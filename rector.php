@@ -533,7 +533,8 @@ final class DrupalAnnotationToAttributeRector extends AbstractRector implements 
 return RectorConfig::configure()
     ->withPaths([
 #        __DIR__ . '/core/tests/Drupal/BuildTests',
-        __DIR__ . '/core/tests/Drupal/Tests/Component',
+        __DIR__ . '/core/tests/Drupal/Tests',
+#        __DIR__ . '/core/tests/Drupal/Tests/Component',
 #        __DIR__ . '/core/tests/Drupal/KernelTests/Core/Database',
 #        __DIR__ . '/core/tests/Drupal/FunctionalJavascriptTests',
 #        __DIR__ . '/core',
@@ -542,7 +543,7 @@ return RectorConfig::configure()
     ->withSkip([
         __DIR__ . '/core/tests/Drupal/Tests/Component/Annotation/Doctrine/Fixtures',
 #        __DIR__ . '/core/tests/Drupal/Tests/Component/Datetime/TimeTest.php',
-        __DIR__ . '/core/tests/Drupal/Tests/Component/Plugin/PluginBaseTest.php',
+#        __DIR__ . '/core/tests/Drupal/Tests/Component/Plugin/PluginBaseTest.php',
 /*        __DIR__ . '/core/tests/Drupal/Tests/Component/Annotation/AnnotatedClassDiscoveryTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Component/Annotation/AnnotationBaseTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Component/Annotation/Doctrine/StaticReflectionParserTest.php',
