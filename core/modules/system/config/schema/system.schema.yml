@@ -508,6 +508,8 @@ system.feature_flags:
 
 condition.plugin.current_theme:
   type: condition.plugin
+  constraints:
+    FullyValidatable: ~
   mapping:
     theme:
       type: string
