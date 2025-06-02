@@ -560,7 +560,7 @@ return RectorConfig::configure()
         __DIR__ . '/core/tests/Drupal/Tests/Component/Utility/UserAgentTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Component/Plugin/Discovery/StaticDiscoveryDecoratorTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Component/Plugin/Factory/ReflectionFactoryTest.php',*/
-        __DIR__ . '/core/tests/Drupal/Tests/Core/Config/TypeResolverTest.php'
+        __DIR__ . '/core/tests/Drupal/Tests/Core/Config/TypeResolverTest.php',
         '*/ProxyClass/*',
         '*.api.php',
     ])
