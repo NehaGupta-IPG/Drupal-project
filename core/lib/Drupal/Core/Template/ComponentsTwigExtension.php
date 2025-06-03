@@ -89,6 +89,19 @@ final class ComponentsTwigExtension extends AbstractExtension {
     elseif ($context['attributes'] instanceof Attribute) {
       $context['attributes']->merge(new Attribute($component_attributes));
     }
+    // Add default props values.
+    if (
+      is_array($component->metadata->schema)
+      && isset($component->metadata->schema['properties'])
+      && is_array($component->metadata->schema['properties'])
+    ) {
+      foreach ($component->metadata->schema['properties'] as $prop_name => $prop_def) {
+        if (isset($context[$prop_name]) || !isset($prop_def['default'])) {
+          continue;
+        }
+        $context[$prop_name] = $prop_def['default'];
+      }
+    }
     return $context;
   }
 
