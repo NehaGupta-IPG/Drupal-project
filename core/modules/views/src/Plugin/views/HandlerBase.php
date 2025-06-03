@@ -245,6 +245,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    *   The transformed string.
    */
   protected function caseTransform($string, $option) {
+    $string = (string) $string;
     switch ($option) {
       default:
         return $string;
