@@ -57,13 +57,10 @@
         // Check if the opener element is inside an AJAX container.
         const $element = $(event.target);
 
-        const dialogData = new WeakMap();
-        const ajaxContainer =
-          (dialogData.get($element[0]) &&
-            dialogData
-              .get($element[0])
-              .opener.closest('[data-drupal-ajax-container]')) ||
-          [];
+        // We still need to use $.data() to retrieve the dialog data because jQuery stores
+        // the data in an internal cache that is not available in the dom element.
+        const dialogData = $element[0] && $.data($element[0], 'uiDialog');
+        const ajaxContainer = dialogData !== undefined ? dialogData.opener.closest('[data-drupal-ajax-container]') : [];
 
         // If the opener element was in an ajax container, and focus is on the
         // body element, we can assume focus was lost. To recover, focus is
