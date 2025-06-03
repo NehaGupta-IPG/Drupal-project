@@ -631,7 +631,7 @@ function _filter_url_trim($text, $length = NULL) {
  */
 function _filter_autop($text) {
   // All block level tags
-  $block = '(?:table|thead|tfoot|caption|col|colgroup|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|select|option|form|map|area|blockquote|address|math|input|p|h[1-6]|fieldset|legend|hr|article|aside|details|figcaption|figure|footer|header|hgroup|menu|nav|section|summary)';
+  $block = '(?:table|thead|tfoot|caption|col|colgroup|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|select|option|form|map|area|blockquote|address|math|p|h[1-6]|fieldset|legend|hr|article|aside|details|figcaption|figure|footer|header|hgroup|menu|nav|section|summary)';
 
   // Split at opening and closing PRE, SCRIPT, STYLE, OBJECT, IFRAME tags
   // and comments. We don't apply any processing to the contents of these tags
