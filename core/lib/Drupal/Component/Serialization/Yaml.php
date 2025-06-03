@@ -3,7 +3,6 @@
 namespace Drupal\Component\Serialization;
 
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\Yaml\Dumper;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Tag\TaggedValue;
@@ -63,24 +62,18 @@ class Yaml implements SerializationInterface {
    *
    * @param mixed $data
    *   Parsed yaml data
-   * @param callable[] $tall_callbacks
+   * @param callable[] $tag_callbacks
    *   Optional callbacks for tag value, indexed by tag.
-   * @param array $options
-   *   Extra options to pass to tag callbacks.
    *
    * @return mixed
    *   Parsed data with parsed tag values.
    */
-  public static function decodeTags($data, array $tag_callbacks = [], array $options = []) {
-    // Replace 'translate' tags with proper translations.
-    $tag_callbacks += [
-      'translate' => [__CLASS__, 'tagTranslate']
-    ];
+  public static function decodeTags($data, array $tag_callbacks = []) {
     if (is_array($data)) {
       foreach ($data as $key => $value) {
         if (is_object($value) && $value instanceof TaggedValue) {
           if (isset($tag_callbacks[$value->getTag()])) {
-            $data[$key] = call_user_func($tag_callbacks[$value->getTag()], $value->getValue(), $options);
+            $data[$key] = call_user_func($tag_callbacks[$value->getTag()], $value);
           }
           else {
             $data[$key] = $value->getValue();
@@ -90,52 +83,8 @@ class Yaml implements SerializationInterface {
           $data[$key] = static::decodeTags($value, $tag_callbacks);
         }
       }
-      return $data;
     }
-    else {
-      return $data;
-    }
-  }
-
-  /**
-   * Callback for 'translate' tag value.
-   *
-   * A translatable string can be represented as a plain string, or as an array
-   * with 'string' and 'context' and maybe other parameters. For example:
-   *
-   * @code
-   * element:
-   *   label: !translate 'Website feedback'
-   * another:
-   *   label: !translate {string: 'Website feedback', context: 'Contact form'}
-   * @endcode
-   *
-   * In this second case, the full array minus the 'string' part will be passed
-   * as the '$options' parameter for the translation.
-   *
-   * @see t()
-   *
-   * @param string|array $value
-   *   The tagged value representing a translatable string.
-   * @param array $options
-   *   Extra options to pass to the translation.
-   *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
-   *   The translatable string object.
-   */
-  public static function tagTranslate($value, $options = []) {
-    if (is_array($value) && isset($value['string'])) {
-      $string = $value['string'];
-      unset($value['string']);
-      $options += $value;
-    } elseif (is_string($value)) {
-      $string = $value;
-    }
-    else {
-      throw new InvalidDataTypeException("Cannot parse the 'translate' tag. The tagged value is not a string nor has a 'string' element.");
-    }
-
-    return new TranslatableMarkup($string, [], $options);
+    return $data;
   }
 
 }
