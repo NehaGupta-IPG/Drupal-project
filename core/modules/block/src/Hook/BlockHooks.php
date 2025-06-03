@@ -82,13 +82,14 @@ class BlockHooks {
    * block.html.twig is used.
    *
    * Most themes use their own copy of block.html.twig. The default is located
-   * inside "core/modules/block/templates/block.html.twig". Look in there for the
-   * full list of available variables.
+   * inside "core/modules/block/templates/block.html.twig". Look in there for
+   * the full list of available variables.
    *
    * @param array $variables
    *   An associative array containing:
-   *   - elements: An associative array containing the properties of the element.
-   *     Properties used: #block, #configuration, #children, #plugin_id.
+   *   - elements: An associative array containing the properties of the
+   *     element. Properties used: #block, #configuration, #children,
+   *     and #plugin_id.
    */
   public function preprocessBlock(&$variables): void {
     $variables['configuration'] = $variables['elements']['#configuration'];
@@ -98,8 +99,8 @@ class BlockHooks {
     $variables['in_preview'] = $variables['elements']['#in_preview'] ?? FALSE;
     $variables['label'] = !empty($variables['configuration']['label_display']) ? $variables['configuration']['label'] : '';
     $variables['content'] = $variables['elements']['content'];
-    // A block's label is configuration: it is static. Allow dynamic labels to be
-    // set in the render array.
+    // A block's label is configuration: it is static. Allow dynamic labels to
+    // be set in the render array.
     if (isset($variables['elements']['content']['#title']) && !empty($variables['configuration']['label_display'])) {
       $variables['label'] = $variables['elements']['content']['#title'];
     }
@@ -150,7 +151,12 @@ class BlockHooks {
    * @see block_themes_installed()
    */
   #[Hook('modules_installed')]
-  public function modulesInstalled($modules): void {
+  public function modulesInstalled($modules, bool $is_syncing): void {
+    // Do not create blocks during config sync.
+    if ($is_syncing) {
+      return;
+    }
+
     // block_themes_installed() does not call block_theme_initialize() during
     // site installation because block configuration can be optional or provided
     // by the profile. Now, when the profile is installed, this configuration

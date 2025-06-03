@@ -5,7 +5,7 @@
  */
 
 use Drupal\Core\Batch\BatchBuilder;
-use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
+use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\Core\Utility\ProjectInfo;
 
 /**
@@ -18,7 +18,7 @@ require_once __DIR__ . '/locale.translation.inc';
 /**
  * Clear the project data table.
  */
-#[StopProceduralHookScan]
+#[ProceduralHookScanStop]
 function locale_translation_flush_projects(): void {
   \Drupal::service('locale.project')->deleteAll();
 }
@@ -26,12 +26,12 @@ function locale_translation_flush_projects(): void {
 /**
  * Builds list of projects and stores the result in the database.
  *
- * The project data is based on the project list supplied by the Update module.
- * Only the properties required by Locale module is included and additional
- * (custom) modules and translation server data is added.
+ * The project data is based on the project list supplied by the Update Status
+ * module. Only the properties required by Locale module is included and
+ * additional (custom) modules and translation server data is added.
  *
- * In case the Update module is disabled this function will return an empty
- * array.
+ * In case the Update Status module is disabled this function will return an
+ * empty array.
  *
  * @return array
  *   Array of project data:
@@ -99,15 +99,15 @@ function locale_translation_project_list() {
   if (empty($projects)) {
     $projects = [];
 
-    $additional_whitelist = [
+    $additional_allow_list = [
       'interface translation project',
       'interface translation server pattern',
     ];
     $module_data = _locale_translation_prepare_project_list(\Drupal::service('extension.list.module')->getList(), 'module');
     $theme_data = _locale_translation_prepare_project_list(\Drupal::service('extension.list.theme')->reset()->getList(), 'theme');
     $project_info = new ProjectInfo();
-    $project_info->processInfoList($projects, $module_data, 'module', TRUE, $additional_whitelist);
-    $project_info->processInfoList($projects, $theme_data, 'theme', TRUE, $additional_whitelist);
+    $project_info->processInfoList($projects, $module_data, 'module', TRUE, $additional_allow_list);
+    $project_info->processInfoList($projects, $theme_data, 'theme', TRUE, $additional_allow_list);
 
     // Allow other modules to alter projects before fetching and comparing.
     \Drupal::moduleHandler()->alter('locale_translation_projects', $projects);
