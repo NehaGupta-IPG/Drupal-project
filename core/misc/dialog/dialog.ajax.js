@@ -14,8 +14,6 @@
    */
   Drupal.behaviors.dialog = {
     attach(context, settings) {
-      const $context = $(context);
-
       // Provide a known 'drupal-modal' DOM element for Drupal-based modal
       // dialogs. Non-modal dialogs are responsible for creating their own
       // elements, since there can be multiple non-modal dialogs at a time.
@@ -58,12 +56,8 @@
       settings.dialog.close = function (event, ...args) {
         originalClose.apply(settings.dialog, [event, ...args]);
         // Check if the opener element is inside an AJAX container.
-        const $element = $(event.target);
-
-        // We still need to use $.data() to retrieve the dialog data because jQuery stores
-        // the data in an internal cache that is not available in the dom element.
-        const dialogData = $element[0] && $.data($element[0], 'uiDialog');
-        const ajaxContainer = dialogData !== undefined ? dialogData.opener.closest('[data-drupal-ajax-container]') : [];
+        const uiDialog = $(event.target).dialog('instance');
+        const ajaxContainer = uiDialog !== undefined ? uiDialog.opener.closest('[data-drupal-ajax-container]') : [];
 
         // If the opener element was in an ajax container, and focus is on the
         // body element, we can assume focus was lost. To recover, focus is
