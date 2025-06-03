@@ -503,13 +503,15 @@ class MenuForm extends EntityForm {
     // parent. To prevent this, save items in the form in the same order they
     // are sent, ensuring parents are saved first, then their children.
     // See https://www.drupal.org/node/181126#comment-632270.
-    $order = is_array($input) ? array_flip(array_keys($input)) : [];
-    // Update our original form with the new order.
-    $form = array_intersect_key(array_merge($order, $form), $form);
-
+    $order = is_array($input) ? array_keys($input) : [];
     $fields = ['weight', 'parent', 'enabled'];
     $form_links = $form['links'];
-    foreach (Element::children($form_links) as $id) {
+
+    $children = Element::children($form_links);
+
+    // Update our original form with the new order.
+    $links = array_intersect_key($order, $children);
+    foreach ($links as $id) {
       if (isset($form_links[$id]['#item'])) {
         $element = $form_links[$id];
         $updated_values = [];
