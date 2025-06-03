@@ -58,13 +58,27 @@ class TestDiscoveryTest extends UnitTestCase {
       'Drupal\Tests\Core\DrupalTest',
     ];
 
+    // A component unit test.
+    $tests[] = [
+      // Expected result.
+      [
+        'name' => 'Drupal\Tests\Component\Plugin\PluginBaseTest',
+        'group' => 'Plugin',
+        'groups' => ['Plugin'],
+        'description' => 'Tests \Drupal\Component\Plugin\PluginBase.',
+        'type' => 'PHPUnit-Unit-Component',
+      ],
+      // Classname.
+      'Drupal\Tests\Component\Plugin\PluginBaseTest',
+    ];
+
     // Functional PHPUnit test.
     $tests[] = [
       // Expected result.
       [
         'name' => 'Drupal\FunctionalTests\BrowserTestBaseTest',
         'group' => 'browsertestbase',
-        'groups' => ['browsertestbase', '#slow'],
+        'groups' => ['browsertestbase'],
         'description' => 'Tests BrowserTestBase functionality.',
         'type' => 'PHPUnit-Functional',
       ],
@@ -72,7 +86,7 @@ class TestDiscoveryTest extends UnitTestCase {
       'Drupal\FunctionalTests\BrowserTestBaseTest',
     ];
 
-    // kernel PHPUnit test.
+    // Kernel PHPUnit test.
     $tests['phpunit-kernel'] = [
       // Expected result.
       [
@@ -231,7 +245,7 @@ EOT;
     $this->assertEmpty($info['description']);
   }
 
-  protected function setupVfsWithTestClasses() {
+  protected function setupVfsWithTestClasses(): void {
     vfsStream::setup('drupal');
 
     $test_file = <<<EOF
@@ -456,7 +470,7 @@ EOF;
     $data['module-functional javascript test'] = ['\Drupal\Tests\toolbar\FunctionalJavascript\ToolbarIntegrationTest', 'FunctionalJavascript'];
     $data['core-unittest'] = ['\Drupal\Tests\ComposerIntegrationTest', 'Unit'];
     $data['core-unittest2'] = ['Drupal\Tests\Core\DrupalTest', 'Unit'];
-    $data['core-unittest3'] = ['Drupal\Tests\Scripts\TestSiteApplicationTest', 'Unit'];
+    $data['core-script-test'] = ['Drupal\KernelTests\Scripts\TestSiteApplicationTest', 'Kernel'];
     $data['core-kernel test'] = ['\Drupal\KernelTests\KernelTestBaseTest', 'Kernel'];
     $data['core-functional test'] = ['\Drupal\FunctionalTests\ExampleTest', 'Functional'];
     $data['core-functional javascript test'] = ['\Drupal\FunctionalJavascriptTests\ExampleTest', 'FunctionalJavascript'];

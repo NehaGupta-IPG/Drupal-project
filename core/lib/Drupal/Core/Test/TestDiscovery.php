@@ -55,10 +55,9 @@ class TestDiscovery {
    *
    * @param string $root
    *   The app root.
-   * @param $class_loader
+   * @param class-string $class_loader
    *   The class loader. Normally Composer's ClassLoader, as included by the
-   *   front controller, but may also be decorated; e.g.,
-   *   \Symfony\Component\ClassLoader\ApcClassLoader.
+   *   front controller, but may also be decorated.
    */
   public function __construct($root, $class_loader) {
     $this->root = $root;
@@ -104,6 +103,15 @@ class TestDiscovery {
 
       // Add PHPUnit test namespaces.
       $this->testNamespaces["Drupal\\Tests\\$name\\"][] = "$base_path/tests/src";
+    }
+
+    // Expose tests provided by core recipes.
+    $base_path = $this->root . '/core/recipes';
+    if (@opendir($base_path)) {
+      while (($recipe = readdir()) !== FALSE) {
+        $this->testNamespaces["Drupal\\FunctionalTests\\Recipe\\Core\\$recipe\\"][] = "$base_path/$recipe/tests/src/Functional";
+      }
+      closedir();
     }
 
     foreach ($this->testNamespaces as $prefix => $paths) {
@@ -234,10 +242,10 @@ class TestDiscovery {
    * @param string $namespace_prefix
    *   The namespace prefix to use for discovered classes. Must contain a
    *   trailing namespace separator (backslash).
-   *   For example: 'Drupal\\node\\Tests\\'
+   *   For example: 'Drupal\\node\\Tests\\'.
    * @param string $path
    *   The directory path to scan.
-   *   For example: '/path/to/drupal/core/modules/node/tests/src'
+   *   For example: '/path/to/drupal/core/modules/node/tests/src'.
    *
    * @return array
    *   An associative array whose keys are fully-qualified class names and whose
@@ -391,6 +399,9 @@ class TestDiscovery {
    */
   public static function getPhpunitTestSuite($classname) {
     if (preg_match('/Drupal\\\\Tests\\\\(\w+)\\\\(\w+)/', $classname, $matches)) {
+      if ($matches[1] === 'Component') {
+        return 'Unit-Component';
+      }
       // This could be an extension test, in which case the first match will be
       // the extension name. We assume that lower-case strings are module names.
       if (strtolower($matches[1]) == $matches[1]) {

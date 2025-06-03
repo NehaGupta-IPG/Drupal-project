@@ -186,9 +186,10 @@ class AttachedAssetsTest extends KernelTestBase {
     [$header_js, $footer_js] = $this->assetResolver->getJsAssets($assets, TRUE, \Drupal::languageManager()->getCurrentLanguage());
     $this->assertEquals([], \Drupal::service('asset.js.collection_renderer')->render($header_js), 'There are 0 JavaScript assets in the header.');
     $rendered_footer_js = \Drupal::service('asset.js.collection_renderer')->render($footer_js);
-    $this->assertCount(2, $rendered_footer_js, 'There are 2 JavaScript assets in the footer.');
+    $this->assertCount(3, $rendered_footer_js, 'There are 3 JavaScript assets in the footer.');
     $this->assertEquals('drupal-settings-json', $rendered_footer_js[0]['#attributes']['data-drupal-selector'], 'The first of the two JavaScript assets in the footer has drupal settings.');
-    $this->assertStringStartsWith(base_path(), $rendered_footer_js[1]['#attributes']['src'], 'The second of the two JavaScript assets in the footer has the sole aggregated JavaScript asset.');
+    $this->assertStringContainsString('jquery.min.js', $rendered_footer_js[1]['#attributes']['src'], 'The second of the two JavaScript assets in the footer is jquery.min.js.');
+    $this->assertStringStartsWith(base_path(), $rendered_footer_js[2]['#attributes']['src'], 'The third of the two JavaScript assets in the footer has the sole aggregated JavaScript asset.');
   }
 
   /**
@@ -255,7 +256,7 @@ class AttachedAssetsTest extends KernelTestBase {
     $assets = AttachedAssets::createFromRenderArray($build);
 
     $js = $this->assetResolver->getJsAssets($assets, FALSE, \Drupal::languageManager()->getCurrentLanguage())[1];
-    $this->assertFalse($js['core/modules/system/tests/modules/common_test/nocache.js']['preprocess'], 'Setting cache to FALSE sets preprocess to FALSE when adding JavaScript.');
+    $this->assertFalse($js['core/modules/system/tests/modules/common_test/no_cache.js']['preprocess'], 'Setting cache to FALSE sets preprocess to FALSE when adding JavaScript.');
   }
 
   /**
@@ -422,7 +423,7 @@ class AttachedAssetsTest extends KernelTestBase {
     // Retrieve a dynamic library definition.
     // @see common_test_library_info_build()
     \Drupal::state()->set('common_test.library_info_build_test', TRUE);
-    $library_discovery->clearCachedDefinitions();
+    $library_discovery->clear();
     $dynamic_library = $library_discovery->getLibraryByName('common_test', 'dynamic_library');
     $this->assertIsArray($dynamic_library);
     $this->assertArrayHasKey('version', $dynamic_library);
