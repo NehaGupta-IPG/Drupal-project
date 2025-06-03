@@ -4,6 +4,8 @@ namespace Drupal\link\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -186,11 +188,11 @@ class LinkFormatter extends FormatterBase {
           foreach ($route_parameters as $entity_type => $id) {
             if ($this->entityTypeManager->hasDefinition($entity_type)) {
               if ($entity = $this->entityTypeManager->getStorage($entity_type)->load($id)) {
-                $translated_entity = $entity->hasTranslation($langcode) ? $entity->getTranslation($langcode) : $entity;
-                if ($translated_entity->hasField('title')) {
+                $translated_entity = $entity instanceof TranslatableInterface && $entity->hasTranslation($langcode) ? $entity->getTranslation($langcode) : $entity;
+                if ($translated_entity instanceof FieldableEntityInterface && $translated_entity->hasField('title')) {
                   $link_title = $translated_entity->get('title')->value;
                 }
-                elseif ($translated_entity->hasField('name')) {
+                elseif ($translated_entity instanceof FieldableEntityInterface &&  $translated_entity->hasField('name')) {
                   $link_title = $translated_entity->get('name')->value;
                 }
               }
