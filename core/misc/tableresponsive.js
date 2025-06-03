@@ -101,7 +101,7 @@
        *   The event triggered.
        */
       eventhandlerEvaluateColumnVisibility(e) {
-        const pegged = parseInt(this.$link.data('pegged'), 10);
+        const pegged = parseInt(this.$link[0].dataset?.pegged, 10);
         const hiddenLength = this.$headers.filter(
           '.priority-medium:hidden, .priority-low:hidden',
         ).length;
@@ -151,7 +151,7 @@
             self.$revealedCells = $().add(self.$revealedCells).add($header);
           });
           this.$link[0].textContent = this.hideText;
-          this.$link.data('pegged', 1);
+          this.$link[0].dataset.pegged = 1;
         }
         // Hide revealed columns.
         else {
@@ -181,7 +181,7 @@
             $cell.attr('style', newProps.join(';'));
           });
           this.$link[0].textContent = this.showText;
-          this.$link.data('pegged', 0);
+          this.$link[0].dataset.pegged = 0;
           // Refresh the toggle link.
           $(window).trigger('resize.tableresponsive');
         }

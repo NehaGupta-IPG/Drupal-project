@@ -57,7 +57,10 @@
         originalClose.apply(settings.dialog, [event, ...args]);
         // Check if the opener element is inside an AJAX container.
         const uiDialog = $(event.target).dialog('instance');
-        const ajaxContainer = uiDialog !== undefined ? uiDialog.opener.closest('[data-drupal-ajax-container]') : [];
+        const ajaxContainer =
+          uiDialog !== undefined
+            ? uiDialog.opener.closest('[data-drupal-ajax-container]')
+            : [];
 
         // If the opener element was in an ajax container, and focus is on the
         // body element, we can assume focus was lost. To recover, focus is
