@@ -220,32 +220,22 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // - Currently in a transaction.
     // - A 'mimic_implicit_commit' does not exist already.
     // - The query is not a savepoint query.
-    $wrap_with_savepoint = $this->inTransaction() &&
+    if (
+      $this->inTransaction() &&
       !$this->transactionManager()->has('mimic_implicit_commit') &&
-      !(is_string($query) && (
-        stripos($query, 'ROLLBACK TO SAVEPOINT ') === 0 ||
-        stripos($query, 'RELEASE SAVEPOINT ') === 0 ||
-        stripos($query, 'SAVEPOINT ') === 0
-      )
-    );
-    if ($wrap_with_savepoint) {
+      !(is_string($query) && (stripos($query, 'ROLLBACK TO SAVEPOINT ') === 0 || stripos($query, 'RELEASE SAVEPOINT ') === 0 || stripos($query, 'SAVEPOINT ') === 0))
+    ) {
       // Create a savepoint so we can rollback a failed query. This is so we can
       // mimic MySQL and SQLite transactions which don't fail if a single query
       // fails. This is important for tables that are created on demand. For
       // example, \Drupal\Core\Cache\DatabaseBackend.
-      if ($this->inTransaction()) {
-        $savepoint = $this->startTransaction('mimic_implicit_commit');
-      }
+      $savepoint = $this->startTransaction('mimic_implicit_commit');
       try {
         $return = parent::query($query, $args, $options);
-        if (isset($savepoint)) {
-          $savepoint->commitOrRelease();
-        }
+        $savepoint->commitOrRelease();
       }
       catch (\Exception $e) {
-        if (isset($savepoint)) {
-          $savepoint->rollback();
-        }
+        $savepoint->rollback();
         throw $e;
       }
     }
