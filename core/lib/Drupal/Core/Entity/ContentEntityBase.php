@@ -1107,8 +1107,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    */
   public function &__get($name) {
     // If this is an entity field, handle it accordingly.
-    if (($field = ($this->fields[$name][$this->activeLangcode] ?? NULL)) ||
-        ($field = $this->getTranslatedField($name, $this->activeLangcode, FALSE))) {
+    if (($field = $this->getTranslatedField($name, $this->activeLangcode, FALSE))) {
       return $field;
     }
     if ($name === 'original') {
@@ -1131,13 +1130,17 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    */
   public function __set($name, $value) {
     // Handle Field API fields.
-    if (($field = ($this->fields[$name][$this->activeLangcode] ?? NULL)) ||
-        ($field = $this->getTranslatedField($name, $this->activeLangcode, FALSE))) {
+    if (($field = $this->getTranslatedField($name, $this->activeLangcode, FALSE))) {
       // Support setting values via property objects.
       if ($value instanceof TypedDataInterface) {
         $value = $value->getValue();
       }
       $field->setValue($value);
+    }
+    // The translations array is unset when cloning the entity object, we just
+    // need to restore it.
+    elseif ($name == 'translations') {
+      $this->translations = $value;
     }
     elseif ($name == 'original') {
       parent::__set('original', $value);
