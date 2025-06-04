@@ -116,8 +116,8 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
 
     // Assert that HTML is not escaped unexpectedly.
     if ($this->testHTMLEscapeForAllLanguages) {
-      $this->assertSession()->responseNotContains('&lt;span class=&quot;translation-entity-all-languages&quot;&gt;(all languages)&lt;/span&gt;');
-      $this->assertSession()->responseContains('<span class="translation-entity-all-languages">(all languages)</span>');
+      $this->assertSession()->responseNotContains('&lt;span class=&quot;translation-entity-all-languages&quot;&gt;(this translation)&lt;/span&gt;');
+      $this->assertSession()->responseContains('<span class="translation-entity-all-languages">(this translation)</span>');
     }
 
     // Ensure that the content language cache context is not yet added to the
