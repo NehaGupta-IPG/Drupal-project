@@ -8,6 +8,11 @@
    */
   Drupal.htmx = {
     /**
+     * This helps trigger attachBehaviors when there are assets or commands to execute.
+     */
+    assetsPromises: new WeakMap(),
+
+    /**
      * Helper function to merge two objects recursively.
      *
      * @param current

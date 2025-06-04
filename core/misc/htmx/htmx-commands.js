@@ -1,16 +1,42 @@
 ((Drupal, drupalSettings, htmx) => {
+
+  // @see https://htmx.org/events/#htmx:beforeSwap
+  htmx.on('htmx:beforeSwap', (event) => {
+
+    const { detail } = event;
+
+    // Check if we're dealing with ajax commands.
+    if (detail.serverResponse[0] !== '[') {
+      return;
+    }
+
+    let commands = [];
+    try {
+      commands = JSON.parse(detail.serverResponse);
+    }
+    catch (e) {
+      // This is not a valid JSON response, error out.
+      return;
+    }
+
+    // Stop htmx from processing further, it's handled by Drupal now.
+    event.preventDefault();
+
+    Drupal.htmx.assetsPromises.get(detail.xhr).then(() => Drupal.htmx.commandExecutionQueue(event, commands));
+  });
+
   /**
    * Helper method to make sure commands are executed in sequence.
    *
+   * @param {Event} event
+   *   The htmx event object.
    * @param {Array} response
    *   Drupal Ajax response.
-   * @param {number} status
-   *   XMLHttpRequest status.
    *
    * @return {Promise}
    *  The promise that will resolve once all commands have finished executing.
    */
-  Drupal.htmx.commandExecutionQueue = function (response, status) {
+  Drupal.htmx.commandExecutionQueue = function (event, response) {
     const ajaxCommands = Drupal.htmx.commands;
     return Object.keys(response || {}).reduce(
       // Add all commands to a single execution queue.
@@ -22,7 +48,7 @@
             // execute until that promise has been fulfilled. This is typically
             // used to ensure JavaScript files added via the 'add_js' command
             // have loaded before subsequent commands execute.
-            return ajaxCommands[command](response[key], status);
+            return ajaxCommands[command](event, response[key]);
           }
         }),
       Promise.resolve(),
@@ -38,6 +64,8 @@
     /**
      * Command to insert new content into the DOM.
      *
+     * @param {Event} event
+     *   The htmx event object.
      * @param {object} response
      *   The response from the Ajax request.
      * @param {string} response.data
@@ -47,8 +75,14 @@
      * @param {string} [response.selector]
      *   An optional selector string.
      */
-    insert({ data, method, selector }) {
-      const target = htmx.find(selector);
+    insert(event, { data, method = 'replaceWith', selector }) {
+      let target = null;
+      if (selector) {
+        target = htmx.find(selector);
+      }
+      else {
+        target = event.detail.requestConfig.target;
+      }
 
       // Detach behaviors.
       htmx.trigger(target, 'htmx:drupal:unload');
@@ -72,12 +106,14 @@
     /**
      * Command to remove a chunk from the page.
      *
+     * @param {Event} event
+     *   The htmx event object.
      * @param {object} response
      *   The response from the Ajax request.
      * @param {string} response.selector
      *   A jQuery selector string.
      */
-    remove({ selector }) {
+    remove(event, { selector }) {
       htmx.findAll(selector).forEach((element) => {
         htmx.trigger(element, 'htmx:drupal:unload');
         element.remove();
@@ -87,6 +123,8 @@
     /**
      * Command to provide triggers audio UAs to read the supplied text.
      *
+     * @param {Event} event
+     *   The htmx event object.
      * @param {object} response
      *   The JSON response from the Ajax request.
      * @param {string} [response.text]
@@ -94,7 +132,7 @@
      * @param {string} [response.priority]
      *   An optional priority that will be used for the announcement.
      */
-    announce({ text, priority }) {
+    announce(event, { text, priority }) {
       if (priority) {
         Drupal.announce(text, priority);
       } else {
@@ -105,12 +143,14 @@
     /**
      * Command to set the window.location, redirecting the browser.
      *
+     * @param {Event} event
+     *   The htmx event object.
      * @param {object} response
      *   The response from the Ajax request.
      * @param {string} response.url
      *   The URL to redirect to.
      */
-    redirect({ url }) {
+    redirect(event, { url }) {
       window.location = url;
     },
 
@@ -119,6 +159,8 @@
      *
      * This method will also remove expired `drupalSettings.ajax` settings.
      *
+     * @param {Event} event
+     *   The htmx event object.
      * @param {object} response
      *   The response from the Ajax request.
      * @param {boolean} response.merge
@@ -127,7 +169,7 @@
      * @param {object} response.settings
      *   Contains additional settings to add to the global settings.
      */
-    settings({ merge, settings }) {
+    settings(event, { merge, settings }) {
       if (merge) {
         Drupal.htmx.mergeSettings(drupalSettings, settings);
       }
@@ -136,6 +178,8 @@
     /**
      * Command to update a form's build ID.
      *
+     * @param {Event} event
+     *   The htmx event object.
      * @param {object} response
      *   The response from the Ajax request.
      * @param {string} response.old
@@ -143,7 +187,7 @@
      * @param {string} response.new
      *   The new form build ID.
      */
-    update_build_id(response) {
+    update_build_id(event, response) {
       document
         .querySelectorAll(
           `input[name="form_build_id"][value="${response.old}"]`,
@@ -156,18 +200,38 @@
     /**
      * Command to add css.
      *
+     * @param {Event} event
+     *   The htmx event object.
      * @param {object} response
      *   The response from the Ajax request.
      * @param {object[]} response.data
      *   An array of styles to be added.
      */
-    add_css({ data }) {
+    add_css(event, { data }) {
       return Drupal.htmx.addAssets(data);
+    },
+
+    /**
+     * Command to add JS.
+     *
+     * @param {Event} event
+     *   The htmx event object.
+     * @param {object} response
+     *   The response from the Ajax request.
+     * @param {Array} response.data
+     *   An array of objects of script attributes.
+     */
+    add_js(event, { data }) {
+      return Drupal.htmx.addAssets(data).then(() => {
+        htmx.trigger(document.body, 'htmx:drupal:load');
+      });
     },
 
     /**
      * Command to add a message to the message area.
      *
+     * @param {Event} event
+     *   The htmx event object.
      * @param {object} response
      *   The response from the Ajax request.
      * @param {string} response.messageWrapperQuerySelector
@@ -179,7 +243,7 @@
      * @param {boolean} response.clearPrevious
      *   If true, clear previous messages.
      */
-    message({
+    message(event, {
       message,
       messageOptions,
       messageWrapperQuerySelector,
@@ -193,19 +257,34 @@
       }
       messages.add(message, messageOptions);
     },
-
     /**
-     * Command to add JS.
+     * Command to apply a jQuery method.
      *
+     * @param {Event} event
+     *   The htmx event object.
      * @param {object} response
      *   The response from the Ajax request.
-     * @param {Array} response.data
-     *   An array of objects of script attributes.
+     * @param {Array} response.args
+     *   An array of arguments to the jQuery method, if any.
+     * @param {string} response.method
+     *   The jQuery method to invoke.
+     * @param {string} response.selector
+     *   A jQuery selector string.
      */
-    add_js({ data }) {
-      return Drupal.htmx.addAssets(data).then(() => {
-        htmx.trigger(document.body, 'htmx:drupal:load');
-      });
+    invoke(event, { selector, method, args}) {
+      // We copy some of the jQuery methods for Core to work.
+      const methods = {
+        focus(elt) {
+          elt.focus();
+        },
+      };
+
+      if (!method in methods) {
+        console.warn(`Method '${method}' not implemented`);
+      }
+
+      htmx.findAll(selector).forEach(methods[method]);
     },
+
   };
 })(Drupal, drupalSettings, htmx);

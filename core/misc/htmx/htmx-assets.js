@@ -22,6 +22,13 @@
   const requestAssetsLoaded = new WeakMap();
 
   /**
+   *
+   */
+  htmx.on('htmx:beforeRequest', ({ detail }) => {
+    Drupal.htmx.assetsPromises.set(detail.xhr, Promise.resolve());
+  });
+
+  /**
    * Send the current ajax page state with each request.
    *
    * @param configRequestEvent
@@ -52,10 +59,6 @@
   htmx.on('htmx:beforeSwap', ({ detail }) => {
     // Custom event to detach behaviors.
     htmx.trigger(detail.elt, 'htmx:drupal:unload');
-
-    if (!detail.xhr) {
-      return;
-    }
 
     // We need to parse the response to find all the assets to load.
     // htmx cleans up too many things to be able to rely on their dom fragment.
@@ -89,16 +92,16 @@
     // Helps with memory management.
     responseHTML = null;
 
-    requestAssetsLoaded.set(detail.xhr, Drupal.htmx.addAssets(data));
+    Drupal.htmx.assetsPromises.get(detail.xhr).then(() => Drupal.htmx.addAssets(data));
   });
 
   // Trigger the Drupal processing once all assets have been loaded.
   // @see https://htmx.org/events/#htmx:afterSettle
   htmx.on('htmx:afterSettle', ({ detail }) => {
-    (requestAssetsLoaded.get(detail.xhr) || Promise.resolve()).then(() => {
+    (Drupal.htmx.assetsPromises.get(detail.xhr) || Promise.resolve()).then(() => {
       htmx.trigger(detail.elt, 'htmx:drupal:load');
       // This should be automatic but don't wait for the garbage collector.
-      requestAssetsLoaded.delete(detail.xhr);
+      Drupal.htmx.assetsPromises.delete(detail.xhr);
     });
   });
 })(Drupal, drupalSettings, htmx);
