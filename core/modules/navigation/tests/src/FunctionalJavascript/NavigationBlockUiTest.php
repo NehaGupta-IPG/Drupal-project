@@ -82,7 +82,6 @@ class NavigationBlockUiTest extends WebDriverTestBase {
     $this->drupalGet($layout_url);
     $this->getSession()->getPage()->pressButton('Enable edit mode');
     $this->assertSession()->assertWaitOnAjaxRequest();
-    $this->getSession()->getPage()->find('css', 'button.toolbar-button--icon--burger')->click();
     $this->openAddBlockForm('Layout Builder form block test form api form block');
     $this->getSession()->getPage()->checkField('settings[label_display]');
 
@@ -133,7 +132,6 @@ class NavigationBlockUiTest extends WebDriverTestBase {
     $page = $this->getSession()->getPage();
     $this->getSession()->getPage()->pressButton('Enable edit mode');
     $this->assertSession()->assertWaitOnAjaxRequest();
-
     // Add section should not be present
     $this->assertSession()->linkNotExists('Add section');
     // Configure section should not be present.
