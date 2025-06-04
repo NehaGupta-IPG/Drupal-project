@@ -3,7 +3,6 @@
 namespace Drupal\Core\StringTranslation;
 
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 
 /**
@@ -28,22 +27,23 @@ class YamlTagTranslator {
    * as the '$options' parameter for the translation.
    *
    * @see t()
-   * 
+   *
    * @param \Symfony\Component\Yaml\Tag\TaggedValue $tagged_value
    *   The tagged value object.
    * @param array $options
    *   Extra options to pass to the translation.
-   * 
+   *
    * @return \Drupal\Core\StringTranslation\TranslatableMarkup
    *   The translatable string object.
    */
-  public static function translateTaggedValue(TaggedValue $tagged_value, $options = []){
+  public static function translateTaggedValue(TaggedValue $tagged_value, $options = []) {
     $value = $tagged_value->getValue();
     if (is_array($value) && isset($value['string'])) {
       $string = $value['string'];
       unset($value['string']);
       $options += $value;
-    } elseif (is_string($value)) {
+    }
+    elseif (is_string($value)) {
       $string = $value;
     }
     else {
@@ -53,9 +53,4 @@ class YamlTagTranslator {
     return new TranslatableMarkup($string, [], $options);
   }
 
-}    
-
-
-
-
-
+}

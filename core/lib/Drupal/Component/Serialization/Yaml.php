@@ -61,7 +61,7 @@ class Yaml implements SerializationInterface {
    * The only tag custom tag supported by default is the '!translate' tag.
    *
    * @param mixed $data
-   *   Parsed yaml data
+   *   Parsed YAML data.
    * @param callable[] $tag_callbacks
    *   Optional callbacks for tag value, indexed by tag.
    *
