@@ -8,6 +8,7 @@ use Drupal\Component\Utility\Variable;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Form\FormHelper;
 use Drupal\Core\Render\Element\RenderCallbackInterface;
@@ -250,9 +251,10 @@ class Renderer implements RendererInterface {
       return $return;
     }
 
-    // Only when we're in a root (non-recursive) Renderer::render() call,
-    // placeholders must be processed, to prevent breaking the render cache in
-    // case of nested elements with #cache set.
+    // Only when rendering the root do placeholders have to be processed. If we
+    // were to replace them while rendering cacheable nested elements, their
+    // cacheable metadata would still bubble all the way up the render tree,
+    // effectively making the use of placeholders pointless.
     $this->replacePlaceholders($elements);
 
     return $elements['#markup'];
@@ -304,11 +306,9 @@ class Renderer implements RendererInterface {
     }
     $context->push(new BubbleableMetadata());
 
-    // Set the bubbleable rendering metadata that has configurable defaults, if:
-    // - this is the root call, to ensure that the final render array definitely
-    //   has these configurable defaults, even when no subtree is render cached.
-    // - this is a render cacheable subtree, to ensure that the cached data has
-    //   the configurable defaults (which may affect the ID and invalidation).
+    // Set the bubbleable rendering metadata that has configurable defaults if
+    // this is a render cacheable subtree, to ensure that the cached data has
+    // the configurable defaults (which may affect the ID and invalidation).
     if (isset($elements['#cache']['keys'])) {
       $required_cache_contexts = $this->rendererConfig['required_cache_contexts'];
       if (isset($elements['#cache']['contexts'])) {
@@ -779,6 +779,9 @@ class Renderer implements RendererInterface {
    * {@inheritdoc}
    */
   public function addCacheableDependency(array &$elements, $dependency) {
+    if (!$dependency instanceof CacheableDependencyInterface) {
+      @trigger_error(sprintf("Calling %s() with an object that doesn't implement %s is deprecated in drupal:11.3.0 and will throw an error in drupal:13.0.0. See https://www.drupal.org/node/3525389", __METHOD__, CacheableDependencyInterface::class), E_USER_DEPRECATED);
+    }
     $meta_a = CacheableMetadata::createFromRenderArray($elements);
     $meta_b = CacheableMetadata::createFromObject($dependency);
     $meta_a->merge($meta_b)->applyTo($elements);

@@ -1052,12 +1052,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Component/Plugin/LazyPluginCollection.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Plugin\\\\LazyPluginCollection\\:\\:getIterator\\(\\) return type with generic class ArrayIterator does not specify its types\\: TKey, TValue$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Plugin/LazyPluginCollection.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Component\\\\Plugin\\\\LazyPluginCollection\\:\\:initializePlugin\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -11120,12 +11114,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Validation/Plugin/Validation/Constraint/UniqueFieldValueValidator.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\automated_cron\\\\EventSubscriber\\\\AutomatedCron\\:\\:onTerminate\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/automated_cron/src/EventSubscriber/AutomatedCron.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\ban\\\\BanIpManager\\:\\:banIp\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -11738,18 +11726,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/block/tests/src/Unit/Plugin/migrate/process/BlockSettingsTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\block_content\\\\Access\\\\AccessGroupAnd\\:\\:addDependency\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/src/Access/AccessGroupAnd.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\block_content\\\\Access\\\\AccessGroupAnd\\:\\:getDependencies\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/src/Access/AccessGroupAnd.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Variable \\$dependency in empty\\(\\) always exists and is not falsy\\.$#',
 	'identifier' => 'empty.variable',
 	'count' => 1,
@@ -12096,12 +12072,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/block_content/tests/src/Kernel/Migrate/MigrateBlockContentStubTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Unit\\\\Access\\\\DependentAccessTest\\:\\:providerTestSetFirst\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Unit/Access/DependentAccessTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Unit\\\\Menu\\\\BlockContentLocalTasksTest\\:\\:getBlockContentListingRoutes\\(\\) has no return type specified\\.$#',
@@ -27020,6 +26990,30 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/src/Form/NodeDeleteForm.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeForm\\:\\:create\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Form/NodeForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeForm\\:\\:form\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Form/NodeForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeForm\\:\\:preview\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Form/NodeForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeForm\\:\\:save\\(\\) should return int but return statement is missing\\.$#',
+	'identifier' => 'return.missing',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/node/src/Form/NodeForm.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodePreviewForm\\:\\:create\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -27062,6 +27056,30 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/src/Form/NodeRevisionRevertTranslationForm.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeTypeForm\\:\\:create\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeTypeForm\\:\\:form\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeTypeForm\\:\\:save\\(\\) should return int but return statement is missing\\.$#',
+	'identifier' => 'return.missing',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeTypeForm\\:\\:validateForm\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\node\\\\Form\\\\RebuildPermissionsForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -27090,30 +27108,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/node/src/NodeAccessControlHandlerInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeForm\\:\\:form\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeForm\\:\\:preview\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeForm\\:\\:save\\(\\) should return int but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeForm.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\node\\\\NodeGrantDatabaseStorage\\:\\:alterQuery\\(\\) should return int but return statement is missing\\.$#',
@@ -27198,30 +27192,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/node/src/NodeTranslationHandler.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeTypeForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeTypeForm\\:\\:form\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeTypeForm\\:\\:save\\(\\) should return int but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeTypeForm\\:\\:validateForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\node\\\\NodeTypeInterface\\:\\:setDisplaySubmitted\\(\\) has no return type specified\\.$#',
@@ -34376,12 +34346,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/modules/services_defaults_test/src/TestService.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\session_test\\\\Controller\\\\SessionTestController\\:\\:triggerWriteException\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/session_test/src/Controller/SessionTestController.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\session_test\\\\EventSubscriber\\\\SessionTestSubscriber\\:\\:onKernelRequestSessionTest\\(\\) has no return type specified\\.$#',
@@ -48519,25 +48483,25 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Functional\\\\WorkspaceFormValidationTest\\:\\:isLabelInContentOverview\\(\\) has no return type specified\\.$#',
-  'identifier' => 'missingType.return',
+	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/WorkspaceFormValidationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Functional\\\\WorkspaceFormValidationTest\\:\\:setupWorkspaceSwitcherBlock\\(\\) has no return type specified\\.$#',
-  'identifier' => 'missingType.return',
+	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/WorkspaceFormValidationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Functional\\\\WorkspaceFormValidationTest\\:\\:switchToLive\\(\\) has no return type specified\\.$#',
-  'identifier' => 'missingType.return',
+	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/WorkspaceFormValidationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Functional\\\\WorkspaceFormValidationTest\\:\\:switchToWorkspace\\(\\) has no return type specified\\.$#',
-  'identifier' => 'missingType.return',
+	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/WorkspaceFormValidationTest.php',
 ];
@@ -51084,6 +51048,174 @@ $ignoreErrors[] = [
 	'identifier' => 'isset.variable',
 	'count' => 2,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDecoupledTranslationRevisionsTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:addBaseField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:addBaseFieldIndex\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:addBundleField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:addEntityIndex\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:addLongNameBaseField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:addRevisionableBaseField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:applyEntityUpdates\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:deleteEntityType\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:doEntityUpdate\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:doFieldUpdate\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:enableNewEntityType\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:makeBaseFieldEntityKey\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:modifyBaseField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:modifyBundleField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:removeBaseField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:removeBaseFieldIndex\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:removeBundleField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:removeEntityIndex\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:renameBaseTable\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:renameDataTable\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:renameRevisionBaseTable\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:renameRevisionDataTable\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:resetEntityType\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:updateEntityTypeToNotRevisionable\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:updateEntityTypeToNotTranslatable\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:updateEntityTypeToRevisionable\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:updateEntityTypeToRevisionableAndTranslatable\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateMultipleTypesTest\\:\\:updateEntityTypeToTranslatable\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityDefinitionUpdateProviderTest\\:\\:addBaseField\\(\\) has no return type specified\\.$#',
