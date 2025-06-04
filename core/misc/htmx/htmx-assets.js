@@ -92,16 +92,20 @@
     // Helps with memory management.
     responseHTML = null;
 
-    Drupal.htmx.assetsPromises.get(detail.xhr).then(() => Drupal.htmx.addAssets(data));
+    Drupal.htmx.assetsPromises
+      .get(detail.xhr)
+      .then(() => Drupal.htmx.addAssets(data));
   });
 
   // Trigger the Drupal processing once all assets have been loaded.
   // @see https://htmx.org/events/#htmx:afterSettle
   htmx.on('htmx:afterSettle', ({ detail }) => {
-    (Drupal.htmx.assetsPromises.get(detail.xhr) || Promise.resolve()).then(() => {
-      htmx.trigger(detail.elt, 'htmx:drupal:load');
-      // This should be automatic but don't wait for the garbage collector.
-      Drupal.htmx.assetsPromises.delete(detail.xhr);
-    });
+    (Drupal.htmx.assetsPromises.get(detail.xhr) || Promise.resolve()).then(
+      () => {
+        htmx.trigger(detail.elt, 'htmx:drupal:load');
+        // This should be automatic but don't wait for the garbage collector.
+        Drupal.htmx.assetsPromises.delete(detail.xhr);
+      },
+    );
   });
 })(Drupal, drupalSettings, htmx);

@@ -1,8 +1,6 @@
 ((Drupal, drupalSettings, htmx) => {
-
   // @see https://htmx.org/events/#htmx:beforeSwap
   htmx.on('htmx:beforeSwap', (event) => {
-
     const { detail } = event;
 
     // Check if we're dealing with ajax commands.
@@ -13,8 +11,7 @@
     let commands = [];
     try {
       commands = JSON.parse(detail.serverResponse);
-    }
-    catch (e) {
+    } catch (e) {
       // This is not a valid JSON response, error out.
       return;
     }
@@ -22,7 +19,9 @@
     // Stop htmx from processing further, it's handled by Drupal now.
     event.preventDefault();
 
-    Drupal.htmx.assetsPromises.get(detail.xhr).then(() => Drupal.htmx.commandExecutionQueue(event, commands));
+    Drupal.htmx.assetsPromises
+      .get(detail.xhr)
+      .then(() => Drupal.htmx.commandExecutionQueue(event, commands));
   });
 
   /**
@@ -79,8 +78,7 @@
       let target = null;
       if (selector) {
         target = htmx.find(selector);
-      }
-      else {
+      } else {
         target = event.detail.requestConfig.target;
       }
 
@@ -243,12 +241,10 @@
      * @param {boolean} response.clearPrevious
      *   If true, clear previous messages.
      */
-    message(event, {
-      message,
-      messageOptions,
-      messageWrapperQuerySelector,
-      clearPrevious,
-    }) {
+    message(
+      event,
+      { message, messageOptions, messageWrapperQuerySelector, clearPrevious },
+    ) {
       const messages = new Drupal.Message(
         document.querySelector(messageWrapperQuerySelector),
       );
@@ -271,7 +267,7 @@
      * @param {string} response.selector
      *   A jQuery selector string.
      */
-    invoke(event, { selector, method, args}) {
+    invoke(event, { selector, method, args }) {
       // We copy some of the jQuery methods for Core to work.
       const methods = {
         focus(elt) {
@@ -279,12 +275,11 @@
         },
       };
 
-      if (!method in methods) {
+      if ((!method) in methods) {
         console.warn(`Method '${method}' not implemented`);
       }
 
       htmx.findAll(selector).forEach(methods[method]);
     },
-
   };
 })(Drupal, drupalSettings, htmx);

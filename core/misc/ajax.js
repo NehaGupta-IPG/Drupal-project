@@ -21,10 +21,6 @@
   loadjs,
   { isFocusable, tabbable },
 ) {
-  Drupal.ajax = {};
-  Drupal.Ajax = {};
-  Drupal.AjaxCommands = function() {};
-  return;
   /**
    * Attaches the Ajax behavior to each Ajax form element.
    *
@@ -48,6 +44,10 @@
         // Use jQuery selector instead of a native selector for
         // backwards compatibility.
         once('drupal-ajax', $(elementSettings.selector)).forEach((el) => {
+          // Skip all htmx enabled links
+          if (el.dataset.hxGet || el.dataset.hxPost) {
+            return;
+          }
           elementSettings.element = el;
           elementSettings.base = base;
           Drupal.ajax(elementSettings);
@@ -61,6 +61,10 @@
 
       // This class means to submit the form to the action using Ajax.
       once('ajax', '.use-ajax-submit').forEach((el) => {
+        // Skip all htmx enabled links
+        if (el.dataset.hxGet || el.dataset.hxPost) {
+          return;
+        }
         const elementSettings = {};
 
         // Ajax submits specified in this manner automatically submit to the
