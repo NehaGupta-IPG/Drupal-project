@@ -347,8 +347,9 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
         }
       }
 
-      $element['#attached']['library'][] = 'core/internal.jquery.form';
-      $element['#attached']['library'][] = 'core/drupal.ajax';
+      // $element['#attached']['library'][] = 'core/internal.jquery.form';
+      // $element['#attached']['library'][] = 'core/drupal.ajax';
+      $element['#attached']['library'][] = 'core/drupal.htmx.commands';
 
       $settings = $element['#ajax'];
 
@@ -387,7 +388,13 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
       else {
         $settings['url'] = NULL;
       }
+      $method = strtolower($settings['httpMethod']);
+      $element['#attributes']['data-hx-' . $method] = $settings['url'];
       unset($settings['options']);
+
+      if (!empty($settings['wrapper'])) {
+        $element['#attributes']['data-hx-target'] = '#' . $settings['wrapper'];
+      }
 
       // Add special data to $settings['submit'] so that when this element
       // triggers an Ajax submission, Drupal's form processing can determine
@@ -405,6 +412,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
         if (isset($settings['trigger_as']['value'])) {
           $settings['submit']['_triggering_element_value'] = $settings['trigger_as']['value'];
         }
+        $element['#attributes']['data-hx-vals'] = json_encode($settings['submit']);
         unset($settings['trigger_as']);
       }
       elseif (isset($element['#name'])) {
@@ -417,6 +425,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
         if (!empty($element['#is_button']) && empty($element['#has_garbage_value'])) {
           $settings['submit']['_triggering_element_value'] = $element['#value'];
         }
+        $element['#attributes']['data-hx-vals'] = json_encode($settings['submit']);
       }
 
       // Convert a simple #ajax['progress'] string into an array.

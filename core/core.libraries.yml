@@ -617,6 +617,7 @@ drupal.form:
 drupal.htmx:
   version: VERSION
   js:
+    misc/htmx/htmx-utils.js: {}
     misc/htmx/htmx-assets.js: {}
     misc/htmx/htmx-behaviors.js: {}
   dependencies:
@@ -631,6 +632,19 @@ drupal.htmx:
       theme: null
       theme_token: null
     ajaxTrustedUrl: {}
+
+drupal.htmx.commands:
+  version: VERSION
+  js:
+    misc/htmx/htmx-commands.js: {}
+  dependencies:
+    - core/htmx
+    - core/drupal
+    - core/drupal.htmx
+    - core/drupalSettings
+    - core/loadjs
+    - core/drupal.message
+
 
 drupal.machine-name:
   version: VERSION

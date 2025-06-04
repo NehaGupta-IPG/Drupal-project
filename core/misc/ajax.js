@@ -21,6 +21,10 @@
   loadjs,
   { isFocusable, tabbable },
 ) {
+  Drupal.ajax = {};
+  Drupal.Ajax = {};
+  Drupal.AjaxCommands = function() {};
+  return;
   /**
    * Attaches the Ajax behavior to each Ajax form element.
    *
