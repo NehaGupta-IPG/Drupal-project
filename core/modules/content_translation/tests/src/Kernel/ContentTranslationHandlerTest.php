@@ -176,7 +176,7 @@ class ContentTranslationHandlerTest extends KernelTestBase {
     $tests['no-translatability-clue']['expected'] = $element;
 
     $expected = $element;
-    $expected['test']['#title'] .= ' <span class="translation-entity-all-languages">(all languages)</span>';
+    $expected['test']['#title'] .= ' <span class="translation-entity-all-languages">(this translation)</span>';
     $tests['translatability-clue'] = $tests['no-translatability-clue'];
     $tests['translatability-clue']['default_translation_affected'] = FALSE;
     $tests['translatability-clue']['expected'] = $expected;

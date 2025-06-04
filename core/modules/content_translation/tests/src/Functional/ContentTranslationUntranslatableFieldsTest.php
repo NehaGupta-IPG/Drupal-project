@@ -91,7 +91,7 @@ class ContentTranslationUntranslatableFieldsTest extends ContentTranslationPendi
     $this->drupalGet($en_edit_url);
     $field_xpath = '//input[@name="' . $this->fieldName . '[0][value]"]';
     $this->assertSession()->elementExists('xpath', $field_xpath);
-    $clue_xpath = '//label[@for="edit-' . strtr($this->fieldName, '_', '-') . '-0-value"]/span[text()="(all languages)"]';
+    $clue_xpath = '//label[@for="edit-' . strtr($this->fieldName, '_', '-') . '-0-value"]/span[text()="(this translation)"]';
     $this->assertSession()->elementNotExists('xpath', $clue_xpath);
     $this->assertSession()->pageTextContains('Untranslatable-but-visible test field');
 
