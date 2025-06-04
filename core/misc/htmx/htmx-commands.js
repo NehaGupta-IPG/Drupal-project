@@ -275,7 +275,7 @@
         },
       };
 
-      if ((!method) in methods) {
+      if (!(method in methods)) {
         console.warn(`Method '${method}' not implemented`);
       }
 
