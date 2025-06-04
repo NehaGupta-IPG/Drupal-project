@@ -576,7 +576,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
 
     // Add a French translation and assert the title markup is not escaped.
     $this->drupalGet("node/$nid/translations/add/en/fr");
-    $markup = 'Image <span class="translation-entity-all-languages">(all languages)</span>';
+    $markup = 'Image <span class="translation-entity-all-languages">(this translation)</span>';
     $this->assertSession()->assertNoEscaped($markup);
     $this->assertSession()->responseContains($markup);
   }
