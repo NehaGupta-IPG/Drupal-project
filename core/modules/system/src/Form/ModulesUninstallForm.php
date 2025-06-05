@@ -130,6 +130,7 @@ class ModulesUninstallForm extends FormBase {
       '#list_container_selector' => '[data-drupal-selector="system-modules-uninstall"]',
       '#list_item' => 'tbody tr',
       '#list_text' => '.table-filter-text-source, .module-name, .module-description',
+      '#search_start_of_words' => TRUE,
       '#announce' => [
         'singular' => $this->t('1 module is available in the modified list.'),
         'plural' => $this->t('@count modules are available in the modified list.'),
