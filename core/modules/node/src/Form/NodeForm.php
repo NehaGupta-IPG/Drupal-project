@@ -169,7 +169,7 @@ class NodeForm extends ContentEntityForm {
 
     $form['status']['#group'] = 'footer';
     // Show the status checkbox but make it disabled if user has no access.
-    if (!$this->currentUser->hasPermission('administer nodes')) {
+    if (!$node->status->access('edit')) {
       $form['status']['#access'] = TRUE;
       $form['status']['#disabled'] = TRUE;
       $form['status']['widget']['value']['#description'] = $this->t('You can not change the published status.');
