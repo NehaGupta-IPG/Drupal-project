@@ -25,6 +25,7 @@ class LayoutSectionTest extends BrowserTestBase {
     'layout_builder',
     'node',
     'block_test',
+    'block',
   ];
 
   /**
