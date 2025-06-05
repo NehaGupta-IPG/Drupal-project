@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Unit\Plugin\migrate\process\d7;
 
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\field\Plugin\migrate\process\d7\FieldInstanceSettings;
 use Drupal\migrate\MigrateLookup;
 use Drupal\migrate\MigrateExecutableInterface;
@@ -26,7 +28,20 @@ class FieldInstanceSettingsTest extends MigrateTestCase {
   public function testTransformImageSettings($type, $instance_settings, $widget_settings, $field_definition, $lookup_result, $expected_results): void {
     $migrate_lookup = $this->createMock(MigrateLookup::class);
     $migrate_lookup->method('lookup')->willReturn($lookup_result);
-    $plugin = new FieldInstanceSettings([], 'd7_field_instance_settings', [], $migrate_lookup);
+
+    $entity_storage = $this->createMock(EntityStorageInterface::class);
+    $entity_storage->expects($this->once())
+      ->method('loadMultiple')
+      ->willReturn([]);
+    $entity_type_manager = $this->createMock(EntityTypeManagerInterface::class);
+    $entity_type_manager
+      ->expects($this->any())
+      ->method('getStorage')
+      ->with('node_type')
+      ->willReturn($entity_storage);
+    $entity_type_manager->expects($this->any())->method('getStorage')->willReturn($entity_storage);
+
+    $plugin = new FieldInstanceSettings([], 'd7_field_instance_settings', [], $migrate_lookup, $entity_type_manager);
 
     $executable = $this->createMock(MigrateExecutableInterface::class);
     $row = $this->getMockBuilder(Row::class)

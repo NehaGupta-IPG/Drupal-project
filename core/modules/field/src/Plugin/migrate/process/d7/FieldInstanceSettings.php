@@ -2,6 +2,7 @@
 
 namespace Drupal\field\Plugin\migrate\process\d7;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\MigrateExecutableInterface;
@@ -30,6 +31,13 @@ class FieldInstanceSettings extends ProcessPluginBase implements ContainerFactor
   protected $migrateLookup;
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected EntityTypeManagerInterface $entityTypeManager;
+
+  /**
    * Constructs a FieldInstanceSettings object.
    *
    * @param array $configuration
@@ -42,9 +50,10 @@ class FieldInstanceSettings extends ProcessPluginBase implements ContainerFactor
    *   The migrate lookup service.
    */
   // @codingStandardsIgnoreLine
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrateLookupInterface $migrate_lookup) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrateLookupInterface $migrate_lookup, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->migrateLookup = $migrate_lookup;
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -56,6 +65,7 @@ class FieldInstanceSettings extends ProcessPluginBase implements ContainerFactor
       $plugin_id,
       $plugin_definition,
       $container->get('migrate.lookup'),
+      $container->get('entity_type.manager'),
     );
   }
 
@@ -127,7 +137,7 @@ class FieldInstanceSettings extends ProcessPluginBase implements ContainerFactor
       }
       else {
         // @see field_field_config_presave()
-        $target_bundles = array_keys(NodeType::loadMultiple());
+        $target_bundles = array_keys($this->entityTypeManager->getStorage('node_type')->loadMultiple());
       }
 
       $instance_settings['handler_settings'] = [
