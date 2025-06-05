@@ -89,7 +89,6 @@ trait BlockPluginTrait {
    *
    * @return array
    *   An associative array with the default configuration.
-   * 
    */
   protected function baseConfigurationDefaults() {
     return [
