@@ -205,13 +205,11 @@ class LibraryDiscoveryCollector extends CacheCollector implements LibraryDiscove
    * {@inheritdoc}
    */
   public function isLibraryValid(array $library) {
-    $valid = TRUE;
-
     if (array_key_exists('js', $library)) {
       foreach ($library['js'] as $js) {
         if ($js['type'] == 'file') {
           if (!file_exists(DRUPAL_ROOT . '/' . $js['data'])) {
-            $valid = FALSE;
+            return FALSE;
           }
         }
       }
@@ -221,7 +219,7 @@ class LibraryDiscoveryCollector extends CacheCollector implements LibraryDiscove
       foreach ($library['css'] as $css) {
         if ($css['type'] == 'file') {
           if (!file_exists(DRUPAL_ROOT . '/' . $css['data'])) {
-            $valid = FALSE;
+            return FALSE;
           }
         }
       }
@@ -231,11 +229,13 @@ class LibraryDiscoveryCollector extends CacheCollector implements LibraryDiscove
       foreach ($library['dependencies'] as $dependency) {
         $parts = explode('/', $dependency, 2);
         $dependencyLibrary = $this->getLibraryByName($parts[0], $parts[1]);
-        $valid = $this->isLibraryValid($dependencyLibrary);
+        if (!$this->isLibraryValid($dependencyLibrary)) {
+          return FALSE;
+        }
       }
     }
 
-    return $valid;
+    return TRUE;
   }
 
 }
