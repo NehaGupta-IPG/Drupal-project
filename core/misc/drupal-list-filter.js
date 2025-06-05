@@ -507,8 +507,8 @@
                 minQueryLength: minLength
                   ? parseInt(minLength, 10)
                   : undefined,
-                searchFromWordStart: searchStart === 'true',
-                debug: debug === 'true',
+                searchFromWordStart: searchStart === 'true' ?? undefined,
+                debug: debug === 'true' ?? undefined,
                 hideElement: overrides.hideElement || defaultHideElement,
                 showElement: overrides.showElement || defaultShowElement,
                 normalizeString: overrides.normalizeString || defaultNormalizeString,
