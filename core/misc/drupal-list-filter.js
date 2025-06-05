@@ -126,6 +126,7 @@
   /**
    * Builds the filter items from the table element.
    *
+   * @function Drupal.listFilter.filterItemsBuilder
    * @param {HTMLElement} tableElement
    *   The table element to filter.
    * @param {string} rowSelector
@@ -148,6 +149,75 @@
         node: source,
         textContent: normalizeString(textContent),
       };
+    });
+  }
+
+  /**
+   * Default function to check and update the visibility of labels.
+   * 
+   * @function Drupal.listFilter.defaultCheckLabels
+   * @param {Array} labels
+   *   An array of label elements to check.
+   * @param {boolean} reset
+   *   Whether to reset the label state.
+   */
+  function defaultCheckLabels(labels, reset = false) {
+    for (const label of labels) {
+      const anyVisible = Array.from(label.labelledItems).some(
+        (element) => !element.hasAttribute('hidden'),
+      );
+      if (!anyVisible) {
+        this.hideElement(label);
+        continue;
+      }
+      // @todo make the function to process other node types overridable, for example, fieldset elements.
+      // we can check if the function exists then call it, or we can use a different approach.
+      // like this[checkFIELDSETLabels](reset, label);
+      if (label.nodeName === 'DETAILS') {
+        this.checkDetailedLabels(reset, label);
+      }
+      this.showElement(label);
+    }
+  }
+
+  /**
+   * Default function to check and update the opened status of detailed labels.
+   * 
+   * @param {boolean} reset
+   *   Whether to reset the label state.
+   * @param {string} label
+   *   The label element to check.
+   */
+  function defaultCheckDetailedLabels(reset, label) {
+    if (!reset && !label.open) {
+      label.open = true;
+      label.dataset.openedByFilter = true;
+    } else if (reset && label.dataset.openedByFilter) {
+      label.open = false;
+      delete label.dataset.openedByFilter;
+    }
+  }
+
+  /**
+   * Default debug function to visually highlight elements.
+   * 
+   * @function Drupal.listFilter.defaultDebug
+   * @param {HTMLElement} tableElement 
+   *   The table element to debug.
+   * @param {string} rowSelector
+   *   The selector for the rows/items to filter.
+   * @param {string} targetSelector 
+   *   The selector for sub-elements to search within each row.
+   */
+  function defaultDebug(tableElement, rowSelector, targetSelector) {
+    tableElement.style.outline = '2px solid red';
+    tableElement.querySelectorAll(rowSelector).forEach((item) => {
+      item.style.backgroundColor = 'yellow';
+      if (targetSelector) {
+        item.querySelectorAll(targetSelector).forEach((target) => {
+          target.style.outline = 'green 2px dotted';
+        });
+      }
     });
   }
 
@@ -211,6 +281,27 @@
      */
     announce: defaultAnnounce,
 
+    /**
+     * Checks and updates the visibility of labels.
+     * 
+     * @type {function}
+     */
+    checkLabels: defaultCheckLabels,
+
+    /**
+     * Checks and updates the visibility of labels.
+     * 
+     * @type {function}
+     */
+    checkDetailedLabels: defaultCheckDetailedLabels,
+
+    /**
+     * Default debug function. Can be overridden.
+     * 
+     * @type {function}
+     */
+    debug: defaultDebug,
+
     /*
      * Builds filter items from the table element. Can be overridden.
      *
@@ -237,59 +328,6 @@
      * @type {object}
      */
     options: {},
-
-    defaultDebug: (tableElement, rowSelector, targetSelector) => {
-      tableElement.style.outline = '2px solid red';
-      tableElement.querySelectorAll(rowSelector)?.forEach((item) => {
-        item.style.backgroundColor = 'yellow';
-        if (targetSelector) {
-          item.querySelectorAll(targetSelector)?.forEach((target) => {
-            target.style.outline = 'green 2px dotted';
-          });
-        }
-      });
-    },
-
-    /**
-     * Controll opened status of Detail elements.
-     * 
-     * @param {boolean} reset 
-     * @param {HTMLElement} label 
-     */
-    checkDetailedLabels: function (reset, label) {
-      if (!reset && !label.open) {
-        label.open = true;
-        label.dataset.openedByFilter = true;
-      } else if (reset && label.dataset.openedByFilter) {
-        label.open = false;
-        delete label.dataset.openedByFilter;
-      }
-    },
-
-    /**
-     * Checks and updates the visibility of labels.
-     *
-     * @param {boolean} [reset=false]
-     *   Whether to reset the label state.
-     */
-    checkLabels: function (labels, reset = false) {
-      for (const label of labels) {
-        const anyVisible = Array.from(label.labelledItems).some(
-          (element) => !element.hasAttribute('hidden'),
-        );
-        if (!anyVisible) {
-          this.hideElement(label);
-          continue;
-        }
-        // @todo make the function to process other node types overridable, for example, fieldset elements.
-        // we can check if the function exists then call it, or we can use a different approach.
-        // like this[checkFIELDSETLabels](reset, label);
-        if (label.nodeName === 'DETAILS') {
-          this.checkDetailedLabels(reset, label);
-        }
-        this.showElement(label);
-      }
-    },
 
     /**
      * Filters table/list rows based on input.
@@ -408,7 +446,7 @@
         tableElement.addEventListener(FILTER_EVENT, filterTableList.bind(this));
 
         if (debug) {
-          this.defaultDebug(tableElement, rowSelector, targetSelector);
+          this.debug(tableElement, rowSelector, targetSelector);
         }
       }
 
@@ -469,8 +507,8 @@
                 minQueryLength: minLength
                   ? parseInt(minLength, 10)
                   : undefined,
-                searchFromWordStart: searchStart === 'true',
-                debug: debug === 'true',
+                searchFromWordStart: searchStart === 'true' ?? undefined,
+                debug: debug === 'true' ?? undefined,
                 hideElement: overrides.hideElement || defaultHideElement,
                 showElement: overrides.showElement || defaultShowElement,
                 normalizeString: overrides.normalizeString || defaultNormalizeString,
