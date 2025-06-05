@@ -254,9 +254,11 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
           // the first source IDs in order.
           $lookup_value = array_values($row_values);
         }
-        foreach ($source_map as $key => $source) {
-          // If the source IDs are specified with keys, use the keys.
-          $lookup_value[$key] = $row_values[$source];
+        else {
+          foreach ($source_map as $key => $source) {
+            // If the source IDs are specified with keys, use the keys.
+            $lookup_value[$key] = $row_values[$source];
+          }
         }
       }
       $lookup_value = (array) $lookup_value;
