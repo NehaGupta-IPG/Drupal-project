@@ -1,18 +1,34 @@
 ((Drupal, drupalSettings, htmx) => {
+
+  /**
+   * Helper to parse a potential JSON string.
+   *
+   * @param {string} text
+   *
+   * @return {object|boolean}
+   */
+  function parseJSON(text) {
+    // Check if we're dealing with ajax commands.
+    if (detail.serverResponse[0] !== '[') {
+      return false;
+    }
+
+    try {
+      return JSON.parse(detail.serverResponse);
+    } catch (e) {
+      // This is not a valid JSON response, error out.
+      return false;
+    }
+  }
+
   // @see https://htmx.org/events/#htmx:beforeSwap
   htmx.on('htmx:beforeSwap', (event) => {
     const { detail } = event;
 
-    // Check if we're dealing with ajax commands.
-    if (detail.serverResponse[0] !== '[') {
-      return;
-    }
+    const commands = parseJSON(detail.serverResponse);
 
-    let commands = [];
-    try {
-      commands = JSON.parse(detail.serverResponse);
-    } catch (e) {
-      // This is not a valid JSON response, error out.
+    // This is not a valid JSON string, probably not an array of command objects.
+    if (!commands) {
       return;
     }
 
@@ -74,7 +90,7 @@
      * @param {string} [response.selector]
      *   An optional selector string.
      */
-    insert(event, { data, method = 'replaceWith', selector }) {
+    insert(event, { data, method = 'replaceWith', selector= '' }) {
       let target = null;
       if (selector) {
         target = htmx.find(selector);
@@ -131,11 +147,7 @@
      *   An optional priority that will be used for the announcement.
      */
     announce(event, { text, priority }) {
-      if (priority) {
-        Drupal.announce(text, priority);
-      } else {
-        Drupal.announce(text);
-      }
+      Drupal.announce(text, priority);
     },
 
     /**
