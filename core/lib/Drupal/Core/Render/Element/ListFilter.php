@@ -12,7 +12,7 @@ use Drupal\Core\Render\Attribute\RenderElement;
  * - #auto_activate: (optional) Whether the filter functionality should be
  *   automatically activated via the drupalFilterByText behavior; it can be set
  *   to FALSE, in which case the implementation needs to provide its own
- *   integration with Drupal.filterByText. Defaults to TRUE.
+ *   integration with `Drupal.listFilter`. Defaults to TRUE.
  * - #size: (optional) The size of the input field. Defaults to 60.
  * - #maxlength: (optional) The maximum length of the input field. Defaults to
  *   128.
@@ -97,15 +97,18 @@ class ListFilter extends Search {
     if ($element['#list_text']) {
       $element['#attributes']['data-targets'] = $element['#list_text'];
     }
+
     $element['#attributes']['data-min-length'] = $element['#minimum_filter_length'];
     $element['#attributes']['data-search-start'] = $element['#search_start_of_words'] ? 'true' : 'false';
 
     if ($element['#library']) {
       $element['#attached']['library'][] = $element['#library'];
     }
+    
     $element['#attributes']['data-singular'] = $element['#announce']['singular'];
     $element['#attributes']['data-plural'] = $element['#announce']['plural'];
     $element['#attributes']['data-full'] = $element['#announce']['all'];
+    
     if ($element['#debug']) {
       $element['#attributes']['data-debug'] = 'true';
     }
