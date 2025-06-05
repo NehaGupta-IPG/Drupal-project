@@ -151,7 +151,7 @@ class ThemeHook {
    * block.html.twig is used.
    *
    * Most themes use their own copy of block.html.twig. The default is located
-   * inside "core/modules/block/templates/block.html.twig". Look in there for
+   * inside "core/modules/system/templates/block.html.twig". Look in there for
    * the full list of available variables.
    *
    * @param array $variables
