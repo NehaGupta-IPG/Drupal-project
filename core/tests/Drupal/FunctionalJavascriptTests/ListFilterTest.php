@@ -100,37 +100,33 @@ class ListFilterTest extends WebDriverTestBase {
     $filterOne = $page->find('css', '.filter-input-one');
     $filterOne->setValue('mint');
     $this->waitSearchFiltered();
-    $rowsOne = $page->findAll('css', '.filter-container-one tbody tr');
-    $visibleRowsOne = array_filter($rowsOne, fn($row) => $row->isVisible());
-    $this->assertCount(2, $visibleRowsOne, 'Two recipes are visible after filtering for "Mint".');
-    $visibleTextOne = array_map(fn($row) => $row->getText(), $visibleRowsOne);
-    $this->assertTrue(
-      (bool) array_filter($visibleTextOne, fn($text) => str_contains($text, 'Mojito')),
-      'Mojito recipe is visible.'
-    );
-    $this->assertTrue(
-      (bool) array_filter($visibleTextOne, fn($text) => str_contains($text, 'Virgin Mojito')),
-      'Virgin Mojito recipe is visible.'
+    $visibleRows = $this->getVisibleRows('.filter-container-one tbody tr');
+    $this->assertEquals(2, count($visibleRows), 'Two recipes are visible after filtering for "Mint".');
+    $visibleExpected = [
+      'Mojito',
+      'Virgin Mojito',
+    ];
+    $visibleFound = array_map(fn($row) => $row->find('css', 'td')->getText(), $visibleRows);
+    $this->assertEquals(
+      $visibleExpected,
+      array_values($visibleFound),
+      'Filtered recipes match expected results.'
     );
 
     // Ensure Table Two (ingredients) is unaffected.
-    $rowsTwo = $page->findAll('css', '.filter-container-two tbody tr');
-    $visibleRowsTwo = array_filter($rowsTwo, fn($row) => $row->isVisible());
-    $this->assertCount(count($rowsTwo), $visibleRowsTwo, 'All ingredient rows are visible when filtering recipes.');
+    $visibleRowsTwo = $this->countVisibleRows('.filter-container-two tbody tr');
+    $totalRowsTow = count($this->getTableRows('.filter-container-two tbody tr'));
+    $this->assertEquals($visibleRowsTwo, $totalRowsTow);
 
     // Now filter Table Two (ingredients) by "Mint".
     $filterTwo = $page->find('css', '.filter-input-two');
     $filterTwo->setValue('Mint');
     $this->waitSearchFiltered();
-    $rowsTwo = $page->findAll('css', '.filter-container-two tbody tr');
-    $visibleRowsTwo = array_filter($rowsTwo, fn($row) => $row->isVisible());
-    $this->assertCount(1, $visibleRowsTwo, 'Only one ingredient row is visible after filtering for "Mint".');
-    $this->assertStringContainsString('Mint', reset($visibleRowsTwo)->getText());
+    $visibleRowsTwoCount = $this->countVisibleRows('.filter-container-two tbody tr');
+    $this->assertEquals(1, $visibleRowsTwoCount, 'Only one ingredient row is visible after filtering for "Mint".');
 
     // Ensure Table One (recipes) is still filtered as before.
-    $rowsOne = $page->findAll('css', '.filter-container-one tbody tr');
-    $visibleRowsOne = array_filter($rowsOne, fn($row) => $row->isVisible());
-    $this->assertCount(2, $visibleRowsOne, 'Recipe table remains filtered after filtering ingredients.');
+    $this->assertEquals(2, $this->countVisibleRows('.filter-container-one tbody tr'), 'Table One remains filtered with 2 visible rows.');
   }
 
   /**
@@ -150,9 +146,22 @@ class ListFilterTest extends WebDriverTestBase {
    *   The number of visible rows.
    */
   protected function countVisibleRows(string $selector = '.filter-container tbody tr'): int {
-    return count(array_filter($this->getTableRows(), function ($element) {
+    return count($this->getVisibleRows($selector));
+  }
+
+  /**
+   * Counts the number of visible rows in the filter container.
+   *
+   * @param string $selector
+   *   The CSS selector for the rows to count.
+   *
+   * @return array
+   *   The number of visible rows.
+   */
+  protected function getVisibleRows(string $selector = '.filter-container tbody tr'): array {
+    return array_filter($this->getTableRows($selector), function ($element) {
       return $element->isVisible();
-    }));
+    });
   }
 
   /**
