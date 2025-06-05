@@ -90,6 +90,50 @@ class ListFilterTest extends WebDriverTestBase {
   }
 
   /**
+   * Tests multiple filter elements on the same page.
+   */
+  public function testMultipleFilterElementsInPage() {
+    $this->drupalGet('/list-filter/multiple-filters-on-page');
+    $page = $this->getSession()->getPage();
+
+    // Filter Table One (drinks recipes) by "Mint".
+    $filterOne = $page->find('css', '.filter-input-one');
+    $filterOne->setValue('mint');
+    $this->waitSearchFiltered();
+    $rowsOne = $page->findAll('css', '.filter-container-one tbody tr');
+    $visibleRowsOne = array_filter($rowsOne, fn($row) => $row->isVisible());
+    $this->assertCount(2, $visibleRowsOne, 'Two recipes are visible after filtering for "Mint".');
+    $visibleTextOne = array_map(fn($row) => $row->getText(), $visibleRowsOne);
+    $this->assertTrue(
+      (bool) array_filter($visibleTextOne, fn($text) => str_contains($text, 'Mojito')),
+      'Mojito recipe is visible.'
+    );
+    $this->assertTrue(
+      (bool) array_filter($visibleTextOne, fn($text) => str_contains($text, 'Virgin Mojito')),
+      'Virgin Mojito recipe is visible.'
+    );
+
+    // Ensure Table Two (ingredients) is unaffected.
+    $rowsTwo = $page->findAll('css', '.filter-container-two tbody tr');
+    $visibleRowsTwo = array_filter($rowsTwo, fn($row) => $row->isVisible());
+    $this->assertCount(count($rowsTwo), $visibleRowsTwo, 'All ingredient rows are visible when filtering recipes.');
+
+    // Now filter Table Two (ingredients) by "Mint".
+    $filterTwo = $page->find('css', '.filter-input-two');
+    $filterTwo->setValue('Mint');
+    $this->waitSearchFiltered();
+    $rowsTwo = $page->findAll('css', '.filter-container-two tbody tr');
+    $visibleRowsTwo = array_filter($rowsTwo, fn($row) => $row->isVisible());
+    $this->assertCount(1, $visibleRowsTwo, 'Only one ingredient row is visible after filtering for "Mint".');
+    $this->assertStringContainsString('Mint', reset($visibleRowsTwo)->getText());
+
+    // Ensure Table One (recipes) is still filtered as before.
+    $rowsOne = $page->findAll('css', '.filter-container-one tbody tr');
+    $visibleRowsOne = array_filter($rowsOne, fn($row) => $row->isVisible());
+    $this->assertCount(2, $visibleRowsOne, 'Recipe table remains filtered after filtering ingredients.');
+  }
+
+  /**
    * Helper function to wait for the search to be filtered.
    */
   protected function waitSearchFiltered($timeout = 300000): void {
