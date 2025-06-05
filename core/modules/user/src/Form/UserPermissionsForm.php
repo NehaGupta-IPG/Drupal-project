@@ -166,7 +166,7 @@ class UserPermissionsForm extends FormBase {
       '#description' => $this->t('Enter permission name'),
       '#list_container_selector' => '#permissions',
       '#list_item' => 'tbody tr[data-filter-labelledby]',
-      '#data_targets' => '.table-filter-text-source',
+      '#list_text' => '.permission',
       '#singular' => $this->t('1 permission is available in the modified list.'),
       '#plural' => $this->t('@count permissions are available in the modified list.'),
       '#full' => $this->t('All available permissions are listed.'),

@@ -61,8 +61,8 @@ class ListFilter extends Search {
       '#theme_wrappers' => ['form_element'],
       '#list_container_selector' => '.filter-container',
       '#list_item' => 'tbody tr',
-      '#minimum_filter_length' => 2,
       '#list_text' => '',
+      '#minimum_filter_length' => 2,
       '#search_start_of_words' => FALSE,
       '#announce' => [
         'singular' => $this->t('1 item is available in the modified list.'),
