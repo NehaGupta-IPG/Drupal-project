@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7e45f46f86addf53ba6170d650e30fc2",
+    "content-hash": "0b356b72476248f0c15d28e56afc2952",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -497,7 +497,7 @@
             "dist": {
                 "type": "path",
                 "url": "core",
-                "reference": "cc47b8e83dc7fe1fb24f2baa25102b85a24212de"
+                "reference": "9dc18d846f5077cbc5615fc28a4361adf2f160ba"
             },
             "require": {
                 "asm89/stack-cors": "^2.3",
@@ -541,7 +541,6 @@
                 "symfony/mime": "^7.3",
                 "symfony/polyfill-iconv": "^1.32",
                 "symfony/polyfill-php84": "^1.32",
-                "symfony/polyfill-php85": "^1.32",
                 "symfony/process": "^7.3",
                 "symfony/psr-http-message-bridge": "^7.3",
                 "symfony/routing": "^7.3",
@@ -10201,13 +10200,7 @@
         "drupal/core": 20,
         "drupal/core-project-message": 20,
         "drupal/core-recipe-unpack": 20,
-        "drupal/core-vendor-hardening": 20,
-        "symfony/browser-kit": 10,
-        "symfony/css-selector": 10,
-        "symfony/dom-crawler": 10,
-        "symfony/error-handler": 10,
-        "symfony/lock": 10,
-        "symfony/var-dumper": 10
+        "drupal/core-vendor-hardening": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
