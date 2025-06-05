@@ -22,7 +22,7 @@ class ListFilterTestController extends ControllerBase {
     // Define the filter element.
     $build['filter'] = $filterElement;
 
-    [$header, $rows] = $this->dataProvider();
+    [$header, $rows] = $this->moviesList();
 
     $build['table'] = [
       '#type' => 'table',
@@ -42,12 +42,250 @@ class ListFilterTestController extends ControllerBase {
   }
 
   /**
-   * Provides the data for the table.
+   * Provides a build with two filter elements and their respective tables.
    *
    * @return array
-   *   An array containing the header and rows for the table.
+   *   A render array containing two filter elements and their associated tables.
    */
-  protected function dataProvider(): array {
+  /**
+   * Provides a build with two filter elements and their respective tables.
+   */
+  public function multipleFiltersOnPage(): array {
+    [$header, $rows] = $this->drinksRecipes();
+    $build['filter_one'] = $this->getDefaultFilterElementSettings();
+    $build['filter_one']['#title'] = $this->t('Filter Recipes');
+    $build['filter_one']['#list_container_selector'] = '.filter-container-one';
+    $build['filter_one']['#attributes']['class'] = ['filter-input-one'];
+    $build['filter_one']['#list_text'] = '.name, .category, .is_alcoholic, .ingredients, .instructions';
+
+    $build['table_one'] = [
+      '#type' => 'table',
+      '#header' => $header,
+      '#rows' => $rows,
+      '#attributes' => [
+        'class' => ['filter-container-one'],
+      ],
+    ];
+
+    $build['filter_two'] = $this->getDefaultFilterElementSettings();
+    $build['filter_two']['#title'] = $this->t('Filter Ingredients');
+    $build['filter_two']['#list_container_selector'] = '.filter-container-two';
+    $build['filter_two']['#attributes']['class'] = ['filter-input-two'];
+    $build['filter_two']['#list_text'] = '.ingredient, .type, .is_alcoholic';
+
+    [$header, $rows] = $this->ingredientsList();
+    $build['table_two'] = [
+      '#type' => 'table',
+      '#header' => $header,
+      '#rows' => $rows,
+      '#attributes' => [
+        'class' => ['filter-container-two'],
+      ],
+    ];
+    return $build;
+  }
+
+  /**
+   * Provides a list of drinks recipes.
+   */
+  protected function drinksRecipes(): array {
+    $data = [
+      [
+        'name' => 'Lemonade',
+        'category' => 'Non-alcoholic',
+        'is_alcoholic' => 'No',
+        'ingredients' => 'Lemon, Sugar, Water',
+        'instructions' => 'Mix lemon juice, sugar, and water. Serve chilled.',
+      ],
+      [
+        'name' => 'Mojito',
+        'category' => 'Cocktail',
+        'is_alcoholic' => 'Yes',
+        'ingredients' => 'Rum, Mint, Sugar, Lime, Soda Water',
+        'instructions' => 'Muddle mint with sugar and lime. Add rum and soda water. Serve with ice.',
+      ],
+      [
+        'name' => 'Espresso Martini',
+        'category' => 'Cocktail',
+        'is_alcoholic' => 'Yes',
+        'ingredients' => 'Vodka, Coffee Liqueur, Espresso',
+        'instructions' => 'Shake vodka, coffee liqueur, and espresso with ice. Strain into a glass.',
+      ],
+      [
+        'name' => 'Iced Tea',
+        'category' => 'Non-alcoholic',
+        'is_alcoholic' => 'No',
+        'ingredients' => 'Tea, Lemon, Sugar, Ice',
+        'instructions' => 'Brew tea, add lemon and sugar, pour over ice.',
+      ],
+      [
+        'name' => 'Virgin Mojito',
+        'category' => 'Mocktail',
+        'is_alcoholic' => 'No',
+        'ingredients' => 'Mint, Sugar, Lime, Soda Water',
+        'instructions' => 'Muddle mint with sugar and lime. Add soda water. Serve with ice.',
+      ],
+    ];
+
+    $header = [
+      $this->t('Name'),
+      $this->t('Category'),
+      $this->t('Alcoholic'),
+      $this->t('Ingredients'),
+      $this->t('Instructions'),
+    ];
+
+    $rows = [];
+    foreach ($data as $row) {
+      $rows[] = [
+        'data' => [
+          ['data' => $row['name'], 'class' => ['name']],
+          ['data' => $row['category'], 'class' => ['category']],
+          ['data' => $row['is_alcoholic'], 'class' => ['is_alcoholic']],
+          ['data' => $row['ingredients'], 'class' => ['ingredients']],
+          ['data' => $row['instructions'], 'class' => ['instructions']],
+        ],
+      ];
+    }
+    return [$header, $rows];
+  }
+
+  /**
+   * Provides a list of drink ingredients.
+   */
+  protected function ingredientsList(): array {
+    $data = [
+      [
+        'ingredient' => 'Lemon',
+        'type' => 'Fruit',
+        'is_alcoholic' => 'No',
+      ],
+      [
+        'ingredient' => 'Rum',
+        'type' => 'Spirit',
+        'is_alcoholic' => 'Yes',
+      ],
+      [
+        'ingredient' => 'Mint',
+        'type' => 'Herb',
+        'is_alcoholic' => 'No',
+      ],
+      [
+        'ingredient' => 'Vodka',
+        'type' => 'Spirit',
+        'is_alcoholic' => 'Yes',
+      ],
+      [
+        'ingredient' => 'Coffee Liqueur',
+        'type' => 'Liqueur',
+        'is_alcoholic' => 'Yes',
+      ],
+      [
+        'ingredient' => 'Tea',
+        'type' => 'Beverage',
+        'is_alcoholic' => 'No',
+      ],
+      [
+        'ingredient' => 'Sugar',
+        'type' => 'Sweetener',
+        'is_alcoholic' => 'No',
+      ],
+      [
+        'ingredient' => 'Lime',
+        'type' => 'Fruit',
+        'is_alcoholic' => 'No',
+      ],
+      [
+        'ingredient' => 'Soda Water',
+        'type' => 'Beverage',
+        'is_alcoholic' => 'No',
+      ],
+      [
+        'ingredient' => 'Espresso',
+        'type' => 'Beverage',
+        'is_alcoholic' => 'No',
+      ],
+    ];
+
+    $header = [
+      $this->t('Ingredient'),
+      $this->t('Type'),
+      $this->t('Alcoholic'),
+    ];
+
+    $rows = [];
+    foreach ($data as $row) {
+      $rows[] = [
+        'data' => [
+          ['data' => $row['ingredient'], 'class' => ['ingredient']],
+          ['data' => $row['type'], 'class' => ['type']],
+          ['data' => $row['is_alcoholic'], 'class' => ['is_alcoholic']],
+        ],
+      ];
+    }
+    return [$header, $rows];
+  }
+
+  /**
+   * Provides the default settings for the filter element.
+   *
+   * @return array
+   *   The default filter element settings.
+   */
+  protected function getDefaultFilterElementSettings(): array {
+    return [
+      '#type' => 'list_filter',
+      '#title' => $this->t('Filter users'),
+      '#placeholder' => $this->t('Search by name or email'),
+      '#list_container_selector' => '.filter-container',
+      '#list_item' => 'tbody tr',
+      '#list_text' => '.name, .description, .category, .likes, .release_date',
+      '#minimum_filter_length' => 1,
+      '#search_start_of_words' => FALSE,
+      '#auto_activate' => TRUE,
+      '#attributes' => [
+        'class' => ['filter-input'],
+      ],
+    ];
+  }
+
+  /**
+   * Overrides the default filter element settings based on the test case.
+   *
+   * @param string $test_case
+   *   The test case identifier.
+   *
+   * @return array
+   *   The modified filter element settings.
+   */
+  protected function overrideFilterElementSettings($test_case): array {
+    $filterElement = $this->getDefaultFilterElementSettings();
+    switch ($test_case) {
+      case 'minimum_filter_length':
+        $filterElement['#minimum_filter_length'] = 5;
+        break;
+
+      case 'search_start_of_words':
+        $filterElement['#search_start_of_words'] = TRUE;
+        break;
+
+      case 'auto_activate_false':
+        $filterElement['#auto_activate'] = FALSE;
+        break;
+
+      default:
+        return $filterElement;
+    }
+    return $filterElement;
+  }
+
+  /**
+   * Provides a list of movies with their details.
+   *
+   * @return array
+   *   An array containing the header and rows for the movies table.
+   */
+  protected function moviesList(): array {
     $data = [
       [
         'name' => 'Inception',
@@ -107,59 +345,6 @@ class ListFilterTestController extends ControllerBase {
       ];
     }
     return [$header, $rows];
-  }
-
-  /**
-   * Provides the default settings for the filter element.
-   *
-   * @return array
-   *   The default filter element settings.
-   */
-  protected function getDefaultFilterElementSettings(): array {
-    return [
-      '#type' => 'list_filter',
-      '#title' => $this->t('Filter users'),
-      '#placeholder' => $this->t('Search by name or email'),
-      '#list_container_selector' => '.filter-container',
-      '#list_item' => 'tbody tr',
-      '#list_text' => '.name, .description, .category, .likes, .release_date',
-      '#minimum_filter_length' => 1,
-      '#search_start_of_words' => FALSE,
-      '#auto_activate' => TRUE,
-      '#attributes' => [
-        'class' => ['filter-input'],
-      ],
-    ];
-  }
-
-  /**
-   * Overrides the default filter element settings based on the test case.
-   *
-   * @param string $test_case
-   *   The test case identifier.
-   *
-   * @return array
-   *   The modified filter element settings.
-   */
-  protected function overrideFilterElementSettings($test_case): array {
-    $filterElement = $this->getDefaultFilterElementSettings();
-    switch ($test_case) {
-      case 'minimum_filter_length':
-        $filterElement['#minimum_filter_length'] = 5;
-        break;
-
-      case 'search_start_of_words':
-        $filterElement['#search_start_of_words'] = TRUE;
-        break;
-
-      case 'auto_activate_false':
-        $filterElement['#auto_activate'] = FALSE;
-        break;
-
-      default:
-        return $filterElement;
-    }
-    return $filterElement;
   }
 
 }
