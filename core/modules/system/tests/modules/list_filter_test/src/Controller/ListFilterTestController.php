@@ -35,7 +35,7 @@ class ListFilterTestController extends ControllerBase {
 
     if ($test_case === 'override_library') {
       $build['#attached']['library'][] = 'list_filter_test/list_filter_test';
-      $build['filter']['#auto_activate'] = FALSE;
+      $build['filter']['#auto_activate'] = TRUE;
       $build['filter']['#suffix'] = "<span class='js-filter-count hidden'></span>";
     }
     return $build;

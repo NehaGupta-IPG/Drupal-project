@@ -373,17 +373,16 @@
         checkLabels = this.checkLabels,
         checkDetailedLabels = this.checkDetailedLabels,
         announce = this.announce,
-        debug: debugFunction = this.debug,
-        searchingFinished = this.searchingFinished ?? undefined,
+        debugFunction = this.debug,
+        searchingFinished = this.searchingFinished || undefined,
       } = options;
-
       const tables = document.querySelectorAll(table);
 
       for (const tableElement of tables) {
         let filterItemsTransitional = null;
         let queryTransitional = '';
 
-        const filterItems = this.filterItemsBuilder(
+        const filterItems = filterItemsBuilder(
           tableElement,
           items,
           targets,
@@ -408,7 +407,7 @@
         function filterTableList(e) {
           e = e.detail.event;
           tableElement.classList.remove('js-list-filtered');
-          const query = this.normalizeString(e.target.value);
+          const query = normalizeString(e.target.value);
           const queryContinuation = query.startsWith(queryTransitional);
 
           if (queryContinuation && filterItemsTransitional.length === 0) return;
@@ -422,31 +421,31 @@
               if (!searchMethod(item.textContent, query, searchStart)) {
                 hideElement(item.node);
               } else {
-                this.showElement(item.node);
+                showElement(item.node);
                 matches.push(item);
               }
             }
-            this.announce(
+            announce(
               matches.length,
               singular,
               plural,
               SINGULAR_PHRASE,
               PLURAL_PHRASE
             );
-            this.checkLabels(labels);
+            checkLabels(labels);
             filterItemsTransitional = matches;
           } else {
             for (const item of filterItems) {
-              this.showElement(item.node); // Use override or default
+              showElement(item.node); // Use override or default
             }
             Drupal.announce(full ?? ALL_PHRASE);
-            this.checkLabels(labels, true);
+            checkLabels(labels, true);
             filterItemsTransitional = filterItems;
           }
-          this.matchedRows = filterItemsTransitional.length;
+          listFilter.matchedRows = filterItemsTransitional.length;
           tableElement.classList.add('js-list-filtered');
-          if (this.searchingFinished !== undefined) {
-            this.searchingFinished();
+          if (searchingFinished !== undefined) {
+            searchingFinished(filterItemsTransitional.length);
           }
           queryTransitional = query;
         }
@@ -454,7 +453,7 @@
         tableElement.addEventListener(FILTER_EVENT, filterTableList.bind(this));
 
         if (debug) {
-          this.debug(tableElement, items, targets);
+          debugFunction(tableElement, items, targets);
         }
       }
 
@@ -502,10 +501,10 @@
                 input: input,
                 ...input.dataset,
               };
-
+              // console.log(options, '1')
               const event = new CustomEvent('listFilter:options', { detail: { options, input } });
               input.dispatchEvent(event);
-
+              // console.log(options, '2')
               Drupal.listFilter.filter(event.detail.options);
             },
             { once: true },
