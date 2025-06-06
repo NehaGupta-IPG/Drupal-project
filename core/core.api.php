@@ -1474,7 +1474,7 @@
  *   id: 'my_entity_type',
  *   label: new TranslatableMarkup('New content type'),
  *   ...
- *   base_table: "my_entity_type"
+ *   base_table: 'my_entity_type'
  * )]
  * class NewContentType extends ContentEntityBase {
  * @endcode
@@ -2054,12 +2054,12 @@
  * only a single 'id' attribute argument. For these, it is possible to use
  * a shorthand syntax. For example:
  * @code
- * #[ViewsArea("entity")]
+ * #[ViewsArea('entity')]
  * @endcode
  * in place of
  * @code
  * #[ViewsArea(
- *   id: "entity",
+ *   id: 'entity',
  * )]
  * @endcode
  *

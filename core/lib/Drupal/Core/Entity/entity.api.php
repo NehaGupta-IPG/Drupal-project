@@ -376,7 +376,7 @@ use Drupal\node\Entity\NodeType;
  *   features, which will allow your entity type to be used with Drupal's
  *   editorial workflow provided by the Content Moderation module.
  * - The 'id' attribute argument gives the entity type ID, and the 'label'
- *   property gives the human-readable name of the entity type. If you are
+ *   argument gives the human-readable name of the entity type. If you are
  *   defining a content entity type that uses bundles, the 'bundle_label'
  *   property gives the human-readable name to use for a bundle of this entity
  *   type (for example, "Content type" for the Node entity).
@@ -453,8 +453,8 @@ use Drupal\node\Entity\NodeType;
  *   example, for the Node entity, the bundle class is
  *   \Drupal\node\Entity\NodeType, whose machine name is 'node_type'. This is
  *   the attribute argument 'bundle_entity_type' on the \Drupal\node\Entity\Node
- *   class. Also, the bundle config entity type attribute argument must have a
- *   'bundle_of' property, giving the machine name of the entity type it is
+ *   class. Also, the bundle config entity type attribute must have a
+ *   'bundle_of' argument, giving the machine name of the entity type it is
  *   acting as a bundle for. These machine names are considered permanent, they
  *   may not be renamed.
  * - Additional attribute arguments can be seen on entity class examples such

@@ -46,7 +46,7 @@
  * in its plugin attributes:
  * @code
  * 'forms' => [
- *   "settings_tray" => \Drupal\some_module\Form\MyBlockOffCanvasForm::class,
+ *   'settings_tray' => \Drupal\some_module\Form\MyBlockOffCanvasForm::class,
  * ],
  * @endcode
  *
@@ -55,7 +55,7 @@
  * settings_tray form:
  * @code
  * 'forms' => [
- *   "settings_tray" => FALSE,
+ *   'settings_tray' => FALSE,
  * ],
  * @endcode
  *
@@ -66,7 +66,7 @@
  * added to its attribute:
  * @code
  * 'forms' => [
- *   "settings_tray" => \Drupal\system\Plugin\Block\SystemPoweredByBlock::class,
+ *   'settings_tray' => \Drupal\system\Plugin\Block\SystemPoweredByBlock::class,
  * ],
  * @endcode
  *
