@@ -31,7 +31,7 @@ function hook_media_source_info_alter(array &$sources) {
  *
  * @param array $data
  *   Data provided by the oEmbed resource.
- * @param $url
+ * @param string $url
  *   The oEmbed resource URL.
  */
 function hook_oembed_resource_data_alter(array &$data, $url) {
