@@ -338,44 +338,46 @@
     /**
      * Filters table/list rows based on input.
      *
-     * @todo update options documentation and sync with onFilter function overrides.
-     *
      * @function Drupal.listFilter.filter
      * @param {object} options
      *   - inputElement: {HTMLElement} The input element to bind events to.
-     *   - tableSelector: {string} Selector for the table(s) to filter.
-     *   - rowSelector: {string} Selector for the items/rows to filter.
-     *   - targetSelector: {string|null} (Optional) Selector for sub-elements to search within each row.
-     *   - singularLabel: {string|null} (Optional) Singular label for ARIA/live region.
-     *   - pluralLabel: {string|null} (Optional) Plural label for ARIA/live region.
-     *   - fullLabel: {string|null} (Optional) Label for "all items listed".
-     *   - minQueryLength: {number} (Optional) Minimum query length to trigger filtering.
-     *   - searchFromWordStart: {boolean} (Optional) If true, only match from start of words.
+     *   - table: {string} Selector for the table(s) to filter.
+     *   - items: {string} Selector for the items/rows to filter.
+     *   - targets: {string|null} (Optional) Selector for sub-elements to search within each row.
+     *   - singular: {string|null} (Optional) Singular label for ARIA/live region.
+     *   - plural: {string|null} (Optional) Plural label for ARIA/live region.
+     *   - full: {string|null} (Optional) Label for "all items listed".
+     *   - minLength: {number} (Optional) Minimum query length to trigger filtering.
+     *   - searchStart: {boolean} (Optional) If true, only match from start of words.
      *   - debug: {boolean} (Optional) If true, enable debug outlines.
      *   - hideElement: {function} (Optional) Custom hideElement override.
      *   - showElement: {function} (Optional) Custom showElement override.
      */
     filter: function (options) {
       const {
-        inputElement,
-        tableSelector,
-        rowSelector,
-        targetSelector = null,
-        singularLabel = null,
-        pluralLabel = null,
-        fullLabel = null,
-        minQueryLength = defaultOptions.minQueryLength,
-        searchFromWordStart = defaultOptions.searchFromWordStart,
+        input,
+        table,
+        items,
+        targets = null,
+        singular = null,
+        plural = null,
+        full = null,
+        minLength = defaultOptions.minLength,
+        searchStart = defaultOptions.searchStart,
         debug = defaultOptions.debug,
-        hideElement,
-        showElement,
-        searchMethod,
-        searchingFinished,
+        hideElement = this.hideElement,
+        showElement = this.showElement,
+        searchMethod = this.searchMethod,
+        normalizeString = this.normalizeString,
+        filterItemsBuilder = this.filterItemsBuilder,
+        checkLabels = this.checkLabels,
+        checkDetailedLabels = this.checkDetailedLabels,
+        announce = this.announce,
+        debug: debugFunction = this.debug,
+        searchingFinished = this.searchingFinished ?? undefined,
       } = options;
-      this.showElement = showElement;
-      this.hideElement = hideElement;
-      this.searchingFinished = searchingFinished;
-      const tables = document.querySelectorAll(tableSelector);
+
+      const tables = document.querySelectorAll(table);
 
       for (const tableElement of tables) {
         let filterItemsTransitional = null;
@@ -383,8 +385,8 @@
 
         const filterItems = this.filterItemsBuilder(
           tableElement,
-          rowSelector,
-          targetSelector,
+          items,
+          targets,
           listFilter.normalizeString,
         );
 
@@ -410,14 +412,14 @@
           const queryContinuation = query.startsWith(queryTransitional);
 
           if (queryContinuation && filterItemsTransitional.length === 0) return;
-          if (!searchMethod(query, queryTransitional, searchFromWordStart)) {
+          if (!searchMethod(query, queryTransitional, searchStart)) {
             filterItemsTransitional = filterItems;
           }
 
-          if (query.length >= minQueryLength) {
+          if (query.length >= minLength) {
             const matches = [];
             for (const item of filterItemsTransitional) {
-              if (!searchMethod(item.textContent, query, searchFromWordStart)) {
+              if (!searchMethod(item.textContent, query, searchStart)) {
                 hideElement(item.node);
               } else {
                 this.showElement(item.node);
@@ -426,8 +428,8 @@
             }
             this.announce(
               matches.length,
-              singularLabel,
-              pluralLabel,
+              singular,
+              plural,
               SINGULAR_PHRASE,
               PLURAL_PHRASE
             );
@@ -437,7 +439,7 @@
             for (const item of filterItems) {
               this.showElement(item.node); // Use override or default
             }
-            Drupal.announce(fullLabel ?? ALL_PHRASE);
+            Drupal.announce(full ?? ALL_PHRASE);
             this.checkLabels(labels, true);
             filterItemsTransitional = filterItems;
           }
@@ -452,11 +454,11 @@
         tableElement.addEventListener(FILTER_EVENT, filterTableList.bind(this));
 
         if (debug) {
-          this.debug(tableElement, rowSelector, targetSelector);
+          this.debug(tableElement, items, targets);
         }
       }
 
-      inputElement.addEventListener(
+      input.addEventListener(
         'input',
         debounce((event) => {
           tables.forEach((tableElement) => {
@@ -467,65 +469,13 @@
         }, 200),
       );
 
-      inputElement.addEventListener('keydown', (e) => {
+      input.addEventListener('keydown', (e) => {
         if (e.which === 13) {
           e.preventDefault();
           e.stopPropagation();
         }
       });
       return listFilter;
-    },
-
-    /**
-     * Attaches the filter to input elements.
-     *
-     * @todo document all override options.
-     *
-     * @param inputFilter
-     * @param context
-     * @param overrides
-     */
-    onFilter: function (inputFilter, context, overrides = {}) {
-      once('drupal-list-filter', inputFilter, context).forEach(
-        (input) => {
-          const {
-            table,
-            items,
-            targets,
-            singular,
-            plural,
-            full,
-            minLength,
-            searchStart,
-            debug
-          } = input.dataset;
-          input.addEventListener(
-            'focus',
-            () => {
-              Drupal.listFilter.filter({
-                inputElement: input,
-                tableSelector: table,
-                rowSelector: items,
-                targetSelector: targets || null,
-                singularLabel: singular || null,
-                pluralLabel: plural || null,
-                fullLabel: full || null,
-                minQueryLength: minLength
-                  ? parseInt(minLength, 10)
-                  : undefined,
-                searchFromWordStart: searchStart === 'true' ?? undefined,
-                debug: debug === 'true' ?? undefined,
-                hideElement: overrides.hideElement || defaultHideElement,
-                showElement: overrides.showElement || defaultShowElement,
-                normalizeString: overrides.normalizeString || defaultNormalizeString,
-                searchMethod: overrides.searchMethod || defaultSearchMethod,
-                searchingFinished: overrides?.searchingFinished,
-              });
-            },
-            { once: true },
-          );
-        },
-      );
     },
   };
 
@@ -543,7 +493,25 @@
    */
   Drupal.behaviors.drupalListFilter = {
     attach(context) {
-      Drupal.listFilter.onFilter('.table-filter-text[data-auto-activate="true"]', context);
-    },
+      once('drupal-list-filter', '.table-filter-text[data-auto-activate="true"]', context).forEach(
+        (input) => {
+          input.addEventListener(
+            'focus',
+            function handler() {
+              let options = {
+                input: input,
+                ...input.dataset,
+              };
+
+              const event = new CustomEvent('listFilter:options', { detail: { options, input } });
+              input.dispatchEvent(event);
+
+              Drupal.listFilter.filter(event.detail.options);
+            },
+            { once: true },
+          );
+        }
+      );
+    }
   };
 })(Drupal, Drupal.debounce, once);
