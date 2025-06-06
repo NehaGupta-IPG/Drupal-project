@@ -262,7 +262,7 @@ function _drupal_log_error($error, $fatal = FALSE): void {
       // We fallback to a maintenance page at this point, because the page
       // generation itself can generate errors.
       // Should not translate the string to avoid errors producing more errors.
-      $message = 'The website encountered an unexpected error. Try again later.' . '<br />' . $message;
+      $message = 'The website encountered an unexpected error. Try again later.' . '<br /><br />' . $message;
 
       if ($is_installer) {
         // install_display_output() prints the output and ends script execution.
@@ -277,6 +277,16 @@ function _drupal_log_error($error, $fatal = FALSE): void {
         catch (\Throwable) {
           // The maintenance page failed, so fall back to a plain error message.
         }
+      }
+
+      $html = Error::renderFatalError([
+        'title' => 'Service unavailable',
+        'content' => $message,
+        'displayable' => error_displayable($error),
+      ]);
+      if (!empty($html)) {
+        $message = $html;
+        $response->headers->set('Content-Type', 'text/html');
       }
 
       $response->setContent($message);
