@@ -246,11 +246,6 @@
     matchedRows: null,
 
     /**
-     * @todo improve this variable or how can we handle the end of searching.
-     */
-    searchingFinished: undefined,
-
-    /**
      * Hides an element. Can be overridden.
      *
      * @type {function}
@@ -374,7 +369,7 @@
         checkDetailedLabels = this.checkDetailedLabels,
         announce = this.announce,
         debugFunction = this.debug,
-        searchingFinished = this.searchingFinished || undefined,
+        searchingFinished = undefined,
       } = options;
       const tables = document.querySelectorAll(table);
 
