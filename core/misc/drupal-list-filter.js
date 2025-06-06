@@ -303,6 +303,16 @@
      */
     debug: defaultDebug,
 
+    /**
+     * Function to be called when searching is finished.
+     */
+    searchingFinished: null,
+
+    /**
+     * Debug function to visually highlight elements.
+     */
+    debugFunction: defaultDebug,
+
     /*
      * Builds filter items from the table element. Can be overridden.
      *
@@ -360,24 +370,19 @@
         minLength = defaultOptions.minLength,
         searchStart = defaultOptions.searchStart,
         debug = defaultOptions.debug,
-        hideElement = this.hideElement,
-        showElement = this.showElement,
-        searchMethod = this.searchMethod,
-        normalizeString = this.normalizeString,
-        filterItemsBuilder = this.filterItemsBuilder,
-        checkLabels = this.checkLabels,
-        checkDetailedLabels = this.checkDetailedLabels,
-        announce = this.announce,
-        debugFunction = this.debug,
-        searchingFinished = undefined,
       } = options;
       const tables = document.querySelectorAll(table);
+
+      Object
+        .keys(options)
+        .filter(key => this[key] !== undefined)
+        .forEach((key) => this[key] = options[key]);
 
       for (const tableElement of tables) {
         let filterItemsTransitional = null;
         let queryTransitional = '';
 
-        const filterItems = filterItemsBuilder(
+        const filterItems = this.filterItemsBuilder(
           tableElement,
           items,
           targets,
@@ -402,45 +407,45 @@
         function filterTableList(e) {
           e = e.detail.event;
           tableElement.classList.remove('js-list-filtered');
-          const query = normalizeString(e.target.value);
+          const query = this.normalizeString(e.target.value);
           const queryContinuation = query.startsWith(queryTransitional);
 
           if (queryContinuation && filterItemsTransitional.length === 0) return;
-          if (!searchMethod(query, queryTransitional, searchStart)) {
+          if (!this.searchMethod(query, queryTransitional, searchStart)) {
             filterItemsTransitional = filterItems;
           }
 
           if (query.length >= minLength) {
             const matches = [];
             for (const item of filterItemsTransitional) {
-              if (!searchMethod(item.textContent, query, searchStart)) {
-                hideElement(item.node);
+              if (!this.searchMethod(item.textContent, query, searchStart)) {
+                this.hideElement(item.node);
               } else {
-                showElement(item.node);
+                this.showElement(item.node);
                 matches.push(item);
               }
             }
-            announce(
+            this.announce(
               matches.length,
               singular,
               plural,
               SINGULAR_PHRASE,
               PLURAL_PHRASE
             );
-            checkLabels(labels);
+            this.checkLabels(labels);
             filterItemsTransitional = matches;
           } else {
             for (const item of filterItems) {
-              showElement(item.node); // Use override or default
+              this.showElement(item.node); // Use override or default
             }
             Drupal.announce(full ?? ALL_PHRASE);
-            checkLabels(labels, true);
+            this.checkLabels(labels, true);
             filterItemsTransitional = filterItems;
           }
           listFilter.matchedRows = filterItemsTransitional.length;
           tableElement.classList.add('js-list-filtered');
-          if (searchingFinished !== undefined) {
-            searchingFinished(filterItemsTransitional.length);
+          if (this.searchingFinished) {
+            this.searchingFinished(filterItemsTransitional.length);
           }
           queryTransitional = query;
         }
@@ -448,7 +453,7 @@
         tableElement.addEventListener(FILTER_EVENT, filterTableList.bind(this));
 
         if (debug) {
-          debugFunction(tableElement, items, targets);
+          this.debugFunction(tableElement, items, targets);
         }
       }
 
