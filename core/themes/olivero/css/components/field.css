@@ -42,7 +42,3 @@
 .field--label-inline .field__items {
   padding-inline-end: 0.5em;
 }
-
-.field--label-inline .field__label::after {
-  content: ":";
-}
