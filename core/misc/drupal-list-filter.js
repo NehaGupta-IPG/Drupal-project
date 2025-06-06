@@ -21,6 +21,18 @@
   const SINGULAR_PHRASE = '1 item is available in the modified list.';
   const PLURAL_PHRASE = '@count items are available in the modified list.';
 
+  /**
+   * Default options for the list filter.
+   */
+  const defaultOptions = {
+    minLength: 2,
+    searchStart: false,
+    debug: false,
+  };
+
+  /**
+   * List filter object.
+   */
   let listFilter;
 
   /**
@@ -220,12 +232,6 @@
       }
     });
   }
-
-  const defaultOptions = {
-    minQueryLength: 2,
-    searchFromWordStart: false,
-    debug: false,
-  };
 
   /**
    * List filter object.
