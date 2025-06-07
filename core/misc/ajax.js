@@ -1341,7 +1341,7 @@
         const tempDiv = fragment.appendChild(document.createElement('div'));
 
         // Set the innerHTML of the div to the provided HTML string
-        tempDiv.innerHTML = htmlString;
+        tempDiv.setHTMLUnsafe(htmlString);
 
         // Return the contents of the temporary div
         return tempDiv.childNodes;
