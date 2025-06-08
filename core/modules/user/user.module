@@ -16,6 +16,9 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\MailerInterface;
 
 /**
  * Returns whether this site supports the default user picture feature.
@@ -644,7 +647,6 @@ function user_role_revoke_permissions($rid, array $permissions = []): void {
 function _user_mail_notify($op, AccountInterface $account) {
 
   if (\Drupal::config('user.settings')->get('notify.' . $op)) {
-    $params['account'] = $account;
     // Get the custom site notification email to use as the from email address
     // if it has been set.
     $site_mail = \Drupal::config('system.site')->get('mail_notification');
@@ -656,11 +658,51 @@ function _user_mail_notify($op, AccountInterface $account) {
     if (empty($site_mail)) {
       $site_mail = ini_get('sendmail_from');
     }
-    $mail = \Drupal::service('plugin.manager.mail')->mail('user', $op, $account->getEmail(), $account->getPreferredLangcode(), $params, $site_mail);
-    if ($op == 'register_pending_approval') {
-      // If a user registered requiring admin approval, notify the admin, too.
-      // We use the site default language for this.
-      \Drupal::service('plugin.manager.mail')->mail('user', 'register_pending_approval_admin', $site_mail, \Drupal::languageManager()->getDefaultLanguage()->getId(), $params);
+
+    $mailer = NULL;
+    try {
+      if (\Drupal::getContainer()?->getParameter('user.use_experimental_mailer')) {
+        $mailer = \Drupal::getContainer()?->get(MailerInterface::class);
+      }
+    }
+    catch (NotFoundExceptionInterface) {
+      // Fall back to mail manager when experimental mailer is not available or
+      // when the feature flag isn't enabled.
+    }
+    if ($mailer) {
+      $mail = ['result' => NULL];
+      assert($account instanceof UserInterface);
+      assert($mailer instanceof MailerInterface);
+
+      $email = $account->toEmail($op, $account->getPreferredLangcode());
+      try {
+        $mailer->send($email->from($site_mail)->to($account->getEmail()));
+        $mail['result'] = TRUE;
+      }
+      catch (TransportException) {
+        $mail['result'] = FALSE;
+      }
+
+      if ($op == 'register_pending_approval') {
+        // If a user registered requiring admin approval, notify the admin, too.
+        // We use the site default language for this.
+        $email = $account->toEmail('register_pending_approval_admin', \Drupal::languageManager()->getDefaultLanguage()->getId());
+        try {
+          $mailer->send($email->from($site_mail)->to($site_mail));
+        }
+        catch (TransportException) {
+          // Ignored.
+        }
+      }
+    }
+    else {
+      $params['account'] = $account;
+      $mail = \Drupal::service('plugin.manager.mail')->mail('user', $op, $account->getEmail(), $account->getPreferredLangcode(), $params, $site_mail);
+      if ($op == 'register_pending_approval') {
+        // If a user registered requiring admin approval, notify the admin, too.
+        // We use the site default language for this.
+        \Drupal::service('plugin.manager.mail')->mail('user', 'register_pending_approval_admin', $site_mail, \Drupal::languageManager()->getDefaultLanguage()->getId(), $params);
+      }
     }
   }
   return empty($mail) ? NULL : $mail['result'];

@@ -6,6 +6,7 @@ use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
+use Drupal\Core\Entity\EntityEmailTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -21,6 +22,7 @@ use Drupal\user\TimeZoneItem;
 use Drupal\user\UserAccessControlHandler;
 use Drupal\user\UserInterface;
 use Drupal\user\UserListBuilder;
+use Drupal\user\UserMessageBuilder;
 use Drupal\user\UserStorage;
 use Drupal\user\UserStorageSchema;
 use Drupal\user\UserViewsData;
@@ -56,6 +58,17 @@ use Drupal\user\UserViewsData;
       'cancel' => UserCancelForm::class,
       'register' => RegisterForm::class,
     ],
+    'email' => [
+      'cancel_confirm' => UserMessageBuilder::class,
+      'password_reset' => UserMessageBuilder::class,
+      'register_admin_created' => UserMessageBuilder::class,
+      'register_no_approval_required' => UserMessageBuilder::class,
+      'register_pending_approval_admin' => UserMessageBuilder::class,
+      'register_pending_approval' => UserMessageBuilder::class,
+      'status_activated' => UserMessageBuilder::class,
+      'status_blocked' => UserMessageBuilder::class,
+      'status_canceled' => UserMessageBuilder::class,
+    ],
     'translation' => ProfileTranslationHandler::class,
   ],
   links: [
@@ -78,6 +91,7 @@ use Drupal\user\UserViewsData;
 class User extends ContentEntityBase implements UserInterface {
 
   use EntityChangedTrait;
+  use EntityEmailTrait;
 
   /**
    * Stores a reference for a reusable anonymous user entity.

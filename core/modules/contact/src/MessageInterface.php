@@ -3,11 +3,12 @@
 namespace Drupal\contact;
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityEmailInterface;
 
 /**
  * Provides an interface defining a contact message entity.
  */
-interface MessageInterface extends ContentEntityInterface {
+interface MessageInterface extends ContentEntityInterface, EntityEmailInterface {
 
   /**
    * Returns the form this contact message belongs to.
