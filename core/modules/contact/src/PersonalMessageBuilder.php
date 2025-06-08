@@ -119,7 +119,7 @@ class PersonalMessageBuilder extends EntityHandlerBase implements EntityHandlerI
     // user administrator because they can always send emails even if the
     // contacted user has disabled their contact form.
     if ($key === 'user_mail' && !$sender->hasPermission('administer users')) {
-      $build['optout'] = [
+      $build['opt_out'] = [
         '#type' => 'processed_text',
         '#text' => $this->t("If you don't want to receive such messages, you can change your settings at @recipient-edit-url.", $variables, $options),
         '#langcode' => $langcode,
