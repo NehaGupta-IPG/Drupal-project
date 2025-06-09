@@ -117,8 +117,8 @@ abstract class AssetControllerBase extends FileDownloadController {
 
     // Check to see whether a file matching the $uri already exists, this can
     // happen if it was created while this request was in progress.
-    if (file_exists($uri)) {
-      return new BinaryFileResponse($uri, 200, [
+    if (file_exists($file_name)) {
+      return new BinaryFileResponse($file_name, 200, [
         'Cache-control' => static::CACHE_CONTROL,
       ]);
     }
