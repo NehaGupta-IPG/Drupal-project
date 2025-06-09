@@ -608,3 +608,7 @@ zoneinfo
 zoomin
 zoomout
 zxvf
+hitmen
+patri
+patr
+patria
