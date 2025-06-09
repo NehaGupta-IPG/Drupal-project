@@ -31,11 +31,6 @@
   };
 
   /**
-   * List filter object.
-   */
-  let listFilter;
-
-  /**
    * Hides an element visually and semantically.
    *
    * @function Drupal.listFilter.hideElement
@@ -181,13 +176,13 @@
    *   Whether to reset the label state.
    */
   function defaultCheckLabels(labels, reset = false) {
-    for (const label of labels) {
+    labels.forEach((label) => {
       const anyVisible = Array.from(label.labelledItems).some(
         (element) => !element.hasAttribute('hidden'),
       );
       if (!anyVisible) {
         this.hideElement(label);
-        continue;
+        return;
       }
       // @todo make the function to process other node types overridable, for example, fieldset elements.
       // we can check if the function exists then call it, or we can use a different approach.
@@ -196,7 +191,7 @@
         this.checkDetailedLabels(reset, label);
       }
       this.showElement(label);
-    }
+    });
   }
 
   /**
@@ -245,7 +240,7 @@
    *
    * @namespace Drupal.listFilter
    */
-  listFilter = {
+  const listFilter = {
     /**
      * Total rows matched by the filter.
      */
@@ -444,11 +439,13 @@
       } = options;
       Object.keys(options)
         .filter((key) => this[key] !== undefined)
-        .forEach((key) => (this[key] = options[key]));
+        .forEach((key) => {
+          this[key] = options[key];
+        });
 
       const tables = document.querySelectorAll(table);
 
-      for (const tableElement of tables) {
+      tables.forEach((tableElement) => {
         const filterItems = this.filterItemsBuilder(
           tableElement,
           items,
@@ -462,11 +459,11 @@
         };
 
         const labels = tableElement.querySelectorAll('[data-filter-label]');
-        for (const label of labels) {
+        labels.forEach((label) => {
           label.labelledItems = tableElement.querySelectorAll(
             `[data-filter-labelledby="${label.dataset.filterLabel}"]`,
           );
-        }
+        });
 
         // Bind the input event to the table element.
         tableElement.addEventListener(FILTER_EVENT, (e) => {
@@ -483,7 +480,7 @@
         if (debug) {
           this.debugFunction(tableElement, items, targets);
         }
-      }
+      });
 
       input.addEventListener(
         'input',
