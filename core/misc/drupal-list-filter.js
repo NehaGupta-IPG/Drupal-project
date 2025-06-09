@@ -74,7 +74,10 @@
    */
   function defaultNormalizeString(str) {
     return str
-      ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+      ? str
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
       : '';
   }
 
@@ -147,16 +150,25 @@
    * An array of objects containing the node and normalized text content.
    *
    */
-  function defaultFilterItemsBuilder(tableElement, rowSelector, targetSelector, normalizeString) {
-    return Array.from(tableElement.querySelectorAll(rowSelector)).map((source) => {
-      const textContent = targetSelector
-        ? Array.from(source.querySelectorAll(targetSelector)).map(t => t.textContent).join(' ')
-        : source.textContent;
-      return {
-        node: source,
-        textContent: normalizeString(textContent),
-      };
-    });
+  function defaultFilterItemsBuilder(
+    tableElement,
+    rowSelector,
+    targetSelector,
+    normalizeString,
+  ) {
+    return Array.from(tableElement.querySelectorAll(rowSelector)).map(
+      (source) => {
+        const textContent = targetSelector
+          ? Array.from(source.querySelectorAll(targetSelector))
+              .map((t) => t.textContent)
+              .join(' ')
+          : source.textContent;
+        return {
+          node: source,
+          textContent: normalizeString(textContent),
+        };
+      },
+    );
   }
 
   /**
@@ -234,7 +246,6 @@
    * @namespace Drupal.listFilter
    */
   listFilter = {
-
     /**
      * Total rows matched by the filter.
      */
@@ -325,21 +336,8 @@
      * @param {object} options
      *   Options for filtering.
      */
-    filterTableList: function (
-      e,
-      tableElement,
-      filterItems,
-      labels,
-      prevState,
-      options
-    ) {
-      const {
-        singular,
-        plural,
-        full,
-        minLength,
-        searchStart
-      } = options;
+    filterTableList(e, tableElement, filterItems, labels, prevState, options) {
+      const { singular, plural, full, minLength, searchStart } = options;
 
       e = e.detail.event;
       tableElement.classList.remove('js-list-filtered');
@@ -348,7 +346,8 @@
 
       let filterItemsTransitional = prevState.filterItemsTransitional;
 
-      if (queryContinuation && filterItemsTransitional.length === 0) return prevState;
+      if (queryContinuation && filterItemsTransitional.length === 0)
+        return prevState;
       if (!this.searchMethod(query, prevState.queryTransitional, searchStart)) {
         filterItemsTransitional = filterItems;
       }
@@ -363,11 +362,7 @@
             matches.push(item);
           }
         });
-        this.announce(
-          matches.length,
-          singular,
-          plural
-        );
+        this.announce(matches.length, singular, plural);
         this.checkLabels(labels);
         filterItemsTransitional = matches;
       } else {
@@ -434,7 +429,7 @@
      *   - hideElement: {function} (Optional) Custom hideElement override.
      *   - showElement: {function} (Optional) Custom showElement override.
      */
-    filter: function (options) {
+    filter(options) {
       const {
         input,
         table,
@@ -447,10 +442,9 @@
         searchStart = defaultOptions.searchStart,
         debug = defaultOptions.debug,
       } = options;
-      Object
-        .keys(options)
-        .filter(key => this[key] !== undefined)
-        .forEach((key) => this[key] = options[key]);
+      Object.keys(options)
+        .filter((key) => this[key] !== undefined)
+        .forEach((key) => (this[key] = options[key]));
 
       const tables = document.querySelectorAll(table);
 
@@ -475,25 +469,16 @@
         }
 
         // Bind the input event to the table element.
-        tableElement.addEventListener(
-          FILTER_EVENT,
-          (e) => {
-            state = this.filterTableList(
-              e,
-              tableElement,
-              filterItems,
-              labels,
-              state,
-              {
-                singular,
-                plural,
-                full,
-                minLength,
-                searchStart,
-              }
-            ) || state;
-          }
-        );
+        tableElement.addEventListener(FILTER_EVENT, (e) => {
+          state =
+            this.filterTableList(e, tableElement, filterItems, labels, state, {
+              singular,
+              plural,
+              full,
+              minLength,
+              searchStart,
+            }) || state;
+        });
 
         if (debug) {
           this.debugFunction(tableElement, items, targets);
@@ -535,26 +520,32 @@
    */
   Drupal.behaviors.drupalListFilter = {
     attach(context) {
-      once('drupal-list-filter', '.table-filter-text[data-auto-activate="true"]', context).forEach(
-        (input) => {
-          input.addEventListener(
-            'focus',
-            () => {
-              let options = {
-                input: input,
-                ...input.dataset,
-                searchStart: input.dataset.searchStart === 'true',
-                debug: input.dataset.debug === 'true',
-                minLength: parseInt(input.dataset.minLength, 10) || defaultOptions.minLength,
-              };
-              const event = new CustomEvent('listFilter:options', { detail: { options, input } });
-              input.dispatchEvent(event);
-              Drupal.listFilter.filter(event.detail.options);
-            },
-            { once: true },
-          );
-        }
-      );
-    }
+      once(
+        'drupal-list-filter',
+        '.table-filter-text[data-auto-activate="true"]',
+        context,
+      ).forEach((input) => {
+        input.addEventListener(
+          'focus',
+          () => {
+            const options = {
+              input,
+              ...input.dataset,
+              searchStart: input.dataset.searchStart === 'true',
+              debug: input.dataset.debug === 'true',
+              minLength:
+                parseInt(input.dataset.minLength, 10) ||
+                defaultOptions.minLength,
+            };
+            const event = new CustomEvent('listFilter:options', {
+              detail: { options, input },
+            });
+            input.dispatchEvent(event);
+            Drupal.listFilter.filter(event.detail.options);
+          },
+          { once: true },
+        );
+      });
+    },
   };
 })(Drupal, Drupal.debounce, once);

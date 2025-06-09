@@ -12,16 +12,17 @@
       //     result.innerText = `Results found: ${this.matchedRows}`;
       //   },
       // });
-      const result = document.querySelector(".js-filter-count");
-      once('list-filter-override', '.filter-input', context)
-        .forEach((input) => {
+      const result = document.querySelector('.js-filter-count');
+      once('list-filter-override', '.filter-input', context).forEach(
+        (input) => {
           input.addEventListener('listFilter:options', (e) => {
-            e.detail.options.searchingFinished = function(matchedRows) {
-              result.classList.remove("hidden");
+            e.detail.options.searchingFinished = function (matchedRows) {
+              result.classList.remove('hidden');
               result.innerText = `Results found: ${matchedRows}`;
             };
           });
-        });
+        },
+      );
     },
   };
 })(Drupal);
