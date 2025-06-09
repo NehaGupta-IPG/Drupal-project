@@ -371,12 +371,13 @@
         searchStart = defaultOptions.searchStart,
         debug = defaultOptions.debug,
       } = options;
-      const tables = document.querySelectorAll(table);
 
       Object
         .keys(options)
         .filter(key => this[key] !== undefined)
         .forEach((key) => this[key] = options[key]);
+
+      const tables = document.querySelectorAll(table);
 
       for (const tableElement of tables) {
         let filterItemsTransitional = null;
