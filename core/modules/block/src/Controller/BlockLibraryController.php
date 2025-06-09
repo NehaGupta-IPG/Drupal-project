@@ -108,12 +108,18 @@ class BlockLibraryController extends ControllerBase {
       $row = [];
       $row['title']['data'] = [
         '#type' => 'inline_template',
-        '#template' => '<div class="block-filter-text-source">{{ label }}</div>',
+        '#template' => '<div class="block-filter-text-source list-filter-target">{{ label }}</div>',
         '#context' => [
           'label' => $plugin_definition['admin_label'],
         ],
       ];
-      $row['category']['data'] = $plugin_definition['category'];
+      $row['category']['data'] = [
+        '#type' => 'inline_template',
+        '#template' => '<div class="list-filter-target">{{ label }}</div>',
+        '#context' => [
+          'label' => $plugin_definition['category'],
+        ],
+      ];
       $links['add'] = [
         'title' => $this->t('Place block'),
         'url' => Url::fromRoute('block.admin_add', ['plugin_id' => $plugin_id, 'theme' => $theme]),
@@ -148,6 +154,7 @@ class BlockLibraryController extends ControllerBase {
       '#placeholder' => $this->t('Filter by block name'),
       '#list_container_selector' => '.block-add-table',
       '#list_item' => 'tbody tr',
+      '#list_text' => '.list-filter-target',
       '#announce' => [
         'singular' => $this->t('1 block is available in the modified list.'),
         'plural' => $this->t('@count blocks are available in the modified list.'),
