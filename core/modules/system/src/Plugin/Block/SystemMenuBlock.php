@@ -157,6 +157,13 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
       $parameters = $this->menuTree->getCurrentRouteMenuTreeParameters($menu_name);
     }
 
+    // Menu links that aren't enabled are filtered out by
+    // MenuLinkTreeInterface::build() however this happens after menu tree
+    // manipulators have run, including access checks. Therefore ensure only
+    // enabled links are loaded in the first place to avoid unnecessary access
+    // checks.
+    $parameters->onlyEnabledLinks();
+
     // Adjust the menu tree parameters based on the block's configuration.
     $level = $this->configuration['level'];
     $depth = $this->configuration['depth'];
