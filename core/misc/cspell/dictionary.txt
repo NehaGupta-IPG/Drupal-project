@@ -340,8 +340,8 @@ paramconverter
 parseable
 parsererror
 pathauto
-patri
 patr
+patri
 patria
 pcre
 pcss
