@@ -29,7 +29,7 @@ class ListFilterTest extends WebDriverTestBase {
   /**
    * Tests the ListFilter with auto_activate set to FALSE.
    */
-  public function testAutoActivateFalse() {
+  public function testAutoActivateFalse(): void {
     $this->drupalGet('/list-filter/auto_activate_false');
     $this->getSession()
       ->getPage()
@@ -46,7 +46,7 @@ class ListFilterTest extends WebDriverTestBase {
   /**
    * Tests the ListFilter with an overridden library.
    */
-  public function testListFilterOverride() {
+  public function testListFilterOverride(): void {
     $this->drupalGet('/list-filter/override_library');
     $page = $this->getSession()->getPage();
     $filterInput = $page->find('css', '.filter-input');
@@ -60,7 +60,7 @@ class ListFilterTest extends WebDriverTestBase {
   /**
    * Tests the minimum filter length functionality.
    */
-  public function testMinFilterLength() {
+  public function testMinFilterLength(): void {
     $this->drupalGet('/list-filter/minimum_filter_length');
     $page = $this->getSession()->getPage();
     $totalRows = count($page->findAll('css', '.filter-container tbody tr'));
@@ -78,7 +78,7 @@ class ListFilterTest extends WebDriverTestBase {
   /**
    * Tests the search start of words functionality.
    */
-  public function testSearchStartOfWords() {
+  public function testSearchStartOfWords(): void {
     $this->drupalGet('/list-filter/search_start_of_words');
     $page = $this->getSession()->getPage();
     $filterInput = $page->find('css', '.filter-input');
@@ -92,7 +92,7 @@ class ListFilterTest extends WebDriverTestBase {
   /**
    * Tests multiple filter elements on the same page.
    */
-  public function testMultipleFilterElementsInPage() {
+  public function testMultipleFilterElementsInPage(): void {
     $this->drupalGet('/list-filter/multiple-filters-on-page');
     $page = $this->getSession()->getPage();
 
