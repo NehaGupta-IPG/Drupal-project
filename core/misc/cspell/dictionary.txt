@@ -218,6 +218,7 @@ hateoas
 hexcode
 hhvm
 hilited
+hitmen
 hmac
 hookname
 hrefs
@@ -353,6 +354,9 @@ paramconverter
 parseable
 parsererror
 pathauto
+patri
+patr
+patria
 pcre
 pcss
 peast
@@ -608,7 +612,3 @@ zoneinfo
 zoomin
 zoomout
 zxvf
-hitmen
-patri
-patr
-patria
