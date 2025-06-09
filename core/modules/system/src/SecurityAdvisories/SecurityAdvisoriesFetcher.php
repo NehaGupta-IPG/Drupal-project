@@ -28,6 +28,11 @@ final class SecurityAdvisoriesFetcher {
   protected const ADVISORIES_JSON_EXPIRABLE_KEY = 'advisories_response';
 
   /**
+   * The key to use for advisories flood control.
+   */
+  protected const ADVISORIES_FLOOD_KEY = 'system.advisories';
+
+  /**
    * The 'system.advisories' configuration.
    *
    * @var \Drupal\Core\Config\ImmutableConfig
@@ -122,22 +127,23 @@ final class SecurityAdvisoriesFetcher {
     $advisories = [];
 
     $json_payload = $this->keyValueExpirable->get(self::ADVISORIES_JSON_EXPIRABLE_KEY);
+    $interval_seconds = $this->config->get('interval_hours') * 60 * 60;
     // If $json_payload is not an array then it was not set in this method or
     // has expired in which case we should try to retrieve the advisories.
-    if (!is_array($json_payload)) {
+    if (!is_array($json_payload) || \Drupal::flood()->isAllowed(self::ADVISORIES_FLOOD_KEY, 1, $interval_seconds, 0)) {
       if (!$allow_outgoing_request) {
         return NULL;
       }
       $response = $this->doRequest($timeout);
-      $interval_seconds = $this->config->get('interval_hours') * 60 * 60;
       $json_payload = Json::decode($response);
+      \Drupal::flood()->register(self::ADVISORIES_FLOOD_KEY, $interval_seconds, 0);
       if (is_array($json_payload)) {
         // Only store and use the response if it could be successfully
         // decoded to an array from the JSON string.
         // This value will be deleted if the 'advisories.interval_hours' config
         // is changed to a lower value.
         // @see \Drupal\update\EventSubscriber\ConfigSubscriber::onConfigSave()
-        $this->keyValueExpirable->setWithExpire(self::ADVISORIES_JSON_EXPIRABLE_KEY, $json_payload, $interval_seconds);
+        $this->keyValueExpirable->setWithExpire(self::ADVISORIES_JSON_EXPIRABLE_KEY, $json_payload, $interval_seconds * 2);
       }
       else {
         $this->logger->error('The security advisory JSON feed from Drupal.org could not be decoded.');
