@@ -119,13 +119,8 @@
    * @param {string|null} singularLabel
    *   Singular label for ARIA/live region.
    * @param {string|null} pluralLabel
-   *   Plural label for ARIA/live region.
-   * @param {string} SINGULAR_PHRASE
-   *   Default singular phrase.
-   * @param {string} PLURAL_PHRASE
-   *   Default plural phrase.
    */
-  function defaultAnnounce(matches, singularLabel, pluralLabel, SINGULAR_PHRASE, PLURAL_PHRASE) {
+  function defaultAnnounce(matches, singularLabel, pluralLabel) {
     Drupal.announce(
       Drupal.formatPlural(
         matches,
@@ -314,6 +309,87 @@
     debugFunction: defaultDebug,
 
     /**
+     * Filters the table/list based on the input event.
+     *
+     * @function Drupal.listFilter.filterTableList
+     * @param {Event} e
+     *   The input event.
+     * @param {HTMLElement} tableElement
+     *   The table element being filtered.
+     * @param {Array} filterItems
+     *   The original filter items.
+     * @param {Array} labels
+     *   The label elements.
+     * @param {object} context
+     *   Context object holding transitional state.
+     * @param {object} options
+     *   Options for filtering.
+     */
+    filterTableList: function (
+      e,
+      tableElement,
+      filterItems,
+      labels,
+      prevState,
+      options
+    ) {
+      const {
+        singular,
+        plural,
+        full,
+        minLength,
+        searchStart
+      } = options;
+
+      e = e.detail.event;
+      tableElement.classList.remove('js-list-filtered');
+      const query = this.normalizeString(e.target.value);
+      const queryContinuation = query.startsWith(prevState.queryTransitional);
+
+      let filterItemsTransitional = prevState.filterItemsTransitional;
+
+      if (queryContinuation && filterItemsTransitional.length === 0) return prevState;
+      if (!this.searchMethod(query, prevState.queryTransitional, searchStart)) {
+        filterItemsTransitional = filterItems;
+      }
+
+      if (query.length >= minLength) {
+        const matches = [];
+        filterItemsTransitional.forEach((item) => {
+          if (!this.searchMethod(item.textContent, query, searchStart)) {
+            this.hideElement(item.node);
+          } else {
+            this.showElement(item.node);
+            matches.push(item);
+          }
+        });
+        this.announce(
+          matches.length,
+          singular,
+          plural
+        );
+        this.checkLabels(labels);
+        filterItemsTransitional = matches;
+      } else {
+        filterItems.forEach((item) => {
+          this.showElement(item.node);
+        });
+        Drupal.announce(full ?? Drupal.t('All available items are listed.'));
+        this.checkLabels(labels, true);
+        filterItemsTransitional = filterItems;
+      }
+      listFilter.matchedRows = filterItemsTransitional.length;
+      tableElement.classList.add('js-list-filtered');
+      if (this.searchingFinished) {
+        this.searchingFinished(filterItemsTransitional.length);
+      }
+      return {
+        filterItemsTransitional,
+        queryTransitional: query,
+      };
+    },
+
+    /*
      * Builds filter items from the table element. Can be overridden.
      *
      * @todo add this function in the override filter "constructor"
@@ -371,7 +447,6 @@
         searchStart = defaultOptions.searchStart,
         debug = defaultOptions.debug,
       } = options;
-
       Object
         .keys(options)
         .filter(key => this[key] !== undefined)
@@ -380,9 +455,6 @@
       const tables = document.querySelectorAll(table);
 
       for (const tableElement of tables) {
-        let filterItemsTransitional = null;
-        let queryTransitional = '';
-
         const filterItems = this.filterItemsBuilder(
           tableElement,
           items,
@@ -390,7 +462,10 @@
           listFilter.normalizeString,
         );
 
-        filterItemsTransitional = filterItems;
+        let state = {
+          filterItemsTransitional: filterItems,
+          queryTransitional: '',
+        };
 
         const labels = tableElement.querySelectorAll('[data-filter-label]');
         for (const label of labels) {
@@ -399,59 +474,26 @@
           );
         }
 
-        /**
-         * Filters the table/list based on the input event.
-         *
-         * @param {Event} e
-         *   The input event.
-         */
-        function filterTableList(e) {
-          e = e.detail.event;
-          tableElement.classList.remove('js-list-filtered');
-          const query = this.normalizeString(e.target.value);
-          const queryContinuation = query.startsWith(queryTransitional);
-
-          if (queryContinuation && filterItemsTransitional.length === 0) return;
-          if (!this.searchMethod(query, queryTransitional, searchStart)) {
-            filterItemsTransitional = filterItems;
-          }
-
-          if (query.length >= minLength) {
-            const matches = [];
-            for (const item of filterItemsTransitional) {
-              if (!this.searchMethod(item.textContent, query, searchStart)) {
-                this.hideElement(item.node);
-              } else {
-                this.showElement(item.node);
-                matches.push(item);
+        // Bind the input event to the table element.
+        tableElement.addEventListener(
+          FILTER_EVENT,
+          (e) => {
+            state = this.filterTableList(
+              e,
+              tableElement,
+              filterItems,
+              labels,
+              state,
+              {
+                singular,
+                plural,
+                full,
+                minLength,
+                searchStart,
               }
-            }
-            this.announce(
-              matches.length,
-              singular,
-              plural,
-              SINGULAR_PHRASE,
-              PLURAL_PHRASE
-            );
-            this.checkLabels(labels);
-            filterItemsTransitional = matches;
-          } else {
-            for (const item of filterItems) {
-              this.showElement(item.node); // Use override or default
-            }
-            Drupal.announce(full ?? ALL_PHRASE);
-            this.checkLabels(labels, true);
-            filterItemsTransitional = filterItems;
+            ) || state;
           }
-          listFilter.matchedRows = filterItemsTransitional.length;
-          tableElement.classList.add('js-list-filtered');
-          if (this.searchingFinished) {
-            this.searchingFinished(filterItemsTransitional.length);
-          }
-          queryTransitional = query;
-        }
-
-        tableElement.addEventListener(FILTER_EVENT, filterTableList.bind(this));
+        );
 
         if (debug) {
           this.debugFunction(tableElement, items, targets);
@@ -497,15 +539,16 @@
         (input) => {
           input.addEventListener(
             'focus',
-            function handler() {
+            () => {
               let options = {
                 input: input,
                 ...input.dataset,
+                searchStart: input.dataset.searchStart === 'true',
+                debug: input.dataset.debug === 'true',
+                minLength: parseInt(input.dataset.minLength, 10) || defaultOptions.minLength,
               };
-              // console.log(options, '1')
               const event = new CustomEvent('listFilter:options', { detail: { options, input } });
               input.dispatchEvent(event);
-              // console.log(options, '2')
               Drupal.listFilter.filter(event.detail.options);
             },
             { once: true },
