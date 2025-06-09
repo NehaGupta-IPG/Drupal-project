@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\list_filter_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
@@ -46,9 +48,6 @@ class ListFilterTestController extends ControllerBase {
    *
    * @return array
    *   A render array containing two filter elements and their associated tables.
-   */
-  /**
-   * Provides a build with two filter elements and their respective tables.
    */
   public function multipleFiltersOnPage(): array {
     [$header, $rows] = $this->drinksRecipes();
