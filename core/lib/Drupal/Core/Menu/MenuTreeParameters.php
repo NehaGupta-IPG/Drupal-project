@@ -173,6 +173,19 @@ class MenuTreeParameters implements \Serializable {
   }
 
   /**
+   * Removes a custom query condition.
+   *
+   * @param string $definition_field
+   *   Only conditions that are testing menu link definition fields are allowed.
+   *
+   * @return $this
+   */
+  public function removeCondition($definition_field) {
+    unset($this->conditions[$definition_field]);
+    return $this;
+  }
+
+  /**
    * Excludes links that are not enabled.
    *
    * @return $this
