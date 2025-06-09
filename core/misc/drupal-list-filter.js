@@ -166,7 +166,7 @@
 
   /**
    * Default function to check and update the visibility of labels.
-   * 
+   *
    * @function Drupal.listFilter.defaultCheckLabels
    * @param {Array} labels
    *   An array of label elements to check.
@@ -194,7 +194,7 @@
 
   /**
    * Default function to check and update the opened status of detailed labels.
-   * 
+   *
    * @param {boolean} reset
    *   Whether to reset the label state.
    * @param {string} label
@@ -212,13 +212,13 @@
 
   /**
    * Default debug function to visually highlight elements.
-   * 
+   *
    * @function Drupal.listFilter.defaultDebug
-   * @param {HTMLElement} tableElement 
+   * @param {HTMLElement} tableElement
    *   The table element to debug.
    * @param {string} rowSelector
    *   The selector for the rows/items to filter.
-   * @param {string} targetSelector 
+   * @param {string} targetSelector
    *   The selector for sub-elements to search within each row.
    */
   function defaultDebug(tableElement, rowSelector, targetSelector) {
@@ -284,21 +284,21 @@
 
     /**
      * Checks and updates the visibility of labels.
-     * 
+     *
      * @type {function}
      */
     checkLabels: defaultCheckLabels,
 
     /**
      * Checks and updates the visibility of labels.
-     * 
+     *
      * @type {function}
      */
     checkDetailedLabels: defaultCheckDetailedLabels,
 
     /**
      * Default debug function. Can be overridden.
-     * 
+     *
      * @type {function}
      */
     debug: defaultDebug,
@@ -313,7 +313,7 @@
      */
     debugFunction: defaultDebug,
 
-    /*
+    /**
      * Builds filter items from the table element. Can be overridden.
      *
      * @todo add this function in the override filter "constructor"
