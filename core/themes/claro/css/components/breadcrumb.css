@@ -34,17 +34,18 @@
 
 .breadcrumb__item + .breadcrumb__item::before {
   display: inline-block;
-  width: 0.35rem;
-  height: 0.35rem;
-  margin-inline: 0.75rem 1.25rem;
+  width: 0.25rem;
+  height: 0.25rem;
+  margin-inline: 0.5rem;
   content: "";
   transform: rotate(45deg);
-  border-block-start: 2px solid var(--color-text);
-  border-inline-end: 2px solid var(--color-text);
+  border-block-start: 1px solid var(--color-text);
+  border-inline-end: 1px solid var(--color-text);
+  vertical-align: middle;
 }
 
 [dir="rtl"] :is(.breadcrumb__item + .breadcrumb__item::before) {
-  transform: scaleX(-1);
+  transform: rotate(-45deg);
 }
 
 @media (forced-colors: active) {
