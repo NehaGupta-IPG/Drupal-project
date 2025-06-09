@@ -72,7 +72,7 @@ class ListFilterTest extends WebDriverTestBase {
     $filterInput->setValue('patria');
     $this->waitSearchFiltered();
     $totalVisibleRows = $this->countVisibleRows();
-    $this->assertLessThan($totalRows, $totalVisibleRows, 'Rows are visible after reaching the minimum filter length.');;
+    $this->assertLessThan($totalRows, $totalVisibleRows, 'Rows are visible after reaching the minimum filter length.');
   }
 
   /**

@@ -104,11 +104,11 @@ class ListFilter extends Search {
     if ($element['#library']) {
       $element['#attached']['library'][] = $element['#library'];
     }
-    
+
     $element['#attributes']['data-singular'] = $element['#announce']['singular'] ?? t('1 item is available in the modified list.');
     $element['#attributes']['data-plural'] = $element['#announce']['plural'] ?? t('@count items are available in the modified list.');
     $element['#attributes']['data-full'] = $element['#announce']['all'] ?? t('All available items are listed.');
-    
+
     if ($element['#debug']) {
       $element['#attributes']['data-debug'] = 'true';
     }
