@@ -119,13 +119,8 @@
    * @param {string|null} singularLabel
    *   Singular label for ARIA/live region.
    * @param {string|null} pluralLabel
-   *   Plural label for ARIA/live region.
-   * @param {string} SINGULAR_PHRASE
-   *   Default singular phrase.
-   * @param {string} PLURAL_PHRASE
-   *   Default plural phrase.
    */
-  function defaultAnnounce(matches, singularLabel, pluralLabel, SINGULAR_PHRASE, PLURAL_PHRASE) {
+  function defaultAnnounce(matches, singularLabel, pluralLabel) {
     Drupal.announce(
       Drupal.formatPlural(
         matches,
@@ -343,9 +338,7 @@
         plural,
         full,
         minLength,
-        searchStart,
-        SINGULAR_PHRASE,
-        PLURAL_PHRASE,
+        searchStart
       } = options;
 
       e = e.detail.event;
@@ -373,9 +366,7 @@
         this.announce(
           matches.length,
           singular,
-          plural,
-          SINGULAR_PHRASE,
-          PLURAL_PHRASE
+          plural
         );
         this.checkLabels(labels);
         filterItemsTransitional = matches;
@@ -483,7 +474,7 @@
           );
         }
 
-        // Bind the extracted filterTableList function.
+        // Bind the input event to the table element.
         tableElement.addEventListener(
           FILTER_EVENT,
           (e) => {
@@ -499,8 +490,6 @@
                 full,
                 minLength,
                 searchStart,
-                SINGULAR_PHRASE,
-                PLURAL_PHRASE,
               }
             ) || state;
           }
