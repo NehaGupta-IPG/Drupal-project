@@ -18,13 +18,15 @@ class CaseTransformTest extends UnitTestCase {
    * Provides test cases for caseTransform().
    *
    * @return array
+   *   An array of test cases, each containing input,
+   *   transformation type, and expected output.
    */
-  public static function transformValueProvider() {
+  public static function transformValueProvider(): array {
     return [
-      ['hello', 'upper', 'HELLO'],
-      ['HELLO', 'lower', 'hello'],
-      ['hello', 'ucfirst', 'Hello'],
-      ['hello world', 'ucwords', 'Hello World'],
+      ['exploration', 'upper', 'EXPLORATION'],
+      ['DISCOVERY', 'lower', 'discovery'],
+      ['journey', 'ucfirst', 'Journey'],
+      ['new horizons', 'ucwords', 'New Horizons'],
       [NULL, 'upper', ''],
       ['', 'upper', ''],
       [123, 'upper', ''],
@@ -36,15 +38,15 @@ class CaseTransformTest extends UnitTestCase {
    *
    * @dataProvider transformValueProvider
    */
-  public function testCaseTransform($input, $option, $expected) {
+  public function testCaseTransform(mixed $input, string $option, string $expected): void {
     // Mocking HandlerBase with dummy constructor values.
     $handler = $this->getMockBuilder(HandlerBase::class)
       ->disableOriginalConstructor()
       ->getMock();
 
-    // Using reflection to call the protected method
+    // Using reflection to call the protected method.
     $method = new \ReflectionMethod($handler, 'caseTransform');
-    $method->setAccessible(true);
+    $method->setAccessible(TRUE);
 
     $this->assertSame($expected, $method->invoke($handler, $input, $option));
   }
