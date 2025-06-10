@@ -192,7 +192,7 @@ final class Recipe {
             fields: [
               // Every input definition must have a description.
               'description' => [
-                new Type(['string', \Stringable::class]),
+                new Type('string'),
                 new NotBlank(),
               ],
               // There can be an optional set of constraints, which is an
