@@ -262,45 +262,6 @@
     }
   });
 
-  /*
-   * When a Layout Builder dialog is triggered, the main canvas resizes. After
-   * the resize transition is complete, see if the target element is still
-   * visible in viewport. If not, scroll page so the target element is again
-   * visible.
-   *
-   * @todo Replace this custom solution when a general solution is made
-   *   available with https://www.drupal.org/node/3033410
-   */
-  if (document.querySelector('[data-off-canvas-main-canvas]')) {
-    const mainCanvas = document.querySelector('[data-off-canvas-main-canvas]');
-
-    // This event fires when canvas CSS transitions are complete.
-    mainCanvas.addEventListener('transitionend', () => {
-      const $target = $('.is-layout-builder-highlighted');
-
-      if ($target.length > 0) {
-        // These four variables are used to determine if the element is in the
-        // viewport.
-        const targetTop = $target.offset().top;
-        const targetBottom = targetTop + $target.outerHeight();
-        const viewportTop = $(window).scrollTop();
-        const viewportBottom = viewportTop + $(window).height();
-
-        // If the element is not in the viewport, scroll it into view.
-        if (targetBottom < viewportTop || targetTop > viewportBottom) {
-          const viewportMiddle = (viewportBottom + viewportTop) / 2;
-          const scrollAmount = targetTop - viewportMiddle;
-
-          window.scrollBy({
-            top: scrollAmount,
-            left: 0,
-            behavior: 'smooth',
-          });
-        }
-      }
-    });
-  }
-
   window.addEventListener('dialog:afterclose', (e) => {
     const $element = $(e.target);
     if (Drupal.offCanvas.isOffCanvas($element)) {
