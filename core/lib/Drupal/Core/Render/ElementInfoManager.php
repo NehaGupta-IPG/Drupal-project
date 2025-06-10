@@ -225,8 +225,10 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
 
   /**
    * {@inheritdoc}
+   *
+   * @return \Drupal\Core\Render\Element\ElementInterface
+   *   The render element plugin instance.
    */
-  // phpcs:ignore Drupal.Commenting.FunctionComment.MissingReturnComment
   public function createInstance($plugin_id, array $configuration = [], &$element = []): ElementInterface {
     $instance = parent::createInstance($plugin_id, $configuration);
     assert($instance instanceof ElementInterface);
