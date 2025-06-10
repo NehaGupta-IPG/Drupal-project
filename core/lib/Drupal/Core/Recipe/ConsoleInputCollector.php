@@ -112,11 +112,6 @@ final class ConsoleInputCollector implements InputCollectorInterface {
       $arguments['default'] = (string) $arguments['default'];
     }
 
-    // Run localization before calling final method.
-    $arguments = array_map(function ($value) {
-      return is_object($value) && $value instanceof \Stringable ? (string) $value : $value;
-    }, $arguments);
-
     return $this->io->$method(...$arguments);
   }
 

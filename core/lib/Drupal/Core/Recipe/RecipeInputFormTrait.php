@@ -43,7 +43,7 @@ trait RecipeInputFormTrait {
        *   'recipe_1' => [
        *     'input_1' => [
        *       '#type' => 'textfield',
-       *       '#title' => !translate 'Some input value',
+       *       '#title' => 'Some input value',
        *     ],
        *     'input_2' => [
        *       '#type' => 'checkbox',
@@ -53,7 +53,7 @@ trait RecipeInputFormTrait {
        *   'dependency_recipe' => [
        *     'input_1' => [
        *       '#type' => 'textarea',
-       *       '#title' => !translate 'An input defined by a dependency of recipe_1',
+       *       '#title' => 'An input defined by a dependency of recipe_1',
        *     ],
        *   ],
        *   '#tree' => TRUE,
