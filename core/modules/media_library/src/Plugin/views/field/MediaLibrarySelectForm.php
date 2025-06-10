@@ -132,6 +132,7 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
         'query' => $query,
       ],
       'callback' => [static::class, 'updateWidget'],
+      'disable-refocus' => TRUE,
     ];
 
     $form['actions']['submit']['#value'] = $this->t('Insert selected');
