@@ -24,7 +24,7 @@ class DisplayKernelTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'node', 'field', 'user'];
+  protected static $modules = ['block', 'node', 'field', 'user', 'views_test_data'];
 
   /**
    * Views plugin types to test.
@@ -113,6 +113,34 @@ class DisplayKernelTest extends ViewsKernelTestBase {
     $first = spl_object_hash($display_handler->getPlugin('style'));
     $second = spl_object_hash($display_handler->getPlugin('style'));
     $this->assertSame($first, $second, 'The same plugin instance was returned.');
+  }
+
+  /**
+   * Tests \Drupal\views\Plugin\views\display\DisplayPluginBase::getPlugin().
+   */
+  public function testQueryPluginId(): void {
+    $view = Views::getView('test_view');
+    $view->initDisplay();
+    $display_handler = $view->display_handler;
+    // Assert that the query plugin ID defaults to "views_query".
+    $this->assertSame('views_query', $display_handler->getPlugin('query')->getPluginId());
+    $query_options = $display_handler->getOption('query');
+    $this->assertSame('views_query', $query_options['type']);
+
+    // Update the views data definition so the base plugin is now "query_test".
+    /** @var \Drupal\Core\State\StateInterface $state */
+    $state = $this->container->get('state');
+    $data = $state->get('views_test_data_views_data');
+    // Use the test query plugin as the base table name.
+    $data['views_test_data']['table']['base']['query_id'] = 'query_test';
+    $state->set('views_test_data_views_data', $data);
+    $this->container->get('views.views_data')->clear();
+
+    // Check that the plugin ID and configuration setting has been updated to
+    // match the new ID.
+    $this->assertSame('query_test', $display_handler->getPlugin('query')->getPluginId());
+    $query_options = $display_handler->getOption('query');
+    $this->assertSame('query_test', $query_options['type']);
   }
 
   /**
