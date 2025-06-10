@@ -49,7 +49,7 @@ class YamlTagTranslator {
     else {
       throw new InvalidDataTypeException("Cannot parse the 'translate' tag. The tagged value is not a string nor has a 'string' element.");
     }
-
+    // @phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
     return new TranslatableMarkup($string, [], $options);
   }
 
