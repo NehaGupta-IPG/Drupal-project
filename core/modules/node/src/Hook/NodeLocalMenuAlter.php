@@ -15,7 +15,7 @@ class NodeLocalMenuAlter {
   /**
    * Implements hook_menu_local_tasks_alter().
    */
-  public function __invoke(&$local_tasks, $route_name, RefinableCacheableDependencyInterface &$cacheability) {
+  public function __invoke(&$local_tasks, $route_name, RefinableCacheableDependencyInterface &$cacheability): void {
     if ($route_name === 'entity.node.revision') {
       // Show the same local tasks on node revision pages as the ones displayed
       // on node canonical pages.
