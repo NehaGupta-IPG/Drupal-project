@@ -104,7 +104,7 @@ function olivero_preprocess_node(&$variables): void {
 
   // Apply custom date formatter to "date" field.
   if (!empty($variables['date']) && !empty($variables['display_submitted']) && $variables['display_submitted'] === TRUE) {
-    $variables['date'] = \Drupal::service('date.formatter')->format($variables['node']->getCreatedTime(), 'short_date_only');
+    $variables['date'] = \Drupal::service('date.formatter')->format($variables['node']->getCreatedTime(), 'olivero_medium');
   }
 
   // Pass layout variable to template if content type is article in full view
@@ -577,7 +577,7 @@ function olivero_preprocess_text_format_wrapper(&$variables): void {
 function olivero_preprocess_search_result(&$variables): void {
   // Apply custom date formatter to "date" field.
   if (!empty($variables['result']['date'])) {
-    $variables['info_date'] = \Drupal::service('date.formatter')->format($variables['result']['node']->getCreatedTime(), 'short_date_only');
+    $variables['info_date'] = \Drupal::service('date.formatter')->format($variables['result']['node']->getCreatedTime(), 'olivero_medium');
   }
 }
 
