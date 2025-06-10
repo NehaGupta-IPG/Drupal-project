@@ -132,7 +132,10 @@ class Action extends ConfigEntityBase implements ActionConfigEntityInterface, En
   }
 
   /**
-   * {@inheritdoc}
+   * Sets the action plugin.
+   *
+   * @param string $plugin_id
+   *   The action plugin ID.
    */
   public function setPlugin($plugin_id) {
     $this->plugin = $plugin_id;
