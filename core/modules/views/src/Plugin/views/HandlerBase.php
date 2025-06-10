@@ -246,7 +246,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    */
   protected function caseTransform($string, $option) {
     // Handling null or empty input safely.
-    if (!is_string($string) && !is_numeric($string)) {
+    if (!is_string($string)) {
       return '';
     }
 
