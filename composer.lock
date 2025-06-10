@@ -368,7 +368,7 @@
             "dist": {
                 "type": "path",
                 "url": "core",
-                "reference": "57bcca0ee7f6772c98052a6c7515df8418560402"
+                "reference": "802330906648222acb6d5632ed462a49636ee79d"
             },
             "require": {
                 "asm89/stack-cors": "^2.3",
@@ -382,6 +382,7 @@
                 "ext-filter": "*",
                 "ext-gd": "*",
                 "ext-hash": "*",
+                "ext-intl": "*",
                 "ext-json": "*",
                 "ext-pcre": "*",
                 "ext-pdo": "*",
