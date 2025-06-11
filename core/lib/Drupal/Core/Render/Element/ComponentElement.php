@@ -122,7 +122,7 @@ class ComponentElement extends RenderElementBase {
           "#plain_text" => (string) $slot_value,
         ];
       }
-      if (!Element::isRenderArray($slot_value)) {
+      if (!Element::isRenderArray($slot_value) && !empty($slot_value)) {
         $message = sprintf(
           'Unable to render component "%s". A render array or a scalar is expected for the slot "%s" when using the render element with the "#slots" property',
           $id,
