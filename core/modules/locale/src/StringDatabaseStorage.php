@@ -527,7 +527,7 @@ class StringDatabaseStorage implements StringStorageInterface {
   protected function dbDelete($table, $keys) {
     $query = $this->connection->delete($table, $this->options);
     foreach ($keys as $field => $value) {
-      $query->condition($field, $value);
+      $query->condition($field, $value, is_array($value) ? 'IN' : '=');
     }
     return $query;
   }

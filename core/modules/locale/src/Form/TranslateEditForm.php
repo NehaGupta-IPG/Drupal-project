@@ -47,6 +47,7 @@ class TranslateEditForm extends TranslateFormBase {
       '#header' => [
         $this->t('Source string'),
         $this->t('Translation for @language', ['@language' => $language_name]),
+        $this->t('Delete'),
       ],
       '#empty' => $this->t('No strings available.'),
       '#attributes' => ['class' => ['locale-translate-edit-table']],
@@ -138,12 +139,30 @@ class TranslateEditForm extends TranslateFormBase {
             $form['strings'][$string->lid]['translations'][1]['#title'] = $this->t('Plural form');
           }
         }
+        $form['strings'][$string->lid]['delete'] = [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Delete translation'),
+          '#title_display' => 'invisible',
+        ];
       }
       if (count(Element::children($form['strings']))) {
         $form['actions'] = ['#type' => 'actions'];
         $form['actions']['submit'] = [
           '#type' => 'submit',
           '#value' => $this->t('Save translations'),
+          '#button_type' => 'primary',
+        ];
+        $form['actions']['delete'] = [
+          '#type' => 'submit',
+          '#name' => 'delete',
+          '#value' => $this->t('Delete translations'),
+          '#submit' => [[$this, 'submitDelete']],
+          '#button_type' => 'danger',
+          '#states' => [
+            'visible' => [
+              ':input[name$="[delete]"]' => ['checked' => TRUE],
+            ],
+          ],
         ];
       }
     }
@@ -155,6 +174,9 @@ class TranslateEditForm extends TranslateFormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
+    if ($form_state->getTriggeringElement()['#name'] === 'delete') {
+      return;
+    }
     $langcode = $form_state->getValue('langcode');
     foreach ($form_state->getValue('strings') as $lid => $translations) {
       foreach ($translations['translations'] as $key => $value) {
@@ -231,11 +253,27 @@ class TranslateEditForm extends TranslateFormBase {
         ['page' => $page]
       );
     }
-
     if ($updated) {
       // Clear cache and force refresh of JavaScript translations.
       _locale_refresh_translations([$langcode], $updated);
       _locale_refresh_configuration([$langcode], $updated);
+    }
+  }
+
+  public function submitDelete(array $form, FormStateInterface $form_state) {
+    $langcode = $form_state->getValue('langcode');
+    $delete = [];
+    foreach ($form_state->getValue('strings') as $lid => $new_translation) {
+      if ($new_translation['delete']) {
+        $delete[] = $lid;
+      }
+    }
+
+    if ($delete) {
+      $this->localeStorage->deleteStrings(['lid' => $delete]);
+      $this->messenger()->addStatus($this->t('Translations were deleted'));
+      _locale_refresh_translations([$langcode], $delete);
+      _locale_refresh_configuration([$langcode], $delete);
     }
   }
 

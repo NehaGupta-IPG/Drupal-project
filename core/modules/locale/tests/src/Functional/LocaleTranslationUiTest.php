@@ -255,6 +255,58 @@ class LocaleTranslationUiTest extends BrowserTestBase {
   }
 
   /**
+   * Tests string delete feature on translation form.
+   */
+  public function testLocaleStringDelete() {
+    $user = $this->drupalCreateUser([
+      'translate interface',
+      'administer languages',
+      'access administration pages',
+    ]);
+    $this->drupalLogin($user);
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+
+    // Create test source string.
+    $string = $this->container->get('locale.storage')->createString([
+      'source' => $this->randomMachineName(100),
+      'context' => $this->randomMachineName(20),
+    ])->save();
+
+    // Reset locale cache.
+    $this->container->get('string_translation')->reset();
+
+    // Ensure non-customized translation string does appear if searching
+    // non-customized translation.
+    $this->drupalGet('admin/config/regional/translate');
+    $search = [
+      'string' => $string->getString(),
+    ];
+    $this->submitForm($search, 'Filter');
+
+    // Submit the translations without changing the translation.
+    $this->drupalGet('admin/config/regional/translate');
+    $textarea = $this->assertSession()->elementExists('xpath', '//textarea');
+    $lid = $textarea->getAttribute('name');
+
+    // Ensure that delete checkbox exists.
+    $this->assertSession()->fieldExists("strings[$string->lid][delete]");
+
+    // Submit the form to delete the checkbox.
+    $edit = [
+      $lid => $string->getString(),
+      "strings[$string->lid][delete]" => 1,
+    ];
+    $this->submitForm($edit, 'Delete translations');
+
+    $this->drupalGet('admin/config/regional/translate');
+    $search = [
+      'string' => $string->getString(),
+    ];
+    $this->submitForm($search, 'Filter');
+    $this->assertSession()->responseContains('No strings available.');
+  }
+
+  /**
    * Tests the rebuilding of JavaScript translation files on deletion.
    */
   public function testJavaScriptTranslation(): void {
