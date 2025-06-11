@@ -354,7 +354,6 @@
           !this.model.get('areSubtreesLoaded') &&
           $activeTab[0] &&
           $activeTab[0].dataset?.drupalSubtrees !== undefined &&
-          typeof $activeTab.data('drupal-subtrees') !== 'undefined' &&
           orientation === 'vertical'
         ) {
           const subtreesHash = drupalSettings.toolbar.subtreesHash;
