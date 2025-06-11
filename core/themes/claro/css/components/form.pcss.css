@@ -228,5 +228,5 @@ optgroup {
  * normalize.css 4.1.0.
  */
 ::-webkit-file-upload-button {
-  -webkit-appearance: push-button;
+  -webkit-appearance: button;
 }

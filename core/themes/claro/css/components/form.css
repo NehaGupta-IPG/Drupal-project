@@ -255,5 +255,5 @@ optgroup {
  */
 
 ::-webkit-file-upload-button {
-  -webkit-appearance: push-button;
+  -webkit-appearance: button;
 }
