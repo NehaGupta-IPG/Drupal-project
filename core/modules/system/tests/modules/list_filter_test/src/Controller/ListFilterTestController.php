@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\list_filter_test\Controller;
 
+// cspell:ignore hitmen
+
 use Drupal\Core\Controller\ControllerBase;
 
 /**

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalJavascriptTests;
 
+// cspell:ignore patri patr patria
+
 /**
  * Tests the ListFilter functionality.
  *
