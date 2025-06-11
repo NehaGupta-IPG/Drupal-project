@@ -9,7 +9,6 @@ use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Test\Exception\MissingGroupException;
 use Drupal\Core\Test\TestDiscovery;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
@@ -226,9 +225,8 @@ class TestDiscoveryTest extends UnitTestCase {
  * Bulk delete storages and fields, and clean up afterwards.
  */
 EOT;
-    $this->expectException(MissingGroupException::class);
-    $this->expectExceptionMessage('Missing @group annotation in Drupal\KernelTests\field\BulkDeleteTest');
-    TestDiscovery::getTestInfo($classname, $doc_comment);
+    $info = TestDiscovery::getTestInfo($classname, $doc_comment);
+    $this->assertEquals($info['group'], 'default');
   }
 
   /**
@@ -488,10 +486,10 @@ EOF;
     // If getTestInfo() performed reflection, it won't be able to find the
     // class we asked it to analyze, so it will throw a ReflectionException.
     // We want to make sure it didn't do that, because we already did some
-    // analysis and already have an empty docblock. getTestInfo() will throw
-    // MissingGroupException because the annotation is empty.
-    $this->expectException(MissingGroupException::class);
-    TestDiscovery::getTestInfo('Drupal\Tests\ThisTestDoesNotExistTest', '');
+    // analysis and already have an empty docblock. getTestInfo() will not
+    // find a group because the annotation is empty.
+    $info = TestDiscovery::getTestInfo('Drupal\Tests\ThisTestDoesNotExistTest', '');
+    $this->assertArrayNotHasKey('group', $info);
   }
 
   /**

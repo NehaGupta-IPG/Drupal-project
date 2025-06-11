@@ -6,7 +6,6 @@ use Drupal\Component\Annotation\Doctrine\StaticReflectionParser;
 use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Extension\ExtensionDiscovery;
-use Drupal\Core\Test\Exception\MissingGroupException;
 
 /**
  * Discovers available tests.
@@ -169,20 +168,11 @@ class TestDiscovery {
     foreach ($classmap as $classname => $pathname) {
       $finder = MockFileFinder::create($pathname);
       $parser = new StaticReflectionParser($classname, $finder, TRUE);
-      try {
-        $info = static::getTestInfo($classname, $parser->getDocComment());
-      }
-      catch (MissingGroupException $e) {
-        // If the class name ends in Test and is not a migrate table dump.
-        if (str_ends_with($classname, 'Test') && !str_contains($classname, 'migrate_drupal\Tests\Table')) {
-          throw $e;
+      $info = static::getTestInfo($classname, $parser->getDocComment());
+      if (!empty($info['groups'])) {
+        foreach ($info['groups'] as $group) {
+          $list[$group][$classname] = $info;
         }
-        // If the class is @group annotation just skip it. Most likely it is an
-        // abstract class, trait or test fixture.
-        continue;
-      }
-      foreach ($info['groups'] as $group) {
-        $list[$group][$classname] = $info;
       }
     }
 
@@ -309,9 +299,6 @@ class TestDiscovery {
    *   - group: The test's first @group (parsed from PHPDoc annotations).
    *   - groups: All of the test's @group annotations, as an array (parsed from
    *     PHPDoc annotations).
-   *
-   * @throws \Drupal\Core\Test\Exception\MissingGroupException
-   *   If the class does not have a @group annotation.
    */
   public static function getTestInfo($classname, $doc_comment = NULL) {
     if ($doc_comment === NULL) {
@@ -341,12 +328,22 @@ class TestDiscovery {
       }
     }
 
-    if (empty($annotations['group'])) {
-      // Concrete tests must have a group.
-      throw new MissingGroupException(sprintf('Missing @group annotation in %s', $classname));
+    // If no group is set, assign the "default" one.
+    if (
+      empty($annotations['group']) &&
+      str_ends_with($classname, 'Test') &&
+      !str_contains($classname, 'migrate_drupal\Tests\Table') &&
+      !empty($doc_comment)
+    ) {
+      $annotations['group'] = 'default';
+      $annotations['groups'][] = 'default';
     }
-    $info['group'] = $annotations['group'];
-    $info['groups'] = $annotations['groups'];
+    if (!empty($annotations['group'])) {
+      $info['group'] = $annotations['group'];
+    }
+    if (!empty($annotations['groups'])) {
+      $info['groups'] = $annotations['groups'];
+    }
     $info['type'] = 'PHPUnit-' . static::getPhpunitTestSuite($classname);
 
     if (!empty($annotations['coversDefaultClass'])) {
