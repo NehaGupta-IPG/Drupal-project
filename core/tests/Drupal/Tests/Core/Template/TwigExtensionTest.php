@@ -251,7 +251,7 @@ class TwigExtensionTest extends UnitTestCase {
    *
    * @covers ::urlFilter
    */
-  public function testUrlEscaping() {
+  public function testUrlEscaping(): void {
     $loader = new StringLoader();
     $twig = new Environment($loader);
     $twig->addExtension($this->systemUnderTest);
