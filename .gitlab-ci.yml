@@ -588,6 +588,34 @@ default:
         coverage_format: cobertura
         path: core/tests/PHPStan/coverage.cobertura.xml
 
+'🧐 Strict types':
+  <<: [ *default-job-settings-lint ]
+  stage: 🪄 Lint
+  variables:
+    KUBERNETES_CPU_REQUEST: "2"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "**/*.php"
+  script:
+    - |
+      CHANGED=$(git diff --diff-filter=AM --name-only origin/${CI_MERGE_REQUEST_DIFF_BASE_SHA}...${CI_COMMIT_SHA} | grep '\.php$' || true)
+      echo "$CHANGED" | grep . || { echo "✅ No new or modified PHP files."; exit 0; }
+
+      FAIL=0
+
+      for FILE in $CHANGED; do
+        if ! grep -q "declare(strict_types=1);" $FILE ; then
+          echo "- $FILE is missing strict_types declaration."
+          FAIL=1
+        fi
+      done
+
+      if [ "$FAIL" -eq 1 ]; then
+        echo "Please add declare(strict_types=1); to all new php files."
+        exit 1
+      fi
+
 '📔 Validatable config':
   <<: [ *default-job-settings-lint ]
   stage: 🪄 Lint
