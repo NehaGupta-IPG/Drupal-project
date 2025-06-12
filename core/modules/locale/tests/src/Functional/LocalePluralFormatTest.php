@@ -383,6 +383,39 @@ class LocalePluralFormatTest extends BrowserTestBase {
   }
 
   /**
+   * Tests that empty plural msgstr fallback to the source string.
+   */
+  public function testEmptyPluralTranslationFallback(): void {
+    // Enable import of translations. By default this is disabled for automated
+    // tests.
+    $this->config('locale.settings')
+      ->set('translation.import_enabled', TRUE)
+      ->set('translation.use_source', LOCALE_TRANSLATION_USE_SOURCE_LOCAL)
+      ->save();
+
+    // Create a .po string with empty plural translations.
+    $po = $this->getPoFileWithEmptyPluralTranslations();
+
+    $this->importPoFile($po, [
+      'langcode' => 'fr',
+      'overwrite_options[not_customized]' => TRUE,
+    ]);
+
+    // Reset language services.
+    \Drupal::languageManager()->reset();
+
+    // The translation should fallback to the original source string.
+
+    // Singular fallback test.
+    $output = $this->container->get('string_translation')->formatPlural(1, 'One apple', '@count apples', [], ['langcode' => 'fr']);
+    $this->assertEquals('One apple', $output, 'Fallback occurred: empty singular translation used original string.');
+
+    // Plural fallback test.
+    $output = $this->container->get('string_translation')->formatPlural(2, 'One apple', '@count apples', [], ['langcode' => 'fr']);
+    $this->assertEquals('2 apples', $output, 'Fallback occurred: empty plural translation used original string.');
+  }
+
+  /**
    * Imports a standalone .po file in a given language.
    *
    * @param string $contents
@@ -484,6 +517,23 @@ msgstr ""
 
 msgid "Monday"
 msgstr "Ponedjeljak"
+EOF;
+  }
+
+  /**
+   * Returns a .po file with empty plural translations.
+   */
+  public function getPoFileWithEmptyPluralTranslations(): string {
+    return <<<EOF
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\\n"
+
+msgid "One apple"
+msgid_plural "@count apples"
+msgstr[0] ""
+msgstr[1] ""
 EOF;
   }
 
