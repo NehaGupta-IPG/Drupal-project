@@ -180,7 +180,7 @@ class TwigTransTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('O HAI NU TXTZZZZ.');
 
     // Assert that {% trans %} Kittens are awesome: {{ 'javascript:alert(0)'|url_filter }} {% endtrans %}
-    // is succesfully escaped and translated.
+    // is successfully escaped and translated.
     $this->assertSession()->pageTextContains("Kittens be full 'o awe: alert(0)");
 
     // Makes sure https://www.drupal.org/node/2489024 doesn't happen without
