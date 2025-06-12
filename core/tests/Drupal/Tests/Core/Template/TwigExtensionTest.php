@@ -247,6 +247,22 @@ class TwigExtensionTest extends UnitTestCase {
   }
 
   /**
+   * Tests the escaping of objects implementing SafeStringInterface.
+   *
+   * @covers ::urlFilter
+   */
+  public function testUrlEscaping() {
+    $renderer = $this->getMock('\Drupal\Core\Render\RendererInterface');
+    $twig_extension = new TwigExtension($renderer);
+
+    $loader = new StringLoader();
+    $twig = new \Twig_Environment($loader);
+    $twig->addExtension($twig_extension);
+    $result = $twig->render("{{ 'javascript:alert(0)'|url_filter }}");
+    $this->assertEquals('alert(0)', $result);
+  }
+
+  /**
    * @covers ::safeJoin
    */
   public function testSafeJoin(): void {

@@ -179,6 +179,11 @@ class TwigTransTest extends BrowserTestBase {
     // is successfully translated with context in specified language.
     $this->assertSession()->pageTextContains('O HAI NU TXTZZZZ.');
 
+    $this->assertText(
+      "Kittens be full 'o awe: alert(0)",
+      "{% trans %} Kittens are awesome: {{ 'javascript:alert(0)'|url_filter }} {% endtrans %} was succesfully escaped and translated"
+    );
+
     // Makes sure https://www.drupal.org/node/2489024 doesn't happen without
     // twig debug.
     // Ensure that running php code inside a Twig trans is not possible.
@@ -263,6 +268,9 @@ msgstr[1] "O HAI @count STARZZZZ"
 
 msgid "Escaped: @string"
 msgstr "ESCAPEE: @string"
+
+msgid "Kittens are awesome: :url"
+msgstr "Kittens be full 'o awe: :url"
 
 msgid "Placeholder: %string"
 msgstr "PLAYSHOLDR: %string"

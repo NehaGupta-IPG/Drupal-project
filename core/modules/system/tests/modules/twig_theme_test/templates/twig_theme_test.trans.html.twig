@@ -96,3 +96,11 @@
     Number I never remember: ' . print(pi()) . '
   {% endtrans %}
 </div>
+
+{# Tests URL escaping. #}
+<div>
+  {% set url = 'javascript:alert(0)' %}
+  {% trans %}
+    Kittens are awesome: {{ url|url_filter }}
+  {% endtrans %}
+</div>

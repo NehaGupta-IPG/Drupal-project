@@ -10,6 +10,7 @@ use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Render\AttachmentsInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Markup;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Render\RenderableInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
@@ -125,6 +126,7 @@ class TwigExtension extends AbstractExtension {
       // "raw" filter and give it identifiable names. These filters should only
       // be used in "trans" tags.
       // @see TwigNodeTrans::compileString()
+      new \Twig_SimpleFilter('url_filter', array($this, 'urlFilter'), array('is_safe' => array('html'))),
       new TwigFilter('placeholder', [$this, 'escapePlaceholder'], ['is_safe' => ['html'], 'needs_environment' => TRUE]),
 
       // Replace twig's escape filter with our own.
@@ -400,6 +402,19 @@ class TwigExtension extends AbstractExtension {
     $return = $this->escapeFilter($env, $string);
 
     return $return ? '<em class="placeholder">' . $return . '</em>' : NULL;
+  }
+
+  /**
+   * Escapes URLs to HTML and strips them of dangerous protocols.
+   *
+   * @param mixed $string
+   *   The URL.
+   *
+   * @return null|string
+   *   The sanitized, rendered output, or NULL if there is no valid output.
+   */
+  public function urlFilter($string) {
+    return Html::escape(UrlHelper::stripDangerousProtocols($string));
   }
 
   /**
