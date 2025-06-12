@@ -598,6 +598,7 @@ drupal.list-filter:
     - core/drupal.announce
     - core/drupal.debounce
     - core/once
+    - core/transliteration
 
 drupal.fieldgroup:
   version: VERSION
