@@ -38,6 +38,8 @@ class OEmbedWidget extends StringTextfieldWidget {
   }
 
   /**
+   * Merges description and provider messages.
+   *
    * @param \Drupal\Core\Field\FieldItemListInterface $items
    *   FieldItemList containing the values to be edited.
    * @param scalar|\Stringable|\Drupal\Core\Render\RenderableInterface|array $description

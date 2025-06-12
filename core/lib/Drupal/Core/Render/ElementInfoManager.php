@@ -120,6 +120,9 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
     $this->definitions = $definitions;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function clearCachedDefinitions(): void {
     $this->elementInfo = NULL;
 

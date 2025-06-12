@@ -18,9 +18,7 @@ class FormTestHooks {
 
   use StringTranslationTrait;
 
-  public function __construct(protected ElementInfoManagerInterface $elementInfoManager) {
-
-  }
+  public function __construct(protected ElementInfoManagerInterface $elementInfoManager) {}
 
   /**
    * Implements hook_form_FORM_ID_alter().

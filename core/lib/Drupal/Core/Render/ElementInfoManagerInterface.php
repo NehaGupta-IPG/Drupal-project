@@ -2,14 +2,15 @@
 
 namespace Drupal\Core\Render;
 
-use Drupal\Component\Plugin\PluginManagerInterface;
+use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
+use Drupal\Component\Plugin\Factory\FactoryInterface;
 use Drupal\Core\Render\Element\ElementInterface;
 use Drupal\Core\Render\Element\Form;
 
 /**
  * Collects available render array element types.
  */
-interface ElementInfoManagerInterface extends PluginManagerInterface {
+interface ElementInfoManagerInterface extends DiscoveryInterface, FactoryInterface {
 
   /**
    * Retrieves the default properties for the defined element type.
