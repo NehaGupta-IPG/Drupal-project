@@ -40,7 +40,6 @@ use Drupal\Core\Render\Attribute\RenderElement;
  *   - plural: Message to announce when more than one items are visible. This
  *     must contain the '@count' placeholder.
  *   - all': Message to announce when all items are visible.
- * - #debug: (optional) Set to TRUE to add CSS styling to highlight the
  *   different elements.
  */
 #[RenderElement("list_filter")]
