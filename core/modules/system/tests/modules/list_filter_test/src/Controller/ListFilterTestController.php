@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\list_filter_test\Controller;
 
-// cspell:ignore hitmen
-
 use Drupal\Core\Controller\ControllerBase;
 
 /**
@@ -26,7 +24,7 @@ class ListFilterTestController extends ControllerBase {
     // Define the filter element.
     $build['filter'] = $filterElement;
 
-    [$header, $rows] = $this->moviesList();
+    [$header, $rows] = $this->drinksRecipes();
 
     $build['table'] = [
       '#type' => 'table',
@@ -240,7 +238,7 @@ class ListFilterTestController extends ControllerBase {
       '#placeholder' => $this->t('Search by name or email'),
       '#list_container_selector' => '.filter-container',
       '#list_item' => 'tbody tr',
-      '#list_text' => '.name, .description, .category, .likes, .release_date',
+      '#list_text' => '.name, .ingredients, .instructions, .category, .is_alcoholic',
       '#minimum_filter_length' => 1,
       '#search_start_of_words' => FALSE,
       '#auto_activate' => TRUE,
@@ -278,74 +276,6 @@ class ListFilterTestController extends ControllerBase {
         return $filterElement;
     }
     return $filterElement;
-  }
-
-  /**
-   * Provides a list of movies with their details.
-   *
-   * @return array
-   *   An array containing the header and rows for the movies table.
-   */
-  protected function moviesList(): array {
-    $data = [
-      [
-        'name' => 'Inception',
-        'description' => 'A thief who steals corporate secrets through dream-sharing technology.',
-        'category' => 'Drama',
-        'likes' => 1200,
-        'release_date' => '2010-07-16',
-      ],
-      [
-        'name' => 'The Godfather',
-        'description' => 'The aging patriarch of an organized crime dynasty transfers control to his reluctant son.',
-        'category' => 'Crime',
-        'likes' => 1500,
-        'release_date' => '1972-03-24',
-      ],
-      [
-        'name' => 'Pulp Fiction',
-        'description' => 'The lives of two mob hitmen, a boxer, and others intertwine in four tales of violence and redemption.',
-        'category' => 'Drama',
-        'likes' => 980,
-        'release_date' => '1994-10-14',
-      ],
-      [
-        'name' => 'The Matrix',
-        'description' => 'A computer hacker learns about the true nature of his reality and his role in the war.',
-        'category' => 'Action',
-        'likes' => 1100,
-        'release_date' => '1999-03-31',
-      ],
-      [
-        'name' => 'Spirited Away',
-        'description' => 'During her family\'s move to the suburbs, a sullen 10-year-old girl wanders into a world ruled by gods.',
-        'category' => 'Animation',
-        'likes' => 870,
-        'release_date' => '2001-07-20',
-      ],
-    ];
-
-    $header = [
-      $this->t('Name'),
-      $this->t('Description'),
-      $this->t('Category'),
-      $this->t('Likes'),
-      $this->t('Release Date'),
-    ];
-
-    $rows = [];
-    foreach ($data as $row) {
-      $rows[] = [
-        'data' => [
-          ['data' => $row['name'], 'class' => ['name']],
-          ['data' => $row['description'], 'class' => ['description']],
-          ['data' => $row['category'], 'class' => ['category']],
-          ['data' => $row['likes'], 'class' => ['likes']],
-          ['data' => $row['release_date'], 'class' => ['release_date']],
-        ],
-      ];
-    }
-    return [$header, $rows];
   }
 
 }
