@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\Attribute\RenderElement;
 
 /**
  * Provides a search element for filtering a list with JavaScript.
@@ -39,10 +40,8 @@ use Drupal\Core\Render\Element;
  *   - plural: Message to announce when more than one items are visible. This
  *     must contain the '@count' placeholder.
  *   - all': Message to announce when all items are visible.
- *   different elements.
- *
- * @RenderElement("list_filter")
  */
+#[RenderElement("list_filter")]
 class ListFilter extends Search {
 
   /**
@@ -66,9 +65,9 @@ class ListFilter extends Search {
       '#minimum_filter_length' => 2,
       '#search_start_of_words' => FALSE,
       '#announce' => [
-        'singular' => t('1 item is available in the modified list.'),
-        'plural' => t('@count items are available in the modified list.'),
-        'all' => t('All available items are listed.'),
+        'singular' => $this->t('1 item is available in the modified list.'),
+        'plural' => $this->t('@count items are available in the modified list.'),
+        'all' => $this->t('All available items are listed.'),
       ],
       '#library' => 'core/drupal.list-filter',
     ];
