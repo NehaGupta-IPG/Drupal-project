@@ -1447,4 +1447,29 @@ class EntityQueryTest extends EntityKernelTestBase {
     $this->storage->getQuery()->execute();
   }
 
+  /**
+   * Test conditions using langcode.
+   */
+  public function testConditionsLangcode(): void {
+    $greetings = $this->greetings;
+
+    // Test that the OR conditions properly use the langcode
+    $query = $this->storage
+      ->getQuery()
+      ->accessCheck(false);
+
+    $orCondition = $query->orConditionGroup();
+    $orCondition
+      ->condition("$greetings.value", "merhaba", '=','tr')
+      ->condition("$greetings.value", "siema", '=','pl');
+    $query->condition($orCondition);
+//
+    $this->queryResults = $query
+      ->sort('id')
+      ->execute();
+    // Bit 2 (4, 5, 6, 7, 12, 13, 14, 15) or bit 4 (8, 9, 10, 11, 12, 13, 14, 15)
+    // needs to be set.
+    $this->assertResult(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+  }
+
 }
