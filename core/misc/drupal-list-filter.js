@@ -9,17 +9,8 @@
    *
    * @const {string} FILTER_EVENT
    *   The custom event name for triggering filtering.
-   * @const {string} ALL_PHRASE
-   *   Default phrase for "all items listed".
-   * @const {string} SINGULAR_PHRASE
-   *   Default phrase for a single item.
-   * @const {string} PLURAL_PHRASE
-   *   Default phrase for multiple items.
    */
   const FILTER_EVENT = 'drupal-filter-event';
-  const ALL_PHRASE = Drupal.t('All available items are listed.');
-  const SINGULAR_PHRASE = '1 item is available in the modified list.';
-  const PLURAL_PHRASE = '@count items are available in the modified list.';
 
   /**
    * Default options for the list filter.
@@ -27,7 +18,6 @@
   const defaultOptions = {
     minLength: 2,
     searchStart: false,
-    debug: false,
   };
 
   /**
@@ -38,8 +28,6 @@
    *   The element to hide.
    */
   function defaultHideElement(element) {
-    element.classList.add('hidden');
-    element.setAttribute('hidden', true);
     element.style.display = 'none';
     return element;
   }
@@ -52,8 +40,6 @@
    *   The element to show.
    */
   function defaultShowElement(element) {
-    element.classList.remove('hidden');
-    element.removeAttribute('hidden');
     element.style.display = '';
     return element;
   }
@@ -114,16 +100,17 @@
    * @function Drupal.listFilter.announce
    * @param {number} matches
    *   The number of matches.
-   * @param {string|null} singularLabel
+   * @param {string} singularLabel
    *   Singular label for ARIA/live region.
-   * @param {string|null} pluralLabel
+   * @param {string} pluralLabel
+   *   Plural label for ARIA/a live region.
    */
   function defaultAnnounce(matches, singularLabel, pluralLabel) {
     Drupal.announce(
       Drupal.formatPlural(
         matches,
-        singularLabel ?? SINGULAR_PHRASE,
-        pluralLabel ?? PLURAL_PHRASE,
+        singularLabel,
+        pluralLabel,
       ),
     );
   }
@@ -178,15 +165,12 @@
   function defaultCheckLabels(labels, reset = false) {
     labels.forEach((label) => {
       const anyVisible = Array.from(label.labelledItems).some(
-        (element) => !element.hasAttribute('hidden'),
+        (element) => element.style.display !== 'none',
       );
       if (!anyVisible) {
         this.hideElement(label);
         return;
       }
-      // @todo make the function to process other node types overridable, for example, fieldset elements.
-      // we can check if the function exists then call it, or we can use a different approach.
-      // like this[checkFIELDSETLabels](reset, label);
       if (label.nodeName === 'DETAILS') {
         this.checkDetailedLabels(reset, label);
       }
@@ -210,29 +194,6 @@
       label.open = false;
       delete label.dataset.openedByFilter;
     }
-  }
-
-  /**
-   * Default debug function to visually highlight elements.
-   *
-   * @function Drupal.listFilter.defaultDebug
-   * @param {HTMLElement} tableElement
-   *   The table element to debug.
-   * @param {string} rowSelector
-   *   The selector for the rows/items to filter.
-   * @param {string} targetSelector
-   *   The selector for sub-elements to search within each row.
-   */
-  function defaultDebug(tableElement, rowSelector, targetSelector) {
-    tableElement.style.outline = '2px solid red';
-    tableElement.querySelectorAll(rowSelector).forEach((item) => {
-      item.style.backgroundColor = 'yellow';
-      if (targetSelector) {
-        item.querySelectorAll(targetSelector).forEach((target) => {
-          target.style.outline = 'green 2px dotted';
-        });
-      }
-    });
   }
 
   /**
@@ -298,21 +259,9 @@
     checkDetailedLabels: defaultCheckDetailedLabels,
 
     /**
-     * Default debug function. Can be overridden.
-     *
-     * @type {function}
-     */
-    debug: defaultDebug,
-
-    /**
      * Function to be called when searching is finished.
      */
     searchingFinished: null,
-
-    /**
-     * Debug function to visually highlight elements.
-     */
-    debugFunction: defaultDebug,
 
     /**
      * Filters the table/list based on the input event.
@@ -382,8 +331,6 @@
     /*
      * Builds filter items from the table element. Can be overridden.
      *
-     * @todo add this function in the override filter "constructor"
-     *
      * @type {function}
      * @param {HTMLElement} tableElement
      *   The table element to filter.
@@ -400,7 +347,6 @@
 
     /**
      * Default options for the filter.
-     * @todo update this instance when filter created.
      *
      * @type {object}
      */
@@ -420,7 +366,6 @@
      *   - full: {string|null} (Optional) Label for "all items listed".
      *   - minLength: {number} (Optional) Minimum query length to trigger filtering.
      *   - searchStart: {boolean} (Optional) If true, only match from start of words.
-     *   - debug: {boolean} (Optional) If true, enable debug outlines.
      *   - hideElement: {function} (Optional) Custom hideElement override.
      *   - showElement: {function} (Optional) Custom showElement override.
      */
@@ -435,7 +380,6 @@
         full = null,
         minLength = defaultOptions.minLength,
         searchStart = defaultOptions.searchStart,
-        debug = defaultOptions.debug,
       } = options;
       Object.keys(options)
         .filter((key) => this[key] !== undefined)
@@ -476,10 +420,6 @@
               searchStart,
             }) || state;
         });
-
-        if (debug) {
-          this.debugFunction(tableElement, items, targets);
-        }
       });
 
       input.addEventListener(
@@ -529,7 +469,6 @@
               input,
               ...input.dataset,
               searchStart: input.dataset.searchStart === 'true',
-              debug: input.dataset.debug === 'true',
               minLength:
                 parseInt(input.dataset.minLength, 10) ||
                 defaultOptions.minLength,

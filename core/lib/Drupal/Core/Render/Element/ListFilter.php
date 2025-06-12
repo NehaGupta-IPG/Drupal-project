@@ -71,7 +71,6 @@ class ListFilter extends Search {
         'plural' => $this->t('@count items are available in the modified list.'),
         'all' => $this->t('All available items are listed.'),
       ],
-      '#debug' => FALSE,
       '#library' => 'core/drupal.list-filter',
     ];
   }
@@ -110,10 +109,6 @@ class ListFilter extends Search {
     $element['#attributes']['data-singular'] = $element['#announce']['singular'] ?? t('1 item is available in the modified list.');
     $element['#attributes']['data-plural'] = $element['#announce']['plural'] ?? t('@count items are available in the modified list.');
     $element['#attributes']['data-full'] = $element['#announce']['all'] ?? t('All available items are listed.');
-
-    if ($element['#debug']) {
-      $element['#attributes']['data-debug'] = 'true';
-    }
 
     return $element;
   }
