@@ -1456,14 +1456,14 @@ class EntityQueryTest extends EntityKernelTestBase {
     // Test that the OR conditions properly use the langcode
     $query = $this->storage
       ->getQuery()
-      ->accessCheck(false);
+      ->accessCheck(FALSE);
 
     $orCondition = $query->orConditionGroup();
     $orCondition
-      ->condition("$greetings.value", "merhaba", '=','tr')
-      ->condition("$greetings.value", "siema", '=','pl');
+      ->condition("$greetings.value", "merhaba", '=', 'tr')
+      ->condition("$greetings.value", "siema", '=', 'pl');
     $query->condition($orCondition);
-//
+
     $this->queryResults = $query
       ->sort('id')
       ->execute();
