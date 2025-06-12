@@ -126,7 +126,7 @@ class TwigExtension extends AbstractExtension {
       // "raw" filter and give it identifiable names. These filters should only
       // be used in "trans" tags.
       // @see TwigNodeTrans::compileString()
-      new \Twig_SimpleFilter('url_filter', array($this, 'urlFilter'), array('is_safe' => array('html'))),
+      new TwigFilter('url_filter', [$this, 'urlFilter'], ['is_safe' => ['html']]),
       new TwigFilter('placeholder', [$this, 'escapePlaceholder'], ['is_safe' => ['html'], 'needs_environment' => TRUE]),
 
       // Replace twig's escape filter with our own.

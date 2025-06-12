@@ -252,12 +252,9 @@ class TwigExtensionTest extends UnitTestCase {
    * @covers ::urlFilter
    */
   public function testUrlEscaping() {
-    $renderer = $this->getMock('\Drupal\Core\Render\RendererInterface');
-    $twig_extension = new TwigExtension($renderer);
-
     $loader = new StringLoader();
-    $twig = new \Twig_Environment($loader);
-    $twig->addExtension($twig_extension);
+    $twig = new Environment($loader);
+    $twig->addExtension($this->systemUnderTest);
     $result = $twig->render("{{ 'javascript:alert(0)'|url_filter }}");
     $this->assertEquals('alert(0)', $result);
   }
