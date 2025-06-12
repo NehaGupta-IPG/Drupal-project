@@ -599,7 +599,7 @@ default:
         - "**/*.php"
   script:
     - |
-      CHANGED=$(git diff --diff-filter=AM --name-only origin/${CI_MERGE_REQUEST_DIFF_BASE_SHA}...${CI_COMMIT_SHA} | grep '\.php$' || true)
+      CHANGED=$(git diff --diff-filter=AM --name-only ${CI_MERGE_REQUEST_DIFF_BASE_SHA}...${CI_COMMIT_SHA} | grep '\.php$' || true)
       echo "$CHANGED" | grep . || { echo "✅ No new or modified PHP files."; exit 0; }
 
       FAIL=0
