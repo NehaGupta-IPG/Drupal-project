@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity\Controller;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityDescriptionInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
@@ -18,6 +19,7 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Provides the add-page and title callbacks for entities.
@@ -143,12 +145,20 @@ class EntityController implements ContainerInjectionInterface {
    *
    * @param string $entity_type_id
    *   The entity type ID.
+   * @param ?\Symfony\Component\HttpFoundation\Request $request
+   *   The request object. If this contains a destination query parameter, it is
+   *   "forwarded" to the add links (or the redirect response).
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse|array
    *   If there's only one available bundle, a redirect response.
    *   Otherwise, a render array with the add links for each bundle.
    */
-  public function addPage($entity_type_id) {
+  public function addPage($entity_type_id, ?Request $request = NULL) {
+    if ($request === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $request argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3490141', E_USER_DEPRECATED);
+      $request = \Drupal::request();
+    }
+
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
     $bundles = $this->entityTypeBundleInfo->getBundleInfo($entity_type_id);
     $bundle_key = $entity_type->getKey('bundle');
@@ -186,6 +196,22 @@ class EntityController implements ContainerInjectionInterface {
       $bundle_argument = $bundle_key;
     }
 
+    // If the request includes a destination, fetch it to add it to the links
+    // below, but remove it from the request so that it does not override the
+    // redirect that happens in case there is only a single bundle.
+    $options = [];
+    if ($request->query->has('destination')) {
+      $options['query'] = [
+        'destination' => $request->query->get('destination'),
+      ];
+      $request->query->remove('destination');
+    }
+    // Make sure that different destination query parameters create separate
+    // cache entries.
+    CacheableMetadata::createFromRenderArray($build)
+      ->addCacheContexts(['url.query_args:destination'])
+      ->applyTo($build);
+
     $form_route_name = 'entity.' . $entity_type_id . '.add_form';
     // Redirect if there's only one bundle available.
     if (count($bundles) == 1) {
@@ -193,14 +219,19 @@ class EntityController implements ContainerInjectionInterface {
       $bundle_name = reset($bundle_names);
       $parameters = $this->routeMatch->getRawParameters()->all();
       $parameters[$bundle_argument] = $bundle_name;
-      return $this->redirect($form_route_name, $parameters);
+      return $this->redirect($form_route_name, $parameters, $options);
     }
     // Prepare the #bundles array for the template.
     foreach ($bundles as $bundle_name => $bundle_info) {
       $build['#bundles'][$bundle_name] = [
         'label' => $bundle_info['label'],
         'description' => $bundle_info['description'] ?? '',
-        'add_link' => Link::createFromRoute($bundle_info['label'], $form_route_name, [$bundle_argument => $bundle_name]),
+        'add_link' => Link::createFromRoute(
+          $bundle_info['label'],
+          $form_route_name,
+          [$bundle_argument => $bundle_name],
+          $options
+        ),
       ];
     }
 

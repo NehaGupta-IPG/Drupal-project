@@ -62,6 +62,13 @@ class EntityAddUITest extends BrowserTestBase {
     $this->drupalGet('/entity_test_with_bundle/add');
     $this->assertSession()->addressEquals('/entity_test_with_bundle/add/test');
 
+    // Ensure that a destination query parameter is forwarded through the
+    // redirect.
+    $this->drupalGet('/entity_test_with_bundle/add', [
+      'query' => ['destination' => '/admin'],
+    ]);
+    $this->assertSession()->addressEquals('/entity_test_with_bundle/add/test?destination=/admin');
+
     // Two bundles exist, confirm both are shown.
     EntityTestBundle::create([
       'id' => 'test2',
@@ -76,11 +83,19 @@ class EntityAddUITest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('My test2 description');
 
     $this->clickLink('Test2 label');
-    $this->drupalGet('/entity_test_with_bundle/add/test2');
+    $this->assertSession()->addressEquals('/entity_test_with_bundle/add/test2');
 
     $this->submitForm(['name[0][value]' => 'test name'], 'Save');
     $entity = EntityTestWithBundle::load(1);
     $this->assertEquals('test name', $entity->label());
+
+    // Ensure that a destination query parameter is forwarded through the link.
+    $this->drupalGet('/entity_test_with_bundle/add', [
+      'query' => ['destination' => '/admin'],
+    ]);
+    $this->assertSession()->linkExists('Test2 label');
+    $this->clickLink('Test2 label');
+    $this->assertSession()->addressEquals('/entity_test_with_bundle/add/test2?destination=/admin');
 
     // Create a new user that only has bundle specific permissions.
     $user = $this->drupalCreateUser([
@@ -157,6 +172,13 @@ class EntityAddUITest extends BrowserTestBase {
     $this->drupalGet('/entity_test_mul/add');
     $this->assertSession()->addressEquals('/entity_test_mul/add/test');
 
+    // Ensure that a destination query parameter is forwarded through the
+    // redirect.
+    $this->drupalGet('/entity_test_mul/add', [
+      'query' => ['destination' => '/admin'],
+    ]);
+    $this->assertSession()->addressEquals('/entity_test_mul/add/test?destination=/admin');
+
     // Two bundles exist, confirm both are shown.
     EntityTestHelper::createBundle('test2', 'Test2 label', 'entity_test_mul');
     $this->drupalGet('/entity_test_mul/add');
@@ -165,11 +187,19 @@ class EntityAddUITest extends BrowserTestBase {
     $this->assertSession()->linkExists('Test2 label');
 
     $this->clickLink('Test2 label');
-    $this->drupalGet('/entity_test_mul/add/test2');
+    $this->assertSession()->addressEquals('/entity_test_mul/add/test2');
 
     $this->submitForm(['name[0][value]' => 'test name'], 'Save');
     $entity = EntityTestMul::load(1);
     $this->assertEquals('test name', $entity->label());
+
+    // Ensure that a destination query parameter is forwarded through the link.
+    $this->drupalGet('/entity_test_mul/add', [
+      'query' => ['destination' => '/admin'],
+    ]);
+    $this->assertSession()->linkExists('Test2 label');
+    $this->clickLink('Test2 label');
+    $this->assertSession()->addressEquals('/entity_test_mul/add/test2?destination=/admin');
   }
 
 }
