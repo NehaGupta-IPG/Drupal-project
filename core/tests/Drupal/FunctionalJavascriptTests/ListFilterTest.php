@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalJavascriptTests;
 
-// cspell:ignore patri patr patria
+// cspell:ignore Lim lemo
 
 /**
  * Tests the ListFilter functionality.
@@ -38,7 +38,7 @@ class ListFilterTest extends WebDriverTestBase {
     $this->getSession()
       ->getPage()
       ->find('css', '.filter-input')
-      ->setValue('patriarch');
+      ->setValue('Mojito');
     $this->waitSearchFiltered();
     $this->assertEquals(
       $this->countVisibleRows(),
@@ -54,7 +54,7 @@ class ListFilterTest extends WebDriverTestBase {
     $this->drupalGet('/list-filter/override_library');
     $page = $this->getSession()->getPage();
     $filterInput = $page->find('css', '.filter-input');
-    $filterInput->setValue('patri');
+    $filterInput->setValue('Mojito');
     $this->waitSearchFiltered();
     $filterInput->blur();
     $this->assertSession()->waitForElementVisible('css', '.js-filter-count');
@@ -69,11 +69,11 @@ class ListFilterTest extends WebDriverTestBase {
     $page = $this->getSession()->getPage();
     $totalRows = count($page->findAll('css', '.filter-container tbody tr'));
     $filterInput = $page->find('css', '.filter-input');
-    $filterInput->setValue('patr');
+    $filterInput->setValue('lemo');
     $this->waitSearchFiltered();
     $totalVisibleRows = $this->countVisibleRows();
     $this->assertEquals($totalRows, $totalVisibleRows, 'All rows are visible before reaching the minimum filter length.');
-    $filterInput->setValue('patria');
+    $filterInput->setValue('lemon');
     $this->waitSearchFiltered();
     $totalVisibleRows = $this->countVisibleRows();
     $this->assertLessThan($totalRows, $totalVisibleRows, 'Rows are visible after reaching the minimum filter length.');
@@ -86,11 +86,14 @@ class ListFilterTest extends WebDriverTestBase {
     $this->drupalGet('/list-filter/search_start_of_words');
     $page = $this->getSession()->getPage();
     $filterInput = $page->find('css', '.filter-input');
-    $filterInput->setValue('rea');
+    $filterInput->setValue('Lim');
     $this->waitSearchFiltered();
     $trs = $page->findAll('css', '.filter-container tbody tr');
-    $this->assertTrue($trs[3]->isVisible(), 'The Matrix move should be visible when searching for "rea".');
-    $this->assertFalse($trs[0]->isVisible(), 'Inception should not be visible when searching for "rea".');
+    $this->assertTrue($trs[1]->isVisible(), 'Mojito should be visible when searching for "Lim".');
+    $this->assertTrue($trs[4]->isVisible(), 'Virgin Mojito should be visible when searching for "Lim".');
+    $this->assertFalse($trs[3]->isVisible(), 'Iced Tea should not be visible when searching for "Lim".');
+    $this->assertFalse($trs[2]->isVisible(), 'Espresso Martini should not be visible when searching for "Lim".');
+    $this->assertFalse($trs[0]->isVisible(), 'Lemonade should not be visible when searching for "Lim".');
   }
 
   /**
@@ -102,7 +105,7 @@ class ListFilterTest extends WebDriverTestBase {
 
     // Filter Table One (drinks recipes) by "Mint".
     $filterOne = $page->find('css', '.filter-input-one');
-    $filterOne->setValue('mint');
+    $filterOne->setValue('Mint');
     $this->waitSearchFiltered();
     $visibleRows = $this->getVisibleRows('.filter-container-one tbody tr');
     $this->assertEquals(2, count($visibleRows), 'Two recipes are visible after filtering for "Mint".');
