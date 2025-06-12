@@ -345,7 +345,7 @@ class UserController extends ControllerBase {
   protected function validatePathParameters(UserInterface $user, int $timestamp, string $hash, int $timeout = 0): bool {
     $current = \Drupal::time()->getRequestTime();
     $timeout_valid = ((!empty($timeout) && $current - $timestamp < $timeout) || empty($timeout));
-    return ($timestamp >= $user->getLastLoginTime()) && $timestamp <= $current && $timeout_valid && hash_equals($hash, user_pass_rehash($user, $timestamp));
+    return ($timestamp >= $user->getLastLoginTime()) && $timestamp <= $current && $timeout_valid && hash_equals(user_pass_rehash($user, $timestamp), $hash);
   }
 
   /**
