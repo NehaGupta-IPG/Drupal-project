@@ -3,7 +3,7 @@
  * List filter for admin tables and lists.
  */
 
-(function (Drupal, debounce, once) {
+(function (Drupal, debounce, once, slugify) {
   /**
    * Default phrases for filter status messages.
    *
@@ -103,13 +103,7 @@
    *   Plural label for ARIA/a live region.
    */
   function defaultAnnounce(matches, singularLabel, pluralLabel) {
-    Drupal.announce(
-      Drupal.formatPlural(
-        matches,
-        singularLabel,
-        pluralLabel,
-      ),
-    );
+    Drupal.announce(Drupal.formatPlural(matches, singularLabel, pluralLabel));
   }
 
   /**
@@ -481,4 +475,4 @@
       });
     },
   };
-})(Drupal, Drupal.debounce, once);
+})(Drupal, Drupal.debounce, once, window.slugify);
