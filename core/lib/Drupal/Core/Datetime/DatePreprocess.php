@@ -81,49 +81,4 @@ class DatePreprocess {
     $variables['content'] = $element;
   }
 
-  /**
-   * Prepares variables for datetime form wrapper templates.
-   *
-   * Default template: datetime-wrapper.html.twig.
-   *
-   * @param array $variables
-   *   An associative array containing:
-   *   - element: An associative array containing the properties of the element.
-   *     Properties used: #title, #children, #required, #attributes.
-   */
-  public function preprocessDatetimeWrapper(array &$variables): void {
-    $element = $variables['element'];
-
-    if (!empty($element['#title'])) {
-      $variables['title'] = $element['#title'];
-      // If the element title is a string, wrap it a render array so that markup
-      // will not be escaped (but XSS-filtered).
-      if (is_string($variables['title']) && $variables['title'] !== '') {
-        $variables['title'] = ['#markup' => $variables['title']];
-      }
-    }
-
-    // Suppress error messages.
-    $variables['errors'] = NULL;
-
-    $variables['description'] = NULL;
-    if (!empty($element['#description'])) {
-      $description_attributes = [];
-      if (!empty($element['#id'])) {
-        $description_attributes['id'] = $element['#id'] . '--description';
-      }
-      $description_attributes['data-drupal-field-elements'] = 'description';
-      $variables['description'] = $element['#description'];
-      $variables['description_attributes'] = new Attribute($description_attributes);
-    }
-
-    $variables['required'] = FALSE;
-    // For required datetime fields 'form-required' & 'js-form-required' classes
-    // are appended to the label attributes.
-    if (!empty($element['#required'])) {
-      $variables['required'] = TRUE;
-    }
-    $variables['content'] = $element['#children'];
-  }
-
 }

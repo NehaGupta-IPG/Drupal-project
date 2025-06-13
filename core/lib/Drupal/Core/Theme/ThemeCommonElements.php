@@ -47,10 +47,6 @@ class ThemeCommonElements {
         'render element' => 'element',
         'initial preprocess' => DatePreprocess::class . ':preprocessDatetimeForm',
       ],
-      'datetime_wrapper' => [
-        'render element' => 'element',
-        'initial preprocess' => DatePreprocess::class . ':preprocessDatetimeWrapper',
-      ],
       'status_messages' => [
         'variables' => [
           'status_headings' => [],
