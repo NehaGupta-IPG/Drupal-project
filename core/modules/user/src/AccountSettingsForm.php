@@ -143,7 +143,7 @@ class AccountSettingsForm extends ConfigFormBase {
       '#markup' => '<p><strong>If self registration is enabled you should choose one of the following options or use 3rd party modules or custom code to prevent information disclosure.</strong></p>',
     ];
 
-    // @todo The states are not working correct - please click on and off to disable correctly.
+    // @todo The states are not working correct - click on and off to disable correctly.
     $form['registration_cancellation']['user_register_silent_mode'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Show no information about existing mail addresses or usernames while registration.'),

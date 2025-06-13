@@ -111,7 +111,7 @@ class PreregisterForm extends FormBase {
 
     $form['infotext'] = [
       '#prefix' => '<p>',
-      '#markup' => $this->t('Please enter your mail address. After submit you will get a mail with the registration link.'),
+      '#markup' => $this->t('Enter your mail address. After submit you will get a mail with the registration link.'),
       '#suffix' => '</p>',
     ];
 
