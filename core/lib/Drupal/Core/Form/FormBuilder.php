@@ -689,7 +689,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
    * @return bool
    *   Is the type in the array?
    */
-  public function isComplexElement($type) {
+  public function isComplexElement(string $type): bool {
     return in_array($type, [
       'actions',
       'container',
