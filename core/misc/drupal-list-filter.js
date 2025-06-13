@@ -393,17 +393,19 @@
           queryTransitional: '',
         };
 
-        const labels = tableElement.querySelectorAll('[data-filter-label]');
+        const labels = tableElement.querySelectorAll(
+          '[data-filter-group-name]',
+        );
         labels.forEach((label) => {
           label.labelledItems = tableElement.querySelectorAll(
-            `[data-filter-labelledby="${label.dataset.filterLabel}"]`,
+            `[data-filter-parent-group="${label.dataset.filterGroupName}"]`,
           );
         });
 
         // Bind the input event to the table element.
         tableElement.addEventListener(FILTER_EVENT, (e) => {
           state =
-            this.filterTableList(e, tableElement, filterItems, labels, state, {
+            this.filterTableList(e, filterItems, labels, state, {
               singular,
               plural,
               full,
