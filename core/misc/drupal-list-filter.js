@@ -337,13 +337,6 @@
     filterItemsBuilder: defaultFilterItemsBuilder,
 
     /**
-     * Default options for the filter.
-     *
-     * @type {object}
-     */
-    options: {},
-
-    /**
      * Filters table/list rows based on input.
      *
      * @function Drupal.listFilter.filter
