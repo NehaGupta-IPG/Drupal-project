@@ -367,6 +367,26 @@ function template_preprocess_datetime_form(&$variables): void {
 }
 
 /**
+ * Prepares variables for datetime form wrapper templates.
+ *
+ * Default template: datetime-wrapper.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - element: An associative array containing the properties of the element.
+ *     Properties used: #title, #children, #required, #attributes.
+ *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Initial
+ *  template_preprocess functions are registered directly in hook_theme().
+ *
+ * @see https://www.drupal.org/node/3504125
+ */
+function template_preprocess_datetime_wrapper(&$variables): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(ThemePreprocess::class)->preprocessDatetimeWrapper($variables);
+}
+
+/**
  * Prepares variables for links templates.
  *
  * Default template: links.html.twig.
