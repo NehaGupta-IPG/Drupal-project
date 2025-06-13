@@ -222,7 +222,7 @@ class ModulesListForm extends FormBase {
         '#theme' => 'system_modules_details',
         '#attributes' => [
           'class' => ['package-listing'],
-          'data-filter-label' => 'package-' . $package,
+          'data-filter-group-name' => 'package-' . $package,
         ],
         // Ensure that the "Core" package comes first.
         '#weight' => $package == 'Core' ? -10 : NULL,
@@ -268,7 +268,7 @@ class ModulesListForm extends FormBase {
     $row['#requires'] = [];
     $row['#required_by'] = [];
 
-    $row['#attributes'] = ['data-filter-labelledby' => 'package-' . $module->info['package']];
+    $row['#attributes'] = ['data-filter-parent-group' => 'package-' . $module->info['package']];
 
     $lifecycle = $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER];
     $row['name']['#markup'] = $module->info['name'];

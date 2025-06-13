@@ -157,7 +157,7 @@ class ChooseBlockController implements ContainerInjectionInterface {
     foreach ($grouped_definitions as $category => $blocks) {
       $block_categories[$category]['#type'] = 'details';
       $block_categories[$category]['#attributes']['class'][] = 'js-layout-builder-category';
-      $block_categories[$category]['#attributes']['data-filter-label'] = 'block-' . $category;
+      $block_categories[$category]['#attributes']['data-filter-group-name'] = 'block-' . $category;
       $block_categories[$category]['#open'] = TRUE;
       $block_categories[$category]['#title'] = $category;
       $block_categories[$category]['links'] = $this->getBlockLinks($section_storage, $delta, $region, $blocks, $category);
@@ -235,7 +235,7 @@ class ChooseBlockController implements ContainerInjectionInterface {
       $attributes = $this->getAjaxAttributes();
       $attributes['class'][] = 'js-layout-builder-block-link';
       if ($category) {
-        $attributes['data-filter-labelledby'] = 'block-' . $category;
+        $attributes['data-filter-parent-group'] = 'block-' . $category;
       }
 
       $link = [

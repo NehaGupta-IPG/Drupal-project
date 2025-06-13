@@ -165,7 +165,7 @@ class UserPermissionsForm extends FormBase {
       '#placeholder' => $this->t('Filter by permission name'),
       '#description' => $this->t('Enter permission name'),
       '#list_container_selector' => '#permissions',
-      '#list_item' => 'tbody tr[data-filter-labelledby]',
+      '#list_item' => 'tbody tr[data-filter-parent-group]',
       '#list_text' => '.permission',
       '#announce' => [
         'singular' => $this->t('1 permission is available in the modified list.'),
@@ -195,7 +195,7 @@ class UserPermissionsForm extends FormBase {
     foreach ($this->permissionsByProvider() as $provider => $permissions) {
       // Module name.
       $form['permissions']['module_' . $provider] = [
-        '#attributes' => ['data-filter-label' => 'module-' . $provider],
+        '#attributes' => ['data-filter-group-name' => 'module-' . $provider],
         [
           '#wrapper_attributes' => [
             'colspan' => count($role_names) + 1,
@@ -212,7 +212,7 @@ class UserPermissionsForm extends FormBase {
           'restrict access' => FALSE,
           'warning' => !empty($perm_item['restrict access']) ? $this->t('Warning: Give to trusted roles only; this permission has security implications.') : '',
         ];
-        $form['permissions'][$perm]['#attributes'] = ['data-filter-labelledby' => 'module-' . $provider];
+        $form['permissions'][$perm]['#attributes'] = ['data-filter-parent-group' => 'module-' . $provider];
         $form['permissions'][$perm]['description'] = [
           '#type' => 'inline_template',
           '#template' => '<div class="permission"><span class="title table-filter-text-source">{{ title }}</span>{% if description or warning %}<div class="description">{% if warning %}<em class="permission-warning">{{ warning }}</em> {% endif %}{{ description }}</div>{% endif %}</div>',
