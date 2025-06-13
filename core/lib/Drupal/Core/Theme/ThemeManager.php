@@ -210,7 +210,7 @@ class ThemeManager implements ThemeManagerInterface {
           }
         }
       }
-      else {
+      elseif (isset($info['render element'])) {
         $variables[$info['render element']] = $element;
         // Give a hint to render engines to prevent infinite recursion.
         $variables[$info['render element']]['#render_children'] = TRUE;
