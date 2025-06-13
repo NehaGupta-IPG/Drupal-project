@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Hook;
 
+use Drupal\Core\Render\Markup;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\StreamWrapper\LocalStream;
 use Drupal\Core\Site\Settings;
@@ -254,6 +255,29 @@ class SystemHooks {
       $minimal_libraries = $library_dependency_resolver->getMinimalRepresentativeSubset(array_unique(array_merge($assets->getLibraries(), $assets->getAlreadyLoadedLibraries())));
       sort($minimal_libraries);
       $settings['ajaxPageState']['libraries'] = implode(',', $minimal_libraries);
+    }
+
+    // @todo Preferably, retrieve these from the render element.
+    foreach (['status', 'error', 'warning'] as $type) {
+      $message_type_key = $type . 'MessagesTemplate';
+      if (array_key_exists($message_type_key, $settings)) {
+        /** @var \Drupal\Core\Render\RendererInterface $renderer */
+        $renderer = \Drupal::service('renderer');
+        $message_template = [
+          '#theme' => 'status_messages',
+          '#message_list' => [
+            $type => [
+              '#markup' => Markup::create('<div data-drupal-message-template></div>'),
+            ],
+          ],
+          '#status_headings' => [
+            'status' => $this->t('Status message'),
+            'error' => $this->t('Error message'),
+            'warning' => $this->t('Warning message'),
+          ],
+        ];
+        $settings[$message_type_key] = $renderer->renderInIsolation($message_template);
+      }
     }
   }
 
