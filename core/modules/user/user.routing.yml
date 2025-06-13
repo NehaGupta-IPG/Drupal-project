@@ -1,10 +1,15 @@
 user.register:
-  path: '/user/register'
+  path: '/user/register/{token}/{hash}'
   defaults:
-    _entity_form: 'user.register'
+    _controller: '\Drupal\user\Controller\UserController::registerUser'
     _title: 'Create new account'
+    token: FALSE
+    hash: FALSE
   requirements:
     _access_user_register: 'TRUE'
+    _user_is_logged_in: 'FALSE'
+  options:
+    no_cache: TRUE
 
 user.logout:
   path: '/user/logout'
