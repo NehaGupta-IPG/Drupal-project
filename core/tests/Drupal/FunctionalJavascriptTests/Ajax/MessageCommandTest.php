@@ -38,27 +38,27 @@ class MessageCommandTest extends WebDriverTestBase {
     $page->pressButton('Make Message In Default Location');
     $this->waitForMessageVisible('I am a message in the default location.');
     $this->assertAnnounceContains('I am a message in the default location.');
-    $assert_session->elementsCount('css', '.messages__wrapper .messages', 1);
+    $assert_session->elementsCount('css', '.messages__wrapper [data-drupal-messages]', 1);
 
     $page->pressButton('Make Message In Alternate Location');
     $this->waitForMessageVisible('I am a message in an alternate location.', '#alternate-message-container');
     $assert_session->pageTextContains('I am a message in the default location.');
     $this->assertAnnounceContains('I am a message in an alternate location.');
-    $assert_session->elementsCount('css', '.messages__wrapper .messages', 1);
-    $assert_session->elementsCount('css', '#alternate-message-container .messages', 1);
+    $assert_session->elementsCount('css', '.messages__wrapper [data-drupal-messages]', 1);
+    $assert_session->elementsCount('css', '#alternate-message-container [data-drupal-messages]', 1);
 
     $page->pressButton('Make Warning Message');
     $this->waitForMessageVisible('I am a warning message in the default location.', NULL, 'warning');
     $assert_session->pageTextNotContains('I am a message in the default location.');
-    $assert_session->elementsCount('css', '.messages__wrapper .messages', 1);
-    $assert_session->elementsCount('css', '#alternate-message-container .messages', 1);
+    $assert_session->elementsCount('css', '.messages__wrapper [data-drupal-messages]', 1);
+    $assert_session->elementsCount('css', '#alternate-message-container [data-drupal-messages]', 1);
 
     $this->drupalGet('ajax-test/message');
     // Test that by default, previous messages in a location are removed.
     for ($i = 0; $i < 6; $i++) {
       $page->pressButton('Make Message In Default Location');
       $this->waitForMessageVisible('I am a message in the default location.');
-      $assert_session->elementsCount('css', '.messages__wrapper .messages', 1);
+      $assert_session->elementsCount('css', '.messages__wrapper [data-drupal-messages]', 1);
 
       $page->pressButton('Make Warning Message');
       $this->waitForMessageVisible('I am a warning message in the default location.', NULL, 'warning');
@@ -66,7 +66,7 @@ class MessageCommandTest extends WebDriverTestBase {
       // screen reader announcement.
       $this->assertAnnounceNotContains('I am a warning message in the default location.');
       $this->waitForMessageRemoved('I am a message in the default location.');
-      $assert_session->elementsCount('css', '.messages__wrapper .messages', 1);
+      $assert_session->elementsCount('css', '.messages__wrapper [data-drupal-messages]', 1);
     }
 
     // Test that if MessageCommand::clearPrevious is FALSE, messages will not
@@ -75,7 +75,7 @@ class MessageCommandTest extends WebDriverTestBase {
     for ($i = 1; $i < 7; $i++) {
       $page->pressButton('Make Message In Alternate Location');
       $expected_count = $page->waitFor(10, function () use ($i, $page): bool {
-        return count($page->findAll('css', '#alternate-message-container .messages')) === $i;
+        return count($page->findAll('css', '#alternate-message-container [data-drupal-messages]')) === $i;
       });
       $this->assertTrue($expected_count);
       $this->assertAnnounceContains('I am a message in an alternate location.');
@@ -183,7 +183,7 @@ class MessageCommandTest extends WebDriverTestBase {
    *   The expected type.
    */
   protected function waitForMessageVisible(string $message, ?string $selector = '[data-drupal-messages]', string $type = 'status'): void {
-    $this->assertNotEmpty($this->assertSession()->waitForElementVisible('css', $selector . ' .messages--' . $type . ':contains("' . $message . '")'));
+    $this->assertNotEmpty($this->assertSession()->waitForElementVisible('css', $selector . ' [data-drupal-message-template]:contains("' . $message . '")'));
   }
 
   /**

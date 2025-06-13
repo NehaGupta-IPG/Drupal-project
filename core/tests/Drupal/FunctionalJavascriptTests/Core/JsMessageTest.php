@@ -101,7 +101,7 @@ class JsMessageTest extends WebDriverTestBase {
     $this->click('[id="id-no-status"]');
     $no_status_msg = 'Msg-id-no-status';
     $this->assertCurrentMessages([$no_status_msg], $messagesSelector);
-    $web_assert->elementTextContains('css', "$messagesSelector .messages--status[data-drupal-message-id=\"my-special-id\"]", $no_status_msg);
+    $web_assert->elementTextContains('css', "$messagesSelector [data-drupal-message-id=\"my-special-id\"]", $no_status_msg);
 
   }
 

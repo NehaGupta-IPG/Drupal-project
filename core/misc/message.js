@@ -252,6 +252,7 @@
     element.querySelector('[data-drupal-message-template]').innerHTML = text;
     const fragment = document.createDocumentFragment();
     fragment.appendChild(element);
+    fragment.firstElementChild.firstElementChild.setAttribute('data-drupal-message-id', id);
     return fragment.firstElementChild.firstElementChild;
   };
 })(Drupal);
