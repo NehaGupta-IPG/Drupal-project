@@ -74,7 +74,8 @@ services:
     class: Drupal\Core\Config\Action\ConfigActionManager
     parent: default_plugin_manager
     arguments: ['@config.manager', '@config.storage', '@config.typed', '@config.factory']
-  Drupal\Core\DefaultContent\Importer:
+  importer:
+    class: Drupal\Core\DefaultContent\Importer
     autowire: true
   Drupal\Core\DefaultContent\AdminAccountSwitcher:
     arguments:
