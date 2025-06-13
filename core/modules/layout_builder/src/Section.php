@@ -153,7 +153,11 @@ class Section implements ThirdPartySettingsInterface {
    *   This method should only be used by code responsible for storing the data.
    */
   public function getLayoutSettings() {
-    return $this->getLayout()->getConfiguration();
+    if ($this->hasLayout()) {
+      return $this->getLayout()->getConfiguration();
+    }
+
+    return $this->layoutSettings;
   }
 
   /**
