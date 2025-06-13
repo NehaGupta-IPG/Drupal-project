@@ -63,15 +63,15 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
       ->save();
     $this->drupalGet('theme-test/general-suggestion-alter');
     $this->assertSession()->pageTextContains('Template overridden based on new theme suggestion provided by the test_theme theme via hook_theme_suggestions_alter().');
-    $this->assertSession()->pageTextContains('Hooks: theme_test_theme none');
+    $this->assertSession()->pageTextContains('Hooks: theme_test_theme test_theme_theme_suggestions_alter');
 
     // Enable the theme_suggestions_test module to test modules implementing
     // suggestions alter hooks.
     \Drupal::service('module_installer')->install(['theme_suggestions_test']);
     $this->resetAll();
     $this->drupalGet('theme-test/general-suggestion-alter');
-    $this->assertSession()->pageTextContains('Template overridden based on new theme suggestion provided by the test_theme theme via hook_theme_suggestions_alter()');
-    $this->assertSession()->pageTextContains('Hooks: theme_test_theme none');
+    $this->assertSession()->pageTextContains('Template overridden based on new theme suggestion provided by a module via hook_theme_suggestions_alter().');
+    $this->assertSession()->pageTextContains('Hooks: theme_suggestions_test_theme_suggestions_alter test_theme_theme_suggestions_alter');
   }
 
   /**
@@ -93,7 +93,7 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
     \Drupal::service('module_installer')->install(['theme_suggestions_test']);
     $this->resetAll();
     $this->drupalGet('theme-test/suggestion-alter');
-    $this->assertSession()->pageTextContains('Template overridden based on new theme suggestion provided by the test_theme theme via hook_theme_suggestions_HOOK_alter().');
+    $this->assertSession()->pageTextContains('Template overridden based on new theme suggestion provided by a module via hook_theme_suggestions_HOOK_alter().');
   }
 
   /**
@@ -135,10 +135,9 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
     // Ensure that the order is first by extension, then for a given extension,
     // the hook-specific one after the generic one.
     $expected_order = [
-      'theme_test_theme_suggestions_theme_test_suggestions() executed.',
       'theme_suggestions_test_theme_suggestions_alter() executed.',
       'theme_suggestions_test_theme_suggestions_theme_test_suggestions_alter() executed.',
-      'theme_test_theme_suggestions_alter() executed.',
+      'theme_test_theme_suggestions_alter() executed for theme_test_suggestions.',
       'theme_test_theme_suggestions_theme_test_suggestions_alter() executed.',
       'test_theme_theme_suggestions_alter() executed.',
       'test_theme_theme_suggestions_theme_test_suggestions_alter() executed.',
