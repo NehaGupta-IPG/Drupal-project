@@ -86,7 +86,7 @@ class PreregisterForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('entity_type.manager')->getStorage('user'),
       $container->get('language_manager'),
@@ -149,7 +149,7 @@ class PreregisterForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     $flood_config = $this->configFactory->get('user.flood');
     if (!$this->flood->isAllowed('user.register', $flood_config->get('ip_limit'), $flood_config->get('ip_window'))) {
       $form_state->setErrorByName('name', $this->t('Too many requests from your IP address. It is temporarily blocked. Try again later or contact the site administrator.'));
@@ -168,7 +168,7 @@ class PreregisterForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $mail = trim($form_state->getValue('mail'));
 
     $data = [

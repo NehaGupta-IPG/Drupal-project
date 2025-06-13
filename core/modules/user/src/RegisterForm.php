@@ -73,10 +73,11 @@ class RegisterForm extends AccountForm {
   /**
    * {@inheritdoc}
    */
-  protected function flagViolations(EntityConstraintViolationListInterface $violations, array $form, FormStateInterface $form_state) {
+  protected function flagViolations(EntityConstraintViolationListInterface $violations, array $form, FormStateInterface $form_state): void {
 
     if (\Drupal::config('user.settings')->get('user_register_silent_mode')) {
-      // Filter name & mail violation to prevent information disclosure #2346389.
+      // Filter name & mail violation
+      // to prevent information disclosure #2346389.
       $field_names = [
         'name',
         'mail',
