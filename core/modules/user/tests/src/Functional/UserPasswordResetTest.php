@@ -40,7 +40,7 @@ class UserPasswordResetTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'language', 'user'];
+  protected static $modules = ['block', 'language'];
 
   /**
    * {@inheritdoc}
