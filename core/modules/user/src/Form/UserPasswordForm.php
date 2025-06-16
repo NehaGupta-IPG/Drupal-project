@@ -204,7 +204,8 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
             '%email' => $account->getEmail(),
           ]);
       }
-      // This message will be generated when the email field in empty for the user.
+      // This message will be generated when the email field in empty
+      // for the user.
       else {
         $this->messenger()
           ->addStatus($this->t('If %identifier is a valid account, an email will be sent with instructions to reset your password.', [
