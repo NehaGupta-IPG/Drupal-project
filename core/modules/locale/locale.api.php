@@ -41,8 +41,7 @@
  * @code
  * 'interface translation server pattern': public://translations/%project-%version.%language.po
  * @endcode
- * And an additional streamwrapper "module://" is available to set the relative
- * path to the current module:
+ * Streamwrapper "module://" addresses paths relative to the current project.
  * @code
  * 'interface translation server pattern': module://translations/%version.%language.po
  * @endcode
