@@ -194,30 +194,27 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $account = $form_state->getValue('account');
-    if ($account && $account->isActive()) {
-      if (!empty($account->get('mail')->value)) {
-        // Mail one time login URL and instructions using current language.
-        $mail = _user_mail_notify('password_reset', $account);
-        if (!empty($mail)) {
-          $this->logger('user')
-            ->info('Password reset instructions mailed to %name at %email.', [
-              '%name' => $account->getAccountName(),
-              '%email' => $account->getEmail(),
-            ]);
-        }
-      }
-      else {
-        // Account exists and is active but has no email address
+    if ($account) {
+      // Mail one time login URL and instructions using current language.
+      $mail = _user_mail_notify('password_reset', $account);
+      if (!empty($mail)) {
         $this->logger('user')
-          ->notice('Password reset form was submitted for account without email address: %name.', [
+          ->info('Password reset instructions mailed to %name at %email.', [
             '%name' => $account->getAccountName(),
+            '%email' => $account->getEmail(),
           ]);
+      }
+      // This message will be generated when the email field in empty for the user.
+      else {
+        $this->messenger()
+          ->addStatus($this->t('If %identifier is a valid account, an email will be sent with instructions to reset your password.', [
+            '%identifier' => $form_state->getValue('name'),
+          ]));
       }
     }
     else {
-      // Account doesn't exist or is blocked
       $this->logger('user')
-        ->notice('Password reset form was submitted with an unknown or inactive account: %name.', [
+        ->info('Password reset form was submitted with an unknown or inactive account: %name.', [
           '%name' => $form_state->getValue('name'),
         ]);
     }
