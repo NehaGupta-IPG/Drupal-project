@@ -73,8 +73,8 @@
  *   the same project name will be listed as one the translation status list.
  * - "interface translation server pattern": URL of the .po translation files
  *   used to download the files from. The URL contains tokens which will be
- *   replaced by appropriate values. The file can be locate both at a local
- *   relative path, a local absolute path and a remote server location.
+ *   replaced by appropriate values. This value can be a local path relative to
+ *   the Drupal root, a local absolute path, or a remote server location.
  *
  * The following tokens are available for the server pattern:
  * - "%core": Core version. Value example: "8.x".
