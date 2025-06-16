@@ -29,6 +29,8 @@ class AccessDeniedTest extends BrowserTestBase {
 
   /**
    * The test user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
    */
   protected $adminUser;
 
@@ -54,6 +56,9 @@ class AccessDeniedTest extends BrowserTestBase {
     user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['access user profiles']);
   }
 
+  /**
+   * Tests access denied functionality.
+   */
   public function testAccessDenied(): void {
     $this->drupalGet('admin');
     $this->assertSession()->pageTextContains('Access denied');

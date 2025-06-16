@@ -1105,12 +1105,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
     $this->setUpEntityStorage();
 
     $entity = $this->entityStorage->create();
-    $entity->expects($this->atLeastOnce())
-      ->method('id')
-      ->willReturn('foo');
-
     $this->assertInstanceOf(EntityInterface::class, $entity);
-    $this->assertSame('foo', $entity->id());
     $this->assertTrue($entity->isNew());
   }
 
@@ -1308,7 +1303,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
       ->with([
         $key => [
           'data' => $entity,
-          'tags' => [$this->entityTypeId . '_values', 'entity_field_info'],
+          'tags' => ['entity_field_info'],
         ],
       ]);
 

@@ -288,6 +288,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
    * Data provider for testCalculateDependenciesWithPluginCollections.
    *
    * @return array
+   *   An array of test cases, each containing a plugin definition and expected dependencies.
    */
   public static function providerCalculateDependenciesWithPluginCollections(): array {
     // Start with 'a' so that order of the dependency array is fixed.
@@ -507,6 +508,11 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     $this->assertNull($duplicate->getOriginalId());
     $this->assertNotEquals($this->entity->uuid(), $duplicate->uuid());
     $this->assertSame($new_uuid, $duplicate->uuid());
+
+    $this->moduleHandler->invokeAll($this->entityTypeId . '_duplicate', [$duplicate, $this->entity])
+      ->shouldHaveBeenCalled();
+    $this->moduleHandler->invokeAll('entity_duplicate', [$duplicate, $this->entity])
+      ->shouldHaveBeenCalled();
   }
 
   /**
@@ -715,15 +721,22 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
 }
 
+/**
+ * Stub class for testing.
+ */
 class TestConfigEntityWithPluginCollections extends ConfigEntityBaseWithPluginCollections {
 
   /**
    * The plugin collection.
+   *
+   * @var \Drupal\Core\Plugin\DefaultLazyPluginCollection
    */
   protected $pluginCollection;
 
   /**
    * The plugin manager.
+   *
+   * @var \Drupal\Component\Plugin\PluginManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $pluginManager;
 

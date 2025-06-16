@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Base class for any views plugin types.
  *
- * Via the @Plugin definition the plugin may specify a theme function or
+ * Via the plugin definition the plugin may specify a theme function or
  * template to be used for the plugin. It also can auto-register the theme
  * implementation for that file or function.
  * - theme: the theme implementation to use in the plugin. This must be the
@@ -269,9 +269,9 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
    */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     // Some form elements belong in a fieldset for presentation, but can't
-    // be moved into one because of the $form_state->getValues() hierarchy. Those
-    // elements can add a #fieldset => 'fieldset_name' property, and they'll
-    // be moved to their fieldset during pre_render.
+    // be moved into one because of the $form_state->getValues() hierarchy.
+    // Those elements can add a #fieldset => 'fieldset_name' property, and
+    // they'll be moved to their fieldset during pre_render.
     $form['#pre_render'][] = [static::class, 'preRenderAddFieldsetMarkup'];
   }
 
@@ -354,6 +354,7 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
    *   Array of token => replacement_value items.
    *
    * @return string
+   *   The sanitized string with tokens replaced.
    */
   protected function viewsTokenReplace($text, $tokens) {
     if (!strlen($text)) {
@@ -659,6 +660,7 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
    * Returns the render API renderer.
    *
    * @return \Drupal\Core\Render\RendererInterface
+   *   The renderer service.
    */
   protected function getRenderer() {
     if (!isset($this->renderer)) {

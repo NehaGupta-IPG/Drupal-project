@@ -302,4 +302,15 @@ class File extends ContentEntityBase implements FileInterface {
     Cache::invalidateTags($tags);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getDownloadHeaders(): array {
+    return [
+      'Content-Type' => $this->getMimeType(),
+      'Content-Length' => $this->getSize(),
+      'Cache-Control' => 'private',
+    ];
+  }
+
 }

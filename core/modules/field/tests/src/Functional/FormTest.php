@@ -10,6 +10,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestBaseFieldDisplay;
+use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 
@@ -98,6 +99,9 @@ class FormTest extends FieldTestBase {
     ];
   }
 
+  /**
+   * Tests the single-value field form functionality.
+   */
   public function testFieldFormSingle(): void {
     $field_storage = $this->fieldStorageSingle;
     $field_name = $field_storage['field_name'];
@@ -208,6 +212,9 @@ class FormTest extends FieldTestBase {
     $this->assertTrue($entity->{$field_name}->isEmpty(), 'Field is now empty.');
   }
 
+  /**
+   * Tests the required single-value field form.
+   */
   public function testFieldFormSingleRequired(): void {
     $field_storage = $this->fieldStorageSingle;
     $field_name = $field_storage['field_name'];
@@ -248,6 +255,9 @@ class FormTest extends FieldTestBase {
     $this->assertSession()->pageTextContains("{$this->field['label']} field is required.");
   }
 
+  /**
+   * Tests the unlimited-value field form.
+   */
   public function testFieldFormUnlimited(): void {
     $field_storage = $this->fieldStorageUnlimited;
     $field_name = $field_storage['field_name'];
@@ -598,7 +608,7 @@ class FormTest extends FieldTestBase {
     $this->drupalLogin($user);
 
     // Ensure that the 'bar' bundle exists, to avoid config validation errors.
-    entity_test_create_bundle('bar', entity_type: 'entity_test_base_field_display');
+    EntityTestHelper::createBundle('bar', entity_type: 'entity_test_base_field_display');
 
     FieldStorageConfig::create([
       'entity_type' => 'entity_test_base_field_display',

@@ -299,7 +299,8 @@ trait PerformanceTestTrait {
    * @todo https://www.drupal.org/project/drupal/issues/3379757
    *
    * @param string|null $service_name
-   *   An optional human readable identifier so that traces can be grouped together.
+   *   An optional human readable identifier so that traces can be grouped
+   *   together.
    *
    * @return \Drupal\Tests\PerformanceData
    *   An instance of the performance data value object.
@@ -611,6 +612,7 @@ trait PerformanceTestTrait {
    *   The message to display.
    *
    * @return void
+   *   No return value.
    *
    * @throws \PHPUnit\Framework\ExpectationFailedException
    */
@@ -652,6 +654,7 @@ trait PerformanceTestTrait {
    *   An instance of the performance data value object.
    *
    * @return void
+   *   No return value.
    */
   protected function assertMetrics(
     array $expected,
@@ -663,14 +666,18 @@ trait PerformanceTestTrait {
       'ScriptBytes',
       'StylesheetBytes',
     ];
+    $values = [];
     foreach ($expected as $name => $metric) {
       if (in_array($name, $assertRange)) {
         $this->assertCountBetween($metric - 500, $metric + 500, $performance_data->{"get$name"}(), "Asserting $name");
+        unset($expected[$name]);
       }
       else {
-        $this->assertSame($metric, $performance_data->{"get$name"}(), "Asserting $name");
+        $values[$name] = $performance_data->{"get$name"}();
       }
     }
+    $this->assertSame($expected, $values);
+
   }
 
   /**
@@ -692,8 +699,7 @@ trait PerformanceTestTrait {
       'CacheGetCount' => $performance_data->getCacheGetCount(),
       'CacheSetCount' => $performance_data->getCacheSetCount(),
       'CacheDeleteCount' => $performance_data->getCacheDeleteCount(),
-      'CacheTagChecksumCount' => $performance_data->getCacheTagChecksumCount(),
-      'CacheTagIsValidCount' => $performance_data->getCacheTagIsValidCount(),
+      'CacheTagLookupQueryCount' => $performance_data->getCacheTagLookupQueryCount(),
       'CacheTagInvalidationCount' => $performance_data->getCacheTagInvalidationCount(),
     ];
   }
