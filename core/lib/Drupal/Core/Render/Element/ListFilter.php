@@ -39,7 +39,7 @@ use Drupal\Core\Render\Attribute\RenderElement;
  *   - singular: Message to announce when only one item is visible.
  *   - plural: Message to announce when more than one items are visible. This
  *     must contain the '@count' placeholder.
- *   - all': Message to announce when all items are visible.
+ *   - all: Message to announce when all items are visible.
  */
 #[RenderElement('list_filter')]
 class ListFilter extends Search {
