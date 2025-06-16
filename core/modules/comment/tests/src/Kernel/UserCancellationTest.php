@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Kernel;
 
 use Drupal\comment\Entity\Comment;
@@ -41,14 +43,15 @@ class UserCancellationTest extends KernelTestBase {
     parent::setUp();
 
     $this->installSchema('comment', 'comment_entity_statistics');
-    $this->installSchema('system', 'sequences');
     $this->installEntitySchema('comment');
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
     $this->installConfig('node');
+    $this->installConfig('user');
 
     CommentType::create([
       'id' => 'test',
+      'label' => 'Test',
       'target_entity_type_id' => 'node',
     ])->save();
 

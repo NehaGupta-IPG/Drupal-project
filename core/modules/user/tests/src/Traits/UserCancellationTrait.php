@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Traits;
 
 use Drupal\user\UserInterface;
@@ -26,7 +28,7 @@ trait UserCancellationTrait {
     $page->selectFieldOption('action', 'user_cancel_user_action');
     $page->pressButton('Apply to selected items');
     $page->selectFieldOption('user_cancel_method', $method);
-    $page->pressButton('Cancel accounts');
+    $page->pressButton('Confirm');
     $this->checkForMetaRefresh();
     $this->assertSession()->pageTextContains('The update has been performed.');
   }

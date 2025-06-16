@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\user\Entity\Handler;
 
 use Drupal\Core\Batch\BatchBuilder;
@@ -15,25 +17,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class BatchCancellationHandler extends DefaultCancellationHandler {
 
   /**
-   * The renderer service.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
    * BatchCancellationHandler constructor.
-   *
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\Core\Entity\ContentEntityStorageInterface $storage
-   *   The entity storage handler.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
    */
-  public function __construct(ContentEntityTypeInterface $entity_type, ContentEntityStorageInterface $storage, RendererInterface $renderer) {
-    parent::__construct($entity_type, $storage);
-    $this->renderer = $renderer;
+  public function __construct(
+    ContentEntityTypeInterface $entityType,
+    ContentEntityStorageInterface $storage,
+    protected readonly RendererInterface $renderer,
+  ) {
+    parent::__construct($entityType, $storage);
   }
 
   /**
@@ -98,8 +89,7 @@ class BatchCancellationHandler extends DefaultCancellationHandler {
    *   The entity handler.
    */
   protected static function getInstance(string $entity_type_id) {
-    return \Drupal::entityTypeManager()
-      ->getHandler($entity_type_id, 'user_cancel');
+    return \Drupal::entityTypeManager()->getHandler($entity_type_id, 'user_cancel');
   }
 
   /**

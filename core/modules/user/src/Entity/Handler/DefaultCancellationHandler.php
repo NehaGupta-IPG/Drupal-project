@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\user\Entity\Handler;
 
 use Drupal\Core\Entity\ContentEntityInterface;
@@ -26,30 +28,12 @@ class DefaultCancellationHandler implements CancellationHandlerInterface, Entity
   use StringTranslationTrait;
 
   /**
-   * The entity type definition.
-   *
-   * @var \Drupal\Core\Entity\ContentEntityTypeInterface
-   */
-  protected $entityType;
-
-  /**
-   * The entity storage handler.
-   *
-   * @var \Drupal\Core\Entity\ContentEntityStorageInterface
-   */
-  protected $storage;
-
-  /**
    * DefaultCancellationHandler constructor.
-   *
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\Core\Entity\ContentEntityStorageInterface $storage
-   *   The entity storage handler.
    */
-  public function __construct(ContentEntityTypeInterface $entity_type, ContentEntityStorageInterface $storage) {
-    $this->entityType = $entity_type;
-    $this->storage = $storage;
+  public function __construct(
+    protected readonly ContentEntityTypeInterface $entityType,
+    protected readonly ContentEntityStorageInterface $storage,
+  ) {
   }
 
   /**

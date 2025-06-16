@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\Functional;
 
 use Drupal\media\Entity\Media;
@@ -40,7 +42,9 @@ class UserCancellationTest extends MediaFunctionalTestBase {
     $charlie_media->setNewRevision();
     $charlie_media->save();
 
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer users',
+    ]));
     $this->cancelUser($alice, CancellationHandlerInterface::METHOD_BLOCK_UNPUBLISH);
     $alice_media = Media::load($alice_media->id());
     $this->assertFalse($alice_media->isPublished());
@@ -59,6 +63,15 @@ class UserCancellationTest extends MediaFunctionalTestBase {
     $this->assertNull($media_storage->loadRevision($original_charlie_media_vid));
   }
 
+  /**
+   * Creates a media entity associated with a user account.
+   *
+   * @param \Drupal\user\UserInterface $user
+   *   The user account that will own the node.
+   *
+   * @return \Drupal\media\Entity\Media
+   *   The new, saved media.
+   */
   protected function createMediaForUser(UserInterface $user): Media {
     $media = Media::create([
       'bundle' => 'test',

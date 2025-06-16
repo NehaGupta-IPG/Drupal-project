@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Functional;
 
 use Drupal\file\Entity\File;
@@ -51,7 +53,9 @@ class UserCancellationTest extends BrowserTestBase {
     $charlieFile = File::create($values)->setOwner($charlie);
     $charlieFile->save();
 
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer users',
+    ]));
     $this->cancelUser($alice, CancellationHandlerInterface::METHOD_BLOCK_UNPUBLISH);
     $this->assertSame($alice->id(), File::load($aliceFile->id())->getOwnerId());
     $this->cancelUser($bob, CancellationHandlerInterface::METHOD_REASSIGN);

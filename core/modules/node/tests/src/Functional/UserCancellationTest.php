@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\node\Entity\Node;
@@ -47,7 +49,9 @@ class UserCancellationTest extends BrowserTestBase {
     $charlie_node->setNewRevision();
     $charlie_node->save();
 
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer users',
+    ]));
     $this->cancelUser($alice, CancellationHandlerInterface::METHOD_BLOCK_UNPUBLISH);
     $alice_node = Node::load($alice_node->id());
     $this->assertFalse($alice_node->isPublished());
