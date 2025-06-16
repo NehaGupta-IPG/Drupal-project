@@ -26,7 +26,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\user\Entity\User;
 use Drupal\user\EntityOwnerTrait;
-use Drupal\user\Entity\Handler\BatchCancellationHandler;
 
 /**
  * Defines the comment entity class.

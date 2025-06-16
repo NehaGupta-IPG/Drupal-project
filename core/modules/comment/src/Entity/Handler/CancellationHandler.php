@@ -18,25 +18,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class CancellationHandler extends DefaultCancellationHandler {
 
   /**
-   * The config factory service.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
    * CancellationHandler constructor.
-   *
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\Core\Entity\ContentEntityStorageInterface $storage
-   *   The entity storage handler.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory service.
    */
-  public function __construct(ContentEntityTypeInterface $entity_type, ContentEntityStorageInterface $storage, ConfigFactoryInterface $config_factory) {
-    parent::__construct($entity_type, $storage);
-    $this->configFactory = $config_factory;
+  public function __construct(
+    ContentEntityTypeInterface $entityType,
+    ContentEntityStorageInterface $storage,
+    protected readonly ConfigFactoryInterface $configFactory,
+  ) {
+    parent::__construct($entityType, $storage);
   }
 
   /**
