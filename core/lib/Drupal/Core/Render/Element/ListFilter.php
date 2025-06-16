@@ -41,7 +41,7 @@ use Drupal\Core\Render\Attribute\RenderElement;
  *     must contain the '@count' placeholder.
  *   - all': Message to announce when all items are visible.
  */
-#[RenderElement("list_filter")]
+#[RenderElement('list_filter')]
 class ListFilter extends Search {
 
   /**
