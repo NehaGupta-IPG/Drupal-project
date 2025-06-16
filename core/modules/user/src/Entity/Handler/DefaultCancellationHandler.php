@@ -117,7 +117,7 @@ class DefaultCancellationHandler implements CancellationHandlerInterface, Entity
 
     // For efficiency, manually save the original entity before applying any
     // changes.
-    $entity->original = clone $entity;
+    $entity->setOriginal(clone $entity);
 
     // Update each translation individually.
     $langcodes = array_keys($entity->getTranslationLanguages());

@@ -337,7 +337,7 @@ class WorkspaceTest extends BrowserTestBase {
     $this->drupalGet('/admin/config/workflow/workspaces');
     $this->assertSession()->pageTextContains('Summer event');
     $summer_event_workspace_row = $page->find('css', 'table tbody tr:nth-of-type(2)');
-    $this->assertEquals('N/A', $summer_event_workspace_row->find('css', 'td:nth-of-type(2)')->getText());
+    $this->assertEquals('Anonymous', $summer_event_workspace_row->find('css', 'td:nth-of-type(2)')->getText());
   }
 
   /**
