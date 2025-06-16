@@ -35955,6 +35955,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/src/Controller/UserAuthenticationController.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\user\\\\Entity\\\\Handler\\\\DefaultCancellationHandler\\:\\:setMessenger\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/src/Entity/Handler/DefaultCancellationHandler.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\user\\\\Entity\\\\Role\\:\\:postLoad\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
