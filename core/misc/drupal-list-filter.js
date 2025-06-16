@@ -260,8 +260,6 @@
      * @function Drupal.listFilter.filterTableList
      * @param {Event} e
      *   The input event.
-     * @param {HTMLElement} tableElement
-     *   The table element being filtered.
      * @param {Array} filterItems
      *   The original filter items.
      * @param {Array} labels
@@ -271,51 +269,58 @@
      * @param {object} options
      *   Options for filtering.
      */
-    filterTableList(e, tableElement, filterItems, labels, prevState, options) {
+    filterTableList(e, allItems, labels, prevState, options) {
       const { singular, plural, full, minLength, searchStart } = options;
 
-      e = e.detail.event;
-      tableElement.classList.remove('js-list-filtered');
-      const query = this.normalizeString(e.target.value);
-      const queryContinuation = query.startsWith(prevState.queryTransitional);
+      // Extract the input event.
+      const query = this.normalizeString(e.detail.event.target.value);
 
-      let filterItemsTransitional = prevState.filterItemsTransitional;
+      // Optimization: If the query is an extension of the previous query,
+      // and there were matches, filter only those matches.
+      // Otherwise, start from the full item set.
+      let currentMatches = prevState.currentMatches || allItems;
+      const isQueryExtension = query.startsWith(prevState.previousQuery || '');
 
-      if (queryContinuation && filterItemsTransitional.length === 0)
-        return prevState;
-      if (!this.searchMethod(query, prevState.queryTransitional, searchStart)) {
-        filterItemsTransitional = filterItems;
+      if (!isQueryExtension || currentMatches.length === 0) {
+        currentMatches = allItems;
       }
 
+      let newMatches = [];
+
+      // Ensure the query length is sufficient for filtering.
       if (query.length >= minLength) {
-        const matches = [];
-        filterItemsTransitional.forEach((item) => {
-          if (!this.searchMethod(item.textContent, query, searchStart)) {
-            this.hideElement(item.node);
-          } else {
+        currentMatches.forEach((item) => {
+          if (this.searchMethod(item.textContent, query, searchStart)) {
             this.showElement(item.node);
-            matches.push(item);
+            newMatches.push(item);
+          } else {
+            this.hideElement(item.node);
           }
         });
-        this.announce(matches.length, singular, plural);
+
+        this.announce(newMatches.length, singular, plural);
         this.checkLabels(labels);
-        filterItemsTransitional = matches;
-      } else {
-        filterItems.forEach((item) => {
+      }
+
+      // ... otherwise, show all items.
+      else {
+        allItems.forEach((item) => {
           this.showElement(item.node);
         });
         Drupal.announce(full ?? Drupal.t('All available items are listed.'));
         this.checkLabels(labels, true);
-        filterItemsTransitional = filterItems;
+        newMatches = allItems;
       }
-      listFilter.matchedRows = filterItemsTransitional.length;
-      tableElement.classList.add('js-list-filtered');
+
+      listFilter.matchedRows = newMatches.length;
       if (this.searchingFinished) {
-        this.searchingFinished(filterItemsTransitional.length);
+        this.searchingFinished(newMatches.length);
       }
+
+      // Return the new state for the next filter event.
       return {
-        filterItemsTransitional,
-        queryTransitional: query,
+        currentMatches: newMatches,
+        previousQuery: query,
       };
     },
 
