@@ -367,7 +367,15 @@ class NodeViewsData extends EntityViewsData {
             'left_field' => 'nid',
             'field' => 'sid',
             'table' => 'search_index',
-            'extra' => "node_search_index.type = 'node_search' AND node_search_index.langcode = node_field_data.langcode",
+            'alias' => 'node_search_index',
+            'extra' => "%alias.type = 'node_search'",
+          ],
+          'node_field_revision' => [
+            'left_field' => 'nid',
+            'field' => 'sid',
+            'table' => 'search_index',
+            'alias' => 'node_search_index',
+            'extra' => "node_search_index.type = 'node_search'",
           ],
         ];
 
@@ -380,6 +388,14 @@ class NodeViewsData extends EntityViewsData {
 
         $data['node_search_dataset']['table']['join'] = [
           'node_field_data' => [
+            'left_field' => 'sid',
+            'left_table' => 'node_search_index',
+            'field' => 'sid',
+            'table' => 'search_dataset',
+            'extra' => 'node_search_index.type = node_search_dataset.type AND node_search_index.langcode = node_search_dataset.langcode',
+            'type' => 'INNER',
+          ],
+          'node_field_revision' => [
             'left_field' => 'sid',
             'left_table' => 'node_search_index',
             'field' => 'sid',
