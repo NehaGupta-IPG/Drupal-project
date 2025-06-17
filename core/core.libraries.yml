@@ -600,16 +600,24 @@ drupal.entity-form:
   dependencies:
     - core/drupal.form
 
+drupal.list-filter-class:
+  version: VERSION
+  js:
+    misc/ListFilter/ListFilter.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.announce
+    - core/drupal.debounce
+    - core/transliteration
+
 drupal.list-filter:
   version: VERSION
   js:
     misc/drupal-list-filter.js: {}
   dependencies:
     - core/drupal
-    - core/drupal.announce
-    - core/drupal.debounce
     - core/once
-    - core/transliteration
+    - core/drupal.list-filter-class
 
 drupal.fieldgroup:
   version: VERSION
