@@ -229,8 +229,6 @@
     /**
      * Announces the number of matches. Can be overridden.
      *
-     * @todo add this function in the override filter "constructor"
-     *
      * @type {function}
      */
     announce: defaultAnnounce,
