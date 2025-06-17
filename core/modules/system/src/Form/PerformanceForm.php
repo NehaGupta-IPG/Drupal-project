@@ -5,6 +5,7 @@ namespace Drupal\system\Form;
 use Drupal\Core\Asset\AssetCollectionOptimizerInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
@@ -62,14 +63,21 @@ class PerformanceForm extends ConfigFormBase {
    *   The JavaScript asset collection optimizer service.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
+   * @param \Drupal\Core\File\FileSystemInterface|null $fileSystem
+   *   The file system service.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, DateFormatterInterface $date_formatter, AssetCollectionOptimizerInterface $css_collection_optimizer, AssetCollectionOptimizerInterface $js_collection_optimizer, ModuleHandlerInterface $module_handler) {
+  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, DateFormatterInterface $date_formatter, AssetCollectionOptimizerInterface $css_collection_optimizer, AssetCollectionOptimizerInterface $js_collection_optimizer, ModuleHandlerInterface $module_handler, protected ?FileSystemInterface $fileSystem = NULL) {
     parent::__construct($config_factory, $typedConfigManager);
 
     $this->dateFormatter = $date_formatter;
     $this->cssCollectionOptimizer = $css_collection_optimizer;
     $this->jsCollectionOptimizer = $js_collection_optimizer;
     $this->moduleHandler = $module_handler;
+
+    if ($this->fileSystem === NULL) {
+      @trigger_error('Calling ' . __CLASS__ . ' constructor without the $fileSystem argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/944582', E_USER_DEPRECATED);
+      $this->fileSystem = \Drupal::service('file_system');
+    }
   }
 
   /**
@@ -82,7 +90,8 @@ class PerformanceForm extends ConfigFormBase {
       $container->get('date.formatter'),
       $container->get('asset.css.collection_optimizer'),
       $container->get('asset.js.collection_optimizer'),
-      $container->get('module_handler')
+      $container->get('module_handler'),
+      $container->get('file_system'),
     );
   }
 

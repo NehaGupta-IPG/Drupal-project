@@ -749,10 +749,14 @@ class FileSystem implements FileSystemInterface {
    * @return bool
    *   TRUE if the directory is writable and executable; FALSE otherwise.
    */
-  public function isWritable($uri) {
+  public function isWritable($uri): bool {
     // By converting the URI to a normal path using drupal_realpath(), we can
     // correctly handle both stream wrappers and normal paths.
     $realpath = $this->realpath($uri);
+    $filename = $realpath ?: $uri;
+    if (\is_dir($filename) !== TRUE) {
+      return FALSE;
+    }
     return is_writable($realpath ?: $uri) && $this->isExecutable($uri);
   }
 
@@ -771,7 +775,7 @@ class FileSystem implements FileSystemInterface {
    * @see is_executable()
    * @ingroup php_wrappers
    */
-  public function isExecutable($uri) {
+  public function isExecutable($uri): bool {
     // By converting the URI to a normal path using drupal_realpath(), we can
     // correctly handle both stream wrappers and normal paths.
     $realpath = $this->realpath($uri);

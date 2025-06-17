@@ -533,7 +533,7 @@ interface FileSystemInterface {
    * @return bool
    *   TRUE if the directory is writable and executable; FALSE otherwise.
    */
-  public function isWritable($uri);
+  public function isWritable($uri): bool;
 
   /**
    * Determines if a file or directory is executable.
@@ -550,6 +550,6 @@ interface FileSystemInterface {
    * @see is_executable()
    * @ingroup php_wrappers
    */
-  public function isExecutable($uri);
+  public function isExecutable($uri): bool;
 
 }
