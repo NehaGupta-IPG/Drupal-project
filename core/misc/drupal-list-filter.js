@@ -145,59 +145,11 @@
   }
 
   /**
-   * Default function to check and update the visibility of labels.
-   *
-   * @function Drupal.listFilter.defaultCheckLabels
-   * @param {Array} labels
-   *   An array of label elements to check.
-   * @param {boolean} reset
-   *   Whether to reset the label state.
-   */
-  function defaultCheckLabels(labels, reset = false) {
-    labels.forEach((label) => {
-      const anyVisible = Array.from(label.labelledItems).some(
-        (element) => element.style.display !== 'none',
-      );
-      if (!anyVisible) {
-        this.hideElement(label);
-        return;
-      }
-      if (label.nodeName === 'DETAILS') {
-        this.checkDetailedLabels(reset, label);
-      }
-      this.showElement(label);
-    });
-  }
-
-  /**
-   * Default function to check and update the opened status of detailed labels.
-   *
-   * @param {boolean} reset
-   *   Whether to reset the label state.
-   * @param {string} label
-   *   The label element to check.
-   */
-  function defaultCheckDetailedLabels(reset, label) {
-    if (!reset && !label.open) {
-      label.open = true;
-      label.dataset.openedByFilter = true;
-    } else if (reset && label.dataset.openedByFilter) {
-      label.open = false;
-      delete label.dataset.openedByFilter;
-    }
-  }
-
-  /**
    * List filter object.
    *
    * @namespace Drupal.listFilter
    */
   const listFilter = {
-    /**
-     * Total rows matched by the filter.
-     */
-    matchedRows: null,
-
     /**
      * Hides an element. Can be overridden.
      *
@@ -234,20 +186,6 @@
     announce: defaultAnnounce,
 
     /**
-     * Checks and updates the visibility of labels.
-     *
-     * @type {function}
-     */
-    checkLabels: defaultCheckLabels,
-
-    /**
-     * Checks and updates the visibility of labels.
-     *
-     * @type {function}
-     */
-    checkDetailedLabels: defaultCheckDetailedLabels,
-
-    /**
      * Function to be called when searching is finished.
      */
     searchingFinished: null,
@@ -262,64 +200,59 @@
      *   The original filter items.
      * @param {Array} labels
      *   The label elements.
-     * @param {object} context
-     *   Context object holding transitional state.
      * @param {object} options
      *   Options for filtering.
      */
-    filterTableList(e, allItems, labels, prevState, options) {
+    filterTableList(e, allItems, labels, options) {
       const { singular, plural, full, minLength, searchStart } = options;
-
-      // Extract the input event.
       const query = this.normalizeString(e.detail.event.target.value);
+      const toShow = [];
+      const toHide = [];
+      const visibleGroups = {};
 
-      // Optimization: If the query is an extension of the previous query,
-      // and there were matches, filter only those matches.
-      // Otherwise, start from the full item set.
-      let currentMatches = prevState.currentMatches || allItems;
-      const isQueryExtension = query.startsWith(prevState.previousQuery || '');
-
-      if (!isQueryExtension || currentMatches.length === 0) {
-        currentMatches = allItems;
-      }
-
-      let newMatches = [];
-
-      // Ensure the query length is sufficient for filtering.
       if (query.length >= minLength) {
-        currentMatches.forEach((item) => {
+        allItems.forEach((item) => {
           if (this.searchMethod(item.textContent, query, searchStart)) {
-            this.showElement(item.node);
-            newMatches.push(item);
+            toShow.push(item.node);
+
+            // Mark the group as visible using data-filter-parent-group
+            const group = item.node.dataset.filterParentGroup;
+            if (group) {
+              visibleGroups[group] = true;
+            }
           } else {
-            this.hideElement(item.node);
+            toHide.push(item.node);
           }
         });
 
-        this.announce(newMatches.length, singular, plural);
-        this.checkLabels(labels);
-      }
+        requestAnimationFrame(() => {
+          toShow.forEach((node) => this.showElement(node));
+          toHide.forEach((node) => this.hideElement(node));
 
-      // ... otherwise, show all items.
-      else {
-        allItems.forEach((item) => {
-          this.showElement(item.node);
+          // Show/hide labels based on visibleGroups
+          labels.forEach((label) => {
+            if (visibleGroups[label.dataset.filterGroupName]) {
+              this.showElement(label);
+            } else {
+              this.hideElement(label);
+            }
+          });
+          this.announce(toShow.length, singular, plural);
         });
-        Drupal.announce(full ?? Drupal.t('All available items are listed.'));
-        this.checkLabels(labels, true);
-        newMatches = allItems;
+      } else {
+        allItems.forEach((item) => {
+          toShow.push(item.node);
+        });
+        requestAnimationFrame(() => {
+          toShow.forEach((node) => this.showElement(node));
+          labels.forEach((label) => this.showElement(label));
+          Drupal.announce(full ?? Drupal.t('All available items are listed.'));
+        });
       }
 
-      listFilter.matchedRows = newMatches.length;
       if (this.searchingFinished) {
-        this.searchingFinished(newMatches.length);
+        this.searchingFinished(toShow.length);
       }
-
-      // Return the new state for the next filter event.
-      return {
-        currentMatches: newMatches,
-        previousQuery: query,
-      };
     },
 
     /*
@@ -368,6 +301,7 @@
         minLength = defaultOptions.minLength,
         searchStart = defaultOptions.searchStart,
       } = options;
+
       Object.keys(options)
         .filter((key) => this[key] !== undefined)
         .forEach((key) => {
@@ -384,14 +318,10 @@
           listFilter.normalizeString,
         );
 
-        let state = {
-          filterItemsTransitional: filterItems,
-          queryTransitional: '',
-        };
-
         const labels = tableElement.querySelectorAll(
           '[data-filter-group-name]',
         );
+
         labels.forEach((label) => {
           label.labelledItems = tableElement.querySelectorAll(
             `[data-filter-parent-group="${label.dataset.filterGroupName}"]`,
@@ -400,14 +330,13 @@
 
         // Bind the input event to the table element.
         tableElement.addEventListener(FILTER_EVENT, (e) => {
-          state =
-            this.filterTableList(e, filterItems, labels, state, {
-              singular,
-              plural,
-              full,
-              minLength,
-              searchStart,
-            }) || state;
+          this.filterTableList(e, filterItems, labels, {
+            singular,
+            plural,
+            full,
+            minLength,
+            searchStart,
+          });
         });
       });
 
