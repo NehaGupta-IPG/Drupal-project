@@ -48,18 +48,36 @@
      *
      * @param {object} [options={}]
      *   Configuration options and method overrides.
+     *   @param {HTMLElement} [options.input]
+     *     The input element to bind events to.
+     *   @param {string} [options.containerSelector]
+     *     Selector for the container(s) (table, list, etc.) to filter.
+     *   @param {string} [options.itemsSelector]
+     *     Selector for the items/rows to filter.
+     *   @param {string} [options.targetsSelector]
+     *     (Optional) Selector for sub-elements to search within each item.
+     *   @param {string} [options.singular]
+     *     (Optional) Singular label for ARIA/live region.
+     *   @param {string} [options.plural]
+     *     (Optional) Plural label for ARIA/live region.
+     *   @param {string} [options.full]
+     *     (Optional) Label for "all items listed".
+     *   @param {number} [options.minLength]
+     *     (Optional) Minimum query length to trigger filtering.
+     *   @param {boolean} [options.searchStart]
+     *     (Optional) If true, only match from start of words.
      *   @param {function} [options.hideElement]
-     *     Custom function to hide an element.
+     *     (Optional) Custom function to hide an element.
      *   @param {function} [options.showElement]
-     *     Custom function to show an element.
+     *     (Optional) Custom function to show an element.
      *   @param {function} [options.normalizeString]
-     *     Custom function to normalize strings for searching.
+     *     (Optional) Custom function to normalize strings for searching.
      *   @param {function} [options.searchMethod]
-     *     Custom function to determine if an item matches the query.
+     *     (Optional) Custom function to determine if an item matches the query.
      *   @param {function} [options.announce]
-     *     Custom function for accessibility announcements.
+     *     (Optional) Custom function for accessibility announcements.
      *   @param {function} [options.filterItemsBuilder]
-     *     Custom function to build filterable items.
+     *     (Optional) Custom function to build filterable items.
      */
     constructor(options = {}) {
       this.options = { ...ListFilter.defaultOptions, ...options };
