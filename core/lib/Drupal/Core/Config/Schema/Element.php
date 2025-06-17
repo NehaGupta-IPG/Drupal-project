@@ -12,6 +12,13 @@ use Drupal\Core\TypedData\TypedDataManagerInterface;
 abstract class Element extends TypedData {
 
   /**
+   * The typed config manager.
+   *
+   * @var \Drupal\Core\Config\TypedConfigManagerInterface
+   */
+  protected $typedConfig;
+
+  /**
    * The configuration value.
    *
    * @var mixed
@@ -53,6 +60,19 @@ abstract class Element extends TypedData {
     assert($typed_data_manager instanceof TypedConfigManagerInterface, '$typed_data_manager should be an instance of \Drupal\Core\Config\TypedConfigManagerInterface.');
     $this->typedDataManager = $typed_data_manager;
     return $this;
+  }
+
+  /**
+   * Sets the typed config manager on the instance.
+   *
+   * This must be called immediately after construction to enable
+   * self::parseElement() and self::buildDataDefinition() to work.
+   *
+   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
+   *   The typed configuration manager.
+   */
+  public function setTypedConfig(TypedConfigManagerInterface $typed_config): void {
+    $this->typedConfig = $typed_config;
   }
 
 }

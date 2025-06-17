@@ -10,6 +10,7 @@ use Drupal\Core\Config\Schema\TypeResolver;
 use Drupal\Core\Config\Schema\SequenceDataDefinition;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\Config\Schema\Undefined;
+use Drupal\Core\Config\Schema\Element;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\TypedData\MapDataDefinition;
 use Drupal\Core\TypedData\TraversableTypedDataInterface;
@@ -396,6 +397,19 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     // The schema system falls back on the Undefined class for unknown types.
     $definition = $this->getDefinition($name);
     return is_array($definition) && ($definition['class'] != Undefined::class);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createInstance($data_type, array $configuration = []) {
+    $instance = parent::createInstance($data_type, $configuration);
+    // Enable elements to construct their own definitions using the typed config
+    // manager.
+    if ($instance instanceof Element) {
+      $instance->setTypedConfig($this);
+    }
+    return $instance;
   }
 
   /**

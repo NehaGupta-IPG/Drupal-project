@@ -6,7 +6,7 @@ entity_type: entity_test
 bundle: test_bundle
 label: 'Test import field 2 on test bundle'
 description: ''
-required: '0'
+required: false
 default_value: {  }
 default_value_callback: ''
 settings:

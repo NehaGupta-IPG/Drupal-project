@@ -5,11 +5,11 @@ field_name: field_test_import_sync
 entity_type: entity_test
 type: text
 settings:
-  max_length: '255'
+  max_length: 255
 module: text
-locked: '0'
-cardinality: '1'
-translatable: '0'
+locked: false
+cardinality: 1
+translatable: false
 indexes:
   format:
     - format

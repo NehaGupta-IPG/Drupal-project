@@ -6,7 +6,7 @@ entity_type: entity_test
 bundle: entity_test
 label: 'Import from sync'
 description: ''
-required: '0'
+required: false
 default_value: {  }
 default_value_callback: ''
 settings:
