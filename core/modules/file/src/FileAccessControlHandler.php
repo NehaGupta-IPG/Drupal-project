@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 class FileAccessControlHandler extends EntityAccessControlHandler implements EntityHandlerInterface {
 
   /**
-   * Constructs a new BlockListBuilder object.
+   * Constructs a new FileAccessControlHandler object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
