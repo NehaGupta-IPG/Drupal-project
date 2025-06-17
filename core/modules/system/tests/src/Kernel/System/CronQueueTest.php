@@ -72,7 +72,6 @@ class CronQueueTest extends KernelTestBase {
     parent::setUp();
 
     $this->connection = Database::getConnection();
-    $this->cron = \Drupal::service('cron');
 
     $time = new MockTime($this->currentTime, $this->currentTime);
     $this->container->set('datetime.time', $time);
@@ -92,6 +91,8 @@ class CronQueueTest extends KernelTestBase {
     });
 
     $this->container->set('queue', $queue_factory->reveal());
+    // Instantiate the `cron` service after the mock queue factory is set.
+    $this->cron = \Drupal::service('cron');
   }
 
   /**
