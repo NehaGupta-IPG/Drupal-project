@@ -256,9 +256,9 @@
     filter(options) {
       const {
         input,
-        table,
-        items,
-        targets = null,
+        containerSelector,
+        itemsSelector,
+        targetsSelector = null,
         singular = null,
         plural = null,
         full = null,
@@ -266,20 +266,20 @@
         searchStart = this.options.searchStart,
       } = options;
 
-      const tables = document.querySelectorAll(table);
+      const containers = document.querySelectorAll(containerSelector);
 
-      tables.forEach((tableElement) => {
+      containers.forEach((containerElement) => {
         const filterItems = this.filterItemsBuilder(
-          tableElement,
-          items,
-          targets,
+          containerElement,
+          itemsSelector,
+          targetsSelector,
           this.normalizeString,
         );
 
-        const labels = tableElement.querySelectorAll('[data-filter-group-name]');
+        const labels = containerElement.querySelectorAll('[data-filter-group-name]');
 
-        // Bind the input event to the table element.
-        tableElement.addEventListener(ListFilter.FILTER_EVENT, (e) => {
+        // Bind the input event to the container element.
+        containerElement.addEventListener(ListFilter.FILTER_EVENT, (e) => {
           this.filterTableList(e, filterItems, labels, {
             singular,
             plural,
@@ -293,8 +293,8 @@
       input.addEventListener(
         'input',
         Drupal.debounce((event) => {
-          tables.forEach((tableElement) => {
-            tableElement.dispatchEvent(
+          containers.forEach((containerElement) => {
+            containerElement.dispatchEvent(
               new CustomEvent(ListFilter.FILTER_EVENT, { detail: { event } }),
             );
           });

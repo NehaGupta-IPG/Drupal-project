@@ -89,12 +89,12 @@ class ListFilter extends Search {
     Element::setAttributes($element, ['id', 'name', 'value', 'size', 'maxlength', 'placeholder']);
     static::setAttributes($element, ['form-search']);
     $element['#attributes']['class'][] = 'table-filter-text';
-    $element['#attributes']['data-table'] = $element['#list_container_selector'];
-    $element['#attributes']['data-items'] = $element['#list_item'];
     $element['#attributes']['data-auto-activate'] = $element['#auto_activate'] ? 'true' : 'false';
+    $element['#attributes']['data-container-selector'] = $element['#list_container_selector'];
+    $element['#attributes']['data-items-selector'] = $element['#list_item'];
 
     if ($element['#list_text']) {
-      $element['#attributes']['data-targets'] = $element['#list_text'];
+      $element['#attributes']['data-targets-selector'] = $element['#list_text'];
     }
 
     $element['#attributes']['data-min-length'] = $element['#minimum_filter_length'];
