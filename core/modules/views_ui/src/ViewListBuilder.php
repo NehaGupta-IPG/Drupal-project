@@ -100,6 +100,11 @@ class ViewListBuilder extends ConfigEntityListBuilder {
             '#plain_text' => $view->get('description'),
           ],
         ],
+        'tags' => [
+          'data' => [
+            '#plain_text' => $view->get('tag'),
+          ],
+        ],
         'displays' => [
           'data' => [
             '#theme' => 'views_ui_view_displays_list',
@@ -135,6 +140,12 @@ class ViewListBuilder extends ConfigEntityListBuilder {
         'data' => $this->t('Description'),
         '#attributes' => [
           'class' => ['views-ui-description'],
+        ],
+      ],
+      'tags' => [
+        'data' => $this->t('Tags'),
+        '#attributes' => [
+          'class' => ['views-ui-tags'],
         ],
       ],
       'displays' => [
@@ -211,12 +222,12 @@ class ViewListBuilder extends ConfigEntityListBuilder {
       '#title' => $this->t('Filter'),
       '#title_display' => 'invisible',
       '#size' => 60,
-      '#placeholder' => $this->t('Filter by view name, machine name, description, or display path'),
+      '#placeholder' => $this->t('Filter by view name, machine name, description, tags, or display path'),
       '#attributes' => [
         'class' => ['views-filter-text'],
         'data-table' => '.views-listing-table',
         'autocomplete' => 'off',
-        'title' => $this->t('Enter a part of the view name, machine name, description, or display path to filter by.'),
+        'title' => $this->t('Enter a part of the view name, machine name, description, tags, or display path to filter by.'),
       ],
     ];
 

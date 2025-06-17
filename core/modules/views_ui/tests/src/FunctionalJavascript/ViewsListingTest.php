@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\views_ui\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\views\Entity\View;
 
 /**
  * Tests the JavaScript filtering on the Views listing page.
@@ -35,6 +36,11 @@ class ViewsListingTest extends WebDriverTestBase {
       'administer views',
     ]);
     $this->drupalLogin($admin_user);
+
+    // Ensure that some View contains 'default' tag.
+    View::load('content')->set('tag', 'default')->save();
+    // Ensure that some View contains not 'default' tag.
+    View::load('user_admin_people')->set('tag', 'my first tag')->save();
   }
 
   /**
@@ -83,6 +89,21 @@ class ViewsListingTest extends WebDriverTestBase {
 
     $this->assertCount($content_views_count, $enabled_rows);
     $this->assertCount($disabled_views_count, $disabled_rows);
+
+    // Filter on a string that also appears in the tags.
+    $search_input->setValue('default');
+
+    $locator_all_tags = 'tr[class^="views-ui-list-"] td.views-ui-view-tags';
+    $visible_tags = $this->filterVisibleElements($page->findAll('css', $locator_all_tags));
+    $this->assertNotEmpty($visible_tags);
+    foreach ($visible_tags as $tag) {
+      $this->assertStringContainsString('default', $tag->getText());
+    }
+    $hidden_tags = $this->filterNotVisibleElements($page->findAll('css', $locator_all_tags));
+    $this->assertNotEmpty($hidden_tags);
+    foreach ($hidden_tags as $tag) {
+      $this->assertStringNotContainsString('default', $tag->getText());
+    }
 
     // Reset the search string and check that we are back to the initial stage.
     $search_input->setValue('');
@@ -143,6 +164,22 @@ class ViewsListingTest extends WebDriverTestBase {
   protected function filterVisibleElements($elements): array {
     $elements = array_filter($elements, function ($element) {
       return $element->isVisible();
+    });
+    return $elements;
+  }
+
+  /**
+   * Removes any visible elements from the passed array.
+   *
+   * @param array $elements
+   *   Elements for filter.
+   *
+   * @return array
+   *   Not visible elements.
+   */
+  protected function filterNotVisibleElements(array $elements): array {
+    $elements = array_filter($elements, function ($element) {
+      return !$element->isVisible();
     });
     return $elements;
   }
