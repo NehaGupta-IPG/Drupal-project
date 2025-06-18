@@ -80,13 +80,29 @@
      *     (Optional) Custom function to build filterable items.
      */
     constructor(options = {}) {
-      this.options = { ...ListFilter.defaultOptions, ...options };
-      this.hideElement = options.hideElement || this.#hideElementImpl;
-      this.showElement = options.showElement || this.#showElementImpl;
-      this.normalizeString = options.normalizeString || this.#normalizeStringImpl;
-      this.searchMethod = options.searchMethod || this.#searchMethodImpl;
-      this.announce = options.announce || this.#announceImpl;
-      this.filterItemsBuilder = options.filterItemsBuilder || this.#filterItemsBuilderImpl;
+      this.#applyOptions(options);
+    }
+
+    /**
+     * Centralized method to apply/merge options.
+     * Called in both constructor and filter().
+     * @param {object} [options={}]
+     */
+    #applyOptions(options = {}) {
+      // Merge defaults, existing instance options, and new options
+      this.options = {
+        ...ListFilter.defaultOptions,
+        ...(this.options || {}),
+        ...options,
+      };
+
+      // Assign methods, allowing overrides
+      this.hideElement = this.options.hideElement || this.#hideElementImpl;
+      this.showElement = this.options.showElement || this.#showElementImpl;
+      this.normalizeString = this.options.normalizeString || this.#normalizeStringImpl;
+      this.searchMethod = this.options.searchMethod || this.#searchMethodImpl;
+      this.announce = this.options.announce || this.#announceImpl;
+      this.filterItemsBuilder = this.options.filterItemsBuilder || this.#filterItemsBuilderImpl;
     }
 
     /**
@@ -272,6 +288,8 @@
      *   The ListFilter instance (for chaining).
      */
     filter(options) {
+      this.#applyOptions(options);
+
       const {
         input,
         containerSelector,
@@ -282,7 +300,7 @@
         full = null,
         minLength = this.options.minLength,
         searchStart = this.options.searchStart,
-      } = options;
+      } = this.options;
 
       const containers = document.querySelectorAll(containerSelector);
 

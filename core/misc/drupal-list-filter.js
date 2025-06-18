@@ -29,7 +29,7 @@
                 defaultOptions.minLength,
             };
 
-            // Usage example (in Drupal behavior):
+            // Activate the list filter functionality.
             const filter = new Drupal.ListFilter();
             filter.filter(options);
           },
