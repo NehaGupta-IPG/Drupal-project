@@ -103,7 +103,10 @@ class FieldStorageReuseForm extends FormBase {
       '#attributes' => [
         'class' => ['js-table-filter-text'],
         'data-table' => '.js-reuse-table',
+        // Supports the older "autocomplete" attribute and the newer
+        // "aria-autocomplete" one.
         'autocomplete' => 'off',
+        'aria-autocomplete' => 'none',
       ],
     ];
     $form['add'] = [

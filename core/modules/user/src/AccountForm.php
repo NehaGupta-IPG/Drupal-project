@@ -152,8 +152,12 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
           '#weight' => -5,
           // Do not let web browsers remember this password, since we are
           // trying to confirm that the person submitting the form actually
-          // knows the current one.
-          '#attributes' => ['autocomplete' => 'off'],
+          // knows the current one. Supports the older "autocomplete" attribute
+          // and the newer "aria-autocomplete" one.
+          '#attributes' => [
+            'autocomplete' => 'off',
+            'aria-autocomplete' => 'none',
+          ],
         ];
         $form_state->set('user', $account);
 
@@ -179,10 +183,13 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
 
     // When not building the user registration form, prevent web browsers from
     // auto-filling/prefilling the email, username, and password fields.
+    // Supports the older "autocomplete" attribute and the newer
+    // "aria-autocomplete" one.
     if (!$register) {
       foreach (['mail', 'name', 'pass'] as $key) {
         if (isset($form['account'][$key])) {
           $form['account'][$key]['#attributes']['autocomplete'] = 'off';
+          $form['account'][$key]['#attributes']['aria-autocomplete'] = 'none';
         }
       }
     }

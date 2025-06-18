@@ -167,7 +167,10 @@ class UserPermissionsForm extends FormBase {
       '#attributes' => [
         'class' => ['table-filter-text'],
         'data-table' => '#permissions',
+        // Supports the older "autocomplete" attribute and the newer
+        // "aria-autocomplete" one.
         'autocomplete' => 'off',
+        'aria-autocomplete' => 'none',
       ],
     ];
 

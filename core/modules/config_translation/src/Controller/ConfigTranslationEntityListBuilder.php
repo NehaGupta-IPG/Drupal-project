@@ -47,7 +47,10 @@ class ConfigTranslationEntityListBuilder extends ConfigEntityListBuilder impleme
       '#attributes' => [
         'class' => ['table-filter-text'],
         'data-table' => '.config-translation-entity-list',
+        // Supports the older "autocomplete" attribute and the newer
+        // "aria-autocomplete" one.
         'autocomplete' => 'off',
+        'aria-autocomplete' => 'none',
         'title' => $filter['description'],
       ],
     ];

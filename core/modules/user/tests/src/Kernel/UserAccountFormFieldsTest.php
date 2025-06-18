@@ -42,9 +42,11 @@ class UserAccountFormFieldsTest extends KernelTestBase {
     $this->assertFieldOrder($form['admin_account']['account']);
 
     // Verify that web browsers may autocomplete the email value and
-    // autofill/prefill the name and pass values.
+    // autofill/prefill the name and pass values; supports both the older
+    // "autocomplete" attribute and the newer "aria-autocomplete" one.
     foreach (['mail', 'name', 'pass'] as $key) {
       $this->assertFalse(isset($form['account'][$key]['#attributes']['autocomplete']), "'$key' field: 'autocomplete' attribute not found.");
+      $this->assertFalse(isset($form['account'][$key]['#attributes']['aria-autocomplete']), "'$key' field: 'aria-autocomplete' attribute not found.");
     }
   }
 
@@ -66,9 +68,11 @@ class UserAccountFormFieldsTest extends KernelTestBase {
     $this->assertFieldOrder($form['account']);
 
     // Verify that web browsers may autocomplete the email value and
-    // autofill/prefill the name and pass values.
+    // autofill/prefill the name and pass values; supports both the older
+    // "autocomplete" attribute and the newer "aria-autocomplete" one.
     foreach (['mail', 'name', 'pass'] as $key) {
       $this->assertFalse(isset($form['account'][$key]['#attributes']['autocomplete']), "'$key' field: 'autocomplete' attribute not found.");
+      $this->assertFalse(isset($form['account'][$key]['#attributes']['aria-autocomplete']), "'$key' field: 'aria-autocomplete' attribute not found.");
     }
   }
 
@@ -88,9 +92,11 @@ class UserAccountFormFieldsTest extends KernelTestBase {
     // Verify name and pass field order.
     $this->assertFieldOrder($form['account']);
 
-    // Verify that autocomplete is off on all account fields.
+    // Verify that autocomplete is off on all account fields; supports both the
+    // older "autocomplete" attribute and the newer "aria-autocomplete" one.
     foreach (['mail', 'name', 'pass'] as $key) {
       $this->assertSame('off', $form['account'][$key]['#attributes']['autocomplete'], "'{$key}' field: 'autocomplete' attribute is 'off'.");
+      $this->assertSame('none', $form['account'][$key]['#attributes']['aria-autocomplete'], "'{$key}' field: 'aria-autocomplete' attribute is 'none'.");
     }
   }
 

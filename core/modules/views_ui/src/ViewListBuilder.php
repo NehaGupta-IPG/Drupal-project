@@ -215,7 +215,10 @@ class ViewListBuilder extends ConfigEntityListBuilder {
       '#attributes' => [
         'class' => ['views-filter-text'],
         'data-table' => '.views-listing-table',
+        // Supports the older "autocomplete" attribute and the newer
+        // "aria-autocomplete" one.
         'autocomplete' => 'off',
+        'aria-autocomplete' => 'none',
         'title' => $this->t('Enter a part of the view name, machine name, description, or display path to filter by.'),
       ],
     ];
