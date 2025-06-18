@@ -216,6 +216,27 @@
     }
 
     /**
+     * 
+     * 
+     * @param {*} label 
+     * @param {boolean} reset 
+     * @returns 
+     */
+    #labelCollapse(label, reset = false) {
+      if (label.nodeName !== 'DETAILS') {
+        return;
+      }
+
+      if (!reset && !label.open) {
+        label.open = true;
+        label.dataset.openedByFilter = true;
+      } else if (reset && label.dataset.openedByFilter) {
+        label.open = false;
+        delete label.dataset.openedByFilter;
+      }
+    }
+
+    /**
      * Filters the table/list based on the input event.
      *
      * @param {Event} e
@@ -256,6 +277,7 @@
             } else {
               this.hideElement(label);
             }
+            this.#labelCollapse(label);
           });
           this.announce(toShow.length, singular, plural);
         });
@@ -267,6 +289,9 @@
           toShow.forEach((node) => this.showElement(node));
           labels.forEach((label) => this.showElement(label));
           Drupal.announce(full ?? Drupal.t('All available items are listed.'));
+          labels.forEach((label) => {
+            this.#labelCollapse(label, true);
+          });
         });
       }
 
