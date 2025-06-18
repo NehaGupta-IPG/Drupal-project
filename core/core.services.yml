@@ -461,7 +461,6 @@ services:
   cron:
     class: Drupal\Core\Cron
     arguments: ['@module_handler', '@lock', '@queue', '@state', '@account_switcher', '@logger.channel.cron', '@plugin.manager.queue_worker', '@datetime.time', '%queue.config%']
-    lazy: true
   Drupal\Core\CronInterface: '@cron'
   diff.formatter:
     class: Drupal\Core\Diff\DiffFormatter
@@ -709,7 +708,7 @@ services:
   Drupal\Core\Extension\ThemeHandlerInterface: '@theme_handler'
   theme_installer:
     class: Drupal\Core\Extension\ThemeInstaller
-    arguments: ['@theme_handler', '@config.factory', '@config.installer', '@module_handler', '@config.manager', '@asset.css.collection_optimizer', '@router.builder', '@logger.channel.default', '@state', '@extension.list.module', '@theme.registry', '@extension.list.theme']
+    arguments: ['@theme_handler', '@config.factory', '@config.installer', '@module_handler', '@config.manager', '@asset.css.collection_optimizer', '@router.builder', '@logger.channel.default', '@state', '@extension.list.module', '@theme.registry', '@extension.list.theme', '@plugin.manager.sdc']
   Drupal\Core\Extension\ThemeInstallerInterface: '@theme_installer'
   entity.memory_cache:
     class: Drupal\Core\Cache\MemoryCache\LruMemoryCache
@@ -831,7 +830,7 @@ services:
   Drupal\Core\Menu\DefaultMenuLinkTreeManipulators: '@menu.default_tree_manipulators'
   menu.active_trail:
     class: Drupal\Core\Menu\MenuActiveTrail
-    arguments: ['@plugin.manager.menu.link', '@current_route_match', '@cache.menu', '@lock']
+    arguments: ['@plugin.manager.menu.link', '@current_route_match', '@cache.menu', '@lock', '@path.matcher']
     tags:
       - { name: needs_destruction }
     lazy: true
@@ -1597,7 +1596,7 @@ services:
     arguments: ['@variation_cache.access_policy', '@variation_cache.access_policy_memory', '@cache.access_policy_memory', '@current_user', '@account_switcher']
     tags:
       - { name: service_collector, call: addAccessPolicy, tag: access_policy }
-  Drupal\Core\Session\AccessPolicyChainInterface: '@access_policy_processor'
+  Drupal\Core\Session\AccessPolicyProcessorInterface: '@access_policy_processor'
   access_policy.super_user:
     class: Drupal\Core\Session\SuperUserAccessPolicy
     tags:
