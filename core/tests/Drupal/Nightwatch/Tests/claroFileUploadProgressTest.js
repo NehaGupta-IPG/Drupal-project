@@ -20,7 +20,6 @@ module.exports = {
   },
   'Confirm the progress bar works correctly when uploading a file': (browser) => {
     browser
-    // TODO: when upload button is clicked verify that the progress bar is displayed 
-    // correctly
+    // TODO: Click the upload button and verify DOM elements
   },
 };
