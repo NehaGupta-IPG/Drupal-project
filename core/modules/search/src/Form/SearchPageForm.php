@@ -44,6 +44,8 @@ class SearchPageForm extends FormBase implements WorkspaceSafeFormInterface {
     $plugin = $this->entity->getPlugin();
     $form_state->set('search_page_id', $this->entity->id());
 
+    $form['#attributes']['role'] = 'search';
+
     $form['basic'] = [
       '#type' => 'container',
       '#attributes' => [

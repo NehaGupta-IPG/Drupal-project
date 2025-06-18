@@ -98,6 +98,7 @@ class SearchBlockForm extends FormBase implements WorkspaceSafeFormInterface {
     $route = 'search.view_' . $entity_id;
     $form['#action'] = Url::fromRoute($route)->toString();
     $form['#method'] = 'get';
+    $form['#attributes']['role'] = 'search';
 
     $form['keys'] = [
       '#type' => 'search',
