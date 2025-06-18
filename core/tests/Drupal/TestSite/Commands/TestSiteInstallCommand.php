@@ -7,11 +7,11 @@ namespace Drupal\TestSite\Commands;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Test\FunctionalTestSetupTrait;
-use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Test\TestSetupTrait;
 use Drupal\TestSite\TestPreinstallInterface;
 use Drupal\TestSite\TestSetupInterface;
 use Drupal\Tests\RandomGeneratorTrait;
+use Drupal\Tests\SitePrefixTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -32,6 +32,10 @@ class TestSiteInstallCommand extends Command {
   use RandomGeneratorTrait;
   use TestSetupTrait {
     changeDatabasePrefix as protected changeDatabasePrefixTrait;
+  }
+  use SitePrefixTrait {
+    createTestLockId as protected createTestLockIdTrait;
+    SitePrefixTrait::prepareDatabasePrefix insteadof TestSetupTrait;
   }
 
   /**
@@ -291,11 +295,9 @@ class TestSiteInstallCommand extends Command {
   /**
    * {@inheritdoc}
    */
-  protected function prepareDatabasePrefix() {
-    // Override this method so that we can force a lock to be created.
-    $test_db = new TestDatabase(NULL, TRUE);
-    $this->siteDirectory = $test_db->getTestSitePath();
-    $this->databasePrefix = $test_db->getDatabasePrefix();
+  protected function createTestLockId(bool $create_lock = FALSE): int {
+    // Force a lock to be created.
+    return $this->createTestLockIdTrait(TRUE);
   }
 
 }

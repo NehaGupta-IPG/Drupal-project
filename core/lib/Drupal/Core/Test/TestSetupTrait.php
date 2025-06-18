@@ -117,6 +117,8 @@ trait TestSetupTrait {
   /**
    * Generates a database prefix for running tests.
    *
+   * MOVE DOCS to trait!
+   *
    * The database prefix is used by prepareEnvironment() to setup a public files
    * directory for the test to be run, which also contains the PHP error log,
    * which is written to in case of a fatal error. Since that directory is based
@@ -133,8 +135,12 @@ trait TestSetupTrait {
    *
    * @see \Drupal\Tests\BrowserTestBase::prepareEnvironment()
    * @see drupal_valid_test_ua()
+   *
+   * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use the
+   *   method from \Drupal\Core\Test\SitePrefixTrait instead.
    */
   protected function prepareDatabasePrefix() {
+    @trigger_error(__METHOD__ . "() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use Drupal\\Core\\Test\\SitePrefixTrait instead. See https://www.drupal.org/project/drupal/issues/3382586", E_USER_DEPRECATED);
     $test_db = new TestDatabase();
     $this->siteDirectory = $test_db->getTestSitePath();
     $this->databasePrefix = $test_db->getDatabasePrefix();

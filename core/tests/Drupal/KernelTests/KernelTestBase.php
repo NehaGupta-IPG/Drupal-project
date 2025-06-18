@@ -23,6 +23,7 @@ use Drupal\Tests\ConfigTestTrait;
 use Drupal\Tests\ExtensionListTestTrait;
 use Drupal\Tests\RandomGeneratorTrait;
 use Drupal\Tests\PhpUnitCompatibilityTrait;
+use Drupal\Tests\SitePrefixTrait;
 use Drupal\Tests\TestRequirementsTrait;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
 use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
@@ -104,6 +105,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   use PhpUnitCompatibilityTrait;
   use ProphecyTrait;
   use ExpectDeprecationTrait;
+  use SitePrefixTrait;
 
   /**
    * {@inheritdoc}
@@ -117,6 +119,16 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * @var \Composer\Autoload\Classloader
    */
   protected $classLoader;
+
+  /**
+   * The test lock ID.
+   *
+   * A random number used to ensure that test fixtures are unique to each test
+   * method.
+   *
+   * @var int
+   */
+  protected $lockId;
 
   /**
    * @var string
@@ -249,15 +261,17 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
 
     $this->classLoader = require $this->root . '/autoload.php';
 
-    // Set up virtual filesystem.
+    // Set up site prefix.
+    $this->lockId = $this->createTestLockId();
+    $this->siteDirectory = $this->getTestSitePath();
+
     Database::addConnectionInfo('default', 'test-runner', $this->getDatabaseConnectionInfo()['default']);
-    $test_db = new TestDatabase();
-    $this->siteDirectory = $test_db->getTestSitePath();
+
+    $this->prepareDatabasePrefix();
 
     // Ensure that all code that relies on drupal_valid_test_ua() can still be
     // safely executed. This primarily affects the (test) site directory
     // resolution (used by e.g. LocalStream and PhpStorage).
-    $this->databasePrefix = $test_db->getDatabasePrefix();
     drupal_valid_test_ua($this->databasePrefix);
 
     $settings = [
@@ -269,6 +283,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     ];
     new Settings($settings);
 
+    // Set up virtual filesystem.
     $this->setUpFilesystem();
 
     foreach (Database::getAllConnectionInfo() as $key => $targets) {

@@ -671,6 +671,10 @@ trait FunctionalTestSetupTrait {
     $kernel = TestRunnerKernel::createFromRequest($request, $this->classLoader);
     $kernel->boot();
     $kernel->preHandle($request);
+
+    // Set up site prefix.
+    $this->lockId = $this->createTestLockId();
+    $this->siteDirectory = $this->getTestSitePath();
     $this->prepareDatabasePrefix();
 
     $this->originalSite = $kernel->findSitePath($request);
