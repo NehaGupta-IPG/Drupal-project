@@ -1860,6 +1860,7 @@
      *   Selector to use.
      */
     scrollTop(ajax, response) {
+      const scrollAnimationSpeed = 500;
       const offset = $(response.selector).offset();
       // We can't guarantee that the scrollable object should be
       // the body, as the element could be embedded in something
@@ -1870,12 +1871,28 @@
         scrollTarget = $(scrollTarget).parent();
       }
 
-      // Only scroll upward.
-      if (offset.top - 10 < $(scrollTarget).scrollTop()) {
-        scrollTarget.get(0).scrollTo({
-          top: offset.top - 10,
-          behavior: 'smooth',
-        });
+      // Getting the document offset as a starting value.
+      let scrollOffset = offset.top;
+
+      if (scrollTarget.length > 0 && scrollTarget.offset().top > 0) {
+        // If target element name is not empty and its inner offset more than
+        // zero, append the target element offset (scroll position) on the
+        // document, and the offset inside the inner element (scroll position).
+        scrollOffset =
+          scrollOffset +
+          $(scrollTarget).scrollTop() -
+          scrollTarget.offset().top;
+      }
+
+      // Scroll only if target (inner) element position is lower than the
+      // document scroll position.
+      if (scrollOffset - 10 < $(scrollTarget).scrollTop()) {
+        $(scrollTarget).animate(
+          {
+            scrollTop: scrollOffset - 10,
+          },
+          scrollAnimationSpeed,
+        );
       }
     },
   };

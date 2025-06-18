@@ -6,6 +6,30 @@ ajax_test.dialog_contents:
   requirements:
     _access: 'TRUE'
 
+ajax_test.scroll_top_test_page:
+  path: '/ajax-test/scroll-top-test-page'
+  defaults:
+    _title: 'AJAX scrollTop Test Page'
+    _controller: '\Drupal\ajax_test\Controller\AjaxTestController::scrollTopTestPage'
+  requirements:
+    _access: 'TRUE'
+
+ajax_test.scroll_top_test_action_page:
+  path: '/ajax-test/scroll-top-test-action-page'
+  defaults:
+    _title: 'AJAX scrollTop Test Action Page'
+    _controller: '\Drupal\ajax_test\Controller\AjaxTestController::scrollTopTestActionPage'
+  requirements:
+    _access: 'TRUE'
+
+ajax_test.scroll_top_test_action_callback:
+  path: '/ajax-test/scroll_top_test_action_callback'
+  defaults:
+    _title: 'AJAX scrollTop Test Execute Callback'
+    _controller: '\Drupal\ajax_test\Controller\AjaxTestController::scrollTopTestAjaxCallback'
+  requirements:
+    _access: 'TRUE'
+
 ajax_test.ajax_render_types:
   path: '/ajax-test/dialog-contents-types/{type}'
   defaults:

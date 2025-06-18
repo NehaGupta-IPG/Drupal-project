@@ -7,8 +7,10 @@ namespace Drupal\ajax_test\Controller;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\AlertCommand;
+use Drupal\Core\Ajax\AppendCommand;
 use Drupal\Core\Ajax\CloseDialogCommand;
 use Drupal\Core\Ajax\HtmlCommand;
+use Drupal\Core\Ajax\ScrollTopCommand;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -387,6 +389,97 @@ class AjaxTestController {
   public function globalEventsClearLog() {
     $response = new AjaxResponse();
     $response->addCommand(new HtmlCommand('#test_global_events_log', ''));
+    return $response;
+  }
+
+  /**
+   * Returns a render array of page with elements to check scrollTop command.
+   */
+  public function scrollTopTestActionPage() {
+    $build['offset_before'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'div',
+      '#value' => 'Offset before scrollTop target.',
+      '#attributes' => ['style' => 'height: 600px'],
+    ];
+    $build['scroll_top_scroll_target'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'div',
+      '#value' => 'Scroll Target.',
+      '#attributes' => ['id' => 'scroll-top-scroll-target', 'style' => 'height: 600px'],
+    ];
+    $build['offset_after'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'div',
+      '#value' => 'Offset after scrollTop target.',
+      '#attributes' => ['style' => 'height: 600px'],
+    ];
+    $build['execute_scroll_top'] = [
+      '#type' => 'link',
+      '#title' => 'Execute scrollTop',
+      '#url' => Url::fromRoute('ajax_test.scroll_top_test_action_callback'),
+      '#attributes' => [
+        'class' => ['use-ajax'],
+      ],
+    ];
+
+    $build['#attached']['library'][] = 'core/drupal.ajax';
+    $build['#attached']['library'][] = 'views/views.ajax';
+
+    return $build;
+  }
+
+  /**
+   * Returns a render array of page with links to open scrollTop in dialogs.
+   */
+  public function scrollTopTestPage() {
+    $build['offset'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'div',
+      '#value' => 'Offset for scrollTop test',
+      '#attributes' => ['style' => 'height: 600px'],
+    ];
+    $build['open_in_off_canvas'] = [
+      '#type' => 'link',
+      '#title' => 'Open ScrollTop form in an off canvas dialog',
+      '#url' => Url::fromRoute('ajax_test.scroll_top_test_action_page'),
+      '#attributes' => [
+        'id' => 'open-scroll-top-form-in-off-canvas',
+        'class' => ['use-ajax'],
+        'data-dialog-renderer' => 'off_canvas',
+        'data-dialog-type' => 'dialog',
+        'data-dialog-options' => json_encode([
+          'width' => 400,
+        ]),
+      ],
+    ];
+    $build['open_in_dialog'] = [
+      '#type' => 'link',
+      '#title' => 'Open ScrollTop form in a modal dialog',
+      '#url' => Url::fromRoute('ajax_test.scroll_top_test_action_page'),
+      '#attributes' => [
+        'id' => 'open-scroll-top-form-in-dialog',
+        'class' => ['use-ajax'],
+        'data-dialog-type' => 'dialog',
+        'data-dialog-options' => json_encode([
+          'width' => 400,
+        ]),
+      ],
+    ];
+    $build['#attached']['library'][] = 'core/drupal.ajax';
+    $build['#attached']['library'][] = 'views/views.ajax';
+
+    return $build;
+  }
+
+  /**
+   * Returns an AJAX response with ScrollTopCommand.
+   */
+  public function scrollTopTestAjaxCallback() {
+    $selector = '#scroll-top-scroll-target';
+    $response = new AjaxResponse();
+    $response->addCommand(new AppendCommand($selector, " AJAX scrollTop command executed."));
+    $response->addCommand(new ScrollTopCommand($selector));
     return $response;
   }
 
