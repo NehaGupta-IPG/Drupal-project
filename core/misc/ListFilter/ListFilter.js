@@ -15,7 +15,7 @@
    *
    * @example
    *   // Attach your event listeners BEFORE instantiating ListFilter.
-   * 
+   *
    *   // Override default options by listening to 'listFilter:options':
    *   const input = document.querySelector('#my-input');
    *   input.addEventListener('listFilter:options', (event) => {
@@ -59,7 +59,9 @@
      * @static
      * @readonly
      */
-    static FILTER_EVENT = 'listFilter:filter';
+    static get FILTER_EVENT() {
+      return 'listFilter:filter';
+    }
 
     /**
      * The custom event name for overriding options.
@@ -67,7 +69,9 @@
      * @static
      * @readonly
      */
-    static OPTIONS_EVENT = 'listFilter:options';
+    static get OPTIONS_EVENT() {
+      return 'listFilter:options';
+    }
 
     /**
      * The custom event name for signaling that searching has finished.
@@ -75,7 +79,9 @@
      * @static
      * @readonly
      */
-    static SEARCH_FINISHED_EVENT = 'listFilter:searchingFinished';
+    static get SEARCH_FINISHED_EVENT() {
+      return 'listFilter:searchingFinished';
+    }
 
     /**
      * Default options for the ListFilter.
@@ -83,22 +89,24 @@
      * @static
      * @readonly
      */
-    static defaultOptions = {
-      minLength: 2,
-      searchStart: false,
-      singular: null,
-      plural: null,
-      full: null,
-      containerSelector: null,
-      itemsSelector: null,
-      targetsSelector: null,
-      hideElement: null,
-      showElement: null,
-      normalizeString: null,
-      searchMethod: null,
-      announce: null,
-      filterItemsBuilder: null,
-    };
+    static get DEFAULT_OPTIONS() {
+      return {
+        minLength: 2,
+        searchStart: false,
+        singular: null,
+        plural: null,
+        full: null,
+        containerSelector: null,
+        itemsSelector: null,
+        targetsSelector: null,
+        hideElement: null,
+        showElement: null,
+        normalizeString: null,
+        searchMethod: null,
+        announce: null,
+        filterItemsBuilder: null,
+      };
+    }
 
     /**
      * Constructs a ListFilter instance.
@@ -137,13 +145,9 @@
      *     (Optional) Custom function to build filterable items.
      */
     constructor(options = {}) {
-      if (!this.#validOptions(options)) {
-        throw new Error(Drupal.t('ListFilter: The options provided are not vaid.'));
-      }
-
       this.input = options.input;
       const merged = {
-        ...ListFilter.defaultOptions,
+        ...ListFilter.DEFAULT_OPTIONS,
         ...options,
       };
 
@@ -156,10 +160,12 @@
       this.input.dispatchEvent(event);
 
       // Use the (possibly modified) options from event.detail.options
-      const consolidateOptions = this.options = {
+      const consolidateOptions = {
         ...merged,
-        ...event.detail?.options || {},
+        ...(event.detail?.options || {}),
       };
+
+      this.options = consolidateOptions;
 
       // Assignment
       this.containerSelector = consolidateOptions.containerSelector;
@@ -170,12 +176,18 @@
       this.full = consolidateOptions.full;
       this.minLength = consolidateOptions.minLength;
       this.searchStart = consolidateOptions.searchStart;
-      this.hideElement = consolidateOptions.hideElement || this.#hideElementImpl;
-      this.showElement = consolidateOptions.showElement || this.#showElementImpl;
-      this.normalizeString = consolidateOptions.normalizeString || this.#normalizeStringImpl;
-      this.searchMethod = consolidateOptions.searchMethod || this.#searchMethodImpl;
-      this.announce = consolidateOptions.announce || this.#announceImpl;
-      this.filterItemsBuilder = consolidateOptions.filterItemsBuilder || this.#filterItemsBuilderImpl;
+      this.hideElement =
+        consolidateOptions.hideElement || ListFilter._hideElementImpl;
+      this.showElement =
+        consolidateOptions.showElement || ListFilter._showElementImpl;
+      this.normalizeString =
+        consolidateOptions.normalizeString || ListFilter._normalizeStringImpl;
+      this.searchMethod =
+        consolidateOptions.searchMethod || ListFilter._searchMethodImpl;
+      this.announce = consolidateOptions.announce || ListFilter._announceImpl;
+      this.filterItemsBuilder =
+        consolidateOptions.filterItemsBuilder ||
+        ListFilter._filterItemsBuilderImpl;
     }
 
     /**
@@ -258,7 +270,7 @@
             } else {
               this.hideElement(label);
             }
-            this.#labelCollapse(label, false);
+            ListFilter._labelCollapse(label, false);
           });
           this.announce(toShow.length, this.singular, this.plural);
         });
@@ -269,9 +281,11 @@
         requestAnimationFrame(() => {
           toShow.forEach((node) => this.showElement(node));
           labels.forEach((label) => this.showElement(label));
-          Drupal.announce(this.full ?? Drupal.t('All available items are listed.'));
+          Drupal.announce(
+            this.full ?? Drupal.t('All available items are listed.'),
+          );
           labels.forEach((label) => {
-            this.#labelCollapse(label, true);
+            ListFilter._labelCollapse(label, true);
           });
         });
       }
@@ -282,50 +296,10 @@
           detail: {
             matched: toShow,
             unmatched: toHide,
-          }
+          },
         });
         this.input.dispatchEvent(event);
       });
-    }
-
-    /**
-     * Assigns all option values to class properties.
-     * @param {object} opts
-     *   The options object to assign.
-     */
-    #assignOptions(options) {
-
-    }
-
-    /**
-     * Ensure options is a vaid object.
-     * 
-     * @param {*} options 
-     * @returns boolean
-     *   Return true if options is a valid object.
-     */
-    #validOptions(options) {
-      return (
-        options &&
-        typeof options === 'object' &&
-        options.input instanceof HTMLElement &&
-        typeof options.containerSelector === 'string' &&
-        typeof options.itemsSelector === 'string'
-      );
-    }
-
-    /**
-     * Filters the options to only include valid keys.
-     * 
-     * @param  {...options} options 
-     * @returns 
-     */
-    #filterValidKeys(...options) {
-      const aggregated = Object.assign({}, ...options);
-      const validKeys = Object.keys(ListFilter.defaultOptions);
-      return Object.fromEntries(
-        Object.entries(aggregated).filter(([key]) => validKeys.includes(key))
-      );
     }
 
     /**
@@ -333,7 +307,7 @@
      * @param {HTMLElement} element
      * @returns {HTMLElement}
      */
-    #hideElementImpl(element) {
+    static _hideElementImpl(element) {
       element.style.display = 'none';
       return element;
     }
@@ -343,7 +317,7 @@
      * @param {HTMLElement} element
      * @returns {HTMLElement}
      */
-    #showElementImpl(element) {
+    static _showElementImpl(element) {
       element.style.display = '';
       return element;
     }
@@ -353,7 +327,7 @@
      * @param {string} str
      * @returns {string}
      */
-    #normalizeStringImpl(str) {
+    static _normalizeStringImpl(str) {
       return window.slugify(str, { separator: ' ' });
     }
 
@@ -362,7 +336,7 @@
      * @param {string} query
      * @returns {RegExp}
      */
-    #regexpStartsWith(query) {
+    static _regexpStartsWith(query) {
       return new RegExp(`\\b${query}`);
     }
 
@@ -373,9 +347,9 @@
      * @param {boolean} searchFromWordStart
      * @returns {boolean}
      */
-    #searchMethodImpl(target, query, searchFromWordStart) {
+    static _searchMethodImpl(target, query, searchFromWordStart) {
       return searchFromWordStart
-        ? target.search(this.#regexpStartsWith(query)) !== -1
+        ? target.search(ListFilter._regexpStartsWith(query)) !== -1
         : target.includes(query);
     }
 
@@ -385,7 +359,7 @@
      * @param {string} singularLabel
      * @param {string} pluralLabel
      */
-    #announceImpl(matches, singularLabel, pluralLabel) {
+    static _announceImpl(matches, singularLabel, pluralLabel) {
       Drupal.announce(Drupal.formatPlural(matches, singularLabel, pluralLabel));
     }
 
@@ -397,18 +371,25 @@
      * @param {function} normalizeString
      * @returns {Array}
      */
-    #filterItemsBuilderImpl(containerElement, itemsSelector, targetSelector, normalizeString) {
-      return Array.from(containerElement.querySelectorAll(itemsSelector)).map((source) => {
-        const textContent = targetSelector
-          ? Array.from(source.querySelectorAll(targetSelector))
-              .map((t) => t.textContent)
-              .join(' ')
-          : source.textContent;
-        return {
-          node: source,
-          textContent: normalizeString(textContent),
-        };
-      });
+    static _filterItemsBuilderImpl(
+      containerElement,
+      itemsSelector,
+      targetSelector,
+      normalizeString,
+    ) {
+      return Array.from(containerElement.querySelectorAll(itemsSelector)).map(
+        (source) => {
+          const textContent = targetSelector
+            ? Array.from(source.querySelectorAll(targetSelector))
+                .map((t) => t.textContent)
+                .join(' ')
+            : source.textContent;
+          return {
+            node: source,
+            textContent: normalizeString(textContent),
+          };
+        },
+      );
     }
 
     /**
@@ -416,7 +397,7 @@
      * @param {*} label
      * @param {boolean} reset
      */
-    #labelCollapse(label, reset = false) {
+    static _labelCollapse(label, reset = false) {
       if (label.nodeName !== 'DETAILS') {
         return;
       }
