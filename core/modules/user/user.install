@@ -101,7 +101,7 @@ function user_update_last_removed(): int {
 /**
  * Enforce minimum password reset timeout.
  */
-function user_update_10001(): void {
+function user_update_105001(): void {
   $config = \Drupal::configFactory()->getEditable('user.settings');
   if ($config->get('password_reset_timeout') < 300) {
     $config->set('password_reset_timeout', 300);
