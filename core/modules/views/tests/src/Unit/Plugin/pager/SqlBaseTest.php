@@ -110,7 +110,7 @@ class SqlBaseTest extends UnitTestCase {
     ]);
     $this->view->expects($this->any())
       ->method('getRequest')
-      ->will($this->returnValue($request));
+      ->willReturn($request);
 
     $options = [
       'offset' => '',
