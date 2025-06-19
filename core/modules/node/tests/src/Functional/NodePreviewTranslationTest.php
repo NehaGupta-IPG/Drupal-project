@@ -39,6 +39,9 @@ class NodePreviewTranslationTest extends BrowserTestBase {
     $this->drupalCreateContentType(['type' => 'article', 'title' => 'Article']);
     static::enableBundleTranslation('node', 'article');
     static::createLanguageFromLangcode('es');
+    // Rebuild the container so LanguageServiceProvider adds the path
+    // processors.
+    $this->rebuildContainer();
   }
 
   /**
@@ -58,8 +61,7 @@ class NodePreviewTranslationTest extends BrowserTestBase {
       'edit any article content',
     ]));
 
-    // @todo figure out why $node->toUrl('edit-form', ['language' => ConfigurableLanguage::load('es')]) isn't working.
-    $this->drupalGet('/es/node/1/edit');
+    $this->drupalGet($esTranslation->toUrl('edit-form'));
     $this->assertSession()->fieldValueEquals('title[0][value]', 'Spanish node');
     // Preview the spanish translation with an updated title.
     $this->submitForm([
@@ -75,7 +77,7 @@ class NodePreviewTranslationTest extends BrowserTestBase {
 
     // Simulate clicking the Back to content editing link from the spanish
     // translation.
-    $this->drupalGet('/es/node/1/edit', ['query' => ['uuid' => $esTranslation->getPreviewUuid()]]);
+    $this->drupalGet($esTranslation->toUrl('edit-form', ['query' => ['uuid' => $esTranslation->getPreviewUuid()]]));
     // The title should match the updated title from the first preview.
     $this->assertSession()->fieldValueEquals('title[0][value]', 'Spanish node updated');
   }
