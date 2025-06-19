@@ -121,7 +121,7 @@ class ModerationFormTest extends ModerationStateTestBase {
 
     // The preview view should not have a moderation form.
     $preview_url = Url::fromRoute('entity.node.preview', [
-      'node_preview' => $node->uuid(),
+      'node_preview' => $node->getPreviewUuid(),
       'view_mode_id' => 'full',
     ]);
     $this->assertSession()->statusCodeEquals(200);

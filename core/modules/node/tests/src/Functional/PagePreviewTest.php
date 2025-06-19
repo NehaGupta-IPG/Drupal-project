@@ -352,7 +352,7 @@ class PagePreviewTest extends NodeTestBase {
     $destination = 'node';
     $this->drupalGet($node->toUrl('edit-form'), ['query' => ['destination' => $destination]]);
     $this->submitForm([], 'Preview');
-    $parameters = ['node_preview' => $node->uuid(), 'view_mode_id' => 'full'];
+    $parameters = ['node_preview' => $node->getPreviewUuid(), 'view_mode_id' => 'full'];
     $options = ['absolute' => TRUE, 'query' => ['destination' => $destination]];
     $this->assertSession()->addressEquals(Url::fromRoute('entity.node.preview', $parameters, $options));
     $this->submitForm(['view_mode' => 'teaser'], 'Switch');
@@ -363,7 +363,7 @@ class PagePreviewTest extends NodeTestBase {
     // Check that preview page works as expected without a destination set.
     $this->drupalGet($node->toUrl('edit-form'));
     $this->submitForm([], 'Preview');
-    $parameters = ['node_preview' => $node->uuid(), 'view_mode_id' => 'full'];
+    $parameters = ['node_preview' => $node->getPreviewUuid(), 'view_mode_id' => 'full'];
     $this->assertSession()->addressEquals(Url::fromRoute('entity.node.preview', $parameters));
     $this->submitForm(['view_mode' => 'teaser'], 'Switch');
     $this->clickLink('Back to content editing');
@@ -526,7 +526,7 @@ class PagePreviewTest extends NodeTestBase {
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm($edit2, 'Preview');
     $this->assertSession()->addressEquals(Url::fromRoute('entity.node.preview', [
-      'node_preview' => $node->uuid(),
+      'node_preview' => $node->getPreviewUuid(),
       'view_mode_id' => 'full',
     ]));
     $this->assertSession()->pageTextContains($edit2[$title_key]);

@@ -100,7 +100,7 @@ class NodePreviewForm extends FormBase {
 
     $form['uuid'] = [
       '#type' => 'value',
-      '#value' => $node->uuid(),
+      '#value' => $node->getPreviewUuid(),
     ];
 
     $form['view_mode'] = [
