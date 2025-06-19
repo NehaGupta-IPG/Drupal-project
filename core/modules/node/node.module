@@ -683,9 +683,3 @@ function node_reindex_node_search($nid) {
   }
 }
 
-/**
- * Implements hook_config_translation_info_alter().
- */
-function node_config_translation_info_alter(&$info): void {
-  $info['node_type']['class'] = 'Drupal\node\ConfigTranslation\NodeTypeMapper';
-}
