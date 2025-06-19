@@ -4,6 +4,23 @@
  */
 
 (function (Drupal, debounce, once, slugify) {
+  Drupal.behaviors.listFilterOverride = {
+    attach(context) {
+      const result = document.querySelector('.js-filter-count');
+      once(
+        'list-filter-override',
+        '.table-filter-text[data-auto-activate="true"]',
+        context,
+      ).forEach((input) => {
+        input.addEventListener('listFilter:searchingFinished', (e) => {
+          console.warn(`searching finished now...`, e.detail);
+          console.warn(
+            `The number of results: ${e.detail.matched.length} whereas the number of unmatched rows is ${e.detail.unmatched.length}`,
+          );
+        });
+      });
+    },
+  };
 
   /**
    * Behavior to attach the list filter to elements.
@@ -21,9 +38,12 @@
           'focus',
           () => {
             // Pass only the valid dataset attributes to the filter class.
-            const validKeys = Object.keys(Drupal.ListFilter.defaultOptions);
-            sanitizedDataset = Object.fromEntries(
-              Object.entries(input.dataset).filter(([key]) => validKeys.includes(key))
+            const defaultOptions = Drupal.ListFilter.DEFAULT_OPTIONS;
+            const validKeys = Object.keys(defaultOptions);
+            const sanitizedDataset = Object.fromEntries(
+              Object.entries(input.dataset).filter(([key]) =>
+                validKeys.includes(key),
+              ),
             );
 
             // Consolidate the options for the list filter.
