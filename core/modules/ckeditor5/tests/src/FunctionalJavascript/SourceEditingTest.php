@@ -36,7 +36,7 @@ class SourceEditingTest extends SourceEditingTestBase {
 
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ckeditor5-toolbar-item-sourceEditing'));
     $this->triggerKeyUp('.ckeditor5-toolbar-item-sourceEditing', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // The Source Editing plugin settings form should now be present and should
     // have no allowed tags configured.

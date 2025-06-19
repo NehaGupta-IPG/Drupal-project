@@ -123,7 +123,7 @@ abstract class InlineBlockTestBase extends WebDriverTestBase {
     $assert_session->pageTextContains($block_text);
     $this->clickContextualLink($selector, 'Remove block');
     $assert_session->waitForElement('css', "#drupal-off-canvas input[value='Remove']");
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // Output the new HTML.
     $this->htmlOutput($page->getHtml());
@@ -131,7 +131,7 @@ abstract class InlineBlockTestBase extends WebDriverTestBase {
     $page->find('css', '#drupal-off-canvas')->pressButton('Remove');
     $assert_session->assertNoElementAfterWait('css', '#drupal-off-canvas');
     $assert_session->assertNoElementAfterWait('css', $selector);
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $assert_session->pageTextNotContains($block_text);
   }
 
@@ -147,10 +147,10 @@ abstract class InlineBlockTestBase extends WebDriverTestBase {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $page->clickLink('Add block');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertNotEmpty($assert_session->waitForLink('Create content block'));
     $this->clickLink('Create content block');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $textarea = $assert_session->waitForElement('css', '[name="settings[block_form][body][0][value]"]');
     $this->assertNotEmpty($textarea);
     $assert_session->fieldValueEquals('Title', '');
@@ -181,7 +181,7 @@ abstract class InlineBlockTestBase extends WebDriverTestBase {
     $textarea->setValue($new_body);
     $page->pressButton('Update');
     $assert_session->assertNoElementAfterWait('css', '#drupal-off-canvas');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertDialogClosedAndTextVisible($new_body);
   }
 

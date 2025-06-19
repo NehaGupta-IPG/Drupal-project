@@ -163,14 +163,14 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#layout-builder a:contains(\'Add block\')'));
     $this->clickLink('Add block');
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-off-canvas'));
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     $assert_session->linkExists($block_link_text);
     $this->clickLink($block_link_text);
 
     // Wait for off-canvas dialog to reopen with block form.
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', ".layout-builder-add-block"));
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $page->pressButton('Add block');
 
     // Wait for block form to be rendered in the Layout Builder.
@@ -279,7 +279,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
     $body_block->pressButton('Open configuration options');
     $body_block->clickLink('Configure');
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-off-canvas'));
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // After the contextual link opens the dialog, move the mouse pointer
     // elsewhere on the page. If mouse up were not working correctly this would

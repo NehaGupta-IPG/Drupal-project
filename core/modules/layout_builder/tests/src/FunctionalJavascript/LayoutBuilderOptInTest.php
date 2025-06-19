@@ -118,7 +118,7 @@ class LayoutBuilderOptInTest extends WebDriverTestBase {
     $this->drupalGet($layout_builder_ui);
     $assert_session->fieldValueEquals('settings[formatter][type]', 'text_default');
     $page->selectFieldOption('settings[formatter][type]', 'text_trimmed');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $page->pressButton('Update');
     $page->pressButton('Save layout');
 
@@ -140,7 +140,7 @@ class LayoutBuilderOptInTest extends WebDriverTestBase {
 
     // Change the body formatter to Summary.
     $page->selectFieldOption('fields[body][type]', 'text_summary_or_trimmed');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $page->pressButton('Save');
     $assert_session->fieldValueEquals('fields[body][type]', 'text_summary_or_trimmed');
 

@@ -205,7 +205,7 @@ class MachineNameTest extends WebDriverTestBase {
     // Machine name field should not expand after failing validation.
     $this->assertTrue($machine_name_wrapper->hasClass('hidden'), 'The ID field must not be visible');
     $assert->selectExists('snack')->selectOption('apple');
-    $assert->assertWaitOnAjaxRequest();
+    $assert->assertExpectedAjaxRequest();
     $assert->buttonExists('Save')->press();
     $assert->pageTextContains('The form_test_machine_name_validation_form form has been submitted successfully.');
 
@@ -214,7 +214,7 @@ class MachineNameTest extends WebDriverTestBase {
     $this->assertJsCondition('document.forms[0].id.value === "duplicate"');
     $assert->fieldExists('id2')->setValue('duplicate2');
     $assert->selectExists('snack')->selectOption('potato');
-    $assert->assertWaitOnAjaxRequest();
+    $assert->assertExpectedAjaxRequest();
     $assert->buttonExists('Save')->press();
     $assert->pageTextContains('The machine-readable name is already in use. It must be unique.');
     // Ensure both machine name fields both have errors.

@@ -108,7 +108,7 @@ class FieldTest extends WebDriverTestBase {
     $this->assertNotNull($web_assert->waitForLink('Content link'));
     $page->clickLink('Content link');
     // Verify the modal title.
-    $web_assert->assertWaitOnAjaxRequest();
+    $web_assert->assertExpectedAjaxRequest();
     $this->assertEquals('Content', $web_assert->waitForElement('css', '.ui-dialog-title')->getText());
   }
 
@@ -123,16 +123,16 @@ class FieldTest extends WebDriverTestBase {
     $page = $this->getSession()->getPage();
 
     $page->clickLink('Body field');
-    $web_assert->assertWaitOnAjaxRequest();
+    $web_assert->assertExpectedAjaxRequest();
 
     $page->fillField('options[type]', 'text_trimmed');
     // Add a value to the trim_length setting.
-    $web_assert->assertWaitOnAjaxRequest();
+    $web_assert->assertExpectedAjaxRequest();
     $page->fillField('options[settings][trim_length]', '700');
     $apply_button = $page->find('css', '.views-ui-dialog button.button--primary');
     $this->assertNotEmpty($apply_button);
     $apply_button->press();
-    $web_assert->assertWaitOnAjaxRequest();
+    $web_assert->assertExpectedAjaxRequest();
 
     // Save the page.
     $save_button = $page->find('css', '#edit-actions-submit');
@@ -142,13 +142,13 @@ class FieldTest extends WebDriverTestBase {
     // settings are not in the config.
     $this->drupalGet($url);
     $page->clickLink('Body field');
-    $web_assert->assertWaitOnAjaxRequest();
+    $web_assert->assertExpectedAjaxRequest();
 
     $page->fillField('options[type]', 'text_default');
-    $web_assert->assertWaitOnAjaxRequest();
+    $web_assert->assertExpectedAjaxRequest();
     $apply_button = $page->find('css', '.views-ui-dialog button.button--primary');
     $apply_button->press();
-    $web_assert->assertWaitOnAjaxRequest();
+    $web_assert->assertExpectedAjaxRequest();
 
     // Save the page.
     $save_button = $page->find('css', '#edit-actions-submit');

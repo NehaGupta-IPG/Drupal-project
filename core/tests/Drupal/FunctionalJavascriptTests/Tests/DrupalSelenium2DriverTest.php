@@ -69,7 +69,7 @@ class DrupalSelenium2DriverTest extends WebDriverTestBase {
     $this->drupalGet($entity->toUrl('edit-form'));
     $multiple_field = $this->assertSession()->elementExists('xpath', '//input[@multiple]');
     $multiple_field->setValue(implode("\n", $remote_paths));
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->getSession()->getPage()->findButton('Save')->click();
     $entity = EntityTest::load($entity->id());
     $this->assertCount(3, $entity->field_file);

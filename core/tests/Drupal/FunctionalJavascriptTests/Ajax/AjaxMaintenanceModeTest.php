@@ -62,7 +62,7 @@ class AjaxMaintenanceModeTest extends WebDriverTestBase {
     $this->drupalGet('ajax-test/insert-inline-wrapper');
     $assert_session->pageTextContains('Target inline');
     $page->clickLink('Link html pre-wrapped-div');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertSession()->pageTextContainsOnce('Operating in maintenance mode');
   }
 

@@ -57,7 +57,7 @@ class ClaroViewsUiTest extends WebDriverTestBase {
     // Click the Apply button of the dialog.
     $assert_session->elementExists('css', '.js-views-ui-dialog .ui-dialog-buttonpane')->findButton('Apply')->press();
     // Wait for AJAX to finish.
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // Check that the display menu tabs list still has the expected CSS classes.
     $assert_session->elementExists('css', '#views-display-menu-tabs.views-tabs.views-tabs--secondary');
@@ -85,7 +85,7 @@ class ClaroViewsUiTest extends WebDriverTestBase {
     // Click the Apply button of the dialog.
     $assert_session->elementExists('css', '.js-views-ui-dialog .ui-dialog-buttonpane')->findButton('Apply')->press();
     // Wait for AJAX to finish.
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
 
     // Check that the drop button list still has the expected CSS classes.
     $this->assertTrue($extra_actions_dropbutton_list->hasClass('dropbutton--small'));

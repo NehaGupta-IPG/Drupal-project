@@ -95,25 +95,25 @@ class ConfigExportTest extends WebDriverTestBase {
 
     // Check that the export is filled when selecting a config name.
     $page->selectFieldOption('config_name', 'system.site');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertSession()->fieldValueNotEquals('export', '');
 
     // Check that the export is empty when selecting "- Select -" option in
     // the config name.
     $page->selectFieldOption('config_name', '- Select -');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertSession()->fieldValueEquals('export', '');
 
     // Check that the export is emptied again when selecting a config type.
     $page->selectFieldOption('config_type', 'Action');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertSession()->fieldValueEquals('export', '');
 
     // Check that the 'Configuration name' list is sorted alphabetically by ID,
     // which always begins with our prefix, and not the label, which is
     // randomized.
     $page->selectFieldOption('config_type', 'Block');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $options = $page->findField('config_name')->findAll('css', 'option');
     foreach ([1, 2, 3, 4] as $num) {
       $block_name = $this->blockNamePrefix . $num;

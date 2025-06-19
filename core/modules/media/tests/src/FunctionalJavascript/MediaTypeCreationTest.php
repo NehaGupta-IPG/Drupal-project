@@ -141,7 +141,7 @@ class MediaTypeCreationTest extends MediaJavascriptTestBase {
     $page->fillField('label', $label);
     $session->wait(5000, "jQuery('.machine-name-value').text() === '{$mediaTypeMachineName}'");
     $page->selectFieldOption('Media source', 'test');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $page->pressButton('Save');
     $assert_session->pageTextContains('The machine-readable name is already in use. It must be unique.');
   }

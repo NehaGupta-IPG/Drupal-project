@@ -70,7 +70,7 @@ class BlockFormMessagesTest extends WebDriverTestBase {
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', $block_css_locator));
 
     $assert_session->assertNoElementAfterWait('css', '#drupal-off-canvas');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->drupalGet($this->getUrl());
     $page->findButton('Save layout')->click();
     $this->assertNotEmpty($assert_session->waitForElement('css', 'div:contains("The layout override has been saved")'));
@@ -93,7 +93,7 @@ class BlockFormMessagesTest extends WebDriverTestBase {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $messages_locator = '#drupal-off-canvas .messages--error';
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertNotEmpty($assert_session->waitForElement('css', $messages_locator));
     $assert_session->elementTextContains('css', $messages_locator, 'Title field is required.');
     /** @var \Behat\Mink\Element\NodeElement[] $top_form_elements */

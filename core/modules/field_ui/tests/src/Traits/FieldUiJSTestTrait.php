@@ -40,7 +40,7 @@ trait FieldUiJSTestTrait {
       $bundle_path = "$bundle_path/fields";
       $this->drupalGet($bundle_path);
       $this->getSession()->getPage()->clickLink('Create a new field');
-      $this->assertSession()->assertWaitOnAjaxRequest();
+      $this->assertSession()->assertExpectedAjaxRequest();
     }
 
     // First step: 'Add field' page.
@@ -55,7 +55,7 @@ trait FieldUiJSTestTrait {
       $field_definitions = $field_type_plugin_manager->getUiDefinitions();
       $field_type_label = (string) $field_definitions[$field_type]['label'];
       $this->getSession()->getPage()->clickLink($field_type_label);
-      $this->assertSession()->assertWaitOnAjaxRequest();
+      $this->assertSession()->assertExpectedAjaxRequest();
 
       if ($this->getSession()->getPage()->hasField('field_options_wrapper')) {
         $this->assertSession()->fieldExists('field_options_wrapper')->selectOption($field_type);
@@ -66,7 +66,7 @@ trait FieldUiJSTestTrait {
       // Call the helper function to confirm it is in a group.
       $field_group = $this->getFieldFromGroup($field_type);
       $this->clickLink($field_group);
-      $this->assertSession()->assertWaitOnAjaxRequest();
+      $this->assertSession()->assertExpectedAjaxRequest();
       $this->assertSession()->fieldExists('field_options_wrapper')->selectOption($field_type);
     }
     $field_label = $page->findField('label');
@@ -82,7 +82,7 @@ trait FieldUiJSTestTrait {
     $field_field_name->setValue($field_name);
 
     $this->assertSession()->elementExists('xpath', '//button[text()="Continue"]')->press();
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertSession()->waitForElementVisible('css', '#drupal-modal');
 
     $assert_session->waitForText("These settings apply to the $label field everywhere it is used.");

@@ -103,13 +103,13 @@ JS);
       // In case of the non-first AJAX request, ensure that no AJAX requests are
       // in progress.
       try {
-        $this->assertSession()->assertWaitOnAjaxRequest(500);
+        $this->assertSession()->assertExpectedAjaxRequest(500);
       }
       catch (\RuntimeException $e) {
         throw new \LogicException(sprintf('This call to %s claims there no AJAX request was triggered, but this is wrong: %s.', __METHOD__, $e->getMessage()));
       }
       catch (\LogicException $e) {
-        // This is the intent: ::assertWaitOnAjaxRequest() should detect an
+        // This is the intent: ::assertExpectedAjaxRequest() should detect an
         // "incorrect" call, because this assertion is asserting *no* AJAX
         // requests have been triggered.
         assert(str_contains($e->getMessage(), 'Unnecessary'));
@@ -147,7 +147,7 @@ JS;
 
     // Switching to CKEditor 5 should keep the filter settings hidden.
     $page->selectFieldOption('editor[editor]', 'ckeditor5');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $assert_session->pageTextNotContains('Filter settings');
   }
 
@@ -165,13 +165,13 @@ JS;
 
     $this->assertTrue($page->hasUncheckedField('filters[media_embed][status]'));
     $page->checkField('filters[media_embed][status]');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     $media_tab = $assert_session->waitForElementVisible('css', '[href^="#edit-filters-media-embed-settings"]');
     $this->assertTrue($media_tab->isVisible(), 'Media settings should appear when media filter enabled');
 
     $page->uncheckField('filters[media_embed][status]');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     $media_tab = $page->find('css', '[href^="#edit-filters-media-embed-settings"]');
     $this->assertFalse($media_tab->isVisible(), 'Media settings should be removed when media filter disabled');
@@ -239,7 +239,7 @@ JS;
     // Add the source editing plugin to the CKEditor 5 toolbar.
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ckeditor5-toolbar-item-sourceEditing'));
     $this->triggerKeyUp('.ckeditor5-toolbar-item-sourceEditing', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     $find_validation_error_messages = function () use ($page): array {
       return $page->findAll('css', '[role=alert]:contains("The following tag(s) are already supported by enabled plugins and should not be added to the Source Editing "Manually editable HTML tags" field: Bold (<strong>).")');
@@ -255,17 +255,17 @@ JS;
     $assert_session->waitForText('Manually editable HTML tags');
     $source_edit_tags_field = $assert_session->fieldExists('editor[settings][plugins][ckeditor5_sourceEditing][allowed_tags]');
     $source_edit_tags_field->setValue('<strong>');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertCount(1, $find_validation_error_messages());
 
     // Revert Source Editing it: validation messages should be gone.
     $source_edit_tags_field->setValue('');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertCount(0, $find_validation_error_messages());
 
     // Add `<strong>` again: validation messages should be back.
     $source_edit_tags_field->setValue('<strong>');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertCount(1, $find_validation_error_messages());
   }
 
@@ -286,7 +286,7 @@ JS;
 
     // Remove the heading plugin from the toolbar.
     $this->triggerKeyUp('.ckeditor5-toolbar-item-heading', 'ArrowUp');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // The heading plugin config form should no longer be present.
     $assert_session->elementNotExists('css', '[data-drupal-selector="edit-editor-settings-plugins-ckeditor5-heading"]');
@@ -296,7 +296,7 @@ JS;
 
     // Enable the source plugin.
     $this->triggerKeyUp('.ckeditor5-toolbar-item-sourceEditing', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // The source plugin config form should be present.
     $assert_session->elementExists('css', '[data-drupal-selector="edit-editor-settings-plugins-ckeditor5-sourceediting"]');
@@ -307,7 +307,7 @@ JS;
     // Enable the filter that the configurable plugin depends on.
     $this->assertTrue($page->hasUncheckedField('filters[media_embed][status]'));
     $page->checkField('filters[media_embed][status]');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // The filter-dependent configurable plugin should be present.
     $assert_session->elementExists('css', '[data-drupal-selector="edit-editor-settings-plugins-media-media"]');
@@ -327,7 +327,7 @@ JS;
 
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ckeditor5-toolbar-item-textPartLanguage'));
     $this->triggerKeyUp('.ckeditor5-toolbar-item-textPartLanguage', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // The CKEditor 5 module should warn that `<span>` cannot be created.
     $assert_session->waitForElement('css', '[role=alert][data-drupal-message-type="warning"]:contains("The Language plugin needs another plugin to create <span>, for it to be able to create the following attributes: <span lang dir>. Enable a plugin that supports creating this tag. If none exists, you can configure the Source Editing plugin to support it.")');
@@ -335,7 +335,7 @@ JS;
     // Make `<span>` creatable.
     $this->assertNotEmpty($assert_session->elementExists('css', '.ckeditor5-toolbar-item-sourceEditing'));
     $this->triggerKeyUp('.ckeditor5-toolbar-item-sourceEditing', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     // The Source Editing plugin settings form should now be present and should
     // have no allowed tags configured.
     $page->clickLink('Source editing');
@@ -349,7 +349,7 @@ JS;
     // Dispatching an `input` event does not work in WebDriver. Enabling another
     // toolbar item which has no associated HTML elements forces it.
     $this->triggerKeyUp('.ckeditor5-toolbar-item-undo', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // Confirm there are no longer any warnings.
     $assert_session->waitForElementRemoved('css', '[data-drupal-messages] [role="alert"]');
@@ -359,7 +359,7 @@ JS;
 
     // It must also be possible to remove the language plugin again.
     $this->triggerKeyUp('.ckeditor5-toolbar-item-textPartLanguage', 'ArrowUp');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // The language plugin config form should not be present anymore.
     $assert_session->elementNotExists('css', '[data-drupal-selector="edit-editor-settings-plugins-ckeditor5-language"]');

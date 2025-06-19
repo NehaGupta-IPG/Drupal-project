@@ -37,7 +37,7 @@ class StyleTest extends CKEditor5TestBase {
 
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ckeditor5-toolbar-item-style'));
     $this->triggerKeyUp('.ckeditor5-toolbar-item-style', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // No validation error upon enabling the Style plugin.
     $this->assertNoRealtimeValidationErrors();
@@ -45,7 +45,7 @@ class StyleTest extends CKEditor5TestBase {
 
     // Still no validation error when configuring other functionality first.
     $this->triggerKeyUp('.ckeditor5-toolbar-item-undo', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertNoRealtimeValidationErrors();
 
     // The Style plugin settings form should now be present and should have no
@@ -118,7 +118,7 @@ JS;
     $this->drupalGet('admin/config/content/formats/manage/ckeditor5');
     $this->assertNotEmpty($assert_session->elementExists('css', '.ckeditor5-toolbar-item-sourceEditing'));
     $this->triggerKeyUp('.ckeditor5-toolbar-item-sourceEditing', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     // The Source Editing plugin settings form should now be present and should
     // have no allowed tags configured.
     $page->clickLink('Source editing');
@@ -131,7 +131,7 @@ JS;
       allowedTags.dispatchEvent(new Event('change'));
 JS;
     $this->getSession()->executeScript($javascript);
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // Create a style with `aside` and a class name.
     $javascript = <<<JS
@@ -140,7 +140,7 @@ JS;
       allowedTags.dispatchEvent(new Event('change'));
 JS;
     $this->getSession()->executeScript($javascript);
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // The CKEditor 5 module should refuse to create configuration overlaps
     // across plugins.

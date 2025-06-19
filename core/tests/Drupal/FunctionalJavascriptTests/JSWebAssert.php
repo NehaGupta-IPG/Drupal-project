@@ -92,7 +92,7 @@ JS;
 })()
 JS);
 
-    // First invocation of ::assertWaitOnAjaxRequest() on this page: initialize.
+    // First invocation of ::assertExpectedAjaxRequest() on this page: initialize.
     static $current_page_hash;
     static $current_page_ajax_response_count;
     if ($current_page_hash !== $page_hash) {

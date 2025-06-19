@@ -70,7 +70,7 @@ class MediaViewsWizardTest extends MediaJavascriptTestBase {
     $page->fillField('label', $view_id);
     $this->waitUntilVisible('.machine-name-value');
     $page->selectFieldOption('show[wizard_key]', 'media_revision');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $page->checkField('page[create]');
     $page->fillField('page[path]', $this->randomMachineName(16));
     $page->pressButton('Save and edit');

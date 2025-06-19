@@ -99,7 +99,7 @@ class RebuildTest extends WebDriverTestBase {
     // field items in the field for which we just added an item.
     $this->drupalGet('node/add/page');
     $page->find('css', '[value="Add another item"]')->click();
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "field--name-field-ajax-test")]//input[@type="text"]', 2);
 
     // Submit the form with the non-Ajax "Save" button, leaving the file field

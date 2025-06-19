@@ -106,15 +106,15 @@ class CKEditor5Test extends CKEditor5TestBase {
     $this->drupalGet('admin/config/content/formats/manage/ckeditor5');
     $this->assertTrue($page->hasUncheckedField('editor[settings][plugins][ckeditor5_heading][enabled_headings][heading1]'));
     $page->checkField('editor[settings][plugins][ckeditor5_heading][enabled_headings][heading1]');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertTrue($page->hasCheckedField('editor[settings][plugins][ckeditor5_heading][enabled_headings][heading1]'));
     $this->assertTrue($page->hasCheckedField('editor[settings][plugins][ckeditor5_heading][enabled_headings][heading2]'));
     $page->uncheckField('editor[settings][plugins][ckeditor5_heading][enabled_headings][heading2]');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertTrue($page->hasUncheckedField('editor[settings][plugins][ckeditor5_heading][enabled_headings][heading2]'));
     $this->assertTrue($page->hasCheckedField('editor[settings][plugins][ckeditor5_heading][enabled_headings][heading4]'));
     $page->uncheckField('editor[settings][plugins][ckeditor5_heading][enabled_headings][heading4]');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertTrue($page->hasUncheckedField('editor[settings][plugins][ckeditor5_heading][enabled_headings][heading4]'));
     $this->assertHtmlEsqueFieldValueEquals('filters[filter_html][settings][allowed_html]', '<br> <p> <h1> <h3> <h5> <h6> <strong> <em>');
     $this->assertTrue($page->hasUncheckedField('editor[settings][plugins][ckeditor5_heading][enabled_headings][heading4]'));
@@ -186,7 +186,7 @@ class CKEditor5Test extends CKEditor5TestBase {
     // Press arrow down key to add the button to the active toolbar.
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ckeditor5-toolbar-item-textPartLanguage'));
     $this->triggerKeyUp('.ckeditor5-toolbar-item-textPartLanguage', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // The CKEditor 5 module should warn that `<span>` cannot be created.
     $assert_session->waitForElement('css', '[role=alert][data-drupal-message-type="warning"]:contains("The Language plugin needs another plugin to create <span>, for it to be able to create the following attributes: <span lang dir>. Enable a plugin that supports creating this tag. If none exists, you can configure the Source Editing plugin to support it.")');
@@ -194,7 +194,7 @@ class CKEditor5Test extends CKEditor5TestBase {
     // Make `<span>` creatable.
     $this->assertNotEmpty($assert_session->elementExists('css', '.ckeditor5-toolbar-item-sourceEditing'));
     $this->triggerKeyUp('.ckeditor5-toolbar-item-sourceEditing', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     // The Source Editing plugin settings form should now be present and should
     // have no allowed tags configured.
     $page->clickLink('Source editing');
@@ -208,7 +208,7 @@ JS;
     // Dispatching an `input` event does not work in WebDriver. Enabling another
     // toolbar item which has no associated HTML elements forces it.
     $this->triggerKeyUp('.ckeditor5-toolbar-item-undo', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // Confirm there are no longer any warnings.
     $assert_session->waitForElementRemoved('css', '[data-drupal-messages] [role="alert"]');
@@ -229,7 +229,7 @@ JS;
     $select = $page->findField('editor[settings][plugins][ckeditor5_language][language_list]');
     if ($select->getValue() !== $option) {
       $select->selectOption($option);
-      $assert_session->assertWaitOnAjaxRequest();
+      $assert_session->assertExpectedAjaxRequest();
     }
     $page->pressButton('Save configuration');
     $assert_session->responseContains('The text format <em class="placeholder">ckeditor5</em> has been updated.');
@@ -358,7 +358,7 @@ JS;
     $this->assertNull($assert_session->waitForElementVisible('css', '[data-drupal-selector=edit-filters-media-embed-settings]', 0));
     $page->checkField('filters[media_embed][status]');
     $this->assertNotNull($assert_session->waitForElementVisible('css', '[data-drupal-selector=edit-filters-media-embed-settings]', 0));
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     // Filter plugins vertical tabs behavior: the filter plugin settings
     // vertical tab with the heaviest filter weight is active by default.
     // Hence enabling the media_embed filter (weight 100) results in its
@@ -375,7 +375,7 @@ JS;
 
     // Enable upload image to add a third (and fourth) CKE5 plugin vertical tab.
     $this->enableDisabledToolbarItem('drupalInsertImage');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     // The active CKE5 plugin settings vertical tab is unchanged.
     $this->assertSame([
       '➡️Headings',
@@ -402,7 +402,7 @@ JS;
     ], $this->getVerticalTabs('#plugin-settings-wrapper'));
     $this->assertTrue($page->hasUncheckedField('editor[settings][plugins][ckeditor5_image][status]'));
     $page->checkField('editor[settings][plugins][ckeditor5_image][status]');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertSame([
       'Headings',
       '➡️Image',
@@ -450,7 +450,7 @@ JS;
 
     // Add another CKEditor 5 toolbar item just to trigger an AJAX refresh.
     $this->enableDisabledToolbarItem('blockQuote');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     // The active CKE5 plugin settings vertical tab is unchanged.
     $this->assertSame([
       'Headings',
@@ -475,12 +475,12 @@ JS;
     $this->createNewTextFormat($page, $assert_session);
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ckeditor5-toolbar-item-drupalInsertImage'));
     $this->triggerKeyUp('.ckeditor5-toolbar-item-drupalInsertImage', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $page->clickLink('Image');
     $page->checkField('editor[settings][plugins][ckeditor5_image][status]');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $page->checkField('filters[editor_file_reference][status]');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->saveNewTextFormat($page, $assert_session);
 
     $this->drupalGet('node/add/page');

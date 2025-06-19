@@ -79,9 +79,9 @@ class LayoutBuilderUiTest extends WebDriverTestBase {
     // Remove all of the sections from the page.
     $this->drupalGet(static::FIELD_UI_PREFIX . '/display/default/layout');
     $page->clickLink('Remove Section 1');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $page->pressButton('Remove');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     // Assert that there are no sections on the page.
     $assert_session->pageTextNotContains('Remove Section 1');
     $assert_session->pageTextNotContains('Add block');
@@ -138,7 +138,7 @@ class LayoutBuilderUiTest extends WebDriverTestBase {
     $page->clickLink('One column');
     $assert_session->waitForElementVisible('named', ['button', 'Add section']);
     $page->pressButton('Add section');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $assert_session->pageTextContainsOnce('You have unsaved changes.');
 
     // Reload the page.
@@ -166,13 +166,13 @@ class LayoutBuilderUiTest extends WebDriverTestBase {
     $assert_session->elementNotExists('css', '.is-layout-builder-highlighted');
     $page->clickLink('Add section');
     $this->assertNotEmpty($assert_session->waitForElement('css', '#drupal-off-canvas .item-list'));
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // Highlight is present with AddSectionController.
     $this->assertHighlightedElement('[data-layout-builder-highlight-id="section-0"]');
     $page->clickLink('Two column');
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-off-canvas input[type="submit"][value="Add section"]'));
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // The highlight is present with ConfigureSectionForm.
     $this->assertHighlightedElement('[data-layout-builder-highlight-id="section-0"]');
@@ -180,7 +180,7 @@ class LayoutBuilderUiTest extends WebDriverTestBase {
     // Submit the form to add the section and then confirm that no element is
     // highlighted anymore.
     $page->pressButton("Add section");
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertHighlightNotExists();
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '[data-layout-delta="1"]'));
     $assert_session->elementsCount('css', '.layout-builder__add-block', 3);
@@ -188,13 +188,13 @@ class LayoutBuilderUiTest extends WebDriverTestBase {
     // Add a content block.
     $page->clickLink('Add block');
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', 'a:contains("Create content block")'));
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // Highlight is present with ChooseBlockController::build().
     $this->assertHighlightedElement('[data-layout-builder-highlight-id="block-0-first"]');
     $page->clickLink('Create content block');
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-off-canvas input[value="Add block"]'));
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // Highlight is present with ChooseBlockController::inlineBlockList().
     $this->assertHighlightedElement('[data-layout-builder-highlight-id="block-0-first"]');
@@ -204,7 +204,7 @@ class LayoutBuilderUiTest extends WebDriverTestBase {
     // The highlight should persist with all block config dialogs.
     $page->clickLink('Add block');
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', 'a:contains("Recent content")'));
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertHighlightedElement('[data-layout-builder-highlight-id="block-0-first"]');
     $page->clickLink('Recent content');
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-off-canvas input[value="Add block"]'));
@@ -224,7 +224,7 @@ class LayoutBuilderUiTest extends WebDriverTestBase {
     // The highlight is present when the "Remove Section" dialog is open.
     $page->clickLink('Remove Section 1');
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-off-canvas'));
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertHighlightedElement('[data-layout-builder-highlight-id="section-update-0"]');
     $page->pressButton('Close');
     $this->assertHighlightNotExists();
@@ -232,7 +232,7 @@ class LayoutBuilderUiTest extends WebDriverTestBase {
     // A block is highlighted when its "Configure" contextual link is clicked.
     $this->clickContextualLink('.block-field-blocknodebundle-with-section-fieldbody', 'Configure');
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-off-canvas'));
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertHighlightedElement('.block-field-blocknodebundle-with-section-fieldbody');
 
     // Make sure the highlight remains when contextual links are revealed with
@@ -252,7 +252,7 @@ class LayoutBuilderUiTest extends WebDriverTestBase {
     // Block is highlighted when its "Remove block" contextual link is clicked.
     $this->clickContextualLink('.block-field-blocknodebundle-with-section-fieldbody', 'Remove block');
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-off-canvas'));
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertHighlightedElement('.block-field-blocknodebundle-with-section-fieldbody');
     $page->pressButton('Close');
     $this->assertHighlightNotExists();
@@ -275,10 +275,10 @@ class LayoutBuilderUiTest extends WebDriverTestBase {
     $assert_session->pageTextContains('New Extra Field');
     $this->clickContextualLink('.block-extra-field-blocknodebundle-with-section-fieldlayout-builder-extra-field-test', 'Remove block');
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-off-canvas'));
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $assert_session->pageTextContains('Are you sure you want to remove');
     $page->pressButton('Remove');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $assert_session->pageTextNotContains('New Extra Field');
   }
 

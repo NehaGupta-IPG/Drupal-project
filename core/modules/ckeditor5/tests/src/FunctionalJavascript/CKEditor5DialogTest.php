@@ -68,7 +68,7 @@ class CKEditor5DialogTest extends CKEditor5TestBase {
     $this->drupalGet('/ckeditor5_test/dialog');
     $page->clickLink('Add Node');
     $assert_session->waitForElementVisible('css', '[role="dialog"]');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     $content_area = $assert_session->waitForElementVisible('css', '.ck-editor__editable');
     // Focus the editable area first.

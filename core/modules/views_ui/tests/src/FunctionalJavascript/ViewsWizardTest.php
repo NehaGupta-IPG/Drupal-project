@@ -81,14 +81,14 @@ class ViewsWizardTest extends WebDriverTestBase {
     $this->assertEquals('titles_linked', $page->findField('block[style][row_plugin]')->getValue(), 'The block display format shows the expected default value.');
 
     $page->selectFieldOption('show[wizard_key]', 'users');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertNull($page->findField('show[type]'), 'The "of type" filter is not added for users.');
     $this->assertEquals('fields', $page->findField('page[style][row_plugin]')->getValue(), 'The page display format was updated to a valid value.');
     $this->assertEquals('fields', $page->findField('block[style][row_plugin]')->getValue(), 'The block display format was updated to a valid value.');
 
     $this->drupalCreateContentType(['type' => 'page']);
     $page->selectFieldOption('show[wizard_key]', 'node');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertNotNull($page->findField('show[type]'), 'The "of type" filter is added for nodes when there is at least one node type.');
     $this->assertEquals('fields', $page->findField('page[style][row_plugin]')->getValue(), 'The page display format was not changed from a valid value.');
     $this->assertEquals('fields', $page->findField('block[style][row_plugin]')->getValue(), 'The block display format was not changed from a valid value.');

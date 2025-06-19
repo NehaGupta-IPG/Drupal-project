@@ -122,7 +122,7 @@ class WidgetViewsTest extends MediaLibraryTestBase {
     $this->waitForElementTextContains('.js-media-library-view .js-pager__items > li:nth-of-type(2)', 'Page 2');
     $page->fillField('Name', 'Bear');
     $page->pressButton('Apply filters');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $assert_session->pageTextNotContains('Dog');
     $assert_session->pageTextContains('Bear');
     $assert_session->pageTextNotContains('Turtle');
@@ -137,7 +137,7 @@ class WidgetViewsTest extends MediaLibraryTestBase {
     // Assert the exposed filters are persisted when changing display.
     $page->fillField('Name', 'Dog');
     $page->pressButton('Apply filters');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $assert_session->pageTextContains('Dog');
     $assert_session->pageTextNotContains('Crocodile');
     $assert_session->pageTextNotContains('Turtle');

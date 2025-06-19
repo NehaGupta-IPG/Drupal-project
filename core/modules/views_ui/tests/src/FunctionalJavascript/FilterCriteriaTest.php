@@ -61,7 +61,7 @@ class FilterCriteriaTest extends WebDriverTestBase {
     $create_new_filter_group = $page->findById('views-add-group-link');
     $this->assertTrue($create_new_filter_group->isVisible(), 'Add group link found.');
     $create_new_filter_group->click();
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // Assert the existence of the new filter group by checking the remove group
     // link.
@@ -70,7 +70,7 @@ class FilterCriteriaTest extends WebDriverTestBase {
 
     // Remove the group again and assert the group is not present anymore.
     $remove_link->click();
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $remove_link = $page->findLink('Remove group');
     $this->assertEmpty($remove_link, 'Remove button not available');
 
@@ -78,7 +78,7 @@ class FilterCriteriaTest extends WebDriverTestBase {
     $create_new_filter_group = $page->findById('views-add-group-link');
     $this->assertTrue($create_new_filter_group->isVisible(), 'Add group link found.');
     $create_new_filter_group->click();
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // Validate dragging behaviors.
 
@@ -115,7 +115,7 @@ class FilterCriteriaTest extends WebDriverTestBase {
     $create_new_filter_group = $page->findLink('Create new filter group');
     $this->assertTrue($create_new_filter_group->isVisible(), 'Add group link found.');
     $create_new_filter_group->click();
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // Validate dragging works correctly and the new group will contain the new
     // filter.
@@ -186,7 +186,7 @@ class FilterCriteriaTest extends WebDriverTestBase {
     $add_link = $page->findById('views-rearrange-filter');
     $this->assertTrue($add_link->isVisible(), 'And/Or Rearrange button found.');
     $add_link->click();
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
   }
 
 }
