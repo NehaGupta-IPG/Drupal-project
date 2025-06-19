@@ -286,7 +286,7 @@ class ComponentRenderTest extends ComponentKernelTestBase {
   }
 
   /**
-   * Ensure that the slots allow a render array or a scalar when using the render element.
+   * Ensure that the slots allow a scalar or a render array or an empty array when using the render element.
    */
   public function checkSlots(): void {
     $slots = [
@@ -294,6 +294,7 @@ class ComponentRenderTest extends ComponentKernelTestBase {
       [
         '#plain_text' => 'This is the contents of the banner body.',
       ],
+      [],
     ];
     foreach ($slots as $slot) {
       $build = [
