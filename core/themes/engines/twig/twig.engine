@@ -14,7 +14,7 @@ use Twig\Error\RuntimeError;
  * Implements hook_theme().
  */
 function twig_theme($existing, $type, $theme, $path): array {
-  return drupal_find_theme_templates($existing, '.html.twig', $path);
+  return \Drupal::service('theme.registry')->findThemeTemplates($existing, '.html.twig', $path);
 }
 
 /**

@@ -25,9 +25,7 @@ class RegistryTest extends KernelTestBase {
   protected static $modules = ['theme_test', 'system'];
 
   /**
-   * The profile to use for this test.
-   *
-   * @var string
+   * {@inheritdoc}
    */
   protected $profile = 'testing';
 
@@ -79,11 +77,11 @@ class RegistryTest extends KernelTestBase {
     $module_list = $this->container->get('extension.list.module');
     assert($module_list instanceof ModuleExtensionList);
 
-    $registry_subsub_theme = new Registry($this->root, \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $theme_handler, \Drupal::service('theme.initialization'), \Drupal::service('cache.bootstrap'), $module_list, \Drupal::service('kernel'), 'test_subsubtheme');
+    $registry_subsub_theme = new Registry($this->root, \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $theme_handler, \Drupal::service('theme.initialization'), \Drupal::service('cache.bootstrap'), $module_list, \Drupal::service('kernel'), \Drupal::service('file_system'), 'test_subsubtheme');
     $registry_subsub_theme->setThemeManager(\Drupal::theme());
-    $registry_sub_theme = new Registry($this->root, \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $theme_handler, \Drupal::service('theme.initialization'), \Drupal::service('cache.bootstrap'), $module_list, \Drupal::service('kernel'), 'test_subtheme',);
+    $registry_sub_theme = new Registry($this->root, \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $theme_handler, \Drupal::service('theme.initialization'), \Drupal::service('cache.bootstrap'), $module_list, \Drupal::service('kernel'), \Drupal::service('file_system'), 'test_subtheme',);
     $registry_sub_theme->setThemeManager(\Drupal::theme());
-    $registry_base_theme = new Registry($this->root, \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $theme_handler, \Drupal::service('theme.initialization'), \Drupal::service('cache.bootstrap'), $module_list, \Drupal::service('kernel'), 'test_base_theme');
+    $registry_base_theme = new Registry($this->root, \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $theme_handler, \Drupal::service('theme.initialization'), \Drupal::service('cache.bootstrap'), $module_list, \Drupal::service('kernel'), \Drupal::service('file_system'), 'test_base_theme');
     $registry_base_theme->setThemeManager(\Drupal::theme());
 
     $preprocess_functions = $registry_subsub_theme->get()['theme_test_template_test']['preprocess functions'];
@@ -114,7 +112,7 @@ class RegistryTest extends KernelTestBase {
 
     $extension_list = $this->container->get('extension.list.module');
     assert($extension_list instanceof ModuleExtensionList);
-    $registry_theme = new Registry($this->root, \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $theme_handler, \Drupal::service('theme.initialization'), \Drupal::service('cache.bootstrap'), $extension_list, \Drupal::service('kernel'), 'test_theme');
+    $registry_theme = new Registry($this->root, \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $theme_handler, \Drupal::service('theme.initialization'), \Drupal::service('cache.bootstrap'), $extension_list, \Drupal::service('kernel'), \Drupal::service('file_system'), 'test_theme');
     $registry_theme->setThemeManager(\Drupal::theme());
 
     $suggestions = ['__kitten', '__flamingo'];
@@ -154,7 +152,7 @@ class RegistryTest extends KernelTestBase {
 
     $extension_list = $this->container->get('extension.list.module');
     assert($extension_list instanceof ModuleExtensionList);
-    $registry = new Registry($this->root, \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $theme_handler, \Drupal::service('theme.initialization'), \Drupal::service('cache.bootstrap'), $extension_list, \Drupal::service('kernel'), 'test_theme');
+    $registry = new Registry($this->root, \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $theme_handler, \Drupal::service('theme.initialization'), \Drupal::service('cache.bootstrap'), $extension_list, \Drupal::service('kernel'), \Drupal::service('file_system'), 'test_theme');
     $registry->setThemeManager(\Drupal::theme());
     $this->assertEquals('value', $registry->get()['theme_test_template_test']['variables']['additional']);
   }
@@ -263,7 +261,7 @@ class RegistryTest extends KernelTestBase {
 
     $extension_list = \Drupal::service('extension.list.module');
     assert($extension_list instanceof ModuleExtensionList);
-    $registry_theme = new Registry($this->root, \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $theme_handler, \Drupal::service('theme.initialization'), \Drupal::service('cache.bootstrap'), $extension_list, \Drupal::service('kernel'), 'test_theme');
+    $registry_theme = new Registry($this->root, \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $theme_handler, \Drupal::service('theme.initialization'), \Drupal::service('cache.bootstrap'), $extension_list, \Drupal::service('kernel'), \Drupal::service('file_system'), 'test_theme');
     $registry_theme->setThemeManager(\Drupal::theme());
 
     $expected = [
@@ -272,6 +270,24 @@ class RegistryTest extends KernelTestBase {
     $registry = $registry_theme->get();
     $this->assertEquals('Drupal\Core\Theme\ThemePreprocess:preprocessContainer', $registry['theme_test_registered_by_module']['initial preprocess']);
     $this->assertEquals($expected, array_values($registry['theme_test_registered_by_module']['preprocess functions']));
+  }
+
+  /**
+   * Tests deprecated drupal_find_theme_templates function.
+   *
+   * @see drupal_find_theme_templates()
+   * @group legacy
+   */
+  public function testLegacyfindThemeTemplates(): void {
+
+    $registry = \Drupal::service('theme.registry');
+    $cache = $registry->get();
+    $extension = '.html.twig';
+    $path = $this->getThemePath('test_theme');
+    $this->assertEquals($registry->findThemeTemplates($cache, $extension, $path), drupal_find_theme_templates($cache, $extension, $path));
+
+    $this->expectDeprecation('drupal_find_theme_templates() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use theme.registry service findThemeTemplates() method instead. See https://www.drupal.org/node/3351736');
+
   }
 
 }
