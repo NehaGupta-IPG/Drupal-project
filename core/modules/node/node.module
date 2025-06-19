@@ -686,4 +686,3 @@ function node_reindex_node_search($nid): void {
     \Drupal::service('search.index')->markForReindex('node_search', $nid);
   }
 }
-
