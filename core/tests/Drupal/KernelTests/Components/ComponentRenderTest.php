@@ -294,7 +294,9 @@ class ComponentRenderTest extends ComponentKernelTestBase {
       [
         '#plain_text' => 'This is the contents of the banner body.',
       ],
-      [],
+      [
+        '#plain_text' => '',
+      ],
     ];
     foreach ($slots as $slot) {
       $build = [
