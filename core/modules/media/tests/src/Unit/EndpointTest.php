@@ -49,12 +49,7 @@ class EndpointTest extends UnitTestCase {
       $this->createMock('\Drupal\media\OEmbed\Provider'),
       [$endpointScheme],
     );
-    if ($match) {
-      $this->assertTrue($endpoint->matchUrl($matchUrl));
-    }
-    else {
-      $this->assertFalse($endpoint->matchUrl($matchUrl));
-    }
+    $this->assertSame($match, $endpoint->matchUrl($matchUrl));
   }
 
   /**
@@ -62,6 +57,7 @@ class EndpointTest extends UnitTestCase {
    */
   public static function providerMatchUrlSpecialCharacters(): array {
     return [
+      // Some providers use regex that does not follow spec, we don't support it.
       ['https://(m|www).example.com/video/*', 'https://m.example.com/video/bar', FALSE],
       ['http://*.deviantart.com/*#/d*', 'http://foo.deviantart.com/bar#/dbaz', TRUE],
     ];
