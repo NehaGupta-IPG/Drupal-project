@@ -156,8 +156,13 @@ abstract class QueryPluginBase extends PluginBase implements CacheableDependency
 
   /**
    * Set an OFFSET on the query, specifying a number of results to skip.
+   *
+   * phpcs:disable Drupal.Commenting
+   * @todo Uncomment new method parameters before drupal:12.0.0.
+   * @see https://www.drupal.org/project/drupal/issues/3530904
+   * phpcs:enable
    */
-  public function setOffset(int $offset) {
+  public function setOffset(/* int */$offset) {
     $this->offset = $offset;
   }
 

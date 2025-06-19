@@ -117,6 +117,8 @@ class SqlBaseTest extends UnitTestCase {
     ];
     $this->pager->init($this->view, $this->display, $options);
     $this->pager->query();
+    // We're just asserting that an error isn't thrown.
+    $this->addToAssertionCount(1);
   }
 
 }
