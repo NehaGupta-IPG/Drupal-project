@@ -15,6 +15,9 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
  */
 class CanaryTransportFactory extends AbstractTransportFactory implements TransportFactoryInterface {
 
+  /**
+   * {@inheritdoc}
+   */
   protected function getSupportedSchemes(): array {
     return ['drupal.test-canary'];
   }
