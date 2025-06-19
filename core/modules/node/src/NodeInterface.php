@@ -147,4 +147,9 @@ interface NodeInterface extends ContentEntityInterface, EntityChangedInterface, 
    */
   public function setRevisionCreationTime($timestamp);
 
+  /**
+   * Gets a uuid to use as a key in the node_preview tempstore.
+   */
+  public function getPreviewUuid(): string;
+
 }

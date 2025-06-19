@@ -75,9 +75,9 @@ class NodePreviewTranslationTest extends BrowserTestBase {
 
     // Simulate clicking the Back to content editing link from the spanish
     // translation.
-    $this->drupalGet('/es/node/1/edit', ['query' => ['uuid' => $node->uuid()]]);
+    $this->drupalGet('/es/node/1/edit', ['query' => ['uuid' => $esTranslation->getPreviewUuid()]]);
     // The title should match the updated title from the first preview.
-    $this->assertSession()->fieldValueEquals('title[0][value]', 'Spanish node');
+    $this->assertSession()->fieldValueEquals('title[0][value]', 'Spanish node updated');
   }
 
 }

@@ -77,7 +77,7 @@ class NodePreviewForm extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state, ?EntityInterface $node = NULL) {
     $view_mode = $node->preview_view_mode;
 
-    $query_options = ['query' => ['uuid' => $node->uuid()]];
+    $query_options = ['query' => ['uuid' => $node->getPreviewUuid()]];
     $query = $this->getRequest()->query;
     if ($query->has('destination')) {
       $query_options['query']['destination'] = $query->get('destination');

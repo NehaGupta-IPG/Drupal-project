@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EditorialContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\node\Form\DeleteMultiple;
@@ -271,6 +272,13 @@ class Node extends EditorialContentEntityBase implements NodeInterface {
   public function setSticky($sticky) {
     $this->set('sticky', $sticky ? NodeInterface::STICKY : NodeInterface::NOT_STICKY);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPreviewUuid(): string {
+    return \sprintf('%s-%s', $this->uuid(), $this->language()?->getId() ?? LanguageInterface::LANGCODE_DEFAULT);
   }
 
   /**
