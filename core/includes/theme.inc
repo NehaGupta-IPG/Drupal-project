@@ -1365,7 +1365,7 @@ function template_preprocess_pager(&$variables): void {
     return;
   }
 
-  $pager_max = $pager->getTotalPages();
+  $pager_max = $pager->totalPages;
 
   // Nothing to do if there is only one page.
   if ($pager_max <= 1) {
@@ -1377,7 +1377,7 @@ function template_preprocess_pager(&$variables): void {
   // Calculate various markers within this pager piece:
   // Middle is used to "center" pages around the current page.
   $pager_middle = ceil($quantity / 2);
-  $current_page = $pager->getCurrentPage();
+  $current_page = $pager->currentPage;
   // The current pager is the page we are currently paged to.
   $pager_current = $current_page + 1;
   // The first pager is the first page listed by this pager piece (re quantity).

@@ -5,35 +5,17 @@ namespace Drupal\Core\Pager;
 /**
  * A value object that represents a pager.
  */
-class Pager {
-
-  /**
-   * The total number of items .
-   *
-   * @var int
-   */
-  protected $totalItems;
+readonly class Pager {
 
   /**
    * The total number of pages.
-   *
-   * @var int
    */
-  protected $totalPages;
+  public int $totalPages;
 
   /**
    * The current page of the pager.
-   *
-   * @var int
    */
-  protected $currentPage;
-
-  /**
-   * The maximum number of items per page.
-   *
-   * @var int
-   */
-  protected $limit;
+  public int $currentPage;
 
   /**
    * Pager constructor.
@@ -45,9 +27,11 @@ class Pager {
    * @param int $currentPage
    *   The current page.
    */
-  public function __construct($totalItems, $limit, $currentPage = 0) {
-    $this->totalItems = $totalItems;
-    $this->limit = $limit;
+  public function __construct(
+    public int $totalItems,
+    public int $limit,
+    int $currentPage = 0,
+  ) {
     $this->setTotalPages($totalItems, $limit);
     $this->setCurrentPage($currentPage);
   }
@@ -63,7 +47,7 @@ class Pager {
    *   (optional) The current page.
    */
   protected function setCurrentPage($currentPage = 0) {
-    $this->currentPage = max(0, min($currentPage, $this->getTotalPages() - 1));
+    $this->currentPage = max(0, min($currentPage, $this->totalPages - 1));
   }
 
   /**
@@ -85,6 +69,7 @@ class Pager {
    *   The total number of items.
    */
   public function getTotalItems() {
+    @\trigger_error('@todo deprecation message', E_USER_DEPRECATED);
     return $this->totalItems;
   }
 
@@ -95,6 +80,7 @@ class Pager {
    *   The total number of pages.
    */
   public function getTotalPages() {
+    @\trigger_error('@todo deprecation message', E_USER_DEPRECATED);
     return $this->totalPages;
   }
 
@@ -105,6 +91,7 @@ class Pager {
    *   The current page.
    */
   public function getCurrentPage() {
+    @\trigger_error('@todo deprecation message', E_USER_DEPRECATED);
     return $this->currentPage;
   }
 
@@ -115,6 +102,7 @@ class Pager {
    *   The maximum number of items per page.
    */
   public function getLimit() {
+    @\trigger_error('@todo deprecation message', E_USER_DEPRECATED);
     return $this->limit;
   }
 
