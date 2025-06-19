@@ -1860,19 +1860,20 @@
      *   Selector to use.
      */
     scrollTop(ajax, response) {
-      const offset = $(response.selector).offset();
+      let $scrollTarget = $(response.selector);
+      const offset = $scrollTarget.offset();
+
       // We can't guarantee that the scrollable object should be
       // the body, as the element could be embedded in something
       // more complex such as a modal popup. Recurse up the DOM
       // and scroll the first element that has a non-zero top.
-      let scrollTarget = response.selector;
-      while ($(scrollTarget).scrollTop() === 0 && $(scrollTarget).parent()) {
-        scrollTarget = $(scrollTarget).parent();
+      while ($scrollTarget.scrollTop() === 0 && $scrollTarget.parent()) {
+        $scrollTarget = $scrollTarget.parent();
       }
 
       // Only scroll upward.
-      if (offset.top - 10 < $(scrollTarget).scrollTop()) {
-        scrollTarget.get(0).scrollTo({
+      if (offset.top - 10 < $scrollTarget.scrollTop()) {
+        $scrollTarget.get(0).scrollTo({
           top: offset.top - 10,
           behavior: 'smooth',
         });
