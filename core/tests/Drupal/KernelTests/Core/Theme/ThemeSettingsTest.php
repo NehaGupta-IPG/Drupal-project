@@ -90,7 +90,7 @@ class ThemeSettingsTest extends KernelTestBase {
     // Tests logo path with scheme.
     /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
     $file_url_generator = \Drupal::service('file_url_generator');
-    $expected = $file_url_generator->generateString('public://logo_with_scheme.png');
+    $expected = $file_url_generator->generate('public://logo_with_scheme.png')->toString();
     $this->assertEquals($expected, theme_get_setting('logo.url', 'stark'));
 
     $values = [

@@ -251,10 +251,10 @@ function theme_get_setting($setting_name, $theme = NULL) {
       // Generate the path to the logo image.
       if ($cache[$theme]->get('logo.use_default')) {
         $logo = \Drupal::service('theme.initialization')->getActiveThemeByName($theme)->getLogo();
-        $cache[$theme]->set('logo.url', $file_url_generator->generateString($logo));
+        $cache[$theme]->set('logo.url', $file_url_generator->generate($logo)->toString());
       }
       elseif ($logo_path = $cache[$theme]->get('logo.path')) {
-        $cache[$theme]->set('logo.url', $file_url_generator->generateString($logo_path));
+        $cache[$theme]->set('logo.url', $file_url_generator->generate($logo_path)->toString());
       }
 
       // Generate the path to the favicon.
@@ -262,14 +262,14 @@ function theme_get_setting($setting_name, $theme = NULL) {
         $favicon_path = $cache[$theme]->get('favicon.path');
         if ($cache[$theme]->get('favicon.use_default')) {
           if (file_exists($favicon = $theme_object->getPath() . '/favicon.ico')) {
-            $cache[$theme]->set('favicon.url', $file_url_generator->generateString($favicon));
+            $cache[$theme]->set('favicon.url', $file_url_generator->generate($favicon)->toString());
           }
           else {
-            $cache[$theme]->set('favicon.url', $file_url_generator->generateString('core/misc/favicon.ico'));
+            $cache[$theme]->set('favicon.url', $file_url_generator->generate('core/misc/favicon.ico')->toString());
           }
         }
         elseif ($favicon_path) {
-          $cache[$theme]->set('favicon.url', $file_url_generator->generateString($favicon_path));
+          $cache[$theme]->set('favicon.url', $file_url_generator->generate($favicon_path)->toString());
         }
         else {
           $cache[$theme]->set('features.favicon', FALSE);
@@ -489,7 +489,7 @@ function template_preprocess_image(&$variables): void {
   $file_url_generator = \Drupal::service('file_url_generator');
 
   if (!empty($variables['uri'])) {
-    $variables['attributes']['src'] = $file_url_generator->generateString($variables['uri']);
+    $variables['attributes']['src'] = $file_url_generator->generate($variables['uri'])->toString();
   }
   // Generate a srcset attribute conforming to the spec at
   // https://www.w3.org/html/wg/drafts/html/master/embedded-content.html#attr-img-srcset
@@ -497,7 +497,7 @@ function template_preprocess_image(&$variables): void {
     $srcset = [];
     foreach ($variables['srcset'] as $src) {
       // URI is mandatory.
-      $source = $file_url_generator->generateString($src['uri']);
+      $source = $file_url_generator->generate($src['uri'])->toString();
       if (isset($src['width']) && !empty($src['width'])) {
         $source .= ' ' . $src['width'];
       }
