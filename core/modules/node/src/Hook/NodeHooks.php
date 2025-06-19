@@ -30,7 +30,7 @@ class NodeHooks {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   The module handler
+   *   The module handler.
    */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
@@ -97,4 +97,12 @@ class NodeHooks {
     $info['node_type']['class'] = 'Drupal\node\ConfigTranslation\NodeTypeMapper';
   }
 
+  /** 
+   * Implements hook_block_alter().
+   */
+  #[Hook('block_alter')]
+  public function blockAlter(&$definitions): void {
+    // Hide the deprecated Syndicate block from the UI.
+    $definitions['node_syndicate_block']['_block_ui_hidden'] = TRUE;
+  }
 }

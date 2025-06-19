@@ -21,21 +21,9 @@ final class ProceduralCall {
   }
 
   /**
-   * Calls a function in the root namespace.
-   *
-   * __call() does not support references https://bugs.php.net/bug.php?id=71256
-   * Because of this, ModuleHandler::getHookListeners() inlines this
-   * method so it is not called anywhere in core.
-   */
-  public function __call($name, $args): mixed {
-    $this->loadFile($name);
-    return ('\\' . $name)(... $args);
-  }
-
-  /**
    * Loads the file a function lives in, if any.
    *
-   * @param $function
+   * @param string $function
    *   The name of the function.
    */
   public function loadFile($function): void {

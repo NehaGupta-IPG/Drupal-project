@@ -359,7 +359,12 @@ class PathPluginBaseTest extends UnitTestCase {
    */
   public function testAlterRouteWithAlterCallback(): void {
     $collection = new RouteCollection();
-    $collection->add('test_route', new Route('test_route', ['_controller' => 'Drupal\Tests\Core\Controller\TestController::content', '_title_callback' => '\Drupal\Tests\views\Unit\Plugin\display\TestController::testTitle']));
+    $collection->add('test_route', new Route(
+      'test_route',
+      [
+        '_controller' => 'Drupal\Tests\Core\Controller\TestController::content',
+        '_title_callback' => '\Drupal\Tests\views\Unit\Plugin\display\TestController::testTitle',
+      ]));
     $route_2 = new Route('test_route/example', ['_controller' => 'Drupal\Tests\Core\Controller\TestController::content']);
     $collection->add('test_route_2', $route_2);
 
@@ -576,7 +581,7 @@ class PathPluginBaseTest extends UnitTestCase {
 
     $access_plugin = $this->getMockBuilder('Drupal\views\Plugin\views\access\AccessPluginBase')
       ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
+      ->getMock();
     $this->accessPluginManager->expects($this->any())
       ->method('createInstance')
       ->willReturn($access_plugin);
