@@ -191,6 +191,10 @@ class EntityFormDisplay extends EntityDisplayBase implements EntityFormDisplayIn
 
     // Let each widget generate the form elements.
     foreach ($this->getComponents() as $name => $options) {
+      // Skip rendering hidden widget type, only if type is set.
+      if (isset($options['type']) && $options['type'] === 'hidden') {
+        continue;
+      }
       if ($widget = $this->getRenderer($name)) {
         $items = $entity->get($name);
         $items->filterEmptyItems();
