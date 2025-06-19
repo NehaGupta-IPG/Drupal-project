@@ -97,7 +97,7 @@ class NodeHooks {
     $info['node_type']['class'] = 'Drupal\node\ConfigTranslation\NodeTypeMapper';
   }
 
-  /** 
+  /**
    * Implements hook_block_alter().
    */
   #[Hook('block_alter')]
@@ -105,4 +105,5 @@ class NodeHooks {
     // Hide the deprecated Syndicate block from the UI.
     $definitions['node_syndicate_block']['_block_ui_hidden'] = TRUE;
   }
+
 }
