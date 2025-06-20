@@ -42,8 +42,8 @@ class ConfigTranslationUiTest extends WebDriverTestBase {
 
     $this->drupalGet('node');
     $contextualLinks = $this->assertSession()->waitForElement('css', '.contextual-links');
-    $link = $contextualLinks->findLink('Translate view');
-    $this->assertNotNull($link, 'Translate View contextual link added.');
+    $link = $contextualLinks->findLink('Translate View');
+    $this->assertNotNull($link, 'Translate view contextual link added.');
   }
 
   /**
