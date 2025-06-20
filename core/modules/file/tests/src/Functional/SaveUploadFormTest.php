@@ -190,7 +190,8 @@ class SaveUploadFormTest extends FileManagedTestBase {
     FileTestHelper::reset();
 
     $extensions = 'foo ' . $this->imageExtension;
-    // Now tell _file_save_upload_from_form() to allow the extension of our test image.
+    // Now tell _file_save_upload_from_form() to allow the extension of our test
+    // image.
     $edit = [
       'file_test_replace' => FileExists::Replace->name,
       'files[file_test_upload][]' => $file_system->realpath($this->image->getFileUri()),
@@ -244,7 +245,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->drupalGet('file-test/save_upload_from_form_test');
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->responseContains('For security reasons, your upload has been renamed to <em class="placeholder">' . $this->phpFile->filename . '_.txt' . '</em>');
+    $this->assertSession()->responseContains('For security reasons, your upload has been renamed to <em class="placeholder">' . $this->phpFile->filename . '_.txt</em>');
     $this->assertSession()->pageTextContains('File MIME type is text/plain.');
     $this->assertSession()->pageTextContains("You WIN!");
 
@@ -570,7 +571,8 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains("Epic upload FAIL!");
 
-    // Search for combined error message followed by a formatted list of messages.
+    // Search for combined error message followed by a formatted list of
+    // messages.
     $this->assertSession()->responseContains('One or more files could not be uploaded.<ul>');
   }
 

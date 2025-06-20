@@ -214,8 +214,8 @@ class XssTest extends TestCase {
         'script',
         'HTML tag stripping evasion -- no closing tag.',
       ],
-      // DRUPAL-SA-2008-047: This doesn't seem exploitable, but the filter should
-      // work consistently.
+      // DRUPAL-SA-2008-047: This doesn't seem exploitable, but the filter
+      // should work consistently.
       [
         '<script>>',
         'script',
@@ -426,13 +426,19 @@ class XssTest extends TestCase {
         'Netscape 4.x javascript entities.',
         ['br'],
       ],
-      // DRUPAL-SA-2008-006: Invalid UTF-8, these only work as reflected XSS with
-      // Internet Explorer 6.
+      // DRUPAL-SA-2008-006: Invalid UTF-8, these only work as reflected XSS
+      // with Internet Explorer 6.
       [
         "<p arg=\"\xe0\">\" style=\"background-image: url(javascript:alert(0));\"\xe0<p>",
         'style',
         'HTML filter -- invalid UTF-8.',
         ['p'],
+      ],
+      [
+        '<iframe srcdoc="&lt;script&gt;alert(document.cookie)&lt;/script&gt;"></iframe>',
+        'srcdoc',
+        'HTML filter attributes removal -- srcdoc attribute.',
+        ['iframe'],
       ],
     ];
     return $cases;

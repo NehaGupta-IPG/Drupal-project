@@ -5,10 +5,10 @@ namespace Drupal\path\Plugin\Field\FieldType;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
 
 /**
@@ -49,15 +49,20 @@ class PathItem extends FieldItemBase {
    * {@inheritdoc}
    */
   public function isEmpty() {
-    return ($this->alias === NULL || $this->alias === '') && ($this->pid === NULL || $this->pid === '') && ($this->langcode === NULL || $this->langcode === '');
+    $alias = $this->get('alias')->getValue();
+    $pid = $this->get('pid')->getValue();
+    $langcode = $this->get('langcode')->getValue();
+
+    return ($alias === NULL || $alias === '') && ($pid === NULL || $pid === '') && ($langcode === NULL || $langcode === '');
   }
 
   /**
    * {@inheritdoc}
    */
   public function preSave() {
-    if ($this->alias !== NULL) {
-      $this->alias = trim($this->alias);
+    $alias = $this->get('alias')->getValue();
+    if ($alias !== NULL) {
+      $this->set('alias', trim($alias));
     }
   }
 
@@ -66,13 +71,16 @@ class PathItem extends FieldItemBase {
    */
   public function postSave($update) {
     $path_alias_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
+    $entity = $this->getEntity();
+    $alias = $this->get('alias')->getValue();
+    $pid = $this->get('pid')->getValue();
+    $langcode = $this->get('langcode')->getValue();
 
     // If specified, rely on the langcode property for the language, so that the
     // existing language of an alias can be kept. That could for example be
     // unspecified even if the field/entity has a specific langcode.
-    $alias_langcode = ($this->langcode && $this->pid) ? $this->langcode : $this->getLangcode();
+    $alias_langcode = ($langcode && $pid) ? $langcode : $this->getLangcode();
 
-    $entity = $this->getEntity();
     $moduleHandler = \Drupal::service('module_handler');
     if ($moduleHandler->moduleExists('content_translation') && !$moduleHandler->moduleExists('workspaces')) {
       // If either entity or the path field is non-translatable, use 'und'.
@@ -82,28 +90,28 @@ class PathItem extends FieldItemBase {
     }
 
     // If we have an alias, we need to create or update a path alias entity.
-    if ($this->alias) {
-      if (!$update || !$this->pid) {
+    if ($alias) {
+      if (!$update || !$pid) {
         $path_alias = $path_alias_storage->create([
           'path' => '/' . $entity->toUrl()->getInternalPath(),
-          'alias' => $this->alias,
+          'alias' => $alias,
           'langcode' => $alias_langcode,
         ]);
         $path_alias->save();
-        $this->pid = $path_alias->id();
+        $this->set('pid', $path_alias->id());
       }
-      elseif ($this->pid) {
-        $path_alias = $path_alias_storage->load($this->pid);
+      else {
+        $path_alias = $path_alias_storage->load($pid);
 
-        if ($this->alias != $path_alias->getAlias()) {
-          $path_alias->setAlias($this->alias);
+        if ($alias != $path_alias->getAlias()) {
+          $path_alias->setAlias($alias);
           $path_alias->save();
         }
       }
     }
-    elseif ($this->pid && !$this->alias) {
+    elseif ($pid) {
       // Otherwise, delete the old alias if the user erased it.
-      $path_alias = $path_alias_storage->load($this->pid);
+      $path_alias = $path_alias_storage->load($pid);
       if ($entity->isDefaultRevision()) {
         $path_alias_storage->delete([$path_alias]);
       }
@@ -116,7 +124,7 @@ class PathItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function generateSampleValue(FieldDefinitionInterface $field_definition): array {
+  public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
     $random = new Random();
     $values['alias'] = '/' . str_replace(' ', '-', strtolower($random->sentences(3)));
     return $values;
@@ -125,7 +133,7 @@ class PathItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function mainPropertyName(): string {
+  public static function mainPropertyName() {
     return 'alias';
   }
 

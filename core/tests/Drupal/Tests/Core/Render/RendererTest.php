@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Render;
 
+use Drupal\Core\Render\RenderContext;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
@@ -26,6 +27,8 @@ class RendererTest extends RendererTestBase {
 
   /**
    * The expected theme variables.
+   *
+   * @var array
    */
   protected $defaultThemeVars = [
     '#cache' => [
@@ -67,6 +70,7 @@ class RendererTest extends RendererTestBase {
    * Provides a list of render arrays to test basic rendering.
    *
    * @return array
+   *   An array of render arrays and their expected output.
    */
   public static function providerTestRenderBasic(): array {
     $data = [];
@@ -549,6 +553,40 @@ class RendererTest extends RendererTestBase {
   }
 
   /**
+   * Tests that element defaults are added.
+   *
+   * @covers ::render
+   * @covers ::doRender
+   */
+  public function testElementDefaultsAdded(): void {
+    $build = ['#type' => 'details'];
+    $this->renderer->renderInIsolation($build);
+    $this->assertTrue($build['#defaults_loaded'], "An element with a type had said type's defaults loaded.");
+
+    $build = [
+      '#lazy_builder' => [
+        'Drupal\Tests\Core\Render\TestCallables::lazyBuilder',
+        [FALSE],
+      ],
+      '#create_placeholder' => FALSE,
+    ];
+
+    $this->renderer->renderInIsolation($build);
+    $this->assertArrayNotHasKey('#defaults_loaded', $build, "A lazy builder that did not set a type had no type defaults loaded.");
+
+    $build = [
+      '#lazy_builder' => [
+        'Drupal\Tests\Core\Render\TestCallables::lazyBuilder',
+        [TRUE],
+      ],
+      '#create_placeholder' => FALSE,
+    ];
+
+    $this->renderer->renderInIsolation($build);
+    $this->assertTrue($build['#defaults_loaded'], "A lazy builder that set a type had said type's defaults loaded.");
+  }
+
+  /**
    * @covers ::render
    * @covers ::doRender
    *
@@ -670,6 +708,7 @@ class RendererTest extends RendererTestBase {
    * Provides a list of render array iterations.
    *
    * @return array
+   *   An array of render arrays.
    */
   public static function providerRenderTwice() {
     return [
@@ -724,6 +763,7 @@ class RendererTest extends RendererTestBase {
    * Provides a list of both booleans.
    *
    * @return array
+   *   A list of boolean values and AccessResult objects.
    */
   public static function providerAccessValues() {
     return [
@@ -799,6 +839,7 @@ class RendererTest extends RendererTestBase {
    * Provides a list of access conditions and expected cache metadata.
    *
    * @return array
+   *   An array of access conditions and expected cache metadata.
    */
   public static function providerRenderCache() {
     return [
@@ -1056,7 +1097,7 @@ class RendererTest extends RendererTestBase {
             'max-age' => 600,
           ],
         ],
-        new \stdClass(),
+        (new CacheableMetadata())->setCacheMaxAge(0),
         [
           '#cache' => [
             'contexts' => ['theme'],
@@ -1068,8 +1109,28 @@ class RendererTest extends RendererTestBase {
     ];
   }
 
+  /**
+   * @covers ::hasRenderContext
+   */
+  public function testHasRenderContext(): void {
+    // Tests with no render context.
+    $this->assertFalse($this->renderer->hasRenderContext());
+
+    // Tests in a render context.
+    $this->renderer->executeInRenderContext(new RenderContext(), function () {
+      $this->assertTrue($this->renderer->hasRenderContext());
+    });
+
+    // Test that the method works with no current request.
+    $this->requestStack->pop();
+    $this->assertFalse($this->renderer->hasRenderContext());
+  }
+
 }
 
+/**
+ * Test class for mocking the access callback.
+ */
 class TestAccessClass implements TrustedCallbackInterface {
 
   public static function accessTrue() {
@@ -1097,6 +1158,9 @@ class TestAccessClass implements TrustedCallbackInterface {
 
 }
 
+/**
+ * Mock callable for testing the pre_render callback.
+ */
 class TestCallables implements TrustedCallbackInterface {
 
   public function preRenderPrinted($elements) {
@@ -1104,11 +1168,19 @@ class TestCallables implements TrustedCallbackInterface {
     return $elements;
   }
 
+  public static function lazyBuilder(bool $set_type): array {
+    $build['content'] = ['#markup' => 'Content'];
+    if ($set_type) {
+      $build['#type'] = 'details';
+    }
+    return $build;
+  }
+
   /**
    * {@inheritdoc}
    */
   public static function trustedCallbacks() {
-    return ['preRenderPrinted'];
+    return ['preRenderPrinted', 'lazyBuilder'];
   }
 
 }

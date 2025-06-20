@@ -200,7 +200,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    */
   public function __construct(array $values, $entity_type, $bundle = FALSE, $translations = []) {
     $this->entityTypeId = $entity_type;
-    $this->entityKeys['bundle'] = $bundle ? $bundle : $this->entityTypeId;
+    $this->entityKeys['bundle'] = $bundle ?: $this->entityTypeId;
     $this->langcodeKey = $this->getEntityType()->getKey('langcode');
     $this->defaultLangcodeKey = $this->getEntityType()->getKey('default_langcode');
     $this->revisionTranslationAffectedKey = $this->getEntityType()->getKey('revision_translation_affected');
@@ -233,8 +233,8 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
             }
           }
           else {
-            // We save translatable fields such as the publishing status of a node
-            // into an entity key array keyed by langcode as a performance
+            // We save translatable fields such as the publishing status of a
+            // node into an entity key array keyed by langcode as a performance
             // optimization, so we don't have to go through TypedData when we
             // need these values.
             foreach ($this->values[$field_name] as $langcode => $field_value) {
@@ -345,13 +345,13 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * {@inheritdoc}
    */
   public function isDefaultRevision($new_value = NULL) {
-    $return = $this->isDefaultRevision;
-    if (isset($new_value)) {
-      $this->isDefaultRevision = (bool) $new_value;
-    }
+    $current_value = $this->isDefaultRevision;
     // New entities should always ensure at least one default revision exists,
     // creating an entity without a default revision is an invalid state.
-    return $this->isNew() || $return;
+    if (isset($new_value) && (!$this->isNew() || $new_value === TRUE)) {
+      $this->isDefaultRevision = (bool) $new_value;
+    }
+    return (bool) $current_value;
   }
 
   /**
@@ -516,7 +516,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   public function validate() {
     $this->validated = TRUE;
     $violations = $this->getTypedData()->validate();
-    return new EntityConstraintViolationList($this, iterator_to_array($violations));
+    return new EntityConstraintViolationList($this, $violations);
   }
 
   /**
