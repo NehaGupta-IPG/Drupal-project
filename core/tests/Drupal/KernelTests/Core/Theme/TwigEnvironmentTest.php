@@ -23,9 +23,7 @@ use Twig\Error\LoaderError;
 class TwigEnvironmentTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system'];
 
@@ -185,7 +183,7 @@ class TwigEnvironmentTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
 
     $definition = new Definition('Twig\Loader\FilesystemLoader', [[sys_get_temp_dir()]]);

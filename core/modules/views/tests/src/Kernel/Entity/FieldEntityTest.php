@@ -38,9 +38,7 @@ class FieldEntityTest extends ViewsKernelTestBase {
   ];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'comment', 'field', 'text'];
 
@@ -50,12 +48,12 @@ class FieldEntityTest extends ViewsKernelTestBase {
   protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
     parent::setUp(FALSE);
 
-    $this->installConfig(['node', 'comment']);
     $this->installEntitySchema('node');
-    $this->installSchema('node', ['node_access']);
     $this->installEntitySchema('comment');
     $this->installEntitySchema('user');
+    $this->installSchema('node', ['node_access']);
     $this->installSchema('comment', ['comment_entity_statistics']);
+    $this->installConfig(['node', 'comment']);
     $this->createContentType(['type' => 'page']);
     $this->addDefaultCommentField('node', 'page');
 

@@ -14,7 +14,6 @@ use Drupal\user\Entity\User;
 /**
  * Runs UpdatePathTestBase with a dump filled with content.
  *
- * @group #slow
  * @group Update
  */
 class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
@@ -27,7 +26,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setDatabaseDumpFiles() {
+  protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-8.update-test-schema-enabled.php';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-8.update-test-semver-update-n-enabled.php';
@@ -303,10 +302,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $action = Action::load('test_action');
     $this->assertEquals('Test action', $action->label());
 
-    // Make sure our ban still exists.
-    $this->drupalGet('admin/config/people/ban');
-    $this->assertSession()->pageTextContains('8.8.8.8');
-
     // Make sure our vocabulary exists.
     $this->drupalGet('admin/structure/taxonomy/manage/test_vocabulary/overview');
 
@@ -332,7 +327,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
 
     // Make sure our modules are still enabled.
     $expected_enabled_modules = [
-      'ban',
       'basic_auth',
       'block',
       'block_content',
@@ -401,7 +395,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function replaceUser1() {
+  protected function replaceUser1(): void {
     // Do not replace the user from our dump.
   }
 
