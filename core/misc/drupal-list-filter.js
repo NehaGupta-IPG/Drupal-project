@@ -3,10 +3,9 @@
  * List filter for admin tables and lists.
  */
 
-(function (Drupal, debounce, once, slugify) {
+(function (Drupal, debounce, once, ListFilter) {
   Drupal.behaviors.listFilterOverride = {
     attach(context) {
-      const result = document.querySelector('.js-filter-count');
       once(
         'list-filter-override',
         '.table-filter-text[data-auto-activate="true"]',
@@ -38,26 +37,26 @@
           'focus',
           () => {
             // Pass only the valid dataset attributes to the filter class.
-            const defaultOptions = Drupal.ListFilter.DEFAULT_OPTIONS;
-            const validKeys = Object.keys(defaultOptions);
+            const defaultSettings = ListFilter.DEFAULT_SETTINGS;
+            const validKeys = Object.keys(defaultSettings);
             const sanitizedDataset = Object.fromEntries(
               Object.entries(input.dataset).filter(([key]) =>
                 validKeys.includes(key),
               ),
             );
 
-            // Consolidate the options for the list filter.
-            const options = {
+            // Consolidate the settings for the list filter.
+            const settings = {
               input,
               ...sanitizedDataset,
               searchStart: input.dataset.searchStart === 'true',
               minLength:
                 parseInt(input.dataset.minLength, 10) ||
-                defaultOptions.minLength,
+                defaultSettings.minLength,
             };
 
             // Activate the list filter.
-            const filter = new Drupal.ListFilter(options);
+            const filter = new ListFilter(settings);
             filter.filter();
           },
           { once: true },
@@ -65,4 +64,4 @@
       });
     },
   };
-})(Drupal, Drupal.debounce, once, window.slugify);
+})(Drupal, Drupal.debounce, once, Drupal.ListFilter);

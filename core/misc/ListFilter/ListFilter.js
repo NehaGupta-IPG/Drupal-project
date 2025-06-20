@@ -3,7 +3,7 @@
  * ListFilter class for filtering admin tables and lists in Drupal.
  */
 
-(function (Drupal) {
+(function (Drupal, slugify) {
   /**
    * ListFilter provides filtering functionality for tables and lists.
    *
@@ -16,11 +16,11 @@
    * @example
    *   // Attach your event listeners BEFORE instantiating ListFilter.
    *
-   *   // Override default options by listening to 'listFilter:options':
+   *   // Override default settings by listening to 'listFilter:settings':
    *   const input = document.querySelector('#my-input');
-   *   input.addEventListener('listFilter:options', (event) => {
-   *     event.detail.options.minLength = 5;
-   *     event.detail.options.hideElement = (el) => {
+   *   input.addEventListener('listFilter:settings', (event) => {
+   *     event.detail.settings.minLength = 5;
+   *     event.detail.settings.hideElement = (el) => {
    *       el.style.display = 'none'; return el;
    *     };
    *   });
@@ -64,13 +64,13 @@
     }
 
     /**
-     * The custom event name for overriding options.
+     * The custom event name for overriding settings.
      * @type {string}
      * @static
      * @readonly
      */
-    static get OPTIONS_EVENT() {
-      return 'listFilter:options';
+    static get SETTINGS_EVENT() {
+      return 'listFilter:settings';
     }
 
     /**
@@ -84,12 +84,12 @@
     }
 
     /**
-     * Default options for the ListFilter.
+     * Default settings for the ListFilter.
      * @type {object}
      * @static
      * @readonly
      */
-    static get DEFAULT_OPTIONS() {
+    static get DEFAULT_SETTINGS() {
       return {
         minLength: 2,
         searchStart: false,
@@ -111,82 +111,80 @@
     /**
      * Constructs a ListFilter instance.
      *
-     * @param {object} [options={}]
-     *   Configuration options and method overrides.
-     *   @param {HTMLElement} [options.input]
+     * @param {object} [settings={}]
+     *   Configuration settings and method overrides.
+     *   @param {HTMLElement} [settings.input]
      *     The input element to bind events to.
-     *   @param {string} [options.containerSelector]
+     *   @param {string} [settings.containerSelector]
      *     Selector for the container(s) (table, list, etc.) to filter.
-     *   @param {string} [options.itemsSelector]
+     *   @param {string} [settings.itemsSelector]
      *     Selector for the items/rows to filter.
-     *   @param {string} [options.targetsSelector]
+     *   @param {string} [settings.targetsSelector]
      *     (Optional) Selector for sub-elements to search within each item.
-     *   @param {string} [options.singular]
+     *   @param {string} [settings.singular]
      *     (Optional) Singular label for ARIA/live region.
-     *   @param {string} [options.plural]
+     *   @param {string} [settings.plural]
      *     (Optional) Plural label for ARIA/live region.
-     *   @param {string} [options.full]
+     *   @param {string} [settings.full]
      *     (Optional) Label for "all items listed".
-     *   @param {number} [options.minLength]
+     *   @param {number} [settings.minLength]
      *     (Optional) Minimum query length to trigger filtering.
-     *   @param {boolean} [options.searchStart]
+     *   @param {boolean} [settings.searchStart]
      *     (Optional) If true, only match from start of words.
-     *   @param {function} [options.hideElement]
+     *   @param {function} [settings.hideElement]
      *     (Optional) Custom function to hide an element.
-     *   @param {function} [options.showElement]
+     *   @param {function} [settings.showElement]
      *     (Optional) Custom function to show an element.
-     *   @param {function} [options.normalizeString]
+     *   @param {function} [settings.normalizeString]
      *     (Optional) Custom function to normalize strings for searching.
-     *   @param {function} [options.searchMethod]
+     *   @param {function} [settings.searchMethod]
      *     (Optional) Custom function to determine if an item matches the query.
-     *   @param {function} [options.announce]
+     *   @param {function} [settings.announce]
      *     (Optional) Custom function for accessibility announcements.
-     *   @param {function} [options.filterItemsBuilder]
+     *   @param {function} [settings.filterItemsBuilder]
      *     (Optional) Custom function to build filterable items.
      */
-    constructor(options = {}) {
-      this.input = options.input;
+    constructor(settings = {}) {
+      this.input = settings.input;
       const merged = {
-        ...ListFilter.DEFAULT_OPTIONS,
-        ...options,
+        ...ListFilter.DEFAULT_SETTINGS,
+        ...settings,
       };
 
-      // Dispatch event to allow external modules to override options
-      const event = new CustomEvent(ListFilter.OPTIONS_EVENT, {
-        detail: { options: merged },
+      // Dispatch event to allow external modules to override settings
+      const event = new CustomEvent(ListFilter.SETTINGS_EVENT, {
+        detail: { settings: merged },
         bubbles: false,
         cancelable: true,
       });
       this.input.dispatchEvent(event);
 
-      // Use the (possibly modified) options from event.detail.options
-      const consolidateOptions = {
+      // Use the (possibly modified) settings from event.detail.settings
+      const consolidateSettings = {
         ...merged,
-        ...(event.detail?.options || {}),
+        ...(event.detail?.settings || {}),
       };
 
-      this.options = consolidateOptions;
-
       // Assignment
-      this.containerSelector = consolidateOptions.containerSelector;
-      this.itemsSelector = consolidateOptions.itemsSelector;
-      this.targetsSelector = consolidateOptions.targetsSelector;
-      this.singular = consolidateOptions.singular;
-      this.plural = consolidateOptions.plural;
-      this.full = consolidateOptions.full;
-      this.minLength = consolidateOptions.minLength;
-      this.searchStart = consolidateOptions.searchStart;
+      this.containerSelector = consolidateSettings.containerSelector;
+      this.itemsSelector = consolidateSettings.itemsSelector;
+      this.targetsSelector = consolidateSettings.targetsSelector;
+      this.singular = consolidateSettings.singular;
+      this.plural = consolidateSettings.plural;
+      this.full = consolidateSettings.full;
+      this.minLength = consolidateSettings.minLength;
+      this.searchStart = consolidateSettings.searchStart;
       this.hideElement =
-        consolidateOptions.hideElement || ListFilter._hideElementImpl;
+        consolidateSettings.hideElement || ListFilter._hideElementImpl;
       this.showElement =
-        consolidateOptions.showElement || ListFilter._showElementImpl;
+        consolidateSettings.showElement || ListFilter._showElementImpl;
       this.normalizeString =
-        consolidateOptions.normalizeString || ListFilter._normalizeStringImpl;
+        consolidateSettings.normalizeString || ListFilter._normalizeStringImpl;
       this.searchMethod =
-        consolidateOptions.searchMethod || ListFilter._searchMethodImpl;
-      this.announce = consolidateOptions.announce || ListFilter._announceImpl;
+        consolidateSettings.searchMethod || ListFilter._searchMethodImpl;
+      this.announce = consolidateSettings.announce || ListFilter._announceImpl;
       this.filterItemsBuilder =
-        consolidateOptions.filterItemsBuilder ||
+        consolidateSettings.filterItemsBuilder ||
         ListFilter._filterItemsBuilderImpl;
     }
 
@@ -328,7 +326,7 @@
      * @returns {string}
      */
     static _normalizeStringImpl(str) {
-      return window.slugify(str, { separator: ' ' });
+      return slugify(str, { separator: ' ' });
     }
 
     /**
@@ -413,4 +411,4 @@
 
   // Expose the class to Drupal namespace
   Drupal.ListFilter = ListFilter;
-})(Drupal);
+})(Drupal, window.slugify);
