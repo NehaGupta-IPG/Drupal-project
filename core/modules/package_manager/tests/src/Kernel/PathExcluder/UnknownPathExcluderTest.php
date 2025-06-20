@@ -212,6 +212,31 @@ class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
   }
 
   /**
+   * Tests that additional known files can be added in config.
+   */
+  public function testExcluderKnownFilesCanBeAdded(): void {
+    $this->createTestProjectForTemplate(TRUE);
+
+    $project_root = $this->container->get(PathLocator::class)
+      ->getProjectRoot();
+    mkdir($project_root . '/known');
+    touch($project_root . '/known/file.txt');
+
+    $config = $this->config('package_manager.settings');
+    $config->set('additional_known_files_in_project_root', ['known'])->save();
+
+    $stage = $this->createStage();
+    $stage->create();
+    $this->assertFileExists($stage->getStageDirectory() . '/known/file.txt');
+    $stage->destroy();
+
+    $config->set('additional_known_files_in_project_root', [])->save();
+    $this->assertFileExists($project_root . '/known/file.txt');
+    $stage->create();
+    $this->assertFileDoesNotExist($stage->getStageDirectory() . '/known/file.txt');
+  }
+
+  /**
    * Tests that the excluder can be disabled by a config flag.
    */
   public function testExcluderCanBeDisabled(): void {

@@ -101,6 +101,8 @@ final class UnknownPathExcluder implements EventSubscriberInterface, LoggerAware
       $web_root,
       'composer.json',
       'composer.lock',
+      ...$this->configFactory->get('package_manager.settings')
+        ->get('additional_known_files_in_project_root'),
     ];
     foreach ($this->getScaffoldFiles() as $scaffold_file_path) {
       // The web root is always included in staging operations, so we don't need

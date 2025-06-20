@@ -16,6 +16,9 @@ package_manager.settings:
       sequence:
         type: package_name
         label: 'Trusted composer plugin'
+    additional_known_files_in_project_root:
+      type: sequence
+      label: 'Known files that would otherwise be excluded from staging operations'
     include_unknown_files_in_project_root:
       type: boolean
       label: 'Include unrecognized files and directories in the project root in staging operations'
