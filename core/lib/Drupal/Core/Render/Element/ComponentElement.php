@@ -51,7 +51,7 @@ class ComponentElement extends RenderElementBase {
    */
   public function preRenderComponent(array $element): array {
     $props = $element['#props'];
-    if (isset($element["#variant"]) && !empty($element["#variant"]) && !isset($props['variant'])) {
+    if (!empty($element["#variant"]) && !isset($props['variant'])) {
       $props['variant'] = $element["#variant"];
     }
 
