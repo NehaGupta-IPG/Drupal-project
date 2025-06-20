@@ -28,10 +28,10 @@ class ConfigTranslationUiTest extends ConfigTranslationUiTestBase {
     $this->drupalLogin($this->adminUser);
 
     $this->drupalGet('admin/config/people/accounts');
-    $this->assertSession()->linkExists('Translate account settings');
+    $this->assertSession()->linkExists('Translate Account settings');
 
     $this->drupalGet('admin/config/people/accounts/translate');
-    $this->assertSession()->linkExists('Translate account settings');
+    $this->assertSession()->linkExists('Translate Account settings');
     $this->assertSession()->linkByHrefExists('admin/config/people/accounts/translate/fr/add');
 
     // Update account settings fields for French.
