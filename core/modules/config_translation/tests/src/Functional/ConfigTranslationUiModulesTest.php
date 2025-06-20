@@ -47,7 +47,7 @@ class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
 
     // Make sure translate tab is present.
     $this->drupalGet('admin/structure/contact/manage/feedback');
-    $this->assertSession()->linkExists('Translate contact form');
+    $this->assertSession()->linkExists('Translate Contact form');
 
     // Visit the form to confirm the changes.
     $this->drupalGet('contact/feedback');
@@ -55,7 +55,7 @@ class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
 
     foreach ($this->langcodes as $langcode) {
       $this->drupalGet($translation_base_url);
-      $this->assertSession()->linkExists('Translate contact form');
+      $this->assertSession()->linkExists('Translate Contact form');
 
       // 'Add' link should be present for $langcode translation.
       $translation_page_url = "$translation_base_url/$langcode/add";
