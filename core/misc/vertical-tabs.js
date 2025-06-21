@@ -82,7 +82,7 @@
             .before(tabList);
 
           // Transform each details into a tab.
-          let errorFocussed = false;
+          let checkFocus = true;
           $details.each(function () {
             const $that = $(this);
             const $summary = $that.find('> summary');
@@ -103,11 +103,13 @@
               .data('verticalTab', verticalTab);
 
             // Check if this tab needs to be focussed.
-            if (!errorFocussed && $('.error', this).length) {
-              tabFocus = $that;
-              errorFocussed = true;
-            } else if (!errorFocussed && this.id === focusID) {
-              tabFocus = $that;
+            if (checkFocus) {
+              if ($('.error', this).length) {
+                tabFocus = $that;
+                checkFocus = false;
+              } else if (this.id === focusID) {
+                tabFocus = $that;
+              }
             }
           });
 
