@@ -42,7 +42,7 @@ class DatabaseEventSubscriber implements EventSubscriberInterface {
   public function __construct(
     #[Autowire(service: 'keyvalue')]
     protected KeyValueFactoryInterface $keyValue,
-  ){
+  ) {
   }
 
   /**

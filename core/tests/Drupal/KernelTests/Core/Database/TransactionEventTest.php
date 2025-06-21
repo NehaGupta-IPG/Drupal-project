@@ -60,6 +60,7 @@ class TransactionEventTest extends DatabaseTestBase {
     $savepoint = $this->connection->startTransaction('foo');
     $tx->commitOrRelease();
     $this->assertMatchesRegularExpression("/^default default .*\\\\drupal_transaction stack: .*\\\\drupal_transaction/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+    unset($savepoint);
   }
 
 }
