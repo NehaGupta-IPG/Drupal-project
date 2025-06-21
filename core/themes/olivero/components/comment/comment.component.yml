@@ -1,0 +1,42 @@
+# This is so your IDE knows about the syntax for fixes and autocomplete.
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+
+# The human readable name.
+name: Comment
+
+# Status can be: "experimental", "stable", "deprecated", "obsolete".
+status: stable
+
+# Schema for the props. We support www.json-schema.org. Learn more about the
+# syntax there.
+props:
+  type: object
+  properties:
+    attributes:
+      type: Drupal\Core\Template\Attribute
+    user_picture:
+      type: array
+      title: User Picture
+    author:
+      type: Drupal\Core\Render\Markup
+      title: Author
+    created:
+      type: Drupal\Core\StringTranslation\TranslatableMarkup
+      title: Created
+    parent:
+      type: string
+      title: Parent
+    title:
+      type: Drupal\Core\GeneratedLink
+      title: Title
+    title_prefix:
+      type: array
+      title: Title Prefix
+    title_suffix:
+      type: array
+      title: Title Suffix
+    title_attributes:
+      type: Drupal\Core\Template\Attribute
+    content:
+      type: array
+      title: Content

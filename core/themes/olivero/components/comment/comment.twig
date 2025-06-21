@@ -1,0 +1,36 @@
+<article {{ attributes.setAttribute('role', 'article').setAttribute('data-drupal-selector', 'comment') }}>
+  {#
+    Hide the "new" indicator by default, let a piece of JavaScript ask the
+    server which comments are new for the user. Rendering the final "new"
+    indicator here would break the render cache.
+  #}
+  <span class="hidden" data-comment-timestamp="{{ new_indicator_timestamp }}"></span>
+
+  <div class="comment__picture-wrapper">
+    <div class="comment__picture">
+      {{ user_picture }}
+    </div>
+  </div>
+  <div class="comment__text-wrapper">
+    <footer class="comment__meta">
+      <p class="comment__author">{{ author }}</p>
+      <p class="comment__time">{{ created }}</p>
+      {#
+        Indicate the semantic relationship between parent and child comments
+        for accessibility. The list is difficult to navigate in a screen
+        reader without this information.
+       #}
+      {% if parent %}
+        <p class="visually-hidden">{{ parent }}</p>
+      {% endif %}
+    </footer>
+    <div{{ content_attributes.addClass('comment__content') }}>
+      {% if title %}
+        {{ title_prefix }}
+        <h3{{ title_attributes }}>{{ title }}</h3>
+        {{ title_suffix }}
+      {% endif %}
+      {{ content }}
+    </div>
+  </div>
+</article>

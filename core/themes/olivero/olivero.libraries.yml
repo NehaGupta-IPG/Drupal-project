@@ -76,13 +76,11 @@ color-picker:
     - core/once
     - core/drupal.announce
 
-comments:
+comments-wrapper:
   version: VERSION
   css:
     component:
-      css/components/comments.css: {}
-  js:
-    js/comments.js: {}
+      css/components/comments-wrapper.css: {}
 
 content-below:
   version: VERSION
