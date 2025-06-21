@@ -64,7 +64,7 @@
       once('vertical-tabs', '[data-vertical-tabs-panes]', context).forEach(
         (verticalTab) => {
           const $this = $(verticalTab).addClass('vertical-tabs__panes');
-          let focusID = $this.find(':hidden.vertical-tabs__active-tab')[0]
+          const focusID = $this.find(':hidden.vertical-tabs__active-tab')[0]
             .value;
           let tabFocus;
 
@@ -81,17 +81,8 @@
             .wrap('<div class="vertical-tabs clearfix"></div>')
             .before(tabList);
 
-          let errorFocussed = false;
-          $details.each(function () {
-            if ($('.error', this).length) {
-              if (!errorFocussed) {
-                focusID = this.id
-                errorFocussed = true;
-              }
-            }
-          });
-
           // Transform each details into a tab.
+          let errorFocussed = false;
           $details.each(function () {
             const $that = $(this);
             const $summary = $that.find('> summary');
@@ -110,7 +101,11 @@
               .removeAttr('open')
               .addClass('vertical-tabs__pane')
               .data('verticalTab', verticalTab);
-            if (this.id === focusID) {
+
+            if (!errorFocussed && $('.error', this).length) {
+              tabFocus = $that;
+              errorFocussed = true;
+            } else if (!errorFocussed && this.id === focusID) {
               tabFocus = $that;
             }
           });
