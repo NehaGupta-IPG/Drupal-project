@@ -145,7 +145,9 @@ abstract class StatementBase implements \Iterator, StatementInterface {
         $this->connection->getTarget(),
         $this->getQueryString(),
         $args,
-        $this->connection->findCallerFromDebugBacktrace()
+        $this->connection->findCallerFromDebugBacktrace(),
+        $this->connection->transactionManager()->currentTransactionId(),
+        $this->connection->transactionManager()->currentTransactionName(),
       );
       $this->connection->dispatchEvent($startEvent);
       return $startEvent;
@@ -168,7 +170,9 @@ abstract class StatementBase implements \Iterator, StatementInterface {
         $startEvent->queryString,
         $startEvent->args,
         $startEvent->caller,
-        $startEvent->time
+        $startEvent->time,
+        $startEvent->transactionId,
+        $startEvent->transactionName,
       ));
     }
   }
@@ -194,6 +198,8 @@ abstract class StatementBase implements \Iterator, StatementInterface {
         get_class($e),
         $e->getCode(),
         $e->getMessage(),
+        $startEvent->transactionId,
+        $startEvent->transactionName,
       ));
     }
   }
