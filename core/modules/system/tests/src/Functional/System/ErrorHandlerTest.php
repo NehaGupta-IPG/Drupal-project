@@ -163,7 +163,7 @@ class ErrorHandlerTest extends BrowserTestBase {
     // Assert statement improved since static queries adds table alias in the
     // error message.
     $this->assertSession()->pageTextContains($error_pdo_exception['@message']);
-    $error_details = new FormattableMarkup('in %function (line ', $error_pdo_exception);
+    $error_details = 'in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;triggerPDOException()</em> (line ';
     $this->assertSession()->responseContains($error_details);
     $this->drupalGet('error-test/trigger-renderer-exception');
     $this->assertSession()->statusCodeEquals(500);
