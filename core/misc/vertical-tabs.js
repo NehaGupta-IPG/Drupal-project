@@ -102,6 +102,7 @@
               .addClass('vertical-tabs__pane')
               .data('verticalTab', verticalTab);
 
+            // Check if this tab needs to be focussed.
             if (!errorFocussed && $('.error', this).length) {
               tabFocus = $that;
               errorFocussed = true;
