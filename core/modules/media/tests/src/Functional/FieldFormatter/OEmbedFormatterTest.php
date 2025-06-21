@@ -58,6 +58,7 @@ class OEmbedFormatterTest extends MediaFunctionalTestBase {
    * @see ::testRender()
    *
    * @return array
+   *   An array of test data.
    */
   public static function providerRender() {
     return [
@@ -72,19 +73,22 @@ class OEmbedFormatterTest extends MediaFunctionalTestBase {
             'height' => '360',
             'title' => 'Drupal Rap Video - Schipulcon09',
             'loading' => 'lazy',
+            // cSpell:disable-next-line
+            'allowtransparency' => NULL,
+            'frameborder' => NULL,
           ],
         ],
         'self_closing' => TRUE,
       ],
       'Vimeo video, resized' => [
         'https://vimeo.com/7073899',
-        'video_vimeo.json?maxwidth=100&maxheight=100',
+        'video_vimeo-resized.json',
         ['max_width' => '100', 'max_height' => '100'],
         [
           'iframe' => [
-            'src' => '/media/oembed?url=https%3A//vimeo.com/7073899',
+            'src' => '/media/oembed?url=https%3A//vimeo.com/7073899&max_width=100&max_height=100',
             'width' => '100',
-            'height' => '100',
+            'height' => '67',
             'title' => 'Drupal Rap Video - Schipulcon09',
             'loading' => 'lazy',
           ],
@@ -157,7 +161,7 @@ class OEmbedFormatterTest extends MediaFunctionalTestBase {
   /**
    * Tests that oEmbed media types' display can be configured correctly.
    */
-  public function testDisplayConfiguration() {
+  public function testDisplayConfiguration(): void {
     $account = $this->drupalCreateUser(['administer media display']);
     $this->drupalLogin($account);
 
@@ -189,7 +193,7 @@ class OEmbedFormatterTest extends MediaFunctionalTestBase {
    *
    * @dataProvider providerRender
    */
-  public function testRender($url, $resource_url, array $formatter_settings, array $selectors, bool $self_closing) {
+  public function testRender($url, $resource_url, array $formatter_settings, array $selectors, bool $self_closing): void {
     $account = $this->drupalCreateUser(['view media']);
     $this->drupalLogin($account);
 

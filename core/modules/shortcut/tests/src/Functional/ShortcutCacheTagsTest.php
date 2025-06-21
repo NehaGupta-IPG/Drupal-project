@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\shortcut\Functional;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Url;
 use Drupal\shortcut\Entity\Shortcut;
+use Drupal\shortcut\Entity\ShortcutSet;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\system\Functional\Entity\EntityCacheTagsTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Tests the Shortcut entity's cache tags.
@@ -31,6 +32,13 @@ class ShortcutCacheTagsTest extends EntityCacheTagsTestBase {
   ];
 
   /**
+   * User with permission to administer shortcuts.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected UserInterface $adminUser;
+
+  /**
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
@@ -40,6 +48,14 @@ class ShortcutCacheTagsTest extends EntityCacheTagsTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+
+    $this->adminUser = $this->drupalCreateUser([
+      'access toolbar',
+      'access shortcuts',
+      'administer site configuration',
+      'administer shortcuts',
+      'administer themes',
+    ]);
 
     // Give anonymous users permission to customize shortcut links, so that we
     // can verify the cache tags of cached versions of shortcuts.
@@ -66,32 +82,9 @@ class ShortcutCacheTagsTest extends EntityCacheTagsTestBase {
   }
 
   /**
-   * Tests that when creating a shortcut, the shortcut set tag is invalidated.
-   */
-  public function testEntityCreation() {
-    $cache_bin = $this->getRenderCacheBackend();
-
-    // Create a cache entry that is tagged with a shortcut set cache tag.
-    $cache_tags = ['config:shortcut.set.default'];
-
-    $cacheability = new CacheableMetadata();
-    $cacheability->addCacheTags($cache_tags);
-    $cache_bin->set(['foo'], 'bar', $cacheability, $cacheability);
-
-    // Verify a cache hit.
-    $this->verifyRenderCache(['foo'], $cache_tags, $cacheability);
-
-    // Now create a shortcut entity in that shortcut set.
-    $this->createEntity();
-
-    // Verify a cache miss.
-    $this->assertFalse($cache_bin->get(['foo'], $cacheability), 'Creating a new shortcut invalidates the cache tag of the shortcut set.');
-  }
-
-  /**
    * Tests visibility and cacheability of shortcuts in the toolbar.
    */
-  public function testToolbar() {
+  public function testToolbar(): void {
     $this->drupalPlaceBlock('page_title_block', ['id' => 'title']);
 
     $test_page_url = Url::fromRoute('test_page_test.test_page');
@@ -100,7 +93,7 @@ class ShortcutCacheTagsTest extends EntityCacheTagsTestBase {
 
     // Ensure that without enabling the shortcuts-in-page-title-link feature
     // in the theme, the shortcut_list cache tag is not added to the page.
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->adminUser);
     $this->drupalGet('admin/config/system/cron');
     $expected_cache_tags = [
       'block_view',
@@ -157,22 +150,20 @@ class ShortcutCacheTagsTest extends EntityCacheTagsTestBase {
     // user has a cache hit despite the user cache context, as
     // the returned cache contexts include those from lazy-builder content.
     $site_configuration_user1 = $this->drupalCreateUser();
-    $site_configuration_user1->addRole($site_configuration_role);
-    $site_configuration_user1->save();
+    $site_configuration_user1->addRole($site_configuration_role)->save();
     $site_configuration_user2 = $this->drupalCreateUser();
-    $site_configuration_user2->addRole($site_configuration_role);
-    $site_configuration_user2->save();
+    $site_configuration_user2->addRole($site_configuration_role)->save();
 
     $this->drupalLogin($site_configuration_user1);
     $this->verifyDynamicPageCache($test_page_url, 'MISS');
     $this->verifyDynamicPageCache($test_page_url, 'HIT');
-    $this->assertCacheContexts(['user', 'url.query_args:_wrapper_format']);
+    $this->assertCacheContexts(['session', 'user', 'url.query_args:_wrapper_format']);
     $this->assertSession()->linkExists('Shortcuts');
     $this->assertSession()->linkExists('Cron');
 
     $this->drupalLogin($site_configuration_user2);
     $this->verifyDynamicPageCache($test_page_url, 'HIT');
-    $this->assertCacheContexts(['user', 'url.query_args:_wrapper_format']);
+    $this->assertCacheContexts(['session', 'user', 'url.query_args:_wrapper_format']);
     $this->assertSession()->linkExists('Shortcuts');
     $this->assertSession()->linkExists('Cron');
 
@@ -203,6 +194,62 @@ class ShortcutCacheTagsTest extends EntityCacheTagsTestBase {
     $this->verifyDynamicPageCache($test_page_url, 'HIT');
     $this->assertSession()->linkExists('Cron');
     $this->assertSession()->linkNotExists('Alpaca');
+
+    // Add a new Shortcut Set with a single link.
+    $new_set = ShortcutSet::create([
+      'id' => 'llama-set',
+      'label' => 'Llama Set',
+    ]);
+    $new_set->save();
+    $new_shortcut = Shortcut::create([
+      'shortcut_set' => 'llama-set',
+      'title' => 'New Llama',
+      'weight' => 0,
+      'link' => [['uri' => 'internal:/admin/config']],
+    ]);
+    $new_shortcut->save();
+
+    // Assign the new shortcut set to user 2 and confirm that links are
+    // changed automatically.
+    \Drupal::entityTypeManager()
+      ->getStorage('shortcut_set')
+      ->assignUser($new_set, $site_configuration_user2);
+
+    $this->verifyDynamicPageCache($test_page_url, 'HIT');
+    $this->assertSession()->linkExists('Cron');
+    $this->assertSession()->linkExists('New Llama');
+
+    // Confirm that links for user 1 have not been affected.
+    $this->drupalLogin($site_configuration_user1);
+    $this->verifyDynamicPageCache($test_page_url, 'HIT');
+    $this->assertSession()->linkExists('Cron');
+    $this->assertSession()->linkNotExists('New Llama');
+
+    // Confirm that removing assignment automatically changes the links too.
+    $this->drupalLogin($site_configuration_user2);
+    $this->verifyDynamicPageCache($test_page_url, 'HIT');
+    $this->assertSession()->linkExists('Cron');
+    $this->assertSession()->linkExists('New Llama');
+    \Drupal::entityTypeManager()
+      ->getStorage('shortcut_set')
+      ->unassignUser($site_configuration_user2);
+    $this->verifyDynamicPageCache($test_page_url, 'HIT');
+    $this->assertSession()->linkExists('Cron');
+    $this->assertSession()->linkNotExists('New Llama');
+
+    // Confirm that deleting a shortcut set automatically changes the links too.
+    \Drupal::entityTypeManager()
+      ->getStorage('shortcut_set')
+      ->assignUser($new_set, $site_configuration_user2);
+    $this->verifyDynamicPageCache($test_page_url, 'HIT');
+    $this->assertSession()->linkExists('Cron');
+    $this->assertSession()->linkExists('New Llama');
+    \Drupal::entityTypeManager()
+      ->getStorage('shortcut_set')
+      ->delete([$new_set]);
+    $this->verifyDynamicPageCache($test_page_url, 'HIT');
+    $this->assertSession()->linkExists('Cron');
+    $this->assertSession()->linkNotExists('New Llama');
   }
 
   /**
@@ -221,7 +268,7 @@ class ShortcutCacheTagsTest extends EntityCacheTagsTestBase {
 
     // Ensure that without enabling the shortcuts-in-page-title-link feature
     // in the theme, the shortcut_list cache tag is not added to the page.
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->adminUser);
     $this->drupalGet('admin/config/system/cron');
     $expected_cache_tags = [
       'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form',
@@ -277,11 +324,9 @@ class ShortcutCacheTagsTest extends EntityCacheTagsTestBase {
     // user has a cache hit despite the user cache context, as
     // the returned cache contexts include those from lazy-builder content.
     $site_configuration_user1 = $this->drupalCreateUser();
-    $site_configuration_user1->addRole($site_configuration_role);
-    $site_configuration_user1->save();
+    $site_configuration_user1->addRole($site_configuration_role)->save();
     $site_configuration_user2 = $this->drupalCreateUser();
-    $site_configuration_user2->addRole($site_configuration_role);
-    $site_configuration_user2->save();
+    $site_configuration_user2->addRole($site_configuration_role)->save();
 
     $this->drupalLogin($site_configuration_user1);
     $this->verifyDynamicPageCache($test_page_url, 'MISS');

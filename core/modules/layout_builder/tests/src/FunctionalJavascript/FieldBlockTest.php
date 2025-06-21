@@ -14,6 +14,7 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
  * @coversDefaultClass \Drupal\layout_builder\Plugin\Block\FieldBlock
  *
  * @group field
+ * @group legacy
  */
 class FieldBlockTest extends WebDriverTestBase {
 
@@ -25,8 +26,9 @@ class FieldBlockTest extends WebDriverTestBase {
     'datetime',
     'layout_builder',
     'user',
-    // See \Drupal\layout_builder_fieldblock_test\Plugin\Block\FieldBlock.
-    'layout_builder_fieldblock_test',
+    // See \Drupal\layout_builder_field_block_test\Plugin\Block\FieldBlock.
+    'layout_builder_field_block_test',
+    'layout_builder_expose_all_field_blocks',
   ];
 
   /**
@@ -40,9 +42,6 @@ class FieldBlockTest extends WebDriverTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    \Drupal::configFactory()->getEditable('layout_builder.settings')
-      ->set('expose_all_field_blocks', TRUE)
-      ->save();
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'field_date',
       'entity_type' => 'user',
@@ -68,7 +67,7 @@ class FieldBlockTest extends WebDriverTestBase {
   /**
    * Tests configuring a field block for a user field.
    */
-  public function testUserFieldBlock() {
+  public function testUserFieldBlock(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -138,13 +137,13 @@ class FieldBlockTest extends WebDriverTestBase {
 
     // Assert that the block is displaying the user field.
     $this->drupalGet('admin');
-    $assert_session->pageTextContains('Sunday, November 19, 1978 - 16:00');
+    $assert_session->pageTextContains('Sunday, 19 November 1978 - 16:00');
   }
 
   /**
    * Tests configuring a field block that uses #states.
    */
-  public function testStatesFieldBlock() {
+  public function testStatesFieldBlock(): void {
     $page = $this->getSession()->getPage();
 
     $timestamp_field_storage = FieldStorageConfig::create([

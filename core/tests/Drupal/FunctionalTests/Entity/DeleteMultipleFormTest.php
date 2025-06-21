@@ -27,9 +27,7 @@ class DeleteMultipleFormTest extends BrowserTestBase {
   protected $account;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test', 'user', 'language'];
 
@@ -57,7 +55,7 @@ class DeleteMultipleFormTest extends BrowserTestBase {
   /**
    * Tests the delete form for translatable entities.
    */
-  public function testTranslatableEntities() {
+  public function testTranslatableEntities(): void {
     ConfigurableLanguage::createFromLangcode('es')->save();
     ConfigurableLanguage::createFromLangcode('fr')->save();
 
@@ -117,7 +115,7 @@ class DeleteMultipleFormTest extends BrowserTestBase {
   /**
    * Tests the delete form for untranslatable entities.
    */
-  public function testUntranslatableEntities() {
+  public function testUntranslatableEntities(): void {
     $selection = [];
 
     $entity1 = EntityTestRev::create(['type' => 'default', 'name' => 'entity1']);

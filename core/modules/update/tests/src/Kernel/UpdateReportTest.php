@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\update\Kernel;
 
 use Drupal\Core\Link;
@@ -28,7 +30,7 @@ class UpdateReportTest extends KernelTestBase {
   /**
    * @dataProvider providerTemplatePreprocessUpdateReport
    */
-  public function testTemplatePreprocessUpdateReport($variables) {
+  public function testTemplatePreprocessUpdateReport($variables): void {
     \Drupal::moduleHandler()->loadInclude('update', 'inc', 'update.report');
 
     // The function should run without an exception being thrown when the value
@@ -64,7 +66,7 @@ class UpdateReportTest extends KernelTestBase {
    *
    * @see template_preprocess_update_fetch_error_message()
    */
-  public function testTemplatePreprocessUpdateFetchErrorMessageNoDblog() {
+  public function testTemplatePreprocessUpdateFetchErrorMessageNoDblog(): void {
     $build = [
       '#theme' => 'update_fetch_error_message',
     ];
@@ -86,7 +88,7 @@ class UpdateReportTest extends KernelTestBase {
    *
    * @see template_preprocess_update_fetch_error_message()
    */
-  public function testTemplatePreprocessUpdateFetchErrorMessageWithDblog() {
+  public function testTemplatePreprocessUpdateFetchErrorMessageWithDblog(): void {
     \Drupal::moduleHandler()->loadInclude('update', 'inc', 'update.report');
 
     $this->enableModules(['dblog', 'user']);
@@ -115,7 +117,7 @@ class UpdateReportTest extends KernelTestBase {
     $this->render($build);
     $this->assertRaw('Failed to fetch available update data:<ul><li>See <a href="https://www.drupal.org/node/3170647">PHP OpenSSL requirements</a> in the Drupal.org handbook for possible reasons this could happen and what you can do to resolve them.</li><li>Check');
     $dblog_url = Url::fromRoute('dblog.overview', [], ['query' => ['type' => ['update']]]);
-    $this->assertRaw(Link::fromTextAndUrl('your local system logs', $dblog_url)->toString());
+    $this->assertRaw((string) Link::fromTextAndUrl('your local system logs', $dblog_url)->toString());
     $this->assertRaw(' for additional error messages.</li></ul>');
 
     $variables = [];

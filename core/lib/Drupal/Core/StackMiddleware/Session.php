@@ -52,7 +52,7 @@ class Session implements HttpKernelInterface {
 
     $result = $this->httpKernel->handle($request, $type, $catch);
 
-    if ($type === self::MAIN_REQUEST && !$result instanceof ResponseKeepSessionOpenInterface && PHP_SAPI !== 'cli' && $request->hasSession()) {
+    if ($type === self::MAIN_REQUEST && !$result instanceof ResponseKeepSessionOpenInterface && PHP_SAPI !== 'cli') {
       $request->getSession()->save();
     }
 
@@ -60,7 +60,7 @@ class Session implements HttpKernelInterface {
   }
 
   /**
-   * Initializes a session backed by persistent store and puts it on the request.
+   * Sets a session backed by persistent store and puts it on the request.
    *
    * Sessions for web requests need to be backed by a persistent session store
    * and a real session handler (responsible for session cookie management).

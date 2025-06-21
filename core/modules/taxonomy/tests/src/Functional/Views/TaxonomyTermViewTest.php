@@ -19,9 +19,7 @@ use Drupal\views\Views;
 class TaxonomyTermViewTest extends TaxonomyTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['taxonomy', 'views'];
 
@@ -67,7 +65,7 @@ class TaxonomyTermViewTest extends TaxonomyTestBase {
       ],
       'auto_create' => TRUE,
     ];
-    $this->createEntityReferenceField('node', 'article', $this->fieldName1, NULL, 'taxonomy_term', 'default', $handler_settings, FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+    $this->createEntityReferenceField('node', 'article', $this->fieldName1, '', 'taxonomy_term', 'default', $handler_settings, FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
 
     /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
     $display_repository = \Drupal::service('entity_display.repository');
@@ -86,7 +84,7 @@ class TaxonomyTermViewTest extends TaxonomyTestBase {
   /**
    * Tests that the taxonomy term view is working properly.
    */
-  public function testTaxonomyTermView() {
+  public function testTaxonomyTermView(): void {
     // Create terms in the vocabulary.
     $term = $this->createTerm();
 

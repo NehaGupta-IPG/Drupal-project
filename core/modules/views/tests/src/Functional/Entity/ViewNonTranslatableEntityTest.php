@@ -16,9 +16,7 @@ use Drupal\Tests\BrowserTestBase;
 class ViewNonTranslatableEntityTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'entity_test',
@@ -35,7 +33,7 @@ class ViewNonTranslatableEntityTest extends BrowserTestBase {
   /**
    * Tests displaying a view of non-translatable entities.
    */
-  public function testViewNoTranslatableEntity() {
+  public function testViewNoTranslatableEntity(): void {
     // Add a new language.
     ConfigurableLanguage::createFromLangcode('sr')->save();
 

@@ -16,6 +16,9 @@ use Drupal\language\Entity\ConfigurableLanguage;
  */
 class UpcastingTest extends BrowserTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['paramconverter_test', 'node', 'language'];
 
   /**
@@ -33,7 +36,7 @@ class UpcastingTest extends BrowserTestBase {
    * The test shuffles the parameters around and checks if the right thing is
    * happening.
    */
-  public function testUpcasting() {
+  public function testUpcasting(): void {
     $node = $this->drupalCreateNode(['title' => $this->randomMachineName(8)]);
     $user = $this->drupalCreateUser(['access content']);
     $foo = 'bar';
@@ -59,7 +62,7 @@ class UpcastingTest extends BrowserTestBase {
   /**
    * Confirms we can upcast to controller arguments of the same type.
    */
-  public function testSameTypes() {
+  public function testSameTypes(): void {
     $node = $this->drupalCreateNode(['title' => $this->randomMachineName(8)]);
     $parent = $this->drupalCreateNode(['title' => $this->randomMachineName(8)]);
     // paramconverter_test/node/{node}/set/parent/{parent}
@@ -71,7 +74,7 @@ class UpcastingTest extends BrowserTestBase {
   /**
    * Confirms entity is shown in user's language by default.
    */
-  public function testEntityLanguage() {
+  public function testEntityLanguage(): void {
     $language = ConfigurableLanguage::createFromLangcode('de');
     $language->save();
     \Drupal::configFactory()->getEditable('language.negotiation')

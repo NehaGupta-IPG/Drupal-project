@@ -21,9 +21,7 @@ class MenuLinkReorderTest extends BrowserTestBase {
   protected $administrator;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['menu_ui', 'test_page_test', 'node', 'block'];
 
@@ -35,7 +33,7 @@ class MenuLinkReorderTest extends BrowserTestBase {
   /**
    * Tests creating, editing, deleting menu links via node form widget.
    */
-  public function testDefaultMenuLinkReorder() {
+  public function testDefaultMenuLinkReorder(): void {
 
     // Add the main menu block.
     $this->drupalPlaceBlock('system_menu_block:main');

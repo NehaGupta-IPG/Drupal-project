@@ -13,6 +13,9 @@ use Drupal\Tests\BrowserTestBase;
  */
 class LocaleUpdateDevelopmentReleaseTest extends BrowserTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['locale', 'locale_test_development_release'];
 
   /**
@@ -37,7 +40,10 @@ class LocaleUpdateDevelopmentReleaseTest extends BrowserTestBase {
     $this->submitForm(['predefined_langcode' => 'hu'], 'Add language');
   }
 
-  public function testLocaleUpdateDevelopmentRelease() {
+  /**
+   * @covers ::\locale_translation_build_projects
+   */
+  public function testLocaleUpdateDevelopmentRelease(): void {
     $projects = locale_translation_build_projects();
     $this->assertEquals('8.0.x', $projects['drupal']->info['version'], 'The branch of the core dev release.');
     $this->assertEquals('12.x-10.x', $projects['contrib']->info['version'], 'The branch of the contrib module dev release.');

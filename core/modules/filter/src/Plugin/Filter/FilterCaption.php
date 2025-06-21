@@ -45,7 +45,7 @@ class FilterCaption extends FilterBase implements ContainerFactoryPluginInterfac
    * @param \Drupal\filter\FilterPluginManager $filter_manager
    *   Filter plugin manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, FilterPluginManager $filter_manager = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ?FilterPluginManager $filter_manager = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->filterManager = $filter_manager ?: \Drupal::service('plugin.manager.filter');
   }
@@ -121,7 +121,8 @@ class FilterCaption extends FilterBase implements ContainerFactoryPluginInterfac
         ];
         $altered_html = \Drupal::service('renderer')->render($filter_caption);
 
-        // Load the altered HTML into a new DOMDocument and retrieve the element.
+        // Load the altered HTML into a new DOMDocument and retrieve the
+        // element.
         $updated_nodes = Html::load($altered_html)->getElementsByTagName('body')
           ->item(0)
           ->childNodes;

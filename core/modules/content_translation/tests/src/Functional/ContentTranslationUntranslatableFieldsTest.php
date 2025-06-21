@@ -50,7 +50,7 @@ class ContentTranslationUntranslatableFieldsTest extends ContentTranslationPendi
   /**
    * {@inheritdoc}
    */
-  protected function setupTestFields() {
+  protected function setupTestFields(): void {
     parent::setupTestFields();
 
     $field_storage = FieldStorageConfig::create([
@@ -76,7 +76,7 @@ class ContentTranslationUntranslatableFieldsTest extends ContentTranslationPendi
   /**
    * Tests that hiding untranslatable field widgets works correctly.
    */
-  public function testHiddenWidgets() {
+  public function testHiddenWidgets(): void {
     /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
     $entity_type_manager = $this->container->get('entity_type.manager');
     $id = $this->createEntity(['title' => $this->randomString()], 'en');

@@ -28,7 +28,7 @@ class InstallerRouterTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function prepareEnvironment() {
+  protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
     $info = [
       'type' => 'profile',
@@ -52,7 +52,7 @@ class InstallerRouterTest extends InstallerTestBase {
   /**
    * Confirms that the installation succeeded.
    */
-  public function testInstalled() {
+  public function testInstalled(): void {
     $this->assertSession()->statusCodeEquals(200);
     // Ensures that router is not rebuilt unnecessarily during the install. It
     // is rebuilt during:

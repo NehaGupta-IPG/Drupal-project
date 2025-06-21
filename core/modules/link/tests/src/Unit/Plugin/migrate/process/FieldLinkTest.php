@@ -11,6 +11,8 @@ use Drupal\migrate\Row;
 use Drupal\Tests\UnitTestCase;
 
 /**
+ * Tests the link field migrate process plugin.
+ *
  * @group Link
  */
 class FieldLinkTest extends UnitTestCase {
@@ -20,7 +22,7 @@ class FieldLinkTest extends UnitTestCase {
    *
    * @dataProvider canonicalizeUriDataProvider
    */
-  public function testCanonicalizeUri($url, $expected, $configuration = []) {
+  public function testCanonicalizeUri($url, $expected, $configuration = []): void {
     $link_plugin = new FieldLink($configuration, '', [], $this->createMock(MigrationInterface::class));
     $transformed = $link_plugin->transform([
       'url' => $url,
@@ -110,7 +112,7 @@ class FieldLinkTest extends UnitTestCase {
   /**
    * Tests the attributes that are deeply serialized are discarded.
    */
-  public function testCanonicalizeUriSerialized() {
+  public function testCanonicalizeUriSerialized(): void {
     $link_plugin = new FieldLink([], '', [], $this->createMock(MigrationInterface::class));
     $migrate_executable = $this->createMock(MigrateExecutableInterface::class);
     $row = new Row();

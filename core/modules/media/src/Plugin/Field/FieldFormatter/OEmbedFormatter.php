@@ -22,7 +22,6 @@ use Drupal\media\OEmbed\UrlResolverInterface;
 use Drupal\media\Plugin\media\Source\OEmbedInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-// cspell:ignore allowtransparency
 /**
  * Plugin implementation of the 'oembed' formatter.
  *
@@ -197,8 +196,8 @@ class OEmbedFormatter extends FormatterBase {
         $element[$delta] = [
           '#theme' => 'image',
           '#uri' => $resource->getUrl()->toString(),
-          '#width' => $max_width ?: $resource->getWidth(),
-          '#height' => $max_height ?: $resource->getHeight(),
+          '#width' => $resource->getWidth(),
+          '#height' => $resource->getHeight(),
           '#attributes' => [
             'loading' => $this->getSetting('loading')['attribute'],
           ],
@@ -227,11 +226,11 @@ class OEmbedFormatter extends FormatterBase {
           '#tag' => 'iframe',
           '#attributes' => [
             'src' => $url->toString(),
-            'frameborder' => 0,
             'scrolling' => FALSE,
-            'allowtransparency' => TRUE,
-            'width' => $max_width ?: $resource->getWidth(),
-            'height' => $max_height ?: $resource->getHeight(),
+            // External service is not supposed to send something larger
+            // than the max width or max height, so those values should be used.
+            'width' => $resource->getWidth() ?: $max_width,
+            'height' => $resource->getHeight() ?: $max_height,
             'class' => ['media-oembed-content'],
             'loading' => $this->getSetting('loading')['attribute'],
           ],

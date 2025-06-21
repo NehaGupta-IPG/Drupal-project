@@ -77,7 +77,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
   /**
    * {@inheritdoc}
    */
-  public function resetCache(array $ids = NULL) {
+  public function resetCache(?array $ids = NULL) {
     $this->ancestors = [];
     $this->treeChildren = [];
     $this->treeParents = [];
@@ -92,7 +92,6 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
    */
   public function loadParents($tid) {
     $terms = [];
-    /** @var \Drupal\taxonomy\TermInterface $term */
     if ($tid && $term = $this->load($tid)) {
       foreach ($this->getParents($term) as $id => $parent) {
         // This method currently doesn't return the <root> parent.
@@ -433,7 +432,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
   /**
    * {@inheritdoc}
    */
-  public function __sleep() {
+  public function __sleep(): array {
     /** @var string[] $vars */
     $vars = parent::__sleep();
     // Do not serialize static cache.
@@ -444,7 +443,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
   /**
    * {@inheritdoc}
    */
-  public function __wakeup() {
+  public function __wakeup(): void {
     parent::__wakeup();
     // Initialize static caches.
     $this->ancestors = [];

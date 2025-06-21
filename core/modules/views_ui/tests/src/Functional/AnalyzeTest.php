@@ -12,9 +12,7 @@ namespace Drupal\Tests\views_ui\Functional;
 class AnalyzeTest extends UITestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['views_ui'];
 
@@ -33,7 +31,7 @@ class AnalyzeTest extends UITestBase {
   /**
    * Tests that analyze works in general.
    */
-  public function testAnalyzeBasic() {
+  public function testAnalyzeBasic(): void {
     $this->drupalLogin($this->adminUser);
 
     $this->drupalGet('admin/structure/views/view/test_view/edit');

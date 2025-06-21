@@ -26,7 +26,7 @@ class ConfigLocalTasksTest extends LocalTaskIntegrationTestBase {
    *
    * @dataProvider getConfigAdminRoutes
    */
-  public function testConfigAdminLocalTasks($route, $expected) {
+  public function testConfigAdminLocalTasks($route, $expected): void {
     $this->assertLocalTasks($route, $expected);
   }
 
@@ -36,10 +36,30 @@ class ConfigLocalTasksTest extends LocalTaskIntegrationTestBase {
   public static function getConfigAdminRoutes() {
     return [
       ['config.sync', [['config.sync', 'config.import', 'config.export']]],
-      ['config.import_full', [['config.sync', 'config.import', 'config.export'], ['config.import_full', 'config.import_single']]],
-      ['config.import_single', [['config.sync', 'config.import', 'config.export'], ['config.import_full', 'config.import_single']]],
-      ['config.export_full', [['config.sync', 'config.import', 'config.export'], ['config.export_full', 'config.export_single']]],
-      ['config.export_single', [['config.sync', 'config.import', 'config.export'], ['config.export_full', 'config.export_single']]],
+      ['config.import_full',
+        [
+          ['config.sync', 'config.import', 'config.export'],
+          ['config.import_full', 'config.import_single'],
+        ],
+      ],
+      ['config.import_single',
+        [
+          ['config.sync', 'config.import', 'config.export'],
+          ['config.import_full', 'config.import_single'],
+        ],
+      ],
+      ['config.export_full',
+        [
+          ['config.sync', 'config.import', 'config.export'],
+          ['config.export_full', 'config.export_single'],
+        ],
+      ],
+      ['config.export_single',
+        [
+          ['config.sync', 'config.import', 'config.export'],
+          ['config.export_full', 'config.export_single'],
+        ],
+      ],
     ];
   }
 

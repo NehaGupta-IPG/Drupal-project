@@ -1,11 +1,3 @@
-layout_builder.settings:
-  path: '/admin/config/content/layout-builder'
-  defaults:
-    _form: '\Drupal\layout_builder\Form\LayoutBuilderSettingsForm'
-    _title: 'Layout Builder'
-  requirements:
-    _permission: 'administer layout builder'
-
 layout_builder.choose_section:
   path: '/layout_builder/choose/section/{section_storage_type}/{section_storage}/{delta}'
   defaults:
@@ -78,7 +70,7 @@ layout_builder.add_block:
     _form: '\Drupal\layout_builder\Form\AddBlockForm'
     _title: 'Configure block'
   requirements:
-    _layout_builder_access: 'view'
+    _layout_builder_access: 'add_block'
   options:
     _admin_route: TRUE
     parameters:
@@ -91,7 +83,7 @@ layout_builder.choose_inline_block:
     _controller: '\Drupal\layout_builder\Controller\ChooseBlockController::inlineBlockList'
     _title: 'Add a new content block'
   requirements:
-    _layout_builder_access: 'view'
+    _layout_builder_access: 'add_block'
   options:
     _admin_route: TRUE
     parameters:

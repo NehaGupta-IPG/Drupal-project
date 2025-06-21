@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel\Views;
 
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -34,7 +36,7 @@ class NodeViewsFieldAccessTest extends FieldFieldAccessTestBase {
   /**
    * Check access for node fields.
    */
-  public function testNodeFields() {
+  public function testNodeFields(): void {
     $user = User::create([
       'name' => 'test user',
     ]);
@@ -70,6 +72,7 @@ class NodeViewsFieldAccessTest extends FieldFieldAccessTestBase {
     $this->assertFieldAccess('node', 'promote', 'On');
     $this->assertFieldAccess('node', 'sticky', 'Off');
 
+    // phpcs:ignore Drupal.Files.LineLength
     // $this->assertFieldAccess('node', 'created', \Drupal::service('date.formatter')->format(123456));
     // $this->assertFieldAccess('node', 'changed', \Drupal::service('date.formatter')->format(\Drupal::time()->getRequestTime()));
   }

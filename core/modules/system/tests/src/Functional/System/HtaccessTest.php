@@ -14,9 +14,7 @@ use Drupal\Tests\BrowserTestBase;
 class HtaccessTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'path'];
 
@@ -99,7 +97,6 @@ class HtaccessTest extends BrowserTestBase {
 
     // Ensure web server configuration files cannot be accessed.
     $file_paths["$path/.htaccess"] = 403;
-    $file_paths["$path/web.config"] = 403;
 
     return $file_paths;
   }
@@ -107,7 +104,7 @@ class HtaccessTest extends BrowserTestBase {
   /**
    * Iterates over protected files and calls assertNoFileAccess().
    */
-  public function testFileAccess() {
+  public function testFileAccess(): void {
     foreach ($this->getProtectedFiles() as $file => $response_code) {
       $this->assertFileAccess($file, $response_code);
     }
@@ -157,7 +154,7 @@ class HtaccessTest extends BrowserTestBase {
   /**
    * Tests that SVGZ files are served with Content-Encoding: gzip.
    */
-  public function testSvgzContentEncoding() {
+  public function testSvgzContentEncoding(): void {
     $this->drupalGet('core/modules/system/tests/logo.svgz');
     $this->assertSession()->statusCodeEquals(200);
 

@@ -15,9 +15,7 @@ use Drupal\user\Entity\User;
 class FastTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['theme_test'];
 
@@ -44,7 +42,7 @@ class FastTest extends BrowserTestBase {
   /**
    * Tests access to user autocompletion and verify the correct results.
    */
-  public function testUserAutocomplete() {
+  public function testUserAutocomplete(): void {
     $this->drupalLogin($this->account);
     $this->drupalGet('user/autocomplete', ['query' => ['q' => $this->account->getAccountName()]]);
     $this->assertSession()->responseContains($this->account->getAccountName());

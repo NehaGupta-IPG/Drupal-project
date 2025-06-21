@@ -7,12 +7,15 @@ namespace Drupal\FunctionalTests\Rest;
 use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 
+/**
+ * Resource test base for the entity_view_mode entity.
+ */
 abstract class EntityViewModeResourceTestBase extends ConfigEntityResourceTestBase {
 
   /**
    * {@inheritdoc}
    *
-   * @todo: Remove 'field_ui' when https://www.drupal.org/node/2867266.
+   * @todo Remove 'field_ui' when https://www.drupal.org/node/2867266.
    */
   protected static $modules = ['user', 'field_ui'];
 

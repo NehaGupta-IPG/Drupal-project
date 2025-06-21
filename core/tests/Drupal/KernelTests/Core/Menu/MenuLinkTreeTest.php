@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Menu;
 
 use Drupal\Core\Menu\InaccessibleMenuLink;
@@ -34,9 +36,7 @@ class MenuLinkTreeTest extends KernelTestBase {
   protected $menuLinkManager;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
@@ -62,7 +62,7 @@ class MenuLinkTreeTest extends KernelTestBase {
   /**
    * Tests deleting all the links in a menu.
    */
-  public function testDeleteLinksInMenu() {
+  public function testDeleteLinksInMenu(): void {
     /** @var \Drupal\system\MenuStorage $storage */
     $storage = \Drupal::entityTypeManager()->getStorage('menu');
     $storage->create(['id' => 'menu1', 'label' => 'Menu 1'])->save();
@@ -89,7 +89,7 @@ class MenuLinkTreeTest extends KernelTestBase {
   /**
    * Tests creating links with an expected tree structure.
    */
-  public function testCreateLinksInMenu() {
+  public function testCreateLinksInMenu(): void {
     // This creates a tree with the following structure:
     // - 1
     // - 2
@@ -107,7 +107,7 @@ class MenuLinkTreeTest extends KernelTestBase {
       3 => MenuLinkMock::create(['id' => 'test.example3', 'route_name' => 'example3', 'title' => 'baz', 'parent' => 'test.example2', 'route_parameters' => ['baz' => 'qux']]),
       4 => MenuLinkMock::create(['id' => 'test.example4', 'route_name' => 'example4', 'title' => 'qux', 'parent' => 'test.example3']),
       5 => MenuLinkMock::create(['id' => 'test.example5', 'route_name' => 'example5', 'title' => 'title5', 'parent' => '']),
-      6 => MenuLinkMock::create(['id' => 'test.example6', 'route_name' => '', 'url' => 'https://www.drupal.org/', 'title' => 'barbar', 'parent' => '']),
+      6 => MenuLinkMock::create(['id' => 'test.example6', 'route_name' => '', 'url' => 'https://www.drupal.org/', 'title' => 'bar_bar', 'parent' => '']),
       7 => MenuLinkMock::create(['id' => 'test.example7', 'route_name' => 'example7', 'title' => 'title7', 'parent' => '']),
       8 => MenuLinkMock::create(['id' => 'test.example8', 'route_name' => 'example8', 'title' => 'title8', 'parent' => '']),
     ];
@@ -139,7 +139,7 @@ class MenuLinkTreeTest extends KernelTestBase {
   /**
    * Tests user/login and user/logout links.
    */
-  public function testUserLoginAndUserLogoutLinks() {
+  public function testUserLoginAndUserLogoutLinks(): void {
     $account_switcher = $this->container->get('account_switcher');
 
     $login_menu_link = MenuLinkMock::create(['id' => 'user_login_example', 'route_name' => 'user.login']);

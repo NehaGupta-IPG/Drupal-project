@@ -112,7 +112,8 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
    * @param \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface $argument_resolver
    *   An object to use in resolving route arguments.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request object to use for building titles and paths for plugin instances.
+   *   The request object to use for building titles and paths for plugin
+   *   instances.
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The current route match.
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
@@ -197,11 +198,58 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
   public function getLocalTasksForRoute($route_name) {
     if (!isset($this->instances[$route_name])) {
       $this->instances[$route_name] = [];
-      $data = $this->getLocalTasksDataForRoute($route_name);
-      $base_routes = $data['base_routes'];
-      $children = $data['children'];
-      $parents = $data['parents'];
-
+      if ($cache = $this->cacheBackend->get($this->cacheKey . ':' . $route_name)) {
+        $base_routes = $cache->data['base_routes'];
+        $parents = $cache->data['parents'];
+        $children = $cache->data['children'];
+      }
+      else {
+        $definitions = $this->getDefinitions();
+        // We build the hierarchy by finding all tabs that should
+        // appear on the current route.
+        $base_routes = [];
+        $parents = [];
+        $children = [];
+        foreach ($definitions as $plugin_id => $task_info) {
+          // Fill in the base_route from the parent to insure consistency.
+          if (!empty($task_info['parent_id']) && !empty($definitions[$task_info['parent_id']])) {
+            $task_info['base_route'] = $definitions[$task_info['parent_id']]['base_route'];
+            // Populate the definitions we use in the next loop. Using a
+            // reference like &$task_info causes bugs.
+            $definitions[$plugin_id]['base_route'] = $definitions[$task_info['parent_id']]['base_route'];
+          }
+          if ($route_name == $task_info['route_name']) {
+            if (!empty($task_info['base_route'])) {
+              $base_routes[$task_info['base_route']] = $task_info['base_route'];
+            }
+            // Tabs that link to the current route are viable parents
+            // and their parent and children should be visible also.
+            // @todo This only works for 2 levels of tabs instead
+            //   need to iterate up.
+            $parents[$plugin_id] = TRUE;
+            if (!empty($task_info['parent_id'])) {
+              $parents[$task_info['parent_id']] = TRUE;
+            }
+          }
+        }
+        if ($base_routes) {
+          // Find all the plugins with the same root and that are at the top
+          // level or that have a visible parent.
+          foreach ($definitions as $plugin_id => $task_info) {
+            if (!empty($base_routes[$task_info['base_route']]) && (empty($task_info['parent_id']) || !empty($parents[$task_info['parent_id']]))) {
+              // Concat '> ' with root ID for the parent of top-level tabs.
+              $parent = empty($task_info['parent_id']) ? '> ' . $task_info['base_route'] : $task_info['parent_id'];
+              $children[$parent][$plugin_id] = $task_info;
+            }
+          }
+        }
+        $data = [
+          'base_routes' => $base_routes,
+          'parents' => $parents,
+          'children' => $children,
+        ];
+        $this->cacheBackend->set($this->cacheKey . ':' . $route_name, $data, Cache::PERMANENT, $this->cacheTags);
+      }
       // Create a plugin instance for each element of the hierarchy.
       foreach ($base_routes as $base_route) {
         // Convert the tree keyed by plugin IDs into a simple one with
@@ -312,6 +360,17 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
         foreach ($local_tasks as $tab_level => $items) {
           $data[$tab_level] = empty($data[$tab_level]) ? $items : array_merge($data[$tab_level], $items);
         }
+
+        // Sort by weight and alphabetically if weights are the same.
+        foreach ($data as $key => $values) {
+          $weights = array_column($values, '#weight');
+          array_multisort(
+            $weights, SORT_ASC, SORT_NUMERIC,
+            array_keys($values), SORT_ASC, SORT_NATURAL,
+            $data[$key],
+          );
+        }
+
         $this->taskData[$route_name]['tabs'] = $data;
         // Allow modules to alter local tasks.
         $this->moduleHandler->alter('menu_local_tasks', $this->taskData[$route_name], $route_name, $cacheability);
@@ -362,82 +421,6 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
       $active = array_intersect_assoc($route_parameters, $raw_variables) == $route_parameters;
     }
     return $active;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getBaseRouteNames(string $route_name): array {
-    $data = $this->getLocalTasksDataForRoute($route_name);
-    return $data['base_routes'] ?? [];
-  }
-
-  /**
-   * Gets the local task data for the given route.
-   *
-   * @param string $route_name
-   *   The route name.
-   *
-   * @return array
-   *   The local task data with the following keys:
-   *   - base_routes: An array of base route names of the given route.
-   *   - children: An array of the route's child local task definitions keyed by
-   *     local task ID.
-   *   - parents: An array of the route's parent local task definitions.
-   */
-  protected function getLocalTasksDataForRoute(string $route_name): array {
-    if ($cache = $this->cacheBackend->get($this->cacheKey . ':' . $route_name)) {
-      $data = $cache->data;
-    }
-    else {
-      $definitions = $this->getDefinitions();
-      // We build the hierarchy by finding all tabs that should
-      // appear on the current route.
-      $base_routes = [];
-      $parents = [];
-      $children = [];
-      foreach ($definitions as $plugin_id => $task_info) {
-        // Fill in the base_route from the parent to insure consistency.
-        if (!empty($task_info['parent_id']) && !empty($definitions[$task_info['parent_id']])) {
-          $task_info['base_route'] = $definitions[$task_info['parent_id']]['base_route'];
-          // Populate the definitions we use in the next loop. Using a
-          // reference like &$task_info causes bugs.
-          $definitions[$plugin_id]['base_route'] = $definitions[$task_info['parent_id']]['base_route'];
-        }
-        if ($route_name == $task_info['route_name']) {
-          if (!empty($task_info['base_route'])) {
-            $base_routes[$task_info['base_route']] = $task_info['base_route'];
-          }
-          // Tabs that link to the current route are viable parents
-          // and their parent and children should be visible also.
-          // @todo - this only works for 2 levels of tabs.
-          // instead need to iterate up.
-          $parents[$plugin_id] = TRUE;
-          if (!empty($task_info['parent_id'])) {
-            $parents[$task_info['parent_id']] = TRUE;
-          }
-        }
-      }
-      if ($base_routes) {
-        // Find all the plugins with the same root and that are at the top
-        // level or that have a visible parent.
-        foreach ($definitions as $plugin_id => $task_info) {
-          if (!empty($base_routes[$task_info['base_route']]) && (empty($task_info['parent_id']) || !empty($parents[$task_info['parent_id']]))) {
-            // Concat '> ' with root ID for the parent of top-level tabs.
-            $parent = empty($task_info['parent_id']) ? '> ' . $task_info['base_route'] : $task_info['parent_id'];
-            $children[$parent][$plugin_id] = $task_info;
-          }
-        }
-      }
-      $data = [
-        'base_routes' => $base_routes,
-        'parents' => $parents,
-        'children' => $children,
-      ];
-      $this->cacheBackend->set($this->cacheKey . ':' . $route_name, $data, Cache::PERMANENT, $this->cacheTags);
-    }
-
-    return $data;
   }
 
 }

@@ -14,9 +14,7 @@ use Drupal\user\Entity\User;
 class NodeContextualLinksTest extends NodeTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['contextual'];
 
@@ -34,7 +32,7 @@ class NodeContextualLinksTest extends NodeTestBase {
    *
    * @see https://www.drupal.org/node/2379811
    */
-  public function testPageWithDisabledContextualModule() {
+  public function testPageWithDisabledContextualModule(): void {
     \Drupal::service('module_installer')->uninstall(['contextual']);
     \Drupal::service('module_installer')->install(['views_ui']);
 

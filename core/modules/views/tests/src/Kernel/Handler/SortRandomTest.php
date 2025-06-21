@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Core\Cache\Cache;
@@ -69,7 +71,7 @@ class SortRandomTest extends ViewsKernelTestBase {
    *
    * @see DatabaseSelectTestCase::testRandomOrder()
    */
-  public function testRandomOrdering() {
+  public function testRandomOrdering(): void {
     // Execute a basic view first.
     $view = Views::getView('test_view');
     $this->executeView($view);
@@ -90,7 +92,8 @@ class SortRandomTest extends ViewsKernelTestBase {
       'views_test_data_age' => 'views_test_data_name',
     ]);
 
-    // Execute a second random view, we expect the result set to be different again.
+    // Execute a second random view, we expect the result set to be different
+    // again.
     $view_random_2 = $this->getBasicRandomView();
     $this->executeView($view_random_2);
     $this->assertSameSize($this->dataSet(), $view_random_2->result, 'The number of returned rows match.');
@@ -106,7 +109,7 @@ class SortRandomTest extends ViewsKernelTestBase {
    * The random sorting should opt out of caching by defining a max age of 0.
    * At the same time, the row render caching still works.
    */
-  public function testRandomOrderingWithRenderCaching() {
+  public function testRandomOrderingWithRenderCaching(): void {
     $view_random = $this->getBasicRandomView();
 
     $display = &$view_random->storage->getDisplay('default');

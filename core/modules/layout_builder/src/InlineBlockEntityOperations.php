@@ -7,7 +7,6 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Entity\SynchronizableInterface;
-use Drupal\layout_builder\Plugin\Block\InlineBlock;
 use Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -80,12 +79,12 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
    *   The parent entity.
    */
   protected function removeUnusedForEntityOnSave(EntityInterface $entity) {
-    // If the entity is new or '$entity->original' is not set then there will
+    // If the entity is new or there is no original entity then there will
     // not be any unused inline blocks to remove.
     // If this is a revisionable entity then do not remove inline blocks. They
     // could be referenced in previous revisions even if this is not a new
     // revision.
-    if ($entity->isNew() || !isset($entity->original) || $entity instanceof RevisionableInterface) {
+    if ($entity->isNew() || !$entity->getOriginal() || $entity instanceof RevisionableInterface) {
       return;
     }
     // If the original entity used the default storage then we cannot remove
@@ -111,7 +110,7 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
    *   The block content IDs that were removed.
    */
   protected function getRemovedBlockIds(EntityInterface $entity) {
-    $original_sections = $this->getEntitySections($entity->original);
+    $original_sections = $this->getEntitySections($entity->getOriginal());
     $current_sections = $this->getEntitySections($entity);
     // Avoid un-needed conversion from revision IDs to block content IDs by
     // first determining if there are any revisions in the original that are not
@@ -169,24 +168,6 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
       }
     }
     $this->removeUnusedForEntityOnSave($entity);
-  }
-
-  /**
-   * Gets a block ID for an inline block plugin.
-   *
-   * @param \Drupal\layout_builder\Plugin\Block\InlineBlock $block_plugin
-   *   The inline block plugin.
-   *
-   * @return int
-   *   The block content ID or null none available.
-   */
-  protected function getPluginBlockId(InlineBlock $block_plugin) {
-    $configuration = $block_plugin->getConfiguration();
-    if (!empty($configuration['block_revision_id'])) {
-      $revision_ids = $this->getBlockIdsForRevisionIds([$configuration['block_revision_id']]);
-      return array_pop($revision_ids);
-    }
-    return NULL;
   }
 
   /**
@@ -252,7 +233,7 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
     $plugin->saveBlockContent($new_revision, $duplicate_blocks);
     $post_save_configuration = $plugin->getConfiguration();
     if ($duplicate_blocks || (empty($pre_save_configuration['block_revision_id']) && !empty($post_save_configuration['block_revision_id']))) {
-      $this->usage->addUsage($this->getPluginBlockId($plugin), $entity);
+      $this->usage->addUsage($post_save_configuration['block_id'], $entity);
     }
     $component->setConfiguration($post_save_configuration);
   }

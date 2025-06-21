@@ -19,9 +19,6 @@ class EnvironmentTest extends TestCase {
   /**
    * Tests \Drupal\Component\Utility\Environment::checkMemoryLimit().
    *
-   * @dataProvider providerTestCheckMemoryLimit
-   * @covers ::checkMemoryLimit
-   *
    * @param string $required
    *   The required memory argument for
    *   \Drupal\Component\Utility\Environment::checkMemoryLimit().
@@ -31,8 +28,11 @@ class EnvironmentTest extends TestCase {
    * @param bool $expected
    *   The expected return value from
    *   \Drupal\Component\Utility\Environment::checkMemoryLimit().
+   *
+   * @dataProvider providerTestCheckMemoryLimit
+   * @covers ::checkMemoryLimit
    */
-  public function testCheckMemoryLimit($required, $custom_memory_limit, $expected) {
+  public function testCheckMemoryLimit($required, $custom_memory_limit, $expected): void {
     $actual = Environment::checkMemoryLimit($required, $custom_memory_limit);
     $this->assertEquals($expected, $actual);
   }

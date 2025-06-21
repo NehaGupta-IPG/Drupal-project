@@ -25,7 +25,7 @@ class DistributionProfileTest extends InstallerTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  protected function prepareEnvironment() {
+  protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
     $this->info = [
       'type' => 'profile',
@@ -49,7 +49,7 @@ class DistributionProfileTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpLanguage() {
+  protected function setUpLanguage(): void {
     // Verify that the distribution name appears.
     $this->assertSession()->pageTextContains($this->info['distribution']['name']);
     // Verify that the distribution name is used in the site title.
@@ -65,14 +65,14 @@ class DistributionProfileTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpProfile() {
+  protected function setUpProfile(): void {
     // This step is skipped, because there is a distribution profile.
   }
 
   /**
    * Confirms that the installation succeeded.
    */
-  public function testInstalled() {
+  public function testInstalled(): void {
     $this->assertSession()->addressEquals('root-user');
     $this->assertSession()->statusCodeEquals(200);
     // Confirm that we are logged-in after installation.

@@ -11,14 +11,13 @@ use Drupal\node\Entity\Node;
  * Tests the Layout Builder UI.
  *
  * @group layout_builder
- * @group #slow
  */
 class LayoutBuilderOverridesTest extends LayoutBuilderTestBase {
 
   /**
    * Tests deleting a field in-use by an overridden layout.
    */
-  public function testDeleteField() {
+  public function testDeleteField(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -51,7 +50,7 @@ class LayoutBuilderOverridesTest extends LayoutBuilderTestBase {
   /**
    * Tests Layout Builder overrides without access to edit the default layout.
    */
-  public function testOverridesWithoutDefaultsAccess() {
+  public function testOverridesWithoutDefaultsAccess(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -71,15 +70,15 @@ class LayoutBuilderOverridesTest extends LayoutBuilderTestBase {
   /**
    * Tests Layout Builder overrides without Field UI installed.
    */
-  public function testOverridesWithoutFieldUi() {
+  public function testOverridesWithoutFieldUi(): void {
     $this->container->get('module_installer')->uninstall(['field_ui']);
 
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
-    // @todo In https://www.drupal.org/node/540008 switch this to logging in as
-    //   a user with the 'configure any layout' permission.
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->drupalCreateUser([
+      'configure any layout',
+    ]));
 
     LayoutBuilderEntityViewDisplay::load('node.bundle_with_section_field.default')
       ->enableLayoutBuilder()
@@ -95,7 +94,7 @@ class LayoutBuilderOverridesTest extends LayoutBuilderTestBase {
   /**
    * Tests functionality of Layout Builder for overrides.
    */
-  public function testOverrides() {
+  public function testOverrides(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -142,7 +141,7 @@ class LayoutBuilderOverridesTest extends LayoutBuilderTestBase {
   /**
    * Tests a custom alter of the overrides form.
    */
-  public function testOverridesFormAlter() {
+  public function testOverridesFormAlter(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -177,7 +176,7 @@ class LayoutBuilderOverridesTest extends LayoutBuilderTestBase {
   /**
    * Tests removing all sections from overrides and defaults.
    */
-  public function testRemovingAllSections() {
+  public function testRemovingAllSections(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

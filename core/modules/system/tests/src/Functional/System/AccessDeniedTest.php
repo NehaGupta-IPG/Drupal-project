@@ -18,9 +18,7 @@ class AccessDeniedTest extends BrowserTestBase {
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'node', 'system_test'];
 
@@ -29,6 +27,11 @@ class AccessDeniedTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * The test user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
   protected $adminUser;
 
   /**
@@ -53,7 +56,10 @@ class AccessDeniedTest extends BrowserTestBase {
     user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['access user profiles']);
   }
 
-  public function testAccessDenied() {
+  /**
+   * Tests access denied functionality.
+   */
+  public function testAccessDenied(): void {
     $this->drupalGet('admin');
     $this->assertSession()->pageTextContains('Access denied');
     $this->assertSession()->statusCodeEquals(403);
@@ -130,7 +136,7 @@ class AccessDeniedTest extends BrowserTestBase {
   /**
    * Tests that an inaccessible custom 403 page falls back to the default.
    */
-  public function testAccessDeniedCustomPageWithAccessDenied() {
+  public function testAccessDeniedCustomPageWithAccessDenied(): void {
     // Sets up a 403 page not accessible by the anonymous user.
     $this->config('system.site')->set('page.403', '/system-test/custom-4xx')->save();
 

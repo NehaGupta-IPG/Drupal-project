@@ -32,7 +32,7 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
   protected $libraryDiscovery;
 
   /**
-   * jQuery UI CSS and JS assets keyed by their weight.
+   * The jQuery UI CSS and JS assets keyed by their weight.
    *
    * For example, the value of $weightGroupedAssets[-11] would be an array
    * of every jQuery UI CSS and JS file asset configured with a weight of -11.
@@ -94,7 +94,7 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
    * order. The necessary loading order was determined by the requirements
    * specified in each jQuery UI JavaScript file.
    */
-  public function testProperlySetWeights() {
+  public function testProperlySetWeights(): void {
     $assets = [];
 
     // Confirm that no asset is assigned multiple weights.
@@ -113,13 +113,9 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
         'core/assets/vendor/jquery.ui/ui/data-min.js',
         'core/assets/vendor/jquery.ui/ui/disable-selection-min.js',
         'core/assets/vendor/jquery.ui/ui/focusable-min.js',
-        'core/assets/vendor/jquery.ui/ui/form-min.js',
-        'core/assets/vendor/jquery.ui/ui/ie-min.js',
         'core/assets/vendor/jquery.ui/ui/jquery-patch-min.js',
         'core/assets/vendor/jquery.ui/ui/keycode-min.js',
         'core/assets/vendor/jquery.ui/ui/plugin-min.js',
-        'core/assets/vendor/jquery.ui/ui/safe-active-element-min.js',
-        'core/assets/vendor/jquery.ui/ui/safe-blur-min.js',
         'core/assets/vendor/jquery.ui/ui/scroll-parent-min.js',
         'core/assets/vendor/jquery.ui/ui/unique-id-min.js',
         'core/assets/vendor/jquery.ui/ui/widget-min.js',
@@ -169,7 +165,7 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
   /**
    * Confirm that uses of a jQuery UI asset are configured with the same weight.
    */
-  public function testSameAssetSameWeight() {
+  public function testSameAssetSameWeight(): void {
     $asset_weights = [];
     $libraries_to_check = $this->coreLibrariesWithJqueryUiAssets;
 
@@ -218,7 +214,7 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
    *
    * @dataProvider providerTestAssetLoading
    */
-  public function testLibraryAssetLoadingOrder($library) {
+  public function testLibraryAssetLoadingOrder($library, array $expected_css, array $expected_js): void {
     $this->drupalGet("jqueryui_library_assets_test/$library");
     $this->assertSession()->statusCodeEquals(200);
 
@@ -299,7 +295,7 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
    *
    * @dataProvider providerTestAssetLoading
    */
-  public function testAssetLoadingUnchanged($library, array $expected_css, array $expected_js) {
+  public function testAssetLoadingUnchanged($library, array $expected_css, array $expected_js): void {
     $this->drupalGet("jqueryui_library_assets_test/$library");
     $this->assertSession()->statusCodeEquals(200);
 

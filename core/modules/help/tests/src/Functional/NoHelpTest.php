@@ -14,7 +14,7 @@ use Drupal\Tests\BrowserTestBase;
 class NoHelpTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
+   * Modules to install.
    *
    * Use one of the test modules that do not implement hook_help().
    *
@@ -29,6 +29,8 @@ class NoHelpTest extends BrowserTestBase {
 
   /**
    * The user who will be created.
+   *
+   * @var \Drupal\user\Entity\User|false
    */
   protected $adminUser;
 
@@ -43,7 +45,7 @@ class NoHelpTest extends BrowserTestBase {
   /**
    * Ensures modules not implementing help do not appear on admin/help.
    */
-  public function testMainPageNoHelp() {
+  public function testMainPageNoHelp(): void {
     $this->drupalLogin($this->adminUser);
 
     $this->drupalGet('admin/help');

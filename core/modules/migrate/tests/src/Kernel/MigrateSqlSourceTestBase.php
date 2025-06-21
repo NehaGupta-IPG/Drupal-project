@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Kernel;
 
 use Drupal\Core\Cache\MemoryCounterBackendFactory;
@@ -86,7 +88,7 @@ abstract class MigrateSqlSourceTestBase extends MigrateSourceTestBase {
    *
    * @requires extension pdo_sqlite
    */
-  public function testSource(array $source_data, array $expected_data, $expected_count = NULL, array $configuration = [], $high_water = NULL, $expected_cache_key = NULL) {
+  public function testSource(array $source_data, array $expected_data, $expected_count = NULL, array $configuration = [], $high_water = NULL, $expected_cache_key = NULL): void {
     $plugin = $this->getPlugin($configuration);
 
     // Since we don't yet inject the database connection, we need to use a

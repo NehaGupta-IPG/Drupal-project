@@ -27,7 +27,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
   /**
    * Tests that uploads in the 'media_library_widget' works as expected.
    */
-  public function testWidgetUpload() {
+  public function testWidgetUpload(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $driver = $this->getSession()->getDriver();
@@ -208,9 +208,12 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     // Assert we can now only upload one more media item.
     $this->openMediaLibraryForField('field_twin_media');
     $this->switchToMediaType('Four');
-    // Despite the 'One file only' text, we don't limit the number of uploads.
-    $this->assertTrue($assert_session->fieldExists('Add file')->hasAttribute('multiple'));
+    // We set the multiple to FALSE if only one file can be uploaded
+    $this->assertFalse($assert_session->fieldExists('Add file')->hasAttribute('multiple'));
     $assert_session->pageTextContains('One file only.');
+    $choose_files = $assert_session->elementExists('css', '.form-managed-file');
+    $choose_files->hasButton('Choose file');
+    $this->assertFalse($choose_files->hasButton('Choose files'));
 
     // Assert media type four should only allow jpg files by trying a png file
     // first.
@@ -298,7 +301,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     // Create a list of new files to upload.
     $filenames = [];
     $remote_paths = [];
-    foreach (range(1, 4) as $i) {
+    for ($i = 1; $i < 5; $i++) {
       $path = $file_system->copy($png_image->uri, 'public://');
       $filenames[] = $file_system->basename($path);
       $remote_paths[] = $driver->uploadFileAndGetRemoteFilePath($file_system->realpath($path));
@@ -368,7 +371,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
    * @todo Merge this with testWidgetUpload() in
    *   https://www.drupal.org/project/drupal/issues/3087227
    */
-  public function testWidgetUploadAdvancedUi() {
+  public function testWidgetUploadAdvancedUi(): void {
     $this->config('media_library.settings')->set('advanced_ui', TRUE)->save();
 
     $assert_session = $this->assertSession();
@@ -555,9 +558,13 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     // Assert we can now only upload one more media item.
     $this->openMediaLibraryForField('field_twin_media');
     $this->switchToMediaType('Four');
-    // Despite the 'One file only' text, we don't limit the number of uploads.
-    $this->assertTrue($assert_session->fieldExists('Add file')->hasAttribute('multiple'));
+
+    // We set the multiple to FALSE if only one file can be uploaded
+    $this->assertFalse($assert_session->fieldExists('Add file')->hasAttribute('multiple'));
     $assert_session->pageTextContains('One file only.');
+    $choose_files = $assert_session->elementExists('css', '.form-managed-file');
+    $choose_files->hasButton('Choose file');
+    $this->assertFalse($choose_files->hasButton('Choose files'));
 
     // Assert media type four should only allow jpg files by trying a png file
     // first.
@@ -673,7 +680,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     // Create a list of new files to upload.
     $filenames = [];
     $remote_paths = [];
-    foreach (range(1, 4) as $i) {
+    for ($i = 1; $i < 5; $i++) {
       $path = $file_system->copy($png_image->uri, 'public://');
       $filenames[] = $file_system->basename($path);
       $remote_paths[] = $driver->uploadFileAndGetRemoteFilePath($file_system->realpath($path));

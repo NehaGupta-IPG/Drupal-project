@@ -139,7 +139,8 @@ JAVASCRIPT_PACKAGES_CHANGED=0
 # it is used to make sure the compiled JS is valid.
 CKEDITOR5_PLUGINS_CHANGED=0
 
-# This variable will be set to when the dictionary has changed.
+# This variable will be set to one when either of the core dictionaries or the
+# .cspell.json config has changed.
 CSPELL_DICTIONARY_FILE_CHANGED=0
 
 # Build up a list of absolute file names.
@@ -176,7 +177,7 @@ for FILE in $FILES; do
     CKEDITOR5_PLUGINS_CHANGED=1;
   fi;
 
-  if [[ $FILE == "core/misc/cspell/dictionary.txt" || $FILE == "core/misc/cspell/drupal-dictionary.txt" ]]; then
+  if [[ $FILE == "core/misc/cspell/dictionary.txt" || $FILE == "core/misc/cspell/drupal-dictionary.txt" || $FILE == "core/.cspell.json" ]]; then
     CSPELL_DICTIONARY_FILE_CHANGED=1;
   fi
 done
@@ -216,7 +217,7 @@ else
   # Check all files for spelling in one go for better performance. We pipe the
   # list files in so we obey the globs set on the spellcheck:core command in
   # core/package.json.
-    echo "${ABS_FILES}" | tr ' ' '\n' | yarn run spellcheck:core --no-must-find-files --root --file-list $TOP_LEVEL $ABS_FILES >/dev/null stdin
+  echo "${ABS_FILES}" | tr ' ' '\n' | yarn run spellcheck:core --no-must-find-files --file-list stdin
 fi
 
 if [ "$?" -ne "0" ]; then

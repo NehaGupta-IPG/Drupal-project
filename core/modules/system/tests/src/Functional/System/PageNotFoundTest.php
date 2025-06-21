@@ -18,9 +18,7 @@ class PageNotFoundTest extends BrowserTestBase {
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system_test'];
 
@@ -29,6 +27,11 @@ class PageNotFoundTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * The test user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
   protected $adminUser;
 
   /**
@@ -49,7 +52,10 @@ class PageNotFoundTest extends BrowserTestBase {
     user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['access user profiles']);
   }
 
-  public function testPageNotFound() {
+  /**
+   * Tests page not found.
+   */
+  public function testPageNotFound(): void {
     $this->drupalLogin($this->adminUser);
     $this->drupalGet($this->randomMachineName(10));
     $this->assertSession()->pageTextContains('Page not found');
@@ -76,7 +82,7 @@ class PageNotFoundTest extends BrowserTestBase {
   /**
    * Tests that an inaccessible custom 404 page falls back to the default.
    */
-  public function testPageNotFoundCustomPageWithAccessDenied() {
+  public function testPageNotFoundCustomPageWithAccessDenied(): void {
     // Sets up a 404 page not accessible by the anonymous user.
     $this->config('system.site')->set('page.404', '/system-test/custom-4xx')->save();
 

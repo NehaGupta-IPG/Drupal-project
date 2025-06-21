@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\language_test\Plugin\LanguageNegotiation;
 
 use Drupal\Core\Language\LanguageInterface;
@@ -31,7 +33,7 @@ class LanguageNegotiationTest extends LanguageNegotiationMethodBase {
   /**
    * {@inheritdoc}
    */
-  public function getLangcode(Request $request = NULL) {
+  public function getLangcode(?Request $request = NULL) {
     return 'it';
   }
 

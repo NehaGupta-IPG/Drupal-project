@@ -49,12 +49,13 @@ class Search extends FilterPluginBase {
   /**
    * The search score.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public string $search_score;
 
   /**
    * {@inheritdoc}
    */
-  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
+  public function init(ViewExecutable $view, DisplayPluginBase $display, ?array &$options = NULL) {
     parent::init($view, $display, $options);
 
     $this->searchType = $this->definition['search_type'];

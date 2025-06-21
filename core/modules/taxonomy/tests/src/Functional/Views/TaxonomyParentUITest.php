@@ -27,9 +27,7 @@ class TaxonomyParentUITest extends UITestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['taxonomy', 'taxonomy_test_views'];
 
@@ -43,7 +41,7 @@ class TaxonomyParentUITest extends UITestBase {
   /**
    * Tests the taxonomy parent plugin UI.
    */
-  public function testTaxonomyParentUI() {
+  public function testTaxonomyParentUI(): void {
     $this->drupalGet('admin/structure/views/nojs/handler/test_taxonomy_parent/default/relationship/parent');
     $this->assertSession()->pageTextNotContains('The handler for this item is broken or missing.');
   }

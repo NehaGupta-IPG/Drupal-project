@@ -28,7 +28,10 @@ class UserRequirementsTest extends BrowserTestBase {
       ->condition('uid', 0)
       ->execute();
 
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->drupalCreateUser([
+      'access administration pages',
+      'administer site configuration',
+    ]));
     $this->drupalGet('/admin/reports/status');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains("The anonymous user does not exist.");

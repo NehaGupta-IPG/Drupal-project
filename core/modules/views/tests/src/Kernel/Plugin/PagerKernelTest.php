@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Plugin;
 
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -40,7 +42,7 @@ class PagerKernelTest extends ViewsKernelTestBase {
    * @see \Drupal\views\ViewExecutable::setOffset
    * @see \Drupal\views\ViewExecutable::setCurrentPage
    */
-  public function testSetPagerMethods() {
+  public function testSetPagerMethods(): void {
     $view = Views::getView('test_pager_full');
 
     // Mark the view as cacheable in order have the cache checking working

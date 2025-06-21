@@ -21,9 +21,7 @@ class ContactLanguageTest extends BrowserTestBase {
   use LanguageTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'contact',
@@ -53,7 +51,7 @@ class ContactLanguageTest extends BrowserTestBase {
   /**
    * Tests configuration options with language enabled.
    */
-  public function testContactLanguage() {
+  public function testContactLanguage(): void {
     // Ensure that contact form by default does not show the language select.
     $this->drupalGet('contact');
     $this->assertSession()->statusCodeEquals(200);

@@ -17,7 +17,6 @@ use Drupal\Tests\TestFileCreationTrait;
  * Tests the creation of text fields.
  *
  * @group text
- * @group #slow
  */
 class TextFieldTest extends StringFieldTest {
 
@@ -59,7 +58,7 @@ class TextFieldTest extends StringFieldTest {
   /**
    * Tests text field validation.
    */
-  public function testTextFieldValidation() {
+  public function testTextFieldValidation(): void {
     // Create a field with settings to validate.
     $max_length = 3;
     $field_name = $this->randomMachineName();
@@ -94,7 +93,7 @@ class TextFieldTest extends StringFieldTest {
   /**
    * Tests required long text with file upload.
    */
-  public function testRequiredLongTextWithFileUpload() {
+  public function testRequiredLongTextWithFileUpload(): void {
     // Create a text field.
     $text_field_name = 'text_long';
     $field_storage = FieldStorageConfig::create([
@@ -156,7 +155,7 @@ class TextFieldTest extends StringFieldTest {
   /**
    * Tests widgets.
    */
-  public function testTextfieldWidgets() {
+  public function testTextfieldWidgets(): void {
     $this->_testTextfieldWidgets('text', 'text_textfield');
     $this->_testTextfieldWidgets('text_long', 'text_textarea');
   }
@@ -164,7 +163,7 @@ class TextFieldTest extends StringFieldTest {
   /**
    * Tests widgets + 'formatted_text' setting.
    */
-  public function testTextfieldWidgetsFormatted() {
+  public function testTextfieldWidgetsFormatted(): void {
     $this->_testTextfieldWidgetsFormatted('text', 'text_textfield');
     $this->_testTextfieldWidgetsFormatted('text_long', 'text_textarea');
   }
@@ -172,7 +171,7 @@ class TextFieldTest extends StringFieldTest {
   /**
    * Test widgets for fields with selected allowed formats.
    */
-  public function testTextfieldWidgetsAllowedFormats() {
+  public function testTextfieldWidgetsAllowedFormats(): void {
     // Create one text format.
     $this->drupalLogin($this->adminUser);
     $format1 = FilterFormat::create([
@@ -308,7 +307,7 @@ class TextFieldTest extends StringFieldTest {
   /**
    * Helper function for testTextfieldWidgetsFormatted().
    */
-  public function _testTextfieldWidgetsFormatted($field_type, $widget_type) {
+  public function _testTextfieldWidgetsFormatted($field_type, $widget_type): void {
     // Create a field.
     $field_name = $this->randomMachineName();
     $field_storage = FieldStorageConfig::create([
@@ -399,7 +398,6 @@ class TextFieldTest extends StringFieldTest {
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been updated.');
 
     // Display the entity.
-    $this->container->get('entity_type.manager')->getStorage('entity_test')->resetCache([$id]);
     $entity = EntityTest::load($id);
     $display = $display_repository->getViewDisplay($entity->getEntityTypeId(), $entity->bundle(), 'full');
     $content = $display->build($entity);

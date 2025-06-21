@@ -101,7 +101,7 @@ class UrlResolver implements UrlResolverInterface {
     }
 
     $document = Html::load((string) $response->getBody());
-    $xpath = new \DOMXpath($document);
+    $xpath = new \DOMXPath($document);
 
     return $this->findUrl($xpath, 'json') ?: $this->findUrl($xpath, 'xml');
   }
@@ -176,7 +176,7 @@ class UrlResolver implements UrlResolverInterface {
     // provide extra parameters in the query string. For example, Instagram also
     // supports the 'omitscript' parameter.
     $this->moduleHandler->alter('oembed_resource_url', $parsed_url, $provider);
-    $resource_url = $parsed_url['path'] . '?' . rawurldecode(UrlHelper::buildQuery($parsed_url['query']));
+    $resource_url = $parsed_url['path'] . '?' . UrlHelper::buildQuery($parsed_url['query']);
 
     $this->urlCache[$url] = $resource_url;
     $this->cacheBackend->set($cache_id, $resource_url);

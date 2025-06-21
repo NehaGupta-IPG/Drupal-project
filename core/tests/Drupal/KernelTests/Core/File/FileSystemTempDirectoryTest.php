@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\File;
 
 use Drupal\Component\FileSystem\FileSystem as FileSystemComponent;
@@ -15,9 +17,7 @@ use Drupal\KernelTests\KernelTestBase;
 class FileSystemTempDirectoryTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system'];
 
@@ -43,7 +43,7 @@ class FileSystemTempDirectoryTest extends KernelTestBase {
    *
    * @covers ::getTempDirectory
    */
-  public function testGetTempDirectorySettings() {
+  public function testGetTempDirectorySettings(): void {
     $tempDir = '/var/tmp/' . $this->randomMachineName();
     $this->setSetting('file_temp_path', $tempDir);
     $this->assertEquals($tempDir, $this->fileSystem->getTempDirectory());
@@ -54,7 +54,7 @@ class FileSystemTempDirectoryTest extends KernelTestBase {
    *
    * @covers ::getTempDirectory
    */
-  public function testGetTempDirectoryOsDefault() {
+  public function testGetTempDirectoryOsDefault(): void {
     $tempDir = FileSystemComponent::getOsTemporaryDirectory();
     $dir = $this->fileSystem->getTempDirectory();
     $this->assertEquals($tempDir, $dir);
