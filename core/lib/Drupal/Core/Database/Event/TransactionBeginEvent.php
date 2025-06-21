@@ -7,5 +7,5 @@ namespace Drupal\Core\Database\Event;
 /**
  * Represents the beginning of a transaction.
  */
-class TransactionBeginEvent extends TransactionEventBase {
+final class TransactionBeginEvent extends TransactionEventBase {
 }

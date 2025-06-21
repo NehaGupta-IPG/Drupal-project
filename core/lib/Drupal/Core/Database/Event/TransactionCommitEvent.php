@@ -7,5 +7,5 @@ namespace Drupal\Core\Database\Event;
 /**
  * Represents the commit of a transaction.
  */
-class TransactionCommitEvent extends TransactionEventBase {
+final class TransactionCommitEvent extends TransactionEventBase {
 }

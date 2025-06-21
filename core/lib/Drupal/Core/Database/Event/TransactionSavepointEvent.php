@@ -7,5 +7,5 @@ namespace Drupal\Core\Database\Event;
 /**
  * Represents the activation of a transaction savepoint.
  */
-class TransactionSavepointEvent extends TransactionEventBase {
+final class TransactionSavepointEvent extends TransactionEventBase {
 }

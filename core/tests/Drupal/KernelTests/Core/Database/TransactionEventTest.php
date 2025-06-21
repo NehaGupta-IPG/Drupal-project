@@ -7,12 +7,12 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\Event\TransactionBeginEvent;
 use Drupal\Core\Database\Event\TransactionEvent;
 use Drupal\Core\Database\Event\TransactionSavepointEvent;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Transaction events.
- *
- * @group Database
  */
+#[Group('Database')]
 class TransactionEventTest extends DatabaseTestBase {
 
   /**
@@ -29,6 +29,7 @@ class TransactionEventTest extends DatabaseTestBase {
   public function testTransactionBegin(): void {
     $this->expectException(\RuntimeException::class);
     $this->expectExceptionMessageMatches("/^default default .*\\\\drupal_transaction/");
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
     $tx = $this->connection->startTransaction();
   }
 
@@ -39,9 +40,11 @@ class TransactionEventTest extends DatabaseTestBase {
     $this->connection->disableEvents([
       TransactionBeginEvent::class,
     ]);
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
     $tx = $this->connection->startTransaction();
     $this->expectException(\RuntimeException::class);
     $this->expectExceptionMessageMatches("/^default default .*\\\\savepoint_1 stack: .*\\\\drupal_transaction/");
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
     $savepoint = $this->connection->startTransaction();
   }
 
@@ -54,10 +57,11 @@ class TransactionEventTest extends DatabaseTestBase {
       TransactionSavepointEvent::class,
     ]);
     $tx = $this->connection->startTransaction();
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
     $savepoint = $this->connection->startTransaction('foo');
     $this->expectException(\RuntimeException::class);
     $this->expectExceptionMessageMatches("/^default default .*\\\\drupal_transaction stack: .*\\\\drupal_transaction > .*\\\\foo/");
-    unset($tx);
+    $tx->commitOrRelease();
   }
 
 }
