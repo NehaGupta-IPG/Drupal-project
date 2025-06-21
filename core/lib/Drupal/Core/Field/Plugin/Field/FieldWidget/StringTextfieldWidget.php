@@ -71,7 +71,7 @@ class StringTextfieldWidget extends WidgetBase {
    */
   public function singleElementObject(FieldItemListInterface $items, $delta, Widget $widget, ElementInterface $form, FormStateInterface $form_state): ElementInterface {
     $value = $widget->createChild('value', Textfield::class, copyProperties: TRUE);
-    $value->default_value = $items[$delta]->value;
+    $value->default_value = $items[$delta]->value ?? NULL;
     $value->size = $this->getSetting('size');
     $value->placeholder = $this->getSetting('placeholder');
     $value->maxlength = $this->getFieldSetting('max_length');

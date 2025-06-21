@@ -145,7 +145,7 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
    * @return string
    *   The cache ID.
    */
-  protected function getCid($theme_name) {
+  protected function getCid($theme_name): string {
     return 'element_info_build:' . $theme_name;
   }
 
