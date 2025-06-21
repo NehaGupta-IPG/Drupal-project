@@ -1495,7 +1495,7 @@ abstract class Connection {
   /**
    * Enables database API events dispatching.
    *
-   * @param string[] $eventNames
+   * @param list<class-string<\Drupal\Core\Database\Event\DatabaseEvent>> $eventNames
    *   A list of database events to be enabled.
    *
    * @return static
@@ -1512,7 +1512,7 @@ abstract class Connection {
   /**
    * Disables database API events dispatching.
    *
-   * @param string[] $eventNames
+   * @param list<class-string<\Drupal\Core\Database\Event\DatabaseEvent>> $eventNames
    *   A list of database events to be disabled.
    *
    * @return static

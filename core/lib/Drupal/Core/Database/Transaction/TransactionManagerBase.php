@@ -7,6 +7,7 @@ namespace Drupal\Core\Database\Transaction;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Event\TransactionBeginEvent;
 use Drupal\Core\Database\Event\TransactionCommitEvent;
+use Drupal\Core\Database\Event\TransactionEvent;
 use Drupal\Core\Database\Event\TransactionSavepointEvent;
 use Drupal\Core\Database\Transaction;
 use Drupal\Core\Database\TransactionCommitFailedException;
@@ -170,6 +171,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    *   changes the order of object destruction when the develop mode is enabled.
    */
   public function commitAll(): void {
+    $this->connection->disableEvents(TransactionEvent::all());
     foreach (array_reverse($this->stack()) as $id => $item) {
       $this->unpile($item->name, $id);
     }
@@ -470,6 +472,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     elseif ($this->stackDepth() === 1 && $this->stack()[$id]->type === StackItemType::Root) {
       // If this was the root Drupal transaction, we can commit the client
       // transaction.
+      $this->processRootCommit();
       if ($this->connection->isEventEnabled(TransactionCommitEvent::class)) {
         $this->connection->dispatchEvent(new TransactionCommitEvent(
           $this->connection->getKey(),
@@ -479,7 +482,6 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
           $this->stackItemsAsArray(),
         ));
       }
-      $this->processRootCommit();
     }
     else {
       // The stack got corrupted.

@@ -1,5 +1,6 @@
 services:
   _defaults:
+    autowire: true
     autoconfigure: true
   # A test subscriber for the database API events.
   Drupal\database_test\EventSubscriber\DatabaseEventSubscriber: ~
