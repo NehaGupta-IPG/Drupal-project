@@ -36,11 +36,11 @@ class TransactionManager extends TransactionManagerBase {
     try {
       return (bool) $this->connection->getClientConnection()->query('ROLLBACK TO SAVEPOINT ' . $name);
     }
-    catch (\mysqli_sql_exception) {
+    catch (\mysqli_sql_exception $e) {
       // If the rollback failed, most likely the savepoint was not there
       // because the transaction is no longer active. In this case we void the
       // transaction stack.
-      $this->voidClientTransaction();
+      $this->voidClientTransaction($e->getMessage());
       return TRUE;
     }
   }

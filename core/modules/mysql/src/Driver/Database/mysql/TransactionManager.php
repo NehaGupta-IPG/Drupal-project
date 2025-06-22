@@ -29,7 +29,7 @@ class TransactionManager extends TransactionManagerBase {
    */
   protected function processRootCommit(): void {
     if (!$this->connection->getClientConnection()->inTransaction()) {
-      $this->voidClientTransaction();
+      $this->voidClientTransaction('MySql no longer in transaction');
       return;
     }
     parent::processRootCommit();
@@ -40,7 +40,7 @@ class TransactionManager extends TransactionManagerBase {
    */
   protected function rollbackClientSavepoint(string $name): bool {
     if (!$this->connection->getClientConnection()->inTransaction()) {
-      $this->voidClientTransaction();
+      $this->voidClientTransaction('MySql no longer in transaction');
       return TRUE;
     }
     return parent::rollbackClientSavepoint($name);
@@ -51,7 +51,7 @@ class TransactionManager extends TransactionManagerBase {
    */
   protected function releaseClientSavepoint(string $name): bool {
     if (!$this->connection->getClientConnection()->inTransaction()) {
-      $this->voidClientTransaction();
+      $this->voidClientTransaction('MySql no longer in transaction');
       return TRUE;
     }
     return parent::releaseClientSavepoint($name);
@@ -74,7 +74,7 @@ class TransactionManager extends TransactionManagerBase {
    */
   protected function rollbackClientTransaction(): bool {
     if (!$this->connection->getClientConnection()->inTransaction()) {
-      $this->voidClientTransaction();
+      $this->voidClientTransaction('MySql no longer in transaction');
       return FALSE;
     }
     $clientRollback = $this->connection->getClientConnection()->rollBack();

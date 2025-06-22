@@ -110,7 +110,7 @@ interface TransactionManagerInterface {
    *
    * This method should only be called internally by a database driver.
    */
-  public function voidClientTransaction(): void;
+  public function voidClientTransaction(/* string $reason */): void;
 
   /**
    * Adds a root transaction end callback.

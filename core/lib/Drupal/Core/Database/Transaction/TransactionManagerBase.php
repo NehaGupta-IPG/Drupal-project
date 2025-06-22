@@ -804,8 +804,19 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function voidClientTransaction(): void {
+  public function voidClientTransaction(?string $reason = NULL): void {
     while ($i = array_key_last($this->stack())) {
+      if ($this->stack()[$i]->type === StackItemType::Root && $this->connection->isEventEnabled(TransactionCommitEvent::class)) {
+        $this->connection->dispatchEvent(new TransactionCommitEvent(
+          $this->connection->getKey(),
+          $this->connection->getTarget(),
+          $i,
+          $this->stack()[$i]->name,
+          $this->stackItemsAsArray(),
+          TRUE,
+          $reason ?? '',
+        ));
+      }
       $this->voidStackItem((string) $i);
     }
     $this->setConnectionTransactionState(ClientConnectionTransactionState::Voided);

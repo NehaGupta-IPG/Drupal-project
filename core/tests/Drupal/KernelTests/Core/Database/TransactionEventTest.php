@@ -47,7 +47,7 @@ class TransactionEventTest extends DatabaseTestBase {
   public function testTransactionCommit(): void {
     $tx = $this->connection->startTransaction();
     $tx->commitOrRelease();
-    $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+    $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction auto-commit: false auto-commit-reason: $/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
   }
 
   /**
@@ -57,8 +57,33 @@ class TransactionEventTest extends DatabaseTestBase {
     $tx = $this->connection->startTransaction();
     $savepoint = $this->connection->startTransaction('foo');
     $tx->commitOrRelease();
-    $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+    $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction auto-commit: false auto-commit-reason: $/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
     unset($savepoint);
+  }
+
+  /**
+   * Tests DDL auto-commit.
+   */
+  public function testDDLAutoCommit(): void {
+    if ($this->connection->supportsTransactionalDDL()) {
+      $this->markTestSkipped('This test is only relevant for databases that do not support transactional DDL.');
+    }
+
+    $table = [
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+      ],
+      'primary key' => ['id'],
+    ];
+
+    $tx = $this->connection->startTransaction();
+    $this->connection->schema()->createTable('database_test_00', $table);
+    $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction auto-commit: false auto-commit-reason: $/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+    unset($tx);
   }
 
   /**
