@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Database;
 
-use Drupal\Core\Database\Event\TransactionBeginEvent;
-use Drupal\Core\Database\Event\TransactionCommitEvent;
 use Drupal\Core\Database\Event\TransactionEvent;
-use Drupal\Core\Database\Event\TransactionSavepointEvent;
 use PHPUnit\Framework\Attributes\Group;
 
 /**

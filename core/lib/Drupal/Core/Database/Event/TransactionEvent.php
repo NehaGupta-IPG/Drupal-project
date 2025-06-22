@@ -12,7 +12,9 @@ enum TransactionEvent: string {
   case Begin = TransactionBeginEvent::class;
   case Savepoint = TransactionSavepointEvent::class;
   case Commit = TransactionCommitEvent::class;
+  case CommitFailure = TransactionCommitFailureEvent::class;
   case ReleaseSavepoint = TransactionReleaseSavepointEvent::class;
+  case ReleaseSavepointFailure = TransactionReleaseSavepointFailureEvent::class;
 
   /**
    * Returns an array with all transaction related events.
