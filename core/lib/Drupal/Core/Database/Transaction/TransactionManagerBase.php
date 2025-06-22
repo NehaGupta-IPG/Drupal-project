@@ -411,6 +411,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // database. We can unpile it, and if we are left with no more items in the
     // stack, we can also process the post transaction callbacks.
     $this->commit($name, $id, CommitType::ImplicitOnDestruct);
+    $this->removeStackItem($id);
     if ($this->rootId === $id) {
       $this->processPostTransactionCallbacks();
       $this->rootId = NULL;
@@ -508,7 +509,6 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       // transaction.
       try {
         $this->processRootCommit();
-        $this->removeStackItem($id);
         if ($this->connection->isEventEnabled(TransactionCommitEvent::class)) {
           $this->connection->dispatchEvent(new TransactionCommitEvent(
             $this->connection->getKey(),
