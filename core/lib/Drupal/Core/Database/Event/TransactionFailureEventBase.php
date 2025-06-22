@@ -35,7 +35,7 @@ abstract class TransactionFailureEventBase extends TransactionEventBase {
     string $name,
     array $stackItems,
     public readonly string $className,
-    public readonly srting $message,
+    public readonly string $message,
   ) {
     parent::__construct($key, $target, $id, $name, $stackItems);
   }
