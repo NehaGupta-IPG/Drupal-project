@@ -86,7 +86,7 @@ class PermissionsHashGenerator implements PermissionsHashGeneratorInterface {
    *   The hash.
    */
   protected function hash($identifier) {
-    return hash('xxh64', $identifier);
+    return hash('xxh3', $identifier);
   }
 
 }

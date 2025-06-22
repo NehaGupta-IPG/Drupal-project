@@ -69,7 +69,7 @@ final class LockFileValidator implements EventSubscriberInterface {
    */
   private function getHash(string $path): string|false {
     try {
-      return @hash_file('xxh64', $path);
+      return @hash_file('xxh3', $path);
     }
     catch (\Throwable) {
       return FALSE;
