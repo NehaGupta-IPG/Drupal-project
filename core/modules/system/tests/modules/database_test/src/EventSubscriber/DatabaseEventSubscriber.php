@@ -9,6 +9,7 @@ use Drupal\Core\Database\Event\StatementExecutionFailureEvent;
 use Drupal\Core\Database\Event\StatementExecutionStartEvent;
 use Drupal\Core\Database\Event\TransactionBeginEvent;
 use Drupal\Core\Database\Event\TransactionCommitEvent;
+use Drupal\Core\Database\Event\TransactionReleaseSavepointEvent;
 use Drupal\Core\Database\Event\TransactionSavepointEvent;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
