@@ -277,7 +277,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * @return string|null
    *   The current transaction id.
    *
-   * @todo add method to TransactionManagerInterface in a major.
+   * @todo add method to TransactionManagerInterface in drupal:12.0.0.
    */
   public function currentTransactionId(): ?string {
     if (!$this->inTransaction()) {
@@ -292,7 +292,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * @return string|null
    *   The current transaction name.
    *
-   * @todo add method to TransactionManagerInterface in a major.
+   * @todo add method to TransactionManagerInterface in drupal:12.0.0.
    */
   public function currentTransactionName(): ?string {
     if (!$this->inTransaction()) {
@@ -410,7 +410,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // When we get here, the transaction (or savepoint) is still active on the
     // database. We can unpile it, and if we are left with no more items in the
     // stack, we can also process the post transaction callbacks.
-    $this->commit($name, $id);
+    $this->commit($name, $id, CommitType::ImplicitOnDestruct);
     if ($this->rootId === $id) {
       $this->processPostTransactionCallbacks();
       $this->rootId = NULL;
@@ -437,7 +437,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     }
 
     // Commit the transaction.
-    $this->commit($name, $id);
+    $this->commit($name, $id, CommitType::Explicit);
 
     // Void the transaction stack item.
     $this->voidStackItem($id);
@@ -450,13 +450,15 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    *   The name of the transaction.
    * @param string $id
    *   The id of the transaction.
+   * @param \Drupal\Core\Database\Transaction\CommitType|null $commitType
+   *   The type of commit.
    *
    * @throws \Drupal\Core\Database\TransactionOutOfOrderException
    *   If a Drupal Transaction with the specified name does not exist.
    * @throws \Drupal\Core\Database\TransactionCommitFailedException
    *   If the commit of the root transaction failed.
    */
-  protected function commit(string $name, string $id): void {
+  protected function commit(string $name, string $id, ?CommitType $commitType = NULL): void {
     if ($this->getConnectionTransactionState() !== ClientConnectionTransactionState::Active) {
       // The stack got corrupted.
       throw new TransactionOutOfOrderException("Transaction {$id}\\{$name} is out of order. Active stack: " . $this->dumpStackItemsAsString());
@@ -514,6 +516,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
             $id,
             $name,
             $this->stackItemsAsArray(),
+            $commitType,
           ));
         }
       }
@@ -804,7 +807,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function voidClientTransaction(?string $reason = NULL): void {
+  public function voidClientTransaction(): void {
     while ($i = array_key_last($this->stack())) {
       if ($this->stack()[$i]->type === StackItemType::Root && $this->connection->isEventEnabled(TransactionCommitEvent::class)) {
         $this->connection->dispatchEvent(new TransactionCommitEvent(
@@ -813,8 +816,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
           $i,
           $this->stack()[$i]->name,
           $this->stackItemsAsArray(),
-          TRUE,
-          $reason ?? '',
+          CommitType::AutomaticUponDDL,
         ));
       }
       $this->voidStackItem((string) $i);

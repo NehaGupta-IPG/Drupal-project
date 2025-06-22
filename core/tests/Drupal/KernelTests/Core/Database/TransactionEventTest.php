@@ -47,7 +47,16 @@ class TransactionEventTest extends DatabaseTestBase {
   public function testTransactionCommit(): void {
     $tx = $this->connection->startTransaction();
     $tx->commitOrRelease();
-    $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction auto-commit: false auto-commit-reason: $/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+    $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction commit-type: Explicit$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+  }
+
+  /**
+   * Tests implicitly committing a transaction via object destruction.
+   */
+  public function testTransactionImplicitCommit(): void {
+    $tx = $this->connection->startTransaction();
+    unset($tx);
+    $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction commit-type: ImplicitOnDestruct$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
   }
 
   /**
@@ -57,7 +66,7 @@ class TransactionEventTest extends DatabaseTestBase {
     $tx = $this->connection->startTransaction();
     $savepoint = $this->connection->startTransaction('foo');
     $tx->commitOrRelease();
-    $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction auto-commit: false auto-commit-reason: $/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+    $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction commit-type: Explicit$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
     unset($savepoint);
   }
 
@@ -82,7 +91,7 @@ class TransactionEventTest extends DatabaseTestBase {
 
     $tx = $this->connection->startTransaction();
     $this->connection->schema()->createTable('database_test_00', $table);
-    $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction auto-commit: false auto-commit-reason: $/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+    $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction commit-type: AutomaticUponDDL$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
     unset($tx);
   }
 

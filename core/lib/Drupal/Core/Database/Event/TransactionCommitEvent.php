@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Database\Event;
 
+use Drupal\Core\Database\Transaction\CommitType;
+
 /**
  * Represents the commit of a transaction.
  */
@@ -25,10 +27,8 @@ final class TransactionCommitEvent extends TransactionEventBase {
    *   The name of the transaction.
    * @param array $stackItems
    *   The current transaction stack items.
-   * @param bool $autoCommit
-   *   TRUE if the transaction auto-committed.
-   * @param ?string $autoCommitReason
-   *   The reason of the auto-commit.
+   * @param \Drupal\Core\Database\Transaction\CommitType $type
+   *   The type of commit.
    */
   public function __construct(
     string $key,
@@ -36,8 +36,7 @@ final class TransactionCommitEvent extends TransactionEventBase {
     string $id,
     string $name,
     array $stackItems,
-    public readonly bool $autoCommit = FALSE,
-    public readonly ?string $autoCommitReason = NULL,
+    public readonly CommitType $type = CommitType::Explicit,
   ) {
     parent::__construct($key, $target, $id, $name, $stackItems);
   }

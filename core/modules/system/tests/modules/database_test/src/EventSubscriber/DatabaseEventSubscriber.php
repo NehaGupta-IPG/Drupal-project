@@ -125,7 +125,7 @@ class DatabaseEventSubscriber implements EventSubscriberInterface {
    *   The transaction event.
    */
   public function onTransactionCommit(TransactionCommitEvent $event): void {
-    $this->keyValue->get('TransactionEventTest')->set('event_data', get_class($event) . ' ' . $event->key . ' ' . $event->target . ' ' . $event->id . '\\' . $event->name . ' auto-commit: ' . ($event->autoCommit ? 'true' : 'false') . ' auto-commit-reason: ' . $event->autoCommitReason ?? '');
+    $this->keyValue->get('TransactionEventTest')->set('event_data', get_class($event) . ' ' . $event->key . ' ' . $event->target . ' ' . $event->id . '\\' . $event->name . ' commit-type: ' . $event->type->name);
   }
 
   /**

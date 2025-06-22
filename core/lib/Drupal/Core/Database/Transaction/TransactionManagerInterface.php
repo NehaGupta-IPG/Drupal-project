@@ -20,6 +20,26 @@ interface TransactionManagerInterface {
   public function inTransaction(): bool;
 
   /**
+   * Gets the current transaction id.
+   *
+   * @return string|null
+   *   The current transaction id.
+   *
+   * @todo add method to TransactionManagerInterface in drupal:12.0.0.
+   */
+  /* public function currentTransactionId(): ?string; */
+
+  /**
+   * Gets the current transaction name.
+   *
+   * @return string|null
+   *   The current transaction name.
+   *
+   * @todo add method to TransactionManagerInterface in drupal:12.0.0.
+   */
+  /* public function currentTransactionName(): ?string; */
+
+  /**
    * Checks if a named Drupal transaction is active.
    *
    * @param string $name
@@ -110,7 +130,7 @@ interface TransactionManagerInterface {
    *
    * This method should only be called internally by a database driver.
    */
-  public function voidClientTransaction(/* string $reason */): void;
+  public function voidClientTransaction(): void;
 
   /**
    * Adds a root transaction end callback.
