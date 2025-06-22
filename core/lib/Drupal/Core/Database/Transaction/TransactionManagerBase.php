@@ -809,19 +809,37 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    */
   public function voidClientTransaction(): void {
     while ($i = array_key_last($this->stack())) {
-      if ($this->stack()[$i]->type === StackItemType::Root && $this->connection->isEventEnabled(TransactionCommitEvent::class)) {
-        $this->connection->dispatchEvent(new TransactionCommitEvent(
-          $this->connection->getKey(),
-          $this->connection->getTarget(),
-          $i,
-          $this->stack()[$i]->name,
-          $this->stackItemsAsArray(),
-          CommitType::AutomaticUponDDL,
-        ));
-      }
       $this->voidStackItem((string) $i);
     }
     $this->setConnectionTransactionState(ClientConnectionTransactionState::Voided);
+  }
+
+  /**
+   * Handles automatic commit occurred upon execution of a DDL statement.
+   *
+   * In some cases the active transaction is automatically committed by the
+   * database server when a DDL statement is executed during a transaction
+   * (for example, MySql). In such cases we need to trigger a
+   * TransactionCommitEvent and void the remaining items on the stack.
+   *
+   * This method should only be called internally by a database driver.
+   *
+   * @todo add method to TransactionManagerInterface in drupal:12.0.0.
+   */
+  public function handleAutomaticCommitUponDDL(): void {
+    if ($this->connection->isEventEnabled(TransactionCommitEvent::class)) {
+      $i = array_key_first($this->stack);
+      assert($this->stack[$i]->type === StackItemType::Root);
+      $this->connection->dispatchEvent(new TransactionCommitEvent(
+        $this->connection->getKey(),
+        $this->connection->getTarget(),
+        $i,
+        $this->stack[$i]->name,
+        $this->stackItemsAsArray(),
+        CommitType::AutomaticUponDDL,
+      ));
+    }
+    $this->voidClientTransaction();
   }
 
 }
