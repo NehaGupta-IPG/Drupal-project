@@ -325,6 +325,14 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
 
     // Do the client-level processing.
     if ($this->stackDepth() === 0) {
+      $this->beginClientTransaction();
+      $type = StackItemType::Root;
+      $this->setConnectionTransactionState(ClientConnectionTransactionState::Active);
+      // Only set ::rootId if there's not one set already, which may happen in
+      // case of broken transactions.
+      if ($this->rootId === NULL) {
+        $this->rootId = $id;
+      }
       if ($this->connection->isEventEnabled(TransactionBeginEvent::class)) {
         $this->connection->dispatchEvent(new TransactionBeginEvent(
           $this->connection->getKey(),
@@ -334,19 +342,13 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
           $this->stackItemsAsArray(),
         ));
       }
-      $this->beginClientTransaction();
-      $type = StackItemType::Root;
-      $this->setConnectionTransactionState(ClientConnectionTransactionState::Active);
-      // Only set ::rootId if there's not one set already, which may happen in
-      // case of broken transactions.
-      if ($this->rootId === NULL) {
-        $this->rootId = $id;
-      }
     }
     else {
       // If we're already in a Drupal transaction then we want to create a
       // database savepoint, rather than try to begin another database
       // transaction.
+      $this->addClientSavepoint($name);
+      $type = StackItemType::Savepoint;
       if ($this->connection->isEventEnabled(TransactionSavepointEvent::class)) {
         $this->connection->dispatchEvent(new TransactionSavepointEvent(
           $this->connection->getKey(),
@@ -356,8 +358,6 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
           $this->stackItemsAsArray(),
         ));
       }
-      $this->addClientSavepoint($name);
-      $type = StackItemType::Savepoint;
     }
 
     // Add an item on the stack, increasing its depth.
