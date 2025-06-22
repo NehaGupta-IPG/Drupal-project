@@ -135,17 +135,29 @@ class NodeTypeTest extends NodeTestBase {
     // Change the name and the description.
     $edit = [
       'name' => 'Bar',
-      'description' => 'Lorem ipsum.',
+      'description' => '<em>Lorem</em> ipsum.',
     ];
     $this->drupalGet('admin/structure/types/manage/page');
     $this->submitForm($edit, 'Save');
 
     $this->drupalGet('node/add');
     $assert->pageTextContains('Bar');
-    $assert->pageTextContains('Lorem ipsum');
+    $assert->responseContains('<em>Lorem</em> ipsum');
     $this->clickLink('Bar');
     $assert->pageTextContains('Foo');
     $assert->pageTextContains('Body');
+
+    // Change description with invalid markup.
+    $this->drupalGet('admin/structure/types/manage/page');
+    $this->submitForm([
+      'name' => 'Bar',
+      'description' => '<em>Lorem ipsum.',
+    ], 'Save');
+
+    $this->drupalGet('node/add');
+    $assert->pageTextContains('Bar');
+    // Description markup should be normalized.
+    $assert->responseContains('<em>Lorem ipsum.</em>');
 
     // Change the name through the API
     /** @var \Drupal\node\NodeTypeInterface $node_type */

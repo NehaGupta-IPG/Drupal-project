@@ -2,6 +2,7 @@
 
 namespace Drupal\node\Form;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -193,6 +194,12 @@ class NodeTypeForm extends BundleEntityFormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
+
+    // Normalize content type description.
+    $description = $form_state->getValue('description');
+    if ($description !== '') {
+      $form_state->setValue('description', Html::normalize($description));
+    }
 
     $id = trim($form_state->getValue('type'));
     // '0' is invalid, since elsewhere we check it using empty().
