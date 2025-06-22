@@ -102,6 +102,15 @@ class NodeAccessTest extends ModerationStateTestBase {
       $this->fail('Test node was not saved correctly.');
     }
 
+    // Ensure the status field is not visible for a user without administer
+    // nodes.
+    $this->drupalLogin($this->createUser([
+      'create moderated_content content',
+    ]));
+    $this->drupalGet('node/add/moderated_content');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->fieldNotExists('Published');
+
     $view_path = 'node/' . $node->id();
     $edit_path = 'node/' . $node->id() . '/edit';
     $latest_path = 'node/' . $node->id() . '/latest';
