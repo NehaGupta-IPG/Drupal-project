@@ -1314,6 +1314,15 @@ function system_requirements($phase): array {
     }
     $requirements['update status']['title'] = t('Update notifications');
 
+    if (Settings::get('development_mode', FALSE)) {
+      $requirements['development_mode'] = [
+        'title' => t('Development mode'),
+        'value' => t('Enabled'),
+        'severity' => REQUIREMENT_WARNING,
+        'description' => t('Development mode is enabled in settings.php. It is recommended to have this setting disabled in production environments.'),
+      ];
+    }
+
     if (Settings::get('rebuild_access')) {
       $requirements['rebuild access'] = [
         'title' => t('Rebuild access'),
@@ -1585,9 +1594,24 @@ function system_requirements($phase): array {
     }
   }
 
-  // Add warning when twig debug option is enabled.
+  // Add warnings for development mode.
   if ($phase === 'runtime') {
+    // Add warning when development mode is enabled.
     $development_settings = \Drupal::keyValue('development_settings');
+    $development_mode = $development_settings->get('development_mode', FALSE);
+    if ($development_mode) {
+      $requirements['development_mode_enabled'] = [
+        'title' => t('Development mode'),
+        'value' => t('The development mode is enabled. Go to @link to disable.', [
+          '@link' => Link::createFromRoute(
+            'development settings page',
+            'system.development_settings',
+          )->toString(),
+        ]),
+        'severity' => REQUIREMENT_WARNING,
+      ];
+    }
+    // Add warning when twig debug option is enabled.
     $twig_debug = $development_settings->get('twig_debug', FALSE);
     $twig_cache_disable = $development_settings->get('twig_cache_disable', FALSE);
     if ($twig_debug || $twig_cache_disable) {

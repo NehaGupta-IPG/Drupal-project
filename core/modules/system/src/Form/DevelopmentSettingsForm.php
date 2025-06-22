@@ -57,6 +57,13 @@ class DevelopmentSettingsForm extends FormBase {
       '#plain_text' => $this->t('These settings should only be enabled on development environments and never on production.'),
     ];
 
+    $form['development_mode'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Development mode'),
+      '#description' => $this->t('Enables verbose error messages.'),
+      '#default_value' => $development_settings->get('development_mode', FALSE),
+    ];
+
     $twig_debug = $development_settings->get('twig_debug', FALSE);
     $twig_cache_disable = $development_settings->get('twig_cache_disable', FALSE);
     $twig_development_state_conditions = [
@@ -121,6 +128,16 @@ class DevelopmentSettingsForm extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $development_settings = $this->keyValueFactory->get('development_settings');
+
+    // Development mode.
+    $development_mode = (bool) $form_state->getValue('development_mode');
+    if ($development_mode) {
+      $development_settings->set('development_mode', TRUE);
+    }
+    else {
+      $development_settings->delete('development_mode');
+    }
+
     $disable_rendered_output_cache_bins_previous = $development_settings->get('disable_rendered_output_cache_bins', FALSE);
     $disable_rendered_output_cache_bins = (bool) $form_state->getValue('disable_rendered_output_cache_bins');
     if ($disable_rendered_output_cache_bins) {

@@ -17,6 +17,14 @@ class DevelopmentSettingsPass implements CompilerPassInterface {
   public function process(ContainerBuilder $container): void {
     /** @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface $development_settings */
     $development_settings = $container->get('keyvalue')->get('development_settings');
+
+    // Development mode.
+    if ($development_settings->get('development_mode', FALSE)) {
+      $development_mode = $container->getParameter('development_mode');
+      $container->setParameter('development_mode', $development_mode);
+    }
+
+    // Twig debugging.
     $twig_debug = $development_settings->get('twig_debug', FALSE);
     $twig_cache_disable = $development_settings->get('twig_cache_disable', FALSE);
     if ($twig_debug || $twig_cache_disable) {
