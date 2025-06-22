@@ -10,7 +10,6 @@ namespace Drupal\Core\Database\Event;
 enum TransactionEvent: string {
 
   case Begin = TransactionBeginEvent::class;
-  case Savepoint = TransactionSavepointEvent::class;
   case Commit = TransactionCommitEvent::class;
   case CommitFailure = TransactionCommitFailureEvent::class;
   case ReleaseSavepoint = TransactionReleaseSavepointEvent::class;
@@ -19,6 +18,7 @@ enum TransactionEvent: string {
   case RollbackFailure = TransactionRollbackFailureEvent::class;
   case RollbackToSavepoint = TransactionRollbackToSavepointEvent::class;
   case RollbackToSavepointFailure = TransactionRollbackToSavepointFailureEvent::class;
+  case Savepoint = TransactionSavepointEvent::class;
 
   /**
    * Returns an array with all transaction related event classes.

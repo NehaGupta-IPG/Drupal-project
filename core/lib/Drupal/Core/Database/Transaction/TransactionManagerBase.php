@@ -712,8 +712,11 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   protected function processRootCommit(): void {
     $clientCommit = $this->commitClientTransaction();
     if (!$clientCommit) {
+      $this->voidClientTransaction();
+      $this->setConnectionTransactionState(ClientConnectionTransactionState::CommitFailed);
       throw new TransactionCommitFailedException();
     }
+    $this->setConnectionTransactionState(ClientConnectionTransactionState::Committed);
   }
 
   /**

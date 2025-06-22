@@ -8,6 +8,7 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\ExceptionHandler;
 use Drupal\Core\Database\Log;
 use Drupal\Core\Database\StatementWrapperIterator;
+use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\Tests\Core\Database\Stub\Driver\Schema;
 
 /**
@@ -50,6 +51,20 @@ class StubConnection extends Connection {
    */
   public static function open(array &$connection_options = []) {
     return new \stdClass();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getKey() {
+    return 'default';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTarget() {
+    return 'default';
   }
 
   /**
@@ -124,6 +139,13 @@ class StubConnection extends Connection {
    */
   public function condition($conjunction) {
     return new StubCondition($conjunction);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function driverTransactionManager(): TransactionManagerInterface {
+    return new StubTransactionManager($this);
   }
 
 }
