@@ -11,6 +11,10 @@ use Drupal\Core\Database\Event\TransactionCommitFailureEvent;
 use Drupal\Core\Database\Event\TransactionEvent;
 use Drupal\Core\Database\Event\TransactionReleaseSavepointEvent;
 use Drupal\Core\Database\Event\TransactionReleaseSavepointFailureEvent;
+use Drupal\Core\Database\Event\TransactionRollbackEvent;
+use Drupal\Core\Database\Event\TransactionRollbackFailureEvent;
+use Drupal\Core\Database\Event\TransactionRollbackToSavepointEvent;
+use Drupal\Core\Database\Event\TransactionRollbackToSavepointFailureEvent;
 use Drupal\Core\Database\Event\TransactionSavepointEvent;
 use Drupal\Core\Database\Transaction;
 use Drupal\Core\Database\TransactionCommitFailedException;
@@ -556,20 +560,70 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
         // Rollback the client transaction to the savepoint when the Drupal
         // transaction is not a root one. Then, release the savepoint too. The
         // client connection remains active.
-        $this->rollbackClientSavepoint($name);
-        $this->releaseClientSavepoint($name);
-        // The Transaction object remains open, and when it will get destructed
-        // no commit should happen. Void the stack item.
-        $this->voidStackItem($id);
+        try {
+          $this->rollbackClientSavepoint($name);
+          $this->releaseClientSavepoint($name);
+          // The Transaction object remains open, and when it will get
+          // destructed no commit should happen. Void the stack item.
+          $this->voidStackItem($id);
+          if ($this->connection->isEventEnabled(TransactionRollbackToSavepointEvent::class)) {
+            $this->connection->dispatchEvent(new TransactionRollbackToSavepointEvent(
+              $this->connection->getKey(),
+              $this->connection->getTarget(),
+              $id,
+              $name,
+              $this->stackItemsAsArray(),
+            ));
+          }
+        }
+        catch (\Throwable $t) {
+          if ($this->connection->isEventEnabled(TransactionRollbackToSavepointFailureEvent::class)) {
+            $this->connection->dispatchEvent(new TransactionRollbackToSavepointFailureEvent(
+              $this->connection->getKey(),
+              $this->connection->getTarget(),
+              $id,
+              $name,
+              $this->stackItemsAsArray(),
+              get_class($t),
+              $t->getMessage(),
+            ));
+          }
+          throw $t;
+        }
       }
       elseif ($this->stackDepth() === 1 && $this->stack()[$id]->type === StackItemType::Root) {
         // If this was the root Drupal transaction, we can rollback the client
         // transaction. The transaction is closed.
-        $this->processRootRollback();
-        if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::RolledBack) {
-          // The Transaction object remains open, and when it will get
-          // destructed no commit should happen. Void the stack item.
-          $this->voidStackItem($id);
+        try {
+          $this->processRootRollback();
+          if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::RolledBack) {
+            // The Transaction object remains open, and when it will get
+            // destructed no commit should happen. Void the stack item.
+            $this->voidStackItem($id);
+          }
+          if ($this->connection->isEventEnabled(TransactionRollbackEvent::class)) {
+            $this->connection->dispatchEvent(new TransactionRollbackEvent(
+              $this->connection->getKey(),
+              $this->connection->getTarget(),
+              $id,
+              $name,
+              $this->stackItemsAsArray(),
+            ));
+          }
+        }
+        catch (\Throwable $t) {
+          if ($this->connection->isEventEnabled(TransactionRollbackFailureEvent::class)) {
+            $this->connection->dispatchEvent(new TransactionRollbackFailureEvent(
+              $this->connection->getKey(),
+              $this->connection->getTarget(),
+              $id,
+              $name,
+              $this->stackItemsAsArray(),
+              get_class($t),
+              $t->getMessage(),
+            ));
+          }
+          throw $t;
         }
       }
       else {

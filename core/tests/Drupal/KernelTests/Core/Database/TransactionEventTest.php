@@ -26,7 +26,7 @@ class TransactionEventTest extends DatabaseTestBase {
    */
   public function testTransactionBegin(): void {
     $tx = $this->connection->startTransaction();
-    $this->assertMatchesRegularExpression("/^default default .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+    $this->assertMatchesRegularExpression("/^.*TransactionBeginEvent default default .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
     $tx->commitOrRelease();
   }
 
@@ -36,7 +36,7 @@ class TransactionEventTest extends DatabaseTestBase {
   public function testTransactionSavepoint(): void {
     $tx = $this->connection->startTransaction();
     $savepoint = $this->connection->startTransaction();
-    $this->assertMatchesRegularExpression("/^default default .*\\\\savepoint_1 stack: .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+    $this->assertMatchesRegularExpression("/^.*TransactionSavepointEvent default default .*\\\\savepoint_1 stack: .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
     $savepoint->commitOrRelease();
     $tx->commitOrRelease();
   }
@@ -47,7 +47,7 @@ class TransactionEventTest extends DatabaseTestBase {
   public function testTransactionCommit(): void {
     $tx = $this->connection->startTransaction();
     $tx->commitOrRelease();
-    $this->assertMatchesRegularExpression("/^default default .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+    $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
   }
 
   /**
@@ -57,7 +57,7 @@ class TransactionEventTest extends DatabaseTestBase {
     $tx = $this->connection->startTransaction();
     $savepoint = $this->connection->startTransaction('foo');
     $tx->commitOrRelease();
-    $this->assertMatchesRegularExpression("/^default default .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+    $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
     unset($savepoint);
   }
 
@@ -68,7 +68,27 @@ class TransactionEventTest extends DatabaseTestBase {
     $tx = $this->connection->startTransaction();
     $savepoint = $this->connection->startTransaction('foo');
     $savepoint->commitOrRelease();
-    $this->assertMatchesRegularExpression("/^default default .*\\\\foo stack: .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+    $this->assertMatchesRegularExpression("/^.*TransactionReleaseSavepointEvent default default .*\\\\foo stack: .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+    unset($tx);
+  }
+
+  /**
+   * Tests rolling back a transaction.
+   */
+  public function testTransactionRollback(): void {
+    $tx = $this->connection->startTransaction();
+    $tx->rollback();
+    $this->assertMatchesRegularExpression("/^.*TransactionRollbackEvent default default .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+  }
+
+  /**
+   * Tests rolling back a transaction to a savepoint.
+   */
+  public function testTransactionRollbackToSavepoint(): void {
+    $tx = $this->connection->startTransaction();
+    $savepoint = $this->connection->startTransaction('foo');
+    $savepoint->rollback();
+    $this->assertMatchesRegularExpression("/^.*TransactionRollbackToSavepointEvent default default .*\\\\foo stack: .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
     unset($tx);
   }
 

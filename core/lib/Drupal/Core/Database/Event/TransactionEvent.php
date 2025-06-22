@@ -15,12 +15,16 @@ enum TransactionEvent: string {
   case CommitFailure = TransactionCommitFailureEvent::class;
   case ReleaseSavepoint = TransactionReleaseSavepointEvent::class;
   case ReleaseSavepointFailure = TransactionReleaseSavepointFailureEvent::class;
+  case Rollback = TransactionRollbackEvent::class;
+  case RollbackFailure = TransactionRollbackFailureEvent::class;
+  case RollbackToSavepoint = TransactionRollbackToSavepointEvent::class;
+  case RollbackToSavepointFailure = TransactionRollbackToSavepointFailureEvent::class;
 
   /**
-   * Returns an array with all transaction related events.
+   * Returns an array with all transaction related event classes.
    *
    * @return list<class-string<\Drupal\Core\Database\Event\TransactionEventBase>>
-   *   An array with all transaction related events.
+   *   An array with all transaction related event classes.
    */
   public static function all(): array {
     return array_map(fn(self $case) => $case->value, self::cases());
