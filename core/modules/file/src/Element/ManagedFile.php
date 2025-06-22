@@ -448,6 +448,11 @@ class ManagedFile extends FormElementBase {
       }
     }
 
+    // If field access is not set then we don't need to do further validation.
+    if (isset($element['#access']) && !$element['#access']) {
+      return;
+    }
+
     // Check required property based on the FID.
     if ($element['#required'] && empty($element['fids']['#value']) && !in_array($clicked_button, ['upload_button', 'remove_button'])) {
       // We expect the field name placeholder value to be wrapped in t()

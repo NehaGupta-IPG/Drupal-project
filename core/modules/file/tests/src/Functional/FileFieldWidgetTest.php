@@ -609,4 +609,26 @@ class FileFieldWidgetTest extends FileFieldTestBase {
     $this->assertFileExists($victim_tmp_file->getFileUri());
   }
 
+  /**
+   * Tests the file field required validation when field access is set to FALSE.
+   */
+  public function testFileFieldAccess(): void {
+    $this->container->get('entity_type.manager')->getStorage('node');
+    $type_name = 'article';
+    $field_name = $this->randomMachineName();
+    \Drupal::state()->set('file_module_test.enable_field_access', TRUE);
+    \Drupal::state()->set('file_module_test.forbidden_field', $field_name);
+    $this->createFileField($field_name, 'node', $type_name, [], ['required' => '1']);
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet("node/add/$type_name");
+    $title = $this->randomMachineName();
+    $edit = [
+      'title[0][value]' => $title,
+    ];
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->statusMessageNotContains("$field_name field is required.", 'error');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains($title);
+  }
+
 }
