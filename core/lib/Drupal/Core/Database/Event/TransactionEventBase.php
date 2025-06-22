@@ -10,7 +10,7 @@ namespace Drupal\Core\Database\Event;
 abstract class TransactionEventBase extends DatabaseEvent {
 
   /**
-   * Constructs a TransactionBeginEvent object.
+   * Constructs a TransactionEventBase object.
    *
    * See 'Customizing database settings' in settings.php for an explanation of
    * the $key and $target connection values.
@@ -22,7 +22,7 @@ abstract class TransactionEventBase extends DatabaseEvent {
    * @param string $id
    *   The id of the transaction.
    * @param string $name
-   *   The name of the savepoint.
+   *   The name of the transaction.
    * @param array $stackItems
    *   The current transaction stack items.
    */

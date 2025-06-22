@@ -404,7 +404,6 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // database. We can unpile it, and if we are left with no more items in the
     // stack, we can also process the post transaction callbacks.
     $this->commit($name, $id);
-    $this->removeStackItem($id);
     if ($this->rootId === $id) {
       $this->processPostTransactionCallbacks();
       $this->rootId = NULL;
@@ -467,20 +466,63 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     if ($this->stackDepth() > 1 && $this->stack()[$id]->type === StackItemType::Savepoint) {
       // Release the client transaction savepoint in case the Drupal
       // transaction is not a root one.
-      $this->releaseClientSavepoint($name);
+      try {
+        $this->releaseClientSavepoint($name);
+        $this->removeStackItem($id);
+        if ($this->connection->isEventEnabled(TransactionReleaseSavepointEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionReleaseSavepointEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->stackItemsAsArray(),
+          ));
+        }
+      }
+      catch (\Throwable $t) {
+        if ($this->connection->isEventEnabled(TransactionReleaseSavepointFailureEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionReleaseSavepointFailureEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->stackItemsAsArray(),
+            get_class($t),
+            $t->getMessage(),
+          ));
+        }
+        throw $t;
+      }
     }
     elseif ($this->stackDepth() === 1 && $this->stack()[$id]->type === StackItemType::Root) {
       // If this was the root Drupal transaction, we can commit the client
       // transaction.
-      $this->processRootCommit();
-      if ($this->connection->isEventEnabled(TransactionCommitEvent::class)) {
-        $this->connection->dispatchEvent(new TransactionCommitEvent(
-          $this->connection->getKey(),
-          $this->connection->getTarget(),
-          $id,
-          $name,
-          $this->stackItemsAsArray(),
-        ));
+      try {
+        $this->processRootCommit();
+        $this->removeStackItem($id);
+        if ($this->connection->isEventEnabled(TransactionCommitEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionCommitEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->stackItemsAsArray(),
+          ));
+        }
+      }
+      catch (\Throwable $t) {
+        if ($this->connection->isEventEnabled(TransactionCommitFailureEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionCommitFailureEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->stackItemsAsArray(),
+            get_class($t),
+            $t->getMessage(),
+          ));
+        }
+        throw $t;
       }
     }
     else {

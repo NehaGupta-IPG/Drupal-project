@@ -56,6 +56,7 @@ class DatabaseEventSubscriber implements EventSubscriberInterface {
       TransactionBeginEvent::class => 'onTransactionBegin',
       TransactionSavepointEvent::class => 'onTransactionSavepoint',
       TransactionCommitEvent::class => 'onTransactionCommit',
+      TransactionReleaseSavepointEvent::class => 'onTransactionReleaseSavepoint',
     ];
   }
 
@@ -119,6 +120,16 @@ class DatabaseEventSubscriber implements EventSubscriberInterface {
    *   The transaction event.
    */
   public function onTransactionCommit(TransactionCommitEvent $event): void {
+    $this->keyValue->get('TransactionEventTest')->set('event_data', $event->key . ' ' . $event->target . ' ' . $event->id . '\\' . $event->name);
+  }
+
+  /**
+   * Subscribes to a TransactionReleaseSavepointEvent.
+   *
+   * @param \Drupal\Core\Database\Event\TransactionReleaseSavepointEvent $event
+   *   The transaction event.
+   */
+  public function onTransactionReleaseSavepoint(TransactionReleaseSavepointEvent $event): void {
     $this->keyValue->get('TransactionEventTest')->set('event_data', $event->key . ' ' . $event->target . ' ' . $event->id . '\\' . $event->name . ' stack: ' . implode(' > ', $event->stackItems));
   }
 
