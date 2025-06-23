@@ -67,8 +67,9 @@ class SystemTokensHooks {
       'description' => $this->t("The URL of the site's login page."),
     ];
 
-    // The [site:logo] token renders the active theme logo. Chained tokens can be
-    // used for rendering specific theme logos or logo properties (URLs) instead.
+    // The [site:logo] token renders the active theme logo. Chained tokens can
+    // be used for rendering specific theme logos or logo properties (URLs)
+    // instead.
     $site['logo'] = [
       'name' => $this->t('Logo'),
       'description' => $this->t('The logo of the active theme. Note that the theme may be different when this is used in the administrative interface.'),
@@ -258,7 +259,8 @@ class SystemTokensHooks {
 
       // Detect direct tokens ([site:logo:theme-olivero]).
       foreach ($tokens as $name => $original) {
-        // Strip 'theme-' to get the theme name, but do not strip 'active-theme'.
+        // Strip 'theme-' to get the theme name, but do not strip
+        // 'active-theme'.
         $name = str_starts_with($name, 'theme-') ? substr($name, 6) : $name;
         if (in_array($name, $installed_themes)) {
           $replacements[$original] = $this->getLogoRendered($name, $bubbleable_metadata);
@@ -330,7 +332,7 @@ class SystemTokensHooks {
    *   The bubbleable metadata to alter in order to cache the token.
    *
    * @return string|null
-   *   The path to the logo, NULL if logo.url does not exist for the given theme.
+   *   The logo path, or NULL if logo.url not set for the theme.
    */
   protected function getLogoPath(string $theme, BubbleableMetadata $bubbleable_metadata) {
     if ($theme === 'default-theme') {
