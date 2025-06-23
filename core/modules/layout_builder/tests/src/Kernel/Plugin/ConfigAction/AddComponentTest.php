@@ -104,8 +104,8 @@ class AddComponentTest extends KernelTestBase {
     $this->assertSame($existing_component_expected_weight, $components['1445597a-c674-431d-ac0a-277d99347a7f']->getWeight());
     // Assert the component configuration (defined with its config schema), and the
     // additional configuration (ignored in config schema)
-    $this->assertSame($config_action_value['component']['configuration'], $components[$uuid]->get('configuration'));
-    $this->assertSame($config_action_value['component']['additional'] ?? [], $components[$uuid]->get('additional'));
+    $this->assertSame($config_action_value['component']['configuration'], $components[$uuid]->getConfiguration());
+    $this->assertSame($config_action_value['component']['third_party_settings']['layout_builder_defaults_test'] ?? [], $components[$uuid]->getThirdPartySettings('layout_builder_defaults_test'));
   }
 
   /**
@@ -165,8 +165,10 @@ class AddComponentTest extends KernelTestBase {
             'id' => 'my_plugin_id',
             'some_configuration' => 'my_configuration_value',
           ],
-          'additional' => [
-            'some_additional_value' => 'my_custom_value',
+          'third_party_settings' => [
+            'layout_builder_defaults_test' => [
+              'harold' => 'my_custom_value',
+            ],
           ],
         ],
       ],
@@ -188,8 +190,10 @@ class AddComponentTest extends KernelTestBase {
             'id' => 'my_plugin_id',
             'some_configuration' => 'my_configuration_value',
           ],
-          'additional' => [
-            'some_additional_value' => 'my_custom_value',
+          'third_party_settings' => [
+            'layout_builder_defaults_test' => [
+              'harold' => 'my_custom_value',
+            ],
           ],
         ],
       ],
