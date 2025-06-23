@@ -27,6 +27,11 @@ class EntityTranslationFormTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * The test language codes.
+   *
+   * @var string[]
+   */
   protected $langcodes;
 
   /**

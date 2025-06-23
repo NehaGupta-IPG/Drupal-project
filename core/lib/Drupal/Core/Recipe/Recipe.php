@@ -6,9 +6,11 @@ namespace Drupal\Core\Recipe;
 
 use Drupal\Core\DefaultContent\Finder;
 use Drupal\Core\Extension\Dependency;
+use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Component\Serialization\Yaml;
+use Drupal\Core\Render\Element;
 use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\RegexConstraint;
 use Symfony\Component\Validator\Constraints\All;
@@ -59,6 +61,8 @@ final class Recipe {
    *   The default content finder.
    * @param string $path
    *   The recipe's path.
+   * @param array $extra
+   *   Any extra information to expose to specific modules.
    */
   public function __construct(
     public readonly string $name,
@@ -70,6 +74,7 @@ final class Recipe {
     public readonly InputConfigurator $input,
     public readonly Finder $content,
     public readonly string $path,
+    private readonly array $extra,
   ) {}
 
   /**
@@ -89,7 +94,7 @@ final class Recipe {
     $config = new ConfigConfigurator($recipe_data['config'], $path, \Drupal::service('config.storage'));
     $input = new InputConfigurator($recipe_data['input'] ?? [], $recipes, basename($path), \Drupal::typedDataManager());
     $content = new Finder($path . '/content');
-    return new static($recipe_data['name'], $recipe_data['description'], $recipe_data['type'], $recipes, $install, $config, $input, $content, $path);
+    return new static($recipe_data['name'], $recipe_data['description'], $recipe_data['type'], $recipes, $install, $config, $input, $content, $path, $recipe_data['extra'] ?? []);
   }
 
   /**
@@ -203,8 +208,8 @@ final class Recipe {
                   'interface' => PrimitiveInterface::class,
                 ]),
               ],
-              // If there is a `prompt` element, it has its own set of
-              // constraints.
+              // The `prompt` and `form` elements, though optional, have their
+              // own sets of constraints,
               'prompt' => new Optional([
                 new Collection([
                   'method' => [
@@ -213,6 +218,19 @@ final class Recipe {
                   'arguments' => new Optional([
                     new Type('associative_array'),
                   ]),
+                ]),
+              ]),
+              'form' => new Optional([
+                new Sequentially([
+                  new Type('associative_array'),
+                  // Every element in the `form` array has to be a form API
+                  // property, prefixed with `#`. Because recipe inputs can only
+                  // be primitive data types, child elements aren't allowed.
+                  new Callback(function (array $element, ExecutionContextInterface $context): void {
+                    if (Element::children($element)) {
+                      $context->addViolation('Form elements for recipe inputs cannot have child elements.');
+                    }
+                  }),
                 ]),
               ]),
               // Every input must define a default value.
@@ -257,6 +275,16 @@ final class Recipe {
               ]),
             ]),
           ]),
+          'strict' => new Optional([
+            new AtLeastOneOf([
+              new Type('boolean'),
+              new All([
+                new Type('string'),
+                new NotBlank(),
+                new Regex('/^.+\./'),
+              ]),
+            ], message: 'This value must be a boolean, or a list of config names.', includeInternalMessages: FALSE),
+          ]),
           'actions' => new Optional([
             new All([
               new Type('array'),
@@ -271,6 +299,12 @@ final class Recipe {
       ]),
       'content' => new Optional([
         new Type('array'),
+      ]),
+      'extra' => new Optional([
+        new Sequentially([
+          new Type('associative_array'),
+          new Callback(self::validateKeysAreValidExtensionNames(...)),
+        ]),
       ]),
     ]);
 
@@ -373,14 +407,23 @@ final class Recipe {
 
     $configurator = new RecipeConfigurator($recipe_being_validated['recipes'] ?? [], $include_path);
 
+    /** @var \Drupal\Core\Extension\ModuleExtensionList $module_list */
+    $module_list = \Drupal::service('extension.list.module');
     // The config provider must either be an already-installed module or theme,
     // or an extension being installed by this recipe or a recipe it depends on.
     $all_extensions = [
-      ...array_keys(\Drupal::service('extension.list.module')->getAllInstalledInfo()),
+      ...array_keys($module_list->getAllInstalledInfo()),
       ...array_keys(\Drupal::service('extension.list.theme')->getAllInstalledInfo()),
       ...$recipe_being_validated['install'] ?? [],
       ...$configurator->listAllExtensions(),
     ];
+    // Explicitly treat required modules as installed, even if Drupal isn't
+    // installed yet, because we know they WILL be installed.
+    foreach ($module_list->getAllAvailableInfo() as $name => $info) {
+      if (!empty($info['required'])) {
+        $all_extensions[] = $name;
+      }
+    }
 
     if (!in_array($config_provider, $all_extensions, TRUE)) {
       $context->addViolation('Config actions cannot be applied to %config_name because the %config_provider extension is not installed, and is not installed by this recipe or any of the recipes it depends on.', [
@@ -388,6 +431,42 @@ final class Recipe {
         '%config_provider' => $config_provider,
       ]);
     }
+  }
+
+  /**
+   * Validates that the keys of an array are valid extension names.
+   *
+   * Note that the keys do not have to be the names of extensions that are
+   * installed, or even extensions that exist. They just have to follow the
+   * form of a valid extension name.
+   *
+   * @param array $value
+   *   The array being validated.
+   * @param \Symfony\Component\Validator\Context\ExecutionContextInterface $context
+   *   The validator execution context.
+   */
+  private static function validateKeysAreValidExtensionNames(array $value, ExecutionContextInterface $context): void {
+    $keys = array_keys($value);
+    foreach ($keys as $key) {
+      if (!preg_match(ExtensionDiscovery::PHP_FUNCTION_PATTERN, $key)) {
+        $context->addViolation('%name is not a valid extension name.', [
+          '%name' => $key,
+        ]);
+      }
+    }
+  }
+
+  /**
+   * Returns extra information to expose to a particular extension.
+   *
+   * @param string $extension_name
+   *   The name of a Drupal extension.
+   *
+   * @return mixed
+   *   The extra data exposed to the given extension, or NULL if there is none.
+   */
+  public function getExtra(string $extension_name): mixed {
+    return $this->extra[$extension_name] ?? NULL;
   }
 
 }

@@ -27,6 +27,9 @@ class ConfigActionsTest extends KernelTestBase {
    */
   protected static $modules = ['block', 'system', 'user'];
 
+  /**
+   * The configuration action manager.
+   */
   private readonly ConfigActionManager $configActionManager;
 
   /**
@@ -46,6 +49,9 @@ class ConfigActionsTest extends KernelTestBase {
     $this->configActionManager = $this->container->get('plugin.manager.config_action');
   }
 
+  /**
+   * Tests the application of entity method actions on a block.
+   */
   public function testEntityMethodActions(): void {
     $block = $this->placeBlock('system_messages_block', ['theme' => 'olivero']);
     $this->assertSame('content', $block->getRegion());
@@ -73,10 +79,13 @@ class ConfigActionsTest extends KernelTestBase {
    */
   public function testPlaceBlockActionOnlyWorksOnBlocks(string $action): void {
     $this->expectException(PluginNotFoundException::class);
-    $this->expectExceptionMessage("The \"$action\" plugin does not exist.");
+    $this->expectExceptionMessage("The \"user_role\" entity does not support the \"$action\" config action.");
     $this->configActionManager->applyAction($action, 'user.role.anonymous', []);
   }
 
+  /**
+   * Verifies placeBlockInDefaultTheme action doesn't alter an existing block.
+   */
   public function testPlaceBlockActionDoesNotChangeExistingBlock(): void {
     $extant_region = Block::load('olivero_powered')->getRegion();
     $this->assertNotSame('content', $extant_region);
@@ -136,11 +145,17 @@ class ConfigActionsTest extends KernelTestBase {
     $this->assertSame('content', $block->getRegion());
   }
 
+  /**
+   * Tests placing a block in the default theme's region.
+   */
   public function testPlaceBlockInDefaultRegion(): void {
     $this->config('system.theme')->set('default', 'umami')->save();
     $this->testPlaceBlockInDynamicRegion('placeBlockInDefaultTheme', 'umami', 'content');
   }
 
+  /**
+   * Tests placing a block at the first and last position in a region.
+   */
   public function testPlaceBlockAtPosition(): void {
     // Ensure there's at least one block already in the region.
     $block = Block::create([
@@ -178,6 +193,30 @@ class ConfigActionsTest extends KernelTestBase {
     $this->assertGreaterThanOrEqual(3, $blocks);
     $this->assertSame('first', key($blocks));
     $this->assertSame('last', end($blocks));
+  }
+
+  /**
+   * Tests using the PlaceBlock action in an empty region.
+   */
+  public function testPlaceBlockInEmptyRegion(): void {
+    /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
+    $query = $this->container->get(EntityTypeManagerInterface::class)
+      ->getStorage('block')
+      ->getQuery()
+      ->count()
+      ->condition('theme', 'olivero')
+      ->condition('region', 'footer_top');
+    $this->assertSame(0, $query->execute());
+
+    // Place a block in that region.
+    $this->configActionManager->applyAction('placeBlockInDefaultTheme', 'block.block.test', [
+      'plugin' => 'system_powered_by_block',
+      'region' => [
+        'olivero' => 'footer_top',
+      ],
+      'position' => 'first',
+    ]);
+    $this->assertSame(1, $query->execute());
   }
 
 }

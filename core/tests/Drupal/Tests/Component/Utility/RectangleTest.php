@@ -10,7 +10,6 @@ use PHPUnit\Framework\TestCase;
 /**
  * @coversDefaultClass \Drupal\Component\Utility\Rectangle
  * @group Image
- * @group #slow
  */
 class RectangleTest extends TestCase {
 
@@ -21,7 +20,7 @@ class RectangleTest extends TestCase {
    */
   public function testWrongWidth(): void {
     $this->expectException(\InvalidArgumentException::class);
-    $rect = new Rectangle(-40, 20);
+    new Rectangle(-40, 20);
   }
 
   /**
@@ -31,7 +30,7 @@ class RectangleTest extends TestCase {
    */
   public function testWrongHeight(): void {
     $this->expectException(\InvalidArgumentException::class);
-    $rect = new Rectangle(40, 0);
+    new Rectangle(40, 0);
   }
 
   /**

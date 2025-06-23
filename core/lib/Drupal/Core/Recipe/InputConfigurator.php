@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Recipe;
 
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 
@@ -24,11 +25,11 @@ final class InputConfigurator {
   private array $data = [];
 
   /**
-   * The collected input values, or NULL if none have been collected yet.
+   * The collected input values.
    *
-   * @var mixed[]|null
+   * @var mixed[]
    */
-  private ?array $values = NULL;
+  private array $values = [];
 
   /**
    * @param array<string, array<string, mixed>> $definitions
@@ -71,8 +72,21 @@ final class InputConfigurator {
         $definition['constraints'],
       );
       $data_definition->setSettings($definition);
-      $this->data[$name] = $typedDataManager->create($data_definition);
+      $this->data[$name] = $typedDataManager->create($data_definition, name: "$prefix.$name");
     }
+  }
+
+  /**
+   * Returns the typed data definitions for the inputs defined by this recipe.
+   *
+   * This does NOT return the data definitions for inputs defined by this
+   * recipe's dependencies.
+   *
+   * @return \Drupal\Core\TypedData\DataDefinitionInterface[]
+   *   The typed data definitions, keyed by input name.
+   */
+  public function getDataDefinitions(): array {
+    return array_map(fn (TypedDataInterface $data) => $data->getDataDefinition(), $this->data);
   }
 
   /**
@@ -82,7 +96,7 @@ final class InputConfigurator {
    *   The collected input values, keyed by name.
    */
   public function getValues(): array {
-    return $this->values ?? [];
+    return $this->values;
   }
 
   /**
@@ -98,8 +112,8 @@ final class InputConfigurator {
     foreach ($this->dependencies->recipes as $dependency) {
       $descriptions = array_merge($descriptions, $dependency->input->describeAll());
     }
-    foreach ($this->data as $key => $data) {
-      $name = $this->prefix . '.' . $key;
+    foreach ($this->data as $data) {
+      $name = $data->getName();
       $descriptions[$name] = $data->getDataDefinition()->getDescription();
     }
     return $descriptions;
@@ -110,34 +124,35 @@ final class InputConfigurator {
    *
    * @param \Drupal\Core\Recipe\InputCollectorInterface $collector
    *   The input collector to use.
+   * @param string[] $processed
+   *   The names of the recipes for which input has already been collected.
+   *   Internal use only, should not be passed in by calling code.
    *
    * @throws \Symfony\Component\Validator\Exception\ValidationFailedException
    *   Thrown if any of the collected values violate their validation
    *   constraints.
+   * @throws \LogicException
+   *   Thrown if input values have already been collected for this recipe.
    */
-  public function collectAll(InputCollectorInterface $collector): void {
-    if (is_array($this->values)) {
-      throw new \LogicException('Input values cannot be changed once they have been set.');
-    }
-
+  public function collectAll(InputCollectorInterface $collector, array &$processed = []): void {
     // Don't bother collecting values for a recipe we've already seen.
-    static $processed = [];
     if (in_array($this->prefix, $processed, TRUE)) {
       return;
     }
-
+    if ($this->values) {
+      throw new \LogicException('Input values cannot be changed once they have been set.');
+    }
     // First, collect values for the recipe's dependencies.
     /** @var \Drupal\Core\Recipe\Recipe $dependency */
     foreach ($this->dependencies->recipes as $dependency) {
-      $dependency->input->collectAll($collector);
+      $dependency->input->collectAll($collector, $processed);
     }
 
-    $this->values = [];
     foreach ($this->data as $key => $data) {
       $definition = $data->getDataDefinition();
 
       $value = $collector->collectValue(
-        $this->prefix . '.' . $key,
+        $data->getName(),
         $definition,
         $this->getDefaultValue($definition),
       );
@@ -145,7 +160,7 @@ final class InputConfigurator {
 
       $violations = $data->validate();
       if (count($violations) > 0) {
-        throw new ValidationFailedException($value, $violations);
+        throw new ValidationFailedException($data, $violations);
       }
       $this->values[$key] = $data->getCastedValue();
     }

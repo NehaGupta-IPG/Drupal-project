@@ -2,12 +2,16 @@
 
 namespace Drupal\Core\Ajax;
 
+use Drupal\Component\Render\MarkupInterface;
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Asset\AttachedAssets;
 
 /**
  * AJAX command for a JavaScript Drupal.message() call.
  *
- * AJAX command that allows you to add messages from an Ajax response. The command will create a new Drupal.Message() object and call its addMessage() method.
+ * AJAX command that allows you to add messages from an Ajax response. The
+ * command will create a new Drupal.Message() object and call its addMessage()
+ * method.
  *
  * Usage examples:
  * Here are examples of how to suppress announcements:
@@ -68,7 +72,7 @@ class MessageCommand implements CommandInterface, CommandWithAttachedAssetsInter
   /**
    * The message text.
    *
-   * @var string
+   * @var string|\Drupal\Component\Render\MarkupInterface
    */
   protected $message;
 
@@ -96,7 +100,7 @@ class MessageCommand implements CommandInterface, CommandWithAttachedAssetsInter
   /**
    * Constructs a MessageCommand object.
    *
-   * @param string $message
+   * @param string|\Drupal\Component\Render\MarkupInterface $message
    *   The text of the message.
    * @param string|null $wrapper_query_selector
    *   The query selector of the element to display messages in when they
@@ -120,7 +124,9 @@ class MessageCommand implements CommandInterface, CommandWithAttachedAssetsInter
   public function render() {
     return [
       'command' => 'message',
-      'message' => $this->message,
+      'message' => $this->message instanceof MarkupInterface
+        ? (string) $this->message
+        : Xss::filterAdmin($this->message),
       'messageWrapperQuerySelector' => $this->wrapperQuerySelector,
       'messageOptions' => $this->options,
       'clearPrevious' => $this->clearPrevious,

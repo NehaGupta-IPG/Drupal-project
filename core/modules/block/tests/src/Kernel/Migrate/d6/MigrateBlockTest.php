@@ -6,6 +6,7 @@ namespace Drupal\Tests\block\Kernel\Migrate\d6;
 
 use Drupal\block\Entity\Block;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use Drupal\block\Hook\BlockHooks;
 
 /**
  * Tests migration of blocks to configuration entities.
@@ -50,11 +51,13 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'd6_filter_format',
       'block_content_type',
       'block_content_body_field',
+      'd6_menu',
       'd6_custom_block',
       'd6_user_role',
       'd6_block',
     ]);
-    block_rebuild();
+    $blockRebuild = new BlockHooks();
+    $blockRebuild->rebuild();
   }
 
   /**
@@ -97,7 +100,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
    */
   public function testBlockMigration(): void {
     $blocks = Block::loadMultiple();
-    $this->assertCount(25, $blocks);
+    $this->assertCount(24, $blocks);
 
     // Check user blocks.
     $visibility = [
@@ -187,10 +190,13 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
 
     // Check menu blocks.
     $settings = [
-      'id' => 'broken',
+      'id' => 'system_menu_block',
       'label' => '',
-      'provider' => 'core',
+      'provider' => 'system',
       'label_display' => '0',
+      'level' => 1,
+      'depth' => NULL,
+      'expand_all_items' => FALSE,
     ];
     $this->assertEntity('menu', [], 'header', 'olivero', -5, $settings);
 
