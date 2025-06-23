@@ -161,7 +161,7 @@ class FileUploadForm extends AddFormBase {
     $process = (array) $this->elementInfo->getInfoProperty('managed_file', '#process', []);
     $form['container']['upload'] = [
       '#type' => 'managed_file',
-      '#title' => $this->getSourceFieldLabel($media_type),
+      '#title' => $this->getSourceFieldLabel($media_type) ?? $this->formatPlural($slots, 'Add file', 'Add files'),
       // @todo Move validation in https://www.drupal.org/node/2988215
       '#process' => array_merge(['::validateUploadElement'], $process, ['::processUploadElement']),
       '#upload_validators' => $item->getUploadValidators(),

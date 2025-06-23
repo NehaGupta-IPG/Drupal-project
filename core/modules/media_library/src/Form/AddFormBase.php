@@ -844,7 +844,8 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    *   The media type to get the source field name for.
    *
    * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup|null
-   *   The label of the media type's source field.
+   *   The label of the media type's source field. NULL if
+   *    no label is available.
    */
   protected function getSourceFieldLabel(MediaTypeInterface $media_type): string|TranslatableMarkup|null {
     return $media_type->getSource()
@@ -859,7 +860,8 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    *   The media type to get the source field name for.
    *
    * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup|null
-   *   The description of the media type's source field.
+   *   The description of the media type's source field. NULL if
+   *    no description is available.
    */
   protected function getSourceFieldDescription(MediaTypeInterface $media_type): string|TranslatableMarkup|null {
     return $media_type->getSource()
