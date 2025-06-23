@@ -25,7 +25,7 @@ abstract class TransactionEventBase extends DatabaseEvent {
    *   The id of the transaction.
    * @param string $name
    *   The name of the transaction.
-   * @param \Drupal\Core\Database\Transaction\ClientConnectionTransactionState $transactionState,
+   * @param \Drupal\Core\Database\Transaction\ClientConnectionTransactionState $transactionState
    *   The state of the client transaction.
    * @param array $stackItems
    *   The current transaction stack items.
