@@ -127,7 +127,7 @@
     object-fit: cover;
 
     /* @TODO: create image-style for profile's avatar to have image squared by default. */
-    @media all and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+    @media all and (forced-colors: active) , (forced-colors: active) {
       position: absolute;
       /* stylelint-disable csstools/use-logical */
       top: 50%;

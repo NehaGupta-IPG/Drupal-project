@@ -131,7 +131,7 @@
   transform: scaleX(1);
 }
 
-@media screen and (-ms-high-contrast: active) {
+@media screen and (forced-colors: active) {
   .block-search-narrow .search-form__submit:focus {
     border-bottom-width: var(--sp0-5);
   }
@@ -147,7 +147,7 @@
   }
 }
 
-@media screen and (-ms-high-contrast: active) {
+@media screen and (forced-colors: active) {
   /* IE11's high contrast show will not show the background image, so we show the text. */
   .block-search-narrow .search-form__submit .visually-hidden {
     position: static;

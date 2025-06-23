@@ -142,7 +142,7 @@
   /* @TODO: create image-style for profile's avatar to have image squared by default. */
 }
 
-@media all and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+@media all and (forced-colors: active), (forced-colors: active) {
   .add-comment__picture img,
   .comment__picture img {
     position: absolute;

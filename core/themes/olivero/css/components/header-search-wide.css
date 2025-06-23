@@ -138,7 +138,7 @@
   transform: scaleX(1);
 }
 
-@media screen and (-ms-high-contrast: active) {
+@media screen and(forced-colors: active) {
   .block-search-wide__wrapper .search-form__submit:focus {
     border-bottom-width: var(--sp0-5);
   }
@@ -148,7 +148,7 @@
   }
 }
 
-@media screen and (-ms-high-contrast: active) {
+@media screen and (forced-colors: active) {
   /* Edge's high contrast does show the background image, so we hide it. */
   .block-search-wide__wrapper .search-form__submit .icon--search {
     display: none;
