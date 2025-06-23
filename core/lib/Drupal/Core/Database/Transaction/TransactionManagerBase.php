@@ -490,6 +490,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
         }
       }
       catch (\Throwable $t) {
+        $this->voidClientTransaction();
         if ($this->connection->isEventEnabled(TransactionReleaseSavepointFailureEvent::class)) {
           $this->connection->dispatchEvent(new TransactionReleaseSavepointFailureEvent(
             $this->connection->getKey(),
@@ -501,7 +502,6 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
             $t->getMessage(),
           ));
         }
-        throw $t;
       }
     }
     elseif ($this->stackDepth() === 1 && $this->stack()[$id]->type === StackItemType::Root) {
@@ -787,7 +787,13 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    *   Returns TRUE on success or FALSE on failure.
    */
   protected function releaseClientSavepoint(string $name): bool {
-    $this->connection->query('RELEASE SAVEPOINT ' . $name);
+    try {
+      $this->connection->query('RELEASE SAVEPOINT ' . $name);
+    }
+    catch (\Throwable) {
+      $this->setConnectionTransactionState(ClientConnectionTransactionState::CommitFailed);
+      throw new TransactionCommitFailedException();
+    }
     return TRUE;
   }
 
