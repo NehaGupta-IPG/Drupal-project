@@ -74,6 +74,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $this->switchToMediaType('Four');
     $assert_session->fieldExists('Image');
     $assert_session->pageTextContains('Maximum 2 files.');
+    $assert_session->pageTextContains('Type four media image field test description');
 
     // Create a user that can create media for all media types.
     $user = $this->drupalCreateUser([
