@@ -378,7 +378,7 @@ class AddComponentTest extends KernelTestBase {
 
     $this->assertSame('bottom', $components[$uuid]->getRegion());
     $this->assertSame(0, $components[$uuid]->getWeight());
-    $this->assertSame(['id' => 'my_plugin_id'], $components[$uuid]->get('configuration'));
+    $this->assertSame(['id' => 'my_plugin_id'], $components[$uuid]->getConfiguration());
   }
 
   /**
