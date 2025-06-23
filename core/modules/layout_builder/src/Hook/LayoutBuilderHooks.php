@@ -4,6 +4,7 @@ namespace Drupal\layout_builder\Hook;
 
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Entity\EntityViewDisplayConfigUpdater;
 use Drupal\Core\Link;
 use Drupal\Core\Breadcrumb\Breadcrumb;
 use Drupal\Core\Access\AccessResult;
@@ -402,6 +403,14 @@ class LayoutBuilderHooks {
       // See system_theme_suggestions_field().
       $suggestions[] = 'field__' . $element['#entity_type'] . '__' . $element['#field_name'] . '__' . $element['#bundle'] . '__' . $element['#third_party_settings']['layout_builder']['view_mode'];
     }
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_presave().
+   */
+  #[Hook('entity_view_display_presave')]
+  public function entityViewDisplayPreSave(EntityViewDisplayInterface $display): void {
+    \Drupal::service(EntityViewDisplayConfigUpdater::class)->updateEntity($display);
   }
 
 }

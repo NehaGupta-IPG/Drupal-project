@@ -22,7 +22,6 @@ class ThirdPartySectionComponentUpdateTest extends UpdatePathTestBase {
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.bare.standard.php.gz',
       __DIR__ . '/../../../fixtures/update/layout-builder.php',
       __DIR__ . '/../../../fixtures/update/layout-builder-sections.php',
-
     ];
   }
 
@@ -30,7 +29,7 @@ class ThirdPartySectionComponentUpdateTest extends UpdatePathTestBase {
    * Tests the update path for section components.
    */
   public function testRunUpdates(): void {
-    $this->expectDeprecation('Setting additional properties is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Additional component properties should be set via ::setThirdPartySetting(). See https://www.drupal.org/node/3100177');
+    $this->expectDeprecation('Setting additional properties is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Additional component properties should be set via ::setThirdPartySetting(). See https://www.drupal.org/node/3100177');
 
     $display = \Drupal::entityTypeManager()->getStorage('entity_view_display')->load('node.article.teaser')->toArray();
     $before_section = $display['third_party_settings']['layout_builder']['sections'][0]->toArray();

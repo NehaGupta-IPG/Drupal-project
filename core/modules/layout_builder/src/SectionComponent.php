@@ -96,7 +96,7 @@ class SectionComponent implements ThirdPartySettingsInterface {
     // @phpstan-ignore-next-line
     $this->additional = $additional;
     if ($additional !== []) {
-      @trigger_error('Setting additional properties is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Additional component properties should be set via ::setThirdPartySetting(). See https://www.drupal.org/node/3100177', E_USER_DEPRECATED);
+      @trigger_error('Setting additional properties is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Additional component properties should be set via ::setThirdPartySetting(). See https://www.drupal.org/node/3100177', E_USER_DEPRECATED);
     }
     $this->thirdPartySettings = $third_party_settings;
   }
@@ -126,7 +126,7 @@ class SectionComponent implements ThirdPartySettingsInterface {
    * @param string $property
    *   The property to retrieve.
    *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
    * Additional properties should be gotten via ::getThirdPartySetting().
    *
    * @see https://www.drupal.org/node/3100177
@@ -141,7 +141,7 @@ class SectionComponent implements ThirdPartySettingsInterface {
     else {
       $value = $this->additional[$property] ?? NULL;
     }
-    @trigger_error('Getting additional properties is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Additional component properties should be gotten via ::getThirdPartySetting(). See https://www.drupal.org/node/3100177', E_USER_DEPRECATED);
+    @trigger_error('Getting additional properties is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Additional component properties should be gotten via ::getThirdPartySetting(). See https://www.drupal.org/node/3100177', E_USER_DEPRECATED);
     return $value;
   }
 
@@ -167,7 +167,7 @@ class SectionComponent implements ThirdPartySettingsInterface {
     else {
       $this->additional[$property] = $value;
     }
-    @trigger_error('Setting random section component properties is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Component properties should be set via dedicated setters. See https://www.drupal.org/node/3100177', E_USER_DEPRECATED);
+    @trigger_error('Setting random section component properties is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Component properties should be set via dedicated setters. See https://www.drupal.org/node/3100177', E_USER_DEPRECATED);
     return $this;
   }
 
