@@ -36,7 +36,7 @@ final class TransactionCommitEvent extends TransactionEventBase {
     string $id,
     string $name,
     array $stackItems,
-    public readonly CommitType $type = CommitType::Explicit,
+    public readonly CommitType $type,
   ) {
     parent::__construct($key, $target, $id, $name, $stackItems);
   }

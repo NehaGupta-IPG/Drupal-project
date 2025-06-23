@@ -521,6 +521,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
         }
       }
       catch (\Throwable $t) {
+        $this->voidClientTransaction();
         if ($this->connection->isEventEnabled(TransactionCommitFailureEvent::class)) {
           $this->connection->dispatchEvent(new TransactionCommitFailureEvent(
             $this->connection->getKey(),
@@ -712,7 +713,6 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   protected function processRootCommit(): void {
     $clientCommit = $this->commitClientTransaction();
     if (!$clientCommit) {
-      $this->voidClientTransaction();
       $this->setConnectionTransactionState(ClientConnectionTransactionState::CommitFailed);
       throw new TransactionCommitFailedException();
     }
@@ -814,7 +814,9 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     while ($i = array_key_last($this->stack())) {
       $this->voidStackItem((string) $i);
     }
-    $this->setConnectionTransactionState(ClientConnectionTransactionState::Voided);
+    if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::Active) {
+      $this->setConnectionTransactionState(ClientConnectionTransactionState::Voided);
+    }
   }
 
   /**

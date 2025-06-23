@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Event\TransactionEvent;
-use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Transaction events.
+ *
+ * @group Database
  */
-#[Group('Database')]
 class TransactionEventTest extends DatabaseTestBase {
 
   /**
