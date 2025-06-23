@@ -23,8 +23,8 @@ class TwigExtensionPass implements CompilerPassInterface {
       $class_name = $container->getDefinition($service_id)->getClass();
       $reflection = new \ReflectionClass($class_name);
       // We use the class names as hash in order to invalidate on new extensions
-      // and crc32 for every time we change an existing file.
-      $twig_extension_hash .= $class_name . hash_file('crc32', $reflection->getFileName());
+      // and xxh3 for every time we change an existing file.
+      $twig_extension_hash .= $class_name . hash_file('xxh3', $reflection->getFileName());
     }
 
     $container->setParameter('twig_extension_hash', Crypt::hashBase64($twig_extension_hash));
