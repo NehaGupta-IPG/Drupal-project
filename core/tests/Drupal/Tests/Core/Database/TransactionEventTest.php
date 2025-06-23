@@ -8,6 +8,8 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Event\TransactionCommitEvent;
 use Drupal\Core\Database\Event\TransactionCommitFailureEvent;
 use Drupal\Core\Database\Event\TransactionEvent;
+use Drupal\Core\Database\Event\TransactionReleaseSavepointEvent;
+use Drupal\Core\Database\Event\TransactionReleaseSavepointFailureEvent;
 use Drupal\Core\Database\TransactionCommitFailedException;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Tests\Core\Database\Stub\EventSubscriber\StubTransactionEventSubscriber;
@@ -71,6 +73,29 @@ class TransactionEventTest extends UnitTestCase {
       // Expected, do nothing.
     }
     $this->assertSame(TransactionCommitFailureEvent::class, get_class($this->subscriber->lastEvent));
+  }
+
+  /**
+   * Tests releasing a savepoint.
+   */
+  public function testTransactionReleaseSavepoint(): void {
+    $tx = $this->connection->startTransaction();
+    $savepoint = $this->connection->startTransaction('foo');
+    $savepoint->commitOrRelease();
+    $this->assertSame(TransactionReleaseSavepointEvent::class, get_class($this->subscriber->lastEvent));
+    unset($tx);
+  }
+
+  /**
+   * Tests a transaction release savepoint failure.
+   */
+  public function testTransactionReleaseSavepointFailure(): void {
+    $tx = $this->connection->startTransaction();
+    $savepoint = $this->connection->startTransaction('foo');
+    $this->connection->transactionManager()->success = FALSE;
+    $savepoint->commitOrRelease();
+    $this->assertSame(TransactionReleaseSavepointFailureEvent::class, get_class($this->subscriber->lastEvent));
+    unset($tx);
   }
 
 }
