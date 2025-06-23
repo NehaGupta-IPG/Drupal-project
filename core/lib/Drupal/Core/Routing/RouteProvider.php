@@ -5,6 +5,7 @@ namespace Drupal\Core\Routing;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Path\CurrentPathStack;
@@ -123,7 +124,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    *   The cache tag invalidator.
    * @param string $table
    *   (Optional) The table in the database to use for matching. Defaults to
-   *   'router'
+   *   'router'.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   (Optional) The language manager.
    */
@@ -199,7 +200,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    * Find the route using the provided route name.
    *
    * @param string $name
-   *   The route name to fetch
+   *   The route name to fetch.
    *
    * @return \Symfony\Component\Routing\Route
    *   The found route.
@@ -383,7 +384,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
         ':patterns[]' => $ancestors,
         ':count_parts' => count($parts),
       ])
-        ->fetchAll(\PDO::FETCH_ASSOC);
+        ->fetchAll(FetchAs::Associative);
     }
     catch (\Exception) {
       $routes = [];

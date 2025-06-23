@@ -14,13 +14,6 @@ use PHPUnit\Framework\TestCase;
 class ArgumentsResolverTest extends TestCase {
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-  }
-
-  /**
    * Tests the getArgument() method.
    *
    * @dataProvider providerTestGetArgument
@@ -204,6 +197,9 @@ class TestClass {
 
 }
 
+/**
+ * Provides a class for testing a static method.
+ */
 class TestStaticMethodClass {
 
   public static function access($foo) {

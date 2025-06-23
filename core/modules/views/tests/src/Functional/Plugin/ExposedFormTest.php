@@ -116,7 +116,7 @@ class ExposedFormTest extends ViewTestBase {
         'field' => 'type',
         'id' => 'type',
         'table' => 'node_field_data',
-        'plugin_id' => 'bundle',
+        'plugin_id' => 'in_operator',
         'entity_type' => 'node',
         'entity_field' => 'type',
         'expose' => [
@@ -209,10 +209,13 @@ class ExposedFormTest extends ViewTestBase {
     $this->assertSession()->fieldValueEquals('edit-type', 'article');
 
     // Test the reset works.
-    $this->drupalGet('test_exposed_form_buttons', ['query' => ['op' => 'Reset']]);
+    $this->submitForm([], 'Reset');
+    $this->assertSession()->addressEquals('test_exposed_form_buttons');
     $this->assertSession()->statusCodeEquals(200);
     // Test the type has been reset.
     $this->assertSession()->fieldValueEquals('edit-type', 'All');
+    // Test that the reset button didn't start a session.
+    $this->assertEquals(FALSE, (bool) $this->getSession()->getCookie($this->getSessionName()));
 
     // Test the button is hidden after reset.
     $this->assertSession()->fieldNotExists('edit-reset');
