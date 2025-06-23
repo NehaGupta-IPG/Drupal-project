@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Database\Event;
 
+use Drupal\Core\Database\Transaction\ClientConnectionTransactionState;
+
 /**
  * Base class for database transaction events.
  */
 abstract class TransactionEventBase extends DatabaseEvent {
 
   /**
-   * Constructs a TransactionEventBase object.
+   * Constructor.
    *
    * See 'Customizing database settings' in settings.php for an explanation of
    * the $key and $target connection values.
@@ -23,6 +25,8 @@ abstract class TransactionEventBase extends DatabaseEvent {
    *   The id of the transaction.
    * @param string $name
    *   The name of the transaction.
+   * @param \Drupal\Core\Database\Transaction\ClientConnectionTransactionState $transactionState,
+   *   The state of the client transaction.
    * @param array $stackItems
    *   The current transaction stack items.
    */
@@ -31,6 +35,7 @@ abstract class TransactionEventBase extends DatabaseEvent {
     public readonly string $target,
     public readonly string $id,
     public readonly string $name,
+    public readonly ClientConnectionTransactionState $transactionState,
     public readonly array $stackItems,
   ) {
     parent::__construct();

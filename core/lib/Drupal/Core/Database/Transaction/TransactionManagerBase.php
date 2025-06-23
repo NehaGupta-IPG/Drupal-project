@@ -326,8 +326,8 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // Do the client-level processing.
     if ($this->stackDepth() === 0) {
       $this->beginClientTransaction();
-      $type = StackItemType::Root;
       $this->setConnectionTransactionState(ClientConnectionTransactionState::Active);
+      $this->addStackItem($id, new StackItem($name, StackItemType::Root));
       // Only set ::rootId if there's not one set already, which may happen in
       // case of broken transactions.
       if ($this->rootId === NULL) {
@@ -339,6 +339,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
           $this->connection->getTarget(),
           $id,
           $name,
+          $this->getConnectionTransactionState(),
           $this->stackItemsAsArray(),
         ));
       }
@@ -348,20 +349,18 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       // database savepoint, rather than try to begin another database
       // transaction.
       $this->addClientSavepoint($name);
-      $type = StackItemType::Savepoint;
+      $this->addStackItem($id, new StackItem($name, StackItemType::Savepoint));
       if ($this->connection->isEventEnabled(TransactionSavepointEvent::class)) {
         $this->connection->dispatchEvent(new TransactionSavepointEvent(
           $this->connection->getKey(),
           $this->connection->getTarget(),
           $id,
           $name,
+          $this->getConnectionTransactionState(),
           $this->stackItemsAsArray(),
         ));
       }
     }
-
-    // Add an item on the stack, increasing its depth.
-    $this->addStackItem($id, new StackItem($name, $type));
 
     // Actually return a new Transaction object.
     return new Transaction($this->connection, $name, $id);
@@ -477,7 +476,9 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       // Release the client transaction savepoint in case the Drupal
       // transaction is not a root one.
       try {
-        $this->releaseClientSavepoint($name);
+        if (!$this->releaseClientSavepoint($name)) {
+          throw new TransactionCommitFailedException();
+        }
         $this->removeStackItem($id);
         if ($this->connection->isEventEnabled(TransactionReleaseSavepointEvent::class)) {
           $this->connection->dispatchEvent(new TransactionReleaseSavepointEvent(
@@ -485,11 +486,14 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
             $this->connection->getTarget(),
             $id,
             $name,
+            $this->getConnectionTransactionState(),
             $this->stackItemsAsArray(),
+            $commitType,
           ));
         }
       }
       catch (\Throwable $t) {
+        $this->setConnectionTransactionState(ClientConnectionTransactionState::CommitFailed);
         $this->voidClientTransaction();
         if ($this->connection->isEventEnabled(TransactionReleaseSavepointFailureEvent::class)) {
           $this->connection->dispatchEvent(new TransactionReleaseSavepointFailureEvent(
@@ -497,9 +501,11 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
             $this->connection->getTarget(),
             $id,
             $name,
+            $this->getConnectionTransactionState(),
             $this->stackItemsAsArray(),
             get_class($t),
             $t->getMessage(),
+            $commitType,
           ));
         }
       }
@@ -509,12 +515,14 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       // transaction.
       try {
         $this->processRootCommit();
+        $this->removeStackItem($id);
         if ($this->connection->isEventEnabled(TransactionCommitEvent::class)) {
           $this->connection->dispatchEvent(new TransactionCommitEvent(
             $this->connection->getKey(),
             $this->connection->getTarget(),
             $id,
             $name,
+            $this->getConnectionTransactionState(),
             $this->stackItemsAsArray(),
             $commitType,
           ));
@@ -528,9 +536,11 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
             $this->connection->getTarget(),
             $id,
             $name,
+            $this->getConnectionTransactionState(),
             $this->stackItemsAsArray(),
             get_class($t),
             $t->getMessage(),
+            $commitType,
           ));
         }
         throw $t;
@@ -576,6 +586,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
               $this->connection->getTarget(),
               $id,
               $name,
+              $this->getConnectionTransactionState(),
               $this->stackItemsAsArray(),
             ));
           }
@@ -587,6 +598,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
               $this->connection->getTarget(),
               $id,
               $name,
+              $this->getConnectionTransactionState(),
               $this->stackItemsAsArray(),
               get_class($t),
               $t->getMessage(),
@@ -611,6 +623,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
               $this->connection->getTarget(),
               $id,
               $name,
+              $this->getConnectionTransactionState(),
               $this->stackItemsAsArray(),
             ));
           }
@@ -622,6 +635,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
               $this->connection->getTarget(),
               $id,
               $name,
+              $this->getConnectionTransactionState(),
               $this->stackItemsAsArray(),
               get_class($t),
               $t->getMessage(),
@@ -787,13 +801,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    *   Returns TRUE on success or FALSE on failure.
    */
   protected function releaseClientSavepoint(string $name): bool {
-    try {
-      $this->connection->query('RELEASE SAVEPOINT ' . $name);
-    }
-    catch (\Throwable) {
-      $this->setConnectionTransactionState(ClientConnectionTransactionState::CommitFailed);
-      throw new TransactionCommitFailedException();
-    }
+    $this->connection->query('RELEASE SAVEPOINT ' . $name);
     return TRUE;
   }
 
@@ -846,6 +854,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
         $this->connection->getTarget(),
         $i,
         $this->stack[$i]->name,
+        $this->getConnectionTransactionState(),
         $this->stackItemsAsArray(),
         CommitType::AutomaticUponDDL,
       ));

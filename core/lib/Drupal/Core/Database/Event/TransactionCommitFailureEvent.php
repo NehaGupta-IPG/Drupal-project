@@ -7,5 +7,5 @@ namespace Drupal\Core\Database\Event;
 /**
  * Represents the failed commit of a transaction.
  */
-final class TransactionCommitFailureEvent extends TransactionFailureEventBase {
+final class TransactionCommitFailureEvent extends TransactionCommitOrReleaseFailureEventBase {
 }

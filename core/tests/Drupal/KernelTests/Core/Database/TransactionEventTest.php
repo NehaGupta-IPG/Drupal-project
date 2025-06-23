@@ -36,7 +36,7 @@ class TransactionEventTest extends DatabaseTestBase {
   public function testTransactionSavepoint(): void {
     $tx = $this->connection->startTransaction();
     $savepoint = $this->connection->startTransaction();
-    $this->assertMatchesRegularExpression("/^.*TransactionSavepointEvent default default .*\\\\savepoint_1 stack: .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+    $this->assertMatchesRegularExpression("/^.*TransactionSavepointEvent default default .*\\\\savepoint_1 stack: .*\\\\drupal_transaction > .*\\\\savepoint_1$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
     $savepoint->commitOrRelease();
     $tx->commitOrRelease();
   }

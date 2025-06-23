@@ -7,5 +7,5 @@ namespace Drupal\Core\Database\Event;
 /**
  * Represents a savepoint release.
  */
-final class TransactionReleaseSavepointEvent extends TransactionEventBase {
+final class TransactionReleaseSavepointEvent extends TransactionCommitOrReleaseEventBase {
 }

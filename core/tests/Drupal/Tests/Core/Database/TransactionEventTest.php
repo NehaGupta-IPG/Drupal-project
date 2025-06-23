@@ -10,6 +10,8 @@ use Drupal\Core\Database\Event\TransactionCommitFailureEvent;
 use Drupal\Core\Database\Event\TransactionEvent;
 use Drupal\Core\Database\Event\TransactionReleaseSavepointEvent;
 use Drupal\Core\Database\Event\TransactionReleaseSavepointFailureEvent;
+use Drupal\Core\Database\Transaction\ClientConnectionTransactionState;
+use Drupal\Core\Database\Transaction\CommitType;
 use Drupal\Core\Database\TransactionCommitFailedException;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Tests\Core\Database\Stub\EventSubscriber\StubTransactionEventSubscriber;
@@ -58,6 +60,23 @@ class TransactionEventTest extends UnitTestCase {
     $tx = $this->connection->startTransaction();
     $tx->commitOrRelease();
     $this->assertSame(TransactionCommitEvent::class, get_class($this->subscriber->lastEvent));
+    $this->assertSame('drupal_transaction', $this->subscriber->lastEvent->name);
+    $this->assertSame(ClientConnectionTransactionState::Committed, $this->subscriber->lastEvent->transactionState);
+    $this->assertSame(CommitType::Explicit, $this->subscriber->lastEvent->type);
+    $this->assertCount(0, $this->subscriber->lastEvent->stackItems);
+  }
+
+  /**
+   * Tests committing a transaction via object destruction.
+   */
+  public function testTransactionCommitOnDestruct(): void {
+    $tx = $this->connection->startTransaction();
+    unset($tx);
+    $this->assertSame(TransactionCommitEvent::class, get_class($this->subscriber->lastEvent));
+    $this->assertSame('drupal_transaction', $this->subscriber->lastEvent->name);
+    $this->assertSame(ClientConnectionTransactionState::Committed, $this->subscriber->lastEvent->transactionState);
+    $this->assertSame(CommitType::ImplicitOnDestruct, $this->subscriber->lastEvent->type);
+    $this->assertCount(0, $this->subscriber->lastEvent->stackItems);
   }
 
   /**
@@ -73,6 +92,10 @@ class TransactionEventTest extends UnitTestCase {
       // Expected, do nothing.
     }
     $this->assertSame(TransactionCommitFailureEvent::class, get_class($this->subscriber->lastEvent));
+    $this->assertSame('drupal_transaction', $this->subscriber->lastEvent->name);
+    $this->assertSame(ClientConnectionTransactionState::CommitFailed, $this->subscriber->lastEvent->transactionState);
+    $this->assertSame(CommitType::Explicit, $this->subscriber->lastEvent->type);
+    $this->assertCount(0, $this->subscriber->lastEvent->stackItems);
   }
 
   /**
@@ -83,6 +106,10 @@ class TransactionEventTest extends UnitTestCase {
     $savepoint = $this->connection->startTransaction('foo');
     $savepoint->commitOrRelease();
     $this->assertSame(TransactionReleaseSavepointEvent::class, get_class($this->subscriber->lastEvent));
+    $this->assertSame('foo', $this->subscriber->lastEvent->name);
+    $this->assertSame(ClientConnectionTransactionState::Active, $this->subscriber->lastEvent->transactionState);
+    $this->assertSame(CommitType::Explicit, $this->subscriber->lastEvent->type);
+    $this->assertCount(1, $this->subscriber->lastEvent->stackItems);
     unset($tx);
   }
 
@@ -95,6 +122,10 @@ class TransactionEventTest extends UnitTestCase {
     $this->connection->transactionManager()->success = FALSE;
     $savepoint->commitOrRelease();
     $this->assertSame(TransactionReleaseSavepointFailureEvent::class, get_class($this->subscriber->lastEvent));
+    $this->assertSame('foo', $this->subscriber->lastEvent->name);
+    $this->assertSame(ClientConnectionTransactionState::CommitFailed, $this->subscriber->lastEvent->transactionState);
+    $this->assertSame(CommitType::Explicit, $this->subscriber->lastEvent->type);
+    $this->assertCount(0, $this->subscriber->lastEvent->stackItems);
     unset($tx);
   }
 
