@@ -103,30 +103,30 @@ class Block extends DisplayPluginBase {
    *   The entity type manager.
    * @param \Drupal\Core\Block\BlockManagerInterface $block_manager
    *   The block manager.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value
+   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface|null $key_value
    *   The key/value manager service.
-   * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface $context_repository
+   * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface|null $context_repository
    *   The context repository.
-   * @param \Drupal\Core\Plugin\Context\ContextHandlerInterface $context_handler
+   * @param \Drupal\Core\Plugin\Context\ContextHandlerInterface|null $context_handler
    *   The ContextHandler for applying contexts to conditions properly.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, BlockManagerInterface $block_manager, KeyValueFactoryInterface $key_value = NULL, ContextRepositoryInterface $context_repository = NULL, ContextHandlerInterface $context_handler = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, BlockManagerInterface $block_manager, ?KeyValueFactoryInterface $key_value = NULL, ?ContextRepositoryInterface $context_repository = NULL, ?ContextHandlerInterface $context_handler = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
     $this->blockManager = $block_manager;
     if (!isset($key_value)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $key_value argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3395016', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $key_value argument is deprecated in drupal:11.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3395016', E_USER_DEPRECATED);
       $key_value = \Drupal::service('keyvalue');
     }
     $this->keyValue = $key_value;
     if (!isset($context_repository)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $context_repository argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3395016', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $context_repository argument is deprecated in drupal:11.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3395016', E_USER_DEPRECATED);
       $context_repository = \Drupal::service('context.repository');
     }
     $this->contextRepository = $context_repository;
     if (!isset($context_handler)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $context_handler argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3395016', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $context_handler argument is deprecated in drupal:11.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3395016', E_USER_DEPRECATED);
       $context_handler = \Drupal::service('context.handler');
     }
     $this->contextHandler = $context_handler;
