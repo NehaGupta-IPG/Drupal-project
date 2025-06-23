@@ -173,16 +173,6 @@ abstract class BrowserTestBase extends TestCase {
   protected $originalShutdownCallbacks = [];
 
   /**
-   * The original container.
-   *
-   * Move this to \Drupal\Core\Test\FunctionalTestSetupTrait once TestBase no
-   * longer provides the same value.
-   *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface
-   */
-  protected $originalContainer;
-
-  /**
    * {@inheritdoc}
    */
   public function __construct(string $name) {
@@ -512,8 +502,14 @@ abstract class BrowserTestBase extends TestCase {
    *
    * @return array
    *   Associative array of option keys and values.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is
+   *   no direct replacement.
+   *
+   * @see https://www.drupal.org/node/3523039
    */
   protected function getOptions($select, ?Element $container = NULL) {
+    @trigger_error(__METHOD__ . 'is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3523039', E_DEPRECATED);
     if (is_string($select)) {
       $select = $this->assertSession()->selectExists($select, $container);
     }
@@ -609,9 +605,8 @@ abstract class BrowserTestBase extends TestCase {
    *   The JSON decoded drupalSettings value from the current page.
    */
   protected function getDrupalSettings() {
-    $html = $this->getSession()->getPage()->getContent();
-    if (preg_match('@<script type="application/json" data-drupal-selector="drupal-settings-json">([^<]*)</script>@', $html, $matches)) {
-      $settings = Json::decode($matches[1]);
+    if ($elements = $this->xpath('//script[@type="application/json" and @data-drupal-selector="drupal-settings-json"]')) {
+      $settings = Json::decode($elements[0]->getText());
       if (isset($settings['ajaxPageState']['libraries'])) {
         $settings['ajaxPageState']['libraries'] = UrlHelper::uncompressQueryParameter($settings['ajaxPageState']['libraries']);
       }

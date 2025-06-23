@@ -30,7 +30,7 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
       'ScriptCount' => 1,
       'ScriptBytes' => 11700,
       'StylesheetCount' => 6,
-      'StylesheetBytes' => 121000,
+      'StylesheetBytes' => 118700,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
@@ -50,7 +50,7 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
       'ScriptCount' => 3,
       'ScriptBytes' => 170500,
       'StylesheetCount' => 5,
-      'StylesheetBytes' => 86650,
+      'StylesheetBytes' => 85000,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
@@ -69,9 +69,9 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
     }, 'umamiFrontAndRecipePagesEditor');
     $expected = [
       'ScriptCount' => 5,
-      'ScriptBytes' => 338200,
+      'ScriptBytes' => 335003,
       'StylesheetCount' => 5,
-      'StylesheetBytes' => 206750,
+      'StylesheetBytes' => 205100,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
