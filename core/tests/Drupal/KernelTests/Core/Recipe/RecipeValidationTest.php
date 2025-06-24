@@ -258,6 +258,60 @@ YAML,
         '[config][import][0]' => ['This value should satisfy at least one of the following constraints: [1] This value should be identical to string "*". [2] Each element of this collection should satisfy its own set of constraints.'],
       ],
     ];
+    yield 'config import item has only one period' => [
+      <<<YAML
+name: Bad wildcard in config import list
+install:
+  - system
+config:
+  import:
+    system:
+      - system.*
+YAML,
+      [
+        '[config][import][system]' => ['This value should satisfy at least one of the following constraints: [1] This value should be identical to string "*". [2] Each element of this collection should satisfy its own set of constraints.'],
+      ],
+    ];
+    yield 'config import item has misplaced wildcard' => [
+      <<<YAML
+name: Bad wildcard in config import list
+install:
+  - node
+config:
+  import:
+    node:
+      - core.entity_view_mode.node.*.full
+YAML,
+      [
+        '[config][import][node]' => ['This value should satisfy at least one of the following constraints: [1] This value should be identical to string "*". [2] Each element of this collection should satisfy its own set of constraints.'],
+      ],
+    ];
+    yield 'config import item has more than one wildcard' => [
+      <<<YAML
+name: Bad wildcard in config import list
+install:
+  - node
+config:
+  import:
+    node:
+      - core.entity_*_mode.node.*.*
+YAML,
+      [
+        '[config][import][node]' => ['This value should satisfy at least one of the following constraints: [1] This value should be identical to string "*". [2] Each element of this collection should satisfy its own set of constraints.'],
+      ],
+    ];
+    yield 'config import with wildcard' => [
+      <<<YAML
+name: Wildcard in config import list
+install:
+  - node
+config:
+  import:
+    node:
+      - node.type.*
+YAML,
+      NULL,
+    ];
     yield 'config strict is not a boolean or array' => [
       <<<YAML
 name: Invalid strict flag

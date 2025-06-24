@@ -270,7 +270,7 @@ final class Recipe {
                 new All([
                   new Type('string'),
                   new NotBlank(),
-                  new Regex('/^.+\./'),
+                  new Callback(self::validateImportItem(...)),
                 ]),
               ]),
             ]),
@@ -323,6 +323,18 @@ final class Recipe {
       'content' => [],
     ];
     return $recipe_data;
+  }
+
+  public static function validateImportItem(string $value, ExecutionContextInterface $context): void {
+    // If there's no wildcard, no further validation is needed.
+    if (!str_contains($value, '*')) {
+      return;
+    }
+    // If the value doesn't have at least two periods and end with '.*' (with
+    // no other * in it), it's not valid.
+    if (substr_count($value, '.') < 2 || !str_ends_with($value, '.*') || substr_count($value, '*') > 1) {
+      $context->addViolation('"%value" is not something that can be imported.');
+    }
   }
 
   /**
