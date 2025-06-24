@@ -36,6 +36,11 @@ interface NodeAccessControlHandlerInterface {
   public function writeDefaultGrant();
 
   /**
+   * Delete default node access entry.
+   */
+  public function deleteDefaultGrant();
+
+  /**
    * Deletes all node access entries.
    */
   public function deleteGrants();

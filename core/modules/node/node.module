@@ -534,7 +534,7 @@ function node_access_rebuild($batch_mode = FALSE): void {
   // to signal that the node access table still needs to be rebuilt if this
   // function does not finish.
   node_access_needs_rebuild(TRUE);
-  $access_control_handler->deleteGrants();
+  $access_control_handler->deleteDefaultGrant();
 
   // Only recalculate if the site is using a node_access module.
   if (\Drupal::moduleHandler()->hasImplementations('node_grants')) {
@@ -568,14 +568,16 @@ function node_access_rebuild($batch_mode = FALSE): void {
         // To preserve database integrity, only write grants if the node
         // loads successfully.
         if (!empty($node)) {
-          $grants = $access_control_handler->acquireGrants($node);
+          $grants = $access_control_handler->acquireGrants($node, TRUE);
           \Drupal::service('node.grant_storage')->write($node, $grants);
         }
       }
     }
   }
   else {
-    // Not using any node_access modules. Add the default grant.
+    // Not using any node_access modules. Add the default grant after removing
+    // all old records.
+    $access_control_handler->deleteGrants();
     $access_control_handler->writeDefaultGrant();
   }
 
@@ -602,15 +604,15 @@ function _node_access_rebuild_batch_operation(&$context): void {
   if (empty($context['sandbox'])) {
     // Initiate multistep processing.
     $context['sandbox']['progress'] = 0;
-    $context['sandbox']['current_node'] = 0;
+    $context['sandbox']['current_node'] = (int) current(\Drupal::entityQuery('node')->sort('nid', 'DESC')->range(0, 1)->execute());
     $context['sandbox']['max'] = \Drupal::entityQuery('node')->accessCheck(FALSE)->count()->execute();
   }
 
   // Process the next 20 nodes.
   $limit = 20;
   $nids = \Drupal::entityQuery('node')
-    ->condition('nid', $context['sandbox']['current_node'], '>')
-    ->sort('nid', 'ASC')
+  ->condition('nid', $context['sandbox']['current_node'], '<')
+  ->sort('nid', 'DESC')
     // Disable access checking since all nodes must be processed even if the
     // user does not have access. And unless the current user has the bypass
     // node access permission, no nodes are accessible since the grants have
@@ -627,7 +629,7 @@ function _node_access_rebuild_batch_operation(&$context): void {
       $node = $nodes[$nid];
       /** @var \Drupal\node\NodeAccessControlHandlerInterface $access_control_handler */
       $access_control_handler = \Drupal::entityTypeManager()->getAccessControlHandler('node');
-      $grants = $access_control_handler->acquireGrants($node);
+      $grants = $access_control_handler->acquireGrants($node, TRUE);
       \Drupal::service('node.grant_storage')->write($node, $grants);
     }
     $context['sandbox']['progress']++;

@@ -82,6 +82,11 @@ interface NodeGrantDatabaseStorageInterface {
   public function delete();
 
   /**
+   * Delete default node access entry.
+   */
+  public function deleteDefault();
+
+  /**
    * Creates the default node access grant entry.
    *
    * The default node access grant is a special grant added to the node_access

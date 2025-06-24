@@ -276,6 +276,13 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
   /**
    * {@inheritdoc}
    */
+  public function deleteDefault() {
+    $this->database->delete('node_access')->condition('nid', 0)->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function writeDefault() {
     $this->database->insert('node_access')
       ->fields([
