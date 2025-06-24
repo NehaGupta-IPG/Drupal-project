@@ -169,6 +169,7 @@ class TransactionEventTest extends UnitTestCase {
     $this->assertSame('foo', $this->subscriber->lastEvent->name);
     $this->assertSame(ClientConnectionTransactionState::Active, $this->subscriber->lastEvent->transactionState);
     $this->assertCount(1, $this->subscriber->lastEvent->stackItems);
+    unset($tx);
   }
 
   /**
@@ -183,6 +184,7 @@ class TransactionEventTest extends UnitTestCase {
     $this->assertSame('foo', $this->subscriber->lastEvent->name);
     $this->assertSame(ClientConnectionTransactionState::RollbackFailed, $this->subscriber->lastEvent->transactionState);
     $this->assertCount(0, $this->subscriber->lastEvent->stackItems);
+    unset($tx);
   }
 
 }
