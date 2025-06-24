@@ -361,7 +361,7 @@ function file_get_file_references(FileInterface $file, ?FieldDefinitionInterface
           foreach ($entity->getTranslationLanguages() as $langcode => $language) {
             foreach ($entity->getTranslation($langcode)->get($field_name) as $item) {
               if ($file->id() == $item->{$field_column}) {
-                $references[$file->id()][$age][$field_name][$entity_type_id][$entity->id()] = $entity;
+                $references[$file->id()][$age][$field_name][$entity_type_id][$entity->id()] = $entity->hasTranslation($langcode) ? $entity->getTranslation($langcode) : $entity;
                 break;
               }
             }
