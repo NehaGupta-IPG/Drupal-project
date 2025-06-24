@@ -5,6 +5,7 @@ namespace Drupal\Core\Action;
 use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Plugin\DependentPluginInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\ConfigurableTrait;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Session\AccountInterface;
 
@@ -13,6 +14,8 @@ use Drupal\Core\Session\AccountInterface;
  */
 abstract class ConfigurableActionBase extends ActionBase implements ConfigurableInterface, DependentPluginInterface, PluginFormInterface {
 
+  use ConfigurableTrait;
+
   /**
    * {@inheritdoc}
    */
@@ -20,27 +23,6 @@ abstract class ConfigurableActionBase extends ActionBase implements Configurable
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->setConfiguration($configuration);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function defaultConfiguration() {
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConfiguration() {
-    return $this->configuration;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setConfiguration(array $configuration) {
-    $this->configuration = $configuration + $this->defaultConfiguration();
   }
 
   /**
