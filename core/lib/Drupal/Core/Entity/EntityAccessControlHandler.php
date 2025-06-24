@@ -367,7 +367,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
     $this->moduleHandler()->alter('entity_field_access', $grants, $context);
 
     $result = $this->processAccessHookResults($grants);
-    assert('$this->isFieldOperationRecognized($operation, $grants)', 'Unrecognized field access operation: ' . $operation);
+    assert($this->isFieldOperationRecognized($operation, $grants), 'Unrecognized field access operation: ' . $operation);
     return $return_as_object ? $result : $result->isAllowed();
   }
 
