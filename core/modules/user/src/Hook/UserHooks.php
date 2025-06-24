@@ -67,7 +67,7 @@ class UserHooks {
         return '<p>' . $this->t("This web page allows administrators to register new users. Users' email addresses and usernames must be unique.") . '</p>';
 
       case 'user.admin_permissions':
-        return '<p>' . $this->t('Permissions let you control what users can do and see on your site. You can define a specific set of permissions for each role. (See the <a href=":role">Roles</a> page to create a role.) Any permissions granted to the Authenticated user role will be given to any user who is logged in to your site. On the <a href=":settings">Role settings</a> page, you can make any role into an Administrator role for the site, meaning that role will be granted all permissions. You should be careful to ensure that only trusted users are given this access and level of control of your site.', [
+        return '<p>' . $this->t('Permissions let you control what users can do and see on your site. You can define a specific set of permissions for each role. (See the <a href=":role">Roles</a> page to create a role.) Any permissions granted to the Authenticated user role will be given to any user who is logged in to your site. On the <a href=":settings">Role settings</a> page, you can make any role into an Administrator role for the site, meaning that role will be granted all new permissions automatically. You should be careful to ensure that only trusted users are given this access and level of control of your site.', [
           ':role' => Url::fromRoute('entity.user_role.collection')->toString(),
           ':settings' => Url::fromRoute('user.role.settings')->toString(),
         ]) . '</p>';

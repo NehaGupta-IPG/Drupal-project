@@ -36069,6 +36069,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/src/Form/UserMultipleCancelConfirm.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Core\\\\Form\\\\FormBase\\:\\:messenger\\(\\) invoked with 1 parameter, 0 required\\.$#',
+	'identifier' => 'arguments.count',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/src/Form/UserPasswordForm.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\user\\\\Form\\\\UserPasswordForm\\:\\:create\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -36867,7 +36873,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/tests/src/Functional/UserPasswordResetTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\UserPasswordResetTest\\:\\:getResetURL\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\UserPasswordResetTest\\:\\:getResetUrl\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/tests/src/Functional/UserPasswordResetTest.php',
@@ -36981,7 +36987,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/tests/src/FunctionalJavascript/UserPasswordResetTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\FunctionalJavascript\\\\UserPasswordResetTest\\:\\:getResetURL\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\FunctionalJavascript\\\\UserPasswordResetTest\\:\\:getResetUrl\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/tests/src/FunctionalJavascript/UserPasswordResetTest.php',

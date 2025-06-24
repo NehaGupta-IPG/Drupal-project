@@ -208,7 +208,7 @@ function template_preprocess_username(&$variables): void {
  *
  * The current user is replaced with the passed in account.
  *
- * @param \Drupal\user\UserInterface $account
+ * @param \Drupal\user\Entity\UserInterface $account
  *   The account to log in.
  *
  * @see hook_user_login()
@@ -239,7 +239,7 @@ function user_login_finalize(UserInterface $account): void {
 /**
  * Generates a unique URL for a user to log in and reset their password.
  *
- * @param \Drupal\user\UserInterface $account
+ * @param \Drupal\user\Entity\UserInterface $account
  *   An object containing the user account.
  * @param array $options
  *   (optional) A keyed array of settings. Supported options are:
@@ -250,8 +250,8 @@ function user_login_finalize(UserInterface $account): void {
  *   A unique URL that provides a one-time log in for the user, from which
  *   they can change their password.
  */
-function user_pass_reset_url($account, $options = []) {
-  $timestamp = \Drupal::time()->getCurrentTime();
+function user_pass_reset_url(UserInterface $account, array $options = []) {
+  $timestamp = \Drupal::time()->getRequestTime();
   $langcode = $options['langcode'] ?? $account->getPreferredLangcode();
   return Url::fromRoute('user.reset',
     [
@@ -269,7 +269,7 @@ function user_pass_reset_url($account, $options = []) {
 /**
  * Generates a URL to confirm an account cancellation request.
  *
- * @param \Drupal\user\UserInterface $account
+ * @param \Drupal\user\Entity\UserInterface $account
  *   The user account object.
  * @param array $options
  *   (optional) A keyed array of settings. Supported options are:
@@ -283,10 +283,13 @@ function user_pass_reset_url($account, $options = []) {
  * @see user_mail_tokens()
  * @see \Drupal\user\Controller\UserController::confirmCancel()
  */
-function user_cancel_url(UserInterface $account, $options = []) {
+function user_cancel_url(UserInterface $account, array $options = []) {
   $timestamp = \Drupal::time()->getRequestTime();
   $langcode = $options['langcode'] ?? $account->getPreferredLangcode();
-  $url_options = ['absolute' => TRUE, 'language' => \Drupal::languageManager()->getLanguage($langcode)];
+  $url_options = [
+    'absolute' => TRUE,
+    'language' => \Drupal::languageManager()->getLanguage($langcode),
+  ];
   return Url::fromRoute('user.cancel_confirm', [
     'user' => $account->id(),
     'timestamp' => $timestamp,
@@ -306,7 +309,7 @@ function user_cancel_url(UserInterface $account, $options = []) {
  * For a usage example, see user_cancel_url() and
  * \Drupal\user\Controller\UserController::confirmCancel().
  *
- * @param \Drupal\user\UserInterface $account
+ * @param \Drupal\user\Entity\UserInterface $account
  *   An object containing the user account.
  * @param int $timestamp
  *   A UNIX timestamp, typically \Drupal::time()->getRequestTime().
@@ -338,7 +341,7 @@ function user_pass_rehash(UserInterface $account, $timestamp) {
  *
  * @see _user_cancel()
  */
-function user_cancel($edit, $uid, $method): void {
+function user_cancel(array $edit, $uid, $method): void {
   $account = User::load($uid);
 
   if (!$account) {
@@ -358,7 +361,9 @@ function user_cancel($edit, $uid, $method): void {
   // account deletion.
   if ($method != 'user_cancel_delete') {
     // Allow modules to add further sets to this batch.
-    \Drupal::moduleHandler()->invokeAll('user_cancel', [$edit, $account, $method]);
+    \Drupal::moduleHandler()->invokeAll('user_cancel', [
+      $edit, $account, $method,
+    ]);
   }
 
   // Finish the batch and actually cancel the account.
@@ -389,14 +394,14 @@ function user_cancel($edit, $uid, $method): void {
  *
  * @param array $edit
  *   An array of submitted form values.
- * @param \Drupal\user\UserInterface $account
+ * @param \Drupal\user\Entity\UserInterface $account
  *   The user ID of the user account to cancel.
  * @param string $method
  *   The account cancellation method to use.
  *
  * @see user_cancel()
  */
-function _user_cancel($edit, $account, $method): void {
+function _user_cancel(array $edit, UserInterface $account, $method): void {
   $logger = \Drupal::logger('user');
 
   switch ($method) {
@@ -410,7 +415,10 @@ function _user_cancel($edit, $account, $method): void {
       $account->block();
       $account->save();
       \Drupal::messenger()->addStatus(t('Account %name has been disabled.', ['%name' => $account->getDisplayName()]));
-      $logger->notice('Blocked user: %name %email.', ['%name' => $account->getAccountName(), '%email' => '<' . $account->getEmail() . '>']);
+      $logger->notice('Blocked user: %name %email.', [
+        '%name' => $account->getAccountName(),
+        '%email' => '<' . $account->getEmail() . '>',
+      ]);
       break;
 
     case 'user_cancel_reassign':
@@ -421,7 +429,10 @@ function _user_cancel($edit, $account, $method): void {
       }
       $account->delete();
       \Drupal::messenger()->addStatus(t('Account %name has been deleted.', ['%name' => $account->getDisplayName()]));
-      $logger->notice('Deleted user: %name %email.', ['%name' => $account->getAccountName(), '%email' => '<' . $account->getEmail() . '>']);
+      $logger->notice('Deleted user: %name %email.', [
+        '%name' => $account->getAccountName(),
+        '%email' => '<' . $account->getEmail() . '>',
+      ]);
       break;
   }
 
@@ -523,7 +534,7 @@ function user_cancel_methods(): array {
  *   A keyed array of settings and flags to control the token replacement
  *   process. See \Drupal\Core\Utility\Token::replace().
  */
-function user_mail_tokens(&$replacements, $data, $options): void {
+function user_mail_tokens(array &$replacements, array $data, array $options): void {
   if (isset($data['user'])) {
     $replacements['[user:one-time-login-url]'] = user_pass_reset_url($data['user'], $options);
     $replacements['[user:cancel-url]'] = user_cancel_url($data['user'], $options);
@@ -547,7 +558,7 @@ function user_mail_tokens(&$replacements, $data, $options): void {
  *   Any value that evaluates to FALSE will cause the permission to be
  *   revoked.
  *   @code
- *     [
+ *     array[
  *       'administer nodes' => 0,                // Revoke 'administer nodes'
  *       'administer blocks' => FALSE,           // Revoke 'administer blocks'
  *       'access user profiles' => 1,            // Grant 'access user profiles'
@@ -617,7 +628,7 @@ function user_role_revoke_permissions($rid, array $permissions = []): void {
 }
 
 /**
- * Creates and sends a notification email following a change to a user account.
+ * Conditionally create and send a notification email.
  *
  * @param string $op
  *   The operation being performed on the account. Possible values:
@@ -762,7 +773,7 @@ function user_logout(): void {
  *       profile being viewed.
  *   - attributes: HTML attributes for the containing element.
  */
-function template_preprocess_user(&$variables): void {
+function template_preprocess_user(array &$variables): void {
   $variables['user'] = $variables['elements']['#user'];
   // Helpful $content variable for templates.
   foreach (Element::children($variables['elements']) as $key) {
