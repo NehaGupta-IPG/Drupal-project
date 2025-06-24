@@ -153,14 +153,14 @@ class PrivateFileOnTranslatedEntityTest extends FileFieldTestBase {
   }
 
   /**
-   * Tests the private file access with content moderation.
+   * Tests that the private file access works in a content moderation workflow.
    */
   public function testPrivateLanguageFileWithContentModeration(): void {
     $workflow = $this->createEditorialWorkflow();
     $workflow->getTypePlugin()->addEntityTypeAndBundle('node', 'page');
     $workflow->save();
 
-    // Create a default language node.
+    // Create a node in the default language.
     $default_language_node = $this->drupalCreateNode([
       'type' => 'page',
       'moderation_state' => 'draft',
@@ -188,7 +188,7 @@ class PrivateFileOnTranslatedEntityTest extends FileFieldTestBase {
     $node->save();
     $this->drupalLogout();
 
-    // Verify the translation was created and visit the file page.
+    // Verify that the translation was created and visit the file page.
     $french_node = $node->getTranslation('fr');
     $node_file = File::load($french_node->{$this->fieldName}->target_id);
     $this->drupalGet($node_file->createFileUrl(FALSE));
