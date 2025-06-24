@@ -308,6 +308,8 @@ class StringDatabaseStorage implements StringStorageInterface {
   /**
    * Loads multiple string objects.
    *
+   * The string objects are ordered by their source and context.
+   *
    * @param array $conditions
    *   Any of the conditions used by dbStringSelect().
    * @param array $options
@@ -320,7 +322,10 @@ class StringDatabaseStorage implements StringStorageInterface {
    */
   protected function dbStringLoad(array $conditions, array $options, $class) {
     $strings = [];
-    $result = $this->dbStringSelect($conditions, $options)->execute();
+    $select = $this->dbStringSelect($conditions, $options);
+    $select->orderBy('s.source');
+    $select->orderBy('s.context');
+    $result = $select->execute();
     foreach ($result as $item) {
       /** @var \Drupal\locale\StringInterface $string */
       $string = new $class($item);
@@ -446,9 +451,6 @@ class StringDatabaseStorage implements StringStorageInterface {
     if (!empty($options['pager limit'])) {
       $query = $query->extend(PagerSelectExtender::class)->limit($options['pager limit']);
     }
-
-    $query->orderBy('s.source');
-    $query->orderBy('s.context');
 
     return $query;
   }

@@ -139,21 +139,9 @@ class LocaleStringTest extends KernelTestBase {
     $source1 = $this->buildSourceString(['source' => $prefix . $this->randomMachineName(100)])->save();
     $source2 = $this->buildSourceString(['source' => $prefix . $this->randomMachineName(100)])->save();
     $source3 = $this->buildSourceString()->save();
-
-    /** @var \Drupal\locale\StringInterface[] $sorted_strings */
-    $sorted_strings = [$source1, $source2, $source3];
-    usort(
-      $sorted_strings,
-      static fn(StringInterface $source_a, StringInterface $source_b)
-        => strcmp($source_a->source, $source_b->source) ?: strcmp($source_a->context, $source_b->context),
-    );
-
     // Load all source strings.
     $strings = $this->storage->getStrings([]);
     $this->assertCount(3, $strings);
-    foreach (array_values($strings) as $index => $string) {
-      $this->assertEquals($sorted_strings[$index]->lid, $string->lid);
-    }
     // Load all source strings matching a given string.
     $filter_options['filters'] = ['source' => $prefix];
     $strings = $this->storage->getStrings([], $filter_options);
@@ -214,19 +202,44 @@ class LocaleStringTest extends KernelTestBase {
   }
 
   /**
-   * Tests that equal source strings are sorted by context.
+   * Tests sorting of strings by their source and context.
    */
-  public function testStringSortContext(): void {
-    $sourceString = $this->randomString();
-    $this->buildSourceString(['source' => $sourceString, 'context' => 'B'])->save();
-    $this->buildSourceString(['source' => $sourceString, 'context' => 'C'])->save();
-    $this->buildSourceString(['source' => $sourceString, 'context' => 'A'])->save();
+  public function testStringSort(): void {
+    $langcode = 'es';
+    $sources_and_contexts_sorted = [
+      ['source_A', 'context_A'],
+      ['source_A', 'context_B'],
+      ['source_A', 'context_C'],
+      ['source_B', 'context_A'],
+      ['source_B', 'context_B'],
+      ['source_B', 'context_C'],
+      ['source_C', 'context_A'],
+      ['source_C', 'context_B'],
+      ['source_C', 'context_C'],
+    ];
+    foreach (array_reverse($sources_and_contexts_sorted) as $source_and_context) {
+      $string = $this->buildSourceString(
+        [
+          'source' => $source_and_context[0],
+          'context' => $source_and_context[1],
+        ],
+      )->save();
+      $this->createTranslation($string, $langcode)->save();
+    }
+
+    // Assert the sort order of a string array.
+    $assert_sort_order = function (array $strings) use ($sources_and_contexts_sorted): void {
+      $sources_and_contexts_actual = array_map(
+        static fn(StringInterface $string) => [$string->source, $string->context],
+        $strings,
+      );
+      $this->assertEquals($sources_and_contexts_sorted, $sources_and_contexts_actual);
+    };
 
     $strings = $this->storage->getStrings();
-    $this->assertCount(3, $strings);
-    $this->assertEquals('A', $strings[0]->context);
-    $this->assertEquals('B', $strings[1]->context);
-    $this->assertEquals('C', $strings[2]->context);
+    $assert_sort_order($strings);
+    $strings = $this->storage->getTranslations(['language' => $langcode]);
+    $assert_sort_order($strings);
   }
 
   /**
