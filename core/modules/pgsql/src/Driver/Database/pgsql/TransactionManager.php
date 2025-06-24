@@ -23,12 +23,7 @@ class TransactionManager extends TransactionManagerBase {
    * {@inheritdoc}
    */
   protected function rollbackClientTransaction(): bool {
-    $clientRollback = $this->connection->getClientConnection()->rollBack();
-    $this->setConnectionTransactionState($clientRollback ?
-      ClientConnectionTransactionState::RolledBack :
-      ClientConnectionTransactionState::RollbackFailed
-    );
-    return $clientRollback;
+    return $this->connection->getClientConnection()->rollBack();
   }
 
   /**

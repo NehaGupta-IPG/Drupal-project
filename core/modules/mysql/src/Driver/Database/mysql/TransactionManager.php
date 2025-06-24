@@ -6,6 +6,7 @@ namespace Drupal\mysql\Driver\Database\mysql;
 
 use Drupal\Core\Database\Transaction\ClientConnectionTransactionState;
 use Drupal\Core\Database\Transaction\TransactionManagerBase;
+use Drupal\Core\Database\TransactionNoActiveException;
 
 /**
  * MySql implementation of TransactionManagerInterface.
@@ -27,21 +28,9 @@ class TransactionManager extends TransactionManagerBase {
   /**
    * {@inheritdoc}
    */
-  protected function processRootCommit(): void {
-    if (!$this->connection->getClientConnection()->inTransaction()) {
-      $this->voidClientTransaction();
-      return;
-    }
-    parent::processRootCommit();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function rollbackClientSavepoint(string $name): bool {
     if (!$this->connection->getClientConnection()->inTransaction()) {
-      $this->voidClientTransaction();
-      return TRUE;
+      throw new TransactionNoActiveException();
     }
     return parent::rollbackClientSavepoint($name);
   }
@@ -51,8 +40,7 @@ class TransactionManager extends TransactionManagerBase {
    */
   protected function releaseClientSavepoint(string $name): bool {
     if (!$this->connection->getClientConnection()->inTransaction()) {
-      $this->voidClientTransaction();
-      return TRUE;
+      throw new TransactionNoActiveException();
     }
     return parent::releaseClientSavepoint($name);
   }
@@ -69,15 +57,9 @@ class TransactionManager extends TransactionManagerBase {
    */
   protected function rollbackClientTransaction(): bool {
     if (!$this->connection->getClientConnection()->inTransaction()) {
-      $this->voidClientTransaction();
-      return FALSE;
+      throw new TransactionNoActiveException();
     }
-    $clientRollback = $this->connection->getClientConnection()->rollBack();
-    $this->setConnectionTransactionState($clientRollback ?
-      ClientConnectionTransactionState::RolledBack :
-      ClientConnectionTransactionState::RollbackFailed
-    );
-    return $clientRollback;
+    return $this->connection->getClientConnection()->rollBack();
   }
 
 }

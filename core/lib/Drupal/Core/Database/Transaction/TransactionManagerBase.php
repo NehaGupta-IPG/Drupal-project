@@ -18,6 +18,7 @@ use Drupal\Core\Database\Event\TransactionRollbackToSavepointFailureEvent;
 use Drupal\Core\Database\Event\TransactionSavepointEvent;
 use Drupal\Core\Database\Transaction;
 use Drupal\Core\Database\TransactionCommitFailedException;
+use Drupal\Core\Database\TransactionException;
 use Drupal\Core\Database\TransactionNameNonUniqueException;
 use Drupal\Core\Database\TransactionOutOfOrderException;
 
@@ -492,7 +493,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
           ));
         }
       }
-      catch (\Throwable $t) {
+      catch (\Exception $e) {
         $this->setConnectionTransactionState(ClientConnectionTransactionState::CommitFailed);
         $this->voidClientTransaction();
         if ($this->connection->isEventEnabled(TransactionReleaseSavepointFailureEvent::class)) {
@@ -503,8 +504,8 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
             $name,
             $this->getConnectionTransactionState(),
             $this->stackItemsAsArray(),
-            get_class($t),
-            $t->getMessage(),
+            get_class($e),
+            $e->getMessage(),
             $commitType,
           ));
         }
@@ -528,7 +529,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
           ));
         }
       }
-      catch (\Throwable $t) {
+      catch (\Exception $e) {
         $this->voidClientTransaction();
         if ($this->connection->isEventEnabled(TransactionCommitFailureEvent::class)) {
           $this->connection->dispatchEvent(new TransactionCommitFailureEvent(
@@ -538,12 +539,12 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
             $name,
             $this->getConnectionTransactionState(),
             $this->stackItemsAsArray(),
-            get_class($t),
-            $t->getMessage(),
+            get_class($e),
+            $e->getMessage(),
             $commitType,
           ));
         }
-        throw $t;
+        throw $e;
       }
     }
     else {
@@ -591,7 +592,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
             ));
           }
         }
-        catch (\Throwable $t) {
+        catch (\Exception $e) {
           if ($this->connection->isEventEnabled(TransactionRollbackToSavepointFailureEvent::class)) {
             $this->connection->dispatchEvent(new TransactionRollbackToSavepointFailureEvent(
               $this->connection->getKey(),
@@ -600,11 +601,10 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
               $name,
               $this->getConnectionTransactionState(),
               $this->stackItemsAsArray(),
-              get_class($t),
-              $t->getMessage(),
+              get_class($e),
+              $e->getMessage(),
             ));
           }
-          throw $t;
         }
       }
       elseif ($this->stackDepth() === 1 && $this->stack()[$id]->type === StackItemType::Root) {
@@ -612,11 +612,9 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
         // transaction. The transaction is closed.
         try {
           $this->processRootRollback();
-          if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::RolledBack) {
-            // The Transaction object remains open, and when it will get
-            // destructed no commit should happen. Void the stack item.
-            $this->voidStackItem($id);
-          }
+          // The Transaction object remains open, and when it will get
+          // destructed no commit should happen. Void the stack item.
+          $this->voidStackItem($id);
           if ($this->connection->isEventEnabled(TransactionRollbackEvent::class)) {
             $this->connection->dispatchEvent(new TransactionRollbackEvent(
               $this->connection->getKey(),
@@ -628,7 +626,8 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
             ));
           }
         }
-        catch (\Throwable $t) {
+        catch (\Exception $e) {
+          $this->voidClientTransaction();
           if ($this->connection->isEventEnabled(TransactionRollbackFailureEvent::class)) {
             $this->connection->dispatchEvent(new TransactionRollbackFailureEvent(
               $this->connection->getKey(),
@@ -637,11 +636,10 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
               $name,
               $this->getConnectionTransactionState(),
               $this->stackItemsAsArray(),
-              get_class($t),
-              $t->getMessage(),
+              get_class($e),
+              $e->getMessage(),
             ));
           }
-          throw $t;
         }
       }
       else {
@@ -715,7 +713,12 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * Processes the root transaction rollback.
    */
   protected function processRootRollback(): void {
-    $this->rollbackClientTransaction();
+    $clientRollback = $this->rollbackClientTransaction();
+    if (!$clientRollback) {
+      $this->setConnectionTransactionState(ClientConnectionTransactionState::RollbackFailed);
+      throw new TransactionException();
+    }
+    $this->setConnectionTransactionState(ClientConnectionTransactionState::RolledBack);
   }
 
   /**

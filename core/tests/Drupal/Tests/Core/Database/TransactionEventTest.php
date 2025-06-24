@@ -10,6 +10,8 @@ use Drupal\Core\Database\Event\TransactionCommitFailureEvent;
 use Drupal\Core\Database\Event\TransactionEvent;
 use Drupal\Core\Database\Event\TransactionReleaseSavepointEvent;
 use Drupal\Core\Database\Event\TransactionReleaseSavepointFailureEvent;
+use Drupal\Core\Database\Event\TransactionRollbackEvent;
+use Drupal\Core\Database\Event\TransactionRollbackFailureEvent;
 use Drupal\Core\Database\Transaction\ClientConnectionTransactionState;
 use Drupal\Core\Database\Transaction\CommitType;
 use Drupal\Core\Database\TransactionCommitFailedException;
@@ -127,6 +129,31 @@ class TransactionEventTest extends UnitTestCase {
     $this->assertSame(CommitType::Explicit, $this->subscriber->lastEvent->type);
     $this->assertCount(0, $this->subscriber->lastEvent->stackItems);
     unset($tx);
+  }
+
+  /**
+   * Tests rolling back a transaction.
+   */
+  public function testTransactionRollback(): void {
+    $tx = $this->connection->startTransaction();
+    $tx->rollback();
+    $this->assertSame(TransactionRollbackEvent::class, get_class($this->subscriber->lastEvent));
+    $this->assertSame('drupal_transaction', $this->subscriber->lastEvent->name);
+    $this->assertSame(ClientConnectionTransactionState::RolledBack, $this->subscriber->lastEvent->transactionState);
+    $this->assertCount(0, $this->subscriber->lastEvent->stackItems);
+  }
+
+  /**
+   * Tests a transaction rollback failure.
+   */
+  public function testTransactionRollbackFailure(): void {
+    $tx = $this->connection->startTransaction();
+    $this->connection->transactionManager()->success = FALSE;
+    $tx->rollback();
+    $this->assertSame(TransactionRollbackFailureEvent::class, get_class($this->subscriber->lastEvent));
+    $this->assertSame('drupal_transaction', $this->subscriber->lastEvent->name);
+    $this->assertSame(ClientConnectionTransactionState::RollbackFailed, $this->subscriber->lastEvent->transactionState);
+    $this->assertCount(0, $this->subscriber->lastEvent->stackItems);
   }
 
 }
