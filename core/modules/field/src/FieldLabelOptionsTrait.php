@@ -7,6 +7,11 @@ namespace Drupal\field;
  */
 trait FieldLabelOptionsTrait {
 
+  const LABEL_ABOVE = 'above';
+  const LABEL_INLINE = 'inline';
+  const LABEL_HIDDEN = 'hidden';
+  const LABEL_VISUALLY_HIDDEN = 'visually_hidden';
+
   /**
    * Returns an array of visibility options for field labels.
    *
@@ -15,10 +20,10 @@ trait FieldLabelOptionsTrait {
    */
   protected function getFieldLabelOptions(): array {
     return [
-      'above' => $this->t('Above'),
-      'inline' => $this->t('Inline'),
-      'hidden' => '- ' . $this->t('Hidden') . ' -',
-      'visually_hidden' => '- ' . $this->t('Visually Hidden') . ' -',
+      self::LABEL_ABOVE => $this->t('Above'),
+      self::LABEL_INLINE => $this->t('Inline'),
+      self::LABEL_HIDDEN => '- ' . $this->t('Hidden') . ' -',
+      self::LABEL_VISUALLY_HIDDEN => '- ' . $this->t('Visually Hidden') . ' -',
     ];
   }
 
