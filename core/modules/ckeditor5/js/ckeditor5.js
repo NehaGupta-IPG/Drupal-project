@@ -621,10 +621,21 @@
       ckeditorAjaxDialog.execute();
 
       // Store the save callback to be executed when this dialog is closed.
-      Drupal.ckeditor5.saveCallback.set(
-        dialogSettings.selector || '#drupal-modal',
-        saveCallback,
-      );
+      if (
+        Object.hasOwn(Drupal.ckeditor5, 'saveCallback') &&
+        Drupal.ckeditor5.saveCallback != null &&
+        Object.hasOwn(Drupal.ckeditor5.saveCallback, 'has') &&
+        Drupal.ckeditor5.saveCallback.has(set) &&
+        Object.hasOwn(dialogSettings, 'selector')
+      ) {
+        Drupal.ckeditor5.saveCallback.set(
+          dialogSettings.selector || '#drupal-modal',
+          saveCallback,
+        );
+      }
+      else {
+        Drupal.ckeditor5.saveCallback = saveCallback;
+      }
     },
   };
 
@@ -694,10 +705,12 @@
   // Respond to dialogs that are saved, sending data back to CKEditor.
   $(window).on('editor:dialogsave', (e, values, selector) => {
     if (Drupal.ckeditor5.saveCallback) {
-      if (Object.hasOwn(Drupal.ckeditor5.saveCallback, 'has') && Drupal.ckeditor5.saveCallback.has(selector)) {
+      if (
+        Object.hasOwn(Drupal.ckeditor5.saveCallback, 'has') &&
+        Drupal.ckeditor5.saveCallback.has(selector)
+      ) {
         Drupal.ckeditor5.saveCallback.get(selector)(values);
-      }
-      else {
+      } else {
         Drupal.ckeditor5.saveCallback(values);
       }
     }
@@ -709,10 +722,12 @@
     const options = dialogSettings.options || {};
     const selector = options.selector || '#drupal-modal';
     if (Drupal.ckeditor5.saveCallback) {
-      if (Object.hasOwn(Drupal.ckeditor5.saveCallback, 'has') && Drupal.ckeditor5.saveCallback.has(selector)) {
+      if (
+        Object.hasOwn(Drupal.ckeditor5.saveCallback, 'has') &&
+        Drupal.ckeditor5.saveCallback.has(selector)
+      ) {
         Drupal.ckeditor5.saveCallback.delete(selector);
-      }
-      else {
+      } else {
         Drupal.ckeditor5.saveCallback = null;
       }
     }
