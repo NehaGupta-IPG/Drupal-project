@@ -7,6 +7,9 @@ namespace Drupal\Tests\locale\Traits;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Logger\RfcLogLevel;
 
+/**
+ * Contains helper methods for importing translations in tests.
+ */
 trait TranslationImportTestTrait {
 
   /**
