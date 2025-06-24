@@ -478,7 +478,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       // transaction is not a root one.
       try {
         if (!$this->releaseClientSavepoint($name)) {
-          throw new TransactionCommitFailedException();
+          throw new TransactionCommitFailedException("Release savepoint $name failed");
         }
         $this->removeStackItem($id);
         if ($this->connection->isEventEnabled(TransactionReleaseSavepointEvent::class)) {
@@ -576,8 +576,12 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
         // transaction is not a root one. Then, release the savepoint too. The
         // client connection remains active.
         try {
-          $this->rollbackClientSavepoint($name);
-          $this->releaseClientSavepoint($name);
+          if (!$this->rollbackClientSavepoint($name)) {
+            throw new TransactionException("Rollback to savepoint $name failed");
+          }
+          if (!$this->releaseClientSavepoint($name)) {
+            throw new TransactionException("Release savepoint $name failed");
+          }
           // The Transaction object remains open, and when it will get
           // destructed no commit should happen. Void the stack item.
           $this->voidStackItem($id);
@@ -593,6 +597,8 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
           }
         }
         catch (\Exception $e) {
+          $this->setConnectionTransactionState(ClientConnectionTransactionState::RollbackFailed);
+          $this->voidClientTransaction();
           if ($this->connection->isEventEnabled(TransactionRollbackToSavepointFailureEvent::class)) {
             $this->connection->dispatchEvent(new TransactionRollbackToSavepointFailureEvent(
               $this->connection->getKey(),
@@ -716,7 +722,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     $clientRollback = $this->rollbackClientTransaction();
     if (!$clientRollback) {
       $this->setConnectionTransactionState(ClientConnectionTransactionState::RollbackFailed);
-      throw new TransactionException();
+      throw new TransactionException('Transaction rollback failed');
     }
     $this->setConnectionTransactionState(ClientConnectionTransactionState::RolledBack);
   }
@@ -731,7 +737,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     $clientCommit = $this->commitClientTransaction();
     if (!$clientCommit) {
       $this->setConnectionTransactionState(ClientConnectionTransactionState::CommitFailed);
-      throw new TransactionCommitFailedException();
+      throw new TransactionCommitFailedException('Transaction commit failed');
     }
     $this->setConnectionTransactionState(ClientConnectionTransactionState::Committed);
   }
