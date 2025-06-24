@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\sqlite\Driver\Database\sqlite;
 
-use Drupal\Core\Database\Transaction\ClientConnectionTransactionState;
 use Drupal\Core\Database\Transaction\TransactionManagerBase;
 
 /**

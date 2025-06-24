@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\mysqli\Driver\Database\mysqli;
 
-use Drupal\Core\Database\Transaction\ClientConnectionTransactionState;
 use Drupal\Core\Database\Transaction\TransactionManagerBase;
 
 /**
