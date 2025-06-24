@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\mysql\Driver\Database\mysql;
 
-use Drupal\Core\Database\Transaction\ClientConnectionTransactionState;
 use Drupal\Core\Database\Transaction\TransactionManagerBase;
 use Drupal\Core\Database\TransactionNoActiveException;
 
