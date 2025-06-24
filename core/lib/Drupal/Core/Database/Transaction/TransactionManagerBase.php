@@ -515,7 +515,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       // transaction.
       try {
         $this->processRootCommit();
-        $this->removeStackItem($id);
+        $this->voidStackItem($id);
         if ($this->connection->isEventEnabled(TransactionCommitEvent::class)) {
           $this->connection->dispatchEvent(new TransactionCommitEvent(
             $this->connection->getKey(),
