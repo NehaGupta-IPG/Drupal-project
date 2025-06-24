@@ -67,16 +67,6 @@ class PrivateFileOnTranslatedEntityTest extends FileFieldTestBase {
       'create page content',
       'edit any page content',
       'translate any entity',
-      'administer languages',
-      'access content',
-      'administer site configuration',
-      'administer users',
-      'administer permissions',
-      'administer content types',
-      'administer node fields',
-      'administer node display',
-      'administer nodes',
-      'bypass node access',
     ];
     $admin_user = $this->drupalCreateUser($permissions);
     $this->drupalLogin($admin_user);
