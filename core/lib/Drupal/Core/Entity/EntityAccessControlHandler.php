@@ -445,9 +445,10 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
    * @param array $grants
    *   The access grants produced by hook_entity_field_access and _alter.
    *
-   * @return bool|\Drupal\Core\Access\AccessResultInterface
+   * @return bool
+   *   True if the operation is recognized.
    */
-  protected function isFieldOperationRecognized($operation, array $grants) {
+  protected function isFieldOperationRecognized(string $operation, array $grants): bool {
     if (in_array($operation, ["view", "edit"])) {
       $recognized = TRUE;
     }
