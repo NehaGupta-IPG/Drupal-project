@@ -78,12 +78,12 @@ class TaxonomyTokensHooks {
     ];
     if (\Drupal::moduleHandler()->moduleExists('node')) {
       $term['node-count'] = [
-        'name' => t("Node count"),
-        'description' => t("The number of nodes tagged with the taxonomy term."),
+        'name' => $this->t("Node count"),
+        'description' => $this->t("The number of nodes tagged with the taxonomy term."),
       ];
       $vocabulary['node-count'] = [
-        'name' => t("Node count"),
-        'description' => t("The number of nodes tagged with terms belonging to the taxonomy vocabulary."),
+        'name' => $this->t("Node count"),
+        'description' => $this->t("The number of nodes tagged with terms belonging to the taxonomy vocabulary."),
       ];
     }
     return ['types' => $types, 'tokens' => ['term' => $term, 'vocabulary' => $vocabulary]];
