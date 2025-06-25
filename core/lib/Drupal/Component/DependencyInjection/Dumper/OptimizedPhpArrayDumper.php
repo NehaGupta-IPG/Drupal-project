@@ -34,6 +34,14 @@ use Symfony\Component\ExpressionLanguage\Expression;
  * \Drupal\Component\DependencyInjection\Dumper\PhpArrayDumper.
  *
  * @see \Drupal\Component\DependencyInjection\Container
+ *
+ * @phpstan-type ContainerDefinition array{
+ *   aliases: array{class-string, string},
+ *   parameters: array<string, mixed>,
+ *   services: array<string, string>,
+ *   frozen: bool,
+ *   machine_format: bool,
+ * }
  */
 class OptimizedPhpArrayDumper extends Dumper {
 
@@ -65,7 +73,7 @@ class OptimizedPhpArrayDumper extends Dumper {
   /**
    * Gets the service container definition as a PHP array.
    *
-   * @return array
+   * @return ContainerDefinition
    *   A PHP array representation of the service container.
    */
   public function getArray() {
