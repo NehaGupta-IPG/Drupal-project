@@ -71,7 +71,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
   public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityTypeManagerInterface $entityTypeManager, protected EntityDisplayRepositoryInterface $entityDisplayRepository, protected AccountInterface $currentUser, protected ?LoggerInterface $logger = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     if (!$logger) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $looger argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3436810', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $logger argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3436810', E_USER_DEPRECATED);
       $this->logger = \Drupal::service('logger.channel.layout_builder');
     }
     if (!empty($this->configuration['block_revision_id']) || !empty($this->configuration['block_serialized'])) {
