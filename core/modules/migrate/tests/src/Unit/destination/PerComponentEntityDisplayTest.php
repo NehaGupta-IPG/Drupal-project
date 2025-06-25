@@ -60,16 +60,9 @@ class TestPerComponentEntityDisplay extends ComponentEntityDisplayBase {
    */
   protected $testValues;
 
-  /**
-   * The test entity.
-   *
-   * @var \PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $entity;
-
-  public function __construct($entity) {
-    $this->entity = $entity;
-  }
+  public function __construct(
+    protected $entity,
+  ) {}
 
   /**
    * Gets the test entity.

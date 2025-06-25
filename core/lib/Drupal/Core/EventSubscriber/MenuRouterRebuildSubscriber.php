@@ -37,8 +37,7 @@ class MenuRouterRebuildSubscriber implements EventSubscriberInterface {
     protected Connection $connection,
     protected ReplicaKillSwitch $replicaKillSwitch,
     protected LoggerInterface $logger,
-  ) {
-  }
+  ) {}
 
   /**
    * Rebuilds the menu links and deletes the local_task cache tag.

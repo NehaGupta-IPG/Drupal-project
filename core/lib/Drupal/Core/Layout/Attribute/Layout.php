@@ -24,15 +24,6 @@ use Drupal\Core\Layout\LayoutDefinition;
 class Layout extends Plugin {
 
   /**
-   * Any additional properties and values.
-   *
-   * @var array
-   *
-   * @see \Drupal\Core\Layout\LayoutDefinition::$additional
-   */
-  public readonly array $additional;
-
-  /**
    * Constructs a Layout attribute.
    *
    * @param string $id
@@ -90,7 +81,7 @@ class Layout extends Plugin {
     public readonly array $context_definitions = [],
     public readonly array $config_dependencies = [],
     public readonly ?string $deriver = NULL,
-    ...$additional,
+    ...public readonly $additional,
   ) {
     // Layout definitions support arbitrary properties being passed in, which
     // are stored in the 'additional' property in LayoutDefinition. The variadic
@@ -99,7 +90,6 @@ class Layout extends Plugin {
     // gets passed to the LayoutDefinition constructor in ::get().
     // @see \Drupal\Core\Layout\LayoutDefinition::$additional
     // @see \Drupal\Core\Layout\LayoutDefinition::get()
-    $this->additional = $additional;
   }
 
   /**

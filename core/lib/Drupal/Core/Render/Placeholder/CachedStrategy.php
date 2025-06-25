@@ -14,8 +14,7 @@ class CachedStrategy implements PlaceholderStrategyInterface {
   public function __construct(
     protected readonly PlaceholderStrategyInterface $placeholderStrategy,
     protected readonly RenderCacheInterface $renderCache,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

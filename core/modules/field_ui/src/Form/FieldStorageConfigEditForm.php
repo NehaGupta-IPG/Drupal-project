@@ -35,8 +35,7 @@ class FieldStorageConfigEditForm extends EntityForm {
    */
   public function __construct(
     protected TypedDataManagerInterface $typedDataManager,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -24,8 +24,9 @@ class DiskSpaceValidator implements EventSubscriberInterface {
   use BaseRequirementValidatorTrait;
   use StringTranslationTrait;
 
-  public function __construct(private readonly PathLocator $pathLocator) {
-  }
+  public function __construct(
+    private readonly PathLocator $pathLocator,
+  ) {}
 
   /**
    * Wrapper around the disk_free_space() function.

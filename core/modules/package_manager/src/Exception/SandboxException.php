@@ -21,7 +21,10 @@ class SandboxException extends \RuntimeException {
    * @param mixed ...$arguments
    *   Additional arguments to pass to the parent constructor.
    */
-  public function __construct(public readonly SandboxManagerBase $sandboxManager, ...$arguments) {
+  public function __construct(
+    public readonly SandboxManagerBase $sandboxManager,
+    ...$arguments,
+  ) {
     parent::__construct(...$arguments);
   }
 

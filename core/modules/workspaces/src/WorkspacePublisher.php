@@ -23,8 +23,15 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
 
   use StringTranslationTrait;
 
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected Connection $database, protected WorkspaceManagerInterface $workspaceManager, protected WorkspaceAssociationInterface $workspaceAssociation, protected EventDispatcherInterface $eventDispatcher, protected WorkspaceInterface $sourceWorkspace, protected LoggerInterface $logger) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected Connection $database,
+    protected WorkspaceManagerInterface $workspaceManager,
+    protected WorkspaceAssociationInterface $workspaceAssociation,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected WorkspaceInterface $sourceWorkspace,
+    protected LoggerInterface $logger,
+  ) {}
 
   /**
    * {@inheritdoc}

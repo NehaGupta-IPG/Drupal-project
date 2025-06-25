@@ -42,8 +42,9 @@ abstract class PhpassHashedPasswordBase implements PasswordInterface {
    * @param \Drupal\Core\Password\PasswordInterface $corePassword
    *   The core PHP password interface.
    */
-  public function __construct(protected PasswordInterface $corePassword) {
-  }
+  public function __construct(
+    protected PasswordInterface $corePassword,
+  ) {}
 
   /**
    * Encodes bytes into printable base 64 using the *nix standard from crypt().

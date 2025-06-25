@@ -119,8 +119,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    */
   public function __construct(
     protected readonly Connection $connection,
-  ) {
-  }
+  ) {}
 
   /**
    * Destructor.

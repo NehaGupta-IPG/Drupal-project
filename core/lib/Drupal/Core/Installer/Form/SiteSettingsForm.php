@@ -34,8 +34,7 @@ class SiteSettingsForm extends FormBase {
     protected string $sitePath,
     protected RendererInterface $renderer,
     protected DatabaseDriverList $databaseDriverList,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

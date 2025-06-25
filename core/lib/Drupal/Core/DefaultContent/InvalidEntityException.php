@@ -13,7 +13,10 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
  */
 final class InvalidEntityException extends \RuntimeException {
 
-  public function __construct(public readonly EntityConstraintViolationListInterface $violations, public readonly string $filePath) {
+  public function __construct(
+    public readonly EntityConstraintViolationListInterface $violations,
+    public readonly string $filePath,
+  ) {
     $messages = [];
 
     foreach ($violations as $violation) {

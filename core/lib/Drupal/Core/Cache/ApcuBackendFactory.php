@@ -43,7 +43,12 @@ class ApcuBackendFactory implements CacheFactoryInterface {
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    */
-  public function __construct($root, $site_path, CacheTagsChecksumInterface $checksum_provider, protected TimeInterface $time) {
+  public function __construct(
+    $root,
+    $site_path,
+    CacheTagsChecksumInterface $checksum_provider,
+    protected TimeInterface $time,
+  ) {
     $this->sitePrefix = Settings::getApcuPrefix('apcu_backend', $root, $site_path);
     $this->checksumProvider = $checksum_provider;
     $this->backendClass = 'Drupal\Core\Cache\ApcuBackend';

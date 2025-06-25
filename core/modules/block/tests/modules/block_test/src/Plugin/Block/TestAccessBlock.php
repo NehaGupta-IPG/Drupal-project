@@ -38,7 +38,12 @@ class TestAccessBlock extends BlockBase implements ContainerFactoryPluginInterfa
    * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface $keyValue
    *   The key value store.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected KeyValueStoreInterface $keyValue) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected KeyValueStoreInterface $keyValue,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

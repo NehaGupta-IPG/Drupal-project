@@ -44,8 +44,7 @@ class CallableResolver {
    */
   public function __construct(
     protected readonly ClassResolverInterface $classResolver,
-  ) {
-  }
+  ) {}
 
   /**
    * Gets a callable from a definition.

@@ -23,8 +23,9 @@ class WritableFileSystemValidator implements EventSubscriberInterface {
   use BaseRequirementValidatorTrait;
   use StringTranslationTrait;
 
-  public function __construct(private readonly PathLocator $pathLocator) {
-  }
+  public function __construct(
+    private readonly PathLocator $pathLocator,
+  ) {}
 
   /**
    * Checks that the file system is writable.

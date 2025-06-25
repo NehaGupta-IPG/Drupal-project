@@ -24,7 +24,12 @@ class RecipePreExistingConfigException extends \RuntimeException {
    * @param null|\Throwable $previous
    *   [optional] The previous throwable used for the exception chaining.
    */
-  public function __construct(public readonly string $configName, string $message = "", int $code = 0, ?\Throwable $previous = NULL) {
+  public function __construct(
+    public readonly string $configName,
+    string $message = "",
+    int $code = 0,
+    ?\Throwable $previous = NULL,
+  ) {
     parent::__construct($message, $code, $previous);
   }
 

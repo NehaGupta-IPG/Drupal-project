@@ -32,8 +32,7 @@ class ThemePreprocess {
     protected RendererInterface $renderer,
     protected RouteMatchInterface $routeMatch,
     protected ThemeManagerInterface $themeManager,
-  ) {
-  }
+  ) {}
 
   /**
    * Prepares variables for container templates.

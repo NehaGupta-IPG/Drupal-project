@@ -32,7 +32,6 @@ class PluginSettingsBaseTest extends UnitTestCase {
  */
 class TestPluginSettingsBase extends PluginSettingsBase {
 
-  public function __construct() {
-  }
+  public function __construct() {}
 
 }

@@ -24,8 +24,7 @@ class SendmailCommandValidationTransportFactory implements TransportFactoryInter
   public function __construct(
     #[AutowireDecorated]
     protected TransportFactoryInterface $inner,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -22,8 +22,7 @@ class PhpPassword implements PasswordInterface {
   public function __construct(
     protected string $algorithm = PASSWORD_DEFAULT,
     protected array $options = [],
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

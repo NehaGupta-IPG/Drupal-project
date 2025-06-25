@@ -91,8 +91,7 @@ class ConfigSingleImportForm extends ConfirmFormBase {
     protected ThemeHandlerInterface $themeHandler,
     protected ModuleExtensionList $moduleExtensionList,
     protected ThemeExtensionList $themeExtensionList,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

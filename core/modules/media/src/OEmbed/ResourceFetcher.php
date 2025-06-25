@@ -33,8 +33,7 @@ class ResourceFetcher implements ResourceFetcherInterface {
     protected ProviderRepositoryInterface $providers,
     protected CacheBackendInterface $cacheBackend,
     protected int $timeout = 5,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

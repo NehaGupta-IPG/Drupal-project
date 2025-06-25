@@ -22,8 +22,9 @@ final class MultisiteValidator implements EventSubscriberInterface {
   use BaseRequirementValidatorTrait;
   use StringTranslationTrait;
 
-  public function __construct(private readonly PathLocator $pathLocator) {
-  }
+  public function __construct(
+    private readonly PathLocator $pathLocator,
+  ) {}
 
   /**
    * Validates that the current site is not part of a multisite.

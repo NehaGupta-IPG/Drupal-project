@@ -31,7 +31,9 @@ final class DirectWriteSubscriber implements EventSubscriberInterface {
    */
   private const STATE_KEY = 'package_manager.maintenance_mode';
 
-  public function __construct(private readonly StateInterface $state) {}
+  public function __construct(
+    private readonly StateInterface $state,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -16,7 +16,9 @@ class ConfigTestPermissions implements ContainerInjectionInterface {
 
   use StringTranslationTrait;
 
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager) {}
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {}
 
   /**
    * {@inheritdoc}

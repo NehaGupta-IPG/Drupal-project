@@ -30,7 +30,10 @@ class EntityTypeRepository implements EntityTypeRepositoryInterface {
    */
   protected $classNameEntityTypeMap = [];
 
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, protected EntityTypeBundleInfoInterface $entityTypeBundleInfo) {
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+  ) {
     $this->entityTypeManager = $entity_type_manager;
   }
 

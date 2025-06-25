@@ -190,8 +190,7 @@ class BigPipe {
     protected RequestContext $requestContext,
     protected LoggerInterface $logger,
     protected bool $debugCacheabilityHeaders = FALSE,
-  ) {
-  }
+  ) {}
 
   /**
    * Performs tasks after sending content (and rendering placeholders).

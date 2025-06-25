@@ -35,8 +35,7 @@ class BatchStorage implements BatchStorageInterface {
     protected SessionInterface $session,
     protected CsrfTokenGenerator $csrfToken,
     protected TimeInterface $time,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

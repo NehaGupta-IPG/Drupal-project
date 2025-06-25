@@ -47,13 +47,6 @@ class ModuleHandler implements ModuleHandlerInterface {
   protected array $alterEventListeners = [];
 
   /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
    * A list of module include file keys.
    *
    * @var array
@@ -113,14 +106,13 @@ class ModuleHandler implements ModuleHandlerInterface {
    * @see \Drupal\Core\CoreServiceProvider
    */
   public function __construct(
-    $root,
+    protected $root,
     array $module_list,
     protected EventDispatcherInterface $eventDispatcher,
     protected array $hookImplementationsMap,
     protected array $groupIncludes = [],
     protected array $packedOrderOperations = [],
   ) {
-    $this->root = $root;
     $this->moduleList = [];
     foreach ($module_list as $name => $module) {
       $this->moduleList[$name] = new Extension($this->root, $module['type'], $module['pathname'], $module['filename']);

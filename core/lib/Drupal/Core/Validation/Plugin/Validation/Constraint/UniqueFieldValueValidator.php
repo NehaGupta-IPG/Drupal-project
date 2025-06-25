@@ -22,8 +22,10 @@ class UniqueFieldValueValidator extends ConstraintValidator implements Container
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(protected EntityFieldManagerInterface $entityFieldManager, protected EntityTypeManagerInterface $entityTypeManager) {
-  }
+  public function __construct(
+    protected EntityFieldManagerInterface $entityFieldManager,
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {}
 
   /**
    * {@inheritdoc}

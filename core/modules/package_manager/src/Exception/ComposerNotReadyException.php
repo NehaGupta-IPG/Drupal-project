@@ -26,7 +26,12 @@ final class ComposerNotReadyException extends \RuntimeException {
    * @param \Throwable|null $previous
    *   (optional) The previous exception, for exception chaining.
    */
-  public function __construct(public readonly ?string $workingDir, array $messages, int $code = 0, ?\Throwable $previous = NULL) {
+  public function __construct(
+    public readonly ?string $workingDir,
+    array $messages,
+    int $code = 0,
+    ?\Throwable $previous = NULL,
+  ) {
     parent::__construct(implode("\n", $messages), $code, $previous);
   }
 

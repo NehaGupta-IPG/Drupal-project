@@ -36,7 +36,13 @@ class TestService {
    */
   protected $kernel;
 
-  public function __construct(TestInjectionInterface $test_injection, TestInjection2 $test_injection2, Connection $database, DrupalKernelInterface $kernel, protected TestInjectionInterface $testInjection3) {
+  public function __construct(
+    TestInjectionInterface $test_injection,
+    TestInjection2 $test_injection2,
+    Connection $database,
+    DrupalKernelInterface $kernel,
+    protected TestInjectionInterface $testInjection3,
+  ) {
     $this->testInjection = $test_injection;
     $this->testInjection2 = $test_injection2;
     $this->database = $database;

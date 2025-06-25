@@ -64,7 +64,13 @@ class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionIn
    * @param \Drupal\Core\Extension\ModuleExtensionList|null $moduleExtensionList
    *   The module extension list.
    */
-  public function __construct(MenuLinkManagerInterface $menu_link_manager, MenuParentFormSelectorInterface $menu_parent_selector, TranslationInterface $string_translation, ModuleHandlerInterface $module_handler, protected ?ModuleExtensionList $moduleExtensionList = NULL) {
+  public function __construct(
+    MenuLinkManagerInterface $menu_link_manager,
+    MenuParentFormSelectorInterface $menu_parent_selector,
+    TranslationInterface $string_translation,
+    ModuleHandlerInterface $module_handler,
+    protected ?ModuleExtensionList $moduleExtensionList = NULL,
+  ) {
     $this->menuLinkManager = $menu_link_manager;
     $this->menuParentSelector = $menu_parent_selector;
     $this->stringTranslation = $string_translation;

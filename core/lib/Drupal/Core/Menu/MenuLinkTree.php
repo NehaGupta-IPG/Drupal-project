@@ -35,8 +35,7 @@ class MenuLinkTree implements MenuLinkTreeInterface {
     protected RouteProviderInterface $routeProvider,
     protected MenuActiveTrailInterface $menuActiveTrail,
     protected CallableResolver $callableResolver,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

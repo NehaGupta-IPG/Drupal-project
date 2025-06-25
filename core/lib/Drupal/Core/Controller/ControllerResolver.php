@@ -23,8 +23,9 @@ class ControllerResolver implements ControllerResolverInterface {
    * @param \Drupal\Core\Utility\CallableResolver $callableResolver
    *   The callable resolver.
    */
-  public function __construct(protected CallableResolver $callableResolver) {
-  }
+  public function __construct(
+    protected CallableResolver $callableResolver,
+  ) {}
 
   /**
    * {@inheritdoc}

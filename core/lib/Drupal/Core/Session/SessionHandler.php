@@ -31,8 +31,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
     protected RequestStack $requestStack,
     protected Connection $connection,
     protected TimeInterface $time,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

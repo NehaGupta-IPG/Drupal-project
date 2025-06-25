@@ -12,7 +12,6 @@ class AnonymousUserSession extends UserSession {
    *
    * Intentionally don't allow parameters to be passed in like UserSession.
    */
-  public function __construct() {
-  }
+  public function __construct() {}
 
 }

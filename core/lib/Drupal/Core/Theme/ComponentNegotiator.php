@@ -32,8 +32,7 @@ class ComponentNegotiator {
    */
   public function __construct(
     protected ThemeManagerInterface $themeManager,
-  ) {
-  }
+  ) {}
 
   /**
    * Negotiates the active component for the current request.

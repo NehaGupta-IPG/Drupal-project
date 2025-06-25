@@ -27,8 +27,7 @@ final class RecipeOverrideConfigStorage implements StorageInterface {
     protected readonly StorageInterface $recipeStorage,
     protected readonly StorageInterface $wrappedStorage,
     protected readonly string $collection = StorageInterface::DEFAULT_COLLECTION,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -24,8 +24,7 @@ class AnnounceController extends ControllerBase implements ContainerInjectionInt
    */
   public function __construct(
     protected AnnounceRenderer $announceRenderer,
-  ) {
-  }
+  ) {}
 
   /**
    * Returns the list of Announcements.

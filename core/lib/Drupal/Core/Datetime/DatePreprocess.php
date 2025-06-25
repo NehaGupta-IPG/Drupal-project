@@ -16,8 +16,7 @@ class DatePreprocess {
 
   public function __construct(
     protected DateFormatterInterface $dateFormatter,
-  ) {
-  }
+  ) {}
 
   /**
    * Prepares variables for time templates.

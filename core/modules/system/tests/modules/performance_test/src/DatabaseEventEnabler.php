@@ -15,7 +15,10 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class DatabaseEventEnabler implements HttpKernelInterface {
 
-  public function __construct(protected readonly HttpKernelInterface $httpKernel, protected readonly Connection $connection) {}
+  public function __construct(
+    protected readonly HttpKernelInterface $httpKernel,
+    protected readonly Connection $connection,
+  ) {}
 
   /**
    * {@inheritdoc}

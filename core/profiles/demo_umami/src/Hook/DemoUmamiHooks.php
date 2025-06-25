@@ -37,8 +37,7 @@ class DemoUmamiHooks {
     protected AccountInterface $currentUser,
     protected AdminContext $adminContext,
     protected EntityTypeManagerInterface $entityTypeManager,
-  ) {
-  }
+  ) {}
 
   /**
    * Implements hook_help().

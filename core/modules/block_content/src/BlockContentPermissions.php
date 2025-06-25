@@ -25,8 +25,7 @@ class BlockContentPermissions implements ContainerInjectionInterface {
    */
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

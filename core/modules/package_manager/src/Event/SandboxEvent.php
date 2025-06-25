@@ -18,7 +18,8 @@ abstract class SandboxEvent extends Event {
    * @param \Drupal\package_manager\SandboxManagerBase $sandboxManager
    *   The stage which fired this event.
    */
-  public function __construct(public readonly SandboxManagerBase $sandboxManager) {
-  }
+  public function __construct(
+    public readonly SandboxManagerBase $sandboxManager,
+  ) {}
 
 }

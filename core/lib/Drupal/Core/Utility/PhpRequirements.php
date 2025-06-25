@@ -37,8 +37,7 @@ final class PhpRequirements {
   /**
    * This class should not be instantiated.
    */
-  private function __construct() {
-  }
+  private function __construct() {}
 
   /**
    * Dynamically identifies the minimum supported PHP version based on the date.

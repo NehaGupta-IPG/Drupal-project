@@ -38,8 +38,7 @@ class HelpController extends ControllerBase {
     protected ModuleExtensionList $moduleExtensionList,
     protected ModuleAdminLinksHelper $moduleAdminLinks,
     protected ModulePermissionsLinkHelper $modulePermissionsLinks,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

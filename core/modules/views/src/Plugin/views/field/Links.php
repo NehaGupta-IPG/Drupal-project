@@ -27,7 +27,12 @@ abstract class Links extends FieldPluginBase {
    * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirectDestination
    *   The redirect destination service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected RedirectDestinationInterface $redirectDestination) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected RedirectDestinationInterface $redirectDestination,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

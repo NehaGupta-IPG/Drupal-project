@@ -40,8 +40,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
   public function __construct(
     protected string $appRoot,
     protected string $workingDirectory,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

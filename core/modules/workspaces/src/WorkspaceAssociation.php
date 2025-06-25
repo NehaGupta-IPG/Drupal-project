@@ -44,8 +44,12 @@ class WorkspaceAssociation implements WorkspaceAssociationInterface, EventSubscr
    */
   protected array $associatedInitialRevisions = [];
 
-  public function __construct(protected Connection $database, protected EntityTypeManagerInterface $entityTypeManager, protected WorkspaceRepositoryInterface $workspaceRepository, protected LoggerInterface $logger) {
-  }
+  public function __construct(
+    protected Connection $database,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected WorkspaceRepositoryInterface $workspaceRepository,
+    protected LoggerInterface $logger,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -16,7 +16,9 @@ use PhpTuf\ComposerStager\API\Path\Value\PathListInterface;
  */
 final class ImmutablePathList implements PathListInterface {
 
-  public function __construct(private readonly PathListInterface $decorated) {}
+  public function __construct(
+    private readonly PathListInterface $decorated,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -32,8 +32,7 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
     protected Connection $connection,
     protected RequestStack $requestStack,
     protected TimeInterface $time,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

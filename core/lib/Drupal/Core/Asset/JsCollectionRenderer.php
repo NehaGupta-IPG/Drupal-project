@@ -25,8 +25,7 @@ class JsCollectionRenderer implements AssetCollectionRendererInterface {
     protected AssetQueryStringInterface $assetQueryString,
     protected FileUrlGeneratorInterface $fileUrlGenerator,
     protected TimeInterface $time,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

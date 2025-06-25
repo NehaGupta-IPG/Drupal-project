@@ -12,7 +12,9 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
  */
 final class UserRolesAccessPolicy extends AccessPolicyBase implements CacheOptionalInterface {
 
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager) {}
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {}
 
   /**
    * {@inheritdoc}

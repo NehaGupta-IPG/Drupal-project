@@ -20,8 +20,7 @@ class CssCollectionRenderer implements AssetCollectionRendererInterface {
   public function __construct(
     protected AssetQueryStringInterface $assetQueryString,
     protected FileUrlGeneratorInterface $fileUrlGenerator,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

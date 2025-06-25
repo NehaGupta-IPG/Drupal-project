@@ -28,8 +28,7 @@ class RenderCache implements RenderCacheInterface {
     protected RequestStack $requestStack,
     protected VariationCacheFactoryInterface $cacheFactory,
     protected CacheContextsManager $cacheContextsManager,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

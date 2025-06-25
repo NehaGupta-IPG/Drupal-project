@@ -78,8 +78,7 @@ class ConfigSync extends FormBase {
     protected ModuleExtensionList $moduleExtensionList,
     protected ImportStorageTransformer $importTransformer,
     protected ThemeExtensionList $themeExtensionList,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

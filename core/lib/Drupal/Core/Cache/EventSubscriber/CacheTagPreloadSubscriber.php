@@ -14,8 +14,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class CacheTagPreloadSubscriber implements EventSubscriberInterface {
 
-  public function __construct(protected CacheTagsChecksumInterface $cacheTagsChecksum) {
-  }
+  public function __construct(
+    protected CacheTagsChecksumInterface $cacheTagsChecksum,
+  ) {}
 
   /**
    * Preloads frequently used cache tags.

@@ -136,13 +136,6 @@ class Registry implements DestructableInterface {
   protected $themeName;
 
   /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
    * The theme handler.
    *
    * @var \Drupal\Core\Extension\ThemeHandlerInterface
@@ -213,8 +206,19 @@ class Registry implements DestructableInterface {
    * @param array<string, true> $preprocess_for_suggestions
    *   (optional) Grouped preprocess functions from modules.
    */
-  public function __construct($root, CacheBackendInterface $cache, LockBackendInterface $lock, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, ThemeInitializationInterface $theme_initialization, CacheBackendInterface $runtime_cache, ModuleExtensionList $module_list, protected HttpKernelInterface $kernel, $theme_name = NULL, array $preprocess_for_suggestions = []) {
-    $this->root = $root;
+  public function __construct(
+    protected $root,
+    CacheBackendInterface $cache,
+    LockBackendInterface $lock,
+    ModuleHandlerInterface $module_handler,
+    ThemeHandlerInterface $theme_handler,
+    ThemeInitializationInterface $theme_initialization,
+    CacheBackendInterface $runtime_cache,
+    ModuleExtensionList $module_list,
+    protected HttpKernelInterface $kernel,
+    $theme_name = NULL,
+    array $preprocess_for_suggestions = [],
+  ) {
     $this->cache = $cache;
     $this->lock = $lock;
     $this->moduleHandler = $module_handler;

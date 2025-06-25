@@ -18,7 +18,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 final class VendorHardeningExcluder implements EventSubscriberInterface {
 
-  public function __construct(private readonly PathLocator $pathLocator) {}
+  public function __construct(
+    private readonly PathLocator $pathLocator,
+  ) {}
 
   /**
    * {@inheritdoc}

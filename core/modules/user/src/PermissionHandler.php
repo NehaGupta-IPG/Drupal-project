@@ -87,7 +87,12 @@ class PermissionHandler implements PermissionHandlerInterface {
    * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
    *   The module extension list.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, TranslationInterface $string_translation, CallableResolver $callable_resolver, protected ModuleExtensionList $moduleExtensionList) {
+  public function __construct(
+    ModuleHandlerInterface $module_handler,
+    TranslationInterface $string_translation,
+    CallableResolver $callable_resolver,
+    protected ModuleExtensionList $moduleExtensionList,
+  ) {
     $this->callableResolver = $callable_resolver;
 
     // @todo It would be nice if you could pull all module directories from the

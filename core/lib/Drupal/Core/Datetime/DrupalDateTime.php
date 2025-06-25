@@ -92,7 +92,6 @@ class DrupalDateTime extends DateTimePlus {
 
     // Instantiate the parent class.
     parent::__construct($time, $timezone, $settings);
-
   }
 
   /**

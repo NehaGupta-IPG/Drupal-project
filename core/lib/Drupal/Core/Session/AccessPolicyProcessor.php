@@ -25,8 +25,7 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
     protected CacheBackendInterface $static,
     protected AccountProxyInterface $currentUser,
     protected AccountSwitcherInterface $accountSwitcher,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

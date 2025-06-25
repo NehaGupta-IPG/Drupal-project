@@ -120,7 +120,14 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    * @param \Drupal\Core\Cache\CacheBackendInterface|null $cacheBackend
    *   The cache backend.
    */
-  public function __construct(LanguageDefault $default_language, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, LanguageConfigFactoryOverrideInterface $config_override, RequestStack $request_stack, protected ?CacheBackendInterface $cacheBackend = NULL) {
+  public function __construct(
+    LanguageDefault $default_language,
+    ConfigFactoryInterface $config_factory,
+    ModuleHandlerInterface $module_handler,
+    LanguageConfigFactoryOverrideInterface $config_override,
+    RequestStack $request_stack,
+    protected ?CacheBackendInterface $cacheBackend = NULL,
+  ) {
     $this->defaultLanguage = $default_language;
     $this->configFactory = $config_factory;
     $this->moduleHandler = $module_handler;

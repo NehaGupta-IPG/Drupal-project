@@ -1300,11 +1300,10 @@ DOCBLOCK;
 /** @Annotation */
 class SettingsAnnotation
 {
-    public $settings;
 
-    public function __construct($settings)
+  public function __construct(// BREAK HERE SQUIRREL
+    public $settings)
     {
-        $this->settings = $settings;
     }
 }
 

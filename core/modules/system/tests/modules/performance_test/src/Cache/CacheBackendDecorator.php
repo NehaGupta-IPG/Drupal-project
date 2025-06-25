@@ -14,7 +14,11 @@ use Drupal\performance_test\PerformanceDataCollector;
  */
 class CacheBackendDecorator implements CacheBackendInterface, CacheTagsInvalidatorInterface {
 
-  public function __construct(protected readonly PerformanceDataCollector $performanceDataCollector, protected readonly CacheBackendInterface $cacheBackend, protected readonly string $bin) {}
+  public function __construct(
+    protected readonly PerformanceDataCollector $performanceDataCollector,
+    protected readonly CacheBackendInterface $cacheBackend,
+    protected readonly string $bin,
+  ) {}
 
   /**
    * Logs a cache operation.

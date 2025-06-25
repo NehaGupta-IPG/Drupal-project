@@ -8,18 +8,11 @@ namespace Drupal\Core\KeyValueStore;
 abstract class StorageBase implements KeyValueStoreInterface {
 
   /**
-   * The name of the collection holding key and value pairs.
-   *
-   * @var string
-   */
-  protected $collection;
-
-  /**
    * {@inheritdoc}
    */
-  public function __construct($collection) {
-    $this->collection = $collection;
-  }
+  public function __construct(
+    protected $collection,
+  ) {}
 
   /**
    * {@inheritdoc}

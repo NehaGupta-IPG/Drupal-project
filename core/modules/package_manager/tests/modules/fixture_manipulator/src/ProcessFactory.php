@@ -28,7 +28,9 @@ final class ProcessFactory implements ProcessFactoryInterface {
    * @param \PhpTuf\ComposerStager\API\Process\Factory\ProcessFactoryInterface $decorated
    *   The decorated process factory service.
    */
-  public function __construct(private readonly ProcessFactoryInterface $decorated) {}
+  public function __construct(
+    private readonly ProcessFactoryInterface $decorated,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -26,8 +26,7 @@ class TestWaitTerminateMiddleware implements HttpKernelInterface {
     protected HttpKernelInterface $httpKernel,
     protected LockBackendInterface $lock,
     protected bool $waitForTerminate = FALSE,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

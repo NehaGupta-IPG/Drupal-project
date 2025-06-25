@@ -16,7 +16,10 @@ class RegexRecursiveFilterIterator extends \RecursiveFilterIterator {
    *   The regular expression to match, including delimiters. For example,
    *   /\.yml$/ would list only files ending in .yml.
    */
-  public function __construct(\RecursiveIterator $iterator, protected string $regex = '') {
+  public function __construct(
+    \RecursiveIterator $iterator,
+    protected string $regex = '',
+  ) {
     parent::__construct($iterator);
   }
 

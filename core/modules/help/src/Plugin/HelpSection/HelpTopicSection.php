@@ -66,7 +66,16 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
    *   The translation manager. We are using a method that doesn't exist on an
    *   interface, so require this class.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected HelpTopicPluginManagerInterface $pluginManager, protected RendererInterface $renderer, protected LanguageDefault $defaultLanguage, protected LanguageManagerInterface $languageManager, protected TranslationManager $translationManager) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected HelpTopicPluginManagerInterface $pluginManager,
+    protected RendererInterface $renderer,
+    protected LanguageDefault $defaultLanguage,
+    protected LanguageManagerInterface $languageManager,
+    protected TranslationManager $translationManager,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

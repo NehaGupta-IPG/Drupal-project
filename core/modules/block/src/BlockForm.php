@@ -91,7 +91,15 @@ class BlockForm extends EntityForm {
    * @param \Drupal\block\BlockRepositoryInterface $blockRepository
    *   The block repository service.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, ExecutableManagerInterface $manager, ContextRepositoryInterface $context_repository, LanguageManagerInterface $language, ThemeHandlerInterface $theme_handler, PluginFormFactoryInterface $plugin_form_manager, protected BlockRepositoryInterface $blockRepository) {
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    ExecutableManagerInterface $manager,
+    ContextRepositoryInterface $context_repository,
+    LanguageManagerInterface $language,
+    ThemeHandlerInterface $theme_handler,
+    PluginFormFactoryInterface $plugin_form_manager,
+    protected BlockRepositoryInterface $blockRepository,
+  ) {
     $this->storage = $entity_type_manager->getStorage('block');
     $this->manager = $manager;
     $this->contextRepository = $context_repository;

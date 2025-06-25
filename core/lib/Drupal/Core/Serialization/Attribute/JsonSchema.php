@@ -20,8 +20,7 @@ class JsonSchema {
    */
   public function __construct(
     public readonly array $schema = [],
-  ) {
-  }
+  ) {}
 
   /**
    * Get a JSON Schema type definition array.

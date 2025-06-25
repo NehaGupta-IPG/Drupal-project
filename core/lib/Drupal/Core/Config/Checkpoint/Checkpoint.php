@@ -29,7 +29,6 @@ final class Checkpoint {
     public readonly \Stringable|string $label,
     public readonly int $timestamp,
     public readonly ?string $parent,
-  ) {
-  }
+  ) {}
 
 }

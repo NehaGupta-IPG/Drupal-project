@@ -51,8 +51,7 @@ class CKEditor5ImageController extends ControllerBase {
     protected FileUploadHandlerInterface $fileUploadHandler,
     protected LockBackendInterface $lock,
     protected CKEditor5PluginManagerInterface $pluginManager,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -24,8 +24,7 @@ abstract class ResultBase {
   public function __construct(
     protected FetchAs $fetchMode,
     protected array $fetchOptions,
-  ) {
-  }
+  ) {}
 
   /**
    * Returns the number of rows matched by the last SQL statement.

@@ -31,8 +31,7 @@ final class BootstrapErrorHandler {
    */
   public function __construct(
     private readonly PhpUnitErrorHandler $phpUnitErrorHandler,
-  ) {
-  }
+  ) {}
 
   /**
    * Executes when the object is called as a function.

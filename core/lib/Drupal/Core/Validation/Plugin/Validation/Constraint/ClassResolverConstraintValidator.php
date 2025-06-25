@@ -16,7 +16,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class ClassResolverConstraintValidator extends ConstraintValidator implements ContainerInjectionInterface {
 
-  public function __construct(protected ClassResolver $classResolver) {}
+  public function __construct(
+    protected ClassResolver $classResolver,
+  ) {}
 
   /**
    * {@inheritdoc}

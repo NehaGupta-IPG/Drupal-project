@@ -508,7 +508,13 @@ class ViewExecutable {
    * @param \Drupal\views\Plugin\ViewsPluginManager|null $displayPluginManager
    *   The plugin manager for display.
    */
-  public function __construct(ViewEntityInterface $storage, AccountInterface $user, ViewsData $views_data, RouteProviderInterface $route_provider, protected ?ViewsPluginManager $displayPluginManager = NULL) {
+  public function __construct(
+    ViewEntityInterface $storage,
+    AccountInterface $user,
+    ViewsData $views_data,
+    RouteProviderInterface $route_provider,
+    protected ?ViewsPluginManager $displayPluginManager = NULL,
+  ) {
     // Reference the storage and the executable to each other.
     $this->storage = $storage;
     $this->storage->set('executable', $this);
@@ -519,7 +525,6 @@ class ViewExecutable {
       @trigger_error('Calling ' . __METHOD__ . ' without the $displayPluginManager argument is deprecated in drupal:10.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3410349', E_USER_DEPRECATED);
       $this->displayPluginManager = \Drupal::service('plugin.manager.views.display');
     }
-
   }
 
   /**

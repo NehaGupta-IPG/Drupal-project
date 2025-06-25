@@ -62,7 +62,12 @@ class UpdateFetcher implements UpdateFetcherInterface {
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, ClientInterface $http_client, Settings $settings, protected LoggerInterface $logger) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    ClientInterface $http_client,
+    Settings $settings,
+    protected LoggerInterface $logger,
+  ) {
     $this->fetchUrl = $config_factory->get('update.settings')->get('fetch.url');
     $this->httpClient = $http_client;
     $this->updateSettings = $config_factory->get('update.settings');

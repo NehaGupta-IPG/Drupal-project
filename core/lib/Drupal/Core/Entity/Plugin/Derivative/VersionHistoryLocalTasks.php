@@ -20,8 +20,7 @@ class VersionHistoryLocalTasks extends DeriverBase implements ContainerDeriverIn
    */
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

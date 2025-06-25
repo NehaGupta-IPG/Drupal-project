@@ -32,8 +32,9 @@ class ApiController extends ControllerBase {
    */
   protected $finishedRoute = 'package_manager_test_api.finish';
 
-  public function __construct(protected SandboxManagerBase $stage) {
-  }
+  public function __construct(
+    protected SandboxManagerBase $stage,
+  ) {}
 
   /**
    * {@inheritdoc}

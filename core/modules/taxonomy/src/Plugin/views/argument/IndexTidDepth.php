@@ -27,7 +27,12 @@ class IndexTidDepth extends ArgumentPluginBase implements ContainerFactoryPlugin
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityRepositoryInterface $entityRepository) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityRepositoryInterface $entityRepository,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

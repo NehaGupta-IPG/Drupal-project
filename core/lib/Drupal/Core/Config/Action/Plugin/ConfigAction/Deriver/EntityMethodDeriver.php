@@ -38,7 +38,9 @@ final class EntityMethodDeriver extends DeriverBase implements ContainerDeriverI
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(protected readonly EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(
+    protected readonly EntityTypeManagerInterface $entityTypeManager,
+  ) {
     $this->inflector = new EnglishInflector();
   }
 

@@ -17,8 +17,14 @@ use Psr\Log\LoggerInterface;
  */
 class WorkspaceMerger implements WorkspaceMergerInterface {
 
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected Connection $database, protected WorkspaceAssociationInterface $workspaceAssociation, protected WorkspaceInterface $sourceWorkspace, protected WorkspaceInterface $targetWorkspace, protected LoggerInterface $logger) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected Connection $database,
+    protected WorkspaceAssociationInterface $workspaceAssociation,
+    protected WorkspaceInterface $sourceWorkspace,
+    protected WorkspaceInterface $targetWorkspace,
+    protected LoggerInterface $logger,
+  ) {}
 
   /**
    * {@inheritdoc}

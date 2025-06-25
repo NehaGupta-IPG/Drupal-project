@@ -21,7 +21,9 @@ class JsOptimizer implements AssetOptimizerInterface {
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger.
    */
-  public function __construct(protected readonly LoggerInterface $logger) {}
+  public function __construct(
+    protected readonly LoggerInterface $logger,
+  ) {}
 
   /**
    * {@inheritdoc}

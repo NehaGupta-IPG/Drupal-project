@@ -35,8 +35,7 @@ class RoutePreloader implements EventSubscriberInterface {
   public function __construct(
     protected RouteProviderInterface $routeProvider,
     protected StateInterface $state,
-  ) {
-  }
+  ) {}
 
   /**
    * Loads all non-admin routes right before the actual page is rendered.

@@ -11,13 +11,6 @@ use Drupal\Component\Datetime\TimeInterface;
 class ApcuBackend implements CacheBackendInterface {
 
   /**
-   * The name of the cache bin to use.
-   *
-   * @var string
-   */
-  protected $bin;
-
-  /**
    * Prefix for all keys in the storage that belong to this site.
    *
    * @var string
@@ -53,12 +46,11 @@ class ApcuBackend implements CacheBackendInterface {
    *   The time service.
    */
   public function __construct(
-    $bin,
+    protected $bin,
     $site_prefix,
     CacheTagsChecksumInterface $checksum_provider,
     protected TimeInterface $time,
   ) {
-    $this->bin = $bin;
     $this->sitePrefix = $site_prefix;
     $this->checksumProvider = $checksum_provider;
     $this->binPrefix = $this->sitePrefix . '::' . $this->bin . '::';
