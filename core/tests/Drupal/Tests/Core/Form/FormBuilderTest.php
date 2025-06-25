@@ -1002,6 +1002,39 @@ class FormBuilderTest extends FormTestBase {
     ];
   }
 
+  /**
+   * @covers ::renderPlaceholderFormAction
+   * @covers ::buildFormAction
+   *
+   * @dataProvider providerTestRenderPlaceholderFormAction
+   */
+  public function testRenderPlaceholderFormAction($expected, $request_uri): void {
+    $request = new Request([], [], [], [], [], ['REQUEST_URI' => $request_uri]);
+    $request->headers->set('HOST', 'example.com');
+    $this->requestStack->push($request);
+    $element = $this->formBuilder->renderPlaceholderFormAction();
+    $this->assertEquals($expected, $element['#markup']);
+  }
+
+  /**
+   * Data provider for testRenderPlaceholderFormAction.
+   *
+   * @return array[]
+   *   Items are arrays of two items:
+   *   - The expected result;
+   *   - The request URI to create a request with.
+   */
+  public static function providerTestRenderPlaceholderFormAction(): array {
+    return [
+      ['/path', '/path'],
+      ['/path?t=1', '/path?t=1'],
+      // Cases of CSRF protection in buildFormAction() method.
+      ['http://example.com//path', '//path'],
+      ['http://example.com///path', '///path'],
+      ['http://example.com///path', '///path?t=1'],
+    ];
+  }
+
 }
 
 /**
