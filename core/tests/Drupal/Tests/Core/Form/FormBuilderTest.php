@@ -305,6 +305,33 @@ class FormBuilderTest extends FormTestBase {
   }
 
   /**
+   * Tests that the 'data-drupal-selector' attribute is property set.
+   */
+  public function testDataDrupalSelector() {
+    $form_id = '\Drupal\Tests\Core\Form\TestForm';
+    $object = new TestForm();
+    $form = [];
+    $form_state = new FormState();
+    $expected_form = $object->buildForm($form, $form_state);
+
+    $form = $this->formBuilder->getForm($form_id);
+    $this->assertFormElement($expected_form, $form, 'test');
+    $this->assertSame('test-form', $form['#id']);
+    $this->assertSame('test-form', $form['#attributes']['data-drupal-selector']);
+
+    $form_id = '\Drupal\Tests\Core\Form\TestFormWithDataDrupalSelector';
+    $object = new TestForm();
+    $form = [];
+    $form_state = new FormState();
+    $expected_form = $object->buildForm($form, $form_state);
+
+    $form = $this->formBuilder->getForm($form_id);
+    $this->assertFormElement($expected_form, $form, 'test');
+    $this->assertSame('test-form-data-drupal-selector', $form['#id']);
+    $this->assertSame('test-value123', $form['#attributes']['data-drupal-selector']);
+  }
+
+  /**
    * Tests whether the triggering element is properly identified.
    *
    * @param string $element_value
@@ -1015,6 +1042,24 @@ class TestForm implements FormInterface {
 
   public function buildForm(array $form, FormStateInterface $form_state) {
     return test_form_id();
+  }
+
+  public function validateForm(array &$form, FormStateInterface $form_state) {}
+
+  public function submitForm(array &$form, FormStateInterface $form_state) {}
+
+}
+
+class TestFormWithDataDrupalSelector implements FormInterface {
+
+  public function getFormId() {
+    return 'test_form_data_drupal_selector';
+  }
+
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    $form = test_form_id();
+    $form['#attributes']['data-drupal-selector'] = 'test-value123';
+    return $form;
   }
 
   public function validateForm(array &$form, FormStateInterface $form_state) {}

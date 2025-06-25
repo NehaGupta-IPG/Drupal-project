@@ -794,13 +794,16 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
         '#type' => 'hidden',
         '#value' => $form_id,
         '#id' => Html::getUniqueId("edit-$form_id"),
+        '#attributes' => [
+          'data-drupal-selector' => Html::getId("edit-$form_id"),
+        ],
         // Form processing and validation require this value. Ensure the
         // submitted form value appears literally, regardless of custom #tree
         // and #parents being set elsewhere.
         '#parents' => ['form_id'],
       ];
     }
-    if (!isset($form['#id'])) {
+    if (!isset($form['#attributes']['data-drupal-selector'])) {
       $form['#id'] = Html::getUniqueId($form_id);
       // Provide a selector usable by JavaScript. As the ID is unique, it's not
       // possible to rely on it in JavaScript.
@@ -986,11 +989,6 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // Provide a selector usable by JavaScript. As the ID is unique, it's not
       // possible to rely on it in JavaScript.
       $element['#attributes']['data-drupal-selector'] = Html::getId($unprocessed_id);
-    }
-    else {
-      // Provide a selector usable by JavaScript. As the ID is unique, it's not
-      // possible to rely on it in JavaScript.
-      $element['#attributes']['data-drupal-selector'] = Html::getId($element['#id']);
     }
 
     // Add the aria-describedby attribute to associate the form control with its
