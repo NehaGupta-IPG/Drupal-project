@@ -10,6 +10,7 @@ use Drupal\Tests\views_ui\Functional\UITestBase;
  * Tests the default file formatter.
  *
  * @see \Drupal\file\Plugin\Field\FieldFormatter\DefaultFileFormatter
+ * @group file
  */
 class DefaultFileFormatterTest extends UITestBase {
 
