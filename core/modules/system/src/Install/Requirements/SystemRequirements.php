@@ -562,15 +562,20 @@ class SystemRequirements implements InstallRequirementsInterface {
     }
 
     if ($phase === 'runtime' || $phase === 'update') {
-      // Test database JSON support.
-      $requirements['database_support_json'] = [
-        'title' => t('Database support for JSON'),
-        'severity' => RequirementSeverity::OK,
-        'value' => t('Available'),
-        'description' => t('Drupal requires databases that support JSON storage.'),
-      ];
+      $database_supports_json = Database::getConnection()->hasJson();
 
-      if (!Database::getConnection()->hasJson()) {
+      // Show the JSON support status on the status report, but only show the
+      // warning in the update runtime if no JSON support is available.
+      if (!$database_supports_json || $phase !== 'update') {
+        $requirements['database_support_json'] = [
+          'title' => t('Database support for JSON'),
+          'severity' => RequirementSeverity::OK,
+          'value' => t('Available'),
+          'description' => t('Drupal requires databases that support JSON storage.'),
+        ];
+      }
+
+      if (!$database_supports_json) {
         $requirements['database_support_json']['value'] = t('Not available');
         $requirements['database_support_json']['severity'] = RequirementSeverity::Error;
       }
