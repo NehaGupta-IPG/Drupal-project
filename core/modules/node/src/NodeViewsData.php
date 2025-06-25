@@ -351,6 +351,7 @@ class NodeViewsData extends EntityViewsData {
    * Provides views integration related to the taxonomy module.
    *
    * @return array
+   *   An associative array of data used by the views module.
    */
   protected function taxonomyIntegration() {
     $data['taxonomy_index']['table']['group'] = $this->t('Taxonomy term');
