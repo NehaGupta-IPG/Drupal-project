@@ -1,11 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\service_provider_test;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\Site\Settings;
 
+/**
+ * Service provider for service provider testing module.
+ */
 class ServiceProviderTestServiceProvider implements ServiceModifierInterface {
 
   /**
