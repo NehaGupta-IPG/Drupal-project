@@ -46,3 +46,7 @@ services:
     arguments: ['@current_route_match']
     tags:
       - { name: 'context_provider' }
+  node.repository:
+    class: Drupal\node\NodeRepository
+    arguments: ['@entity_type.manager', '@current_route_match']
+  Drupal\node\NodeRepositoryInterface: '@node.repository'
