@@ -73,4 +73,18 @@ class RestExportTest extends ViewsKernelTestBase {
     $this->assertEquals($header, $response->headers->get('Custom-Header'));
   }
 
+  /**
+   * @covers ::initDisplay
+   */
+  public function testInitDisplayNoRequest(): void {
+    // Clear all requests from the current stack to simulate a request-free
+    // execution, e.g. from drush.
+    while ($this->container->get('request_stack')->pop()) {
+      continue;
+    }
+    $view = View::load('test_serializer_shared_path');
+    $view->getExecutable()->setDisplay('rest_export_1');
+    $this->assertEquals($view->getExecutable()->getDisplay()->display['id'], 'rest_export_1');
+  }
+
 }
