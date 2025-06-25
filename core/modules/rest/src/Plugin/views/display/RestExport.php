@@ -166,13 +166,16 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
 
     // Only use the requested content type if it's not 'html'. This allows
     // still falling back to the default for things like views preview.
-    $request_content_type = $this->view->getRequest()->getRequestFormat();
+    if ($this->view->getRequest()) {
+      $request_content_type = $this->view->getRequest()->getRequestFormat();
 
-    if ($request_content_type !== 'html') {
-      $this->setContentType($request_content_type);
+      if ($request_content_type !== 'html') {
+        $this->setContentType($request_content_type);
+      }
+
+      $this->setMimeType($this->view->getRequest()
+        ->getMimeType($this->getContentType()));
     }
-
-    $this->setMimeType($this->view->getRequest()->getMimeType($this->getContentType()));
   }
 
   /**
