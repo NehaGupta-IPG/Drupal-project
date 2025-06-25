@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Theme;
 
 use Drupal\Core\Datetime\DatePreprocess;
+use Drupal\Core\Field\FieldPreprocess;
 
 /**
  * Provide common theme render elements.
@@ -176,6 +177,7 @@ class ThemeCommonElements {
         ],
         'includes' => ['core/includes/theme.maintenance.inc'],
         'template' => 'authorize-report',
+        'deprecated' => 'The "authorize-report" template is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3522119',
       ],
       'pager' => [
         'render element' => 'pager',
@@ -240,9 +242,11 @@ class ThemeCommonElements {
       // From field system.
       'field' => [
         'render element' => 'element',
+        'initial preprocess' => FieldPreprocess::class . ':preprocessField',
       ],
       'field_multiple_value_form' => [
         'render element' => 'element',
+        'initial preprocess' => FieldPreprocess::class . ':preprocessFieldMultipleValueForm',
       ],
       'off_canvas_page_wrapper' => [
         'variables' => [

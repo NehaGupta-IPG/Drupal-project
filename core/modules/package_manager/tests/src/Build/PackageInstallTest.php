@@ -18,7 +18,6 @@ class PackageInstallTest extends TemplateProjectTestBase {
    */
   public function testPackageInstall(): void {
     $this->createTestProject('RecommendedProject');
-
     $this->setReleaseMetadata([
       'alpha' => __DIR__ . '/../../fixtures/release-history/alpha.1.1.0.xml',
     ]);

@@ -40,9 +40,9 @@ class FormTestClickedButtonForm extends FormBase {
 
     // Define button types for each argument.
     $button_types = [
-      'submit',
-      'image_button',
-      'button',
+      's' => 'submit',
+      'i' => 'image_button',
+      'b' => 'button',
     ];
 
     // Loop through each path argument, adding buttons based on the information
@@ -52,7 +52,7 @@ class FormTestClickedButtonForm extends FormBase {
     // to test a variety of combinations.
     foreach ($args as $index => $arg) {
       // Get the button type based on the index of the argument.
-      $type = $button_types[$index] ?? NULL;
+      $type = $button_types[$arg] ?? NULL;
       $name = 'button' . ($index + 1);
 
       if ($type) {
