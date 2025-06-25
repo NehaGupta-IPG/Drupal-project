@@ -147,7 +147,7 @@ class Condition implements ConditionInterface, \Countable {
    * @throws \Drupal\Core\Database\InvalidQueryException
    *   If passed invalid arguments, such as an empty array as $value.
    */
-  public function compare(string $field, string $field2, ?string $operator = '='): self {
+  public function compare(string $field, string $field2, ?string $operator = '='): static {
     if (empty($operator)) {
       $operator = '=';
     }
