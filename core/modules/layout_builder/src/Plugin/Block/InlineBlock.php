@@ -233,6 +233,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
    * {@inheritdoc}
    */
   public function build() {
+    $block = $this->getEntity();
     if (!$block) {
       return ['#markup' => $this->t('This block is broken or missing. You may be missing content or you might need to enable the original module.')];
     }
