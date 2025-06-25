@@ -117,7 +117,7 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
   /**
    * {@inheritdoc}
    */
-  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+  public function buildOptionsForm(&$form, FormStateInterface $form_state): void {
     parent::buildOptionsForm($form, $form_state);
 
     $options = [];
@@ -160,7 +160,7 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
   /**
    * {@inheritdoc}
    */
-  public function query() {
+  public function query(): void {
     // Set the date format based on granularity.
     if (isset($this->dateFormats[$this->options['granularity']])) {
       $this->dateFormat = $this->dateFormats[$this->options['granularity']];
