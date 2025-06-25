@@ -34,7 +34,7 @@ class ManageDisplayTest extends BrowserTestBase {
     'search',
     'field_test',
     'field_third_party_test',
-    'block',
+    'navigation_variant_test',
   ];
 
   /**
@@ -57,8 +57,6 @@ class ManageDisplayTest extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->drupalPlaceBlock('system_breadcrumb_block');
-    $this->drupalPlaceBlock('local_tasks_block');
 
     // Create a test user.
     $admin_user = $this->drupalCreateUser([

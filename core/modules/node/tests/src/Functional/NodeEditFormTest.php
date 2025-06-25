@@ -43,7 +43,7 @@ class NodeEditFormTest extends NodeTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'node', 'datetime'];
+  protected static $modules = ['navigation_variant_test', 'node', 'datetime'];
 
   /**
    * {@inheritdoc}
@@ -59,7 +59,6 @@ class NodeEditFormTest extends NodeTestBase {
       'bypass node access',
       'administer nodes',
     ]);
-    $this->drupalPlaceBlock('local_tasks_block');
 
     $this->nodeStorage = $this->container->get('entity_type.manager')->getStorage('node');
   }

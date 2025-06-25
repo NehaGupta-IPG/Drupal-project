@@ -20,7 +20,7 @@ class MediaUiJavascriptTest extends MediaJavascriptTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
+    'navigation_variant_test',
     'media_test_source',
   ];
 
@@ -35,15 +35,6 @@ class MediaUiJavascriptTest extends MediaJavascriptTestBase {
    * @var \Drupal\media\MediaTypeInterface
    */
   protected $testMediaType;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-    $this->drupalPlaceBlock('local_actions_block');
-    $this->drupalPlaceBlock('local_tasks_block');
-  }
 
   /**
    * Tests a media type administration.

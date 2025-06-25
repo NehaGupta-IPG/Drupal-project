@@ -33,7 +33,7 @@ abstract class InlineBlockTestBase extends WebDriverTestBase {
   protected static $modules = [
     'block_content',
     'layout_builder',
-    'block',
+    'navigation_variant_test',
     'node',
     'contextual',
   ];
@@ -50,8 +50,6 @@ abstract class InlineBlockTestBase extends WebDriverTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $this->drupalPlaceBlock('local_tasks_block');
 
     $this->createContentType(['type' => 'bundle_with_section_field', 'new_revision' => TRUE]);
     $this->createNode([

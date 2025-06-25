@@ -28,6 +28,7 @@ class LayoutBuilderContentModerationIntegrationTest extends BrowserTestBase {
     'content_moderation',
     'menu_ui',
     'block_content',
+    'navigation_variant_test',
   ];
 
   /**
@@ -40,10 +41,6 @@ class LayoutBuilderContentModerationIntegrationTest extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    // @todo The Layout Builder UI relies on local tasks; fix in
-    //   https://www.drupal.org/project/drupal/issues/2917777.
-    $this->drupalPlaceBlock('local_tasks_block');
 
     // Add a new bundle.
     $this->createContentType(['type' => 'bundle_with_section_field']);

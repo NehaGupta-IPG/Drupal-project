@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autoconfigure: true
+    autowire: true
+
+  Drupal\navigation_variant_test\EventSubscriber\NavigationVariantSubscriber:
+    - { name: 'event_subscriber', priority: 1000 }

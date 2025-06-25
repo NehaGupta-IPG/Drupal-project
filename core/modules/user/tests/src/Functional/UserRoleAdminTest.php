@@ -25,7 +25,7 @@ class UserRoleAdminTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block'];
+  protected static $modules = ['navigation_variant_test'];
 
   /**
    * {@inheritdoc}
@@ -41,7 +41,6 @@ class UserRoleAdminTest extends BrowserTestBase {
       'administer permissions',
       'administer users',
     ]);
-    $this->drupalPlaceBlock('local_tasks_block', ['id' => 'test_role_admin_test_local_tasks_block']);
   }
 
   /**
@@ -50,9 +49,10 @@ class UserRoleAdminTest extends BrowserTestBase {
   public function testRoleAdministration(): void {
     $this->drupalLogin($this->adminUser);
     $default_langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
-    // Test presence of tab.
+
+    // Test presence of 'Roles' tab.
     $this->drupalGet('admin/people/permissions');
-    $this->assertSession()->elementsCount('xpath', '//div[@id="block-test-role-admin-test-local-tasks-block"]/ul/li/a[contains(., "Roles")]', 1);
+    $this->assertSession()->linkExists('Roles');
 
     // Test adding a role. (In doing so, we use a role name that happens to
     // correspond to an integer, to test that the role administration pages
@@ -70,8 +70,7 @@ class UserRoleAdminTest extends BrowserTestBase {
 
     // Verify permissions local task can be accessed when editing a role.
     $this->drupalGet("admin/people/roles/manage/{$role->id()}");
-    $local_tasks_block = $this->assertSession()->elementExists('css', '#block-test-role-admin-test-local-tasks-block');
-    $local_tasks_block->clickLink('Permissions');
+    $this->clickLink('Permissions');
     $this->assertSession()->fieldExists("{$role->id()}[change own username]");
 
     // Try adding a duplicate role.

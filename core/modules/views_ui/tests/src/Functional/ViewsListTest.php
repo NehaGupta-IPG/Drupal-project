@@ -17,7 +17,7 @@ class ViewsListTest extends UITestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'views_ui'];
+  protected static $modules = ['navigation_variant_test', 'views_ui'];
 
   /**
    * {@inheritdoc}
@@ -37,8 +37,6 @@ class ViewsListTest extends UITestBase {
   protected function setUp($import_test_views = TRUE, $modules = []): void {
     parent::setUp($import_test_views, $modules);
 
-    $this->drupalPlaceBlock('local_tasks_block');
-    $this->drupalPlaceBlock('local_actions_block');
     $this->adminUser = $this->drupalCreateUser(['administer views']);
     $this->drupalLogin($this->adminUser);
   }

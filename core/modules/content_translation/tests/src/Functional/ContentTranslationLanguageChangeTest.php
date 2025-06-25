@@ -30,7 +30,7 @@ class ContentTranslationLanguageChangeTest extends NodeTestBase {
     'content_translation',
     'content_translation_test',
     'node',
-    'block',
+    'navigation_variant_test',
     'field_ui',
     'image',
   ];
@@ -49,7 +49,6 @@ class ContentTranslationLanguageChangeTest extends NodeTestBase {
     foreach ($langcodes as $langcode) {
       static::createLanguageFromLangcode($langcode);
     }
-    $this->drupalPlaceBlock('local_tasks_block');
     $user = $this->drupalCreateUser([
       'administer site configuration',
       'administer nodes',

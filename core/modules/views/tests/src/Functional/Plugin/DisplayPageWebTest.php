@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Functional\Plugin;
 
+use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
@@ -27,7 +28,7 @@ class DisplayPageWebTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'views_ui'];
+  protected static $modules = ['views_ui'];
 
   /**
    * {@inheritdoc}
@@ -41,13 +42,17 @@ class DisplayPageWebTest extends ViewTestBase {
     parent::setUp($import_test_views, $modules);
 
     $this->enableViewsTestModule();
-    $this->drupalPlaceBlock('local_tasks_block');
   }
 
   /**
    * Tests arguments.
    */
   public function testArguments(): void {
+    \Drupal::service(ModuleInstallerInterface::class)->install([
+      'block',
+    ]);
+    $this->drupalPlaceBlock('local_tasks_block');
+
     $xpath = '//span[@class="field-content"]';
 
     // Ensure that all the entries are returned.
@@ -93,6 +98,11 @@ class DisplayPageWebTest extends ViewTestBase {
    * Tests menu settings of page displays.
    */
   public function testPageDisplayMenu(): void {
+    \Drupal::service(ModuleInstallerInterface::class)->install([
+      'block',
+    ]);
+    $this->drupalPlaceBlock('local_tasks_block');
+
     // Check local tasks.
     $this->drupalGet('test_page_display_menu');
     $this->assertSession()->statusCodeEquals(200);

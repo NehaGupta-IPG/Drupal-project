@@ -19,7 +19,7 @@ class MediaUiFunctionalTest extends MediaFunctionalTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
+    'navigation_variant_test',
     'media_test_source',
     'media',
   ];
@@ -28,15 +28,6 @@ class MediaUiFunctionalTest extends MediaFunctionalTestBase {
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-    $this->drupalPlaceBlock('local_actions_block');
-    $this->drupalPlaceBlock('local_tasks_block');
-  }
 
   /**
    * Tests the media actions (add/edit/delete).

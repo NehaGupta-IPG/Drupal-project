@@ -20,6 +20,7 @@ class LayoutBuilderViewModeTest extends LayoutBuilderTestBase {
    * Tests that a non-default view mode works as expected.
    */
   public function testNonDefaultViewMode(): void {
+    $this->drupalPlaceBlock('local_tasks_block');
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -77,6 +78,8 @@ class LayoutBuilderViewModeTest extends LayoutBuilderTestBase {
    * @see \Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage::getDefaultSectionStorage()
    */
   public function testLayoutBuilderUiFullViewMode(): void {
+    $this->drupalPlaceBlock('local_tasks_block');
+
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

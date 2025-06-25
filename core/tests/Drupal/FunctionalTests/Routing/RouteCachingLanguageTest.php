@@ -28,7 +28,7 @@ class RouteCachingLanguageTest extends BrowserTestBase {
     'node',
     'content_translation',
     'link',
-    'block',
+    'navigation_variant_test',
   ];
 
   /**
@@ -50,9 +50,6 @@ class RouteCachingLanguageTest extends BrowserTestBase {
     parent::setUp();
 
     $this->createContentType(['type' => 'page']);
-
-    $this->drupalPlaceBlock('local_tasks_block');
-    $this->drupalPlaceBlock('page_title_block');
 
     $permissions = [
       'access administration pages',

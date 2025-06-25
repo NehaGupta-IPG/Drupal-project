@@ -22,7 +22,7 @@ class ConfigTranslationCacheTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
+    'navigation_variant_test',
     'config_translation',
     'config_translation_test',
     'contact',
@@ -113,8 +113,6 @@ class ConfigTranslationCacheTest extends BrowserTestBase {
     foreach ($this->langcodes as $langcode) {
       ConfigurableLanguage::createFromLangcode($langcode)->save();
     }
-    $this->drupalPlaceBlock('local_tasks_block');
-    $this->drupalPlaceBlock('page_title_block');
   }
 
   /**

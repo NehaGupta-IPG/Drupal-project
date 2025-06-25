@@ -22,7 +22,7 @@ class ConfigEntityListTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'config_test'];
+  protected static $modules = ['navigation_variant_test', 'config_test'];
 
   /**
    * {@inheritdoc}
@@ -37,7 +37,6 @@ class ConfigEntityListTest extends BrowserTestBase {
     // Delete the override config_test entity since it is not required by this
     // test.
     \Drupal::entityTypeManager()->getStorage('config_test')->load('override')->delete();
-    $this->drupalPlaceBlock('local_actions_block');
   }
 
   /**

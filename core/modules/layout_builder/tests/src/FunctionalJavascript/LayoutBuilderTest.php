@@ -61,8 +61,6 @@ class LayoutBuilderTest extends WebDriverTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->drupalPlaceBlock('local_tasks_block');
-
     $bundle = BlockContentType::create([
       'id' => 'basic',
       'label' => 'Basic',

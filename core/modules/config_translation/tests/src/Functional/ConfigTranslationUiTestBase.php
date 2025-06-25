@@ -53,7 +53,6 @@ abstract class ConfigTranslationUiTestBase extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
     'config_translation',
     'config_translation_test',
     'contact',
@@ -116,8 +115,6 @@ abstract class ConfigTranslationUiTestBase extends BrowserTestBase {
       ConfigurableLanguage::createFromLangcode($langcode)->save();
     }
     $this->localeStorage = $this->container->get('locale.storage');
-    $this->drupalPlaceBlock('local_tasks_block');
-    $this->drupalPlaceBlock('page_title_block');
   }
 
   /**

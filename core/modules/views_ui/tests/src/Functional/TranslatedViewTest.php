@@ -20,6 +20,7 @@ class TranslatedViewTest extends UITestBase {
    */
   protected static $modules = [
     'config_translation',
+    'navigation_variant_test',
     'views_ui',
   ];
 
@@ -56,8 +57,6 @@ class TranslatedViewTest extends UITestBase {
       'translate configuration',
       'translate interface',
     ];
-
-    $this->drupalPlaceBlock('local_tasks_block', ['id' => 'test_role_admin_test_local_tasks_block']);
 
     // Create and log in user.
     $this->adminUser = $this->drupalCreateUser($permissions);

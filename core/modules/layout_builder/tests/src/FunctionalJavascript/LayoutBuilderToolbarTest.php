@@ -17,7 +17,7 @@ class LayoutBuilderToolbarTest extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
+    'navigation_variant_test',
     'node',
     'field_ui',
     'layout_builder',
@@ -35,8 +35,6 @@ class LayoutBuilderToolbarTest extends WebDriverTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $this->drupalPlaceBlock('local_tasks_block');
 
     // Create a content type.
     $this->createContentType([

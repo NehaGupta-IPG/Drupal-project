@@ -30,7 +30,7 @@ class ManageFieldsFunctionalTestBase extends BrowserTestBase {
     'field_test',
     'taxonomy',
     'image',
-    'block',
+    'navigation_variant_test',
     'node_access_test',
   ];
 
@@ -72,11 +72,6 @@ class ManageFieldsFunctionalTestBase extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $this->drupalPlaceBlock('system_breadcrumb_block');
-    $this->drupalPlaceBlock('local_actions_block');
-    $this->drupalPlaceBlock('local_tasks_block');
-    $this->drupalPlaceBlock('page_title_block');
 
     // Create a test user.
     $admin_user = $this->drupalCreateUser([

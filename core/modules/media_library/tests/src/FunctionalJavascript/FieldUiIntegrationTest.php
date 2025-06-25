@@ -21,7 +21,7 @@ class FieldUiIntegrationTest extends MediaLibraryTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['field_ui', 'block'];
+  protected static $modules = ['field_ui', 'navigation_variant_test'];
 
   /**
    * {@inheritdoc}
@@ -33,7 +33,6 @@ class FieldUiIntegrationTest extends MediaLibraryTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->drupalPlaceBlock('local_tasks_block');
 
     // Create a user who can add media fields.
     $user = $this->drupalCreateUser([

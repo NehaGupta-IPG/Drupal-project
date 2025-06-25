@@ -25,7 +25,7 @@ class NodeTypeTranslationTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
+    'navigation_variant_test',
     'config_translation',
     'field_ui',
     'node',
@@ -185,9 +185,6 @@ class NodeTypeTranslationTest extends BrowserTestBase {
     $type = $this->randomMachineName(16);
     $name = $this->randomString();
     $this->drupalCreateContentType(['type' => $type, 'name' => $name]);
-
-    // Set tabs.
-    $this->drupalPlaceBlock('local_tasks_block', ['primary' => TRUE]);
 
     // Change default language.
     $this->drupalGet('admin/config/regional/language');

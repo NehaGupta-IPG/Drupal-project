@@ -15,7 +15,7 @@ class NodeAccessCacheRedirectWarningTest extends NodeTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'node_access_test_empty'];
+  protected static $modules = ['navigation_variant_test', 'node_access_test_empty'];
 
   /**
    * {@inheritdoc}
@@ -37,8 +37,6 @@ class NodeAccessCacheRedirectWarningTest extends NodeTestBase {
    * @covers \Drupal\node\NodeAccessControlHandler
    */
   public function testNodeAccessCacheRedirectWarning(): void {
-    $this->drupalPlaceBlock('local_tasks_block');
-
     // Ensure that both a node_grants implementation exists, and that the
     // current user has 'view own unpublished nodes' permission. Node's access
     // control handler bypasses node grants when 'view own published nodes' is

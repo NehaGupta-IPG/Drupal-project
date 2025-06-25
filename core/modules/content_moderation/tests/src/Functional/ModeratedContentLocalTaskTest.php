@@ -24,7 +24,7 @@ class ModeratedContentLocalTaskTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
+    'navigation_variant_test',
     'content_moderation',
     'node',
   ];
@@ -39,8 +39,6 @@ class ModeratedContentLocalTaskTest extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $this->drupalPlaceBlock('local_tasks_block');
 
     $this->adminUser = $this->drupalCreateUser([
       'access administration pages',

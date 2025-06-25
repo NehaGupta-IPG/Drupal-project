@@ -19,7 +19,7 @@ class ConfigEntityListMultilingualTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['config_test', 'language', 'block'];
+  protected static $modules = ['config_test', 'language', 'navigation_variant_test'];
 
   /**
    * {@inheritdoc}
@@ -34,8 +34,6 @@ class ConfigEntityListMultilingualTest extends BrowserTestBase {
     // Delete the override config_test entity. It is not required by this test.
     \Drupal::entityTypeManager()->getStorage('config_test')->load('override')->delete();
     ConfigurableLanguage::createFromLangcode('hu')->save();
-
-    $this->drupalPlaceBlock('local_actions_block');
   }
 
   /**

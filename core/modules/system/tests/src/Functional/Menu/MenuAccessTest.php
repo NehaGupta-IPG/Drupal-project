@@ -26,15 +26,6 @@ class MenuAccessTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-
-    $this->drupalPlaceBlock('local_tasks_block');
-  }
-
-  /**
    * Tests menu link for route with access check.
    *
    * @see \Drupal\menu_test\Access\AccessCheck::access()
@@ -42,6 +33,7 @@ class MenuAccessTest extends BrowserTestBase {
   public function testMenuBlockLinksAccessCheck(): void {
     $this->container->get('module_installer')->install(['menu_test']);
     $this->drupalPlaceBlock('system_menu_block:account');
+    $this->drupalPlaceBlock('local_tasks_block');
     // Test that there's link rendered on the route.
     $this->drupalGet('menu_test_access_check_session');
     $this->assertSession()->linkExists('Test custom route access check');

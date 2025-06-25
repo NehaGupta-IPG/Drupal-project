@@ -20,7 +20,7 @@ class EntityUuidIdTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'content_translation', 'entity_test'];
+  protected static $modules = ['navigation_variant_test', 'content_translation', 'entity_test'];
 
   /**
    * {@inheritdoc}
@@ -35,8 +35,6 @@ class EntityUuidIdTest extends BrowserTestBase {
 
     $this->createLanguageFromLangcode('af');
     $this->enableContentTranslation('entity_test_uuid_id', 'entity_test_uuid_id');
-    $this->drupalPlaceBlock('page_title_block');
-    $this->drupalPlaceBlock('local_tasks_block');
   }
 
   /**

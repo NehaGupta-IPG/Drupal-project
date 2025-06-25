@@ -23,7 +23,7 @@ class LayoutBuilderTranslationTest extends ContentTranslationTestBase {
     'contextual',
     'entity_test',
     'layout_builder',
-    'block',
+    'navigation_variant_test',
   ];
 
   /**
@@ -141,10 +141,6 @@ class LayoutBuilderTranslationTest extends ContentTranslationTestBase {
    */
   protected function setUpEntities(): void {
     $this->drupalLogin($this->administrator);
-
-    // @todo The Layout Builder UI relies on local tasks; fix in
-    //   https://www.drupal.org/project/drupal/issues/2917777.
-    $this->drupalPlaceBlock('local_tasks_block');
 
     // Create a test entity.
     $id = $this->createEntity([

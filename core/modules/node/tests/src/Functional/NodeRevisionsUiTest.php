@@ -24,7 +24,7 @@ class NodeRevisionsUiTest extends NodeTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block'];
+  protected static $modules = ['navigation_variant_test'];
 
   /**
    * @var \Drupal\user\Entity\User
@@ -204,7 +204,6 @@ class NodeRevisionsUiTest extends NodeTestBase {
    * @covers \Drupal\node\Hook\NodeHooks1::localTasksAlter
    */
   public function testNodeDuplicateRevisionsTab(): void {
-    $this->drupalPlaceBlock('local_tasks_block');
     $this->drupalLogin($this->editor);
 
     $node = $this->drupalCreateNode();

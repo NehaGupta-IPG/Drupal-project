@@ -21,7 +21,7 @@ class FilterFormatAccessTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'filter', 'node'];
+  protected static $modules = ['navigation_variant_test', 'filter', 'node'];
 
   /**
    * {@inheritdoc}
@@ -115,7 +115,6 @@ class FilterFormatAccessTest extends BrowserTestBase {
       $this->secondAllowedFormat->getPermissionName(),
       $this->disallowedFormat->getPermissionName(),
     ]);
-    $this->drupalPlaceBlock('local_tasks_block');
   }
 
   /**

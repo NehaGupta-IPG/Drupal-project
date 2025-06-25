@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
+use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Url;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Entity\CommentType;
@@ -48,24 +49,22 @@ class CommentTypeTest extends CommentTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->drupalPlaceBlock('page_title_block');
-    $this->drupalPlaceBlock('system_breadcrumb_block');
-
-    $this->adminUser = $this->drupalCreateUser($this->permissions);
+    $this->drupalLogin($this->drupalCreateUser($this->permissions));
   }
 
   /**
    * Tests creating a comment type programmatically and via a form.
    */
   public function testCommentTypeCreation(): void {
+    \Drupal::service(ModuleInstallerInterface::class)->install([
+      'navigation_variant_test',
+    ]);
+
     // Create a comment type programmatically.
     $type = $this->createCommentType('other');
 
     $comment_type = CommentType::load('other');
     $this->assertInstanceOf(CommentType::class, $comment_type);
-
-    // Log in a test user.
-    $this->drupalLogin($this->adminUser);
 
     // Ensure that the new comment type admin page can be accessed.
     $this->drupalGet('admin/structure/comment/manage/' . $type->id());
@@ -121,8 +120,6 @@ class CommentTypeTest extends CommentTestBase {
    * Tests editing a comment type using the UI.
    */
   public function testCommentTypeEditing(): void {
-    $this->drupalLogin($this->adminUser);
-
     $field = FieldConfig::loadByName('comment', 'comment', 'comment_body');
     $this->assertEquals('Comment', $field->getLabel(), 'Comment body field was found.');
 
@@ -161,8 +158,6 @@ class CommentTypeTest extends CommentTestBase {
     $this->drupalCreateContentType(['type' => 'page']);
     $this->addDefaultCommentField('node', 'page', 'foo', CommentItemInterface::OPEN, 'foo');
     $field_storage = FieldStorageConfig::loadByName('node', 'foo');
-
-    $this->drupalLogin($this->adminUser);
 
     // Create a node.
     $node = Node::create([

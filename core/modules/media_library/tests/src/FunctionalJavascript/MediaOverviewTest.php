@@ -14,7 +14,7 @@ class MediaOverviewTest extends MediaLibraryTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block'];
+  protected static $modules = ['navigation_variant_test'];
 
   /**
    * {@inheritdoc}
@@ -42,9 +42,6 @@ class MediaOverviewTest extends MediaLibraryTestBase {
         'Turtle',
       ],
     ]);
-
-    $this->drupalPlaceBlock('local_tasks_block');
-    $this->drupalPlaceBlock('local_actions_block');
 
     $user = $this->drupalCreateUser([
       'access media overview',

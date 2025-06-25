@@ -23,6 +23,7 @@ class NavigationTopBarTest extends PageCacheTagsTestBase {
   protected static $modules = [
     'navigation',
     'node',
+    'block',
     'layout_builder',
     'test_page_test',
   ];
