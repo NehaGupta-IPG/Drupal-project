@@ -13,7 +13,7 @@ use Drupal\views\Plugin\views\style\DefaultSummary;
  * @ingroup views_area_handlers
  */
 #[ViewsArea("result")]
-class Result extends AreaPluginBase {
+class Result extends TokenizeAreaPluginBase {
 
   /**
    * {@inheritdoc}
@@ -114,6 +114,7 @@ class Result extends AreaPluginBase {
     // Send the output.
     if (!empty($total) || !empty($this->options['empty'])) {
       $output .= str_replace(array_keys($replacements), array_values($replacements), $format);
+      $output = $this->tokenizeValue($output);
       // Return as render array.
       return [
         '#markup' => $output,
