@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\options\Functional;
 
 use Drupal\field\Entity\FieldConfig;
@@ -10,13 +12,12 @@ use Drupal\Tests\field\Functional\FieldTestBase;
  * Tests the Options field UI functionality.
  *
  * @group options
+ * @group #slow
  */
 class OptionsFieldUITest extends FieldTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node',
@@ -88,7 +89,7 @@ class OptionsFieldUITest extends FieldTestBase {
   /**
    * Options (integer) : test 'allowed values' input.
    */
-  public function testOptionsAllowedValuesInteger() {
+  public function testOptionsAllowedValuesInteger(): void {
     $this->fieldName = 'field_options_integer';
     $this->createOptionsField('list_integer');
     $page = $this->getSession()->getPage();
@@ -160,7 +161,7 @@ class OptionsFieldUITest extends FieldTestBase {
   /**
    * Options (float) : test 'allowed values' input.
    */
-  public function testOptionsAllowedValuesFloat() {
+  public function testOptionsAllowedValuesFloat(): void {
     $this->fieldName = 'field_options_float';
     $this->createOptionsField('list_float');
     $page = $this->getSession()->getPage();
@@ -249,7 +250,7 @@ class OptionsFieldUITest extends FieldTestBase {
   /**
    * Options (text) : test 'allowed values' input.
    */
-  public function testOptionsAllowedValuesText() {
+  public function testOptionsAllowedValuesText(): void {
     $this->fieldName = 'field_options_text';
     $this->createOptionsField('list_string');
     $page = $this->getSession()->getPage();
@@ -306,14 +307,15 @@ class OptionsFieldUITest extends FieldTestBase {
     $field_storage = FieldStorageConfig::loadByName('node', $this->fieldName);
     $this->assertSame($field_storage->getSetting('allowed_values'), ['zero' => 'Zero']);
 
-    // Check that string values with dots can not be used.
+    // Check that string values with special characters can be used.
     $input = [
       'field_storage[subform][settings][allowed_values][table][0][item][key]' => 'zero',
       'field_storage[subform][settings][allowed_values][table][0][item][label]' => 'Zero',
-      'field_storage[subform][settings][allowed_values][table][1][item][key]' => 'example.com',
+      'field_storage[subform][settings][allowed_values][table][1][item][key]' => '.example #example',
       'field_storage[subform][settings][allowed_values][table][1][item][label]' => 'Example',
     ];
-    $this->assertAllowedValuesInput($input, 'The machine-readable name must contain only lowercase letters, numbers, and underscores.', 'String value with dot is not supported.');
+    $array = ['zero' => 'Zero', '.example #example' => 'Example'];
+    $this->assertAllowedValuesInput($input, $array, '');
 
     // Check that the same key can only be used once.
     $input = [
@@ -332,7 +334,7 @@ class OptionsFieldUITest extends FieldTestBase {
    * @param string $type
    *   One of 'list_integer', 'list_float' or 'list_string'.
    */
-  protected function createOptionsField($type) {
+  protected function createOptionsField($type): void {
     // Create a field.
     FieldStorageConfig::create([
       'field_name' => $this->fieldName,
@@ -389,7 +391,7 @@ class OptionsFieldUITest extends FieldTestBase {
   /**
    * Tests normal and key formatter display on node display.
    */
-  public function testNodeDisplay() {
+  public function testNodeDisplay(): void {
     $this->fieldName = $this->randomMachineName();
     $this->createOptionsField('list_integer');
     $node = $this->drupalCreateNode(['type' => $this->type]);
@@ -441,7 +443,7 @@ class OptionsFieldUITest extends FieldTestBase {
   /**
    * Confirms the allowed value list is a required field.
    */
-  public function testRequiredPropertyForAllowedValuesList() {
+  public function testRequiredPropertyForAllowedValuesList(): void {
     $field_types = [
       'list_float',
       'list_string',

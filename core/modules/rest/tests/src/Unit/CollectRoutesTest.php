@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\rest\Unit;
 
 use Drupal\Tests\UnitTestCase;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\rest\Plugin\views\display\RestExport;
+use Drupal\views\Entity\View;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -24,6 +27,8 @@ class CollectRoutesTest extends UnitTestCase {
 
   /**
    * The RouteCollection.
+   *
+   * @var \Symfony\Component\Routing\RouteCollection
    */
   protected $routes;
 
@@ -34,15 +39,7 @@ class CollectRoutesTest extends UnitTestCase {
     parent::setUp();
 
     $container = new ContainerBuilder();
-
-    $request = $this->getMockBuilder('\Symfony\Component\HttpFoundation\Request')
-      ->disableOriginalConstructor()
-      ->getMock();
-
-    $view = $this->getMockBuilder('\Drupal\views\Entity\View')
-      ->addMethods(['initHandlers'])
-      ->setConstructorArgs([['id' => 'test_view'], 'view'])
-      ->getMock();
+    $view = new View(['id' => 'test_view'], 'view');
 
     $view_executable = $this->getMockBuilder('\Drupal\views\ViewExecutable')
       ->onlyMethods(['initHandlers', 'getTitle'])
@@ -143,7 +140,7 @@ class CollectRoutesTest extends UnitTestCase {
   /**
    * Tests if adding a requirement to a route only modify one route.
    */
-  public function testRoutesRequirements() {
+  public function testRoutesRequirements(): void {
     $this->restExport->collectRoutes($this->routes);
 
     $requirements_1 = $this->routes->get('test_1')->getRequirements();

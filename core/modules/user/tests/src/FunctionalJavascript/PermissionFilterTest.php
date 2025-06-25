@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
@@ -36,7 +38,7 @@ class PermissionFilterTest extends WebDriverTestBase {
   /**
    * Tests that filter results announcement has correct pluralization.
    */
-  public function testPermissionFilter() {
+  public function testPermissionFilter(): void {
     // Find the permission filter field.
     $this->drupalGet('admin/people/permissions');
     $assertSession = $this->assertSession();

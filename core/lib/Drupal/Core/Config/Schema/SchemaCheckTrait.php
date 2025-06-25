@@ -41,7 +41,7 @@ trait SchemaCheckTrait {
    * path segment can use a wildcard (`*`) to indicate any value for that
    * segment should be accepted for this property path to be ignored.
    *
-   * @var \string[][]
+   * @var array<string, array<string, array<int, string>>>
    */
   protected static array $ignoredPropertyPaths = [
     'search.page.*' => [
@@ -50,6 +50,27 @@ trait SchemaCheckTrait {
       // @see search.schema.yml
       'label' => [
         'This value should not be blank.',
+      ],
+    ],
+    'contact.settings' => [
+      // @todo Simple config cannot have dependencies on any other config.
+      //   Remove this in https://www.drupal.org/project/drupal/issues/3425992.
+      'default_form' => [
+        "The 'contact.form.feedback' config does not exist.",
+      ],
+    ],
+    'editor.editor.*' => [
+      // @todo Fix stream wrappers not being available early enough in
+      //   https://www.drupal.org/project/drupal/issues/3416735
+      'image_upload.scheme' => [
+        '^The file storage you selected is not a visible, readable and writable stream wrapper\. Possible choices: <em class="placeholder"><\/em>\.$',
+      ],
+    ],
+    'search.settings' => [
+      // @todo Simple config cannot have dependencies on any other config.
+      //   Remove this in https://www.drupal.org/project/drupal/issues/3425992.
+      'default_page' => [
+        "The 'search.page.node_search' config does not exist.",
       ],
     ],
   ];
@@ -63,19 +84,15 @@ trait SchemaCheckTrait {
    *   The configuration name.
    * @param array $config_data
    *   The configuration data, assumed to be data for a top-level config object.
+   * @param bool $validate_constraints
+   *   Determines if constraints will be validated. If TRUE, constraint
+   *   validation errors will be added to the errors found.
    *
    * @return array|bool
    *   FALSE if no schema found. List of errors if any found. TRUE if fully
    *   valid.
    */
-  public function checkConfigSchema(TypedConfigManagerInterface $typed_config, $config_name, $config_data) {
-    // We'd like to verify that the top-level type is either config_base,
-    // config_entity, or a derivative. The only thing we can really test though
-    // is that the schema supports having langcode in it. So add 'langcode' to
-    // the data if it doesn't already exist.
-    if (!isset($config_data['langcode'])) {
-      $config_data['langcode'] = 'en';
-    }
+  public function checkConfigSchema(TypedConfigManagerInterface $typed_config, $config_name, $config_data, bool $validate_constraints = FALSE) {
     $this->configName = $config_name;
     if (!$typed_config->hasConfigSchema($config_name)) {
       return FALSE;
@@ -86,29 +103,22 @@ trait SchemaCheckTrait {
       $errors[] = $this->checkValue($key, $value);
     }
     $errors = array_merge(...$errors);
-    // Also perform explicit validation. Note this does NOT require every node
-    // in the config schema tree to have validation constraints defined.
-    $violations = $this->schema->validate();
-    $filtered_violations = array_filter(
-      iterator_to_array($violations),
-      fn (ConstraintViolation $v) => !static::isViolationForIgnoredPropertyPath($v),
-    );
-    $validation_errors = array_map(
-      fn (ConstraintViolation $v) => sprintf("[%s] %s", $v->getPropertyPath(), (string) $v->getMessage()),
-      $filtered_violations
-    );
-    // If config validation errors are encountered for a contrib module, avoid
-    // failing the test (which would be too disruptive for the ecosystem), but
-    // trigger a deprecation notice instead.
-    if (!empty($validation_errors) && $this->isContribViolation()) {
-      @trigger_error(sprintf("The '%s' configuration contains validation errors. Invalid config is deprecated in drupal:10.2.0 and will be required to be valid in drupal:11.0.0. The following validation errors were found:\n\t\t- %s\nSee https://www.drupal.org/node/3362879",
-        $config_name,
-        implode("\n\t\t- ", $validation_errors)
-      ), E_USER_DEPRECATED);
-    }
-    else {
+    if ($validate_constraints) {
+      // Also perform explicit validation. Note this does NOT require every node
+      // in the config schema tree to have validation constraints defined.
+      $violations = $this->schema->validate();
+      $filtered_violations = array_filter(
+        iterator_to_array($violations),
+        fn(ConstraintViolation $v) => !static::isViolationForIgnoredPropertyPath($v),
+      );
+      $validation_errors = array_map(
+        fn(ConstraintViolation $v) => sprintf("[%s] %s", $v->getPropertyPath(), (string) $v->getMessage()),
+        $filtered_violations
+      );
+      // @todo Decide in https://www.drupal.org/project/drupal/issues/3395099 when/how to trigger deprecation errors or even failures for contrib modules.
       $errors = array_merge($errors, $validation_errors);
     }
+
     if (empty($errors)) {
       return TRUE;
     }
@@ -122,6 +132,8 @@ trait SchemaCheckTrait {
    *   A validation constraint violation for a Config object.
    *
    * @return bool
+   *   TRUE when the violation is for an ignored configuration property path,
+   *   FALSE otherwise.
    */
   protected static function isViolationForIgnoredPropertyPath(ConstraintViolation $v): bool {
     // When the validated object is a config entity wrapped in a
@@ -175,17 +187,6 @@ trait SchemaCheckTrait {
       }
     }
     return FALSE;
-  }
-
-  /**
-   * Whether the current test is for a contrib module.
-   *
-   * @return bool
-   */
-  private function isContribViolation(): bool {
-    $test_file_name = (new \ReflectionClass($this))->getFileName();
-    $root = dirname(__DIR__, 6);
-    return !str_starts_with($test_file_name, $root . DIRECTORY_SEPARATOR . 'core');
   }
 
   /**

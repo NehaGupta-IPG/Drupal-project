@@ -3,7 +3,9 @@
 namespace Drupal\block_content\Plugin\Block;
 
 use Drupal\block_content\BlockContentUuidLookup;
+use Drupal\block_content\Plugin\Derivative\BlockContent;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
@@ -12,18 +14,18 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines a generic block type.
- *
- * @Block(
- *  id = "block_content",
- *  admin_label = @Translation("Content block"),
- *  category = @Translation("Content block"),
- *  deriver = "Drupal\block_content\Plugin\Derivative\BlockContent"
- * )
  */
+#[Block(
+  id: "block_content",
+  admin_label: new TranslatableMarkup("Content block"),
+  category: new TranslatableMarkup("Content block"),
+  deriver: BlockContent::class
+)]
 class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**
@@ -137,9 +139,7 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
   }
 
   /**
-   * Overrides \Drupal\Core\Block\BlockBase::blockForm().
-   *
-   * Adds body and description fields to the block configuration form.
+   * {@inheritdoc}
    */
   public function blockForm($form, FormStateInterface $form_state) {
     $block = $this->getEntity();
@@ -156,7 +156,6 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
       '#default_value' => $this->configuration['view_mode'],
       '#access' => (count($options) > 1),
     ];
-    $form['title']['#description'] = $this->t('The title of the block as shown to the user.');
     return $form;
   }
 
@@ -195,6 +194,13 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
         '#access' => $this->account->hasPermission('administer blocks'),
       ];
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createPlaceholder(): bool {
+    return TRUE;
   }
 
   /**
