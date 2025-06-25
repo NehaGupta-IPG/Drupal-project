@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\theme_test\EventSubscriber;
 
 use Drupal\Core\Render\RendererInterface;
@@ -16,6 +18,8 @@ class ThemeTestSubscriber implements EventSubscriberInterface {
 
   /**
    * The used container.
+   *
+   * @var object
    *
    * @todo This variable is never initialized, so we don't know what it is.
    *   See https://www.drupal.org/node/2721315
@@ -59,7 +63,7 @@ class ThemeTestSubscriber implements EventSubscriberInterface {
       // First, force the theme registry to be rebuilt on this page request.
       // This allows us to test a full initialization of the theme system in
       // the code below.
-      drupal_theme_rebuild();
+      \Drupal::service('theme.registry')->reset();
       // Next, initialize the theme system by storing themed text in a global
       // variable. We will use this later in
       // theme_test_request_listener_page_callback() to test that even when the
@@ -70,7 +74,7 @@ class ThemeTestSubscriber implements EventSubscriberInterface {
         '#url' => Url::fromRoute('user.page'),
         '#attributes' => ['title' => 'Themed output generated in a KernelEvents::REQUEST listener'],
       ];
-      $GLOBALS['theme_test_output'] = $this->renderer->renderPlain($more_link);
+      $GLOBALS['theme_test_output'] = $this->renderer->renderInIsolation($more_link);
     }
   }
 

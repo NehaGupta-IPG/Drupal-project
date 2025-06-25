@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\PathProcessor;
 
 use Drupal\Core\Language\Language;
@@ -39,6 +41,7 @@ class PathProcessorTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
 
     // Set up some languages to be used by the language-based path processor.
     $languages = [];
@@ -47,14 +50,6 @@ class PathProcessorTest extends UnitTestCase {
       $languages[$langcode] = $language;
     }
     $this->languages = $languages;
-
-    // Create a stub configuration.
-    $language_prefixes = array_keys($this->languages);
-    $config = [
-      'url' => [
-        'prefixes' => array_combine($language_prefixes, $language_prefixes),
-      ],
-    ];
 
     // Create a language manager stub.
     $language_manager = $this->getMockBuilder('Drupal\language\ConfigurableLanguageManagerInterface')
@@ -75,7 +70,7 @@ class PathProcessorTest extends UnitTestCase {
   /**
    * Tests resolving the inbound path to the system path.
    */
-  public function testProcessInbound() {
+  public function testProcessInbound(): void {
 
     // Create an alias manager stub.
     $alias_manager = $this->getMockBuilder(AliasManager::class)
@@ -95,8 +90,8 @@ class PathProcessorTest extends UnitTestCase {
       ->method('getPathByAlias')
       ->willReturnMap($system_path_map);
 
-    // Create a stub config factory with all config settings that will be checked
-    // during this test.
+    // Create a stub config factory with all config settings that will be
+    // checked during this test.
     $config_factory_stub = $this->getConfigFactoryStub(
       [
         'system.site' => [
@@ -145,8 +140,8 @@ class PathProcessorTest extends UnitTestCase {
     $language_processor = new PathProcessorLanguage($config_factory_stub, $this->languageManager, $negotiator, $current_user, $config_subscriber);
 
     // First, test the processor manager with the processors in the incorrect
-    // order. The alias processor will run before the language processor, meaning
-    // aliases will not be found.
+    // order. The alias processor will run before the language processor,
+    // meaning aliases will not be found.
     $priorities = [
       1000 => $alias_processor,
       500 => $decode_processor,

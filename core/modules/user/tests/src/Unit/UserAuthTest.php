@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Unit;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -66,6 +68,8 @@ class UserAuthTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->userStorage = $this->createMock('Drupal\Core\Entity\EntityStorageInterface');
 
     /** @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entity_type_manager */
@@ -92,7 +96,7 @@ class UserAuthTest extends UnitTestCase {
    *
    * @dataProvider providerTestAuthenticateWithMissingCredentials
    */
-  public function testAuthenticateWithMissingCredentials($username, $password) {
+  public function testAuthenticateWithMissingCredentials($username, $password): void {
     $this->userStorage->expects($this->never())
       ->method('loadByProperties');
 
@@ -103,8 +107,9 @@ class UserAuthTest extends UnitTestCase {
    * Data provider for testAuthenticateWithMissingCredentials().
    *
    * @return array
+   *   An array of test data.
    */
-  public function providerTestAuthenticateWithMissingCredentials() {
+  public static function providerTestAuthenticateWithMissingCredentials() {
     return [
       [NULL, NULL],
       [NULL, ''],
@@ -118,7 +123,7 @@ class UserAuthTest extends UnitTestCase {
    *
    * @covers ::authenticate
    */
-  public function testAuthenticateWithNoAccountReturned() {
+  public function testAuthenticateWithNoAccountReturned(): void {
     $this->userStorage->expects($this->once())
       ->method('loadByProperties')
       ->with(['name' => $this->username])
@@ -132,7 +137,7 @@ class UserAuthTest extends UnitTestCase {
    *
    * @covers ::authenticate
    */
-  public function testAuthenticateWithIncorrectPassword() {
+  public function testAuthenticateWithIncorrectPassword(): void {
     $this->userStorage->expects($this->once())
       ->method('loadByProperties')
       ->with(['name' => $this->username])
@@ -151,7 +156,7 @@ class UserAuthTest extends UnitTestCase {
    *
    * @covers ::authenticate
    */
-  public function testAuthenticateWithCorrectPassword() {
+  public function testAuthenticateWithCorrectPassword(): void {
     $this->testUser->expects($this->once())
       ->method('id')
       ->willReturn(1);
@@ -178,7 +183,7 @@ class UserAuthTest extends UnitTestCase {
    *
    * @covers ::authenticate
    */
-  public function testAuthenticateWithZeroPassword() {
+  public function testAuthenticateWithZeroPassword(): void {
     $this->testUser->expects($this->once())
       ->method('id')
       ->willReturn(2);
@@ -201,7 +206,7 @@ class UserAuthTest extends UnitTestCase {
    *
    * @covers ::authenticate
    */
-  public function testAuthenticateWithCorrectPasswordAndNewPasswordHash() {
+  public function testAuthenticateWithCorrectPasswordAndNewPasswordHash(): void {
     $this->testUser->expects($this->once())
       ->method('id')
       ->willReturn(1);
@@ -276,6 +281,56 @@ class UserAuthTest extends UnitTestCase {
       ->addCheckToUrl($event);
 
     $this->assertSame("$frontend_url?check_logged_in=1", $response->getTargetUrl());
+  }
+
+  /**
+   * Tests the auth that ends in a redirect from subdomain with a fragment to TLD.
+   */
+  public function testAddCheckToUrlForTrustedRedirectResponseWithFragment(): void {
+    $site_domain = 'site.com';
+    $frontend_url = "https://$site_domain";
+    $backend_url = "https://api.$site_domain";
+    $request = Request::create($backend_url);
+    $response = new TrustedRedirectResponse($frontend_url . '#a_fragment');
+
+    $request_context = $this->createMock(RequestContext::class);
+    $request_context
+      ->method('getCompleteBaseUrl')
+      ->willReturn($backend_url);
+
+    $container = new ContainerBuilder();
+    $container->set('router.request_context', $request_context);
+    \Drupal::setContainer($container);
+
+    $session_mock = $this->createMock(SessionInterface::class);
+    $session_mock
+      ->expects($this->once())
+      ->method('has')
+      ->with('check_logged_in')
+      ->willReturn(TRUE);
+    $session_mock
+      ->expects($this->once())
+      ->method('remove')
+      ->with('check_logged_in');
+
+    $event = new ResponseEvent(
+      $this->createMock(HttpKernelInterface::class),
+      $request,
+      HttpKernelInterface::MAIN_REQUEST,
+      $response
+    );
+
+    $request
+      ->setSession($session_mock);
+
+    $this
+      ->getMockBuilder(Cookie::class)
+      ->disableOriginalConstructor()
+      ->onlyMethods([])
+      ->getMock()
+      ->addCheckToUrl($event);
+
+    $this->assertSame("$frontend_url?check_logged_in=1#a_fragment", $response->getTargetUrl());
   }
 
 }

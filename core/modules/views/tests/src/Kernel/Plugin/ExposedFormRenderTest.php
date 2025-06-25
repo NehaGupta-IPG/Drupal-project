@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Plugin;
 
 use Drupal\Component\Utility\Html;
@@ -36,7 +38,7 @@ class ExposedFormRenderTest extends ViewsKernelTestBase {
   /**
    * Tests the exposed form markup.
    */
-  public function testExposedFormRender() {
+  public function testExposedFormRender(): void {
     $view = Views::getView('test_exposed_form_buttons');
     $this->executeView($view);
     $exposed_form = $view->display_handler->getPlugin('exposed_form');
@@ -56,9 +58,11 @@ class ExposedFormRenderTest extends ViewsKernelTestBase {
   /**
    * Tests the exposed form raw input.
    */
-  public function testExposedFormRawInput() {
-    $node_type = NodeType::create(['type' => 'article']);
-    $node_type->save();
+  public function testExposedFormRawInput(): void {
+    NodeType::create([
+      'type' => 'article',
+      'name' => 'Article',
+    ])->save();
 
     $view = Views::getView('test_exposed_form_buttons');
     $view->setDisplay();
@@ -133,12 +137,13 @@ class ExposedFormRenderTest extends ViewsKernelTestBase {
     $view->save();
     $this->executeView($view);
 
+    // The "type" filter should be excluded from the raw input because its
+    // value is "All".
     $expected = [
-      'type' => 'All',
       'type_with_default_value' => 'article',
       'multiple_types_with_default_value' => ['article' => 'article'],
     ];
-    $this->assertSame($view->exposed_raw_input, $expected);
+    $this->assertSame($expected, $view->exposed_raw_input);
   }
 
 }

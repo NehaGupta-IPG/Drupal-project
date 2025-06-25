@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\test_fieldtype_boolean_emoji_normalizer\Normalizer;
 
 use Drupal\Core\Field\Plugin\Field\FieldType\BooleanItem;
@@ -10,11 +12,6 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  * Normalizes boolean fields weirdly: renders them as 👍 (TRUE) or 👎 (FALSE).
  */
 class BooleanItemNormalizer extends FieldItemNormalizer implements DenormalizerInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $supportedInterfaceOrClass = BooleanItem::class;
 
   /**
    * {@inheritdoc}
@@ -41,6 +38,13 @@ class BooleanItemNormalizer extends FieldItemNormalizer implements DenormalizerI
     }
     $data['value'] = ($data['value'] === '👍');
     return $data;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedTypes(?string $format): array {
+    return [BooleanItem::class => TRUE];
   }
 
 }

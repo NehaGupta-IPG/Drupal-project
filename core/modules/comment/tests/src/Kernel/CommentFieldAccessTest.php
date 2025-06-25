@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Kernel;
 
 use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Entity\CommentType;
+use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Tests\CommentTestTrait;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
@@ -27,9 +29,7 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
   use GeneratePermutationsTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['comment', 'entity_test', 'user'];
 
@@ -93,7 +93,7 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
   /**
    * Tests permissions on comment fields.
    */
-  public function testAccessToAdministrativeFields() {
+  public function testAccessToAdministrativeFields(): void {
     // Create a comment type.
     $comment_type = CommentType::create([
       'id' => 'comment',
@@ -102,10 +102,6 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
       'target_entity_type_id' => 'entity_test',
     ]);
     $comment_type->save();
-
-    // Create a comment against a test entity.
-    $host = EntityTest::create();
-    $host->save();
 
     // An administrator user. No user exists yet, ensure that the first user
     // does not have UID 1.
@@ -140,6 +136,15 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
     // Add two fields.
     $this->addDefaultCommentField('entity_test', 'entity_test', 'comment');
     $this->addDefaultCommentField('entity_test', 'entity_test', 'comment_other');
+
+    // Create a comment against a test entity.
+    $host = EntityTest::create();
+    $host->save();
+
+    $host2 = EntityTest::create();
+    $host2->comment->status = CommentItemInterface::CLOSED;
+    $host2->comment_other->status = CommentItemInterface::CLOSED;
+    $host2->save();
 
     // Change the second field's anonymous contact setting.
     $instance = FieldConfig::loadByName('entity_test', 'entity_test', 'comment_other');
@@ -179,7 +184,7 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
       'hostname' => 'magic.example.com',
       // Unpublished.
       'status' => 0,
-      'subject' => 'Gail the minky whale',
+      'subject' => 'Gail the minke whale',
       'entity_id' => $host->id(),
       'comment_type' => 'comment',
       'field_name' => 'comment_other',
@@ -200,11 +205,37 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
       'pid' => 0,
       'uid' => $anonymous_user->id(),
     ]);
+    // Note we intentionally don't save this comment so it remains 'new'.
+    $comment5 = Comment::create([
+      'entity_type' => 'entity_test',
+      'hostname' => 'magic.example.com',
+      // Unpublished.
+      'status' => 0,
+      'subject' => 'Wally the Border Collie',
+      // This one is closed for comments.
+      'entity_id' => $host2->id(),
+      'comment_type' => 'comment',
+      'field_name' => 'comment_other',
+      'pid' => 0,
+      'uid' => $anonymous_user->id(),
+    ]);
 
     // Generate permutations.
     $combinations = [
-      'comment' => [$comment1, $comment2, $comment3, $comment4],
-      'user' => [$comment_admin_user, $comment_enabled_user, $comment_no_edit_user, $comment_disabled_user, $anonymous_user],
+      'comment' => [
+        $comment1,
+        $comment2,
+        $comment3,
+        $comment4,
+        $comment5,
+      ],
+      'user' => [
+        $comment_admin_user,
+        $comment_enabled_user,
+        $comment_no_edit_user,
+        $comment_disabled_user,
+        $anonymous_user,
+      ],
     ];
     $permutations = $this->generatePermutations($combinations);
 
@@ -213,28 +244,29 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
       foreach ($permutations as $set) {
         $may_view = $set['comment']->{$field}->access('view', $set['user']);
         $may_update = $set['comment']->{$field}->access('edit', $set['user']);
-        $this->assertTrue($may_view, new FormattableMarkup('User @user can view field @field on comment @comment', [
-          '@user' => $set['user']->getAccountName(),
-          '@comment' => $set['comment']->getSubject(),
-          '@field' => $field,
-        ]));
-        $this->assertEquals($may_update, $set['user']->hasPermission('administer comments'), new FormattableMarkup('User @user @state update field @field on comment @comment', [
-          '@user' => $set['user']->getAccountName(),
-          '@state' => $may_update ? 'can' : 'cannot',
-          '@comment' => $set['comment']->getSubject(),
-          '@field' => $field,
-        ]));
+        $account_name = $set['user']->getAccountName();
+        $comment_subject = $set['comment']->getSubject();
+        $this->assertTrue($may_view, "User $account_name can view field $field on comment $comment_subject");
+        $this->assertEquals(
+          $may_update,
+          $set['user']->hasPermission('administer comments'),
+          "User $account_name" . ($may_update ? 'can' : 'cannot') . "update field $field on comment $comment_subject"
+        );
       }
     }
 
     // Check access to normal field.
     foreach ($permutations as $set) {
       $may_update = $set['comment']->access('update', $set['user']) && $set['comment']->subject->access('edit', $set['user']);
-      $this->assertEquals($may_update, $set['user']->hasPermission('administer comments') || ($set['user']->hasPermission('edit own comments') && $set['user']->id() == $set['comment']->getOwnerId()), new FormattableMarkup('User @user @state update field subject on comment @comment', [
-        '@user' => $set['user']->getAccountName(),
-        '@state' => $may_update ? 'can' : 'cannot',
-        '@comment' => $set['comment']->getSubject(),
-      ]));
+      $this->assertEquals(
+        $may_update,
+        $set['user']->hasPermission('administer comments') || ($set['user']->hasPermission('edit own comments') && $set['user']->id() == $set['comment']->getOwnerId()),
+        sprintf('User %s %s update field subject on comment %s',
+          $set['user']->getAccountName(),
+          $may_update ? 'can' : 'cannot',
+          $set['comment']->getSubject(),
+        ),
+      );
     }
 
     // Check read-only fields.
@@ -252,18 +284,25 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
           $view_access = TRUE;
           $state = 'can';
         }
-        $this->assertEquals($may_view, $view_access, new FormattableMarkup('User @user @state view field @field on comment @comment', [
-          '@user' => $set['user']->getAccountName(),
-          '@comment' => $set['comment']->getSubject(),
-          '@field' => $field,
-          '@state' => $state,
-        ]));
-        $this->assertFalse($may_update, new FormattableMarkup('User @user @state update field @field on comment @comment', [
-          '@user' => $set['user']->getAccountName(),
-          '@state' => $may_update ? 'can' : 'cannot',
-          '@comment' => $set['comment']->getSubject(),
-          '@field' => $field,
-        ]));
+        $this->assertEquals(
+          $may_view,
+          $view_access,
+          sprintf('User %s %s view field %s on comment %s',
+            $set['user']->getAccountName(),
+            $state,
+            $field,
+            $set['comment']->getSubject(),
+          ),
+        );
+        $this->assertFalse(
+          $may_update,
+          sprintf('User %s %s update field %s on comment %s',
+            $set['user']->getAccountName(),
+            $may_update ? 'can' : 'cannot',
+            $field,
+            $set['comment']->getSubject(),
+          ),
+        );
       }
     }
 
@@ -273,17 +312,25 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
       foreach ($permutations as $set) {
         $may_view = $set['comment']->{$field}->access('view', $set['user']);
         $may_update = $set['comment']->{$field}->access('edit', $set['user']);
-        $this->assertTrue($may_view, new FormattableMarkup('User @user can view field @field on comment @comment', [
-          '@user' => $set['user']->getAccountName(),
-          '@comment' => $set['comment']->getSubject(),
-          '@field' => $field,
-        ]));
-        $this->assertEquals($may_update, $set['user']->hasPermission('post comments') && $set['comment']->isNew(), new FormattableMarkup('User @user @state update field @field on comment @comment', [
-          '@user' => $set['user']->getAccountName(),
-          '@state' => $may_update ? 'can' : 'cannot',
-          '@comment' => $set['comment']->getSubject(),
-          '@field' => $field,
-        ]));
+        $this->assertTrue(
+          $may_view,
+          sprintf('User %s can view field %s on comment %s',
+            $set['user']->getAccountName(),
+            $field,
+            $set['comment']->getSubject(),
+          ),
+        );
+        $expected = $set['user']->hasPermission('post comments') && $set['comment']->isNew() && (int) $set['comment']->getCommentedEntity()->get($set['comment']->getFieldName())->status !== CommentItemInterface::CLOSED;
+        $this->assertEquals(
+          $expected,
+          $may_update,
+          sprintf('User %s %s update field %s on comment %s',
+            $set['user']->getAccountName(),
+            $expected ? 'can' : 'cannot',
+            $field,
+            $set['comment']->getSubject(),
+          ),
+        );
       }
     }
 
@@ -300,12 +347,14 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
             $set['comment']->isNew() &&
             $set['user']->hasPermission('post comments') &&
             $set['comment']->getFieldName() == 'comment_other'
-          ), new FormattableMarkup('User @user @state update field @field on comment @comment', [
-            '@user' => $set['user']->getAccountName(),
-            '@state' => $may_update ? 'can' : 'cannot',
-            '@comment' => $set['comment']->getSubject(),
-            '@field' => $field,
-          ]));
+          ),
+          sprintf('User %s %s update field %s on comment %s',
+            $set['user']->getAccountName(),
+            $may_update ? 'can' : 'cannot',
+            $field,
+            $set['comment']->getSubject(),
+          ),
+        );
       }
     }
     foreach ($permutations as $set) {

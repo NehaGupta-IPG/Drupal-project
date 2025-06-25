@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Unit\Plugin\migrate\field;
 
 use Drupal\migrate\Plugin\MigrationInterface;
@@ -14,11 +16,15 @@ use Prophecy\Argument;
 class TaxonomyTermReferenceFieldTest extends UnitTestCase {
 
   /**
+   * The migrate field plugin.
+   *
    * @var \Drupal\migrate_drupal\Plugin\MigrateFieldInterface
    */
   protected $plugin;
 
   /**
+   * The migration.
+   *
    * @var \Drupal\migrate\Plugin\MigrationInterface
    */
   protected $migration;
@@ -27,6 +33,8 @@ class TaxonomyTermReferenceFieldTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->plugin = new TaxonomyTermReference([], 'taxonomy', []);
 
     $migration = $this->prophesize(MigrationInterface::class);
@@ -46,7 +54,7 @@ class TaxonomyTermReferenceFieldTest extends UnitTestCase {
   /**
    * @covers ::defineValueProcessPipeline
    */
-  public function testDefineValueProcessPipeline($method = 'defineValueProcessPipeline') {
+  public function testDefineValueProcessPipeline($method = 'defineValueProcessPipeline'): void {
     $this->plugin->$method($this->migration, 'field_name', []);
 
     $expected = [

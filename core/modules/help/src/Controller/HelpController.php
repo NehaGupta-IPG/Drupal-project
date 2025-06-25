@@ -8,6 +8,8 @@ use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\help\HelpSectionManager;
+use Drupal\system\ModuleAdminLinksHelper;
+use Drupal\user\ModulePermissionsLinkHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -17,40 +19,26 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class HelpController extends ControllerBase {
 
   /**
-   * The current route match.
-   *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
-   */
-  protected $routeMatch;
-
-  /**
-   * The help section plugin manager.
-   *
-   * @var \Drupal\help\HelpSectionManager
-   */
-  protected $helpManager;
-
-  /**
-   * The module extension list.
-   *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
-   */
-  protected $moduleExtensionList;
-
-  /**
    * Creates a new HelpController.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
    *   The current route match.
-   * @param \Drupal\help\HelpSectionManager $help_manager
+   * @param \Drupal\help\HelpSectionManager $helpManager
    *   The help section manager.
-   * @param \Drupal\Core\Extension\ModuleExtensionList|null $module_extension_list
+   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
    *   The module extension list.
+   * @param \Drupal\system\ModuleAdminLinksHelper $moduleAdminLinks
+   *   The module admin links.
+   * @param \Drupal\user\ModulePermissionsLinkHelper $modulePermissionsLinks
+   *   The module permissions link.
    */
-  public function __construct(RouteMatchInterface $route_match, HelpSectionManager $help_manager, ModuleExtensionList $module_extension_list) {
-    $this->routeMatch = $route_match;
-    $this->helpManager = $help_manager;
-    $this->moduleExtensionList = $module_extension_list;
+  public function __construct(
+    protected RouteMatchInterface $routeMatch,
+    protected HelpSectionManager $helpManager,
+    protected ModuleExtensionList $moduleExtensionList,
+    protected ModuleAdminLinksHelper $moduleAdminLinks,
+    protected ModulePermissionsLinkHelper $modulePermissionsLinks,
+  ) {
   }
 
   /**
@@ -60,7 +48,9 @@ class HelpController extends ControllerBase {
     return new static(
       $container->get('current_route_match'),
       $container->get('plugin.manager.help_section'),
-      $container->get('extension.list.module')
+      $container->get('extension.list.module'),
+      $container->get('system.module_admin_links_helper'),
+      $container->get('user.module_permissions_link_helper')
     );
   }
 
@@ -129,7 +119,7 @@ class HelpController extends ControllerBase {
   public function helpPage($name) {
     $build = [];
     if ($this->moduleHandler()->hasImplementations('help', $name)) {
-      $module_name = $this->moduleHandler()->getName($name);
+      $module_name = $this->moduleExtensionList->getName($name);
       $build['#title'] = $module_name;
 
       $info = $this->moduleExtensionList->getExtensionInfo($name);
@@ -150,7 +140,10 @@ class HelpController extends ControllerBase {
 
       // Only print list of administration pages if the module in question has
       // any such pages associated with it.
-      $admin_tasks = system_get_module_admin_tasks($name, $info);
+      $admin_tasks = $this->moduleAdminLinks->getModuleAdminLinks($name);
+      if ($module_permissions_link = $this->modulePermissionsLinks->getModulePermissionsLink($name, $info['name'])) {
+        $admin_tasks["user.admin_permissions.{$name}"] = $module_permissions_link;
+      }
       if (!empty($admin_tasks)) {
         $links = [];
         foreach ($admin_tasks as $task) {

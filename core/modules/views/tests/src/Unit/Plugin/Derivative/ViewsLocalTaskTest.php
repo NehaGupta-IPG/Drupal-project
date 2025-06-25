@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\views\Unit\Plugin\Derivative\ViewsLocalTaskTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\views\Unit\Plugin\Derivative;
 
@@ -33,10 +30,17 @@ class ViewsLocalTaskTest extends UnitTestCase {
   protected $state;
 
   /**
+   * The views storage.
+   *
    * @var \Drupal\Core\Entity\EntityStorageInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $viewStorage;
 
+  /**
+   * The base definition for the test plugin.
+   *
+   * @var array
+   */
   protected $baseDefinition = [
     'class' => '\Drupal\views\Plugin\Menu\LocalTask\ViewsLocalTask',
     'deriver' => '\Drupal\views\Plugin\Derivative\ViewsLocalTask',
@@ -53,6 +57,8 @@ class ViewsLocalTaskTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
     $this->state = $this->createMock('Drupal\Core\State\StateInterface');
     $this->viewStorage = $this->createMock('Drupal\Core\Entity\EntityStorageInterface');
@@ -65,7 +71,7 @@ class ViewsLocalTaskTest extends UnitTestCase {
    *
    * @see \Drupal\views\Plugin\Derivative\ViewsLocalTask::getDerivativeDefinitions()
    */
-  public function testGetDerivativeDefinitionsWithoutHookMenuViews() {
+  public function testGetDerivativeDefinitionsWithoutHookMenuViews(): void {
     $result = [];
     $this->localTaskDerivative->setApplicableMenuViews($result);
 
@@ -76,14 +82,14 @@ class ViewsLocalTaskTest extends UnitTestCase {
   /**
    * Tests fetching the derivatives on a view with without a local task.
    */
-  public function testGetDerivativeDefinitionsWithoutLocalTask() {
+  public function testGetDerivativeDefinitionsWithoutLocalTask(): void {
     $executable = $this->getMockBuilder('Drupal\views\ViewExecutable')
       ->disableOriginalConstructor()
       ->getMock();
     $display_plugin = $this->getMockBuilder('Drupal\views\Plugin\views\display\PathPluginBase')
       ->onlyMethods(['getOption'])
       ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
+      ->getMock();
     $display_plugin->expects($this->once())
       ->method('getOption')
       ->with('menu')
@@ -115,7 +121,7 @@ class ViewsLocalTaskTest extends UnitTestCase {
   /**
    * Tests fetching the derivatives on a view with a default local task.
    */
-  public function testGetDerivativeDefinitionsWithLocalTask() {
+  public function testGetDerivativeDefinitionsWithLocalTask(): void {
     $executable = $this->getMockBuilder('Drupal\views\ViewExecutable')
       ->disableOriginalConstructor()
       ->getMock();
@@ -138,7 +144,7 @@ class ViewsLocalTaskTest extends UnitTestCase {
     $display_plugin = $this->getMockBuilder('Drupal\views\Plugin\views\display\PathPluginBase')
       ->onlyMethods(['getOption'])
       ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
+      ->getMock();
     $display_plugin->expects($this->once())
       ->method('getOption')
       ->with('menu')
@@ -172,7 +178,7 @@ class ViewsLocalTaskTest extends UnitTestCase {
   /**
    * Tests fetching the derivatives on a view which overrides an existing route.
    */
-  public function testGetDerivativeDefinitionsWithOverrideRoute() {
+  public function testGetDerivativeDefinitionsWithOverrideRoute(): void {
     $executable = $this->getMockBuilder('Drupal\views\ViewExecutable')
       ->disableOriginalConstructor()
       ->getMock();
@@ -195,7 +201,7 @@ class ViewsLocalTaskTest extends UnitTestCase {
     $display_plugin = $this->getMockBuilder('Drupal\views\Plugin\views\display\PathPluginBase')
       ->onlyMethods(['getOption'])
       ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
+      ->getMock();
     $display_plugin->expects($this->once())
       ->method('getOption')
       ->with('menu')
@@ -221,7 +227,7 @@ class ViewsLocalTaskTest extends UnitTestCase {
   /**
    * Tests fetching the derivatives on a view with a default local task.
    */
-  public function testGetDerivativeDefinitionsWithDefaultLocalTask() {
+  public function testGetDerivativeDefinitionsWithDefaultLocalTask(): void {
     $executable = $this->getMockBuilder('Drupal\views\ViewExecutable')
       ->disableOriginalConstructor()
       ->getMock();
@@ -244,7 +250,7 @@ class ViewsLocalTaskTest extends UnitTestCase {
     $display_plugin = $this->getMockBuilder('Drupal\views\Plugin\views\display\PathPluginBase')
       ->onlyMethods(['getOption'])
       ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
+      ->getMock();
     $display_plugin->expects($this->exactly(2))
       ->method('getOption')
       ->with('menu')
@@ -294,7 +300,7 @@ class ViewsLocalTaskTest extends UnitTestCase {
    *
    * The parent is defined by another module, not views.
    */
-  public function testGetDerivativeDefinitionsWithExistingLocalTask() {
+  public function testGetDerivativeDefinitionsWithExistingLocalTask(): void {
     $executable = $this->getMockBuilder('Drupal\views\ViewExecutable')
       ->disableOriginalConstructor()
       ->getMock();
@@ -317,7 +323,7 @@ class ViewsLocalTaskTest extends UnitTestCase {
     $display_plugin = $this->getMockBuilder('Drupal\views\Plugin\views\display\PathPluginBase')
       ->onlyMethods(['getOption', 'getPath'])
       ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
+      ->getMock();
     $display_plugin->expects($this->exactly(2))
       ->method('getOption')
       ->with('menu')
@@ -384,12 +390,17 @@ class ViewsLocalTaskTest extends UnitTestCase {
  */
 class TestViewsLocalTask extends ViewsLocalTask {
 
+  /**
+   * The view result.
+   *
+   * @var array
+   */
   protected $result;
 
   /**
    * Sets applicable views result.
    */
-  public function setApplicableMenuViews($result) {
+  public function setApplicableMenuViews($result): void {
     $this->result = $result;
   }
 

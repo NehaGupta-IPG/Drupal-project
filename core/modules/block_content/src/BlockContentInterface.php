@@ -2,14 +2,14 @@
 
 namespace Drupal\block_content;
 
-use Drupal\block_content\Access\RefinableDependentAccessInterface;
+use Drupal\Core\Access\RefinableDependentAccessInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
 
 /**
- * Provides an interface defining a custom block entity.
+ * Provides an interface defining a content block entity.
  */
 interface BlockContentInterface extends ContentEntityInterface, EntityChangedInterface, RevisionLogInterface, EntityPublishedInterface, RefinableDependentAccessInterface {
 
@@ -74,7 +74,7 @@ interface BlockContentInterface extends ContentEntityInterface, EntityChangedInt
   public function getTheme();
 
   /**
-   * Gets the configured instances of this custom block.
+   * Gets the configured instances of this content block.
    *
    * @return array
    *   Array of Drupal\block\Core\Plugin\Entity\Block entities.

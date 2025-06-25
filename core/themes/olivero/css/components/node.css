@@ -10,6 +10,10 @@
  * Node specific styles.
  */
 
+.node__author {
+  display: inline-flex;
+}
+
 .node__meta {
   display: flex;
   align-items: center;
@@ -24,7 +28,6 @@
 }
 
 @media (min-width: 31.25rem) {
-
   .node__meta {
     margin-block-end: var(--sp2);
   }
@@ -40,7 +43,10 @@
 
 .node__title a {
   padding-block-end: 0.1875rem;
-  transition: background-size 0.2s, color 0.2s;
+  transition:
+    background-size 0.2s,
+    color 0.2s;
+  -webkit-text-decoration: none;
   text-decoration: none;
   color: var(--color-text-neutral-loud);
   background-color: transparent;
@@ -64,7 +70,6 @@
 }
 
 @media (min-width: 62.5rem) {
-
   .node__content {
     padding-block-end: var(--sp3);
   }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\TestSite\Commands;
 
 use Drupal\Core\Config\ConfigImporter;
@@ -49,12 +51,6 @@ class TestSiteInstallCommand extends Command {
    */
   protected array $originalShutdownCallbacks = [];
 
-  /**
-   * The translation file directory for the test environment.
-   *
-   * This is set in BrowserTestBase::prepareEnvironment().
-   */
-  protected string $translationFilesDirectory;
 
   /**
    * The config importer that can be used in a test.
@@ -99,7 +95,7 @@ class TestSiteInstallCommand extends Command {
       ->addOption('json', NULL, InputOption::VALUE_NONE, 'Output test site connection details in JSON.')
       ->addUsage('--setup-file core/tests/Drupal/TestSite/TestSiteMultilingualInstallTestScript.php --json')
       ->addUsage('--install-profile demo_umami --langcode fr')
-      ->addUsage('--base-url "http://example.com" --db-url "mysql://username:password@localhost/databasename#table_prefix"');
+      ->addUsage('--base-url "http://example.com" --db-url "mysql://username:password@localhost/database_name#table_prefix"');
   }
 
   /**
@@ -284,18 +280,18 @@ class TestSiteInstallCommand extends Command {
   }
 
   /**
-   * {@inheritdoc}
+   * Changes the database connection to the prefixed one.
    */
-  protected function changeDatabasePrefix() {
+  protected function changeDatabasePrefix(): void {
     // Ensure that we use the database from SIMPLETEST_DB environment variable.
     Database::removeConnection('default');
     $this->changeDatabasePrefixTrait();
   }
 
   /**
-   * {@inheritdoc}
+   * Generates a database prefix for the site installation.
    */
-  protected function prepareDatabasePrefix() {
+  protected function prepareDatabasePrefix(): void {
     // Override this method so that we can force a lock to be created.
     $test_db = new TestDatabase(NULL, TRUE);
     $this->siteDirectory = $test_db->getTestSitePath();

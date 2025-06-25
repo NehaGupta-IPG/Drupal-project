@@ -3,6 +3,7 @@
 namespace Drupal\serialization\Normalizer;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Serialization\Attribute\JsonSchema;
 use Drupal\Core\TypedData\Type\DateTimeInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -13,6 +14,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  * @internal
  */
 class DateTimeNormalizer extends NormalizerBase implements DenormalizerInterface {
+
+  use SchematicNormalizerTrait;
 
   /**
    * Allowed datetime formats for the denormalizer.
@@ -28,11 +31,6 @@ class DateTimeNormalizer extends NormalizerBase implements DenormalizerInterface
     'RFC 3339' => \DateTime::RFC3339,
     'ISO 8601' => \DateTime::ISO8601,
   ];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $supportedInterfaceOrClass = DateTimeInterface::class;
 
   /**
    * The system's date configuration.
@@ -54,9 +52,10 @@ class DateTimeNormalizer extends NormalizerBase implements DenormalizerInterface
   /**
    * {@inheritdoc}
    */
-  public function normalize($datetime, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
-    assert($datetime instanceof DateTimeInterface);
-    $drupal_date_time = $datetime->getDateTime();
+  #[JsonSchema(['type' => 'string', 'format' => 'date-time'])]
+  public function doNormalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
+    assert($object instanceof DateTimeInterface);
+    $drupal_date_time = $object->getDateTime();
     if ($drupal_date_time === NULL) {
       return $drupal_date_time;
     }
@@ -74,7 +73,7 @@ class DateTimeNormalizer extends NormalizerBase implements DenormalizerInterface
    * @see ::normalize
    * @see \Drupal\Core\Datetime\DrupalDateTime::prepareTimezone()
    *
-   * @returns \DateTimeZone
+   * @return \DateTimeZone
    *   The timezone to use.
    */
   protected function getNormalizationTimezone() {
@@ -118,8 +117,10 @@ class DateTimeNormalizer extends NormalizerBase implements DenormalizerInterface
   /**
    * {@inheritdoc}
    */
-  public function hasCacheableSupportsMethod(): bool {
-    return TRUE;
+  public function getSupportedTypes(?string $format): array {
+    return [
+      DateTimeInterface::class => TRUE,
+    ];
   }
 
 }

@@ -8,7 +8,6 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\State\StateInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -42,8 +41,6 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
    *   The time service.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state key/value store.
    */
   public function __construct(
     protected readonly AssetCollectionGrouperInterface $grouper,
@@ -56,7 +53,6 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
     protected readonly FileUrlGeneratorInterface $fileUrlGenerator,
     protected readonly TimeInterface $time,
     protected readonly LanguageManagerInterface $languageManager,
-    protected readonly StateInterface $state
   ) {}
 
   /**
@@ -122,8 +118,8 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
       if (!empty($css_asset['preprocessed'])) {
         $query = ['delta' => "$order"] + $query_args;
         $filename = 'css_' . $this->generateHash($css_asset) . '.css';
-        $uri = 'public://css/' . $filename;
-        $css_assets[$order]['data'] = $this->fileUrlGenerator->generateAbsoluteString($uri) . '?' . UrlHelper::buildQuery($query);
+        $uri = 'assets://css/' . $filename;
+        $css_assets[$order]['data'] = $this->fileUrlGenerator->generateString($uri) . '?' . UrlHelper::buildQuery($query);
       }
       unset($css_assets[$order]['items']);
     }
@@ -134,28 +130,8 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
   /**
    * {@inheritdoc}
    */
-  public function getAll() {
-    return $this->state->get('drupal_css_cache_files', []);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function deleteAll() {
-    $this->state->delete('drupal_css_cache_files');
-
-    $delete_stale = function ($uri) {
-      $threshold = $this->configFactory
-        ->get('system.performance')
-        ->get('stale_file_threshold');
-      // Default stale file threshold is 30 days.
-      if ($this->time->getRequestTime() - filemtime($uri) > $threshold) {
-        $this->fileSystem->delete($uri);
-      }
-    };
-    if (is_dir('public://css')) {
-      $this->fileSystem->scanDirectory('public://css', '/.*/', ['callback' => $delete_stale]);
-    }
+    $this->fileSystem->deleteRecursive('assets://css');
   }
 
   /**
@@ -172,10 +148,17 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
         $data .= "/* @license " . $css_asset['license']['name'] . " " . $css_asset['license']['url'] . " */\n";
       }
       $current_license = $css_asset['license'];
-      $data .= $this->optimizer->optimize($css_asset);
+
+      // Append this file if already minified; otherwise optimize it.
+      if (isset($css_asset['minified']) && $css_asset['minified']) {
+        $data .= file_get_contents($css_asset['data']);
+      }
+      else {
+        $data .= $this->optimizer->optimize($css_asset);
+      }
     }
     // Per the W3C specification at
-    // http://www.w3.org/TR/REC-CSS2/cascade.html#at-import, @import rules must
+    // https://www.w3.org/TR/REC-CSS2/cascade.html#at-import, @import rules must
     // precede any other style, so we move those to the top. The regular
     // expression is expressed in NOWDOC since it is detecting backslashes as
     // well as single and double quotes. It is difficult to read when

@@ -30,6 +30,8 @@ abstract class CachePluginBase extends PluginBase {
 
   /**
    * Contains all data that should be written/read from cache.
+   *
+   * @var array
    */
   public $storage = [];
 
@@ -62,8 +64,7 @@ abstract class CachePluginBase extends PluginBase {
   }
 
   /**
-   * Return a string to display as the clickable title for the
-   * access control.
+   * Returns a string to display as the clickable title for the access control.
    */
   public function summaryTitle() {
     return $this->t('Unknown');
@@ -74,21 +75,24 @@ abstract class CachePluginBase extends PluginBase {
    *
    * Plugins must override this to implement expiration.
    *
-   * @param $type
+   * @param string $type
    *   The cache type, either 'query', 'result'.
    */
   protected function cacheExpire($type) {
   }
 
   /**
-   * Determine cache expiration time.
+   * Determines cache expiration time based on its type.
    *
-   * Plugins must override this to implement expiration in the cache table. The
-   * default is CACHE_PERMANENT, indicating that the item will not be removed
-   * automatically from cache.
+   * Plugins must override this to implement expiration in the cache table.
    *
    * @param string $type
    *   The cache type.
+   *
+   * @return int
+   *   Either an offset from the request time to indicate when the cache
+   *   expires, or \Drupal\Core\Cache\Cache::PERMANENT to indicate that the
+   *   cache does not expire. Defaults to \Drupal\Core\Cache\Cache::PERMANENT.
    */
   protected function cacheSetMaxAge($type) {
     return Cache::PERMANENT;
@@ -99,7 +103,7 @@ abstract class CachePluginBase extends PluginBase {
    *
    * A plugin should override this to provide specialized caching behavior.
    *
-   * @param $type
+   * @param string $type
    *   The cache type, either 'query', 'result'.
    */
   public function cacheSet($type) {
@@ -125,7 +129,7 @@ abstract class CachePluginBase extends PluginBase {
    *
    * A plugin should override this to provide specialized caching behavior.
    *
-   * @param $type
+   * @param string $type
    *   The cache type, either 'query', 'result'.
    *
    * @return bool
@@ -147,7 +151,7 @@ abstract class CachePluginBase extends PluginBase {
             // Load entities for each result.
             $this->view->query->loadEntities($this->view->result);
             $this->view->total_rows = $cache->data['total_rows'];
-            $this->view->setCurrentPage($cache->data['current_page'], TRUE);
+            $this->view->setCurrentPage($cache->data['current_page']);
             $this->view->execute_time = 0;
             return TRUE;
           }
@@ -180,7 +184,7 @@ abstract class CachePluginBase extends PluginBase {
    * go there:
    *
    * @code
-   *   strtr($output, array('<!--post-FIELD-1-->', 'output for FIELD of nid 1');
+   *   strtr($output, ['<!--post-FIELD-1-->', 'output for FIELD of nid 1']);
    * @endcode
    *
    * All of the cached result data will be available in $view->result, as well,
@@ -257,6 +261,7 @@ abstract class CachePluginBase extends PluginBase {
    * Gets the max age for the current view.
    *
    * @return int
+   *   The maximum age for the current view's cache.
    */
   public function getCacheMaxAge() {
     $max_age = $this->getDefaultCacheMaxAge();

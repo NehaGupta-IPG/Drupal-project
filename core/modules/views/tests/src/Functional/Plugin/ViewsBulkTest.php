@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Tests\views\Functional\ViewTestBase;
@@ -16,12 +18,10 @@ class ViewsBulkTest extends ViewTestBase {
    *
    * @var \Drupal\user\UserInterface
    */
-  protected $admin_user;
+  protected $adminUser;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'views'];
 
@@ -37,13 +37,13 @@ class ViewsBulkTest extends ViewTestBase {
     parent::setUp($import_test_views, $modules);
 
     $this->drupalCreateContentType(['type' => 'page']);
-    $this->admin_user = $this->createUser(['bypass node access', 'administer nodes', 'access content overview']);
+    $this->adminUser = $this->createUser(['bypass node access', 'administer nodes', 'access content overview']);
   }
 
   /**
    * Tests bulk selection.
    */
-  public function testBulkSelection() {
+  public function testBulkSelection(): void {
 
     // Create first node, set updated time to the past.
     $node_1 = $this->drupalCreateNode([
@@ -53,7 +53,7 @@ class ViewsBulkTest extends ViewTestBase {
     ]);
 
     // Login as administrator and go to admin/content.
-    $this->drupalLogin($this->admin_user);
+    $this->drupalLogin($this->adminUser);
     $this->drupalGet('admin/content');
     $this->assertSession()->pageTextContains($node_1->getTitle());
 

@@ -3,11 +3,13 @@
 namespace Drupal\Core\EventSubscriber;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\ReplicaKillSwitch;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Routing\RoutingEvents;
-use Drupal\Core\Database\Connection;
+use Drupal\Core\Utility\Error;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -16,48 +18,26 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class MenuRouterRebuildSubscriber implements EventSubscriberInterface {
 
   /**
-   * @var \Drupal\Core\Lock\LockBackendInterface
-   */
-  protected $lock;
-
-  /**
-   * The menu link plugin manager.
-   *
-   * @var \Drupal\Core\Menu\MenuLinkManagerInterface
-   */
-  protected $menuLinkManager;
-
-  /**
-   * The replica kill switch.
-   *
-   * @var \Drupal\Core\Database\ReplicaKillSwitch
-   */
-  protected $replicaKillSwitch;
-
-  /**
-   * The database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $connection;
-
-  /**
    * Constructs the MenuRouterRebuildSubscriber object.
    *
    * @param \Drupal\Core\Lock\LockBackendInterface $lock
    *   The lock backend.
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager
+   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
    *   The menu link plugin manager.
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
-   * @param \Drupal\Core\Database\ReplicaKillSwitch $replica_kill_switch
+   * @param \Drupal\Core\Database\ReplicaKillSwitch $replicaKillSwitch
    *   The replica kill switch.
+   * @param \Psr\Log\LoggerInterface $logger
+   *   The logger.
    */
-  public function __construct(LockBackendInterface $lock, MenuLinkManagerInterface $menu_link_manager, Connection $connection, ReplicaKillSwitch $replica_kill_switch) {
-    $this->lock = $lock;
-    $this->menuLinkManager = $menu_link_manager;
-    $this->connection = $connection;
-    $this->replicaKillSwitch = $replica_kill_switch;
+  public function __construct(
+    protected LockBackendInterface $lock,
+    protected MenuLinkManagerInterface $menuLinkManager,
+    protected Connection $connection,
+    protected ReplicaKillSwitch $replicaKillSwitch,
+    protected LoggerInterface $logger,
+  ) {
   }
 
   /**
@@ -87,7 +67,7 @@ class MenuRouterRebuildSubscriber implements EventSubscriberInterface {
         if (isset($transaction)) {
           $transaction->rollBack();
         }
-        watchdog_exception('menu', $e);
+        Error::logException($this->logger, $e);
       }
 
       $this->lock->release(__FUNCTION__);

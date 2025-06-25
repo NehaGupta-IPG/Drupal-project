@@ -16,7 +16,7 @@ final class DebugExtension extends AbstractExtension {
    *
    * Defined as a string because the Symfony VarDumper does not always exist.
    *
-   * @type string
+   * @var string
    */
   private const SYMFONY_VAR_DUMPER_CLASS = '\Symfony\Component\VarDumper\VarDumper';
 
@@ -30,7 +30,15 @@ final class DebugExtension extends AbstractExtension {
     // @see \Symfony\Component\VarDumper\VarDumper
     if (class_exists(self::SYMFONY_VAR_DUMPER_CLASS)) {
       return [
-        new TwigFunction('dump', [self::class, 'dump'], ['needs_context' => TRUE, 'needs_environment' => TRUE, 'is_variadic' => TRUE]),
+        new TwigFunction(
+          'dump',
+          [self::class, 'dump'],
+          [
+            'needs_context' => TRUE,
+            'needs_environment' => TRUE,
+            'is_variadic' => TRUE,
+          ]
+        ),
       ];
     }
 

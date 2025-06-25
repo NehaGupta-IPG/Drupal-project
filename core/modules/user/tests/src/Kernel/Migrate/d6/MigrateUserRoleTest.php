@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel\Migrate\d6;
 
 use Drupal\migrate\Plugin\MigrationInterface;
@@ -33,7 +35,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
    * @param \Drupal\migrate\Plugin\MigrateIdMapInterface $id_map
    *   The migration ID map plugin.
    */
-  public function assertMessages(array $role_data, MigrateIdMapInterface $id_map) {
+  public function assertMessages(array $role_data, MigrateIdMapInterface $id_map): void {
     foreach ($id_map->getMessages() as $message) {
       $permissions = implode("', '", $role_data[$message->dest_id]['invalid']);
       $expected_message = "Permission(s) '" . $permissions . "' not found.";
@@ -46,7 +48,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
   /**
    * Asserts there are no duplicate roles.
    */
-  public function assertNoDuplicateRoles() {
+  public function assertNoDuplicateRoles(): void {
     $roles = [
       'anonymous1',
       'authenticated1',
@@ -82,8 +84,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
   }
 
   /**
-   * Helper function to test the migration of the user roles. The user roles
-   * will be re-imported and the tests here will be repeated.
+   * Helper to assert the user roles.
    *
    * @param array $permissions
    *   Contains the valid and invalid permissions.
@@ -101,7 +102,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
   /**
    * Data provider for user role migration tests.
    */
-  public function providerTestUserRole() {
+  public static function providerTestUserRole() {
     return [
       'filter only' => [
         'modules' => [],
@@ -111,7 +112,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
         ],
         'role_data' => [
           'anonymous' => [
-            'rid' => '1',
+            'rid' => 1,
             'valid' => [
               'access content',
               'use text format filtered_html',
@@ -121,7 +122,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
             ],
           ],
           'authenticated' => [
-            'rid' => '2',
+            'rid' => 2,
             'valid' => [
               'access content',
               'use text format filtered_html',
@@ -134,7 +135,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
             ],
           ],
           'migrate_test_role_1' => [
-            'rid' => '3',
+            'rid' => 3,
             'valid' => [
               'use text format full_html',
               'use text format php_code',
@@ -144,7 +145,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
             ],
           ],
           'migrate_test_role_2' => [
-            'rid' => '4',
+            'rid' => 4,
             'valid' => [
               'access content overview',
               'administer nodes',
@@ -167,7 +168,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
             ],
           ],
           'migrate_test_role_3_that_is_longer_than_thirty_two_characters' => [
-            'rid' => '5',
+            'rid' => 5,
             'valid' => [
               'use text format php_code',
             ],
@@ -201,7 +202,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
         ],
         'role_data' => [
           'anonymous' => [
-            'rid' => '1',
+            'rid' => 1,
             'valid' => [
               'access content',
               'use text format filtered_html',
@@ -211,7 +212,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
             ],
           ],
           'authenticated' => [
-            'rid' => '2',
+            'rid' => 2,
             'valid' => [
               'access comments',
               'access content',
@@ -224,7 +225,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
             ],
           ],
           'migrate_test_role_1' => [
-            'rid' => '3',
+            'rid' => 3,
             'valid' => [
               'use text format full_html',
               'use text format php_code',
@@ -234,7 +235,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
             ],
           ],
           'migrate_test_role_2' => [
-            'rid' => '4',
+            'rid' => 4,
             'valid' => [
               'access content overview',
               'administer contact forms',
@@ -257,7 +258,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
             ],
           ],
           'migrate_test_role_3_that_is_longer_than_thirty_two_characters' => [
-            'rid' => '5',
+            'rid' => 5,
             'valid' => [
               'use text format php_code',
             ],
@@ -280,9 +281,9 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
    *   contains the source role id, an array of valid permissions and an array
    *   of invalid permissions.
    *
-   * @dataProvider providerTestUserRole()
+   * @dataProvider providerTestUserRole
    */
-  public function testUserRole(array $modules, array $migrations, array $role_data) {
+  public function testUserRole(array $modules, array $migrations, array $role_data): void {
     if ($modules) {
       // Install modules that have migrations that may provide permissions.
       \Drupal::service('module_installer')->install($modules);

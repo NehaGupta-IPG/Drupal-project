@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\UpdateSystem;
 
 use Drupal\Core\Url;
@@ -7,8 +9,7 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\RequirementsPageTrait;
 
 /**
- * Tests that a module implementing hook_update_8000() causes an error to be
- * displayed on update.
+ * Tests that hook_update_8000() is disallowed.
  *
  * @group Update
  */
@@ -17,9 +18,7 @@ class InvalidUpdateHookTest extends BrowserTestBase {
   use RequirementsPageTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'update_test_invalid_hook',
@@ -59,7 +58,10 @@ class InvalidUpdateHookTest extends BrowserTestBase {
     ]);
   }
 
-  public function testInvalidUpdateHook() {
+  /**
+   * Tests updating from a module with a hook_update_8000().
+   */
+  public function testInvalidUpdateHook(): void {
     // Confirm that a module with hook_update_8000() cannot be updated.
     $this->drupalLogin($this->updateUser);
     $this->drupalGet($this->updateUrl);

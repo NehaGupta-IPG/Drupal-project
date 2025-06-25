@@ -20,6 +20,7 @@
   padding-inline: var(--sp1-5);
   cursor: pointer;
   text-align: center;
+  -webkit-text-decoration: none;
   text-decoration: none;
   color: var(--color-text-primary-medium);
   border: solid 2px currentColor;
@@ -28,13 +29,13 @@
   font-family: var(--font-sans);
   font-size: var(--font-size-l);
   font-weight: 700;
-  -webkit-appearance: none;
   appearance: none;
   -webkit-font-smoothing: antialiased;
 }
 
 .button:hover,
 .button:focus {
+  -webkit-text-decoration: none;
   text-decoration: none;
   color: var(--color-text-primary-loud);
   border: solid 2px currentColor;
@@ -65,7 +66,6 @@
   */
 
 @supports (display: inline-flex) {
-
   .button {
     display: inline-flex;
     align-items: center;
@@ -122,7 +122,7 @@
   align-items: center;
 }
 
-.button--icon-back:before {
+.button--icon-back::before {
   display: block;
   width: 0.5em;
   height: 0.5em;
@@ -133,10 +133,6 @@
   border-inline-start: solid 2px currentColor;
 }
 
-[dir="rtl"] .button--icon-back:before {
+[dir="rtl"] .button--icon-back::before {
   transform: rotate(-45deg);
-}
-
-.shepherd-cancel-icon {
-  font-size: 1.5em;
 }

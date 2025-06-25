@@ -19,11 +19,6 @@ final class ConfigEntityDenormalizer extends EntityDenormalizerBase {
   /**
    * {@inheritdoc}
    */
-  protected $supportedInterfaceOrClass = ConfigEntityInterface::class;
-
-  /**
-   * {@inheritdoc}
-   */
   protected function prepareInput(array $data, ResourceType $resource_type, $format, array $context) {
     $prepared = [];
     foreach ($data as $key => $value) {
@@ -35,8 +30,10 @@ final class ConfigEntityDenormalizer extends EntityDenormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function hasCacheableSupportsMethod(): bool {
-    return TRUE;
+  public function getSupportedTypes(?string $format): array {
+    return [
+      ConfigEntityInterface::class => TRUE,
+    ];
   }
 
 }

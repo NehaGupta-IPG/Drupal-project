@@ -7,17 +7,18 @@ use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\Timer;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Lock\LockBackendInterface;
-use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\Queue\DelayableQueueInterface;
+use Drupal\Core\Queue\DelayedRequeueException;
+use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\Queue\QueueInterface;
 use Drupal\Core\Queue\QueueWorkerInterface;
 use Drupal\Core\Queue\QueueWorkerManagerInterface;
-use Drupal\Core\Queue\DelayedRequeueException;
 use Drupal\Core\Queue\RequeueException;
 use Drupal\Core\Queue\SuspendQueueException;
 use Drupal\Core\Session\AccountSwitcherInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\State\StateInterface;
+use Drupal\Core\Utility\Error;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -25,62 +26,6 @@ use Psr\Log\NullLogger;
  * The Drupal core Cron service.
  */
 class Cron implements CronInterface {
-
-  /**
-   * The module handler service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The lock service.
-   *
-   * @var \Drupal\Core\Lock\LockBackendInterface
-   */
-  protected $lock;
-
-  /**
-   * The queue service.
-   *
-   * @var \Drupal\Core\Queue\QueueFactory
-   */
-  protected $queueFactory;
-
-  /**
-   * The state service.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
-   * The account switcher service.
-   *
-   * @var \Drupal\Core\Session\AccountSwitcherInterface
-   */
-  protected $accountSwitcher;
-
-  /**
-   * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
-   * The queue plugin manager.
-   *
-   * @var \Drupal\Core\Queue\QueueWorkerManagerInterface
-   */
-  protected $queueManager;
-
-  /**
-   * The time service.
-   *
-   * @var \Drupal\Component\Datetime\TimeInterface
-   */
-  protected $time;
 
   /**
    * The queue config.
@@ -92,42 +37,36 @@ class Cron implements CronInterface {
   /**
    * Constructs a cron object.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   The module handler.
    * @param \Drupal\Core\Lock\LockBackendInterface $lock
    *   The lock service.
-   * @param \Drupal\Core\Queue\QueueFactory $queue_factory
+   * @param \Drupal\Core\Queue\QueueFactory $queueFactory
    *   The queue service.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state service.
-   * @param \Drupal\Core\Session\AccountSwitcherInterface $account_switcher
+   * @param \Drupal\Core\Session\AccountSwitcherInterface $accountSwitcher
    *   The account switching service.
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\Core\Queue\QueueWorkerManagerInterface $queue_manager
+   * @param \Drupal\Core\Queue\QueueWorkerManagerInterface $queueManager
    *   The queue plugin manager.
-   * @param \Drupal\Component\Datetime\TimeInterface|null $time
+   * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
-   * @param mixed[]|null $queue_config
+   * @param array $queue_config
    *   Queue configuration from the service container.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, LockBackendInterface $lock, QueueFactory $queue_factory, StateInterface $state, AccountSwitcherInterface $account_switcher, LoggerInterface $logger, QueueWorkerManagerInterface $queue_manager, TimeInterface $time = NULL, ?array $queue_config = NULL) {
-    $this->moduleHandler = $module_handler;
-    $this->lock = $lock;
-    $this->queueFactory = $queue_factory;
-    $this->state = $state;
-    $this->accountSwitcher = $account_switcher;
-    $this->logger = $logger;
-    $this->queueManager = $queue_manager;
-    if (!isset($time)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $time argument is deprecated in drupal:10.1.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3343743', E_USER_DEPRECATED);
-      $time = \Drupal::service('datetime.time');
-    }
-    $this->time = $time;
-    if (!isset($queue_config)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $queue_config argument is deprecated in drupal:10.1.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3343743', E_USER_DEPRECATED);
-      $queue_config = \Drupal::getContainer()->getParameter('queue.config');
-    }
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+    protected LockBackendInterface $lock,
+    protected QueueFactory $queueFactory,
+    protected StateInterface $state,
+    protected AccountSwitcherInterface $accountSwitcher,
+    protected LoggerInterface $logger,
+    protected QueueWorkerManagerInterface $queueManager,
+    protected TimeInterface $time,
+    array $queue_config,
+  ) {
     $this->queueConfig = $queue_config + [
       'suspendMaximumWait' => 30.0,
     ];
@@ -165,6 +104,9 @@ class Cron implements CronInterface {
       // Release cron lock.
       $this->lock->release('cron');
 
+      // Add watchdog message.
+      $this->logger->info('Cron run completed.');
+
       // Return TRUE so other functions can check if it did run successfully
       $return = TRUE;
     }
@@ -182,7 +124,6 @@ class Cron implements CronInterface {
     // Record cron time.
     $request_time = $this->time->getRequestTime();
     $this->state->set('system.cron_last', $request_time);
-    $this->logger->info('Cron run completed.');
   }
 
   /**
@@ -191,23 +132,19 @@ class Cron implements CronInterface {
   protected function processQueues() {
     $max_wait = (float) $this->queueConfig['suspendMaximumWait'];
 
-    $queues = array_filter(
-      array_values($this->queueManager->getDefinitions()),
-      function (array $queueInfo) {
-        return isset($queueInfo['cron']);
-      }
-    );
-
     // Build a stack of queues to work on.
     /** @var array<array{process_from: int<0, max>, queue: \Drupal\Core\Queue\QueueInterface, worker: \Drupal\Core\Queue\QueueWorkerInterface}> $queues */
-    $queues = array_map(function (array $queue_info) {
-      $queue_name = $queue_info['id'];
+    $queues = [];
+    foreach ($this->queueManager->getDefinitions() as $queue_name => $queue_info) {
+      if (!isset($queue_info['cron'])) {
+        continue;
+      }
       $queue = $this->queueFactory->get($queue_name);
       // Make sure every queue exists. There is no harm in trying to recreate
       // an existing queue.
       $queue->createQueue();
       $worker = $this->queueManager->createInstance($queue_name);
-      return [
+      $queues[] = [
         // Set process_from to zero so each queue is always processed
         // immediately for the first time. This process_from timestamp will
         // change if a queue throws a delayable SuspendQueueException.
@@ -215,7 +152,7 @@ class Cron implements CronInterface {
         'queue' => $queue,
         'worker' => $worker,
       ];
-    }, $queues);
+    }
 
     // Work through stack of queues, re-adding to the stack when a delay is
     // necessary.
@@ -229,7 +166,7 @@ class Cron implements CronInterface {
       // Each queue will be processed immediately when it is reached for the
       // first time, as zero > currentTime will never be true.
       if ($process_from > $this->time->getCurrentMicroTime()) {
-        $this->usleep(round($process_from - $this->time->getCurrentMicroTime(), 3) * 1000000);
+        $this->usleep((int) round($process_from - $this->time->getCurrentMicroTime(), 3) * 1000000);
       }
 
       try {
@@ -302,7 +239,7 @@ class Cron implements CronInterface {
       catch (\Exception $e) {
         // In case of any other kind of exception, log it and leave the item
         // in the queue to be processed again later.
-        watchdog_exception('cron', $e);
+        Error::logException($this->logger, $e);
       }
     }
   }
@@ -338,7 +275,7 @@ class Cron implements CronInterface {
         $hook();
       }
       catch (\Exception $e) {
-        watchdog_exception('cron', $e);
+        Error::logException($this->logger, $e);
       }
 
       Timer::stop('cron_' . $module);

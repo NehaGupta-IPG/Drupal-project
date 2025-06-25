@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalJavascriptTests;
 
 use PHPUnit\Framework\AssertionFailedError;
@@ -40,8 +42,7 @@ class JavascriptErrorsTest extends WebDriverTestBase {
   }
 
   /**
-   * Tests that JavaScript console errors will result in a test failure
-   * during asynchronous calls.
+   * Tests JavaScript console errors during asynchronous calls.
    */
   public function testJavascriptErrorsAsync(): void {
     // Visit page that will throw a JavaScript console error in async context.
@@ -62,7 +63,7 @@ class JavascriptErrorsTest extends WebDriverTestBase {
    *
    * @postCondition
    */
-  public function clearErrorLog() {
+  public function clearErrorLog(): void {
     $this->getSession()->executeScript("sessionStorage.removeItem('js_testing_log_test.errors')");
   }
 

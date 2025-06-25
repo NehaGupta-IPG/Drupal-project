@@ -112,7 +112,7 @@ TOP_LEVEL=$($GIT rev-parse --show-toplevel)
 # This variable will be set to one when the file core/phpcs.xml.dist is changed.
 PHPCS_XML_DIST_FILE_CHANGED=0
 
-# This variable will be set to one when the files core/phpstan-baseline.neon or
+# This variable will be set to one when the files core/.phpstan-baseline.php or
 # core/phpstan.neon.dist are changed.
 PHPSTAN_DIST_FILE_CHANGED=0
 
@@ -129,9 +129,19 @@ ESLINT_CONFIG_PASSING_FILE_CHANGED=0
 #  - core/.stylelintrc.json
 STYLELINT_CONFIG_FILE_CHANGED=0
 
+# This variable will be set to one when JavaScript packages files are changed.
+# changed:
+#  - core/package.json
+#  - core/yarn.lock
+JAVASCRIPT_PACKAGES_CHANGED=0
+
 # This variable will be set when a Drupal-specific CKEditor 5 plugin has changed
 # it is used to make sure the compiled JS is valid.
 CKEDITOR5_PLUGINS_CHANGED=0
+
+# This variable will be set to one when either of the core dictionaries or the
+# .cspell.json config has changed.
+CSPELL_DICTIONARY_FILE_CHANGED=0
 
 # Build up a list of absolute file names.
 ABS_FILES=
@@ -144,7 +154,7 @@ for FILE in $FILES; do
     PHPCS_XML_DIST_FILE_CHANGED=1;
   fi;
 
-  if [[ $FILE == "core/phpstan-baseline.neon" || $FILE == "core/phpstan.neon.dist" ]]; then
+  if [[ $FILE == "core/.phpstan-baseline.php" || $FILE == "core/phpstan.neon.dist" ]]; then
     PHPSTAN_DIST_FILE_CHANGED=1;
   fi;
 
@@ -160,11 +170,16 @@ for FILE in $FILES; do
   if [[ $FILE == "core/package.json" || $FILE == "core/yarn.lock" ]]; then
     ESLINT_CONFIG_PASSING_FILE_CHANGED=1;
     STYLELINT_CONFIG_FILE_CHANGED=1;
+    JAVASCRIPT_PACKAGES_CHANGED=1;
   fi;
 
   if [[ -f "$TOP_LEVEL/$FILE" ]] && [[ $FILE =~ \.js$ ]] && [[ $FILE =~ ^core/modules/ckeditor5/js/build || $FILE =~ ^core/modules/ckeditor5/js/ckeditor5_plugins ]]; then
     CKEDITOR5_PLUGINS_CHANGED=1;
   fi;
+
+  if [[ $FILE == "core/misc/cspell/dictionary.txt" || $FILE == "core/misc/cspell/drupal-dictionary.txt" || $FILE == "core/.cspell.json" ]]; then
+    CSPELL_DICTIONARY_FILE_CHANGED=1;
+  fi
 done
 
 # Exit early if there are no files.
@@ -191,18 +206,20 @@ fi
 cd "$TOP_LEVEL/core"
 
 # Ensure JavaScript development dependencies are installed.
-yarn check -s 2>/dev/null
-if [ "$?" -ne "0" ]; then
-  printf "Drupal's JavaScript development dependencies are not installed or cannot be resolved. Run 'yarn install' inside the core directory, or 'yarn check -s' to list other errors.\n"
-  DEPENDENCIES_NEED_INSTALLING=1;
-fi
-
-if [ $DEPENDENCIES_NEED_INSTALLING -ne 0 ]; then
-  exit 1;
-fi
+yarn --version
+yarn >/dev/null
 
 # Check all files for spelling in one go for better performance.
-yarn run -s spellcheck --no-must-find-files -c $TOP_LEVEL/core/.cspell.json $ABS_FILES
+if [[ $CSPELL_DICTIONARY_FILE_CHANGED == "1" ]] ; then
+  printf "\nRunning spellcheck on *all* files.\n"
+  yarn run spellcheck:core --no-must-find-files --no-progress
+else
+  # Check all files for spelling in one go for better performance. We pipe the
+  # list files in so we obey the globs set on the spellcheck:core command in
+  # core/package.json.
+  echo "${ABS_FILES}" | tr ' ' '\n' | yarn run spellcheck:core --no-must-find-files --file-list stdin
+fi
+
 if [ "$?" -ne "0" ]; then
   # If there are failures set the status to a number other than 0.
   FINAL_STATUS=1
@@ -244,7 +261,7 @@ printf "\n"
 # Run PHPCS on all files on DrupalCI or when phpcs files are changed.
 if [[ $PHPCS_XML_DIST_FILE_CHANGED == "1" ]] || [[ "$DRUPALCI" == "1" ]]; then
   # Test all files with phpcs rules.
-  vendor/bin/phpcs -ps --parallel=$(nproc) --standard="$TOP_LEVEL/core/phpcs.xml.dist"
+  vendor/bin/phpcs -ps --parallel="$( (nproc || sysctl -n hw.logicalcpu || echo 4) 2>/dev/null)" --standard="$TOP_LEVEL/core/phpcs.xml.dist"
   PHPCS=$?
   if [ "$PHPCS" -ne "0" ]; then
     # If there are failures set the status to a number other than 0.
@@ -262,7 +279,7 @@ fi
 # When the eslint config has been changed, then eslint must check all files.
 if [[ $ESLINT_CONFIG_PASSING_FILE_CHANGED == "1" ]]; then
   cd "$TOP_LEVEL/core"
-  yarn run -s lint:core-js-passing "$TOP_LEVEL/core"
+  yarn run lint:core-js-passing "$TOP_LEVEL/core"
   CORRECTJS=$?
   if [ "$CORRECTJS" -ne "0" ]; then
     # If there are failures set the status to a number other than 0.
@@ -281,7 +298,7 @@ fi
 # When the stylelint config has been changed, then stylelint must check all files.
 if [[ $STYLELINT_CONFIG_FILE_CHANGED == "1" ]]; then
   cd "$TOP_LEVEL/core"
-  yarn run -s lint:css
+  yarn run lint:css
   if [ "$?" -ne "0" ]; then
     # If there are failures set the status to a number other than 0.
     FINAL_STATUS=1
@@ -302,13 +319,32 @@ fi
 # is in sync and conform to expectations.
 if [[ "$DRUPALCI" == "1" ]] && [[ $CKEDITOR5_PLUGINS_CHANGED == "1" ]]; then
   cd "$TOP_LEVEL/core"
-  yarn run -s check:ckeditor5
+  yarn run check:ckeditor5
   if [ "$?" -ne "0" ]; then
     # If there are failures set the status to a number other than 0.
     FINAL_STATUS=1
     printf "\nDrupal-specific CKEditor 5 plugins: ${red}failed${reset}\n"
   else
     printf "\nDrupal-specific CKEditor 5 plugins: ${green}passed${reset}\n"
+  fi
+  cd $TOP_LEVEL
+  # Add a separator line to make the output easier to read.
+  printf "\n"
+  printf -- '-%.0s' {1..100}
+  printf "\n"
+fi
+
+# When JavaScript packages change, then rerun all JavaScript style checks.
+if [[ "$JAVASCRIPT_PACKAGES_CHANGED" == "1" ]]; then
+  cd "$TOP_LEVEL/core"
+  yarn run build:css --check
+  CORRECTCSS=$?
+  if [ "$CORRECTCSS" -ne "0" ]; then
+    FINAL_STATUS=1
+    printf "\n${red}ERROR: The compiled CSS from the PCSS files"
+    printf "\n       does not match the current CSS files. Some added"
+    printf "\n       or updated JavaScript package made changes."
+    printf "\n       Recompile the CSS with: yarn run build:css${reset}\n\n"
   fi
   cd $TOP_LEVEL
   # Add a separator line to make the output easier to read.
@@ -326,13 +362,8 @@ for FILE in $FILES; do
   # Ensure the file still exists (i.e. is not being deleted).
   if [ -a $FILE ]; then
     if [ ${FILE: -3} != ".sh" ]; then
-      # Ensure the file has the correct mode.
-      STAT="$(stat -f "%A" $FILE 2>/dev/null)"
-      if [ $? -ne 0 ]; then
-        STAT="$(stat -c "%a" $FILE 2>/dev/null)"
-      fi
-      if [ "$STAT" -ne "644" ]; then
-        printf "${red}check failed:${reset} file $FILE should be 644 not $STAT\n"
+      if [ -x $FILE ]; then
+        printf "${red}check failed:${reset} file $FILE should not be executable\n"
         STATUS=1
       fi
     fi

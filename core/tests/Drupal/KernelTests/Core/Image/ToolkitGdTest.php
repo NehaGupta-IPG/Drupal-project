@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Image;
 
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Image\ImageInterface;
 use Drupal\KernelTests\KernelTestBase;
+
+// cspell:ignore iccp, imagecreatefrom
 
 /**
  * Tests for the GD image toolkit.
@@ -61,7 +65,7 @@ class ToolkitGdTest extends KernelTestBase {
     $this->assertEquals('gd', $this->imageFactory->getToolkitId(), 'The image factory is set to use the \'gd\' image toolkit.');
 
     // Prepare a directory for test file results.
-    $this->directory = 'public://imagetest';
+    $this->directory = 'public://image_test';
     \Drupal::service('file_system')->prepareDirectory($this->directory, FileSystemInterface::CREATE_DIRECTORY);
   }
 
@@ -91,20 +95,20 @@ class ToolkitGdTest extends KernelTestBase {
    */
   public function getPixelColor(ImageInterface $image, int $x, int $y): array {
     $toolkit = $image->getToolkit();
-    $color_index = imagecolorat($toolkit->getResource(), $x, $y);
+    $color_index = imagecolorat($toolkit->getImage(), $x, $y);
 
-    $transparent_index = imagecolortransparent($toolkit->getResource());
+    $transparent_index = imagecolortransparent($toolkit->getImage());
     if ($color_index == $transparent_index) {
       return [0, 0, 0, 127];
     }
 
-    return array_values(imagecolorsforindex($toolkit->getResource(), $color_index));
+    return array_values(imagecolorsforindex($toolkit->getImage(), $color_index));
   }
 
   /**
    * Data provider for ::testManipulations().
    */
-  public function providerTestImageFiles(): array {
+  public static function providerTestImageFiles(): array {
     // Typically the corner colors will be unchanged. These colors are in the
     // order of top-left, top-right, bottom-right, bottom-left.
     $default_corners = [static::RED, static::GREEN, static::BLUE, static::TRANSPARENT];
@@ -188,6 +192,13 @@ class ToolkitGdTest extends KernelTestBase {
         'arguments' => ['extension' => 'webp'],
         'corners' => $default_corners,
       ],
+      'convert_avif' => [
+        'operation' => 'convert',
+        'width' => 40,
+        'height' => 20,
+        'arguments' => ['extension' => 'avif'],
+        'corners' => $default_corners,
+      ],
     ];
 
     // Systems using non-bundled GD2 may miss imagerotate(). Test if available.
@@ -238,9 +249,9 @@ class ToolkitGdTest extends KernelTestBase {
           'arguments' => [],
           'height' => 20,
           'width' => 40,
-          // Grayscale corners are a bit funky. Each of the corners are a shade of
-          // gray. The values of these were determined simply by looking at the
-          // final image to see what desaturated colors end up being.
+          // Grayscale corners are a bit funky. Each of the corners are a shade
+          // of gray. The values of these were determined simply by looking at
+          // the final image to see what desaturated colors end up being.
           'corners' => [
             array_fill(0, 3, 76) + [3 => 0],
             array_fill(0, 3, 149) + [3 => 0],
@@ -258,6 +269,7 @@ class ToolkitGdTest extends KernelTestBase {
       'image-test-no-transparency.gif',
       'image-test.jpg',
       'img-test.webp',
+      'img-test.avif',
     ] as $file_name) {
       foreach ($test_cases as $test_case => $values) {
         $operation = $values['operation'];
@@ -271,6 +283,8 @@ class ToolkitGdTest extends KernelTestBase {
   }
 
   /**
+   * Tests height, width and color for the corners for the final images.
+   *
    * Since PHP can't visually check that our images have been manipulated
    * properly, build a list of expected color values for each of the corners and
    * the expected height and widths for the final images.
@@ -284,7 +298,7 @@ class ToolkitGdTest extends KernelTestBase {
     $this->assertTrue($image->isValid());
     $image_original_type = $image->getToolkit()->getType();
 
-    $this->assertTrue(imageistruecolor($toolkit->getResource()), "Image '$file_name' after load should be a truecolor image, but it is not.");
+    $this->assertTrue(imageistruecolor($toolkit->getImage()), "Image '$file_name' after load should be a truecolor image, but it is not.");
 
     // Perform our operation.
     $image->apply($operation, $arguments);
@@ -296,8 +310,8 @@ class ToolkitGdTest extends KernelTestBase {
     // Check that the both the GD object and the Image object have an accurate
     // record of the dimensions.
     if (isset($expected['height']) && isset($expected['width'])) {
-      $this->assertSame($expected['height'], imagesy($toolkit->getResource()), "Image '$file_name' after '$test_case' should have a proper height.");
-      $this->assertSame($expected['width'], imagesx($toolkit->getResource()), "Image '$file_name' after '$test_case' should have a proper width.");
+      $this->assertSame($expected['height'], imagesy($toolkit->getImage()), "Image '$file_name' after '$test_case' should have a proper height.");
+      $this->assertSame($expected['width'], imagesx($toolkit->getImage()), "Image '$file_name' after '$test_case' should have a proper width.");
       $this->assertSame($expected['height'], $image->getHeight(), "Image '$file_name' after '$test_case' should have a proper height.");
       $this->assertSame($expected['width'], $image->getWidth(), "Image '$file_name' after '$test_case' should have a proper width.");
     }
@@ -320,27 +334,13 @@ class ToolkitGdTest extends KernelTestBase {
       }
 
       // Get the location of the corner.
-      switch ($key) {
-        case 0:
-          $x = 0;
-          $y = 0;
-          break;
+      [$x, $y] = match ($key) {
+        0 => [0, 0],
+        1 => [$image->getWidth() - 1, 0],
+        2 => [$image->getWidth() - 1, $image->getHeight() - 1],
+        3 => [0, $image->getHeight() - 1],
+      };
 
-        case 1:
-          $x = $image->getWidth() - 1;
-          $y = 0;
-          break;
-
-        case 2:
-          $x = $image->getWidth() - 1;
-          $y = $image->getHeight() - 1;
-          break;
-
-        case 3:
-          $x = 0;
-          $y = $image->getHeight() - 1;
-          break;
-      }
       $actual_color = $this->getPixelColor($image, $x, $y);
 
       // If image cannot handle transparent colors, skip the pixel color test.
@@ -348,15 +348,18 @@ class ToolkitGdTest extends KernelTestBase {
         continue;
       }
 
-      // JPEG has small differences in color after processing.
-      $tolerance = $image_original_type === IMAGETYPE_JPEG ? 3 : 0;
+      // JPEG and AVIF have small differences in color after processing.
+      $tolerance = match($image_original_type) {
+        IMAGETYPE_JPEG, IMAGETYPE_AVIF => 3,
+        default => 0,
+      };
 
       $this->assertColorsAreEqual($expected_color, $actual_color, $tolerance, "Image '$file_name' object after '$test_case' action has the correct color placement at corner '$key'");
     }
 
     // Check that saved image reloads without raising PHP errors.
     $image_reloaded = $this->imageFactory->get($file_path);
-    $this->assertInstanceOf(\GDImage::class, $image_reloaded->getToolkit()->getResource());
+    $this->assertInstanceOf(\GdImage::class, $image_reloaded->getToolkit()->getImage());
   }
 
   /**
@@ -365,7 +368,7 @@ class ToolkitGdTest extends KernelTestBase {
    */
   public function testSupportedExtensions(): void {
     // Test the list of supported extensions.
-    $expected_extensions = ['png', 'gif', 'jpeg', 'jpg', 'jpe', 'webp'];
+    $expected_extensions = ['png', 'gif', 'jpeg', 'jpg', 'jpe', 'webp', 'avif'];
     $this->assertEqualsCanonicalizing($expected_extensions, $this->imageFactory->getSupportedExtensions());
 
     // Test that the supported extensions map to correct internal GD image
@@ -377,6 +380,7 @@ class ToolkitGdTest extends KernelTestBase {
       'jpg' => IMAGETYPE_JPEG,
       'jpe' => IMAGETYPE_JPEG,
       'webp' => IMAGETYPE_WEBP,
+      'avif' => IMAGETYPE_AVIF,
     ];
     $image = $this->imageFactory->get();
     foreach ($expected_image_types as $extension => $expected_image_type) {
@@ -387,12 +391,13 @@ class ToolkitGdTest extends KernelTestBase {
   /**
    * Data provider for ::testCreateImageFromScratch().
    */
-  public function providerSupportedImageTypes(): array {
+  public static function providerSupportedImageTypes(): array {
     return [
       [IMAGETYPE_PNG],
       [IMAGETYPE_GIF],
       [IMAGETYPE_JPEG],
       [IMAGETYPE_WEBP],
+      [IMAGETYPE_AVIF],
     ];
   }
 
@@ -460,9 +465,9 @@ class ToolkitGdTest extends KernelTestBase {
     // Color at top-right pixel should be fully transparent.
     $file = 'image-test-transparent-indexed.gif';
     $image = $this->imageFactory->get('core/tests/fixtures/files/' . $file);
-    $resource = $image->getToolkit()->getResource();
-    $color_index = imagecolorat($resource, $image->getWidth() - 1, 0);
-    $color = array_values(imagecolorsforindex($resource, $color_index));
+    $gd_image = $image->getToolkit()->getImage();
+    $color_index = imagecolorat($gd_image, $image->getWidth() - 1, 0);
+    $color = array_values(imagecolorsforindex($gd_image, $color_index));
     $this->assertEquals(static::ROTATE_TRANSPARENT, $color, "Image {$file} after load has full transparent color at corner 1.");
 
     // Test deliberately creating a GIF image with no transparent color set.
@@ -473,17 +478,17 @@ class ToolkitGdTest extends KernelTestBase {
     // Create image.
     $image = $this->imageFactory->get();
     $image->createNew(50, 20, 'gif', NULL);
-    $resource = $image->getToolkit()->getResource();
-    $color_index = imagecolorat($resource, $image->getWidth() - 1, 0);
-    $color = array_values(imagecolorsforindex($resource, $color_index));
+    $gd_image = $image->getToolkit()->getImage();
+    $color_index = imagecolorat($gd_image, $image->getWidth() - 1, 0);
+    $color = array_values(imagecolorsforindex($gd_image, $color_index));
     $this->assertEquals(static::ROTATE_TRANSPARENT, $color, "New GIF image with no transparent color set after creation has full transparent color at corner 1.");
     // Save image.
     $this->assertTrue($image->save($file_path), "New GIF image {$file} was saved.");
     // Reload image.
     $image_reloaded = $this->imageFactory->get($file_path);
-    $resource = $image_reloaded->getToolkit()->getResource();
-    $color_index = imagecolorat($resource, $image_reloaded->getWidth() - 1, 0);
-    $color = array_values(imagecolorsforindex($resource, $color_index));
+    $gd_image = $image_reloaded->getToolkit()->getImage();
+    $color_index = imagecolorat($gd_image, $image_reloaded->getWidth() - 1, 0);
+    $color = array_values(imagecolorsforindex($gd_image, $color_index));
     // Check explicitly for alpha == 0 as the rest of the color has been
     // compressed and may have slight difference from full white.
     $this->assertEquals(0, $color[3], "New GIF image {$file} after reload has no transparent color at corner 1.");
@@ -502,7 +507,7 @@ class ToolkitGdTest extends KernelTestBase {
     $file = 'image-test-transparent-out-of-range.gif';
     $image = $this->imageFactory->get('core/tests/fixtures/files/' . $file);
     $this->assertTrue($image->isValid(), "Image '$file' after load should be valid, but it is not.");
-    $this->assertTrue(imageistruecolor($image->getToolkit()->getResource()), "Image '$file' after load should be a truecolor image, but it is not.");
+    $this->assertTrue(imageistruecolor($image->getToolkit()->getImage()), "Image '$file' after load should be a truecolor image, but it is not.");
   }
 
   /**
@@ -523,13 +528,56 @@ class ToolkitGdTest extends KernelTestBase {
   public function testGetRequirements(): void {
     $this->assertEquals([
       'version' => [
-        'title' => t('GD library'),
+        'title' => 'GD library',
         'value' => gd_info()['GD Version'],
-        'description' => t("Supported image file formats: %formats.", [
-          '%formats' => implode(', ', ['GIF', 'JPEG', 'PNG', 'WEBP']),
-        ]),
+        'description' => sprintf("Supported image file formats: %s.", implode(', ', ['GIF', 'JPEG', 'PNG', 'WEBP', 'AVIF'])),
       ],
     ], $this->imageFactory->get()->getToolkit()->getRequirements());
+  }
+
+  /**
+   * Tests that GD doesn't trigger warnings for iCCP sRGB profiles.
+   *
+   * If image is saved with 'sRGB IEC61966-2.1' sRGB profile, GD will trigger
+   * a warning about an incorrect sRGB profile'.
+   *
+   * @dataProvider pngImageProvider
+   */
+  public function testIncorrectIccpSrgbProfile(string $image_uri): void {
+    $warning_detected = FALSE;
+    // @see https://github.com/sebastianbergmann/phpunit/issues/5062
+    $error_handler = static function () use (&$warning_detected): void {
+      $warning_detected = TRUE;
+    };
+    // $error_level is intentionally set to 0. It's required for PHP '@'
+    // suppression not to trigger Drupal error handler. In that case native
+    // PHP handler will be called and Drupal's will serve like a notification.
+    set_error_handler($error_handler, 0);
+
+    $image_factory = $this->container->get('image.factory');
+    \assert($image_factory instanceof ImageFactory);
+
+    $image = $image_factory->get($image_uri, 'gd');
+    // We need to do any image manipulation to trigger GD profile loading.
+    $image->resize('100', '100');
+
+    self::assertFalse($warning_detected);
+
+    restore_error_handler();
+  }
+
+  /**
+   * Provides a list of PNG image URIs for testing.
+   *
+   * @return \Generator
+   *   The test data.
+   */
+  public static function pngImageProvider(): \Generator {
+    yield 'valid image 1' => ['core/tests/fixtures/files/image-1.png'];
+    yield 'valid image 2' => ['core/tests/fixtures/files/image-test.png'];
+    yield 'PNG with iCCP profile' => [
+      'core/tests/fixtures/files/image-test-iccp-profile.png',
+    ];
   }
 
 }

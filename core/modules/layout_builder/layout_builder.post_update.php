@@ -8,7 +8,7 @@
 /**
  * Implements hook_removed_post_updates().
  */
-function layout_builder_removed_post_updates() {
+function layout_builder_removed_post_updates(): array {
   return [
     'layout_builder_post_update_rebuild_plugin_dependencies' => '9.0.0',
     'layout_builder_post_update_add_extra_fields' => '9.0.0',
@@ -28,5 +28,7 @@ function layout_builder_removed_post_updates() {
     'layout_builder_post_update_override_entity_form_controller' => '10.0.0',
     'layout_builder_post_update_section_storage_context_mapping' => '10.0.0',
     'layout_builder_post_update_tempstore_route_enhancer' => '10.0.0',
+    'layout_builder_post_update_timestamp_formatter' => '11.0.0',
+    'layout_builder_post_update_enable_expose_field_block_feature_flag' => '11.0.0',
   ];
 }

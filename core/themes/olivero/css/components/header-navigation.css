@@ -32,27 +32,25 @@
    * viewport on short screens. */
   border-block-start: solid var(--color--white) calc(var(--sp3) + var(--drupal-displace-offset-top, 0px));
   background-color: var(--color--white);
-  box-shadow: 0 0 72px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 72px rgb(0, 0, 0, 0.1);
 }
 
 .header-nav.is-active {
   visibility: visible;
-  transform: translateX(-100%); /* LTR */
+  transform: translateX(calc(-100% - var(--drupal-displace-offset-right, 0px))); /* LTR */
 }
 
-[dir="rtl"] .header-nav.is-active {
-  transform: translateX(100%);
+.header-nav.is-active:dir(rtl) {
+  transform: translateX(calc(100% + var(--drupal-displace-offset-left, 0px)));
 }
 
 @media (min-width: 31.25rem) {
-
   .header-nav {
     border-top-width: calc(var(--sp5) + var(--drupal-displace-offset-top, 0px));
   }
 }
 
 @media (min-width: 43.75rem) {
-
   .header-nav {
     padding-block-end: var(--sp3);
     padding-inline-start: var(--sp3);
@@ -61,7 +59,6 @@
 }
 
 @media (min-width: 62.5rem) {
-
   .header-nav {
     grid-column: 5 / 14;
   }
@@ -72,7 +69,6 @@
    */
 
 @media (forced-colors: active) {
-
   .header-nav {
     border-top-color: canvas;
   }
@@ -84,11 +80,12 @@
  */
 
 html.js .header-nav {
-  transition: visibility 0.2s, transform 0.2s;
+  transition:
+    visibility 0.2s,
+    transform 0.2s;
 }
 
 @media (min-width: 75rem) {
-
   body:not(.is-always-mobile-nav) .header-nav {
     position: static;
     display: flex;
@@ -111,18 +108,18 @@ html.js .header-nav {
 }
 
 @media (min-width: 75rem) {
-
   body.is-always-mobile-nav .header-nav {
     overflow: auto;
     max-width: calc((7 * (var(--grid-col-width) + var(--grid-gap))));
     padding-inline-end: var(--sp);
-    transition: transform 0.2s, visibility 0.2s;
+    transition:
+      transform 0.2s,
+      visibility 0.2s;
     border-top-width: calc(var(--drupal-displace-offset-top, 0px) + var(--sp11));
   }
 }
 
 @media (min-width: 90rem) {
-
   body.is-always-mobile-nav .header-nav {
     max-width: calc(100vw - (var(--max-width) + var(--content-left)) + ((7 * (var(--grid-col-width) + var(--grid-gap)))));
     padding-inline-end: calc(100vw - (var(--max-width) + var(--content-left) - var(--sp)));
@@ -141,13 +138,12 @@ html.js .header-nav {
   background: var(--color--gray-5);
 }
 
-@media (forced-colors: active) {
+.is-overlay-active .header-nav-overlay {
+  display: block;
+}
 
+@media (forced-colors: active) {
   .header-nav-overlay {
     background: canvastext;
   }
-}
-
-.is-overlay-active .header-nav-overlay {
-  display: block;
 }

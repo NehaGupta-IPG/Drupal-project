@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config_translation\Functional;
 
+use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
@@ -16,9 +19,7 @@ use Drupal\Tests\BrowserTestBase;
 class ConfigTranslationCacheTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -119,10 +120,10 @@ class ConfigTranslationCacheTest extends BrowserTestBase {
   /**
    * Tests the translation of field and field storage configuration.
    */
-  public function testFieldConfigTranslation() {
+  public function testFieldConfigTranslation(): void {
     // Add a test field which has a translatable field setting and a
     // translatable field storage setting.
-    $field_name = strtolower($this->randomMachineName());
+    $field_name = $this->randomMachineName();
     $field_storage = FieldStorageConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'entity_test',
@@ -133,8 +134,8 @@ class ConfigTranslationCacheTest extends BrowserTestBase {
     $field_storage->setSetting('translatable_storage_setting', $translatable_storage_setting);
     $field_storage->save();
 
-    $bundle = strtolower($this->randomMachineName());
-    entity_test_create_bundle($bundle);
+    $bundle = $this->randomMachineName();
+    EntityTestHelper::createBundle($bundle);
     $field = FieldConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'entity_test',

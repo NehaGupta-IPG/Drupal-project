@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\Core\Menu\LocalActionManagerTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Menu;
 
@@ -23,6 +20,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\Tests\UnitTestCase;
 use Prophecy\Argument;
+use Prophecy\Prophet;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
@@ -107,6 +105,8 @@ class LocalActionManagerTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->argumentResolver = $this->createMock('\Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface');
     $this->request = $this->createMock('Symfony\Component\HttpFoundation\Request');
     $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
@@ -137,7 +137,7 @@ class LocalActionManagerTest extends UnitTestCase {
   /**
    * @covers ::getTitle
    */
-  public function testGetTitle() {
+  public function testGetTitle(): void {
     $local_action = $this->createMock('Drupal\Core\Menu\LocalActionInterface');
     $local_action->expects($this->once())
       ->method('getTitle')
@@ -156,13 +156,22 @@ class LocalActionManagerTest extends UnitTestCase {
    *
    * @dataProvider getActionsForRouteProvider
    */
-  public function testGetActionsForRoute($route_appears, array $plugin_definitions, array $expected_actions) {
+  public function testGetActionsForRoute($route_appears, array $plugin_definitions, array $expected_actions): void {
     $this->discovery->expects($this->any())
       ->method('getDefinitions')
       ->willReturn($plugin_definitions);
     $map = [];
     foreach ($plugin_definitions as $plugin_id => $plugin_definition) {
-      $plugin = $this->createMock('Drupal\Core\Menu\LocalActionInterface');
+      $plugin = $this->createMock('Drupal\Core\Menu\LocalActionDefault');
+      $plugin->expects($this->any())
+        ->method('getCacheContexts')
+        ->willReturn([]);
+      $plugin->expects($this->any())
+        ->method('getCacheTags')
+        ->willReturn([]);
+      $plugin->expects($this->any())
+        ->method('getCacheMaxAge')
+        ->willReturn(0);
       $plugin->expects($this->any())
         ->method('getRouteName')
         ->willReturn($plugin_definition['route_name']);
@@ -193,8 +202,10 @@ class LocalActionManagerTest extends UnitTestCase {
     $this->assertEquals($expected_actions, $this->localActionManager->getActionsForRoute($route_appears));
   }
 
-  public function getActionsForRouteProvider() {
-    $cache_contexts_manager = $this->prophesize(CacheContextsManager::class);
+  public static function getActionsForRouteProvider() {
+    $originalContainer = \Drupal::hasContainer() ? \Drupal::getContainer() : NULL;
+
+    $cache_contexts_manager = (new Prophet())->prophesize(CacheContextsManager::class);
     $cache_contexts_manager->assertValidTokens(Argument::any())
       ->willReturn(TRUE);
 
@@ -375,11 +386,19 @@ class LocalActionManagerTest extends UnitTestCase {
       ],
     ];
 
+    // Restore the original container if needed.
+    if ($originalContainer) {
+      \Drupal::setContainer($originalContainer);
+    }
+
     return $data;
   }
 
 }
 
+/**
+ * Stub class for testing LocalActionManager.
+ */
 class TestLocalActionManager extends LocalActionManager {
 
   public function __construct(ArgumentResolverInterface $argument_resolver, Request $request, RouteMatchInterface $route_match, RouteProviderInterface $route_provider, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, AccessManagerInterface $access_manager, AccountInterface $account, DiscoveryInterface $discovery, FactoryInterface $factory) {
@@ -394,7 +413,7 @@ class TestLocalActionManager extends LocalActionManager {
     $this->routeMatch = $route_match;
     $this->moduleHandler = $module_handler;
     $this->alterInfo('menu_local_actions');
-    $this->setCacheBackend($cache_backend, 'local_action_plugins', ['local_action']);
+    $this->setCacheBackend($cache_backend, 'local_action_plugins');
   }
 
 }

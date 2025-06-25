@@ -1,13 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use Drupal\block\Entity\Block;
 
 /**
- * Tests if a block can be configured to be only visible on a particular
- * language.
+ * Tests per-language block configuration.
  *
  * @group block
  */
@@ -15,13 +16,13 @@ class BlockLanguageTest extends BrowserTestBase {
 
   /**
    * An administrative user to configure the test environment.
+   *
+   * @var \Drupal\user\Entity\User|false
    */
   protected $adminUser;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language', 'block', 'content_translation', 'node'];
 
@@ -68,10 +69,10 @@ class BlockLanguageTest extends BrowserTestBase {
   /**
    * Tests the visibility settings for the blocks based on language.
    */
-  public function testLanguageBlockVisibility() {
+  public function testLanguageBlockVisibility(): void {
     // Check if the visibility setting is available.
     $default_theme = $this->config('system.theme')->get('default');
-    $this->drupalGet('admin/structure/block/add/system_powered_by_block' . '/' . $default_theme);
+    $this->drupalGet('admin/structure/block/add/system_powered_by_block/' . $default_theme);
     // Ensure that the language visibility field is visible without a type
     // setting.
     $this->assertSession()->fieldExists('visibility[language][langcodes][en]');
@@ -80,10 +81,10 @@ class BlockLanguageTest extends BrowserTestBase {
     // Enable a standard block and set the visibility setting for one language.
     $edit = [
       'visibility[language][langcodes][en]' => TRUE,
-      'id' => strtolower($this->randomMachineName(8)),
+      'id' => $this->randomMachineName(8),
       'region' => 'sidebar_first',
     ];
-    $this->drupalGet('admin/structure/block/add/system_powered_by_block' . '/' . $default_theme);
+    $this->drupalGet('admin/structure/block/add/system_powered_by_block/' . $default_theme);
     $this->submitForm($edit, 'Save block');
 
     // Change the default language.
@@ -107,7 +108,7 @@ class BlockLanguageTest extends BrowserTestBase {
   /**
    * Tests if the visibility settings are removed if the language is deleted.
    */
-  public function testLanguageBlockVisibilityLanguageDelete() {
+  public function testLanguageBlockVisibilityLanguageDelete(): void {
     // Enable a standard block and set the visibility setting for one language.
     $edit = [
       'visibility' => [
@@ -144,7 +145,7 @@ class BlockLanguageTest extends BrowserTestBase {
   /**
    * Tests block language visibility with different language types.
    */
-  public function testMultipleLanguageTypes() {
+  public function testMultipleLanguageTypes(): void {
     // Customize content language detection to be different from interface
     // language detection.
     $edit = [
@@ -161,19 +162,19 @@ class BlockLanguageTest extends BrowserTestBase {
 
     // Check if the visibility setting is available with a type setting.
     $default_theme = $this->config('system.theme')->get('default');
-    $this->drupalGet('admin/structure/block/add/system_powered_by_block' . '/' . $default_theme);
+    $this->drupalGet('admin/structure/block/add/system_powered_by_block/' . $default_theme);
     $this->assertSession()->fieldExists('visibility[language][langcodes][en]');
     $this->assertSession()->fieldExists('visibility[language][context_mapping][language]');
 
     // Enable a standard block and set visibility to French only.
-    $block_id = strtolower($this->randomMachineName(8));
+    $block_id = $this->randomMachineName(8);
     $edit = [
       'visibility[language][context_mapping][language]' => '@language.current_language_context:language_interface',
       'visibility[language][langcodes][fr]' => TRUE,
       'id' => $block_id,
       'region' => 'sidebar_first',
     ];
-    $this->drupalGet('admin/structure/block/add/system_powered_by_block' . '/' . $default_theme);
+    $this->drupalGet('admin/structure/block/add/system_powered_by_block/' . $default_theme);
     $this->submitForm($edit, 'Save block');
 
     // Interface negotiation depends on request arguments.

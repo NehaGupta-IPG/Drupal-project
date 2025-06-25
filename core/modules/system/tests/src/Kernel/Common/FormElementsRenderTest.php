@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Common;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
 
@@ -19,10 +20,11 @@ class FormElementsRenderTest extends KernelTestBase {
   protected static $modules = ['common_test', 'system'];
 
   /**
-   * Tests rendering form elements without passing through
-   * \Drupal::formBuilder()->doBuildForm().
+   * Tests rendering form elements without using doBuildForm().
+   *
+   * @see \Drupal\Core\Form\FormBuilderInterface::doBuildForm()
    */
-  public function testDrupalRenderFormElements() {
+  public function testDrupalRenderFormElements(): void {
     // Define a series of form elements.
     $element = [
       '#type' => 'button',
@@ -147,9 +149,7 @@ class FormElementsRenderTest extends KernelTestBase {
 
     $xpath = $this->buildXPathQuery($xpath, $xpath_args);
     $element += ['#value' => NULL];
-    $this->assertFieldByXPath($xpath, $element['#value'], new FormattableMarkup('#type @type was properly rendered.', [
-      '@type' => var_export($element['#type'], TRUE),
-    ]));
+    $this->assertFieldByXPath($xpath, $element['#value'], '#type ' . var_export($element['#type'], TRUE) . ' was properly rendered.');
   }
 
 }

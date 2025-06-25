@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Enhancer;
 
 use Drupal\Core\Routing\Enhancer\ParamConversionEnhancer;
@@ -38,7 +40,7 @@ class ParamConversionEnhancerTest extends UnitTestCase {
   /**
    * @covers ::enhance
    */
-  public function testEnhance() {
+  public function testEnhance(): void {
     $route = new Route('/test/{id}/{literal}/{null}');
 
     $raw_variables = [
@@ -73,8 +75,9 @@ class ParamConversionEnhancerTest extends UnitTestCase {
   /**
    * @covers ::copyRawVariables
    */
-  public function testCopyRawVariables() {
+  public function testCopyRawVariables(): void {
     $route = new Route('/test/{id}');
+    $route->setDefault('node_type', 'page');
     $defaults = [
       RouteObjectInterface::ROUTE_OBJECT => $route,
       'id' => '1',
@@ -90,7 +93,10 @@ class ParamConversionEnhancerTest extends UnitTestCase {
 
         return $defaults;
       });
-    $expected = new InputBag(['id' => 1]);
+    $expected = new InputBag([
+      'id' => '1',
+      'node_type' => 'page',
+    ]);
     $result = $this->paramConversionEnhancer->enhance($defaults, new Request());
     $this->assertEquals($result['_raw_variables'], $expected);
   }

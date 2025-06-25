@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
+use Drupal\comment\CommentInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\user\RoleInterface;
@@ -32,7 +34,7 @@ class CommentAdminTest extends CommentTestBase {
   /**
    * Tests comment approval functionality through admin/content/comment.
    */
-  public function testApprovalAdminInterface() {
+  public function testApprovalAdminInterface(): void {
     // Set anonymous comments to require approval.
     user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments' => TRUE,
@@ -41,7 +43,7 @@ class CommentAdminTest extends CommentTestBase {
     ]);
     $this->drupalLogin($this->adminUser);
     // Ensure that doesn't require contact info.
-    $this->setCommentAnonymous('0');
+    $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
 
     // Test that the comments page loads correctly when there are no comments
     $this->drupalGet('admin/content/comment');
@@ -125,17 +127,15 @@ class CommentAdminTest extends CommentTestBase {
   /**
    * Tests comment approval functionality through the node interface.
    */
-  public function testApprovalNodeInterface() {
+  public function testApprovalNodeInterface(): void {
     // Set anonymous comments to require approval.
     user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments' => TRUE,
       'post comments' => TRUE,
       'skip comment approval' => FALSE,
     ]);
-    $this->drupalLogin($this->adminUser);
     // Ensure that doesn't require contact info.
-    $this->setCommentAnonymous('0');
-    $this->drupalLogout();
+    $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
 
     // Post anonymous comment without contact info.
     $subject = $this->randomMachineName();
@@ -180,7 +180,7 @@ class CommentAdminTest extends CommentTestBase {
   /**
    * Tests comment bundle admin.
    */
-  public function testCommentAdmin() {
+  public function testCommentAdmin(): void {
     // Login.
     $this->drupalLogin($this->adminUser);
     // Browse to comment bundle overview.
@@ -202,7 +202,7 @@ class CommentAdminTest extends CommentTestBase {
   /**
    * Tests editing a comment as an admin.
    */
-  public function testEditComment() {
+  public function testEditComment(): void {
     // Enable anonymous user comments.
     user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments',
@@ -218,10 +218,8 @@ class CommentAdminTest extends CommentTestBase {
     $this->drupalLogout();
 
     // Post anonymous comment.
-    $this->drupalLogin($this->adminUser);
     // Ensure that we need email id before posting comment.
-    $this->setCommentAnonymous('2');
-    $this->drupalLogout();
+    $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MUST_CONTACT);
 
     // Post comment with contact info (required).
     $author_name = $this->randomMachineName();
@@ -245,7 +243,7 @@ class CommentAdminTest extends CommentTestBase {
   /**
    * Tests commented translation deletion admin view.
    */
-  public function testCommentedTranslationDeletion() {
+  public function testCommentedTranslationDeletion(): void {
     \Drupal::service('module_installer')->install([
       'language',
       'locale',
@@ -256,7 +254,7 @@ class CommentAdminTest extends CommentTestBase {
     // Rebuild the container to update the default language container variable.
     $this->rebuildContainer();
     // Ensure that doesn't require contact info.
-    $this->setCommentAnonymous('0');
+    $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
     $this->drupalLogin($this->webUser);
     $count_query = \Drupal::entityTypeManager()
       ->getStorage('comment')
@@ -282,8 +280,8 @@ class CommentAdminTest extends CommentTestBase {
     ];
     $this->drupalGet('admin/content/comment');
     $this->submitForm($edit, 'Update');
-    $this->assertSession()->responseContains(new FormattableMarkup('@label (Original translation) - <em>The following comment translations will be deleted:</em>', ['@label' => $comment1->label()]));
-    $this->assertSession()->responseContains(new FormattableMarkup('@label (Original translation) - <em>The following comment translations will be deleted:</em>', ['@label' => $comment2->label()]));
+    $this->assertSession()->responseContains($comment1->label() . " (Original translation) - <em>The following comment translations will be deleted:</em>");
+    $this->assertSession()->responseContains($comment2->label() . " (Original translation) - <em>The following comment translations will be deleted:</em>");
     $this->assertSession()->pageTextContains('English');
     $this->assertSession()->pageTextContains('Urdu');
     $this->submitForm([], 'Delete');

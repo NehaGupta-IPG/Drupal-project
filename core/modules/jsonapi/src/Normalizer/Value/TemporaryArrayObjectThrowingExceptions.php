@@ -30,22 +30,16 @@ class TemporaryArrayObjectThrowingExceptions extends \ArrayObject {
    * @param int $flags
    *   The flags to sort the ArrayObject by.
    *
-   * @return bool
-   *   This method always returns TRUE.
-   *
    * @throws \Exception
    *   This class does not support this action but it must implement it, because
    *   it is extending \ArrayObject.
    */
-  public function asort($flags = SORT_REGULAR): bool {
+  public function asort($flags = SORT_REGULAR): TRUE {
     throw new \Exception('This ' . __CLASS__ . ' does not support this action but it must implement it, because it is extending \ArrayObject.');
   }
 
   /**
    * Count the ArrayObject.
-   *
-   * @return int
-   *   The number of public properties in the \ArrayObject.
    *
    * @throws \Exception
    *   This class does not support this action but it must implement it, because
@@ -61,9 +55,6 @@ class TemporaryArrayObjectThrowingExceptions extends \ArrayObject {
    * @param array|object $array
    *   The array to replace for the current array.
    *
-   * @return array
-   *   The new array or object to exchange with the current array.
-   *
    * @throws \Exception
    *   This class does not support this action but it must implement it, because
    *   it is extending \ArrayObject.
@@ -74,9 +65,6 @@ class TemporaryArrayObjectThrowingExceptions extends \ArrayObject {
 
   /**
    * Exports the \ArrayObject to an array.
-   *
-   * @return array
-   *   Returns a copy of the array.
    *
    * @throws \Exception
    *   This class does not support this action but it must implement it, because
@@ -89,9 +77,6 @@ class TemporaryArrayObjectThrowingExceptions extends \ArrayObject {
   /**
    * Gets the behavior flags of the \ArrayObject.
    *
-   * @return int
-   *   Returns the behavior flags of the \ArrayObject.
-   *
    * @throws \Exception
    *   This class does not support this action but it must implement it, because
    *   it is extending \ArrayObject.
@@ -103,9 +88,6 @@ class TemporaryArrayObjectThrowingExceptions extends \ArrayObject {
   /**
    * Create a new iterator from an ArrayObject instance.
    *
-   * @return \Iterator
-   *   An iterator from the ArrayObject.
-   *
    * @throws \Exception
    *   This class does not support this action but it must implement it, because
    *   it is extending \ArrayObject.
@@ -115,10 +97,7 @@ class TemporaryArrayObjectThrowingExceptions extends \ArrayObject {
   }
 
   /**
-   * Gets the class name of the array iterator that is used by \ArrayObject::getIterator().
-   *
-   * @return string
-   *   Returns the iterator class name that is used to iterate over this object.
+   * Gets the class name of the iterator used by \ArrayObject::getIterator().
    *
    * @throws \Exception
    *   This class does not support this action but it must implement it, because
@@ -134,42 +113,33 @@ class TemporaryArrayObjectThrowingExceptions extends \ArrayObject {
    * @param int $flags
    *   The flags to sort the ArrayObject by.
    *
-   * @return bool
-   *   This method always returns TRUE.
-   *
    * @throws \Exception
    *   This class does not support this action but it must implement it, because
    *   it is extending \ArrayObject.
    */
-  public function ksort($flags = SORT_REGULAR): bool {
+  public function ksort($flags = SORT_REGULAR): TRUE {
     throw new \Exception('This ' . __CLASS__ . ' does not support this action but it must implement it, because it is extending \ArrayObject.');
   }
 
   /**
    * Sort an array using a case insensitive "natural order" algorithm.
    *
-   * @return bool
-   *   This method always returns TRUE.
-   *
    * @throws \Exception
    *   This class does not support this action but it must implement it, because
    *   it is extending \ArrayObject.
    */
-  public function natcasesort(): bool {
+  public function natcasesort(): TRUE {
     throw new \Exception('This ' . __CLASS__ . ' does not support this action but it must implement it, because it is extending \ArrayObject.');
   }
 
   /**
    * Sort entries using a "natural order" algorithm.
    *
-   * @return bool
-   *   This method always returns TRUE.
-   *
    * @throws \Exception
    *   This class does not support this action but it must implement it, because
    *   it is extending \ArrayObject.
    */
-  public function natsort(): bool {
+  public function natsort(): TRUE {
     throw new \Exception('This ' . __CLASS__ . ' does not support this action but it must implement it, because it is extending \ArrayObject.');
   }
 
@@ -178,9 +148,6 @@ class TemporaryArrayObjectThrowingExceptions extends \ArrayObject {
    *
    * @param mixed $key
    *   The index being checked.
-   *
-   * @return bool
-   *   Return TRUE if the requested index exists, otherwise FALSE.
    *
    * @throws \Exception
    *   This class does not support this action but it must implement it, because
@@ -203,8 +170,7 @@ class TemporaryArrayObjectThrowingExceptions extends \ArrayObject {
    *   This class does not support this action but it must implement it, because
    *   it is extending \ArrayObject.
    */
-  #[\ReturnTypeWillChange]
-  public function offsetGet($key) {
+  public function offsetGet($key): mixed {
     throw new \Exception('This ' . __CLASS__ . ' does not support this action but it must implement it, because it is extending \ArrayObject.');
   }
 
@@ -275,14 +241,11 @@ class TemporaryArrayObjectThrowingExceptions extends \ArrayObject {
    *   greater than zero if the first argument is considered to be respectively
    *   less than, equal to, or greater than the second.
    *
-   * @return bool
-   *   This method always returns TRUE.
-   *
    * @throws \Exception
    *   This class does not support this action but it must implement it, because
    *   it is extending \ArrayObject.
    */
-  public function uasort($callback): bool {
+  public function uasort($callback): TRUE {
     throw new \Exception('This ' . __CLASS__ . ' does not support this action but it must implement it, because it is extending \ArrayObject.');
   }
 
@@ -294,14 +257,11 @@ class TemporaryArrayObjectThrowingExceptions extends \ArrayObject {
    *   greater than zero if the first argument is considered to be respectively
    *   less than, equal to, or greater than the second.
    *
-   * @return bool
-   *   This method always returns TRUE.
-   *
    * @throws \Exception
    *   This class does not support this action but it must implement it, because
    *   it is extending \ArrayObject.
    */
-  public function uksort($callback): bool {
+  public function uksort($callback): TRUE {
     throw new \Exception('This ' . __CLASS__ . ' does not support this action but it must implement it, because it is extending \ArrayObject.');
   }
 

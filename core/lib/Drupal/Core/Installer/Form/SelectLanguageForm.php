@@ -64,14 +64,15 @@ class SelectLanguageForm extends FormBase {
       '#title' => 'Choose language',
       '#title_display' => 'invisible',
       '#options' => $select_options,
-      // Use the browser detected language as default or English if nothing found.
+      // Use the browser detected language as default or English if nothing
+      // found.
       '#default_value' => !empty($browser_langcode) ? $browser_langcode : 'en',
     ];
     $link_to_english = install_full_redirect_url(['parameters' => ['langcode' => 'en']]);
     $form['help'] = [
       '#type' => 'item',
       // #markup is XSS admin filtered which ensures unsafe protocols will be
-      // removed from the url.
+      // removed from the URL.
       '#markup' => '<p>Translations will be downloaded from the <a href="https://localize.drupal.org/download">Drupal Translation website</a>. If you do not want this, select <a href="' . $link_to_english . '">English</a>.</p>',
       '#states' => [
         'invisible' => [

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
@@ -8,6 +10,7 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
  * Tests the JavaScript functionality of the module filter.
  *
  * @group system
+ * @group #slow
  */
 class ModuleFilterTest extends WebDriverTestBase {
 
@@ -36,7 +39,7 @@ class ModuleFilterTest extends WebDriverTestBase {
   /**
    * Tests that filter results announcement has correct pluralization.
    */
-  public function testModuleFilter() {
+  public function testModuleFilter(): void {
 
     // Find the module filter field.
     $this->drupalGet('admin/modules');
@@ -67,6 +70,14 @@ class ModuleFilterTest extends WebDriverTestBase {
     self::assertEquals(1, count($visible_rows));
     $expected_message = '1 module is available in the modified list.';
     $assertSession->elementTextContains('css', '#drupal-live-announce', $expected_message);
+
+    // Test filtering by a machine name, when the module description doesn't end
+    // with a period or other separator. This condition is common for test
+    // modules.
+    $filter->setValue('comment_base_field_test');
+    $session->wait(1000, 'jQuery("#module-node:visible").length == 0');
+    $visible_rows = $this->filterVisibleElements($module_rows);
+    self::assertEquals(1, count($visible_rows));
 
     // Test Drupal.announce() message when no matches are expected.
     $filter->setValue('Pan-Galactic Gargle Blaster');

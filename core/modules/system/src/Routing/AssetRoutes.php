@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
 
 /**
- * Defines a routes' callback to register an url for serving assets.
+ * Defines a routes' callback to register a URL for serving assets.
  */
 class AssetRoutes implements ContainerInjectionInterface {
 
@@ -19,7 +19,7 @@ class AssetRoutes implements ContainerInjectionInterface {
    *   The stream wrapper manager service.
    */
   public function __construct(
-    protected readonly StreamWrapperManagerInterface $streamWrapperManager
+    protected readonly StreamWrapperManagerInterface $streamWrapperManager,
   ) {}
 
   /**
@@ -42,7 +42,7 @@ class AssetRoutes implements ContainerInjectionInterface {
     // Generate assets. If clean URLs are disabled image derivatives will always
     // be served through the routing system. If clean URLs are enabled and the
     // image derivative already exists, PHP will be bypassed.
-    $directory_path = $this->streamWrapperManager->getViaScheme('public')->getDirectoryPath();
+    $directory_path = $this->streamWrapperManager->getViaScheme('assets')->getDirectoryPath();
 
     $routes['system.css_asset'] = new Route(
       '/' . $directory_path . '/css/{file_name}',

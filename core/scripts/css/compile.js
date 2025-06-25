@@ -1,5 +1,5 @@
 const log = require('./log');
-const fs = require('fs');
+const fs = require('node:fs');
 const postcss = require('postcss');
 const postcssImport = require('postcss-import');
 const postcssHeader = require('postcss-header');
@@ -7,7 +7,7 @@ const postcssUrl = require('postcss-url');
 const postcssPresetEnv = require('postcss-preset-env');
 // cspell:ignore pxtorem
 const postcssPixelsToRem = require('postcss-pxtorem');
-const stylelint = require('stylelint');
+const prettier = require('prettier');
 const removeUnwantedComments = require('./remove-unwanted-comments');
 
 module.exports = (filePath, callback) => {
@@ -33,6 +33,8 @@ module.exports = (filePath, callback) => {
           'has-pseudo-class': false,
           'image-set-function': false,
           'prefers-color-scheme-query': false,
+          'content-alt-text': false,
+          'nesting-rules': { edition: '2021' },
         }
       }),
       postcssPixelsToRem({
@@ -68,15 +70,11 @@ module.exports = (filePath, callback) => {
       })
     ])
     .process(css, { from: filePath })
-    .then(result => {
-        return stylelint.lint({
-          code: result.css,
-          fix: true
-        });
+    .then(async result => {
+      const config = await prettier.resolveConfig(filePath);
+      return await prettier.format(result.css, config);
     })
-    .then(result => {
-      callback(result.output);
-    })
+    .then(callback)
     .catch(error => {
       log(error);
       process.exitCode = 1;

@@ -54,7 +54,7 @@ class ProtectedUserFieldConstraintValidator extends ConstraintValidator implemen
   /**
    * {@inheritdoc}
    */
-  public function validate($items, Constraint $constraint) {
+  public function validate($items, Constraint $constraint): void {
     if (!isset($items)) {
       return;
     }

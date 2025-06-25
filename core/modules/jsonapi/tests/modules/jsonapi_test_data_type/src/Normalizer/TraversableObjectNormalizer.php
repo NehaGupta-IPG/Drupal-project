@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\jsonapi_test_data_type\Normalizer;
 
 use Drupal\jsonapi_test_data_type\TraversableObject;
@@ -13,11 +15,6 @@ class TraversableObjectNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  protected $supportedInterfaceOrClass = TraversableObject::class;
-
-  /**
-   * {@inheritdoc}
-   */
   public function normalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
     return $object->property;
   }
@@ -25,8 +22,8 @@ class TraversableObjectNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function hasCacheableSupportsMethod(): bool {
-    return TRUE;
+  public function getSupportedTypes(?string $format): array {
+    return [TraversableObject::class => TRUE];
   }
 
 }

@@ -27,12 +27,13 @@ class FormState implements FormStateInterface {
    * on a form element may use this reference to access other information in the
    * form the element is contained in.
    *
+   * @var array
+   *
    * @see self::getCompleteForm()
    *
    * This property is uncacheable.
-   *
-   * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $complete_form;
 
   /**
@@ -65,6 +66,7 @@ class FormState implements FormStateInterface {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $build_info = [
     'args' => [],
     'files' => [],
@@ -79,6 +81,7 @@ class FormState implements FormStateInterface {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $rebuild_info = [];
 
   /**
@@ -100,9 +103,9 @@ class FormState implements FormStateInterface {
    *
    * This property is uncacheable.
    *
-   * @see self::setRebuild()
-   *
    * @var bool
+   *
+   * @see self::setRebuild()
    */
   protected $rebuild = FALSE;
 
@@ -115,9 +118,9 @@ class FormState implements FormStateInterface {
    *
    * This property is uncacheable.
    *
-   * @see self::setInvalidToken()
-   *
    * @var bool
+   *
+   * @see self::setInvalidToken()
    */
   protected $invalidToken = FALSE;
 
@@ -137,13 +140,20 @@ class FormState implements FormStateInterface {
   protected $response;
 
   /**
-   * Used to redirect the form on submission.
+   * Used to ignore destination when redirecting.
    *
-   * @see self::getRedirect()
+   * @var bool
+   */
+  protected bool $ignoreDestination = FALSE;
+
+  /**
+   * Used to redirect the form on submission.
    *
    * This property is uncacheable.
    *
    * @var \Drupal\Core\Url|\Symfony\Component\HttpFoundation\RedirectResponse|null
+   *
+   * @see self::getRedirect()
    */
   protected $redirect;
 
@@ -156,6 +166,7 @@ class FormState implements FormStateInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $no_redirect;
 
   /**
@@ -186,6 +197,8 @@ class FormState implements FormStateInterface {
   protected $requestMethod = 'GET';
 
   /**
+   * Determines if the unprocessed form structure is cached.
+   *
    * If set to TRUE the original, unprocessed form structure will be cached,
    * which allows the entire form to be rebuilt from cache. A typical form
    * workflow involves two page requests; first, a form is built and rendered
@@ -196,7 +209,7 @@ class FormState implements FormStateInterface {
    * the $form and $form_state variables from the initial page request to the
    * one that processes the submission. 'cache' can be set to TRUE to do this.
    * A prominent example is an Ajax-enabled form, in which
-   * \Drupal\Core\Render\Element\RenderElement::processAjaxForm()
+   * \Drupal\Core\Render\Element\RenderElementBase::processAjaxForm()
    * enables form caching for all forms that include an element with the #ajax
    * property. (The Ajax handler has no way to build the form itself, so must
    * rely on the cached version.) Note that the persistence of $form and
@@ -212,6 +225,7 @@ class FormState implements FormStateInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $no_cache;
 
   /**
@@ -220,7 +234,7 @@ class FormState implements FormStateInterface {
    * The validation functions and submit functions use this array for nearly all
    * their decision making. (Note that #tree determines whether the values are a
    * flat array or an array whose structure parallels the $form array. See
-   * \Drupal\Core\Render\Element\FormElement for more information.)
+   * \Drupal\Core\Render\Element\FormElementBase for more information.)
    *
    * This property is uncacheable.
    *
@@ -249,7 +263,7 @@ class FormState implements FormStateInterface {
   /**
    * The array of values as they were submitted by the user.
    *
-   * These are raw and unvalidated, so should not be used without a thorough
+   * These are raw and non validated, so should not be used without a thorough
    * understanding of security implications. In almost all cases, code should
    * use the data in the 'values' array exclusively. The most common use of this
    * key is for multi-step forms that need to clear some of the user input when
@@ -270,6 +284,7 @@ class FormState implements FormStateInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $always_process;
 
   /**
@@ -284,6 +299,7 @@ class FormState implements FormStateInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $must_validate;
 
   /**
@@ -307,6 +323,7 @@ class FormState implements FormStateInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $programmed_bypass_access_check = TRUE;
 
   /**
@@ -319,6 +336,7 @@ class FormState implements FormStateInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $process_input;
 
   /**
@@ -350,6 +368,7 @@ class FormState implements FormStateInterface {
    *
    * @var array|null
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $triggering_element;
 
   /**
@@ -360,10 +379,11 @@ class FormState implements FormStateInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $has_file_element;
 
   /**
-   * Contains references to details elements to render them within vertical tabs.
+   * The references to details elements to render them within vertical tabs.
    *
    * This property is uncacheable.
    *
@@ -427,6 +447,7 @@ class FormState implements FormStateInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $validation_complete = FALSE;
 
   /**
@@ -452,6 +473,7 @@ class FormState implements FormStateInterface {
    *
    * @var array|null
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $limit_validation_errors;
 
   /**
@@ -461,6 +483,7 @@ class FormState implements FormStateInterface {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $validate_handlers = [];
 
   /**
@@ -470,6 +493,7 @@ class FormState implements FormStateInterface {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $submit_handlers = [];
 
   /**
@@ -636,9 +660,11 @@ class FormState implements FormStateInterface {
    * have side-effects, such as persisting $form_state changes.
    *
    * @return bool
+   *   TRUE if the request method is considered a safe HTTP method. Otherwise
+   *   FALSE.
    *
    * @see \Symfony\Component\HttpFoundation\Request::isMethodSafe()
-   * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
+   * @see https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
    */
   protected function isRequestMethodSafe() {
     return in_array($this->requestMethod, ['GET', 'HEAD']);
@@ -1056,6 +1082,21 @@ class FormState implements FormStateInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function setIgnoreDestination(bool $status = TRUE) {
+    $this->ignoreDestination = $status;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getIgnoreDestination(): bool {
+    return $this->ignoreDestination;
+  }
+
+  /**
    * Sets the global status of errors.
    *
    * @param bool $errors
@@ -1168,7 +1209,7 @@ class FormState implements FormStateInterface {
    * {@inheritdoc}
    */
   public function prepareCallback($callback) {
-    if (is_string($callback) && substr($callback, 0, 2) == '::') {
+    if (is_string($callback) && str_starts_with($callback, '::')) {
       $callback = [$this->getFormObject(), substr($callback, 2)];
     }
     return $callback;
@@ -1230,23 +1271,23 @@ class FormState implements FormStateInterface {
       // We iterate over the #parents of this button and move a reference to
       // each parent in self::getValues(). For example, if #parents is:
       // @code
-      //   array('foo', 'bar', 'baz')
+      //   ['foo', 'bar', 'baz']
       // @endcode
-      // then the corresponding self::getValues() part will look like this:
+      // Then the corresponding self::getValues() part will look like this:
       // @code
-      // array(
-      //   'foo' => array(
-      //     'bar' => array(
+      // [
+      //   'foo' => [
+      //     'bar' => [
       //       'baz' => 'button_value',
-      //     ),
-      //   ),
-      // )
+      //     ],
+      //   ],
+      // ]
       // @endcode
       // We start by (re)moving 'baz' to $last_parent, so we are able unset it
       // at the end of the iteration. Initially, $values will contain a
       // reference to self::getValues(), but in the iteration we move the
       // reference to self::getValue('foo'), and finally to
-      // self::getValue(array('foo', 'bar')), which is the level where we
+      // self::getValue(['foo', 'bar']), which is the level where we
       // can unset 'baz' (that is stored in $last_parent).
       $parents = $button['#parents'];
       $last_parent = array_pop($parents);

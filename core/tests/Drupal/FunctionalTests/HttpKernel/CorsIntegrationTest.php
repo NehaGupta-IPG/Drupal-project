@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\HttpKernel;
 
 use Drupal\Core\Url;
@@ -26,7 +28,7 @@ class CorsIntegrationTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  public function testCrossSiteRequest() {
+  public function testCrossSiteRequest(): void {
     // Test default parameters.
     $cors_config = $this->container->getParameter('cors.config');
     $this->assertFalse($cors_config['enabled']);
@@ -65,14 +67,59 @@ class CorsIntegrationTest extends BrowserTestBase {
     $this->assertSession()->responseHeaderEquals('Access-Control-Allow-Origin', '*');
     $this->assertSession()->responseHeaderNotContains('Vary', 'Origin');
 
-    // Configure the CORS stack to allow a specific origin.
-    $cors_config['allowedOrigins'] = ['http://example.com'];
+    // Configure the CORS stack to match allowed origins using regex patterns.
+    $cors_config['allowedOrigins'] = [];
+    $cors_config['allowedOriginsPatterns'] = ['#^http://[a-z-]*\.valid.com$#'];
 
     $this->setContainerParameter('cors.config', $cors_config);
     $this->rebuildContainer();
 
     // Fire a request from an origin that isn't allowed.
-    /** @var \Symfony\Component\HttpFoundation\Response $response */
+    $this->drupalGet('/test-page', [], ['Origin' => 'http://non-valid.com']);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseHeaderDoesNotExist('Access-Control-Allow-Origin');
+    $this->assertSession()->responseHeaderContains('Vary', 'Origin');
+
+    // Specify a valid origin.
+    $this->drupalGet('/test-page', [], ['Origin' => 'http://sub-domain.valid.com']);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseHeaderEquals('Access-Control-Allow-Origin', 'http://sub-domain.valid.com');
+    $this->assertSession()->responseHeaderContains('Vary', 'Origin');
+
+    // Test combining allowedOrigins and allowedOriginsPatterns.
+    $cors_config['allowedOrigins'] = ['http://domainA.com'];
+    $cors_config['allowedOriginsPatterns'] = ['#^http://domain[B-Z-]*\.com$#'];
+
+    $this->setContainerParameter('cors.config', $cors_config);
+    $this->rebuildContainer();
+
+    // Specify an origin that does not match allowedOrigins nor
+    // allowedOriginsPattern.
+    $this->drupalGet('/test-page', [], ['Origin' => 'http://non-valid.com']);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseHeaderDoesNotExist('Access-Control-Allow-Origin');
+    $this->assertSession()->responseHeaderContains('Vary', 'Origin');
+
+    // Specify a valid origin that matches allowedOrigins.
+    $this->drupalGet('/test-page', [], ['Origin' => 'http://domainA.com']);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseHeaderEquals('Access-Control-Allow-Origin', 'http://domainA.com');
+    $this->assertSession()->responseHeaderContains('Vary', 'Origin');
+
+    // Specify a valid origin that matches allowedOriginsPatterns.
+    $this->drupalGet('/test-page', [], ['Origin' => 'http://domainX.com']);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseHeaderEquals('Access-Control-Allow-Origin', 'http://domainX.com');
+    $this->assertSession()->responseHeaderContains('Vary', 'Origin');
+
+    // Configure the CORS stack to allow a specific origin.
+    $cors_config['allowedOrigins'] = ['http://example.com'];
+    $cors_config['allowedOriginsPatterns'] = [];
+
+    $this->setContainerParameter('cors.config', $cors_config);
+    $this->rebuildContainer();
+
+    // Fire a request from an origin that isn't allowed.
     $this->drupalGet('/test-page', [], ['Origin' => 'http://non-valid.com']);
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseHeaderEquals('Access-Control-Allow-Origin', 'http://example.com');
@@ -91,7 +138,6 @@ class CorsIntegrationTest extends BrowserTestBase {
     $this->rebuildContainer();
 
     // Fire a request from an origin that isn't allowed.
-    /** @var \Symfony\Component\HttpFoundation\Response $response */
     $this->drupalGet('/test-page', [], ['Origin' => 'http://non-valid.com']);
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseHeaderEquals('Access-Control-Allow-Origin', NULL);
@@ -115,6 +161,7 @@ class CorsIntegrationTest extends BrowserTestBase {
     /** @var \GuzzleHttp\ClientInterface $httpClient */
     $httpClient = $this->getSession()->getDriver()->getClient()->getClient();
     $url = Url::fromUri('base:/test-page');
+    /** @var \Symfony\Component\HttpFoundation\Response $response */
     $response = $httpClient->request('POST', $url->setAbsolute()->toString(), [
       'headers' => [
         'Origin' => $origin,

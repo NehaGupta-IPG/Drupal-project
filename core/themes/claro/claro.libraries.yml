@@ -12,17 +12,16 @@ global-styling:
       css/classy/components/field.css: {}
       css/classy/components/icons.css: {}
       css/classy/components/inline-form.css: {}
-      css/classy/components/item-list.css: {}
       css/classy/components/link.css: {}
       css/classy/components/links.css: {}
       css/classy/components/menu.css: {}
       css/classy/components/more-link.css: {}
-      css/classy/components/tablesort.css: {}
       css/classy/components/textarea.css: {}
       css/classy/components/ui-dialog.css: {}
       css/components/accordion.css: {}
       css/components/action-link.css: {}
       css/components/content-header.css: {}
+      css/components/ckeditor5.css: {}
       css/components/container-inline.css: {}
       css/components/container-inline.module.css: {}
       css/components/breadcrumb.css: {}
@@ -49,14 +48,8 @@ global-styling:
       css/components/tables.css: {}
       css/components/table--file-multiple-widget.css: {}
       css/components/search-admin-settings.css: {}
-      css/components/tablesort-indicator.css: {}
-      css/components/system-status-report-general-info.css: {}
-      css/components/system-status-report.css: {}
-      css/components/system-status-report-counters.css: {}
-      css/components/system-status-counter.css: {}
       css/components/tableselect.css: {}
       css/components/tabs.css: {}
-      css/components/views-ui.css: {}
     theme:
       css/theme/colors.css: {}
     layout:
@@ -77,13 +70,11 @@ global-styling:
     # attached, therefore it is always attached.
     - core/drupal.touchevents-test
 
-node-form:
+form-two-columns:
   version: VERSION
   css:
     layout:
-      css/layout/node-add.css: {}
-  dependencies:
-    - node/form
+      css/layout/form-two-columns.css: {}
 
 maintenance-page:
   version: VERSION
@@ -115,16 +106,6 @@ drupal.nav-tabs:
     - core/drupal
     - core/once
     - core/drupal.debounce
-    - core/collapse
-
-drupal.responsive-detail:
-  version: VERSION
-  js:
-    js/responsive-details.js: {}
-  dependencies:
-    - core/jquery
-    - core/once
-    - core/collapse
 
 claro.jquery.ui:
   version: VERSION
@@ -137,17 +118,26 @@ claro.drupal.dialog:
   css:
     theme:
       css/components/dialog.css: {}
+  dependencies:
+    - claro/claro.jquery.ui
 
 claro.tabledrag:
   version: VERSION
   js:
     js/tabledrag.js: {}
 
-tour-styling:
+drupal.node.preview:
   version: VERSION
   css:
     theme:
-      css/theme/tour.theme.css: {}
+      css/components/node-preview.css: {}
+
+drupal.tablesort:
+  version: VERSION
+  css:
+    component:
+      css/classy/components/tablesort.css: {}
+      css/components/tablesort-indicator.css: {}
 
 media-form:
   version: VERSION
@@ -157,6 +147,12 @@ media-form:
   dependencies:
     - media/form
 
+image.admin:
+  version: VERSION
+  css:
+    component:
+      css/components/image.admin.css: {}
+
 system.admin:
   version: VERSION
   css:
@@ -165,7 +161,6 @@ system.admin:
       css/components/system-admin--links.css: { weight: -10 }
       css/components/system-admin--modules.css: { weight: -10 }
       css/components/system-admin--panel.css: { weight: -10 }
-      css/components/system-admin--status-report.css: { weight: -10 }
     layout:
       css/layout/system-admin--layout.css: { weight: -10 }
   dependencies:
@@ -197,6 +192,7 @@ autocomplete:
     js/autocomplete.js: {}
   dependencies:
     - core/once
+    - claro/claro.jquery.ui
 
 drupal.shortcut:
   version: VERSION
@@ -214,6 +210,11 @@ ajax:
   js:
     js/ajax.js: {}
 
+item-list:
+  css:
+    component:
+      css/classy/components/item-list.css: {}
+
 form.password-confirm:
   css:
     component:
@@ -224,10 +225,40 @@ form.password-confirm:
     - core/drupal
     - claro/global-styling
 
+
+status.report:
+  version: VERSION
+  css:
+    component:
+      css/components/system-status-report-general-info.css: {}
+      css/components/system-status-report.css: {}
+      css/components/system-status-report-counters.css: {}
+      css/components/system-status-counter.css: {}
+  moved_files:
+    claro/global-styling:
+      deprecation_version: 11.2.0
+      removed_version: 12.0.0
+      deprecation_link: https://www.drupal.org/node/3432346
+      css:
+        component:
+          css/components/system-status-report.css:
+            base: css/components/system-status-report.css
+          css/components/system-status-counter.css:
+            base: css/components/system-status-counter.css
+          css/components/system-status-report-counters.css:
+            base: css/components/system-status-report-counters.css
+          css/components/system-status-report-general-info.css:
+            base: css/components/system-status-report-general-info.css
+
 views:
   css:
     component:
       css/components/views-exposed-form.css: {}
+
+views_ui:
+  css:
+    component:
+      css/components/views-ui.css: {}
 
 messages:
   js:
@@ -279,6 +310,11 @@ progress:
     component:
       css/components/progress.css: {}
 
+tabbingmanager:
+  version: VERSION
+  dependencies:
+    - claro/claro.jquery.ui
+
 filter:
   version: VERSION
   css:
@@ -297,23 +333,11 @@ tableselect:
     - core/tabbable
     - core/once
 
-classy.book-navigation:
-  version: VERSION
-  css:
-    component:
-      css/classy/components/book-navigation.css: {}
-
 classy.file:
   version: VERSION
   css:
     component:
       css/classy/components/file.css: { weight: -10 }
-
-classy.forum:
-  version: VERSION
-  css:
-    component:
-      css/classy/components/forum.css: { weight: -10 }
 
 classy.indented:
   version: VERSION

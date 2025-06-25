@@ -123,7 +123,7 @@ class Dependency {
    * @return static
    */
   public static function createFromString($dependency) {
-    if (strpos($dependency, ':') !== FALSE) {
+    if (str_contains($dependency, ':')) {
       [$project, $dependency] = explode(':', $dependency);
     }
     else {
@@ -141,7 +141,7 @@ class Dependency {
    * @return array
    *   The properties to serialize.
    */
-  public function __sleep() {
+  public function __sleep(): array {
     return ['name', 'project', 'constraintString'];
   }
 

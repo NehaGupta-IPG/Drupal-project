@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\comment\Tests\CommentTestTrait;
@@ -13,8 +15,7 @@ use Drupal\taxonomy\Entity\Term;
 use Drupal\Tests\BrowserTestBase;
 
 /**
- * Tests themed output for each entity type in all available themes to ensure
- * entity labels are filtered for XSS.
+ * Tests XSS filtering for themed output for each entity type in all themes.
  *
  * @group Theme
  */
@@ -87,7 +88,7 @@ class EntityFilteringThemeTest extends BrowserTestBase {
     $listing = new ExtensionDiscovery(\Drupal::root());
     $this->themes = $listing->scan('theme', FALSE);
     /** @var \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler */
-    $theme_data = \Drupal::service('theme_handler')->rebuildThemeData();
+    $theme_data = \Drupal::service('extension.list.theme')->reset()->getList();
     foreach (array_keys($this->themes) as $theme) {
       // Skip obsolete and deprecated themes.
       $info = $theme_data[$theme]->info;
@@ -139,7 +140,7 @@ class EntityFilteringThemeTest extends BrowserTestBase {
   /**
    * Checks each themed entity for XSS filtering in available themes.
    */
-  public function testThemedEntity() {
+  public function testThemedEntity(): void {
     // Check paths where various view modes of the entities are rendered.
     $paths = [
       'user',

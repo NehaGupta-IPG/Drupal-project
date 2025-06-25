@@ -29,7 +29,6 @@ select {
   background-position: right var(--sp) center; /* LTR */
   font-family: inherit;
   font-size: inherit;
-  -webkit-appearance: none;
   appearance: none;
 }
 
@@ -39,7 +38,6 @@ select:focus {
 }
 
 @supports (outline-style: double) {
-
   select:focus {
     border-width: 1px;
     outline-width: 6px;
@@ -79,20 +77,15 @@ select.form-element--small {
 /* Necessary to show chevron in forced colors mode in modern browsers. */
 
 @media (forced-colors: active) {
-
   select {
     padding-inline-end: var(--sp);
     background-image: none;
-    -webkit-appearance: listbox;
-    appearance: listbox; /* Default <select> appearance value for modern browsers. */
+    appearance: auto; /* Default <select> appearance value for modern browsers. */
 
     /* Lets browser set <select> appearance to whatever the browser's default is. */
   }
-
-  @supports ((-webkit-appearance: revert) or (appearance: revert)) {
-
+  @supports (appearance: revert) {
     select {
-      -webkit-appearance: revert;
       appearance: revert;
     }
   }

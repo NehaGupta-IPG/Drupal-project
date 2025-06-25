@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\block_content\Functional;
 
@@ -49,20 +49,31 @@ class BlockContentRevisionRevertTest extends BlockContentTestBase {
     $this->drupalGet($entity->toUrl('revision-revert-form'));
     $this->assertSession()->statusCodeEquals(403);
 
-    // Create a new latest revision.
+    // Create a new non default revision.
     $entity
       ->setRevisionCreationTime((new \DateTimeImmutable('11 January 2009 5pm'))->getTimestamp())
       ->setRevisionTranslationAffected(TRUE)
       ->setNewRevision();
+    $entity->isDefaultRevision(FALSE);
     $entity->save();
+    $nonDefaultRevisionId = $entity->getRevisionId();
 
-    // Reload the entity.
+    // Reload the default entity.
     $revision = \Drupal::entityTypeManager()->getStorage('block_content')
       ->loadRevision($revisionId);
+    // Cannot revert default revision.
     $this->drupalGet($revision->toUrl('revision-revert-form'));
-    $this->assertSession()->pageTextContains('Are you sure you want to revert to the revision from Sun, 01/11/2009 - 16:00?');
+    $this->assertSession()->statusCodeEquals(403);
+    $this->assertFalse($revision->access('revert', $this->adminUser, FALSE));
+
+    // Reload the non default entity.
+    $revision2 = \Drupal::entityTypeManager()->getStorage('block_content')
+      ->loadRevision($nonDefaultRevisionId);
+    $this->drupalGet($revision2->toUrl('revision-revert-form'));
+    $this->assertSession()->pageTextContains('Are you sure you want to revert to the revision from Sun, 11 Jan 2009 - 17:00?');
     $this->assertSession()->buttonExists('Revert');
     $this->assertSession()->linkExists('Cancel');
+    $this->assertTrue($revision2->access('revert', $this->adminUser, FALSE));
 
     $countRevisions = static function (): int {
       return (int) \Drupal::entityTypeManager()->getStorage('block_content')
@@ -77,8 +88,8 @@ class BlockContentRevisionRevertTest extends BlockContentTestBase {
     $this->submitForm([], 'Revert');
     $this->assertEquals($count + 1, $countRevisions());
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->addressEquals(sprintf('block/%s/revisions', $entity->id()));
-    $this->assertSession()->pageTextContains(sprintf('basic %s has been reverted to the revision from Sun, 01/11/2009 - 16:00.', $entity->label()));
+    $this->assertSession()->addressEquals(sprintf('admin/content/block/%s/revisions', $entity->id()));
+    $this->assertSession()->pageTextContains(sprintf('basic %s has been reverted to the revision from Sun, 11 Jan 2009 - 17:00.', $entity->label()));
     // Three rows, from the top: the newly reverted revision, the revision from
     // 5pm, and the revision from 4pm.
     $this->assertSession()->elementsCount('css', 'table tbody tr', 3);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Test;
 
 use Composer\Autoload\ClassLoader;
@@ -11,35 +13,41 @@ use Drupal\Core\Test\Exception\MissingGroupException;
 use Drupal\Core\Test\TestDiscovery;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
- * @coversDefaultClass \Drupal\Core\Test\TestDiscovery
- * @group Test
+ * Unit tests for TestDiscovery.
  */
+#[CoversClass(TestDiscovery::class)]
+#[Group('Test')]
+#[IgnoreDeprecations]
 class TestDiscoveryTest extends UnitTestCase {
 
   /**
-   * @covers ::getTestInfo
-   * @dataProvider infoParserProvider
+   * @legacy-covers ::getTestInfo
    */
-  public function testTestInfoParser($expected, $classname, $doc_comment = NULL) {
+  #[DataProvider('infoParserProvider')]
+  public function testTestInfoParser($expected, $classname, $doc_comment = NULL): void {
     $info = TestDiscovery::getTestInfo($classname, $doc_comment);
     $this->assertEquals($expected, $info);
   }
 
-  public function infoParserProvider() {
+  public static function infoParserProvider() {
     // A module provided unit test.
     $tests[] = [
       // Expected result.
       [
-        'name' => static::class,
+        'name' => TestDatabaseTest::class,
         'group' => 'Test',
-        'groups' => ['Test'],
-        'description' => 'Tests \Drupal\Core\Test\TestDiscovery.',
+        'groups' => ['Test', 'simpletest', 'Template'],
+        'description' => 'Tests \Drupal\Core\Test\TestDatabase.',
         'type' => 'PHPUnit-Unit',
       ],
       // Classname.
-      static::class,
+      TestDatabaseTest::class,
     ];
 
     // A core unit test.
@@ -56,6 +64,20 @@ class TestDiscoveryTest extends UnitTestCase {
       'Drupal\Tests\Core\DrupalTest',
     ];
 
+    // A component unit test.
+    $tests[] = [
+      // Expected result.
+      [
+        'name' => 'Drupal\Tests\Component\Plugin\PluginBaseTest',
+        'group' => 'Plugin',
+        'groups' => ['Plugin'],
+        'description' => 'Tests \Drupal\Component\Plugin\PluginBase.',
+        'type' => 'PHPUnit-Unit-Component',
+      ],
+      // Classname.
+      'Drupal\Tests\Component\Plugin\PluginBaseTest',
+    ];
+
     // Functional PHPUnit test.
     $tests[] = [
       // Expected result.
@@ -70,7 +92,7 @@ class TestDiscoveryTest extends UnitTestCase {
       'Drupal\FunctionalTests\BrowserTestBaseTest',
     ];
 
-    // kernel PHPUnit test.
+    // Kernel PHPUnit test.
     $tests['phpunit-kernel'] = [
       // Expected result.
       [
@@ -201,9 +223,9 @@ class TestDiscoveryTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getTestInfo
+   * @legacy-covers ::getTestInfo
    */
-  public function testTestInfoParserMissingGroup() {
+  public function testTestInfoParserMissingGroup(): void {
     $classname = 'Drupal\KernelTests\field\BulkDeleteTest';
     $doc_comment = <<<EOT
 /**
@@ -216,9 +238,9 @@ EOT;
   }
 
   /**
-   * @covers ::getTestInfo
+   * @legacy-covers ::getTestInfo
    */
-  public function testTestInfoParserMissingSummary() {
+  public function testTestInfoParserMissingSummary(): void {
     $classname = 'Drupal\KernelTests\field\BulkDeleteTest';
     $doc_comment = <<<EOT
 /**
@@ -229,7 +251,7 @@ EOT;
     $this->assertEmpty($info['description']);
   }
 
-  protected function setupVfsWithTestClasses() {
+  protected function setupVfsWithTestClasses(): void {
     vfsStream::setup('drupal');
 
     $test_file = <<<EOF
@@ -295,9 +317,9 @@ EOF;
   }
 
   /**
-   * @covers ::getTestClasses
+   * @legacy-covers ::getTestClasses
    */
-  public function testGetTestClasses() {
+  public function testGetTestClasses(): void {
     $this->setupVfsWithTestClasses();
     $extensions = [
       'test_module' => new Extension('vfs://drupal', 'module', 'modules/test_module/test_module.info.yml'),
@@ -364,9 +386,9 @@ EOF;
   }
 
   /**
-   * @covers ::getTestClasses
+   * @legacy-covers ::getTestClasses
    */
-  public function testGetTestClassesWithSelectedTypes() {
+  public function testGetTestClassesWithSelectedTypes(): void {
     $this->setupVfsWithTestClasses();
     $extensions = [
       'test_module' => new Extension('vfs://drupal', 'module', 'modules/test_module/test_module.info.yml'),
@@ -409,9 +431,9 @@ EOF;
   }
 
   /**
-   * @covers ::getTestClasses
+   * @legacy-covers ::getTestClasses
    */
-  public function testGetTestsInProfiles() {
+  public function testGetTestsInProfiles(): void {
     $this->setupVfsWithTestClasses();
     $class_loader = $this->prophesize(ClassLoader::class);
 
@@ -438,27 +460,27 @@ EOF;
   }
 
   /**
-   * @covers ::getPhpunitTestSuite
-   * @dataProvider providerTestGetPhpunitTestSuite
+   * @legacy-covers ::getPhpunitTestSuite
    */
-  public function testGetPhpunitTestSuite($classname, $expected) {
+  #[DataProvider('providerTestGetPhpunitTestSuite')]
+  public function testGetPhpunitTestSuite($classname, $expected): void {
     $this->assertEquals($expected, TestDiscovery::getPhpunitTestSuite($classname));
   }
 
-  public function providerTestGetPhpunitTestSuite() {
+  public static function providerTestGetPhpunitTestSuite() {
     $data = [];
-    $data['simpletest-webtest'] = ['\Drupal\rest\Tests\NodeTest', FALSE];
+    $data['simpletest-web test'] = ['\Drupal\rest\Tests\NodeTest', FALSE];
     $data['module-unittest'] = [static::class, 'Unit'];
-    $data['module-kerneltest'] = ['\Drupal\KernelTests\Core\Theme\TwigMarkupInterfaceTest', 'Kernel'];
-    $data['module-functionaltest'] = ['\Drupal\FunctionalTests\BrowserTestBaseTest', 'Functional'];
-    $data['module-functionaljavascripttest'] = ['\Drupal\Tests\toolbar\FunctionalJavascript\ToolbarIntegrationTest', 'FunctionalJavascript'];
+    $data['module-kernel test'] = ['\Drupal\KernelTests\Core\Theme\TwigMarkupInterfaceTest', 'Kernel'];
+    $data['module-functional test'] = ['\Drupal\FunctionalTests\BrowserTestBaseTest', 'Functional'];
+    $data['module-functional javascript test'] = ['\Drupal\Tests\toolbar\FunctionalJavascript\ToolbarIntegrationTest', 'FunctionalJavascript'];
     $data['core-unittest'] = ['\Drupal\Tests\ComposerIntegrationTest', 'Unit'];
     $data['core-unittest2'] = ['Drupal\Tests\Core\DrupalTest', 'Unit'];
-    $data['core-unittest3'] = ['Drupal\Tests\Scripts\TestSiteApplicationTest', 'Unit'];
-    $data['core-kerneltest'] = ['\Drupal\KernelTests\KernelTestBaseTest', 'Kernel'];
-    $data['core-functionaltest'] = ['\Drupal\FunctionalTests\ExampleTest', 'Functional'];
-    $data['core-functionaljavascripttest'] = ['\Drupal\FunctionalJavascriptTests\ExampleTest', 'FunctionalJavascript'];
-    $data['core-buildtest'] = ['\Drupal\BuildTests\Framework\Tests\BuildTestTest', 'Build'];
+    $data['core-script-test'] = ['Drupal\KernelTests\Scripts\TestSiteApplicationTest', 'Kernel'];
+    $data['core-kernel test'] = ['\Drupal\KernelTests\KernelTestBaseTest', 'Kernel'];
+    $data['core-functional test'] = ['\Drupal\FunctionalTests\ExampleTest', 'Functional'];
+    $data['core-functional javascript test'] = ['\Drupal\FunctionalJavascriptTests\ExampleTest', 'FunctionalJavascript'];
+    $data['core-build test'] = ['\Drupal\BuildTests\Framework\Tests\BuildTestTest', 'Build'];
 
     return $data;
   }
@@ -466,9 +488,9 @@ EOF;
   /**
    * Ensure that classes are not reflected when the docblock is empty.
    *
-   * @covers ::getTestInfo
+   * @legacy-covers ::getTestInfo
    */
-  public function testGetTestInfoEmptyDocblock() {
+  public function testGetTestInfoEmptyDocblock(): void {
     // If getTestInfo() performed reflection, it won't be able to find the
     // class we asked it to analyze, so it will throw a ReflectionException.
     // We want to make sure it didn't do that, because we already did some
@@ -481,9 +503,9 @@ EOF;
   /**
    * Ensure TestDiscovery::scanDirectory() ignores certain abstract file types.
    *
-   * @covers ::scanDirectory
+   * @legacy-covers ::scanDirectory
    */
-  public function testScanDirectoryNoAbstract() {
+  public function testScanDirectoryNoAbstract(): void {
     $this->setupVfsWithTestClasses();
     $files = TestDiscovery::scanDirectory('Drupal\\Tests\\test_module\\Kernel\\', vfsStream::url('drupal/modules/test_module/tests/src/Kernel'));
     $this->assertNotEmpty($files);

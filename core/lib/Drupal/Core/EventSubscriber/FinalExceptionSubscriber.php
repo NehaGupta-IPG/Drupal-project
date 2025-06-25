@@ -3,6 +3,9 @@
 namespace Drupal\Core\EventSubscriber;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Render\PlainTextOutput;
+use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Error;
@@ -62,6 +65,7 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
    * Gets the configured error level.
    *
    * @return string
+   *   The error level. Defaults to the configure site error level.
    */
   protected function getErrorLevel() {
     if (!isset($this->errorLevel)) {
@@ -123,7 +127,7 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
     }
 
     $content_type = $event->getRequest()->getRequestFormat() == 'html' ? 'text/html' : 'text/plain';
-    $content = $this->t('The website encountered an unexpected error. Please try again later.');
+    $content = $this->t('The website encountered an unexpected error. Try again later.');
     $content .= $message ? '<br><br>' . $message : '';
     $response = new Response($content, 500, ['Content-Type' => $content_type]);
 
@@ -139,9 +143,38 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
   }
 
   /**
+   * Handles all 4xx errors that aren't caught in other exception subscribers.
+   *
+   * For example, we catch 406s and 403s generated when handling unsupported
+   * formats.
+   *
+   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   *   The event to process.
+   */
+  public function on4xx(ExceptionEvent $event) {
+    $exception = $event->getThrowable();
+    if ($exception && $exception instanceof HttpExceptionInterface && str_starts_with((string) $exception->getStatusCode(), '4')) {
+      $message = PlainTextOutput::renderFromHtml($exception->getMessage());
+      // If the exception is cacheable, generate a cacheable response.
+      if ($exception instanceof CacheableDependencyInterface) {
+        $response = new CacheableResponse($message, $exception->getStatusCode(), ['Content-Type' => 'text/plain']);
+        $response->addCacheableDependency($exception);
+      }
+      else {
+        $response = new Response($message, $exception->getStatusCode(), ['Content-Type' => 'text/plain']);
+      }
+
+      $response->headers->add($exception->getHeaders());
+      $event->setResponse($response);
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents(): array {
+    // Listen on 4xx exceptions late, but before the final exception handler.
+    $events[KernelEvents::EXCEPTION][] = ['on4xx', -250];
     // Run as the final (very late) KernelEvents::EXCEPTION subscriber.
     $events[KernelEvents::EXCEPTION][] = ['onException', -256];
     return $events;
@@ -151,6 +184,7 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
    * Checks whether the error level is verbose or not.
    *
    * @return bool
+   *   TRUE when verbose reporting is enabled, FALSE otherwise.
    */
   protected function isErrorLevelVerbose() {
     return $this->getErrorLevel() === ERROR_REPORTING_DISPLAY_VERBOSE;
@@ -159,10 +193,11 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
   /**
    * Wrapper for error_displayable().
    *
-   * @param $error
+   * @param array $error
    *   Optional error to examine for ERROR_REPORTING_DISPLAY_SOME.
    *
    * @return bool
+   *   TRUE if an error should be displayed, FALSE otherwise.
    *
    * @see \error_displayable
    */
@@ -176,7 +211,7 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
    * Attempts to reduce verbosity by removing DRUPAL_ROOT from the file path in
    * the message. This does not happen for (false) security.
    *
-   * @param $error
+   * @param array $error
    *   Optional error to examine for ERROR_REPORTING_DISPLAY_SOME.
    *
    * @return array

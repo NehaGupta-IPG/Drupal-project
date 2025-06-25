@@ -78,6 +78,9 @@ class Query extends QueryBase implements QueryInterface {
    * {@inheritdoc}
    */
   public function execute() {
+    // Invoke entity query alter hooks.
+    $this->alter();
+
     // Load the relevant config records.
     $configs = $this->loadRecords();
 
@@ -200,21 +203,21 @@ class Query extends QueryBase implements QueryInterface {
         case 'STARTS_WITH':
           $filter = static function ($name) use ($value, $prefix_length) {
             $id = substr($name, $prefix_length);
-            return strpos($id, $value) === 0;
+            return str_starts_with($id, $value);
           };
           break;
 
         case 'CONTAINS':
           $filter = static function ($name) use ($value, $prefix_length) {
             $id = substr($name, $prefix_length);
-            return strpos($id, $value) !== FALSE;
+            return str_contains($id, $value);
           };
           break;
 
         case 'ENDS_WITH':
           $filter = static function ($name) use ($value, $prefix_length) {
             $id = substr($name, $prefix_length);
-            return strrpos($id, $value) === strlen($id) - strlen($value);
+            return str_ends_with($id, $value);
           };
           break;
       }
