@@ -2,7 +2,6 @@
 
 namespace Drupal\layout_builder\Form;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Ajax\AjaxFormHelperTrait;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;

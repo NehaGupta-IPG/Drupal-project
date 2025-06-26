@@ -4,7 +4,6 @@ namespace Drupal\settings_tray\Block;
 
 use Drupal\block\BlockForm;
 use Drupal\block\BlockInterface;
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Ajax\AjaxFormHelperTrait;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\RedirectCommand;
