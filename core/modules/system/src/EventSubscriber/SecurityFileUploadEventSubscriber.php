@@ -107,7 +107,7 @@ class SecurityFileUploadEventSubscriber implements EventSubscriberInterface {
       if ($munge_everything) {
         $filename .= '_';
       }
-      elseif (!empty($extensions) && !in_array(strtolower($filename_part), $extensions) && preg_match("/^[a-zA-Z]{2,5}\d?$/", $filename_part)) {
+      elseif (!empty($extensions) && !in_array(strtolower($filename_part), $extensions) && in_array(strtolower($filename_part), FileSystemInterface::INSECURE_EXTENSIONS, TRUE)) {
         $filename .= '_';
       }
     }
