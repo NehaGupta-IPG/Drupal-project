@@ -22,7 +22,6 @@ use Drupal\Composer\Composer;
  * This is because Composer only uses the packages.json file to resolve the
  * project template and not any other dependencies.
  *
- * @group #slow
  * @group Template
  */
 class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
@@ -32,7 +31,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
    *
    * @see https://getcomposer.org/doc/04-schema.md#minimum-stability
    */
-  protected const MINIMUM_STABILITY = 'beta';
+  protected const MINIMUM_STABILITY = 'stable';
 
   /**
    * The order of stability strings from least stable to most stable.
@@ -110,6 +109,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
 
     $exclude = [
       'drupal/core',
+      'drupal/core-recipe-unpack',
       'drupal/core-project-message',
       'drupal/core-vendor-hardening',
     ];
@@ -424,6 +424,11 @@ JSON;
    */
   protected function getCoreStability() {
     $version = \Drupal::VERSION;
+    // If the current version is x.y-dev then this is the equivalent of the main
+    // branch and should be treated as a dev release.
+    if (preg_match('/^(\d)+\.(\d)+-dev$/', $version)) {
+      return 'dev';
+    }
     $stability = VersionParser::parseStability($version);
     if ($stability === 'dev') {
       // Strip off "-dev";

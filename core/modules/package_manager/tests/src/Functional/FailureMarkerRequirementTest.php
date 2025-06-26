@@ -7,8 +7,7 @@ namespace Drupal\Tests\package_manager\Functional;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\package_manager\FailureMarker;
 use Drupal\package_manager\PathLocator;
-use Drupal\package_manager\StageBase;
-use Drupal\Tests\BrowserTestBase;
+use Drupal\package_manager\SandboxManagerBase;
 use Drupal\Tests\package_manager\Traits\AssertPreconditionsTrait;
 
 /**
@@ -17,7 +16,7 @@ use Drupal\Tests\package_manager\Traits\AssertPreconditionsTrait;
  * @group package_manager
  * @internal
  */
-class FailureMarkerRequirementTest extends BrowserTestBase {
+class FailureMarkerRequirementTest extends PackageManagerTestBase {
   use StringTranslationTrait;
 
   use AssertPreconditionsTrait;
@@ -29,11 +28,6 @@ class FailureMarkerRequirementTest extends BrowserTestBase {
     'package_manager',
     'package_manager_bypass',
   ];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $defaultTheme = 'stark';
 
   /**
    * Tests that error is shown if failure marker already exists.
@@ -50,13 +44,14 @@ class FailureMarkerRequirementTest extends BrowserTestBase {
 
     $failure_marker = $this->container->get(FailureMarker::class);
     $message = $this->t('Package Manager is here to wreck your day.');
-    $stage = new class() extends StageBase {
+    $stage = new class() extends SandboxManagerBase {
 
       public function __construct() {}
 
       /**
        * {@inheritdoc}
        */
+      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable, Drupal.Commenting.VariableComment.Missing
       protected string $type = 'test';
     };
     $failure_marker->write($stage, $message);

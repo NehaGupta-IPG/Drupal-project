@@ -23,6 +23,14 @@ use Symfony\Component\Process\Process;
 /**
  * Provides a workspace to test build processes.
  *
+ * Module tests extending BuildTestBase must exist in the
+ * Drupal\Tests\your_module\Build namespace and live in the
+ * modules/your_module/tests/src/Build directory.
+ *
+ * Tests for core/lib/Drupal classes extending BuildTestBase must exist in the
+ * \Drupal\BuildTests namespace and live in the core/tests/Drupal/BuildTests
+ * directory.
+ *
  * If you need to build a file system and then run a command from the command
  * line then this is the test framework for you.
  *
@@ -215,6 +223,7 @@ abstract class BuildTestBase extends TestCase {
    * Set up the Mink session manager.
    *
    * @return \Behat\Mink\Session
+   *   The Mink session.
    */
   protected function initMink() {
     $client = new DrupalTestBrowser();
@@ -319,12 +328,13 @@ abstract class BuildTestBase extends TestCase {
    *   execute the command. Defaults to the workspace directory.
    *
    * @return \Symfony\Component\Process\Process
+   *   The process object.
    */
   public function executeCommand($command_line, $working_dir = NULL) {
     $this->commandProcess = Process::fromShellCommandline($command_line);
     $this->commandProcess->setWorkingDirectory($this->getWorkingPath($working_dir))
-      ->setTimeout(300)
-      ->setIdleTimeout(300);
+      ->setTimeout(360)
+      ->setIdleTimeout(360);
     $this->commandProcess->run();
     return $this->commandProcess;
   }
@@ -502,6 +512,7 @@ abstract class BuildTestBase extends TestCase {
    *   A number between 1024 and 65536.
    *
    * @return bool
+   *   TRUE if the port is available, FALSE otherwise.
    */
   protected function checkPortIsAvailable($port): bool {
     $fp = @fsockopen(self::$hostName, $port, $errno, $errstr, 1);
@@ -523,6 +534,7 @@ abstract class BuildTestBase extends TestCase {
    * Test should never call this. Used by standUpServer().
    *
    * @return int
+   *   The port number.
    */
   protected function getPortNumber(): int {
     if (empty($this->hostPort)) {
