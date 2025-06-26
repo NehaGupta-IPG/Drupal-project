@@ -83,20 +83,27 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
       }
     }
 
+    $target_type_label = $target_type_info->getLabel();
     if ($target_id_data_type === 'integer') {
       $target_id_definition = DataReferenceTargetDefinition::create('integer')
-        ->setLabel(new TranslatableMarkup('@label ID', ['@label' => $target_type_info->getLabel()]))
+        ->setLabel(new TranslatableMarkup('@label ID', ['@label' => $target_type_label]))
         ->setSetting('unsigned', TRUE);
     }
     else {
       $target_id_definition = DataReferenceTargetDefinition::create('string')
-        ->setLabel(new TranslatableMarkup('@label ID', ['@label' => $target_type_info->getLabel()]));
+        ->setLabel(new TranslatableMarkup('@label ID', ['@label' => $target_type_label]));
     }
     $target_id_definition->setRequired(TRUE);
     $properties['target_id'] = $target_id_definition;
 
+    $properties['target_uuid'] = DataReferenceTargetDefinition::create('string')
+      ->setLabel(new TranslatableMarkup('@label UUID', ['@label' => $target_type_label]))
+      ->setComputed(TRUE)
+      ->setReadOnly(FALSE)
+      ->addConstraint('Uuid');
+
     $properties['entity'] = DataReferenceDefinition::create('entity')
-      ->setLabel($target_type_info->getLabel())
+      ->setLabel($target_type_label)
       ->setDescription(new TranslatableMarkup('The referenced entity'))
       // The entity object is computed out of the entity ID.
       ->setComputed(TRUE)
