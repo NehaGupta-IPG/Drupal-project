@@ -21,7 +21,7 @@ class BlockDefinitionsTest extends KernelTestBase {
   /**
    * Tests that every block plugin has a category.
    */
-  public function testBlockCategory() {
+  public function testBlockCategory(): void {
     // Get a list of all modules.
     $modules = $this->coreModuleListDataProvider();
 
