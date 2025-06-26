@@ -35,6 +35,16 @@ use Drupal\filter\FilterPluginCollection;
 class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5PluginManagerInterface {
 
   /**
+   * Static cache for ckeditor plugin configuration.
+   */
+  protected array $ckeditorPluginConfigCache = [];
+
+  /**
+   * Static cache for computing provided elements.
+   */
+  protected array $providedElementsCache = [];
+
+  /**
    * Constructs a CKEditor5PluginManager object.
    *
    * @param \Traversable $namespaces
@@ -314,6 +324,10 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
    * {@inheritdoc}
    */
   public function getCKEditor5PluginConfig(EditorInterface $editor): array {
+    $cid = $editor->id();
+    if (isset($this->ckeditorPluginConfigCache[$cid])) {
+      return $this->ckeditorPluginConfigCache;
+    }
     $definitions = $this->getEnabledDefinitions($editor);
 
     // Allow plugin to modify config, such as loading dynamic values.
@@ -342,16 +356,27 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
       ];
     }
 
-    return [
+    $this->ckeditorPluginConfigCache[$cid] =  [
       'plugins' => $this->mergeDefinitionValues('getCKEditor5Plugins', $definitions),
       'config' => NestedArray::mergeDeepArray($config),
     ];
+    return $this->ckeditorPluginConfigCache[$cid];
   }
 
   /**
    * {@inheritdoc}
    */
   public function getProvidedElements(array $plugin_ids = [], ?EditorInterface $editor = NULL, bool $resolve_wildcards = TRUE, bool $creatable_elements_only = FALSE): array {
+    $cid_parts = [
+      ...$plugin_ids,
+      $editor?->id() ?? '',
+      $resolve_wildcards ? '1' : '0',
+      $creatable_elements_only ? '1' : '0',
+    ];
+    $cid = hash('sha256', implode('-', $cid_parts,));
+    if (isset($this->providedElementsCache[$cid])) {
+      return $this->providedElementsCache[$cid];
+    }
     $plugins = $this->getDefinitions();
     if (!empty($plugin_ids)) {
       $plugins = array_intersect_key($plugins, array_flip($plugin_ids));
@@ -430,7 +455,8 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
       }
     }
 
-    return $elements->getAllowedElements($resolve_wildcards);
+    $this->providedElementsCache[$cid] = $elements->getAllowedElements($resolve_wildcards);
+    return $this->providedElementsCache[$cid];
   }
 
   /**
