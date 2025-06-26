@@ -214,7 +214,7 @@ class UrlHelper {
 
         // parse_str() does not distinguish between '?key' and '?key='.
         // This occurs when the URL '/?key' is fed through ::parse() and
-        //  ::buildQuery() incorrectly appends a '=' to the end. Replacing
+        // ::buildQuery() incorrectly appends a '=' to the end. Replacing
         // empty string values with NULL solves that problem.
         foreach ($options['query'] as $key => &$value) {
           $escaped_key = preg_quote($key, '/');
