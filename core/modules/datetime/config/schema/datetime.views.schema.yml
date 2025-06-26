@@ -23,7 +23,7 @@ views.filter.datetime:
   type: views.filter.date
   mapping:
     granularity:
-      type: integer
+      type: string
       label: 'Granularity'
 
 views.filter_value.datetime:
