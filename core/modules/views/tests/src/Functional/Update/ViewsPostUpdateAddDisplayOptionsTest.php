@@ -19,8 +19,6 @@ class ViewsPostUpdateAddDisplayOptionsTest extends UpdatePathTestBase {
 
   /**
    * Sets the path to database dumps.
-   *
-   * @return void
    */
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
@@ -38,8 +36,6 @@ class ViewsPostUpdateAddDisplayOptionsTest extends UpdatePathTestBase {
 
   /**
    * Tests the upgrade path for adding 'style_options' and 'pager_options'.
-   *
-   * @return void
    */
   public function testViewsAddDisplayOptionsUpdateForAllDisplays(): void {
     // Load the view to test the update on.

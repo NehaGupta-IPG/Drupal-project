@@ -118,7 +118,8 @@ function views_post_update_block_items_per_page(?array &$sandbox = NULL): void {
  *   A sandbox array used for batch processing.
  *
  * @return string|null
- *   A message indicating the result of the update, or null if the batch is still processing.
+ *   A message indicating the result of the update, or null if the batch is
+ *   still processing.
  */
 function views_post_update_add_style_and_pager_display_options(?array &$sandbox = NULL): ?string {
   if (!isset($sandbox['progress'])) {
