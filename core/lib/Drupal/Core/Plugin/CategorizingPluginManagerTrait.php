@@ -33,7 +33,7 @@ trait CategorizingPluginManagerTrait {
     if (empty($definition['category'])) {
       // Default to the human readable module name if the provider is a module;
       // otherwise the provider machine name is used.
-      $definition['category'] = $this->getProviderName($definition['provider']);
+      $definition['category'] = $this->t($this->getProviderName($definition['provider']));
     }
   }
 

@@ -10,6 +10,7 @@ use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\CategorizingPluginManagerTrait;
 use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -95,28 +96,30 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
   public function testProcessDefinitionCategory(): void {
     // Existing category.
     $definition = [
-      'label' => 'some',
+      'label' => new TranslatableMarkup('some'),
       'provider' => 'core',
-      'category' => 'bag',
+      'category' => new TranslatableMarkup('bag'),
     ];
     $this->pluginManager->processDefinition($definition, 'some');
-    $this->assertSame('bag', $definition['category']);
+    $this->assertSame('bag', $definition['category']->getUntranslatedString());
 
     // No category, provider without label.
     $definition = [
-      'label' => 'some',
+      'label' => new TranslatableMarkup('some'),
       'provider' => 'core',
     ];
     $this->pluginManager->processDefinition($definition, 'some');
-    $this->assertSame('core', $definition['category']);
+    $this->assertInstanceOf(TranslatableMarkup::class, $definition['category']);
+    $this->assertSame('core', $definition['category']->getUntranslatedString());
 
     // No category, provider is module with label.
     $definition = [
-      'label' => 'some',
+      'label' => new TranslatableMarkup('some'),
       'provider' => 'node',
     ];
     $this->pluginManager->processDefinition($definition, 'some');
-    $this->assertSame('Node', $definition['category']);
+    $this->assertInstanceOf(TranslatableMarkup::class, $definition['category']);
+    $this->assertSame('Node', $definition['category']->getUntranslatedString());
   }
 
 }
