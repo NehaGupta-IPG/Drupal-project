@@ -15,7 +15,8 @@ use Drupal\Core\Routing\RouteMatchInterface;
  */
 #[Block(
   id: "local_actions_block",
-  admin_label: new TranslatableMarkup("Primary admin actions")
+  admin_label: new TranslatableMarkup("Primary admin actions"),
+  category: new TranslatableMarkup("Menus"),
 )]
 class LocalActionsBlock extends BlockBase implements ContainerFactoryPluginInterface {
 

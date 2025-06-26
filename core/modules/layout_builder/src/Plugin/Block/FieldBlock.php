@@ -36,7 +36,8 @@ use Drupal\field\FieldLabelOptionsTrait;
  */
 #[Block(
   id: "field_block",
-  deriver: FieldBlockDeriver::class
+  category: new TranslatableMarkup("Layout Builder"),
+  deriver: FieldBlockDeriver::class,
 )]
 class FieldBlock extends BlockBase implements ContextAwarePluginInterface, ContainerFactoryPluginInterface {
 

@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 #[Block(
   id: "system_branding_block",
   admin_label: new TranslatableMarkup("Site branding"),
+  category: new TranslatableMarkup("System"),
   forms: ['settings_tray' => SystemBrandingOffCanvasForm::class]
 )]
 class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInterface {

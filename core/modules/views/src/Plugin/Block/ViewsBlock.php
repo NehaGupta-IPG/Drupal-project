@@ -16,6 +16,7 @@ use Drupal\Core\Entity\EntityInterface;
 #[Block(
   id: "views_block",
   admin_label: new TranslatableMarkup("Views Block"),
+  category: new TranslatableMarkup("Lists (Views)"),
   deriver: ViewsBlockDeriver::class
 )]
 class ViewsBlock extends ViewsBlockBase {

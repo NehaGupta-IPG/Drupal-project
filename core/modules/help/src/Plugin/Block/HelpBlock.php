@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 #[Block(
   id: "help_block",
   admin_label: new TranslatableMarkup("Help"),
+  category: new TranslatableMarkup("Help"),
   forms: ['settings_tray' => FALSE]
 )]
 class HelpBlock extends BlockBase implements ContainerFactoryPluginInterface {

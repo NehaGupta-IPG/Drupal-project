@@ -15,7 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 #[Block(
   id: "system_breadcrumb_block",
-  admin_label: new TranslatableMarkup("Breadcrumbs")
+  admin_label: new TranslatableMarkup("Breadcrumbs"),
+  category: new TranslatableMarkup("System"),
 )]
 class SystemBreadcrumbBlock extends BlockBase implements ContainerFactoryPluginInterface {
 

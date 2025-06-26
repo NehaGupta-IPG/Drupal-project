@@ -30,6 +30,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 #[Block(
   id: "extra_field_block",
+  category: new TranslatableMarkup("Layout Builder"),
   deriver: ExtraFieldBlockDeriver::class
 )]
 class ExtraFieldBlock extends BlockBase implements ContextAwarePluginInterface, ContainerFactoryPluginInterface {

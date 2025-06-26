@@ -21,8 +21,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 #[Block(
   id: 'announce_block',
-  admin_label: new TranslatableMarkup('Announcements Feed')),
-]
+  admin_label: new TranslatableMarkup('Announcements Feed'),
+  category: new TranslatableMarkup('Announcements Feed'),
+)]
 class AnnounceBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**

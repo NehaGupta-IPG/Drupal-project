@@ -13,6 +13,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 #[Block(
   id: "system_main_block",
   admin_label: new TranslatableMarkup("Main page content"),
+  category: new TranslatableMarkup("System"),
   forms: [
     'settings_tray' => FALSE,
   ]

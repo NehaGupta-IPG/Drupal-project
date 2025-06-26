@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 #[Block(
   id: 'navigation_shortcuts',
   admin_label: new TranslatableMarkup('Navigation Shortcuts'),
+  category: new TranslatableMarkup('Navigation'),
 )]
 final class NavigationShortcutsBlock extends BlockBase implements ContainerFactoryPluginInterface {
 

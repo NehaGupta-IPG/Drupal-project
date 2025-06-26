@@ -15,7 +15,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  */
 #[Block(
   id: "system_messages_block",
-  admin_label: new TranslatableMarkup("Messages")
+  admin_label: new TranslatableMarkup("Messages"),
+  category: new TranslatableMarkup("System"),
 )]
 class SystemMessagesBlock extends BlockBase implements MessagesBlockPluginInterface {
 

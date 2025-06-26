@@ -20,6 +20,7 @@ use Drupal\Core\Url;
 #[Block(
   id: 'navigation_link',
   admin_label: new TranslatableMarkup('Link'),
+  category: new TranslatableMarkup('Navigation'),
 )]
 final class NavigationLinkBlock extends BlockBase {
 
