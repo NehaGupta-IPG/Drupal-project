@@ -4,4 +4,4 @@ description: 'Provides a custom entity type to test hidden widget behavior.'
 core_version_requirement: ^11
 package: Testing
 dependencies:
-  - field
+  - drupal:field

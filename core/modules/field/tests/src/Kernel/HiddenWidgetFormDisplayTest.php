@@ -29,7 +29,7 @@ class HiddenWidgetFormDisplayTest extends KernelTestBase {
   /**
    * Tests hidden widget in form display.
    */
-  public function testHiddenWidgetNotRendered() {
+  public function testHiddenWidgetNotRendered(): void {
     // Install schema for test_entity.
     $this->installEntitySchema('test_entity');
 

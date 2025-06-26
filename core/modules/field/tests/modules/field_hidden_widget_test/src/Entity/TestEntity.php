@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\field_hidden_widget_test\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
@@ -32,8 +34,8 @@ class TestEntity extends ContentEntityBase {
   /**
    * Gets the entity title.
    */
-  public static function getTitle($entity) {
-    return $entity->get('name')->value ?: t('Test Entity @id', ['@id' => $entity->id()]);
+  public static function getTitle($entity): string {
+    return $entity->get('name')->value ?: (string) t('Test Entity @id', ['@id' => $entity->id()]);
   }
 
   /**
