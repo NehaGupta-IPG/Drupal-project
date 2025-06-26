@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * @file
+ * Module file for field_hidden_widget_test.
+ */
+
+declare(strict_types=1);
