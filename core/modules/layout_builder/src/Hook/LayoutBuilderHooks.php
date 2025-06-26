@@ -2,6 +2,7 @@
 
 namespace Drupal\layout_builder\Hook;
 
+use Drupal\block_content\BlockContentPermissions;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Link;
@@ -276,6 +277,10 @@ class LayoutBuilderHooks {
       return AccessResult::neutral();
     }
     if ($account->hasPermission('create and edit custom blocks')) {
+      return AccessResult::allowed();
+    }
+    if ($account->hasPermission('create and edit accessible custom blocks')
+      && $account->hasPermission(BlockContentPermissions::getBundlePermission($entity->bundle(), $operation))) {
       return AccessResult::allowed();
     }
     return AccessResult::forbidden();
