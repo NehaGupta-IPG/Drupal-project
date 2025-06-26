@@ -66,7 +66,10 @@ class Toolbar extends RenderElementBase {
     if (!empty($breakpoints)) {
       $media_queries = [];
       foreach ($breakpoints as $id => $breakpoint) {
-        $media_queries[$id] = $breakpoint->getMediaQuery();
+        $media_query = $breakpoint->getMediaQuery();
+        if ($media_query !== '') {
+          $media_queries[$id] = $media_query;
+        }
       }
 
       $element['#attached']['drupalSettings']['toolbar']['breakpoints'] = $media_queries;

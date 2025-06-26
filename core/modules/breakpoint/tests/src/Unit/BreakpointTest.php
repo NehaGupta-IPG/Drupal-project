@@ -90,59 +90,28 @@ class BreakpointTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::hasMediaQuery
-   * @dataProvider providerHasMediaQuery
-   */
-  public function testHasMediaQuery(?string $mediaQuery, bool $expectedValue): void {
-    $this->pluginDefinition['mediaQuery'] = $mediaQuery;
-    $this->setupBreakpoint();
-    $this->assertEquals($expectedValue, $this->breakpoint->hasMediaQuery());
-  }
-
-  /**
-   * Test cases for ::testHasMediaQuery.
-   */
-  public static function providerHasMediaQuery(): array {
-    return [
-      'Empty string' => ['', FALSE],
-      'NULL' => [NULL, FALSE],
-      'Not empty string' => ['not empty string', TRUE],
-      'Not empty but "0" falsy string' => ['0', TRUE],
-      'Not empty but "FALSE" falsy string' => ['FALSE', TRUE],
-    ];
-  }
-
-  /**
    * @covers ::getMediaQuery
-   * @dataProvider providerGetMediaQueryReturnsTrimmedString
+   * @dataProvider providerGetMediaQueryHandlesVariousInputs
    */
-  public function testGetMediaQueryReturnsTrimmedString($defined, $expected): void {
-    $this->pluginDefinition['mediaQuery'] = $defined;
+  public function testGetMediaQueryHandlesVariousInputs($input, $expected): void {
+    $this->pluginDefinition['mediaQuery'] = $input;
     $this->setupBreakpoint();
-    $this->assertEquals($expected, $this->breakpoint->getMediaQuery());
+    $this->assertSame($expected, $this->breakpoint->getMediaQuery());
   }
 
   /**
-   * Test cases for ::testGetMediaQueryReturnsTrimmedString.
+   * Test cases for ::testGetMediaQueryHandlesVariousInputs.
    */
-  public static function providerGetMediaQueryReturnsTrimmedString(): array {
-    $mediaQuery = 'only screen and (min-width: 1220px)';
+  public static function providerGetMediaQueryHandlesVariousInputs(): array {
     return [
-      [$mediaQuery, $mediaQuery],
-      [" $mediaQuery", $mediaQuery],
-      ["$mediaQuery ", $mediaQuery],
-      [" $mediaQuery ", $mediaQuery],
-      ["   $mediaQuery   ", $mediaQuery],
+      'Empty string' => ['', ''],
+      'NULL' => [NULL, ''],
+      'Not empty string' => ['not empty string', 'not empty string'],
+      'Not empty but "0" falsy string' => ['0', '0'],
+      'Not empty but "FALSE" falsy string' => ['FALSE', 'FALSE'],
+      'Whitespace only' => ['   ', ''],
+      'Whitespace padded string' => ['  hello  ', 'hello'],
     ];
-  }
-
-  /**
-   * @covers ::getMediaQuery
-   */
-  public function testGetMediaQueryReturnsStringWhenUndefined(): void {
-    $this->pluginDefinition['mediaQuery'] = NULL;
-    $this->setupBreakpoint();
-    $this->assertSame('', $this->breakpoint->getMediaQuery());
   }
 
   /**

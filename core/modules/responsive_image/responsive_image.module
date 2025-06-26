@@ -369,8 +369,9 @@ function _responsive_image_build_source_attributes(array $variables, BreakpointI
   $source_attributes = new Attribute([
     'srcset' => implode(', ', array_unique($srcset)),
   ]);
-  if ($breakpoint->hasMediaQuery()) {
-    $source_attributes->setAttribute('media', $breakpoint->getMediaQuery());
+  $media_query = $breakpoint->getMediaQuery();
+  if ($media_query !== '') {
+    $source_attributes->setAttribute('media', $media_query);
   }
   if (count(array_unique($derivative_mime_types)) == 1) {
     $source_attributes->setAttribute('type', $derivative_mime_types[0]);
