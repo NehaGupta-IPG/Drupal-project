@@ -211,6 +211,7 @@ class ConfigTranslationHooks {
       'mapping' => '\Drupal\config_translation\FormElement\ListElement',
       'sequence' => '\Drupal\config_translation\FormElement\ListElement',
       'plural_label' => '\Drupal\config_translation\FormElement\PluralVariants',
+      'path' => '\Drupal\config_translation\FormElement\Textfield',
     ];
     // Enhance the text and date type definitions with classes to generate
     // proper form elements in ConfigTranslationFormBase. Other translatable
