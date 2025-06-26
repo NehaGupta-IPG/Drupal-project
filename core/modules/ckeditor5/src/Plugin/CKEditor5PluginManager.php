@@ -356,7 +356,7 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
       ];
     }
 
-    $this->ckeditorPluginConfigCache[$cid] =  [
+    $this->ckeditorPluginConfigCache[$cid] = [
       'plugins' => $this->mergeDefinitionValues('getCKEditor5Plugins', $definitions),
       'config' => NestedArray::mergeDeepArray($config),
     ];
