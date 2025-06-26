@@ -2,10 +2,13 @@
 
 namespace Drupal\field;
 
-use Drupal\field\FieldLabelVisibility;
-
 /**
  * Provides a trait for the valid field label options.
+ *
+ * @category Field
+ * @package Drupal\field
+ * @license https://www.gnu.org/licenses/gpl-2.0.html GPL-2.0+
+ * @link https://www.drupal.org
  */
 trait FieldLabelOptionsTrait {
 
@@ -17,10 +20,10 @@ trait FieldLabelOptionsTrait {
    */
   protected function getFieldLabelOptions(): array {
     return [
-      FieldLabelVisibility::ABOVE->value => $this->t('Above'),
-      FieldLabelVisibility::INLINE->value => $this->t('Inline'),
-      FieldLabelVisibility::HIDDEN->value => '- ' . $this->t('Hidden') . ' -',
-      FieldLabelVisibility::VISUALLY_HIDDEN->value => '- ' . $this->t('Visually Hidden') . ' -',
+      FieldLabelVisibility::Above->value => $this->t('Above'),
+      FieldLabelVisibility::Inline->value => $this->t('Inline'),
+      FieldLabelVisibility::Hidden->value => '- ' . $this->t('Hidden') . ' -',
+      FieldLabelVisibility::VisuallyHidden->value => '- ' . $this->t('Visually Hidden') . ' -',
     ];
   }
 
