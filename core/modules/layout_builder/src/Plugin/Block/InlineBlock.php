@@ -2,6 +2,7 @@
 
 namespace Drupal\layout_builder\Plugin\Block;
 
+use Drupal\block_content\BlockContentPermissions;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\RefinableDependentAccessInterface;
@@ -128,6 +129,8 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
    */
   public function blockForm($form, FormStateInterface $form_state) {
     $block = $this->getEntity();
+    $operation = $block->isNew() ? 'create' : 'edit';
+    $block_form_access = $this->blockOperationAccess($this->currentUser, $operation);
 
     // Add the entity form display in a process callback so that #parents can
     // be successfully propagated to field widgets.
@@ -135,7 +138,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
       '#type' => 'container',
       '#process' => [[static::class, 'processBlockForm']],
       '#block' => $block,
-      '#access' => $this->currentUser->hasPermission('create and edit custom blocks'),
+      '#access' => $block_form_access->isAllowed(),
     ];
 
     $options = $this->entityDisplayRepository->getViewModeOptionsByBundle('block_content', $block->bundle());
@@ -211,6 +214,30 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
       return $entity->access('view', $account, TRUE);
     }
     return AccessResult::forbidden();
+  }
+
+  /**
+   * Checks access to perform a given operation on this block.
+   *
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The account being checked.
+   * @param string $operation
+   *   The performed operation (create or edit).
+   *
+   * @return \Drupal\Core\Access\AccessResult
+   *   The access result.
+   */
+  public function blockOperationAccess(AccountInterface $account, string $operation): AccessResult {
+    $result = AccessResult::allowedIfHasPermission($account, 'create and edit custom blocks');
+    if ($result->isAllowed()) {
+      return $result;
+    }
+
+    $block_bundle = $this->getEntity()->bundle();
+    return AccessResult::allowedIfHasPermissions($account, [
+      'create and edit accessible custom blocks',
+      BlockContentPermissions::getBundlePermission($block_bundle, $operation),
+    ]);
   }
 
   /**

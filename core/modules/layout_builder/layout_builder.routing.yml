@@ -71,11 +71,14 @@ layout_builder.add_block:
     _title: 'Configure block'
   requirements:
     _layout_builder_access: 'add_block'
+    _layout_builder_add_block_access: 'view'
   options:
     _admin_route: TRUE
     parameters:
       section_storage:
         layout_builder_tempstore: TRUE
+      plugin_id:
+        type: string
 
 layout_builder.choose_inline_block:
   path: '/layout_builder/choose/inline-block/{section_storage_type}/{section_storage}/{delta}/{region}'
@@ -96,12 +99,16 @@ layout_builder.update_block:
     _form: '\Drupal\layout_builder\Form\UpdateBlockForm'
     _title: 'Configure block'
   requirements:
-    _layout_builder_access: 'view'
+    _layout_builder_update_block_access: 'view'
   options:
     _admin_route: TRUE
     parameters:
       section_storage:
         layout_builder_tempstore: TRUE
+      delta:
+        type: string
+      uuid:
+        type: string
 
 layout_builder.move_block_form:
   path: '/layout_builder/move/block/{section_storage_type}/{section_storage}/{delta}/{region}/{uuid}'

@@ -667,17 +667,14 @@ class InlineBlockTest extends InlineBlockTestBase {
     $this->addInlineBlockToLayout('The block label', 'The body value');
 
     $assert = function ($permissions, $expected) {
-      $assert_session = $this->assertSession();
-
       $this->drupalLogin($this->drupalCreateUser($permissions));
       $this->drupalGet(static::FIELD_UI_PREFIX . '/display/default/layout');
-      $this->clickContextualLink(static::INLINE_BLOCK_LOCATOR, 'Configure');
-      $assert_session->assertWaitOnAjaxRequest();
+      $link_element = $this->getContextualLink(static::INLINE_BLOCK_LOCATOR, 'Configure');
       if ($expected) {
-        $assert_session->fieldExists('settings[block_form][body][0][value]');
+        $this->assertNotNull($link_element);
       }
       else {
-        $assert_session->fieldNotExists('settings[block_form][body][0][value]');
+        $this->assertNull($link_element);
       }
     };
 
