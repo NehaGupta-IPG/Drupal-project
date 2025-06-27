@@ -324,7 +324,7 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
    * {@inheritdoc}
    */
   public function getCKEditor5PluginConfig(EditorInterface $editor): array {
-    $cid = $editor->id();
+    $cid = hash('sha256', serialize($editor->toArray()));
     if (isset($this->ckeditorPluginConfigCache[$cid])) {
       return $this->ckeditorPluginConfigCache;
     }
@@ -369,7 +369,7 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
   public function getProvidedElements(array $plugin_ids = [], ?EditorInterface $editor = NULL, bool $resolve_wildcards = TRUE, bool $creatable_elements_only = FALSE): array {
     $cid_parts = [
       ...$plugin_ids,
-      $editor?->id() ?? '',
+      serialize($editor?->toArray() ?? []),
       $resolve_wildcards ? '1' : '0',
       $creatable_elements_only ? '1' : '0',
     ];
