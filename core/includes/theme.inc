@@ -1176,23 +1176,6 @@ function template_preprocess_field_multiple_value_form(&$variables): void {
 }
 
 /**
- * Prepares variables for breadcrumb templates.
- *
- * Default template: breadcrumb.html.twig.
- *
- * @param array $variables
- *   An associative array containing:
- *   - links: A list of \Drupal\Core\Link objects which should be rendered.
- */
-function template_preprocess_breadcrumb(&$variables): void {
-  $variables['breadcrumb'] = [];
-  /** @var \Drupal\Core\Link $link */
-  foreach ($variables['links'] as $key => $link) {
-    $variables['breadcrumb'][$key] = ['text' => $link->getText(), 'url' => $link->getUrl()->toString()];
-  }
-}
-
-/**
  * Prepares variables for pager templates.
  *
  * Default template: pager.html.twig.
