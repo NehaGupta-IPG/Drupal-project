@@ -9,7 +9,9 @@ use Drupal\Component\Utility\NestedArray;
  */
 class SubformState extends FormStateDecoratorBase implements SubformStateInterface {
 
-  use FormStateValuesTrait;
+  use FormStateValuesTrait {
+    getDeprecationCheckKey as traitGetDeprecationCheckKey;
+  }
 
   /**
    * The parent form.
@@ -165,6 +167,13 @@ class SubformState extends FormStateDecoratorBase implements SubformStateInterfa
     }
 
     return parent::getFormObject();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getDeprecationCheckKey(array|int|string $key): array {
+    return array_merge($this->subform['#parents'], $this->traitGetDeprecationCheckKey($key));
   }
 
 }

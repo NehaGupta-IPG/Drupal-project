@@ -34,7 +34,7 @@ trait FormStateValuesTrait {
       $deprecated = FALSE;
       // Deprecated keys are stored as arrays, so convert single string key to
       // array for comparison.
-      $key = is_array($key) ? $key : [$key];
+      $key = $this->getDeprecationCheckKey($key);
       foreach ($deprecated_keys as $deprecated_key) {
         // This will check whether the array values of $key start with the same
         // values as the deprecated key. For example, if the key is
@@ -102,6 +102,19 @@ trait FormStateValuesTrait {
    */
   public function setValueForElement(array $element, $value) {
     return $this->setValue($element['#parents'], $value);
+  }
+
+  /**
+   * Gets the key to check whether its corresponding element is deprecated.
+   *
+   * @param int|string|list<int|string> $key
+   *   The key to the render element.
+   *
+   * @return string[]
+   *   The key to look up deprecations for.
+   */
+  protected function getDeprecationCheckKey(int|string|array $key): array {
+    return is_array($key) ? $key : [$key];
   }
 
 }
