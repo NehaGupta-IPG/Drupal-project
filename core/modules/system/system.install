@@ -67,9 +67,6 @@ const DRUPAL_CORE_REMOVED_THEME_LIST = [
 function system_requirements($phase): array {
   global $install_state;
 
-  // Get the current default PHP requirements for this version of Drupal.
-  $minimum_supported_php = PhpRequirements::getMinimumSupportedPhp();
-
   // Reset the extension lists.
   /** @var \Drupal\Core\Extension\ModuleExtensionList $module_extension_list */
   $module_extension_list = \Drupal::service('extension.list.module');
@@ -207,6 +204,16 @@ function system_requirements($phase): array {
     _system_advisories_requirements($requirements);
   }
 
+  if (isset($GLOBALS['install_state']['profile_info'])) {
+    $profile_info = $GLOBALS['install_state']['profile_info'];
+  }
+  else {
+    if (!isset($profile)) {
+      $profile = \Drupal::installProfile();
+    }
+    $profile_info = install_profile_info($profile);
+  }
+
   // Web server information.
   $request_object = \Drupal::request();
   $software = $request_object->server->get('SERVER_SOFTWARE');
@@ -307,10 +314,10 @@ function system_requirements($phase): array {
   ];
 
   // Check if the PHP version is below what Drupal supports.
-  if (version_compare($phpversion, $minimum_supported_php) < 0) {
+  if (version_compare($phpversion, $profile_info['php']) < 0) {
     $requirements['php']['description'] = t('Your PHP installation is too old. Drupal requires at least PHP %version. It is recommended to upgrade to PHP version %recommended or higher for the best ongoing support. See <a href="http://php.net/supported-versions.php">PHP\'s version support documentation</a> and the <a href=":php_requirements">Drupal PHP requirements</a> page for more information.',
       [
-        '%version' => $minimum_supported_php,
+        '%version' => $profile_info['php'],
         '%recommended' => \Drupal::RECOMMENDED_PHP,
         ':php_requirements' => 'https://www.drupal.org/docs/system-requirements/php-requirements',
       ]
@@ -591,16 +598,16 @@ function system_requirements($phase): array {
     'value' => $memory_limit == -1 ? t('-1 (Unlimited)') : $memory_limit,
   ];
 
-  if (!Environment::checkMemoryLimit(\Drupal::MINIMUM_PHP_MEMORY_LIMIT, $memory_limit)) {
+  if (!Environment::checkMemoryLimit($profile_info['php_memory_limit'], $memory_limit)) {
     $description = [];
     if ($phase == 'install') {
-      $description['phase'] = t('Consider increasing your PHP memory limit to %memory_minimum_limit to help prevent errors in the installation process.', ['%memory_minimum_limit' => \Drupal::MINIMUM_PHP_MEMORY_LIMIT]);
+      $description['phase'] = t('Consider increasing your PHP memory limit to %memory_minimum_limit to help prevent errors in the installation process.', ['%memory_minimum_limit' => $profile_info['php_memory_limit']]);
     }
     elseif ($phase == 'update') {
-      $description['phase'] = t('Consider increasing your PHP memory limit to %memory_minimum_limit to help prevent errors in the update process.', ['%memory_minimum_limit' => \Drupal::MINIMUM_PHP_MEMORY_LIMIT]);
+      $description['phase'] = t('Consider increasing your PHP memory limit to %memory_minimum_limit to help prevent errors in the update process.', ['%memory_minimum_limit' => $profile_info['php_memory_limit']]);
     }
     elseif ($phase == 'runtime') {
-      $description['phase'] = t('Depending on your configuration, Drupal can run with a %memory_limit PHP memory limit. However, a %memory_minimum_limit PHP memory limit or above is recommended, especially if your site uses additional custom or contributed modules.', ['%memory_limit' => $memory_limit, '%memory_minimum_limit' => \Drupal::MINIMUM_PHP_MEMORY_LIMIT]);
+      $description['phase'] = t('Depending on your configuration, Drupal can run with a %memory_limit PHP memory limit. However, a %memory_minimum_limit PHP memory limit or above is recommended, especially if your site uses additional custom or contributed modules.', ['%memory_limit' => $memory_limit, '%memory_minimum_limit' => $profile_info['php_memory_limit']]);
     }
 
     if (!empty($description['phase'])) {

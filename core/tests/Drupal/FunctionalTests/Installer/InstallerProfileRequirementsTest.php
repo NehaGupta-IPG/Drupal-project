@@ -49,6 +49,10 @@ class InstallerProfileRequirementsTest extends InstallerTestBase {
    */
   public function testHookRequirementsFailure(): void {
     $this->assertSession()->pageTextContains('Testing requirements failed requirements.');
+    // Profile PHP requirements.
+    $this->assertSession()->pageTextContains('Warnings found');
+    $this->assertSession()->pageTextContains('Consider increasing your PHP memory limit to 123456789M to help prevent errors in the installation process.');
+    $this->assertSession()->pageTextContains('Your PHP installation is too old. Drupal requires at least PHP 123456789.');
   }
 
 }

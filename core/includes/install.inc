@@ -788,6 +788,7 @@ function install_profile_info($profile, $langcode = 'en') {
       'hidden' => FALSE,
       'php' => \Drupal::MINIMUM_PHP,
       'config_install_path' => NULL,
+      'php_memory_limit' => \Drupal::MINIMUM_PHP_MEMORY_LIMIT,
     ];
     $profile_path = \Drupal::service('extension.list.profile')->getPath($profile);
     /** @var \Drupal\Core\Extension\InfoParserInterface $parser */
