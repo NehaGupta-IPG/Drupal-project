@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Validation;
@@ -6,6 +7,7 @@ namespace Drupal\KernelTests\Core\Validation;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -48,7 +50,7 @@ class StreamWrapperUriConstraintValidatorTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
     $container->register('stream_wrapper.private', 'Drupal\Core\StreamWrapper\PrivateStream')
       ->addTag('stream_wrapper', ['scheme' => 'private']);
@@ -87,7 +89,7 @@ class StreamWrapperUriConstraintValidatorTest extends KernelTestBase {
   /**
    * Data provider for testValidate().
    */
-  public function provideTestValidate(): array {
+  public static function provideTestValidate(): array {
     $data = [];
     // Not a string.
     $data[] = [FALSE, 'type'];
