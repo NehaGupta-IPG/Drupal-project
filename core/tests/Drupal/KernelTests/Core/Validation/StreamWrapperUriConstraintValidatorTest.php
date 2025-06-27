@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Validation;
 
@@ -20,14 +21,14 @@ class StreamWrapperUriConstraintValidatorTest extends KernelTestBase {
    *
    * @var \Drupal\Core\TypedData\TypedDataManager
    */
-  private $typedData;
+  private TypedDataManager $typedData;
 
   /**
    * The data definition object to use.
    *
    * @var \Drupal\Core\TypedData\DataDefinition
    */
-  private $definition;
+  private DataDefinition $definition;
 
   /**
    * {@inheritdoc}
