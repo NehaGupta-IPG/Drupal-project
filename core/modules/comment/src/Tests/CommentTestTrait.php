@@ -51,6 +51,7 @@ trait CommentTestTrait {
       $comment_type_storage->create([
         'id' => $comment_type_id,
         'label' => Unicode::ucfirst($comment_type_id),
+        'form_heading' => 'Add new comment',
         'target_entity_type_id' => $entity_type,
         'description' => 'Default comment field',
       ])->save();

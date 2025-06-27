@@ -2,6 +2,7 @@
 
 namespace Drupal\comment\Plugin\Field\FieldFormatter;
 
+use Drupal\comment\Entity\CommentType;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
@@ -206,9 +207,11 @@ class CommentDefaultFormatter extends FormatterBase {
         }
       }
 
+      $comment_type = CommentType::load($this->getFieldSetting('comment_type'));
       $elements[] = $output + [
         '#comment_type' => $this->getFieldSetting('comment_type'),
         '#comment_display_mode' => $this->getFieldSetting('default_mode'),
+        '#comment_form_heading' => $comment_type->getFormHeading(),
         'comments' => [],
         'comment_form' => [],
       ];

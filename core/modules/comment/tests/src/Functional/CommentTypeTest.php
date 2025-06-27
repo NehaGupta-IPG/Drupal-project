@@ -210,4 +210,59 @@ class CommentTypeTest extends CommentTestBase {
     $this->assertSession()->pageTextContains('The comment type ' . $type->label() . ' has been deleted.');
   }
 
+  /**
+   * Tests for Comment heading section.
+   */
+  public function testCommentHeading() {
+    $user = $this->drupalCreateUser([], 'comments', TRUE);
+    // Log in a test user.
+    $this->drupalLogin($user);
+    // Ensure that the new comment type admin page can be accessed.
+    $this->drupalGet('admin/structure/comment/types/add');
+    $this->assertSession()->statusCodeEquals(200);
+    // Create a comment type via the user interface and assert the form heading is saved.
+    $edit = [
+      'id' => 'header',
+      'label' => 'title for header',
+      'description' => '',
+      'target_entity_type_id' => 'node',
+      'form_heading' => 'heading for new comment',
+    ];
+    $this->submitForm($edit, 'Save');
+    $comment_type = CommentType::load('header');
+    $this->assertInstanceOf(CommentType::class, $comment_type);
+    $this->assertSame('heading for new comment', $comment_type->get('form_heading'));
+
+    // Create a Content type and a node and attach comment to it.
+    $this->drupalCreateContentType(['type' => 'page']);
+    $this->addDefaultCommentField('node', 'page', 'header', CommentItemInterface::OPEN, 'header');
+    $field_storage = FieldStorageConfig::loadByName('node', 'header');
+
+    $node = Node::create([
+      'type' => 'page',
+      'title' => 'Node with Comment',
+    ]);
+    $node->save();
+
+    // Add a new comment of this type.
+    $comment = Comment::create([
+      'comment_type' => 'header',
+      'entity_type' => 'node',
+      'field_name' => 'header',
+      'entity_id' => $node->id(),
+    ]);
+    $comment->save();
+
+    $this->drupalGet('comment/' . $comment->id());
+    $this->assertSession()->statusCodeEquals(200);
+    $edit = [
+      'subject[0][value]' => 'New comment',
+      'comment_body[0][value]' => 'Body Content',
+    ];
+    $this->submitForm($edit, 'Save');
+    $this->drupalGet('comment/' . $comment->id());
+    $this->assertSession()->pageTextContains('Node with Comment');
+    $this->assertSession()->pageTextContains('heading for new comment');
+  }
+
 }

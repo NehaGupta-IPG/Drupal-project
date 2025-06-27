@@ -28,6 +28,24 @@ interface CommentTypeInterface extends ConfigEntityInterface {
   public function setDescription($description);
 
   /**
+   * Returns the comment type form heading.
+   *
+   * @return string
+   *   The comment-type form heading.
+   */
+  public function getFormHeading();
+
+  /**
+   * Sets the form heading of the comment type.
+   *
+   * @param string $form_heading
+   *   The new form heading.
+   *
+   * @return $this
+   */
+  public function setFormHeading($form_heading);
+
+  /**
    * Gets the target entity type id for this comment type.
    *
    * @return string

@@ -80,6 +80,14 @@ class CommentType extends ConfigEntityBundleBase implements CommentTypeInterface
   protected $description;
 
   /**
+   * The form heading of the comment type.
+   *
+   * @var string
+   */
+  protected $form_heading = 'Add new comment';
+
+
+  /**
    * The target entity type.
    *
    * @var string
@@ -98,6 +106,21 @@ class CommentType extends ConfigEntityBundleBase implements CommentTypeInterface
    */
   public function setDescription($description) {
     $this->description = $description;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFormHeading() {
+    return $this->form_heading;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setFormHeading($form_heading) {
+    $this->form_heading = $form_heading;
     return $this;
   }
 

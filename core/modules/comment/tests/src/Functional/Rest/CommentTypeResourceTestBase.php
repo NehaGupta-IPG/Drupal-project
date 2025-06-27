@@ -60,6 +60,7 @@ abstract class CommentTypeResourceTestBase extends ConfigEntityResourceTestBase 
     return [
       'dependencies' => [],
       'description' => 'Camelids are large, strictly herbivorous animals with slender necks and long legs.',
+      'form_heading' => 'Add new comment',
       'id' => 'camelids',
       'label' => 'Camelids',
       'langcode' => 'en',

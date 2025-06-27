@@ -97,6 +97,7 @@ class CommentTypeTest extends ConfigEntityResourceTestBase {
           'status' => TRUE,
           'target_entity_type_id' => 'node',
           'drupal_internal__id' => 'camelids',
+          'form_heading' => 'Add new comment',
         ],
       ],
     ];

@@ -104,6 +104,13 @@ class CommentTypeForm extends EntityForm {
       '#title' => $this->t('Description'),
     ];
 
+    $form['form_heading'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Form heading'),
+      '#maxlength' => 255,
+      '#default_value' => $comment_type->getFormHeading(),
+    ];
+
     if ($comment_type->isNew()) {
       $options = [];
       // Only expose entities that have field UI enabled, only those can

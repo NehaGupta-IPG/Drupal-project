@@ -280,6 +280,9 @@ function comment_preprocess_field(&$variables): void {
     // Append additional attributes from the first field item.
     $variables['attributes'] += $variables['items'][0]['attributes']->storage();
 
+    // Get comment form heading.
+    $variables['form_heading'] = $element[0]['#comment_form_heading'];
+
     // Create separate variables for the comments and comment form.
     $variables['comments'] = $element[0]['comments'];
     $variables['comment_form'] = $element[0]['comment_form'];
