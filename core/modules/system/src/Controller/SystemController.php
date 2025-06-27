@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class SystemController extends ControllerBase {
 
+  // @todo implement the method manually and deprecate it.
   use ModuleDependencyMessageTrait;
 
   /**

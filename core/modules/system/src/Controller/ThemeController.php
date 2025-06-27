@@ -8,6 +8,8 @@ use Drupal\Core\Config\UnmetDependenciesException;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\MissingDependencyException;
+use Drupal\Core\Extension\ModuleDependencyMessageTrait;
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Extension\ThemeInstallerInterface;
@@ -23,6 +25,8 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  * Controller for theme handling.
  */
 class ThemeController extends ControllerBase {
+
+  use ModuleDependencyMessageTrait;
 
   /**
    * The theme handler service.
@@ -58,8 +62,10 @@ class ThemeController extends ControllerBase {
    *   The theme installer.
    * @param \Drupal\Core\Extension\ThemeExtensionList $themeExtensionList
    *   The theme extension list.
+   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   *   The module extension list.
    * @param \Drupal\Core\Theme\ThemeAccessCheck $themeAccess
-   * The theme access check.
+   *   The theme access check.
    */
   public function __construct(
     ThemeHandlerInterface $theme_handler,
@@ -67,6 +73,7 @@ class ThemeController extends ControllerBase {
     ConfigFactoryInterface $config_factory,
     ThemeInstallerInterface $theme_installer,
     protected ThemeExtensionList $themeExtensionList,
+    protected ModuleExtensionList $moduleExtensionList,
     #[Autowire('access_check.theme')]
     protected ThemeAccessCheck $themeAccess,
   ) {
