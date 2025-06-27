@@ -311,7 +311,7 @@ body {
 
   & > .toolbar-block {
     &:last-of-type {
-      margin-block-end: var(--admin-toolbar-space-12);
+      padding-bottom: var(--admin-toolbar-space-12);
     }
   }
 
