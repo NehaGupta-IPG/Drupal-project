@@ -110,7 +110,7 @@ trait FormStateValuesTrait {
    * @param int|string|list<int|string> $key
    *   The key to the render element.
    *
-   * @return string[]
+   * @return list<int|string>
    *   The key to look up deprecations for.
    */
   protected function getDeprecationCheckKey(int|string|array $key): array {
