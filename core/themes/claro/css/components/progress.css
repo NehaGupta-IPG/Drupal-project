@@ -21,12 +21,6 @@
   --progress-bar-default-size-radius: var(--space-m);
 }
 
-.progress::after {
-  display: table;
-  clear: both;
-  content: "";
-}
-
 .progress--small {
   & .progress__track {
     height: var(--progress-bar-small-size);
