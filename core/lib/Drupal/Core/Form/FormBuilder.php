@@ -1087,13 +1087,13 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
         }
       }
       if (!$element_deprecated) {
-        $deprecate_keys[] = ['key' => $element['#parents']] + $element['#deprecated'] + [
+        $deprecated_keys[] = ['key' => $element['#parents']] + $element['#deprecated'] + [
           'class' => '',
           'deprecation_version' => '',
           'removed_version' => '',
           'change_record' => '',
         ];
-        $form_state->set('deprecated_keys', $deprecate_keys);
+        $form_state->set('deprecated_keys', $deprecated_keys);
       }
     }
 
