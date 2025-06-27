@@ -24,7 +24,7 @@ class FileManagedStateTest extends WebDriverTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Tests if managed file is correctly hidden with states.
+   * Tests if the managed file element is correctly hidden using states.
    */
   public function testFileStateVisible(): void {
     $this->drupalLogin($this->drupalCreateUser());
