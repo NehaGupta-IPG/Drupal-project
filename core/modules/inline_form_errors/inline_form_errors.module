@@ -35,7 +35,7 @@ function inline_form_errors_preprocess_datetime_wrapper(&$variables): void {
 /**
  * Implements hook_element_info_alter().
  */
-function inline_form_errors_element_info_alter(array &$info) {
+function inline_form_errors_element_info_alter(array &$info): void {
   $info['form']['#inline_form_errors_summary'] = TRUE;
   \Drupal::classResolver(RenderElementHelper::class)->alterElementInfo($info);
 }
