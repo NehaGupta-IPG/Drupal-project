@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Database\Query;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Database\Connection;
 
 /**
@@ -9,9 +11,10 @@ use Drupal\Core\Database\Connection;
  *
  * @ingroup database
  */
-class Select extends Query implements SelectInterface {
+class Select extends Query implements SelectInterface, RefinableCacheableDependencyInterface {
 
   use QueryConditionTrait;
+  use RefinableCacheableDependencyTrait;
 
   /**
    * The fields to SELECT.
