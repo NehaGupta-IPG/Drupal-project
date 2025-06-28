@@ -16,8 +16,8 @@ use Drupal\Core\Cache\NullBackend;
  * shepherding of database connections into a single location without the use of
  * globals.
  *
- * @phpstan-type UnprocessedConnectionInfoArray array{driver: string, autoload?: string, namespace?: string, database: string, username?: string, password?: string, host?: string, port?: string|int, prefix?: string, collation?: string, dependencies?: array<string,array{autoload?: string, namespace?: string}>}
- * @phpstan-type ConnectionInfoArray array{driver: string, autoload?: string, namespace?: string, database: string, username?: string, password?: string, host?: string, port?: string|int, prefix: string, collation?: string, dependencies?: array<string,array{autoload?: string, namespace?: string}>}
+ * @phpstan-type UnprocessedConnectionInfoArray array{driver: string, autoload?: string, namespace?: string, database: string, username?: string, password?: string, host?: string, port?: string|int, prefix?: string, collation?: string, pdo?: array<mixed>, isolation_level?: int|string, init_commands?: list<string>, dependencies?: array<string,array{autoload?: string, namespace?: string}>}
+ * @phpstan-type ConnectionInfoArray array{driver: string, autoload?: string, namespace?: string, database: string, username?: string, password?: string, host?: string, port?: string|int, prefix: string, collation?: string, pdo?: array<mixed>, isolation_level?: int|string, init_commands?: list<string>, dependencies?: array<string,array{autoload?: string, namespace?: string}>}
  *
  * @final
  */
