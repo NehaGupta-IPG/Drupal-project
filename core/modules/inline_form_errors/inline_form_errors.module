@@ -39,8 +39,7 @@ function inline_form_errors_preprocess_datetime_wrapper(&$variables): void {
  */
 function inline_form_errors_element_info_alter(array &$info): void {
   $info['form']['#inline_form_errors_summary'] = TRUE;
-  \Drupal::classResolver->getInstanceFromDefinition(RenderElementHelper::class)
-    ->alterElementInfo($info);
+  \Drupal::classResolver(RenderElementHelper::class)->alterElementInfo($info);
 }
 
 /**
