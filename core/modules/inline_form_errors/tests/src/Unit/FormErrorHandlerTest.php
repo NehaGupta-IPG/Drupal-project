@@ -220,7 +220,7 @@ class FormErrorHandlerTest extends UnitTestCase {
   /**
    * Tests that disabling Inline Form Errors summary works.
    */
-  public function testDisabledInlineErrorsSummary() {
+  public function testDisabledInlineErrorsSummary(): void {
     $this->messenger->expects($this->exactly(2))
       ->method('addError');
 
