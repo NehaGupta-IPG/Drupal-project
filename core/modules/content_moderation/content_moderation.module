@@ -6,6 +6,7 @@
 
 use Drupal\content_moderation\BuildAlter;
 use Drupal\content_moderation\ContentPreprocess;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Implements hook_preprocess_HOOK().
