@@ -624,15 +624,22 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
 
             // If the violation is for a specific property, find the element
             // that corresponds to it.
+            $property_path = explode('.', $property_path);
+            $error_element = $this->errorElement($delta_element, $violation, $form, $form_state);
             if ($property_path) {
-              $violation_element = NestedArray::getValue($delta_element, explode('.', $property_path), $exists);
-              if (!$exists) {
-                // If the property path does not exist, use the main element.
-                $violation_element = $delta_element;
+              $violation_element = NestedArray::getValue($delta_element, $property_path, $exists);
+              if (
+                $exists
+                && Element::isVisibleElement($violation_element)
+                // Some elements return the property as part of the
+                // ::errorElement method. Trying to descend into it would
+                // result in an property not found error.
+                && $violation_element !== $error_element
+              ) {
+                $error_element = $this->errorElement($violation_element, $violation, $form, $form_state);
               }
             }
 
-            $error_element = $this->errorElement($violation_element, $violation, $form, $form_state);
             if ($error_element !== FALSE) {
               $form_state->setError($error_element, $violation->getMessage());
             }
