@@ -5,11 +5,11 @@ namespace Drupal\Core\Entity\KeyValueStore;
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException;
-use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageBase;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -51,6 +51,13 @@ class KeyValueEntityStorage extends EntityStorageBase {
   protected $languageManager;
 
   /**
+   * The DI container.
+   *
+   * @var \Symfony\Component\DependencyInjection\ContainerInterface
+   */
+  protected $container;
+
+  /**
    * Constructs a new KeyValueEntityStorage.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -63,12 +70,15 @@ class KeyValueEntityStorage extends EntityStorageBase {
    *   The language manager.
    * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
    *   The memory cache.
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The DI container.
    */
-  public function __construct(EntityTypeInterface $entity_type, KeyValueStoreInterface $key_value_store, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, MemoryCacheInterface $memory_cache) {
+  public function __construct(EntityTypeInterface $entity_type, KeyValueStoreInterface $key_value_store, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, MemoryCacheInterface $memory_cache, ContainerInterface $container) {
     parent::__construct($entity_type, $memory_cache);
     $this->keyValueStore = $key_value_store;
     $this->uuidService = $uuid_service;
     $this->languageManager = $language_manager;
+    $this->container = $container;
 
     // Check if the entity type supports UUIDs.
     $this->uuidKey = $this->entityType->getKey('uuid');
@@ -83,7 +93,8 @@ class KeyValueEntityStorage extends EntityStorageBase {
       $container->get('keyvalue')->get('entity_storage__' . $entity_type->id()),
       $container->get('uuid'),
       $container->get('language_manager'),
-      $container->get('entity.memory_cache')
+      $container->get('entity.memory_cache'),
+      $container
     );
   }
 
@@ -93,8 +104,10 @@ class KeyValueEntityStorage extends EntityStorageBase {
   public function doCreate(array $values = []) {
     // Set default language to site default if not provided.
     $values += [$this->getEntityType()->getKey('langcode') => $this->languageManager->getDefaultLanguage()->getId()];
+
+    /** @var \Drupal\Core\Entity\EntityInterface::class $entity_class */
     $entity_class = $this->getEntityClass();
-    $entity = new $entity_class($values, $this->entityTypeId);
+    $entity = $entity_class::createInstance($this->container, $values, $this->entityTypeId);
 
     // @todo This is handled by ContentEntityStorageBase, which assumes
     //   FieldableEntityInterface. The current approach in

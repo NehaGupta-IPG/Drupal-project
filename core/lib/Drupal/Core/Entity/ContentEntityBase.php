@@ -11,6 +11,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\TranslationStatusInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Implements Entity Field API specific enhancements to the Entity class.
@@ -272,6 +273,13 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
       // keep it safe from changes.
       $this->updateLoadedRevisionId();
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function createInstance(ContainerInterface $container, array $values, string $entity_type, bool $bundle = FALSE, array $translations = []) {
+    return new static($values, $entity_type, $bundle, $translations);
   }
 
   /**

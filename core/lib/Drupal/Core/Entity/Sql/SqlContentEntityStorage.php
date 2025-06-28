@@ -506,8 +506,9 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     foreach ($values as $id => $entity_values) {
       $bundle = $this->bundleKey ? $entity_values[$this->bundleKey][LanguageInterface::LANGCODE_DEFAULT] : NULL;
       // Turn the record into an entity class.
+      /** @var \Drupal\Core\Entity\ContentEntityInterface::class $entity_class */
       $entity_class = $this->getEntityClass($bundle);
-      $entities[$id] = new $entity_class($entity_values, $this->entityTypeId, $bundle, array_keys($translations[$id]));
+      $entities[$id] = $entity_class::createInstance($this->container, $entity_values, $this->entityTypeId, $bundle, array_keys($translations[$id]));
     }
 
     return $entities;

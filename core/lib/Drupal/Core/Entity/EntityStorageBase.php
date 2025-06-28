@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
 
 /**
  * A base entity storage class.
@@ -90,6 +90,11 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
   protected $memoryCacheTag;
 
   /**
+   * @var \Symfony\Component\DependencyInjection\ContainerInterface|null
+   */
+  protected $container;
+
+  /**
    * Constructs an EntityStorageBase instance.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -106,6 +111,9 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
     $this->langcodeKey = $this->entityType->getKey('langcode');
     $this->memoryCache = $memory_cache;
     $this->memoryCacheTag = 'entity.memory_cache:' . $this->entityTypeId;
+
+    // @todo Require extending classes to pass in the container?
+    $this->container = \Drupal::getContainer();
   }
 
   /**
@@ -251,8 +259,9 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    *   The created entity.
    */
   protected function doCreate(array $values) {
+    /** @var \Drupal\Core\Entity\EntityInterface::class $entity_class */
     $entity_class = $this->getEntityClass();
-    return new $entity_class($values, $this->entityTypeId);
+    return $entity_class::createInstance($this->container, $values, $this->entityTypeId);
   }
 
   /**
@@ -414,9 +423,10 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
   protected function mapFromStorageRecords(array $records) {
     $entities = [];
     foreach ($records as $record) {
+      /** @var \Drupal\Core\Entity\EntityInterface::class $entity_class */
       $entity_class = $this->getEntityClass();
       /** @var \Drupal\Core\Entity\EntityInterface $entity */
-      $entity = new $entity_class($record, $this->entityTypeId);
+      $entity = $entity_class::createInstance($this->container, $record, $this->entityTypeId);
       $entities[$entity->id()] = $entity;
     }
     return $entities;

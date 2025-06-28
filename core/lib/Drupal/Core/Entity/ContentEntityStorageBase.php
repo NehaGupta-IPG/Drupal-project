@@ -123,8 +123,9 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     if ($this->bundleKey && !$bundle) {
       throw new EntityStorageException('Missing bundle for entity type ' . $this->entityTypeId);
     }
+    /** @var \Drupal\Core\Entity\ContentEntityInterface::class $entity_class */
     $entity_class = $this->getEntityClass($bundle);
-    $entity = new $entity_class([], $this->entityTypeId, $bundle);
+    $entity = $entity_class::createInstance($this->container, [], $this->entityTypeId, $bundle);
     $this->initFieldValues($entity, $values);
     return $entity;
   }

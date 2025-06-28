@@ -89,6 +89,13 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   protected $cacheTagsInvalidator;
 
   /**
+   * The service container.
+   *
+   * @var \Symfony\Component\DependencyInjection\ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected $container;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -140,8 +147,9 @@ class KeyValueEntityStorageTest extends UnitTestCase {
     $this->languageManager->expects($this->any())
       ->method('getCurrentLanguage')
       ->willReturn($language);
+    $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
-    $this->entityStorage = new KeyValueEntityStorage($this->entityType, $this->keyValueStore, $this->uuidService, $this->languageManager, new MemoryCache(new Time()));
+    $this->entityStorage = new KeyValueEntityStorage($this->entityType, $this->keyValueStore, $this->uuidService, $this->languageManager, new MemoryCache(new Time()), $this->container);
     $this->entityStorage->setModuleHandler($this->moduleHandler);
 
     $container = new ContainerBuilder();
