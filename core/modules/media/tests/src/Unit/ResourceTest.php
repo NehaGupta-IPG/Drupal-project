@@ -108,8 +108,8 @@ class ResourceTest extends UnitTestCase {
       '',
       3600,
       'https://example.com/thumb1.jpg',
-      150,  // Thumbnail width
-      150   // Thumbnail height
+      150,
+      150
     );
     $this->assertSame(150, $resource1->getThumbnailWidth());
     $this->assertSame(150, $resource1->getThumbnailHeight());
@@ -125,8 +125,8 @@ class ResourceTest extends UnitTestCase {
       '',
       3600,
       'https://example.com/thumb2.jpg',
-      null,  // Missing width
-      150    // Height provided
+      NULL,
+      150
     );
     $this->assertNull($resource2->getThumbnailWidth());
     $this->assertNull($resource2->getThumbnailHeight());
@@ -142,11 +142,26 @@ class ResourceTest extends UnitTestCase {
       '',
       3600,
       'https://example.com/thumb3.jpg',
-      0,  // Invalid width
-      0   // Invalid height
+      0,
+      0
     );
     $this->assertNull($resource3->getThumbnailWidth());
     $this->assertNull($resource3->getThumbnailHeight());
+
+    // Case 4: Both dimensions missing
+    $resource2 = Resource::photo(
+      'https://example.com/photo2.jpg',
+      800,
+      600,
+      $provider,
+      'Photo without Thumbnail',
+      '',
+      '',
+      3600,
+      'https://example.com/thumb2.jpg'
+    );
+    $this->assertNull($resource2->getThumbnailWidth());
+    $this->assertNull($resource2->getThumbnailHeight());
   }
 
 }
