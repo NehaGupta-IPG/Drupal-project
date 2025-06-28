@@ -22,8 +22,8 @@ class Log {
    *
    * This will only be used if the query logger is enabled.
    *
-   * @var array
-   * The structure for the logging array is as follows:
+   * @var array<string,list<array{query: string, args: list<mixed>, caller: string, target: string, time: float, start:float}>>
+   *   The structure for the logging array is as follows:
    *
    * @code
    * [
@@ -75,7 +75,7 @@ class Log {
    * @param string $logging_key
    *   The logging key to fetch.
    *
-   * @return array
+   * @return list<array{query: string, args: list<mixed>, caller: string, target: string, time: float, start:float}>
    *   An indexed array of all query records for this logging key.
    */
   public function get($logging_key) {
