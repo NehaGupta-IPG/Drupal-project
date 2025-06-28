@@ -364,8 +364,11 @@ class ManagedFile extends FormElementBase {
     // Add the extension list to the page as JavaScript settings.
     if (isset($element['#upload_validators']['FileExtension']['extensions'])) {
       $allowed_extensions = $element['#upload_validators']['FileExtension']['extensions'];
-      $extension_list = implode(',', array_filter(explode(' ', $allowed_extensions)));
-      $element['upload']['#attached']['drupalSettings']['file']['elements']['#' . $id] = $extension_list;
+      $valid_extensions = array_filter(explode(' ', $allowed_extensions));
+      $element['upload']['#attached']['drupalSettings']['file']['elements']['#' . $id] = implode(',', $valid_extensions);
+      if (!isset($element['upload']['#attributes']['accept'])) {
+        $element['upload']['#attributes']['accept'] = '.' . implode(',.', $valid_extensions);
+      }
     }
 
     // Prefix and suffix used for Ajax replacement.
