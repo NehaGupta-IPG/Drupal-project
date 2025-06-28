@@ -12,11 +12,15 @@ use Drupal\Core\Url;
  * Provides a text format render element.
  *
  * Properties:
- * - #base_type: The form element #type to use for the 'value' element.
+ *
+ * @property $base_type
+ *   The form element #type to use for the 'value' element.
  *   'textarea' by default.
- * - #format: (optional) The text format ID to preselect. If omitted, the
+ * @property $format
+ *   (optional) The text format ID to preselect. If omitted, the
  *   default format for the current user will be used.
- * - #allowed_formats: (optional) An array of text format IDs that are available
+ * @property $allowed_formats
+ *   (optional) An array of text format IDs that are available
  *   for this element. If omitted, all text formats that the current user has
  *   access to will be allowed.
  *
@@ -39,10 +43,9 @@ class TextFormat extends RenderElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#process' => [
-        [$class, 'processFormat'],
+        [static::class, 'processFormat'],
       ],
       '#base_type' => 'textarea',
       '#theme_wrappers' => ['text_format_wrapper'],
@@ -295,6 +298,7 @@ class TextFormat extends RenderElementBase {
    * Wraps the config factory.
    *
    * @return \Drupal\Core\Config\ConfigFactoryInterface
+   *   The configuration factory service.
    */
   protected static function configFactory() {
     return \Drupal::configFactory();
@@ -304,6 +308,7 @@ class TextFormat extends RenderElementBase {
    * Wraps the element info service.
    *
    * @return \Drupal\Core\Render\ElementInfoManagerInterface
+   *   The element info service.
    */
   protected static function elementInfo() {
     return \Drupal::service('element_info');
