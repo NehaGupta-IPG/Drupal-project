@@ -4,6 +4,8 @@
  * @file
  */
 
+use Drupal\inline_form_errors\RenderElementHelper;
+
 /**
  * Implements hook_preprocess_HOOK() for form element templates.
  */
@@ -37,7 +39,8 @@ function inline_form_errors_preprocess_datetime_wrapper(&$variables): void {
  */
 function inline_form_errors_element_info_alter(array &$info): void {
   $info['form']['#inline_form_errors_summary'] = TRUE;
-  \Drupal::classResolver(RenderElementHelper::class)->alterElementInfo($info);
+  \Drupal::classResolver->getInstanceFromDefinition(RenderElementHelper::class)
+  ->alterElementInfo($info);
 }
 
 /**
