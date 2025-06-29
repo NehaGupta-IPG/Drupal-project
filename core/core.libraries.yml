@@ -589,6 +589,17 @@ drupal.entity-form:
   dependencies:
     - core/drupal.form
 
+drupal.list-filter:
+  version: VERSION
+  js:
+    misc/drupal-list-filter.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.announce
+    - core/drupal.debounce
+    - core/once
+    - core/transliteration
+
 drupal.fieldgroup:
   version: VERSION
   css:

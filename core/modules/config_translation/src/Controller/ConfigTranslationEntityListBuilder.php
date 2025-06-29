@@ -41,19 +41,22 @@ class ConfigTranslationEntityListBuilder extends ConfigEntityListBuilder impleme
     ];
 
     $build['filters']['text'] = [
-      '#type' => 'search',
+      '#type' => 'list_filter',
       '#title' => $this->t('Search'),
       '#size' => 30,
       '#placeholder' => $filter['placeholder'],
+      '#list_container_selector' => '[data-drupal-selector="config-translation-entity-list"]',
+      '#list_item' => 'tbody tr',
+      '#list_text' => '.table-filter-text-source',
+      '#search_start_of_words' => TRUE,
       '#attributes' => [
-        'class' => ['table-filter-text'],
-        'data-table' => '.config-translation-entity-list',
         'autocomplete' => 'off',
         'title' => $filter['description'],
       ],
     ];
 
     $build['table']['#attributes']['class'][] = 'config-translation-entity-list';
+    $build['table']['#attributes']['data-drupal-selector'] = 'config-translation-entity-list';
     $build['table']['#weight'] = 0;
     $build['#attached']['library'][] = 'system/drupal.system.modules';
 

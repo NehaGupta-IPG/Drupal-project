@@ -126,13 +126,19 @@ class ChooseBlockController implements ContainerInjectionInterface {
     }
 
     $build['filter'] = [
-      '#type' => 'search',
+      '#type' => 'list_filter',
       '#title' => $this->t('Filter by block name'),
       '#title_display' => 'invisible',
       '#size' => 30,
       '#placeholder' => $this->t('Filter by block name'),
+      '#list_container_selector' => '.js-layout-builder-categories',
+      '#list_item' => '.js-layout-builder-block-link',
+      '#announce' => [
+        'singular' => $this->t('1 block is available in the modified list.'),
+        'plural' => $this->t('@count blocks are available in the modified list.'),
+        'all' => $this->t('All available blocks are listed.'),
+      ],
       '#attributes' => [
-        'class' => ['js-layout-builder-filter'],
         'title' => $this->t('Enter a part of the block name to filter by.'),
       ],
     ];
@@ -151,9 +157,10 @@ class ChooseBlockController implements ContainerInjectionInterface {
     foreach ($grouped_definitions as $category => $blocks) {
       $block_categories[$category]['#type'] = 'details';
       $block_categories[$category]['#attributes']['class'][] = 'js-layout-builder-category';
+      $block_categories[$category]['#attributes']['data-filter-group-name'] = 'block-' . $category;
       $block_categories[$category]['#open'] = TRUE;
       $block_categories[$category]['#title'] = $category;
-      $block_categories[$category]['links'] = $this->getBlockLinks($section_storage, $delta, $region, $blocks);
+      $block_categories[$category]['links'] = $this->getBlockLinks($section_storage, $delta, $region, $blocks, $category);
     }
     $build['block_categories'] = $block_categories;
     return $build;
@@ -182,7 +189,7 @@ class ChooseBlockController implements ContainerInjectionInterface {
     $build = [];
     $inline_blocks_category = (string) $this->t('Inline blocks');
     if (isset($blocks[$inline_blocks_category])) {
-      $build['links'] = $this->getBlockLinks($section_storage, $delta, $region, $blocks[$inline_blocks_category]);
+      $build['links'] = $this->getBlockLinks($section_storage, $delta, $region, $blocks[$inline_blocks_category], 'inline');
       $build['links']['#attributes']['class'][] = 'inline-block-list';
       foreach ($build['links']['#links'] as &$link) {
         $link['attributes']['class'][] = 'inline-block-list__item';
@@ -216,15 +223,21 @@ class ChooseBlockController implements ContainerInjectionInterface {
    *   The region the block is going in.
    * @param array $blocks
    *   The information for each block.
+   * @param string $category
+   *   Block category.
    *
    * @return array
    *   The block links render array.
    */
-  protected function getBlockLinks(SectionStorageInterface $section_storage, int $delta, $region, array $blocks) {
+  protected function getBlockLinks(SectionStorageInterface $section_storage, int $delta, $region, array $blocks, string $category) {
     $links = [];
     foreach ($blocks as $block_id => $block) {
       $attributes = $this->getAjaxAttributes();
       $attributes['class'][] = 'js-layout-builder-block-link';
+      if ($category) {
+        $attributes['data-filter-parent-group'] = 'block-' . $category;
+      }
+
       $link = [
         'title' => $block['admin_label'],
         'url' => Url::fromRoute('layout_builder.add_block',

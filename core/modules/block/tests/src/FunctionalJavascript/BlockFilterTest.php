@@ -48,7 +48,7 @@ class BlockFilterTest extends WebDriverTestBase {
 
     // Find the block filter field on the add-block dialog.
     $page->find('css', '#edit-blocks-region-header-title')->click();
-    $filter = $assertSession->waitForElement('css', '.block-filter-text');
+    $filter = $assertSession->waitForElement('css', '.table-filter-text');
 
     // Get all block rows, for assertions later.
     $block_rows = $page->findAll('css', '.block-add-table tbody tr');

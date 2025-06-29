@@ -78,7 +78,7 @@ class DisplayBlockTest extends ViewTestBase {
     $this->drupalGet('admin/structure/views/add');
     $this->submitForm($edit, 'Save and edit');
 
-    $pattern = '//tr[.//td[text()=:category] and .//td//a[contains(@href, :href)]]';
+    $pattern = '//tr[.//td/div[contains(@class, "list-filter-target") and text()=:category] and .//td//a[contains(@href, :href)]]';
     $arguments = [
       ':href' => Url::fromRoute('block.admin_add', [
         'plugin_id' => 'views_block:' . $edit['id'] . '-block_1',

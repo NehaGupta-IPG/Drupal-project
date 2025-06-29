@@ -65,10 +65,10 @@ class BlockFilterTest extends WebDriverTestBase {
     $assert_session->assertWaitOnAjaxRequest();
 
     // Get all blocks, for assertions later.
-    $blocks = $page->findAll('css', '.js-layout-builder-categories li');
+    $blocks = $page->findAll('css', '.js-layout-builder-categories li a');
     $categories = $page->findAll('css', '.js-layout-builder-category');
 
-    $filter = $assert_session->elementExists('css', '.js-layout-builder-filter');
+    $filter = $assert_session->elementExists('css', '.table-filter-text');
 
     // Set announce to ensure it is not cleared.
     $init_message = 'init message';
@@ -90,6 +90,7 @@ class BlockFilterTest extends WebDriverTestBase {
 
     // Test block filter reduces the number of visible rows.
     $filter->setValue('ad');
+    sleep(1);
     $fewer_blocks_message = ' blocks are available in the modified list';
     $this->assertAnnounceContains($fewer_blocks_message);
     $visible_rows = $this->filterVisibleElements($blocks);
@@ -103,6 +104,7 @@ class BlockFilterTest extends WebDriverTestBase {
 
     // Test 3 letter search.
     $filter->setValue('adm');
+    sleep(1);
     $visible_rows = $this->filterVisibleElements($blocks);
     $this->assertCount(2, $visible_rows);
     $visible_categories = $this->filterVisibleElements($categories);
@@ -110,6 +112,7 @@ class BlockFilterTest extends WebDriverTestBase {
 
     // Retest that blocks appear when reducing letters.
     $filter->setValue('ad');
+    sleep(1);
     $visible_rows = $this->filterVisibleElements($blocks);
     $this->assertCount(3, $visible_rows);
     $visible_categories = $this->filterVisibleElements($categories);
@@ -117,10 +120,12 @@ class BlockFilterTest extends WebDriverTestBase {
 
     // Test blocks reappear after being filtered by repeating search for "a"
     $filter->setValue('a');
+    sleep(1);
     $this->assertAnnounceContains('All available blocks are listed.');
 
     // Test Drupal.announce() message when only one match is present.
     $filter->setValue('Powered by');
+    sleep(1);
     $this->assertAnnounceContains(' block is available');
     $visible_rows = $this->filterVisibleElements($blocks);
     $this->assertCount(1, $visible_rows);
@@ -130,6 +135,7 @@ class BlockFilterTest extends WebDriverTestBase {
 
     // Test Drupal.announce() message when no matches are present.
     $filter->setValue('Pan-Galactic Gargle Blaster');
+    sleep(1);
     $visible_rows = $this->filterVisibleElements($blocks);
     $this->assertCount(0, $visible_rows);
     $visible_categories = $this->filterVisibleElements($categories);
@@ -141,6 +147,7 @@ class BlockFilterTest extends WebDriverTestBase {
 
     // Test Drupal.announce() message when all blocks are listed.
     $filter->setValue('');
+    sleep(1);
     $this->assertAnnounceContains('All available blocks are listed.');
     // Confirm the Content Fields category remains collapsed after filtering.
     $this->assertFalse($promoteToFrontPageLink->isVisible());

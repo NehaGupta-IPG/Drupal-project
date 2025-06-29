@@ -193,7 +193,7 @@ class BlockUiTest extends BrowserTestBase {
   public function testCandidateBlockList(): void {
     $this->drupalGet('admin/structure/block');
     $this->clickLink('Place block');
-    $this->assertSession()->elementExists('xpath', '//tr[.//td/div[text()="Display message"] and .//td[text()="Block test"] and .//td//a[contains(@href, "admin/structure/block/add/test_block_instantiation/stark")]]');
+    $this->assertSession()->elementExists('xpath', '//tr[.//td/div[contains(@class, "list-filter-target") and text()="Display message"] and .//td/div[contains(@class, "list-filter-target") and text()="Block test"] and .//td//a[contains(@href, "admin/structure/block/add/test_block_instantiation/stark")]]');
 
     // Trigger the custom category addition in block_test_block_alter().
     $this->container->get('state')->set('block_test_info_alter', TRUE);
@@ -201,7 +201,7 @@ class BlockUiTest extends BrowserTestBase {
 
     $this->drupalGet('admin/structure/block');
     $this->clickLink('Place block');
-    $this->assertSession()->elementExists('xpath', '//tr[.//td/div[text()="Display message"] and .//td[text()="Custom category"] and .//td//a[contains(@href, "admin/structure/block/add/test_block_instantiation/stark")]]');
+    $this->assertSession()->elementExists('xpath', '//tr[.//td/div[contains(@class, "list-filter-target") and text()="Display message"] and .//td/div[contains(@class, "list-filter-target") and text()="Custom category"] and .//td//a[contains(@href, "admin/structure/block/add/test_block_instantiation/stark")]]');
   }
 
   /**
@@ -230,7 +230,7 @@ class BlockUiTest extends BrowserTestBase {
 
     $this->drupalGet('admin/structure/block');
     $this->clickLink('Place block');
-    $this->assertSession()->elementExists('xpath', '//tr[.//td/div[text()="Test context-aware block"] and .//td[text()="Block test"] and .//td//a[contains(@href, "' . $block_url . '")]]');
+    $this->assertSession()->elementExists('xpath', '//tr[.//td/div[contains(@class, "list-filter-target") and text()="Test context-aware block"] and .//td/div[contains(@class, "list-filter-target") and text()="Block test"] and .//td//a[contains(@href, "' . $block_url . '")]]');
     $definition = \Drupal::service('plugin.manager.block')->getDefinition('test_context_aware');
     $this->assertNotEmpty($definition, 'The context-aware test block exists.');
     $edit = [

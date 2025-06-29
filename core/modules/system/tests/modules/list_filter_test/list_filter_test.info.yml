@@ -1,0 +1,5 @@
+name: 'List Filter test'
+type: module
+description: 'Support module for list filter testing.'
+package: Testing
+version: VERSION

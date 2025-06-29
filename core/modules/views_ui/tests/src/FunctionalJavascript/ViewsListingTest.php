@@ -62,8 +62,10 @@ class ViewsListingTest extends WebDriverTestBase {
     $this->assertCount($disabled_views_count, $disabled_rows);
 
     // Filter on the string 'people'. This should only show the people view.
-    $search_input = $page->find('css', '.views-filter-text.form-search');
+    $search_input = $page->find('css', '.table-filter-text');
     $search_input->setValue('people');
+
+    sleep(1);
 
     $enabled_rows = $page->findAll('css', 'tr.views-ui-list-enabled');
     $enabled_rows = $this->filterVisibleElements($enabled_rows);
@@ -75,6 +77,8 @@ class ViewsListingTest extends WebDriverTestBase {
 
     // Filter on a string that also appears in the description.
     $search_input->setValue('content');
+
+    sleep(1);
 
     $enabled_rows = $page->findAll('css', 'tr.views-ui-list-enabled');
     $enabled_rows = $this->filterVisibleElements($enabled_rows);
@@ -88,6 +92,8 @@ class ViewsListingTest extends WebDriverTestBase {
     $search_input->setValue('');
     // Add a backspace to trigger the keyUp event.
     $search_input->keyUp(8);
+
+    sleep(1);
 
     $enabled_rows = $page->findAll('css', 'tr.views-ui-list-enabled');
     $enabled_rows = $this->filterVisibleElements($enabled_rows);
@@ -108,6 +114,8 @@ class ViewsListingTest extends WebDriverTestBase {
     $disable_button->click();
 
     $session->assertWaitOnAjaxRequest();
+
+    sleep(1);
 
     $enabled_rows = $page->findAll('css', 'tr.views-ui-list-enabled');
     $enabled_rows = $this->filterVisibleElements($enabled_rows);

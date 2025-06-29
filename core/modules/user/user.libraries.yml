@@ -39,9 +39,9 @@ drupal.user.permissions:
     - core/once
     - core/drupal
     - core/drupalSettings
+    - core/drupal.list-filter
     - user/drupal.user.admin
     - core/drupal.checkbox
-    - core/drupal.debounce
     - core/drupal.announce
   moved_files:
     user/user.permissions.js:
