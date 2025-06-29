@@ -6,16 +6,9 @@ namespace Drupal\Core\Database;
 
 abstract class ConnectionParameters {
 
-    public string $prefix = '' {
-      get {
-        return $this->prefix;
-      }
-      set(string $value) {
-        $this->prefix = $value;
-      }
-    }
+  public string $prefix = '';
 
-    public function __construct(
+  public function __construct(
     public readonly string $driver,
     public readonly ?string $namespace,
     public readonly ?string $autoload,
