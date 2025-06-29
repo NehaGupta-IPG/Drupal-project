@@ -66,11 +66,11 @@ trait TaxonomyIndexDepthQueryTrait {
         $union_query->addField('tn', 'nid');
         $left_join = "[tn].[tid]";
         if ($this->options['depth'] > 0) {
-          $union_query->join('taxonomy_term__parent', "th", "$left_join = [th].[entity_id]");
+          $union_query->join('taxonomy_term__parent', "th", $union_query->joinCondition()->compare($left_join, 'th.entity_id'));
           $left_join = "[th].[$left_field]";
         }
         foreach (range(1, $count) as $inner_count) {
-          $union_query->join('taxonomy_term__parent', "th$inner_count", "$left_join = [th$inner_count].[$right_field]");
+          $union_query->join('taxonomy_term__parent', "th$inner_count", $union_query->joinCondition()->compare($left_join, "th$inner_count.$right_field"));
           $left_join = "[th$inner_count].[$left_field]";
         }
         $union_query->condition("th$inner_count.entity_id", $tids, $operator);

@@ -215,7 +215,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
         $this->treeParents[$vid] = [];
         $this->treeTerms[$vid] = [];
         $query = $this->database->select($this->getDataTable(), 't');
-        $query->join('taxonomy_term__parent', 'p', '[t].[tid] = [p].[entity_id]');
+        $query->join('taxonomy_term__parent', 'p', $query->joinCondition()->compare('t.tid', 'p.entity_id'));
         $query->addExpression('[parent_target_id]', 'parent');
         $result = $query
           ->addTag('taxonomy_term_access')
@@ -308,7 +308,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
   public function nodeCount($vid) {
     $query = $this->database->select('taxonomy_index', 'ti');
     $query->addExpression('COUNT(DISTINCT [ti].[nid])');
-    $query->leftJoin($this->getBaseTable(), 'td', '[ti].[tid] = [td].[tid]');
+    $query->leftJoin($this->getBaseTable(), 'td', $query->joinCondition()->compare('ti.tid', 'td.tid'));
     $query->condition('td.vid', $vid);
     $query->addTag('vocabulary_node_count');
     return $query->execute()->fetchField();
@@ -329,7 +329,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
    */
   public function getNodeTerms(array $nids, array $vids = [], $langcode = NULL) {
     $query = $this->database->select($this->getDataTable(), 'td');
-    $query->innerJoin('taxonomy_index', 'tn', '[td].[tid] = [tn].[tid]');
+    $query->innerJoin('taxonomy_index', 'tn', $query->joinCondition()->compare('td.tid', 'tn.tid'));
     $query->fields('td', ['tid']);
     $query->addField('tn', 'nid', 'node_nid');
     $query->orderby('td.weight');
@@ -375,7 +375,11 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
     $query->fields('tfr', [$id_field]);
     $query->addExpression("MAX([tfr].[$revision_field])", $revision_field);
 
-    $query->join($this->getRevisionTable(), 'tr', "[tfr].[$revision_field] = [tr].[$revision_field] AND [tr].[$revision_default_field] = 0");
+    $query->join($this->getRevisionTable(), 'tr',
+      $query->joinCondition()
+        ->compare("tfr.$revision_field", "tr.$revision_field")
+        ->condition("tr.$revision_default_field", 0)
+    );
 
     $inner_select = $this->database->select($this->getRevisionDataTable(), 't');
     $inner_select->condition("t.$rta_field", '1');
@@ -385,7 +389,11 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
       ->groupBy("t.$id_field")
       ->groupBy("t.$langcode_field");
 
-    $query->join($inner_select, 'mr', "[tfr].[$revision_field] = [mr].[$revision_field] AND [tfr].[$langcode_field] = [mr].[$langcode_field]");
+    $query->join($inner_select, 'mr',
+      $query->joinCondition()
+        ->compare("tfr.$revision_field", "mr.$revision_field")
+        ->compare("tfr.$langcode_field", "mr.$langcode_field")
+    );
 
     $query->groupBy("tfr.$id_field");
 

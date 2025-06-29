@@ -127,7 +127,7 @@ class Block extends DrupalSqlBase {
       ->fields('br', ['rid'])
       ->condition('module', $module)
       ->condition('delta', $delta);
-    $query->join($this->userRoleTable, 'ur', '[br].[rid] = [ur].[rid]');
+    $query->join($this->userRoleTable, 'ur', $query->joinCondition()->compare('br.rid', 'ur.rid'));
     $roles = $query->execute()
       ->fetchCol();
     $row->setSourceProperty('roles', $roles);

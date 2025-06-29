@@ -113,7 +113,12 @@ class CommentStorage extends SqlContentEntityStorage implements CommentStorageIn
     // This is the 0-based display ordinal.
     $data_table = $this->getDataTable();
     $query = $this->database->select($data_table, 'c1');
-    $query->innerJoin($data_table, 'c2', '[c2].[entity_id] = [c1].[entity_id] AND [c2].[entity_type] = [c1].[entity_type] AND [c2].[field_name] = [c1].[field_name]');
+    $query->innerJoin($data_table, 'c2',
+      $query->joinCondition()
+        ->compare('c2.entity_id', 'c1.entity_id')
+        ->compare('c2.entity_type', 'c1.entity_type')
+        ->compare('c2.field_name', 'c1.field_name')
+    );
     $query->addExpression('COUNT(*)', 'count');
     $query->condition('c2.cid', $comment->id());
     if (!$this->currentUser->hasPermission('administer comments')) {

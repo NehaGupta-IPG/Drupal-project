@@ -58,7 +58,7 @@ class AlterTest extends DatabaseTestBase {
     $tid_field = $query->addField('test_task', 'tid');
     $pid_field = $query->addField('test_task', 'pid');
     $task_field = $query->addField('test_task', 'task');
-    $people_alias = $query->join('test', 'people', "[test_task].[pid] = [people].[id]");
+    $people_alias = $query->join('test', 'people', $query->joinCondition()->compare('test_task.pid', 'people.id'));
     $name_field = $query->addField($people_alias, 'name', 'name');
     $query->condition('test_task.tid', '1');
     $query->orderBy($tid_field);
@@ -141,7 +141,7 @@ class AlterTest extends DatabaseTestBase {
 
     // Create a main query and join to sub-query.
     $query = $this->connection->select('test_task', 'tt');
-    $query->join($subquery, 'pq', '[pq].[id] = [tt].[pid]');
+    $query->join($subquery, 'pq', $query->joinCondition()->compare('pq.id', 'tt.pid'));
     $age_field = $query->addField('pq', 'double_age');
     $name_field = $query->addField('pq', 'name');
 

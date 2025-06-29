@@ -25,7 +25,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
       // Create another query that joins against the virtual table resulting
       // from the subquery.
       $select = $this->connection->select($subquery, 'tt2');
-      $select->join('test', 't', '[t].[id] = [tt2].[pid]');
+      $select->join('test', 't', $select->joinCondition()->compare('t.id', 'tt2.pid'));
       $select->addField('t', 'name');
       if ($i) {
         // Use a different number of conditions here to confuse the subquery
@@ -61,7 +61,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
     // Create another query that joins against the virtual table resulting
     // from the subquery.
     $select = $this->connection->select($subquery, 'tt2');
-    $select->join('test', 't', '[t].[id] = [tt2].[pid]');
+    $select->join('test', 't', $select->joinCondition()->compare('t.id', 'tt2.pid'));
     $select->addField('t', 'name');
 
     // The resulting query should be equivalent to:
@@ -197,7 +197,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
     // Create another query that joins against the virtual table resulting
     // from the subquery.
     $select = $this->connection->select('test', 't');
-    $select->join($subquery, 'tt', '[t].[id] = [tt].[pid]');
+    $select->join($subquery, 'tt', $select->joinCondition()->compare('t.id', 'tt.pid'));
     $select->addField('t', 'name');
 
     // The resulting query should be equivalent to:

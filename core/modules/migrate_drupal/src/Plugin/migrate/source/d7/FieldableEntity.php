@@ -56,7 +56,7 @@ abstract class FieldableEntity extends DrupalSqlBase {
 
       // Join the 'field_config' table and add the 'translatable' setting to the
       // query.
-      $query->leftJoin('field_config', 'fc', '[fci].[field_id] = [fc].[id]');
+      $query->leftJoin('field_config', 'fc', $query->joinCondition()->compare('fci.field_id', 'fc.id'));
       $query->addField('fc', 'translatable');
 
       $this->fieldInfo[$cid] = $query->execute()->fetchAllAssoc('field_name');

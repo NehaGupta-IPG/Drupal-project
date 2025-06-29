@@ -24,7 +24,11 @@ class MenuLinkContentStorage extends SqlContentEntityStorage implements MenuLink
     $query->fields('mlfr', [$id_field]);
     $query->addExpression("MAX([mlfr].[$revision_field])", $revision_field);
 
-    $query->join($this->getRevisionTable(), 'mlr', "[mlfr].[$revision_field] = [mlr].[$revision_field] AND [mlr].[$revision_default_field] = 0");
+    $query->join($this->getRevisionTable(), 'mlr',
+      $query->joinCondition()
+        ->compare("mlfr.$revision_field", "mlr.$revision_field")
+        ->condition("mlr.$revision_default_field", 0)
+    );
 
     $inner_select = $this->database->select($this->getRevisionDataTable(), 't');
     $inner_select->condition("t.$rta_field", '1');
@@ -34,7 +38,11 @@ class MenuLinkContentStorage extends SqlContentEntityStorage implements MenuLink
       ->groupBy("t.$id_field")
       ->groupBy("t.$langcode_field");
 
-    $query->join($inner_select, 'mr', "[mlfr].[$revision_field] = [mr].[$revision_field] AND [mlfr].[$langcode_field] = [mr].[$langcode_field]");
+    $query->join($inner_select, 'mr',
+      $query->joinCondition()
+        ->compare("mlfr.$revision_field", "mr.$revision_field")
+        ->compare("mlfr.$langcode_field", "mr.$langcode_field")
+    );
 
     $query->groupBy("mlfr.$id_field");
 

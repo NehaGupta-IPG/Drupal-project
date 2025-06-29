@@ -647,6 +647,9 @@ class Select extends Query implements SelectInterface {
     if (is_string($condition)) {
       $condition = str_replace('%alias', $alias, $condition);
     }
+    if ($condition instanceof ConditionInterface) {
+      $condition->resolveAlias('%alias', $alias);
+    }
 
     $this->tables[$alias] = [
       'join type' => $type,
@@ -657,6 +660,19 @@ class Select extends Query implements SelectInterface {
     ];
 
     return $alias;
+  }
+
+  /**
+   * Helper method for generation join conditions.
+   *
+   * @param string $conjunction
+   *   The operator to use to combine conditions: 'AND' or 'OR'.
+   *
+   * @return \Drupal\Core\Database\Query\ConditionInterface
+   *   An object holding a group of conditions.
+   */
+  public function joinCondition(string $conjunction = 'AND'): ConditionInterface {
+    return $this->connection->condition($conjunction);
   }
 
   /**

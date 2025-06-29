@@ -34,7 +34,7 @@ class FieldLabelDescriptionTranslation extends DrupalSqlBase {
       ->condition('property', 'widget_label')
       ->condition('property', 'widget_description');
     $query->condition($condition);
-    $query->innerJoin('locales_target', 'lt', '[lt].[lid] = [i18n].[lid]');
+    $query->innerJoin('locales_target', 'lt', $query->joinCondition()->compare('lt.lid', 'i18n.lid'));
 
     return $query;
   }

@@ -388,6 +388,19 @@ class SelectExtender implements SelectInterface {
   }
 
   /**
+   * Helper method for generation join conditions.
+   *
+   * @param string $conjunction
+   *   The operator to use to combine conditions: 'AND' or 'OR'.
+   *
+   * @return \Drupal\Core\Database\Query\ConditionInterface
+   *   An object holding a group of conditions.
+   */
+  public function joinCondition(string $conjunction = 'AND'): ConditionInterface {
+    return $this->query->joinCondition($conjunction);
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function orderBy($field, $direction = 'ASC') {

@@ -24,7 +24,7 @@ class FieldInstanceOptionTranslation extends FieldOptionTranslation {
    */
   public function query() {
     $query = parent::query();
-    $query->join('content_node_field_instance', 'cnfi', '[cnfi].[field_name] = [cnf].[field_name]');
+    $query->join('content_node_field_instance', 'cnfi', $query->joinCondition()->compare('cnfi.field_name', 'cnf.field_name'));
     $query->addField('cnfi', 'type_name');
     return $query;
   }

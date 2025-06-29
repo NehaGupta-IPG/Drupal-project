@@ -2,6 +2,7 @@
 
 namespace Drupal\workspaces\EntityQuery;
 
+use Drupal\Core\Database\Query\ConditionInterface;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityType;
 use Drupal\Core\Entity\Query\Sql\Tables as BaseTables;
@@ -93,9 +94,18 @@ class Tables extends BaseTables {
       // 'revision_id' string used when joining dedicated field tables.
       // If those two conditions are met, we have to update the join condition
       // to also look for a possible workspace-specific revision using COALESCE.
-      $condition_parts = explode(' = ', $join_condition);
-      $condition_parts_1 = str_replace(['[', ']'], '', $condition_parts[1]);
-      [$base_table, $id_field] = explode('.', $condition_parts_1);
+      if ($join_condition instanceof ConditionInterface) {
+        $first_condition = $join_condition->conditions()[0];
+        $field = $first_condition['field'];
+        $field2 = $first_condition['field2'];
+        [$base_table, $id_field] = explode('.', $field2);
+        $condition_parts = [];
+      }
+      else {
+        $condition_parts = explode(' = ', $join_condition);
+        $condition_parts_1 = str_replace(['[', ']'], '', $condition_parts[1]);
+        [$base_table, $id_field] = explode('.', $condition_parts_1);
+      }
 
       if (isset($this->baseTablesEntityType[$base_table])) {
         $entity_type_id = $this->baseTablesEntityType[$base_table];
@@ -103,7 +113,12 @@ class Tables extends BaseTables {
 
         if ($id_field === $revision_key || $id_field === 'revision_id') {
           $workspace_association_table = $this->contentWorkspaceTables[$base_table];
-          $join_condition = "{$condition_parts[0]} = COALESCE($workspace_association_table.target_entity_revision_id, {$condition_parts[1]})";
+          if ($join_condition instanceof ConditionInterface) {
+            $join_condition = $this->sqlQuery->joinCondition()->where("$field = COALESCE($workspace_association_table.target_entity_revision_id, $field2)");
+          }
+          else {
+            $join_condition = "{$condition_parts[0]} = COALESCE($workspace_association_table.target_entity_revision_id, {$condition_parts[1]})";
+          }
         }
       }
     }
@@ -149,7 +164,12 @@ class Tables extends BaseTables {
 
       // LEFT join the Workspace association entity's table so we can properly
       // include live content along with a possible workspace-specific revision.
-      $this->contentWorkspaceTables[$base_table_alias] = $this->sqlQuery->leftJoin('workspace_association', NULL, "[%alias].[target_entity_type_id] = '$entity_type_id' AND [%alias].[$target_id_field] = [$base_table_alias].[$id_field] AND [%alias].[workspace] = '$active_workspace_id'");
+      $this->contentWorkspaceTables[$base_table_alias] = $this->sqlQuery->leftJoin('workspace_association', NULL,
+        $this->sqlQuery->joinCondition()
+          ->condition("%alias.target_entity_type_id", $entity_type_id)
+          ->compare("%alias.$target_id_field", "$base_table_alias.$id_field")
+          ->condition("%alias.workspace", $active_workspace_id)
+      );
 
       $this->baseTablesEntityType[$base_table_alias] = $entity_type->id();
     }

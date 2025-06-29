@@ -21,6 +21,17 @@ class TermNodeRevision extends TermNode {
   /**
    * {@inheritdoc}
    */
-  const JOIN = 'tn.nid = n.nid AND tn.vid != n.vid';
+  const JOIN = [
+    [
+      'field' => 'tn.nid',
+      'field2' => 'n.nid',
+      'operator' => '=',
+    ],
+    [
+      'field' => 'tn.vid',
+      'field2' => 'n.vid',
+      'operator' => '<>',
+    ],
+  ];
 
 }

@@ -20,7 +20,13 @@ class NodeComplete extends NodeRevision {
   /**
    * The join options between the node and the node_revisions_table.
    */
-  const JOIN = 'n.nid = nr.nid';
+  const JOIN = [
+    [
+      'field' => 'n.nid',
+      'field2' => 'nr.nid',
+      'operator' => '=',
+    ],
+  ];
 
   /**
    * {@inheritdoc}

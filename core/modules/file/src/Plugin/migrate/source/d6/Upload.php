@@ -23,7 +23,18 @@ class Upload extends DrupalSqlBase {
   /**
    * The join options between the node and the upload table.
    */
-  const JOIN = '[n].[nid] = [u].[nid] AND [n].[vid] = [u].[vid]';
+  const JOIN = [
+    [
+      'field' => 'n.nid',
+      'field2' => 'u.nid',
+      'operator' => '=',
+    ],
+    [
+      'field' => 'n.vid',
+      'field2' => 'u.vid',
+      'operator' => '=',
+    ],
+  ];
 
   /**
    * {@inheritdoc}
@@ -32,7 +43,22 @@ class Upload extends DrupalSqlBase {
     $query = $this->select('upload', 'u')
       ->distinct()
       ->fields('u', ['nid', 'vid']);
-    $query->innerJoin('node', 'n', static::JOIN);
+
+    if (is_string(static::JOIN)) {
+      $query->innerJoin('node', 'n', static::JOIN);
+    }
+    else {
+      $condition = $query->joinCondition();
+      foreach (static::JOIN as $join) {
+        if (isset($join['field2'])) {
+          $condition->compare($join['field'], $join['field2'], $join['operator']);
+        }
+        else {
+          $condition->condition($join['field'], $join['value'], $join['operator']);
+        }
+      }
+      $query->innerJoin('node', 'n', $condition);
+    }
     $query->addField('n', 'type');
     $query->addField('n', 'language');
     return $query;
@@ -46,7 +72,22 @@ class Upload extends DrupalSqlBase {
       ->fields('u', ['fid', 'description', 'list'])
       ->condition('u.nid', $row->getSourceProperty('nid'))
       ->orderBy('u.weight');
-    $query->innerJoin('node', 'n', static::JOIN);
+
+    if (is_string(static::JOIN)) {
+      $query->innerJoin('node', 'n', static::JOIN);
+    }
+    else {
+      $condition = $query->joinCondition();
+      foreach (static::JOIN as $join) {
+        if (isset($join['field2'])) {
+          $condition->compare($join['field'], $join['field2'], $join['operator']);
+        }
+        else {
+          $condition->condition($join['field'], $join['value'], $join['operator']);
+        }
+      }
+      $query->innerJoin('node', 'n', $condition);
+    }
     $row->setSourceProperty('upload', $query->execute()->fetchAll());
     return parent::prepareRow($row);
   }

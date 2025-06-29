@@ -128,6 +128,71 @@ class Condition implements ConditionInterface, \Countable {
   }
 
   /**
+   * Compare two database fields with each other.
+   *
+   * This method is used in joins to compare 2 fields from different tables to
+   * each other.
+   *
+   * @param string $field
+   *   The name of the field to compare.
+   * @param string $field2
+   *   The name of the other field to compare.
+   * @param string|null $operator
+   *   (optional) The operator to use. The supported operators are: =, <>, <,
+   *   <=, >, >=, <>.
+   *
+   * @return $this
+   *   The called object.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If passed invalid arguments, such as an empty array as $value.
+   */
+  public function compare(string $field, string $field2, ?string $operator = '='): static {
+    if (empty($operator)) {
+      $operator = '=';
+    }
+    if (!in_array($operator, ['=', '<', '>', '>=', '<=', '<>'], TRUE)) {
+      throw new InvalidQueryException(sprintf("In a query compare '%s %s %s' the operator must be one of the following: '=', '<', '>', '>=', '<=', '<>'.", $field, $operator, $field2));
+    }
+
+    $this->conditions[] = [
+      'field' => $field,
+      'field2' => $field2,
+      'operator' => $operator,
+    ];
+
+    $this->changed = TRUE;
+
+    return $this;
+  }
+
+  /**
+   * Resolve the alias placeholder in the condition and its children.
+   *
+   * @param string $placeholder
+   *   The value of the placeholder.
+   * @param string $alias
+   *   The value to replace the placeholder.
+   *
+   * @internal
+   */
+  public function resolveAlias(string $placeholder, string $alias): void {
+    foreach ($this->conditions as &$condition) {
+      if (isset($condition['field']) && $condition['field'] instanceof ConditionInterface) {
+        $condition['field']->resolveAlias($placeholder, $alias);
+      }
+      else {
+        if (isset($condition['field'])) {
+          $condition['field'] = str_replace($placeholder, $alias, $condition['field']);
+        }
+        if (isset($condition['field2'])) {
+          $condition['field2'] = str_replace($placeholder, $alias, $condition['field2']);
+        }
+      }
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function where($snippet, $args = []) {
@@ -225,7 +290,7 @@ class Condition implements ConditionInterface, \Countable {
           // @see ConditionInterface::condition() method (and thus have the
           // default value as defined over there) it is assumed to be a valid
           // condition on its own: ignore the operator and value parts.
-          $ignore_operator = $condition['operator'] === '=' && $condition['value'] === NULL;
+          $ignore_operator = ($condition['operator'] === '=' && $condition['value'] === NULL) || ($condition['operator'] === NULL && $condition['value'] === []);
         }
         elseif (!isset($condition['operator'])) {
           // Left hand part is a literal string added with the
@@ -281,7 +346,13 @@ class Condition implements ConditionInterface, \Countable {
 
         // Process value.
         $value_fragment = '';
-        if ($operator['use_value']) {
+        if (isset($condition['field2'])) {
+          // The key field2 is only set when we are comparing two fields with
+          // each other. The value part of the condition will be the second
+          // field.
+          $value_fragment = $connection->escapeField($condition['field2']);
+        }
+        elseif ($operator['use_value']) {
           // For simplicity, we first convert to an array, so that we can handle
           // the single and multi value cases the same.
           if (!is_array($condition['value'])) {

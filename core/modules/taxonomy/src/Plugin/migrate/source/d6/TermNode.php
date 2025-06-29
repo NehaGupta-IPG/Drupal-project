@@ -40,7 +40,13 @@ class TermNode extends DrupalSqlBase {
   /**
    * The join options between the node and the term node table.
    */
-  const JOIN = '[tn].[vid] = [n].[vid]';
+  const JOIN = [
+    [
+      'field' => 'tn.vid',
+      'field2' => 'n.vid',
+      'operator' => '=',
+    ],
+  ];
 
   /**
    * {@inheritdoc}
@@ -51,8 +57,27 @@ class TermNode extends DrupalSqlBase {
       ->fields('tn', ['nid', 'vid'])
       ->fields('n', ['type']);
     // Because this is an inner join it enforces the current revision.
-    $query->innerJoin('term_data', 'td', '[td].[tid] = [tn].[tid] AND [td].[vid] = :vid', [':vid' => $this->configuration['vid']]);
-    $query->innerJoin('node', 'n', static::JOIN);
+    $query->innerJoin('term_data', 'td',
+      $query->joinCondition()
+        ->compare('td.tid', 'tn.tid')
+        ->condition('td.vid', $this->configuration['vid'])
+    );
+
+    if (is_string(static::JOIN)) {
+      $query->innerJoin('node', 'n', static::JOIN);
+    }
+    else {
+      $condition = $query->joinCondition();
+      foreach (static::JOIN as $join) {
+        if (isset($join['field2'])) {
+          $condition->compare($join['field'], $join['field2'], $join['operator']);
+        }
+        else {
+          $condition->condition($join['field'], $join['value'], $join['operator']);
+        }
+      }
+      $query->innerJoin('node', 'n', $condition);
+    }
     return $query;
   }
 
@@ -75,8 +100,27 @@ class TermNode extends DrupalSqlBase {
     $query = $this->select('term_node', 'tn')
       ->fields('tn', ['tid'])
       ->condition('n.nid', $row->getSourceProperty('nid'));
-    $query->join('node', 'n', static::JOIN);
-    $query->innerJoin('term_data', 'td', '[td].[tid] = [tn].[tid] AND [td].[vid] = :vid', [':vid' => $this->configuration['vid']]);
+
+    if (is_string(static::JOIN)) {
+      $query->join('node', 'n', static::JOIN);
+    }
+    else {
+      $condition = $query->joinCondition();
+      foreach (static::JOIN as $join) {
+        if (isset($join['field2'])) {
+          $condition->compare($join['field'], $join['field2'], $join['operator']);
+        }
+        else {
+          $condition->condition($join['field'], $join['value'], $join['operator']);
+        }
+      }
+      $query->join('node', 'n', $condition);
+    }
+    $query->innerJoin('term_data', 'td',
+      $query->joinCondition()
+        ->compare('td.tid', 'tn.tid')
+        ->condition('td.vid', $this->configuration['vid'])
+    );
     $row->setSourceProperty('tid', $query->execute()->fetchCol());
     return parent::prepareRow($row);
   }

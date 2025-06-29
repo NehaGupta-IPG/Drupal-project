@@ -83,7 +83,13 @@ class Node extends FieldableEntity {
   /**
    * The join options between the node and the node_revision table.
    */
-  const JOIN = '[n].[vid] = [nr].[vid]';
+  const JOIN = [
+    [
+      'field' => 'n.vid',
+      'field2' => 'nr.vid',
+      'operator' => '=',
+    ],
+  ];
 
   /**
    * {@inheritdoc}
@@ -112,12 +118,26 @@ class Node extends FieldableEntity {
       ]);
     $query->addField('n', 'uid', 'node_uid');
     $query->addField('nr', 'uid', 'revision_uid');
-    $query->innerJoin('node', 'n', static::JOIN);
 
+    if (is_string(static::JOIN)) {
+      $query->innerJoin('node', 'n', static::JOIN);
+    }
+    else {
+      $condition = $query->joinCondition();
+      foreach (static::JOIN as $join) {
+        if (isset($join['field2'])) {
+          $condition->compare($join['field'], $join['field2'], $join['operator']);
+        }
+        else {
+          $condition->condition($join['field'], $join['value'], $join['operator']);
+        }
+      }
+      $query->innerJoin('node', 'n', $condition);
+    }
     // If the content_translation module is enabled, get the source langcode
     // to fill the content_translation_source field.
     if ($this->moduleHandler->moduleExists('content_translation')) {
-      $query->leftJoin('node', 'nt', '[n].[tnid] = [nt].[nid]');
+      $query->leftJoin('node', 'nt', $query->joinCondition()->compare('n.tnid', 'nt.nid'));
       $query->addField('nt', 'language', 'source_langcode');
     }
     $this->handleTranslations($query);

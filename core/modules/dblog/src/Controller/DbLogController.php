@@ -152,7 +152,7 @@ class DbLogController extends ControllerBase {
       'variables',
       'link',
     ]);
-    $query->leftJoin('users_field_data', 'ufd', '[w].[uid] = [ufd].[uid]');
+    $query->leftJoin('users_field_data', 'ufd', $query->joinCondition()->compare('w.uid', 'ufd.uid'));
 
     $this->addFilterToQuery($request, $query);
 

@@ -86,7 +86,11 @@ trait QueryTrait {
       // revision.
       $id_field = $this->entityType->getKey('id');
       $target_id_field = WorkspaceAssociation::getIdField($this->entityTypeId);
-      $this->sqlQuery->leftJoin('workspace_association', 'workspace_association', "[%alias].[target_entity_type_id] = '{$this->entityTypeId}' AND [%alias].[$target_id_field] = [base_table].[$id_field] AND [%alias].[workspace] = '{$active_workspace->id()}'");
+      $this->sqlQuery->leftJoin('workspace_association', 'workspace_association', $this->sqlQuery->joinCondition()
+        ->condition("%alias.target_entity_type_id", $this->entityTypeId)
+        ->compare("%alias.$target_id_field", "base_table.$id_field")
+        ->condition("%alias.workspace", $active_workspace->id())
+      );
     }
 
     return $this;

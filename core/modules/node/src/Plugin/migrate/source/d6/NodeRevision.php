@@ -22,7 +22,18 @@ class NodeRevision extends Node {
   /**
    * The join options between the node and the node_revisions_table.
    */
-  const JOIN = 'n.nid = nr.nid AND n.vid <> nr.vid';
+  const JOIN = [
+    [
+      'field' => 'n.nid',
+      'field2' => 'nr.nid',
+      'operator' => '=',
+    ],
+    [
+      'field' => 'n.vid',
+      'field2' => 'nr.vid',
+      'operator' => '<>',
+    ],
+  ];
 
   /**
    * {@inheritdoc}
