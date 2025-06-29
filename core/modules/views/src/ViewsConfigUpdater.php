@@ -147,7 +147,7 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
       if ($this->processRevisionFieldHyphenFix($view)) {
         $changed = TRUE;
       }
-      if ($this->processDefaultArgumentSkipUrlUpdate($handler, $handler_type)) {
+      if ($this->processDefaultArgumentSkipUrlUpdate($handler, $handler_type, $view)) {
         $changed = TRUE;
       }
       if ($this->processDefaultPagerHeadingUpdate($handler, $handler_type)) {
@@ -473,8 +473,8 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
    *   default_argument_skip_url removed.
    */
   public function needsDefaultArgumentSkipUrlUpdate(ViewEntityInterface $view) {
-    return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type) {
-      return $this->processDefaultArgumentSkipUrlUpdate($handler, $handler_type);
+    return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type) use ($view) {
+      return $this->processDefaultArgumentSkipUrlUpdate($handler, $handler_type, $view);
     });
   }
 
@@ -485,13 +485,20 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
    *   A display handler.
    * @param string $handler_type
    *   The handler type.
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
    *
    * @return bool
    *   Whether the handler was updated.
    */
-  public function processDefaultArgumentSkipUrlUpdate(array &$handler, string $handler_type): bool {
+  public function processDefaultArgumentSkipUrlUpdate(array &$handler, string $handler_type, ViewEntityInterface $view): bool {
     if ($handler_type === 'argument' && isset($handler['default_argument_skip_url'])) {
       unset($handler['default_argument_skip_url']);
+      $deprecations_triggered = &$this->triggeredDeprecations['981870'][$view->id()];
+      if ($this->deprecationsEnabled && !$deprecations_triggered) {
+        $deprecations_triggered = TRUE;
+        @trigger_error(sprintf('The default_argument_skip_url attribute for view "%s" is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3382316', $view->id()), E_USER_DEPRECATED);
+      }
       return TRUE;
     }
     return FALSE;

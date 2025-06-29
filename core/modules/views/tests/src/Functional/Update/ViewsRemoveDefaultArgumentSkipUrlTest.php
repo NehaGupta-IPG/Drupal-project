@@ -45,6 +45,7 @@ class ViewsRemoveDefaultArgumentSkipUrlTest extends UpdatePathTestBase {
    * Tests the upgrade path removing default_argument_skip_url.
    */
   public function testViewsPostUpdateFixRevisionId(): void {
+    $this->expectDeprecation('The default_argument_skip_url attribute for view "remove_default_argument_skip_url" is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3382316');
     $view = View::load('remove_default_argument_skip_url');
     $data = $view->toArray();
     $this->assertArrayHasKey('default_argument_skip_url', $data['display']['default']['display_options']['arguments']['tid']);
