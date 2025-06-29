@@ -360,7 +360,7 @@ function system_check_directory($form_element, FormStateInterface $form_state) {
     $logger->error('The directory %directory does not exist and could not be created.', ['%directory' => $directory]);
   }
 
-  if (is_dir($directory) && !is_writable($directory) && !$file_system->chmod($directory)) {
+  if (is_dir($directory) && !$file_system->isWritable($directory) && !$file_system->chmod($directory)) {
     // If the directory is not writable and cannot be made so.
     $form_state->setErrorByName($form_element['#parents'][0], t('The directory %directory exists but is not writable and could not be made writable.', ['%directory' => $directory]));
     $logger->error('The directory %directory exists but is not writable and could not be made writable.', ['%directory' => $directory]);

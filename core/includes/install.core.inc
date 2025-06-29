@@ -1973,7 +1973,7 @@ function install_check_translations($langcode, $server_pattern): array {
   // Get values so the requirements errors can be specific.
   if (drupal_verify_install_file($translations_directory, FILE_EXIST, 'dir')) {
     $readable = is_readable($translations_directory);
-    $writable = is_writable($translations_directory);
+    $writable = $file_system->isWritable($translations_directory);
     $translations_directory_exists = TRUE;
   }
 
@@ -2163,7 +2163,7 @@ function install_check_requirements($install_state) {
     // Otherwise, if $file does not exist yet, we can try to copy
     // $default_file to create it.
     elseif (!$exists) {
-      $copied = drupal_verify_install_file($site_path, FILE_EXIST | FILE_WRITABLE, 'dir') && @copy($default_file, $file);
+      $copied = drupal_verify_install_file($site_path, FILE_EXIST | FILE_WRITABLE | FILE_EXECUTABLE, 'dir') && @copy($default_file, $file);
       if ($copied) {
         // If the new $file file has the same owner as $default_file this means
         // $default_file is owned by the webserver user. This is an inherent

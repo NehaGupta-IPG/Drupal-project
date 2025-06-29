@@ -330,6 +330,8 @@ function drupal_verify_install_file($file, $mask = NULL, $type = 'file', $auto_f
     }
   }
 
+  /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+  $file_system = \Drupal::service('file_system');
   // Verify file permissions.
   if (isset($mask)) {
     $masks = [FILE_EXIST, FILE_READABLE, FILE_WRITABLE, FILE_EXECUTABLE, FILE_NOT_READABLE, FILE_NOT_WRITABLE, FILE_NOT_EXECUTABLE];
@@ -354,13 +356,13 @@ function drupal_verify_install_file($file, $mask = NULL, $type = 'file', $auto_f
             break;
 
           case FILE_WRITABLE:
-            if (!is_writable($file)) {
+            if (!$file_system->isWritable($file)) {
               $return = FALSE;
             }
             break;
 
           case FILE_EXECUTABLE:
-            if (!is_executable($file)) {
+            if (!$file_system->isExecutable($file)) {
               $return = FALSE;
             }
             break;
@@ -372,13 +374,13 @@ function drupal_verify_install_file($file, $mask = NULL, $type = 'file', $auto_f
             break;
 
           case FILE_NOT_WRITABLE:
-            if (is_writable($file)) {
+            if ($file_system->isWritable($file)) {
               $return = FALSE;
             }
             break;
 
           case FILE_NOT_EXECUTABLE:
-            if (is_executable($file)) {
+            if ($file_system->isExecutable($file)) {
               $return = FALSE;
             }
             break;
@@ -461,7 +463,8 @@ function drupal_install_fix_file($file, $mask, $message = TRUE) {
   if (!file_exists($file)) {
     return FALSE;
   }
-
+  /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+  $file_system = \Drupal::service('file_system');
   $mod = fileperms($file) & 0777;
   $masks = [FILE_READABLE, FILE_WRITABLE, FILE_EXECUTABLE, FILE_NOT_READABLE, FILE_NOT_WRITABLE, FILE_NOT_EXECUTABLE];
 
@@ -479,13 +482,13 @@ function drupal_install_fix_file($file, $mask, $message = TRUE) {
           break;
 
         case FILE_WRITABLE:
-          if (!is_writable($file)) {
+          if (!$file_system->isWritable($file)) {
             $mod |= 0222;
           }
           break;
 
         case FILE_EXECUTABLE:
-          if (!is_executable($file)) {
+          if (!$file_system->isExecutable($file)) {
             $mod |= 0111;
           }
           break;
@@ -497,13 +500,13 @@ function drupal_install_fix_file($file, $mask, $message = TRUE) {
           break;
 
         case FILE_NOT_WRITABLE:
-          if (is_writable($file)) {
+          if ($file_system->isWritable($file)) {
             $mod &= ~0222;
           }
           break;
 
         case FILE_NOT_EXECUTABLE:
-          if (is_executable($file)) {
+          if ($file_system->isExecutable($file)) {
             $mod &= ~0111;
           }
           break;

@@ -531,7 +531,7 @@ class FileSystem implements FileSystemInterface {
       }
     }
 
-    $writable = is_writable($directory);
+    $writable = $this->isWritable($directory);
     if (!$writable && ($options & static::MODIFY_PERMISSIONS)) {
       return $this->chmod($directory);
     }
@@ -732,6 +732,56 @@ class FileSystem implements FileSystemInterface {
     // Give priority to files in this folder by merging them after
     // any subdirectory files.
     return array_merge(array_merge(...$files_in_sub_dirs), $files_in_this_directory);
+  }
+
+  /**
+   * Determines if a directory is writable by the web server.
+   *
+   * PHP's is_writable() does not fully support stream wrappers, so this
+   * function fills that gap.
+   * In order to be able to write files within the directory, the directory
+   * itself must be writable, and it must also have the executable bit set. This
+   * helper function checks both at the same time.
+   *
+   * @param string $uri
+   *   A URI or pathname pointing to the directory that will be checked.
+   *
+   * @return bool
+   *   TRUE if the directory is writable and executable; FALSE otherwise.
+   */
+  public function isWritable($uri): bool {
+    // By converting the URI to a normal path using drupal_realpath(), we can
+    // correctly handle both stream wrappers and normal paths.
+    $realpath = $this->realpath($uri);
+    $filename = $realpath ?: $uri;
+    if (\is_dir($filename) !== TRUE) {
+      return FALSE;
+    }
+    return is_writable($realpath ?: $uri) && $this->isExecutable($uri);
+  }
+
+  /**
+   * Determines if a file or directory is executable.
+   *
+   * PHP's is_executable() does not fully support stream wrappers, so this
+   * function fills that gap.
+   *
+   * @param string $uri
+   *   A URI or pathname pointing to the file or directory that will be checked.
+   *
+   * @return bool
+   *   TRUE if the file or directory is executable; FALSE otherwise.
+   *
+   * @see is_executable()
+   * @ingroup php_wrappers
+   */
+  public function isExecutable($uri): bool {
+    // By converting the URI to a normal path using drupal_realpath(), we can
+    // correctly handle both stream wrappers and normal paths.
+    $realpath = $this->realpath($uri);
+    $filename = $realpath ?: $uri;
+    // Determine whether the URI is an executable file or a directory.
+    return is_executable($filename) || is_dir($filename);
   }
 
 }

@@ -339,7 +339,7 @@ abstract class Updater {
     // Make the parent dir writable if need be and create the dir.
     if (!is_dir($directory)) {
       $parent_dir = dirname($directory);
-      if (!is_writable($parent_dir)) {
+      if (!\Drupal::service('file_system')->isWritable($parent_dir)) {
         @chmod($parent_dir, 0755);
         // It is expected that this will fail if the directory is owned by the
         // FTP user. If the FTP user == web server, it will succeed.
@@ -385,7 +385,7 @@ abstract class Updater {
    *   If the chmod should be applied recursively.
    */
   public function makeWorldReadable(&$filetransfer, $path, $recursive = TRUE) {
-    if (!is_executable($path)) {
+    if (!\Drupal::service('file_system')->isExecutable($path)) {
       // Set it to read + execute.
       $new_perms = fileperms($path) & 0777 | 0005;
       $filetransfer->chmod($path, $new_perms, $recursive);

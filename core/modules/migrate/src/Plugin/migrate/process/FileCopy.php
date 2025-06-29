@@ -145,7 +145,7 @@ class FileCopy extends FileProcessBase implements ContainerFactoryPluginInterfac
     // If the directory exists and is writable, avoid
     // \Drupal\Core\File\FileSystemInterface::prepareDirectory() call and write
     // the file to destination.
-    if (!is_dir($dir) || !is_writable($dir)) {
+    if (!is_dir($dir) || !$this->fileSystem->isWritable($dir)) {
       if (!$this->fileSystem->prepareDirectory($dir, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS)) {
         throw new MigrateException("Could not create or write to directory '$dir'");
       }

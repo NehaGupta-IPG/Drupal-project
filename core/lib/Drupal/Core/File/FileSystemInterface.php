@@ -518,4 +518,38 @@ interface FileSystemInterface {
    */
   public function scanDirectory($dir, $mask, array $options = []);
 
+  /**
+   * Determines if a directory is writable by the web server.
+   *
+   * PHP's is_writable() does not fully support stream wrappers, so this
+   * function fills that gap.
+   * In order to be able to write files within the directory, the directory
+   * itself must be writable, and it must also have the executable bit set. This
+   * helper function checks both at the same time.
+   *
+   * @param string $uri
+   *   A URI or pathname pointing to the directory that will be checked.
+   *
+   * @return bool
+   *   TRUE if the directory is writable and executable; FALSE otherwise.
+   */
+  public function isWritable($uri): bool;
+
+  /**
+   * Determines if a file or directory is executable.
+   *
+   * PHP's is_executable() does not fully support stream wrappers, so this
+   * function fills that gap.
+   *
+   * @param string $uri
+   *   A URI or pathname pointing to the file or directory that will be checked.
+   *
+   * @return bool
+   *   TRUE if the file or directory is executable; FALSE otherwise.
+   *
+   * @see is_executable()
+   * @ingroup php_wrappers
+   */
+  public function isExecutable($uri): bool;
+
 }
