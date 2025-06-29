@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Entity;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\Entity\Exception\UnknownFieldNameException;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Entity\TypedData\EntityDataDefinition;
 use Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface;
@@ -988,6 +989,42 @@ class EntityFieldTest extends EntityKernelTestBase {
     $this->expectException(EntityStorageException::class);
     $entity->set('id', $entity_id + 1);
     $storage->save($entity);
+  }
+
+  /**
+   * Tests behavior when passing an invalid field name to $entity->get().
+   *
+   * @param bool|null $exception_on_invalid
+   *   Value to be passed to $exception_on_invalid parameter of get().
+   *
+   * @dataProvider providerEntityGetInvalidFieldName
+   */
+  public function testEntityGetInvalidFieldName(?bool $exception_on_invalid): void {
+    $entity = $this->createTestEntity('entity_test');
+
+    if (is_null($exception_on_invalid) || $exception_on_invalid) {
+      $this->expectException(UnknownFieldNameException::class);
+      $this->expectExceptionMessage('Field field_does_not_exist is unknown.');
+    }
+
+    if (is_null($exception_on_invalid)) {
+      $value = $entity->get('field_does_not_exist')?->value;
+    }
+    else {
+      $value = $entity->get('field_does_not_exist', $exception_on_invalid)?->value;
+    }
+    $this->assertNull($value);
+  }
+
+  /**
+   * Data provider for testEntityGetInvalidFieldName().
+   */
+  public static function providerEntityGetInvalidFieldName(): array {
+    return [
+      'default' => [NULL],
+      'pass true' => [TRUE],
+      'pass false' => [FALSE],
+    ];
   }
 
 }

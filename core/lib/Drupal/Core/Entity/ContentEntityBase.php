@@ -3,6 +3,7 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Entity\Exception\UnknownFieldNameException;
 use Drupal\Core\Entity\Plugin\DataType\EntityReference;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Language\Language;
@@ -592,9 +593,19 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   /**
    * {@inheritdoc}
    */
-  public function get($field_name) {
+  public function get(/* string */$field_name /* , bool $exception_on_invalid = TRUE */) {
+    $arguments = func_get_args();
+    $exception_on_invalid = !isset($arguments[1]) || (bool) $arguments[1];
     if (!isset($this->fields[$field_name][$this->activeLangcode])) {
-      return $this->getTranslatedField($field_name, $this->activeLangcode);
+      try {
+        return $this->getTranslatedField($field_name, $this->activeLangcode);
+      }
+      catch (UnknownFieldNameException $e) {
+        if ($exception_on_invalid) {
+          throw $e;
+        }
+        return NULL;
+      }
     }
     return $this->fields[$field_name][$this->activeLangcode];
   }
@@ -614,7 +625,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     if (!isset($this->fields[$name][$langcode])) {
       $definition = $this->getFieldDefinition($name);
       if (!$definition) {
-        throw new \InvalidArgumentException("Field $name is unknown.");
+        throw new UnknownFieldNameException("Field $name is unknown.");
       }
       // Non-translatable fields are always stored with
       // LanguageInterface::LANGCODE_DEFAULT as key.
