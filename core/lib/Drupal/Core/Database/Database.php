@@ -189,7 +189,7 @@ abstract class Database {
    *   structure of this array depends on the database driver it is connecting
    *   to.
    */
-  final public static function parseConnectionInfo(array $info) {
+  final public static function parseConnectionInfo(array $info): ConnectionParameters {
     // If there is no "driver" property, then we assume it's an array of
     // possible connections for this target. Pick one at random. That allows
     // us to have, for example, multiple replica servers.
@@ -237,7 +237,14 @@ abstract class Database {
       }
     }
 
-    return $info;
+    $connectionParametersClass = $info['namespace'] . '\\ConnectionParameters';
+    return new $connectionParametersClass(
+      $info['driver'],
+      $info['namespace'],
+      $info['autoload'],
+      $info['database'],
+      $info['prefix'],
+    );
   }
 
   /**
@@ -270,9 +277,11 @@ abstract class Database {
    *
    * @see \Drupal\Core\Database\Database::setActiveConnection
    */
-  final public static function addConnectionInfo($key, $target, array $info, $class_loader = NULL, $app_root = NULL) {
+  final public static function addConnectionInfo($key, $target, ConnectionParameters|array $info, $class_loader = NULL, $app_root = NULL) {
     if (empty(self::$databaseInfo[$key][$target])) {
-      $info = self::parseConnectionInfo($info);
+      if (is_array($info)) {
+        $info = self::parseConnectionInfo($info);
+      }
       self::$databaseInfo[$key][$target] = $info;
 
       // If the database driver is provided by a module, then its code may need
@@ -281,15 +290,14 @@ abstract class Database {
       // initialization but the container definition is likely in the database.
       // Therefore, allow the connection info to specify an autoload directory
       // for the driver.
-      if (isset($info['autoload']) && $class_loader && $app_root) {
-        $class_loader->addPsr4($info['namespace'] . '\\', $app_root . '/' . $info['autoload']);
+      if ($class_loader && $app_root) {
+        $class_loader->addPsr4($info->namespace . '\\', $app_root . '/' . $info->autoload);
 
         // When the database driver is extending from other database drivers,
         // then add autoload directory for the parent database driver modules
         // as well.
-        if (!empty($info['dependencies'])) {
-          assert(is_array($info['dependencies']));
-          foreach ($info['dependencies'] as $dependency) {
+        if (!empty($info->dependencies)) {
+          foreach ($info->dependencies as $dependency) {
             if (isset($dependency['namespace']) && isset($dependency['autoload'])) {
               $class_loader->addPsr4($dependency['namespace'] . '\\', $app_root . '/' . $dependency['autoload']);
             }
@@ -414,11 +422,11 @@ abstract class Database {
       throw new ConnectionNotDefinedException('The specified database connection is not defined: ' . $key);
     }
 
-    if (!self::$databaseInfo[$key][$target]['driver']) {
+    if (!self::$databaseInfo[$key][$target]->driver) {
       throw new DriverNotSpecifiedException('Driver not specified for this database connection: ' . $key);
     }
 
-    $driver_class = self::$databaseInfo[$key][$target]['namespace'] . '\\Connection';
+    $driver_class = self::$databaseInfo[$key][$target]->getDriverConnectionClassName();
 
     $client_connection = $driver_class::open(self::$databaseInfo[$key][$target]);
     $new_connection = new $driver_class($client_connection, self::$databaseInfo[$key][$target]);
@@ -513,7 +521,7 @@ abstract class Database {
    * @throws \RuntimeException
    *   Exception thrown when a module provided database driver does not exist.
    */
-  public static function convertDbUrlToConnectionInfo(string $url, $root = NULL, ?bool $include_test_drivers = NULL): array {
+  public static function convertDbUrlToConnectionInfo(string $url, $root = NULL, ?bool $include_test_drivers = NULL): ConnectionParameters {
     if ($root !== NULL) {
       if (is_bool($root)) {
         $include_test_drivers = $root;
@@ -579,7 +587,14 @@ abstract class Database {
       $options['dependencies'] = $autoloadInfo['dependencies'];
     }
 
-    return $options;
+    $connectionParametersClass = $options['namespace'] . '\\ConnectionParameters';
+    return new $connectionParametersClass(
+      $options['driver'],
+      $options['namespace'],
+      $options['autoload'],
+      $options['database'],
+      $options['prefix'] ?? '',
+    );
   }
 
   /**

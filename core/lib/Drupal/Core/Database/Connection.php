@@ -87,10 +87,8 @@ abstract class Connection {
 
   /**
    * The connection information for this connection object.
-   *
-   * @var array
    */
-  protected $connectionOptions = [];
+  protected ConnectionParameters $connectionOptions;
 
   /**
    * The schema object for this connection.
@@ -177,19 +175,11 @@ abstract class Connection {
    *   - namespace
    *   - Other driver-specific options.
    */
-  public function __construct(object $connection, array $connection_options) {
+  public function __construct(object $connection, ConnectionParameters $connection_options) {
     assert(count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
 
     // Manage the table prefix.
-    $connection_options['prefix'] = $connection_options['prefix'] ?? '';
-    $this->setPrefix($connection_options['prefix']);
-
-    // Work out the database driver namespace if none is provided. This normally
-    // written to setting.php by installer or set by
-    // \Drupal\Core\Database\Database::parseConnectionInfo().
-    if (empty($connection_options['namespace'])) {
-      $connection_options['namespace'] = (new \ReflectionObject($this))->getNamespaceName();
-    }
+    $this->setPrefix($connection_options->prefix);
 
     $this->connection = $connection;
     $this->connectionOptions = $connection_options;
@@ -204,7 +194,7 @@ abstract class Connection {
    * @return object
    *   A client connection object.
    */
-  abstract public static function open(array &$connection_options = []);
+  abstract public static function open(ConnectionParameters $connection_options);
 
   /**
    * Ensures that the client connection can be garbage collected.
@@ -1567,7 +1557,7 @@ abstract class Connection {
    *   database call itself.
    */
   public function findCallerFromDebugBacktrace(): array {
-    $stack = $this->removeDatabaseEntriesFromDebugBacktrace($this->getDebugBacktrace(), $this->getConnectionOptions()['namespace']);
+    $stack = $this->removeDatabaseEntriesFromDebugBacktrace($this->getDebugBacktrace(), $this->getConnectionOptions()->namespace);
     // Return the first function call whose stack entry has a 'file' key, that
     // is, it is not a callback or a closure.
     for ($i = 0; $i < count($stack); $i++) {

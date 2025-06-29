@@ -330,8 +330,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
 
     // When a module is providing the database driver, then enable that module.
     $connection_info = Database::getConnectionInfo();
-    $namespace = $connection_info['default']['namespace'] ?? '';
-    $autoload = $connection_info['default']['autoload'] ?? '';
+    $namespace = $connection_info['default']->namespace;
+    $autoload = $connection_info['default']->autoload;
     if (str_contains($autoload, 'src/Driver/Database/')) {
       [$first, $second] = explode('\\', $namespace, 3);
       if ($first === 'Drupal' && strtolower($second) === $second) {
@@ -450,7 +450,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       foreach ($connection_info as $target => $value) {
         // Replace the full table prefix definition to ensure that no table
         // prefixes of the test runner leak into the test.
-        $connection_info[$target]['prefix'] = $this->databasePrefix;
+        $connection_info[$target]->prefix = $this->databasePrefix ?? '';
       }
     }
     return $connection_info;
@@ -662,9 +662,9 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
 
     // Remove all prefixed tables.
     $original_connection_info = Database::getConnectionInfo('simpletest_original_default');
-    $original_prefix = $original_connection_info['default']['prefix'] ?? NULL;
+    $original_prefix = $original_connection_info['default']->prefix;
     $test_connection_info = Database::getConnectionInfo('default');
-    $test_prefix = $test_connection_info['default']['prefix'] ?? NULL;
+    $test_prefix = $test_connection_info['default']->prefix;
     if ($original_prefix != $test_prefix) {
       $tables = Database::getConnection()->schema()->findTables('%');
       foreach ($tables as $table) {
