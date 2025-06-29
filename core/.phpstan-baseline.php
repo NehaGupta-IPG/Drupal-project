@@ -9716,12 +9716,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Weight.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\ElementInfoManager\\:\\:clearCachedDefinitions\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/ElementInfoManager.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\HtmlResponseAttachmentsProcessor\\:\\:renderHtmlResponseAttachmentPlaceholders\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -17466,18 +17460,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/file/tests/file_module_test/src/Form/FileModuleTestForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\file_test\\\\Form\\\\FileTestForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/file_test/src/Form/FileTestForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\file_test\\\\Form\\\\FileTestForm\\:\\:validateForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/file_test/src/Form/FileTestForm.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\file_test\\\\Form\\\\FileTestSaveUploadFromForm\\:\\:create\\(\\) has no return type specified\\.$#',
