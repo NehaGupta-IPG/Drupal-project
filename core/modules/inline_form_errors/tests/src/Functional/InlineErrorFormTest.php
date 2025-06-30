@@ -6,8 +6,16 @@ namespace Drupal\Tests\inline_form_errors\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 
+/**
+ * Validation test for inline_form_errors.
+ *
+ * @group inline_form_errors
+ */
 class InlineErrorFormTest extends BrowserTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected $defaultTheme = 'stark';
 
   /**
@@ -27,7 +35,7 @@ class InlineErrorFormTest extends BrowserTestBase {
    *
    * @see \Drupal\form_test\Form\FormTestValidateRequiredForm
    */
-  public function testRequiredCheckboxesRadio() {
+  public function testRequiredCheckboxesRadio(): void {
     $form = \Drupal::formBuilder()->getForm('\Drupal\form_test\Form\FormTestValidateRequiredForm');
 
     // Attempt to submit the form with no required fields set.

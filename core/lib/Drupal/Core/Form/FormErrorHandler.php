@@ -63,7 +63,7 @@ class FormErrorHandler implements FormErrorHandlerInterface {
       if (isset($form_element['#id'])) {
         // Render the error messages as HTML.
         $message = [
-          '#prefix' => '<div id="' . $form_element['#id'] . '--error-message' . '">',
+          '#prefix' => '<div id="' . $form_element['#id'] . '--error-message">',
           '#suffix' => '</div>',
           'message' => [
             '#markup' => $error,
