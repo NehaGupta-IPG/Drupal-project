@@ -26,10 +26,12 @@ class RequirementsTest extends KernelTestBase {
    * Tests requirements data altering.
    */
   public function testRequirementsAlter(): void {
-    $requirements = $this->container->get('system.manager')->listRequirements();
+    /** @var \Drupal\system\SystemManager $systemManager */
+    $systemManager = $this->container->get('system.manager');
+    $requirements = $systemManager->listRequirements();
     // @see requirements1_test_requirements_alter()
-    $this->assertEquals('Requirements 1 Test - Changed', $requirements['requirements1_test_alterable']['title']);
-    $this->assertEquals(RequirementSeverity::Warning, $requirements['requirements1_test_alterable']['severity']);
+    $this->assertEquals('Requirements 1 Test - Changed', $requirements['requirements1_test_alterable']->getTitle());
+    $this->assertEquals(RequirementSeverity::Warning, $requirements['requirements1_test_alterable']->getSeverity());
     $this->assertArrayNotHasKey('requirements1_test_deletable', $requirements);
   }
 

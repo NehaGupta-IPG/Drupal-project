@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Extension\Requirement\Requirement;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
@@ -1138,45 +1139,46 @@ function hook_updater_info_alter(&$updaters) {
  *     when installing, or RequirementSeverity::Info otherwise.
  */
 function hook_requirements($phase): array {
+  /** @var \Drupal\Core\Extension\Requirement\Requirement[] $requirements */
   $requirements = [];
 
   // Report Drupal version
   if ($phase == 'runtime') {
-    $requirements['drupal'] = [
-      'title' => t('Drupal'),
-      'value' => \Drupal::VERSION,
-      'severity' => RequirementSeverity::Info,
-    ];
+    $requirements['drupal'] = new Requirement(
+      title: t('Drupal'),
+      value: \Drupal::VERSION,
+      severity: RequirementSeverity::Info,
+    );
   }
 
   // Test PHP version
-  $requirements['php'] = [
-    'title' => t('PHP'),
-    'value' => ($phase == 'runtime') ? Link::fromTextAndUrl(phpversion(), Url::fromRoute('system.php'))->toString() : phpversion(),
-  ];
+  $requirements['php'] = new Requirement(
+    title: t('PHP'),
+    value: ($phase == 'runtime') ? Link::fromTextAndUrl(phpversion(), Url::fromRoute('system.php'))->toString() : phpversion(),
+  );
   if (version_compare(phpversion(), \Drupal::MINIMUM_PHP) < 0) {
-    $requirements['php']['description'] = t('Your PHP installation is too old. Drupal requires at least PHP %version.', ['%version' => \Drupal::MINIMUM_PHP]);
-    $requirements['php']['severity'] = RequirementSeverity::Error;
+    $requirements['php']->setDescription(t('Your PHP installation is too old. Drupal requires at least PHP %version.', ['%version' => \Drupal::MINIMUM_PHP]));
+    $requirements['php']->setSeverity(RequirementSeverity::Error);
   }
 
   // Report cron status
   if ($phase == 'runtime') {
     $cron_last = \Drupal::state()->get('system.cron_last');
 
-    if (is_numeric($cron_last)) {
-      $requirements['cron']['value'] = t('Last run @time ago', ['@time' => \Drupal::service('date.formatter')->formatTimeDiffSince($cron_last)]);
+    if (is_numeric($cron_last) && isset($requirements['cron'])) {
+      $requirements['cron']->setValue(t('Last run @time ago', ['@time' => \Drupal::service('date.formatter')->formatTimeDiffSince($cron_last)]));
     }
     else {
-      $requirements['cron'] = [
-        'description' => t('Cron has not run. It appears cron jobs have not been setup on your system. Check the help pages for <a href=":url">configuring cron jobs</a>.', [':url' => 'https://www.drupal.org/docs/administering-a-drupal-site/cron-automated-tasks/cron-automated-tasks-overview']),
-        'severity' => RequirementSeverity::Error,
-        'value' => t('Never run'),
-      ];
+      $requirements['cron'] = new Requirement(
+        value: t('Never run'),
+        description: t('Cron has not run. It appears cron jobs have not been setup on your system. Check the help pages for <a href=":url">configuring cron jobs</a>.', [':url' => 'https://www.drupal.org/docs/administering-a-drupal-site/cron-automated-tasks/cron-automated-tasks-overview']),
+        severity: RequirementSeverity::Error,
+      );
     }
+    $description = $requirements['cron']->getDescription();
+    $requirements['cron']->setDescription($description . ' ' . t('You can <a href=":cron">run cron manually</a>.', [':cron' => Url::fromRoute('system.run_cron')->toString()]));
 
-    $requirements['cron']['description'] .= ' ' . t('You can <a href=":cron">run cron manually</a>.', [':cron' => Url::fromRoute('system.run_cron')->toString()]);
-
-    $requirements['cron']['title'] = t('Cron maintenance tasks');
+    $requirements['cron']->setTitle(t('Cron maintenance tasks'));
   }
 
   return $requirements;
