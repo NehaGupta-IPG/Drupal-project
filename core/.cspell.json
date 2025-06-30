@@ -25,6 +25,7 @@
       "modules/navigation/assets/**",
       "modules/search/tests/UnicodeTest.txt",
       "modules/system/tests/logo.svgz",
+      "modules/system/tests/fixtures/update/*",
       "node_modules/*",
       "profiles/demo_umami/modules/demo_umami_content/default_content/languages/es/**/*",
       "tests/fixtures/config_install/*",
