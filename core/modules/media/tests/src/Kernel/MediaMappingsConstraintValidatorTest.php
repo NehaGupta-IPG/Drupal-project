@@ -29,13 +29,14 @@ class MediaMappingsConstraintValidatorTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('file');
+    $this->installEntitySchema('media');
     $this->installEntitySchema('user');
   }
 
   /**
    * @covers ::validate
    */
-  public function testMediaMappingSource() {
+  public function testMediaMappingSource(): void {
     $media_type = $this->createMediaType('image', [
       'id' => 'test',
     ]);

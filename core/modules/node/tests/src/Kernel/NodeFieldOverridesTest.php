@@ -25,9 +25,7 @@ class NodeFieldOverridesTest extends EntityKernelTestBase {
   protected $user;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['user', 'system', 'field', 'node'];
 
@@ -44,7 +42,7 @@ class NodeFieldOverridesTest extends EntityKernelTestBase {
   /**
    * Tests that field overrides work as expected.
    */
-  public function testFieldOverrides() {
+  public function testFieldOverrides(): void {
     if (!NodeType::load('ponies')) {
       NodeType::create(['name' => 'Ponies', 'type' => 'ponies'])->save();
     }

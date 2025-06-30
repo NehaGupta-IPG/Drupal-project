@@ -19,9 +19,7 @@ use Drupal\KernelTests\KernelTestBase;
 class BooleanFormatterTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'field',
@@ -107,7 +105,7 @@ class BooleanFormatterTest extends KernelTestBase {
   /**
    * Tests boolean formatter output.
    */
-  public function testBooleanFormatter() {
+  public function testBooleanFormatter(): void {
     $data = [];
     $data[] = [0, [], 'Off'];
     $data[] = [1, [], 'On'];

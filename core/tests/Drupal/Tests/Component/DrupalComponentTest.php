@@ -18,7 +18,7 @@ class DrupalComponentTest extends TestCase {
   /**
    * Tests that classes in Component do not use any Core class.
    */
-  public function testNoCoreInComponent() {
+  public function testNoCoreInComponent(): void {
     $component_path = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__))) . '/lib/Drupal/Component';
     foreach ($this->findPhpClasses($component_path) as $class) {
       $this->assertNoCoreUsage($class);
@@ -28,7 +28,7 @@ class DrupalComponentTest extends TestCase {
   /**
    * Tests that classes in Component Tests do not use any Core class.
    */
-  public function testNoCoreInComponentTests() {
+  public function testNoCoreInComponentTests(): void {
     $component_path = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__))) . '/tests/Drupal/Tests/Component';
     foreach ($this->findPhpClasses($component_path) as $class) {
       $this->assertNoCoreUsage($class);
@@ -52,6 +52,8 @@ class DrupalComponentTest extends TestCase {
    * Data provider.
    *
    * @return array
+   *   An associative array where the keys are component names and the values
+   *   are arrays containing the corresponding component path.
    */
   public static function getComponents(): array {
     $root_component_path = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__))) . '/lib/Drupal/Component';
@@ -73,7 +75,7 @@ class DrupalComponentTest extends TestCase {
    * @return array
    *   An array of class paths.
    */
-  protected function findPhpClasses($dir) {
+  protected function findPhpClasses($dir): array {
     $classes = [];
     foreach (new \DirectoryIterator($dir) as $file) {
       if ($file->isDir() && !$file->isDot()) {
@@ -140,7 +142,7 @@ class DrupalComponentTest extends TestCase {
    * @covers \Drupal\Tests\Component\DrupalComponentTest::assertNoCoreUsage
    * @dataProvider providerAssertNoCoreUsage
    */
-  public function testAssertNoCoreUsage($expected_pass, $file_data) {
+  public function testAssertNoCoreUsage($expected_pass, $file_data): void {
     // Set up a virtual file to read.
     $vfs_root = vfsStream::setup('root');
     vfsStream::newFile('Test.php')->at($vfs_root)->setContent($file_data);
@@ -150,7 +152,7 @@ class DrupalComponentTest extends TestCase {
       $pass = TRUE;
       $this->assertNoCoreUsage($file_uri);
     }
-    catch (AssertionFailedError $e) {
+    catch (AssertionFailedError) {
       $pass = FALSE;
     }
     $this->assertEquals($expected_pass, $pass, $expected_pass ?

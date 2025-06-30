@@ -19,9 +19,7 @@ class RouteCachingNonPathLanguageNegotiationTest extends BrowserTestBase {
   use PathAliasTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language', 'block'];
 
@@ -81,7 +79,7 @@ class RouteCachingNonPathLanguageNegotiationTest extends BrowserTestBase {
   /**
    * Tests aliases when the negotiated language is not in the path.
    */
-  public function testAliases() {
+  public function testAliases(): void {
     // Switch to French and try to access the now inaccessible block.
     $this->drupalGet('');
 

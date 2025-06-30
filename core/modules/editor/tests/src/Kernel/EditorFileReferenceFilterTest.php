@@ -21,9 +21,7 @@ class EditorFileReferenceFilterTest extends KernelTestBase {
   use TestFileCreationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
@@ -56,7 +54,7 @@ class EditorFileReferenceFilterTest extends KernelTestBase {
   /**
    * Tests the editor file reference filter.
    */
-  public function testEditorFileReferenceFilter() {
+  public function testEditorFileReferenceFilter(): void {
     $filter = $this->filters['editor_file_reference'];
 
     $test = function ($input) use ($filter) {

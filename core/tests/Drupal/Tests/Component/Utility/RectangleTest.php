@@ -18,9 +18,9 @@ class RectangleTest extends TestCase {
    *
    * @covers ::rotate
    */
-  public function testWrongWidth() {
+  public function testWrongWidth(): void {
     $this->expectException(\InvalidArgumentException::class);
-    $rect = new Rectangle(-40, 20);
+    new Rectangle(-40, 20);
   }
 
   /**
@@ -28,9 +28,9 @@ class RectangleTest extends TestCase {
    *
    * @covers ::rotate
    */
-  public function testWrongHeight() {
+  public function testWrongHeight(): void {
     $this->expectException(\InvalidArgumentException::class);
-    $rect = new Rectangle(40, 0);
+    new Rectangle(40, 0);
   }
 
   /**
@@ -53,7 +53,7 @@ class RectangleTest extends TestCase {
    *
    * @dataProvider providerPhp55RotateDimensions
    */
-  public function testRotateDimensions($width, $height, $angle, $exp_width, $exp_height) {
+  public function testRotateDimensions($width, $height, $angle, $exp_width, $exp_height): void {
     $rect = new Rectangle($width, $height);
     $rect->rotate($angle);
     $this->assertEquals($exp_width, $rect->getBoundingWidth());

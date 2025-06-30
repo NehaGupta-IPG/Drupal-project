@@ -14,9 +14,7 @@ use Drupal\Core\Url;
 class LocaleUpdateInterfaceTest extends LocaleUpdateBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['locale_test_translate'];
 
@@ -46,7 +44,7 @@ class LocaleUpdateInterfaceTest extends LocaleUpdateBase {
    * Testing the Available updates summary on the side wide status page and the
    * Available translation updates page.
    */
-  public function testInterface() {
+  public function testInterface(): void {
     // No language added.
     // Check status page and Available translation updates page.
     $this->drupalGet('admin/reports/status');

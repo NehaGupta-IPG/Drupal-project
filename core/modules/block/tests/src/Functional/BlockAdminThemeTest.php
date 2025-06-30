@@ -14,9 +14,7 @@ use Drupal\Tests\BrowserTestBase;
 class BlockAdminThemeTest extends BrowserTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'contextual'];
 
@@ -28,7 +26,7 @@ class BlockAdminThemeTest extends BrowserTestBase {
   /**
    * Check for the accessibility of the admin theme on the block admin page.
    */
-  public function testAdminTheme() {
+  public function testAdminTheme(): void {
     // Create administrative user.
     $admin_user = $this->drupalCreateUser([
       'administer blocks',
@@ -53,7 +51,7 @@ class BlockAdminThemeTest extends BrowserTestBase {
   /**
    * Ensure contextual links are disabled in Claro theme.
    */
-  public function testClaroAdminTheme() {
+  public function testClaroAdminTheme(): void {
     // Create administrative user.
     $admin_user = $this->drupalCreateUser([
       'access administration pages',

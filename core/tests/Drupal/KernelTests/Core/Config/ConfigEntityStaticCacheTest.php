@@ -15,9 +15,7 @@ use Drupal\KernelTests\KernelTestBase;
 class ConfigEntityStaticCacheTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'config_test',
@@ -54,7 +52,7 @@ class ConfigEntityStaticCacheTest extends KernelTestBase {
   /**
    * Tests that the static cache is working.
    */
-  public function testCacheHit() {
+  public function testCacheHit(): void {
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($this->entityTypeId);
     $entity_1 = $storage->load($this->entityId);
@@ -68,7 +66,7 @@ class ConfigEntityStaticCacheTest extends KernelTestBase {
   /**
    * Tests that the static cache is reset on entity save and delete.
    */
-  public function testReset() {
+  public function testReset(): void {
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($this->entityTypeId);
     $entity = $storage->load($this->entityId);
@@ -89,7 +87,7 @@ class ConfigEntityStaticCacheTest extends KernelTestBase {
   /**
    * Tests that the static cache is sensitive to config overrides.
    */
-  public function testConfigOverride() {
+  public function testConfigOverride(): void {
     /** @var \Drupal\Core\Config\Entity\ConfigEntityStorage $storage */
     $storage = \Drupal::entityTypeManager()->getStorage($this->entityTypeId);
     // Prime the cache prior to adding a config override.
@@ -112,6 +110,12 @@ class ConfigEntityStaticCacheTest extends KernelTestBase {
 
     // Enable overrides and reload the entity and ensure the cache is used.
     $this->assertSame($entity_override->_loadStamp, $storage->load($this->entityId)->_loadStamp);
+
+    // Reset the cache, ensure that all variations of this entity are
+    // invalidated.
+    $storage->resetCache([$this->entityId]);
+    $this->assertNotSame($entity_no_override->_loadStamp, $storage->loadOverrideFree($this->entityId)->_loadStamp);
+    $this->assertNotSame($entity_override->_loadStamp, $storage->load($this->entityId)->_loadStamp);
   }
 
 }

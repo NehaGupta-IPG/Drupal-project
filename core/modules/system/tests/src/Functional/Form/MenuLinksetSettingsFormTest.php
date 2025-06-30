@@ -14,9 +14,7 @@ use Drupal\Tests\BrowserTestBase;
 class MenuLinksetSettingsFormTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system'];
 
@@ -40,7 +38,7 @@ class MenuLinksetSettingsFormTest extends BrowserTestBase {
   /**
    * Tests the menu_linkset_settings form.
    */
-  public function testMenuLinksetSettingsForm() {
+  public function testMenuLinksetSettingsForm(): void {
     // Users without the appropriate permissions should not be able to access.
     $this->drupalGet('admin/config/services/linkset');
     $this->assertSession()->pageTextContains('Access denied');

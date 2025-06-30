@@ -21,9 +21,7 @@ use Drupal\KernelTests\KernelTestBase;
 class ConfigOverridesPriorityTest extends KernelTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
@@ -32,7 +30,10 @@ class ConfigOverridesPriorityTest extends KernelTestBase {
     'language',
   ];
 
-  public function testOverridePriorities() {
+  /**
+   * Tests the order of config overrides.
+   */
+  public function testOverridePriorities(): void {
     $GLOBALS['config_test_run_module_overrides'] = FALSE;
 
     $non_overridden_mail = 'site@example.com';

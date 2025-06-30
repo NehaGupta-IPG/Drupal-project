@@ -14,9 +14,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 class ContentEntityFieldMethodInvocationOrderTest extends EntityKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language', 'system', 'entity_test'];
 
@@ -45,7 +43,7 @@ class ContentEntityFieldMethodInvocationOrderTest extends EntityKernelTestBase {
   /**
    * Tests correct field method invocation order.
    */
-  public function testFieldMethodInvocationOrder() {
+  public function testFieldMethodInvocationOrder(): void {
 
     // Create a test entity.
     $entity = $this->entityTestFieldMethodsStorage->create([

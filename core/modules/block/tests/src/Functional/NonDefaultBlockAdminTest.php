@@ -14,9 +14,7 @@ use Drupal\Tests\BrowserTestBase;
 class NonDefaultBlockAdminTest extends BrowserTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block'];
 
@@ -37,7 +35,7 @@ class NonDefaultBlockAdminTest extends BrowserTestBase {
   /**
    * Tests non-default theme admin.
    */
-  public function testNonDefaultBlockAdmin() {
+  public function testNonDefaultBlockAdmin(): void {
     $admin_user = $this->drupalCreateUser([
       'administer blocks',
       'administer themes',

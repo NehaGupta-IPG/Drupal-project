@@ -17,6 +17,9 @@ use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
  */
 class MigrateBlockContentBodyFieldTest extends MigrateDrupal7TestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['block', 'block_content', 'filter', 'text'];
 
   /**
@@ -35,7 +38,7 @@ class MigrateBlockContentBodyFieldTest extends MigrateDrupal7TestBase {
   /**
    * Tests the block content body field migration.
    */
-  public function testBlockContentBodyFieldMigration() {
+  public function testBlockContentBodyFieldMigration(): void {
     /** @var \Drupal\field\FieldStorageConfigInterface $storage */
     $storage = FieldStorageConfig::load('block_content.body');
     $this->assertInstanceOf(FieldStorageConfigInterface::class, $storage);

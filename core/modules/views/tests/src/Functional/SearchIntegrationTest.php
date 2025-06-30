@@ -16,9 +16,7 @@ class SearchIntegrationTest extends ViewTestBase {
   use CronRunTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'search'];
 
@@ -37,7 +35,7 @@ class SearchIntegrationTest extends ViewTestBase {
   /**
    * Tests search integration.
    */
-  public function testSearchIntegration() {
+  public function testSearchIntegration(): void {
     // Create a content type.
     $type = $this->drupalCreateContentType();
 

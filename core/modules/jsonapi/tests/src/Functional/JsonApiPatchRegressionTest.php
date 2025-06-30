@@ -23,7 +23,6 @@ use GuzzleHttp\RequestOptions;
  * JSON:API regression tests.
  *
  * @group jsonapi
- * @group #slow
  *
  * @internal
  */
@@ -48,10 +47,10 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
    *
    * @see https://www.drupal.org/project/drupal/issues/2953207
    */
-  public function testBundleSpecificTargetEntityTypeFromIssue2953207() {
+  public function testBundleSpecificTargetEntityTypeFromIssue2953207(): void {
     // Set up data model.
     $this->assertTrue($this->container->get('module_installer')->install(['comment'], TRUE), 'Installed modules.');
-    $this->addDefaultCommentField('taxonomy_term', 'tags', 'comment', CommentItemInterface::OPEN, 'tcomment');
+    $this->addDefaultCommentField('taxonomy_term', 'tags', 'comment', CommentItemInterface::OPEN, 'test_comment_type');
     $this->rebuildAll();
 
     // Create data.
@@ -70,7 +69,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
     $user = $this->drupalCreateUser([
       'access comments',
     ]);
-    $response = $this->request('GET', Url::fromUri('internal:/jsonapi/comment/tcomment?include=entity_id&filter[entity_id.name]=foobar'), [
+    $response = $this->request('GET', Url::fromUri('internal:/jsonapi/comment/test_comment_type?include=entity_id&filter[entity_id.name]=foobar'), [
       RequestOptions::AUTH => [
         $user->getAccountName(),
         $user->pass_raw,
@@ -84,7 +83,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
    *
    * @see https://www.drupal.org/project/drupal/issues/2976371
    */
-  public function testBundlelessRelationshipMutationFromIssue2973681() {
+  public function testBundlelessRelationshipMutationFromIssue2973681(): void {
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
 
     // Set up data model.
@@ -135,7 +134,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
    *
    * @see https://www.drupal.org/project/drupal/issues/2968972
    */
-  public function testDanglingReferencesInAnEntityReferenceFieldFromIssue2968972() {
+  public function testDanglingReferencesInAnEntityReferenceFieldFromIssue2968972(): void {
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
 
     // Set up data model.
@@ -206,7 +205,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
    *
    * @see https://www.drupal.org/project/drupal/issues/3021194
    */
-  public function testPatchingDateTimeFieldsFromIssue3021194() {
+  public function testPatchingDateTimeFieldsFromIssue3021194(): void {
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
 
     // Set up data model.
@@ -289,7 +288,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
    *
    * @see https://www.drupal.org/project/drupal/issues/3026030
    */
-  public function testPatchToIncludeUrlDoesNotReturnIncludeFromIssue3026030() {
+  public function testPatchToIncludeUrlDoesNotReturnIncludeFromIssue3026030(): void {
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
 
     // Set up data model.
@@ -335,7 +334,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
    *
    * @see https://www.drupal.org/project/drupal/issues/3043168
    */
-  public function testNonTranslatableEntityUpdatesFromIssue3043168() {
+  public function testNonTranslatableEntityUpdatesFromIssue3043168(): void {
     // Enable write-mode.
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
     // Set the site language to Russian.
@@ -399,7 +398,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
    *
    * @see https://www.drupal.org/project/drupal/issues/3127883
    */
-  public function testPatchInvalidFieldPropertyFromIssue3127883() {
+  public function testPatchInvalidFieldPropertyFromIssue3127883(): void {
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
 
     // Set up data model.

@@ -37,7 +37,7 @@ class BlockDragTest extends WebDriverTestBase {
   /**
    * Tests drag and drop blocks.
    */
-  public function testDragAndDropBlocks() {
+  public function testDragAndDropBlocks(): void {
     // Resize window to work around https://github.com/bitovi/syn/issues/164.
     $this->getSession()->resizeWindow(1024, 2048);
     $this->drupalGet('admin/structure/block');
@@ -70,7 +70,8 @@ class BlockDragTest extends WebDriverTestBase {
     // Check if the message unsaved changed appears.
     $assertSession->pageTextContains('You have unsaved changes.');
 
-    // Test if the message for empty regions appear after drag the unique block on the region.
+    // Test if the message for empty regions appear after drag the unique block
+    // on the region.
     $noBlockMessage = $page->find('css', 'tr[data-drupal-selector="edit-blocks-region-primary-menu-message"] td')->getText();
     $this->assertSession()->assert($noBlockMessage === 'No blocks in this region', 'Region primary menu should be empty.');
 

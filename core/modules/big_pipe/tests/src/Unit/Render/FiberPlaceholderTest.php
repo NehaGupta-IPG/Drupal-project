@@ -13,11 +13,13 @@ use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Render\PlaceholderGeneratorInterface;
 use Drupal\Core\Render\RenderCacheInterface;
 use Drupal\Core\Render\Renderer;
+use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
 use Prophecy\Argument;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -33,7 +35,7 @@ class FiberPlaceholderTest extends UnitTestCase {
   /**
    * @covers \Drupal\big_pipe\Render\BigPipe::sendPlaceholders
    */
-  public function testLongPlaceholderFiberSuspendingLoop() {
+  public function testLongPlaceholderFiberSuspendingLoop(): void {
     $request_stack = $this->prophesize(RequestStack::class);
     $request_stack->getMainRequest()
       ->willReturn(new Request());
@@ -69,6 +71,8 @@ class FiberPlaceholderTest extends UnitTestCase {
       $this->createMock(EventDispatcherInterface::class),
       $this->prophesize(ConfigFactoryInterface::class)->reveal(),
       $this->prophesize(MessengerInterface::class)->reveal(),
+      $this->prophesize(RequestContext::class)->reveal(),
+      $this->prophesize(LoggerInterface::class)->reveal(),
     );
     $response = new BigPipeResponse(new HtmlResponse());
 
@@ -78,6 +82,7 @@ class FiberPlaceholderTest extends UnitTestCase {
         'ajaxPageState' => [],
       ],
       'big_pipe_placeholders' => [
+        // cspell:disable-next-line
         'callback=%5CDrupal%5CTests%5Cbig_pipe%5CUnit%5CRender%5CTurtleLazyBuilder%3A%3Aturtle&amp;&amp;token=uhKFNfT4eF449_W-kDQX8E5z4yHyt0-nSHUlwaGAQeU' => [
           '#lazy_builder' => [
             '\Drupal\Tests\big_pipe\Unit\Render\TurtleLazyBuilder::turtle',
@@ -89,6 +94,7 @@ class FiberPlaceholderTest extends UnitTestCase {
     $response->setAttachments($attachments);
 
     // Construct minimal HTML response.
+    // cspell:disable-next-line
     $content = '<html><body><span data-big-pipe-placeholder-id="callback=%5CDrupal%5CTests%5Cbig_pipe%5CUnit%5CRender%5CTurtleLazyBuilder%3A%3Aturtle&amp;&amp;token=uhKFNfT4eF449_W-kDQX8E5z4yHyt0-nSHUlwaGAQeU"></body></html>';
     $response->setContent($content);
 
@@ -104,14 +110,18 @@ class FiberPlaceholderTest extends UnitTestCase {
 
 }
 
+/**
+ * Test class for testing fiber placeholders.
+ */
 class TurtleLazyBuilder implements TrustedCallbackInterface {
 
   /**
-   * #lazy_builder callback.
+   * Render API callback: Suspends execution twice to simulate a long operation.
    *
-   * Suspends its own execution twice to simulate long operation.
+   * This function is assigned as a #lazy_builder callback.
    *
    * @return array
+   *   The lazy builder callback.
    */
   public static function turtle(): array {
     if (\Fiber::getCurrent() !== NULL) {

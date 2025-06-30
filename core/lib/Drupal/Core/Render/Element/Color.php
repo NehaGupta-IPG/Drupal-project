@@ -11,7 +11,9 @@ use Drupal\Component\Utility\Color as ColorUtility;
  * Provides a form element for choosing a color.
  *
  * Properties:
- * - #default_value: Default value, in a format like #ffffff.
+ *
+ * @property $default_value
+ *   Default value, in a format like #ffffff.
  *
  * Example usage:
  * @code
@@ -29,17 +31,16 @@ class Color extends FormElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#process' => [
-        [$class, 'processAjaxForm'],
+        [static::class, 'processAjaxForm'],
       ],
       '#element_validate' => [
-        [$class, 'validateColor'],
+        [static::class, 'validateColor'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderColor'],
+        [static::class, 'preRenderColor'],
       ],
       '#theme' => 'input__color',
       '#theme_wrappers' => ['form_element'],
@@ -53,7 +54,7 @@ class Color extends FormElementBase {
     $value = trim($element['#value']);
 
     // Default to black if no value is given.
-    // @see http://www.w3.org/TR/html5/number-state.html#color-state
+    // @see https://www.w3.org/TR/html5/number-state.html#color-state
     if ($value === '') {
       $form_state->setValueForElement($element, '#000000');
     }
@@ -62,7 +63,7 @@ class Color extends FormElementBase {
       try {
         $form_state->setValueForElement($element, ColorUtility::rgbToHex(ColorUtility::hexToRgb($value)));
       }
-      catch (\InvalidArgumentException $e) {
+      catch (\InvalidArgumentException) {
         $form_state->setError($element, t('%name must be a valid color.', ['%name' => empty($element['#title']) ? $element['#parents'][0] : $element['#title']]));
       }
     }

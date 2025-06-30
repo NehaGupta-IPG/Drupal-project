@@ -118,14 +118,14 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
    *
    * With link 6 being the only external link.
    */
-  protected function mockTree() {
+  protected function mockTree(): void {
     $this->links = [
       1 => MenuLinkMock::create(['id' => 'test.example1', 'route_name' => 'example1', 'title' => 'foo', 'parent' => '']),
       2 => MenuLinkMock::create(['id' => 'test.example2', 'route_name' => 'example2', 'title' => 'bar', 'parent' => 'test.example1', 'route_parameters' => ['foo' => 'bar']]),
       3 => MenuLinkMock::create(['id' => 'test.example3', 'route_name' => 'example3', 'title' => 'baz', 'parent' => 'test.example2', 'route_parameters' => ['baz' => 'qux']]),
       4 => MenuLinkMock::create(['id' => 'test.example4', 'route_name' => 'example4', 'title' => 'qux', 'parent' => 'test.example3']),
       5 => MenuLinkMock::create(['id' => 'test.example5', 'route_name' => 'example5', 'title' => 'title5', 'parent' => '']),
-      6 => MenuLinkMock::create(['id' => 'test.example6', 'route_name' => '', 'url' => 'https://www.drupal.org/', 'title' => 'barbar', 'parent' => '']),
+      6 => MenuLinkMock::create(['id' => 'test.example6', 'route_name' => '', 'url' => 'https://www.drupal.org/', 'title' => 'bar_bar', 'parent' => '']),
       7 => MenuLinkMock::create(['id' => 'test.example7', 'route_name' => 'example7', 'title' => 'title7', 'parent' => '']),
       8 => MenuLinkMock::create(['id' => 'test.example8', 'route_name' => 'example8', 'title' => 'title8', 'parent' => '']),
       9 => DynamicMenuLinkMock::create(['id' => 'test.example9', 'parent' => ''])->setCurrentUser($this->currentUser),
@@ -150,7 +150,7 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
    *
    * @covers ::generateIndexAndSort
    */
-  public function testGenerateIndexAndSort() {
+  public function testGenerateIndexAndSort(): void {
     $this->mockTree();
     $tree = $this->originalTree;
     $tree = $this->defaultMenuTreeManipulators->generateIndexAndSort($tree);
@@ -159,7 +159,7 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
     $this->assertEquals($this->links[1]->getPluginId(), $tree['50000 foo test.example1']->link->getPluginId());
     $this->assertEquals($this->links[2]->getPluginId(), $tree['50000 bar test.example2']->link->getPluginId());
     $this->assertEquals($this->links[5]->getPluginId(), $tree['50000 title5 test.example5']->link->getPluginId());
-    $this->assertEquals($this->links[6]->getPluginId(), $tree['50000 barbar test.example6']->link->getPluginId());
+    $this->assertEquals($this->links[6]->getPluginId(), $tree['50000 bar_bar test.example6']->link->getPluginId());
     $this->assertEquals($this->links[8]->getPluginId(), $tree['50000 title8 test.example8']->link->getPluginId());
 
     // Verify that child element #4 is at the correct location in the hierarchy.
@@ -174,7 +174,7 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
    * @covers ::checkAccess
    * @covers ::menuLinkCheckAccess
    */
-  public function testCheckAccess() {
+  public function testCheckAccess(): void {
     // Those menu links that are non-external will have their access checks
     // performed. 9 routes, but 1 is external, 2 already have their 'access'
     // property set, and 1 is a child if an inaccessible menu link, so only 5
@@ -282,7 +282,7 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
    *
    * @covers ::flatten
    */
-  public function testFlatten() {
+  public function testFlatten(): void {
     $this->mockTree();
     $tree = $this->defaultMenuTreeManipulators->flatten($this->originalTree);
     $this->assertEquals([1, 2, 5, 6, 8, 9], array_keys($this->originalTree));
@@ -296,7 +296,7 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
    * @covers ::collectNodeLinks
    * @covers ::checkAccess
    */
-  public function testCheckNodeAccess() {
+  public function testCheckNodeAccess(): void {
     $links = [
       1 => MenuLinkMock::create(['id' => 'node.1', 'route_name' => 'entity.node.canonical', 'title' => 'foo', 'parent' => '', 'route_parameters' => ['node' => 1]]),
       2 => MenuLinkMock::create(['id' => 'node.2', 'route_name' => 'entity.node.canonical', 'title' => 'bar', 'parent' => '', 'route_parameters' => ['node' => 2]]),

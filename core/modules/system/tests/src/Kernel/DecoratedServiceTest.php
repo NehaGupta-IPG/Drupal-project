@@ -15,6 +15,9 @@ use Drupal\KernelTests\KernelTestBase;
  */
 class DecoratedServiceTest extends KernelTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = [
     'decorated_service_test',
   ];
@@ -22,7 +25,7 @@ class DecoratedServiceTest extends KernelTestBase {
   /**
    * Check that decorated services keep their original service ID.
    */
-  public function testDecoratedServiceId() {
+  public function testDecoratedServiceId(): void {
     // Service decorated once.
     $test_service = $this->container->get('test_service');
     $this->assertEquals('test_service', $this->container->get(ReverseContainer::class)->getId($test_service));

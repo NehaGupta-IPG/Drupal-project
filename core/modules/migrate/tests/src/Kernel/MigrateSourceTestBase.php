@@ -82,11 +82,12 @@ abstract class MigrateSourceTestBase extends KernelTestBase {
    * Determines the plugin to be tested by reading the class @covers annotation.
    *
    * @return string
+   *   The fully qualified class name of the plugin to be tested.
    */
   protected function getPluginClass() {
-    $covers = $this->getTestClassCovers();
-    if (!empty($covers)) {
-      return $covers[0];
+    $covers = $this->valueObjectForEvents()->metadata()->isCovers()->isClassLevel()->asArray();
+    if (isset($covers[0])) {
+      return $covers[0]->target();
     }
     else {
       $this->fail('No plugin class was specified');
@@ -146,7 +147,7 @@ abstract class MigrateSourceTestBase extends KernelTestBase {
    *
    * @dataProvider providerSource
    */
-  public function testSource(array $source_data, array $expected_data, $expected_count = NULL, array $configuration = [], $high_water = NULL) {
+  public function testSource(array $source_data, array $expected_data, $expected_count = NULL, array $configuration = [], $high_water = NULL): void {
     $plugin = $this->getPlugin($configuration);
     $clone_plugin = clone $plugin;
 
@@ -205,5 +206,13 @@ abstract class MigrateSourceTestBase extends KernelTestBase {
       }
     }
   }
+
+  /**
+   * Provides source data for ::testSource.
+   *
+   * @return iterable
+   *   The source data.
+   */
+  abstract public static function providerSource();
 
 }

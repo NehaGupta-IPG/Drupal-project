@@ -62,6 +62,8 @@ class CommentLinkBuilderTest extends UnitTestCase {
   protected $timestamp;
 
   /**
+   * The comment link builder.
+   *
    * @var \Drupal\comment\CommentLinkBuilderInterface
    */
   protected $commentLinkBuilder;
@@ -115,7 +117,7 @@ class CommentLinkBuilderTest extends UnitTestCase {
    *
    * @covers ::buildCommentedEntityLinks
    */
-  public function testCommentLinkBuilder(array $node_args, $context, $has_access_comments, $history_exists, $has_post_comments, $is_anonymous, $expected) {
+  public function testCommentLinkBuilder(array $node_args, $context, $has_access_comments, $history_exists, $has_post_comments, $is_anonymous, $expected): void {
     $node = $this->getMockNode(...$node_args);
     $this->moduleHandler->expects($this->any())
       ->method('moduleExists')
@@ -239,7 +241,13 @@ class CommentLinkBuilderTest extends UnitTestCase {
               }
               else {
                 // On a separate page.
-                $expected['comment-add']['url'] = Url::fromRoute('comment.reply', ['entity_type' => 'node', 'entity' => 1, 'field_name' => 'comment']);
+                $expected['comment-add']['url'] = Url::fromRoute(
+                  'comment.reply',
+                  [
+                    'entity_type' => 'node',
+                    'entity' => 1,
+                    'field_name' => 'comment',
+                  ]);
               }
             }
           }
@@ -263,9 +271,9 @@ class CommentLinkBuilderTest extends UnitTestCase {
    * @param bool $has_field
    *   TRUE if the node has the 'comment' field.
    * @param int $comment_status
-   *   One of CommentItemInterface::OPEN|HIDDEN|CLOSED
+   *   One of CommentItemInterface::OPEN|HIDDEN|CLOSED.
    * @param int $form_location
-   *   One of CommentItemInterface::FORM_BELOW|FORM_SEPARATE_PAGE
+   *   One of CommentItemInterface::FORM_BELOW|FORM_SEPARATE_PAGE.
    * @param int $comment_count
    *   Number of comments against the field.
    *
@@ -327,6 +335,9 @@ namespace Drupal\comment;
 
 if (!function_exists('history_read')) {
 
+  /**
+   * Gets a timestamp for the current user's last view of a specified node.
+   */
   function history_read($nid) {
     return 0;
   }

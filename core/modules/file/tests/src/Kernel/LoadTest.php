@@ -6,6 +6,7 @@ namespace Drupal\Tests\file\Kernel;
 
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
+use Drupal\file_test\FileTestHelper;
 
 /**
  * Tests \Drupal\file\Entity\File::load().
@@ -17,7 +18,7 @@ class LoadTest extends FileManagedUnitTestBase {
   /**
    * Try to load a non-existent file by fid.
    */
-  public function testLoadMissingFid() {
+  public function testLoadMissingFid(): void {
     $this->assertNull(File::load(-1), 'Try to load an invalid fid fails.');
     $this->assertFileHooksCalled([]);
   }
@@ -25,7 +26,7 @@ class LoadTest extends FileManagedUnitTestBase {
   /**
    * Try to load a non-existent file by URI.
    */
-  public function testLoadMissingFilepath() {
+  public function testLoadMissingFilepath(): void {
     $files = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['uri' => 'foobar://misc/druplicon.png']);
     $this->assertFalse(reset($files), "Try to load a file that doesn't exist in the database fails.");
     $this->assertFileHooksCalled([]);
@@ -34,7 +35,7 @@ class LoadTest extends FileManagedUnitTestBase {
   /**
    * Try to load a non-existent file by status.
    */
-  public function testLoadInvalidStatus() {
+  public function testLoadInvalidStatus(): void {
     $files = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['status' => -99]);
     $this->assertFalse(reset($files), 'Trying to load a file with an invalid status fails.');
     $this->assertFileHooksCalled([]);
@@ -43,7 +44,7 @@ class LoadTest extends FileManagedUnitTestBase {
   /**
    * Load a single file and ensure that the correct values are returned.
    */
-  public function testSingleValues() {
+  public function testSingleValues(): void {
     // Create a new file entity from scratch so we know the values.
     $file = $this->createFile('druplicon.txt', NULL, 'public');
     $by_fid_file = File::load($file->id());
@@ -60,12 +61,12 @@ class LoadTest extends FileManagedUnitTestBase {
   /**
    * This will test loading file data from the database.
    */
-  public function testMultiple() {
+  public function testMultiple(): void {
     // Create a new file entity.
     $file = $this->createFile('druplicon.txt', NULL, 'public');
 
     // Load by path.
-    file_test_reset();
+    FileTestHelper::reset();
     $by_path_files = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['uri' => $file->getFileUri()]);
     $this->assertFileHookCalled('load');
     $this->assertCount(1, $by_path_files, '\Drupal::entityTypeManager()->getStorage(\'file\')->loadByProperties() returned an array of the correct size.');
@@ -74,7 +75,7 @@ class LoadTest extends FileManagedUnitTestBase {
     $this->assertEquals($file->id(), $by_path_file->id(), 'Loading by filepath got the correct fid.');
 
     // Load by fid.
-    file_test_reset();
+    FileTestHelper::reset();
     $by_fid_files = File::loadMultiple([$file->id()]);
     $this->assertFileHooksCalled([]);
     $this->assertCount(1, $by_fid_files, '\Drupal\file\Entity\File::loadMultiple() returned an array of the correct size.');
@@ -86,11 +87,11 @@ class LoadTest extends FileManagedUnitTestBase {
   /**
    * Loads a single file and ensure that the correct values are returned.
    */
-  public function testUuidValues() {
+  public function testUuidValues(): void {
     // Create a new file entity from scratch so we know the values.
     $file = $this->createFile('druplicon.txt', NULL, 'public');
     $file->save();
-    file_test_reset();
+    FileTestHelper::reset();
 
     $by_uuid_file = \Drupal::service('entity.repository')->loadEntityByUuid('file', $file->uuid());
     $this->assertFileHookCalled('load');

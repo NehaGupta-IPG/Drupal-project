@@ -86,7 +86,7 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
    * @covers ::checkRedirectUrl
    * @dataProvider providerTestDestinationRedirect
    */
-  public function testDestinationRedirect(Request $request, $expected) {
+  public function testDestinationRedirect(Request $request, $expected): void {
     $dispatcher = new EventDispatcher();
     $kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
     $response = new RedirectResponse('http://example.com/drupal');
@@ -127,7 +127,7 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
   /**
    * @dataProvider providerTestDestinationRedirectToExternalUrl
    */
-  public function testDestinationRedirectToExternalUrl($request, $expected) {
+  public function testDestinationRedirectToExternalUrl($request, $expected): void {
     $dispatcher = new EventDispatcher();
     $kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
     $response = new RedirectResponse('http://other-example.com');
@@ -142,7 +142,7 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
   /**
    * @covers ::checkRedirectUrl
    */
-  public function testRedirectWithOptInExternalUrl() {
+  public function testRedirectWithOptInExternalUrl(): void {
     $dispatcher = new EventDispatcher();
     $kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
     $response = new TrustedRedirectResponse('http://external-url.com');
@@ -166,7 +166,7 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
       'absolute external url' => [new Request(['destination' => 'http://example.com']), 'http://example.com'],
       'absolute external url with folder' => [new Request(['destination' => 'http://example.com/foobar']), 'http://example.com/foobar'],
       'absolute external url with folder2' => [new Request(['destination' => 'http://example.ca/drupal']), 'http://example.ca/drupal'],
-      'path without drupal basepath' => [new Request(['destination' => '/test']), 'http://example.com/test'],
+      'path without drupal base path' => [new Request(['destination' => '/test']), 'http://example.com/test'],
       'path with URL' => [new Request(['destination' => '/example.com']), 'http://example.com/example.com'],
       'path with URL and two slashes' => [new Request(['destination' => '//example.com']), 'http://example.com//example.com'],
     ];
@@ -175,7 +175,7 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
   /**
    * @dataProvider providerTestDestinationRedirectWithInvalidUrl
    */
-  public function testDestinationRedirectWithInvalidUrl(Request $request) {
+  public function testDestinationRedirectWithInvalidUrl(Request $request): void {
     $dispatcher = new EventDispatcher();
     $kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
     $response = new RedirectResponse('http://example.com/drupal');
@@ -196,7 +196,7 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
     $data[] = [new Request(['destination' => '//example:com/test'])];
     $data['absolute external url'] = [new Request(['destination' => 'http://example.com'])];
     $data['absolute external url with folder'] = [new Request(['destination' => 'http://example.ca/drupal'])];
-    $data['path without drupal basepath'] = [new Request(['destination' => '/test'])];
+    $data['path without drupal base path'] = [new Request(['destination' => '/test'])];
     $data['path with URL'] = [new Request(['destination' => '/example.com'])];
     $data['path with URL and two slashes'] = [new Request(['destination' => '//example.com'])];
 

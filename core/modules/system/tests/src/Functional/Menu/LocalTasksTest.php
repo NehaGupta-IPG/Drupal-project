@@ -21,9 +21,7 @@ class LocalTasksTest extends BrowserTestBase {
   use TaxonomyTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var string[]
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'menu_test', 'entity_test', 'node'];
 
@@ -106,7 +104,7 @@ class LocalTasksTest extends BrowserTestBase {
   /**
    * Tests the plugin based local tasks.
    */
-  public function testPluginLocalTask() {
+  public function testPluginLocalTask(): void {
     // Verify local tasks defined in the hook.
     $this->drupalGet(Url::fromRoute('menu_test.tasks_default'));
     $this->assertLocalTasks([
@@ -213,7 +211,7 @@ class LocalTasksTest extends BrowserTestBase {
   /**
    * Tests that local task blocks are configurable to show a specific level.
    */
-  public function testLocalTaskBlock() {
+  public function testLocalTaskBlock(): void {
     // Remove the default block and create a new one.
     $this->sut->delete();
 
@@ -262,7 +260,7 @@ class LocalTasksTest extends BrowserTestBase {
   /**
    * Tests that local tasks blocks cache is invalidated correctly.
    */
-  public function testLocalTaskBlockCache() {
+  public function testLocalTaskBlockCache(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'administer content types',
       'administer permissions',

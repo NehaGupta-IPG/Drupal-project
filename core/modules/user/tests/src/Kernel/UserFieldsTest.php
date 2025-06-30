@@ -15,9 +15,7 @@ use Drupal\KernelTests\KernelTestBase;
 class UserFieldsTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['user', 'system'];
 
@@ -38,7 +36,7 @@ class UserFieldsTest extends KernelTestBase {
   /**
    * Tests account's available fields.
    */
-  public function testUserFields() {
+  public function testUserFields(): void {
     // Create the user to test the user fields.
     $user = User::create([
       'name' => 'foobar',

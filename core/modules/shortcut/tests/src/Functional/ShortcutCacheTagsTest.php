@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\shortcut\Functional;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Url;
 use Drupal\shortcut\Entity\Shortcut;
 use Drupal\shortcut\Entity\ShortcutSet;
@@ -83,32 +82,9 @@ class ShortcutCacheTagsTest extends EntityCacheTagsTestBase {
   }
 
   /**
-   * Tests that when creating a shortcut, the shortcut set tag is invalidated.
-   */
-  public function testEntityCreation() {
-    $cache_bin = $this->getRenderCacheBackend();
-
-    // Create a cache entry that is tagged with a shortcut set cache tag.
-    $cache_tags = ['config:shortcut.set.default'];
-
-    $cacheability = new CacheableMetadata();
-    $cacheability->addCacheTags($cache_tags);
-    $cache_bin->set(['foo'], 'bar', $cacheability, $cacheability);
-
-    // Verify a cache hit.
-    $this->verifyRenderCache(['foo'], $cache_tags, $cacheability);
-
-    // Now create a shortcut entity in that shortcut set.
-    $this->createEntity();
-
-    // Verify a cache miss.
-    $this->assertFalse($cache_bin->get(['foo'], $cacheability), 'Creating a new shortcut invalidates the cache tag of the shortcut set.');
-  }
-
-  /**
    * Tests visibility and cacheability of shortcuts in the toolbar.
    */
-  public function testToolbar() {
+  public function testToolbar(): void {
     $this->drupalPlaceBlock('page_title_block', ['id' => 'title']);
 
     $test_page_url = Url::fromRoute('test_page_test.test_page');

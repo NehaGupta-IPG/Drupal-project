@@ -18,9 +18,7 @@ class LanguageSelectorTranslatableTest extends BrowserTestBase {
   use LanguageTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',
@@ -73,7 +71,7 @@ class LanguageSelectorTranslatableTest extends BrowserTestBase {
   /**
    * Tests content translation language selectors are correctly translated.
    */
-  public function testLanguageStringSelector() {
+  public function testLanguageStringSelector(): void {
     // Add another language.
     static::createLanguageFromLangcode('es');
 
@@ -98,7 +96,7 @@ class LanguageSelectorTranslatableTest extends BrowserTestBase {
   /**
    * Tests that correct title is displayed for content translation page.
    */
-  public function testContentTranslationPageTitle() {
+  public function testContentTranslationPageTitle(): void {
     $this->drupalGet('admin/config/regional/content-language');
     $this->assertSession()->pageTextContains('Content language and translation');
     $this->assertSession()->pageTextNotMatches('#Content language$#');

@@ -13,6 +13,9 @@ use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
  */
 class MigrateImageSettingsTest extends MigrateDrupal7TestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['image'];
 
   /**
@@ -26,7 +29,7 @@ class MigrateImageSettingsTest extends MigrateDrupal7TestBase {
   /**
    * Tests the migration.
    */
-  public function testMigration() {
+  public function testMigration(): void {
     $config = $this->config('image.settings');
     // These settings are not recommended...
     $this->assertTrue($config->get('allow_insecure_derivatives'));

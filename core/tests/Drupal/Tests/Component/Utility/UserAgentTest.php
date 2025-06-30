@@ -25,7 +25,7 @@ class UserAgentTest extends TestCase {
    * @return array
    *   Language codes, ordered by priority.
    */
-  protected function getLanguages() {
+  protected function getLanguages(): array {
     return [
       // In our test case, 'en' has priority over 'en-US'.
       'en',
@@ -53,7 +53,7 @@ class UserAgentTest extends TestCase {
    * @return array
    *   Language mappings.
    */
-  protected function getMappings() {
+  protected function getMappings(): array {
     return [
       'no' => 'nb',
       'pt' => 'pt-pt',
@@ -74,7 +74,7 @@ class UserAgentTest extends TestCase {
    * @dataProvider providerTestGetBestMatchingLangcode
    * @covers ::getBestMatchingLangcode
    */
-  public function testGetBestMatchingLangcode($accept_language, $expected) {
+  public function testGetBestMatchingLangcode($accept_language, $expected): void {
     $result = UserAgent::getBestMatchingLangcode($accept_language, $this->getLanguages(), $this->getMappings());
     $this->assertSame($expected, $result);
   }

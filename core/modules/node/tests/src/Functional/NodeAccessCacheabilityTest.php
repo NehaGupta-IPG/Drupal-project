@@ -19,22 +19,12 @@ class NodeAccessCacheabilityTest extends NodeTestBase {
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node_access_test',
     'node_access_test_auto_bubbling',
   ];
-
-  /**
-   * {@inheritdoc}
-   *
-   * @todo Remove and fix test to not rely on super user.
-   * @see https://www.drupal.org/project/drupal/issues/3437620
-   */
-  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * {@inheritdoc}
@@ -61,14 +51,14 @@ class NodeAccessCacheabilityTest extends NodeTestBase {
    *
    * @see node_query_node_access_alter()
    */
-  public function testNodeAccessCacheabilitySafeguard() {
+  public function testNodeAccessCacheabilitySafeguard(): void {
     // The node grants cache context should be added automatically.
     $this->drupalGet(new Url('node_access_test_auto_bubbling'));
     $this->assertCacheContext('user.node_grants:view');
 
-    // The root user has the 'bypass node access' permission, which means the
+    // The user has the 'bypass node access' permission, which means the
     // node grants cache context is not necessary.
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->drupalCreateUser(['bypass node access']));
     $this->drupalGet(new Url('node_access_test_auto_bubbling'));
     $this->assertNoCacheContext('user.node_grants:view');
     $this->drupalLogout();
@@ -86,7 +76,7 @@ class NodeAccessCacheabilityTest extends NodeTestBase {
   /**
    * Tests that the user cache contexts are correctly set.
    */
-  public function testNodeAccessCacheContext() {
+  public function testNodeAccessCacheContext(): void {
     // Create a user, with edit/delete own content permission.
     $test_user1 = $this->drupalCreateUser([
       'access content',

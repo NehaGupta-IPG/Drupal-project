@@ -16,9 +16,7 @@ use Drupal\Tests\views\Functional\ViewTestBase;
 class LinkViewsTokensTest extends ViewTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['link_test_views'];
 
@@ -69,7 +67,10 @@ class LinkViewsTokensTest extends ViewTestBase {
 
   }
 
-  public function testLinkViewsTokens() {
+  /**
+   * Tests the link views tokens.
+   */
+  public function testLinkViewsTokens(): void {
     // Array of URI's to test.
     $uris = [
       'http://www.example.com' => 'example.com',

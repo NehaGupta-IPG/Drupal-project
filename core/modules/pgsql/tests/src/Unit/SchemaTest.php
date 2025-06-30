@@ -27,7 +27,7 @@ class SchemaTest extends UnitTestCase {
    * @covers ::constraintExists
    * @dataProvider providerComputedConstraintName
    */
-  public function testComputedConstraintName($table_name, $name, $expected) {
+  public function testComputedConstraintName($table_name, $name, $expected): void {
     $max_identifier_length = 63;
 
     $connection = $this->prophesize('\Drupal\pgsql\Driver\Database\pgsql\Connection');
@@ -53,7 +53,11 @@ class SchemaTest extends UnitTestCase {
     return [
       ['user_field_data', 'pkey', 'user_field_data____pkey'],
       ['user_field_data', 'name__key', 'user_field_data__name__key'],
-      ['user_field_data', 'a_very_very_very_very_super_long_field_name__key', 'drupal_WW_a8TlbZ3UQi20UTtRlJFaIeSa6FEtQS5h4NRA3UeU_key'],
+      [
+        'user_field_data',
+        'a_very_very_very_very_super_long_field_name__key',
+        'drupal_WW_a8TlbZ3UQi20UTtRlJFaIeSa6FEtQS5h4NRA3UeU_key',
+      ],
     ];
   }
 

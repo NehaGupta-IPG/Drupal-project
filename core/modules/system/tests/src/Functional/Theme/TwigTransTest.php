@@ -19,9 +19,7 @@ use Twig\Error\SyntaxError;
 class TwigTransTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'theme_test',
@@ -85,7 +83,7 @@ class TwigTransTest extends BrowserTestBase {
   /**
    * Tests Twig "trans" tags.
    */
-  public function testTwigTransTags() {
+  public function testTwigTransTags(): void {
     // Run this once without and once with Twig debug because trans can work
     // differently depending on that setting.
     $this->drupalGet('twig-theme-test/trans', ['language' => \Drupal::languageManager()->getLanguage('xx')]);
@@ -105,7 +103,7 @@ class TwigTransTest extends BrowserTestBase {
   /**
    * Tests empty Twig "trans" tags.
    */
-  public function testEmptyTwigTransTags() {
+  public function testEmptyTwigTransTags(): void {
     $elements = [
       '#type' => 'inline_template',
       '#template' => '{% trans %}{% endtrans %}',
@@ -121,7 +119,7 @@ class TwigTransTest extends BrowserTestBase {
     catch (SyntaxError $e) {
       $this->assertStringContainsString('{% trans %} tag cannot be empty', $e->getMessage());
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       $this->fail('{% trans %}{% endtrans %} threw an unexpected exception.');
     }
   }
@@ -190,7 +188,7 @@ class TwigTransTest extends BrowserTestBase {
   /**
    * Helper function: install languages.
    */
-  protected function installLanguages() {
+  protected function installLanguages(): void {
     $file_system = \Drupal::service('file_system');
     foreach ($this->languages as $langcode => $name) {
       // Generate custom .po contents for the language.

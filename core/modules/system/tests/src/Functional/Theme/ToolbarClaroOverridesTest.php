@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\WaitTerminateTestTrait;
 
 /**
  * Tests the loading of Claro assets on a non-Claro default theme.
@@ -13,6 +14,8 @@ use Drupal\Tests\BrowserTestBase;
  * @group Theme
  */
 class ToolbarClaroOverridesTest extends BrowserTestBase {
+
+  use WaitTerminateTestTrait;
 
   /**
    * {@inheritdoc}
@@ -56,12 +59,14 @@ class ToolbarClaroOverridesTest extends BrowserTestBase {
       'administer shortcuts',
       'access content overview',
     ]));
+
+    $this->setWaitForTerminate();
   }
 
   /**
    * Confirm Claro assets load on a non-Claro default theme.
    */
-  public function testClaroAssets() {
+  public function testClaroAssets(): void {
     $default_stylesheets = [
       'core/modules/toolbar/css/toolbar.module.css',
       'core/modules/toolbar/css/toolbar.menu.css',

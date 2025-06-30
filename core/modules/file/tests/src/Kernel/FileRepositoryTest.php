@@ -49,7 +49,7 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
    *
    * @covers ::writeData
    */
-  public function testWithFilename() {
+  public function testWithFilename(): void {
     $contents = $this->randomMachineName();
 
     // Using filename with non-latin characters.
@@ -79,7 +79,7 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
    *
    * @covers ::writeData
    */
-  public function testExistingRename() {
+  public function testExistingRename(): void {
     // Setup a file to overwrite.
     $existing = $this->createFile();
     $contents = $this->randomMachineName();
@@ -111,7 +111,7 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
    *
    * @covers ::writeData
    */
-  public function testExistingReplace() {
+  public function testExistingReplace(): void {
     // Setup a file to overwrite.
     $existing = $this->createFile();
     $contents = $this->randomMachineName();
@@ -142,7 +142,7 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
    *
    * @covers ::writeData
    */
-  public function testExistingError() {
+  public function testExistingError(): void {
     $contents = $this->randomMachineName();
     $existing = $this->createFile(NULL, $contents);
 
@@ -153,7 +153,6 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
     }
     // FileExistsException is a subclass of FileException.
     catch (FileExistsException $e) {
-      // expected exception.
       $this->assertStringContainsString("could not be copied because a file by that name already exists in the destination directory", $e->getMessage());
     }
     $this->assertEquals($contents, file_get_contents($existing->getFileUri()), 'Contents of existing file were unchanged.');
@@ -170,7 +169,7 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
    *
    * @covers ::writeData
    */
-  public function testInvalidStreamWrapper() {
+  public function testInvalidStreamWrapper(): void {
     $this->expectException(InvalidStreamWrapperException::class);
     $this->expectExceptionMessage('Invalid stream wrapper: foo://');
     $this->fileRepository->writeData('asdf', 'foo://');
@@ -181,7 +180,7 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
    *
    * @covers ::writeData
    */
-  public function testEntityStorageException() {
+  public function testEntityStorageException(): void {
     /** @var \Drupal\Core\Entity\EntityTypeManager $entityTypeManager */
     $entityTypeManager = $this->prophesize(EntityTypeManager::class);
     $entityTypeManager->getStorage('file')
@@ -206,7 +205,7 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
    *
    * @covers ::loadByUri
    */
-  public function testLoadByUri() {
+  public function testLoadByUri(): void {
     $source = $this->createFile();
     $result = $this->fileRepository->loadByUri($source->getFileUri());
     $this->assertSameFile($source, $result);
@@ -217,7 +216,7 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
    *
    * @covers ::loadByUri
    */
-  public function testLoadByUriCaseSensitive() {
+  public function testLoadByUriCaseSensitive(): void {
     $source = $this->createFile('FooBar.txt');
     $result = $this->fileRepository->loadByUri('public://FooBar.txt');
     $this->assertSameFile($source, $result);

@@ -126,7 +126,7 @@ class FieldDropbuttonTest extends ViewsKernelTestBase {
   /**
    * Tests that dropbutton markup doesn't leak between rows.
    */
-  public function testDropbuttonMarkupShouldNotLeakBetweenRows() {
+  public function testDropbuttonMarkupShouldNotLeakBetweenRows(): void {
     $view = Views::getView('test_dropbutton');
     $view->setDisplay();
     $view->preExecute([]);
@@ -137,7 +137,7 @@ class FieldDropbuttonTest extends ViewsKernelTestBase {
 
     // Render each row and field in turn - the dropbutton plugin relies on
     // output being set in previous versions.
-    foreach ($view->result as $index => $row) {
+    foreach ($view->result as $row) {
       foreach (array_keys($view->field) as $field) {
         $output = $renderer->executeInRenderContext(new RenderContext(), function () use ($view, $row, $field) {
           return $view->field[$field]->advancedRender($row);

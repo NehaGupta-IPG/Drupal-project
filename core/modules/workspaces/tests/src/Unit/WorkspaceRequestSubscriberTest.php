@@ -20,6 +20,8 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 class WorkspaceRequestSubscriberTest extends UnitTestCase {
 
   /**
+   * The workspace manager.
+   *
    * @var \Drupal\workspaces\WorkspaceManagerInterface
    */
   protected $workspaceManager;
@@ -41,7 +43,7 @@ class WorkspaceRequestSubscriberTest extends UnitTestCase {
   /**
    * @covers ::onKernelRequest
    */
-  public function testOnKernelRequestWithCacheableRouteProvider() {
+  public function testOnKernelRequestWithCacheableRouteProvider(): void {
     $route_provider = $this->prophesize(CacheableRouteProviderInterface::class);
     $route_provider->addExtraCacheKeyPart('workspace', 'test')->shouldBeCalled();
 
@@ -56,7 +58,7 @@ class WorkspaceRequestSubscriberTest extends UnitTestCase {
   /**
    * @covers ::onKernelRequest
    */
-  public function testOnKernelRequestWithoutCacheableRouteProvider() {
+  public function testOnKernelRequestWithoutCacheableRouteProvider(): void {
     $route_provider = $this->prophesize(RouteProviderInterface::class);
 
     // Check that WorkspaceRequestSubscriber::onKernelRequest() doesn't call

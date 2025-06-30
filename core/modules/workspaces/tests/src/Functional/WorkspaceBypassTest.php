@@ -22,7 +22,7 @@ class WorkspaceBypassTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'user', 'block', 'workspaces'];
+  protected static $modules = ['node', 'user', 'block', 'workspaces', 'workspaces_ui'];
 
   /**
    * {@inheritdoc}
@@ -32,7 +32,7 @@ class WorkspaceBypassTest extends BrowserTestBase {
   /**
    * Verifies that a user can edit anything in a workspace they own.
    */
-  public function testBypassOwnWorkspace() {
+  public function testBypassOwnWorkspace(): void {
     $permissions = [
       'create workspace',
       'edit own workspace',

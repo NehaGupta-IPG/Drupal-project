@@ -14,6 +14,9 @@ use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
  */
 class MigrateUserPictureEntityFormDisplayTest extends MigrateDrupal7TestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['image', 'file'];
 
   /**
@@ -31,7 +34,7 @@ class MigrateUserPictureEntityFormDisplayTest extends MigrateDrupal7TestBase {
   /**
    * Tests the field's entity form display settings.
    */
-  public function testEntityFormDisplaySettings() {
+  public function testEntityFormDisplaySettings(): void {
     $component = EntityFormDisplay::load('user.user.default')->getComponent('user_picture');
     $this->assertSame('image_image', $component['type']);
     $this->assertSame('throbber', $component['settings']['progress_indicator']);

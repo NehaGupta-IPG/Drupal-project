@@ -63,7 +63,8 @@ class ConfigSingleImportForm extends ConfirmFormBase {
    * @param \Drupal\Core\Config\ConfigManagerInterface $configManager
    *   The configuration manager.
    * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock backend to ensure multiple imports do not occur at the same time.
+   *   The lock backend to ensure multiple imports do not occur at the same
+   *   time.
    * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
    *   The typed configuration manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
@@ -305,7 +306,7 @@ class ConfigSingleImportForm extends ConfirmFormBase {
           $config_importer->validate();
           $form_state->set('config_importer', $config_importer);
         }
-        catch (ConfigImporterException $e) {
+        catch (ConfigImporterException) {
           // There are validation errors.
           $item_list = [
             '#theme' => 'item_list',
@@ -351,7 +352,7 @@ class ConfigSingleImportForm extends ConfirmFormBase {
         }
         batch_set($batch_builder->toArray());
       }
-      catch (ConfigImporterException $e) {
+      catch (ConfigImporterException) {
         // There are validation errors.
         $this->messenger()->addError($this->t('The configuration import failed for the following reasons:'));
         foreach ($config_importer->getErrors() as $message) {

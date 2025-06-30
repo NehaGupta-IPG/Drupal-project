@@ -59,7 +59,7 @@ class BlockContentCacheTagsTest extends EntityCacheTagsTestBase {
    *
    * @see \Drupal\block_content\BlockContentAccessControlHandler::checkAccess()
    */
-  protected function getAccessCacheContextsForEntity(EntityInterface $entity) {
+  protected function getAccessCacheContextsForEntity(EntityInterface $entity): array {
     return [];
   }
 
@@ -68,14 +68,14 @@ class BlockContentCacheTagsTest extends EntityCacheTagsTestBase {
    *
    * Each comment must have a comment body, which always has a text format.
    */
-  protected function getAdditionalCacheTagsForEntity(EntityInterface $entity) {
+  protected function getAdditionalCacheTagsForEntity(EntityInterface $entity): array {
     return ['config:filter.format.plain_text'];
   }
 
   /**
    * Tests that the block is cached with the correct contexts and tags.
    */
-  public function testBlock() {
+  public function testBlock(): void {
     $block = $this->drupalPlaceBlock('block_content:' . $this->entity->uuid());
     $build = $this->container->get('entity_type.manager')->getViewBuilder('block')->view($block, 'block');
 

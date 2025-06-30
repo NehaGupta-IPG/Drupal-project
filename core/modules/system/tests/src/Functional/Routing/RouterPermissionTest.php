@@ -14,9 +14,7 @@ use Drupal\Tests\BrowserTestBase;
 class RouterPermissionTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['router_test'];
 
@@ -28,7 +26,7 @@ class RouterPermissionTest extends BrowserTestBase {
   /**
    * Tests permission requirements on routes.
    */
-  public function testPermissionAccess() {
+  public function testPermissionAccess(): void {
     // Ensure 403 Access Denied for a route without permission.
     $this->drupalGet('router_test/test7');
     $this->assertSession()->statusCodeEquals(403);

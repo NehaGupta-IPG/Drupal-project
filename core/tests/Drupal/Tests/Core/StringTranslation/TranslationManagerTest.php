@@ -32,7 +32,9 @@ class TranslationManagerTest extends UnitTestCase {
 
   /**
    * Provides some test data for formatPlural()
+   *
    * @return array
+   *   An array of test data for formatPlural().
    */
   public static function providerTestFormatPlural() {
     return [
@@ -49,7 +51,7 @@ class TranslationManagerTest extends UnitTestCase {
   /**
    * @dataProvider providerTestFormatPlural
    */
-  public function testFormatPlural($count, $singular, $plural, array $args, array $options, $expected) {
+  public function testFormatPlural($count, $singular, $plural, array $args, array $options, $expected): void {
     $langcode = empty($options['langcode']) ? 'fr' : $options['langcode'];
     $translator = $this->createMock('\Drupal\Core\StringTranslation\Translator\TranslatorInterface');
     $translator->expects($this->once())
@@ -77,7 +79,7 @@ class TranslationManagerTest extends UnitTestCase {
    *
    * @dataProvider providerTestTranslatePlaceholder
    */
-  public function testTranslatePlaceholder($string, array $args, $expected_string) {
+  public function testTranslatePlaceholder($string, array $args, $expected_string): void {
     $actual = $this->translationManager->translate($string, $args);
     $this->assertInstanceOf(MarkupInterface::class, $actual);
     $this->assertEquals($expected_string, (string) $actual);
@@ -87,6 +89,7 @@ class TranslationManagerTest extends UnitTestCase {
    * Provides test data for translate().
    *
    * @return array
+   *   An array of test data for translate().
    */
   public static function providerTestTranslatePlaceholder() {
     return [
@@ -99,6 +102,9 @@ class TranslationManagerTest extends UnitTestCase {
 
 }
 
+/**
+ * A chained translation implementation used for testing.
+ */
 class TestTranslationManager extends TranslationManager {
 
   public function __construct() {

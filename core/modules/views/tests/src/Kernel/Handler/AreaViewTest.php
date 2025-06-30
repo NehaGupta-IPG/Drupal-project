@@ -16,9 +16,7 @@ use Drupal\views\Views;
 class AreaViewTest extends ViewsKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['user'];
 
@@ -32,7 +30,7 @@ class AreaViewTest extends ViewsKernelTestBase {
   /**
    * Tests the view area handler.
    */
-  public function testViewArea() {
+  public function testViewArea(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $view = Views::getView('test_area_view');

@@ -97,7 +97,7 @@ class LanguageNegotiationContentEntityTest extends LanguageNegotiationTestBase {
   /**
    * @covers ::getLangcode
    */
-  public function testGetLangcode() {
+  public function testGetLangcode(): void {
     $languageNegotiationContentEntity = $this->createLanguageNegotiationPlugin();
 
     // Case 1: Empty request.
@@ -131,7 +131,7 @@ class LanguageNegotiationContentEntityTest extends LanguageNegotiationTestBase {
   /**
    * @covers ::processOutbound
    */
-  public function testProcessOutbound() {
+  public function testProcessOutbound(): void {
 
     // Case 1: Not all processing conditions are met.
     $languageNegotiationContentEntityMock = $this->createPartialMock($this->getPluginClass(),
@@ -192,7 +192,8 @@ class LanguageNegotiationContentEntityTest extends LanguageNegotiationTestBase {
     $this->assertTrue(isset($options['query'][LanguageNegotiationContentEntity::QUERY_PARAMETER]));
     $this->assertEquals('en', $options['query'][LanguageNegotiationContentEntity::QUERY_PARAMETER]);
 
-    // Case 3a1: via $options['language'] with an additional $options['query'][static::QUERY_PARAMETER].
+    // Case 3a1: via $options['language'] with an additional
+    // $options['query'][static::QUERY_PARAMETER].
     $options['language'] = $this->languages['en'];
     $options['query'][LanguageNegotiationContentEntity::QUERY_PARAMETER] = 'xx';
     $this->assertEquals($path, $languageNegotiationContentEntityMock->processOutbound($path, $options, $request, $bubbleableMetadataMock));
@@ -208,7 +209,7 @@ class LanguageNegotiationContentEntityTest extends LanguageNegotiationTestBase {
   /**
    * @covers ::getLanguageSwitchLinks
    */
-  public function testGetLanguageSwitchLinks() {
+  public function testGetLanguageSwitchLinks(): void {
     $languageNegotiationContentEntity = $this->createLanguageNegotiationPlugin();
     $languageNegotiationContentEntity->setLanguageManager($this->languageManager);
 

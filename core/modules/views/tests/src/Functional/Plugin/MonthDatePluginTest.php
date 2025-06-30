@@ -22,9 +22,7 @@ class MonthDatePluginTest extends ViewTestBase {
   public static $testViews = ['test_month_date_plugin'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node'];
 
@@ -65,7 +63,7 @@ class MonthDatePluginTest extends ViewTestBase {
   /**
    * Tests the Month Date Plugin.
    */
-  public function testMonthDatePlugin() {
+  public function testMonthDatePlugin(): void {
     $assert_session = $this->assertSession();
 
     // Test fallback value.

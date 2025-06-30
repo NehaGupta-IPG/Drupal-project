@@ -6,6 +6,7 @@ namespace Drupal\Tests\Core\Render\Element;
 
 use Drupal\Core\Render\Markup;
 use Drupal\Tests\Core\Render\RendererTestBase;
+use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Render\Element\HtmlTag;
 
 /**
@@ -17,8 +18,8 @@ class HtmlTagTest extends RendererTestBase {
   /**
    * @covers ::getInfo
    */
-  public function testGetInfo() {
-    $htmlTag = new HtmlTag([], 'test', 'test');
+  public function testGetInfo(): void {
+    $htmlTag = new HtmlTag([], 'test', 'test', elementInfoManager: $this->createStub(ElementInfoManagerInterface::class));
     $info = $htmlTag->getInfo();
     $this->assertArrayHasKey('#pre_render', $info);
     $this->assertArrayHasKey('#attributes', $info);
@@ -29,7 +30,7 @@ class HtmlTagTest extends RendererTestBase {
    * @covers ::preRenderHtmlTag
    * @dataProvider providerPreRenderHtmlTag
    */
-  public function testPreRenderHtmlTag($element, $expected) {
+  public function testPreRenderHtmlTag($element, $expected): void {
     $result = HtmlTag::preRenderHtmlTag($element);
     foreach ($result as &$child) {
       if (is_array($child) && isset($child['#tag'])) {

@@ -15,9 +15,7 @@ use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
 class MigrateShortcutSetUsersTest extends MigrateDrupal7TestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'link',
@@ -44,7 +42,7 @@ class MigrateShortcutSetUsersTest extends MigrateDrupal7TestBase {
   /**
    * Tests the shortcut set migration.
    */
-  public function testShortcutSetUsersMigration() {
+  public function testShortcutSetUsersMigration(): void {
     // Check if migrated user has correct migrated shortcut set assigned.
     $account = User::load(2);
     $shortcut_set_storage = \Drupal::entityTypeManager()->getStorage('shortcut_set');

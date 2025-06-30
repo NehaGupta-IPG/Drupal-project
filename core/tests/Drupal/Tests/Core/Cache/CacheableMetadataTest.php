@@ -29,7 +29,7 @@ class CacheableMetadataTest extends UnitTestCase {
    * @covers ::merge
    * @dataProvider providerTestMerge
    */
-  public function testMerge(CacheableMetadata $a, CacheableMetadata $b, CacheableMetadata $expected) {
+  public function testMerge(CacheableMetadata $a, CacheableMetadata $b, CacheableMetadata $expected): void {
     $cache_contexts_manager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
       ->disableOriginalConstructor()
       ->getMock();
@@ -55,7 +55,7 @@ class CacheableMetadataTest extends UnitTestCase {
    * @covers ::addCacheableDependency
    * @dataProvider providerTestMerge
    */
-  public function testAddCacheableDependency(CacheableMetadata $a, CacheableMetadata $b, CacheableMetadata $expected) {
+  public function testAddCacheableDependency(CacheableMetadata $a, CacheableMetadata $b, CacheableMetadata $expected): void {
     $cache_contexts_manager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
       ->disableOriginalConstructor()
       ->getMock();
@@ -71,6 +71,7 @@ class CacheableMetadataTest extends UnitTestCase {
    * Provides test data for testMerge().
    *
    * @return array
+   *   An array of test cases, each containing two CacheableMetadata objects and their expected merged result.
    */
   public static function providerTestMerge() {
     return [
@@ -90,7 +91,7 @@ class CacheableMetadataTest extends UnitTestCase {
    *
    * @covers ::addCacheTags
    */
-  public function testAddCacheTags() {
+  public function testAddCacheTags(): void {
     $metadata = new CacheableMetadata();
     $add_expected = [
       [[], []],
@@ -114,7 +115,7 @@ class CacheableMetadataTest extends UnitTestCase {
    * @covers ::setCacheMaxAge
    * @dataProvider providerSetCacheMaxAge
    */
-  public function testSetCacheMaxAge($data, $expect_exception) {
+  public function testSetCacheMaxAge($data, $expect_exception): void {
     $metadata = new CacheableMetadata();
     if ($expect_exception) {
       $this->expectException('\InvalidArgumentException');
@@ -142,7 +143,7 @@ class CacheableMetadataTest extends UnitTestCase {
    * @covers ::createFromRenderArray
    * @dataProvider providerTestCreateFromRenderArray
    */
-  public function testCreateFromRenderArray(array $render_array, CacheableMetadata $expected) {
+  public function testCreateFromRenderArray(array $render_array, CacheableMetadata $expected): void {
     $this->assertEquals($expected, CacheableMetadata::createFromRenderArray($render_array));
   }
 
@@ -150,6 +151,7 @@ class CacheableMetadataTest extends UnitTestCase {
    * Provides test data for createFromRenderArray().
    *
    * @return array
+   *   An array of test cases, each containing a render array and the expected CacheableMetadata object.
    */
   public static function providerTestCreateFromRenderArray() {
     $data = [];
@@ -178,7 +180,7 @@ class CacheableMetadataTest extends UnitTestCase {
    * @covers ::createFromObject
    * @dataProvider providerTestCreateFromObject
    */
-  public function testCreateFromObject($object, CacheableMetadata $expected) {
+  public function testCreateFromObject($object, CacheableMetadata $expected): void {
     $this->assertEquals($expected, CacheableMetadata::createFromObject($object));
   }
 
@@ -186,6 +188,7 @@ class CacheableMetadataTest extends UnitTestCase {
    * Provides test data for createFromObject().
    *
    * @return array
+   *   An array of test cases, each containing an object and the expected CacheableMetadata.
    */
   public static function providerTestCreateFromObject() {
     $data = [];

@@ -18,6 +18,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -69,7 +70,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    * Constructs a MediaLibraryWidget widget.
    *
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
@@ -78,6 +79,8 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *   The widget settings.
    * @param array $third_party_settings
    *   Any third party settings.
+   * @param \Drupal\Core\Render\ElementInfoManagerInterface $elementInfoManager
+   *   The element info manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   Entity type manager service.
    * @param \Drupal\Core\Session\AccountInterface $current_user
@@ -85,8 +88,8 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, ModuleHandlerInterface $module_handler) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ElementInfoManagerInterface $elementInfoManager, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, ModuleHandlerInterface $module_handler) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $elementInfoManager);
     $this->entityTypeManager = $entity_type_manager;
     $this->currentUser = $current_user;
     $this->moduleHandler = $module_handler;
@@ -102,6 +105,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['third_party_settings'],
+      $container->get('plugin.manager.element_info'),
       $container->get('entity_type.manager'),
       $container->get('current_user'),
       $container->get('module_handler')
@@ -934,7 +938,6 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       $ids = explode(',', $value['media_library_selection']);
       $ids = array_filter($ids, 'is_numeric');
       if (!empty($ids)) {
-        /** @var \Drupal\media\MediaInterface[] $media */
         return Media::loadMultiple($ids);
       }
     }

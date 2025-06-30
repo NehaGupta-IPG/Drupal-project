@@ -6,6 +6,8 @@ namespace Drupal\Tests\field\Kernel;
 
 use Drupal\Core\Field\BaseFieldDefinition;
 
+// cspell:ignore onewidgetfield
+
 /**
  * Tests the field widget manager.
  *
@@ -16,7 +18,7 @@ class WidgetPluginManagerTest extends FieldKernelTestBase {
   /**
    * Tests that the widget definitions alter hook works.
    */
-  public function testWidgetDefinitionAlter() {
+  public function testWidgetDefinitionAlter(): void {
     $widget_definition = \Drupal::service('plugin.manager.field.widget')->getDefinition('test_field_widget_multiple');
 
     // Test if hook_field_widget_info_alter is being called.
@@ -28,7 +30,7 @@ class WidgetPluginManagerTest extends FieldKernelTestBase {
    *
    * @see \Drupal\field\Tests\FormatterPluginManagerTest::testNotApplicableFallback()
    */
-  public function testNotApplicableFallback() {
+  public function testNotApplicableFallback(): void {
     /** @var \Drupal\Core\Field\WidgetPluginManager $widget_plugin_manager */
     $widget_plugin_manager = \Drupal::service('plugin.manager.field.widget');
 

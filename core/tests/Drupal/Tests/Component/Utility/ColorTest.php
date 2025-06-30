@@ -24,7 +24,7 @@ class ColorTest extends TestCase {
    *
    * @dataProvider providerTestValidateHex
    */
-  public function testValidateHex($expected, $value) {
+  public function testValidateHex($expected, $value): void {
     $this->assertSame($expected, Color::validateHex($value));
   }
 
@@ -80,7 +80,7 @@ class ColorTest extends TestCase {
    *
    * @dataProvider providerTestHexToRgb
    */
-  public function testHexToRgb($value, $expected, $invalid = FALSE) {
+  public function testHexToRgb($value, $expected, $invalid = FALSE): void {
     if ($invalid) {
       $this->expectException('InvalidArgumentException');
     }
@@ -141,7 +141,7 @@ class ColorTest extends TestCase {
    *
    * @dataProvider providerTestRbgToHex
    */
-  public function testRgbToHex($value, $expected) {
+  public function testRgbToHex($value, $expected): void {
     $this->assertSame($expected, Color::rgbToHex($value));
   }
 
@@ -163,7 +163,7 @@ class ColorTest extends TestCase {
       [['red' => 119, 'green' => 119, 'blue' => 119], '#777777'],
       [['red' => 1, 'green' => 2, 'blue' => 3], '#010203'],
     ];
-    // Input using indexed RGB array (e.g.: array(10, 10, 10)).
+    // Input using indexed RGB array (e.g.: [10, 10, 10]).
     foreach ($tests as $test) {
       $tests[] = [array_values($test[0]), $test[1]];
     }
@@ -208,7 +208,7 @@ class ColorTest extends TestCase {
    *
    * @dataProvider providerTestNormalizeHexLength
    */
-  public function testNormalizeHexLength($value, $expected) {
+  public function testNormalizeHexLength($value, $expected): void {
     $this->assertSame($expected, Color::normalizeHexLength($value));
   }
 

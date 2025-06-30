@@ -23,9 +23,7 @@ class ContentTranslationConfigImportTest extends KernelTestBase {
   protected $configImporter;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
@@ -68,7 +66,7 @@ class ContentTranslationConfigImportTest extends KernelTestBase {
   /**
    * Tests config import updates.
    */
-  public function testConfigImportUpdates() {
+  public function testConfigImportUpdates(): void {
     $entity_type_id = 'entity_test_mul';
     $config_id = $entity_type_id . '.' . $entity_type_id;
     $config_name = 'language.content_settings.' . $config_id;

@@ -14,9 +14,7 @@ use Drupal\Tests\BrowserTestBase;
 class HtaccessTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'path'];
 
@@ -41,6 +39,7 @@ class HtaccessTest extends BrowserTestBase {
       'engine',
       'inc',
       'install',
+      'less',
       'make',
       'module',
       'module~',
@@ -49,6 +48,8 @@ class HtaccessTest extends BrowserTestBase {
       'module.save',
       'module.swo',
       'module.swp',
+      'pcss',
+      'pcss.css',
       'php~',
       'php.bak',
       'php.orig',
@@ -57,6 +58,8 @@ class HtaccessTest extends BrowserTestBase {
       'php.swp',
       'profile',
       'po',
+      'sass',
+      'scss',
       'sh',
       'sql',
       'theme',
@@ -106,7 +109,7 @@ class HtaccessTest extends BrowserTestBase {
   /**
    * Iterates over protected files and calls assertNoFileAccess().
    */
-  public function testFileAccess() {
+  public function testFileAccess(): void {
     foreach ($this->getProtectedFiles() as $file => $response_code) {
       $this->assertFileAccess($file, $response_code);
     }
@@ -156,7 +159,7 @@ class HtaccessTest extends BrowserTestBase {
   /**
    * Tests that SVGZ files are served with Content-Encoding: gzip.
    */
-  public function testSvgzContentEncoding() {
+  public function testSvgzContentEncoding(): void {
     $this->drupalGet('core/modules/system/tests/logo.svgz');
     $this->assertSession()->statusCodeEquals(200);
 

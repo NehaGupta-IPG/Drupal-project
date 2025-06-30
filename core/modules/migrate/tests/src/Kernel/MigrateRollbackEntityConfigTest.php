@@ -15,9 +15,7 @@ use Drupal\taxonomy\Entity\Vocabulary;
 class MigrateRollbackEntityConfigTest extends MigrateTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'field',
@@ -42,7 +40,7 @@ class MigrateRollbackEntityConfigTest extends MigrateTestBase {
   /**
    * Tests rolling back configuration entity translations.
    */
-  public function testConfigEntityRollback() {
+  public function testConfigEntityRollback(): void {
     // We use vocabularies to demonstrate importing and rolling back
     // configuration entities with translations. First, import vocabularies.
     $vocabulary_data_rows = [

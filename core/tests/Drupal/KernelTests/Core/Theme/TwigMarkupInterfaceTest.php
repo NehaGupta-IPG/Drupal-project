@@ -22,9 +22,7 @@ use Drupal\KernelTests\KernelTestBase;
 class TwigMarkupInterfaceTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',
@@ -33,7 +31,7 @@ class TwigMarkupInterfaceTest extends KernelTestBase {
   /**
    * @dataProvider providerTestMarkupInterfaceEmpty
    */
-  public function testMarkupInterfaceEmpty($expected, $variable) {
+  public function testMarkupInterfaceEmpty($expected, $variable): void {
     $this->assertSame($expected, (string) $this->renderObjectWithTwig($variable));
   }
 
@@ -61,7 +59,7 @@ class TwigMarkupInterfaceTest extends KernelTestBase {
   /**
    * Tests behavior if a string is translated to become an empty string.
    */
-  public function testEmptyTranslation() {
+  public function testEmptyTranslation(): void {
     $settings = Settings::getAll();
     $settings['locale_custom_strings_en'] = ['' => ['test' => '']];
     // Recreate the settings static.

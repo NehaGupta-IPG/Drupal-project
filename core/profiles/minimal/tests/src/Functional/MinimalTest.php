@@ -19,6 +19,9 @@ class MinimalTest extends BrowserTestBase {
   use SchemaCheckTestTrait;
   use RequirementsPageTrait;
 
+  /**
+   * {@inheritdoc}
+   */
   protected $profile = 'minimal';
 
   /**
@@ -29,7 +32,7 @@ class MinimalTest extends BrowserTestBase {
   /**
    * Tests Minimal installation profile.
    */
-  public function testMinimal() {
+  public function testMinimal(): void {
     $this->drupalGet('');
     // Check the login block is present.
     $this->assertSession()->buttonExists('Log in');

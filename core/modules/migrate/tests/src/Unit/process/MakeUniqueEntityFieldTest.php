@@ -66,7 +66,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
    *
    * @dataProvider providerTestMakeUniqueEntityField
    */
-  public function testMakeUniqueEntityField($count, $postfix = '', $start = NULL, $length = NULL) {
+  public function testMakeUniqueEntityField($count, $postfix = '', $start = NULL, $length = NULL): void {
     $configuration = [
       'entity_type' => 'test_entity_type',
       'field' => 'test_field',
@@ -88,7 +88,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
   /**
    * Tests that invalid start position throws an exception.
    */
-  public function testMakeUniqueEntityFieldEntityInvalidStart() {
+  public function testMakeUniqueEntityFieldEntityInvalidStart(): void {
     $configuration = [
       'entity_type' => 'test_entity_type',
       'field' => 'test_field',
@@ -103,7 +103,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
   /**
    * Tests that invalid length option throws an exception.
    */
-  public function testMakeUniqueEntityFieldEntityInvalidLength() {
+  public function testMakeUniqueEntityFieldEntityInvalidLength(): void {
     $configuration = [
       'entity_type' => 'test_entity_type',
       'field' => 'test_field',
@@ -161,7 +161,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
    * @param int $count
    *   The number of unique values to be set up.
    */
-  protected function entityQueryExpects($count) {
+  protected function entityQueryExpects($count): void {
     $this->entityQuery->expects($this->exactly($count + 1))
       ->method('condition')
       ->willReturn($this->entityQuery);
@@ -178,7 +178,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
   /**
    * Tests making an entity field value unique only for migrated entities.
    */
-  public function testMakeUniqueEntityFieldMigrated() {
+  public function testMakeUniqueEntityFieldMigrated(): void {
     $configuration = [
       'entity_type' => 'test_entity_type',
       'field' => 'test_field',

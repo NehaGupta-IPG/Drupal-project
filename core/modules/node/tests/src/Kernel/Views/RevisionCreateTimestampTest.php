@@ -42,7 +42,10 @@ class RevisionCreateTimestampTest extends ViewsKernelTestBase {
     }
   }
 
-  public function testRevisionCreateTimestampView() {
+  /**
+   * Tests the revision create timestamp view.
+   */
+  public function testRevisionCreateTimestampView(): void {
     $node_type = NodeType::create([
       'type' => 'article',
       'name' => 'Article',

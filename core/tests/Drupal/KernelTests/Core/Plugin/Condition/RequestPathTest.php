@@ -41,9 +41,7 @@ class RequestPathTest extends KernelTestBase {
   protected $requestStack;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'user', 'field', 'path'];
 
@@ -79,7 +77,7 @@ class RequestPathTest extends KernelTestBase {
   /**
    * Tests the request path condition.
    */
-  public function testConditions() {
+  public function testConditions(): void {
 
     // Get the request path condition and test and configure it to check against
     // different patterns and requests.

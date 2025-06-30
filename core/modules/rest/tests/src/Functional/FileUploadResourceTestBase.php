@@ -166,7 +166,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
   /**
    * Tests using the file upload POST route.
    */
-  public function testPostFileUpload() {
+  public function testPostFileUpload(): void {
     $this->initAuthentication();
 
     $this->provisionResource([static::$format], static::$auth ? [static::$auth] : [], ['POST']);
@@ -229,6 +229,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
    * Returns the normalized POST entity referencing the uploaded file.
    *
    * @return array
+   *   The normalized POST entity.
    *
    * @see ::testPostFileUpload()
    * @see \Drupal\Tests\rest\Functional\EntityResource\EntityTest\EntityTestResourceTestBase::getNormalizedPostEntity()
@@ -257,7 +258,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
   /**
    * Tests using the file upload POST route with invalid headers.
    */
-  public function testPostFileUploadInvalidHeaders() {
+  public function testPostFileUploadInvalidHeaders(): void {
     $this->initAuthentication();
 
     $this->provisionResource([static::$format], static::$auth ? [static::$auth] : [], ['POST']);
@@ -299,7 +300,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
    *
    * A new file should be created with a suffixed name.
    */
-  public function testPostFileUploadDuplicateFile() {
+  public function testPostFileUploadDuplicateFile(): void {
     $this->initAuthentication();
 
     $this->provisionResource([static::$format], static::$auth ? [static::$auth] : [], ['POST']);
@@ -332,7 +333,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
    *
    * A validation error should occur when the filenames are not unique.
    */
-  public function testPostFileUploadDuplicateFileRaceCondition() {
+  public function testPostFileUploadDuplicateFileRaceCondition(): void {
     $this->initAuthentication();
 
     $this->provisionResource([static::$format], static::$auth ? [static::$auth] : [], ['POST']);
@@ -363,7 +364,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition#Directives
    */
-  public function testFileUploadStrippedFilePath() {
+  public function testFileUploadStrippedFilePath(): void {
     $this->initAuthentication();
 
     $this->provisionResource([static::$format], static::$auth ? [static::$auth] : [], ['POST']);
@@ -412,7 +413,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
   /**
    * Tests using the file upload route with a unicode file name.
    */
-  public function testFileUploadUnicodeFilename() {
+  public function testFileUploadUnicodeFilename(): void {
     $this->initAuthentication();
 
     $this->provisionResource([static::$format], static::$auth ? [static::$auth] : [], ['POST']);
@@ -433,7 +434,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
   /**
    * Tests using the file upload route with a zero byte file.
    */
-  public function testFileUploadZeroByteFile() {
+  public function testFileUploadZeroByteFile(): void {
     $this->initAuthentication();
 
     $this->provisionResource([static::$format], static::$auth ? [static::$auth] : [], ['POST']);
@@ -457,7 +458,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
   /**
    * Tests using the file upload route with an invalid file type.
    */
-  public function testFileUploadInvalidFileType() {
+  public function testFileUploadInvalidFileType(): void {
     $this->initAuthentication();
 
     $this->provisionResource([static::$format], static::$auth ? [static::$auth] : [], ['POST']);
@@ -478,7 +479,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
   /**
    * Tests using the file upload route with a file size larger than allowed.
    */
-  public function testFileUploadLargerFileSize() {
+  public function testFileUploadLargerFileSize(): void {
     // Set a limit of 50 bytes.
     $this->field->setSetting('max_filesize', 50)
       ->save();
@@ -504,7 +505,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
   /**
    * Tests using the file upload POST route with malicious extensions.
    */
-  public function testFileUploadMaliciousExtension() {
+  public function testFileUploadMaliciousExtension(): void {
     $this->initAuthentication();
 
     $this->provisionResource([static::$format], static::$auth ? [static::$auth] : [], ['POST']);
@@ -632,7 +633,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
   /**
    * Tests using the file upload POST route no extension configured.
    */
-  public function testFileUploadNoExtensionSetting() {
+  public function testFileUploadNoExtensionSetting(): void {
     $this->initAuthentication();
 
     $this->provisionResource([static::$format], static::$auth ? [static::$auth] : [], ['POST']);
@@ -756,8 +757,6 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
   /**
    * Performs a file upload request. Wraps the Guzzle HTTP client.
    *
-   * @see \GuzzleHttp\ClientInterface::request()
-   *
    * @param \Drupal\Core\Url $url
    *   URL to request.
    * @param string $file_contents
@@ -768,8 +767,11 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
    *   the header value to FALSE.
    *
    * @return \Psr\Http\Message\ResponseInterface
+   *   The response object.
+   *
+   * @see \GuzzleHttp\ClientInterface::request()
    */
-  protected function fileRequest(Url $url, $file_contents, array $headers = []) {
+  protected function fileRequest(Url $url, $file_contents, array $headers = []): ResponseInterface {
     // Set the format for the response.
     $url->setOption('query', ['_format' => static::$format]);
 

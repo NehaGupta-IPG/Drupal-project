@@ -58,7 +58,7 @@ class MenuLinkContentCacheabilityBubblingTest extends KernelTestBase {
   /**
    * Tests bubbleable metadata of menu links' outbound route/path processing.
    */
-  public function testOutboundPathAndRouteProcessing() {
+  public function testOutboundPathAndRouteProcessing(): void {
     $request_stack = \Drupal::requestStack();
     /** @var \Symfony\Component\Routing\RequestContext $request_context */
     $request_context = \Drupal::service('router.request_context');
@@ -91,7 +91,8 @@ class MenuLinkContentCacheabilityBubblingTest extends KernelTestBase {
     // cacheability metadata of the same type is working (two links with cache
     // tags).
     $test_cases = [
-      // \Drupal\Core\RouteProcessor\RouteProcessorCurrent: 'route' cache context.
+      // \Drupal\Core\RouteProcessor\RouteProcessorCurrent: 'route' cache
+      // context.
       [
         'uri' => 'route:<current>',
         'cacheability' => (new BubbleableMetadata())->setCacheContexts(['route']),
