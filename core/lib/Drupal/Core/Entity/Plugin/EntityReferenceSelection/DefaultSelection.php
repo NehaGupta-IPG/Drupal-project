@@ -398,7 +398,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
 
         case 'authors_default':
           $language_code = $this->currentUser->getPreferredLangcode();
-          $language = $language_code ? $language_code : $language_interface->getId();
+          $language = $language_code ?: $language_interface->getId();
           break;
 
         default:
