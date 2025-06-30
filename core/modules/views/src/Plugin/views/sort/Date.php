@@ -62,12 +62,11 @@ class Date extends SortPluginBase {
       'day' => $this->getDateFormat('Ymd'),
       'hour' => $this->getDateFormat('YmdH'),
       'minute' => $this->getDateFormat('YmdHi'),
-      'seconds' => NULL,
       default => NULL,
     };
 
     // Add the field.
-    if ($formula) {
+    if ($formula !== NULL) {
       $this->query->addOrderBy(NULL, $formula, $this->options['order'], $this->tableAlias . '_' . $this->field . '_' . $this->options['granularity']);
     }
     else {
