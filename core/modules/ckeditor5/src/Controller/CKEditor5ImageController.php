@@ -14,6 +14,7 @@ use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Lock\LockBackendInterface;
+use Drupal\Core\Utility\Token;
 use Drupal\editor\Entity\Editor;
 use Drupal\file\Upload\FileUploadHandlerInterface;
 use Drupal\file\Upload\FormUploadedFile;
@@ -45,12 +46,15 @@ class CKEditor5ImageController extends ControllerBase {
    *   The lock service.
    * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface $pluginManager
    *   The CKEditor 5 plugin manager.
+   * @param \Drupal\Core\Utility\Token $token
+   *   The token service.
    */
   public function __construct(
     protected FileSystemInterface $fileSystem,
     protected FileUploadHandlerInterface $fileUploadHandler,
     protected LockBackendInterface $lock,
     protected CKEditor5PluginManagerInterface $pluginManager,
+    protected Token $token,
   ) {
   }
 
@@ -62,7 +66,8 @@ class CKEditor5ImageController extends ControllerBase {
       $container->get('file_system'),
       $container->get('file.upload_handler'),
       $container->get('lock'),
-      $container->get('plugin.manager.ckeditor5.plugin')
+      $container->get('plugin.manager.ckeditor5.plugin'),
+      $container->get('token')
     );
   }
 
@@ -92,7 +97,7 @@ class CKEditor5ImageController extends ControllerBase {
     /** @var \Drupal\editor\EditorInterface $editor */
     $editor = $request->attributes->get('editor');
     $settings = $editor->getImageUploadSettings();
-    $destination = $settings['scheme'] . '://' . $settings['directory'];
+    $destination = $settings['scheme'] . '://' . $this->token->replacePlain($settings['directory']);
 
     // Check the destination file path is writable.
     if (!$this->fileSystem->prepareDirectory($destination, FileSystemInterface::CREATE_DIRECTORY)) {
