@@ -24,6 +24,10 @@ class Token extends Hidden {
       '#input' => TRUE,
       '#pre_render' => [
         [static::class, 'preRenderHidden'],
+        [static::class, 'preRenderGroup'],
+      ],
+      '#process' => [
+        [static::class, 'processGroup'],
       ],
       '#theme' => 'input__hidden',
     ];

@@ -96,9 +96,11 @@ class WeightTest extends KernelTestBase {
       '#process' => [
         [Select::class, 'processSelect'],
         [Select::class, 'processAjaxForm'],
+        [Select::class, 'processGroup'],
       ],
       '#pre_render' => [
         [Select::class, 'preRenderSelect'],
+        [Select::class, 'preRenderGroup'],
       ],
     ]);
 
@@ -114,12 +116,14 @@ class WeightTest extends KernelTestBase {
     $assert('number', $number, [
       '#process' => [
         [Number::class, 'processAjaxForm'],
+        [Number::class, 'processGroup'],
       ],
       '#element_validate' => [
         [Number::class, 'validateNumber'],
       ],
       '#pre_render' => [
         [Number::class, 'preRenderNumber'],
+        [Number::class, 'preRenderGroup'],
         // The custom callback is appended.
         /* @see \Drupal\element_info_test\ElementInfoTestNumberBuilder::preRender */
         [ElementInfoTestNumberBuilder::class, 'preRender'],

@@ -32,12 +32,14 @@ class ManagedFile extends FormElementBase {
       '#input' => TRUE,
       '#process' => [
         [static::class, 'processManagedFile'],
+        [static::class, 'processGroup'],
       ],
       '#element_validate' => [
         [static::class, 'validateManagedFile'],
       ],
       '#pre_render' => [
         [static::class, 'preRenderManagedFile'],
+        [static::class, 'preRenderGroup'],
       ],
       '#theme' => 'file_managed_file',
       '#theme_wrappers' => ['form_element'],

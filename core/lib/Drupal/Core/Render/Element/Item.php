@@ -27,6 +27,12 @@ class Item extends FormElementBase {
       '#input' => TRUE,
       '#markup' => '',
       '#theme_wrappers' => ['form_element'],
+      '#process' => [
+        [static::class, 'processGroup'],
+      ],
+      '#pre_render' => [
+        [static::class, 'preRenderGroup'],
+      ],
     ];
   }
 

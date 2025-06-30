@@ -31,6 +31,10 @@ class Datelist extends DateElementBase {
       ],
       '#process' => [
         [static::class, 'processDatelist'],
+        [static::class, 'processGroup'],
+      ],
+      '#pre_render' => [
+        [static::class, 'preRenderGroup'],
       ],
       '#theme' => 'datetime_form',
       '#theme_wrappers' => ['datetime_wrapper'],

@@ -72,10 +72,11 @@ class Tableselect extends Table {
       '#sticky' => FALSE,
       '#pre_render' => [
         [static::class, 'preRenderTable'],
-        [static::class, 'preRenderTableselect'],
+        [static::class, 'preRenderGroup'],
       ],
       '#process' => [
         [static::class, 'processTableselect'],
+        [static::class, 'processGroup'],
       ],
       '#options' => [],
       '#empty' => '',

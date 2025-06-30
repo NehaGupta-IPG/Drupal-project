@@ -108,9 +108,11 @@ class Select extends FormElementBase {
       '#process' => [
         [static::class, 'processSelect'],
         [static::class, 'processAjaxForm'],
+        [static::class, 'processGroup'],
       ],
       '#pre_render' => [
         [static::class, 'preRenderSelect'],
+        [static::class, 'preRenderGroup'],
       ],
       '#theme' => 'select',
       '#theme_wrappers' => ['form_element'],

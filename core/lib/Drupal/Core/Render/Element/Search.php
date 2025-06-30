@@ -33,9 +33,11 @@ class Search extends FormElementBase {
       '#process' => [
         [static::class, 'processAutocomplete'],
         [static::class, 'processAjaxForm'],
+        [static::class, 'processGroup'],
       ],
       '#pre_render' => [
         [static::class, 'preRenderSearch'],
+        [static::class, 'preRenderGroup'],
       ],
       '#theme' => 'input__search',
       '#theme_wrappers' => ['form_element'],

@@ -42,6 +42,7 @@ class Range extends Number {
       '#max' => 100,
       '#pre_render' => [
         [static::class, 'preRenderRange'],
+        [static::class, 'preRenderGroup'],
       ],
       '#theme' => 'input__range',
     ] + $info;

@@ -26,9 +26,11 @@ class Radio extends FormElementBase {
       '#default_value' => NULL,
       '#process' => [
         [static::class, 'processAjaxForm'],
+        [static::class, 'processGroup'],
       ],
       '#pre_render' => [
         [static::class, 'preRenderRadio'],
+        [static::class, 'preRenderGroup'],
       ],
       '#theme' => 'input__radio',
       '#theme_wrappers' => ['form_element'],

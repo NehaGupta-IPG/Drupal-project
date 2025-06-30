@@ -30,6 +30,12 @@ class Value extends FormElementBase {
   public function getInfo() {
     return [
       '#input' => TRUE,
+      '#process' => [
+        [static::class, 'processGroup'],
+      ],
+      '#pre_render' => [
+        [static::class, 'preRenderGroup'],
+      ],
     ];
   }
 

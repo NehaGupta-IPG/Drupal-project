@@ -24,6 +24,12 @@ class LanguageSelect extends FormElementBase {
     return [
       '#input' => TRUE,
       '#default_value' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      '#process' => [
+        [static::class, 'processGroup'],
+      ],
+      '#pre_render' => [
+        [static::class, 'preRenderGroup'],
+      ],
     ];
   }
 

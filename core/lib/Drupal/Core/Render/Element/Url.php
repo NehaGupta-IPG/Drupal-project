@@ -48,12 +48,14 @@ class Url extends FormElementBase {
         [static::class, 'processAutocomplete'],
         [static::class, 'processAjaxForm'],
         [static::class, 'processPattern'],
+        [static::class, 'processGroup'],
       ],
       '#element_validate' => [
         [static::class, 'validateUrl'],
       ],
       '#pre_render' => [
         [static::class, 'preRenderUrl'],
+        [static::class, 'preRenderGroup'],
       ],
       '#theme' => 'input__url',
       '#theme_wrappers' => ['form_element'],

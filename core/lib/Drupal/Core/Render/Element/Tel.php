@@ -45,9 +45,11 @@ class Tel extends FormElementBase {
         [static::class, 'processAutocomplete'],
         [static::class, 'processAjaxForm'],
         [static::class, 'processPattern'],
+        [static::class, 'processGroup'],
       ],
       '#pre_render' => [
         [static::class, 'preRenderTel'],
+        [static::class, 'preRenderGroup'],
       ],
       '#theme' => 'input__tel',
       '#theme_wrappers' => ['form_element'],
