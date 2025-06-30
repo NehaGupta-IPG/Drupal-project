@@ -24,6 +24,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\EntityOwnerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Default plugin implementation of the Entity Reference Selection plugin.
@@ -45,6 +46,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   deriver: DefaultSelectionDeriver::class,
 )]
 class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPluginInterface, SelectionWithAutocreateInterface {
+
+  use StringTranslationTrait;
 
   /**
    * The entity type manager service.
@@ -89,13 +92,6 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
   protected $currentUser;
 
   /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
    * Constructs a new DefaultSelection object.
    *
    * @param array $configuration
@@ -116,10 +112,10 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
    *   The entity type bundle info service.
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
    *   The entity repository.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   Language manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, AccountInterface $current_user, ?EntityFieldManagerInterface $entity_field_manager = NULL, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?EntityRepositoryInterface $entity_repository = NULL, ?LanguageManagerInterface $language_manager = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, AccountInterface $current_user, ?EntityFieldManagerInterface $entity_field_manager = NULL, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?EntityRepositoryInterface $entity_repository = NULL, protected ?LanguageManagerInterface $languageManager = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
@@ -129,11 +125,11 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->entityRepository = $entity_repository;
 
-    if (!$language_manager) {
-      @trigger_error('Calling DefaultSelection::__construct() with the $language_manager argument is supported in drupal:8.8.0 and will be required before drupal:9.0.0.', E_USER_DEPRECATED);
-      $language_manager = \Drupal::service('language_manager');
+    if ($this->languageManager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $languageManager argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/2144377', E_USER_DEPRECATED);
+      $this->languageManager = \Drupal::service('language_manager');
     }
-    $this->languageManager = $language_manager;
+
   }
 
   /**
@@ -356,13 +352,12 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
   }
 
   /**
-   * Validates a target_bundles element.
-   * Get language_restriction options list.
+   * Validates a target_bundles element get language_restriction options list.
    *
    * @return array
    *   Options list.
    */
-  protected function getLanguageRestrictionOptions() {
+  protected function getLanguageRestrictionOptions(): array {
 
     $options = [
       '' => $this->t('No restrictions'),
@@ -373,7 +368,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
 
     $languages = $this->languageManager->getLanguages(LanguageInterface::STATE_ALL);
     foreach ($languages as $langcode => $language) {
-      $options[$langcode] = $language->isLocked() ? t('- @name -', ['@name' => $language->getName()]) : $language->getName();
+      $options[$langcode] = $language->isLocked() ? $this->t('- @name -', ['@name' => $language->getName()]) : $language->getName();
     }
 
     return $options;
@@ -385,7 +380,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
    * @return string
    *   Language restriction settings.
    */
-  protected function getLanguageRestriction() {
+  protected function getLanguageRestriction(): string {
     $configuration = $this->getConfiguration();
     $language = '';
 
