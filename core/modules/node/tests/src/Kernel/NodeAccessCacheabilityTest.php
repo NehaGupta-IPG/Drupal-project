@@ -82,14 +82,13 @@ class NodeAccessCacheabilityTest extends EntityKernelTestBase {
    *   The entity query.
    */
   protected function getEntityQuery(): QueryInterface {
-    $query = \Drupal::entityTypeManager()
+    return \Drupal::entityTypeManager()
       ->getStorage('node')
       ->getQuery()
       ->accessCheck(TRUE)
       ->condition('status', NodeInterface::PUBLISHED)
       ->sort('created', 'DESC')
       ->range(0, 1);
-    return $query;
   }
 
 }
