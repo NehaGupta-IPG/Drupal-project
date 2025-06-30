@@ -2,12 +2,21 @@
 
 namespace Drupal\Core\Entity;
 
+@trigger_error('The ' . __NAMESPACE__ . '\ContentEntityConfirmFormBase is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Instead, use \Drupal\Core\Entity\EntityConfirmFormBase. See https://www.drupal.org/node/2491057', E_USER_DEPRECATED);
+
 use Drupal\Core\Form\ConfirmFormHelper;
 use Drupal\Core\Form\ConfirmFormInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Provides a generic base class for an entity-based confirmation form.
+ *
+ * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0.
+ * Use \Drupal\Core\Entity\EntityConfirmFormBase.
+ *
+ * @see https://www.drupal.org/node/2491057
+ *
+ * @internal
  */
 abstract class ContentEntityConfirmFormBase extends ContentEntityForm implements ConfirmFormInterface {
 

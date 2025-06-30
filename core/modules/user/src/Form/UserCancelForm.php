@@ -2,7 +2,7 @@
 
 namespace Drupal\user\Form;
 
-use Drupal\Core\Entity\ContentEntityConfirmFormBase;
+use Drupal\Core\Entity\EntityConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -10,7 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @internal
  */
-class UserCancelForm extends ContentEntityConfirmFormBase {
+class UserCancelForm extends EntityConfirmFormBase {
 
   /**
    * Available account cancellation methods.

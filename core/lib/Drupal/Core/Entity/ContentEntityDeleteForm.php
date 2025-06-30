@@ -10,14 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
  * @todo Re-evaluate and streamline the entity deletion form class hierarchy in
  *   https://www.drupal.org/node/2491057.
  */
-class ContentEntityDeleteForm extends ContentEntityConfirmFormBase {
-
-  use EntityDeleteFormTrait {
-    getQuestion as traitGetQuestion;
-    logDeletionMessage as traitLogDeletionMessage;
-    getDeletionMessage as traitGetDeletionMessage;
-    getCancelUrl as traitGetCancelUrl;
-  }
+class ContentEntityDeleteForm extends EntityDeleteForm {
 
   /**
    * {@inheritdoc}
@@ -79,10 +72,37 @@ class ContentEntityDeleteForm extends ContentEntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
+  public function getQuestion() {
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    $entity = $this->getEntity();
+    if (!$entity->isDefaultTranslation()) {
+      return $this->t('Are you sure you want to delete the @language translation of the @entity-type %label?', [
+        '@language' => $entity->language()->getName(),
+        '@entity-type' => $this->getEntity()->getEntityType()->getSingularLabel(),
+        '%label' => $this->getEntity()->label(),
+      ]);
+    }
+
+    return $this->t('Are you sure you want to delete the @entity-type %label?', [
+      '@entity-type' => $this->getEntity()->getEntityType()->getSingularLabel(),
+      '%label' => $this->getEntity()->label(),
+    ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConfirmText() {
+    return $this->t('Delete');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCancelUrl() {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $this->getEntity();
-    return $entity->isDefaultTranslation() ? $this->traitGetCancelUrl() : $entity->toUrl('canonical');
+    return $entity->isDefaultTranslation() ? $this->getCancelUrl() : $entity->toUrl('canonical');
   }
 
   /**
@@ -100,7 +120,7 @@ class ContentEntityDeleteForm extends ContentEntityConfirmFormBase {
       ]);
     }
 
-    return $this->traitGetDeletionMessage();
+    return $this->getDeletionMessage();
   }
 
   /**
@@ -118,26 +138,8 @@ class ContentEntityDeleteForm extends ContentEntityConfirmFormBase {
       ]);
     }
     else {
-      $this->traitLogDeletionMessage();
+      $this->logDeletionMessage();
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getQuestion() {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    $entity = $this->getEntity();
-
-    if (!$entity->isDefaultTranslation()) {
-      return $this->t('Are you sure you want to delete the @language translation of the @entity-type %label?', [
-        '@language' => $entity->language()->getName(),
-        '@entity-type' => $this->getEntity()->getEntityType()->getSingularLabel(),
-        '%label' => $this->getEntity()->label(),
-      ]);
-    }
-
-    return $this->traitGetQuestion();
   }
 
 }
