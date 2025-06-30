@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel;
 
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\node\NodeInterface;
@@ -90,7 +89,6 @@ class NodeAccessCacheabilityTest extends EntityKernelTestBase {
       ->condition('status', NodeInterface::PUBLISHED)
       ->sort('created', 'DESC')
       ->range(0, 1);
-    $this->assertInstanceOf(RefinableCacheableDependencyInterface::class, $query);
     return $query;
   }
 

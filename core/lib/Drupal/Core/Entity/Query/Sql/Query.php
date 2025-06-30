@@ -3,7 +3,6 @@
 namespace Drupal\Core\Entity\Query\Sql;
 
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -381,33 +380,21 @@ class Query extends QueryBase implements QueryInterface {
    * {@inheritdoc}
    */
   public function getCacheContexts(): array {
-    $contexts = parent::getCacheContexts();
-    if ($this->sqlQuery instanceof CacheableDependencyInterface) {
-      $contexts = Cache::mergeContexts($contexts, $this->sqlQuery->getCacheContexts());
-    }
-    return $contexts;
+    return Cache::mergeContexts(parent::getCacheContexts(), $this->sqlQuery->getCacheContexts());
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCacheMaxAge(): int {
-    $max_age = parent::getCacheMaxAge();
-    if ($this->sqlQuery instanceof CacheableDependencyInterface) {
-      $max_age = Cache::mergeMaxAges($max_age, $this->sqlQuery->getCacheMaxAge());
-    }
-    return $max_age;
+    return Cache::mergeMaxAges(parent::getCacheMaxAge(), $this->sqlQuery->getCacheMaxAge());
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCacheTags(): array {
-    $tags = parent::getCacheTags();
-    if ($this->sqlQuery instanceof CacheableDependencyInterface) {
-      $tags = Cache::mergeTags($tags, $this->sqlQuery->getCacheTags());
-    }
-    return $tags;
+    return Cache::mergeTags(parent::getCacheTags(), $this->sqlQuery->getCacheTags());
   }
 
 }

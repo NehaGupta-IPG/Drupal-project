@@ -3,15 +3,13 @@
 namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Database\Connection;
 
 /**
  * The base extender class for Select queries.
  */
-class SelectExtender implements SelectInterface, RefinableCacheableDependencyInterface {
+class SelectExtender implements SelectInterface {
 
   use RefinableCacheableDependencyTrait {
     getCacheContexts as traitGetCacheContexts;
@@ -567,33 +565,21 @@ class SelectExtender implements SelectInterface, RefinableCacheableDependencyInt
    * {@inheritdoc}
    */
   public function getCacheContexts(): array {
-    $contexts = $this->traitGetCacheContexts();
-    if ($this->query instanceof CacheableDependencyInterface) {
-      $contexts = Cache::mergeContexts($contexts, $this->query->getCacheContexts());
-    }
-    return $contexts;
+    return Cache::mergeContexts($this->traitGetCacheContexts(), $this->query->getCacheContexts());
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCacheMaxAge(): int {
-    $max_age = $this->traitGetCacheMaxAge();
-    if ($this->query instanceof CacheableDependencyInterface) {
-      $max_age = Cache::mergeMaxAges($max_age, $this->query->getCacheMaxAge());
-    }
-    return $max_age;
+    return Cache::mergeMaxAges($this->traitGetCacheMaxAge(), $this->query->getCacheMaxAge());
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCacheTags(): array {
-    $tags = $this->traitGetCacheTags();
-    if ($this->query instanceof CacheableDependencyInterface) {
-      $tags = Cache::mergeTags($tags, $this->query->getCacheTags());
-    }
-    return $tags;
+    return Cache::mergeTags($this->traitGetCacheTags(), $this->query->getCacheTags());
   }
 
 }

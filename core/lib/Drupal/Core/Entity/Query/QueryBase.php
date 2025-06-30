@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Entity\Query;
 
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Utility\TableSort;
@@ -10,7 +9,7 @@ use Drupal\Core\Utility\TableSort;
 /**
  * The base entity query class.
  */
-abstract class QueryBase implements QueryInterface, RefinableCacheableDependencyInterface {
+abstract class QueryBase implements QueryInterface {
 
   use RefinableCacheableDependencyTrait;
 
