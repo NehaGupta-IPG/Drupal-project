@@ -21,24 +21,18 @@ class ClearTest extends BrowserTestBase {
 
   /**
    * The default bin for the cache item.
-   *
-   * @var string
    */
-  protected $defaultBin = 'render';
+  protected string $defaultBin = 'render';
 
   /**
    * The default cache ID.
-   *
-   * @var string
    */
-  protected $defaultCid = 'test_temporary';
+  protected string $defaultCid = 'test_temporary';
 
   /**
    * The cache contents default value.
-   *
-   * @var string
    */
-  protected $defaultValue;
+  protected string $defaultValue;
 
   /**
    * {@inheritdoc}
@@ -70,7 +64,7 @@ class ClearTest extends BrowserTestBase {
   }
 
   /**
-   * Checks whether or not a cache entry exists.
+   * Checks whether a cache entry exists.
    *
    * @param string $cid
    *   The cache id.
@@ -82,7 +76,7 @@ class ClearTest extends BrowserTestBase {
    * @return bool
    *   TRUE on pass, FALSE on fail.
    */
-  protected function checkCacheExists($cid, $var, $bin = NULL): bool {
+  protected function checkCacheExists(string $cid, mixed $var, ?string $bin = NULL): bool {
     if ($bin == NULL) {
       $bin = $this->defaultBin;
     }
@@ -104,7 +98,7 @@ class ClearTest extends BrowserTestBase {
    * @param string|null $bin
    *   The bin the cache item was stored in.
    */
-  protected function assertCacheExists($message, $var = NULL, $cid = NULL, $bin = NULL): void {
+  protected function assertCacheExists($message, ?string $var = NULL, ?string $cid = NULL, ?string $bin = NULL): void {
     if ($bin == NULL) {
       $bin = $this->defaultBin;
     }
@@ -128,7 +122,7 @@ class ClearTest extends BrowserTestBase {
    * @param string|null $bin
    *   The bin the cache item was stored in.
    */
-  public function assertCacheRemoved($message, $cid = NULL, $bin = NULL): void {
+  protected function assertCacheRemoved(string $message, ?string $cid = NULL, ?string $bin = NULL): void {
     if ($bin == NULL) {
       $bin = $this->defaultBin;
     }
