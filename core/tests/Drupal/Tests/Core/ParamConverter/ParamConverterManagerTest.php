@@ -195,7 +195,7 @@ class ParamConverterManagerTest extends UnitTestCase {
     $converter = $this->createMock('Drupal\Core\ParamConverter\ParamConverterInterface');
     $converter->expects($this->any())
       ->method('convert')
-      ->with(1, $this->isType('array'), 'id', $this->isType('array'))
+      ->with(1, $this->isArray(), 'id', $this->isArray())
       ->willReturn('something_better!');
     $this->manager->addConverter($converter, 'test_convert');
 
@@ -241,7 +241,7 @@ class ParamConverterManagerTest extends UnitTestCase {
     $converter = $this->createMock('Drupal\Core\ParamConverter\ParamConverterInterface');
     $converter->expects($this->any())
       ->method('convert')
-      ->with(1, $this->isType('array'), 'id', $this->isType('array'))
+      ->with(1, $this->isArray(), 'id', $this->isArray())
       ->willReturn(NULL);
     $this->manager->addConverter($converter, 'test_convert');
 
