@@ -324,8 +324,6 @@
    */
   behaviors.layoutBuilderToggleContentPreview = {
     attach(context) {
-      const $layoutBuilder = $('#layout-builder');
-
       // The content preview toggle.
       const $layoutBuilderContentPreview = $('#layout-builder-content-preview');
 
@@ -342,65 +340,51 @@
 
       /**
        * Disables content preview in the Layout Builder UI.
-       *
-       * Disabling content preview hides block content. It is replaced with the
-       * value of the block's data-layout-content-preview-placeholder-label
-       * attribute.
-       *
-       * @todo Revisit in https://www.drupal.org/node/3043215, it may be
-       *   possible to remove all but the first line of this function.
        */
       const disableContentPreview = () => {
-        $layoutBuilder.addClass('layout-builder--content-preview-disabled');
-
-        /**
-         * Iterate over all Layout Builder blocks to hide their content and add
-         * placeholder labels.
-         */
-        $('[data-layout-content-preview-placeholder-label]', context).each(
-          (i, element) => {
-            const $element = $(element);
-
-            // Hide everything in block that isn't contextual link related.
-            $element.children(':not([data-contextual-id])').hide(0);
-
-            const contentPreviewPlaceholderText = $element.attr(
-              'data-layout-content-preview-placeholder-label',
-            );
-
-            const contentPreviewPlaceholderLabel = Drupal.theme(
-              'layoutBuilderPrependContentPreviewPlaceholderLabel',
-              contentPreviewPlaceholderText,
-            );
-            $element.prepend(contentPreviewPlaceholderLabel);
-          },
+        $('#layout-builder').addClass(
+          'layout-builder--content-preview-disabled',
         );
+
+        // Hide block content and titles.
+        $(
+          '.layout-builder-block > h2, .layout-builder-block__content-preview-show',
+        ).hide(0);
+
+        // Make placeholder labels visible.
+        $('.layout-builder-block__content-preview-placeholder-label').show(0);
       };
 
       /**
        * Enables content preview in the Layout Builder UI.
-       *
-       * When content preview is enabled, the Layout Builder UI returns to its
-       * default experience. This is accomplished by removing placeholder
-       * labels and un-hiding block content.
-       *
-       * @todo Revisit in https://www.drupal.org/node/3043215, it may be
-       *   possible to remove all but the first line of this function.
        */
       const enableContentPreview = () => {
-        $layoutBuilder.removeClass('layout-builder--content-preview-disabled');
-
-        // Remove all placeholder labels.
-        $('.js-layout-builder-content-preview-placeholder-label').remove();
-
-        // Iterate over all blocks.
-        $('[data-layout-content-preview-placeholder-label]').each(
-          (i, element) => {
-            $(element).children().show();
-          },
+        $('#layout-builder').removeClass(
+          'layout-builder--content-preview-disabled',
         );
+
+        // Make block content and titles visible.
+        $(
+          '.layout-builder-block > h2, .layout-builder-block__content-preview-show',
+        ).show(0);
+
+        // Hide placeholder labels.
+        $('.layout-builder-block__content-preview-placeholder-label').hide();
       };
 
+      /**
+       * On rebuild, see if content preview has been set to disabled. If yes,
+       * disable content preview in the Layout Builder UI.
+       */
+
+      if (!isContentPreview) {
+        $layoutBuilderContentPreview.attr('checked', false);
+        disableContentPreview();
+      } else {
+        enableContentPreview();
+      }
+
+      // Listens for changes in the "Show content preview" checkbox field.
       $('#layout-builder-content-preview', context).on('change', (event) => {
         const isChecked = event.currentTarget.checked;
 
@@ -418,36 +402,7 @@
           );
         }
       });
-
-      /**
-       * On rebuild, see if content preview has been set to disabled. If yes,
-       * disable content preview in the Layout Builder UI.
-       */
-      if (!isContentPreview) {
-        $layoutBuilderContentPreview.attr('checked', false);
-        disableContentPreview();
-      }
     },
-  };
-
-  /**
-   * Creates content preview placeholder label markup.
-   *
-   * @param {string} contentPreviewPlaceholderText
-   *   The text content of the placeholder label
-   *
-   * @return {string}
-   *   A HTML string of the placeholder label.
-   */
-  Drupal.theme.layoutBuilderPrependContentPreviewPlaceholderLabel = (
-    contentPreviewPlaceholderText,
-  ) => {
-    const contentPreviewPlaceholderLabel = document.createElement('div');
-    contentPreviewPlaceholderLabel.className =
-      'layout-builder-block__content-preview-placeholder-label js-layout-builder-content-preview-placeholder-label';
-    contentPreviewPlaceholderLabel.innerHTML = contentPreviewPlaceholderText;
-
-    return `<div class="layout-builder-block__content-preview-placeholder-label js-layout-builder-content-preview-placeholder-label">${contentPreviewPlaceholderText}</div>`;
   };
 
   // Remove all contextual links outside the layout.

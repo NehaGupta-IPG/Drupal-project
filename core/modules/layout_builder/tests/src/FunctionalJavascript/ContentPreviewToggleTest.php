@@ -9,7 +9,7 @@ use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 use Drupal\Tests\system\Traits\OffCanvasTestTrait;
 
-// cspell:ignore blocknodebundle testbody
+// cspell:ignore blocknodebundle testbody testlinks
 
 /**
  * Tests toggling of content preview.
@@ -21,6 +21,56 @@ class ContentPreviewToggleTest extends WebDriverTestBase {
   use ContextualLinkClickTrait;
   use LayoutBuilderSortTrait;
   use OffCanvasTestTrait;
+
+  /**
+   * Placeholder label for the links field block.
+   *
+   * @var \Behat\Mink\Element\NodeElement
+   */
+  protected $linksFieldPlaceholder;
+
+  /**
+   * Placeholder label for the body field block.
+   *
+   * @var \Behat\Mink\Element\NodeElement
+   */
+  protected $bodyFieldPlaceholder;
+
+  /**
+   * The full links field block.
+   *
+   * @var \Behat\Mink\Element\NodeElement
+   */
+  protected $linksBlock;
+
+  /**
+   * The full body field block.
+   *
+   * @var \Behat\Mink\Element\NodeElement
+   */
+  protected $bodyBlock;
+
+  /**
+   * The full search block.
+   *
+   * @var \Behat\Mink\Element\NodeElement
+   */
+  protected $linksBlockContent;
+
+  /**
+   * The content of the body field block.
+   *
+   * @var \Behat\Mink\Element\NodeElement
+   */
+  protected $bodyBlockContent;
+
+  /**
+   * The title label of the links field block.
+   *
+   * @var \Behat\Mink\Element\NodeElement
+   */
+  protected $linksFieldBlockLabel;
+
   /**
    * {@inheritdoc}
    */
@@ -77,14 +127,25 @@ class ContentPreviewToggleTest extends WebDriverTestBase {
     // Open single item layout page.
     $this->drupalGet('node/1/layout');
 
-    // Placeholder label should not be visible, preview content should be.
-    $assert_session->elementNotExists('css', '.layout-builder-block__content-preview-placeholder-label');
-    $assert_session->pageTextContains($content_preview_body_text);
+    $links_field_placeholder_label = '"Links" field';
+    $body_field_placeholder_label = '"Body" field';
 
-    // Disable content preview, confirm presence of placeholder labels.
+    $this->linksFieldPlaceholder = $assert_session->elementExists('css', ".layout-builder-block__content-preview-placeholder-label:contains('$links_field_placeholder_label')");
+    $this->bodyFieldPlaceholder = $assert_session->elementExists('css', ".layout-builder-block__content-preview-placeholder-label:contains('$body_field_placeholder_label')");
+    $this->linksBlock = $assert_session->elementExists('css', '.block-extra-field-blocknodebundle-for-this-particular-testlinks');
+    $this->bodyBlock = $assert_session->elementExists('css', '.block-field-blocknodebundle-for-this-particular-testbody');
+    $this->linksBlockContent = $assert_session->elementExists('css', '.block-extra-field-blocknodebundle-for-this-particular-testlinks .layout-builder-block__content-preview-show');
+    $this->bodyBlockContent = $assert_session->elementExists('css', '.block-field-blocknodebundle-for-this-particular-testbody .layout-builder-block__content-preview-show');
+    $this->setBlockLabel('.block-extra-field-blocknodebundle-for-this-particular-testlinks', 'A block label for links');
+    $this->linksFieldBlockLabel = $assert_session->elementExists('css', '.block-extra-field-blocknodebundle-for-this-particular-testlinks > h2');
+
+    $this->assertContentPreviewEnabled();
+
+    // Disable content preview.
     $this->assertTrue($page->hasCheckedField('layout-builder-content-preview'));
     $page->uncheckField('layout-builder-content-preview');
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.layout-builder-block__content-preview-placeholder-label'));
+    $this->assertContentPreviewDisabled();
 
     // Confirm that block content is not on page.
     $assert_session->pageTextNotContains($content_preview_body_text);
@@ -93,15 +154,18 @@ class ContentPreviewToggleTest extends WebDriverTestBase {
     // Check that content preview is still disabled on page reload.
     $this->getSession()->reload();
     $this->assertNotEmpty($assert_session->waitForElement('css', '.layout-builder-block__content-preview-placeholder-label'));
-    $assert_session->pageTextNotContains($content_preview_body_text);
+    $this->assertContentPreviewDisabled();
     $this->assertContextualLinks();
 
     // Confirm repositioning blocks works with content preview disabled.
-    $this->assertOrderInPage([$links_field_placeholder_label, $body_field_placeholder_label]);
+    $this->assertOrderInPage([
+      $this->linksBlock,
+      $this->bodyBlock,
+    ]);
 
     $region_content = '.layout__region--content';
-    $links_block = "[data-layout-content-preview-placeholder-label='$links_field_placeholder_label']";
-    $body_block = "[data-layout-content-preview-placeholder-label='$body_field_placeholder_label']";
+    $links_block = ".block-extra-field-blocknodebundle-for-this-particular-testlinks";
+    $body_block = ".block-field-blocknodebundle-for-this-particular-testbody";
 
     $assert_session->elementExists('css', $links_block . " div");
     $assert_session->elementExists('css', $body_block . " div");
@@ -110,10 +174,13 @@ class ContentPreviewToggleTest extends WebDriverTestBase {
     $assert_session->assertWaitOnAjaxRequest();
 
     // Check that the drag-triggered rebuild did not trigger content preview.
-    $assert_session->pageTextNotContains($content_preview_body_text);
+    $this->assertContentPreviewDisabled();
 
     // Check that drag successfully repositioned blocks.
-    $this->assertOrderInPage([$body_field_placeholder_label, $links_field_placeholder_label]);
+    $this->assertOrderInPage([
+      $this->bodyBlock,
+      $this->linksBlock,
+    ]);
 
     // Check if block position maintained after enabling content preview.
     $this->assertTrue($page->hasUncheckedField('layout-builder-content-preview'));
@@ -121,7 +188,29 @@ class ContentPreviewToggleTest extends WebDriverTestBase {
     $this->assertNotEmpty($assert_session->waitForText($content_preview_body_text));
     $assert_session->pageTextContains($content_preview_body_text);
     $this->assertNotEmpty($assert_session->waitForText('Placeholder for the "Links" field'));
-    $this->assertOrderInPage([$content_preview_body_text, 'Placeholder for the "Links" field']);
+    $this->assertContentPreviewEnabled();
+    $this->assertOrderInPage([
+      $this->bodyBlock,
+      $this->linksBlock,
+    ]);
+  }
+
+  /**
+   * Enables and sets the block label.
+   */
+  protected function setBlockLabel($selector, $label): void {
+    $page = $this->getSession()->getPage();
+    $assert_session = $this->assertSession();
+
+    $this->clickContextualLink($selector, 'Configure');
+    $this->assertNotEmpty($assert_session->waitForElement('css', "#drupal-off-canvas"));
+    $this->assertSession()->assertWaitOnAjaxRequest();
+
+    $page->fillField('settings[label]', $label);
+    $page->checkField('settings[label_display]');
+    $page->pressButton('Update');
+    $this->assertSession()->assertNoElementAfterWait('css', '#drupal-off-canvas', '10000');
+    $this->assertSession()->assertWaitOnAjaxRequest();
   }
 
   /**
@@ -152,15 +241,38 @@ class ContentPreviewToggleTest extends WebDriverTestBase {
   protected function assertOrderInPage(array $items): void {
     $session = $this->getSession();
     $page = $session->getPage();
-    $blocks = $page->findAll('css', '[data-layout-content-preview-placeholder-label]');
+    $blocks = $page->findAll('css', '.layout-builder-block');
 
-    // Filter will only return value if block contains expected text.
-    $blocks_with_expected_text = array_filter($blocks, function ($block, $key) use ($items) {
-      $block_text = $block->getText();
-      return str_contains($block_text, $items[$key]);
-    }, ARRAY_FILTER_USE_BOTH);
+    // Confirm block order by comparing expected UUIDs to those found.
+    $blocks_that_match_items = array_filter($blocks, function ($block) use ($items) {
+      $block_uuid = $block->getAttribute('data-layout-block-uuid');
+        return in_array($block_uuid, array_map(function ($item) {
+          return $item->getAttribute('data-layout-block-uuid');
+        }, $items), TRUE);
+    });
 
-    $this->assertSameSize($items, $blocks_with_expected_text);
+    $this->assertCount(count($items), $blocks_that_match_items);
+  }
+
+  /**
+   * Checks if content preview is disabled.
+   */
+  protected function assertContentPreviewDisabled(): void {
+    $this->assertTrue($this->linksFieldPlaceholder->isVisible());
+    $this->assertTrue($this->bodyFieldPlaceholder->isVisible());
+    $this->assertFalse($this->bodyBlockContent->isVisible());
+    $this->assertFalse($this->linksBlockContent->isVisible());
+    $this->assertFalse($this->linksFieldBlockLabel->isVisible());
+  }
+
+  /**
+   * Checks if content preview is enabled.
+   */
+  protected function assertContentPreviewEnabled(): void {
+    $this->assertFalse($this->linksFieldPlaceholder->isVisible());
+    $this->assertFalse($this->bodyFieldPlaceholder->isVisible());
+    $this->assertTrue($this->linksBlockContent->isVisible());
+    $this->assertTrue($this->linksFieldBlockLabel->isVisible());
   }
 
 }

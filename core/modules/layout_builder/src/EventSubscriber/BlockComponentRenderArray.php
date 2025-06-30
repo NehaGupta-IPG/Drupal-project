@@ -12,8 +12,8 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\layout_builder\Access\LayoutPreviewAccessAllowed;
 use Drupal\layout_builder\Event\SectionComponentBuildRenderArrayEvent;
-use Drupal\layout_builder\Plugin\Block\InlineBlock;
 use Drupal\layout_builder\LayoutBuilderEvents;
+use Drupal\layout_builder\Plugin\Block\InlineBlock;
 use Drupal\views\Plugin\Block\ViewsBlock;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -121,6 +121,38 @@ class BlockComponentRenderArray implements EventSubscriberInterface {
         return;
       }
 
+      if ($event->inPreview()) {
+        // @todo Use new label methods so the content preview placeholder label
+        //   doesn't have to use preview fallback in
+        //   https://www.drupal.org/node/2025649.
+        if ($block instanceof PreviewFallbackInterface) {
+          $content_preview_placeholder_string = $block->getPreviewFallbackString();
+        }
+        else {
+          $content_preview_placeholder_string = $this->t('"@block" block', ['@block' => $block->label()]);
+        }
+
+        // Placeholder label is added as prefix so it is adjacent to the theme
+        // wrapper. This makes it possible to toggle visibility with css rules.
+        $pre_existing_prefix = $content['#prefix'] ?? '';
+        $content['#prefix'] = "$pre_existing_prefix<div class=\"layout-builder-block__content-preview-placeholder-label\">$content_preview_placeholder_string</div>";
+
+        // If the block content has existing classes, copy them to the wrapper.
+        // This is necessary for some blocks, such as Search form.
+        $wrapper_classes = isset($content['#attributes']['class']) && is_array($content['#attributes']['class']) ? $content['#attributes']['class'] : [];
+        $wrapper_classes[] = 'layout-builder-block__content-preview-show';
+
+        // In preview, block content is wrapped in an additional div that makes
+        // it easier to toggle content preview.
+        $content['#theme_wrappers'] = [
+          'container' => [
+            '#attributes' => [
+              'class' => $wrapper_classes,
+            ],
+          ],
+        ];
+      }
+
       $build = [
         // @todo Move this to BlockBase in https://www.drupal.org/node/2931040.
         '#theme' => 'block',
@@ -130,6 +162,7 @@ class BlockComponentRenderArray implements EventSubscriberInterface {
         '#derivative_plugin_id' => $block->getDerivativeId(),
         '#in_preview' => $event->inPreview(),
         '#weight' => $event->getComponent()->getWeight(),
+        'content' => $content,
       ];
 
       // Place the $content returned by the block plugin into a 'content' child
@@ -156,19 +189,10 @@ class BlockComponentRenderArray implements EventSubscriberInterface {
       $build['content'] = $content;
 
       if ($event->inPreview()) {
-        if ($block instanceof PreviewFallbackInterface) {
-          $preview_fallback_string = $block->getPreviewFallbackString();
-        }
-        else {
-          $preview_fallback_string = $this->t('"@block" block', ['@block' => $block->label()]);
-        }
-        // @todo Use new label methods so
-        //   data-layout-content-preview-placeholder-label doesn't have to use
-        //   preview fallback in https://www.drupal.org/node/2025649.
-        $build['#attributes']['data-layout-content-preview-placeholder-label'] = $preview_fallback_string;
-
         if ($is_content_empty && $is_placeholder_ready) {
-          $build['content']['#markup'] = $this->t('Placeholder for the @preview_fallback', ['@preview_fallback' => $block->getPreviewFallbackString()]);
+          $build['content']['#type'] = 'container';
+          $build['content']['#markup'] = (string) $this->t('Placeholder for the @preview_fallback', ['@preview_fallback' => $block->getPreviewFallbackString()]);
+          $build['content']['#attributes']['class'] = ['layout-builder-block__content-preview-show'];
         }
       }
 

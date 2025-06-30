@@ -107,6 +107,7 @@
 }
 
 .layout-builder-block__content-preview-placeholder-label {
+  display: none;
   margin: 0;
   text-align: center;
   font-size: 1.429em;
