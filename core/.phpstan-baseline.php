@@ -49576,13 +49576,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/ParamConverter/EntityRevisionParamConverterTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to deprecated method isType\\(\\) of class PHPUnit\\\\Framework\\\\Assert\\:
-https\\://github\\.com/sebastianbergmann/phpunit/issues/6052$#',
-	'identifier' => 'staticMethod.deprecated',
-	'count' => 4,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/ParamConverter/ParamConverterManagerTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\ParamConverter\\\\ParamConverterManagerTest\\:\\:providerTestSetRouteParameterConverters\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
