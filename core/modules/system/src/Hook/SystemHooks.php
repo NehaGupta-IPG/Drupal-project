@@ -245,7 +245,7 @@ class SystemHooks {
     if ($route_match instanceof StackedRouteMatchInterface) {
       $route_match = $route_match->getMasterRouteMatch();
     }
-    $current_path = $route_match->getRouteName() ? Url::fromRouteMatch($route_match)->getInternalPath() : '';
+    $current_path = $route_match->getRouteObject() ? Url::fromRouteMatch($route_match)->getInternalPath() : '';
     $current_path_is_admin = \Drupal::service('router.admin_context')->isAdminRoute($route_match->getRouteObject());
     $path_settings = [
       'baseUrl' => $request->getBaseUrl() . '/',
@@ -452,8 +452,7 @@ class SystemHooks {
     $admin_context = \Drupal::service('router.admin_context');
     if ($admin_context->isAdminRoute() && \Drupal::currentUser()->hasPermission('administer site configuration')) {
       $route_match = \Drupal::routeMatch();
-      $route_name = $route_match->getRouteName();
-      if ($route_name !== 'system.status' && \Drupal::config('system.advisories')->get('enabled')) {
+      if (!$route_match->isRouteName('system.status') && \Drupal::config('system.advisories')->get('enabled')) {
         /** @var \Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher $fetcher */
         $fetcher = \Drupal::service('system.sa_fetcher');
         $advisories = $fetcher->getSecurityAdvisories(FALSE);

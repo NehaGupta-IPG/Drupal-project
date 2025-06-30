@@ -128,18 +128,16 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
         // - on AJAX requests.
         // - on Iframe uploads.
         // - on the maintenance mode settings page.
-        if ($route_match->getRouteName() != 'system.site_maintenance_mode') {
-          $show_message = $route_match->getRouteName() != 'system.site_maintenance_mode' &&
-            !$event->getRequest()->isXmlHttpRequest() &&
-            $event->getRequest()->get('ajax_iframe_upload', FALSE) === FALSE;
+        $show_message = !$route_match->isRouteName('system.site_maintenance_mode')
+          && !$event->getRequest()->isXmlHttpRequest()
+          && $event->getRequest()->get('ajax_iframe_upload', FALSE) === FALSE;
 
-          if ($show_message) {
-            if ($this->account->hasPermission('administer site configuration')) {
-              $this->messenger->addMessage($this->t('Operating in maintenance mode. <a href=":url">Go online.</a>', [':url' => $this->urlGenerator->generate('system.site_maintenance_mode')]), 'status', FALSE);
-            }
-            else {
-              $this->messenger->addMessage($this->t('Operating in maintenance mode.'), 'status', FALSE);
-            }
+        if ($show_message) {
+          if ($this->account->hasPermission('administer site configuration')) {
+            $this->messenger->addMessage($this->t('Operating in maintenance mode. <a href=":url">Go online.</a>', [':url' => $this->urlGenerator->generate('system.site_maintenance_mode')]), 'status', FALSE);
+          }
+          else {
+            $this->messenger->addMessage($this->t('Operating in maintenance mode.'), 'status', FALSE);
           }
         }
       }

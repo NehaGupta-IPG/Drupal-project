@@ -94,7 +94,7 @@ class PathMatcher implements PathMatcherInterface {
       $this->isCurrentFrontPage = FALSE;
       // Ensure that the code can also be executed when there is no active
       // route match, like on exception responses.
-      if ($this->routeMatch->getRouteName()) {
+      if ($this->routeMatch->getRouteObject()) {
         $url = Url::fromRouteMatch($this->routeMatch);
         $this->isCurrentFrontPage = ($url->getRouteName() && '/' . $url->getInternalPath() === $this->getFrontPagePath());
       }

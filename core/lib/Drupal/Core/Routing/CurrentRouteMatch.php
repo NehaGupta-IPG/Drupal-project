@@ -45,6 +45,13 @@ class CurrentRouteMatch implements ResettableStackedRouteMatchInterface {
   /**
    * {@inheritdoc}
    */
+  public function isRouteName(string|array $value, RouteName $operator = RouteName::Equals): bool {
+    return $this->getCurrentRouteMatch()->isRouteName($value, $operator);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getRouteObject() {
     return $this->getCurrentRouteMatch()->getRouteObject();
   }

@@ -183,7 +183,7 @@ function shortcut_preprocess_page_title(&$variables): void {
     $shortcuts = \Drupal::entityTypeManager()->getStorage('shortcut')->loadByProperties(['shortcut_set' => $shortcut_set->id()]);
     /** @var \Drupal\shortcut\ShortcutInterface $shortcut */
     foreach ($shortcuts as $shortcut) {
-      if (($shortcut_url = $shortcut->getUrl()) && $shortcut_url->isRouted() && $shortcut_url->getRouteName() == $route_match->getRouteName() && $shortcut_url->getRouteParameters() == $route_match->getRawParameters()->all()) {
+      if (($shortcut_url = $shortcut->getUrl()) && $shortcut_url->isRouted() && $route_match->isRouteName($shortcut_url->getRouteName()) && $shortcut_url->getRouteParameters() == $route_match->getRawParameters()->all()) {
         $shortcut_id = $shortcut->id();
         break;
       }

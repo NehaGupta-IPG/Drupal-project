@@ -8,6 +8,7 @@ use Drupal\content_moderation\ContentPreprocess;
 use Drupal\Core\Routing\CurrentRouteMatch;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\UnitTestCase;
+use Prophecy\Argument;
 
 /**
  * @coversDefaultClass \Drupal\content_moderation\ContentPreprocess
@@ -50,7 +51,7 @@ class ContentPreprocessTest extends UnitTestCase {
    */
   protected function setupCurrentRouteMatch($route_name, $nid) {
     $route_match = $this->prophesize(CurrentRouteMatch::class);
-    $route_match->getRouteName()->willReturn($route_name);
+    $route_match->isRouteName(Argument::any())->willReturn($route_name === 'entity.node.latest_version');
     $route_match->getParameter('node')->willReturn($this->setupNode($nid));
 
     return $route_match->reveal();

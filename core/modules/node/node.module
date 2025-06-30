@@ -202,7 +202,7 @@ function node_add_body_field(NodeTypeInterface $type, $label = 'Body') {
  */
 function node_is_page(NodeInterface $node) {
   $route_match = \Drupal::routeMatch();
-  if ($route_match->getRouteName() == 'entity.node.canonical') {
+  if ($route_match->isRouteName('entity.node.canonical')) {
     $page_node = $route_match->getParameter('node');
   }
   return (!empty($page_node) ? $page_node->id() == $node->id() : FALSE);

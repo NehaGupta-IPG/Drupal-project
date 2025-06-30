@@ -43,7 +43,7 @@ class DbUpdateNegotiator implements ThemeNegotiatorInterface {
    * {@inheritdoc}
    */
   public function applies(RouteMatchInterface $route_match) {
-    return $route_match->getRouteName() == 'system.db_update';
+    return $route_match->isRouteName('system.db_update');
   }
 
   /**

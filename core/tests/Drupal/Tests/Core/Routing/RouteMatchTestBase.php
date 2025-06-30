@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Routing;
 
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Routing\RouteName;
 use Drupal\Tests\UnitTestCase;
 use Symfony\Component\Routing\Route;
 
@@ -87,6 +88,18 @@ abstract class RouteMatchTestBase extends UnitTestCase {
    */
   public function testGetRouteName(RouteMatchInterface $route_match): void {
     $this->assertSame('test_route', $route_match->getRouteName());
+  }
+
+  /**
+   * @covers ::isRouteName
+   * @dataProvider routeMatchProvider
+   */
+  public function testIsRouteName(RouteMatchInterface $route_match): void {
+    $this->assertTrue($route_match->isRouteName('test_route'));
+    $this->assertTrue($route_match->isRouteName('test_', RouteName::StartsWith));
+    $this->assertTrue($route_match->isRouteName('t_r', RouteName::Contains));
+    $this->assertTrue($route_match->isRouteName('_route', RouteName::EndsWith));
+    $this->assertTrue($route_match->isRouteName(['test_route'], RouteName::In));
   }
 
   /**

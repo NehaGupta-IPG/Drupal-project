@@ -299,7 +299,7 @@ class MenuUiHooks {
   public function systemBreadcrumbAlter(Breadcrumb $breadcrumb, RouteMatchInterface $route_match, array $context): void {
     // Custom breadcrumb behavior for editing menu links, we append a link to
     // the menu in which the link is found.
-    if ($route_match->getRouteName() == 'menu_ui.link_edit' && ($menu_link = $route_match->getParameter('menu_link_plugin'))) {
+    if ($route_match->isRouteName('menu_ui.link_edit') && ($menu_link = $route_match->getParameter('menu_link_plugin'))) {
       if ($menu_link instanceof MenuLinkInterface) {
         // Add a link to the menu admin screen.
         $menu = Menu::load($menu_link->getMenuName());

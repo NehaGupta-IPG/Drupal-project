@@ -14,7 +14,7 @@ class AdminDemoNegotiator implements ThemeNegotiatorInterface {
    * {@inheritdoc}
    */
   public function applies(RouteMatchInterface $route_match) {
-    return $route_match->getRouteName() == 'block.admin_demo';
+    return $route_match->isRouteName('block.admin_demo');
   }
 
   /**

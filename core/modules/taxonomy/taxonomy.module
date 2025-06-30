@@ -83,7 +83,7 @@ function template_preprocess_taxonomy_term(&$variables): void {
  *   A taxonomy term entity.
  */
 function taxonomy_term_is_page(Term $term) {
-  if (\Drupal::routeMatch()->getRouteName() == 'entity.taxonomy_term.canonical' && $page_term_id = \Drupal::routeMatch()->getRawParameter('taxonomy_term')) {
+  if (\Drupal::routeMatch()->isRouteName('entity.taxonomy_term.canonical') && $page_term_id = \Drupal::routeMatch()->getRawParameter('taxonomy_term')) {
     return $page_term_id == $term->id();
   }
   return FALSE;

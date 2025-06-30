@@ -59,7 +59,7 @@ class ThemeTestSubscriber implements EventSubscriberInterface {
    * @see \Drupal\system\Tests\Theme\ThemeEarlyInitializationTest::testRequestListener()
    */
   public function onRequest(RequestEvent $event) {
-    if ($this->currentRouteMatch->getRouteName() === 'theme_test.request_listener') {
+    if ($this->currentRouteMatch->isRouteName('theme_test.request_listener')) {
       // First, force the theme registry to be rebuilt on this page request.
       // This allows us to test a full initialization of the theme system in
       // the code below.
@@ -82,12 +82,7 @@ class ThemeTestSubscriber implements EventSubscriberInterface {
    * Ensures that the theme registry was not initialized.
    */
   public function onView(RequestEvent $event) {
-    $current_route = $this->currentRouteMatch->getRouteName();
-    $entity_autocomplete_route = [
-      'system.entity_autocomplete',
-    ];
-
-    if (in_array($current_route, $entity_autocomplete_route)) {
+    if ($this->currentRouteMatch->isRouteName('system.entity_autocomplete')) {
       if ($this->container->initialized('theme.registry')) {
         throw new \Exception('registry initialized');
       }

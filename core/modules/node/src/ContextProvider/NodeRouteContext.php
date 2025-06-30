@@ -54,7 +54,7 @@ class NodeRouteContext implements ContextProviderInterface {
       elseif (isset($route_contexts['node_preview']) && $node = $this->routeMatch->getParameter('node_preview')) {
         $value = $node;
       }
-      elseif ($this->routeMatch->getRouteName() == 'node.add') {
+      elseif ($this->routeMatch->isRouteName('node.add')) {
         $node_type = $this->routeMatch->getParameter('node_type');
         $value = Node::create(['type' => $node_type->id()]);
       }

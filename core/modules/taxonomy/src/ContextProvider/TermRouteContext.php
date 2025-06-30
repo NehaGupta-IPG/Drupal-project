@@ -48,7 +48,7 @@ class TermRouteContext implements ContextProviderInterface {
       if (isset($route_parameters['taxonomy_term']) && $term = $this->routeMatch->getParameter('taxonomy_term')) {
         $value = $term;
       }
-      elseif ($this->routeMatch->getRouteName() == 'entity.taxonomy_term.add_form') {
+      elseif ($this->routeMatch->isRouteName('entity.taxonomy_term.add_form')) {
         $vocabulary = $this->routeMatch->getParameter('taxonomy_vocabulary');
         $value = Term::create(['vid' => $vocabulary->id()]);
       }

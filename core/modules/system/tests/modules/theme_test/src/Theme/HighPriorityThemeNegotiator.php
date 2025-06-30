@@ -16,7 +16,7 @@ class HighPriorityThemeNegotiator implements ThemeNegotiatorInterface {
    * {@inheritdoc}
    */
   public function applies(RouteMatchInterface $route_match) {
-    return ($route_match->getRouteName() == 'theme_test.priority');
+    return ($route_match->isRouteName('theme_test.priority'));
   }
 
   /**

@@ -102,6 +102,25 @@ class RouteMatch implements RouteMatchInterface {
   /**
    * {@inheritdoc}
    */
+  public function isRouteName(string|array $value, RouteName $operator = RouteName::Equals): bool {
+    if (is_array($value) && $operator !== RouteName::In) {
+      throw new \InvalidArgumentException('$operator must be RouteName::In when $value is an array.');
+    }
+
+    // @todo Check $value for deprecated route names.
+
+    return match ($operator) {
+      RouteName::Equals => $this->routeName === $value,
+      RouteName::StartsWith => str_starts_with($this->routeName, $value),
+      RouteName::Contains => str_contains($this->routeName, $value),
+      RouteName::EndsWith => str_ends_with($this->routeName, $value),
+      RouteName::In => in_array($this->routeName, $value, TRUE),
+    };
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getRouteObject() {
     return $this->route;
   }

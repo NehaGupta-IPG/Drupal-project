@@ -24,7 +24,7 @@ class HelpBreadcrumbBuilder implements BreadcrumbBuilderInterface {
     // @todo Remove null safe operator in Drupal 12.0.0, see
     //   https://www.drupal.org/project/drupal/issues/3459277.
     $cacheable_metadata?->addCacheContexts(['route']);
-    return $route_match->getRouteName() == 'help.help_topic';
+    return $route_match->isRouteName('help.help_topic');
   }
 
   /**
