@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Recipe;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -18,6 +19,7 @@ use Symfony\Component\Console\Style\StyleInterface;
  *   This API is experimental.
  */
 final class ConsoleInputCollector implements InputCollectorInterface {
+  use StringTranslationTrait;
 
   /**
    * The name of the command-line option for passing input values.
@@ -99,6 +101,11 @@ final class ConsoleInputCollector implements InputCollectorInterface {
       $arguments += [
         'default' => $default_value,
       ];
+    }
+
+    // Methods that take a 'question' argument: ask, askHidden, confirm, choice.
+    if (!empty($arguments['question'])) {
+      $arguments['question'] = is_string($arguments['question']) ? (string)$this->t($arguments['question']) : (string)$arguments['question'];
     }
 
     // We don't support using Symfony Console's inline validation; instead,
