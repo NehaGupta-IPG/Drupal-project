@@ -290,7 +290,7 @@ class AssetResolverTest extends UnitTestCase {
       $this->assertSame($value['items'], $group_b[$key]['items']);
     }
   }
-  
+
   public function testDrupalSettingsOnlyLibrary() {
     $library_discovery = $this->createMock(LibraryDiscoveryInterface::class);
     $library_dependency_resolver = $this->createMock(LibraryDependencyResolverInterface::class);
@@ -299,7 +299,7 @@ class AssetResolverTest extends UnitTestCase {
     $language_manager = $this->createMock(LanguageManagerInterface::class);
     $cache = $this->createMock(CacheBackendInterface::class);
     $theme_handler = $this->createMock(ThemeHandlerInterface::class);
-  
+
     // Simulate a library that has only drupalSettings and no js/css.
     $library_discovery->method('getLibraryByName')->willReturn([
       'drupalSettings' => [
@@ -308,13 +308,13 @@ class AssetResolverTest extends UnitTestCase {
         ],
       ],
     ]);
-  
+
     $library_dependency_resolver->method('getLibrariesWithDependencies')->willReturn(['core/my_settings']);
     $library_dependency_resolver->method('getMinimalRepresentativeSubset')->willReturn(['core/my_settings']);
-  
+
     $assets = new AttachedAssets();
     $assets->setLibraries(['core/my_settings']);
-  
+
     $resolver = new AssetResolver(
       $library_discovery,
       $library_dependency_resolver,
@@ -324,10 +324,10 @@ class AssetResolverTest extends UnitTestCase {
       $cache,
       $theme_handler
     );
-  
+
     $result = (new \ReflectionMethod(AssetResolver::class, 'getJsSettingsAssets'))
       ->invoke($resolver, $assets);
-  
+
     $this->assertArrayHasKey('myModule', $result);
     $this->assertSame('bar', $result['myModule']['foo']);
   }
