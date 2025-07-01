@@ -77,7 +77,7 @@ class GlobalAreaDependencyTest extends ViewTestBase {
     $this->assertStringContainsString('Node from Child View', $output, 'The child view results are not rendering when the "Display even if view has no result" option is turned on.');
     $view->destroy();
 
-    // Creating node(unpublished) for redneering from Parent view.
+    // Creating node(unpublished) for Parent view.
     Node::create(['type' => 'page', 'title' => 'Node from Parent View', 'status' => 0])->save();
 
     // Parent view has results.
