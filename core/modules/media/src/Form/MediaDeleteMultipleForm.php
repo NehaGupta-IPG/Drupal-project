@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\media_file_delete\Form;
+namespace Drupal\media\Form;
 
 use Drupal\Core\Entity\Form\DeleteMultipleForm;
 use Drupal\Core\Form\FormStateInterface;
@@ -62,24 +62,25 @@ class MediaDeleteMultipleForm extends DeleteMultipleForm {
         if ($entity instanceof MediaInterface && $entity->access('delete', $this->currentUser)) {
           $source = $entity->getSource();
           $file = $source instanceof FileSourceInterface ? $source->getFile($entity) : NULL;
-          if ($file) {
-            if (!$file->access('delete', $this->currentUser)) {
-              $file_inaccessible_count++;
-              continue;
-            }
-
-            $usages = $this->usage->countUsage($file);
-            if ($usages > 0) {
-              $file_in_use_count++;
-              continue;
-            }
-
-            $file->delete();
-            $this->logger('media_file_delete')->notice('Deleted the associated file %name.', [
-              '%name' => $file->getFilename(),
-            ]);
-            $file_deleted_count++;
+          if (empty($file)) {
+            continue;
           }
+          if (!$file->access('delete', $this->currentUser)) {
+            $file_inaccessible_count++;
+            continue;
+          }
+
+          $usages = $this->usage->countUsage($file);
+          if ($usages > 0) {
+            $file_in_use_count++;
+            continue;
+          }
+
+          $file->delete();
+          $this->logger('media')->notice('Deleted the associated file %name.', [
+            '%name' => $file->getFilename(),
+          ]);
+          $file_deleted_count++;
         }
       }
 
