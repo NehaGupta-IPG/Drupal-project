@@ -176,7 +176,7 @@ class EntityOperations implements ContainerInjectionInterface {
         'content_entity_id' => $entity->id(),
         // Make sure that the moderation state entity has the same language code
         // as the moderated entity.
-        'langcode' => $entity->language()->getId(),
+        'langcode' => $entity->getUntranslated()->language()->getId(),
       ]);
       $content_moderation_state->workflow->target_id = $workflow->id();
     }
@@ -188,9 +188,19 @@ class EntityOperations implements ContainerInjectionInterface {
         $content_moderation_state->langcode = $entity_langcode;
       }
       else {
+        // Make sure that moderation state default language matches with
+        // entity default language (which can be changed).
+        $entity_default_language = $entity->getUntranslated()->language()->getId();
+        $moderation_state_default_language = $content_moderation_state->getUntranslated()->language()->getId();
+        if ($entity_default_language != $moderation_state_default_language) {
+          $content_moderation_state->langcode = $entity_default_language;
+        }
+
+        // Create translation, if it doesn't exist yet.
         if (!$content_moderation_state->hasTranslation($entity_langcode)) {
           $content_moderation_state->addTranslation($entity_langcode);
         }
+        // Load current translation.
         if ($content_moderation_state->language()->getId() !== $entity_langcode) {
           $content_moderation_state = $content_moderation_state->getTranslation($entity_langcode);
         }
