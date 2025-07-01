@@ -133,7 +133,7 @@ final class Requirement implements \ArrayAccess {
    * This is for BC support only.
    */
   public function offsetGet($offset): mixed {
-    @trigger_error('Getting values using array access is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use the getter methods instead. See https://www.drupal.org/node/3410939', \E_USER_DEPRECATED);
+    @trigger_error(sprintf('Getting \'%s\' using array access is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use the getter methods instead. See https://www.drupal.org/node/3410939', $offset), \E_USER_DEPRECATED);
     return match ($offset) {
       'description' => $this->getDescription(),
       'title' => $this->getTitle(),
@@ -150,7 +150,7 @@ final class Requirement implements \ArrayAccess {
    * This is for BC support only.
    */
   public function offsetSet($offset, $value): void {
-    @trigger_error('Setting values using array access is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use the setter methods instead. See https://www.drupal.org/node/3410939', \E_USER_DEPRECATED);
+    @trigger_error(sprintf('Setting \'%s\' using array access is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use the setter methods instead. See https://www.drupal.org/node/3410939', $offset), \E_USER_DEPRECATED);
     switch ($offset) {
       case 'description':
         $this->description = $value;

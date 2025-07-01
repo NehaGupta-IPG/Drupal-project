@@ -615,8 +615,8 @@ class SystemRequirements implements InstallRequirementsInterface {
           ],
         ];
 
-        $requirements['php_memory_limit']['description'] = $description;
-        $requirements['php_memory_limit']['severity'] = RequirementSeverity::Warning;
+        $requirements['php_memory_limit']->setDescription($description)
+          ->setSeverity(RequirementSeverity::Warning);
       }
     }
 
@@ -738,7 +738,8 @@ class SystemRequirements implements InstallRequirementsInterface {
         severity: $severity,
       );
       if ($severity != RequirementSeverity::Info) {
-        $requirements['cron']['description'][] = [
+        $desc = $requirements['cron']->getDescription();
+        $desc[] = [
           [
             '#markup' => t('Cron has not run recently.'),
             '#suffix' => ' ',
@@ -749,7 +750,7 @@ class SystemRequirements implements InstallRequirementsInterface {
           ],
         ];
       }
-      $requirements['cron']['description'][] = [
+      $desc[] = [
         [
           '#type' => 'link',
           '#prefix' => '(',
@@ -765,6 +766,7 @@ class SystemRequirements implements InstallRequirementsInterface {
           '#url' => Url::fromRoute('system.run_cron'),
         ],
       ];
+      $requirements['cron']->setDescription($desc);
     }
     if ($phase != 'install') {
       $directories = [
@@ -853,7 +855,7 @@ class SystemRequirements implements InstallRequirementsInterface {
       $is_directory = is_dir($directory);
       if (!$is_writable || !$is_directory) {
         $description = '';
-        $requirements['file system']['value'] = t('Not writable');
+        $requirements['file system']->setValue(t('Not writable'));
         if (!$is_directory) {
           $error = t('The directory %directory does not exist.', ['%directory' => $directory]);
         }
@@ -869,7 +871,7 @@ class SystemRequirements implements InstallRequirementsInterface {
           // For the installer UI, we need different wording. 'value' will
           // be treated as version, so provide none there.
           $description = t('An automated attempt to create this directory failed, possibly due to a permissions problem. To proceed with the installation, either create the directory and modify its permissions manually or ensure that the installer has the permissions to create it automatically. For more information, see INSTALL.txt or the <a href=":handbook_url">online handbook</a>.', [':handbook_url' => 'https://www.drupal.org/server-permissions']);
-          $requirements['file system']['value'] = '';
+          $requirements['file system']->setValue('');
         }
         if (!empty($description)) {
           $description = [
@@ -888,10 +890,10 @@ class SystemRequirements implements InstallRequirementsInterface {
         // This function can be called before the config_cache table has been
         // created.
         if ($phase == 'install' || \Drupal::config('system.file')->get('default_scheme') == 'public') {
-          $requirements['file system']['value'] = t('Writable (<em>public</em> download method)');
+          $requirements['file system']->setValue(t('Writable (<em>public</em> download method)'));
         }
         else {
-          $requirements['file system']['value'] = t('Writable (<em>private</em> download method)');
+          $requirements['file system']->setValue(t('Writable (<em>private</em> download method)'));
         }
       }
     }
@@ -927,9 +929,11 @@ class SystemRequirements implements InstallRequirementsInterface {
       }
 
       if ($has_pending_updates) {
-        $requirements['update']['severity'] = RequirementSeverity::Error;
-        $requirements['update']['value'] = t('Out of date');
-        $requirements['update']['description'] = t('Some modules have database schema updates to install. You should run the <a href=":update">database update script</a> immediately.', [':update' => Url::fromRoute('system.db_update')->toString()]);
+        $requirements['update']->setSeverity(RequirementSeverity::Error)
+          ->setValue(t('Out of date'))
+          ->setDescription(t('Some modules have database schema updates to install. You should run the <a href=":update">database update script</a> immediately.', [
+            ':update' => Url::fromRoute('system.db_update')->toString(),
+          ]));
       }
 
       $requirements['entity_update'] = new Requirement(
@@ -949,9 +953,9 @@ class SystemRequirements implements InstallRequirementsInterface {
         }
 
         $entity_update_issues = \Drupal::service('renderer')->renderInIsolation($build);
-        $requirements['entity_update']['severity'] = RequirementSeverity::Error;
-        $requirements['entity_update']['value'] = t('Mismatched entity and/or field definitions');
-        $requirements['entity_update']['description'] = t('The following changes were detected in the entity type and field definitions. @updates', ['@updates' => $entity_update_issues]);
+        $requirements['entity_update']->setSeverity(RequirementSeverity::Error)
+          ->setValue(t('Mismatched entity and/or field definitions'))
+          ->setDescription(t('The following changes were detected in the entity type and field definitions. @updates', ['@updates' => $entity_update_issues]));
       }
     }
 
@@ -1271,11 +1275,11 @@ class SystemRequirements implements InstallRequirementsInterface {
     );
     switch ($failed_check) {
       case 'mb_strlen':
-        $requirements['unicode']['description'] = t('Operations on Unicode strings are emulated on a best-effort basis. Install the <a href="http://php.net/mbstring">PHP mbstring extension</a> for improved Unicode support.');
+        $requirements['unicode']->setDescription(t('Operations on Unicode strings are emulated on a best-effort basis. Install the <a href="http://php.net/mbstring">PHP mbstring extension</a> for improved Unicode support.'));
         break;
 
       case 'mbstring.encoding_translation':
-        $requirements['unicode']['description'] = t('Multibyte string input conversion in PHP is active and must be disabled. Check the php.ini <em>mbstring.encoding_translation</em> setting. Refer to the <a href="http://php.net/mbstring">PHP mbstring documentation</a> for more information.');
+        $requirements['unicode']->setDescription(t('Multibyte string input conversion in PHP is active and must be disabled. Check the php.ini <em>mbstring.encoding_translation</em> setting. Refer to the <a href="http://php.net/mbstring">PHP mbstring documentation</a> for more information.'));
         break;
     }
 
@@ -1619,9 +1623,11 @@ class SystemRequirements implements InstallRequirementsInterface {
       $advisories = $fetcher->getSecurityAdvisories(TRUE, 5);
     }
     catch (ClientExceptionInterface $exception) {
-      $requirements['system_advisories']['title'] = t('Critical security announcements');
-      $requirements['system_advisories']['severity'] = RequirementSeverity::Warning;
-      $requirements['system_advisories']['description'] = ['#theme' => 'system_security_advisories_fetch_error_message'];
+      $requirements['system_advisories'] = new Requirement(
+        title: t('Critical security announcements'),
+        description: ['#theme' => 'system_security_advisories_fetch_error_message'],
+        severity: RequirementSeverity::Warning,
+      );
       Error::logException(\Drupal::logger('system'), $exception, 'Failed to retrieve security advisory data.');
       return;
     }
@@ -1635,14 +1641,16 @@ class SystemRequirements implements InstallRequirementsInterface {
         }
         $advisory_links[] = new Link($advisory->getTitle(), Url::fromUri($advisory->getUrl()));
       }
-      $requirements['system_advisories']['title'] = t('Critical security announcements');
-      $requirements['system_advisories']['severity'] = $severity;
-      $requirements['system_advisories']['description'] = [
-        'list' => [
-          '#theme' => 'item_list',
-          '#items' => $advisory_links,
+      $requirements['system_advisories'] = new Requirement(
+        title: t('Critical security announcements'),
+        description: [
+          'list' => [
+            '#theme' => 'item_list',
+            '#items' => $advisory_links,
+          ],
         ],
-      ];
+        severity: $severity,
+      );
       if (\Drupal::moduleHandler()->moduleExists('help')) {
         $requirements['system_advisories']['description']['help_link'] = Link::createFromRoute(
           'What are critical security announcements?',
