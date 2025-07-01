@@ -4,6 +4,7 @@ namespace Drupal\media\Plugin\media\Source;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\file\FileInterface;
+use Drupal\file\Plugin\Field\FieldType\FileItem;
 use Drupal\media\Attribute\MediaSource;
 use Drupal\media\MediaInterface;
 use Drupal\media\MediaTypeInterface;
@@ -20,7 +21,7 @@ use Drupal\media\MediaSourceBase;
   description: new TranslatableMarkup("Use local files for reusable media."),
   allowed_field_types: ["file"],
 )]
-class File extends MediaSourceBase {
+class File extends MediaSourceBase implements FileSourceInterface {
 
   /**
    * Key for "Name" metadata attribute.
@@ -122,6 +123,18 @@ class File extends MediaSourceBase {
    */
   public function createSourceField(MediaTypeInterface $type) {
     return parent::createSourceField($type)->set('settings', ['file_extensions' => 'txt doc docx pdf']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFile(MediaInterface $media): ?FileInterface {
+    $field = $this->getSourceFieldDefinition($media->bundle->entity);
+
+    if (is_a($field->getItemDefinition()->getClass(), FileItem::class, TRUE)) {
+      return $media->get($field->getName())->entity;
+    }
+    return NULL;
   }
 
 }

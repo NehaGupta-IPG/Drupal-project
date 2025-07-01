@@ -10,6 +10,7 @@ use Drupal\file\FileInterface;
 use Drupal\file\FileUsage\FileUsageInterface;
 use Drupal\file\Plugin\Field\FieldType\FileItem;
 use Drupal\media\MediaInterface;
+use Drupal\media\Plugin\media\Source\FileSourceInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -97,11 +98,8 @@ class MediaDeleteForm extends ContentEntityDeleteForm {
    *   File.
    */
   protected function getFile(MediaInterface $media) : ?FileInterface {
-    $field = $media->getSource()->getSourceFieldDefinition($media->bundle->entity);
-    if (is_a($field->getItemDefinition()->getClass(), FileItem::class, TRUE) && $fid = $media->getSource()->getSourceFieldValue($media)) {
-      return File::load($fid);
-    }
-    return NULL;
+    $source = $media->getSource();
+    return $source instanceof FileSourceInterface ? $source->getFile($media) : NULL;
   }
 
   /**
@@ -109,6 +107,7 @@ class MediaDeleteForm extends ContentEntityDeleteForm {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
+
     if (($file = $this->getFile($this->getEntity())) && $form_state->getValue('also_delete_file')) {
       $file->delete();
       $this->messenger()->addMessage($this->t('Deleted the associated file %name.', [
