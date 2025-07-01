@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Element;
 
+use Drupal\Core\Extension\Requirement\Requirement;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\RenderElementBase;
@@ -38,10 +39,16 @@ class StatusReportPage extends RenderElementBase {
     ];
     // Loop through requirements and pull out items.
     RequirementSeverity::convertLegacyIntSeveritiesToEnums($element['#requirements'], __METHOD__);
+    /** @var  \Drupal\Core\Extension\Requirement\Requirement|array<string,mixed> $requirement */
     foreach ($element['#requirements'] as $key => $requirement) {
+      if (is_array($requirement)) {
+        @trigger_error(sprintf('Calling %s() with requirements as arrays is deprecated in drupal:11.3.0 and will be required in drupal:12.0.0. Use an array of \Drupal\Core\Extension\Requirement\Requirement instead. See https://www.drupal.org/node/3410821', __METHOD__), E_USER_DEPRECATED);
+        $requirement = Requirement::createFromLegacyArray($requirement);
+      }
       switch ($key) {
         case 'cron':
-          foreach ($requirement['description'] as &$description_elements) {
+          $description = $requirement->getDescription();
+          foreach ($description as &$description_elements) {
             foreach ($description_elements as &$description_element) {
               if (isset($description_element['#url']) && $description_element['#url']->getRouteName() == 'system.run_cron') {
                 $description_element['#attributes']['class'][] = 'button';
@@ -51,6 +58,7 @@ class StatusReportPage extends RenderElementBase {
               }
             }
           }
+          $requirement->setDescription($description);
           // Intentional fall-through.
 
         case 'drupal':
@@ -60,9 +68,7 @@ class StatusReportPage extends RenderElementBase {
         case 'php':
         case 'php_memory_limit':
           $element['#general_info']['#' . $key] = $requirement;
-          if (isset($requirement['severity']) &&
-            in_array($requirement['severity'], [RequirementSeverity::Info, RequirementSeverity::OK], TRUE)
-          ) {
+          if (in_array($requirement->getSeverity(), [RequirementSeverity::Info, RequirementSeverity::OK], TRUE)) {
             unset($element['#requirements'][$key]);
           }
           break;

@@ -27,6 +27,9 @@ final class Requirement implements \ArrayAccess {
    *   The requirement array.
    */
   public static function createFromLegacyArray(array $requirement): Requirement {
+    if (is_int($requirement['severity'])) {
+      $requirement['severity'] = RequirementSeverity::tryFrom($requirement['severity']);
+    }
     return new Requirement(
       title: $requirement['title'] ?? NULL,
       value: $requirement['value'] ?? NULL,
