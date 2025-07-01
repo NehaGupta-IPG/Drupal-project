@@ -28,7 +28,8 @@ class RequirementTest extends UnitTestCase {
     );
 
     // Test array access.
-    $this->expectDeprecation('Getting values using array access is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use the getter methods instead. See https://www.drupal.org/node/3410939');
+    $this->expectDeprecation('Getting \'value\' using array access is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use the getter methods instead. See https://www.drupal.org/node/3410939');
+    $this->expectDeprecation('Getting \'severity\' using array access is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use the getter methods instead. See https://www.drupal.org/node/3410939');
 
     $this->assertEquals('Alice in Wonderland', $requirement['title']);
     $this->assertEquals('It\'s no use going back to yesterday, because I was a different person then.', $requirement['description']);
