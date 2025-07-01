@@ -771,6 +771,9 @@ services:
     class: Drupal\Core\Field\FieldDefinitionListener
     arguments: ['@entity_type.manager', '@entity_field.manager', '@keyvalue', '@cache.discovery']
   Drupal\Core\Field\FieldDefinitionListenerInterface: '@field_definition.listener'
+  Drupal\Core\Field\FieldPreprocess:
+    class: Drupal\Core\Field\FieldPreprocess
+    autowire: true
   entity.form_builder:
     class: Drupal\Core\Entity\EntityFormBuilder
     arguments: ['@entity_type.manager', '@form_builder']
@@ -1794,7 +1797,7 @@ services:
     alias: plugin.manager.element_info
   file.htaccess_writer:
     class: Drupal\Core\File\HtaccessWriter
-    arguments: ['@logger.channel.security', '@stream_wrapper_manager']
+    arguments: ['@logger.channel.security', '@stream_wrapper_manager', '@settings']
   Drupal\Core\File\HtaccessWriterInterface: '@file.htaccess_writer'
   file.mime_type.guesser:
     class: Drupal\Core\File\MimeType\MimeTypeGuesser
@@ -1899,6 +1902,9 @@ services:
     class: Drupal\Core\Pager\PagerParameters
     arguments: ['@request_stack']
   Drupal\Core\Pager\PagerParametersInterface: '@pager.parameters'
+  Drupal\Core\Pager\PagerPreprocess:
+    class: Drupal\Core\Pager\PagerPreprocess
+    autowire: true
   Drupal\Core\Theme\Component\SchemaCompatibilityChecker: {}
   Drupal\Core\Theme\Component\ComponentValidator:
     calls:

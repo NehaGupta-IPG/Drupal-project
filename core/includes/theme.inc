@@ -9,9 +9,9 @@
  */
 
 use Drupal\Core\Datetime\DatePreprocess;
+use Drupal\Core\Field\FieldPreprocess;
+use Drupal\Core\Pager\PagerPreprocess;
 use Drupal\Core\Theme\ThemePreprocess;
-use Drupal\Core\Url;
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\StorageException;
 use Drupal\Core\Template\Attribute;
@@ -803,6 +803,7 @@ function template_preprocess_table(&$variables): void {
  */
 function template_preprocess_item_list(&$variables): void {
   $variables['wrapper_attributes'] = new Attribute($variables['wrapper_attributes']);
+  $variables['#attached']['library'][] = 'core/drupal.item-list';
   foreach ($variables['items'] as &$item) {
     $attributes = [];
     // If the item value is an array, then it is a render array.
@@ -1141,55 +1142,15 @@ function template_preprocess_region(&$variables): void {
  *   - element: A render element representing the field.
  *   - attributes: A string containing the attributes for the wrapping div.
  *   - title_attributes: A string containing the attributes for the title.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
+ *    template_preprocess functions are registered directly in hook_theme().
+ *
+ * @see https://www.drupal.org/node/3504125
  */
 function template_preprocess_field(&$variables, $hook): void {
-  $element = $variables['element'];
-
-  // Creating variables for the template.
-  $variables['entity_type'] = $element['#entity_type'];
-  $variables['field_name'] = $element['#field_name'];
-  $variables['field_type'] = $element['#field_type'];
-  $variables['label_display'] = $element['#label_display'];
-
-  $variables['label_hidden'] = ($element['#label_display'] == 'hidden');
-  // Always set the field label - allow themes to decide whether to display it.
-  // In addition the label should be rendered but hidden to support screen
-  // readers.
-  $variables['label'] = $element['#title'];
-
-  $variables['multiple'] = $element['#is_multiple'];
-
-  static $default_attributes;
-  if (!isset($default_attributes)) {
-    $default_attributes = new Attribute();
-  }
-
-  // Merge attributes when a single-value field has a hidden label.
-  if ($element['#label_display'] == 'hidden' && !$variables['multiple'] && !empty($element['#items'][0]->_attributes)) {
-    $variables['attributes'] = AttributeHelper::mergeCollections($variables['attributes'], (array) $element['#items'][0]->_attributes);
-  }
-
-  // We want other preprocess functions and the theme implementation to have
-  // fast access to the field item render arrays. The item render array keys
-  // (deltas) should always be numerically indexed starting from 0, and looping
-  // on those keys is faster than calling Element::children() or looping on all
-  // keys within $element, since that requires traversal of all element
-  // properties.
-  $variables['items'] = [];
-  $delta = 0;
-  while (!empty($element[$delta])) {
-    $variables['items'][$delta]['content'] = $element[$delta];
-
-    // Modules can add field item attributes (to
-    // $item->_attributes) within hook_entity_prepare_view(). Some field
-    // formatters move those attributes into some nested formatter-specific
-    // element in order have them rendered on the desired HTML element (e.g., on
-    // the <a> element of a field item being rendered as a link). Other field
-    // formatters leave them within $element['#items'][$delta]['_attributes'] to
-    // be rendered on the item wrappers provided by field.html.twig.
-    $variables['items'][$delta]['attributes'] = !empty($element['#items'][$delta]->_attributes) ? new Attribute($element['#items'][$delta]->_attributes) : clone($default_attributes);
-    $delta++;
-  }
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(FieldPreprocess::class)->preprocessField($variables);
 }
 
 /**
@@ -1202,112 +1163,15 @@ function template_preprocess_field(&$variables, $hook): void {
  * @param array $variables
  *   An associative array containing:
  *   - element: A render element representing the form element.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
+ *    template_preprocess functions are registered directly in hook_theme().
+ *
+ * @see https://www.drupal.org/node/3504125
  */
 function template_preprocess_field_multiple_value_form(&$variables): void {
-  $element = $variables['element'];
-  $variables['multiple'] = $element['#cardinality_multiple'];
-  $variables['attributes'] = $element['#attributes'];
-
-  if ($variables['multiple']) {
-    $table_id = Html::getUniqueId($element['#field_name'] . '_values');
-    // Using table id allows handing nested content with the same field names.
-    $order_class = $table_id . '-delta-order';
-    $header_attributes = new Attribute(['class' => ['label']]);
-    if (!empty($element['#required'])) {
-      $header_attributes['class'][] = 'js-form-required';
-      $header_attributes['class'][] = 'form-required';
-    }
-    $header = [
-      [
-        'data' => [
-          '#type' => 'html_tag',
-          '#tag' => 'h4',
-          '#value' => $element['#title'],
-          '#attributes' => $header_attributes,
-        ],
-        'colspan' => 2,
-        'class' => ['field-label'],
-      ],
-      [],
-      t('Order', [], ['context' => 'Sort order']),
-    ];
-    $rows = [];
-
-    // Sort items according to '_weight' (needed when the form comes back after
-    // preview or failed validation).
-    $items = [];
-    $variables['button'] = [];
-    foreach (Element::children($element) as $key) {
-      if ($key === 'add_more') {
-        $variables['button'] = &$element[$key];
-      }
-      else {
-        $items[] = &$element[$key];
-      }
-    }
-    usort($items, '_field_multiple_value_form_sort_helper');
-
-    // Add the items as table rows.
-    foreach ($items as $item) {
-      $item['_weight']['#attributes']['class'] = [$order_class];
-
-      // Remove weight form element from item render array so it can be rendered
-      // in a separate table column.
-      $delta_element = $item['_weight'];
-      unset($item['_weight']);
-
-      // Render actions in a separate column.
-      $actions = [];
-      if (isset($item['_actions'])) {
-        $actions = $item['_actions'];
-        unset($item['_actions']);
-      }
-
-      $cells = [
-        ['data' => '', 'class' => ['field-multiple-drag']],
-        ['data' => $item],
-        ['data' => $actions],
-        ['data' => $delta_element, 'class' => ['delta-order']],
-      ];
-      $rows[] = [
-        'data' => $cells,
-        'class' => ['draggable'],
-      ];
-    }
-
-    $variables['table'] = [
-      '#type' => 'table',
-      '#header' => $header,
-      '#rows' => $rows,
-      '#attributes' => [
-        'id' => $table_id,
-        'class' => ['field-multiple-table'],
-      ],
-      '#tabledrag' => [
-        [
-          'action' => 'order',
-          'relationship' => 'sibling',
-          'group' => $order_class,
-        ],
-      ],
-    ];
-
-    if (!empty($element['#description'])) {
-      $description_id = $element['#attributes']['aria-describedby'];
-      $description_attributes['id'] = $description_id;
-      $variables['description']['attributes'] = new Attribute($description_attributes);
-      $variables['description']['content'] = $element['#description'];
-
-      // Add the description's id to the table aria attributes.
-      $variables['table']['#attributes']['aria-describedby'] = $element['#attributes']['aria-describedby'];
-    }
-  }
-  else {
-    $variables['elements'] = [];
-    foreach (Element::children($element) as $key) {
-      $variables['elements'][] = $element[$key];
-    }
-  }
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(FieldPreprocess::class)->preprocessFieldMultipleValueForm($variables);
 }
 
 /**
@@ -1347,137 +1211,15 @@ function template_preprocess_breadcrumb(&$variables): void {
  *       to the pager links.
  *     - #route_parameters: An associative array of the route parameters.
  *     - #quantity: The number of pages in the list.
+ *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Initial
+ *   template_preprocess functions are registered directly in hook_theme().
+ *
+ * @see https://www.drupal.org/node/3504125
  */
 function template_preprocess_pager(&$variables): void {
-  $element = $variables['pager']['#element'];
-  $parameters = $variables['pager']['#parameters'];
-  $quantity = empty($variables['pager']['#quantity']) ? 0 : $variables['pager']['#quantity'];
-  $route_name = $variables['pager']['#route_name'];
-  $route_parameters = $variables['pager']['#route_parameters'] ?? [];
-
-  /** @var \Drupal\Core\Pager\PagerManagerInterface $pager_manager */
-  $pager_manager = \Drupal::service('pager.manager');
-
-  $pager = $pager_manager->getPager($element);
-
-  // Nothing to do if there is no pager.
-  if (!isset($pager)) {
-    return;
-  }
-
-  $pager_max = $pager->getTotalPages();
-
-  // Nothing to do if there is only one page.
-  if ($pager_max <= 1) {
-    return;
-  }
-
-  $tags = $variables['pager']['#tags'];
-
-  // Calculate various markers within this pager piece:
-  // Middle is used to "center" pages around the current page.
-  $pager_middle = ceil($quantity / 2);
-  $current_page = $pager->getCurrentPage();
-  // The current pager is the page we are currently paged to.
-  $pager_current = $current_page + 1;
-  // The first pager is the first page listed by this pager piece (re quantity).
-  $pager_first = $pager_current - $pager_middle + 1;
-  // The last is the last page listed by this pager piece (re quantity).
-  $pager_last = $pager_current + $quantity - $pager_middle;
-  // End of marker calculations.
-
-  // Prepare for generation loop.
-  $i = $pager_first;
-  if ($pager_last > $pager_max) {
-    // Adjust "center" if at end of query.
-    $i = $i + ($pager_max - $pager_last);
-    $pager_last = $pager_max;
-  }
-  if ($i <= 0) {
-    // Adjust "center" if at start of query.
-    $pager_last = $pager_last + (1 - $i);
-    $i = 1;
-  }
-  // End of generation loop preparation.
-
-  // Create the "first" and "previous" links if we are not on the first page.
-  if ($current_page > 0) {
-    $items['first'] = [];
-    $items['first']['attributes'] = new Attribute();
-    $options = [
-      'query' => $pager_manager->getUpdatedParameters($parameters, $element, 0),
-    ];
-    $items['first']['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
-    if (isset($tags[0])) {
-      $items['first']['text'] = $tags[0];
-    }
-
-    $items['previous'] = [];
-    $items['previous']['attributes'] = new Attribute();
-    $options = [
-      'query' => $pager_manager->getUpdatedParameters($parameters, $element, $current_page - 1),
-    ];
-    $items['previous']['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
-    if (isset($tags[1])) {
-      $items['previous']['text'] = $tags[1];
-    }
-  }
-
-  // Add an ellipsis if there are further previous pages.
-  if ($i > 1) {
-    $variables['ellipses']['previous'] = TRUE;
-  }
-  // Now generate the actual pager piece.
-  for (; $i <= $pager_last && $i <= $pager_max; $i++) {
-    $options = [
-      'query' => $pager_manager->getUpdatedParameters($parameters, $element, $i - 1),
-    ];
-    $items['pages'][$i]['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
-    $items['pages'][$i]['attributes'] = new Attribute();
-    if ($i == $pager_current) {
-      $variables['current'] = $i;
-      $items['pages'][$i]['attributes']->setAttribute('aria-current', 'page');
-    }
-  }
-  // Add an ellipsis if there are further next pages.
-  if ($i < $pager_max + 1) {
-    $variables['ellipses']['next'] = TRUE;
-  }
-
-  // Create the "next" and "last" links if we are not on the last page.
-  if ($current_page < ($pager_max - 1)) {
-    $items['next'] = [];
-    $items['next']['attributes'] = new Attribute();
-    $options = [
-      'query' => $pager_manager->getUpdatedParameters($parameters, $element, $current_page + 1),
-    ];
-    $items['next']['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
-    if (isset($tags[3])) {
-      $items['next']['text'] = $tags[3];
-    }
-
-    $items['last'] = [];
-    $items['last']['attributes'] = new Attribute();
-    $options = [
-      'query' => $pager_manager->getUpdatedParameters($parameters, $element, $pager_max - 1),
-    ];
-    $items['last']['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
-    if (isset($tags[4])) {
-      $items['last']['text'] = $tags[4];
-    }
-  }
-
-  $variables['items'] = $items;
-  $variables['heading_id'] = Html::getUniqueId('pagination-heading');
-  $variables['pagination_heading_level'] = $variables['pager']['#pagination_heading_level'] ?? 'h4';
-  if (!preg_match('/^h[1-6]$/', $variables['pagination_heading_level'])) {
-    $variables['pagination_heading_level'] = 'h4';
-  }
-
-  // The rendered link needs to play well with any other query parameter used
-  // on the page, like exposed filters, so for the cacheability all query
-  // parameters matter.
-  $variables['#cache']['contexts'][] = 'url.query_args';
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(PagerPreprocess::class)->preprocessPager($variables);
 }
 
 /**
@@ -1542,11 +1284,17 @@ function template_preprocess_menu_local_action(&$variables): void {
 }
 
 /**
- * Callback for usort() within template_preprocess_field_multiple_value_form().
+ * Callback for usort() of field item form elements.
  *
  * Sorts using ['_weight']['#value']
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no
+ *   replacement.
+ *
+ * @see https://www.drupal.org/node/3504125
  */
 function _field_multiple_value_form_sort_helper($a, $b) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
   $a_weight = (is_array($a) && isset($a['_weight']['#value']) ? $a['_weight']['#value'] : 0);
   $b_weight = (is_array($b) && isset($b['_weight']['#value']) ? $b['_weight']['#value'] : 0);
   return $a_weight - $b_weight;
