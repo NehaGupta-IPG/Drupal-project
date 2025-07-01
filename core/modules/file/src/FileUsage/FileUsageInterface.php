@@ -67,4 +67,15 @@ interface FileUsageInterface {
    */
   public function listUsage(FileInterface $file);
 
+  /**
+   * Counts the number of places a file is used.
+   *
+   * @param \Drupal\file\FileInterface $file
+   *   A file entity.
+   *
+   * @return int
+   *   The total number of places that the file is being used.
+   */
+  public function countUsage(FileInterface $file): int;
+
 }

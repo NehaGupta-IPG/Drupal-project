@@ -3,7 +3,6 @@
 namespace Drupal\media\Entity;
 
 use Drupal\Core\Entity\Attribute\ContentEntityType;
-use Drupal\Core\Entity\ContentEntityDeleteForm;
 use Drupal\Core\Entity\EntityViewBuilder;
 use Drupal\Core\Entity\Form\DeleteMultipleForm;
 use Drupal\Core\Entity\Routing\RevisionHtmlRouteProvider;
@@ -15,6 +14,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\media\Form\MediaDeleteForm;
 use Drupal\media\MediaAccessControlHandler;
 use Drupal\media\MediaForm;
 use Drupal\media\MediaInterface;
@@ -56,7 +56,7 @@ use Drupal\user\EntityOwnerTrait;
       'default' => MediaForm::class,
       'add' => MediaForm::class,
       'edit' => MediaForm::class,
-      'delete' => ContentEntityDeleteForm::class,
+      'delete' => MediaDeleteForm::class,
       'delete-multiple-confirm' => DeleteMultipleForm::class,
       'revision-delete' => RevisionDeleteForm::class,
       'revision-revert' => RevisionRevertForm::class,

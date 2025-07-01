@@ -55,4 +55,12 @@ abstract class FileUsageBase implements FileUsageInterface {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function countUsage(FileInterface $file): int {
+    // @todo Implement this for real based on what ::listUsages() says.
+    return 0;
+  }
+
 }
