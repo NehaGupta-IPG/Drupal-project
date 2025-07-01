@@ -59,8 +59,11 @@ abstract class FileUsageBase implements FileUsageInterface {
    * {@inheritdoc}
    */
   public function countUsage(FileInterface $file): int {
-    // @todo Implement this for real based on what ::listUsages() says.
-    return 0;
+    return array_reduce($this->listUsage($file), function (int $count, array $module_usage): int {
+      return $count + array_reduce($module_usage, function (int $object_count, array $object_usage): int {
+        return $object_count + count($object_usage);
+      }, 0);
+    }, 0);
   }
 
 }
