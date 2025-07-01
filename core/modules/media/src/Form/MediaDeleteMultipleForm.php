@@ -31,7 +31,7 @@ class MediaDeleteMultipleForm extends DeleteMultipleForm {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $entity_type_id = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, $entity_type_id = NULL): array {
     $build = parent::buildForm($form, $form_state, $entity_type_id);
     $config = $this->configFactory()->get('media.settings');
     return $build + [
@@ -48,7 +48,7 @@ class MediaDeleteMultipleForm extends DeleteMultipleForm {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $file_deleted_count = 0;
     $file_inaccessible_count = 0;
     $file_in_use_count = 0;

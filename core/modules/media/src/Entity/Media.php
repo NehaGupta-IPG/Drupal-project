@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\media\Form\MediaDeleteForm;
+use Drupal\media\Form\MediaDeleteMultipleForm;
 use Drupal\media\MediaAccessControlHandler;
 use Drupal\media\MediaForm;
 use Drupal\media\MediaInterface;
@@ -23,7 +24,6 @@ use Drupal\media\MediaSourceFieldConstraintsInterface;
 use Drupal\media\MediaStorage;
 use Drupal\media\MediaViewsData;
 use Drupal\media\Routing\MediaRouteProvider;
-use Drupal\media_file_delete\Form\MediaDeleteMultipleForm;
 use Drupal\user\EntityOwnerTrait;
 
 /**

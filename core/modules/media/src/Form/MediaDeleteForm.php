@@ -5,10 +5,8 @@ namespace Drupal\media\Form;
 use Drupal\Core\Entity\ContentEntityDeleteForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
 use Drupal\file\FileUsage\FileUsageInterface;
-use Drupal\file\Plugin\Field\FieldType\FileItem;
 use Drupal\media\MediaInterface;
 use Drupal\media\Plugin\media\Source\FileSourceInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -105,7 +103,7 @@ class MediaDeleteForm extends ContentEntityDeleteForm {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     parent::submitForm($form, $form_state);
 
     if (($file = $this->getFile($this->getEntity())) && $form_state->getValue('also_delete_file')) {
