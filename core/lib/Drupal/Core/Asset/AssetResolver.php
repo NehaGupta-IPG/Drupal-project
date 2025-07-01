@@ -271,7 +271,7 @@ class AssetResolver implements AssetResolverInterface {
   protected function getJsSettingsAssets(AttachedAssetsInterface $assets) {
     $settings = [];
 
-    foreach ($this->getLibrariesToLoad($assets, 'js') as $library) {
+    foreach ($this->getLibrariesToLoad($assets, 'drupalSettings') as $library) {
       [$extension, $name] = explode('/', $library, 2);
       $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
       if (isset($definition['drupalSettings'])) {
