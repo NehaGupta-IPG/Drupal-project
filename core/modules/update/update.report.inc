@@ -146,6 +146,25 @@ function template_preprocess_update_project_status(&$variables): void {
   // Storing by reference because we are sorting the project values.
   $project = &$variables['project'];
 
+  // Set the project title per version release.
+  if (!empty($project['releases'])) {
+    foreach ($project['releases'] as &$release) {
+      $release['project_title'] = $project['title'] ?? $project['name'];
+      $release['release_label'] = t(
+        'Release notes for @project_title @release_version',
+        [
+          '@project_title' => $release['project_title'],
+          '@release_version' => $release['version'],
+        ]
+      );
+    }
+  }
+
+  // If there are no releases, we still need the project_title for twig.
+  if (empty($release['project_title'])) {
+    $release['project_title'] = $project['title'] ?? $project['name'];
+  }
+
   // Set the project title and URL.
   $variables['title'] = (isset($project['title'])) ? $project['title'] : $project['name'];
   $variables['url'] = (isset($project['link'])) ? Url::fromUri($project['link'])->toString() : NULL;

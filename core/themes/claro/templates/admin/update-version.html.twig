@@ -12,6 +12,8 @@
  *   - date: The date of the release.
  *   - download_link: The URL for the downloadable file.
  *   - release_link: The URL for the release notes.
+ *   - release_label: The aria-label to use for release note links.
+ *   - project_title: The human readable project title name.
  *   - core_compatible: A flag indicating whether the project is compatible
  *     with the currently installed version of Drupal core. This flag is not
  *     set for the Drupal core project itself.
@@ -27,13 +29,13 @@
   <div class="layout-row clearfix">
     <div class="project-update__version-title layout-column layout-column--quarter">{{ title }}</div>
     <div class="project-update__version-details layout-column layout-column--quarter">
-      <a href="{{ version.release_link }}">{{ version.version }}</a>
+      <a href="{{ version.release_link }}" aria-label="{{ version.project_title }}-{{ version.version }}">{{ version.version }}</a>
       <span class="project-update__version-date">({{ version.date|date('Y-M-d') }})</span>
     </div>
     <div class="layout-column layout-column--half">
       <ul class="project-update__version-links">
         <li class="project-update__release-notes-link">
-          <a href="{{ version.release_link }}">{{ 'Release notes'|t }}</a>
+          <a href="{{ version.release_link }}" aria-label="{{ version.release_label }}">{{ 'Release notes'|t }}</a>
         </li>
         {% if core_compatibility_details %}
           <li class="project-update__compatibility-details">
