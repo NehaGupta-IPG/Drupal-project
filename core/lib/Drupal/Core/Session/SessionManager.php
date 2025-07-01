@@ -126,7 +126,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
       $session_data = $_SESSION;
     }
 
-    $result = parent::start();
+    $result = !headers_sent() && parent::start();
 
     // Restore session data.
     if ($this->startedLazy) {
