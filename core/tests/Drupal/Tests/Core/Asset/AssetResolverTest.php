@@ -298,7 +298,7 @@ class AssetResolverTest extends UnitTestCase {
     }
   }
 
-  public function testDrupalSettingsOnlyLibrary() {
+  public function testDrupalSettingsOnlyLibrary(): void {
     $library_discovery = $this->createMock(LibraryDiscoveryInterface::class);
     $library_dependency_resolver = $this->createMock(LibraryDependencyResolverInterface::class);
     $module_handler = $this->createMock(ModuleHandlerInterface::class);
