@@ -27,3 +27,13 @@ function media_removed_post_updates(): array {
 function media_post_update_media_author_views_filter_update(): void {
   // Empty update function to clear the Views data cache.
 }
+
+/**
+ * Sets values for new configuration settings.
+ */
+function media_post_update_create_new_settings(): void {
+  \Drupal::configFactory()->getEditable('media.settings')
+    ->set('delete_file_default', FALSE)
+    ->set('disable_delete_control', FALSE)
+    ->save();
+}
