@@ -30,7 +30,7 @@ default:
   script:
     - composer install --optimize-autoloader --ansi
     - composer run-script drupal-phpunit-upgrade-check
-    - composer require rector/rector --ansi
+    - composer require --dev rector/rector palantirnet/drupal-rector --ansi
     - git config --global user.name 'rector-bot'
     - git config --global user.email 'rector-bot@rector-bot.com'
     - mkdir rector-changes
