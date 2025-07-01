@@ -44,15 +44,15 @@ body.is-fixed {
   background-position: top right;
 }
 
-a {
+a:link {
   color: var(--color-text-primary-medium);
 }
 
-a:hover {
+a:link:hover {
   color: var(--color--primary-50);
 }
 
-a:focus {
+a:link:focus {
   outline: solid 2px currentColor;
   outline-offset: 2px;
 }

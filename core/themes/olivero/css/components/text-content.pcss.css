@@ -20,7 +20,7 @@
     text-decoration-color supported by Chrome, FF, & Safari
   */
 
-  & a:where(:not(.button)) {
+  & a:link:where(:not(.button)) {
     color: var(--color-text-primary-medium);
     text-decoration-color: currentColor;
     text-decoration-thickness: 2px;

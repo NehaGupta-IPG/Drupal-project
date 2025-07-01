@@ -39,7 +39,7 @@ body {
   background-position: top right;
 }
 
-a {
+a:link {
   color: var(--color-text-primary-medium);
 
   &:hover {
