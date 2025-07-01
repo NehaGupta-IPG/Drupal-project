@@ -308,12 +308,15 @@ class AssetResolverTest extends UnitTestCase {
     $theme_handler = $this->createMock(ThemeHandlerInterface::class);
 
     // Simulate a library that has only drupalSettings and no js/css.
-    $library_discovery->method('getLibraryByName')->willReturn([
-      'drupalSettings' => [
-        'myModule' => [
-          'foo' => 'bar',
+    $library_discovery->expects($this->once())
+      ->method('getLibraryByName')
+      ->with('core', 'my_settings')
+      ->willReturn([
+        'drupalSettings' => [
+          'myModule' => [
+            'foo' => 'bar',
+          ],
         ],
-      ],
     ]);
 
     $library_dependency_resolver->method('getLibrariesWithDependencies')->willReturn(['core/my_settings']);
