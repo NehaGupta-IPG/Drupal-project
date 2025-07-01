@@ -456,6 +456,7 @@ Workflows
 Workspaces
 - Andrei Mateescu 'amateescu' https://www.drupal.org/u/amateescu
 
+
 Topic maintainers
 -----------------
 
@@ -480,11 +481,6 @@ Testing
 - Alex Pott 'alexpott' https://www.drupal.org/u/alexpott
 - Sascha Grossenbacher 'Berdir' https://www.drupal.org/u/berdir
 - Alberto M. 'mondrake' https://www.drupal.org/u/mondrake
-
-Usability
-- Cristina Chumillas 'ckrina' https://www.drupal.org/u/ckrina
-- Roy Scholten 'yoroy' https://www.drupal.org/u/yoroy
-- Bojhan Somers 'Bojhan' https://www.drupal.org/u/bojhan
 
 
 Security team
