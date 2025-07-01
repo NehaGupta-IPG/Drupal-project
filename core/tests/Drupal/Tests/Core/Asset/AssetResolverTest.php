@@ -9,6 +9,7 @@ use Drupal\Core\Asset\AssetResolver;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Asset\JsCollectionGrouper;
+use Drupal\Core\Asset\LibraryDiscoveryInterface;
 use Drupal\Core\Asset\LibraryDependencyResolver;
 use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Language\LanguageInterface;
