@@ -317,7 +317,7 @@ class AssetResolverTest extends UnitTestCase {
             'foo' => 'bar',
           ],
         ],
-    ]);
+      ]);
 
     $library_dependency_resolver->method('getLibrariesWithDependencies')->willReturn(['core/my_settings']);
     $library_dependency_resolver->method('getMinimalRepresentativeSubset')->willReturn(['core/my_settings']);
