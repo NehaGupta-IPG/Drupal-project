@@ -1267,7 +1267,7 @@ class SystemRequirements implements InstallRequirementsInterface {
     $requirements['unicode'] = new Requirement(
       title: t('Unicode library'),
       value: $libraries[$library],
-      severity: $severities[$library],
+      severity: $severities[$library] ?? RequirementSeverity::OK,
     );
     switch ($failed_check) {
       case 'mb_strlen':
