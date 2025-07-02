@@ -262,7 +262,7 @@ abstract class ViewsBlockBase extends BlockBase implements ContainerFactoryPlugi
    * {@inheritdoc}
    */
   public function createPlaceholder(): bool {
-    return TRUE;
+    return FALSE;
   }
 
 }
