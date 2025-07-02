@@ -272,6 +272,9 @@ class SiteConfigureForm extends ConfigFormBase {
       }
     }
 
+    // Reset user cache in case existing config add fields to user entity.
+    $this->entityTypeManager->getStorage('user')->resetCache([1]);
+
     // We created user 1 with placeholder values. Let's save the real values.
     /** @var \Drupal\user\UserInterface $account */
     $account = $this->entityTypeManager->getStorage('user')->load(1);
