@@ -728,13 +728,21 @@ class EntityTestHooks {
    */
   #[Hook('query_entity_test_access_alter')]
   public function queryEntityTestAccessAlter(AlterableInterface $query): void {
-    if (!\Drupal::state()->get('entity_test_query_access')) {
+    if (!\Drupal::keyValue('entity_test')->get('query_access', FALSE)) {
       return;
     }
+
+    // Add user.permissions cache context, since adding query condition is
+    // based on permission.
+    $query->addCacheContexts(['user.permissions']);
     /** @var \Drupal\Core\Database\Query\Select|\Drupal\Core\Database\Query\AlterableInterface $query */
-    if (!\Drupal::currentUser()->hasPermission('view all entity_test_query_access entities')) {
-      $query->condition('entity_test_query_access.name', 'published entity');
+    if (!\Drupal::currentUser()->hasPermission('administer entity_test content')) {
+      $query->condition('entity_test.name', 'published entity');
     }
+
+    // Add cache metadata for cacheability test assertions.
+    $query->addCacheTags(['entity_test.test_tag'])
+      ->mergeCacheMaxAge(60);
   }
 
   /**
