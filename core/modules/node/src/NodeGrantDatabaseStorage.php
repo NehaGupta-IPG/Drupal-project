@@ -40,6 +40,11 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
   protected $languageManager;
 
   /**
+   * Indicates if there are hook_node_grants implementations.
+   */
+  protected bool $hasNodeGrantsImplementations;
+
+  /**
    * Constructs a NodeGrantDatabaseStorage object.
    *
    * @param \Drupal\Core\Database\Connection $database
@@ -53,6 +58,8 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
     $this->database = $database;
     $this->moduleHandler = $module_handler;
     $this->languageManager = $language_manager;
+
+    $this->hasNodeGrantsImplementations = $this->moduleHandler->hasImplementations('node_grants');
   }
 
   /**
@@ -66,7 +73,7 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
 
     // If no module implements the hook or the node does not have an id there is
     // no point in querying the database for access grants.
-    if (!$this->moduleHandler->hasImplementations('node_grants') || $node->isNew()) {
+    if (!$this->hasNodeGrantsImplementations || $node->isNew()) {
       // Return the equivalent of the default grant, defined by
       // self::writeDefault().
       if ($operation === 'view') {
@@ -220,6 +227,11 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
    * {@inheritdoc}
    */
   public function write(NodeInterface $node, array $grants, $realm = NULL, $delete = TRUE) {
+    // Only perform work when node_access modules are active.
+    if (!$this->hasNodeGrantsImplementations) {
+      return;
+    }
+
     if ($delete) {
       $query = $this->database->delete('node_access')->condition('nid', $node->id());
       if ($realm) {
@@ -227,8 +239,7 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
       }
       $query->execute();
     }
-    // Only perform work when node_access modules are active.
-    if (!empty($grants) && $this->moduleHandler->hasImplementations('node_grants')) {
+    if (!empty($grants)) {
       $query = $this->database->insert('node_access')->fields(['nid', 'langcode', 'fallback', 'realm', 'gid', 'grant_view', 'grant_update', 'grant_delete']);
       // If we have defined a granted langcode, use it. But if not, add a grant
       // for every language this node is translated to.
@@ -297,9 +308,12 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
    * {@inheritdoc}
    */
   public function deleteNodeRecords(array $nids) {
-    $this->database->delete('node_access')
-      ->condition('nid', $nids, 'IN')
-      ->execute();
+    // Only perform work when node_access modules are active.
+    if ($this->hasNodeGrantsImplementations) {
+      $this->database->delete('node_access')
+        ->condition('nid', $nids, 'IN')
+        ->execute();
+    }
   }
 
   /**
