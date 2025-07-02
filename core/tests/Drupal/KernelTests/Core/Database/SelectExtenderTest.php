@@ -134,16 +134,43 @@ class SelectExtenderTest extends KernelTestBase {
     $connection = new StubConnection($mock_pdo, ['namespace' => $namespace]);
 
     // Tests the method \Drupal\Core\Database\Query\Select::extend().
-    $select = $connection->select('test')->extend($extend);
-    $this->assertEquals($expected, get_class($select));
+    $select = $connection->select('test');
+
+    // Add cache metadata to the select query.
+    $select->addCacheContexts(['url.site'])
+      ->addCacheTags(['test_tag'])
+      ->mergeCacheMaxAge(60);
+    $extender = $select->extend($extend);
+    $this->assertEquals($expected, get_class($extender));
+
+    // Confirm cache metadata from the select query is merged to the extender.
+    $extender->addCacheContexts(['timezone'])
+      ->addCacheTags(['test_tag2'])
+      ->mergeCacheMaxAge(90);
+    $this->assertEquals(['timezone', 'url.site'], $extender->getCacheContexts());
+    $this->assertEquals(60, $extender->getCacheMaxAge());
+    $this->assertEquals(['test_tag2', 'test_tag'], $extender->getCacheTags());
 
     // Get an instance of the class \Drupal\Core\Database\Query\SelectExtender.
     $select_extender = $connection->select('test')->extend(SelectExtender::class);
     $this->assertEquals(SelectExtender::class, get_class($select_extender));
 
+    // Add cache metadata to the SelectExtender query.
+    $select_extender->addCacheContexts(['ip'])
+      ->addCacheTags(['test_tag3'])
+      ->mergeCacheMaxAge(120);
+
     // Tests the method \Drupal\Core\Database\Query\SelectExtender::extend().
     $select_extender_extended = $select_extender->extend($extend);
     $this->assertEquals($expected, get_class($select_extender_extended));
+
+    // Confirm cache metadata from the select query is merged to the extender.
+    $select_extender_extended->addCacheContexts(['languages'])
+      ->addCacheTags(['test_tag4'])
+      ->mergeCacheMaxAge(45);
+    $this->assertEquals(['languages', 'ip'], $select_extender_extended->getCacheContexts());
+    $this->assertEquals(45, $select_extender_extended->getCacheMaxAge());
+    $this->assertEquals(['test_tag4', 'test_tag3'], $select_extender_extended->getCacheTags());
   }
 
 }
