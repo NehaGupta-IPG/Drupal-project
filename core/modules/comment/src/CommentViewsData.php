@@ -3,6 +3,7 @@
 namespace Drupal\comment;
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\views\EntityViewsData;
 
 /**
@@ -236,6 +237,8 @@ class CommentViewsData extends EntityViewsData {
     // Define the base group of this table. Fields that don't have a group
     // defined will go into this field by default.
     $data['comment_entity_statistics']['table']['group'] = $this->t('Comment Statistics');
+    $data['comment_entity_statistics_and_entity_changed']['table']['group'] = $this->t('Comment Statistics');
+    $data['comment_entity_statistics_and_entity_changed']['table']['real table'] = 'comment_entity_statistics';
 
     // Provide a relationship for each entity type except comment.
     foreach ($entities_types as $type => $entity_type) {
@@ -249,7 +252,8 @@ class CommentViewsData extends EntityViewsData {
       // table to {comment_entity_statistics} for each field as multiple joins
       // between the same two tables is not supported.
       if (\Drupal::service('comment.manager')->getFields($type)) {
-        $data['comment_entity_statistics']['table']['join'][$entity_type->getDataTable() ?: $entity_type->getBaseTable()] = [
+        $table = $entity_type->getDataTable() ?: $entity_type->getBaseTable();
+        $data['comment_entity_statistics']['table']['join'][$table] = [
           'type' => 'LEFT',
           'left_field' => $entity_type->getKey('id'),
           'field' => 'entity_id',
@@ -260,6 +264,14 @@ class CommentViewsData extends EntityViewsData {
             ],
           ],
         ];
+
+        if ($entity_type->entityClassImplements(EntityChangedInterface::class)) {
+          $base_fields = $this->entityFieldManager->getBaseFieldDefinitions($type);
+          // @todo Lookup changed field in keys https://www.drupal.org/node/2209971
+          if (isset($base_fields['changed']) && $base_fields['changed']->getFieldStorageDefinition()->getPropertyDefinition($base_fields['changed']->getFieldStorageDefinition()->getMainPropertyName())->getDataType() === 'timestamp') {
+            $data['comment_entity_statistics_and_entity_changed']['table']['join'][$table] = $data['comment_entity_statistics']['table']['join'][$table];
+          }
+        }
       }
     }
 
@@ -307,7 +319,7 @@ class CommentViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['comment_entity_statistics']['last_updated'] = [
+    $data['comment_entity_statistics_and_entity_changed']['last_updated'] = [
       'title' => $this->t('Updated/commented date'),
       'help' => $this->t('The most recent of last comment posted or entity updated time.'),
       'field' => [

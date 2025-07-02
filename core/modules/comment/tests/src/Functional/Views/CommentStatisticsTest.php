@@ -72,8 +72,8 @@ class CommentStatisticsTest extends ViewTestBase {
     $entity->save();
 
     $result = views_get_view_result('test_ces_entity_test_mul_changed');
-    $this->assertEquals($result[0]->comment_entity_statistics_last_updated, $entity->getChangedTime());
-    $this->assertEquals($result[1]->comment_entity_statistics_last_updated, $comment->getChangedTime());
+    $this->assertEquals($entity->getChangedTime(), $result[0]->comment_entity_statistics_last_updated);
+    $this->assertEquals($comment->getChangedTime(), $result[1]->comment_entity_statistics_last_updated);
   }
 
 }
