@@ -23,11 +23,8 @@ interface TestPreinstallInterface {
    * @param string $site_directory
    *   The site directory.
    *
-   * @return void
-   *   No return value.
-   *
    * @see \Drupal\TestSite\TestSiteInstallTestScript
    */
-  public function preinstall($db_prefix, $site_directory): void;
+  public function preinstall($db_prefix, $site_directory);
 
 }
