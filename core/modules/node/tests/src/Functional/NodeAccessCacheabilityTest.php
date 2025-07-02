@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional;
 
+use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Url;
+use Drupal\node_access_test_auto_bubbling\Controller\NodeAccessTestAutoBubblingController;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\node\NodeAccessRebuild;
 use PHPUnit\Framework\Attributes\Group;
@@ -58,22 +60,53 @@ class NodeAccessCacheabilityTest extends NodeTestBase {
     // The node grants cache context should be added automatically.
     $this->drupalGet(new Url('node_access_test_auto_bubbling'));
     $this->assertCacheContext('user.node_grants:view');
+    $context = new RenderContext();
+
+    // Test that cache context is added when rendering without context from
+    // early render.
+    $build = NodeAccessTestAutoBubblingController::create(\Drupal::getContainer())->latest();
+    // The 'has_render_context' flag should be false to indicate that the query
+    // ran outside a render context.
+    $this->assertFalse(\Drupal::keyValue('node_access_test')->get('has_render_context'));
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = \Drupal::service('renderer');
+    $renderer->executeInRenderContext($context, fn () => $renderer->render($build));
+    /** @var \Drupal\Core\Render\BubbleableMetadata $metadata */
+    $metadata = $context->pop();
+    $this->assertEquals(['user.node_grants:view'], $metadata->getCacheContexts());
 
     // The user has the 'bypass node access' permission, which means the
     // node grants cache context is not necessary.
     $this->drupalLogin($this->drupalCreateUser(['bypass node access']));
     $this->drupalGet(new Url('node_access_test_auto_bubbling'));
     $this->assertNoCacheContext('user.node_grants:view');
+
+    $build = NodeAccessTestAutoBubblingController::create(\Drupal::getContainer())->latest();
+    $this->assertFalse(\Drupal::keyValue('node_access_test')->get('has_render_context'));
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = \Drupal::service('renderer');
+    $renderer->executeInRenderContext($context, fn () => $renderer->render($build));
+    /** @var \Drupal\Core\Render\BubbleableMetadata $metadata */
+    $metadata = $context->pop();
+    $this->assertEmpty($metadata->getCacheContexts());
     $this->drupalLogout();
 
     // Uninstall the module with the only hook_node_grants() implementation.
-    $this->container->get('module_installer')->uninstall(['node_access_test']);
+    \Drupal::service('module_installer')->uninstall(['node_access_test']);
     $this->rebuildContainer();
 
     // Because there are no node grants defined, there also is no need for the
     // node grants cache context to be bubbled.
     $this->drupalGet(new Url('node_access_test_auto_bubbling'));
     $this->assertNoCacheContext('user.node_grants:view');
+    $build = NodeAccessTestAutoBubblingController::create(\Drupal::getContainer())->latest();
+    $this->assertFalse(\Drupal::keyValue('node_access_test')->get('has_render_context'));
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = \Drupal::service('renderer');
+    $renderer->executeInRenderContext($context, fn () => $renderer->render($build));
+    /** @var \Drupal\Core\Render\BubbleableMetadata $metadata */
+    $metadata = $context->pop();
+    $this->assertEmpty($metadata->getCacheContexts());
   }
 
   /**

@@ -6,13 +6,26 @@ namespace Drupal\node_access_test_auto_bubbling\Controller;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\node\NodeInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Returns a node ID listing.
  */
 class NodeAccessTestAutoBubblingController extends ControllerBase implements ContainerInjectionInterface {
+
+  use AutowireTrait;
+
+  public function __construct(
+    #[Autowire(service: 'keyvalue')]
+    protected readonly KeyValueFactoryInterface $keyValueFactory,
+    protected readonly RendererInterface $renderer,
+  ) {}
 
   /**
    * Lists the three latest published node IDs.
@@ -21,13 +34,20 @@ class NodeAccessTestAutoBubblingController extends ControllerBase implements Con
    *   A render array.
    */
   public function latest() {
-    $nids = $this->entityTypeManager()->getStorage('node')->getQuery()
+    // Set flag in key value storage to assert in tests when the query is
+    // executed outside a render context.
+    $this->keyValue('node_access_test')->set('has_render_context', $this->renderer->hasRenderContext());
+    $query = $this->entityTypeManager()->getStorage('node')->getQuery()
       ->accessCheck(TRUE)
       ->condition('status', NodeInterface::PUBLISHED)
       ->sort('created', 'DESC')
-      ->range(0, 3)
-      ->execute();
-    return ['#markup' => $this->t('The three latest nodes are: @nids.', ['@nids' => implode(', ', $nids)])];
+      ->range(0, 3);
+    $nids = $query->execute();
+    $build = ['#markup' => $this->t('The three latest nodes are: @nids.', ['@nids' => implode(', ', $nids)])];
+    BubbleableMetadata::createFromRenderArray($build)
+      ->addCacheableDependency($query)
+      ->applyTo($build);
+    return $build;
   }
 
   /**
