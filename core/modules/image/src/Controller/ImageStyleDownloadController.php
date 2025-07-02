@@ -9,6 +9,7 @@ use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
+use Drupal\image\ImageStyleDownloadInterface;
 use Drupal\image\ImageStyleInterface;
 use Drupal\system\FileDownloadController;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -297,7 +298,7 @@ class ImageStyleDownloadController extends FileDownloadController implements Ima
   /**
    * {@inheritdoc}
    */
-  public function isSchemePublic($token_is_valid, $scheme, $derivative_scheme) {
+  public function isSchemePublic($token_is_valid, $scheme, $derivative_scheme): bool {
     if ($token_is_valid) {
       $is_public = ($scheme !== 'private');
     }
