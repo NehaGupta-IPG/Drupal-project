@@ -393,11 +393,12 @@ function system_check_directory($form_element, FormStateInterface $form_state) {
  */
 function system_region_list($theme, $show = REGIONS_ALL): array {
   if (!$theme instanceof Extension) {
-    $themes = \Drupal::service('theme_handler')->listInfo();
-    if (!isset($themes[$theme])) {
+    try {
+      $theme = \Drupal::service('theme_handler')->getTheme($theme);
+    }
+    catch (\InvalidArgumentException $e) {
       return [];
     }
-    $theme = $themes[$theme];
   }
   $list = [];
   $info = $theme->info;
