@@ -40,6 +40,14 @@
     }
   }
 
+  & a:where(:not([href])) {
+    color: inherit;
+
+    @supports (box-shadow: none) {
+      box-shadow: none;
+    }
+  }
+
   & p {
     margin-block-start: var(--sp);
     margin-block-end: var(--sp);

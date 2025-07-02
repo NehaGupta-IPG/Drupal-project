@@ -53,6 +53,18 @@
   }
 }
 
+.text-content a:where(:not([href])),
+.cke_editable a:where(:not([href])) {
+  color: inherit;
+}
+
+@supports (box-shadow: none) {
+  .text-content a:where(:not([href])),
+  .cke_editable a:where(:not([href])) {
+    box-shadow: none;
+  }
+}
+
 .text-content p,
 .cke_editable p {
   margin-block-start: var(--sp);

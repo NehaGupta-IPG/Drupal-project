@@ -52,6 +52,13 @@ a {
   }
 }
 
+a:not([href]) {
+  cursor: default; /* Change cursor to default */
+  text-decoration: none; /* Remove underline */
+  pointer-events: none; /* Disable pointer events for these links */
+  box-shadow: none; /* Remove box shadow */
+}
+
 button {
   font-family: inherit;
 }
