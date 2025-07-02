@@ -228,7 +228,7 @@ class DbUpdateController extends ControllerBase {
     $this->keyValueExpirableFactory->get('update_available_release')->deleteAll();
 
     $build['info_header'] = [
-      '#markup' => '<p>' . $this->t('Use this utility to update your database whenever a module, theme, or the core software is updated.') . '</p><p>' . $this->t('For more detailed information, see the <a href="https://www.drupal.org/upgrade">upgrading handbook</a>. If you are unsure what these terms mean you should probably contact your hosting provider.') . '</p>',
+      '#markup' => '<p>' . $this->t('Use this utility to update your database whenever a module, theme, or the core software is updated.') . '</p><p>' . $this->t('For more detailed information, see the <a href="https://www.drupal.org/docs/updating-drupal">Drupal update guide</a>.') . '</p>',
     ];
 
     $info[] = $this->t("<strong>Back up your code</strong>. Hint: when backing up module code, do not leave that backup in the 'modules' or 'sites/*/modules' directories as this may confuse Drupal's auto-discovery mechanism.");
@@ -238,14 +238,14 @@ class DbUpdateController extends ControllerBase {
       ':url' => Url::fromRoute('system.site_maintenance_mode')->setOption('base_url', $base_url)->toString(TRUE)->getGeneratedUrl(),
     ]);
     $info[] = $this->t('<strong>Back up your database</strong>. This process will change your database values and in case of emergency you may need to revert to a backup.');
-    $info[] = $this->t('Update your files (as described in the handbook page linked above).');
+    $info[] = $this->t('Update Drupal core using Composer to ensure your codebase is up to date.');
     $build['info'] = [
       '#theme' => 'item_list',
       '#list_type' => 'ol',
       '#items' => $info,
     ];
     $build['info_footer'] = [
-      '#markup' => '<p>' . $this->t('When you have performed the steps above, you may proceed.') . '</p>',
+      '#markup' => '<p>' . $this->t('This process will apply any pending updates to your site database. Click "Continue" when you are ready to start the update process.') . '</p>',
     ];
 
     $build['link'] = [
