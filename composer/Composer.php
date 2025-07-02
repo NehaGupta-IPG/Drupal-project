@@ -119,9 +119,10 @@ class Composer {
    * @param string $root
    *   Path to root of drupal/drupal repository.
    * @param string $subprojectType
-   *   Type of subproject - one of Metapackage, Plugin, or Template
+   *   Type of subproject - one of Metapackage, Plugin, or Template.
    *
    * @return \Symfony\Component\Finder\Finder
+   *   A Finder object.
    */
   public static function composerSubprojectPaths(string $root, string $subprojectType): Finder {
     return Finder::create()

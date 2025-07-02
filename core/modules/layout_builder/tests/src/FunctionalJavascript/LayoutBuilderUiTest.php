@@ -8,6 +8,8 @@ use Drupal\block_content\Entity\BlockContentType;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 
+// cspell:ignore blocknodebundle fieldbody fieldlayout
+
 /**
  * Tests the Layout Builder UI.
  *
@@ -46,6 +48,10 @@ class LayoutBuilderUiTest extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    if ($this->name() === 'testAddHighlights') {
+      $this->markTestSkipped("Skipped temporarily for random fails.");
+    }
+
     parent::setUp();
 
     $this->createContentType(['type' => 'bundle_with_section_field']);
@@ -297,7 +303,6 @@ class LayoutBuilderUiTest extends WebDriverTestBase {
    * Waits for the dialog to close and confirms no highlights are present.
    */
   private function assertHighlightNotExists(): void {
-    $this->markTestSkipped("Skipped temporarily for random fails.");
     $assert_session = $this->assertSession();
 
     $assert_session->assertNoElementAfterWait('css', '#drupal-off-canvas');

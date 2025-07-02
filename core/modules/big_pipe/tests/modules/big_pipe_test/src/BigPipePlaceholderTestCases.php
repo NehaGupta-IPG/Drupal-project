@@ -1,8 +1,6 @@
 <?php
 
-/**
- * @file
- */
+declare(strict_types=1);
 
 // cspell:ignore divpiggydiv timecurrent timetime
 
@@ -34,6 +32,7 @@ class BigPipePlaceholderTestCases {
    *   Optional. Necessary to get the embedded AJAX/HTML responses.
    *
    * @return \Drupal\big_pipe_test\BigPipePlaceholderTestCase[]
+   *   An array of placeholder test cases.
    */
   public static function cases(?ContainerInterface $container = NULL, ?AccountInterface $user = NULL) {
     // Define the two types of cacheability that we expect to see. These will be
@@ -330,6 +329,7 @@ class BigPipePlaceholderTestCases {
     // cspell:disable-next-line
     $exception->bigPipePlaceholderId = 'callback=%5CDrupal%5Cbig_pipe_test%5CBigPipeTestController%3A%3Aexception&amp;args%5B0%5D=llamas&amp;args%5B1%5D=suck&amp;token=uhKFNfT4eF449_W-kDQX8E5z4yHyt0-nSHUlwaGAQeU';
     $exception->bigPipePlaceholderRenderArray = [
+      // cspell:disable-next-line
       '#prefix' => '<span data-big-pipe-placeholder-id="callback=%5CDrupal%5Cbig_pipe_test%5CBigPipeTestController%3A%3Aexception&amp;args%5B0%5D=llamas&amp;args%5B1%5D=suck&amp;token=uhKFNfT4eF449_W-kDQX8E5z4yHyt0-nSHUlwaGAQeU">',
       'interface_preview' => [
         '#theme' => 'big_pipe_interface_preview',
@@ -429,6 +429,9 @@ class BigPipePlaceholderTestCases {
 
 }
 
+/**
+ * Provides a placeholder for the BigPipe placeholder test cases.
+ */
 class BigPipePlaceholderTestCase {
 
   /**

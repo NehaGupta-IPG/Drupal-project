@@ -12,6 +12,8 @@ class Condition implements ConditionInterface, \Countable {
 
   /**
    * Provides a map of condition operators to condition operator options.
+   *
+   * @var string[][]
    */
   protected static $conditionOperatorMap = [
     'BETWEEN' => ['delimiter' => ' AND '],
@@ -60,7 +62,7 @@ class Condition implements ConditionInterface, \Countable {
   protected $changed = TRUE;
 
   /**
-   * The identifier of the query placeholder this condition has been compiled against.
+   * The query placeholder identifier this condition has been compiled against.
    *
    * @var string
    */
@@ -349,8 +351,9 @@ class Condition implements ConditionInterface, \Countable {
   /**
    * PHP magic __clone() method.
    *
-   * Only copies fields that implement Drupal\Core\Database\Query\ConditionInterface. Also sets
-   * $this->changed to TRUE.
+   * Only copies fields that implement
+   * Drupal\Core\Database\Query\ConditionInterface. Also sets $this->changed to
+   * TRUE.
    */
   public function __clone() {
     $this->changed = TRUE;

@@ -72,7 +72,7 @@ class ContainerTest extends TestCase {
     $container_definition = $this->getMockContainerDefinition();
     $container_definition['machine_format'] = !$this->machineFormat;
     $this->expectException(InvalidArgumentException::class);
-    $container = new $this->containerClass($container_definition);
+    new $this->containerClass($container_definition);
   }
 
   /**
@@ -238,6 +238,7 @@ class ContainerTest extends TestCase {
 
   /**
    * Tests that Container::get() for circular dependencies works properly.
+   *
    * @covers ::get
    * @covers ::createService
    */
@@ -357,6 +358,7 @@ class ContainerTest extends TestCase {
 
   /**
    * Tests that Container::get() for NULL service works properly.
+   *
    * @covers ::get
    * @covers ::createService
    */
@@ -735,7 +737,7 @@ class ContainerTest extends TestCase {
    * @return array
    *   Associated array with parameters and services.
    */
-  protected function getMockContainerDefinition() {
+  protected function getMockContainerDefinition(): array {
     $fake_service = new \stdClass();
     $parameters = [];
     $parameters['some_parameter_class'] = get_class($fake_service);
@@ -1196,7 +1198,7 @@ class MockService {
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The container to inject via setter injection.
    */
-  public function setContainer(ContainerInterface $container) {
+  public function setContainer(ContainerInterface $container): void {
     $this->container = $container;
   }
 
@@ -1236,7 +1238,7 @@ class MockService {
    * @param string $some_other_parameter
    *   The setter injected parameter.
    */
-  public function setOtherConfigParameter($some_other_parameter) {
+  public function setOtherConfigParameter($some_other_parameter): void {
     $this->someOtherParameter = $some_other_parameter;
   }
 
@@ -1254,7 +1256,7 @@ class MockService {
    * Provides a factory method to get a service.
    *
    * @param string $class
-   *   The class name of the class to instantiate
+   *   The class name of the class to instantiate.
    * @param array $arguments
    *   (optional) Arguments to pass to the new class.
    *

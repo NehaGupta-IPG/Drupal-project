@@ -179,6 +179,7 @@ class SystemController extends ControllerBase {
    *   Valid values are 'on' and 'off'.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   *   A redirect response to the front page.
    */
   public function compactPage($mode) {
     user_cookie_save(['admin_compact_mode' => ($mode == 'on')]);
@@ -279,8 +280,6 @@ class SystemController extends ControllerBase {
             continue;
           }
 
-          // @todo Add logic for not displaying hidden modules in
-          //   https://drupal.org/node/3117829.
           $module_name = $modules[$dependency]->info['name'];
           $theme->module_dependencies_list[$dependency] = $modules[$dependency]->status ? $this->t('@module_name', ['@module_name' => $module_name]) : $this->t('@module_name (<span class="admin-disabled">disabled</span>)', ['@module_name' => $module_name]);
 
@@ -334,7 +333,7 @@ class SystemController extends ControllerBase {
               'attributes' => ['title' => $this->t('Set @theme as default theme', ['@theme' => $theme->info['name']])],
             ];
           }
-          $admin_theme_options[$theme->getName()] = $theme->info['name'] . ($theme->isExperimental() ? ' (' . t('Experimental') . ')' : '');
+          $admin_theme_options[$theme->getName()] = $theme->info['name'] . ($theme->isExperimental() ? ' (' . $this->t('Experimental') . ')' : '');
         }
         else {
           $theme->operations[] = [

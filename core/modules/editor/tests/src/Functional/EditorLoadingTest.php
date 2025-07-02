@@ -18,9 +18,7 @@ use Drupal\Tests\BrowserTestBase;
 class EditorLoadingTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['filter', 'editor', 'editor_test', 'node'];
 
@@ -304,7 +302,10 @@ class EditorLoadingTest extends BrowserTestBase {
     $this->assertNotSame('edit-field-text-0-value', $select->getAttribute('data-editor-for'));
   }
 
-  protected function getThingsToCheck($field_name, $type = 'textarea') {
+  /**
+   * Gets the information to check for the given field.
+   */
+  protected function getThingsToCheck($field_name, $type = 'textarea'): array {
     $settings = $this->getDrupalSettings();
     return [
       // JavaScript settings.

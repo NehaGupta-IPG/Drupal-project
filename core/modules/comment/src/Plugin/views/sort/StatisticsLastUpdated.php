@@ -19,7 +19,7 @@ class StatisticsLastUpdated extends Date {
   /**
    * The node table.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected ?string $node_table;
 
   /**
@@ -57,7 +57,12 @@ class StatisticsLastUpdated extends Date {
       $container->get('entity_field.manager')
     );
   }
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  protected string $field_alias;
 
+  /**
+   * {@inheritdoc}
+   */
   public function query() {
     $this->ensureMyTable();
 

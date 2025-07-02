@@ -66,15 +66,19 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
 
     // If no module implements the hook or the node does not have an id there is
     // no point in querying the database for access grants.
-    if (!$this->moduleHandler->hasImplementations('node_grants') || !$node->id()) {
+    if (!$this->moduleHandler->hasImplementations('node_grants') || $node->isNew()) {
       // Return the equivalent of the default grant, defined by
       // self::writeDefault().
       if ($operation === 'view') {
-        return AccessResult::allowedIf($node->isPublished());
+        $result = AccessResult::allowedIf($node->isPublished());
+        if (!$node->isNew()) {
+          $result->addCacheableDependency($node);
+        }
+
+        return $result;
       }
-      else {
-        return AccessResult::neutral();
-      }
+
+      return AccessResult::neutral();
     }
 
     // Check the database for potential access grants.
@@ -108,6 +112,13 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
     if (count($grants) > 0) {
       $query->condition($grants);
     }
+    if ($query->execute()->fetchField()) {
+      $access_result = AccessResult::allowed();
+    }
+    else {
+      $access_result = AccessResult::neutral();
+    }
+    $access_result->addCacheContexts(['user.node_grants:' . $operation]);
 
     // Only the 'view' node grant can currently be cached; the others currently
     // don't have any cacheability metadata. Hopefully, we can add that in the
@@ -115,20 +126,10 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
     // cases. For now, this must remain marked as uncacheable, even when it is
     // theoretically cacheable, because we don't have the necessary metadata to
     // know it for a fact.
-    $set_cacheability = function (AccessResult $access_result) use ($operation) {
-      $access_result->addCacheContexts(['user.node_grants:' . $operation]);
-      if ($operation !== 'view') {
-        $access_result->setCacheMaxAge(0);
-      }
-      return $access_result;
-    };
-
-    if ($query->execute()->fetchField()) {
-      return $set_cacheability(AccessResult::allowed());
+    if ($operation !== 'view') {
+      $access_result->setCacheMaxAge(0);
     }
-    else {
-      return $set_cacheability(AccessResult::neutral());
-    }
+    return $access_result;
   }
 
   /**

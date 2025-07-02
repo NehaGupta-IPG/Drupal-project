@@ -94,7 +94,7 @@ class InstallHelper implements ContainerInjectionInterface {
   /**
    * The module's path.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected string $module_path;
 
   /**
@@ -184,17 +184,17 @@ class InstallHelper implements ContainerInjectionInterface {
     foreach ($translated_languages as $language) {
       if (file_exists($default_content_path . "$language/$filename") &&
       ($handle = fopen($default_content_path . "$language/$filename", 'r')) !== FALSE) {
-        $header = fgetcsv($handle);
+        $header = fgetcsv($handle, escape: '');
         $line_counter = 0;
-        while (($content = fgetcsv($handle)) !== FALSE) {
+        while (($content = fgetcsv($handle, escape: '')) !== FALSE) {
           $keyed_content[$language][$line_counter] = array_combine($header, $content);
           $line_counter++;
         }
         fclose($handle);
       }
       else {
-        // Language directory exists, but the file in this language was not found,
-        // remove that language from list of languages to be translated.
+        // Language directory exists, but the file in this language was not
+        // found, remove that language from list of languages to be translated.
         $key = array_search($language, $translated_languages);
         unset($translated_languages[$key]);
       }
@@ -235,7 +235,7 @@ class InstallHelper implements ContainerInjectionInterface {
   }
 
   /**
-   * Retrieves the Media Image ID of a media image saved during the import process.
+   * Retrieves th ID of a media image saved during the import process.
    *
    * @param int $media_image_csv_id
    *   The media image's ID from the CSV file.
@@ -743,7 +743,7 @@ class InstallHelper implements ContainerInjectionInterface {
    * Imports content.
    *
    * @param string $entity_type
-   *   Entity type to be imported
+   *   Entity type to be imported.
    * @param string $bundle_machine_name
    *   Bundle machine name to be imported.
    *
@@ -867,7 +867,7 @@ class InstallHelper implements ContainerInjectionInterface {
     try {
       $uri = $this->fileSystem->copy($path, 'public://' . $filename, FileExists::Replace);
     }
-    catch (FileException $e) {
+    catch (FileException) {
       $uri = FALSE;
     }
     $file = $this->entityTypeManager->getStorage('file')->create([

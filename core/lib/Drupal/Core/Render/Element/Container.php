@@ -14,7 +14,9 @@ use Drupal\Core\Render\Element;
  * an HTML ID.
  *
  * Properties:
- * - #optional: Indicates whether the container should render when it has no
+ *
+ * @property $optional
+ *   Indicates whether the container should render when it has no
  *   visible children. Defaults to FALSE.
  *
  * Usage example:
@@ -49,16 +51,15 @@ class Container extends RenderElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#optional' => FALSE,
       '#process' => [
-        [$class, 'processGroup'],
-        [$class, 'processContainer'],
+        [static::class, 'processGroup'],
+        [static::class, 'processContainer'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderGroup'],
-        [$class, 'preRenderContainer'],
+        [static::class, 'preRenderGroup'],
+        [static::class, 'preRenderContainer'],
       ],
       '#theme_wrappers' => ['container'],
     ];

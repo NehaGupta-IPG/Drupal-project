@@ -7,9 +7,10 @@
  * @see phpunit.xml.dist
  */
 
+declare(strict_types=1);
+
 use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
 use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
-use Drupal\TestTools\Extension\HtmlLogging\HtmlOutputLogger;
 use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
 
@@ -143,7 +144,7 @@ function drupal_phpunit_populate_class_loader() {
 }
 
 // Do class loader population.
-$loader = drupal_phpunit_populate_class_loader();
+drupal_phpunit_populate_class_loader();
 class_alias('\Drupal\Tests\DocumentElement', '\Behat\Mink\Element\DocumentElement', TRUE);
 
 // Set sane locale settings, to ensure consistent string, dates, times and
@@ -176,10 +177,4 @@ if ($deprecationBridgeConfiguration = DeprecationHandler::getConfiguration()) {
   // Enable the DebugClassLoader to get deprecations for methods' signature
   // changes.
   DebugClassLoader::enable();
-}
-
-// Functional tests HTML output logging.
-$browserTestOutputDirectory = getenv('BROWSERTEST_OUTPUT_DIRECTORY');
-if ($browserTestOutputDirectory !== FALSE) {
-  HtmlOutputLogger::init($browserTestOutputDirectory, (bool) getenv('BROWSERTEST_OUTPUT_VERBOSE') ?? FALSE);
 }
