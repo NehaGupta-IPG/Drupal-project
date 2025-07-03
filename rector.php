@@ -28,6 +28,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Logging\TestDox\NamePrettifier;
 use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo;
 use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
 use Rector\BetterPhpDocParser\PhpDocManipulator\PhpDocTagRemover;
@@ -106,6 +107,7 @@ final class DrupalAnnotationToAttributeRector extends AbstractRector implements 
     private static ?string $testedClassName;
     private static ?string $currentClassName;
     private static ?Node $currentClassNode;
+    private static NamePrettifier $namePrettifier;
 
     public function __construct(
         private readonly PhpDocTagRemover $phpDocTagRemover,
@@ -114,6 +116,7 @@ final class DrupalAnnotationToAttributeRector extends AbstractRector implements 
         private readonly PhpDocInfoFactory $phpDocInfoFactory,
         private readonly ReflectionResolver $reflectionResolver,
     ) {
+        self::$namePrettifier = new NamePrettifier();
     }
 
     public function getRuleDefinition(): RuleDefinition
@@ -203,16 +206,33 @@ final class DrupalAnnotationToAttributeRector extends AbstractRector implements 
             $this->docBlockUpdater->updateRefactoredNodeWithPhpDocInfo(self::$currentClassNode);
             $this->docBlockUpdater->updateRefactoredNodeWithPhpDocInfo($node);
 
-            // Ensure a class PhpDoc always exists.
+            // Ensure a class-level PhpDoc always exists.
             if (self::$currentClassNode instanceof Class_) {
                 if (self::$currentClassNode->getDocComment() === null) {
                     if (self::$testedClassName) {
                         $newDoc = "/**\n * Tests " . self::$testedClassName . ".\n */";
                     }
                     else {
-                        $newDoc = "/**\n * Tests.\n */";
+                        $prettifiedClassName = self::$namePrettifier->prettifyTestClassName(self::$currentClassName);
+                        $newDocHeader = preg_replace("/(.*)( \\(.*\\))/i", '${1}', $prettifiedClassName);
+                        $newDoc = "/**\n * Tests {$newDocHeader}.\n */";
                     }
                     self::$currentClassNode->setDocComment(new Doc($newDoc));
+                }
+            }
+
+            // Ensure a method-level PhpDoc always has a description.
+            if ($node instanceof ClassMethod) {
+                $check = preg_match("/.*\/\*\*.*\n.*\* @/i", $node->getDocComment()->getText());
+                if ($check) {
+                    $lines = explode("\n", $node->getDocComment()->getText());
+                    $prettifiedTestMethodName = lcfirst(self::$namePrettifier->prettifyTestMethodName($this->getName($node)));
+                    $newLines = [];
+                    $newLines[] = array_shift($lines);
+                    $newLines[] = "   * Tests {$prettifiedTestMethodName}.";
+                    $newLines[] = "   *";
+                    $newLines = array_merge($newLines, $lines);
+                    $node->setDocComment(new Doc(implode("\n", $newLines)));
                 }
             }
 
@@ -417,7 +437,6 @@ final class DrupalAnnotationToAttributeRector extends AbstractRector implements 
 
         // cleanup
         $this->phpDocTagRemover->removeTagValueFromNode($phpDocInfo, $desiredTagValueNode);
-
     }
 
     private function convertCoversNothing(
@@ -456,15 +475,6 @@ final class DrupalAnnotationToAttributeRector extends AbstractRector implements 
 
         // prevent duplicates
         $existsAlready = false;
-/*        foreach (self::$currentClassNode->attrGroups as $attrGroup) {
-            foreach ($attrGroup->attrs as $attr) {
-                if ($attr->name->toString() === UsesClass::class && $attr->args[0]->value->value->class->toString() === $classLikeName) {
-                    $existsAlready = true;
-                    break 2;
-                }
-#                dump(['*********', $attr->name->toString(), $attr->args[0]->value->value->class->toString()]);
-            }
-        }*/
 
         // Attach the attribute to the class.
         if (! $existsAlready) {
