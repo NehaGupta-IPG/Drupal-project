@@ -160,15 +160,16 @@ class ContentTranslationLanguageChangeTest extends NodeTestBase {
    *
    * This test reproduces the fatal error when changing the langcode on
    * an entity without an existing translation, and verifies the fallback fix.
-   * 
+   *
    * @return void
+   *   This test does not return a value but performs assertions to ensure
+   *   that switching the language field works without errors.
    */
-  public function testSwitchLangcodeWithoutExistingTranslation(): void
-  {
+  public function testSwitchLangcodeWithoutExistingTranslation(): void {
     // Create a node in English.
     $this->drupalGet('node/add/article');
     $edit = [
-    'title[0][value]' => 'Test switch langcode',
+      'title[0][value]' => 'Test switch langcode',
     ];
     $this->submitForm($edit, 'Save');
 
