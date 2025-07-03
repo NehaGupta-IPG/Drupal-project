@@ -552,6 +552,7 @@ return RectorConfig::configure()
         __DIR__ . '/core/tests/Drupal/Tests/Component/Annotation/Doctrine/DocParserTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Component/Datetime/TimeTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Component/DependencyInjection/Dumper/OptimizedPhpArrayDumperTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Component/DependencyInjection/Dumper/PhpArrayDumperTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Component/Plugin/PluginBaseTest.php',
 #        __DIR__ . '/core/tests/Drupal/Tests/Core/Config/TypeResolverTest.php',
         __DIR__ . '/core/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php',
