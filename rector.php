@@ -556,6 +556,8 @@ return RectorConfig::configure()
         __DIR__ . '/core/tests/Drupal/Tests/Component/DependencyInjection/Dumper/PhpArrayDumperTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Component/Plugin/PluginBaseTest.php',
         __DIR__ . '/core/modules/package_manager/tests/src/Unit/InstalledPackagesListTest.php',
+        __DIR__ . '/core/modules/mysql/tests/src/Unit/InstallTasksTest.php ',
+        __DIR__ . '/core/modules/views/tests/src/Unit/Plugin/Block/ViewsBlockTest.php',
 #        __DIR__ . '/core/tests/Drupal/Tests/Core/Config/TypeResolverTest.php',
         __DIR__ . '/core/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php',
         '*/ProxyClass/*',
