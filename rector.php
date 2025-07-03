@@ -596,6 +596,7 @@ return RectorConfig::configure()
         __DIR__ . '/core/modules/views/tests/src/Unit/Plugin/Block/ViewsBlockTest.php',
 #        __DIR__ . '/core/tests/Drupal/Tests/Core/Config/TypeResolverTest.php',
         __DIR__ . '/core/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php',
+        __DIR__ . '/core/modules/ckeditor5/tests/src/FunctionalJavascript/SourceEditingEmptyElementTest.php',
         '*/ProxyClass/*',
         '*.api.php',
     ])
