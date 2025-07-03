@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_translation\Functional;
 
+use Drupal\language\Entity\ContentLanguageSettings;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\node\Entity\NodeType;
@@ -50,30 +54,36 @@ class ContentTranslationLanguageSwitchTest extends BrowserTestBase {
 
     // Ensure the article content type exists.
     if (!NodeType::load('article')) {
-      NodeType::create([
-        'type' => 'article',
-        'name' => 'Article',
-      ])->save();
+      NodeType::create(
+            [
+              'type' => 'article',
+              'name' => 'Article',
+            ]
+        )->save();
     }
 
     // Add the German language if it does not exist.
     if (!\Drupal::languageManager()->getLanguage('de')) {
-      \Drupal\language\Entity\ConfigurableLanguage::create([
-        'id' => 'de',
-        'label' => 'German',
-      ])->save();
+      ConfigurableLanguage::create(
+            [
+              'id' => 'de',
+              'label' => 'German',
+            ]
+        )->save();
     }
 
     // Enable content translation for article content type.
     \Drupal::service('content_translation.manager')->setEnabled('node', 'article', TRUE);
 
     // Enable language switch on the node edit form.
-    $settings = \Drupal\language\Entity\ContentLanguageSettings::loadByEntityTypeBundle('node', 'article');
+    $settings = ContentLanguageSettings::loadByEntityTypeBundle('node', 'article');
     if (!$settings) {
-      $settings = \Drupal\language\Entity\ContentLanguageSettings::create([
-        'target_entity_type_id' => 'node',
-        'target_bundle' => 'article',
-      ]);
+      $settings = ContentLanguageSettings::create(
+            [
+              'target_entity_type_id' => 'node',
+              'target_bundle' => 'article',
+            ]
+        );
     }
     $settings->setDefaultLangcode('en');
     $settings->setLanguageAlterable(TRUE);
@@ -89,11 +99,13 @@ class ContentTranslationLanguageSwitchTest extends BrowserTestBase {
     $this->drupalPlaceBlock('local_tasks_block');
 
     // Create and log in a user with necessary permissions.
-    $this->webUser = $this->drupalCreateUser([
-      'create article content',
-      'edit any article content',
-      'translate any entity',
-    ]);
+    $this->webUser = $this->drupalCreateUser(
+          [
+            'create article content',
+            'edit any article content',
+            'translate any entity',
+          ]
+      );
     $this->drupalLogin($this->webUser);
   }
 
