@@ -785,11 +785,10 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
    * {@inheritdoc}
    */
   public function getOption($option) {
-    if ($this->isDefaulted($option)) {
+    if ($this->isDefaulted($option) || (!$this->isDefaultDisplay() && !\array_key_exists($option, $this->options))) {
       return $this->default_display->getOption($option);
     }
-
-    if (\array_key_exists($option, $this->options)) {
+    elseif (\array_key_exists($option, $this->options)) {
       return $this->options[$option];
     }
   }
