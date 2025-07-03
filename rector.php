@@ -536,10 +536,10 @@ return RectorConfig::configure()
     ])
     ->withPaths([
 #        __DIR__ . '/core/modules/**/tests/src/Build',
-        __DIR__ . '/core/modules/**/tests/src/FunctionalJavascript',
+#        __DIR__ . '/core/modules/**/tests/src/FunctionalJavascript',
 #        __DIR__ . '/core/tests/Drupal/KernelTests',
 #        __DIR__ . '/core/tests/Drupal/Tests',
-#        __DIR__ . '/core/tests/Drupal/Tests/Component',
+        __DIR__ . '/core/tests/Drupal/Tests/Component',
 #        __DIR__ . '/core/tests/Drupal/KernelTests/Core/Database',
 #        __DIR__ . '/core/tests/Drupal/FunctionalTests',
 #        __DIR__ . '/core/tests/Drupal/FunctionalJavascriptTests',
@@ -548,9 +548,12 @@ return RectorConfig::configure()
     ])
     ->withSkip([
         __DIR__ . '/core/tests/Drupal/Tests/Component/Annotation/Doctrine/Fixtures',
-#        __DIR__ . '/core/tests/Drupal/Tests/Component/Datetime/TimeTest.php',
-#        __DIR__ . '/core/tests/Drupal/Tests/Component/Plugin/PluginBaseTest.php',
-        __DIR__ . '/core/tests/Drupal/Tests/Core/Config/TypeResolverTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Component/Annotation/Doctrine/Ticket/DCOM58Test.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Component/Annotation/Doctrine/DocParserTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Component/Datetime/TimeTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Component/DependencyInjection/Dumper/OptimizedPhpArrayDumperTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Component/Plugin/PluginBaseTest.php',
+#        __DIR__ . '/core/tests/Drupal/Tests/Core/Config/TypeResolverTest.php',
         __DIR__ . '/core/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php',
         '*/ProxyClass/*',
         '*.api.php',
