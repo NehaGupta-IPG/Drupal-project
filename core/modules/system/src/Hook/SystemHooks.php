@@ -23,6 +23,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\system\SystemManager;
 
 /**
  * Hook implementations for system.
@@ -453,7 +454,10 @@ class SystemHooks {
     if ($admin_context->isAdminRoute() && \Drupal::currentUser()->hasPermission('administer site configuration')) {
       $route_match = \Drupal::routeMatch();
       $route_name = $route_match->getRouteName();
-      if ($route_name !== 'system.status' && \Drupal::config('system.advisories')->get('enabled')) {
+      if ($route_name === 'system.status') {
+        return;
+      }
+      if (\Drupal::config('system.advisories')->get('enabled')) {
         /** @var \Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher $fetcher */
         $fetcher = \Drupal::service('system.sa_fetcher');
         $advisories = $fetcher->getSecurityAdvisories(FALSE);
@@ -485,6 +489,11 @@ class SystemHooks {
             $display_as_errors ? $messenger->addError($help_link) : $messenger->addWarning($help_link);
           }
         }
+      }
+      // Check for status report errors.
+      if (\Drupal::service(SystemManager::class)->checkRequirements()) {
+        $messenger = \Drupal::messenger();
+        $messenger->addError($this->t('One or more problems were detected with your Drupal installation. Check the <a href=":status">status report</a> for more information.', [':status' => Url::fromRoute('system.status')->toString()]));
       }
     }
   }

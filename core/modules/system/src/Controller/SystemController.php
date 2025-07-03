@@ -118,10 +118,6 @@ class SystemController extends ControllerBase {
    *   A renderable array of the administration overview page.
    */
   public function overview($link_id) {
-    // Check for status report errors.
-    if ($this->currentUser()->hasPermission('administer site configuration') && $this->systemManager->checkRequirements()) {
-      $this->messenger()->addError($this->t('One or more problems were detected with your Drupal installation. Check the <a href=":status">status report</a> for more information.', [':status' => Url::fromRoute('system.status')->toString()]));
-    }
     // Load all menu links below it.
     $parameters = new MenuTreeParameters();
     $parameters->setRoot($link_id)->excludeRoot()->setTopLevelOnly()->onlyEnabledLinks();
