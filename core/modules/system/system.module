@@ -396,7 +396,7 @@ function system_region_list($theme, $show = REGIONS_ALL): array {
     try {
       $theme = \Drupal::service('theme_handler')->getTheme($theme);
     }
-    catch (\InvalidArgumentException $e) {
+    catch (\Drupal\Core\Extension\Exception\UnknownExtensionException $e) {
       return [];
     }
   }
