@@ -625,15 +625,14 @@
         Object.hasOwn(Drupal.ckeditor5, 'saveCallback') &&
         Drupal.ckeditor5.saveCallback != null &&
         Object.hasOwn(Drupal.ckeditor5.saveCallback, 'has') &&
-        Drupal.ckeditor5.saveCallback.has(set) &&
+        Drupal.ckeditor5.saveCallback.has('set') &&
         Object.hasOwn(dialogSettings, 'selector')
       ) {
         Drupal.ckeditor5.saveCallback.set(
           dialogSettings.selector || '#drupal-modal',
           saveCallback,
         );
-      }
-      else {
+      } else {
         Drupal.ckeditor5.saveCallback = saveCallback;
       }
     },

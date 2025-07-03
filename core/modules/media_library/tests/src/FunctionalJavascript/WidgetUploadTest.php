@@ -766,7 +766,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
   /**
    * Tests if the widget is working correctly when opened from a modal.
    */
-  public function testWidgetInModalContext() {
+  public function testWidgetInModalContext(): void {
     $page = $this->getSession()->getPage();
 
     foreach ($this->getTestFiles('image') as $image) {
