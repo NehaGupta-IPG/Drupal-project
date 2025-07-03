@@ -235,6 +235,7 @@ class Node extends EditorialContentEntityBase implements NodeInterface {
     $value = $this->get('created')->value;
     // @todo This method should not return NULL according to its documentation
     // in NodeInterface.
+    // @see https://www.drupal.org/project/drupal/issues/3533981
     return isset($value) ? (int) $value : NULL;
   }
 
