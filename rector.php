@@ -241,7 +241,7 @@ final class DrupalAnnotationToAttributeRector extends AbstractRector implements 
             if ($node instanceof ClassMethod) {
                 $hasDoc = (bool) $node->getDocComment();
                 if ($hasDoc) {
-                    $check = preg_match("/.*\/\*\*.*\n.*\* @/i", $node->getDocComment()->getText());
+                    $check = preg_match("/.*\/\*\*.*\n.*\*( @|\n)/i", $node->getDocComment()->getText());
                 }
                 if (!$hasDoc || $check) {
                     $prettifiedTestMethodName = lcfirst(self::$namePrettifier->prettifyTestMethodName($this->getName($node)));
@@ -573,12 +573,12 @@ return RectorConfig::configure()
     ->withPaths([
 #        __DIR__ . '/core/modules/**/tests/src/Build',
 #        __DIR__ . '/core/modules/**/tests/src/FunctionalJavascript',
-#        __DIR__ . '/core/modules/**/tests/src/Unit',
+        __DIR__ . '/core/modules/**/tests/src/Unit',
 #        __DIR__ . '/core/tests/Drupal/KernelTests',
 #        __DIR__ . '/core/tests/Drupal/Tests',
 #        __DIR__ . '/core/tests/Drupal/Tests/Component',
 #        __DIR__ . '/core/tests/Drupal/KernelTests/Core/Database',
-        __DIR__ . '/core/tests/Drupal/FunctionalTests',
+#        __DIR__ . '/core/tests/Drupal/FunctionalTests',
 #        __DIR__ . '/core/tests/Drupal/FunctionalJavascriptTests',
 #        __DIR__ . '/core',
 #        __DIR__ . '/composer',
