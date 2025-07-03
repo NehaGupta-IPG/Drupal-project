@@ -155,4 +155,34 @@ class ContentTranslationLanguageChangeTest extends NodeTestBase {
     $this->assertArrayNotHasKey('de', $translation_languages);
   }
 
+  /**
+   * Tests saving node after switching langcode without existing translation.
+   *
+   * This test reproduces the fatal error when changing the langcode on
+   * an entity without an existing translation, and verifies the fallback fix.
+   * 
+   * @return void
+   */
+  public function testSwitchLangcodeWithoutExistingTranslation(): void
+  {
+    // Create a node in English.
+    $this->drupalGet('node/add/article');
+    $edit = [
+    'title[0][value]' => 'Test switch langcode',
+    ];
+    $this->submitForm($edit, 'Save');
+
+    // Confirm node saved in English.
+    $node = $this->getNodeByTitle('Test switch langcode');
+    $this->assertEquals('en', $node->language()->getId());
+
+    // Edit the node and switch the langcode to German.
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->submitForm(['langcode[0][value]' => 'de'], 'Save');
+
+    // Reload and assert that the language was updated successfully.
+    $node = $this->getNodeByTitle('Test switch langcode');
+    $this->assertEquals('de', $node->language()->getId());
+  }
+
 }
