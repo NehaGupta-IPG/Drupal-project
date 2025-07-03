@@ -127,6 +127,10 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
 
     $recipient = PlainTextOutput::renderFromHtml($this->token->replace($this->configuration['recipient'], $this->configuration));
 
+    if ($this->configuration['reply_to']) {
+      $reply_to = PlainTextOutput::renderFromHtml($this->token->replace($this->configuration['reply_to'], $this->configuration));
+    }
+
     // If the recipient is a registered user with a language preference, use
     // the recipient's preferred language. Otherwise, use the system default
     // language.
@@ -140,7 +144,11 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
     }
     $params = ['context' => $this->configuration];
 
-    $message = $this->mailManager->mail('system', 'action_send_email', $recipient, $langcode, $params);
+    if ($this->configuration['reply_to']) {
+      $message = $this->mailManager->mail('system', 'action_send_email', $recipient, $langcode, $params, $reply_to);
+    } else {
+      $message = $this->mailManager->mail('system', 'action_send_email', $recipient, $langcode, $params);
+    }
     // Error logging is handled by \Drupal\Core\Mail\MailManager::mail().
     if ($message['result']) {
       $this->logger->info('Sent email to %recipient', ['%recipient' => $recipient]);
@@ -153,6 +161,7 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
   public function defaultConfiguration() {
     return [
       'recipient' => '',
+      'reply_to' => '',
       'subject' => '',
       'message' => '',
     ];
@@ -168,6 +177,13 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
       '#default_value' => $this->configuration['recipient'],
       '#maxlength' => '254',
       '#description' => $this->t('You may also use tokens: [node:author:mail], [comment:author:mail], etc. Separate recipients with a comma.'),
+    ];
+    $form['reply_to'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Reply-to email address or addresses'),
+      '#default_value' => $this->configuration['reply_to'],
+      '#maxlength' => '254',
+      '#description' => $this->t('You may also use tokens: [node:author:mail], [comment:author:mail], etc. Separate reply-to email addresses with a comma.'),
     ];
     $form['subject'] = [
       '#type' => 'textfield',
@@ -196,6 +212,11 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
       // message.
       $form_state->setErrorByName('recipient', $this->t('Enter a valid email address or use a token email address such as %author.', ['%author' => '[node:author:mail]']));
     }
+    if (!$this->emailValidator->isValid($form_state->getValue('reply_to')) && !str_contains($form_state->getValue('reply_to'), ':mail')) {
+      // We want the literal %author placeholder to be emphasized in the error
+      // message.
+      $form_state->setErrorByName('reply_to', $this->t('Enter a valid email address or use a token email address such as %author.', ['%author' => '[node:author:mail]']));
+    }
   }
 
   /**
@@ -203,6 +224,7 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     $this->configuration['recipient'] = $form_state->getValue('recipient');
+    $this->configuration['reply_to'] = $form_state->getValue('reply_to');
     $this->configuration['subject'] = $form_state->getValue('subject');
     $this->configuration['message'] = $form_state->getValue('message');
   }
