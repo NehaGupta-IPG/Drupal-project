@@ -208,16 +208,32 @@ final class DrupalAnnotationToAttributeRector extends AbstractRector implements 
 
             // Ensure a class-level PhpDoc always exists.
             if (self::$currentClassNode instanceof Class_) {
-                if (self::$currentClassNode->getDocComment() === null) {
+                $hasDoc = (bool) self::$currentClassNode->getDocComment();
+                if ($hasDoc) {
+                    $check = preg_match("/.*\/\*\*.*\n.*\* @/i", $node->getDocComment()->getText());
+                }
+                if (!$hasDoc || $check) {
                     if (self::$testedClassName) {
-                        $newDoc = "/**\n * Tests " . self::$testedClassName . ".\n */";
+                        $newDesc = "Tests " . self::$testedClassName . ".";
                     }
                     else {
-                        $prettifiedClassName = self::$namePrettifier->prettifyTestClassName(self::$currentClassName);
-                        $newDocHeader = preg_replace("/(.*)( \\(.*\\))/i", '${1}', $prettifiedClassName);
-                        $newDoc = "/**\n * Tests {$newDocHeader}.\n */";
+                        $prettifiedClassName = preg_replace("/(.*)( \\(.*\\))/i", '${1}', self::$namePrettifier->prettifyTestClassName(self::$currentClassName));
+                        $newDesc = "Tests " . $prettifiedClassName . ".";
                     }
-                    self::$currentClassNode->setDocComment(new Doc($newDoc));
+                    if ($hasDoc) {
+                        $lines = explode("\n", self::$currentClassNode->getDocComment()->getText());
+                        $newLines = [];
+                        $newLines[] = array_shift($lines);
+                        $newLines[] = " * {$newDesc}";
+                        $newLines[] = " *";
+                        $newLines = array_merge($newLines, $lines);
+                    } else {
+                        $newLines = [];
+                        $newLines[] = "/**";
+                        $newLines[] = " * {$newDesc}";
+                        $newLines[] = " */";
+                    }
+                    self::$currentClassNode->setDocComment(new Doc(implode("\n", $newLines)));
                 }
             }
 
@@ -566,7 +582,7 @@ return RectorConfig::configure()
         __DIR__ . '/core/tests/Drupal/Tests/Component/DependencyInjection/Dumper/PhpArrayDumperTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Component/Plugin/PluginBaseTest.php',
         __DIR__ . '/core/modules/package_manager/tests/src/Unit/InstalledPackagesListTest.php',
-        __DIR__ . '/core/modules/mysql/tests/src/Unit/InstallTasksTest.php ',
+        __DIR__ . '/core/modules/mysql/tests/src/Unit/InstallTasksTest.php',
         __DIR__ . '/core/modules/views/tests/src/Unit/Plugin/Block/ViewsBlockTest.php',
 #        __DIR__ . '/core/tests/Drupal/Tests/Core/Config/TypeResolverTest.php',
         __DIR__ . '/core/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php',
