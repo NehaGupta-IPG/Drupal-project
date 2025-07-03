@@ -237,17 +237,27 @@ final class DrupalAnnotationToAttributeRector extends AbstractRector implements 
                 }
             }
 
-            // Ensure a method-level PhpDoc always has a description.
+            // Ensure a method-level PhpDoc always exist and has a description.
             if ($node instanceof ClassMethod) {
-                $check = preg_match("/.*\/\*\*.*\n.*\* @/i", $node->getDocComment()->getText());
-                if ($check) {
-                    $lines = explode("\n", $node->getDocComment()->getText());
+                $hasDoc = (bool) $node->getDocComment();
+                if ($hasDoc) {
+                    $check = preg_match("/.*\/\*\*.*\n.*\* @/i", $node->getDocComment()->getText());
+                }
+                if (!$hasDoc || $check) {
                     $prettifiedTestMethodName = lcfirst(self::$namePrettifier->prettifyTestMethodName($this->getName($node)));
-                    $newLines = [];
-                    $newLines[] = array_shift($lines);
-                    $newLines[] = "   * Tests {$prettifiedTestMethodName}.";
-                    $newLines[] = "   *";
-                    $newLines = array_merge($newLines, $lines);
+                    if ($hasDoc) {
+                        $lines = explode("\n", $node->getDocComment()->getText());
+                        $newLines = [];
+                        $newLines[] = array_shift($lines);
+                        $newLines[] = "   * Tests {$prettifiedTestMethodName}.";
+                        $newLines[] = "   *";
+                        $newLines = array_merge($newLines, $lines);
+                    } else {
+                        $newLines = [];
+                        $newLines[] = "  /**";
+                        $newLines[] = "   * Tests {$prettifiedTestMethodName}.";
+                        $newLines[] = "   */";
+                    }
                     $node->setDocComment(new Doc(implode("\n", $newLines)));
                 }
             }
