@@ -210,7 +210,7 @@ final class DrupalAnnotationToAttributeRector extends AbstractRector implements 
             if (self::$currentClassNode instanceof Class_) {
                 $hasDoc = (bool) self::$currentClassNode->getDocComment();
                 if ($hasDoc) {
-                    $check = preg_match("/.*\/\*\*.*\n.*\* @/i", $node->getDocComment()->getText());
+                    $check = preg_match("/.*\/\*\*.*\n.*\* @/i",  self::$currentClassNode->getDocComment()->getText());
                 }
                 if (!$hasDoc || $check) {
                     if (self::$testedClassName) {
