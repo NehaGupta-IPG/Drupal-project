@@ -562,8 +562,8 @@ return RectorConfig::configure()
     ])
     ->withPaths([
 #        __DIR__ . '/core/modules/**/tests/src/Build',
-#        __DIR__ . '/core/modules/**/tests/src/FunctionalJavascript',
-        __DIR__ . '/core/modules/**/tests/src/Unit',
+        __DIR__ . '/core/modules/**/tests/src/FunctionalJavascript',
+#        __DIR__ . '/core/modules/**/tests/src/Unit',
 #        __DIR__ . '/core/tests/Drupal/KernelTests',
 #        __DIR__ . '/core/tests/Drupal/Tests',
 #        __DIR__ . '/core/tests/Drupal/Tests/Component',
