@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Field;
 
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
@@ -77,7 +79,7 @@ class FieldTypePluginManagerTest extends UnitTestCase {
   /**
    * @covers ::getGroupedDefinitions
    */
-  public function testGetGroupedDefinitions() {
+  public function testGetGroupedDefinitions(): void {
     $this->discovery->getDefinitions()->willReturn([
       'telephone' => [
         'category' => 'general',
@@ -130,7 +132,7 @@ class FieldTypePluginManagerTest extends UnitTestCase {
   /**
    * @covers ::getGroupedDefinitions
    */
-  public function testGetGroupedDefinitionsInvalid() {
+  public function testGetGroupedDefinitionsInvalid(): void {
     $this->discovery->getDefinitions()->willReturn([
       'string' => [
         'category' => 'text',
@@ -147,17 +149,14 @@ class FieldTypePluginManagerTest extends UnitTestCase {
     ]);
 
     $zend_assertions_default = ini_get('zend.assertions');
-    $assert_active_default = assert_options(ASSERT_ACTIVE);
 
     // Test behavior when assertions are not enabled.
     ini_set('zend.assertions', 0);
-    assert_options(ASSERT_ACTIVE, 0);
     $grouped_definitions = $this->fieldTypeManager->getGroupedDefinitions();
     $this->assertEquals(['General'], array_keys($grouped_definitions));
 
     // Test behavior when assertions are enabled.
     ini_set('zend.assertions', 1);
-    assert_options(ASSERT_ACTIVE, 1);
     $this->expectException(\AssertionError::class);
     try {
       $this->fieldTypeManager->getGroupedDefinitions();
@@ -165,7 +164,6 @@ class FieldTypePluginManagerTest extends UnitTestCase {
     catch (\Exception $e) {
       // Reset the original assert values.
       ini_set('zend.assertions', $zend_assertions_default);
-      assert_options(ASSERT_ACTIVE, $assert_active_default);
 
       throw $e;
     }
@@ -174,7 +172,7 @@ class FieldTypePluginManagerTest extends UnitTestCase {
   /**
    * @covers ::getGroupedDefinitions
    */
-  public function testGetGroupedDefinitionsEmpty() {
+  public function testGetGroupedDefinitionsEmpty(): void {
     $this->fieldTypeCategoryManager->getDefinitions()->willReturn([]);
     $this->assertEquals([], $this->fieldTypeManager->getGroupedDefinitions([]));
   }

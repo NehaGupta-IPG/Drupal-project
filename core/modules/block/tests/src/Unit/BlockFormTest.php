@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Unit;
 
 use Drupal\block\BlockForm;
@@ -140,7 +142,7 @@ class BlockFormTest extends UnitTestCase {
    *
    * @see \Drupal\block\BlockForm::getUniqueMachineName()
    */
-  public function testGetUniqueMachineName() {
+  public function testGetUniqueMachineName(): void {
     $blocks = [];
 
     $blocks['test'] = $this->getBlockMockWithMachineName('test');

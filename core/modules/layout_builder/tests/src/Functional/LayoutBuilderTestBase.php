@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Functional;
 
 use Drupal\Tests\BrowserTestBase;
@@ -8,7 +10,7 @@ use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 /**
  * Tests the Layout Builder UI.
  */
-class LayoutBuilderTestBase extends BrowserTestBase {
+abstract class LayoutBuilderTestBase extends BrowserTestBase {
 
   use FieldUiTestTrait;
 

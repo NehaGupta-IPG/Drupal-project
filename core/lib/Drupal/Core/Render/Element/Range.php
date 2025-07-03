@@ -3,6 +3,7 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 
 /**
@@ -11,22 +12,24 @@ use Drupal\Core\Render\Element;
  * Provides an HTML5 input element with type of "range".
  *
  * Properties:
- * - #min: Minimum value (defaults to 0).
- * - #max: Maximum value (defaults to 100).
+ *
+ * @property $min
+ *   Minimum value (defaults to 0).
+ * @property $max
+ *   Maximum value (defaults to 100).
  * Refer to \Drupal\Core\Render\Element\Number for additional properties.
  *
  * Usage example:
  * @code
- * $form['quantity'] = array(
+ * $form['quantity'] = [
  *   '#type' => 'range',
  *   '#title' => $this->t('Quantity'),
- * );
+ * ];
  * @endcode
  *
  * @see \Drupal\Core\Render\Element\Number
- *
- * @FormElement("range")
  */
+#[FormElement('range')]
 class Range extends Number {
 
   /**
@@ -34,12 +37,11 @@ class Range extends Number {
    */
   public function getInfo() {
     $info = parent::getInfo();
-    $class = static::class;
     return [
       '#min' => 0,
       '#max' => 100,
       '#pre_render' => [
-        [$class, 'preRenderRange'],
+        [static::class, 'preRenderRange'],
       ],
       '#theme' => 'input__range',
     ] + $info;

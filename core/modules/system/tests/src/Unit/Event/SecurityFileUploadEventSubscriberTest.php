@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Unit\Event;
 
 use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
@@ -30,7 +32,7 @@ class SecurityFileUploadEventSubscriberTest extends UnitTestCase {
    *
    * @covers ::sanitizeName
    */
-  public function testSanitizeName(string $filename, string $allowed_extensions, string $expected_filename, string $expected_filename_with_insecure_uploads = NULL) {
+  public function testSanitizeName(string $filename, string $allowed_extensions, string $expected_filename, ?string $expected_filename_with_insecure_uploads = NULL): void {
     // Configure insecure uploads to be renamed.
     $config_factory = $this->getConfigFactoryStub([
       'system.file' => [
@@ -70,7 +72,7 @@ class SecurityFileUploadEventSubscriberTest extends UnitTestCase {
    *   Arrays with original name, allowed extensions, expected name and
    *   (optional) expected name 'allow_insecure_uploads' is set to TRUE.
    */
-  public function provideFilenames() {
+  public static function provideFilenames() {
     return [
       'All extensions allowed filename not munged' => ['foo.txt', '', 'foo.txt'],
       'All extensions allowed with .php file' => ['foo.php', '', 'foo.php_.txt', 'foo.php'],
@@ -83,12 +85,17 @@ class SecurityFileUploadEventSubscriberTest extends UnitTestCase {
       'no extension produces no errors' => ['foo', '', 'foo'],
       'filename is munged' => ['foo.phar.png.php.jpg', 'jpg png', 'foo.phar_.png_.php_.jpg'],
       'filename is munged regardless of case' => ['FOO.pHAR.PNG.PhP.jpg', 'jpg png', 'FOO.pHAR_.PNG_.PhP_.jpg'],
-      'null bytes are removed' => ['foo' . chr(0) . '.txt' . chr(0), '', 'foo.txt'],
+      'null bytes are removed even if some extensions are allowed' => [
+        'foo' . chr(0) . '.html' . chr(0),
+        'txt',
+        'foo.html',
+      ],
       'dot files are renamed' => ['.git', '', 'git'],
-      'htaccess files are renamed even if allowed' => ['.htaccess', 'htaccess txt', '.htaccess_.txt', '.htaccess'],
+      'htaccess files are renamed even if allowed' => ['.htaccess', 'htaccess txt', 'htaccess'],
       '.phtml extension allowed with .phtml file' => ['foo.phtml', 'phtml', 'foo.phtml'],
       '.phtml, .txt extension allowed with .phtml file' => ['foo.phtml', 'phtml txt', 'foo.phtml_.txt', 'foo.phtml'],
       'All extensions allowed with .phtml file' => ['foo.phtml', '', 'foo.phtml_.txt', 'foo.phtml'],
+      'dot files are renamed even if allowed and not in security list' => ['.git', 'git', 'git'],
     ];
   }
 
@@ -104,7 +111,7 @@ class SecurityFileUploadEventSubscriberTest extends UnitTestCase {
    *
    * @covers ::sanitizeName
    */
-  public function testSanitizeNameNoMunge(string $filename, string $allowed_extensions) {
+  public function testSanitizeNameNoMunge(string $filename, string $allowed_extensions): void {
     $config_factory = $this->getConfigFactoryStub([
       'system.file' => [
         'allow_insecure_uploads' => FALSE,
@@ -140,14 +147,15 @@ class SecurityFileUploadEventSubscriberTest extends UnitTestCase {
    * @return array
    *   Arrays with original name and allowed extensions.
    */
-  public function provideFilenamesNoMunge() {
+  public static function provideFilenamesNoMunge() {
     return [
       // The following filename would be rejected by 'FileExtension' constraint
       // and therefore remains unchanged.
       '.php is not munged when it would be rejected' => ['foo.php.php', 'jpg'],
-      '.php is not munged when it would be rejected and filename contains null byte character' => ['foo.' . chr(0) . 'php.php', 'jpg'],
-      'extension less files are not munged when they would be rejected' => ['foo', 'jpg'],
-      'dot files are not munged when they would be rejected' => ['.htaccess', 'jpg png'],
+      'extension less files are not munged when they would be rejected' => [
+        'foo',
+        'jpg',
+      ],
     ];
   }
 

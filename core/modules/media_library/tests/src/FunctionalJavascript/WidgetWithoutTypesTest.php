@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media_library\FunctionalJavascript;
 
 use Drupal\Core\Url;
@@ -25,7 +27,7 @@ class WidgetWithoutTypesTest extends MediaLibraryTestBase {
   /**
    * Tests that the widget works as expected when media types are deleted.
    */
-  public function testWidgetWithoutMediaTypes() {
+  public function testWidgetWithoutMediaTypes(): void {
     $assert_session = $this->assertSession();
 
     $user = $this->drupalCreateUser([

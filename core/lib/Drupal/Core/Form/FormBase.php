@@ -6,6 +6,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Logger\LoggerChannelTrait;
+use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
@@ -76,6 +77,13 @@ abstract class FormBase implements FormInterface, ContainerInjectionInterface {
   protected $routeMatch;
 
   /**
+   * The element info manager.
+   *
+   * @var \Drupal\Core\Render\ElementInfoManagerInterface
+   */
+  protected ElementInfoManagerInterface $elementInfoManager;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
@@ -93,13 +101,13 @@ abstract class FormBase implements FormInterface, ContainerInjectionInterface {
    * Retrieves a configuration object.
    *
    * This is the main entry point to the configuration API. Calling
-   * @code $this->config('book.admin') @endcode will return a configuration
-   * object in which the book module can store its administrative settings.
+   * "$this->config('my_module.admin')" will return a configuration object in
+   * which the my_module module can store its administrative settings.
    *
    * @param string $name
    *   The name of the configuration object to retrieve. The name corresponds to
-   *   a configuration file. For @code \Drupal::config('book.admin') @endcode,
-   *   the config object returned will contain the contents of book.admin
+   *   a configuration file. For "\Drupal::config('my_module.admin')", the
+   *   config object returned will contain the contents of my_module.admin
    *   configuration file.
    *
    * @return \Drupal\Core\Config\ImmutableConfig
@@ -116,12 +124,36 @@ abstract class FormBase implements FormInterface, ContainerInjectionInterface {
    * when the config factory needs to be manipulated directly.
    *
    * @return \Drupal\Core\Config\ConfigFactoryInterface
+   *   The configuration factory for this form.
    */
   protected function configFactory() {
     if (!$this->configFactory) {
       $this->configFactory = $this->container()->get('config.factory');
     }
     return $this->configFactory;
+  }
+
+  /**
+   * The element info manager.
+   *
+   * @return \Drupal\Core\Render\ElementInfoManagerInterface
+   *   The element info manager.
+   */
+  protected function elementInfoManager(): ElementInfoManagerInterface {
+    if (!isset($this->elementInfoManager)) {
+      $this->elementInfoManager = $this->container()->get('plugin.manager.element_info');
+    }
+    return $this->elementInfoManager;
+  }
+
+  /**
+   * Sets the element info manager for this form.
+   *
+   * @return $this
+   */
+  public function setElementInfoManager(ElementInfoManagerInterface $elementInfoManager): static {
+    $this->elementInfoManager = $elementInfoManager;
+    return $this;
   }
 
   /**
@@ -161,6 +193,7 @@ abstract class FormBase implements FormInterface, ContainerInjectionInterface {
    * Gets the route match.
    *
    * @return \Drupal\Core\Routing\RouteMatchInterface
+   *   The currently active route match object.
    */
   protected function getRouteMatch() {
     if (!$this->routeMatch) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\help\Unit;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -56,7 +58,7 @@ class HelpTopicTwigLoaderTest extends UnitTestCase {
   /**
    * @covers ::__construct
    */
-  public function testConstructor() {
+  public function testConstructor(): void {
     // Verify that the module/theme directories were added in the constructor,
     // and non-existent directories were omitted.
     $paths = $this->helpLoader->getPaths(HelpTopicTwigLoader::MAIN_NAMESPACE);
@@ -68,7 +70,7 @@ class HelpTopicTwigLoaderTest extends UnitTestCase {
   /**
    * @covers ::getSourceContext
    */
-  public function testGetSourceContext() {
+  public function testGetSourceContext(): void {
     $source = $this->helpLoader->getSourceContext('@' . HelpTopicTwigLoader::MAIN_NAMESPACE . '/test.topic.html.twig');
     $this->assertEquals('{% line 4 %}<h2>Test</h2>', $source->getCode());
   }
@@ -76,7 +78,7 @@ class HelpTopicTwigLoaderTest extends UnitTestCase {
   /**
    * @covers ::getSourceContext
    */
-  public function testGetSourceContextException() {
+  public function testGetSourceContextException(): void {
     $this->expectException(LoaderError::class);
     $this->expectExceptionMessage("Malformed YAML in help topic \"vfs://root/modules/test/help_topics/test.invalid_yaml.html.twig\":");
 
@@ -86,7 +88,7 @@ class HelpTopicTwigLoaderTest extends UnitTestCase {
   /**
    * Sets up the virtual file system.
    */
-  protected function setUpVfs() {
+  protected function setUpVfs(): void {
     $content = <<<EOF
 ---
 label: Test

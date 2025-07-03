@@ -6,7 +6,6 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\Plugin\DataType\EntityAdapter;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Form\SubformStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\field\Entity\FieldConfig;
@@ -70,7 +69,7 @@ class FieldStorageConfigEditForm extends EntityForm {
    * @param \Drupal\field\FieldConfigInterface|string $field_config
    *   The ID of the field config whose field storage config is being edited.
    */
-  public function buildForm(array $form, FormStateInterface $form_state, FieldConfigInterface|string $field_config = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, FieldConfigInterface|string|null $field_config = NULL) {
     if ($field_config) {
       $field = $field_config;
       if (is_string($field)) {
@@ -93,6 +92,9 @@ class FieldStorageConfigEditForm extends EntityForm {
 
     $field_label = $form_state->get('field_config')->label();
     $form['#prefix'] = '<p>' . $this->t('These settings apply to the %field field everywhere it is used. Some also impact the way that data is stored and cannot be changed once data has been created.', ['%field' => $field_label]) . '</p>';
+
+    // Add the cardinality sub-form.
+    $form['cardinality_container'] = $this->getCardinalityForm();
 
     // Add settings provided by the field module. The field module is
     // responsible for not returning settings that cannot be changed if
@@ -118,9 +120,6 @@ class FieldStorageConfigEditForm extends EntityForm {
     }
     $item = $items->first() ?: $items->appendItem();
     $form['settings'] += $item->storageSettingsForm($form, $form_state, $this->entity->hasData());
-
-    // Add the cardinality sub-form.
-    $form['cardinality_container'] = $this->getCardinalityForm();
 
     return $form;
   }
@@ -193,14 +192,7 @@ class FieldStorageConfigEditForm extends EntityForm {
    * {@inheritdoc}
    */
   protected function actions(array $form, FormStateInterface $form_state) {
-    if ($form_state instanceof SubformStateInterface) {
-      return [];
-    }
-    $elements = parent::actions($form, $form_state);
-    $elements['submit']['#value'] = $this->entity->isNew() ? $this->t('Continue') : $this->t('Save');
-
-    @trigger_error('Rendering ' . __CLASS__ . ' outside of a subform is deprecated in drupal:10.2.0 and is removed in drupal:11.0.0. See https://www.drupal.org/node/3391538', E_USER_DEPRECATED);
-    return $elements;
+    return [];
   }
 
   /**
@@ -271,6 +263,8 @@ class FieldStorageConfigEditForm extends EntityForm {
    * returns that cardinality or NULL if no cardinality has been enforced.
    *
    * @return int|null
+   *   The enforced cardinality as an integer, or NULL if no cardinality is
+   *   enforced.
    */
   protected function getEnforcedCardinality() {
     /** @var \Drupal\Core\Field\FieldTypePluginManager $field_type_manager */
