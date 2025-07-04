@@ -10,7 +10,9 @@ use Drupal\Core\Render\Attribute\FormElement;
  * Provides a form element for a set of radio buttons.
  *
  * Properties:
- * - #options: An associative array, where the keys are the returned values for
+ *
+ * @property $options
+ *   An associative array, where the keys are the returned values for
  *   each radio button, and the values are the labels next to each radio button.
  *
  * Usage example:
