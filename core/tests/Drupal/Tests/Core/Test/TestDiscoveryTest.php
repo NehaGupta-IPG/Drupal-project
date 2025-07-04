@@ -39,7 +39,7 @@ class TestDiscoveryTest extends UnitTestCase {
       $info = TestDiscovery::getTestInfo($classname, $doc_comment);
       $this->assertEquals($expected, $info);
     }
-    catch(MissingGroupException) {
+    catch (MissingGroupException) {
       // In case the test class was converted to attributes already, we need to
       // get the data from PHPUnit discovery instead.
       $configurationFilePath = $this->root . \DIRECTORY_SEPARATOR . 'core';
