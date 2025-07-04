@@ -210,7 +210,7 @@ final class DrupalAnnotationToAttributeRector extends AbstractRector implements 
             if (self::$currentClassNode instanceof Class_) {
                 $hasDoc = (bool) self::$currentClassNode->getDocComment();
                 if ($hasDoc) {
-                    $check = preg_match("/.*\/\*\*.*\n.*\* @/i",  self::$currentClassNode->getDocComment()->getText());
+                    $check = preg_match("/.*\/\*\*.*\n.*\*( @|\n)/i",  self::$currentClassNode->getDocComment()->getText());
                 }
                 if (!$hasDoc || $check) {
                     if (self::$testedClassName) {
@@ -594,6 +594,11 @@ return RectorConfig::configure()
         __DIR__ . '/core/modules/package_manager/tests/src/Unit/InstalledPackagesListTest.php',
         __DIR__ . '/core/modules/mysql/tests/src/Unit/InstallTasksTest.php',
         __DIR__ . '/core/modules/views/tests/src/Unit/Plugin/Block/ViewsBlockTest.php',
+        __DIR__ . '/core/modules/comment/tests/src/Unit/CommentLinkBuilderTest.php',
+        __DIR__ . '/core/modules/language/tests/src/Unit/LanguageNegotiationUrlTest.php',
+        __DIR__ . '/core/modules/migrate_drupal/tests/src/Unit/source/d6/Drupal6SqlBaseTest.php',
+        __DIR__ . '/core/modules/views/tests/src/Unit/Plugin/field/FieldPluginBaseTest.php',
+        __DIR__ . '/core/modules/views/tests/src/Unit/Routing/ViewPageControllerTest.php',
 #        __DIR__ . '/core/tests/Drupal/Tests/Core/Config/TypeResolverTest.php',
         __DIR__ . '/core/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php',
         __DIR__ . '/core/modules/ckeditor5/tests/src/FunctionalJavascript/SourceEditingEmptyElementTest.php',
