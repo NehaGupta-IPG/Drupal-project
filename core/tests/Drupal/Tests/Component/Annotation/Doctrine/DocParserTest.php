@@ -162,7 +162,7 @@ DOCBLOCK;
         $this->assertEquals("bar", $annot->foo);
     }
 
-      /**
+    /**
      * Tests typical method doc block.
      */
     #[Group('debug')]
@@ -534,7 +534,7 @@ DOCBLOCK;
         );
     }
 
-      /**
+    /**
      * Tests annotation with var type.
      */
     #[DataProvider('getAnnotationVarTypeProviderValid')]
@@ -552,7 +552,7 @@ DOCBLOCK;
         $this->assertNotNull($result[0]->$attribute);
     }
 
-      /**
+    /**
      * Tests annotation with var type error.
      */
     #[DataProvider('getAnnotationVarTypeProviderInvalid')]
@@ -572,7 +572,7 @@ DOCBLOCK;
     }
 
 
-      /**
+    /**
      * Tests annotation with var type array error.
      */
     #[DataProvider('getAnnotationVarTypeArrayProviderInvalid')]
@@ -591,7 +591,7 @@ DOCBLOCK;
         }
     }
 
-      /**
+    /**
      * Tests annotation with attributes.
      */
     #[DataProvider('getAnnotationVarTypeProviderValid')]
@@ -610,7 +610,7 @@ DOCBLOCK;
         $this->assertNotNull($result[0]->$getter());
     }
 
-     /**
+    /**
      * Tests annotation with attributes error.
      */
     #[DataProvider('getAnnotationVarTypeProviderInvalid')]
@@ -630,7 +630,7 @@ DOCBLOCK;
     }
 
 
-     /**
+    /**
      * Tests annotation with attributes with var type array error.
      */
     #[DataProvider('getAnnotationVarTypeArrayProviderInvalid')]
@@ -872,7 +872,7 @@ DOCBLOCK;
         return $provider;
     }
 
-      /**
+    /**
      * Tests support class constants.
      */
     #[DataProvider('getConstantsProvider')]
@@ -974,8 +974,8 @@ DOCBLOCK;
         $parser->parse($docblock,$context);
     }
 
-      /**
-     * Tests regression d d c 575.
+    /**
+     * Tests regression DDC-575.
      */
     #[Group('DDC-575')]
     public function testRegressionDDC575(): void
@@ -1008,7 +1008,7 @@ DOCBLOCK;
         $this->assertInstanceOf("Drupal\Tests\Component\Annotation\Doctrine\Name", $result[0]);
     }
 
-      /**
+    /**
      * Tests annotation without class is ignored without warning.
      */
     #[Group('DDC-77')]
@@ -1021,7 +1021,7 @@ DOCBLOCK;
         $this->assertCount(0, $result);
     }
 
-      /**
+    /**
      * Tests not an annotation class is ignored without warning.
      */
     #[Group('DCOM-168')]
@@ -1044,7 +1044,7 @@ DOCBLOCK;
         $parser->parse("@Name(foo='bar')");
     }
 
-      /**
+    /**
      * Tests annotation does not throw exception when at sign is not followed by identifier.
      */
     #[Group('DCOM-41')]
@@ -1056,7 +1056,7 @@ DOCBLOCK;
         $this->assertCount(0, $result);
     }
 
-      /**
+    /**
      * Tests annotation throws exception when at sign is not followed by identifier in nested annotation.
      */
     #[Group('DCOM-41')]
@@ -1068,7 +1068,7 @@ DOCBLOCK;
         $parser->parse("@Drupal\Tests\Component\Annotation\Doctrine\Name(@')");
     }
 
-      /**
+    /**
      * Tests autoload annotation.
      */
     #[Group('DCOM-56')]
@@ -1102,7 +1102,7 @@ DOCBLOCK;
         return $parser;
     }
 
-      /**
+    /**
      * Tests syntax error with context description.
      */
     #[Group('DDC-78')]
@@ -1115,7 +1115,7 @@ DOCBLOCK;
         $parser->parse("@Name(foo='bar')", "class \Drupal\Tests\Component\Annotation\Doctrine\Name");
     }
 
-      /**
+    /**
      * Tests syntax error with unknown characters.
      */
     #[Group('DDC-183')]
@@ -1143,8 +1143,8 @@ DOCBLOCK;
         }
     }
 
-      /**
-     * Tests ignore p h p doc throw tag.
+    /**
+     * Tests ignore PHPDoc throw tag.
      */
     #[Group('DCOM-14')]
     public function testIgnorePHPDocThrowTag(): void
@@ -1167,7 +1167,7 @@ DOCBLOCK;
         }
     }
 
-      /**
+    /**
      * Tests cast int.
      */
     #[Group('DCOM-38')]
@@ -1180,7 +1180,7 @@ DOCBLOCK;
         $this->assertIsInt($annot->foo);
     }
 
-      /**
+    /**
      * Tests cast negative int.
      */
     #[Group('DCOM-38')]
@@ -1193,7 +1193,7 @@ DOCBLOCK;
         $this->assertIsInt($annot->foo);
     }
 
-      /**
+    /**
      * Tests cast float.
      */
     #[Group('DCOM-38')]
@@ -1206,7 +1206,7 @@ DOCBLOCK;
         $this->assertIsFloat($annot->foo);
     }
 
-      /**
+    /**
      * Tests cast negative float.
      */
     #[Group('DCOM-38')]
@@ -1306,7 +1306,7 @@ DOCBLOCK;
         $this->assertEquals(array('foo' => 'test', 'bar2' => 'test'), $annots[0]->settings);
     }
 
-      /**
+    /**
      * Tests supports escaped quoted values.
      */
     #[Group('44')]
