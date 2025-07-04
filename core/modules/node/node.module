@@ -909,7 +909,7 @@ function node_node_access(NodeInterface $node, $operation, AccountInterface $acc
  *   arrays of grants for those realms.
  */
 function node_access_grants($operation, AccountInterface $account) {
-  $grants_cache = &drupal_static(__FUNCTION__, []);
+  static $grants_cache = [];
   $account_id = $account->id();
 
   if (!isset($grants_cache[$operation][$account_id])) {
@@ -953,7 +953,7 @@ function node_access_view_all_nodes($account = NULL) {
   }
 
   // Statically cache results in an array keyed by $account->id().
-  $access = &drupal_static(__FUNCTION__);
+  static $access = [];
   if (isset($access[$account->id()])) {
     return $access[$account->id()];
   }
