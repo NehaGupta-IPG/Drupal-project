@@ -599,6 +599,7 @@ return RectorConfig::configure()
         __DIR__ . '/core/modules/migrate_drupal/tests/src/Unit/source/d6/Drupal6SqlBaseTest.php',
         __DIR__ . '/core/modules/views/tests/src/Unit/Plugin/field/FieldPluginBaseTest.php',
         __DIR__ . '/core/modules/views/tests/src/Unit/Routing/ViewPageControllerTest.php',
+        __DIR__ . '/core/modules/migrate/tests/src/Unit/Exception/MigrateSkipProcessExceptionTest.php',
 #        __DIR__ . '/core/tests/Drupal/Tests/Core/Config/TypeResolverTest.php',
         __DIR__ . '/core/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php',
         __DIR__ . '/core/modules/ckeditor5/tests/src/FunctionalJavascript/SourceEditingEmptyElementTest.php',
