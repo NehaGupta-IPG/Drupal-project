@@ -33,7 +33,7 @@
   display: flex;
   align-items: flex-end;
   align-self: stretch;
-  background-color: var(--color--primary-50);
+  background-color: var(--color--blue-30);
 }
 
 .site-header__fixable {

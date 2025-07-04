@@ -39,8 +39,8 @@ textarea {
 }
 
 :is([type="color"], [type="date"], [type="datetime-local"], [type="email"], [type="file"], [type="month"], [type="number"], [type="password"], [type="search"], [type="tel"], [type="text"], [type="time"], [type="url"], [type="week"], textarea):focus {
-  border: solid 2px var(--color--primary-50);
-  outline: solid 2px var(--color--primary-50);
+  border: solid 2px var(--color--blue-30);
+  outline: solid 2px var(--color--blue-30);
 }
 
 @supports (outline-style: double) {

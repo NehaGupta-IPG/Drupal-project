@@ -50,7 +50,7 @@
 }
 
 .primary-nav__menu-link:focus {
-  outline: auto 2px var(--color--primary-50);
+  outline: auto 2px var(--color--blue-30);
   outline-offset: 2px;
 }
 
@@ -88,7 +88,7 @@
   height: 0;
   content: "";
   /* Intentionally not using CSS logical properties. */
-  border-top: solid 3px var(--color--primary-50);
+  border-top: solid 3px var(--color--blue-30);
 }
 
 .primary-nav__menu-link--button.primary-nav__menu-link--has-children::after {
@@ -120,7 +120,7 @@
   transform: scaleX(0);
   transform-origin: left;
   /* Intentionally not using CSS logical properties. */
-  border-top: solid 5px var(--color--primary-50);
+  border-top: solid 5px var(--color--blue-30);
 }
 
 .primary-nav__menu-link:hover .primary-nav__menu-link-inner::after {
@@ -163,7 +163,7 @@
     visibility 0.2s,
     max-height 0.2s;
   opacity: 0;
-  border-inline-start: solid var(--sp) var(--color--primary-50);
+  border-inline-start: solid var(--sp) var(--color--blue-30);
 }
 
 .primary-nav__menu--level-2.is-active-menu-parent {

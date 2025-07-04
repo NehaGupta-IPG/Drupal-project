@@ -44,7 +44,7 @@
 }
 
 .button:focus {
-  outline: 2px solid var(--color--primary-60);
+  outline: 2px solid var(--color--blue-70);
   outline-offset: 2px;
 }
 
@@ -95,20 +95,20 @@
 
 .button--primary {
   color: var(--color--white);
-  border-color: var(--color--primary-40);
-  background-color: var(--color--primary-40);
+  border-color: var(--color--blue-20);
+  background-color: var(--color--blue-20);
 }
 
 .button--primary:hover,
 .button--primary:focus {
   color: var(--color--white);
-  border-color: var(--color--primary-30);
-  background-color: var(--color--primary-30);
+  border-color: var(--color--blue-10);
+  background-color: var(--color--blue-10);
 }
 
 .button--primary:active {
   color: var(--color--white);
-  background-color: var(--color--primary-40);
+  background-color: var(--color--blue-20);
 }
 
 .button--primary:disabled,

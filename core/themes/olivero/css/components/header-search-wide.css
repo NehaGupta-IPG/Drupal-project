@@ -125,7 +125,7 @@
   transition: transform 0.2s;
   transform: scaleX(0);
   transform-origin: left;
-  border-block-start: solid var(--sp0-5) var(--color--primary-50);
+  border-block-start: solid var(--sp0-5) var(--color--blue-30);
 }
 
 .block-search-wide__wrapper .search-form__submit:focus {
@@ -201,7 +201,7 @@
   height: var(--sp3);
   content: "";
   transform: translate(-50%, -50%);
-  border: solid 2px var(--color--primary-50);
+  border: solid 2px var(--color--blue-30);
   border-radius: 0.25rem;
 }
 
@@ -262,7 +262,7 @@ html:not(.js) .search-block-form:focus-within .block-search-wide__wrapper {
 
 [dir] .block-search-wide__wrapper input[type="search"] {
   background-color: transparent;
-  background-image: linear-gradient(var(--color--primary-50), var(--color--primary-50)); /* Two values are needed for IE11 support. */
+  background-image: linear-gradient(var(--color--blue-30), var(--color--blue-30)); /* Two values are needed for IE11 support. */
   background-repeat: no-repeat;
   background-position: bottom left; /* LTR */
   background-size: 0% 0.625rem;

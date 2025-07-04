@@ -12,7 +12,7 @@
   color: var(--color-text-neutral-soft);
 
   &:hover {
-    color: var(--color--primary-50);
+    color: var(--color--blue-30);
   }
 
   @media (--max-nav) {
@@ -38,7 +38,7 @@
   margin-inline-start: var(--sp0-5);
   color: var(--color--white);
   border-radius: 2px;
-  background-color: var(--color--primary-50);
+  background-color: var(--color--blue-30);
 
   & svg {
     vertical-align: top;

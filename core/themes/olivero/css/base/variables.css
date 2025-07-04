@@ -93,10 +93,10 @@
   --color--primary-hue: 202;
   --color--primary-saturation: 79%;
   --color--primary-lightness: 50;
-  --color--primary-30: hsl(var(--color--primary-hue), var(--color--primary-saturation), calc(1% * (var(--color--primary-lightness) - (0.36 * var(--color--primary-lightness)))));
-  --color--primary-40: hsl(var(--color--primary-hue), var(--color--primary-saturation), calc(1% * (var(--color--primary-lightness) - (0.24 * var(--color--primary-lightness))))); /* Blue dark */
-  --color--primary-50: hsl(var(--color--primary-hue), var(--color--primary-saturation), calc(1% * var(--color--primary-lightness))); /* Blue medium */
-  --color--primary-60: hsl(var(--color--primary-hue), var(--color--primary-saturation), calc(1% * (var(--color--primary-lightness) + (0.24 * (100 - var(--color--primary-lightness)))))); /* Blue bright */
+  --color--blue-10: hsl(var(--color--primary-hue), var(--color--primary-saturation), calc(1% * (var(--color--primary-lightness) - (0.36 * var(--color--primary-lightness)))));
+  --color--blue-20: hsl(var(--color--primary-hue), var(--color--primary-saturation), calc(1% * (var(--color--primary-lightness) - (0.24 * var(--color--primary-lightness))))); /* Blue dark */
+  --color--blue-30: hsl(var(--color--primary-hue), var(--color--primary-saturation), calc(1% * var(--color--primary-lightness))); /* Blue medium */
+  --color--blue-70: hsl(var(--color--primary-hue), var(--color--primary-saturation), calc(1% * (var(--color--primary-lightness) + (0.24 * (100 - var(--color--primary-lightness)))))); /* Blue bright */
   --color--primary-80: hsl(var(--color--primary-hue), var(--color--primary-saturation), calc(1% * (var(--color--primary-lightness) + (0.85 * (100 - var(--color--primary-lightness)))))); /* Blue very bright */
 
   /**
@@ -106,8 +106,8 @@
   --color-text-neutral-medium: var(--color--gray-20);
   --color-text-neutral-loud: var(--color--gray-5);
 
-  --color-text-primary-medium: var(--color--primary-40);
-  --color-text-primary-loud: var(--color--primary-30);
+  --color-text-primary-medium: var(--color--blue-20);
+  --color-text-primary-loud: var(--color--blue-10);
 
   /**
    * Named Colors.

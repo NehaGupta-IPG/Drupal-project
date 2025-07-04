@@ -52,7 +52,7 @@
 }
 
 .menu--sidebar .menu__link--link:hover {
-  color: var(--color--primary-50);
+  color: var(--color--blue-30);
 }
 
 /* No bottom divider line for last menu item. */

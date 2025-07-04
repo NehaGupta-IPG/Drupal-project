@@ -28,8 +28,8 @@ input[type="radio"] {
 
 input[type="checkbox"]:focus,
 input[type="radio"]:focus {
-  border: solid 2px var(--color--primary-50);
-  outline: solid 2px var(--color--primary-50);
+  border: solid 2px var(--color--blue-30);
+  outline: solid 2px var(--color--blue-30);
 }
 
 @supports (outline-style: double) {
@@ -44,7 +44,7 @@ input[type="radio"]:focus {
 
 input[type="checkbox"]:hover,
 input[type="radio"]:hover {
-  border-color: var(--color--primary-60);
+  border-color: var(--color--blue-70);
 }
 
 input[type="checkbox"][disabled],
@@ -99,11 +99,11 @@ input[type="radio"]:checked {
 
 input[type="radio"]:focus {
   border-width: 2px;
-  border-color: var(--color--primary-50);
+  border-color: var(--color--blue-30);
   outline-color: transparent;
   box-shadow:
     0 0 0 2px white,
-    0 0 0 4px var(--color--primary-50);
+    0 0 0 4px var(--color--blue-30);
 }
 
 input.error[type="radio"]:focus {

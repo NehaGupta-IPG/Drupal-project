@@ -43,7 +43,7 @@ a {
   color: var(--color-text-primary-medium);
 
   &:hover {
-    color: var(--color--primary-50);
+    color: var(--color--blue-30);
   }
 
   &:focus {

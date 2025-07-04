@@ -43,7 +43,7 @@
   text-align: center;
   color: var(--color--white);
   border-radius: 2px;
-  background-color: var(--color--primary-40);
+  background-color: var(--color--blue-20);
   font-size: 0.6875rem;
   line-height: 1.3125rem;
 }
@@ -55,7 +55,7 @@
   width: 0;
   height: 0;
   content: "";
-  border-block-start: 0.4375rem solid var(--color--primary-40);
+  border-block-start: 0.4375rem solid var(--color--blue-20);
   border-inline-end: 0.5rem solid transparent;
 }
 

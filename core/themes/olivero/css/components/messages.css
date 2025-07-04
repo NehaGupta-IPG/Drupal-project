@@ -125,7 +125,7 @@
 }
 
 .messages__close:focus {
-  outline: 2px solid var(--color--primary-60);
+  outline: 2px solid var(--color--blue-70);
   outline-offset: 2px;
 }
 
@@ -146,7 +146,7 @@
 }
 
 .messages--info .messages__icon svg {
-  fill: var(--color--primary-60);
+  fill: var(--color--blue-70);
 }
 
 .messages a {

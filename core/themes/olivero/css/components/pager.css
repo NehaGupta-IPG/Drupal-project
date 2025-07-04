@@ -47,7 +47,7 @@
 
 .pager__item--active {
   color: var(--color--white);
-  background-color: var(--color--primary-40);
+  background-color: var(--color--blue-20);
 }
 
 @media (forced-colors: active) {

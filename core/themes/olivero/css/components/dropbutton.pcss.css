@@ -7,7 +7,7 @@
   --dropbutton--height: var(--sp1-5);
   --dropbutton--secondary-bg-color: var(--color--white);
   --dropbutton--active-bg-color: var(--color--gray-90);
-  --dropbutton--outline-color: var(--color--primary-40); /* Minimum 3:1 contrast ratio against --dropbutton--active-bg-color and --dropbutton--secondary-bg-color. */
+  --dropbutton--outline-color: var(--color--blue-20); /* Minimum 3:1 contrast ratio against --dropbutton--active-bg-color and --dropbutton--secondary-bg-color. */
   --dropbutton--border-radius: var(--border-radius);
   --dropbutton--font-size: var(--font-size-s);
   --dropbutton--text-color: var(--color-text-neutral-medium); /* Minimum 4.5:1 contrast ratio against --dropbutton--active-bg-color and --dropbutton--secondary-bg-color. */
