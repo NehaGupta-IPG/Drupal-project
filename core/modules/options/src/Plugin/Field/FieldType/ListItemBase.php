@@ -203,7 +203,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
           ->condition($field_name, $current_keys[$delta]);
         $entity_ids = $query->execute();
         if (!empty($entity_ids)) {
-          $element['allowed_values']['table'][$delta]['item']['key']['#attributes']['disabled'] = 'disabled';
+          $element['allowed_values']['table'][$delta]['item']['key']['#attributes']['readonly'] = 'readonly';
           $element['allowed_values']['table'][$delta]['delete']['#attributes']['disabled'] = 'disabled';
           $element['allowed_values']['table'][$delta]['delete'] += [
             'message' => [
