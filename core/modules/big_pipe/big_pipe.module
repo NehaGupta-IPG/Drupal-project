@@ -32,11 +32,11 @@ function big_pipe_theme_suggestions_big_pipe_interface_preview(array $variables)
 
     $suggestions[] = $suggestion .= '__' . $callback;
     if (is_array($variables['arguments'])) {
-      $arguments = preg_replace('/[^a-zA-Z0-9]/', '_', $variables['arguments']);
-      foreach ($arguments as $argument) {
-        if (empty($argument)) {
+      foreach ($variables['arguments'] as $argument) {
+        if (empty($argument)  || !is_string($argument)) {
           continue;
         }
+        $argument = preg_replace('/[^a-zA-Z0-9]/', '_', $argument);
         $suggestions[] = $suggestion . '__' . $argument;
       }
     }

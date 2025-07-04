@@ -80,12 +80,24 @@ class BigPipeInterfacePreviewThemeSuggestionsTest extends KernelTestBase {
     // for big_pipe_theme_suggestions_big_pipe_interface_preview().
     $variables['callback'] = $build['#lazy_builder'][0];
     $variables['arguments'] = $build['#lazy_builder'][1];
+
     $suggestions = big_pipe_theme_suggestions_big_pipe_interface_preview($variables);
     $suggested_id = preg_replace('/[^a-zA-Z0-9]/', '_', $block->id());
     $this->assertSame([
       'big_pipe_interface_preview__block',
       'big_pipe_interface_preview__block__' . $suggested_id,
       'big_pipe_interface_preview__block__full',
+    ], $suggestions);
+
+    $test_args = [];
+    $test_args['callback'] = 'test_callback_function';
+    $test_args['arguments'][] = 'test_arg';
+    // For case the argument element is an array it shouldn't throw an error.
+    $test_args['arguments'][] = ['foo'];
+    $suggestions = big_pipe_theme_suggestions_big_pipe_interface_preview($test_args);
+    $this->assertSame([
+      'big_pipe_interface_preview__test_callback_function',
+      'big_pipe_interface_preview__test_callback_function__test_arg',
     ], $suggestions);
   }
 
