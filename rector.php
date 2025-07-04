@@ -575,8 +575,8 @@ return RectorConfig::configure()
 #        __DIR__ . '/core/modules/**/tests/src/FunctionalJavascript',
 #        __DIR__ . '/core/modules/**/tests/src/Unit',
 #        __DIR__ . '/core/tests/Drupal/KernelTests',
-#        __DIR__ . '/core/tests/Drupal/Tests',
-        __DIR__ . '/core/tests/Drupal/Tests/Component',
+        __DIR__ . '/core/tests/Drupal/Tests',
+#        __DIR__ . '/core/tests/Drupal/Tests/Component',
 #        __DIR__ . '/core/tests/Drupal/KernelTests/Core/Database',
 #        __DIR__ . '/core/tests/Drupal/FunctionalTests',
 #        __DIR__ . '/core/tests/Drupal/FunctionalJavascriptTests',
@@ -585,6 +585,8 @@ return RectorConfig::configure()
     ])
     ->withSkip([
         __DIR__ . '/core/tests/Drupal/Tests/Component/Annotation/Doctrine/Fixtures',
+
+        # Modules' Unit tests skipped.
         __DIR__ . '/core/modules/package_manager/tests/src/Unit/InstalledPackagesListTest.php',
         __DIR__ . '/core/modules/mysql/tests/src/Unit/InstallTasksTest.php',
         __DIR__ . '/core/modules/views/tests/src/Unit/Plugin/Block/ViewsBlockTest.php',
@@ -594,9 +596,12 @@ return RectorConfig::configure()
         __DIR__ . '/core/modules/views/tests/src/Unit/Plugin/field/FieldPluginBaseTest.php',
         __DIR__ . '/core/modules/views/tests/src/Unit/Routing/ViewPageControllerTest.php',
         __DIR__ . '/core/modules/migrate/tests/src/Unit/Exception/MigrateSkipProcessExceptionTest.php',
+
+        # Core's Unit tests skipped.
 #        __DIR__ . '/core/tests/Drupal/Tests/Core/Config/TypeResolverTest.php',
         __DIR__ . '/core/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php',
         __DIR__ . '/core/modules/ckeditor5/tests/src/FunctionalJavascript/SourceEditingEmptyElementTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Component',
         '*/ProxyClass/*',
         '*.api.php',
     ])
