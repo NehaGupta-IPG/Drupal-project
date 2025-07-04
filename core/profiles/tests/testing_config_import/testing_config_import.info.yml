@@ -4,7 +4,7 @@ description: 'Tests install profiles in the config importer.'
 version: VERSION
 hidden: true
 install:
-  - syslog
+  - core:syslog
   - testing_config_import_module
 themes:
-  - stark
+  - core:stark
