@@ -159,8 +159,9 @@
     const n = displacingElements.length;
     for (let i = 0; i < n; i++) {
       const el = displacingElements[i];
-      // If the element is not visible, do consider its dimensions.
-      if (el.style.display === 'none') {
+      // If the element is hidden or not visible, do not consider its
+      // dimensions.
+      if (Drupal.elementIsHidden(el)) {
         continue;
       }
       // If the offset data attribute contains a displacing value, use it.
