@@ -2,6 +2,7 @@
 
 namespace Drupal\update\Hook;
 
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\update\UpdateManagerInterface;
 use Drupal\Core\Url;
@@ -77,14 +78,6 @@ class UpdateHooks {
           $verbose = TRUE;
           break;
       }
-      // This loadInclude() is to ensure that the install API is available.
-      // Since we're loading an include of type 'install', this will also
-      // include core/includes/install.inc for us, which is where the
-      // REQUIREMENTS* constants are currently defined.
-      // @todo Remove this once those constants live in a better place.
-      // @see https://www.drupal.org/project/drupal/issues/2909480
-      // @see https://www.drupal.org/project/drupal/issues/3410938
-      \Drupal::moduleHandler()->loadInclude('update', 'install');
       $status = \Drupal::moduleHandler()->invoke('update', 'runtime_requirements');
       foreach (['core', 'contrib'] as $report_type) {
         $type = 'update_' . $report_type;
@@ -96,10 +89,10 @@ class UpdateHooks {
         }
         if (!empty($verbose)) {
           if (isset($status[$type]['severity'])) {
-            if ($status[$type]['severity'] == REQUIREMENT_ERROR) {
+            if ($status[$type]['severity'] === RequirementSeverity::Error) {
               \Drupal::messenger()->addError($status[$type]['description']);
             }
-            elseif ($status[$type]['severity'] == REQUIREMENT_WARNING) {
+            elseif ($status[$type]['severity'] === RequirementSeverity::Warning) {
               \Drupal::messenger()->addWarning($status[$type]['description']);
             }
           }
