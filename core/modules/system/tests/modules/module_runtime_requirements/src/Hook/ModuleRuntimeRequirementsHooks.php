@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\module_runtime_requirements\Hook;
 
+use Drupal\Core\Extension\Requirement\Requirement;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -21,18 +22,18 @@ class ModuleRuntimeRequirementsHooks {
   #[Hook('runtime_requirements')]
   public function runtimeRequirements(): array {
     return [
-      'test.runtime.error' => [
-        'title' => $this->t('RuntimeError'),
-        'value' => $this->t('None'),
-        'description' => $this->t('Runtime Error.'),
-        'severity' => RequirementSeverity::Error,
-      ],
-      'test.runtime.error.alter' => [
-        'title' => $this->t('RuntimeError'),
-        'value' => $this->t('None'),
-        'description' => $this->t('Runtime Error.'),
-        'severity' => RequirementSeverity::Error,
-      ],
+      'test.runtime.error' => new Requirement(
+        title: $this->t('RuntimeError'),
+        value: $this->t('None'),
+        description: $this->t('Runtime Error.'),
+        severity: RequirementSeverity::Error,
+      ),
+      'test.runtime.error.alter' => new Requirement(
+        title: $this->t('RuntimeError'),
+        value: $this->t('None'),
+        description: $this->t('Runtime Error.'),
+        severity: RequirementSeverity::Error,
+      ),
     ];
   }
 
@@ -41,12 +42,12 @@ class ModuleRuntimeRequirementsHooks {
    */
   #[Hook('runtime_requirements_alter')]
   public function runtimeRequirementsAlter(array &$requirements): void {
-    $requirements['test.runtime.error.alter'] = [
-      'title' => $this->t('RuntimeWarning'),
-      'value' => $this->t('None'),
-      'description' => $this->t('Runtime Warning.'),
-      'severity' => RequirementSeverity::Warning,
-    ];
+    $requirements['test.runtime.error.alter'] = new Requirement(
+      title: $this->t('RuntimeWarning'),
+      value: $this->t('None'),
+      description: $this->t('Runtime Warning.'),
+      severity: RequirementSeverity::Warning,
+    );
   }
 
 }

@@ -2,6 +2,7 @@
 
 namespace Drupal\file\Hook;
 
+use Drupal\Core\Extension\Requirement\Requirement;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
@@ -17,6 +18,7 @@ class FileRequirements {
    */
   #[Hook('runtime_requirements')]
   public function runtime(): array {
+    /** @var \Drupal\Core\Extension\Requirement\Requirement[] $requirements */
     $requirements = [];
     $server_software = \Drupal::request()->server->get('SERVER_SOFTWARE', '');
 
@@ -45,11 +47,11 @@ class FileRequirements {
       $description = $this->t('Your server is not capable of displaying file upload progress. File upload progress requires PHP be run with mod_php or PHP-FPM and not as FastCGI.');
     }
 
-    $requirements['file_progress'] = [
-      'title' => $this->t('Upload progress'),
-      'value' => $value,
-      'description' => $description,
-    ];
+    $requirements['file_progress'] = new Requirement(
+      title: $this->t('Upload progress'),
+      value: $value,
+      description: $description,
+    );
 
     return $requirements;
   }

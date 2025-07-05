@@ -7,6 +7,7 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Extension\Requirement\Requirement;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 
 /**
@@ -19,24 +20,24 @@ function requirements1_test_requirements($phase): array {
 
   // Always fails requirements.
   if ('install' == $phase) {
-    $requirements['requirements1_test'] = [
-      'title' => t('Requirements 1 Test'),
-      'severity' => RequirementSeverity::Error,
-      'description' => t('Requirements 1 Test failed requirements.'),
-    ];
+    $requirements['requirements1_test'] = new Requirement(
+      title: t('Requirements 1 Test'),
+      description: t('Requirements 1 Test failed requirements.'),
+      severity: RequirementSeverity::Error,
+    );
   }
 
-  $requirements['requirements1_test_alterable'] = [
-    'title' => t('Requirements 1 Test Alterable'),
-    'severity' => RequirementSeverity::Error,
-    'description' => t('A requirement that will be altered.'),
-  ];
+  $requirements['requirements1_test_alterable'] = new Requirement(
+    title: t('Requirements 1 Test Alterable'),
+    description: t('A requirement that will be altered.'),
+    severity: RequirementSeverity::Error,
+  );
 
-  $requirements['requirements1_test_deletable'] = [
-    'title' => t('Requirements 1 Test Deletable'),
-    'severity' => RequirementSeverity::Info,
-    'description' => t('A requirement that will be deleted.'),
-  ];
+  $requirements['requirements1_test_deletable'] = new Requirement(
+    title: t('Requirements 1 Test Deletable'),
+    description: t('A requirement that will be deleted.'),
+    severity: RequirementSeverity::Info,
+  );
 
   return $requirements;
 }

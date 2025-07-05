@@ -3,6 +3,7 @@
 namespace Drupal\system;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Extension\Requirement\Requirement;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Menu\MenuActiveTrailInterface;
 use Drupal\Core\Menu\MenuLinkInterface;
@@ -116,7 +117,7 @@ class SystemManager {
   /**
    * Displays the site status report. Can also be used as a pure check.
    *
-   * @return array
+   * @return array<string,\Drupal\Core\Extension\Requirement\Requirement>
    *   An array of system requirements.
    */
   public function listRequirements() {
@@ -130,17 +131,30 @@ class SystemManager {
     $requirements = array_merge($requirements, $runtime_requirements);
     $this->moduleHandler->alter('requirements', $requirements);
     $this->moduleHandler->alter('runtime_requirements', $requirements);
-    uasort($requirements, function ($a, $b) {
-      if (!isset($a['weight'])) {
-        if (!isset($b['weight'])) {
-          return strcasecmp($a['title'], $b['title']);
+    $this->convertLegacyRequirements($requirements);
+    uasort($requirements, function (Requirement $a, Requirement $b) {
+      if (is_null($a->getWeight())) {
+        if (is_null($b->getWeight())) {
+          return strcasecmp($a->getTitle(), $b->getTitle());
         }
-        return -$b['weight'];
+        return -$b->getWeight();
       }
-      return isset($b['weight']) ? $a['weight'] - $b['weight'] : $a['weight'];
+      return !is_null($b->getWeight()) ? $a->getWeight() - $b->getWeight() : $a->getWeight();
     });
 
     return $requirements;
+  }
+
+  /**
+   * Converts legacy requirement arrays to a Requirement value object.
+   */
+  private function convertLegacyRequirements(array &$requirements): void {
+    foreach ($requirements as $key => $requirement) {
+      if (is_array($requirement)) {
+        @trigger_error(sprintf('Using an array for \'%s\' requirements is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use %s instead. See https://www.drupal.org/node/3410939', $key, Requirement::class), \E_USER_DEPRECATED);
+        $requirements[$key] = Requirement::createFromLegacyArray($requirement);
+      }
+    }
   }
 
   /**

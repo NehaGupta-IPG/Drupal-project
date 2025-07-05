@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\mysql\Hook;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Extension\Requirement\Requirement;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Render\Markup;
@@ -72,12 +73,12 @@ class MysqlRequirements {
         ':performance_doc' => 'https://www.drupal.org/docs/system-requirements/setting-the-mysql-transaction-isolation-level',
       ]);
 
-      $requirements['mysql_transaction_level'] = [
-        'title' => $this->t('Transaction isolation level'),
-        'severity' => $severity_level,
-        'value' => $isolation_level,
-        'description' => Markup::create(implode(' ', $description)),
-      ];
+      $requirements['mysql_transaction_level'] = new Requirement(
+        title: $this->t('Transaction isolation level'),
+        value: $isolation_level,
+        description: Markup::create(implode(' ', $description)),
+        severity: $severity_level,
+      );
     }
 
     return $requirements;

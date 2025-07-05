@@ -13,6 +13,7 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\ExtensionLifecycle;
+use Drupal\Core\Extension\Requirement\Requirement;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Link;
@@ -69,28 +70,28 @@ class SystemRequirements implements InstallRequirementsInterface {
 
     // Report Drupal version
     if ($phase == 'runtime') {
-      $requirements['drupal'] = [
-        'title' => t('Drupal'),
-        'value' => \Drupal::VERSION,
-        'severity' => RequirementSeverity::Info,
-        'weight' => -10,
-      ];
+      $requirements['drupal'] = new Requirement(
+        title: t('Drupal'),
+        value: \Drupal::VERSION,
+        severity: RequirementSeverity::Info,
+        weight: -10,
+      );
 
       // Display the currently active installation profile, if the site
       // is not running the default installation profile.
       $profile = \Drupal::installProfile();
       if ($profile != 'standard' && !empty($profile)) {
         $info = $module_extension_list->getExtensionInfo($profile);
-        $requirements['install_profile'] = [
-          'title' => t('Installation profile'),
-          'value' => t('%profile_name (%profile%version)', [
+        $requirements['install_profile'] = new Requirement(
+          title: t('Installation profile'),
+          value: t('%profile_name (%profile%version)', [
             '%profile_name' => $info['name'],
             '%profile' => $profile,
             '%version' => !empty($info['version']) ? '-' . $info['version'] : '',
           ]),
-          'severity' => RequirementSeverity::Info,
-          'weight' => -9,
-        ];
+          severity: RequirementSeverity::Info,
+          weight: -9,
+        );
       }
 
       // Gather all obsolete and experimental modules being enabled.
@@ -115,24 +116,24 @@ class SystemRequirements implements InstallRequirementsInterface {
 
       // Warn if any experimental modules are installed.
       if (!empty($experimental_modules)) {
-        $requirements['experimental_modules'] = [
-          'title' => t('Experimental modules installed'),
-          'value' => t('Experimental modules found: %module_list. <a href=":url">Experimental modules</a> are provided for testing purposes only. Use at your own risk.', ['%module_list' => implode(', ', $experimental_modules), ':url' => 'https://www.drupal.org/core/experimental']),
-          'severity' => RequirementSeverity::Warning,
-        ];
+        $requirements['experimental_modules'] = new Requirement(
+          title: t('Experimental modules installed'),
+          value: t('Experimental modules found: %module_list. <a href=":url">Experimental modules</a> are provided for testing purposes only. Use at your own risk.', ['%module_list' => implode(', ', $experimental_modules), ':url' => 'https://www.drupal.org/core/experimental']),
+          severity: RequirementSeverity::Warning,
+        );
       }
       // Warn if any deprecated modules are installed.
       if (!empty($deprecated_modules)) {
         foreach ($deprecated_modules as $deprecated_module) {
           $deprecated_modules_link_list[] = (string) Link::fromTextAndUrl($deprecated_module['name'], Url::fromUri($deprecated_module['lifecycle_link']))->toString();
         }
-        $requirements['deprecated_modules'] = [
-          'title' => t('Deprecated modules installed'),
-          'value' => t('Deprecated modules found: %module_list.', [
+        $requirements['deprecated_modules'] = new Requirement(
+          title: t('Deprecated modules installed'),
+          value: t('Deprecated modules found: %module_list.', [
             '%module_list' => Markup::create(implode(', ', $deprecated_modules_link_list)),
           ]),
-          'severity' => RequirementSeverity::Warning,
-        ];
+          severity: RequirementSeverity::Warning,
+        );
       }
 
       // Gather all obsolete and experimental themes being installed.
@@ -156,11 +157,11 @@ class SystemRequirements implements InstallRequirementsInterface {
 
       // Warn if any experimental themes are installed.
       if (!empty($experimental_themes)) {
-        $requirements['experimental_themes'] = [
-          'title' => t('Experimental themes installed'),
-          'value' => t('Experimental themes found: %theme_list. Experimental themes are provided for testing purposes only. Use at your own risk.', ['%theme_list' => implode(', ', $experimental_themes)]),
-          'severity' => RequirementSeverity::Warning,
-        ];
+        $requirements['experimental_themes'] = new Requirement(
+          title: t('Experimental themes installed'),
+          value: t('Experimental themes found: %theme_list. Experimental themes are provided for testing purposes only. Use at your own risk.', ['%theme_list' => implode(', ', $experimental_themes)]),
+          severity: RequirementSeverity::Warning,
+        );
       }
 
       // Warn if any deprecated themes are installed.
@@ -169,13 +170,13 @@ class SystemRequirements implements InstallRequirementsInterface {
           $deprecated_themes_link_list[] = (string) Link::fromTextAndUrl($deprecated_theme['name'], Url::fromUri($deprecated_theme['lifecycle_link']))->toString();
 
         }
-        $requirements['deprecated_themes'] = [
-          'title' => t('Deprecated themes installed'),
-          'value' => t('Deprecated themes found: %theme_list.', [
+        $requirements['deprecated_themes'] = new Requirement(
+          title: t('Deprecated themes installed'),
+          value: t('Deprecated themes found: %theme_list.', [
             '%theme_list' => Markup::create(implode(', ', $deprecated_themes_link_list)),
           ]),
-          'severity' => RequirementSeverity::Warning,
-        ];
+          severity: RequirementSeverity::Warning,
+        );
       }
 
       // Warn if any obsolete extensions (themes or modules) are installed.
@@ -183,14 +184,14 @@ class SystemRequirements implements InstallRequirementsInterface {
         foreach ($obsolete_extensions as $obsolete_extension) {
           $obsolete_extensions_link_list[] = (string) Link::fromTextAndUrl($obsolete_extension['name'], Url::fromUri($obsolete_extension['lifecycle_link']))->toString();
         }
-        $requirements['obsolete_extensions'] = [
-          'title' => t('Obsolete extensions installed'),
-          'value' => t('Obsolete extensions found: %extensions. Obsolete extensions are provided only so that they can be uninstalled cleanly. You should immediately <a href=":uninstall_url">uninstall these extensions</a> since they may be removed in a future release.', [
+        $requirements['obsolete_extensions'] = new Requirement(
+          title: t('Obsolete extensions installed'),
+          value: t('Obsolete extensions found: %extensions. Obsolete extensions are provided only so that they can be uninstalled cleanly. You should immediately <a href=":uninstall_url">uninstall these extensions</a> since they may be removed in a future release.', [
             '%extensions' => Markup::create(implode(', ', $obsolete_extensions_link_list)),
             ':uninstall_url' => Url::fromRoute('system.modules_uninstall')->toString(),
           ]),
-          'severity' => RequirementSeverity::Warning,
-        ];
+          severity: RequirementSeverity::Warning,
+        );
       }
       self::systemAdvisoriesRequirements($requirements);
     }
@@ -198,10 +199,10 @@ class SystemRequirements implements InstallRequirementsInterface {
     // Web server information.
     $request_object = \Drupal::request();
     $software = $request_object->server->get('SERVER_SOFTWARE');
-    $requirements['webserver'] = [
-      'title' => t('Web server'),
-      'value' => $software,
-    ];
+    $requirements['webserver'] = new Requirement(
+      title: t('Web server'),
+      value: $software,
+    );
 
     // Tests clean URL support.
     if ($phase == 'install' && $install_state['interactive'] && !$request_object->query->has('rewrite') && str_contains($software, 'Apache')) {
@@ -250,30 +251,30 @@ class SystemRequirements implements InstallRequirementsInterface {
       }
 
       if ($rewrite_warning) {
-        $requirements['apache_version'] = [
-          'title' => t('Apache version'),
-          'value' => $apache_version_string,
-          'severity' => RequirementSeverity::Warning,
-          'description' => t('Due to the settings for ServerTokens in httpd.conf, it is impossible to accurately determine the version of Apache running on this server. The reported value is @reported, to run Drupal without mod_rewrite, a minimum version of 2.2.16 is needed.', ['@reported' => $apache_version_string]),
-        ];
+        $requirements['apache_version'] = new Requirement(
+          title: t('Apache version'),
+          value: $apache_version_string,
+          description: t('Due to the settings for ServerTokens in httpd.conf, it is impossible to accurately determine the version of Apache running on this server. The reported value is @reported, to run Drupal without mod_rewrite, a minimum version of 2.2.16 is needed.', ['@reported' => $apache_version_string]),
+          severity: RequirementSeverity::Warning,
+        );
       }
 
       if ($rewrite_error) {
-        $requirements['Apache version'] = [
-          'title' => t('Apache version'),
-          'value' => $apache_version_string,
-          'severity' => RequirementSeverity::Error,
-          'description' => t('The minimum version of Apache needed to run Drupal without mod_rewrite enabled is 2.2.16. See the <a href=":link">enabling clean URLs</a> page for more information on mod_rewrite.', [':link' => 'https://www.drupal.org/docs/8/clean-urls-in-drupal-8']),
-        ];
+        $requirements['Apache version'] = new Requirement(
+          title: t('Apache version'),
+          value: $apache_version_string,
+          description: t('The minimum version of Apache needed to run Drupal without mod_rewrite enabled is 2.2.16. See the <a href=":link">enabling clean URLs</a> page for more information on mod_rewrite.', [':link' => 'https://www.drupal.org/docs/8/clean-urls-in-drupal-8']),
+          severity: RequirementSeverity::Error,
+        );
       }
 
       if (!$rewrite_error && !$rewrite_warning) {
-        $requirements['rewrite_module'] = [
-          'title' => t('Clean URLs'),
-          'value' => t('Disabled'),
-          'severity' => RequirementSeverity::Warning,
-          'description' => t('Your server is capable of using clean URLs, but it is not enabled. Using clean URLs gives an improved user experience and is recommended. <a href=":link">Enable clean URLs</a>', [':link' => 'https://www.drupal.org/docs/8/clean-urls-in-drupal-8']),
-        ];
+        $requirements['rewrite_module'] = new Requirement(
+          title: t('Clean URLs'),
+          value: t('Disabled'),
+          description: t('Your server is capable of using clean URLs, but it is not enabled. Using clean URLs gives an improved user experience and is recommended. <a href=":link">Enable clean URLs</a>', [':link' => 'https://www.drupal.org/docs/8/clean-urls-in-drupal-8']),
+          severity: RequirementSeverity::Warning,
+        );
       }
     }
 
@@ -289,44 +290,47 @@ class SystemRequirements implements InstallRequirementsInterface {
         ':url' => (new Url('system.php'))->toString(),
       ]);
     }
-    $requirements['php'] = [
-      'title' => t('PHP'),
-      'value' => $phpversion_label,
-    ];
+    $requirements['php'] = new Requirement(
+      title: t('PHP'),
+      value: $phpversion_label,
+    );
 
     // Check if the PHP version is below what Drupal supports.
     if (version_compare($phpversion, $minimum_supported_php) < 0) {
-      $requirements['php']['description'] = t('Your PHP installation is too old. Drupal requires at least PHP %version. It is recommended to upgrade to PHP version %recommended or higher for the best ongoing support. See <a href="http://php.net/supported-versions.php">PHP\'s version support documentation</a> and the <a href=":php_requirements">Drupal PHP requirements</a> page for more information.',
+      $requirements['php']->setDescription(t('Your PHP installation is too old. Drupal requires at least PHP %version. It is recommended to upgrade to PHP version %recommended or higher for the best ongoing support. See <a href="http://php.net/supported-versions.php">PHP\'s version support documentation</a> and the <a href=":php_requirements">Drupal PHP requirements</a> page for more information.',
         [
           '%version' => $minimum_supported_php,
           '%recommended' => \Drupal::RECOMMENDED_PHP,
           ':php_requirements' => 'https://www.drupal.org/docs/system-requirements/php-requirements',
         ]
-      );
+      ));
 
       // If the PHP version is also below the absolute minimum allowed, it's not
       // safe to continue with the requirements check, and should always be an
       // error.
       if (version_compare($phpversion, \Drupal::MINIMUM_PHP) < 0) {
-        $requirements['php']['severity'] = RequirementSeverity::Error;
+        $requirements['php']->setSeverity(RequirementSeverity::Error);
         return $requirements;
       }
       // Otherwise, the message should be an error at runtime, and a warning
       // during installation or update.
-      $requirements['php']['severity'] = ($phase === 'runtime') ? RequirementSeverity::Error : RequirementSeverity::Warning;
+      $requirements['php']->setSeverity(($phase === 'runtime') ? RequirementSeverity::Error : RequirementSeverity::Warning);
     }
     // For PHP versions that are still supported but no longer recommended,
     // inform users of what's recommended, allowing them to take action before
     // it becomes urgent.
     elseif ($phase === 'runtime' && version_compare($phpversion, \Drupal::RECOMMENDED_PHP) < 0) {
-      $requirements['php']['description'] = t('It is recommended to upgrade to PHP version %recommended or higher for the best ongoing support.  See <a href="http://php.net/supported-versions.php">PHP\'s version support documentation</a> and the <a href=":php_requirements">Drupal PHP requirements</a> page for more information.', ['%recommended' => \Drupal::RECOMMENDED_PHP, ':php_requirements' => 'https://www.drupal.org/docs/system-requirements/php-requirements']);
-      $requirements['php']['severity'] = RequirementSeverity::Info;
+      $requirements['php']->setDescription(t('It is recommended to upgrade to PHP version %recommended or higher for the best ongoing support.  See <a href="http://php.net/supported-versions.php">PHP\'s version support documentation</a> and the <a href=":php_requirements">Drupal PHP requirements</a> page for more information.', [
+        '%recommended' => \Drupal::RECOMMENDED_PHP,
+        ':php_requirements' => 'https://www.drupal.org/docs/system-requirements/php-requirements',
+      ]))
+        ->setSeverity(RequirementSeverity::Info);
     }
 
     // Test for PHP extensions.
-    $requirements['php_extensions'] = [
-      'title' => t('PHP extensions'),
-    ];
+    $requirements['php_extensions'] = new Requirement(
+      title: t('PHP extensions'),
+    );
 
     $missing_extensions = [];
     $required_extensions = [
@@ -369,87 +373,87 @@ class SystemRequirements implements InstallRequirementsInterface {
         ],
       ];
 
-      $requirements['php_extensions']['value'] = t('Disabled');
-      $requirements['php_extensions']['severity'] = RequirementSeverity::Error;
-      $requirements['php_extensions']['description'] = $description;
+      $requirements['php_extensions']->setValue(t('Disabled'))
+        ->setSeverity(RequirementSeverity::Error)
+        ->setDescription($description);
     }
     else {
-      $requirements['php_extensions']['value'] = t('Enabled');
+      $requirements['php_extensions']->setValue('Enabled');
     }
 
     if ($phase == 'install' || $phase == 'runtime') {
+      $requirements['php_opcache'] = new Requirement(
+        title: t('PHP OPcode caching'),
+        value: t('Enabled'),
+      );
       // Check to see if OPcache is installed.
       if (!OpCodeCache::isEnabled()) {
-        $requirements['php_opcache'] = [
-          'value' => t('Not enabled'),
-          'severity' => RequirementSeverity::Warning,
-          'description' => t('PHP OPcode caching can improve your site\'s performance considerably. It is <strong>highly recommended</strong> to have <a href="http://php.net/manual/opcache.installation.php" target="_blank">OPcache</a> installed on your server.'),
-        ];
+        $requirements['php_opcache']->setValue(t('Not enabled'))
+          ->setDescription('PHP OPcode caching can improve your site\'s performance considerably. It is <strong>highly recommended</strong> to have <a href="http://php.net/manual/opcache.installation.php" target="_blank">OPcache</a> installed on your server.')
+          ->setSeverity(RequirementSeverity::Warning);
       }
-      else {
-        $requirements['php_opcache']['value'] = t('Enabled');
-      }
-      $requirements['php_opcache']['title'] = t('PHP OPcode caching');
     }
 
     // Check to see if APCu is installed and configured correctly.
     if ($phase == 'runtime' && PHP_SAPI != 'cli') {
-      $requirements['php_apcu_enabled']['title'] = t('PHP APCu caching');
-      $requirements['php_apcu_available']['title'] = t('PHP APCu available caching');
+      $requirements['php_apcu_enabled'] = new Requirement(
+        title: t('PHP APCu caching'),
+      );
+      $requirements['php_apcu_available'] = new Requirement(
+        title: t('PHP APCu available caching'),
+      );
       if (extension_loaded('apcu') && filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN)) {
         $memory_info = apcu_sma_info(TRUE);
         $apcu_actual_size = ByteSizeMarkup::create($memory_info['seg_size'] * $memory_info['num_seg']);
         $apcu_recommended_size = '32 MB';
-        $requirements['php_apcu_enabled']['value'] = t('Enabled (@size)', ['@size' => $apcu_actual_size]);
+        $requirements['php_apcu_enabled']->setValue(t('Enabled (@size)', ['@size' => $apcu_actual_size]));
         if (Bytes::toNumber(ini_get('apc.shm_size')) * ini_get('apc.shm_segments') < Bytes::toNumber($apcu_recommended_size)) {
-          $requirements['php_apcu_enabled']['severity'] = RequirementSeverity::Warning;
-          $requirements['php_apcu_enabled']['description'] = t('Depending on your configuration, Drupal can run with a @apcu_size APCu limit. However, a @apcu_default_size APCu limit (the default) or above is recommended, especially if your site uses additional custom or contributed modules.', [
-            '@apcu_size' => $apcu_actual_size,
-            '@apcu_default_size' => $apcu_recommended_size,
-          ]);
+          $requirements['php_apcu_enabled']->setSeverity(RequirementSeverity::Warning)
+            ->setDescription(t('Depending on your configuration, Drupal can run with a @apcu_size APCu limit. However, a @apcu_default_size APCu limit (the default) or above is recommended, especially if your site uses additional custom or contributed modules.', [
+              '@apcu_size' => $apcu_actual_size,
+              '@apcu_default_size' => $apcu_recommended_size,
+            ]));
         }
         else {
           $memory_available = $memory_info['avail_mem'] / ($memory_info['seg_size'] * $memory_info['num_seg']);
           if ($memory_available < 0.1) {
-            $requirements['php_apcu_available']['severity'] = RequirementSeverity::Error;
-            $requirements['php_apcu_available']['description'] = t('APCu is using over 90% of its allotted memory (@apcu_actual_size). To improve APCu performance, consider increasing this limit.', [
-              '@apcu_actual_size' => $apcu_actual_size,
-            ]);
+            $requirements['php_apcu_available']->setSeverity(RequirementSeverity::Error)
+              ->setDescription(t('APCu is using over 90% of its allotted memory (@apcu_actual_size). To improve APCu performance, consider increasing this limit.', [
+                '@apcu_actual_size' => $apcu_actual_size,
+              ]));
           }
           elseif ($memory_available < 0.25) {
-            $requirements['php_apcu_available']['severity'] = RequirementSeverity::Warning;
-            $requirements['php_apcu_available']['description'] = t('APCu is using over 75% of its allotted memory (@apcu_actual_size). To improve APCu performance, consider increasing this limit.', [
-              '@apcu_actual_size' => $apcu_actual_size,
-            ]);
+            $requirements['php_apcu_available']->setSeverity(RequirementSeverity::Warning)
+              ->setDescription(t('APCu is using over 75% of its allotted memory (@apcu_actual_size). To improve APCu performance, consider increasing this limit.', [
+                '@apcu_actual_size' => $apcu_actual_size,
+              ]));
           }
           else {
-            $requirements['php_apcu_available']['severity'] = RequirementSeverity::OK;
+            $requirements['php_apcu_available']->setSeverity(RequirementSeverity::OK);
           }
-          $requirements['php_apcu_available']['value'] = t('Memory available: @available.', [
+          $requirements['php_apcu_available']->setValue(t('Memory available: @available.', [
             '@available' => ByteSizeMarkup::create($memory_info['avail_mem']),
-          ]);
+          ]));
         }
       }
       else {
-        $requirements['php_apcu_enabled'] += [
-          'value' => t('Not enabled'),
-          'severity' => RequirementSeverity::Info,
-          'description' => t('PHP APCu caching can improve your site\'s performance considerably. It is <strong>highly recommended</strong> to have <a href="https://www.php.net/manual/apcu.installation.php" target="_blank">APCu</a> installed on your server.'),
-        ];
+        $requirements['php_apcu_enabled']->setValue(t('Not enabled'))
+          ->setSeverity(RequirementSeverity::Info)
+          ->setDescription(t('PHP APCu caching can improve your site\'s performance considerably. It is <strong>highly recommended</strong> to have <a href="https://www.php.net/manual/apcu.installation.php" target="_blank">APCu</a> installed on your server.'));
       }
     }
 
     if ($phase != 'update') {
       // Test whether we have a good source of random bytes.
-      $requirements['php_random_bytes'] = [
-        'title' => t('Random number generation'),
-      ];
+      $requirements['php_random_bytes'] = new Requirement(
+        title: t('Random number generation'),
+      );
       try {
         $bytes = random_bytes(10);
         if (strlen($bytes) != 10) {
           throw new \Exception("Tried to generate 10 random bytes, generated '" . strlen($bytes) . "'");
         }
-        $requirements['php_random_bytes']['value'] = t('Successful');
+        $requirements['php_random_bytes']->setValue(t('Successful'));
       }
       catch (\Exception $e) {
         // If /dev/urandom is not available on a UNIX-like system, check whether
@@ -467,32 +471,32 @@ class SystemRequirements implements InstallRequirementsInterface {
           '%exception_message' => $e->getMessage(),
         ];
         if ($open_basedir_blocks_urandom) {
-          $requirements['php_random_bytes']['description'] = t('Drupal is unable to generate highly randomized numbers, which means certain security features like password reset URLs are not as secure as they should be. Instead, only a slow, less-secure fallback generator is available. The most likely cause is that open_basedir restrictions are in effect and /dev/urandom is not on the allowed list. See the <a href=":drupal-php">system requirements</a> page for more information. %exception_message', $args);
+          $requirements['php_random_bytes']->setDescription(t('Drupal is unable to generate highly randomized numbers, which means certain security features like password reset URLs are not as secure as they should be. Instead, only a slow, less-secure fallback generator is available. The most likely cause is that open_basedir restrictions are in effect and /dev/urandom is not on the allowed list. See the <a href=":drupal-php">system requirements</a> page for more information. %exception_message', $args));
         }
         else {
-          $requirements['php_random_bytes']['description'] = t('Drupal is unable to generate highly randomized numbers, which means certain security features like password reset URLs are not as secure as they should be. Instead, only a slow, less-secure fallback generator is available. See the <a href=":drupal-php">system requirements</a> page for more information. %exception_message', $args);
+          $requirements['php_random_bytes']->setDescription(t('Drupal is unable to generate highly randomized numbers, which means certain security features like password reset URLs are not as secure as they should be. Instead, only a slow, less-secure fallback generator is available. See the <a href=":drupal-php">system requirements</a> page for more information. %exception_message', $args));
         }
-        $requirements['php_random_bytes']['value'] = t('Less secure');
-        $requirements['php_random_bytes']['severity'] = RequirementSeverity::Error;
+        $requirements['php_random_bytes']->setValue(t('Less secure'))
+          ->setSeverity(RequirementSeverity::Error);
       }
     }
 
     if ($phase === 'runtime' && PHP_SAPI !== 'cli') {
       if (!function_exists('fastcgi_finish_request') && !function_exists('litespeed_finish_request') && !ob_get_status()) {
-        $requirements['output_buffering'] = [
-          'title' => t('Output Buffering'),
-          'error_value' => t('Not enabled'),
-          'severity' => RequirementSeverity::Warning,
-          'description' => t('<a href="https://www.php.net/manual/en/function.ob-start.php">Output buffering</a> is not enabled. This may degrade Drupal\'s performance. You can enable output buffering by default <a href="https://www.php.net/manual/en/outcontrol.configuration.php#ini.output-buffering">in your PHP settings</a>.'),
-        ];
+        $requirements['output_buffering'] = new Requirement(
+          title: t('Output Buffering'),
+          value: t('Not enabled'),
+          description: t('<a href="https://www.php.net/manual/en/function.ob-start.php">Output buffering</a> is not enabled. This may degrade Drupal\'s performance. You can enable output buffering by default <a href="https://www.php.net/manual/en/outcontrol.configuration.php#ini.output-buffering">in your PHP settings</a>.'),
+          severity: RequirementSeverity::Warning,
+        );
       }
     }
 
     if ($phase == 'install' || $phase == 'update') {
       // Test for PDO (database).
-      $requirements['database_extensions'] = [
-        'title' => t('Database support'),
-      ];
+      $requirements['database_extensions'] = new Requirement(
+        title: t('Database support'),
+      );
 
       // Make sure PDO is available.
       $database_ok = extension_loaded('pdo');
@@ -520,12 +524,12 @@ class SystemRequirements implements InstallRequirementsInterface {
       }
 
       if (!$database_ok) {
-        $requirements['database_extensions']['value'] = t('Disabled');
-        $requirements['database_extensions']['severity'] = RequirementSeverity::Error;
-        $requirements['database_extensions']['description'] = $pdo_message;
+        $requirements['database_extensions']->setValue(t('Disabled'))
+          ->setSeverity(RequirementSeverity::Error)
+          ->setDescription($pdo_message);
       }
       else {
-        $requirements['database_extensions']['value'] = t('Enabled');
+        $requirements['database_extensions']->setValue(t('Enabled'));
       }
     }
 
@@ -534,14 +538,14 @@ class SystemRequirements implements InstallRequirementsInterface {
       $class = Database::getConnection()->getConnectionOptions()['namespace'] . '\\Install\\Tasks';
       /** @var \Drupal\Core\Database\Install\Tasks $tasks */
       $tasks = new $class();
-      $requirements['database_system'] = [
-        'title' => t('Database system'),
-        'value' => $tasks->name(),
-      ];
-      $requirements['database_system_version'] = [
-        'title' => t('Database system version'),
-        'value' => Database::getConnection()->version(),
-      ];
+      $requirements['database_system'] = new Requirement(
+        title: t('Database system'),
+        value: $tasks->name(),
+      );
+      $requirements['database_system_version'] = new Requirement(
+        title: t('Database system version'),
+        value: Database::getConnection()->version(),
+      );
 
       $errors = $tasks->engineVersionRequirementsCheck();
       $error_count = count($errors);
@@ -552,32 +556,32 @@ class SystemRequirements implements InstallRequirementsInterface {
           // Use the comma-list style to display a single error without bullets.
           '#context' => ['list_style' => $error_count === 1 ? 'comma-list' : ''],
         ];
-        $requirements['database_system_version']['severity'] = RequirementSeverity::Error;
-        $requirements['database_system_version']['description'] = $error_message;
+        $requirements['database_system_version']->setSeverity(RequirementSeverity::Error)
+          ->setDescription($error_message);
       }
     }
 
     if ($phase === 'runtime' || $phase === 'update') {
       // Test database JSON support.
-      $requirements['database_support_json'] = [
-        'title' => t('Database support for JSON'),
-        'severity' => RequirementSeverity::OK,
-        'value' => t('Available'),
-        'description' => t('Drupal requires databases that support JSON storage.'),
-      ];
+      $requirements['database_support_json'] = new Requirement(
+        title: t('Database support for JSON'),
+        value: t('Available'),
+        description: t('Drupal requires databases that support JSON storage.'),
+        severity: RequirementSeverity::OK,
+      );
 
       if (!Database::getConnection()->hasJson()) {
-        $requirements['database_support_json']['value'] = t('Not available');
-        $requirements['database_support_json']['severity'] = RequirementSeverity::Error;
+        $requirements['database_support_json']->setValue(t('Not available'))
+          ->setSeverity(RequirementSeverity::Error);
       }
     }
 
     // Test PHP memory_limit
     $memory_limit = ini_get('memory_limit');
-    $requirements['php_memory_limit'] = [
-      'title' => t('PHP memory limit'),
-      'value' => $memory_limit == -1 ? t('-1 (Unlimited)') : $memory_limit,
-    ];
+    $requirements['php_memory_limit'] = new Requirement(
+      title: t('PHP memory limit'),
+      value: $memory_limit == -1 ? t('-1 (Unlimited)') : $memory_limit,
+    );
 
     if (!Environment::checkMemoryLimit(\Drupal::MINIMUM_PHP_MEMORY_LIMIT, $memory_limit)) {
       $description = [];
@@ -611,8 +615,8 @@ class SystemRequirements implements InstallRequirementsInterface {
           ],
         ];
 
-        $requirements['php_memory_limit']['description'] = $description;
-        $requirements['php_memory_limit']['severity'] = RequirementSeverity::Warning;
+        $requirements['php_memory_limit']->setDescription($description)
+          ->setSeverity(RequirementSeverity::Warning);
       }
     }
 
@@ -644,6 +648,10 @@ class SystemRequirements implements InstallRequirementsInterface {
           $conf_errors[] = t("The directory %file is not protected from modifications and poses a security risk. You must change the directory's permissions to be non-writable.", ['%file' => $site_path]);
         }
       }
+      $requirements['configuration_files'] = new Requirement(
+        title: t('Configuration files'),
+        value: t('Protected'),
+      );
       foreach (['settings.php', 'settings.local.php', 'services.yml'] as $conf_file) {
         $full_path = $site_path . '/' . $conf_file;
         if (file_exists($full_path) && !drupal_verify_install_file($full_path, FILE_EXIST | FILE_READABLE | FILE_NOT_WRITABLE, 'file', !Settings::get('skip_permissions_hardening'))) {
@@ -667,18 +675,10 @@ class SystemRequirements implements InstallRequirementsInterface {
             ],
           ];
         }
-        $requirements['configuration_files'] = [
-          'value' => $error_value,
-          'severity' => $file_protection_severity,
-          'description' => $description,
-        ];
+        $requirements['configuration_files']->setValue($error_value)
+          ->setSeverity($file_protection_severity)
+          ->setDescription($description);
       }
-      else {
-        $requirements['configuration_files'] = [
-          'value' => t('Protected'),
-        ];
-      }
-      $requirements['configuration_files']['title'] = t('Configuration files');
     }
 
     // Test the contents of the .htaccess files.
@@ -694,13 +694,13 @@ class SystemRequirements implements InstallRequirementsInterface {
         // file in the latest security update.
         if (!file_exists($htaccess_file) || !($contents = @file_get_contents($htaccess_file)) || !str_contains($contents, 'Drupal_Security_Do_Not_Remove_See_SA_2013_003')) {
           $url = 'https://www.drupal.org/SA-CORE-2013-003';
-          $requirements[$htaccess_file] = [
+          $requirements[$htaccess_file] = new Requirement(
             // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
-            'title' => new TranslatableMarkup($protected_dir->getTitle()),
-            'value' => t('Not fully protected'),
-            'severity' => RequirementSeverity::Error,
-            'description' => t('See <a href=":url">@url</a> for information about the recommended .htaccess file which should be added to the %directory directory to help protect against arbitrary code execution.', [':url' => $url, '@url' => $url, '%directory' => $protected_dir->getPath()]),
-          ];
+            title: new TranslatableMarkup($protected_dir->getTitle()),
+            value: t('Not fully protected'),
+            description: t('See <a href=":url">@url</a> for information about the recommended .htaccess file which should be added to the %directory directory to help protect against arbitrary code execution.', [':url' => $url, '@url' => $url, '%directory' => $protected_dir->getPath()]),
+            severity: RequirementSeverity::Error,
+          );
         }
       }
     }
@@ -732,13 +732,14 @@ class SystemRequirements implements InstallRequirementsInterface {
       // Set summary and description based on values determined above.
       $summary = t('Last run @time ago', ['@time' => \Drupal::service('date.formatter')->formatTimeDiffSince($cron_last)]);
 
-      $requirements['cron'] = [
-        'title' => t('Cron maintenance tasks'),
-        'severity' => $severity,
-        'value' => $summary,
-      ];
+      $requirements['cron'] = new Requirement(
+        title: t('Cron maintenance tasks'),
+        value: $summary,
+        severity: $severity,
+      );
       if ($severity != RequirementSeverity::Info) {
-        $requirements['cron']['description'][] = [
+        $desc = $requirements['cron']->getDescription();
+        $desc[] = [
           [
             '#markup' => t('Cron has not run recently.'),
             '#suffix' => ' ',
@@ -749,7 +750,7 @@ class SystemRequirements implements InstallRequirementsInterface {
           ],
         ];
       }
-      $requirements['cron']['description'][] = [
+      $desc[] = [
         [
           '#type' => 'link',
           '#prefix' => '(',
@@ -765,6 +766,7 @@ class SystemRequirements implements InstallRequirementsInterface {
           '#url' => Url::fromRoute('system.run_cron'),
         ],
       ];
+      $requirements['cron']->setDescription($desc);
     }
     if ($phase != 'install') {
       $directories = [
@@ -820,25 +822,25 @@ class SystemRequirements implements InstallRequirementsInterface {
         else {
           $description = t('The directory %directory does not exist.', ['%directory' => $config_sync_directory]);
         }
-        $requirements['config sync directory'] = [
-          'title' => t('Configuration sync directory'),
-          'description' => $description,
-          'severity' => RequirementSeverity::Error,
-        ];
+        $requirements['config sync directory'] = new Requirement(
+          title: t('Configuration sync directory'),
+          description: $description,
+          severity: RequirementSeverity::Error,
+        );
       }
     }
     if ($phase != 'install' && empty($config_sync_directory)) {
-      $requirements['config sync directory'] = [
-        'title' => t('Configuration sync directory'),
-        'value' => t('Not present'),
-        'description' => t("Your %file file must define the %setting setting as a string containing the directory in which configuration files can be found.", ['%file' => $site_path . '/settings.php', '%setting' => "\$settings['config_sync_directory']"]),
-        'severity' => RequirementSeverity::Error,
-      ];
+      $requirements['config sync directory'] = new Requirement(
+        title: t('Configuration sync directory'),
+        value: t('Not present'),
+        description: t("Your %file file must define the %setting setting as a string containing the directory in which configuration files can be found.", ['%file' => $site_path . '/settings.php', '%setting' => "\$settings['config_sync_directory']"]),
+        severity: RequirementSeverity::Error,
+      );
     }
 
-    $requirements['file system'] = [
-      'title' => t('File system'),
-    ];
+    $requirements['file system'] = new Requirement(
+      title: t('File system'),
+    );
 
     $error = '';
     // For installer, create the directories if possible.
@@ -853,7 +855,7 @@ class SystemRequirements implements InstallRequirementsInterface {
       $is_directory = is_dir($directory);
       if (!$is_writable || !$is_directory) {
         $description = '';
-        $requirements['file system']['value'] = t('Not writable');
+        $requirements['file system']->setValue(t('Not writable'));
         if (!$is_directory) {
           $error = t('The directory %directory does not exist.', ['%directory' => $directory]);
         }
@@ -869,7 +871,7 @@ class SystemRequirements implements InstallRequirementsInterface {
           // For the installer UI, we need different wording. 'value' will
           // be treated as version, so provide none there.
           $description = t('An automated attempt to create this directory failed, possibly due to a permissions problem. To proceed with the installation, either create the directory and modify its permissions manually or ensure that the installer has the permissions to create it automatically. For more information, see INSTALL.txt or the <a href=":handbook_url">online handbook</a>.', [':handbook_url' => 'https://www.drupal.org/server-permissions']);
-          $requirements['file system']['value'] = '';
+          $requirements['file system']->setValue('');
         }
         if (!empty($description)) {
           $description = [
@@ -880,28 +882,28 @@ class SystemRequirements implements InstallRequirementsInterface {
               'description' => $description,
             ],
           ];
-          $requirements['file system']['description'] = $description;
-          $requirements['file system']['severity'] = RequirementSeverity::Error;
+          $requirements['file system']->setDescription($description)
+            ->setSeverity(RequirementSeverity::Error);
         }
       }
       else {
         // This function can be called before the config_cache table has been
         // created.
         if ($phase == 'install' || \Drupal::config('system.file')->get('default_scheme') == 'public') {
-          $requirements['file system']['value'] = t('Writable (<em>public</em> download method)');
+          $requirements['file system']->setValue(t('Writable (<em>public</em> download method)'));
         }
         else {
-          $requirements['file system']['value'] = t('Writable (<em>private</em> download method)');
+          $requirements['file system']->setValue(t('Writable (<em>private</em> download method)'));
         }
       }
     }
 
     // See if updates are available in update.php.
     if ($phase == 'runtime') {
-      $requirements['update'] = [
-        'title' => t('Database updates'),
-        'value' => t('Up to date'),
-      ];
+      $requirements['update'] = new Requirement(
+        title: t('Database updates'),
+        value: t('Up to date'),
+      );
 
       // Check installed modules.
       $has_pending_updates = FALSE;
@@ -927,15 +929,17 @@ class SystemRequirements implements InstallRequirementsInterface {
       }
 
       if ($has_pending_updates) {
-        $requirements['update']['severity'] = RequirementSeverity::Error;
-        $requirements['update']['value'] = t('Out of date');
-        $requirements['update']['description'] = t('Some modules have database schema updates to install. You should run the <a href=":update">database update script</a> immediately.', [':update' => Url::fromRoute('system.db_update')->toString()]);
+        $requirements['update']->setSeverity(RequirementSeverity::Error)
+          ->setValue(t('Out of date'))
+          ->setDescription(t('Some modules have database schema updates to install. You should run the <a href=":update">database update script</a> immediately.', [
+            ':update' => Url::fromRoute('system.db_update')->toString(),
+          ]));
       }
 
-      $requirements['entity_update'] = [
-        'title' => t('Entity/field definitions'),
-        'value' => t('Up to date'),
-      ];
+      $requirements['entity_update'] = new Requirement(
+        title: t('Entity/field definitions'),
+        value: t('Up to date'),
+      );
       // Verify that no entity updates are pending.
       if ($change_list = \Drupal::entityDefinitionUpdateManager()->getChangeSummary()) {
         $build = [];
@@ -949,38 +953,34 @@ class SystemRequirements implements InstallRequirementsInterface {
         }
 
         $entity_update_issues = \Drupal::service('renderer')->renderInIsolation($build);
-        $requirements['entity_update']['severity'] = RequirementSeverity::Error;
-        $requirements['entity_update']['value'] = t('Mismatched entity and/or field definitions');
-        $requirements['entity_update']['description'] = t('The following changes were detected in the entity type and field definitions. @updates', ['@updates' => $entity_update_issues]);
+        $requirements['entity_update']->setSeverity(RequirementSeverity::Error)
+          ->setValue(t('Mismatched entity and/or field definitions'))
+          ->setDescription(t('The following changes were detected in the entity type and field definitions. @updates', ['@updates' => $entity_update_issues]));
       }
     }
 
     // Display the deployment identifier if set.
     if ($phase == 'runtime') {
       if ($deployment_identifier = Settings::get('deployment_identifier')) {
-        $requirements['deployment identifier'] = [
-          'title' => t('Deployment identifier'),
-          'value' => $deployment_identifier,
-          'severity' => RequirementSeverity::Info,
-        ];
+        $requirements['deployment identifier'] = new Requirement(
+          title: t('Deployment identifier'),
+          value: $deployment_identifier,
+          severity: RequirementSeverity::Info,
+        );
       }
     }
 
     // Verify the update.php access setting
     if ($phase == 'runtime') {
+      $requirements['update access'] = new Requirement(
+        title: t('Access to update.php'),
+        value: t('Protected'),
+      );
       if (Settings::get('update_free_access')) {
-        $requirements['update access'] = [
-          'value' => t('Not protected'),
-          'severity' => RequirementSeverity::Error,
-          'description' => t('The update.php script is accessible to everyone without authentication check, which is a security risk. You must change the @settings_name value in your settings.php back to FALSE.', ['@settings_name' => '$settings[\'update_free_access\']']),
-        ];
+        $requirements['update access']->setValue(t('Not protected'))
+          ->setDescription(t('The update.php script is accessible to everyone without authentication check, which is a security risk. You must change the @settings_name value in your settings.php back to FALSE.', ['@settings_name' => '$settings[\'update_free_access\']']))
+          ->setSeverity(RequirementSeverity::Error);
       }
-      else {
-        $requirements['update access'] = [
-          'value' => t('Protected'),
-        ];
-      }
-      $requirements['update access']['title'] = t('Access to update.php');
     }
 
     // Display an error if a newly introduced dependency in a module is not
@@ -1005,16 +1005,16 @@ class SystemRequirements implements InstallRequirementsInterface {
         $template['#context']['extensions']['#items'] = $extension_names;
         $template['#context']['description'] = $description;
         $template['#context']['additional_description'] = $additional_description;
-        return [
-          'title' => $title,
-          'value' => [
+        return new Requirement(
+          title: $title,
+          value: [
             'list' => $template,
             'handbook_link' => [
               '#markup' => $message,
             ],
           ],
-          'severity' => RequirementSeverity::Error,
-        ];
+          severity: RequirementSeverity::Error,
+        );
       };
       $profile = \Drupal::installProfile();
       $files = $module_extension_list->getList();
@@ -1044,12 +1044,12 @@ class SystemRequirements implements InstallRequirementsInterface {
           $required_module = $requirement->getName();
           // Check if the module exists.
           if (!isset($files[$required_module])) {
-            $requirements["$extension_name-$required_module"] = [
-              'title' => t('Unresolved dependency'),
-              'description' => t('@name requires this module.', ['@name' => $name]),
-              'value' => t('@required_name (Missing)', ['@required_name' => $required_module]),
-              'severity' => RequirementSeverity::Error,
-            ];
+            $requirements["$extension_name-$required_module"] = new Requirement(
+              title: t('Unresolved dependency'),
+              value: t('@required_name (Missing)', ['@required_name' => $required_module]),
+              description: t('@name requires this module.', ['@name' => $name]),
+              severity: RequirementSeverity::Error,
+            );
             continue;
           }
           // Check for an incompatible version.
@@ -1058,13 +1058,12 @@ class SystemRequirements implements InstallRequirementsInterface {
           // Remove CORE_COMPATIBILITY- only from the start of the string.
           $version = preg_replace('/^(' . \Drupal::CORE_COMPATIBILITY . '\-)/', '', $required_file->info['version'] ?? '');
           if (!$requirement->isCompatible($version)) {
-            $requirements["$extension_name-$required_module"] = [
-              'title' => t('Unresolved dependency'),
-              'description' => t('@name requires this module and version. Currently using @required_name version @version', ['@name' => $name, '@required_name' => $required_name, '@version' => $version]),
-              'value' => t('@required_name (Version @compatibility required)', ['@required_name' => $required_name, '@compatibility' => $requirement->getConstraintString()]),
-              'severity' => RequirementSeverity::Error,
-            ];
-            continue;
+            $requirements["$extension_name-$required_module"] = new Requirement(
+              title: t('Unresolved dependency'),
+              value: t('@required_name (Version @compatibility required)', ['@required_name' => $required_name, '@compatibility' => $requirement->getConstraintString()]),
+              description: t('@name requires this module and version. Currently using @required_name version @version', ['@name' => $name, '@required_name' => $required_name, '@version' => $version]),
+              severity: RequirementSeverity::Error,
+            );
           }
         }
       }
@@ -1269,47 +1268,43 @@ class SystemRequirements implements InstallRequirementsInterface {
     $failed_check = Unicode::check();
     $library = Unicode::getStatus();
 
-    $requirements['unicode'] = [
-      'title' => t('Unicode library'),
-      'value' => $libraries[$library],
-      'severity' => $severities[$library],
-    ];
+    $requirements['unicode'] = new Requirement(
+      title: t('Unicode library'),
+      value: $libraries[$library],
+      severity: $severities[$library] ?? RequirementSeverity::OK,
+    );
     switch ($failed_check) {
       case 'mb_strlen':
-        $requirements['unicode']['description'] = t('Operations on Unicode strings are emulated on a best-effort basis. Install the <a href="http://php.net/mbstring">PHP mbstring extension</a> for improved Unicode support.');
+        $requirements['unicode']->setDescription(t('Operations on Unicode strings are emulated on a best-effort basis. Install the <a href="http://php.net/mbstring">PHP mbstring extension</a> for improved Unicode support.'));
         break;
 
       case 'mbstring.encoding_translation':
-        $requirements['unicode']['description'] = t('Multibyte string input conversion in PHP is active and must be disabled. Check the php.ini <em>mbstring.encoding_translation</em> setting. Refer to the <a href="http://php.net/mbstring">PHP mbstring documentation</a> for more information.');
+        $requirements['unicode']->setDescription(t('Multibyte string input conversion in PHP is active and must be disabled. Check the php.ini <em>mbstring.encoding_translation</em> setting. Refer to the <a href="http://php.net/mbstring">PHP mbstring documentation</a> for more information.'));
         break;
     }
 
     if ($phase == 'runtime') {
       // Check for update status module.
+      $requirements['update status'] = new Requirement(
+        title: t('Update notifications'),
+        value: t('Enabled'),
+      );
       if (!\Drupal::moduleHandler()->moduleExists('update')) {
-        $requirements['update status'] = [
-          'value' => t('Not enabled'),
-          'severity' => RequirementSeverity::Warning,
-          'description' => t('Update notifications are not enabled. It is <strong>highly recommended</strong> that you install the Update Status module from the <a href=":module">module administration page</a> in order to stay up-to-date on new releases. For more information, <a href=":update">Update status handbook page</a>.', [
+        $requirements['update status']->setValue(t('Not enabled'))
+          ->setSeverity(RequirementSeverity::Warning)
+          ->setDescription(t('Update notifications are not enabled. It is <strong>highly recommended</strong> that you install the Update Status module from the <a href=":module">module administration page</a> in order to stay up-to-date on new releases. For more information, <a href=":update">Update status handbook page</a>.', [
             ':update' => 'https://www.drupal.org/documentation/modules/update',
             ':module' => Url::fromRoute('system.modules_list')->toString(),
-          ]),
-        ];
+          ]));
       }
-      else {
-        $requirements['update status'] = [
-          'value' => t('Enabled'),
-        ];
-      }
-      $requirements['update status']['title'] = t('Update notifications');
 
       if (Settings::get('rebuild_access')) {
-        $requirements['rebuild access'] = [
-          'title' => t('Rebuild access'),
-          'value' => t('Enabled'),
-          'severity' => RequirementSeverity::Error,
-          'description' => t('The rebuild_access setting is enabled in settings.php. It is recommended to have this setting disabled unless you are performing a rebuild.'),
-        ];
+        $requirements['rebuild access'] = new Requirement(
+          title: t('Rebuild access'),
+          value: t('Enabled'),
+          description: t('The rebuild_access setting is enabled in settings.php. It is recommended to have this setting disabled unless you are performing a rebuild.'),
+          severity: RequirementSeverity::Error,
+        );
       }
     }
 
@@ -1325,14 +1320,14 @@ class SystemRequirements implements InstallRequirementsInterface {
           'None' => $request_object->isSecure(),
           default => FALSE,
       };
-      $requirements['php_session_samesite'] = [
-        'title' => t('SameSite cookie attribute'),
-        'value' => $samesite,
-        'severity' => $valid ? RequirementSeverity::OK : RequirementSeverity::Warning,
-        'description' => t('This attribute should be explicitly set to Lax, Strict or None. If set to None then the request must be made via HTTPS. See <a href=":url" target="_blank">PHP documentation</a>', [
+      $requirements['php_session_samesite'] = new Requirement(
+        title: t('SameSite cookie attribute'),
+        value: $samesite,
+        description: t('This attribute should be explicitly set to Lax, Strict or None. If set to None then the request must be made via HTTPS. See <a href=":url" target="_blank">PHP documentation</a>', [
           ':url' => 'https://www.php.net/manual/en/session.configuration.php#ini.session.cookie-samesite',
         ]),
-      ];
+        severity: $valid ? RequirementSeverity::OK : RequirementSeverity::Warning,
+      );
     }
 
     // See if trusted host names have been configured, and warn the user if they
@@ -1340,19 +1335,19 @@ class SystemRequirements implements InstallRequirementsInterface {
     if ($phase == 'runtime') {
       $trusted_host_patterns = Settings::get('trusted_host_patterns');
       if (empty($trusted_host_patterns)) {
-        $requirements['trusted_host_patterns'] = [
-          'title' => t('Trusted Host Settings'),
-          'value' => t('Not enabled'),
-          'description' => t('The trusted_host_patterns setting is not configured in settings.php. This can lead to security vulnerabilities. It is <strong>highly recommended</strong> that you configure this. See <a href=":url">Protecting against HTTP HOST Header attacks</a> for more information.', [':url' => 'https://www.drupal.org/docs/installing-drupal/trusted-host-settings']),
-          'severity' => RequirementSeverity::Error,
-        ];
+        $requirements['trusted_host_patterns'] = new Requirement(
+          title: t('Trusted Host Settings'),
+          value: t('Not enabled'),
+          description: t('The trusted_host_patterns setting is not configured in settings.php. This can lead to security vulnerabilities. It is <strong>highly recommended</strong> that you configure this. See <a href=":url">Protecting against HTTP HOST Header attacks</a> for more information.', [':url' => 'https://www.drupal.org/docs/installing-drupal/trusted-host-settings']),
+          severity: RequirementSeverity::Error,
+        );
       }
       else {
-        $requirements['trusted_host_patterns'] = [
-          'title' => t('Trusted Host Settings'),
-          'value' => t('Enabled'),
-          'description' => t('The trusted_host_patterns setting is set to allow %trusted_host_patterns', ['%trusted_host_patterns' => implode(', ', $trusted_host_patterns)]),
-        ];
+        $requirements['trusted_host_patterns'] = new Requirement(
+          title: t('Trusted Host Settings'),
+          value: t('Enabled'),
+          description: t('The trusted_host_patterns setting is set to allow %trusted_host_patterns', ['%trusted_host_patterns' => implode(', ', $trusted_host_patterns)]),
+        );
       }
     }
 
@@ -1370,12 +1365,12 @@ class SystemRequirements implements InstallRequirementsInterface {
             // Only show the warning when the post update function has run and
             // the module that is providing the database driver is not
             // installed.
-            $requirements['database_driver_provided_by_module'] = [
-              'title' => t('Database driver provided by module'),
-              'value' => t('Not installed'),
-              'description' => t('The current database driver is provided by the module: %module. The module is currently not installed. You should immediately <a href=":install">install</a> the module.', ['%module' => $provider, ':install' => Url::fromRoute('system.modules_list')->toString()]),
-              'severity' => RequirementSeverity::Error,
-            ];
+            $requirements['database_driver_provided_by_module'] = new Requirement(
+              title: t('Database driver provided by module'),
+              value: t('Not installed'),
+              description: t('The current database driver is provided by the module: %module. The module is currently not installed. You should immediately <a href=":install">install</a> the module.', ['%module' => $provider, ':install' => Url::fromRoute('system.modules_list')->toString()]),
+              severity: RequirementSeverity::Error,
+            );
           }
         }
       }
@@ -1390,12 +1385,12 @@ class SystemRequirements implements InstallRequirementsInterface {
       $current_nesting_level = ini_get('xdebug.max_nesting_level');
 
       if ($current_nesting_level < $minimum_nesting_level) {
-        $requirements['xdebug_max_nesting_level'] = [
-          'title' => t('Xdebug settings'),
-          'value' => t('xdebug.max_nesting_level is set to %value.', ['%value' => $current_nesting_level]),
-          'description' => t('Set <code>xdebug.max_nesting_level=@level</code> in your PHP configuration as some pages in your Drupal site will not work when this setting is too low.', ['@level' => $minimum_nesting_level]),
-          'severity' => RequirementSeverity::Error,
-        ];
+        $requirements['xdebug_max_nesting_level'] = new Requirement(
+          title: t('Xdebug settings'),
+          value: t('xdebug.max_nesting_level is set to %value.', ['%value' => $current_nesting_level]),
+          description: t('Set <code>xdebug.max_nesting_level=@level</code> in your PHP configuration as some pages in your Drupal site will not work when this setting is too low.', ['@level' => $minimum_nesting_level]),
+          severity: RequirementSeverity::Error,
+        );
       }
     }
 
@@ -1409,21 +1404,21 @@ class SystemRequirements implements InstallRequirementsInterface {
     if (str_starts_with(PHP_OS, 'WIN')) {
       $depth = strlen(realpath(DRUPAL_ROOT . '/' . PublicStream::basePath()));
       if ($depth > 120) {
-        $requirements['max_path_on_windows'] = [
-          'title' => t('Windows installation depth'),
-          'description' => t('The public files directory path is %depth characters. Paths longer than 120 characters will cause problems on Windows.', ['%depth' => $depth]),
-          'severity' => RequirementSeverity::Error,
-        ];
+        $requirements['max_path_on_windows'] = new Requirement(
+          title: t('Windows installation depth'),
+          description: t('The public files directory path is %depth characters. Paths longer than 120 characters will cause problems on Windows.', ['%depth' => $depth]),
+          severity: RequirementSeverity::Error,
+        );
       }
     }
     // Check to see if dates will be limited to 1901-2038.
     if (PHP_INT_SIZE <= 4) {
-      $requirements['limited_date_range'] = [
-        'title' => t('Limited date range'),
-        'value' => t('Your PHP installation has a limited date range.'),
-        'description' => t('You are running on a system where PHP is compiled or limited to using 32-bit integers. This will limit the range of dates and timestamps to the years 1901-2038. Read about the <a href=":url">limitations of 32-bit PHP</a>.', [':url' => 'https://www.drupal.org/docs/system-requirements/limitations-of-32-bit-php']),
-        'severity' => RequirementSeverity::Warning,
-      ];
+      $requirements['limited_date_range'] = new Requirement(
+        title: t('Limited date range'),
+        value: t('Your PHP installation has a limited date range.'),
+        description: t('You are running on a system where PHP is compiled or limited to using 32-bit integers. This will limit the range of dates and timestamps to the years 1901-2038. Read about the <a href=":url">limitations of 32-bit PHP</a>.', [':url' => 'https://www.drupal.org/docs/system-requirements/limitations-of-32-bit-php']),
+        severity: RequirementSeverity::Warning,
+      );
     }
 
     // During installs from configuration don't support install profiles that
@@ -1431,12 +1426,12 @@ class SystemRequirements implements InstallRequirementsInterface {
     if ($phase == 'install' && !empty($install_state['config_install_path'])) {
       $install_hook = $install_state['parameters']['profile'] . '_install';
       if (function_exists($install_hook)) {
-        $requirements['config_install'] = [
-          'title' => t('Configuration install'),
-          'value' => $install_state['parameters']['profile'],
-          'description' => t('The selected profile has a hook_install() implementation and therefore can not be installed from configuration.'),
-          'severity' => RequirementSeverity::Error,
-        ];
+        $requirements['config_install'] = new Requirement(
+          title: t('Configuration install'),
+          value: $install_state['parameters']['profile'],
+          description: t('The selected profile has a hook_install() implementation and therefore can not be installed from configuration.'),
+          severity: RequirementSeverity::Error,
+        );
       }
     }
 
@@ -1446,11 +1441,11 @@ class SystemRequirements implements InstallRequirementsInterface {
         // The following message is only informational because not all site
         // owners have access to edit their settings.php as it may be
         // controlled by their hosting provider.
-        $requirements['install_profile_in_settings'] = [
-          'title' => t('Install profile in settings'),
-          'value' => t("Drupal 9 no longer uses the \$settings['install_profile'] value in settings.php and it should be removed."),
-          'severity' => RequirementSeverity::Warning,
-        ];
+        $requirements['install_profile_in_settings'] = new Requirement(
+          title: t('Install profile in settings'),
+          value: t("Drupal 9 no longer uses the \$settings['install_profile'] value in settings.php and it should be removed."),
+          severity: RequirementSeverity::Warning,
+        );
       }
     }
 
@@ -1485,28 +1480,28 @@ class SystemRequirements implements InstallRequirementsInterface {
       // If user module is in the list then only show a specific message for
       // Drupal core.
       if (isset($module_list['user'])) {
-        $requirements['user_update_last_removed'] = [
-          'title' => t('The version of Drupal you are trying to update from is too old'),
-          'description' => t('Updating to Drupal @current_major is only supported from Drupal version @required_min_version or higher. If you are trying to update from an older version, first update to the latest version of Drupal @previous_major. (<a href=":url">Drupal upgrade guide</a>)', [
+        $requirements['user_update_last_removed'] = new Requirement(
+          title: t('The version of Drupal you are trying to update from is too old'),
+          description: t('Updating to Drupal @current_major is only supported from Drupal version @required_min_version or higher. If you are trying to update from an older version, first update to the latest version of Drupal @previous_major. (<a href=":url">Drupal upgrade guide</a>)', [
             '@current_major' => 10,
             '@required_min_version' => '9.4.0',
             '@previous_major' => 9,
             ':url' => 'https://www.drupal.org/docs/upgrading-drupal/drupal-8-and-higher',
           ]),
-          'severity' => RequirementSeverity::Error,
-        ];
+          severity: RequirementSeverity::Error,
+        );
       }
       else {
         foreach ($module_list as $module => $data) {
-          $requirements[$module . '_update_last_removed'] = [
-            'title' => t('Unsupported schema version: @module', ['@module' => $data['name']]),
-            'description' => t('The installed version of the %module module is too old to update. Update to an intermediate version first (last removed version: @last_removed_version, installed version: @installed_version).', [
+          $requirements[$module . '_update_last_removed'] = new Requirement(
+            title: t('Unsupported schema version: @module', ['@module' => $data['name']]),
+            description: t('The installed version of the %module module is too old to update. Update to an intermediate version first (last removed version: @last_removed_version, installed version: @installed_version).', [
               '%module' => $data['name'],
               '@last_removed_version' => $data['last_removed'],
               '@installed_version' => $data['installed_version'],
             ]),
-            'severity' => RequirementSeverity::Error,
-          ];
+            severity: RequirementSeverity::Error,
+          );
         }
       }
       // Also check post-updates. Only do this if we're not already showing an
@@ -1530,11 +1525,11 @@ class SystemRequirements implements InstallRequirementsInterface {
                 '@versions' => implode(', ', $versions),
               ]
             );
-            $requirements[$module . '_post_update_removed'] = [
-              'title' => t('Missing updates for: @module', ['@module' => $module_info->info['name']]),
-              'description' => $description,
-              'severity' => RequirementSeverity::Error,
-            ];
+            $requirements[$module . '_post_update_removed'] = new Requirement(
+              title: t('Missing updates for: @module', ['@module' => $module_info->info['name']]),
+              description: $description,
+              severity: RequirementSeverity::Error,
+            );
           }
         }
       }
@@ -1559,16 +1554,16 @@ class SystemRequirements implements InstallRequirementsInterface {
               else {
                 $future_version_string = $data['future_version_string'];
               }
-              $requirements[$module . '_equivalent_update_missing'] = [
-                'title' => t('Missing updates for: @module', ['@module' => $module_info->info['name']]),
-                'description' => t('The version of the %module module that you are attempting to update to is missing update @future_update (which was marked as an equivalent by @ran_update). Update to at least @future_version_string.', [
+              $requirements[$module . '_equivalent_update_missing'] = new Requirement(
+                title: t('Missing updates for: @module', ['@module' => $module_info->info['name']]),
+                description: t('The version of the %module module that you are attempting to update to is missing update @future_update (which was marked as an equivalent by @ran_update). Update to at least @future_version_string.', [
                   '%module' => $module_info->info['name'],
                   '@ran_update' => $data['ran_update'],
                   '@future_update' => $future_update,
                   '@future_version_string' => $future_version_string,
                 ]),
-                'severity' => RequirementSeverity::Error,
-              ];
+                severity: RequirementSeverity::Error,
+              );
               break;
             }
           }
@@ -1582,29 +1577,29 @@ class SystemRequirements implements InstallRequirementsInterface {
       $twig_debug = $development_settings->get('twig_debug', FALSE);
       $twig_cache_disable = $development_settings->get('twig_cache_disable', FALSE);
       if ($twig_debug || $twig_cache_disable) {
-        $requirements['twig_debug_enabled'] = [
-          'title' => t('Twig development mode'),
-          'value' => t('Twig development mode settings are turned on. Go to @link to disable them.', [
+        $requirements['twig_debug_enabled'] = new Requirement(
+          title: t('Twig development mode'),
+          value: t('Twig development mode settings are turned on. Go to @link to disable them.', [
             '@link' => Link::createFromRoute(
               'development settings page',
               'system.development_settings',
             )->toString(),
           ]),
-          'severity' => RequirementSeverity::Warning,
-        ];
+          severity: RequirementSeverity::Warning,
+        );
       }
       $render_cache_disabled = $development_settings->get('disable_rendered_output_cache_bins', FALSE);
       if ($render_cache_disabled) {
-        $requirements['render_cache_disabled'] = [
-          'title' => t('Markup caching disabled'),
-          'value' => t('Render cache, dynamic page cache, and page cache are bypassed. Go to @link to enable them.', [
+        $requirements['render_cache_disabled'] = new Requirement(
+          title: t('Markup caching disabled'),
+          value: t('Render cache, dynamic page cache, and page cache are bypassed. Go to @link to enable them.', [
             '@link' => Link::createFromRoute(
               'development settings page',
               'system.development_settings',
             )->toString(),
           ]),
-          'severity' => RequirementSeverity::Warning,
-        ];
+          severity: RequirementSeverity::Warning,
+        );
       }
     }
 
@@ -1628,9 +1623,11 @@ class SystemRequirements implements InstallRequirementsInterface {
       $advisories = $fetcher->getSecurityAdvisories(TRUE, 5);
     }
     catch (ClientExceptionInterface $exception) {
-      $requirements['system_advisories']['title'] = t('Critical security announcements');
-      $requirements['system_advisories']['severity'] = RequirementSeverity::Warning;
-      $requirements['system_advisories']['description'] = ['#theme' => 'system_security_advisories_fetch_error_message'];
+      $requirements['system_advisories'] = new Requirement(
+        title: t('Critical security announcements'),
+        description: ['#theme' => 'system_security_advisories_fetch_error_message'],
+        severity: RequirementSeverity::Warning,
+      );
       Error::logException(\Drupal::logger('system'), $exception, 'Failed to retrieve security advisory data.');
       return;
     }
@@ -1644,14 +1641,16 @@ class SystemRequirements implements InstallRequirementsInterface {
         }
         $advisory_links[] = new Link($advisory->getTitle(), Url::fromUri($advisory->getUrl()));
       }
-      $requirements['system_advisories']['title'] = t('Critical security announcements');
-      $requirements['system_advisories']['severity'] = $severity;
-      $requirements['system_advisories']['description'] = [
-        'list' => [
-          '#theme' => 'item_list',
-          '#items' => $advisory_links,
+      $requirements['system_advisories'] = new Requirement(
+        title: t('Critical security announcements'),
+        description: [
+          'list' => [
+            '#theme' => 'item_list',
+            '#items' => $advisory_links,
+          ],
         ],
-      ];
+        severity: $severity,
+      );
       if (\Drupal::moduleHandler()->moduleExists('help')) {
         $requirements['system_advisories']['description']['help_link'] = Link::createFromRoute(
           'What are critical security announcements?',
