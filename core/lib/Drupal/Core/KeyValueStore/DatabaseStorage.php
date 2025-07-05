@@ -63,7 +63,14 @@ class DatabaseStorage extends StorageBase {
    */
   public function has($key) {
     try {
-      return (bool) $this->connection->query('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :key', [
+      if (property_exists($this->connection, 'identifiers')) {
+        $table = $this->connection->identifiers->table($this->table)->canonical();
+      }
+      else {
+        // @phpstan-ignore method.deprecated
+        $table = $this->connection->escapeTable($this->table);
+      }
+      return (bool) $this->connection->query('SELECT 1 FROM {' . $table . '} WHERE [collection] = :collection AND [name] = :key', [
         ':collection' => $this->collection,
         ':key' => $key,
       ])->fetchField();
@@ -80,8 +87,15 @@ class DatabaseStorage extends StorageBase {
   public function getMultiple(array $keys) {
     $values = [];
     try {
+      if (property_exists($this->connection, 'identifiers')) {
+        $table = $this->connection->identifiers->table($this->table)->canonical();
+      }
+      else {
+        // @phpstan-ignore method.deprecated
+        $table = $this->connection->escapeTable($this->table);
+      }
       $result = $this->connection
-        ->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [name] IN ( :keys[] ) AND [collection] = :collection', [
+        ->query('SELECT [name], [value] FROM {' . $table . '} WHERE [name] IN ( :keys[] ) AND [collection] = :collection', [
           ':keys[]' => $keys,
           ':collection' => $this->collection,
         ])
@@ -105,7 +119,14 @@ class DatabaseStorage extends StorageBase {
    */
   public function getAll() {
     try {
-      $result = $this->connection->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection', [':collection' => $this->collection]);
+      if (property_exists($this->connection, 'identifiers')) {
+        $table = $this->connection->identifiers->table($this->table)->canonical();
+      }
+      else {
+        // @phpstan-ignore method.deprecated
+        $table = $this->connection->escapeTable($this->table);
+      }
+      $result = $this->connection->query('SELECT [name], [value] FROM {' . $table . '} WHERE [collection] = :collection', [':collection' => $this->collection]);
     }
     catch (\Exception $e) {
       $this->catchException($e);

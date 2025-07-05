@@ -65,7 +65,14 @@ class DatabaseStorage implements StorageInterface {
    */
   public function exists($name) {
     try {
-      return (bool) $this->connection->queryRange('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :name', 0, 1, [
+      if (property_exists($this->connection, 'identifiers')) {
+        $table = $this->connection->identifiers->table($this->table)->canonical();
+      }
+      else {
+        // @phpstan-ignore method.deprecated
+        $table = $this->connection->escapeTable($this->table);
+      }
+      return (bool) $this->connection->queryRange('SELECT 1 FROM {' . $table . '} WHERE [collection] = :collection AND [name] = :name', 0, 1, [
         ':collection' => $this->collection,
         ':name' => $name,
       ], $this->options)->fetchField();
@@ -86,7 +93,14 @@ class DatabaseStorage implements StorageInterface {
   public function read($name) {
     $data = FALSE;
     try {
-      $raw = $this->connection->query('SELECT [data] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :name', [
+      if (property_exists($this->connection, 'identifiers')) {
+        $table = $this->connection->identifiers->table($this->table)->canonical();
+      }
+      else {
+        // @phpstan-ignore method.deprecated
+        $table = $this->connection->escapeTable($this->table);
+      }
+      $raw = $this->connection->query('SELECT [data] FROM {' . $table . '} WHERE [collection] = :collection AND [name] = :name', [
         ':collection' => $this->collection,
         ':name' => $name,
       ], $this->options)->fetchField();
@@ -114,8 +128,15 @@ class DatabaseStorage implements StorageInterface {
 
     $list = [];
     try {
+      if (property_exists($this->connection, 'identifiers')) {
+        $table = $this->connection->identifiers->table($this->table)->canonical();
+      }
+      else {
+        // @phpstan-ignore method.deprecated
+        $table = $this->connection->escapeTable($this->table);
+      }
       $list = $this->connection
-        ->query('SELECT [name], [data] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] IN ( :names[] )', [
+        ->query('SELECT [name], [data] FROM {' . $table . '} WHERE [collection] = :collection AND [name] IN ( :names[] )', [
           ':collection' => $this->collection,
           ':names[]' => $names,
         ], $this->options)
@@ -342,7 +363,14 @@ class DatabaseStorage implements StorageInterface {
    */
   public function getAllCollectionNames() {
     try {
-      return $this->connection->query('SELECT DISTINCT [collection] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] <> :collection ORDER by [collection]', [
+      if (property_exists($this->connection, 'identifiers')) {
+        $table = $this->connection->identifiers->table($this->table)->canonical();
+      }
+      else {
+        // @phpstan-ignore method.deprecated
+        $table = $this->connection->escapeTable($this->table);
+      }
+      return $this->connection->query('SELECT DISTINCT [collection] FROM {' . $table . '} WHERE [collection] <> :collection ORDER by [collection]', [
         ':collection' => StorageInterface::DEFAULT_COLLECTION,
       ])->fetchCol();
     }

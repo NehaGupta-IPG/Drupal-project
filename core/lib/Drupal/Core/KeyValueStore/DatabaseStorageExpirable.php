@@ -43,7 +43,14 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    */
   public function has($key) {
     try {
-      return (bool) $this->connection->query('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :key AND [expire] > :now', [
+      if (property_exists($this->connection, 'identifiers')) {
+        $table = $this->connection->identifiers->table($this->table)->canonical();
+      }
+      else {
+        // @phpstan-ignore method.deprecated
+        $table = $this->connection->escapeTable($this->table);
+      }
+      return (bool) $this->connection->query('SELECT 1 FROM {' . $table . '} WHERE [collection] = :collection AND [name] = :key AND [expire] > :now', [
         ':collection' => $this->collection,
         ':key' => $key,
         ':now' => $this->time->getRequestTime(),
@@ -60,8 +67,15 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    */
   public function getMultiple(array $keys) {
     try {
+      if (property_exists($this->connection, 'identifiers')) {
+        $table = $this->connection->identifiers->table($this->table)->canonical();
+      }
+      else {
+        // @phpstan-ignore method.deprecated
+        $table = $this->connection->escapeTable($this->table);
+      }
       $values = $this->connection->query(
-        'SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [expire] > :now AND [name] IN ( :keys[] ) AND [collection] = :collection',
+        'SELECT [name], [value] FROM {' . $table . '} WHERE [expire] > :now AND [name] IN ( :keys[] ) AND [collection] = :collection',
         [
           ':now' => $this->time->getRequestTime(),
           ':keys[]' => $keys,
@@ -84,8 +98,15 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    */
   public function getAll() {
     try {
+      if (property_exists($this->connection, 'identifiers')) {
+        $table = $this->connection->identifiers->table($this->table)->canonical();
+      }
+      else {
+        // @phpstan-ignore method.deprecated
+        $table = $this->connection->escapeTable($this->table);
+      }
       $values = $this->connection->query(
-        'SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [expire] > :now',
+        'SELECT [name], [value] FROM {' . $table . '} WHERE [collection] = :collection AND [expire] > :now',
         [
           ':collection' => $this->collection,
           ':now' => $this->time->getRequestTime(),
