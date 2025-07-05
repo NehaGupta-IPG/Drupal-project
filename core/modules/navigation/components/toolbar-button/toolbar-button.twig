@@ -22,23 +22,36 @@ appear after main classes #}
   {% set attributes = attributes.setAttribute('data-index-text', text|first|lower).setAttribute('data-icon-text', icon_text) %}
 {% endif %}
 
-<{{ html_tag|default('button') }} {{ attributes.addClass(classes) }}>
+{#
+  Found that trick here https://www.drupal.org/project/2734473/issues/3228914
+  Probably it is not the best way to do it, but it works.
+ #}
+{% set wrapper_attributes = create_attribute(attributes.storage()) %}
+{% do wrapper_attributes.removeAttribute('href') %}
 
-  {% if icon.icon_id %}
-    {{ icon(icon.pack_id|default('navigation'), icon.icon_id, icon.settings|default({ class: 'toolbar-button__icon', size: 20 })) }}
-  {% endif %}
+<toolbar-button {{ wrapper_attributes }}>
+  <template shadowrootmode="open">
+    <link rel="stylesheet" href="/{{ componentMetadata.path }}/toolbar-button-webcomponent.css" />
+    <{{ html_tag|default('button') }} {{ attributes.addClass(classes) }}>
 
-  {% if action %}
-    <span data-toolbar-action class="visually-hidden">{{ action }}</span>
-  {% endif %}
-  {% block content %}
-    {% if text %}
-      <span class="toolbar-button__label" data-toolbar-text>{{~ text ~}}</span>
-    {% endif %}
-  {% endblock %}
+      {% if icon.icon_id %}
+        {{ icon(icon.pack_id|default('navigation'), icon.icon_id, icon.settings|default({ class: 'toolbar-button__icon', size: 20 })) }}
+      {% endif %}
 
-  {% if modifiers is iterable and ('expand--side' in modifiers or 'expand--down' in modifiers) %}
-    {{ icon('navigation', 'chevron', { class: 'toolbar-button__chevron', size: 16 }) }}
-  {% endif %}
+      {% if action %}
+        <span data-toolbar-action class="visually-hidden">{{ action }}</span>
+      {% endif %}
+      {% block content %}
+        {% if text %}
+          <span class="toolbar-button__label" data-toolbar-text>{{~ text ~}}</span>
+        {% endif %}
+      {% endblock %}
 
-</{{ html_tag|default('button') }}>
+      {% if modifiers is iterable and ('expand--side' in modifiers or 'expand--down' in modifiers) %}
+        {{ icon('navigation', 'chevron', { class: 'toolbar-button__chevron', size: 16 }) }}
+      {% endif %}
+
+    </{{ html_tag|default('button') }}>
+  </template>
+
+</toolbar-button>
