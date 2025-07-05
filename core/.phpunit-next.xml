@@ -103,9 +103,9 @@
       <directory>modules/**/tests/src/Unit</directory>
       <directory>profiles/**/tests/src/Unit</directory>
       <directory>themes/**/tests/src/Unit</directory>
-      <directory>../modules/**/tests/src/Unit</directory>
-      <directory>../profiles/**/tests/src/Unit</directory>
-      <directory>../themes/**/tests/src/Unit</directory>
+      <directory>../modules/*/**/tests/src/Unit</directory>
+      <directory>../profiles/*/**/tests/src/Unit</directory>
+      <directory>../themes/*/**/tests/src/Unit</directory>
     </testsuite>
     <testsuite name="kernel">
       <directory>tests/Drupal/KernelTests</directory>
@@ -113,9 +113,9 @@
       <directory>recipes/*/tests/src/Kernel</directory>
       <directory>profiles/**/tests/src/Kernel</directory>
       <directory>themes/**/tests/src/Kernel</directory>
-      <directory>../modules/**/tests/src/Kernel</directory>
-      <directory>../profiles/**/tests/src/Kernel</directory>
-      <directory>../themes/**/tests/src/Kernel</directory>
+      <directory>../modules/*/**/tests/src/Kernel</directory>
+      <directory>../profiles/*/**/tests/src/Kernel</directory>
+      <directory>../themes/*/**/tests/src/Kernel</directory>
     </testsuite>
     <testsuite name="functional">
       <directory>tests/Drupal/FunctionalTests</directory>
@@ -123,9 +123,9 @@
       <directory>profiles/**/tests/src/Functional</directory>
       <directory>recipes/*/tests/src/Functional</directory>
       <directory>themes/**/tests/src/Functional</directory>
-      <directory>../modules/**/tests/src/Functional</directory>
-      <directory>../profiles/**/tests/src/Functional</directory>
-      <directory>../themes/**/tests/src/Functional</directory>
+      <directory>../modules/*/**/tests/src/Functional</directory>
+      <directory>../profiles/*/**/tests/src/Functional</directory>
+      <directory>../themes/*/**/tests/src/Functional</directory>
     </testsuite>
     <testsuite name="functional-javascript">
       <directory>tests/Drupal/FunctionalJavascriptTests</directory>
@@ -133,13 +133,14 @@
       <directory>recipes/*/tests/src/FunctionalJavascript</directory>
       <directory>profiles/**/tests/src/FunctionalJavascript</directory>
       <directory>themes/**/tests/src/FunctionalJavascript</directory>
-      <directory>../modules/**/tests/src/FunctionalJavascript</directory>
-      <directory>../profiles/**/tests/src/FunctionalJavascript</directory>
-      <directory>../themes/**/tests/src/FunctionalJavascript</directory>
+      <directory>../modules/*/**/tests/src/FunctionalJavascript</directory>
+      <directory>../profiles/*/**/tests/src/FunctionalJavascript</directory>
+      <directory>../themes/*/**/tests/src/FunctionalJavascript</directory>
     </testsuite>
     <testsuite name="build">
       <directory>tests/Drupal/BuildTests</directory>
       <directory>modules/**/tests/src/Build</directory>
+      <directory>../modules/*/**/tests/src/Build</directory>
     </testsuite>
   </testsuites>
   <!-- Settings for coverage reports. -->
