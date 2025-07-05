@@ -119,7 +119,7 @@ abstract class IdentifierHandlerBase {
    *   The identifier value object.
    */
   protected function toCache(string $identifier, IdentifierType $type, IdentifierBase $identifierValueObject): void {
-    $this->identifiers['identifier'][$identifier][$type->value] = $identifierValueObject;
+    $this->identifiers[$identifier][$type->value] = $identifierValueObject;
   }
 
   /**
@@ -135,7 +135,7 @@ abstract class IdentifierHandlerBase {
    *   FALSE otherwise.
    */
   protected function isCached(string $identifier, IdentifierType $type): bool {
-    return isset($this->identifiers['identifier'][$identifier][$type->value]);
+    return isset($this->identifiers[$identifier][$type->value]);
   }
 
   /**
@@ -150,7 +150,7 @@ abstract class IdentifierHandlerBase {
    *   The identifier value object.
    */
   protected function fromCache(string $identifier, IdentifierType $type): IdentifierBase {
-    return $this->identifiers['identifier'][$identifier][$type->value];
+    return $this->identifiers[$identifier][$type->value];
   }
 
   /**
