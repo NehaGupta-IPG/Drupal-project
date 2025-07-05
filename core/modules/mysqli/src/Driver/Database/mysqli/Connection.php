@@ -48,7 +48,6 @@ class Connection extends BaseMySqlConnection {
 
     // Manage the table prefix.
     $connectionOptions['prefix'] = $connectionOptions['prefix'] ?? '';
-    assert(is_string($connectionOptions['prefix']), 'The \'prefix\' connection option to ' . __METHOD__ . '() must be a string.');
 
     BaseConnection::__construct(
       $connection,

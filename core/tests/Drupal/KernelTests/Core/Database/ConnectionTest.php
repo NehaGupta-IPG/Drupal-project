@@ -130,7 +130,7 @@ class ConnectionTest extends DatabaseTestBase {
       'test_table' => $connection_info['default']['prefix'] . '_bar',
     ];
     Database::addConnectionInfo('default', 'foo', $new_connection_info);
-    $this->expectException(\AssertionError::class);
+    $this->expectException(\TypeError::class);
     Database::getConnection('foo', 'default');
   }
 
@@ -144,7 +144,7 @@ class ConnectionTest extends DatabaseTestBase {
       'default' => $connection_info['default']['prefix'],
     ];
     Database::addConnectionInfo('default', 'foo', $new_connection_info);
-    $this->expectException(\AssertionError::class);
+    $this->expectException(\TypeError::class);
     Database::getConnection('foo', 'default');
   }
 

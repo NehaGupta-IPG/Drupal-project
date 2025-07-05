@@ -85,7 +85,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
 
     // Manage the table prefix.
     $connection_options['prefix'] = $connection_options['prefix'] ?? '';
-    assert(is_string($connection_options['prefix']), 'The \'prefix\' connection option to ' . __METHOD__ . '() must be a string.');
 
     parent::__construct(
       $connection,
