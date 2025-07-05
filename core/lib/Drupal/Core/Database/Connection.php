@@ -164,7 +164,6 @@ abstract class Connection {
   ) {
     // Manage the table prefix.
     $connection_options['prefix'] = $connection_options['prefix'] ?? '';
-    assert(is_string($connection_options['prefix']), 'The \'prefix\' connection option to ' . __METHOD__ . '() must be a string.');
 
     // Work out the database driver namespace if none is provided. This normally
     // written to setting.php by installer or set by
