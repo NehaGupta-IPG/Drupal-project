@@ -330,10 +330,15 @@ abstract class IdentifierHandlerBase {
   /**
    * Parses a raw table identifier string into its components.
    *
-   * A raw table identifier may include database and/or schema information in
-   * the format [database.][schema.]table and may include quote characters.
+   * A generic raw table identifier may include database and/or schema
+   * information in the format [database.][schema.]table and may include quote
+   * characters.
    * This method returns the parts that can be used to get a Table identifier
    * value object.
+   * Driver implementations can override the logic to comply with different
+   * ways of grouping tables that different database systems have (for example,
+   * MySql does not have a 'schema' concept and will identify tables as
+   * [database.]table).
    *
    * @param string $identifier
    *   A raw table identifier string.
