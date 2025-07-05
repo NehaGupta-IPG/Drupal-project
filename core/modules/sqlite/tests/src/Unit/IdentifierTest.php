@@ -8,13 +8,15 @@ use Drupal\Core\Database\Exception\IdentifierException;
 use Drupal\Core\Database\Identifier\IdentifierType;
 use Drupal\sqlite\Driver\Database\sqlite\IdentifierHandler;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests SQLite database identifiers.
- *
- * @coversDefaultClass \Drupal\sqlite\Driver\Database\sqlite\IdentifierHandler
- * @group Database
  */
+#[CoversClass(IdentifierHandler::class)]
+#[Group('Database')]
 class IdentifierTest extends UnitTestCase {
 
   // cSpell:disable
@@ -149,9 +151,8 @@ class IdentifierTest extends UnitTestCase {
 
   /**
    * Tests table identifiers.
-   *
-   * @dataProvider providerTable
    */
+  #[DataProvider('providerTable')]
   public function testTable(string $identifier, string $prefix = '', ?string $expectedCanonical = '', ?string $expectedMachine = '', ?string $expectedException = NULL): void {
     $handler = new IdentifierHandler($prefix);
     if ($expectedException) {

@@ -243,7 +243,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
       }
       else {
         try {
-          $result = $this->connection->query('SELECT [name], [route] FROM {' . $this->tableName . '} WHERE [name] IN ( :names[] )', [':names[]' => $routes_to_load]);
+          $result = $this->connection->query('SELECT [name], [route] FROM {' . $this->connection->escapeTable($this->tableName) . '} WHERE [name] IN ( :names[] )', [':names[]' => $routes_to_load]);
           $routes = $result->fetchAllKeyed();
 
           $this->cache->set($cid, $routes, Cache::PERMANENT, ['routes']);

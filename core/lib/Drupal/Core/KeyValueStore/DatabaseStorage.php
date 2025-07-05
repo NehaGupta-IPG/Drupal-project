@@ -63,7 +63,7 @@ class DatabaseStorage extends StorageBase {
    */
   public function has($key) {
     try {
-      return (bool) $this->connection->query('SELECT 1 FROM {' . $this->table . '} WHERE [collection] = :collection AND [name] = :key', [
+      return (bool) $this->connection->query('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :key', [
         ':collection' => $this->collection,
         ':key' => $key,
       ])->fetchField();
@@ -81,7 +81,7 @@ class DatabaseStorage extends StorageBase {
     $values = [];
     try {
       $result = $this->connection
-        ->query('SELECT [name], [value] FROM {' . $this->table . '} WHERE [name] IN ( :keys[] ) AND [collection] = :collection', [
+        ->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [name] IN ( :keys[] ) AND [collection] = :collection', [
           ':keys[]' => $keys,
           ':collection' => $this->collection,
         ])
@@ -105,7 +105,7 @@ class DatabaseStorage extends StorageBase {
    */
   public function getAll() {
     try {
-      $result = $this->connection->query('SELECT [name], [value] FROM {' . $this->table . '} WHERE [collection] = :collection', [':collection' => $this->collection]);
+      $result = $this->connection->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection', [':collection' => $this->collection]);
     }
     catch (\Exception $e) {
       $this->catchException($e);
