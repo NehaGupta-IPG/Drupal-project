@@ -97,7 +97,7 @@ class ResourceTest extends UnitTestCase {
     // Mock provider
     $provider = $this->createMock(Provider::class);
 
-    // Case 1: Both dimensions provided
+    // Case 1: Both dimensions provided.
     $resource1 = Resource::photo(
       'https://example.com/photo1.jpg',
       800,
@@ -114,7 +114,7 @@ class ResourceTest extends UnitTestCase {
     $this->assertSame(150, $resource1->getThumbnailWidth());
     $this->assertSame(150, $resource1->getThumbnailHeight());
 
-    // Case 2: One dimension missing
+    // Case 2: One dimension missing.
     $resource2 = Resource::photo(
       'https://example.com/photo2.jpg',
       800,
@@ -131,7 +131,7 @@ class ResourceTest extends UnitTestCase {
     $this->assertNull($resource2->getThumbnailWidth());
     $this->assertNull($resource2->getThumbnailHeight());
 
-    // Case 3: Zero dimensions
+    // Case 3: Zero dimensions.
     $resource3 = Resource::photo(
       'https://example.com/photo3.jpg',
       800,
@@ -148,7 +148,7 @@ class ResourceTest extends UnitTestCase {
     $this->assertNull($resource3->getThumbnailWidth());
     $this->assertNull($resource3->getThumbnailHeight());
 
-    // Case 4: Both dimensions missing
+    // Case 4: Both dimensions missing.
     $resource2 = Resource::photo(
       'https://example.com/photo2.jpg',
       800,
