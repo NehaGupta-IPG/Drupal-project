@@ -1,0 +1,7 @@
+name: SQLite3
+type: module
+description: 'Provides the SQLite3 database driver.'
+package: Core
+version: VERSION
+dependencies:
+  - drupal:sqlite

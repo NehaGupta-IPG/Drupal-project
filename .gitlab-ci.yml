@@ -338,6 +338,16 @@ default:
   variables:
     _TARGET_PHP: "8.3-ubuntu"
     _TARGET_DB: "sqlite-3"
+    _TARGET_DB_DRIVER: "sqlite"
+    _TARGET_DB_DRIVER_MODULE: "sqlite"
+
+'sqlite3 - PHP 8.4':
+  <<: [ *default-stage, *run-on-mr ]
+  variables:
+    _TARGET_PHP: "8.4-ubuntu"
+    _TARGET_DB: "sqlite-3"
+    _TARGET_DB_DRIVER: "sqlite3"
+    _TARGET_DB_DRIVER_MODULE: "sqlite3"
 
 'PHP 8.4 MySQL 8.4':
   <<: [ *default-stage, *run-on-mr ]
