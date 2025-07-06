@@ -18,6 +18,7 @@ use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\TestTools\Random;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\Yaml\Yaml;
@@ -1621,14 +1622,19 @@ PHP,
   /**
    * @covers \Drupal\ckeditor5\Plugin\CKEditor5PluginManager::getDiscovery
    * @dataProvider providerTestDerivedPluginDefinitions
+   * @group legacy
    */
-  public function testDerivedPluginDefinitions(string $yaml, ?string $expected_exception = NULL, ?string $expected_message = NULL, array $additional_files = [], ?array $expected_derived_plugin_definitions = NULL): void {
+  public function testDerivedPluginDefinitions(string $yaml, ?string $expected_exception = NULL, ?string $expected_message = NULL, array $additional_files = [], ?array $expected_derived_plugin_definitions = NULL, ?string $expected_deprecation_message = NULL): void {
     if ($expected_exception) {
       $this->expectException($expected_exception);
     }
     if ($expected_message) {
       $this->expectExceptionMessage($expected_message);
     }
+    if ($expected_deprecation_message) {
+      $this->expectDeprecation($expected_deprecation_message);
+    }
+
     $container = $this->mockModuleInVfs('ckeditor5_derived_plugin', $yaml, $additional_files);
 
     $actual_definitions = $container->get('plugin.manager.ckeditor5.plugin')->getDefinitions();
@@ -1906,6 +1912,7 @@ PHP,
           ] + $drupal_aspects_defaults,
         ]),
       ],
+      'Using @CKEditor5Plugin annotation for plugin with ID ckeditor5_derived_plugin_foo is deprecated and is removed from drupal:13.0.0. Use a Drupal\ckeditor5\Attribute\CKEditor5Plugin attribute instead. See https://www.drupal.org/node/3395575',
     ];
 
     yield 'VALID: minimal base plugin definition, maximal deriver' => [
@@ -2045,6 +2052,28 @@ PHP,
         ]),
       ],
     ];
+  }
+
+  /**
+   * Tests deprecation and backwards compatibility of icon names.
+   */
+  #[IgnoreDeprecations]
+  public function testDeprecatedIcons(): void {
+    $this->expectDeprecation('The icon configuration value "objectBlockLeft" in drupalElementStyles group align for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconObjectLeft" instead. See https://www.drupal.org/node/3528806');
+    $this->expectDeprecation('The icon configuration value "objectBlockRight" in drupalElementStyles group align for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconObjectRight" instead. See https://www.drupal.org/node/3528806');
+    $this->expectDeprecation('The icon configuration value "objectLeft" in drupalElementStyles group align for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconObjectInlineLeft" instead. See https://www.drupal.org/node/3528806');
+    $this->expectDeprecation('The icon configuration value "objectRight" in drupalElementStyles group align for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconObjectInlineRight" instead. See https://www.drupal.org/node/3528806');
+    $this->expectDeprecation('The icon configuration value "threeVerticalDots" in drupalElementStyles group threeVerticalDots for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconThreeVerticalDots" instead. See https://www.drupal.org/node/3528806');
+    \Drupal::service('module_installer')->install(['ckeditor5_icon_deprecation_test']);
+    $definitions = \Drupal::service('plugin.manager.ckeditor5.plugin')->getDefinitions();
+    $config = $definitions['ckeditor5_icon_deprecation_test_plugin']->toArray()['ckeditor5']['config']['drupalElementStyles'];
+    $this->assertSame('IconObjectCenter', $config['align'][0]['icon']);
+    $this->assertSame('IconObjectLeft', $config['align'][1]['icon']);
+    $this->assertSame('IconObjectRight', $config['align'][2]['icon']);
+    $this->assertSame('IconObjectInlineLeft', $config['align'][3]['icon']);
+    $this->assertSame('IconObjectInlineRight', $config['align'][4]['icon']);
+    $this->assertStringContainsString('<svg viewBox="0 0 20 20"', $config['svg'][0]['icon']);
+    $this->assertSame('IconThreeVerticalDots', $config['threeVerticalDots'][0]['icon']);
   }
 
 }

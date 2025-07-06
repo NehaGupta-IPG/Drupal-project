@@ -149,7 +149,7 @@ class Schema extends DatabaseSchema {
   }
 
   /**
-   * Create an SQL string for a field to be used in table creation or alteration.
+   * Create an SQL string for a field to be used in table create or alter.
    *
    * Before passing a field out of a schema definition into this function it has
    * to be processed by self::processField().
@@ -249,6 +249,11 @@ class Schema extends DatabaseSchema {
 
       'blob:big'        => 'BLOB',
       'blob:normal'     => 'BLOB',
+
+      // Only the SQLite driver has this field map to due to a fatal error
+      // error caused by this driver's schema on table introspection.
+      // @todo Add support to all drivers in https://drupal.org/i/3343634
+      'json:normal'     => 'JSON',
     ];
     return $map;
   }
@@ -647,7 +652,7 @@ class Schema extends DatabaseSchema {
   }
 
   /**
-   * Utility method: rename columns in an index definition according to a new mapping.
+   * Renames columns in an index definition according to a new mapping.
    *
    * @param array $key_definition
    *   The key definition.

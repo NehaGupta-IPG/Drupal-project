@@ -37,15 +37,31 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
    * Logs node page tracing data with a cold cache.
    */
   protected function testNodePageColdCache(): void {
-    // @todo Chromedriver doesn't collect tracing performance logs for the very
-    //   first request in a test, so warm it up.
-    //   https://www.drupal.org/project/drupal/issues/3379750
-    $this->drupalGet('user/login');
-    $this->rebuildAll();
-    $this->collectPerformanceData(function () {
+    // Request the node page twice then clear caches, this allows asset
+    // aggregate requests to complete so they are excluded from the performance
+    // test itself. Including the asset aggregates would lead to
+    // a non-deterministic test since they happen in parallel and therefore post
+    // response tasks run in different orders each time.
+    $this->drupalGet('node/1');
+    $this->drupalGet('node/1');
+    $this->clearCaches();
+    $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('node/1');
     }, 'umamiNodePageColdCache');
     $this->assertSession()->pageTextContains('quiche');
+
+    $expected = [
+      'QueryCount' => 458,
+      'CacheSetCount' => 441,
+      'CacheDeleteCount' => 0,
+      'CacheTagLookupQueryCount' => 43,
+      'CacheTagInvalidationCount' => 0,
+      'ScriptCount' => 1,
+      'ScriptBytes' => 12000,
+      'StylesheetCount' => 2,
+      'StylesheetBytes' => 41350,
+    ];
+    $this->assertMetrics($expected, $performance_data);
   }
 
   /**
@@ -63,12 +79,18 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       $this->drupalGet('node/1');
     }, 'umamiNodePageHotCache');
     $this->assertSession()->pageTextContains('quiche');
+
     $expected = [
       'QueryCount' => 0,
       'CacheGetCount' => 1,
       'CacheSetCount' => 0,
       'CacheDeleteCount' => 0,
+      'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 1,
+      'ScriptCount' => 1,
+      'ScriptBytes' => 12000,
+      'StylesheetCount' => 2,
+      'StylesheetBytes' => 41350,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
@@ -85,10 +107,24 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
     $this->clearCaches();
     // Now visit a non-node page to warm non-route-specific caches.
     $this->drupalGet('user/login');
-    $this->collectPerformanceData(function () {
+    $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('node/1');
     }, 'umamiNodePageCoolCache');
     $this->assertSession()->pageTextContains('quiche');
+
+    $expected = [
+      'QueryCount' => 191,
+      'CacheGetCount' => 210,
+      'CacheSetCount' => 65,
+      'CacheDeleteCount' => 0,
+      'CacheTagInvalidationCount' => 0,
+      'CacheTagLookupQueryCount' => 22,
+      'ScriptCount' => 1,
+      'ScriptBytes' => 12000,
+      'StylesheetCount' => 2,
+      'StylesheetBytes' => 41350,
+    ];
+    $this->assertMetrics($expected, $performance_data);
   }
 
   /**
@@ -100,9 +136,12 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
   protected function testNodePageWarmCache(): void {
     // First of all visit the node page to ensure the image style exists.
     $this->drupalGet('node/1');
+    // Allow time for the image style and asset aggregate requests to finish.
+    sleep(1);
     $this->clearCaches();
     // Now visit a different node page to warm non-path-specific caches.
     $this->drupalGet('node/2');
+    sleep(1);
     $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('node/1');
     }, 'umamiNodePageWarmCache');
@@ -416,7 +455,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'ScriptCount' => 1,
       'ScriptBytes' => 12000,
       'StylesheetCount' => 2,
-      'StylesheetBytes' => 41750,
+      'StylesheetBytes' => 41200,
     ];
     $this->assertMetrics($expected, $performance_data);
   }

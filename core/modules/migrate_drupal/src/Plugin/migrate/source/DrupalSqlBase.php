@@ -173,7 +173,7 @@ abstract class DrupalSqlBase extends SqlBase implements DependentPluginInterface
     catch (\Exception) {
       $result = FALSE;
     }
-    return $result !== FALSE ? unserialize($result) : $default;
+    return $result !== FALSE ? unserialize($result, ['allowed_classes' => ['stdClass']]) : $default;
   }
 
   /**
@@ -188,6 +188,13 @@ abstract class DrupalSqlBase extends SqlBase implements DependentPluginInterface
       $this->addDependency('module', $this->configuration['constants']['module']);
     }
     return $this->dependencies;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSourceModule(): ?string {
+    return parent::getSourceModule() ?? $this->pluginDefinition['source_module'] ?? NULL;
   }
 
 }
