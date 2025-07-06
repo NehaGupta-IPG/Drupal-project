@@ -146,7 +146,8 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
 
     if ($this->configuration['reply_to']) {
       $message = $this->mailManager->mail('system', 'action_send_email', $recipient, $langcode, $params, $reply_to);
-    } else {
+    }
+    else {
       $message = $this->mailManager->mail('system', 'action_send_email', $recipient, $langcode, $params);
     }
     // Error logging is handled by \Drupal\Core\Mail\MailManager::mail().
