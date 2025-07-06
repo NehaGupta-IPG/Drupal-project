@@ -8,8 +8,11 @@ use Drupal\Core\Render\Attribute\RenderElement;
  * Provides a render element where the user supplies an in-line Twig template.
  *
  * Properties:
- * - #template: The inline Twig template used to render the element.
- * - #context: (array) The variables to substitute into the Twig template.
+ *
+ * @property $template
+ *   The inline Twig template used to render the element.
+ * @property $context
+ *   (array) The variables to substitute into the Twig template.
  *   Each variable may be a string or a render array.
  *
  * Usage example:
@@ -46,8 +49,8 @@ class InlineTemplate extends RenderElementBase {
    *   The element.
    *
    * @return array
+   *   The modified element with the rendered #markup in it.
    */
-  // phpcs:ignore Drupal.Commenting.FunctionComment.MissingReturnComment
   public static function preRenderInlineTemplate($element) {
     /** @var \Drupal\Core\Template\TwigEnvironment $environment */
     $environment = \Drupal::service('twig');
