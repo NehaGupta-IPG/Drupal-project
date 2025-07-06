@@ -256,11 +256,11 @@ default:
     PERFORMANCE_TEST: $PERFORMANCE_TEST
     OPENTELEMETRY_COLLECTOR: $OPENTELEMETRY_COLLECTOR
   # Run on MR, schedule, push, parent pipeline and performance test.
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   before_script:
     - phpdismod intl
     - killall -USR2 php-fpm 2>/dev/null || true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 # Re-run the pipeline, but with Composer updates.
 'DEFAULT: Updated dependencies (PHP 8.3 MySQL 8.0)':
