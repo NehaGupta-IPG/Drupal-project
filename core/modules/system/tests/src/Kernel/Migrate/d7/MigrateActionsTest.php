@@ -41,6 +41,7 @@ class MigrateActionsTest extends MigrateDrupal7TestBase {
     $this->assertEntity('display_a_message_to_the_user', 'Display a message to the user', 'system', ["message" => "Drupal migration test"]);
     $this->assertEntity('send_e_mail', 'Send e-mail', 'system', [
       "recipient" => "test@example.com",
+      "reply_to" => "test@example.org",
       "subject" => "Drupal migration test",
       "message" => "Drupal migration test",
     ]);
