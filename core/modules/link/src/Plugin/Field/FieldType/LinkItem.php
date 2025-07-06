@@ -38,6 +38,7 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
   public static function defaultFieldSettings() {
     return [
       'title' => DRUPAL_OPTIONAL,
+      'language' => DRUPAL_DISABLED,
       'link_type' => LinkItemInterface::LINK_GENERIC,
     ] + parent::defaultFieldSettings();
   }
@@ -108,6 +109,17 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
       '#type' => 'radios',
       '#title' => $this->t('Allow link text'),
       '#default_value' => $this->getSetting('title'),
+      '#options' => [
+        DRUPAL_DISABLED => $this->t('Disabled'),
+        DRUPAL_OPTIONAL => $this->t('Optional'),
+        DRUPAL_REQUIRED => $this->t('Required'),
+      ],
+    ];
+
+    $element['language'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Allow link language'),
+      '#default_value' => $this->getSetting('language'),
       '#options' => [
         DRUPAL_DISABLED => $this->t('Disabled'),
         DRUPAL_OPTIONAL => $this->t('Optional'),

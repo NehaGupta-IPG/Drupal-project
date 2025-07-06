@@ -44,6 +44,9 @@ field.field_settings.link:
     title:
       type: integer
       label: 'Allow link text'
+    language:
+      type: integer
+      label: 'Allow link language'
     link_type:
       type: integer
       label: 'Allowed link type'
@@ -65,6 +68,9 @@ field.value.link:
     title:
       type: label
       label: 'Link text'
+    language:
+      type: string
+      label: 'Preferred language'
     options:
       type: mapping
       label: 'Link options'

@@ -155,6 +155,7 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
       ->setSettings([
         'link_type' => LinkItemInterface::LINK_INTERNAL,
         'title' => DRUPAL_DISABLED,
+        'language' => DRUPAL_DISABLED,
       ])
       ->setDisplayOptions('form', [
         'type' => 'link_default',

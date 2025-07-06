@@ -100,7 +100,7 @@ class MigrateFieldInstanceTest extends MigrateDrupal6TestBase {
     // Test a link field.
     $field = FieldConfig::load('node.story.field_test_link');
     $this->assertSame('Link Field', $field->label());
-    $expected = ['title' => 2, 'link_type' => LinkItemInterface::LINK_GENERIC];
+    $expected = ['title' => 2, 'language' => DRUPAL_DISABLED, 'link_type' => LinkItemInterface::LINK_GENERIC];
     $this->assertSame($expected, $field->getSettings());
     $this->assertSame('default link title', $entity->field_test_link->title, 'Field field_test_link default title is correct.');
     $this->assertSame('https://www.drupal.org', $entity->field_test_link->uri);
