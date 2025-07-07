@@ -171,6 +171,7 @@ class NodeTokensHooks {
             $replacements[$original] = $account->label();
             break;
 
+          case 'created':
           case 'changed':
             /** @var \Drupal\Core\Datetime\Entity\DateFormat $date_format */
             $date_format = DateFormat::load('medium');
