@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  * @group Security
- * @group #slow
  */
 class RequestSanitizerTest extends UnitTestCase {
 
@@ -107,6 +106,7 @@ class RequestSanitizerTest extends UnitTestCase {
    * Data provider for testRequestSanitization.
    *
    * @return array
+   *   An array of test data for testRequestSanitization.
    */
   public static function providerTestRequestSanitization() {
     $tests = [];
@@ -357,7 +357,7 @@ class RequestSanitizerTest extends UnitTestCase {
    * @param string $errstr
    *   The error message.
    */
-  public function errorHandler($errno, $errstr) {
+  public function errorHandler($errno, $errstr): void {
     $this->errors[] = compact('errno', 'errstr');
   }
 

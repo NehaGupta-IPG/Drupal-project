@@ -72,15 +72,19 @@ trait UiHelperTrait {
    */
   protected function submitForm(array $edit, $submit, $form_html_id = NULL) {
     $assert_session = $this->assertSession();
-
+    $submit_button = $assert_session->buttonExists($submit);
+    // Check if button has a form attribute set.
+    if ($form_id = $submit_button->getAttribute('form')) {
+      $form = $assert_session->elementExists('xpath', "//form[@id='$form_id']");
+      $action = $form->getAttribute('action');
+    }
     // Get the form.
-    if (isset($form_html_id)) {
+    elseif (isset($form_html_id)) {
       $form = $assert_session->elementExists('xpath', "//form[@id='$form_html_id']");
       $submit_button = $assert_session->buttonExists($submit, $form);
       $action = $form->getAttribute('action');
     }
     else {
-      $submit_button = $assert_session->buttonExists($submit);
       $form = $assert_session->elementExists('xpath', './ancestor::form', $submit_button);
       $action = $form->getAttribute('action');
     }
@@ -401,7 +405,7 @@ trait UiHelperTrait {
    * @return bool
    *   Return TRUE if the user is logged in, FALSE otherwise.
    */
-  protected function drupalUserIsLoggedIn(AccountInterface $account) {
+  protected function drupalUserIsLoggedIn(AccountInterface $account): bool {
     $logged_in = FALSE;
 
     if (isset($account->sessionId)) {
@@ -534,7 +538,7 @@ trait UiHelperTrait {
    * @return bool
    *   TRUE if test is using DrupalTestBrowser.
    */
-  protected function isTestUsingGuzzleClient() {
+  protected function isTestUsingGuzzleClient(): bool {
     $driver = $this->getSession()->getDriver();
     if ($driver instanceof BrowserKitDriver) {
       return $driver->getClient() instanceof DrupalTestBrowser;

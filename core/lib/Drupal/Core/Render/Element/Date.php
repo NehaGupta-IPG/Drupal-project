@@ -9,13 +9,18 @@ use Drupal\Core\Render\Element;
  * Provides a form element for date or time selection.
  *
  * Properties:
- * - #attributes: An associative array containing:
+ *
+ * @property $attributes
+ *   An associative array containing:
  *   - type: The type of date field rendered, valid values include 'date',
  *     'time', 'datetime', and 'datetime-local'.
- * - #date_date_format: The date format used in PHP formats.
- * - #default_value: A string representing the date formatted as Y-m-d, or
+ * @property $date_date_format
+ *   The date format used in PHP formats.
+ * @property $default_value
+ *   A string representing the date formatted as Y-m-d, or
  *   hh:mm for time.
- * - #size: The size of the input element in characters.
+ * @property $size
+ *   The size of the input element in characters.
  *
  * @code
  * $form['expiration'] = [
@@ -40,14 +45,13 @@ class Date extends FormElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#theme' => 'input__date',
       '#process' => [
-        [$class, 'processAjaxForm'],
+        [static::class, 'processAjaxForm'],
       ],
-      '#pre_render' => [[$class, 'preRenderDate']],
+      '#pre_render' => [[static::class, 'preRenderDate']],
       '#theme_wrappers' => ['form_element'],
       '#attributes' => ['type' => 'date'],
       '#date_date_format' => 'Y-m-d',
