@@ -253,15 +253,12 @@ function template_preprocess_views_view_summary(&$variables): void {
     $url_options['query'] = $view->exposed_raw_input;
   }
 
+  $currentPath = \Drupal::service('path.current')->getPath();
   $active_urls = [
     // Force system path.
-    Url::fromRoute('<current>', [], ['alias' => TRUE])->toString(),
-    // Force system path.
-    Url::fromRouteMatch(\Drupal::routeMatch())->setOption('alias', TRUE)->toString(),
+    Url::fromUserInput($currentPath, ['alias' => TRUE])->toString(),
     // Could be an alias.
-    Url::fromRoute('<current>')->toString(),
-    // Could be an alias.
-    Url::fromRouteMatch(\Drupal::routeMatch())->toString(),
+    Url::fromUserInput($currentPath)->toString(),
   ];
   $active_urls = array_combine($active_urls, $active_urls);
 
@@ -342,11 +339,12 @@ function template_preprocess_views_view_summary_unformatted(&$variables): void {
   }
 
   $count = 0;
+  $currentPath = \Drupal::service('path.current')->getPath();
   $active_urls = [
     // Force system path.
-    Url::fromRoute('<current>', [], ['alias' => TRUE])->toString(),
+    Url::fromUserInput($currentPath, ['alias' => TRUE])->toString(),
     // Could be an alias.
-    Url::fromRoute('<current>')->toString(),
+    Url::fromUserInput($currentPath)->toString(),
   ];
   $active_urls = array_combine($active_urls, $active_urls);
 
@@ -690,6 +688,12 @@ function template_preprocess_views_view_table(&$variables): void {
     // Add 'responsive-enabled' class to the table to identify it for JS.
     // This is needed to target tables constructed by this function.
     $variables['responsive'] = TRUE;
+  }
+
+  // Fetch classes from handler options.
+  if ($handler->options['class']) {
+    $class = explode(' ', $handler->options['class']);
+    $variables['attributes']['class'] = array_map('\Drupal\Component\Utility\Html::cleanCssIdentifier', $class);
   }
 }
 

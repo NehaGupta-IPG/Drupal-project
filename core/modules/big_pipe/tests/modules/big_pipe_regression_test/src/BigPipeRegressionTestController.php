@@ -84,9 +84,12 @@ class BigPipeRegressionTestController implements TrustedCallbackInterface {
   }
 
   /**
-   * #lazy_builder callback; builds <time> markup with current time.
+   * Render API callback: Builds <time> markup with current time.
+   *
+   * This function is assigned as a #lazy_builder callback.
    *
    * @return array
+   *   Render array with a <time> markup with current time and cache settings.
    */
   public static function currentTime() {
     return [
