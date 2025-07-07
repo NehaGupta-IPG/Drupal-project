@@ -35,15 +35,21 @@
   <tbody>
     {% for module in modules %}
       <tr{{ module.attributes.addClass('module-list__module') }}>
+        {% if module.checkbox %}
         <td class="module-list__checkbox">
           {{ module.checkbox }}
         </td>
+        {% endif %}
         <td class="module-list__module">
+          {% if module.checkbox %}
           <label id="{{ module.id }}" for="{{ module.enable_id }}" class="module-list__module-name table-filter-text-source">{{ module.name }}</label>
+          {% else %}
+          <span class="module-list__module-name table-filter-text-source">{{ module.name }}</span>
+          {% endif %}
         </td>
         <td class="expand priority-low module-list__description">
-          <details class="js-form-wrapper form-wrapper module-list__module-details claro-details" id="{{ module.enable_id }}-description">
-            <summary aria-controls="{{ module.enable_id }}-description" role="button" aria-expanded="false" class="claro-details__summary module-list__module-summary"><span class="text module-description">{{ module.description }}</span></summary>
+          <details class="js-form-wrapper form-wrapper module-list__module-details claro-details" id="{{ module.id }}-description">
+            <summary aria-controls="{{ module.id }}-description" role="button" aria-expanded="false" class="claro-details__summary module-list__module-summary"><span class="text module-description">{{ module.description }}</span></summary>
             <div class="claro-details__wrapper module-details__wrapper">
               <div class="module-details__description">
                 <div class="module-details__requirements">

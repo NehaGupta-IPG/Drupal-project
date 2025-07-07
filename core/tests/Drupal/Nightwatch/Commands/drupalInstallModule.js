@@ -34,10 +34,9 @@ exports.command = function drupalInstallModule(module, force, callback) {
         () => self.click('input[value=Continue]'),
       );
     }
-    // Wait for the checkbox for the module to be disabled as a sign that the
-    // module has been enabled.
-    this.waitForElementPresent(
-      `form.system-modules [name="modules[${module}][enable]"]:disabled`,
+    // Wait for the checkbox to be removed as a sign that the module has been enabled.
+    this.waitForElementNotPresent(
+      `form.system-modules [name="modules[${module}][enable]"]`,
       10000,
     );
   }).perform(() => {

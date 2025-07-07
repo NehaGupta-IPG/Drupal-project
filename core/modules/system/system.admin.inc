@@ -122,7 +122,7 @@ function template_preprocess_system_admin_index(&$variables): void {
  *     projects. Each project (or module) is an associative array containing the
  *     following elements:
  *     - name: The name of the module.
- *     - enable: A checkbox for enabling the module.
+ *     - enable: (optional) A checkbox for enabling the module.
  *     - description: A description of the module.
  *     - version: The version of the module.
  *     - links: Administration links provided by the module.
@@ -152,17 +152,23 @@ function template_preprocess_system_modules_details(&$variables): void {
   foreach (Element::children($form) as $key) {
     // Stick the key into $module for easier access.
     $module = $form[$key];
-    unset($module['enable']['#title']);
+    if (!empty($module['enable'])) {
+      unset($module['enable']['#title']);
+    }
     $module['#requires'] = array_filter($module['#requires']);
     $module['#required_by'] = array_filter($module['#required_by']);
     // Add the checkbox to allow installing new modules and to show the
     // installation status of the module.
-    $module['checkbox'] = $module['enable'];
+    if (!empty($module['enable'])) {
+      $module['checkbox'] = $module['enable'];
+    }
 
     // Add the module label and expand/collapse functionality.
     $id = Html::getUniqueId('module-' . $key);
     $module['id'] = $id;
-    $module['enable_id'] = $module['enable']['#id'];
+    if (!empty($module['enable'])) {
+      $module['enable_id'] = $module['enable']['#id'];
+    }
 
     // @todo Remove early rendering and use safe_join in the Twig template once
     //   https://www.drupal.org/node/2579091 is fixed.
