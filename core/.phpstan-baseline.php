@@ -35469,6 +35469,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/tests/src/Functional/UserRegistrationRestTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\UserRegistrationTest\\:\\:assertMailPattern\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/tests/src/Functional/UserRegistrationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\UserRegistrationTest\\:\\:assertMailString\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/tests/src/Functional/UserRegistrationTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\UserTranslationUITest\\:\\:getNewEntityValues\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
