@@ -68,6 +68,7 @@ variables:
   PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   _TARGET_PHP: "8.3-ubuntu"
   PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: false
+  PHPDISMOD_INTL: false
 
 #############
 # Stages    #
@@ -247,20 +248,13 @@ default:
 
 # Without ext-intl.
 'DEFAULT: PHP 8.3 MySQL 8.0 without ext-intl':
-  <<: *default-stage
+  <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.3-ubuntu"
     _TARGET_DB: "mysql-8"
     _TARGET_DB_DRIVER: "mysql"
     _TARGET_DB_DRIVER_MODULE: "mysql"
-    PERFORMANCE_TEST: $PERFORMANCE_TEST
-    OPENTELEMETRY_COLLECTOR: $OPENTELEMETRY_COLLECTOR
-  # Run on MR, schedule, push, parent pipeline and performance test.
-  before_script:
-    - phpdismod intl
-    - killall -USR2 php-fpm 2>/dev/null || true
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    PHPDISMOD_INTL: true
 
 # Re-run the pipeline, but with Composer updates.
 'DEFAULT: Updated dependencies (PHP 8.3 MySQL 8.0)':

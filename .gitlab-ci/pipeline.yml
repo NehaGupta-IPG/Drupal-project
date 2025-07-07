@@ -26,6 +26,11 @@ default:
       [[ $_TARGET_DB == mariadb* ]] && export SIMPLETEST_DB=$_TARGET_DB_DRIVER://$MYSQL_USER:$MYSQL_PASSWORD@database/$MYSQL_DATABASE?module=$_TARGET_DB_DRIVER_MODULE
       [[ $_TARGET_DB == pgsql* ]] && export SIMPLETEST_DB=pgsql://$POSTGRES_USER:$POSTGRES_PASSWORD@database/$POSTGRES_DB?module=pgsql
     - echo "SIMPLETEST_DB = $SIMPLETEST_DB"
+    - |
+      if [[ $REPEAT_TEST_CLASS == true ]]; then
+        phpdismod intl
+        killall -USR2 php-fpm 2>/dev/null || true
+      fi
     - $CI_PROJECT_DIR/.gitlab-ci/scripts/server-setup.sh
   after_script:
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
