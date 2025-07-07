@@ -19,14 +19,9 @@
           event.target.click();
         };
 
-        const keyDownPreventScroll = function (event) {
+        const keyPressSpaceToClick = function (event) {
           if (event.key === ' ') {
             event.preventDefault();
-          }
-        };
-
-        const keyUpToClick = function (event) {
-          if (event.key === ' ') {
             event.target.click();
           }
         };
@@ -37,8 +32,7 @@
             'onOrientationToggleClick',
           'touchend .toolbar-bar .toolbar-tab .trigger': touchEndToClick,
           'touchend .toolbar-toggle-orientation button': touchEndToClick,
-          'keydown .toolbar-bar .toolbar-tab .trigger': keyDownPreventScroll,
-          'keyup .toolbar-bar .toolbar-tab .trigger': keyUpToClick
+          'keypress .toolbar-bar .toolbar-tab .trigger': keyPressSpaceToClick
         };
       },
 
