@@ -480,10 +480,19 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
       ->range(0, $limit);
 
     $nids = $query->execute()->fetchCol();
+    $this->performUpdateIndex($nids);
+  }
+
+  /**
+   * Updates the search index for specified nodes.
+   *
+   * @param array $nids
+   *   Array of node ids to be indexed.
+   */
+  public function performUpdateIndex(array $nids): void {
     if (!$nids) {
       return;
     }
-
     $node_storage = $this->entityTypeManager->getStorage('node');
     $words = [];
     try {
