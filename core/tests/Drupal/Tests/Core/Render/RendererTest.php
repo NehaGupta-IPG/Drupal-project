@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Render;
 
+use Drupal\Core\Render\Element\ElementInterface;
+use Drupal\Core\Render\Element\Generic;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Access\AccessResult;
@@ -12,6 +14,8 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\Element\Details;
+use Drupal\Core\Render\Element\Link;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Theme\ThemeManagerInterface;
@@ -24,6 +28,27 @@ use PHPUnit\Framework\MockObject\MockObject;
  * @group Render
  */
 class RendererTest extends RendererTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    $this->elementInfo->expects($this->any())
+      ->method('fromRenderable')
+      ->willReturnCallback(function (ElementInterface|array &$element, string $class = Generic::class): ElementInterface {
+        if ($element instanceof ElementInterface) {
+          return $element;
+        }
+        $type = $element['#type'] ?? 'generic';
+        $class = match ($type) {
+          'details' => Details::class,
+          'link' => Link::class,
+          default => $class,
+        };
+        return (new $class([], $type, [], $this->elementInfo))->initializeInternalStorage($element);
+      });
+  }
 
   /**
    * The expected theme variables.
@@ -495,6 +520,48 @@ class RendererTest extends RendererTestBase {
   /**
    * @covers ::render
    * @covers ::doRender
+   *
+   * @dataProvider providerTestRenderBasicWithRenderElementObjects
+   */
+  public function testRenderBasicWithRenderElementObjects($build, $expected, ?callable $setup_code = NULL): void {
+    if (!$build) {
+      return;
+    }
+    if (isset($setup_code)) {
+      $setup_code = $setup_code->bindTo($this);
+      $setup_code($this->themeManager, $this);
+    }
+
+    // Convert the render array to a render element object to test rendering
+    // with objects.
+    $element = $this->elementInfo->fromRenderable($build);
+    if (isset($element->markup)) {
+      $this->assertNotInstanceOf(MarkupInterface::class, $element->markup);
+    }
+
+    $render_output = $this->renderer->renderRoot($element);
+    $this->assertSame($expected, (string) $render_output);
+    if ($render_output !== '') {
+      $this->assertInstanceOf(MarkupInterface::class, $render_output);
+      $this->assertInstanceOf(MarkupInterface::class, $element->markup);
+    }
+  }
+
+  /**
+   * Provides a list of render arrays to test basic rendering.
+   *
+   * @return array
+   *   An array of render arrays and their expected output.
+   */
+  public static function providerTestRenderBasicWithRenderElementObjects(): array {
+    // Remove any data sets with non-array builds for testing rendering with
+    // ElementInterface objects.
+    return array_filter(static::providerTestRenderBasic(), static fn ($item) => is_array($item[0]));
+  }
+
+  /**
+   * @covers ::render
+   * @covers ::doRender
    */
   public function testRenderSorting(): void {
     $first = $this->randomMachineName();
@@ -510,6 +577,7 @@ class RendererTest extends RendererTestBase {
         '#markup' => $first,
       ],
     ];
+    $elements_copy = $elements;
     $output = (string) $this->renderer->renderRoot($elements);
 
     // The lowest weight element should appear last in $output.
@@ -525,6 +593,15 @@ class RendererTest extends RendererTestBase {
     $children = Element::children($elements);
     $this->assertSame('first', array_shift($children), 'Child found in the correct order.');
     $this->assertSame('second', array_shift($children), 'Child found in the correct order.');
+
+    $elements_object = $this->elementInfo->fromRenderable($elements_copy);
+    $output = (string) $this->renderer->renderRoot($elements_object);
+    // The lowest weight element should appear last in $output.
+    $this->assertGreaterThan(strpos($output, $first), strpos($output, $second));
+    $children = $elements_object->getChildren();
+    $this->assertSame('first', $children->key(), 'Child found in the correct order.');
+    $children->next();
+    $this->assertSame('second', $children->key(), 'Child found in the correct order.');
   }
 
   /**
@@ -546,9 +623,14 @@ class RendererTest extends RendererTestBase {
       ],
       '#sorted' => TRUE,
     ];
+    $elements_copy = $elements;
     $output = (string) $this->renderer->renderRoot($elements);
 
     // The elements should appear in output in the same order as the array.
+    $this->assertLessThan(strpos($output, $first), strpos($output, $second));
+
+    $elements_object = $this->elementInfo->fromRenderable($elements_copy);
+    $output = (string) $this->renderer->renderRoot($elements_object);
     $this->assertLessThan(strpos($output, $first), strpos($output, $second));
   }
 
@@ -560,8 +642,13 @@ class RendererTest extends RendererTestBase {
    */
   public function testElementDefaultsAdded(): void {
     $build = ['#type' => 'details'];
+    $build_copy = $build;
     $this->renderer->renderInIsolation($build);
     $this->assertTrue($build['#defaults_loaded'], "An element with a type had said type's defaults loaded.");
+
+    $build_object = $this->elementInfo->fromRenderable($build_copy);
+    $this->renderer->renderInIsolation($build_object);
+    $this->assertTrue($build_object->defaults_loaded);
 
     $build = [
       '#lazy_builder' => [
@@ -570,9 +657,14 @@ class RendererTest extends RendererTestBase {
       ],
       '#create_placeholder' => FALSE,
     ];
+    $build_copy = $build;
 
     $this->renderer->renderInIsolation($build);
     $this->assertArrayNotHasKey('#defaults_loaded', $build, "A lazy builder that did not set a type had no type defaults loaded.");
+
+    $build_object = $this->elementInfo->fromRenderable($build_copy);
+    $this->renderer->renderInIsolation($build_object);
+    $this->assertNull($build_object->defaults_loaded);
 
     $build = [
       '#lazy_builder' => [
@@ -581,9 +673,14 @@ class RendererTest extends RendererTestBase {
       ],
       '#create_placeholder' => FALSE,
     ];
+    $build_copy = $build;
 
     $this->renderer->renderInIsolation($build);
     $this->assertTrue($build['#defaults_loaded'], "A lazy builder that set a type had said type's defaults loaded.");
+
+    $build_object = $this->elementInfo->fromRenderable($build_copy);
+    $this->renderer->renderInIsolation($build_object);
+    $this->assertTrue($build_object->defaults_loaded);
   }
 
   /**
@@ -676,10 +773,15 @@ class RendererTest extends RendererTestBase {
     $build = [
       '#access' => AccessResult::allowed()->addCacheContexts(['user']),
     ];
+    $build_copy = $build;
 
     $this->renderer->renderInIsolation($build);
 
     $this->assertEqualsCanonicalizing(['languages:language_interface', 'theme', 'user'], $build['#cache']['contexts']);
+
+    $build_object = $this->elementInfo->fromRenderable($build_copy);
+    $this->renderer->renderInIsolation($build_object);
+    $this->assertEqualsCanonicalizing(['languages:language_interface', 'theme', 'user'], $build_object->cache['contexts']);
   }
 
   /**
@@ -695,6 +797,7 @@ class RendererTest extends RendererTestBase {
    * @dataProvider providerRenderTwice
    */
   public function testRenderTwice($build): void {
+    $build_copy = $build;
     $this->assertEquals('kittens', $this->renderer->renderRoot($build));
     $this->assertEquals('kittens', $build['#markup']);
     $this->assertEquals(['kittens-147'], $build['#cache']['tags']);
@@ -702,6 +805,12 @@ class RendererTest extends RendererTestBase {
 
     // We don't want to reprint already printed render arrays.
     $this->assertEquals('', $this->renderer->renderRoot($build));
+
+    $build_object = $this->elementInfo->fromRenderable($build_copy);
+    $this->assertEquals('kittens', $this->renderer->renderRoot($build_object));
+    $this->assertEquals('kittens', $build_object->markup);
+    $this->assertEquals(['kittens-147'], $build_object->cache['tags']);
+    $this->assertTrue($build_object->printed);
   }
 
   /**
@@ -755,8 +864,12 @@ class RendererTest extends RendererTestBase {
         '#markup' => 'kittens',
       ],
     ];
+    $build_copy = $build;
 
     $this->assertEquals('', $this->renderer->renderRoot($build));
+
+    $build_object = $this->elementInfo->fromRenderable($build_copy);
+    $this->assertEquals('', $this->renderer->renderRoot($build_object));
   }
 
   /**
@@ -787,11 +900,20 @@ class RendererTest extends RendererTestBase {
   protected function assertAccess(array $build, $access): void {
     $sensitive_content = $this->randomContextValue();
     $build['#markup'] = $sensitive_content;
+    $build_copy = $build;
     if (($access instanceof AccessResultInterface && $access->isAllowed()) || $access === TRUE) {
       $this->assertSame($sensitive_content, (string) $this->renderer->renderRoot($build));
     }
     else {
       $this->assertSame('', (string) $this->renderer->renderRoot($build));
+    }
+
+    $build_object = $this->elementInfo->fromRenderable($build_copy);
+    if (($access instanceof AccessResultInterface && $access->isAllowed()) || $access === TRUE) {
+      $this->assertSame($sensitive_content, (string) $this->renderer->renderRoot($build_object));
+    }
+    else {
+      $this->assertSame('', (string) $this->renderer->renderRoot($build_object));
     }
   }
 
@@ -817,6 +939,25 @@ class RendererTest extends RendererTestBase {
    * @covers ::render
    * @covers ::doRender
    */
+  public function testRenderWithoutThemeArgumentsWithRenderElementObject(): void {
+    $element = [
+      '#theme' => 'common_test_foo',
+    ];
+    $element_object = $this->elementInfo->fromRenderable($element);
+
+    $this->themeManager->expects($this->once())
+      ->method('render')
+      ->with('common_test_foo', $this->defaultThemeVars + $element_object->toRenderable())
+      ->willReturn('foobar');
+
+    // Test that defaults work.
+    $this->assertEquals('foobar', $this->renderer->renderRoot($element_object));
+  }
+
+  /**
+   * @covers ::render
+   * @covers ::doRender
+   */
   public function testRenderWithThemeArguments(): void {
     $element = [
       '#theme' => 'common_test_foo',
@@ -833,6 +974,29 @@ class RendererTest extends RendererTestBase {
 
     // Tests that passing arguments to the theme function works.
     $this->assertEquals($this->renderer->renderRoot($element), $element['#foo'] . $element['#bar'], 'Passing arguments to theme functions works');
+  }
+
+  /**
+   * @covers ::render
+   * @covers ::doRender
+   */
+  public function testRenderWithThemeArgumentsWithRenderElementObject(): void {
+    $element = [
+      '#theme' => 'common_test_foo',
+      '#foo' => $this->randomMachineName(),
+      '#bar' => $this->randomMachineName(),
+    ];
+    $element_object = $this->elementInfo->fromRenderable($element);
+
+    $this->themeManager->expects($this->once())
+      ->method('render')
+      ->with('common_test_foo', $this->defaultThemeVars + $element_object->toRenderable())
+      ->willReturnCallback(function ($hook, $vars) {
+        return $vars['#foo'] . $vars['#bar'];
+      });
+
+    // Tests that passing arguments to the theme function works.
+    $this->assertEquals($this->renderer->renderRoot($element_object), $element_object->foo . $element_object->bar);
   }
 
   /**
@@ -924,6 +1088,58 @@ class RendererTest extends RendererTestBase {
    * @covers \Drupal\Core\Render\RenderCache::get
    * @covers \Drupal\Core\Render\RenderCache::set
    *
+   * @dataProvider providerRenderCache
+   */
+  public function testRenderCacheWithRenderElementObjects($child_access, $expected_tags): void {
+    $this->setUpRequest();
+    $this->setUpMemoryCache();
+
+    // Create an empty element.
+    $test_element = [
+      '#cache' => [
+        'keys' => ['render_cache_test'],
+        'tags' => ['render_cache_tag'],
+      ],
+      '#markup' => '',
+      'child' => [
+        '#access' => $child_access,
+        '#cache' => [
+          'keys' => ['render_cache_test_child'],
+          'tags' => ['render_cache_tag_child:1', 'render_cache_tag_child:2'],
+        ],
+        '#markup' => '',
+      ],
+    ];
+
+    // Render the element and confirm that it goes through the rendering
+    // process (which will set $element_object->printed).
+    $element = $test_element;
+    $element_object = $this->elementInfo->fromRenderable($element);
+    $this->renderer->renderRoot($element_object);
+    $this->assertTrue(isset($element_object->printed));
+
+    // Render the element again and confirm that it is retrieved from the cache
+    // instead (so $element_object->printed will not be set).
+    $element = $test_element;
+    $element_object = $this->elementInfo->fromRenderable($element);
+    $this->renderer->renderRoot($element);
+    $this->assertFalse(isset($element->printer), 'Cache hit');
+
+    // Test that cache tags are correctly collected from the render element,
+    // including the ones from its subchild.
+    $this->assertEquals($expected_tags, $element_object->cache['tags']);
+
+    // The cache item also has a 'rendered' cache tag.
+    $cache_item = $this->cacheFactory->get('render')->get(['render_cache_test'], CacheableMetadata::createFromRenderArray($element_object->toRenderable()));
+    $this->assertSame(Cache::mergeTags($expected_tags, ['rendered']), $cache_item->tags);
+  }
+
+  /**
+   * @covers ::render
+   * @covers ::doRender
+   * @covers \Drupal\Core\Render\RenderCache::get
+   * @covers \Drupal\Core\Render\RenderCache::set
+   *
    * @dataProvider providerTestRenderCacheMaxAge
    */
   public function testRenderCacheMaxAge($max_age, $is_render_cached, $render_cache_item_expire): void {
@@ -940,6 +1156,38 @@ class RendererTest extends RendererTestBase {
     $this->renderer->renderRoot($element);
 
     $cache_item = $this->cacheFactory->get('render')->get(['render_cache_test'], CacheableMetadata::createFromRenderArray($element));
+    if (!$is_render_cached) {
+      $this->assertFalse($cache_item);
+    }
+    else {
+      $this->assertNotFalse($cache_item);
+      $this->assertSame($render_cache_item_expire, $cache_item->expire);
+    }
+  }
+
+  /**
+   * @covers ::render
+   * @covers ::doRender
+   * @covers \Drupal\Core\Render\RenderCache::get
+   * @covers \Drupal\Core\Render\RenderCache::set
+   *
+   * @dataProvider providerTestRenderCacheMaxAge
+   */
+  public function testRenderCacheMaxAgeWithRenderElementObject($max_age, $is_render_cached, $render_cache_item_expire): void {
+    $this->setUpRequest();
+    $this->setUpMemoryCache();
+
+    $element = [
+      '#cache' => [
+        'keys' => ['render_cache_test'],
+        'max-age' => $max_age,
+      ],
+      '#markup' => '',
+    ];
+    $element_object = $this->elementInfo->fromRenderable($element);
+    $this->renderer->renderRoot($element_object);
+
+    $cache_item = $this->cacheFactory->get('render')->get(['render_cache_test'], CacheableMetadata::createFromRenderArray($element_object->toRenderable()));
     if (!$is_render_cached) {
       $this->assertFalse($cache_item);
     }
@@ -992,6 +1240,62 @@ class RendererTest extends RendererTestBase {
 
     $cache = $this->cacheFactory->get('render');
     $data = $cache->get(['render_cache_test'], CacheableMetadata::createFromRenderArray($element))->data;
+
+    // Check that parent markup is ignored when caching children's markup.
+    $this->assertEquals($data['#markup'] === '', (bool) Element::children($data));
+
+    // Check that the element properties are cached as specified.
+    foreach ($expected_results as $property => $expected) {
+      $cached = !empty($data[$property]);
+      $this->assertEquals($cached, (bool) $expected);
+      // Check that only the #markup key is preserved for children.
+      if ($cached) {
+        $this->assertEquals($data[$property], $original[$property]);
+      }
+    }
+    // #custom_property_array can not be a safe_cache_property.
+    $safe_cache_properties = array_diff(Element::properties(array_filter($expected_results)), ['#custom_property_array']);
+    foreach ($safe_cache_properties as $cache_property) {
+      $this->assertInstanceOf(MarkupInterface::class, $data[$cache_property]);
+    }
+  }
+
+  /**
+   * Tests that #cache_properties are properly handled.
+   *
+   * @param array $expected_results
+   *   An associative array of expected results keyed by property name.
+   *
+   * @covers ::render
+   * @covers ::doRender
+   * @covers \Drupal\Core\Render\RenderCache::get
+   * @covers \Drupal\Core\Render\RenderCache::set
+   * @covers \Drupal\Core\Render\RenderCache::getCacheableRenderArray
+   *
+   * @dataProvider providerTestRenderCacheProperties
+   */
+  public function testRenderCachePropertiesWithRenderElementObject(array $expected_results): void {
+    $this->setUpRequest();
+    $this->setUpMemoryCache();
+
+    $element = $original = [
+      '#cache' => [
+        'keys' => ['render_cache_test'],
+      ],
+      // Collect expected property names.
+      '#cache_properties' => array_keys(array_filter($expected_results)),
+      'child1' => ['#markup' => Markup::create('1')],
+      'child2' => ['#markup' => Markup::create('2')],
+      // Mark the value as safe.
+      '#custom_property' => Markup::create('custom_value'),
+      '#custom_property_array' => ['custom value'],
+    ];
+    $element_object = $this->elementInfo->fromRenderable($element);
+
+    $this->renderer->renderRoot($element);
+
+    $cache = $this->cacheFactory->get('render');
+    $data = $cache->get(['render_cache_test'], CacheableMetadata::createFromRenderArray($element_object->toRenderable()))->data;
 
     // Check that parent markup is ignored when caching children's markup.
     $this->assertEquals($data['#markup'] === '', (bool) Element::children($data));

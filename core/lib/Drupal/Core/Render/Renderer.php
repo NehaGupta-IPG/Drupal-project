@@ -11,6 +11,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Form\FormHelper;
+use Drupal\Core\Render\Element\ElementInterface;
 use Drupal\Core\Render\Element\RenderCallbackInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
@@ -96,7 +97,7 @@ class Renderer implements RendererInterface {
   /**
    * {@inheritdoc}
    */
-  public function renderRoot(&$elements) {
+  public function renderRoot(/* array|ElementInterface */&$elements) {
     if (!$elements) {
       return '';
     }
@@ -130,16 +131,22 @@ class Renderer implements RendererInterface {
       return '';
     }
 
-    return $elements['#markup'];
+    return $elements instanceof ElementInterface ? $elements->markup : $elements['#markup'];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function renderInIsolation(&$elements) {
+  public function renderInIsolation(/* array|ElementInterface */&$elements) {
     $context = new RenderContext();
-    return Markup::create($this->executeInRenderContext($context, function () use (&$elements, $context) {
-      return $this->doRenderRoot($elements, $context);
+    if ($elements instanceof ElementInterface) {
+      $elements_array = &$elements->toRenderable();
+    }
+    else {
+      $elements_array = &$elements;
+    }
+    return Markup::create($this->executeInRenderContext($context, function () use (&$elements_array, $context) {
+      return $this->doRenderRoot($elements_array, $context);
     }));
   }
 
@@ -199,20 +206,21 @@ class Renderer implements RendererInterface {
   /**
    * {@inheritdoc}
    */
-  public function renderPlaceholder($placeholder, array $elements) {
+  public function renderPlaceholder($placeholder, /* ElementInterface|*/array $elements) {
+    $elements_array = $elements instanceof ElementInterface ? $elements->toRenderable() : $elements;
     // Get the render array for the given placeholder.
-    $placeholder_element = $elements['#attached']['placeholders'][$placeholder];
+    $placeholder_element = $elements_array['#attached']['placeholders'][$placeholder];
     $markup = $this->doRenderPlaceholder($placeholder_element);
-    return $this->doReplacePlaceholder($placeholder, $markup, $elements, $placeholder_element);
+    return $this->doReplacePlaceholder($placeholder, $markup, $elements_array, $placeholder_element);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function render(/* array */&$elements, $is_root_call = FALSE) {
+  public function render(/* array|ElementInterface */&$elements, $is_root_call = FALSE) {
 
-    if (!is_array($elements)) {
-      trigger_error('Calling ' . __METHOD__ . ' with NULL is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Either pass an array or skip the call. See https://www.drupal.org/node/3534020.');
+    if (!is_array($elements) && !($elements instanceof ElementInterface)) {
+      trigger_error('Calling ' . __METHOD__ . ' with NULL is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Either pass an array or ElementInterface object, or skip the call. See https://www.drupal.org/node/3534020.');
       return '';
     }
 
@@ -226,7 +234,13 @@ class Renderer implements RendererInterface {
       return $this->doRenderRoot($elements, $context);
     }
 
-    return $this->doRender($elements, $context);
+    if ($elements instanceof ElementInterface) {
+      $elements_array = &$elements->toRenderable();
+    }
+    else {
+      $elements_array = &$elements;
+    }
+    return $this->doRender($elements_array, $context);
   }
 
   /**
@@ -384,6 +398,7 @@ class Renderer implements RendererInterface {
         '#cache',
         '#create_placeholder',
         '#lazy_builder_preview',
+        '##object',
         '#placeholder_strategy_denylist',
         '#preview',
         // The keys below are not actually supported, but these are added
