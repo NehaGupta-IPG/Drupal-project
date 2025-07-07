@@ -31,7 +31,7 @@ trait AssertTokenReplacementTrait {
    *   tokens:
    *   - %token for the token name
    *   - %output for the value returned by the token replacement service
-   *   - %expected for the expected result
+   *   - %expected for the expected result.
    * @param array $metadata_tests
    *   The metadata to verify. Keyed by the relevant token.
    */
@@ -63,7 +63,7 @@ trait AssertTokenReplacementTrait {
    *   tokens:
    *   - %token for the token name
    *   - %output for the value returned by the token replacement service
-   *   - %expected for the expected result
+   *   - %expected for the expected result.
    */
   protected function assertTokenReplacement(array $tests, array $data, array $options, string $message): void {
     foreach ($tests as $token => $expected) {
