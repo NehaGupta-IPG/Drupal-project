@@ -39,6 +39,6 @@
 
 @container ck-editor (width > 0) {
   .ck-dropdown__panel {
-    --ck-toolbar-dropdown-max-width: 90cqw;
+    --ck-toolbar-dropdown-max-width: 95cqw;
   }
 }
