@@ -168,7 +168,7 @@ class Action extends ConfigEntityBase implements ActionConfigEntityInterface, En
   }
 
   /**
-   * Helper callback for uasort() to compare configuration entities by weight and label.
+   * Helper callback for uasort() to compare configuration entities.
    */
   public static function compare(ConfigEntityInterface $a, ConfigEntityInterface $b, \Collator $collator): int {
     /** @var \Drupal\system\ActionConfigEntityInterface $a */

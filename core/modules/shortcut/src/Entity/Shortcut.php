@@ -186,7 +186,7 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
   }
 
   /**
-   * Helper callback for uasort() to compare configuration entities by weight and label.
+   * Helper callback for uasort() to compare configuration entities.
    */
   public static function compare(ShortcutInterface $a, ShortcutInterface $b, \Collator $collator): int {
     $a_weight = $a->getWeight();
@@ -201,7 +201,7 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
   }
 
   /**
-   * Helper callback for uasort() to sort configuration entities by weight and label.
+   * Helper callback for uasort() to sort configuration entities.
    *
    * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
    * \Drupal\Core\Config\Entity\ConfigEntityBase::sortEntities() instead.
