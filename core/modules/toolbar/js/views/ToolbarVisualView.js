@@ -19,7 +19,7 @@
           event.target.click();
         };
 
-        const keyPressSpaceToClick = function (event) {
+        const keyDownSpaceToClick = function (event) {
           if (event.key === ' ') {
             event.preventDefault();
             event.target.click();
@@ -32,7 +32,7 @@
             'onOrientationToggleClick',
           'touchend .toolbar-bar .toolbar-tab .trigger': touchEndToClick,
           'touchend .toolbar-toggle-orientation button': touchEndToClick,
-          'keypress .toolbar-bar .toolbar-tab .trigger': keyPressSpaceToClick,
+          'keydown .toolbar-bar .toolbar-tab .trigger': keyDownSpaceToClick,
         };
       },
 

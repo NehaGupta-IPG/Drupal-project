@@ -65,11 +65,11 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
     $this->assertTrue($content_link->isVisible(), 'Toolbar tray is visible again after clicking the "Manage" button a second time.');
 
     // Press SPACE to close.
-    $this->keyPressSpace($manage_link);
+    $this->keyDownSpace($manage_link);
     $this->assertFalse($content_link->isVisible(), 'Toolbar tray is closed after pressing SPACE on the "Manage" link.');
 
     // Press SPACE to open.
-    $this->keyPressSpace($manage_link);
+    $this->keyDownSpace($manage_link);
     $this->assertTrue($content_link->isVisible(), 'Toolbar tray is open again after pressing SPACE on the "Manage" link a second time.');
 
     // Test that the page did not scroll.
@@ -145,17 +145,17 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
   /**
    * Trigger space key event on element.
    *
-   * This is a workaround for non-working built-in function `keyPress()`.
+   * This is a workaround for non-working built-in function `keyDown()`.
    *
    * The built-in function may be failing due to syn.js not setting
    * the `bubbles` property in the event options.
    */
-  private function keyPressSpace(ElementInterface $element): void {
+  private function keyDownSpace(ElementInterface $element): void {
     $script = <<<JS
 document
   .evaluate("{$element->getXpath()}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
   .singleNodeValue
-  .dispatchEvent(new KeyboardEvent('keypress', {
+  .dispatchEvent(new KeyboardEvent('keydown', {
     bubbles: true,
     key: ' '
   }));
