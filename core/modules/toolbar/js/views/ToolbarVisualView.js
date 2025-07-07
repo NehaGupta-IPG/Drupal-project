@@ -32,7 +32,7 @@
             'onOrientationToggleClick',
           'touchend .toolbar-bar .toolbar-tab .trigger': touchEndToClick,
           'touchend .toolbar-toggle-orientation button': touchEndToClick,
-          'keypress .toolbar-bar .toolbar-tab .trigger': keyPressSpaceToClick
+          'keypress .toolbar-bar .toolbar-tab .trigger': keyPressSpaceToClick,
         };
       },
 

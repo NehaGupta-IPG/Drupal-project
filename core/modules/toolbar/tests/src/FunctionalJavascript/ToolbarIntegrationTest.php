@@ -142,7 +142,6 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
     );
   }
 
-
   /**
    * Trigger space key event on element.
    *
