@@ -4,6 +4,7 @@ namespace Drupal\filter\Plugin\Filter;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\filter\Attribute\Filter;
 use Drupal\filter\FilterPluginManager;
@@ -27,13 +28,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class FilterCaption extends FilterBase implements ContainerFactoryPluginInterface {
 
   /**
-   * Filter manager.
-   *
-   * @var \Drupal\filter\FilterPluginManager
-   */
-  protected $filterManager;
-
-  /**
    * Constructs a new FilterCaption.
    *
    * @param array $configuration
@@ -44,10 +38,17 @@ class FilterCaption extends FilterBase implements ContainerFactoryPluginInterfac
    *   Definition.
    * @param \Drupal\filter\FilterPluginManager $filter_manager
    *   Filter plugin manager.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ?FilterPluginManager $filter_manager = NULL) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected readonly FilterPluginManager $filter_manager,
+    protected readonly RendererInterface $renderer,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->filterManager = $filter_manager ?: \Drupal::service('plugin.manager.filter');
   }
 
   /**
@@ -58,7 +59,8 @@ class FilterCaption extends FilterBase implements ContainerFactoryPluginInterfac
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('plugin.manager.filter')
+      $container->get(FilterPluginManager::class),
+      $container->get(RendererInterface::class)
     );
   }
 
@@ -119,7 +121,7 @@ class FilterCaption extends FilterBase implements ContainerFactoryPluginInterfac
           '#caption' => $caption,
           '#classes' => $classes,
         ];
-        $altered_html = \Drupal::service('renderer')->render($filter_caption);
+        $altered_html = $this->renderer->render($filter_caption);
 
         // Load the altered HTML into a new DOMDocument and retrieve the
         // element.
