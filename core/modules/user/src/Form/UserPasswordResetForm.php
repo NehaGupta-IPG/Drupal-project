@@ -49,7 +49,7 @@ class UserPasswordResetForm extends FormBase implements WorkspaceSafeFormInterfa
       $form['#title'] = $user->getLastLoginTime() ? $this->t('Reset password') : $this->t('Set password');
     }
     else {
-      @trigger_error('The expiration date argument to UserPasswordResetForm::buildForm() is mandatory / not passing it is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. See https://www.drupal.org/node/3214529', E_USER_DEPRECATED);
+      @trigger_error('The expiration date argument to UserPasswordResetForm::buildForm() is mandatory / not passing it is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3214529', E_USER_DEPRECATED);
       $form['message'] = ['#markup' => $this->t('<p>This is a one-time login for %user_name.</p><p>Click on this button to log in to the site and change your password.</p>', ['%user_name' => $user->getAccountName()])];
       $form['#title'] = $this->t('Set password');
     }
