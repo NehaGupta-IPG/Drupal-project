@@ -80,14 +80,14 @@ class ContentTranslationPermissions implements ContainerInjectionInterface {
           case 'bundle':
             foreach ($this->entityTypeBundleInfo->getBundleInfo($entity_type_id) as $bundle => $bundle_info) {
               if ($this->contentTranslationManager->isEnabled($entity_type_id, $bundle)) {
-                $permissions["translate $bundle $entity_type_id"] = $this->buildBundlePermission($entity_type, $bundle, $bundle_info);
+                $permissions[static::permissionKey($entity_type, $bundle)] = $this->buildBundlePermission($entity_type, $bundle, $bundle_info);
               }
             }
             break;
 
           case 'entity_type':
             if ($this->contentTranslationManager->isEnabled($entity_type_id)) {
-              $permissions["translate $entity_type_id"] = [
+              $permissions[static::permissionKey($entity_type)] = [
                 'title' => $this->t('Translate @entity_label', ['@entity_label' => $entity_type->getSingularLabel()]),
                 'dependencies' => ['module' => [$entity_type->getProvider()]],
               ];
@@ -98,6 +98,28 @@ class ContentTranslationPermissions implements ContainerInjectionInterface {
     }
 
     return $permissions;
+  }
+
+  /**
+   * Gets the permission key for an entity type and bundle.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type to get the permission for.
+   * @param string|null $bundle
+   *   The bundle to get the permission for, if the entity type has bundle-level
+   *   granularity for content translation permissions. Use NULL if granularity
+   *   is at the entity-type level.
+   *
+   * @return string|null
+   *   The permission name. NULL if the entity type permission granularity is
+   *   bundle-level, but no bundle is provided.
+   */
+  public static function permissionKey(EntityTypeInterface $entity_type, ?string $bundle = NULL): ?string {
+    return match ($entity_type->getPermissionGranularity()) {
+      'bundle' => $bundle ? "translate $bundle " . $entity_type->id() : NULL,
+      'entity_type' => "translate " . $entity_type->id(),
+      default => NULL,
+    };
   }
 
   /**
@@ -128,6 +150,11 @@ class ContentTranslationPermissions implements ContainerInjectionInterface {
     }
     else {
       $permission['dependencies']['module'][] = $entity_type->getProvider();
+    }
+
+    $config = $this->entityTypeManager->getStorage('language_content_settings')->load($entity_type->id() . '.' . $bundle);
+    if ($config) {
+      $permission['dependencies'][$config->getConfigDependencyKey()][] = $config->getConfigDependencyName();
     }
     return $permission;
   }

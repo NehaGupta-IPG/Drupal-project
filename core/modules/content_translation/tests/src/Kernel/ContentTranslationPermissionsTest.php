@@ -6,6 +6,8 @@ namespace Drupal\Tests\content_translation\Kernel;
 
 use Drupal\entity_test\Entity\EntityTestMulBundle;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\user\Entity\Role;
 
 /**
  * Tests the content translation dynamic permissions.
@@ -15,6 +17,8 @@ use Drupal\KernelTests\KernelTestBase;
  * @coversDefaultClass \Drupal\content_translation\ContentTranslationPermissions
  */
 class ContentTranslationPermissionsTest extends KernelTestBase {
+
+  use UserCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -43,7 +47,10 @@ class ContentTranslationPermissionsTest extends KernelTestBase {
     $this->container->get('content_translation.manager')->setEnabled('entity_test_mul_with_bundle', 'test', TRUE);
     $permissions = $this->container->get('user.permissions')->getPermissions();
     $this->assertEquals(['entity_test'], $permissions['translate entity_test_mul']['dependencies']['module']);
-    $this->assertEquals(['entity_test.entity_test_mul_bundle.test'], $permissions['translate test entity_test_mul_with_bundle']['dependencies']['config']);
+    $this->assertEquals([
+      'entity_test.entity_test_mul_bundle.test',
+      'language.content_settings.entity_test_mul_with_bundle.test',
+    ], $permissions['translate test entity_test_mul_with_bundle']['dependencies']['config']);
 
     // Ensure bundle permission granularity works for bundles not based on
     // configuration.
@@ -51,7 +58,16 @@ class ContentTranslationPermissionsTest extends KernelTestBase {
     $this->container->get('entity_type.manager')->clearCachedDefinitions();
     $permissions = $this->container->get('user.permissions')->getPermissions();
     $this->assertEquals(['entity_test'], $permissions['translate entity_test_mul entity_test_mul']['dependencies']['module']);
-    $this->assertEquals(['entity_test.entity_test_mul_bundle.test'], $permissions['translate test entity_test_mul_with_bundle']['dependencies']['config']);
+    $this->assertEquals(['language.content_settings.entity_test_mul.entity_test_mul'], $permissions['translate entity_test_mul entity_test_mul']['dependencies']['config']);
+
+    // Ensure bundle permission is removed from role when content translation
+    // for the bundle is disabled.
+    $rid = $this->createRole(['translate test entity_test_mul_with_bundle']);
+    $role = Role::load($rid);
+    $this->assertEquals(['translate test entity_test_mul_with_bundle'], $role->getPermissions());
+    $this->container->get('content_translation.manager')->setEnabled('entity_test_mul_with_bundle', 'test', FALSE);
+    $role = Role::load($rid);
+    $this->assertEquals([], $role->getPermissions());
   }
 
 }
