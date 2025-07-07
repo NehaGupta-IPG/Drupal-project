@@ -80,7 +80,7 @@ trait AssertMailTrait {
    *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
    *   a string. If left blank, a default message will be displayed.
    */
-  protected function assertMailString($field_name, $string, $email_depth, $message = ''): void {
+  protected function assertMailString($field_name, $string, $email_depth, $message = '') {
     $mails = $this->getMails();
     $string_found = FALSE;
     // Cast MarkupInterface objects to string.
@@ -119,7 +119,7 @@ trait AssertMailTrait {
    *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
    *   a string. If left blank, a default message will be displayed.
    */
-  protected function assertMailPattern($field_name, $regex, $message = ''): void {
+  protected function assertMailPattern($field_name, $regex, $message = '') {
     $mails = $this->getMails();
     $mail = end($mails);
     $regex_found = preg_match("/$regex/", $mail[$field_name]);
