@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\toolbar\FunctionalJavascript;
 
+use Behat\Mink\Element\ElementInterface;
 use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -15,13 +16,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('toolbar')]
 #[RunTestsInSeparateProcesses]
 class ToolbarIntegrationTest extends WebDriverTestBase {
-
-  /**
-   * The character code for the space bar.
-   *
-   * @var int
-   */
-  const SPACE_BAR = 32;
 
   /**
    * {@inheritdoc}
@@ -54,7 +48,6 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
 
     // Test that it is possible to toggle the toolbar tray.
     $content_link = $page->findLink('Content');
-    // By clicking.
     $manage_link = $page->find('css', '#toolbar-item-administration');
 
     // Start with open tray.
@@ -70,14 +63,17 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
     $manage_link->click();
     $this->waitAndAssertAriaPressedState($manage_link, TRUE);
     $this->assertTrue($content_link->isVisible(), 'Toolbar tray is visible again after clicking the "Manage" button a second time.');
-    // By pressing SPACE.
-    $manage = $page->findLink('Manage');
-    $manage->keyDown(self::SPACE_BAR);
-    $manage->keyUp(self::SPACE_BAR);
-    $this->assertFalse($content->isVisible(), 'Toolbar tray is closed after pressing SPACE on the "Manage" link.');
-    $manage->keyDown(self::SPACE_BAR);
-    $manage->keyUp(self::SPACE_BAR);
-    $this->assertTrue($content->isVisible(), 'Toolbar tray is open again after pressing SPACE on the "Manage" link a second time.');
+
+    // Press SPACE to close.
+    $this->triggerSpace($manage_link, 'keydown');
+    $this->triggerSpace($manage_link, 'keyup');
+    $this->assertFalse($content_link->isVisible(), 'Toolbar tray is closed after pressing SPACE on the "Manage" link.');
+
+    // Press SPACE to open.
+    $this->triggerSpace($manage_link, 'keydown');
+    $this->triggerSpace($manage_link, 'keyup');
+    $this->assertTrue($content_link->isVisible(), 'Toolbar tray is open again after pressing SPACE on the "Manage" link a second time.');
+
     // Test that the page did not scroll.
     $scrollTop = $this->getSession()->evaluateScript('document.documentElement.scrollTop');
     $this->assertEquals(0, $scrollTop, 'Page did not scroll.');
@@ -146,6 +142,30 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
           return $actual == $expected;
         })
     );
+  }
+
+
+  /**
+   * Trigger space key event on element.
+   *
+   * This is a workaround for non-working built-in functions
+   * such as `keyDown()`, `keyUp()`.
+   *
+   * The built-in functions may be failing due to syn.js not setting
+   * the `bubbles` property in the event options.
+   */
+  private function triggerSpace(ElementInterface $element, string $event = 'keydown'): void {
+    $script = <<<JS
+document
+  .evaluate("{$element->getXpath()}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
+  .singleNodeValue
+  .dispatchEvent(new KeyboardEvent('{$event}', {
+    bubbles: true,
+    key: ' '
+  }));
+JS;
+
+    $this->getSession()->executeScript($script);
   }
 
 }

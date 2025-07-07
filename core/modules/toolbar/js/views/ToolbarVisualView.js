@@ -19,19 +19,17 @@
           event.target.click();
         };
 
-      var SPACE = 32;
+        const keyDownPreventScroll = function (event) {
+          if (event.key === ' ') {
+            event.preventDefault();
+          }
+        };
 
-      var keyDownPreventScroll = function keyDownPreventScroll(event) {
-        if (event.which === SPACE) {
-          event.preventDefault();
-        }
-      };
-
-      var keyUpToClick = function keyUpToClick(event) {
-        if (event.which === SPACE) {
-          event.target.click();
-        }
-      };
+        const keyUpToClick = function (event) {
+          if (event.key === ' ') {
+            event.target.click();
+          }
+        };
 
         return {
           'click .toolbar-bar .toolbar-tab .trigger': 'onTabClick',
@@ -39,8 +37,8 @@
             'onOrientationToggleClick',
           'touchend .toolbar-bar .toolbar-tab .trigger': touchEndToClick,
           'touchend .toolbar-toggle-orientation button': touchEndToClick,
-        'keydown .toolbar-bar .toolbar-tab .trigger': keyDownPreventScroll,
-        'keyup .toolbar-bar .toolbar-tab .trigger': keyUpToClick
+          'keydown .toolbar-bar .toolbar-tab .trigger': keyDownPreventScroll,
+          'keyup .toolbar-bar .toolbar-tab .trigger': keyUpToClick
         };
       },
 
