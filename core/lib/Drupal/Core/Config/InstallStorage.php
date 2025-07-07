@@ -248,7 +248,7 @@ class InstallStorage extends FileStorage {
    *   The configuration folder name for this component.
    */
   protected function getComponentFolder(Extension $extension) {
-    return $extension->getPath() . '/' . $this->getCollectionDirectory();
+    return $extension->getAbsolutePath() . '/' . $this->getCollectionDirectory();
   }
 
   /**

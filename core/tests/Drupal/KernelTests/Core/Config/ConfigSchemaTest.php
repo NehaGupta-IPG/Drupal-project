@@ -4,17 +4,23 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Config;
 
+use Composer\Autoload\ClassLoader;
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\Schema\ConfigSchemaAlterException;
 use Drupal\Core\Config\Schema\Ignore;
 use Drupal\Core\Config\Schema\Mapping;
 use Drupal\Core\Config\Schema\Undefined;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\TypedData\Plugin\DataType\StringData;
 use Drupal\Core\TypedData\Type\IntegerInterface;
 use Drupal\Core\TypedData\Type\StringInterface;
 use Drupal\image\ImageEffectInterface;
 use Drupal\KernelTests\KernelTestBase;
+use org\bovigo\vfs\vfsStream;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
  * Tests schema for configuration objects.
@@ -633,6 +639,238 @@ class ConfigSchemaTest extends KernelTestBase {
 
     $definition = $tests[3]->get('settings')->getDataDefinition()->toArray();
     $this->assertEquals('test_with_parents.plugin_types.*', $definition['type']);
+  }
+
+  /**
+   * @covers \Drupal\Core\Config\TypedConfigManager::validateType
+   * @covers \Drupal\Core\Config\TypedConfigManager::validateNoCircularTypeReference
+   * @dataProvider providerTestInvalidConfigSchemaDefinitions
+   */
+  public function testInvalidConfigSchemaDefinition(string $yaml, ?string $expected_exception_message, array $additional_files = []): void {
+    $container = $this->mockModuleInVfs('config_schema_invalid_type', $yaml, $additional_files);
+    // Bypass \Drupal\Core\Config\ExtensionInstallStorage::getAllFolders() relying on \Drupal::root(), which references the unmodified container
+    \Drupal::setContainer($container);
+
+    if ($expected_exception_message) {
+      $this->expectException(InvalidPluginDefinitionException::class);
+      $this->expectExceptionMessage($expected_exception_message);
+    }
+    $definitions = $container->get('config.typed')->getDefinitions();
+
+    // If there was no exception, we expect to get the definitions.
+    $this->assertIsArray($definitions);
+  }
+
+  /**
+   * Data provider.
+   *
+   * @return \Generator
+   *   Test scenarios.
+   */
+  public static function providerTestInvalidConfigSchemaDefinitions(): \Generator {
+    yield 'INVALID: a naïve `type: vector`' => [
+      <<<YAML
+vector:
+  label: 'Vector, which is a specialized `type: sequence`'
+YAML,
+      '"vector" claims to be a new config schema type, but it does not provide a class.',
+    ];
+
+    // @see \Drupal\Core\Config\TypedConfigManager::validateType()
+    yield 'INVALID: `type: vector` with nonsensical `class` and no `definition_class` to indicate it is array-like' => [
+      <<<YAML
+vector:
+  label: 'Vector, which is a specialized `type: sequence`'
+  class: '\Drupal'
+YAML,
+      '"vector" appears to be a primitive config schema type (for representing scalar values), but its class Drupal does not implement Drupal\Core\TypedData\PrimitiveInterface. Its class must either implement that interface or specify a definition class.',
+    ];
+
+    yield 'INVALID: `type: vector` with nonsensical `class` and nonsensical `definition_class`' => [
+      <<<YAML
+vector:
+  label: 'Vector, which is a specialized `type: sequence`'
+  class: '\Drupal'
+  definition_class: '\Drupal'
+YAML,
+      'The definition class for "vector" must implement Drupal\Core\TypedData\DataDefinitionInterface.',
+    ];
+
+    yield 'INVALID: `type: vector` with nonsensical `class` and sensible `definition_class`' => [
+      <<<YAML
+vector:
+  label: 'Vector, which is a specialized `type: sequence`'
+  class: '\Drupal'
+  definition_class: '\Drupal\Core\Config\Schema\SequenceDataDefinition'
+YAML,
+      '"vector" claims to be a complex config schema type (for representing array-like values), but its class Drupal does not extend Drupal\Core\Config\Schema\ArrayElement.',
+    ];
+
+    yield 'VALID: `type: vector` with sensible `class` and sensible `definition_class`' => [
+      <<<YAML
+vector:
+  label: 'Vector, which is a specialized `type: sequence`'
+  class: '\Drupal\config_schema_invalid_type\Vector'
+  definition_class: '\Drupal\Core\Config\Schema\SequenceDataDefinition'
+YAML,
+      NULL,
+      [
+        'src' => [
+          'Vector.php' => <<<'PHP'
+<?php
+namespace Drupal\config_schema_invalid_type;
+use Drupal\Core\Config\Schema\Sequence;
+// Vector is just an elaborate alias for sequence in this test coverage.
+final class Vector extends Sequence { }
+PHP,
+        ],
+      ],
+    ];
+
+    yield 'INVALID: obvious circular type reference' => [
+      <<<YAML
+foo.*:
+  type: config_entity
+  label: "The foo"
+  mapping:
+    id:
+      type: string
+    description:
+      type: text
+    foo_plugin_id:
+      type: machine_name
+    settings:
+      type: foo_plugin_settings.[%parent.plugin_id]
+
+foo_plugin_settings.*:
+  type: mapping
+  label: 'The structure for all foo plugin entity settings'
+  mapping:
+    locked:
+      type: boolean
+
+foo_plugin_settings.bar:
+  type: foo_settings.*
+  mapping:
+    complex:
+      label: "Imagine this is a very complex setting specific to the bar plugin and we made a mistake"
+      type: foo.*
+YAML,
+      'Config schema type "foo_plugin_settings.bar" has a circular type reference, where it uses the type "foo_plugin_settings.[%parent.plugin_id]".',
+    ];
+
+    yield 'INVALID: subtle circular type reference' => [
+      <<<YAML
+foo.*:
+  type: config_entity
+  label: "The foo"
+  mapping:
+    id:
+      type: string
+    description:
+      type: text
+    foo_plugins:
+      type: foo_plugin
+
+foo_plugin:
+  type: mapping
+  mapping:
+    plugin_id:
+      type: machine_name
+    settings:
+      type: foo_plugin_settings.[%parent.plugin_id]
+
+foo_plugin_settings.*:
+  type: mapping
+  label: 'The structure for all foo plugin entity settings'
+  mapping:
+    locked:
+      type: boolean
+
+foo_plugin_settings.bar:
+  type: foo_plugin
+  mapping:
+    something:
+      type: integer
+YAML,
+      'Config schema type "foo_plugin_settings.bar" has a circular type reference, where it uses the type "foo_plugin_settings.[%parent.plugin_id]".',
+    ];
+  }
+
+  /**
+   * Mocks a module providing a config schema type in VFS.
+   *
+   * @param string $module_name
+   *   The name of the module.
+   * @param string $yaml
+   *   The YAML to be stored in the *.schema.yml file.
+   * @param array $additional_files
+   *   The additional files to create.
+   *
+   * @return \Symfony\Component\DependencyInjection\ContainerInterface
+   *   The container that has the VFS-mocked config schema type-providing module
+   *   installed in it; this container must be used to simulate this module
+   *   being installed.
+   */
+  private function mockModuleInVfs(string $module_name, string $yaml, array $additional_files = []): ContainerInterface {
+    $site_directory = ltrim(parse_url($this->siteDirectory)['path'], '/');
+    vfsStream::create([
+      'modules' => [
+        $module_name => [
+          "$module_name.info.yml" => <<<YAML
+name: Config Schema Test $module_name
+type: module
+core_version_requirement: ^10
+YAML,
+          'config' => [
+            'schema' => [
+              "$module_name.schema.yml" => $yaml,
+            ],
+          ],
+        ] + $additional_files,
+      ],
+    ], $this->vfsRoot->getChild($site_directory));
+
+    if (!empty($additional_files)) {
+      $additional_class_loader = new ClassLoader();
+      $additional_class_loader->addPsr4("Drupal\\$module_name\\", vfsStream::url("root/$site_directory/modules/$module_name/src/"));
+      $additional_class_loader->register(TRUE);
+    }
+
+    $config_sync = \Drupal::service('config.storage');
+    $config_data = $this->config('core.extension')->get();
+    $config_data['module'][$module_name] = 1;
+    $config_sync->write('core.extension', $config_data);
+
+    // Construct a new container for testing a plugin definition in isolation,
+    // without needing a separate module directory structure for it, and instead
+    // allowing it to be provided entirely by a PHPUnit data provider. Inherit
+    // all definitions from the successfully installed Drupal site for this
+    // kernel test, but do not use $this->container. This is a hybrid of kernel
+    // and unit test, to get the best of both worlds: test a unit, but ensure
+    // the service definitions are in sync.
+    $root = vfsStream::url("root/$site_directory");
+    $container = new ContainerBuilder(new FrozenParameterBag([
+      'app.root' => $root,
+      'container.modules' => [
+        $module_name => [
+          'type' => 'module',
+          'pathname' => "modules/$module_name/$module_name.info.yml",
+          'filename' => NULL,
+        ] + $this->container->getParameter('container.modules'),
+      ],
+      'container.namespaces' => [
+        "Drupal\\$module_name" => vfsStream::url("root/$site_directory/modules/$module_name/src"),
+      ] + $this->container->getParameter('container.namespaces'),
+    ] + $this->container->getParameterBag()->all()));
+    $container->setDefinitions($this->container->getDefinitions());
+
+    // The exception to the above elegance: re-resolve the '%app_root%' param.
+    // @see \Symfony\Component\DependencyInjection\Compiler\ResolveParameterPlaceHoldersPass
+    // @see \Drupal\Core\DrupalKernel::guessApplicationRoot()
+    $container->getDefinition('module_handler')->setArgument(0, '%app.root%');
+
+    return $container;
   }
 
   /**

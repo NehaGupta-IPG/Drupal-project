@@ -2,10 +2,13 @@
 
 namespace Drupal\Core\Config;
 
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Config\Schema\ArrayElement;
 use Drupal\Core\Config\Schema\ConfigSchemaAlterException;
 use Drupal\Core\Config\Schema\ConfigSchemaDiscovery;
+use Drupal\Core\Config\Schema\Ignore;
 use Drupal\Core\Config\Schema\TypeResolver;
 use Drupal\Core\Config\Schema\SequenceDataDefinition;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
@@ -13,6 +16,10 @@ use Drupal\Core\Config\Schema\Undefined;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\TypedData\MapDataDefinition;
 use Drupal\Core\TypedData\TraversableTypedDataInterface;
+use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
+use Drupal\Core\TypedData\DataDefinitionInterface;
+use Drupal\Core\TypedData\ListDataDefinitionInterface;
+use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\FullyValidatableConstraint;
 
@@ -258,6 +265,250 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function processDefinition(&$definition, $plugin_id): void {
+    parent::processDefinition($definition, $plugin_id);
+    static::validateType($definition, $plugin_id);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCachedDefinitions($definitions): void {
+    assert($this->definitions === NULL);
+    parent::setCachedDefinitions($definitions);
+    assert($this->definitions !== NULL);
+
+    // Before this method, not all config schema types were known. After calling
+    // the parent method, all config schema types are known and stored in
+    // $this->definitions.
+    // Because caching this happens only once, it is appropriate to ensure the
+    // combination of these config schema types together makes sense.
+    foreach ($this->definitions as $plugin_id => &$definition) {
+      // TRICKY: Validating the absence of circular type references requires
+      // knowing all config schema type definitions. Hence this cannot happen in
+      // ::processDefinition().
+      $this->validateNoCircularTypeReference($definition, $plugin_id);
+    }
+  }
+
+  /**
+   * Validates the "type" key of a config schema definition.
+   *
+   * @param array $definition
+   *   A config schema type definition.
+   * @param string $id
+   *   A config schema type ID.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   *   Thrown if the config schema type definition is:
+   *   - Incomplete (missing 'class' when defining a new type).
+   *   - Its `class` does not subclass PrimitiveInterface for scalar types.
+   *   - Its `class` does not extend ArrayElement for list or complex types.
+   *   - Its `definition_class` does not implement DataDefinitionInterface.
+   *   - It contains a circular type reference.
+   */
+  protected function validateType(array $definition, string $id): void {
+    // If a config schema does not define a new type, but uses an existing one,
+    // there's nothing left to validate.
+    if (isset($definition['type'])) {
+      return;
+    }
+
+    // This type does not narrow an existing type (for example: `type: string` +
+    // validation constraints to only allow license plates), and is hence a new
+    // "low level type". So its `class` and `definition_class` must meet basic
+    // expectations of the configuration (schema) system.
+    if (!isset($definition['class'])) {
+      throw new InvalidPluginDefinitionException($id, sprintf('"%s" claims to be a new config schema type, but it does not provide a class.', $id));
+    }
+    switch (static::getShape($definition)) {
+      case 'arbitrary':
+        // When arbitrary data can be stored, there is nothing to validate.
+        break;
+
+      // All scalar types' classes must implement PrimitiveInterface.
+      case 'scalar':
+        if (!is_subclass_of($definition['class'], PrimitiveInterface::class)) {
+          throw new InvalidPluginDefinitionException($id, sprintf('"%s" appears to be a primitive config schema type (for representing scalar values), but its class %s does not implement %s. Its class must either implement that interface or specify a definition class.', $id, $definition['class'], PrimitiveInterface::class));
+        }
+        break;
+
+      // All other types must be arrays and can be either:
+      // - list (`type: sequence`)
+      // - complex (`type: mapping`).
+      // They must all extend ArrayElement.
+      case 'list':
+      case 'complex':
+        if (!is_subclass_of($definition['class'], ArrayElement::class)) {
+          throw new InvalidPluginDefinitionException($id, sprintf('"%s" claims to be a complex config schema type (for representing array-like values), but its class %s does not extend %s.', $id, $definition['class'], ArrayElement::class));
+        }
+        break;
+
+      case 'no-data-definition':
+        throw new InvalidPluginDefinitionException($id, sprintf('The definition class for "%s" must implement %s.', $id, DataDefinitionInterface::class));
+    }
+  }
+
+  /**
+   * Gets the shape of a config schema type definition.
+   *
+   * @param array $definition
+   *   A config schema type definition.
+   *
+   * @return string
+   *   One of:
+   *   - "arbitrary": for the "ignore" and "undefined" types that allow
+   *     arbitrary values.
+   *   - "list": for any list type (in core, only "sequence")
+   *   - "complex": for any complex type (in core, only "mapping")
+   *   - "scalar": for any other type (in core, primitives like "string", etc.)
+   *   - "no-data-definition": for an invalid definition class.
+   */
+  private static function getShape(array $definition): string {
+    return match (TRUE) {
+      // Two cases that allow arbitrary values: "ignore" and "undefined".
+      in_array($definition['class'], [Undefined::class, Ignore::class], TRUE) => 'arbitrary',
+      // Optional: default is set later, in ::getDefinitionWithReplacements().
+      !isset($definition['definition_class']) => 'scalar',
+      // The three normal shapes:
+      // - (for ALL data, a data definition must exist describing its structure)
+      // - for data containing more than a single value, the Typed Data objects
+      //   must implement TraversableTypedDataInterface, and two kinds of
+      //   traversable data are supported:
+      //   1. data shaped like "a list of values": ListDataDefinitionInterface
+      //   must be used — in core this is only SequenceDataDefinition
+      //   2. data shaped like "a bunch of key-value pairs",
+      //   ComplexDataDefinitionInterface must be used — in core this is only
+      //   MapDataDefinition
+      // - hence everything else must contain a single scalar value.
+      is_subclass_of($definition['definition_class'], ListDataDefinitionInterface::class) => 'list',
+      is_subclass_of($definition['definition_class'], ComplexDataDefinitionInterface::class) => 'complex',
+      is_subclass_of($definition['definition_class'], DataDefinitionInterface::class) => 'scalar',
+      // A default case only to provide precise guidance.
+      default => 'no-data-definition',
+    };
+  }
+
+  /**
+   * Validates the absence of circular config schema type references.
+   *
+   * @param array $definition
+   *   A config schema type definition.
+   * @param string $plugin_id
+   *   A config schema type ID.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   *   Thrown if the config schema type definition contains a circular type
+   *   reference.
+   */
+  private function validateNoCircularTypeReference(array $definition, string $plugin_id): void {
+    // This validation requires all config schema types to be known.
+    assert($this->definitions !== NULL);
+    $referenced_types = static::getImplicitlyReferencedTypes($definition, $this->definitions);
+    // Resolve types with dynamic names to all possible types they may match.
+    // @see \Drupal\Core\Config\Schema\TypeResolver::resolveExpression()
+    // @see \Drupal\Core\Config\TypedConfigManager::getPossibleTypes()
+    // If this type's name appears anywhere in its definition tree, it has a
+    // circular reference.
+    foreach ($referenced_types as $referenced_type) {
+      $possible_types = $this->getPossibleTypes($referenced_type);
+      if (in_array($plugin_id, $possible_types, TRUE)) {
+        throw new InvalidPluginDefinitionException($plugin_id, sprintf('Config schema type "%s" has a circular type reference, where it uses the type "%s".', $plugin_id, $referenced_type));
+      }
+    }
+  }
+
+  /**
+   * Gets explicitly referenced types for a config schema type definition.
+   *
+   * @param array $definition
+   *   A config schema type definition.
+   *
+   * @return string[]
+   *   All config schema types that are explicitly referenced by this config
+   *   schema type definition. In other words: this collects all `type: …`
+   *   strings in the given $definition.
+   *   For example, for `type: config_object` this would return:
+   *   - `mapping`
+   *   - `_core_config_info`
+   *   - `langcode`
+   */
+  private static function getExplicitlyReferencedTypes(array $definition): array {
+    // Primitive types do not specify the "type" key. They cannot reference
+    // other types, so return early.
+    if (!isset($definition['type'])) {
+      return [];
+    }
+
+    // TRICKY: checking if `$definition['type']` is `sequence` or `mapping` is
+    // insufficient here, because it may be a subtype of a sequence or mapping.
+    // For example:
+    // - `type: views.filter_value.in_operator` is a specialized subtype of
+    //   `type: sequence`
+    // - `type: config_entity` is a specialized subtype of `type: config_object`
+    //   which itself is a specialized subtype of `type: mapping`, and both
+    //   specializations define additional keys in `mapping: …`.
+    $used_types = [$definition['type']];
+
+    // Add the type that all values in this sequence use.
+    if (isset($definition['sequence'])) {
+      $used_types = array_merge($used_types, static::getExplicitlyReferencedTypes($definition['sequence']));
+    }
+    // Add the types that the various keys in this mapping use.
+    elseif (isset($definition['mapping'])) {
+      foreach (array_keys($definition['mapping']) as $key) {
+        $used_types = array_merge($used_types, static::getExplicitlyReferencedTypes($definition['mapping'][$key]));
+      }
+    }
+
+    return array_unique($used_types);
+  }
+
+  /**
+   * Gets implicitly referenced types for a config schema type definition.
+   *
+   * @param array $definition
+   *   A config schema type definition.
+   * @param array $all_definitions
+   *   All config schema type definitions.
+   *
+   * @return string[]
+   *   All config schema types that are implicitly referenced by this config
+   *   schema type definition, by looking up the types used by the explicitly
+   *   referenced types in their respective type definitions. In other words:
+   *   this looks at the config schema type plugin definitions for all the
+   *   explicit `type: …` strings (plugin IDs) found in $definition.
+   *   For example, for `type: config_object` this would return:
+   *   - `mapping` (explicit)
+   *   - `_core_config_info` (explicit)
+   *   - `langcode` (explicit)
+   *   - `string` (implicit, via both `_core_config_info` and `langcode`)
+   */
+  private static function getImplicitlyReferencedTypes(array $definition, array $all_definitions): array {
+    // The implicit ones include the explicit ones too.
+    $explicit = static::getExplicitlyReferencedTypes($definition);
+    // For each of the implicitly used types, figure out recursively which types
+    // they use. If $explicit contains only primitive types, a single iteration
+    // of the loop below will be sufficient.
+    $result = $explicit;
+    do {
+      // For all types seen so far, find the next ones.
+      $next_level = array_map(
+        static::getExplicitlyReferencedTypes(...),
+        // Use $new from the previous iteration, to not repeat the same work.
+        array_intersect_key($all_definitions, array_flip($new ?? $explicit))
+      );
+      // Determine the newly discovered types.
+      $new = array_merge(...array_values($next_level));
+      // Remember them.
+      $result = array_merge($result, $new);
+    } while (!empty($new));
+    return array_unique($result);
+  }
+
+  /**
    * Gets a schema definition with replacements for dynamic type names.
    *
    * @param string $base_plugin_id
@@ -428,6 +679,62 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     $definition = $this->getDefinition($config_name);
     $data_definition = $this->buildDataDefinition($definition, $config_data);
     return $this->create($data_definition, $config_data, $config_name);
+  }
+
+  /**
+   * Returns all possible types for the type with the given name.
+   *
+   * @param string $name
+   *   Configuration name or key.
+   *
+   * @return string[]
+   *   All possible types for a given type. For example,
+   *   `core_date_format_pattern.[%parent.locked]` will return:
+   *   - `core_date_format_pattern.0`
+   *   - `core_date_format_pattern.1`
+   *   If a fallback name is available, that will be returned too. In this
+   *   example, that would be `core_date_format_pattern.*`.
+   */
+  public function getPossibleTypes(string $name): array {
+    // If this name isn't dynamic, there's nothing to do.
+    // @see \Drupal\Core\Config\Schema\TypeResolver::resolveDynamicTypeName()
+    if (!str_contains($name, ']')) {
+      return [$name];
+    }
+
+    // First, parse from e.g.
+    // `module.something.foo_[%parent.locked]`
+    // this:
+    // `[%parent.locked]`
+    // or from
+    // `[%parent.%parent.%type].third_party.[%key]`
+    // this:
+    // `[%parent.%parent.%type]` and `[%key]`.
+    // And collapse all these to just `[]`.
+    // @see \Drupal\Core\Config\Schema\TypeResolver::resolveExpression()
+    $matches = [];
+    if (preg_match_all('/(\[[^\]]+\])/', $name, $matches) >= 1) {
+      $name = str_replace($matches[0], '[]', $name);
+    }
+    // Then, replace all `[]` occurrences with `.*` and escape all periods for
+    // use in a regex. So:
+    // `module\.something\.foo_.*`
+    // or
+    // `.*\.third_party\..*`
+    $regex = str_replace(['.', '[]'], ['\.', '.*'], $name);
+    // Now find all possible types:
+    // 1. `module.something.foo_foo`, `module.something.foo_bar`, etc.
+    $possible_types = array_filter(
+      array_keys($this->definitions),
+      fn (string $type) => preg_match("/^$regex$/", $type) === 1
+    );
+    // 2. The fallback: `module.something.*` — if no concrete definition for it
+    // exists.
+    $fallback_type = $this->findFallback($name);
+    if ($fallback_type && !in_array($fallback_type, $possible_types, TRUE)) {
+      $possible_types[] = $fallback_type;
+    }
+    return $possible_types;
   }
 
 }
