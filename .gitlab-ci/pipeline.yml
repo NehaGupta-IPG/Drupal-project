@@ -28,7 +28,7 @@ default:
     - echo "SIMPLETEST_DB = $SIMPLETEST_DB"
     - |
       if [[ $PHPDISMOD_INTL == true ]]; then
-        /usr/sbin/phpdismod intl
+        rm /etc/php/8.3/fpm/conf.d/20-intl.ini
         killall -USR2 php-fpm 2>/dev/null || true
       fi
     - $CI_PROJECT_DIR/.gitlab-ci/scripts/server-setup.sh
