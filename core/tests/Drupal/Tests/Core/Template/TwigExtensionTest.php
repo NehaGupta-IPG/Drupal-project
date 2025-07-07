@@ -249,7 +249,7 @@ class TwigExtensionTest extends UnitTestCase {
   /**
    * Tests the escaping of objects implementing SafeStringInterface.
    *
-   * @covers ::urlFilter
+   * @legacy-covers ::urlFilter
    */
   public function testUrlEscaping(): void {
     $loader = new StringLoader();

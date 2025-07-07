@@ -407,13 +407,13 @@ class TwigExtension extends AbstractExtension {
   /**
    * Escapes URLs to HTML and strips them of dangerous protocols.
    *
-   * @param mixed $string
+   * @param string $string
    *   The URL.
    *
    * @return null|string
    *   The sanitized, rendered output, or NULL if there is no valid output.
    */
-  public function urlFilter($string) {
+  public function urlFilter(string $string): ?string {
     return Html::escape(UrlHelper::stripDangerousProtocols($string));
   }
 
