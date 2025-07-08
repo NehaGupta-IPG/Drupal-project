@@ -45,9 +45,6 @@ class AreaTest extends ViewTestBase {
     $this->enableViewsTestModule();
   }
 
-  /**
-   * Provides additional Views data for testing.
-   */
   protected function viewsData() {
     $data = parent::viewsData();
     $data['views']['test_example'] = [
@@ -94,6 +91,28 @@ class AreaTest extends ViewTestBase {
       if ($type !== 'empty') {
         $this->assertSession()->fieldExists('options[empty]');
       }
+
+      // Test that the editable machine id input is accessible.
+      $this->assertSession()->fieldExists('options[area_id]');
+
+      // Change the machine name.
+      $new_id = $this->randomMachineName();
+      $this->submitForm(['options[area_id]' => $new_id], 'Apply');
+
+      // Save the view, and test the new ID has been saved.
+      $this->submitForm([], 'Save');
+      $config = $this->config('views.view.test_example_area');
+      $this->assertEquals($new_id, $config->get('display.default.display_options.' . $type . '.' . $new_id . '.id'));
+
+      $view = \Drupal::entityTypeManager()
+        ->getStorage('view')
+        ->load('test_example_area');
+      $displays = $view->get('display');
+      $handlers = $displays['default']['display_options'][$type];
+
+      $this->assertNotEmpty($handlers[$new_id], 'Data found for new area ID key.');
+      $this->assertSame($new_id, $handlers[$new_id]['id'], 'New area ID matches the area ID key.');
+      $this->assertArrayNotHasKey('test_example', $handlers);
     }
   }
 
