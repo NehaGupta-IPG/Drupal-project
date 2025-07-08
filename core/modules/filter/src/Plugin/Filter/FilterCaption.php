@@ -36,7 +36,7 @@ class FilterCaption extends FilterBase implements ContainerFactoryPluginInterfac
    *   Plugin ID.
    * @param mixed $plugin_definition
    *   Definition.
-   * @param \Drupal\filter\FilterPluginManager $filter_manager
+   * @param \Drupal\filter\FilterPluginManager $filterManager
    *   Filter plugin manager.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
@@ -45,7 +45,7 @@ class FilterCaption extends FilterBase implements ContainerFactoryPluginInterfac
     array $configuration,
     $plugin_id,
     $plugin_definition,
-    protected readonly FilterPluginManager $filter_manager,
+    protected readonly FilterPluginManager $filterManager,
     protected readonly RendererInterface $renderer,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
