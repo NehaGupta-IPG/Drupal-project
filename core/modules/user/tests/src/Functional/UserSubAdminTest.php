@@ -140,9 +140,10 @@ class UserSubAdminTest extends BrowserTestBase {
     $this->submitForm([], 'Save configuration');
     $this->assertSession()->responseContains('At least one user cancellation option should be enabled.');
 
-    $this->getSession()->getDriver()->check('.//input[@name="user_cancel_method_options[user_cancel_block]"]');
-    $this->getSession()->getDriver()->check('.//input[@name="user_cancel_method_options[user_cancel_block_unpublish]"]');
-    $this->submitForm([], 'Save configuration');
+    $this->submitForm([
+      'user_cancel_method_options[user_cancel_block]' => TRUE,
+      'user_cancel_method_options[user_cancel_block_unpublish]' => TRUE,
+    ], 'Save configuration');
     $this->assertSession()->responseContains('The configuration options have been saved.');
   }
 
