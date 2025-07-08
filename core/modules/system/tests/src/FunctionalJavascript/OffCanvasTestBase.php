@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\system\Traits\OffCanvasTestTrait;
+use WebDriver\Exception\UnknownError;
 
 /**
  * Base class contains common test functionality for the Off-canvas dialog.
@@ -140,6 +141,40 @@ abstract class OffCanvasTestBase extends WebDriverTestBase {
       ];
     }
     return $data;
+  }
+
+  /**
+   * An internal version of clickLink() that waits for the link to be clickable.
+   *
+   * @param string|\Drupal\Component\Render\MarkupInterface $label
+   *   Text between the anchor tags.
+   * @param int $index
+   *   (optional) The index number for cases where multiple links have the same
+   *   text. Defaults to 0.
+   *
+   * @see \Drupal\Tests\UiHelperTrait\clickLink()
+   * @see https://www.drupal.org/project/drupal/issues/3032275
+   */
+  protected function _safeClick($label, $index = 0): void {
+    /** @var \WebDriver\Exception\UnknownError $not_clickable_exception */
+    $not_clickable_exception = NULL;
+    $result = $this->getSession()->getPage()->waitFor(10, function () use ($label, $index, &$not_clickable_exception) {
+      try {
+        parent::clickLink($label, $index);
+        return TRUE;
+      }
+      catch (UnknownError $exception) {
+        if (strstr($exception->getMessage(), 'not clickable') === FALSE) {
+          // Rethrow any unexpected UnknownError exceptions.
+          throw $exception;
+        }
+        $not_clickable_exception = $exception;
+        return NULL;
+      }
+    });
+    if ($result !== TRUE) {
+      throw $not_clickable_exception;
+    }
   }
 
 }
