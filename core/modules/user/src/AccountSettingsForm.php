@@ -153,11 +153,7 @@ class AccountSettingsForm extends ConfigFormBase {
 
     $default_value_methods = [];
     $cancel_methods_options = $config->get('cancel_method_options') ?? [];
-    foreach ($cancel_methods_options as $method => $access) {
-      if ($access) {
-        $default_value_methods[] = $method;
-      }
-    }
+    $default_value_methods = \array_keys(\array_filter($cancel_method_options));
     $form['registration_cancellation']['user_cancel_method_options'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Available user cancellation options'),
