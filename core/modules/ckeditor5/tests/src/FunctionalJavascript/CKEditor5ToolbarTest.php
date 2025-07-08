@@ -116,4 +116,5 @@ JS;
     $ckeditor5_toolbar_position = (int) $this->getSession()->evaluateScript("document.querySelector('.ck-toolbar').getBoundingClientRect().top");
     $this->assertEqualsWithDelta($toolbar_height, $ckeditor5_toolbar_position, 2);
   }
+
 }

@@ -5,7 +5,7 @@
  * @internal
  */
 
-#drupal-off-canvas-wrapper *:where(:not(svg, svg *, .ck-reset, .ck-reset *, [data-drupal-ck-style-fence] *, .ui-resizable-handle)) {
+#drupal-off-canvas-wrapper *:where(:not(svg, svg *, .ck-reset *, [data-drupal-ck-style-fence] *, .ui-resizable-handle)) {
   all: revert;
   box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
