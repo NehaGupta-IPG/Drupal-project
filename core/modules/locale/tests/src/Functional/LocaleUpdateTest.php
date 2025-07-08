@@ -1,9 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+
+// cspell:ignore extraday lundi
 
 /**
  * Tests for updating the interface translations of projects.
@@ -11,6 +16,8 @@ use Drupal\Core\Language\LanguageInterface;
  * @group locale
  */
 class LocaleUpdateTest extends LocaleUpdateBase {
+
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -53,7 +60,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
    * the most recent files are selected in the different check scenarios: check
    * for local files only, check for both local and remote files.
    */
-  public function testUpdateCheckStatus() {
+  public function testUpdateCheckStatus(): void {
     // Case when contributed modules are absent.
     $this->drupalGet('admin/reports/translations');
     $this->assertSession()->pageTextContains('Missing translations for one project');
@@ -111,7 +118,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
    *  - Source: remote and local files
    *  - Import overwrite: all existing translations
    */
-  public function testUpdateImportSourceRemote() {
+  public function testUpdateImportSourceRemote(): void {
     $config = $this->config('locale.settings');
 
     // Build the test environment.
@@ -165,13 +172,13 @@ class LocaleUpdateTest extends LocaleUpdateBase {
 
     // Check whether existing translations have (not) been overwritten.
     // cSpell:disable
-    $this->assertEquals('Januar_1', t('January', [], ['langcode' => 'de']), 'Translation of January');
-    $this->assertEquals('Februar_2', t('February', [], ['langcode' => 'de']), 'Translation of February');
-    $this->assertEquals('Marz_2', t('March', [], ['langcode' => 'de']), 'Translation of March');
-    $this->assertEquals('April_2', t('April', [], ['langcode' => 'de']), 'Translation of April');
-    $this->assertEquals('Mai_customized', t('May', [], ['langcode' => 'de']), 'Translation of May');
-    $this->assertEquals('Juni', t('June', [], ['langcode' => 'de']), 'Translation of June');
-    $this->assertEquals('Montag', t('Monday', [], ['langcode' => 'de']), 'Translation of Monday');
+    $this->assertEquals('Januar_1', $this->t('January', [], ['langcode' => 'de']), 'Translation of January');
+    $this->assertEquals('Februar_2', $this->t('February', [], ['langcode' => 'de']), 'Translation of February');
+    $this->assertEquals('Marz_2', $this->t('March', [], ['langcode' => 'de']), 'Translation of March');
+    $this->assertEquals('April_2', $this->t('April', [], ['langcode' => 'de']), 'Translation of April');
+    $this->assertEquals('Mai_customized', $this->t('May', [], ['langcode' => 'de']), 'Translation of May');
+    $this->assertEquals('Juni', $this->t('June', [], ['langcode' => 'de']), 'Translation of June');
+    $this->assertEquals('Montag', $this->t('Monday', [], ['langcode' => 'de']), 'Translation of Monday');
     // cSpell:enable
   }
 
@@ -182,7 +189,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
    *  - Source: local files only
    *  - Import overwrite: all existing translations
    */
-  public function testUpdateImportSourceLocal() {
+  public function testUpdateImportSourceLocal(): void {
     $config = $this->config('locale.settings');
 
     // Build the test environment.
@@ -225,13 +232,13 @@ class LocaleUpdateTest extends LocaleUpdateBase {
 
     // Check whether existing translations have (not) been overwritten.
     // cSpell:disable
-    $this->assertEquals('Januar_customized', t('January', [], ['langcode' => 'de']), 'Translation of January');
-    $this->assertEquals('Februar_2', t('February', [], ['langcode' => 'de']), 'Translation of February');
-    $this->assertEquals('Marz_2', t('March', [], ['langcode' => 'de']), 'Translation of March');
-    $this->assertEquals('April_2', t('April', [], ['langcode' => 'de']), 'Translation of April');
-    $this->assertEquals('Mai_customized', t('May', [], ['langcode' => 'de']), 'Translation of May');
-    $this->assertEquals('Juni', t('June', [], ['langcode' => 'de']), 'Translation of June');
-    $this->assertEquals('Montag', t('Monday', [], ['langcode' => 'de']), 'Translation of Monday');
+    $this->assertEquals('Januar_customized', $this->t('January', [], ['langcode' => 'de']), 'Translation of January');
+    $this->assertEquals('Februar_2', $this->t('February', [], ['langcode' => 'de']), 'Translation of February');
+    $this->assertEquals('Marz_2', $this->t('March', [], ['langcode' => 'de']), 'Translation of March');
+    $this->assertEquals('April_2', $this->t('April', [], ['langcode' => 'de']), 'Translation of April');
+    $this->assertEquals('Mai_customized', $this->t('May', [], ['langcode' => 'de']), 'Translation of May');
+    $this->assertEquals('Juni', $this->t('June', [], ['langcode' => 'de']), 'Translation of June');
+    $this->assertEquals('Montag', $this->t('Monday', [], ['langcode' => 'de']), 'Translation of Monday');
     // cSpell:enable
   }
 
@@ -242,7 +249,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
    *  - Source: remote and local files
    *  - Import overwrite: only overwrite non-customized translations
    */
-  public function testUpdateImportModeNonCustomized() {
+  public function testUpdateImportModeNonCustomized(): void {
     $config = $this->config('locale.settings');
 
     // Build the test environment.
@@ -265,13 +272,13 @@ class LocaleUpdateTest extends LocaleUpdateBase {
 
     // Check whether existing translations have (not) been overwritten.
     // cSpell:disable
-    $this->assertEquals('Januar_customized', t('January', [], ['langcode' => 'de']), 'Translation of January');
-    $this->assertEquals('Februar_customized', t('February', [], ['langcode' => 'de']), 'Translation of February');
-    $this->assertEquals('Marz_2', t('March', [], ['langcode' => 'de']), 'Translation of March');
-    $this->assertEquals('April_2', t('April', [], ['langcode' => 'de']), 'Translation of April');
-    $this->assertEquals('Mai_customized', t('May', [], ['langcode' => 'de']), 'Translation of May');
-    $this->assertEquals('Juni', t('June', [], ['langcode' => 'de']), 'Translation of June');
-    $this->assertEquals('Montag', t('Monday', [], ['langcode' => 'de']), 'Translation of Monday');
+    $this->assertEquals('Januar_customized', $this->t('January', [], ['langcode' => 'de']), 'Translation of January');
+    $this->assertEquals('Februar_customized', $this->t('February', [], ['langcode' => 'de']), 'Translation of February');
+    $this->assertEquals('Marz_2', $this->t('March', [], ['langcode' => 'de']), 'Translation of March');
+    $this->assertEquals('April_2', $this->t('April', [], ['langcode' => 'de']), 'Translation of April');
+    $this->assertEquals('Mai_customized', $this->t('May', [], ['langcode' => 'de']), 'Translation of May');
+    $this->assertEquals('Juni', $this->t('June', [], ['langcode' => 'de']), 'Translation of June');
+    $this->assertEquals('Montag', $this->t('Monday', [], ['langcode' => 'de']), 'Translation of Monday');
     // cSpell:enable
   }
 
@@ -282,7 +289,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
    *  - Source: remote and local files
    *  - Import overwrite: don't overwrite any existing translation
    */
-  public function testUpdateImportModeNone() {
+  public function testUpdateImportModeNone(): void {
     $config = $this->config('locale.settings');
 
     // Build the test environment.
@@ -318,7 +325,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
   /**
    * Tests automatic translation import when a module is enabled.
    */
-  public function testEnableUninstallModule() {
+  public function testEnableUninstallModule(): void {
     // Make the hidden test modules look like a normal custom module.
     \Drupal::state()->set('locale.test_system_info_alter', TRUE);
 
@@ -358,7 +365,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
    * enabled modules and will import them. When a language is removed the system
    * will remove all translations of that language from the database.
    */
-  public function testEnableLanguage() {
+  public function testEnableLanguage(): void {
     // Make the hidden test modules look like a normal custom module.
     \Drupal::state()->set('locale.test_system_info_alter', TRUE);
 
@@ -384,7 +391,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     // Check if the right number of translations are added.
     $this->assertSession()->pageTextContains("One translation file imported. 8 translations were added, 0 translations were updated and 0 translations were removed.");
     // cSpell:disable-next-line
-    $this->assertTranslation('Extraday', 'extra dag', 'nl');
+    $this->assertTranslation('Extra day', 'extra dag', 'nl');
 
     // Check if the language data is added to the database.
     $connection = Database::getConnection();
@@ -408,7 +415,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     $this->assertFalse($result, 'Files removed from file history');
 
     // Check that the Dutch translation is gone.
-    $this->assertTranslation('Extraday', '', 'nl');
+    $this->assertTranslation('Extra day', '', 'nl');
     // cSpell:disable-next-line
     $this->assertTranslation('Tuesday', 'Dienstag', 'de');
   }
@@ -416,7 +423,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
   /**
    * Tests automatic translation import when a custom language is added.
    */
-  public function testEnableCustomLanguage() {
+  public function testEnableCustomLanguage(): void {
     // Make the hidden test modules look like a normal custom module.
     \Drupal::state()->set('locale.test_system_info_alter', TRUE);
 

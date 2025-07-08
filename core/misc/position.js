@@ -29,15 +29,18 @@
   const regexVertical = /top|center|bottom/;
   const regexOffset = /[+-]\d+(\.[\d]+)?%?/;
   const regexPosition = /^\w+/;
-  const regexPercent = /%$/;
   const _position = $.fn.position;
 
   function getOffsets(offsets, width, height) {
     return [
       parseFloat(offsets[0]) *
-        (regexPercent.test(offsets[0]) ? width / 100 : 1),
+        (typeof offsets[0] === 'string' && offsets[0].endsWith('%')
+          ? width / 100
+          : 1),
       parseFloat(offsets[1]) *
-        (regexPercent.test(offsets[1]) ? height / 100 : 1),
+        (typeof offsets[1] === 'string' && offsets[1].endsWith('%')
+          ? height / 100
+          : 1),
     ];
   }
 
@@ -47,14 +50,14 @@
 
   function getDimensions(elem) {
     const raw = elem[0];
-    if (raw.nodeType === 9) {
+    if (raw.nodeType === Node.DOCUMENT_NODE) {
       return {
         width: elem.width(),
         height: elem.height(),
         offset: { top: 0, left: 0 },
       };
     }
-    if ($.isWindow(raw)) {
+    if (!!raw && raw === raw.window) {
       return {
         width: elem.width(),
         height: elem.height(),
@@ -193,15 +196,15 @@
           data.my[0] === 'left'
             ? -data.elemWidth
             : data.my[0] === 'right'
-            ? data.elemWidth
-            : 0;
+              ? data.elemWidth
+              : 0;
         const atOffset =
           // eslint-disable-next-line no-nested-ternary
           data.at[0] === 'left'
             ? data.targetWidth
             : data.at[0] === 'right'
-            ? -data.targetWidth
-            : 0;
+              ? -data.targetWidth
+              : 0;
         const offset = -2 * data.offset[0];
         let newOverRight;
         let newOverLeft;
@@ -247,15 +250,15 @@
         const myOffset = top
           ? -data.elemHeight
           : data.my[1] === 'bottom'
-          ? data.elemHeight
-          : 0;
+            ? data.elemHeight
+            : 0;
         const atOffset =
           // eslint-disable-next-line no-nested-ternary
           data.at[1] === 'top'
             ? data.targetHeight
             : data.at[1] === 'bottom'
-            ? -data.targetHeight
-            : 0;
+              ? -data.targetHeight
+              : 0;
         const offset = -2 * data.offset[1];
         let newOverTop;
         let newOverBottom;
@@ -346,8 +349,10 @@
     },
     getWithinInfo(element) {
       const withinElement = $(element || window);
-      const isWindow = $.isWindow(withinElement[0]);
-      const isDocument = !!withinElement[0] && withinElement[0].nodeType === 9;
+      const isWindow =
+        !!withinElement[0] && withinElement[0] === withinElement[0].window;
+      const isDocument =
+        !!withinElement[0] && withinElement[0].nodeType === Node.DOCUMENT_NODE;
       const hasOffset = !isWindow && !isDocument;
       return {
         element: withinElement,
@@ -462,8 +467,8 @@
         pos = regexHorizontal.test(pos[0])
           ? pos.concat(['center'])
           : regexVertical.test(pos[0])
-          ? ['center'].concat(pos)
-          : ['center', 'center'];
+            ? ['center'].concat(pos)
+            : ['center', 'center'];
       }
       pos[0] = regexHorizontal.test(pos[0]) ? pos[0] : 'center';
       pos[1] = regexVertical.test(pos[1]) ? pos[1] : 'center';

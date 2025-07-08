@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views_ui\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the JavaScript filtering on the Views listing page.
  *
  * @see core/modules/views_ui/js/views_ui.listing.js
- * @group views_ui
  */
+#[Group('views_ui')]
 class ViewsListingTest extends WebDriverTestBase {
 
   /**
@@ -38,7 +41,7 @@ class ViewsListingTest extends WebDriverTestBase {
   /**
    * Tests the filtering on the Views listing page.
    */
-  public function testFilterViewsListing() {
+  public function testFilterViewsListing(): void {
     $enabled_views_count = 6;
     $disabled_views_count = 2;
     $content_views_count = 3;
@@ -136,8 +139,9 @@ class ViewsListingTest extends WebDriverTestBase {
    *   The elements.
    *
    * @return array
+   *   The filtered array.
    */
-  protected function filterVisibleElements($elements) {
+  protected function filterVisibleElements($elements): array {
     $elements = array_filter($elements, function ($element) {
       return $element->isVisible();
     });

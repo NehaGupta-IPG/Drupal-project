@@ -2,15 +2,16 @@
 
 namespace Drupal\Core\Field\Plugin\Field\FieldType;
 
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\ContentEntityStorageInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\TypedData\EntityDataDefinition;
+use Drupal\Core\Field\Attribute\FieldType;
+use Drupal\Core\Field\EntityReferenceFieldItemList;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldException;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -30,17 +31,16 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\AllowedValuesConstraint;
  *
  * Supported settings (below the definition's 'settings' key) are:
  * - target_type: The entity type to reference. Required.
- *
- * @FieldType(
- *   id = "entity_reference",
- *   label = @Translation("Entity reference"),
- *   description = @Translation("An entity field containing an entity reference."),
- *   category = "reference",
- *   default_widget = "entity_reference_autocomplete",
- *   default_formatter = "entity_reference_label",
- *   list_class = "\Drupal\Core\Field\EntityReferenceFieldItemList",
- * )
  */
+#[FieldType(
+  id: "entity_reference",
+  label: new TranslatableMarkup("Entity reference"),
+  description: new TranslatableMarkup("An entity field containing an entity reference."),
+  category: "reference",
+  default_widget: "entity_reference_autocomplete",
+  default_formatter: "entity_reference_label",
+  list_class: EntityReferenceFieldItemList::class,
+)]
 class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProviderInterface, PreconfiguredFieldUiOptionsInterface {
 
   /**
@@ -168,7 +168,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
     try {
       $target_type_info = \Drupal::entityTypeManager()->getDefinition($target_type);
     }
-    catch (PluginNotFoundException $e) {
+    catch (PluginNotFoundException) {
       throw new FieldException(sprintf("Field '%s' on entity type '%s' references a target entity type '%s' which does not exist.",
         $field_definition->getName(),
         $field_definition->getTargetEntityTypeId(),
@@ -478,11 +478,15 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
       '#options' => $handlers_options,
       '#default_value' => $field->getSetting('handler'),
       '#required' => TRUE,
+      // Use a form process callback to build #ajax property properly and also
+      // to avoid code duplication.
+      // @see \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem::fieldSettingsAjaxProcess()
       '#ajax' => TRUE,
       '#limit_validation_errors' => [],
     ];
     $form['handler']['handler_submit'] = [
       '#type' => 'submit',
+      '#name' => 'handler_settings_submit',
       '#value' => $this->t('Change handler'),
       '#limit_validation_errors' => [],
       '#attributes' => [
@@ -642,21 +646,21 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
   /**
    * {@inheritdoc}
    */
-  public function getPossibleValues(AccountInterface $account = NULL) {
+  public function getPossibleValues(?AccountInterface $account = NULL) {
     return $this->getSettableValues($account);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getPossibleOptions(AccountInterface $account = NULL) {
+  public function getPossibleOptions(?AccountInterface $account = NULL) {
     return $this->getSettableOptions($account);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getSettableValues(AccountInterface $account = NULL) {
+  public function getSettableValues(?AccountInterface $account = NULL) {
     // Flatten options first, because "settable options" may contain group
     // arrays.
     $flatten_options = OptGroup::flattenOptions($this->getSettableOptions($account));
@@ -666,7 +670,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
   /**
    * {@inheritdoc}
    */
-  public function getSettableOptions(AccountInterface $account = NULL) {
+  public function getSettableOptions(?AccountInterface $account = NULL) {
     $field_definition = $this->getFieldDefinition();
     if (!$options = \Drupal::service('plugin.manager.entity_reference_selection')->getSelectionHandler($field_definition, $this->getEntity())->getReferenceableEntities()) {
       return [];
@@ -703,10 +707,11 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
    * @see static::fieldSettingsAjaxProcess()
    */
   public static function fieldSettingsAjaxProcessElement(&$element, $main_form) {
+    // Elements are marked as TRUE ('#ajax' => TRUE,), so not empty.
     if (!empty($element['#ajax'])) {
       $element['#ajax'] = [
-        'callback' => [static::class, 'settingsAjax'],
-        'wrapper' => $main_form['#id'],
+        'trigger_as' => ['name' => 'handler_settings_submit'],
+        'wrapper' => 'field-combined',
         'element' => $main_form['#array_parents'],
       ];
     }
@@ -732,20 +737,13 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
   }
 
   /**
-   * Ajax callback for the handler settings form.
-   *
-   * @see static::fieldSettingsForm()
-   */
-  public static function settingsAjax($form, FormStateInterface $form_state) {
-    return NestedArray::getValue($form, $form_state->getTriggeringElement()['#ajax']['element']);
-  }
-
-  /**
    * Submit handler for the non-JS case.
    *
    * @see static::fieldSettingsForm()
    */
   public static function settingsAjaxSubmit($form, FormStateInterface $form_state) {
+    $form_storage = &$form_state->getStorage();
+    unset($form_storage['default_value_widget']);
     $form_state->setRebuild();
   }
 

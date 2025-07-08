@@ -33,7 +33,8 @@ class SiteSettingsForm extends FormBase {
   public function __construct(
     protected string $sitePath,
     protected RendererInterface $renderer,
-    protected DatabaseDriverList $databaseDriverList) {
+    protected DatabaseDriverList $databaseDriverList,
+  ) {
   }
 
   /**
@@ -87,18 +88,19 @@ class SiteSettingsForm extends FormBase {
     if (isset($input['driver'])) {
       $default_driver = $input['driver'];
       // In case of database connection info from settings.php, as well as for a
-      // programmed form submission (non-interactive installer), the table prefix
-      // information is usually normalized into an array already, but the form
-      // element only allows to configure one default prefix for all tables.
+      // programmed form submission (non-interactive installer), the table
+      // prefix information is usually normalized into an array already, but the
+      // form element only allows to configure one default prefix for all
+      // tables.
       $prefix = &$input[$default_driver]['prefix'];
       if (isset($prefix) && is_array($prefix)) {
         $prefix = $prefix['default'];
       }
       $default_options = $input[$default_driver];
     }
-    // If there is no database information yet, suggest the first available driver
-    // as default value, so that its settings form is made visible via #states
-    // when JavaScript is enabled (see below).
+    // If there is no database information yet, suggest the first available
+    // driver as default value, so that its settings form is made visible via
+    // #states when JavaScript is enabled (see below).
     else {
       $default_driver = current($drivers_keys);
       $default_options = [];
@@ -195,7 +197,7 @@ class SiteSettingsForm extends FormBase {
       // These are generic errors, so we do not have any specific key of the
       // database connection array to attach them to; therefore, we just put
       // them in the error array with standard numeric keys.
-      $form_errors[$database['driver'] . '][0'] = $this->renderer->renderPlain($error_message);
+      $form_errors[$database['driver'] . '][0'] = $this->renderer->renderInIsolation($error_message);
     }
 
     return $form_errors;
@@ -294,7 +296,7 @@ class SiteSettingsForm extends FormBase {
       // that they can later be added to git. Since this directory is
       // auto-created, we have to write out the README rather than just adding
       // it to the drupal core repo.
-      $text = 'This directory contains configuration to be imported into your Drupal site. To make this configuration active, visit admin/config/development/configuration/sync.' . ' For information about deploying configuration between servers, see https://www.drupal.org/documentation/administer/config';
+      $text = 'This directory contains configuration to be imported into your Drupal site. To make this configuration active, visit admin/config/development/configuration. For information about deploying configuration between servers, see https://www.drupal.org/documentation/administer/config';
       file_put_contents($config_sync_directory . '/README.txt', $text);
     }
 

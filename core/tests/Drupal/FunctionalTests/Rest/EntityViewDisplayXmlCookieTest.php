@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Rest;
 
 use Drupal\Tests\rest\Functional\CookieResourceTestTrait;
 use Drupal\Tests\rest\Functional\EntityResource\XmlEntityNormalizationQuirksTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @group rest
+ * Tests Entity View Display Xml Cookie.
  */
+#[Group('rest')]
 class EntityViewDisplayXmlCookieTest extends EntityViewDisplayResourceTestBase {
 
   use CookieResourceTestTrait;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\TestSite;
 
 use Drupal\Core\Extension\ModuleInstallerInterface;
@@ -10,7 +12,7 @@ use Drupal\comment\Entity\Comment;
 /**
  * Setup file used by TestSiteInstallTestScript.
  *
- * @see \Drupal\Tests\Scripts\TestSiteApplicationTest
+ * @see \Drupal\KernelTests\Scripts\TestSiteApplicationTest
  */
 class TestSiteOliveroInstallTestScript implements TestSetupInterface {
 
@@ -45,7 +47,8 @@ class TestSiteOliveroInstallTestScript implements TestSetupInterface {
     $article_with_comments->save();
 
     $values = [
-      // These values are for the entity that you're creating the comment for, not the comment itself.
+      // These values are for the entity that you're creating the comment for,
+      // not the comment itself.
       'entity_type' => 'node',
       'entity_id'   => 2,
       'field_name'  => 'comment',

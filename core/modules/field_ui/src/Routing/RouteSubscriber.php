@@ -74,14 +74,6 @@ class RouteSubscriber extends RouteSubscriberBase {
         $collection->add("entity.field_config.{$entity_type_id}_field_edit_form", $route);
 
         $route = new Route(
-          "$path/fields/{field_config}/storage",
-          ['_entity_form' => 'field_storage_config.edit'] + $defaults,
-          ['_permission' => 'administer ' . $entity_type_id . ' fields'],
-          $options
-        );
-        $collection->add("entity.field_config.{$entity_type_id}_storage_edit_form", $route);
-
-        $route = new Route(
           "$path/fields/{field_config}/delete",
           ['_entity_form' => 'field_config.delete'] + $defaults,
           ['_entity_access' => 'field_config.delete'],
@@ -101,15 +93,40 @@ class RouteSubscriber extends RouteSubscriberBase {
         $collection->add("entity.{$entity_type_id}.field_ui_fields", $route);
 
         $route = new Route(
+          "$path/fields/reset-add-field/{field_name}",
+          [
+            '_controller' => FieldStorageAddController::class . '::resetField',
+            '_title' => 'Add field',
+          ] + $defaults,
+          [
+            '_permission' => 'administer ' . $entity_type_id . ' fields',
+            '_csrf_token' => 'TRUE',
+          ],
+          $options
+        );
+        $collection->add("field_ui.field_storage_config_reset_add_$entity_type_id", $route);
+
+        $route = new Route(
           "$path/fields/add-field",
           [
-            '_form' => '\Drupal\field_ui\Form\FieldStorageAddForm',
+            '_controller' => FieldStorageAddController::class . '::getFieldSelectionLinks',
             '_title' => 'Add field',
           ] + $defaults,
           ['_permission' => 'administer ' . $entity_type_id . ' fields'],
           $options
         );
         $collection->add("field_ui.field_storage_config_add_$entity_type_id", $route);
+
+        $route = new Route(
+          "$path/fields/add-field/{selected_field_type}/{display_as_group}",
+          [
+            '_form' => '\Drupal\field_ui\Form\FieldStorageAddForm',
+            '_title' => 'Add Sub-field',
+          ] + $defaults,
+          ['_permission' => 'administer ' . $entity_type_id . ' fields'],
+          $options
+        );
+        $collection->add("field_ui.field_storage_config_add_sub_$entity_type_id", $route);
 
         $route = new Route(
           "$path/add-field/{entity_type}/{field_name}",
@@ -121,18 +138,6 @@ class RouteSubscriber extends RouteSubscriberBase {
           $options
         );
         $collection->add("field_ui.field_add_$entity_type_id", $route);
-
-        // @todo remove in https://www.drupal.org/project/drupal/issues/3347291.
-        $route = new Route(
-          "$path/add-storage/{entity_type}/{field_name}",
-          [
-            '_controller' => FieldStorageAddController::class . '::storageAddConfigureForm',
-            '_title' => 'Add storage',
-          ] + $defaults,
-          ['_permission' => 'administer ' . $entity_type_id . ' fields'],
-          $options
-        );
-        $collection->add("field_ui.field_storage_add_$entity_type_id", $route);
 
         $route = new Route(
           "$path/fields/reuse",

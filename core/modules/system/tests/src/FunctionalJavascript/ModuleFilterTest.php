@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the JavaScript functionality of the module filter.
- *
- * @group system
  */
+#[Group('system')]
+#[Group('#slow')]
 class ModuleFilterTest extends WebDriverTestBase {
 
   /**
@@ -36,7 +39,7 @@ class ModuleFilterTest extends WebDriverTestBase {
   /**
    * Tests that filter results announcement has correct pluralization.
    */
-  public function testModuleFilter() {
+  public function testModuleFilter(): void {
 
     // Find the module filter field.
     $this->drupalGet('admin/modules');

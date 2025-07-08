@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
 use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests the JavaScript functionality of the block add filter.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[IgnoreDeprecations]
 class BlockFilterTest extends WebDriverTestBase {
 
   /**
@@ -21,6 +25,7 @@ class BlockFilterTest extends WebDriverTestBase {
     'node',
     'datetime',
     'layout_builder',
+    'layout_builder_expose_all_field_blocks',
     'user',
   ];
 
@@ -49,7 +54,7 @@ class BlockFilterTest extends WebDriverTestBase {
   /**
    * Tests block filter.
    */
-  public function testBlockFilter() {
+  public function testBlockFilter(): void {
     $assert_session = $this->assertSession();
     $session = $this->getSession();
     $page = $session->getPage();
@@ -151,7 +156,7 @@ class BlockFilterTest extends WebDriverTestBase {
    * @return \Behat\Mink\Element\NodeElement[]
    *   An array of visible node elements.
    */
-  protected function filterVisibleElements(array $elements) {
+  protected function filterVisibleElements(array $elements): array {
     return array_filter($elements, function (NodeElement $element) {
       return $element->isVisible();
     });

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\help\Functional;
 
 use Drupal\Core\Extension\ExtensionLifecycle;
@@ -14,6 +16,7 @@ use PHPUnit\Framework\AssertionFailedError;
  * Verifies that all core Help topics can be rendered and comply with standards.
  *
  * @group help
+ * @group #slow
  */
 class HelpTopicsSyntaxTest extends BrowserTestBase {
 
@@ -34,8 +37,11 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
   /**
    * Tests that all Core help topics can be rendered and have good syntax.
    */
-  public function testHelpTopics() {
-    $this->drupalLogin($this->rootUser);
+  public function testHelpTopics(): void {
+    $this->drupalLogin($this->createUser([
+      'administer modules',
+      'access help pages',
+    ]));
 
     // Enable all modules and themes, so that all routes mentioned in topics
     // will be defined.
@@ -92,7 +98,7 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
    * @param int $response
    *   Expected response from visiting the page for the topic.
    */
-  protected function verifyTopic($id, $definitions, $response = 200) {
+  protected function verifyTopic($id, $definitions, $response = 200): void {
     $definition = $definitions[$id];
     HelpTestTwigNodeVisitor::setStateValue('manner', 0);
 
@@ -185,7 +191,7 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
    * @param string $id
    *   ID of help topic (for error messages).
    */
-  protected function validateHtml(string $body, string $id) {
+  protected function validateHtml(string $body, string $id): void {
     $doc = new \DOMDocument();
     $doc->strictErrorChecking = TRUE;
     $doc->validateOnParse = FALSE;
@@ -226,7 +232,7 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
    * @param array $definitions
    *   Array of all topic definitions, keyed by ID.
    */
-  protected function verifyBadTopic($id, $definitions) {
+  protected function verifyBadTopic($id, $definitions): void {
     $bad_topic_type = substr($id, 16);
     // Topics should fail verifyTopic() in specific ways.
     $found_error = FALSE;
@@ -329,7 +335,7 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
    * @return string
    *   The rendered topic.
    */
-  protected function renderHelpTopic(string $content, string $manner) {
+  protected function renderHelpTopic(string $content, string $manner): string {
     // Set up the special state variables for rendering.
     HelpTestTwigNodeVisitor::setStateValue('manner', $manner);
     HelpTestTwigNodeVisitor::setStateValue('max_chunk', -1);
@@ -341,7 +347,7 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
       '#type' => 'inline_template',
       '#template' => $content . "\n{# " . rand() . " #}",
     ];
-    return (string) \Drupal::service('renderer')->renderPlain($build);
+    return (string) \Drupal::service('renderer')->renderInIsolation($build);
   }
 
 }

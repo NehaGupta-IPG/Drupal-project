@@ -3,23 +3,33 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 
 /**
  * Provides a one-line text field form element.
  *
  * Properties:
- * - #maxlength: Maximum number of characters of input allowed.
- * - #size: The size of the input element in characters.
- * - #autocomplete_route_name: A route to be used as callback URL by the
+ *
+ * @property $maxlength
+ *   Maximum number of characters of input allowed.
+ * @property $size
+ *   The size of the input element in characters.
+ * @property $autocomplete_route_name
+ *   A route to be used as callback URL by the
  *   autocomplete JavaScript library.
- * - #autocomplete_route_parameters: An array of parameters to be used in
+ * @property $autocomplete_route_parameters
+ *   An array of parameters to be used in
  *   conjunction with the route name.
- * - #pattern: A string for the native HTML5 pattern attribute.
+ * @property $pattern
+ *   A string for the native HTML5 pattern attribute.
+ * @property $placeholder
+ *   A string to displayed in a textfield when it has no value.
  *
  * Usage example:
+ *
  * @code
- * $form['title'] = array(
+ * $form['title'] = [
  *   '#type' => 'textfield',
  *   '#title' => $this->t('Subject'),
  *   '#default_value' => $node->title,
@@ -27,42 +37,33 @@ use Drupal\Core\Render\Element;
  *   '#maxlength' => 128,
  *   '#pattern' => 'some-prefix-[a-z]+',
  *   '#required' => TRUE,
- * );
+ * ];
  * @endcode
  *
- * @see \Drupal\Core\Render\Element\Color
- * @see \Drupal\Core\Render\Element\Email
- * @see \Drupal\Core\Render\Element\MachineName
- * @see \Drupal\Core\Render\Element\Number
- * @see \Drupal\Core\Render\Element\Password
- * @see \Drupal\Core\Render\Element\PasswordConfirm
- * @see \Drupal\Core\Render\Element\Range
- * @see \Drupal\Core\Render\Element\Tel
- * @see \Drupal\Core\Render\Element\Url
- *
- * @FormElement("textfield")
+ * @see \Drupal\Core\Render\Element
+ * @see \Drupal\Core\Render\Element\Textarea
  */
-class Textfield extends FormElement {
+#[FormElement('textfield')]
+class Textfield extends FormElementBase {
 
   /**
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#size' => 60,
       '#maxlength' => 128,
       '#autocomplete_route_name' => FALSE,
       '#process' => [
-        [$class, 'processAutocomplete'],
-        [$class, 'processAjaxForm'],
-        [$class, 'processPattern'],
-        [$class, 'processGroup'],
+        [static::class, 'processAutocomplete'],
+        [static::class, 'processAjaxForm'],
+        [static::class, 'processPattern'],
+        [static::class, 'processGroup'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderTextfield'],
-        [$class, 'preRenderGroup'],
+        [static::class, 'preRenderTextfield'],
+        [static::class, 'preRenderGroup'],
       ],
       '#theme' => 'input__textfield',
       '#theme_wrappers' => ['form_element'],

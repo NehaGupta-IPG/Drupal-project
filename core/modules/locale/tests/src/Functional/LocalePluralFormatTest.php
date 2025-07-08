@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\Database\Database;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Tests\BrowserTestBase;
+
+// cspell:ignore nmsgid nmsgstr heure heures jours lundi ponedjeljak
 
 /**
  * Tests plural handling for various languages.
@@ -22,9 +26,7 @@ class LocalePluralFormatTest extends BrowserTestBase {
   protected $adminUser;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['locale'];
 
@@ -50,7 +52,7 @@ class LocalePluralFormatTest extends BrowserTestBase {
   /**
    * Tests locale_get_plural() and \Drupal::translation()->formatPlural().
    */
-  public function testGetPluralFormat() {
+  public function testGetPluralFormat(): void {
     // Import some .po files with formulas to set up the environment.
     // These will also add the languages to the system.
     $this->importPoFile($this->getPoFileWithSimplePlural(), [
@@ -142,7 +144,7 @@ class LocalePluralFormatTest extends BrowserTestBase {
         // Assert that the we get the right translation for that. Change the
         // expected index as per the logic for translation lookups.
         $expected_plural_index = ($count == 1) ? 0 : $expected_plural_index;
-        $expected_plural_string = str_replace('@count', $count, $plural_strings[$langcode][$expected_plural_index]);
+        $expected_plural_string = str_replace('@count', (string) $count, $plural_strings[$langcode][$expected_plural_index]);
         $this->assertSame($expected_plural_string, \Drupal::translation()->formatPlural($count, '@count hour', '@count hours', [], ['langcode' => $langcode])->render(), 'Plural translation of @count hour / @count hours for count ' . $count . ' in ' . $langcode . ' is ' . $expected_plural_string);
         // DO NOT use translation to pass translated strings into
         // PluralTranslatableMarkup::createFromTranslatedString() this way. It
@@ -159,7 +161,7 @@ class LocalePluralFormatTest extends BrowserTestBase {
   /**
    * Tests plural editing of DateFormatter strings.
    */
-  public function testPluralEditDateFormatter() {
+  public function testPluralEditDateFormatter(): void {
 
     // Import some .po files with formulas to set up the environment.
     // These will also add the languages to the system.
@@ -233,7 +235,7 @@ class LocalePluralFormatTest extends BrowserTestBase {
   /**
    * Tests plural editing and export functionality.
    */
-  public function testPluralEditExport() {
+  public function testPluralEditExport(): void {
     // Import some .po files with formulas to set up the environment.
     // These will also add the languages to the system.
     $this->importPoFile($this->getPoFileWithSimplePlural(), [
@@ -383,7 +385,7 @@ class LocalePluralFormatTest extends BrowserTestBase {
    * @param array $options
    *   Additional options to pass to the translation import form.
    */
-  public function importPoFile($contents, array $options = []) {
+  public function importPoFile($contents, array $options = []): void {
     $file_system = \Drupal::service('file_system');
     $name = $file_system->tempnam('temporary://', "po_") . '.po';
     file_put_contents($name, $contents);

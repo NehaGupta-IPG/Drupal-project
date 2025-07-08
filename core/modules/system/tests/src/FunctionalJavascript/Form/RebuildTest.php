@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\FunctionalJavascript\Form;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -7,13 +9,14 @@ use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests functionality of \Drupal\Core\Form\FormBuilderInterface::rebuildForm().
  *
- * @group Form
  * @todo Add tests for other aspects of form rebuilding.
  */
+#[Group('Form')]
 class RebuildTest extends WebDriverTestBase {
 
   /**
@@ -51,7 +54,7 @@ class RebuildTest extends WebDriverTestBase {
    * The 'action' attribute of a form should not change after an Ajax submission
    * followed by a non-Ajax submission, which triggers a validation error.
    */
-  public function testPreserveFormActionAfterAJAX() {
+  public function testPreserveFormActionAfterAJAX(): void {
     $page = $this->getSession()->getPage();
     // Create a multi-valued field for 'page' nodes to use for Ajax testing.
     $field_name = 'field_ajax_test';

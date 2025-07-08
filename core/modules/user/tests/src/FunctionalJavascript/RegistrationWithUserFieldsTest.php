@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\FunctionalJavascript;
 
-use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests user registration forms with additional fields.
- *
- * @group user
  */
+#[Group('user')]
 class RegistrationWithUserFieldsTest extends WebDriverTestBase {
 
   /**
@@ -50,7 +52,7 @@ class RegistrationWithUserFieldsTest extends WebDriverTestBase {
   /**
    * Tests Field API fields on user registration forms.
    */
-  public function testRegistrationWithUserFields() {
+  public function testRegistrationWithUserFields(): void {
     // Create a field on 'user' entity type.
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'test_user_field',
