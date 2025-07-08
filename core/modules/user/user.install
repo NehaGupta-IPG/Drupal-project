@@ -92,33 +92,6 @@ function user_install(): void {
 }
 
 /**
- * Implements hook_requirements().
- */
-function user_requirements($phase): array {
-  if ($phase !== 'runtime') {
-    return [];
-  }
-  $return = [];
-
-  $config = \Drupal::configFactory()->getEditable('user.settings');
-  $cancel_methods_options = $config->get('cancel_method_options');
-  if (empty($cancel_methods_options)) {
-
-    // If the user cancellation options are not configured
-    // it will show all of them, so it's not critical.
-    $return['user_cancel_methods'] = [
-      'title' => t('User cancellation methods'),
-      'severity' => REQUIREMENT_WARNING,
-      'value' => t('Missing cancellation methods'),
-      'description' => t('Review your user configuration on <a href="/admin/config/people/accounts">Account settings</a> and choose at least a user cancellation method.'),
-    ];
-  }
-
-  return $return;
-
-}
-
-/**
  * Implements hook_update_last_removed().
  */
 function user_update_last_removed(): int {
