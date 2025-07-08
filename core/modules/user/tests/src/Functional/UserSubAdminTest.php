@@ -91,10 +91,10 @@ class UserSubAdminTest extends BrowserTestBase {
     $cancel_user = $this->createUser();
     $this->drupalGet('user/' . $cancel_user->id() . '/cancel');
     $this->assertSession()->responseContains('Are you sure you want to cancel the account ' . $cancel_user->getAccountName() . '?');
-    $this->assertSession()->responseContains('Disable the account and keep its content.');
-    $this->assertSession()->responseContains('Disable the account and unpublish its content.');
-    $this->assertSession()->responseNotContains('Delete the account and make its content belong to the');
-    $this->assertSession()->responseNotContains('Delete the account and its content. This action cannot be undone.');
+    $this->assertSession()->fieldExists('user_cancel_method[user_cancel_block]');
+    $this->assertSession()->fieldExists('user_cancel_method[user_cancel_block_unpublish]');
+    $this->assertSession()->fieldNotExists('user_cancel_method[user_cancel_reassign]');
+    $this->assertSession()->fieldNotExists('user_cancel_method[user_cancel_delete]');
   }
 
   /**
