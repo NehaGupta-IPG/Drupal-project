@@ -34,6 +34,7 @@ class RendererTest extends RendererTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    // Implement fromRenderable for the types defined in the mock for getInfo().
     $this->elementInfo->expects($this->any())
       ->method('fromRenderable')
       ->willReturnCallback(function (ElementInterface|array &$element, string $class = Generic::class): ElementInterface {
@@ -518,6 +519,8 @@ class RendererTest extends RendererTestBase {
   }
 
   /**
+   * Same as testRenderBasic(), but with render element objects instead.
+   *
    * @covers ::render
    * @covers ::doRender
    *
@@ -577,6 +580,8 @@ class RendererTest extends RendererTestBase {
         '#markup' => $first,
       ],
     ];
+    // Make a copy of the build array before it's modified during render. This
+    // copy will be used to create a render element object.
     $elements_copy = $elements;
     $output = (string) $this->renderer->renderRoot($elements);
 
@@ -594,14 +599,14 @@ class RendererTest extends RendererTestBase {
     $this->assertSame('first', array_shift($children), 'Child found in the correct order.');
     $this->assertSame('second', array_shift($children), 'Child found in the correct order.');
 
+    // Test same assertions when rendering a render element object instead.
     $elements_object = $this->elementInfo->fromRenderable($elements_copy);
     $output = (string) $this->renderer->renderRoot($elements_object);
-    // The lowest weight element should appear last in $output.
     $this->assertGreaterThan(strpos($output, $first), strpos($output, $second));
     $children = $elements_object->getChildren();
-    $this->assertSame('first', $children->key(), 'Child found in the correct order.');
+    $this->assertSame('first', $children->key());
     $children->next();
-    $this->assertSame('second', $children->key(), 'Child found in the correct order.');
+    $this->assertSame('second', $children->key());
   }
 
   /**
@@ -623,12 +628,15 @@ class RendererTest extends RendererTestBase {
       ],
       '#sorted' => TRUE,
     ];
+    // Make a copy of the build array before it's modified during render. This
+    // copy will be used to create a render element object.
     $elements_copy = $elements;
     $output = (string) $this->renderer->renderRoot($elements);
 
     // The elements should appear in output in the same order as the array.
     $this->assertLessThan(strpos($output, $first), strpos($output, $second));
 
+    // Test same assertions when rendering a render element object instead.
     $elements_object = $this->elementInfo->fromRenderable($elements_copy);
     $output = (string) $this->renderer->renderRoot($elements_object);
     $this->assertLessThan(strpos($output, $first), strpos($output, $second));
@@ -657,11 +665,14 @@ class RendererTest extends RendererTestBase {
       ],
       '#create_placeholder' => FALSE,
     ];
+    // Make a copy of the build array before it's modified during render. This
+    // copy will be used to create a render element object.
     $build_copy = $build;
 
     $this->renderer->renderInIsolation($build);
     $this->assertArrayNotHasKey('#defaults_loaded', $build, "A lazy builder that did not set a type had no type defaults loaded.");
 
+    // Test same assertions when rendering a render element object instead.
     $build_object = $this->elementInfo->fromRenderable($build_copy);
     $this->renderer->renderInIsolation($build_object);
     $this->assertNull($build_object->defaults_loaded);
@@ -678,6 +689,7 @@ class RendererTest extends RendererTestBase {
     $this->renderer->renderInIsolation($build);
     $this->assertTrue($build['#defaults_loaded'], "A lazy builder that set a type had said type's defaults loaded.");
 
+    // Test same assertions when rendering a render element object instead.
     $build_object = $this->elementInfo->fromRenderable($build_copy);
     $this->renderer->renderInIsolation($build_object);
     $this->assertTrue($build_object->defaults_loaded);
@@ -773,12 +785,15 @@ class RendererTest extends RendererTestBase {
     $build = [
       '#access' => AccessResult::allowed()->addCacheContexts(['user']),
     ];
+    // Make a copy of the build array before it's modified during render. This
+    // copy will be used to create a render element object.
     $build_copy = $build;
 
     $this->renderer->renderInIsolation($build);
 
     $this->assertEqualsCanonicalizing(['languages:language_interface', 'theme', 'user'], $build['#cache']['contexts']);
 
+    // Test same assertions when rendering a render element object instead.
     $build_object = $this->elementInfo->fromRenderable($build_copy);
     $this->renderer->renderInIsolation($build_object);
     $this->assertEqualsCanonicalizing(['languages:language_interface', 'theme', 'user'], $build_object->cache['contexts']);
@@ -797,6 +812,8 @@ class RendererTest extends RendererTestBase {
    * @dataProvider providerRenderTwice
    */
   public function testRenderTwice($build): void {
+    // Make a copy of the build array before it's modified during render. This
+    // copy will be used to create a render element object.
     $build_copy = $build;
     $this->assertEquals('kittens', $this->renderer->renderRoot($build));
     $this->assertEquals('kittens', $build['#markup']);
@@ -806,6 +823,7 @@ class RendererTest extends RendererTestBase {
     // We don't want to reprint already printed render arrays.
     $this->assertEquals('', $this->renderer->renderRoot($build));
 
+    // Test same assertions when rendering a render element object instead.
     $build_object = $this->elementInfo->fromRenderable($build_copy);
     $this->assertEquals('kittens', $this->renderer->renderRoot($build_object));
     $this->assertEquals('kittens', $build_object->markup);
@@ -864,10 +882,13 @@ class RendererTest extends RendererTestBase {
         '#markup' => 'kittens',
       ],
     ];
+    // Make a copy of the build array before it's modified during render. This
+    // copy will be used to create a render element object.
     $build_copy = $build;
 
     $this->assertEquals('', $this->renderer->renderRoot($build));
 
+    // Test same assertions when rendering a render element object instead.
     $build_object = $this->elementInfo->fromRenderable($build_copy);
     $this->assertEquals('', $this->renderer->renderRoot($build_object));
   }
@@ -936,6 +957,8 @@ class RendererTest extends RendererTestBase {
   }
 
   /**
+   * Same as testRenderWithoutThemeArguments(), except using render objects.
+   *
    * @covers ::render
    * @covers ::doRender
    */
@@ -977,6 +1000,8 @@ class RendererTest extends RendererTestBase {
   }
 
   /**
+   * Same as testRenderWithThemeArguments(), except using render objects.
+   *
    * @covers ::render
    * @covers ::doRender
    */
@@ -1083,6 +1108,8 @@ class RendererTest extends RendererTestBase {
   }
 
   /**
+   * Same as testRenderCache(), except with render element objects.
+   *
    * @covers ::render
    * @covers ::doRender
    * @covers \Drupal\Core\Render\RenderCache::get
@@ -1166,6 +1193,8 @@ class RendererTest extends RendererTestBase {
   }
 
   /**
+   * Same as testRenderCacheMaxAge(), except with render element objects.
+   *
    * @covers ::render
    * @covers ::doRender
    * @covers \Drupal\Core\Render\RenderCache::get
@@ -1261,7 +1290,7 @@ class RendererTest extends RendererTestBase {
   }
 
   /**
-   * Tests that #cache_properties are properly handled.
+   * Same as testRenderCacheProperties(), except with render element objects.
    *
    * @param array $expected_results
    *   An associative array of expected results keyed by property name.

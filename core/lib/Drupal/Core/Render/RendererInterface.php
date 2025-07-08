@@ -91,7 +91,7 @@ interface RendererInterface {
   public function renderPlaceholder($placeholder, /* ElementInterface|*/array $elements);
 
   /**
-   * Renders HTML given a structured array tree.
+   * Renders HTML given a structured array tree or its wrapping render object.
    *
    * Renderable arrays have two kinds of key/value pairs: properties and
    * children. Properties have keys starting with '#' and their values influence
