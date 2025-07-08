@@ -131,7 +131,6 @@ class UserSubAdminTest extends BrowserTestBase {
 
     // Check validation:
     // At least one user cancellation option should be enabled.
-    $container = current($this->getSession()->getDriver()->find('.//fieldset[@id="edit-user-cancel-method-options--wrapper"]'));
     $this->getSession()->getDriver()->uncheck('.//input[@name="user_cancel_method_options[user_cancel_block_unpublish]"]');
     $this->assertSession()->checkboxNotChecked('Disable the account and keep its content.', $container);
     $this->assertSession()->checkboxNotChecked('Disable the account and unpublish its content.', $container);
