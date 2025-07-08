@@ -15,9 +15,9 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests Drupal\Component\Plugin\Discovery\DiscoveryCachedTrait.
  */
-#[CoversClass(DiscoveryCachedTrait::class)]
+#[CoversTrait(DiscoveryCachedTrait::class)]
 #[Group('Plugin')]
-#[UsesClass(DiscoveryTrait::class)]
+#[UsesTrait(DiscoveryTrait::class)]
 class DiscoveryCachedTraitTest extends TestCase {
 
   /**

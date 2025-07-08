@@ -58,7 +58,6 @@ class AnnotatedClassDiscoveryTest extends TestCase {
   /**
    * Make sure AnnotatedClassDiscovery never tries to autoload bad annotations.
    */
-  #[CoversNothing]
   #[DataProvider('provideBadAnnotations')]
   public function testAutoloadBadAnnotations($annotation): void {
     // Set up a class file in vfsStream.
