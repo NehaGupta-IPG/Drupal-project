@@ -25,11 +25,11 @@ final class InputConfigurator {
   private array $data = [];
 
   /**
-   * The collected input values, or NULL if none have been collected yet.
+   * The collected input values.
    *
-   * @var mixed[]|null
+   * @var mixed[]
    */
-  private ?array $values = NULL;
+  private array $values = [];
 
   /**
    * @param array<string, array<string, mixed>> $definitions
@@ -72,7 +72,7 @@ final class InputConfigurator {
         $definition['constraints'],
       );
       $data_definition->setSettings($definition);
-      $this->data[$name] = $typedDataManager->create($data_definition);
+      $this->data[$name] = $typedDataManager->create($data_definition, name: "$prefix.$name");
     }
   }
 
@@ -96,7 +96,7 @@ final class InputConfigurator {
    *   The collected input values, keyed by name.
    */
   public function getValues(): array {
-    return $this->values ?? [];
+    return $this->values;
   }
 
   /**
@@ -112,9 +112,9 @@ final class InputConfigurator {
     foreach ($this->dependencies->recipes as $dependency) {
       $descriptions = array_merge($descriptions, $dependency->input->describeAll());
     }
-    foreach ($this->getDataDefinitions() as $key => $definition) {
-      $name = $this->prefix . '.' . $key;
-      $descriptions[$name] = $definition->getDescription();
+    foreach ($this->data as $data) {
+      $name = $data->getName();
+      $descriptions[$name] = $data->getDataDefinition()->getDescription();
     }
     return $descriptions;
   }
@@ -131,13 +131,15 @@ final class InputConfigurator {
    * @throws \Symfony\Component\Validator\Exception\ValidationFailedException
    *   Thrown if any of the collected values violate their validation
    *   constraints.
+   * @throws \LogicException
+   *   Thrown if input values have already been collected for this recipe.
    */
   public function collectAll(InputCollectorInterface $collector, array &$processed = []): void {
     // Don't bother collecting values for a recipe we've already seen.
     if (in_array($this->prefix, $processed, TRUE)) {
       return;
     }
-    if (is_array($this->values)) {
+    if ($this->values) {
       throw new \LogicException('Input values cannot be changed once they have been set.');
     }
     // First, collect values for the recipe's dependencies.
@@ -146,12 +148,11 @@ final class InputConfigurator {
       $dependency->input->collectAll($collector, $processed);
     }
 
-    $this->values = [];
     foreach ($this->data as $key => $data) {
       $definition = $data->getDataDefinition();
 
       $value = $collector->collectValue(
-        $this->prefix . '.' . $key,
+        $data->getName(),
         $definition,
         $this->getDefaultValue($definition),
       );
@@ -159,7 +160,7 @@ final class InputConfigurator {
 
       $violations = $data->validate();
       if (count($violations) > 0) {
-        throw new ValidationFailedException($value, $violations);
+        throw new ValidationFailedException($data, $violations);
       }
       $this->values[$key] = $data->getCastedValue();
     }
@@ -170,12 +171,17 @@ final class InputConfigurator {
    * Returns the default value for an input definition.
    *
    * @param array $definition
-   *   An input definition. Must contain a `source` element, which can be either
-   *   'config' or 'value'. If `source` is 'config', then there must also be a
-   *   `config` element, which is a two-element indexed array containing
-   *   (in order) the name of an extant config object, and a property path
-   *   within that object. If `source` is 'value', then there must be a `value`
-   *   element, which will be returned as-is.
+   *   An input definition. Must contain a `source` element, which can be one
+   *   of `config`, `env`, or `value`:
+   *   - If `source` is `config`, there must also be a `config` element, which
+   *     is a two-element indexed array containing (in order) the name of an
+   *     extant config object, and a property path within that object.
+   *   - If `source` is `env`, there must also be an `env` element, which is
+   *     the name of an environment variable to return. The value will always
+   *     be returned as a string. If the environment variable is not set, an
+   *     empty string will be returned.
+   *   - If `source` is 'value', then there must be a `value` element, which
+   *    will be returned as-is.
    *
    * @return mixed
    *   The default value.
@@ -190,6 +196,17 @@ final class InputConfigurator {
         throw new \RuntimeException("The '$name' config object does not exist.");
       }
       return $config->get($key);
+    }
+    elseif ($settings['source'] === 'env') {
+      // getenv() accepts NULL to return an array of all environment variables,
+      // but this makes no sense in a recipe. There is no valid situation where
+      // the name of the environment variable should be empty.
+      if (empty($settings['env'])) {
+        throw new \RuntimeException("The name of the environment variable cannot be empty.");
+      }
+      // If the variable doesn't exist, getenv() returns FALSE; we can represent
+      // that as an empty string.
+      return (string) getenv($settings['env']);
     }
     return $settings['value'];
   }

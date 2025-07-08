@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
+use Drupal\jsonapi\JsonApiSpec;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
@@ -142,10 +143,10 @@ class UserTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
           ],
         ],
-        'version' => '1.0',
+        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
       ],
       'links' => [
         'self' => ['href' => $self_url],
@@ -473,7 +474,7 @@ class UserTest extends ResourceTestBase {
 
     $response = $this->request('GET', $collection_url, $request_options);
     $expected_cache_contexts = ['url.path', 'url.query_args', 'url.site'];
-    $this->assertResourceErrorResponse(400, "Filtering on config entities is not supported by Drupal's entity API. You tried to filter on a Role config entity.", $collection_url, $response, FALSE, ['4xx-response', 'http_response'], $expected_cache_contexts, FALSE, 'MISS');
+    $this->assertResourceErrorResponse(400, "Filtering on config entities is not supported by Drupal's entity API. You tried to filter on a Role config entity.", $collection_url, $response, FALSE, ['4xx-response', 'http_response'], $expected_cache_contexts, NULL, 'MISS');
   }
 
   /**
@@ -690,6 +691,7 @@ class UserTest extends ResourceTestBase {
 
   /**
    * Tests if JSON:API respects user.settings.cancel_method: user_cancel_block_unpublish.
+   *
    * @group jsonapi
    */
   public function testDeleteRespectsUserCancelBlockUnpublishAndProcessesBatches(): void {

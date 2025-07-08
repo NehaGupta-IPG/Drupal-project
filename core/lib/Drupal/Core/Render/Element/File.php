@@ -13,8 +13,11 @@ use Drupal\Core\Render\Element;
  * will automatically be added to the form element.
  *
  * Properties:
- * - #multiple: A Boolean indicating whether multiple files may be uploaded.
- * - #size: The size of the file input element in characters.
+ *
+ * @property $multiple
+ *   A Boolean indicating whether multiple files may be uploaded.
+ * @property $size
+ *   The size of the file input element in characters.
  *
  * The value of this form element will always be an array of
  * \Symfony\Component\HttpFoundation\File\UploadedFile objects, regardless of
@@ -27,21 +30,20 @@ class File extends FormElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#multiple' => FALSE,
       '#process' => [
-        [$class, 'processFile'],
+        [static::class, 'processFile'],
       ],
       '#size' => 60,
       '#pre_render' => [
-        [$class, 'preRenderFile'],
+        [static::class, 'preRenderFile'],
       ],
       '#theme' => 'input__file',
       '#theme_wrappers' => ['form_element'],
       '#value_callback' => [
-        [$class, 'valueCallback'],
+        [static::class, 'valueCallback'],
       ],
     ];
   }

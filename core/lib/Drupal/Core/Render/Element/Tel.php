@@ -12,8 +12,11 @@ use Drupal\Core\Render\Element;
  * validation.
  *
  * Properties:
- * - #size: The size of the input element in characters.
- * - #pattern: A string for the native HTML5 pattern attribute.
+ *
+ * @property $size
+ *   The size of the input element in characters.
+ * @property $pattern
+ *   A string for the native HTML5 pattern attribute.
  *
  * Usage example:
  * @code
@@ -33,19 +36,18 @@ class Tel extends FormElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#size' => 30,
       '#maxlength' => 128,
       '#autocomplete_route_name' => FALSE,
       '#process' => [
-        [$class, 'processAutocomplete'],
-        [$class, 'processAjaxForm'],
-        [$class, 'processPattern'],
+        [static::class, 'processAutocomplete'],
+        [static::class, 'processAjaxForm'],
+        [static::class, 'processPattern'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderTel'],
+        [static::class, 'preRenderTel'],
       ],
       '#theme' => 'input__tel',
       '#theme_wrappers' => ['form_element'],

@@ -11,7 +11,9 @@ use Drupal\Component\Utility\Color as ColorUtility;
  * Provides a form element for choosing a color.
  *
  * Properties:
- * - #default_value: Default value, in a format like #ffffff.
+ *
+ * @property $default_value
+ *   Default value, in a format like #ffffff.
  *
  * Example usage:
  * @code
@@ -29,17 +31,16 @@ class Color extends FormElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#process' => [
-        [$class, 'processAjaxForm'],
+        [static::class, 'processAjaxForm'],
       ],
       '#element_validate' => [
-        [$class, 'validateColor'],
+        [static::class, 'validateColor'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderColor'],
+        [static::class, 'preRenderColor'],
       ],
       '#theme' => 'input__color',
       '#theme_wrappers' => ['form_element'],

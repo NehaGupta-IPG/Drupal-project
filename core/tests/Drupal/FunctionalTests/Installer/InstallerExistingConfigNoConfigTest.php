@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Installer;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Verifies that profiles invalid config can not be installed.
- *
- * @group Installer
  */
+#[Group('Installer')]
 class InstallerExistingConfigNoConfigTest extends InstallerConfigDirectoryTestBase {
 
   /**
@@ -16,6 +17,9 @@ class InstallerExistingConfigNoConfigTest extends InstallerConfigDirectoryTestBa
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected $profile = 'no_config_profile';
 
   /**

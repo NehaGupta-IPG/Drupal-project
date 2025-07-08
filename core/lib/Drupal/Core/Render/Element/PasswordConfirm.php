@@ -12,7 +12,9 @@ use Drupal\Core\Render\Attribute\FormElement;
  * entered passwords match.
  *
  * Properties:
- * - #size: The size of the input element in characters.
+ *
+ * @property $size
+ *   The size of the input element in characters.
  *
  * Usage example:
  * @code
@@ -32,12 +34,11 @@ class PasswordConfirm extends FormElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#markup' => '',
       '#process' => [
-        [$class, 'processPasswordConfirm'],
+        [static::class, 'processPasswordConfirm'],
       ],
       '#theme_wrappers' => ['form_element'],
     ];

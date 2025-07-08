@@ -10,12 +10,12 @@ use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Ensure that password reset methods work as expected.
- *
- * @group user
  */
+#[Group('user')]
 class UserPasswordResetTest extends WebDriverTestBase {
 
   use AssertMailTrait {
@@ -83,6 +83,12 @@ class UserPasswordResetTest extends WebDriverTestBase {
     // Reset the password by username via the password reset page.
     $edit['name'] = $this->account->getAccountName();
     $this->submitForm($edit, 'Submit');
+
+    // Check that the email message body does not contain HTML entities
+    // Assume the most recent email.
+    $_emails = $this->drupalGetMails();
+    $email = end($_emails);
+    $this->assertEquals(htmlspecialchars_decode($email['body']), $email['body'], 'The body text of the email contains HTML entities');
 
     $resetURL = $this->getResetURL();
     $this->drupalGet($resetURL);

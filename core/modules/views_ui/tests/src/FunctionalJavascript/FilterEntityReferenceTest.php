@@ -7,13 +7,14 @@ namespace Drupal\Tests\views_ui\FunctionalJavascript;
 use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\views_ui\Traits\FilterEntityReferenceTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests views creation wizard.
  *
- * @group views_ui
  * @see \Drupal\views\Plugin\views\filter\EntityReference
  */
+#[Group('views_ui')]
 class FilterEntityReferenceTest extends WebDriverTestBase {
 
   use FilterEntityReferenceTrait;
@@ -110,6 +111,7 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
     // Test the exposed filter options show up correctly.
     $assert->waitForField('options[expose_button][checkbox][checkbox]');
     $page->findField('options[expose_button][checkbox][checkbox]')->click();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertTrue($page->hasCheckedField('options[expose_button][checkbox][checkbox]'));
 
     // Check the exposed filters multiple option.
@@ -210,6 +212,7 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
     // Test the exposed filter options show up correctly.
     $assert->waitForField('options[expose_button][checkbox][checkbox]');
     $page->findField('options[expose_button][checkbox][checkbox]')->click();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertTrue($page->hasCheckedField('options[expose_button][checkbox][checkbox]'));
 
     // Check the exposed filters multiple option.

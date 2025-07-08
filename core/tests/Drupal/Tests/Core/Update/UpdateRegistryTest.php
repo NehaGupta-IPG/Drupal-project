@@ -61,6 +61,7 @@ EOS;
     $info_d = <<<'EOS'
 type: theme
 name: Theme D
+core_version_requirement: '*'
 EOS;
 
     $module_a = <<<'EOS'
@@ -194,7 +195,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -277,7 +278,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -320,7 +321,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -372,7 +373,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -442,7 +443,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -485,7 +486,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -525,7 +526,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -600,7 +601,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -637,6 +638,7 @@ EOS;
     $info_d = <<<'EOS'
 type: theme
 name: Theme D
+core_version_requirement: '*'
 EOS;
 
     $module_a = <<<'EOS'
@@ -687,7 +689,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
