@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\toolbar\FunctionalJavascript;
 
-use Behat\Mink\Element\ElementInterface;
 use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -149,8 +148,11 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
    *
    * The built-in function may be failing due to syn.js not setting
    * the `bubbles` property in the event options.
+   *
+   * @param \Behat\Mink\Element\NodeElement $element
+   *   The element on which the event is to be triggered.
    */
-  private function keyDownSpace(ElementInterface $element): void {
+  private function keyDownSpace(NodeElement $element): void {
     $script = <<<JS
 document
   .evaluate("{$element->getXpath()}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
