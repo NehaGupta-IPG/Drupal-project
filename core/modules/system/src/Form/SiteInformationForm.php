@@ -123,7 +123,8 @@ class SiteInformationForm extends ConfigFormBase {
       '#config_target' => new ConfigTarget(
         'system.site',
         'page.front',
-        fromConfig: fn($value) => $this->aliasManager->getPathByAlias($value),
+        fromConfig: fn($value) => $this->aliasManager->getAliasByPath($value),
+        toConfig: fn($value) => $this->aliasManager->getPathByAlias($value),
       ),
       '#required' => TRUE,
       '#size' => 40,
@@ -141,7 +142,8 @@ class SiteInformationForm extends ConfigFormBase {
       '#config_target' => new ConfigTarget(
         'system.site',
         'page.403',
-        fromConfig: fn($value) => $this->aliasManager->getPathByAlias($value),
+        fromConfig: fn($value) => $this->aliasManager->getAliasByPath($value),
+        toConfig: fn($value) => $this->aliasManager->getPathByAlias($value),
       ),
       '#size' => 40,
       '#description' => $this->t('This page is displayed when the requested document is denied to the current user. Leave blank to display a generic "access denied" page.'),
@@ -152,7 +154,8 @@ class SiteInformationForm extends ConfigFormBase {
       '#config_target' => new ConfigTarget(
         'system.site',
         'page.404',
-        fromConfig: fn($value) => $this->aliasManager->getPathByAlias($value),
+        fromConfig: fn($value) => $this->aliasManager->getAliasByPath($value),
+        toConfig: fn($value) => $this->aliasManager->getPathByAlias($value),
       ),
       '#size' => 40,
       '#description' => $this->t('This page is displayed when no other content matches the requested document. Leave blank to display a generic "page not found" page.'),
