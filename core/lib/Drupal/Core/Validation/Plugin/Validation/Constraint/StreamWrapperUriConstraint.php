@@ -4,7 +4,8 @@ namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Symfony\Component\Validator\Constraint;
+use Drupal\Core\Validation\Attribute\Constraint;
+use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
 #[Constraint(
   id: 'StreamWrapperUri',
@@ -13,7 +14,7 @@ use Symfony\Component\Validator\Constraint;
 /**
  * Checks if string is a valid stream wrapper URI.
  */
-class StreamWrapperUriConstraint extends Constraint {
+class StreamWrapperUriConstraint extends SymfonyConstraint {
 
   /**
    * {@inheritdoc}
