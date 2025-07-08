@@ -373,7 +373,7 @@ class PhpUnitTestDiscovery {
     if (($metadata = $test->valueObjectForEvents()->metadata()->isCoversClass()) && $metadata->isNotEmpty()) {
       $description = sprintf('Tests %s.', $metadata->asArray()[0]->className());
     }
-    elseif (($metadata = $test->valueObjectForEvents()->metadata()->isCoversDefaultClass()) && $metadata->isNotEmpty()) {
+    elseif (RunnerVersion::getMajor() < 12 && ($metadata = $test->valueObjectForEvents()->metadata()->isCoversDefaultClass()) && $metadata->isNotEmpty()) {
       $description = sprintf('Tests %s.', $metadata->asArray()[0]->className());
     }
     else {
