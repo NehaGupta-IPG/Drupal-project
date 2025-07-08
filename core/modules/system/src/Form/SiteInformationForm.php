@@ -2,7 +2,6 @@
 
 namespace Drupal\system\Form;
 
-use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
@@ -81,8 +80,6 @@ class SiteInformationForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $site_config = $this->config('system.site');
-
     $form['site_information'] = [
       '#type' => 'details',
       '#title' => $this->t('Site details'),
