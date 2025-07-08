@@ -260,6 +260,17 @@ system.action.*.third_party.config_test:
       type: integer
       label: 'Integer'
 
+config_test.validation.giraffes:
+  type: sequence
+  constraints:
+    Callback:
+      callback: [\Drupal\config_test\ConfigValidation, validateSequence]
+  sequence:
+    type: string
+    constraints:
+      Callback:
+        callback: [\Drupal\config_test\ConfigValidation, validateGiraffes]
+
 config_test.validation:
   type: config_object
   label: 'Configuration type'
@@ -267,6 +278,8 @@ config_test.validation:
     Callback:
       callback: [\Drupal\config_test\ConfigValidation, validateMapping]
   mapping:
+    zoo:
+      type: boolean
     llama:
       type: string
       constraints:
@@ -285,16 +298,17 @@ config_test.validation:
           constraints:
             Callback:
               callback: [\Drupal\config_test\ConfigValidation, validateCatCount]
-    giraffe:
-      type: sequence
-      constraints:
-        Callback:
-          callback: [\Drupal\config_test\ConfigValidation, validateSequence]
-      sequence:
-        type: string
-        constraints:
-          Callback:
-            callback: [\Drupal\config_test\ConfigValidation, validateGiraffes]
+    giraffes:
+      type: mapping
+      mapping:
+        unsorted:
+          type: config_test.validation.giraffes
+        sorted_by_key:
+          type: config_test.validation.giraffes
+          orderby: key
+        sorted_by_value:
+          type: config_test.validation.giraffes
+          orderby: value
     uuid:
       type: uuid
 

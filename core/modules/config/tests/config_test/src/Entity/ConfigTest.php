@@ -160,6 +160,10 @@ class ConfigTest extends ConfigEntityBase implements ConfigTestInterface {
     $called[$this->id()] = $dependencies;
     $called[$this->id()]['config'] = array_keys($called[$this->id()]['config']);
     $called[$this->id()]['content'] = array_keys($called[$this->id()]['content']);
+    // Tests should worry about which values are returned, not about their order
+    // nor their keys.
+    // @see \Drupal\KernelTests\Core\Config\ConfigDependencyTest
+    sort($called[$this->id()]['module']);
     \Drupal::state()->set('config_test.on_dependency_removal_called', $called);
 
     $changed = parent::onDependencyRemoval($dependencies);

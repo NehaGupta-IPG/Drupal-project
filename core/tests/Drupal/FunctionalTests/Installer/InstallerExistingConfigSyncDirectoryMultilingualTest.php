@@ -65,16 +65,8 @@ class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerConf
    * Confirms that the installation installed the configuration correctly.
    */
   public function testConfigSync(): void {
+    parent::testConfigSync();
     $comparer = $this->configImporter()->getStorageComparer();
-    $expected_changelist_default_collection = [
-      'create' => [],
-      // The system.mail is changed configuration because the test system
-      // changes it to ensure that mails are not sent.
-      'update' => ['system.mail'],
-      'delete' => [],
-      'rename' => [],
-    ];
-    $this->assertEquals($expected_changelist_default_collection, $comparer->getChangelist());
     $expected_changelist_spanish_collection = [
       'create' => [],
       // The view was untranslated but the translation exists so the installer

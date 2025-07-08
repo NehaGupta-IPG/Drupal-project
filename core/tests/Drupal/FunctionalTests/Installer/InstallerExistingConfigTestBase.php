@@ -162,6 +162,12 @@ abstract class InstallerExistingConfigTestBase extends InstallerTestBase {
       'delete' => [],
       'rename' => [],
     ];
+    // TRICKY: only the multilingual config tarball contains `views.settings`,
+    // and that still contains the `skip_cache` key that was removed in
+    // https://www.drupal.org/node/2541074.
+    if (str_contains($this->getConfigTarball(), 'multilingual')) {
+      $expected['update'][] = 'views.settings';
+    }
     $this->assertEquals($expected, $change_list);
   }
 

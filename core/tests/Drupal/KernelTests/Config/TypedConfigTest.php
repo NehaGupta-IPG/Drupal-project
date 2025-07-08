@@ -13,6 +13,7 @@ use Drupal\Core\TypedData\Type\IntegerInterface;
 use Drupal\Core\TypedData\Type\StringInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Yaml\Yaml;
 
 // cspell:ignore nyans
 
@@ -43,6 +44,101 @@ class TypedConfigTest extends KernelTestBase {
   }
 
   /**
+   * Test cases for ::testGetCanonicalRepresentation().
+   */
+  public static function providerGetCanonicalRepresentation(): array {
+    $config = Yaml::parseFile('core/modules/config/tests/config_test/config/install/config_test.validation.yml');
+
+    $cases = [];
+    $cases['original'] = [$config];
+
+    // If this were in the YAML file above, it would trigger
+    // `config_test.validation:cat.count variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\IntegerData`
+    $config_int_is_string = $config;
+    $config_int_is_string['cat']['count'] = '2';
+    $cases['Intentionally make the integer a string'] = [$config_int_is_string];
+
+    // If this were in the YAML file above, it would trigger
+    // `config_test.validation:zoo variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData`
+    $config_bool_is_true_string = $config;
+    $config_bool_is_true_string['zoo'] = 'TRUE';
+    $cases['Intentionally make the boolean the string "TRUE"'] = [$config_bool_is_true_string];
+    // If this were in the YAML file above, it would trigger
+    // `config_test.validation:zoo variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData`
+    $config_bool_is_true_string = $config;
+    $config_bool_is_true_string['zoo'] = '1';
+    $cases['Intentionally make the boolean the string "1"'] = [$config_bool_is_true_string];
+    // If this were in the YAML file above, it would trigger
+    // `config_test.validation:zoo variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData`
+    $config_bool_is_true_string = $config;
+    $config_bool_is_true_string['zoo'] = 'test';
+    $cases['Intentionally make the boolean the string "test"'] = [$config_bool_is_true_string];
+
+    // This actually is already tested by the YAML file itself (which also has
+    // the llama in the wrong location), but moving it elsewhere still has the
+    // same result.
+    $config_wrong_llama = array_diff_key($config, array_flip(['llama']));
+    $config_wrong_llama += $config;
+    $cases['Intentionally put `llama` in a different wrong location: at the end'] = [$config_wrong_llama];
+
+    // If this were in the YAML file above, it would trigger a validation error.
+    // Intentionally add a key-value pair to the mapping that does not exist in
+    // config schema, ::getCanonicalRepresentation() should put it after the
+    // known mapping keys, so at the very end.
+    $config_with_non_existent_key_first = ['non_existent' => 'something that does not exist in schema'] + $config;
+    $cases['Intentionally add a mapping key-value pair that does not exist in the schema'] = [
+      $config_with_non_existent_key_first,
+      ['non_existent' => 'something that does not exist in schema'],
+    ];
+
+    return $cases;
+  }
+
+  /**
+   * Slightly breaking the raw config yields the same canonical representation.
+   *
+   * @dataProvider providerGetCanonicalRepresentation
+   */
+  public function testGetCanonicalRepresentation(array $config_data, array $extra_unknown_top_level_keys_to_expect = []): void {
+    /** @var \Drupal\Core\Config\TypedConfigManagerInterface $typed_config_manager */
+    $typed_config_manager = \Drupal::service('config.typed');
+
+    /** @var \Drupal\Core\Config\Schema\TypedConfigInterface $typed_config */
+    $typed_config = $typed_config_manager->createFromNameAndData('config_test.validation', $config_data);
+
+    // Note how this ordering matches that in the schema.
+    // @see core/modules/config/tests/config_test/config/schema/config_test.schema.yml
+    $this->assertSame([
+      'langcode' => 'en',
+      'zoo' => TRUE,
+      'llama' => 'llama',
+      'cat' => [
+        'type' => 'kitten',
+        'count' => 2,
+      ],
+      'giraffes' => [
+        'unsorted' => [
+          'hum1' => 'humZ',
+          'hum3' => 'humY',
+          'hum2' => 'humX',
+        ],
+        'sorted_by_key' => [
+          'hum1' => 'humZ',
+          'hum2' => 'humX',
+          'hum3' => 'humY',
+        ],
+        'sorted_by_value' => [
+          0 => 'humX',
+          1 => 'humY',
+          2 => 'humZ',
+        ],
+      ],
+      'uuid' => '7C30C50E-641A-4E34-A7F1-46BCFB9BE5A3',
+      'string__not_blank' => 'this is a label',
+    ] + $extra_unknown_top_level_keys_to_expect, $typed_config_manager->getCanonicalRepresentation($typed_config));
+  }
+
+  /**
    * Verifies that the Typed Data API is implemented correctly.
    */
   public function testTypedDataAPI(): void {
@@ -60,6 +156,41 @@ class TypedConfigTest extends KernelTestBase {
 
     /** @var \Drupal\Core\Config\Schema\TypedConfigInterface $typed_config */
     $typed_config = $typed_config_manager->get('config_test.validation');
+
+    // Note how this ordering matches that in the schema.
+    // @see core/modules/config/tests/config_test/config/schema/config_test.schema.yml
+    $this->assertSame([
+      '_core' => [
+        // cspell:disable-next-line
+        'default_config_hash' => 'M0uZVp4ihphuViwEVk_ceksfS6aTacmoRUZ60m8nVMU',
+      ],
+      'zoo' => TRUE,
+      'llama' => 'llama',
+      'cat' => [
+        'type' => 'kitten',
+        'count' => 2,
+      ],
+      'giraffes' => [
+        'unsorted' => [
+          'hum1' => 'humZ',
+          'hum3' => 'humY',
+          'hum2' => 'humX',
+        ],
+        'sorted_by_key' => [
+          'hum1' => 'humZ',
+          'hum2' => 'humX',
+          'hum3' => 'humY',
+        ],
+        'sorted_by_value' => [
+          0 => 'humX',
+          1 => 'humY',
+          2 => 'humZ',
+        ],
+      ],
+      'uuid' => '7C30C50E-641A-4E34-A7F1-46BCFB9BE5A3',
+      'string__not_blank' => 'this is a label',
+      'host' => 'localhost',
+    ], $typed_config_manager->getCanonicalRepresentation($typed_config));
 
     // Test a primitive.
     $string_data = $typed_config->get('llama');
@@ -80,16 +211,17 @@ class TypedConfigTest extends KernelTestBase {
     $this->assertArrayHasKey('count', $mapping->getProperties());
 
     // Test accessing sequences.
-    $sequence = $typed_config->get('giraffe');
+    $sequence = $typed_config->get('giraffes.unsorted');
     /** @var \Drupal\Core\TypedData\ListInterface $sequence */
     $this->assertInstanceOf(SequenceDataDefinition::class, $sequence->getDataDefinition());
     $this->assertSame(Sequence::class, $sequence->getDataDefinition()->getClass());
-    $this->assertSame('sequence', $sequence->getDataDefinition()->getDataType());
+    $this->assertSame('config_test.validation.giraffes', $sequence->getDataDefinition()->getDataType());
     $this->assertInstanceOf(ComplexDataInterface::class, $sequence);
     $this->assertInstanceOf(StringInterface::class, $sequence->get('hum1'));
-    $this->assertEquals('hum1', $sequence->get('hum1')->getValue());
-    $this->assertEquals('hum2', $sequence->get('hum2')->getValue());
-    $this->assertCount(2, $sequence->getIterator());
+    $this->assertSame('humZ', $sequence->get('hum1')->getValue());
+    $this->assertSame('humX', $sequence->get('hum2')->getValue());
+    $this->assertSame('humY', $sequence->get('hum3')->getValue());
+    $this->assertCount(3, $sequence->getIterator());
     // Verify the item metadata is available.
     $this->assertInstanceOf(SequenceDataDefinition::class, $sequence->getDataDefinition());
 
@@ -98,7 +230,7 @@ class TypedConfigTest extends KernelTestBase {
     $typed_config_manager = \Drupal::service('config.typed');
     $typed_config = $typed_config_manager->createFromNameAndData('config_test.validation', \Drupal::configFactory()->get('config_test.validation')->get());
     $this->assertInstanceOf(TypedConfigInterface::class, $typed_config);
-    $this->assertEquals(['_core', 'llama', 'cat', 'giraffe', 'uuid', 'string__not_blank', 'host'], array_keys($typed_config->getElements()));
+    $this->assertEquals(['_core', 'langcode', 'zoo', 'llama', 'cat', 'giraffes', 'uuid', 'string__not_blank', 'host'], array_keys($typed_config->getElements()));
     $this->assertSame('config_test.validation', $typed_config->getName());
     $this->assertSame('config_test.validation', $typed_config->getPropertyPath());
     $this->assertSame('config_test.validation.llama', $typed_config->get('llama')->getPropertyPath());
@@ -113,6 +245,19 @@ class TypedConfigTest extends KernelTestBase {
     $typed_config = $typed_config_manager->createFromNameAndData($config_test_entity->getConfigDependencyName(), $config_test_entity->toArray());
     $this->assertInstanceOf(TypedConfigInterface::class, $typed_config);
     $this->assertEquals(['uuid', 'langcode', 'status', 'dependencies', 'id', 'label', 'weight', 'style', 'size', 'size_value', 'protected_property'], array_keys($typed_config->getElements()));
+    $this->assertSame([
+      'uuid' => $config_test_entity->uuid(),
+      'langcode' => 'en',
+      'status' => TRUE,
+      'dependencies' => [],
+      'id' => 'test',
+      'label' => 'Test',
+      'weight' => 11,
+      'style' => 'test_style',
+      'size' => NULL,
+      'size_value' => NULL,
+      'protected_property' => NULL,
+    ], $typed_config_manager->getCanonicalRepresentation($typed_config));
   }
 
   /**
@@ -187,7 +332,7 @@ class TypedConfigTest extends KernelTestBase {
 
     // Test constrains on sequences elements.
     $config->set('cat.type', 'nyans');
-    $config->set('giraffe', ['muh', 'hum2']);
+    $config->set('giraffes.unsorted', ['muh', 'hum2']);
     $config->save();
     $typed_config = $typed_config_manager->get('config_test.validation');
     $result = $typed_config->validate();
@@ -195,19 +340,19 @@ class TypedConfigTest extends KernelTestBase {
     $this->assertEquals('Giraffes just hum', $result->get(0)->getMessage());
 
     // Test constrains on the sequence itself.
-    $config->set('giraffe', ['hum', 'hum2', 'invalid-key' => 'hum']);
+    $config->set('giraffes.unsorted', ['hum', 'hum2', 'invalid-key' => 'hum']);
     $config->save();
 
     $typed_config = $typed_config_manager->get('config_test.validation');
     $result = $typed_config->validate();
     $this->assertCount(1, $result);
-    $this->assertEquals('giraffe', $result->get(0)->getPropertyPath());
+    $this->assertEquals('giraffes.unsorted', $result->get(0)->getPropertyPath());
     $this->assertEquals('Invalid giraffe key.', $result->get(0)->getMessage());
 
     // Validates mapping.
     $typed_config = $typed_config_manager->get('config_test.validation');
     $value = $typed_config->getValue();
-    unset($value['giraffe']);
+    unset($value['giraffes']);
     $value['elephant'] = 'foo';
     $value['zebra'] = 'foo';
     $typed_config->setValue($value);

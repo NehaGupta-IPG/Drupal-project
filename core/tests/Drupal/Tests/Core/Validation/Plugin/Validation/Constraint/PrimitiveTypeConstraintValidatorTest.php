@@ -29,6 +29,7 @@ class PrimitiveTypeConstraintValidatorTest extends UnitTestCase {
    * @dataProvider provideTestValidate
    */
   public function testValidate(PrimitiveInterface $typed_data, string|TranslatableMarkup|int|float|array|null $value, bool $valid): void {
+    $typed_data->setValue($value);
     $context = $this->createMock(ExecutionContextInterface::class);
     $context->expects($this->any())
       ->method('getObject')
@@ -55,7 +56,9 @@ class PrimitiveTypeConstraintValidatorTest extends UnitTestCase {
     $data[] = [new BooleanData(DataDefinition::create('boolean')), NULL, TRUE];
 
     $data[] = [new BooleanData(DataDefinition::create('boolean')), 1, TRUE];
-    $data[] = [new BooleanData(DataDefinition::create('boolean')), 'test', FALSE];
+    // TRICKY: while this makes no sense, this is necessary to avoid breaking
+    // backwards compatibility (migration and node type tests would fail).
+    $data[] = [new BooleanData(DataDefinition::create('boolean')), 'test', TRUE];
     $data[] = [new FloatData(DataDefinition::create('float')), 1.5, TRUE];
     $data[] = [new FloatData(DataDefinition::create('float')), 'test', FALSE];
     $data[] = [new IntegerData(DataDefinition::create('integer')), 1, TRUE];

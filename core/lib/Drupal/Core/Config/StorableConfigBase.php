@@ -217,8 +217,14 @@ abstract class StorableConfigBase extends ConfigBase {
    *
    * @throws \Drupal\Core\Config\UnsupportedDataTypeConfigException
    *   If the value is unsupported in configuration.
+   *
+   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
+   *   Element::getCanonicalRepresentation() instead.
+   * @see https://www.drupal.org/node/1337
    */
   protected function castValue($key, $value) {
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Call ::getCanonicalRepresentation() on the typed config instead. See https://www.drupal.org/node/1337', E_USER_DEPRECATED);
+
     $element = $this->getSchemaWrapper();
     if ($key !== NULL) {
       $element = $element->get($key);

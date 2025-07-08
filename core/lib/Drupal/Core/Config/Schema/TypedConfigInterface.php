@@ -25,7 +25,7 @@ interface TypedConfigInterface extends TraversableTypedDataInterface {
   public function isEmpty();
 
   /**
-   * Gets an array of contained elements.
+   * Gets an array of contained elements, in the order they are stored.
    *
    * @return array
    *   Array of \Drupal\Core\TypedData\TypedDataInterface objects.

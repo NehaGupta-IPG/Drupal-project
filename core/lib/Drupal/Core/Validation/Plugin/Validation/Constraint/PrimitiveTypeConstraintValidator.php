@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
+use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\TypedData\Type\BinaryInterface;
 use Drupal\Core\TypedData\Type\BooleanInterface;
 use Drupal\Core\TypedData\Type\DateTimeInterface;
@@ -24,15 +25,20 @@ class PrimitiveTypeConstraintValidator extends ConstraintValidator {
   use TypedDataAwareValidatorTrait;
 
   /**
-   * {@inheritdoc}
+   * Checks if the given value is a valid Primitive Typed Data instance.
+   *
+   * @param \Drupal\Core\TypedData\PrimitiveInterface $typed_data
+   *   A Primitive Typed Data instance.
+   *
+   * @return bool
+   *   TRUE if it is valid, FALSE otherwise.
+   *
+   * @internal
+   * @see \Drupal\Core\Config\TypedConfigManager::getCanonicalRepresentation()
    */
-  public function validate($value, Constraint $constraint): void {
+  public static function isValidPrimitiveTypedData(PrimitiveInterface $typed_data): bool {
+    $value = $typed_data->getValue();
 
-    if (!isset($value)) {
-      return;
-    }
-
-    $typed_data = $this->getTypedData();
     $valid = TRUE;
     if ($typed_data instanceof BinaryInterface && !is_resource($value)) {
       $valid = FALSE;
@@ -40,11 +46,35 @@ class PrimitiveTypeConstraintValidator extends ConstraintValidator {
     if ($typed_data instanceof BooleanInterface && !(is_bool($value) || $value === 0 || $value === '0' || $value === 1 || $value == '1')) {
       $valid = FALSE;
     }
+    // Special handling for booleans: any string is allowed, from "TRUE", to "",
+    // to arbitrary strings such as "test".
+    if ($typed_data instanceof BooleanInterface && is_string($value)) {
+      $valid = TRUE;
+    }
     if ($typed_data instanceof FloatInterface && filter_var($value, FILTER_VALIDATE_FLOAT) === FALSE) {
       $valid = FALSE;
     }
     if ($typed_data instanceof IntegerInterface && filter_var($value, FILTER_VALIDATE_INT) === FALSE) {
       $valid = FALSE;
+    }
+    // Special handling for integers and floats since the configuration
+    // system is primarily concerned with saving values from the Form API
+    // we have to special case the meaning of an empty string for numeric
+    // types. In PHP this would be casted to a 0 but for the purposes of
+    // configuration we need to treat this as a NULL.
+    // @see \Drupal\Core\TypedData\Plugin\DataType\FloatData::getCastedValue()
+    // @see \Drupal\Core\TypedData\Plugin\DataType\IntegerData::getCastedValue()
+    if (($typed_data instanceof IntegerInterface || $typed_data instanceof FloatInterface) && $value === '') {
+      $valid = TRUE;
+    }
+    // Special handling for integers and floats: almost any string is allowed,
+    // for example `"55%"` is interpreted as `55`.
+    if (($typed_data instanceof IntegerInterface || $typed_data instanceof FloatInterface) && is_string($value) && str_contains($value, (string) (int) $value)) {
+      $valid = TRUE;
+    }
+    // Special handling for integers: booleans are allowed (cast to 0/1).
+    if ($typed_data instanceof IntegerInterface && is_bool($value)) {
+      $valid = TRUE;
     }
     if ($typed_data instanceof DecimalInterface && !preg_match('/^[+-]?((\d+(\.\d*)?)|(\.\d+))$/i', $value)) {
       $valid = FALSE;
@@ -74,7 +104,18 @@ class PrimitiveTypeConstraintValidator extends ConstraintValidator {
       $valid = FALSE;
     }
 
-    if (!$valid) {
+    return $valid;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validate($value, Constraint $constraint): void {
+    if (!isset($value)) {
+      return;
+    }
+
+    if (!$this->isValidPrimitiveTypedData($this->getTypedData())) {
       // @todo Provide a good violation message for each problem.
       $this->context->addViolation($constraint->message, [
         '%value' => is_object($value) ? get_class($value) : (is_array($value) ? 'Array' : (string) $value),

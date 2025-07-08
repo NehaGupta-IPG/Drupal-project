@@ -87,7 +87,7 @@ class TypedDataTest extends KernelTestBase {
     $this->assertNull($typed_data->getValue(), 'Boolean wrapper is null-able.');
     $this->assertEquals(0, $typed_data->validate()->count());
     $typed_data->setValue('invalid');
-    $this->assertEquals(1, $typed_data->validate()->count(), 'Validation detected invalid value.');
+    $this->assertEquals(0, $typed_data->validate()->count(), 'String values are cast to booleans for backwards compatibility.');
 
     // String type.
     $value = $this->randomString();
@@ -122,6 +122,8 @@ class TypedDataTest extends KernelTestBase {
     $this->assertNull($typed_data->getValue(), 'Integer wrapper is null-able.');
     $this->assertEquals(0, $typed_data->validate()->count());
     $typed_data->setValue('invalid');
+    // TRICKY: while this makes no sense, this is necessary to avoid breaking
+    // backwards compatibility (migration and node type tests would fail).
     $this->assertEquals(1, $typed_data->validate()->count(), 'Validation detected invalid value.');
 
     // Decimal type.

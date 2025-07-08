@@ -4,6 +4,7 @@ namespace Drupal\Core\Config;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Config\Schema\Mapping;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -202,13 +203,21 @@ class Config extends StorableConfigBase {
     // Validate the configuration object name before saving.
     static::validateName($this->name);
 
-    // If there is a schema for this configuration object, cast all values to
-    // conform to the schema.
+    // Even if the data is trusted, ensure a consistent canonical representation
+    // by casting all values to conform to the schema.
+    if ($this->typedConfigManager->hasConfigSchema($this->name)) {
+      // Ensure that the schema wrapper has the latest data.
+      $this->schemaWrapper = NULL;
+      $schema_wrapper = $this->getSchemaWrapper();
+      // All config is of `type: config_object`, which is always a mapping.
+      assert($schema_wrapper instanceof Mapping);
+      $this->data = $this->typedConfigManager->getCanonicalRepresentation($schema_wrapper);
+    }
+
     if (!$has_trusted_data) {
       if ($this->typedConfigManager->hasConfigSchema($this->name)) {
-        // Ensure that the schema wrapper has the latest data.
-        $this->schemaWrapper = NULL;
-        $this->data = $this->castValue(NULL, $this->data);
+        // Ensure that for example resources are never attempted to be saved.
+        $this->validateValue(NULL, $this->data);
       }
       else {
         foreach ($this->data as $key => $value) {

@@ -4,17 +4,23 @@ namespace Drupal\Core\Config;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Config\Schema\ArrayElement;
 use Drupal\Core\Config\Schema\ConfigSchemaAlterException;
 use Drupal\Core\Config\Schema\ConfigSchemaDiscovery;
+use Drupal\Core\Config\Schema\Element;
 use Drupal\Core\Config\Schema\TypeResolver;
 use Drupal\Core\Config\Schema\SequenceDataDefinition;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\Config\Schema\Undefined;
+use Drupal\Core\Entity\Plugin\DataType\ConfigEntityAdapter;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\TypedData\MapDataDefinition;
+use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\TypedData\TraversableTypedDataInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\FullyValidatableConstraint;
+use Drupal\Core\Validation\Plugin\Validation\Constraint\PrimitiveTypeConstraintValidator;
 
 /**
  * Manages config schema type plugins.
@@ -428,6 +434,96 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     $definition = $this->getDefinition($config_name);
     $data_definition = $this->buildDataDefinition($definition, $config_data);
     return $this->create($data_definition, $config_data, $config_name);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCanonicalRepresentation(TypedDataInterface $data) {
+    // If a config entity is being validated, an EntityInterface object must be
+    // validated. That is handled by TypedDataManager.
+    if ($data instanceof ConfigEntityAdapter) {
+      return parent::getCanonicalRepresentation($data);
+    }
+
+    $raw_value = $data->getValue();
+
+    // Anything in config schema can be marked `nullable: true`.
+    if ($raw_value === NULL) {
+      return NULL;
+    }
+
+    if ($data instanceof PrimitiveInterface) {
+      // Prefer schema non-compliance over data loss: when it is impossible to
+      // safely cast the value of a primitive, fall back to the actual value
+      // encountered.
+      // (These violations will be surfaced by ConfigSchemaChecker during
+      // development.)
+      // @see \Drupal\Core\Config\Development\ConfigSchemaChecker
+      if (!PrimitiveTypeConstraintValidator::isValidPrimitiveTypedData($data)) {
+        return $raw_value;
+      }
+      return $data->getCastedValue();
+    }
+
+    // Everything that is not a primitive must be a config schema element.
+    assert($data instanceof Element);
+
+    // Treat config schema elements containing multiple properties differently:
+    // each could be either NULL, a PrimitiveInterface or an Element instance.
+    // @see \Drupal\Core\Config\Schema\Sequence
+    // @see \Drupal\Core\Config\Schema\Mapping
+    if ($data instanceof ArrayElement) {
+      try {
+        $properties = $data->getProperties();
+      }
+      catch (UnsupportedDataTypeConfigException) {
+        // Prefer schema non-compliance over data loss: when it is impossible to
+        // enumerate the properties in this config schema element in compliance
+        // with the config schema, fall back to the actual value encountered.
+        // (These violations will be surfaced by ConfigSchemaChecker during
+        // development.)
+        // @see \Drupal\Core\Config\Development\ConfigSchemaChecker
+        return $raw_value;
+      }
+      $representation = array_map($this->getCanonicalRepresentation(...), $properties);
+      // Special case: `orderby: value` for `type: sequence` (this one is
+      // special because the canonical representation is needed.)
+      // @see \Drupal\Core\Config\Schema\Sequence::getProperties()
+      $data_definition = $data->getDataDefinition();
+      if ($data_definition instanceof SequenceDataDefinition && $data_definition->getOrderBy() === 'value') {
+        // The PHP documentation notes that "Be careful when sorting arrays with
+        // mixed types values because sort() can produce unpredictable results".
+        // There is no risk here because this method as already cast all values
+        // to the same type using the configuration schema.
+        sort($representation);
+      }
+      return $representation;
+    }
+
+    return $raw_value;
+  }
+
+  /**
+   * Resolves a dynamic expression.
+   *
+   * @param string $expression
+   *   Expression to be resolved.
+   * @param array|\Drupal\Core\TypedData\TypedDataInterface $data
+   *   Configuration data for the element.
+   *
+   * @return string
+   *   The value the expression resolves to, or the given expression if it
+   *   cannot be resolved.
+   *
+   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
+   *   \Drupal\Core\Config\Schema\TypeResolver::resolveExpression() instead.
+   *
+   * @see https://www.drupal.org/node/3413264
+   */
+  protected function resolveExpression(string $expression, array $data): string {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Config\Schema\TypeResolver::' . __FUNCTION__ . '() instead. See https://www.drupal.org/node/3413264', E_USER_DEPRECATED);
+    return TypeResolver::resolveExpression($expression, $data);
   }
 
 }

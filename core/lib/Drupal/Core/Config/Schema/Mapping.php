@@ -3,6 +3,7 @@
 namespace Drupal\Core\Config\Schema;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Config\UnsupportedDataTypeConfigException;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\MapDataDefinition;
 use Drupal\Core\TypedData\TypedDataInterface;
@@ -56,7 +57,8 @@ class Mapping extends ArrayElement {
    * Gets all keys allowed in this mapping.
    *
    * @return string[]
-   *   A list of keys allowed in this mapping.
+   *   A list of keys allowed in this mapping, in the order defined by the
+   *   config schema type.
    */
   public function getValidKeys(): array {
     $all_keys = $this->getDefinedKeys();
@@ -288,6 +290,35 @@ class Mapping extends ArrayElement {
       $possible_types[] = $fallback_type;
     }
     return $possible_types;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getProperties($include_computed = FALSE) {
+    if (!is_array($this->value)) {
+      throw new UnsupportedDataTypeConfigException(sprintf("variable type is %s but applied schema class is %s", gettype($this->value), $this->getDataDefinition()->getClass()));
+    }
+
+    // Mapping keys should be ordered however the data definition says.
+    // Note: this specifically does NOT use ::getRequiredKeys() nor
+    // ::getOptionalKeys()`, because this MUST work even on invalid data (i.e.
+    // when required keys are missing).
+
+    // Note: ::getElements() respects the stored order in $this->value, not the
+    // schema order.
+    $elements = $this->getElements();
+
+    // 1. respect the schema-defined order of mapping keys
+    $ordered_mapping_keys = array_flip($this->getValidKeys());
+    // 2. keep only the keys that have a value (but do not change the order).
+    $elements_in_schema = array_intersect_key($ordered_mapping_keys, $elements);
+    $properties_in_schema = array_replace($elements_in_schema, $elements);
+    // 3. include even key-value pairs absent from schema.
+    // @see \Drupal\KernelTests\Core\Config\ConfigSchemaTest::testConfigSaveWithSchema()
+    $properties_unknown = array_diff_key($elements, $ordered_mapping_keys);
+
+    return $properties_in_schema + $properties_unknown;
   }
 
 }
