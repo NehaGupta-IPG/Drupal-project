@@ -449,14 +449,15 @@ class AccountSettingsForm extends ConfigFormBase {
     }
     $form_state->setValue('user_cancel_method_options', $boolean_values);
     // Remove disabled cancel options.
+    parent::validateForm($form, $form_state);
     $cancel_methods_options = array_filter($cancel_methods_options);
     if (empty($cancel_methods_options)) {
       $form_state->setErrorByName('user_cancel_method_options', $this->t('At least one user cancellation option should be enabled.'));
+      return;
     }
-    elseif (!(in_array($default_cancel_method, $cancel_methods_options))) {
+    if (!(in_array($default_cancel_method, $cancel_methods_options, TRUE))) {
       $form_state->setErrorByName('user_cancel_method', $this->t('The default user cancellation method cannot be a disabled option.'));
     }
-    parent::validateForm($form, $form_state);
   }
 
 }

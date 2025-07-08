@@ -120,8 +120,8 @@ class UserSubAdminTest extends BrowserTestBase {
     $this->drupalLogin($admin_user);
 
     $this->drupalGet('admin/config/people/accounts');
-    $container = current($this->getSession()->getDriver()->find('.//fieldset[@id="edit-user-cancel-method-options--wrapper"]'));
-    $this->getSession()->getDriver()->uncheck('.//input[@name="user_cancel_method_options[user_cancel_block]"]');
+    $container = $this->assertSession()->elementExists('css', '#edit-user-cancel-method-options--wrapper');
+    $this->assertSession()->fieldExists('user_cancel_method_options[user_cancel_block]')->uncheck();
     $this->assertSession()->checkboxNotChecked('Disable the account and keep its content.', $container);
     $this->assertSession()->checkboxChecked('Disable the account and unpublish its content.', $container);
     $this->assertSession()->checkboxNotChecked('Delete the account and make its content belong to the', $container);

@@ -26,5 +26,5 @@ function user_post_update_configure_cancel_options(): void {
   foreach (array_keys($methods['#options']) as $method_name) {
     $config->set('cancel_method_options.' . $method_name, TRUE);
   }
-  $config->save();
+  $config->save(TRUE);
 }
