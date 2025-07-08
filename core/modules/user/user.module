@@ -460,7 +460,7 @@ function _user_cancel_session_regenerate(): void {
  */
 function user_cancel_methods(): array {
   $user_settings = \Drupal::config('user.settings');
-  $cancel_methods_settings = $user_settings->get('cancel_method_options');
+  $cancel_methods_settings = $user_settings->get('cancel_method_options') ?: [];
   $anonymous_name = $user_settings->get('anonymous');
   $methods = [
     'user_cancel_block' => [
