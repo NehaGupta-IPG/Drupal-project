@@ -120,7 +120,12 @@ class SiteInformationForm extends ConfigFormBase {
     $form['front_page']['site_frontpage'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Default front page'),
-      '#default_value' => $this->aliasManager->getAliasByPath($site_config->get('page.front')),
+      '#config_target' => new ConfigTarget(
+        'system.site',
+        'page.front',
+        fromConfig: fn($value) => $this->aliasManager->getPathByAlias($value),
+        toConfig: fn($value) => $this->aliasManager->getPathByAlias($value),
+      ),
       '#required' => TRUE,
       '#size' => 40,
       '#description' => $this->t('Specify a relative URL to display as the front page.'),
@@ -134,14 +139,24 @@ class SiteInformationForm extends ConfigFormBase {
     $form['error_page']['site_403'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Default 403 (access denied) page'),
-      '#config_target' => 'system.site:page.403',
+      '#config_target' => new ConfigTarget(
+        'system.site',
+        'page.403',
+        fromConfig: fn($value) => $this->aliasManager->getPathByAlias($value),
+        toConfig: fn($value) => $this->aliasManager->getPathByAlias($value),
+      ),
       '#size' => 40,
       '#description' => $this->t('This page is displayed when the requested document is denied to the current user. Leave blank to display a generic "access denied" page.'),
     ];
     $form['error_page']['site_404'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Default 404 (not found) page'),
-      '#config_target' => 'system.site:page.404',
+      '#config_target' => new ConfigTarget(
+        'system.site',
+        'page.404',
+        fromConfig: fn($value) => $this->aliasManager->getPathByAlias($value),
+        toConfig: fn($value) => $this->aliasManager->getPathByAlias($value),
+      ),
       '#size' => 40,
       '#description' => $this->t('This page is displayed when no other content matches the requested document. Leave blank to display a generic "page not found" page.'),
     ];
@@ -152,42 +167,12 @@ class SiteInformationForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  protected static function copyFormValuesToConfig(Config $config, FormStateInterface $form_state): void {
-    switch ($config->getName()) {
-      case 'system.site':
-        $path_alias_manager = \Drupal::service('path_alias.manager');
-        $config
-          ->set('name', $form_state->getValue('site_name'))
-          ->set('slogan', $form_state->getValue('site_slogan'))
-          ->set('mail', $form_state->getValue('site_mail'))
-          // Get the normal path of the front page.
-          ->set('page.front', $path_alias_manager->getPathByAlias($form_state->getValue('site_frontpage')))
-          // Get the normal paths of both error pages.
-          ->set('page.403', $path_alias_manager->getPathByAlias($form_state->getValue('site_403')))
-          ->set('page.404', $path_alias_manager->getPathByAlias($form_state->getValue('site_404')));
-        break;
-    }
-  }
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    $this->config('system.site')
+      ->set('page.front', $form_state->getValue('site_frontpage'))
+      ->save();
 
-  /**
-   * {@inheritdoc}
-   */
-  protected static function mapConfigKeyToFormElementName(string $config_name, string $key): string {
-    switch ($config_name) {
-      case 'system.site':
-        return match ($key) {
-        'name' => 'site_name',
-          'slogan' => 'site_slogan',
-          'mail' => 'site_mail',
-          'page.front' => 'site_frontpage',
-          'page.403' => 'site_403',
-          'page.404' => 'site_404',
-          default => self::defaultMapConfigKeyToFormElementName($config_name, $key),
-        };
-
-        default:
-          throw new \InvalidArgumentException();
-    }
+    parent::submitForm($form, $form_state);
   }
 
 }
