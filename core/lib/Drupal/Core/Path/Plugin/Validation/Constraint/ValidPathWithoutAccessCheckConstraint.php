@@ -20,6 +20,6 @@ class ValidPathWithoutAccessCheckConstraint extends SymfonyConstraint {
    *
    * @var string
    */
-  public $message = "Either the path '%link_path' is invalid.";
+  public $message = "The path '%link_path' is invalid.";
 
 }
