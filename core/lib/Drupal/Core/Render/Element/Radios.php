@@ -10,7 +10,9 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  * Provides a form element for a set of radio buttons.
  *
  * Properties:
- * - #options: An associative array, where the keys are the returned values for
+ *
+ * @property $options
+ *   An associative array, where the keys are the returned values for
  *   each radio button, and the values are the labels next to each radio button.
  *
  * Usage example:
@@ -73,11 +75,11 @@ class Radios extends FormElementBase {
         $element[$key] += [
           '#type' => 'radio',
           '#title' => $choice,
-          // The key is sanitized in Drupal\Core\Template\Attribute during output
-          // from the theme function.
+          // The key is sanitized in Drupal\Core\Template\Attribute during
+          // output from the theme function.
           '#return_value' => $key,
-          // Use default or FALSE. A value of FALSE means that the radio button is
-          // not 'checked'.
+          // Use default or FALSE. A value of FALSE means that the radio button
+          // is not 'checked'.
           '#default_value' => $element['#default_value'] ?? FALSE,
           '#attributes' => $element['#attributes'],
           '#parents' => $element['#parents'],

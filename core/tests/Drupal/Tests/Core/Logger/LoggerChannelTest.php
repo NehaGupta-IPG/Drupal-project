@@ -185,16 +185,23 @@ class LoggerChannelTest extends UnitTestCase {
 
 }
 
+/**
+ * Stub class for testing LoggerChannel.
+ */
 class NaughtyRecursiveLogger implements LoggerInterface {
   use LoggerTrait;
 
   /**
    * The logger channel.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannel
    */
   protected $channel;
 
   /**
    * The message to log.
+   *
+   * @var string|\Stringable
    */
   protected $message;
 

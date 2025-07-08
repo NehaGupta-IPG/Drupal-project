@@ -97,6 +97,8 @@ class StatusTest extends BrowserTestBase {
 
     $this->drupalGet('admin/reports/status/php');
     $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('PHP');
+    $this->assertSession()->pageTextNotContains('$_COOKIE');
 
     $settings['settings']['sa_core_2023_004_phpinfo_flags'] = (object) [
       'value' => INFO_ALL,
@@ -181,6 +183,10 @@ class StatusTest extends BrowserTestBase {
     $session->pageTextNotContains('Deprecated themes installed');
     $session->pageTextNotContains('Deprecated themes found: Test deprecated theme.');
     $this->assertSession()->elementNotExists('xpath', "//a[contains(@href, 'http://example.com/deprecated_theme')]");
+
+    // Check that the installation profile information is displayed.
+    $this->drupalGet('admin/reports/status');
+    $this->assertSession()->pageTextContains('Testing (testing-' . \Drupal::VERSION . ')');
 
     // Check if pg_trgm extension is enabled on postgres.
     if (\Drupal::database()->databaseType() == 'pgsql') {

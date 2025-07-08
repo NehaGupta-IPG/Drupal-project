@@ -11,6 +11,7 @@ use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the functionality of Timestamp core field UI.
@@ -18,6 +19,7 @@ use Drupal\Tests\BrowserTestBase;
  * @group field
  * @group lendude
  */
+#[Group('field')]
 class TimestampTest extends BrowserTestBase {
 
   /**
@@ -248,7 +250,8 @@ class TimestampTest extends BrowserTestBase {
     ];
     $this->submitForm($edit, 'Save');
 
-    // Make sure the submitted date is set as the default in the widget.
+    // Make sure the default field value is set as the default value in the
+    // widget.
     $this->assertSession()->fieldExists('field_timestamp[0][value][date]');
     $this->assertSession()->fieldValueEquals('field_timestamp[0][value][date]', $date->format($date_format));
     $this->assertSession()->fieldExists('field_timestamp[0][value][time]');

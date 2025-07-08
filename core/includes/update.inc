@@ -10,6 +10,7 @@
 
 use Drupal\Component\Graph\Graph;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Utility\Error;
 use Drupal\Core\Update\EquivalentUpdate;
 
@@ -19,7 +20,7 @@ use Drupal\Core\Update\EquivalentUpdate;
  * @return array
  *   A requirements info array.
  */
-function update_system_schema_requirements() {
+function update_system_schema_requirements(): array {
   $requirements = [];
 
   $system_schema = \Drupal::service('update.update_hook_registry')->getInstalledVersion('system');
@@ -34,7 +35,7 @@ function update_system_schema_requirements() {
   else {
     $requirements['minimum schema'] += [
       'value' => 'The installed schema version does not meet the minimum.',
-      'severity' => REQUIREMENT_ERROR,
+      'severity' => RequirementSeverity::Error,
       'description' => 'Your system schema version is ' . $system_schema . '. Updating directly from a schema version prior to 8000 is not supported. You must upgrade your site to Drupal 8 first, see https://www.drupal.org/docs/8/upgrade.',
     ];
   }
@@ -73,7 +74,7 @@ function update_check_requirements() {
  * @todo remove in a major version after
  * https://www.drupal.org/project/drupal/issues/3130037 has been fixed.
  */
-function _update_fix_missing_schema() {
+function _update_fix_missing_schema(): void {
   /** @var \Drupal\Core\Update\UpdateHookRegistry $update_registry */
   $update_registry = \Drupal::service('update.update_hook_registry');
   $versions = $update_registry->getAllInstalledVersions();
@@ -162,7 +163,7 @@ function _update_fix_missing_schema() {
  *
  * @see update_resolve_dependencies()
  */
-function update_do_one($module, $number, $dependency_map, &$context) {
+function update_do_one($module, $number, $dependency_map, &$context): void {
   $function = $module . '_update_' . $number;
 
   // If this update was aborted in a previous step, or has a dependency that
@@ -231,7 +232,7 @@ function update_do_one($module, $number, $dependency_map, &$context) {
  * @param array $context
  *   The batch context array.
  */
-function update_invoke_post_update($function, &$context) {
+function update_invoke_post_update($function, &$context): void {
   $ret = [];
 
   // If this update was aborted in a previous step, or has a dependency that was
@@ -304,7 +305,7 @@ function update_invoke_post_update($function, &$context) {
  *       the update number and the description from source code comment for
  *       each update function. This array is keyed by the update number.
  */
-function update_get_update_list() {
+function update_get_update_list(): array {
   // Make sure that the system module is first in the list of updates.
   $ret = ['system' => []];
 
@@ -482,7 +483,7 @@ function update_resolve_dependencies($starting_updates) {
  *
  * @see update_resolve_dependencies()
  */
-function update_get_update_function_list($starting_updates) {
+function update_get_update_function_list($starting_updates): array {
   // Go through each module and find all updates that we need (including the
   // first update that was requested and any updates that run after it).
   $update_functions = [];
@@ -548,7 +549,7 @@ function update_get_update_function_list($starting_updates) {
  * @see \Drupal\Component\Graph\Graph::searchAndSort()
  * @see update_resolve_dependencies()
  */
-function update_build_dependency_graph($update_functions) {
+function update_build_dependency_graph($update_functions): array {
   // Initialize an array that will define a directed graph representing the
   // dependencies between update functions.
   $graph = [];
@@ -638,7 +639,7 @@ function update_already_performed($module, $number) {
  * @see \Drupal\Core\Extension\ModuleHandlerInterface::invokeAll()
  * @see hook_update_dependencies()
  */
-function update_retrieve_dependencies() {
+function update_retrieve_dependencies(): array {
   $return = [];
   /** @var \Drupal\Core\Extension\ModuleExtensionList */
   $extension_list = \Drupal::service('extension.list.module');

@@ -7,7 +7,6 @@ namespace Drupal\KernelTests\Core\DrupalKernel;
 use Composer\Autoload\ClassLoader;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
-use Drupal\Core\Utility\Error;
 use Drupal\KernelTests\KernelTestBase;
 use org\bovigo\vfs\vfsStream;
 use Prophecy\Argument;
@@ -27,8 +26,7 @@ class DrupalKernelTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected function tearDown(): void {
-    $currentErrorHandler = Error::currentErrorHandler();
-    if (is_string($currentErrorHandler) && $currentErrorHandler === '_drupal_error_handler') {
+    if (get_error_handler() === '_drupal_error_handler') {
       restore_error_handler();
     }
     parent::tearDown();
@@ -205,6 +203,8 @@ class DrupalKernelTest extends KernelTestBase {
    * Data provider for self::testClassLoaderAutoDetect.
    *
    * @return array
+   *   An array of test cases. Each test case is an array containing a single boolean value
+   *   that represents the class_loader_auto_detect setting to be tested.
    */
   public static function providerClassLoaderAutoDetect() {
     return [

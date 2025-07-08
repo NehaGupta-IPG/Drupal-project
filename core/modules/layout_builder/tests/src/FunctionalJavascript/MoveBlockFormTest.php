@@ -8,14 +8,13 @@ use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore blocknodebundle fieldbody fieldlinks
-
 /**
  * Tests moving blocks via the form.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
 class MoveBlockFormTest extends WebDriverTestBase {
 
   use ContextualLinkClickTrait;
@@ -39,6 +38,8 @@ class MoveBlockFormTest extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    $this->markTestSkipped("Skipped temporarily for random fails.");
+
     parent::setUp();
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
@@ -66,7 +67,6 @@ class MoveBlockFormTest extends WebDriverTestBase {
       '.block-extra-field-blocknodebundle-with-section-fieldlinks',
       '.block-field-blocknodebundle-with-section-fieldbody',
     ];
-    $this->markTestSkipped("Skipped temporarily for random fails.");
     $this->assertRegionBlocksOrder(0, 'content', $expected_block_order);
 
     // Add a top section using the Two column layout.

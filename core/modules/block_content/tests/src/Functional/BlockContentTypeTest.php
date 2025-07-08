@@ -58,14 +58,26 @@ class BlockContentTypeTest extends BlockContentTestBase {
   }
 
   /**
-   * Tests the order of the block content types on the add page.
+   * Tests the block types on the block/add page.
    */
-  public function testBlockContentAddPageOrder(): void {
-    $this->createBlockContentType(['id' => 'bundle_1', 'label' => 'Bundle 1']);
-    $this->createBlockContentType(['id' => 'bundle_2', 'label' => 'Aaa Bundle 2']);
+  public function testBlockContentAddPage(): void {
+    $this->createBlockContentType([
+      'id' => 'bundle_1',
+      'label' => 'Bundle 1',
+      'description' => 'Bundle 1 description',
+    ]);
+    $this->createBlockContentType([
+      'id' => 'bundle_2',
+      'label' => 'Aaa Bundle 2',
+      'description' => 'Bundle 2 description',
+    ]);
     $this->drupalLogin($this->adminUser);
     $this->drupalGet('block/add');
+    // Ensure bundles are ordered by their label, not id.
     $this->assertSession()->pageTextMatches('/Aaa Bundle 2(.*)Bundle 1/');
+    // Block type descriptions should display.
+    $this->assertSession()->pageTextContains('Bundle 1 description');
+    $this->assertSession()->pageTextContains('Bundle 2 description');
   }
 
   /**
@@ -224,8 +236,8 @@ class BlockContentTypeTest extends BlockContentTestBase {
 
       // For each installed theme, go to its block page and test the redirects.
       foreach ($themes as $theme) {
-        // Test that adding a block from the 'place blocks' form sends you to the
-        // block configure form.
+        // Test that adding a block from the 'place blocks' form sends you to
+        // the block configure form.
         $path = $theme == $default_theme ? 'admin/structure/block' : "admin/structure/block/list/$theme";
         $this->drupalGet($path);
         $this->clickLink('Place block');
