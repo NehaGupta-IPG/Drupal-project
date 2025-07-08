@@ -25,7 +25,6 @@ class UserUpdateCancelOptionsTest extends UpdatePathTestBase {
    * Tests that cancel methods are set correctly on user.settings.
    */
   public function testRolePermissions(): void {
-
     $cancel_methods = $this->config('user.settings')->get('cancel_method_options');
     $this->assertNull($cancel_methods);
 
@@ -34,18 +33,18 @@ class UserUpdateCancelOptionsTest extends UpdatePathTestBase {
 
     $config = $this->config('user.settings');
     $cancel_methods = $config->get('cancel_method_options');
-    $this->assertArrayHasKey('user_cancel_block', $cancel_methods);
-    $this->assertEquals($cancel_methods['user_cancel_block'], TRUE);
-    $this->assertArrayHasKey('user_cancel_block_unpublish', $cancel_methods);
-    $this->assertEquals($cancel_methods['user_cancel_block_unpublish'], TRUE);
-    $this->assertArrayHasKey('user_cancel_reassign', $cancel_methods);
-    $this->assertEquals($cancel_methods['user_cancel_reassign'], TRUE);
-    $this->assertArrayHasKey('user_cancel_delete', $cancel_methods);
-    $this->assertEquals($cancel_methods['user_cancel_delete'], TRUE);
+
+    $expected_cancel_methods = [
+      'user_cancel_block' => TRUE,
+      'user_cancel_block_unpublish' => TRUE,
+      'user_cancel_reassign' => TRUE,
+      'user_cancel_delete' => TRUE,
+    ];
+
+    $this->assertEquals($expected_cancel_methods, $cancel_methods);
 
     // Check valid Schema after update.
     $this->assertConfigSchema(\Drupal::service('config.typed'), 'user.settings', $config->get());
-
   }
 
 }
