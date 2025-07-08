@@ -31,9 +31,9 @@
   margin-inline: 0.5rem;
   content: "";
   transform: rotate(45deg);
+  vertical-align: middle;
   border-block-start: 1px solid var(--color-text);
   border-inline-end: 1px solid var(--color-text);
-  vertical-align: middle;
 
   @nest [dir="rtl"] & {
     transform: rotate(-45deg);
