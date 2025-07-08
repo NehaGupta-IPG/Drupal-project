@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\navigation\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\PerformanceTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
 /**
  * Tests performance with the navigation toolbar enabled.
@@ -13,11 +15,10 @@ use Drupal\FunctionalJavascriptTests\PerformanceTestBase;
  *
  * @todo move this coverage to StandardPerformanceTest when Navigation is
  * enabled by default.
- *
- * @group Common
- * @group #slow
- * @requires extension apcu
  */
+#[Group('Common')]
+#[Group('#slow')]
+#[RequiresPhpExtension('apcu')]
 class PerformanceTest extends PerformanceTestBase {
 
   /**
@@ -93,7 +94,7 @@ class PerformanceTest extends PerformanceTestBase {
       'ScriptCount' => 3,
       'ScriptBytes' => 167569,
       'StylesheetCount' => 2,
-      'StylesheetBytes' => 46000,
+      'StylesheetBytes' => 45450,
     ];
     $this->assertMetrics($expected, $performance_data);
 
