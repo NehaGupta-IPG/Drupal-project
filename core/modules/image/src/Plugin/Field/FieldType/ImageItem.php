@@ -61,6 +61,11 @@ class ImageItem extends FileItem {
   use LoggerChannelTrait;
 
   /**
+   * The default image directory.
+   */
+  public const string DEFAULT_IMAGE_DIRECTORY = 'default_images';
+
+  /**
    * {@inheritdoc}
    */
   public static function defaultStorageSettings() {
@@ -462,7 +467,7 @@ class ImageItem extends FileItem {
       '#title' => $this->t('Image'),
       '#description' => $this->t('Image to be shown if no image is uploaded.'),
       '#default_value' => $fids,
-      '#upload_location' => $settings['uri_scheme'] . '://default_images/',
+      '#upload_location' => $settings['uri_scheme'] . '://' . static::DEFAULT_IMAGE_DIRECTORY . '/',
       '#element_validate' => [
         '\Drupal\file\Element\ManagedFile::validateManagedFile',
         [static::class, 'validateDefaultImageForm'],

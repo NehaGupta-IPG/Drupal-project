@@ -566,7 +566,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->assertEmpty($default_image['uuid'], 'Default image removed from field.');
     // Create an image field that uses the private:// scheme and test that the
     // default image works as expected.
-    $private_field_name = $this->randomMachineName();
+    $private_field_name = 'field_default_private';
     $this->createImageField($private_field_name, 'node', 'article', ['uri_scheme' => 'private']);
     // Add a default image to the new field.
     $edit = [
@@ -606,6 +606,19 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     // Default private image should be displayed when no user supplied image
     // is present.
     $this->assertSession()->responseContains($default_output);
+
+    // Check that the default image itself can be downloaded; i.e.: not just the
+    // HTML markup.
+    $private_default_image_url = \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri());
+    // Check that a user can download the default image attached to a node field
+    // configured to store data in the private file storage.
+    $this->drupalGet($private_default_image_url);
+    $this->assertSession()->statusCodeEquals(200);
+    // Now, install a module that denies access to the field; and check that the
+    // same user now receives a 403 Access Denied.
+    \Drupal::service('module_installer')->install(['image_field_display_test_default_private_storage']);
+    $this->drupalGet($private_default_image_url);
+    $this->assertSession()->statusCodeEquals(403);
   }
 
 }
