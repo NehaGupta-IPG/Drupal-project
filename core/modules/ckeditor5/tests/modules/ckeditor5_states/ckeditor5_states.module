@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @file
+ * Implements hooks for the "CKEditor 5 states" test module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_alter().
+ */
+function ckeditor5_states_form_node_form_alter(array &$form, FormStateInterface $form_state, string $form_id): void {
+  $form['body']['widget'][0]['#states']['required'] = [
+    ':input[name="title[0][value]"]' => ['filled' => TRUE],
+  ];
+}

@@ -625,6 +625,46 @@
     },
   };
 
+  /**
+   * Handle CKEditor change event to keep the source element up to date.
+   *
+   * @type {Drupal~behavior}
+   */
+  Drupal.behaviors.ckeditor5SourceElementUpdater = {
+    attach(context, settings) {
+      const $context = $(context);
+
+      // Iterate through all CKEditors on the page.
+      $(
+        once(
+          'ckeditor5-states',
+          $context.find('[data-ckeditor5-id]').filter(':input'),
+        ),
+      ).each(function () {
+        if (this.dataset.ckeditor5Id) {
+          const editorId = this.dataset.ckeditor5Id;
+          // Using setTimeout() to ensure all CKEditors are loaded.
+          setTimeout(() => {
+            const editor = Drupal.CKEditor5Instances.get(editorId);
+
+            if (editor) {
+              $(once('ckeditor5-states-binding', editor.sourceElement)).each(
+                function () {
+                  editor.model.document.on('change', function () {
+                    if (editor.getData() !== editor.sourceElement.textContent) {
+                      editor.updateSourceElement();
+                      $(editor.sourceElement).trigger('change', [true]);
+                    }
+                  });
+                },
+              );
+            }
+          });
+        }
+      });
+    },
+  };
+
   // Redirect on hash change when the original hash has an associated CKEditor 5.
   function redirectTextareaFragmentToCKEditor5Instance() {
     const hash = window.location.hash.substring(1);
@@ -675,6 +715,23 @@
   window.addEventListener('dialog:afterclose', () => {
     if (Drupal.ckeditor5.saveCallback) {
       Drupal.ckeditor5.saveCallback = null;
+    }
+  });
+
+  /**
+   * Listen to states API "required" event to remove HTML5 "required" from a hidden CKEditor source element.
+   */
+  $(document).on('state:required', (e) => {
+    if (e.trigger) {
+      if (e.value) {
+        const targetIsRequired = e.target.hasAttribute('required');
+        const targetIsCkeditor5 = e.target.hasAttribute('data-ckeditor5-id');
+        if (targetIsRequired && targetIsCkeditor5) {
+          // CKEditor 4 had a feature to remove the required attribute.
+          // see: https://www.drupal.org/project/drupal/issues/1954968
+          e.target.removeAttribute('required');
+        }
+      }
     }
   });
 })(Drupal, Drupal.debounce, CKEditor5, jQuery, once);

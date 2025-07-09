@@ -156,4 +156,19 @@ JS;
     $this->getSession()->evaluateScript($javascript);
   }
 
+  /**
+   * Sets a given text to the editor.
+   *
+   * @param string $text
+   *   The text to be set for the editor.
+   */
+  protected function setEditorText(string $text): void {
+    $javascript = <<<JS
+(function(){
+  return Drupal.CKEditor5Instances.get(Drupal.CKEditor5Instances.keys().next().value).setData(`$text`);
+})();
+JS;
+    $this->getSession()->evaluateScript($javascript);
+  }
+
 }
