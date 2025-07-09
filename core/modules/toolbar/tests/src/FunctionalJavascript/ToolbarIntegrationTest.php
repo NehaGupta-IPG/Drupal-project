@@ -64,12 +64,24 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
     $this->assertTrue($content_link->isVisible(), 'Toolbar tray is visible again after clicking the "Manage" button a second time.');
 
     // Press SPACE to close.
-    $this->keyDownSpace($manage_link);
+    $this->triggerKeyDown($manage_link, ' ');
     $this->assertFalse($content_link->isVisible(), 'Toolbar tray is closed after pressing SPACE on the "Manage" link.');
 
     // Press SPACE to open.
-    $this->keyDownSpace($manage_link);
+    $this->triggerKeyDown($manage_link, ' ');
     $this->assertTrue($content_link->isVisible(), 'Toolbar tray is open again after pressing SPACE on the "Manage" link a second time.');
+
+    // Test that the page did not scroll.
+    $scrollTop = $this->getSession()->evaluateScript('document.documentElement.scrollTop');
+    $this->assertEquals(0, $scrollTop, 'Page did not scroll.');
+
+    // Press ENTER to close.
+    $this->triggerKeyDown($manage_link, 'Enter');
+    $this->assertFalse($content_link->isVisible(), 'Toolbar tray is closed after pressing ENTER on the "Manage" link.');
+
+    // Press ENTER to open.
+    $this->triggerKeyDown($manage_link, 'Enter');
+    $this->assertTrue($content_link->isVisible(), 'Toolbar tray is open again after pressing ENTER on the "Manage" link a second time.');
 
     // Test that the page did not scroll.
     $scrollTop = $this->getSession()->evaluateScript('document.documentElement.scrollTop');
@@ -142,24 +154,25 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
   }
 
   /**
-   * Trigger space key event on element.
+   * Trigger keydown event on element.
    *
    * This is a workaround for non-working built-in function `keyDown()`.
-   *
    * The built-in function may be failing due to syn.js not setting
    * the `bubbles` property in the event options.
    *
    * @param \Behat\Mink\Element\NodeElement $element
    *   The element on which the event is to be triggered.
+   * @param string $key
+   *   The key to be triggered.
    */
-  private function keyDownSpace(NodeElement $element): void {
+  private function triggerKeyDown(NodeElement $element, string $key): void {
     $script = <<<JS
 document
   .evaluate("{$element->getXpath()}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
   .singleNodeValue
   .dispatchEvent(new KeyboardEvent('keydown', {
     bubbles: true,
-    key: ' '
+    key: "{$key}",
   }));
 JS;
 
