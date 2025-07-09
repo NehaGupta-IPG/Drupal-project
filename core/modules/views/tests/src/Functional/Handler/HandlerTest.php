@@ -114,6 +114,40 @@ class HandlerTest extends ViewTestBase {
     $this->assertEquals(['wõrd1', 'wõrd2', 'wõrd'], $handler->value);
     $this->assertEquals('and', $handler->operator);
 
+    // Test commas.
+    $handler = HandlerBase::breakString('Law & Order,word,word');
+    $this->assertEquals(['Law & Order', 'word', 'word'], $handler->value);
+    $this->assertEquals('and', $handler->operator);
+    $handler = HandlerBase::breakString('word,Law & Order,word');
+    $this->assertEquals(['word', 'Law & Order', 'word'], $handler->value);
+    $this->assertEquals('and', $handler->operator);
+    $handler = HandlerBase::breakString('word,#Law&Order,word');
+    $this->assertEquals(['word', '#Law&Order', 'word'], $handler->value);
+    $this->assertEquals('and', $handler->operator);
+    $handler = HandlerBase::breakString('word,word,Law/Order');
+    $this->assertEquals(['word', 'word', 'Law/Order'], $handler->value);
+    $this->assertEquals('and', $handler->operator);
+    $handler = HandlerBase::breakString('word,word,Law (O) Order');
+    $this->assertEquals(['word', 'word', 'Law (O) Order'], $handler->value);
+    $this->assertEquals('and', $handler->operator);
+
+    // Test plus sign.
+    $handler = HandlerBase::breakString('Law & Order+word+word');
+    $this->assertEquals(['Law', '&', 'Order', 'word', 'word'], $handler->value);
+    $this->assertEquals('or', $handler->operator);
+    $handler = HandlerBase::breakString('word+Law & Order+word');
+    $this->assertEquals(['word', 'Law', '&', 'Order', 'word'], $handler->value);
+    $this->assertEquals('or', $handler->operator);
+    $handler = HandlerBase::breakString('word+#Law&Order+word');
+    $this->assertEquals(['word', '#Law&Order', 'word'], $handler->value);
+    $this->assertEquals('or', $handler->operator);
+    $handler = HandlerBase::breakString('word+word+Law/Order');
+    $this->assertEquals(['word', 'word', 'Law/Order'], $handler->value);
+    $this->assertEquals('or', $handler->operator);
+    $handler = HandlerBase::breakString('word+word+Law (O) Order');
+    $this->assertEquals(['word', 'word', 'Law', '(O)', 'Order'], $handler->value);
+    $this->assertEquals('or', $handler->operator);
+
     // Test a single word
     $handler = HandlerBase::breakString('word');
     $this->assertEquals(['word'], $handler->value);

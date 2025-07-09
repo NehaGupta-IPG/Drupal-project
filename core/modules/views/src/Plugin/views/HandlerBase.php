@@ -846,12 +846,12 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
 
     // Determine if the string has 'or' operators (plus signs) or 'and'
     // operators (commas) and split the string accordingly.
-    if (preg_match('/^([\w0-9-_\.]+[+ ]+)+[\w0-9-_\.]+$/u', $str)) {
+    if (preg_match(HandlerBase::generatePattern('+', '+'), $str)) {
       // The '+' character in a query string may be parsed as ' '.
       $operator = 'or';
       $value = preg_split('/[+ ]/', $str);
     }
-    elseif (preg_match('/^([\w0-9-_\.]+[, ]+)*[\w0-9-_\.]+$/u', $str)) {
+    elseif (preg_match(HandlerBase::generatePattern(), $str)) {
       $operator = 'and';
       $value = explode(',', $str);
     }
@@ -990,6 +990,24 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
       }
     }
     return $dependencies;
+  }
+
+  /**
+   * Pass in a string to be added to an auto generated pattern.
+   *
+   * The string will be used to find patterns such as x,y,z and x+y+z.
+   *
+   * @param string $string
+   *   (Optional) A string to use for searching in the pattern. Defaults to ','.
+   * @param string $op
+   *   (Optional) A string used for searching what operation the regex pattern
+   *    will look for. Defaults to '*'.
+   *
+   * @return string
+   *   A regex pattern.
+   */
+  private static function generatePattern(string $string = ',', string $op = '*'): string {
+    return '/^([\w0-9-_\.\#\&\/\(\)]+[' . $string . ' ]+)' . $op . '[\w0-9-_\.\#\&\/\(\)]+$/u';
   }
 
 }
