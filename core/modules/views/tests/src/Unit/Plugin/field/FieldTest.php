@@ -652,7 +652,7 @@ class FieldTest extends UnitTestCase {
   /**
    * @covers ::query
    */
-  public function testQueryWithGroupByForConfigFieldFailure() {
+  public function testQueryWithGroupByForConfigFieldFailure(): void {
     $definition = [
       'entity_type' => 'test_entity',
       'field_name' => 'body',

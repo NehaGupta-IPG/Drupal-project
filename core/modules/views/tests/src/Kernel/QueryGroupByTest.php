@@ -368,7 +368,7 @@ class QueryGroupByTest extends ViewsKernelTestBase {
   /**
    * Tests aggregation on fields with multiple columns.
    */
-  public function testGroupByFieldWithMultipleColumns() {
+  public function testGroupByFieldWithMultipleColumns(): void {
     $this->installEntitySchema('entity_test');
     $this->installEntitySchema('file');
     $this->installSchema('file', 'file_usage');
