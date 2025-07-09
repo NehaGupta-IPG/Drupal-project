@@ -508,7 +508,7 @@ class ViewsConfigUpdater {
    * @return bool
    *   Whether the view was updated.
    */
-  public function needsFixForEmptyGroupColumn(ViewEntityInterface $view) {
+  public function needsFixForEmptyGroupColumn(ViewEntityInterface $view): bool {
     return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type, $key, $display_id) use ($view) {
       return $this->processEmptyGroupColumn($handler, $handler_type, $key, $display_id, $view);
     });
