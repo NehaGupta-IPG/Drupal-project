@@ -36,8 +36,12 @@ use Drupal\node\NodeTypeInterface;
  * @return array|false
  *   A renderable array containing a list of linked node titles fetched from
  *   $result, or FALSE if there are no rows in $result.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement.
+ * @see https://www.drupal.org/node/3531959
  */
 function node_title_list(StatementInterface $result, $title = NULL) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3531959', E_USER_DEPRECATED);
   $items = [];
   $num_rows = FALSE;
   $nids = [];
@@ -121,8 +125,12 @@ function node_get_type_label(NodeInterface $node) {
  *
  * @return string
  *   The node type description.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use $node_type->getDescription() instead.
+ * @see https://www.drupal.org/node/3531945
  */
 function node_type_get_description(NodeTypeInterface $node_type) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use $node_type->getDescription() instead. See https://www.drupal.org/node/3531945', E_USER_DEPRECATED);
   return $node_type->getDescription();
 }
 
@@ -325,10 +333,11 @@ function template_preprocess_node(&$variables): void {
   //   $variables['content'] is more flexible and consistent.
   $submitted_configurable = $node->getFieldDefinition('created')->isDisplayConfigurable('view') || $node->getFieldDefinition('uid')->isDisplayConfigurable('view');
   if (!$skip_custom_preprocessing || !$submitted_configurable) {
-    $variables['date'] = \Drupal::service('renderer')->render($variables['elements']['created']);
-    unset($variables['elements']['created']);
-    $variables['author_name'] = \Drupal::service('renderer')->render($variables['elements']['uid']);
-    unset($variables['elements']['uid']);
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = \Drupal::service('renderer');
+    $variables['date'] = !empty($variables['elements']['created']) ? $renderer->render($variables['elements']['created']) : '';
+    $variables['author_name'] = !empty($variables['elements']['uid']) ? $renderer->render($variables['elements']['uid']) : '';
+    unset($variables['elements']['created'], $variables['elements']['uid']);
   }
 
   if (isset($variables['elements']['title']) && (!$skip_custom_preprocessing || !$node->getFieldDefinition('title')->isDisplayConfigurable('view'))) {
@@ -385,6 +394,11 @@ function node_form_system_themes_admin_form_submit($form, FormStateInterface $fo
     ->set('use_admin_theme', $form_state->getValue('use_admin_theme'))
     ->save();
 }
+
+/**
+ * @addtogroup node_access
+ * @{
+ */
 
 /**
  * Fetches an array of permission IDs granted to the given user ID.
@@ -656,6 +670,10 @@ function _node_access_rebuild_batch_finished($success, $results, $operations): v
     \Drupal::messenger()->addError(t('The content access permissions have not been properly rebuilt.'));
   }
 }
+
+/**
+ * @} End of "addtogroup node_access".
+ */
 
 /**
  * Marks a node to be re-indexed by the node_search plugin.
