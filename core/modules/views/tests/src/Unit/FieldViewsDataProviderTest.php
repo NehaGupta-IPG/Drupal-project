@@ -21,7 +21,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class FieldViewsDataProviderTest extends UnitTestCase {
 
   /**
-   * Covers ::getHandlers
+   * Covers ::getHandlers.
    */
   #[DataProvider('providerGetHandlers')]
   public function testGetHandlers(string $column_type, string $field_type, array $expected): void {
