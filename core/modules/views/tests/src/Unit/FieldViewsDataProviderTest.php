@@ -9,17 +9,21 @@ use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\FieldViewsDataProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
- * @coversDefaultClass \Drupal\views\FieldViewsDataProvider
- * @group views
+ * Tests Drupal\views\FieldViewsDataProvider.
  */
+#[CoversClass(FieldViewsDataProvider::class)]
+#[Group('views')]
 class FieldViewsDataProviderTest extends UnitTestCase {
 
   /**
-   * @covers ::getHandlers
-   * @dataProvider providerGetHandlers
+   * Covers ::getHandlers
    */
+  #[DataProvider('providerGetHandlers')]
   public function testGetHandlers(string $column_type, string $field_type, array $expected): void {
     $entity_type_manager = $this->createMock(EntityTypeManager::class);
     $field_type_plugin_manager = $this->createMock(FieldTypePluginManagerInterface::class);
