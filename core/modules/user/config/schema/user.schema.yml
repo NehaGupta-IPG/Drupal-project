@@ -58,11 +58,21 @@ user.settings:
       constraints:
         UserCancelMethod: []
     cancel_method_options:
-      type: sequence
+      type: mapping
       label: 'Cancellation method options'
-      sequence:
-        type: boolean
-        label: 'Option status'
+      mapping:
+        user_cancel_block:
+          type: boolean
+          label: 'Disable the account and keep its content.'
+        user_cancel_block_unpublish:
+          type: boolean
+          label: 'Disable the account and unpublish its content.'
+        user_cancel_reassign:
+          type: boolean
+          label: 'Delete the account and make its content belong to the anonymous user.'
+        user_cancel_delete:
+          type: boolean
+          label: 'Delete the account and its content.'
     password_reset_timeout:
       type: integer
       label: 'Password reset timeout'
@@ -111,6 +121,8 @@ user.mail:
 user.flood:
   type: config_object
   label: 'User flood settings'
+  constraints:
+    FullyValidatable: ~
   mapping:
     uid_only:
       type: boolean
@@ -118,15 +130,27 @@ user.flood:
     ip_limit:
       type: integer
       label: 'IP limit'
+      constraints:
+        Range:
+          min: 0
     ip_window:
       type: integer
       label: 'IP window'
+      constraints:
+        Range:
+          min: 0
     user_limit:
       type: integer
       label: 'User limit'
+      constraints:
+        Range:
+          min: 0
     user_window:
       type: integer
       label: 'User window'
+      constraints:
+        Range:
+          min: 0
 
 user.role.*:
   type: config_entity
@@ -160,10 +184,14 @@ user.role.*:
 action.configuration.user_add_role_action:
   type: mapping
   label: 'Configuration for the add role action'
+  constraints:
+    FullyValidatable: ~
   mapping:
     rid:
       type: string
       label: 'The ID of the role to add'
+      constraints:
+        RoleExists: ~
 
 action.configuration.user_block_user_action:
   type: action_configuration_default
@@ -176,10 +204,14 @@ action.configuration.user_cancel_user_action:
 action.configuration.user_remove_role_action:
   type: mapping
   label: 'Configuration for the remove role action'
+  constraints:
+    FullyValidatable: ~
   mapping:
     rid:
       type: string
       label: 'The ID of the role to remove'
+      constraints:
+        RoleExists: ~
 
 action.configuration.user_unblock_user_action:
   type: action_configuration_default
