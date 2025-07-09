@@ -213,7 +213,7 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
       $terms = ['keys' => $info['keys']];
       $this->drupalGet('node');
       $this->submitForm($terms, 'Search');
-      $current = $this->getURL();
+      $current = $this->getUrl();
       $expected = Url::fromRoute('search.view_' . $entity->id(), [], ['query' => ['keys' => $info['keys']], 'absolute' => TRUE])->toString();
       $this->assertEquals($expected, $current, 'Block redirected to right search page');
 

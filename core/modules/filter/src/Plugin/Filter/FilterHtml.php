@@ -83,7 +83,7 @@ class FilterHtml extends FilterBase {
    * {@inheritdoc}
    */
   public function process($text, $langcode) {
-    $restrictions = $this->getHtmlRestrictions();
+    $restrictions = $this->getHTMLRestrictions();
     // Split the work into two parts. For filtering HTML tags out of the content
     // we rely on the well-tested Xss::filter() code. Since there is no '*' tag
     // that needs to be removed from the list.

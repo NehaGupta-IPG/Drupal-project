@@ -223,7 +223,7 @@ class LinkFieldTest extends BrowserTestBase {
       'administer entity_test content',
     ]));
     $this->assertValidEntries($field_name, ['/entity_test/add' => '/entity_test/add']);
-    $this->assertInValidEntries($field_name, ['/admin' => $validation_error_3]);
+    $this->assertInvalidEntries($field_name, ['/admin' => $validation_error_3]);
   }
 
   /**

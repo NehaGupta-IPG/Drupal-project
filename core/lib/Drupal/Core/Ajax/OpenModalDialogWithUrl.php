@@ -36,7 +36,7 @@ class OpenModalDialogWithUrl implements CommandInterface {
    */
   public function render() {
     // @see \Drupal\Core\Routing\LocalAwareRedirectResponseTrait::isLocal()
-    if (!UrlHelper::isExternal($this->url) || UrlHelper::externalIsLocal($this->url, $this->getBaseURL())) {
+    if (!UrlHelper::isExternal($this->url) || UrlHelper::externalIsLocal($this->url, $this->getBaseUrl())) {
       return [
         'command' => 'openModalDialogWithUrl',
         'url' => $this->url,

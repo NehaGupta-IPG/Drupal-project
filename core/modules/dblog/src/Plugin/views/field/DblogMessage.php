@@ -59,7 +59,7 @@ class DblogMessage extends FieldPluginBase {
     $value = $this->getValue($values);
 
     if ($this->options['replace_variables']) {
-      $variables = unserialize($this->getvalue($values, 'variables'));
+      $variables = unserialize($this->getValue($values, 'variables'));
       return new FormattableMarkup($value, (array) $variables);
     }
     else {

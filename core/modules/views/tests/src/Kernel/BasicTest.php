@@ -91,7 +91,7 @@ class BasicTest extends ViewsKernelTestBase {
 
     // Verify the result.
     $this->assertCount(3, $view->result, 'The number of returned rows match.');
-    $this->assertIdenticalResultSet($view, $dataset, [
+    $this->assertIdenticalResultset($view, $dataset, [
       'views_test_data_name' => 'name',
       'views_test_data_age' => 'age',
     ]);
@@ -117,7 +117,7 @@ class BasicTest extends ViewsKernelTestBase {
 
     // Verify the result.
     $this->assertCount(1, $view->result, 'The number of returned rows match.');
-    $this->assertIdenticalResultSet($view, $dataset, [
+    $this->assertIdenticalResultset($view, $dataset, [
       'views_test_data_name' => 'name',
       'views_test_data_age' => 'age',
     ]);
@@ -130,7 +130,7 @@ class BasicTest extends ViewsKernelTestBase {
     $dataset = $this->dataSet();
 
     $this->assertCount(5, $view->result, 'The number of returned rows match.');
-    $this->assertIdenticalResultSet($view, $dataset, [
+    $this->assertIdenticalResultset($view, $dataset, [
       'views_test_data_name' => 'name',
       'views_test_data_age' => 'age',
     ]);

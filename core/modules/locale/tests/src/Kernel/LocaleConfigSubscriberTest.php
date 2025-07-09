@@ -59,7 +59,7 @@ class LocaleConfigSubscriberTest extends KernelTestBase {
 
     $this->installSchema('locale', ['locales_source', 'locales_target', 'locales_location']);
 
-    $this->setupLanguages();
+    $this->setUpLanguages();
 
     $this->installConfig(['locale_test']);
     // Simulate this hook invoked which would happen if in a non-kernel test

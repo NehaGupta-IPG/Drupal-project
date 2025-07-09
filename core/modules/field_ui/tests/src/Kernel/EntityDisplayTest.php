@@ -109,12 +109,12 @@ class EntityDisplayTest extends KernelTestBase {
 
     // Check that a component can be removed.
     $display->removeComponent('component_3');
-    $this->assertNULL($display->getComponent('component_3'));
+    $this->assertNull($display->getComponent('component_3'));
 
     // Check that the removal is correctly persisted.
     $display->save();
     $display = EntityViewDisplay::load($display->id());
-    $this->assertNULL($display->getComponent('component_3'));
+    $this->assertNull($display->getComponent('component_3'));
 
     // Check that createCopy() creates a new component that can be correctly
     // saved.

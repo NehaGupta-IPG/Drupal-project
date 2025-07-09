@@ -142,7 +142,7 @@ class CacheTest extends ViewsKernelTestBase {
 
     // Verify the result.
     $this->assertCount(1, $view->result, 'The number of returned rows match.');
-    $this->assertIdenticalResultSet($view, $dataset, [
+    $this->assertIdenticalResultset($view, $dataset, [
       'views_test_data_name' => 'name',
     ]);
 
@@ -173,7 +173,7 @@ class CacheTest extends ViewsKernelTestBase {
 
     // Verify the result.
     $this->assertCount(1, $view->result, 'The number of returned rows match.');
-    $this->assertIdenticalResultSet($view, $dataset, [
+    $this->assertIdenticalResultset($view, $dataset, [
       'views_test_data_name' => 'name',
     ]);
   }

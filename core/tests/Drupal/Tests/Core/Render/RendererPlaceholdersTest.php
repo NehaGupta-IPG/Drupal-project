@@ -600,7 +600,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
    */
   public function testCacheableParent(array $test_element, array $args, array $expected_placeholder_render_array, array|false $placeholder_cache_keys, array $bubbled_cache_contexts, array $bubbled_cache_tags, array $placeholder_expected_render_cache_array): void {
     $element = $test_element;
-    $this->setupMemoryCache();
+    $this->setUpMemoryCache();
 
     $this->setUpRequest('GET');
 
@@ -963,7 +963,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
    */
   public function testRenderChildrenPlaceholdersDifferentArguments(): void {
     $this->setUpRequest();
-    $this->setupMemoryCache();
+    $this->setUpMemoryCache();
     $this->cacheContextsManager->expects($this->any())
       ->method('convertTokensToKeys')
       ->willReturnArgument(0);
@@ -1062,7 +1062,7 @@ HTML;
    */
   public function testRenderLazyBuilderPreview(): void {
     $this->setUpRequest();
-    $this->setupMemoryCache();
+    $this->setUpMemoryCache();
     $this->renderCache = new TestPlaceholderingRenderCache($this->requestStack, $this->cacheFactory, $this->cacheContextsManager, $this->placeholderGenerator);
     $this->renderer = new Renderer($this->callableResolver, $this->themeManager, $this->elementInfo, $this->placeholderGenerator, $this->renderCache, $this->requestStack, $this->rendererConfig);
 

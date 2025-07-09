@@ -112,7 +112,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
     // Create a node and set as home page.
     $this->createHomePage();
     // Go to home page.
-    $this->DrupalGet('<front>');
+    $this->drupalGet('<front>');
     // The language switcher block should display.
     $this->assertSession()->pageTextContains($block_label);
     // Assert that each list item and anchor element has the appropriate data-

@@ -225,7 +225,7 @@ class MigrateNodeTest extends MigrateDrupal7TestBase {
     $this->assertSame('is - High council', Term::load($term_ref)->getName());
 
     $term_ref = $translation->get('field_vocab_fixed')->target_id;
-    $this->assertNulL($term_ref);
+    $this->assertNull($term_ref);
 
     // Test that content_translation_source is set.
     $manager = $this->container->get('content_translation.manager');

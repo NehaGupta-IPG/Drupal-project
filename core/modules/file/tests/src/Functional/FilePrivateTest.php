@@ -64,7 +64,7 @@ class FilePrivateTest extends FileFieldTestBase {
     // Ensure the file can be downloaded.
     $this->drupalGet($node_file->createFileUrl(FALSE));
     $this->assertSession()->statusCodeEquals(200);
-    $this->drupalLogOut();
+    $this->drupalLogout();
     // Ensure the file cannot be downloaded after logging out.
     $this->drupalGet($node_file->createFileUrl(FALSE));
     $this->assertSession()->statusCodeEquals(403);

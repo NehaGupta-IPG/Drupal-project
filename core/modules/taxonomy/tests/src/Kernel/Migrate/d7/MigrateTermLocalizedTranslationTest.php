@@ -134,7 +134,7 @@ class MigrateTermLocalizedTranslationTest extends MigrateDrupal7TestBase {
     $translation = $entity->getTranslation('fr');
     $this->assertSame('fr - DS9 (localized)', $translation->label());
     $this->assertSame('fr - Terok Nor (localized)', $translation->getDescription());
-    $this->assertFALSE($entity->hasTranslation('is'));
+    $this->assertFalse($entity->hasTranslation('is'));
 
     $entity = Term::load(25);
     $this->assertFalse($entity->hasTranslation('is'));
