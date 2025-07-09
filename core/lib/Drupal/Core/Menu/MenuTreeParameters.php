@@ -180,7 +180,7 @@ class MenuTreeParameters implements \Serializable {
    *
    * @return $this
    */
-  public function removeCondition($definition_field) {
+  public function removeCondition(string $definition_field): static {
     unset($this->conditions[$definition_field]);
     return $this;
   }
