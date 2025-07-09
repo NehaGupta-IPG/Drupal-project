@@ -58,21 +58,11 @@ user.settings:
       constraints:
         UserCancelMethod: []
     cancel_method_options:
-      type: mapping
+      type: sequence
       label: 'Cancellation method options'
-      mapping:
-        user_cancel_block:
-          type: boolean
-          label: 'Disable the account and keep its content.'
-        user_cancel_block_unpublish:
-          type: boolean
-          label: 'Disable the account and unpublish its content.'
-        user_cancel_reassign:
-          type: boolean
-          label: 'Delete the account and make its content belong to the anonymous user.'
-        user_cancel_delete:
-          type: boolean
-          label: 'Delete the account and its content.'
+      sequence:
+        type: boolean
+        label: 'Option status'
     password_reset_timeout:
       type: integer
       label: 'Password reset timeout'
