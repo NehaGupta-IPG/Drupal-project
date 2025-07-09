@@ -321,7 +321,7 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
       return $this->options['id'];
     }
     $pager_element = $this->tempStore->get($this->view->dom_id);
-    if ($pager_element) {
+    if (!is_null($pager_element)) {
       return $pager_element;
     }
     $this->tempStore->set($this->view->dom_id, $this->pagerManager->getMaxPagerElementId() + 1);
