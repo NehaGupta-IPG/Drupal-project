@@ -11,6 +11,7 @@ use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\block_content\Hook\BlockContentHooks;
 
 /**
  * Tests the block content.
@@ -37,6 +38,19 @@ class BlockContentTest extends KernelTestBase {
   }
 
   /**
+   * Tests BlockContentType functionality.
+   */
+  public function testBlockContentType(): void {
+    $type = BlockContentType::create([
+      'id' => 'foo',
+      'label' => 'Foo',
+    ]);
+    $this->assertSame('', $type->getDescription());
+    $type->setDescription('Test description');
+    $this->assertSame('Test description', $type->getDescription());
+  }
+
+  /**
    * Tests the editing links for BlockContentBlock.
    */
   public function testOperationLinks(): void {
@@ -60,18 +74,19 @@ class BlockContentTest extends KernelTestBase {
     ]);
 
     // The anonymous user doesn't have the "administer block" permission.
-    $this->assertEmpty(block_content_entity_operation($block));
+    $blockContentEntityOperation = new BlockContentHooks();
+    $this->assertEmpty($blockContentEntityOperation->entityOperation($block));
 
     $this->setUpCurrentUser(['uid' => 1], ['edit any spiffy block content', 'administer blocks']);
 
     // The admin user does have the "administer block" permission.
     $this->assertEquals([
       'block-edit' => [
-        'title' => $this->t('Edit block'),
+        'title' => 'Edit block',
         'url' => $block_content->toUrl('edit-form')->setOptions([]),
         'weight' => 50,
       ],
-    ], block_content_entity_operation($block));
+    ], $blockContentEntityOperation->entityOperation($block));
   }
 
 }

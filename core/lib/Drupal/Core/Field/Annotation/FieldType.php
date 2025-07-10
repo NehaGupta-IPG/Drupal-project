@@ -65,7 +65,7 @@ class FieldType extends DataType {
   public $weight = 0;
 
   /**
-   * The plugin_id of the default widget for this field type.
+   * The plugin ID of the default widget for this field type.
    *
    * This widget must be available whenever the field type is available (i.e.
    * provided by the field type module, or by a module the field type module
@@ -73,11 +73,11 @@ class FieldType extends DataType {
    *
    * @var string
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $default_widget;
 
   /**
-   * The plugin_id of the default formatter for this field type.
+   * The plugin ID of the default formatter for this field type.
    *
    * This formatter must be available whenever the field type is available (i.e.
    * provided by the field type module, or by a module the field type module
@@ -85,21 +85,21 @@ class FieldType extends DataType {
    *
    * @var string
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $default_formatter;
 
   /**
-   * A boolean stating that fields of this type cannot be created through the UI.
+   * Indicates that fields of this type cannot be created through the UI.
    *
    * @var bool
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $no_ui = FALSE;
 
   /**
    * {@inheritdoc}
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $list_class;
 
   /**

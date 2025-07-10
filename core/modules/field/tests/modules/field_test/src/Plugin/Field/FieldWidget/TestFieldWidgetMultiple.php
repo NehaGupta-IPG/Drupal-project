@@ -12,6 +12,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
+// cspell:ignore onewidgetfield
+
 /**
  * Plugin implementation of the 'test_field_widget_multiple' widget.
  *
@@ -56,7 +58,10 @@ class TestFieldWidgetMultiple extends WidgetBase {
    */
   public function settingsSummary() {
     $summary = [];
-    $summary[] = $this->t('@setting: @value', ['@setting' => 'test_widget_setting_multiple', '@value' => $this->getSetting('test_widget_setting_multiple')]);
+    $summary[] = $this->t('@setting: @value', [
+      '@setting' => 'test_widget_setting_multiple',
+      '@value' => $this->getSetting('test_widget_setting_multiple'),
+    ]);
     return $summary;
   }
 

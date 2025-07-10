@@ -17,6 +17,7 @@ use Drupal\views\ResultRow;
 use Drupal\views\ViewEntityInterface;
 use Drupal\views\ViewExecutable;
 use Drupal\views\ViewsData;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -123,7 +124,7 @@ class SqlTest extends UnitTestCase {
    * @param \Drupal\views\ViewsData $views_data
    *   The views data.
    */
-  protected function setupViewsData(ViewsData $views_data) {
+  protected function setupViewsData(ViewsData $views_data): void {
     $container = \Drupal::hasContainer() ? \Drupal::getContainer() : new ContainerBuilder();
     $container->set('views.views_data', $views_data);
     \Drupal::setContainer($container);
@@ -135,7 +136,7 @@ class SqlTest extends UnitTestCase {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
-  protected function setupEntityTypeManager(EntityTypeManagerInterface $entity_type_manager) {
+  protected function setupEntityTypeManager(EntityTypeManagerInterface $entity_type_manager): void {
     $container = \Drupal::hasContainer() ? \Drupal::getContainer() : new ContainerBuilder();
     $container->set('entity_type.manager', $entity_type_manager);
     \Drupal::setContainer($container);
@@ -149,9 +150,10 @@ class SqlTest extends UnitTestCase {
    * @param \Drupal\Core\Entity\EntityInterface[][] $entity_revisions_by_type
    *   Test entities keyed by entity type and revision ID.
    *
-   * @return \Prophecy\Prophecy\ObjectProphecy
+   * @return \Prophecy\Prophecy\ObjectProphecy<\Drupal\Core\Entity\EntityTypeManagerInterface>
+   *   The mocked entity type manager.
    */
-  protected function setupEntityTypes($entities_by_type = [], $entity_revisions_by_type = []) {
+  protected function setupEntityTypes($entities_by_type = [], $entity_revisions_by_type = []): ObjectProphecy {
     $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
     $entity_type0 = new EntityType([
       'label' => 'First',
@@ -316,7 +318,7 @@ class SqlTest extends UnitTestCase {
   /**
    * Create a view with a relationship.
    */
-  protected function setupViewWithRelationships(ViewExecutable $view, $base = 'entity_second') {
+  protected function setupViewWithRelationships(ViewExecutable $view, $base = 'entity_second'): void {
     // We don't use prophecy, because prophecy enforces methods.
     $relationship = $this->getMockBuilder(RelationshipPluginBase::class)->disableOriginalConstructor()->getMock();
     $relationship->definition['base'] = $base;
