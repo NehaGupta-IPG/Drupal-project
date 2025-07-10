@@ -348,7 +348,12 @@ class ConfigImporter {
    *   An array of configuration names.
    */
   public function getUnprocessedConfiguration($op, $collection = StorageInterface::DEFAULT_COLLECTION) {
-    return array_diff($this->storageComparer->getChangelist($op, $collection), $this->processedConfiguration[$collection][$op]);
+    $changelist = $this->storageComparer->getChangelist($op, $collection);
+    $processed = (isset($this->processedConfiguration[$collection][$op]) &&
+      is_array($this->processedConfiguration[$collection][$op]))
+      ? $this->processedConfiguration[$collection][$op]
+      : [];
+    return array_diff($changelist, $processed);
   }
 
   /**
@@ -690,7 +695,9 @@ class ConfigImporter {
       $processed_count = 0;
       foreach ($this->storageComparer->getAllCollectionNames() as $collection) {
         foreach (['delete', 'create', 'rename', 'update'] as $op) {
-          $processed_count += count($this->processedConfiguration[$collection][$op]);
+          $processed_count += isset($this->processedConfiguration[$collection][$op])
+            ? count($this->processedConfiguration[$collection][$op])
+            : 0;
         }
       }
       $context['finished'] = $processed_count / $this->totalConfigurationToProcess;
