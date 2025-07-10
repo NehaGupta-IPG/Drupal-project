@@ -4,6 +4,7 @@ namespace Drupal\views\Plugin\Menu\Form;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Menu\Form\MenuLinkDefaultForm;
@@ -55,13 +56,15 @@ class ViewsMenuLinkForm extends MenuLinkDefaultForm {
    *   The string translation.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
+   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   *   The module extension list.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    */
-  public function __construct(MenuLinkManagerInterface $menu_link_manager, MenuParentFormSelectorInterface $menu_parent_selector, TranslationInterface $string_translation, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager, ConfigFactoryInterface $config_factory) {
-    parent::__construct($menu_link_manager, $menu_parent_selector, $string_translation, $module_handler);
+  public function __construct(MenuLinkManagerInterface $menu_link_manager, MenuParentFormSelectorInterface $menu_parent_selector, TranslationInterface $string_translation, ModuleHandlerInterface $module_handler, ModuleExtensionList $moduleExtensionList, EntityTypeManagerInterface $entity_type_manager, ConfigFactoryInterface $config_factory) {
+    parent::__construct($menu_link_manager, $menu_parent_selector, $string_translation, $module_handler, $moduleExtensionList);
 
     $this->entityTypeManager = $entity_type_manager;
     $this->configFactory = $config_factory;
@@ -76,6 +79,7 @@ class ViewsMenuLinkForm extends MenuLinkDefaultForm {
       $container->get('menu.parent_form_selector'),
       $container->get('string_translation'),
       $container->get('module_handler'),
+      $container->get('extension.list.module'),
       $container->get('entity_type.manager'),
       $container->get('config.factory')
     );
