@@ -134,7 +134,7 @@ class ViewsMenuLink extends MenuLinkBase implements ContainerFactoryPluginInterf
       $metadata = $this->getMetaData();
       $view_id = $metadata['view_id'];
       $display_id = $metadata['display_id'];
-      $view = $this->entityManager->getStorage('view')->load($view_id);
+      $view = $this->entityTypeManager->getStorage('view')->load($view_id);
 
       $config_name = $view->getConfigDependencyName();
       $config_path = 'display.' . $display_id . '.display_options.menu';
