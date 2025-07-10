@@ -2,7 +2,6 @@
 
 namespace Drupal\views\Plugin\Menu\Form;
 
-use Drupal\Core\Url;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
