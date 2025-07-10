@@ -137,11 +137,16 @@ interface ViewsHandlerInterface extends ViewsPluginInterface {
    *   The string to split.
    * @param bool $force_int
    *   Enforce a numeric check.
+   * @param bool $preserve_spaces
+   *   Enforces that the spaces in the values need to preserve or not.
    *
    * @return object
    *   A stdClass object containing value and operator properties.
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   *   Thrown if '+' and ',' characters are together.
    */
-  public static function breakString($str, $force_int = FALSE);
+  public static function breakString($str, $force_int = FALSE, $preserve_spaces = FALSE);
 
   /**
    * Provide text for the administrative summary.

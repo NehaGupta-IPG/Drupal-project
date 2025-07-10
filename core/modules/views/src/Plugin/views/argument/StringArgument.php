@@ -55,6 +55,7 @@ class StringArgument extends ArgumentPluginBase {
     $options['path_case'] = ['default' => 'none'];
     $options['transform_dash'] = ['default' => FALSE];
     $options['break_phrase'] = ['default' => FALSE];
+    $options['preserve_spaces'] = ['default' => FALSE];
 
     if (!empty($this->definition['many to one'])) {
       $options['add_table'] = ['default' => FALSE];
@@ -153,6 +154,15 @@ class StringArgument extends ArgumentPluginBase {
       '#default_value' => !empty($this->options['break_phrase']),
       '#group' => 'options][more',
     ];
+
+    // Preserve spaces with multiple values.
+    $form['preserve_spaces'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Preserve spaces with multiple values'),
+      '#description' => $this->t('If selected, spaces are preserved when "Allow multiple values" is selected.'),
+      '#default_value' => !empty($this->options['preserve_spaces']),
+      '#group' => 'options][more',
+    ];
   }
 
   /**
@@ -217,7 +227,9 @@ class StringArgument extends ArgumentPluginBase {
     }
 
     if (!empty($this->options['break_phrase'])) {
-      $this->unpackArgumentValue();
+      $force_int = !empty($this->definition['numeric']);
+      $preserve_spaces = !empty($this->options['preserve_spaces']);
+      $this->unpackArgumentValue($force_int, $preserve_spaces);
     }
     else {
       $this->value = [$argument];
@@ -236,11 +248,13 @@ class StringArgument extends ArgumentPluginBase {
       if (!empty($this->options['glossary'])) {
         $this->helper->formula = TRUE;
       }
+      $this->operator = 'or';
       $this->helper->ensureMyTable();
       $this->helper->addFilter();
       return;
     }
 
+    // Single value or multiple values with 'AND' operator.
     $this->ensureMyTable();
     $formula = FALSE;
     if (empty($this->options['glossary'])) {
@@ -311,7 +325,9 @@ class StringArgument extends ArgumentPluginBase {
     }
 
     if (!empty($this->options['break_phrase'])) {
-      $this->unpackArgumentValue();
+      $force_int = !empty($this->definition['numeric']);
+      $preserve_spaces = !empty($this->options['preserve_spaces']);
+      $this->unpackArgumentValue($force_int, $preserve_spaces);
     }
     else {
       $this->value = [$this->argument];
