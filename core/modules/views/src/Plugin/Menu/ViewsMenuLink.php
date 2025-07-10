@@ -154,7 +154,6 @@ class ViewsMenuLink extends MenuLinkBase implements ContainerFactoryPluginInterf
       if ($changed) {
         // @todo Improve this to not trigger a full rebuild of everything, if we
         //   just changed some properties. https://www.drupal.org/node/2310389
-        $view->storage->save();
         $config->set($config_path, $options);
         $config->save();
       }
