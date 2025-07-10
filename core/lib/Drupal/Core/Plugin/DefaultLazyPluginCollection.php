@@ -3,7 +3,7 @@
 namespace Drupal\Core\Plugin;
 
 use Drupal\Component\Plugin\ConfigurableInterface;
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Plugin\LazyPluginCollection;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
@@ -72,12 +72,13 @@ class DefaultLazyPluginCollection extends LazyPluginCollection {
 
   /**
    * {@inheritdoc}
+   * @throws PluginException
    */
   protected function initializePlugin($instance_id) {
     $configuration = $this->configurations[$instance_id] ?? [];
     if (!isset($configuration[$this->pluginKey])) {
-      throw new \UnexpectedValueException(sprintf(
-        'Missing plugin configuration key "%s" for plugin instance "%s".',
+      throw new PluginException(sprintf(
+        'Missing key "%s" in configuration for plugin ID "%s".',
         $this->pluginKey,
         $instance_id
       ));
