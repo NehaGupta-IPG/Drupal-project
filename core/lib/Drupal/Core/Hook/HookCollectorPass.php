@@ -236,7 +236,7 @@ class HookCollectorPass implements CompilerPassInterface {
     foreach ($moduleImplementsMap as $hook => $moduleImplements) {
       // Process all hook_module_implements_alter() for build time ordering.
       foreach ($this->moduleImplementsAlters as $alter) {
-        $alter($moduleImplements, $hook);
+        $alter($moduleImplements, (string) $hook);
       }
       foreach ($moduleImplements as $module => $v) {
         if (is_string($hook) && str_starts_with($hook, 'preprocess_') && str_contains($hook, '__')) {
