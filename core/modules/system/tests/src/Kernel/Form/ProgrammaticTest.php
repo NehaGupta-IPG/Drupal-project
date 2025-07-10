@@ -109,7 +109,7 @@ class ProgrammaticTest extends KernelTestBase {
     // on elements are now by-passed, the value for the restricted field should
     // be stored.
     $form_state->setValue('field_restricted', 'dummy value');
-    $form_state->setProgrammedBypassAccessCheck(TRUE);
+    $form_state->setProgrammedBypassAccessCheck();
     \Drupal::formBuilder()->submitForm('\Drupal\form_test\Form\FormTestProgrammaticForm', $form_state);
     $values = $form_state->get('programmatic_form_submit');
     $this->assertEquals('dummy value', $values['field_restricted'], 'The value for the restricted field is not stored.');
