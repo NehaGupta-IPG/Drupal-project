@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\Menu;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Menu\MenuLinkBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -42,6 +43,13 @@ class ViewsMenuLink extends MenuLinkBase implements ContainerFactoryPluginInterf
   protected $viewExecutableFactory;
 
   /**
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
    * The view executable of the menu link.
    *
    * @var \Drupal\views\ViewExecutable
@@ -61,12 +69,15 @@ class ViewsMenuLink extends MenuLinkBase implements ContainerFactoryPluginInterf
    *   The entity type manager.
    * @param \Drupal\views\ViewExecutableFactory $view_executable_factory
    *   The view executable factory.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, ViewExecutableFactory $view_executable_factory) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, ViewExecutableFactory $view_executable_factory, ConfigFactoryInterface $config_factory) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
     $this->viewExecutableFactory = $view_executable_factory;
+    $this->configFactory = $config_factory;
   }
 
   /**
@@ -120,13 +131,23 @@ class ViewsMenuLink extends MenuLinkBase implements ContainerFactoryPluginInterf
     // Update the definition.
     $this->pluginDefinition = $overrides + $this->pluginDefinition;
     if ($persist) {
-      $view = $this->loadView();
-      $display = &$view->storage->getDisplay($view->current_display);
+      $metadata = $this->getMetaData();
+      $view_id = $metadata['view_id'];
+      $display_id = $metadata['display_id'];
+      $view = $this->entityManager->getStorage('view')->load($view_id);
+
+      $config_name = $view->getConfigDependencyName();
+      $config_path = 'display.' . $display_id . '.display_options.menu';
+
+      // Get settings in the original language.
+      $config = $this->configFactory->getEditable($config_name);
+      $options = $config->get($config_path);
+
       // Just save the title to the original view.
       $changed = FALSE;
       foreach ($overrides as $key => $new_definition_value) {
-        if (empty($display['display_options']['menu'][$key]) || $display['display_options']['menu'][$key] != $new_definition_value) {
-          $display['display_options']['menu'][$key] = $new_definition_value;
+        if (empty($options[$key]) || $options[$key] != $new_definition_value) {
+          $options[$key] = $new_definition_value;
           $changed = TRUE;
         }
       }
@@ -134,6 +155,8 @@ class ViewsMenuLink extends MenuLinkBase implements ContainerFactoryPluginInterf
         // @todo Improve this to not trigger a full rebuild of everything, if we
         //   just changed some properties. https://www.drupal.org/node/2310389
         $view->storage->save();
+        $config->set($config_path, $options);
+        $config->save();
       }
     }
     return $this->pluginDefinition;
