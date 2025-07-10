@@ -113,6 +113,11 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     // Add default values from type definition.
     $definition += $this->getDefinitionWithReplacements($type, $replace);
 
+    if (is_array($value) && $definition['type'] === 'string') {
+      $path = $name ?? '[unknown path]';
+      throw new \InvalidArgumentException("Configuration error: Tried to save an array into config property '$path' which is defined as a string in the schema.");
+    }
+
     $data_definition = $this->createDataDefinition($definition['type']);
 
     // Pass remaining values from definition array to data definition.
