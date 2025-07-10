@@ -319,12 +319,12 @@ class FormState implements FormStateInterface {
    * into account. Set this to FALSE when submitting a form programmatically
    * with values that may have been input by the user executing the current
    * request; this will cause #access to be respected as it would on a normal
-   * form submission. Defaults to TRUE.
+   * form submission. Defaults to FALSE.
    *
    * @var bool
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  protected $programmed_bypass_access_check = TRUE;
+  protected $programmed_bypass_access_check = FALSE;
 
   /**
    * Indicates correct form submission.
