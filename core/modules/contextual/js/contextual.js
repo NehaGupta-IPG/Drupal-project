@@ -83,6 +83,11 @@
    *   The server-side rendered HTML for this contextual link.
    */
   function initContextual($contextual, html) {
+    if (!$contextual || !$contextual.length) {
+      console.warn('Skipping contextual init: element not found or empty.');
+      return;
+    }
+
     const $region = $contextual.closest('.contextual-region');
     const { contextual } = Drupal;
 
@@ -166,12 +171,12 @@
           // the chance to set up an event listener on the collection
           // Drupal.contextual.collection.
           window.setTimeout(() => {
-            initContextual(
-              $context
-                .find(`[data-contextual-id="${contextualID.id}"]:empty`)
-                .eq(0),
-              html,
-            );
+            const $contextual = $context
+              .find(`[data-contextual-id="${contextualID.id}"]:empty`)
+              .eq(0);
+            if ($contextual.length) {
+              initContextual($contextual, html);
+            }
           });
           return;
         }
@@ -344,11 +349,16 @@
 
         this.$contextual.find('.contextual-links').prop('hidden', !isOpen);
         const trigger = this.$contextual.find('.trigger').get(0);
-        trigger.textContent = Drupal.t('@action @title configuration options', {
-          '@action': !isOpen ? this.strings.open : this.strings.close,
-          '@title': this.title,
-        });
-        trigger.setAttribute('aria-pressed', isOpen);
+        if (trigger) {
+          trigger.textContent = Drupal.t(
+            '@action @title configuration options',
+            {
+              '@action': !isOpen ? this.strings.open : this.strings.close,
+              '@title': this.title,
+            },
+          );
+          trigger.setAttribute('aria-pressed', isOpen);
+        }
       }
 
       /**
