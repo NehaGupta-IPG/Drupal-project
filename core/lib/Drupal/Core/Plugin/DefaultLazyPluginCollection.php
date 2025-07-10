@@ -76,7 +76,11 @@ class DefaultLazyPluginCollection extends LazyPluginCollection {
   protected function initializePlugin($instance_id) {
     $configuration = $this->configurations[$instance_id] ?? [];
     if (!isset($configuration[$this->pluginKey])) {
-      throw new PluginNotFoundException($instance_id);
+      throw new \UnexpectedValueException(sprintf(
+        'Missing plugin configuration key "%s" for plugin instance "%s".',
+        $this->pluginKey,
+        $instance_id
+      ));
     }
     $this->set($instance_id, $this->manager->createInstance($configuration[$this->pluginKey], $configuration));
   }
