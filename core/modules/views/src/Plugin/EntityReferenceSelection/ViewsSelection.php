@@ -210,7 +210,17 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
     // Check that the view is valid and the display still exists.
     $this->view = Views::getView($view_name);
     if (!$this->view || !$this->view->access($display_name)) {
-      \Drupal::messenger()->addWarning($this->t('The reference view %view_name cannot be found.', ['%view_name' => $view_name]));
+      if (!$this->view) {
+        \Drupal::messenger()->addWarning($this->t(
+          'The reference view %view_name cannot be found.',
+          ['%view_name' => $view_name]));
+      } elseif (!$this->view->access($display_name)) {
+        \Drupal::messenger()->addWarning($this->t('In the reference view "%view_name", the display "%display_name" cannot be found.',
+        [
+          '%view_name' => $view_name, 
+          '%display_name' => $display_name
+        ]));
+      }
       return FALSE;
     }
     $this->view->setDisplay($display_name);
