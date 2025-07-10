@@ -224,7 +224,7 @@ class Html {
    * @see self::getUniqueId()
    */
   public static function getId($id) {
-    $id = str_replace([' ', '_', '[', ']'], ['-', '-', '-', ''], mb_strtolower($id));
+    $id = $id ? str_replace([' ', '_', '[', ']'], ['-', '-', '-', ''], mb_strtolower($id)) : '';
 
     // As defined in https://www.w3.org/TR/html4/types.html#type-name, HTML IDs
     // can only contain letters, digits ([0-9]), hyphens ("-"), underscores
