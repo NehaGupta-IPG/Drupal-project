@@ -215,18 +215,25 @@ function template_preprocess_fieldset(&$variables): void {
   }
 
   if (!empty($element['#description'])) {
-    $description_id = $element['#attributes']['id'] . '--description';
-    $description_attributes['id'] = $description_id;
     $variables['description_display'] = $element['#description_display'];
-    if ($element['#description_display'] === 'invisible') {
-      $description_attributes['class'][] = 'visually-hidden';
-    }
-    $description_attributes['data-drupal-field-elements'] = 'description';
-    $variables['description']['attributes'] = new Attribute($description_attributes);
-    $variables['description']['content'] = $element['#description'];
+    $variables['description'] = [
+      'content' => $element['#description'],
+    ];
 
-    // Add the description's id to the fieldset aria attributes.
-    $variables['attributes']['aria-describedby'] = $description_id;
+    if (!empty($element['#attributes']['id'])) {
+      $description_id = $element['#attributes']['id'] . '--description';
+      // Add the description's id to the fieldset aria attributes.
+      $variables['attributes']['aria-describedby'] = $description_id;
+      // Add the description's id to the description render array.
+      $attributes = [
+        'id' => $description_id,
+        'data-drupal-field-elements' => 'description',
+      ];
+      if ($element['#description_display'] === 'invisible') {
+        $attributes['class'][] = 'visually-hidden';
+      }
+      $variables['description']['attributes'] = new Attribute($attributes);
+    }
   }
 
   // Suppress error messages.
