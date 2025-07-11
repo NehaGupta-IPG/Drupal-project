@@ -278,8 +278,14 @@ class SystemTokensHooks {
       foreach ($tokens as $name => $original) {
         switch ($name) {
           case 'url':
+          case 'url:absolute':
             $logo_path = $this->getLogoPath($data['theme'], $bubbleable_metadata);
             $replacements[$original] = $logo_path ? Url::fromUserInput($logo_path, ['absolute' => TRUE])->toString() : '';
+            break;
+
+          case 'url:relative':
+            $logo_path = $this->getLogoPath($data['theme'], $bubbleable_metadata);
+            $replacements[$original] = $logo_path ? Url::fromUserInput($logo_path, ['absolute' => FALSE])->toString() : '';
             break;
         }
       }
