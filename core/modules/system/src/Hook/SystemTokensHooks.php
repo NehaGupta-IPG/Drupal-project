@@ -362,7 +362,7 @@ class SystemTokensHooks {
    * Returns an <img> tag for the logo of the given theme.
    *
    * @param string $theme
-   *   The theme to get the logo path for.
+   *   The theme to get the image tag for.
    * @param \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata
    *   The bubbleable metadata to alter in order to cache the token.
    *
