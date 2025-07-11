@@ -811,7 +811,7 @@ field.value.boolean:
   type: mapping
   mapping:
     value:
-      type: integer
+      type: boolean
       label: 'Value'
 
 # Schema for the configuration of the Email field type.
