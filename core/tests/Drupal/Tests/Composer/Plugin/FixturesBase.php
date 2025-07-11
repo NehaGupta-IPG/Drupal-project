@@ -148,6 +148,10 @@ abstract class FixturesBase {
   public function tmpDir(string $prefix): string {
     $prefix .= static::persistentPrefix();
     $tmpDir = sys_get_temp_dir() . '/scaffold-' . $prefix . uniqid(md5($prefix . microtime()), TRUE);
+    while (file_exists($tmpDir)) {
+      usleep(500);
+      $tmpDir = sys_get_temp_dir() . '/scaffold-' . $prefix . uniqid(md5($prefix . microtime()), TRUE);
+    }
     $this->tmpDirs[] = $tmpDir;
     return $tmpDir;
   }
