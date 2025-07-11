@@ -365,13 +365,17 @@ class SystemTokensHooks {
    * @param \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata
    *   The bubbleable metadata to alter in order to cache the token.
    *
-   * @return \Drupal\Component\Render\MarkupInterface
-   *   An HTML <img> tag for the logo.
-   *
-   * @see \Drupal\system\Hook\SystemTokensHooks::getLogoPath()
+   * @return \Drupal\Component\Render\MarkupInterface|string
+   *   An HTML <img> tag for the logo or an empty string if no logo is
+   *   configured for the theme.
    */
   protected function getLogoRendered(string $theme, BubbleableMetadata $bubbleable_metadata) {
     $logo_path = $this->getLogoPath($theme, $bubbleable_metadata);
+    // No active / default theme logo is configured, simply return an empty
+    // string:
+    if ($logo_path === NULL) {
+      return '';
+    }
     $build = [
       '#theme' => 'image',
       '#uri' => $logo_path,
