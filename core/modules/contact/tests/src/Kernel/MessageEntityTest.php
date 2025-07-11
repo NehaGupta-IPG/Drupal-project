@@ -66,7 +66,8 @@ class MessageEntityTest extends EntityKernelTestBase {
     $admin = $this->createUser(['administer contact forms'], NULL, FALSE, ['uid' => 4]);
 
     $this->assertFalse(\Drupal::entityTypeManager()->getAccessControlHandler('contact_message')->createAccess(NULL, $no_access_user));
-    $this->assertTrue(\Drupal::entityTypeManager()->getAccessControlHandler('contact_message')->createAccess(NULL, $access_user));
+    // Create forbidden at the access-handler level as messages aren't stored.
+    $this->assertFalse(\Drupal::entityTypeManager()->getAccessControlHandler('contact_message')->createAccess(NULL, $access_user));
     $this->assertTrue($message->access('update', $admin));
     $this->assertFalse($message->access('update', $access_user));
   }

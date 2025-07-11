@@ -17,7 +17,9 @@ class ContactMessageAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    return AccessResult::allowedIfHasPermission($account, 'access site-wide contact form');
+    // Message entities are not stored. Access is denied for
+    // viewing, updating, and deleting.
+    return AccessResult::forbidden('Message entities are not stored.');
   }
 
 }

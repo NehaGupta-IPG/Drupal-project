@@ -30,6 +30,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\DataReferenceTargetDefinition;
 use Drupal\Core\TypedData\TypedDataInternalPropertiesHelper;
 use Drupal\Core\Url;
+use Drupal\contact\Entity\Message;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\jsonapi\CacheableResourceResponse;
@@ -1975,6 +1976,12 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // @todo Remove this in https://www.drupal.org/node/2300677.
     if ($this->entity instanceof ConfigEntityInterface) {
       $this->markTestSkipped('POSTing config entities is not yet supported.');
+    }
+
+    // Message entity has no storage, so always forbids access. Test not
+    // relevant.
+    if ($this->entity instanceof Message) {
+      $this->markTestSkipped('Message entities not stored.');
     }
 
     // Try with all of the following request bodies.
