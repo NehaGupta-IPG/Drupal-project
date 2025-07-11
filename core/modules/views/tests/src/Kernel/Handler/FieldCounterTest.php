@@ -176,4 +176,61 @@ class FieldCounterTest extends ViewsKernelTestBase {
     $this->assertEquals($counter_start + 2, $counter);
   }
 
+  /**
+   * Tests reverse counter field.
+   */
+  public function testReverseCounter(): void {
+    $pager_types = ['full', 'mini'];
+
+    foreach ($pager_types as $pager_type) {
+      $view = Views::getView('test_view');
+      $view->setDisplay();
+
+      // Set reverse counter and name fields.
+      $view->displayHandlers->get('default')->overrideOption('fields', [
+        'counter' => [
+          'id' => 'counter',
+          'table' => 'views',
+          'field' => 'counter',
+          'relationship' => 'none',
+          'reverse' => TRUE,
+        ],
+        'name' => [
+          'id' => 'name',
+          'table' => 'views_test_data',
+          'field' => 'name',
+          'relationship' => 'none',
+        ],
+      ]);
+
+      $view->displayHandlers->get('default')->setOption('pager', [
+        'type' => $pager_type,
+        'options' => ['items_per_page' => 1],
+      ]);
+
+      $view->preview();
+      $total_items = $view->pager->getTotalItems();
+
+      for ($page = 0; $page < $total_items; $page++) {
+        if ($page > 0) {
+          $view->destroy();
+          $view->setCurrentPage($page);
+          $view->preview();
+        }
+
+        $expected = (string) ($total_items - $page);
+        $actual = $view->style_plugin->getField(0, 'counter');
+
+        $this->assertEquals($expected, $actual, sprintf(
+          'Pager [%s] Page %d: Expected counter %s, got %s.',
+          $pager_type,
+          $page + 1,
+          $expected,
+          $actual
+        ));
+      }
+      $view->destroy();
+    }
+  }
+
 }
