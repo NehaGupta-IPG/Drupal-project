@@ -332,7 +332,8 @@ class SystemTokensHooks {
    *   The bubbleable metadata to alter in order to cache the token.
    *
    * @return string|null
-   *   The logo path, or NULL if logo.url not set for the theme.
+   *   The logo path, or NULL if the "logo.url" setting does not exist for the
+   *   theme.
    */
   protected function getLogoPath(string $theme, BubbleableMetadata $bubbleable_metadata) {
     if ($theme === 'default-theme') {
