@@ -745,8 +745,8 @@
     // #ajax['keypress'] is TRUE. On a text-type widget a space should always
     // be a space.
     if (
-      event.which === 13 ||
-      (event.which === 32 &&
+      event.key === 'Enter' ||
+      (event.code === 'Space' &&
         element.type !== 'text' &&
         element.type !== 'textarea' &&
         element.type !== 'tel' &&

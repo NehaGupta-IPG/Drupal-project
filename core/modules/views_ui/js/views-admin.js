@@ -515,7 +515,7 @@
 
     // Trap the ENTER key in the search box so that it doesn't submit the form.
     this.$searchBox.on('keypress', (event) => {
-      if (event.which === 13) {
+      if (event.key === 'Enter') {
         event.preventDefault();
       }
     });
