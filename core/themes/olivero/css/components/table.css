@@ -34,6 +34,10 @@
   line-height: var(--sp);
 }
 
+:is(.text-content table, .views-table, .draggable-table) tbody tr:last-child th {
+  border-block-end: 0;
+}
+
 :is(.text-content table, .views-table, .draggable-table) tr:last-child td {
   border-block-end: 0;
 }
@@ -50,12 +54,13 @@
   margin-block: 0;
   margin-inline-start: 0;
   margin-inline-end: 0;
+  padding-block: 1.375rem 0.875rem;
   text-align: start;
   letter-spacing: 0.02em;
   color: var(--color-text-neutral-loud);
   border-block-end: 2px solid var(--color--primary-50);
   font-family: var(--font-sans);
-  font-size: 0.875rem;
+  font-size: 1rem;
   line-height: var(--sp);
 }
 
