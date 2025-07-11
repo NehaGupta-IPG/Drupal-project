@@ -4,26 +4,31 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\layout_builder\Kernel;
 
+use Drupal\block_content\BlockContentInterface;
 use Drupal\Core\Routing\CurrentRouteMatch;
-use Drupal\block_content\Entity\BlockContent;
-use Drupal\block_content\Entity\BlockContentType;
 use Drupal\entity_test\Entity\EntityTestMulRevPub;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use Drupal\layout_builder\EventSubscriber\SetInlineBlockDependency;
 use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionComponent;
+use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\layout_builder\EventSubscriber\SetInlineBlockDependency
- * @group layout_builder
+ * Tests the SetInlineBlockDependency event subscriber.
  */
+#[CoversClass(SetInlineBlockDependency::class)]
+#[Group('layout_builder')]
 class SetInlineBlockDependencyTest extends KernelTestBase {
 
   use UserCreationTrait;
   use ContentModerationTestTrait;
+  use BlockContentCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -53,11 +58,11 @@ class SetInlineBlockDependencyTest extends KernelTestBase {
     $this->installEntitySchema('block_content');
     $this->installEntitySchema('content_moderation_state');
 
-    BlockContentType::create([
+    $this->createBlockContentType([
       'id' => 'basic',
       'label' => 'Basic block',
       'revision' => 1,
-    ])->save();
+    ]);
 
     $display = LayoutBuilderEntityViewDisplay::create([
       'targetEntityType' => 'entity_test_mulrevpub',
@@ -195,11 +200,11 @@ class SetInlineBlockDependencyTest extends KernelTestBase {
    * @param \Drupal\entity_test\Entity\EntityTestMulRevPub $entity
    *   The entity to add an inline block to.
    *
-   * @return \Drupal\block_content\Entity\BlockContent
+   * @return \Drupal\block_content\BlockContentInterface
    *   The loaded block content revision attached to the layout.
    */
-  protected function addInlineBlockToOverrideLayout(EntityTestMulRevPub $entity): BlockContent {
-    $block = BlockContent::create([
+  protected function addInlineBlockToOverrideLayout(EntityTestMulRevPub $entity): BlockContentInterface {
+    $block = $this->createBlockContent(save: FALSE, values: [
       'type' => 'basic',
       'info' => $this->randomMachineName(),
       'reusable' => FALSE,
