@@ -204,19 +204,19 @@ class TokenReplaceKernelTest extends TokenReplaceKernelTestBase {
       '#uri' => theme_get_setting('logo.url', 'olivero'),
       '#alt' => 'The site logo',
     ];
-    $olivero_logo = $renderer->renderInIsolation($build);
+    $olivero_logo_html_string = $renderer->renderInIsolation($build)->__toString();
     $build = [
       '#theme' => 'image',
       '#uri' => theme_get_setting('logo.url', 'claro'),
       '#alt' => 'The site logo',
     ];
-    $claro_logo = $renderer->renderInIsolation($build);
+    $claro_logo_html_string = $renderer->renderInIsolation($build)->__toString();
 
     $tests = [];
-    $tests['[site:logo]'] = $claro_logo;
-    $tests['[site:logo:active-theme]'] = $claro_logo;
+    $tests['[site:logo]'] = $claro_logo_html_string;
+    $tests['[site:logo:active-theme]'] = $claro_logo_html_string;
     $tests['[site:logo:active-theme:url]'] = Url::fromUserInput($claro_config->get('logo.path'), ['absolute' => TRUE])->toString();
-    $tests['[site:logo:default-theme]'] = $olivero_logo;
+    $tests['[site:logo:default-theme]'] = $olivero_logo_html_string;
     $tests['[site:logo:default-theme:url]'] = Url::fromUserInput($olivero_config->get('logo.path'), ['absolute' => TRUE])->toString();
 
     $bubbleable_metadata_claro = BubbleableMetadata::createFromObject($global_theme_config)
@@ -273,11 +273,11 @@ class TokenReplaceKernelTest extends TokenReplaceKernelTestBase {
       '#uri' => theme_get_setting('logo.url', 'olivero'),
       '#alt' => 'The site logo',
     ];
-    $olivero_logo = $renderer->renderInIsolation($build);
+    $olivero_logo_html_string = $renderer->renderInIsolation($build)->__toString();
 
     // Generate and test tokens.
     $tests = [];
-    $tests['[site:logo:theme-olivero]'] = $olivero_logo;
+    $tests['[site:logo:theme-olivero]'] = $olivero_logo_html_string;
     $tests['[site:logo:theme-olivero:url]'] = Url::fromUserInput($olivero_config->get('logo.path'), ['absolute' => TRUE])->toString();
     $tests['[site:logo:theme-olivero:foo]'] = '[site:logo:theme-olivero:foo]';
     $tests['[site:logo:theme-not-enabled-theme]'] = '[site:logo:theme-not-enabled-theme]';
