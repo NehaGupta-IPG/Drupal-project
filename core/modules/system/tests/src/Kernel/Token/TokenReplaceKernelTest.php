@@ -312,6 +312,24 @@ class TokenReplaceKernelTest extends TokenReplaceKernelTestBase {
   }
 
   /**
+   * Tests the logo token, when the logo is not configured for a theme.
+   */
+  public function testSiteLogoNotConfiguredTokenReplacement(): void {
+    // Install Olivero, but don't set a logo in the olivero settings:
+    \Drupal::service('theme_installer')->install(['olivero']);
+
+    // Generate and test tokens.
+    $tests = [];
+    $tests['[site:logo:theme-olivero]'] = '';
+    $tests['[site:logo:theme-olivero:url]'] = '';
+
+    foreach ($tests as $input => $expected) {
+      $output = $this->tokenService->replace($input);
+      $this->assertSame($expected, $output, "Token '$input' was not replaced.");
+    }
+  }
+
+  /**
    * Tests the generation of all system date tokens.
    */
   public function testSystemDateTokenReplacement(): void {
