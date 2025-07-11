@@ -24,9 +24,9 @@ class BigPipeThemeHooks {
       if (is_array($callback)) {
         $callback = implode('__', $callback);
       }
-      // Use simplified template suggestion, if any.
-      // For example, this simplifies
-            // phpcs:ignore Drupal.Files.LineLength
+      // Use simplified template suggestion, if any. For example, this
+      // simplifies the following line as shown.
+      // phpcs:ignore Drupal.Files.LineLength
       // big-pipe-interface-preview--Drupal-block-BlockViewBuilder--lazyBuilder--<BLOCK ID>.html.twig
       // to
       // big-pipe-interface-preview--block--<BLOCK ID>.html.twig.

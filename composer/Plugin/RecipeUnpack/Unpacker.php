@@ -81,7 +81,7 @@ final readonly class Unpacker {
         }
         else {
           // This recipe should not be unpacked. But it might need to be added
-          // to the root composer.json
+          // to the root composer.json.
           $this->io->write(sprintf('<info>%s</info> not unpacked because it is ignored.', $package->getName()), verbosity: IOInterface::VERBOSE);
         }
       }

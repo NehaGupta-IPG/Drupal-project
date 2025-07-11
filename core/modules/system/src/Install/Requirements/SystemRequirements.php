@@ -67,7 +67,7 @@ class SystemRequirements implements InstallRequirementsInterface {
     $theme_extension_list->reset();
     $requirements = [];
 
-    // Report Drupal version
+    // Report Drupal version.
     if ($phase == 'runtime') {
       $requirements['drupal'] = [
         'title' => t('Drupal'),
@@ -224,7 +224,7 @@ class SystemRequirements implements InstallRequirementsInterface {
       if (preg_match('/Apache\/(\d+)\.?(\d+)?\.?(\d+)?/', $software, $matches)) {
         $apache_version_string = $matches[0];
 
-        // Major version number
+        // Major version number.
         if ($matches[1] < 2) {
           $rewrite_error = TRUE;
         }
@@ -576,7 +576,7 @@ class SystemRequirements implements InstallRequirementsInterface {
       }
     }
 
-    // Test PHP memory_limit
+    // Test PHP memory_limit.
     $memory_limit = ini_get('memory_limit');
     $requirements['php_memory_limit'] = [
       'title' => t('PHP memory limit'),
@@ -970,7 +970,7 @@ class SystemRequirements implements InstallRequirementsInterface {
       }
     }
 
-    // Verify the update.php access setting
+    // Verify the update.php access setting.
     if ($phase == 'runtime') {
       if (Settings::get('update_free_access')) {
         $requirements['update access'] = [

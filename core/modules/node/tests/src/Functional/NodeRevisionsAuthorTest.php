@@ -31,7 +31,7 @@ class NodeRevisionsAuthorTest extends NodeTestBase {
       'edit any page content',
     ]);
     $initialRevisionUser = $this->drupalCreateUser();
-    // Third user is an author only and needs no permissions
+    // Third user is an author only and needs no permissions.
     $initialRevisionAuthor = $this->drupalCreateUser();
 
     // Create initial node (author: $user1).

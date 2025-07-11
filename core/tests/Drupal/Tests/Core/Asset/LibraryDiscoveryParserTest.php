@@ -366,7 +366,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     // - CSS_LAYOUT: -100
     // - CSS_COMPONENT: 0
     // - CSS_STATE: 100
-    // - CSS_THEME: 200.
+    // - CSS_THEME: 200
     $this->assertEquals(200, $css[0]['weight']);
     $this->assertEquals(200 + 29, $css[1]['weight']);
     $this->assertEquals(-200, $css[2]['weight']);

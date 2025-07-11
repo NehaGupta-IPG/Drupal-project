@@ -44,7 +44,7 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
     // "is-active" class is set, but that should remain unchanged:
     // - surrounding HTML
     // - tags for which to test the setting of the "is-active" class
-    // - content of said tags.
+    // - content of said tags
     $edge_case_html5 = '<audio src="foo.ogg">
   <track kind="captions" src="foo.en.vtt" srclang="en" label="English">
   <track kind="captions" src="foo.sv.vtt" srclang="sv" label="Svenska">

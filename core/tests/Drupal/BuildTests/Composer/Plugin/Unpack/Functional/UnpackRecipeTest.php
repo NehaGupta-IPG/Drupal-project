@@ -175,7 +175,7 @@ class UnpackRecipeTest extends BuildTestBase {
     // Run composer install and confirm the composer.lock was created.
     $this->runComposer('install');
 
-    // Disable automatic unpacking as it is the default behavior,
+    // Disable automatic unpacking as it is the default behavior.
     $this->runComposer('config --merge --json extra.drupal-recipe-unpack.on-require false');
 
     // Install a module in require-dev.
@@ -247,7 +247,7 @@ class UnpackRecipeTest extends BuildTestBase {
     $root_project_path = $this->fixturesDir . '/composer-root';
     $this->runComposer('install');
 
-    // Disable automatic unpacking as it is the default behavior,
+    // Disable automatic unpacking as it is the default behavior.
     $this->runComposer('config --merge --json extra.drupal-recipe-unpack.on-require false');
 
     // Install a recipe and check it is not unpacked.
@@ -284,7 +284,7 @@ class UnpackRecipeTest extends BuildTestBase {
     $stdOut = $this->runComposer('drupal:recipe-unpack');
     $this->assertSame("No recipes to unpack.\n", $stdOut);
 
-    // Disable automatic unpacking as it is the default behavior,
+    // Disable automatic unpacking as it is the default behavior.
     $this->runComposer('config --merge --json extra.drupal-recipe-unpack.on-require false');
 
     // Install a recipe and check it is not unpacked.
@@ -364,7 +364,7 @@ class UnpackRecipeTest extends BuildTestBase {
 
     // Run composer install and confirm the composer.lock was created.
     $this->runComposer('install');
-    // Disable automatic unpacking as it is the default behavior,
+    // Disable automatic unpacking as it is the default behavior.
     $this->runComposer('config --merge --json extra.drupal-recipe-unpack.on-require false');
 
     $this->runComposer('require --dev fixtures/recipe-b');
@@ -408,7 +408,7 @@ class UnpackRecipeTest extends BuildTestBase {
   public function testRemoveRecipe(): void {
     $root_project_path = $this->fixturesDir . '/composer-root';
 
-    // Disable automatic unpacking, which is the default behavior,
+    // Disable automatic unpacking, which is the default behavior.
     $this->runComposer('config --merge --json extra.drupal-recipe-unpack.on-require false');
 
     $this->runComposer('install');
@@ -442,7 +442,7 @@ class UnpackRecipeTest extends BuildTestBase {
   public function testIgnoreRecipe(): void {
     $root_project_path = $this->fixturesDir . '/composer-root';
 
-    // Disable automatic unpacking as it is the default behavior,
+    // Disable automatic unpacking as it is the default behavior.
     $this->runComposer('config --merge --json extra.drupal-recipe-unpack.ignore \'["fixtures/recipe-a"]\'');
 
     $this->runComposer('install');
@@ -478,7 +478,7 @@ class UnpackRecipeTest extends BuildTestBase {
   public function testIgnoreDependentRecipe(): void {
     $root_project_path = $this->fixturesDir . '/composer-root';
 
-    // Disable automatic unpacking, which is the default behavior,
+    // Disable automatic unpacking, which is the default behavior.
     $this->runComposer('config --merge --json extra.drupal-recipe-unpack.ignore \'["fixtures/recipe-b"]\'');
     $this->runComposer('config sort-packages true');
 

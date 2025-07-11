@@ -522,7 +522,7 @@ class Schema extends DatabaseSchema {
           // Adding 0 to a string will cause PHP to convert it to a float or
           // an integer depending on what the string is. For example:
           // - '1' + 0 = 1
-          // - '1.0' + 0 = 1.0.
+          // - '1.0' + 0 = 1.0
           $schema['fields'][$row->name]['default'] = $row->dflt_value + 0;
         }
         else {

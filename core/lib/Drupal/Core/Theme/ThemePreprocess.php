@@ -530,7 +530,7 @@ class ThemePreprocess {
     // Format the table columns:
     if (!empty($variables['colgroups'])) {
       foreach ($variables['colgroups'] as &$colgroup) {
-        // Check if we're dealing with a simple or complex column
+        // Check if we're dealing with a simple or complex column.
         if (isset($colgroup['data'])) {
           $cols = $colgroup['data'];
           unset($colgroup['data']);
@@ -626,7 +626,7 @@ class ThemePreprocess {
           $cells = $row;
           $row_attributes = [];
 
-          // Check if we're dealing with a simple or complex row
+          // Check if we're dealing with a simple or complex row.
           if (isset($row['data'])) {
             $cells = $row['data'];
             $variables['no_striping'] = $row['no_striping'] ?? FALSE;

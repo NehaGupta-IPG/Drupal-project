@@ -154,7 +154,7 @@ class TermHierarchyValidationTest extends EntityKernelTestBase {
     // - parent2
     // -- child1 <- this will be a term with a pending revision
     // --- child2
-    // - parent3.
+    // - parent3
     $child2 = $term_storage->create([
       'name' => $this->randomMachineName(),
       'vid' => $vocabulary_id,

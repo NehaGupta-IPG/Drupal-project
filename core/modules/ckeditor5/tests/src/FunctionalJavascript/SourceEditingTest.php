@@ -200,7 +200,7 @@ JS;
       // Edge case: wildcard attribute names:
       // - prefix, f.e. `data-*`
       // - infix, f.e. `*gramma*`
-      // - suffix, f.e. `*-grammar`.
+      // - suffix, f.e. `*-grammar`
       '<a data-*>' => [
         $general_test_case_markup,
         '<div class="llama"><p>The <a href="https://example.com/pirate" data-grammar="subject">pirate</a> is <a href="https://example.com/irate" data-grammar="adjective">irate</a>.</p></div>',

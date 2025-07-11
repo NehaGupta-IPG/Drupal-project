@@ -185,7 +185,7 @@ class UserPasswordResetTest extends BrowserTestBase {
     $_emails = $this->drupalGetMails();
     $email = end($_emails);
     $this->assertEquals(htmlspecialchars_decode($email['body']), $email['body'], 'Email body contains HTML entities');
-    // Change site name to 'Drupal'
+    // Change site name to 'Drupal'.
     $config->set('name', "Drupal")->save();
     $this->rebuildContainer();
     // Visit the user edit page without pass-reset-token and make sure it does
