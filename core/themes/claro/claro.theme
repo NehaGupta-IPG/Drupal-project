@@ -1027,6 +1027,23 @@ function claro_preprocess_select(&$variables): void {
 }
 
 /**
+ * Implements template_preprocess_HOOK() for datetime_wrapper.
+ */
+function claro_preprocess_datetime_wrapper(&$variables): void {
+  if (!empty($variables['element']['#errors'])) {
+    $variables['title_attributes']['class'][] = 'has-error';
+  }
+
+  if (!empty($variables['element']['#disabled'])) {
+    $variables['title_attributes']['class'][] = 'is-disabled';
+
+    if (!empty($variables['description_attributes'])) {
+      $variables['description_attributes']->addClass('is-disabled');
+    }
+  }
+}
+
+/**
  * Implements template_preprocess_HOOK() for fieldset.
  */
 function claro_preprocess_fieldset(&$variables): void {
