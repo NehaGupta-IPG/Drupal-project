@@ -88,7 +88,7 @@ class ThemeTestHooks {
    */
   #[Hook('theme_suggestions_alter')]
   public function themeSuggestionsAlter(array &$suggestions, array $variables, $hook): void {
-    \Drupal::messenger()->addStatus('theme_test_theme_suggestions_alter' . '() executed for ' . $hook . '.');
+    \Drupal::messenger()->addStatus('theme_test_theme_suggestions_alter() executed for ' . $hook . '.');
   }
 
   /**
@@ -96,7 +96,7 @@ class ThemeTestHooks {
    */
   #[Hook('theme_suggestions_theme_test_suggestions_alter')]
   public function themeSuggestionsThemeTestSuggestionsAlter(array &$suggestions, array $variables): void {
-    \Drupal::messenger()->addStatus('theme_test_theme_suggestions_theme_test_suggestions_alter' . '() executed.');
+    \Drupal::messenger()->addStatus('theme_test_theme_suggestions_theme_test_suggestions_alter() executed.');
   }
 
   /**
