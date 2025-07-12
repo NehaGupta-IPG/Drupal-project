@@ -33,7 +33,7 @@ use Drupal\Core\Url;
  */
 #[ProceduralHookScanStop]
 function update_authorize_run_update($filetransfer, $projects) {
-  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
 
   $batch_builder = (new BatchBuilder())
     ->setFile(\Drupal::service('extension.list.module')->getPath('update') . '/update.authorize.inc')
@@ -79,7 +79,7 @@ function update_authorize_run_update($filetransfer, $projects) {
  *   Reference to an array used for Batch API storage.
  */
 function update_authorize_batch_copy_project($project, $updater_name, $local_url, $filetransfer, &$context): void {
-  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
 
   // Initialize some variables in the Batch API $context array.
   if (!isset($context['results']['log'])) {
@@ -100,6 +100,7 @@ function update_authorize_batch_copy_project($project, $updater_name, $local_url
   // though the connection itself is now gone. So, although it's ugly, we have
   // to unset the connection variable at this point so that the FileTransfer
   // object will re-initiate the actual connection.
+  // @phpstan-ignore property.deprecatedClass
   unset($filetransfer->connection);
 
   if (!empty($context['results']['log'][$project]['#abort'])) {
@@ -107,6 +108,7 @@ function update_authorize_batch_copy_project($project, $updater_name, $local_url
     return;
   }
 
+  // @phpstan-ignore getDeprecatedService.deprecated
   $updater = new $updater_name($local_url, \Drupal::getContainer()->get('update.root'));
 
   try {
@@ -149,7 +151,7 @@ function update_authorize_batch_copy_project($project, $updater_name, $local_url
  *   An associative array of results from the batch operation.
  */
 function update_authorize_update_batch_finished($success, $results): void {
-  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
 
   foreach ($results['log'] as $messages) {
     if (!empty($messages['#abort'])) {
@@ -233,7 +235,7 @@ function update_authorize_update_batch_finished($success, $results): void {
  *   if there were errors. Defaults to TRUE.
  */
 function _update_batch_create_message(&$project_results, $message, $success = TRUE): void {
-  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
 
   $project_results[] = ['message' => $message, 'success' => $success];
 }
@@ -252,7 +254,7 @@ function _update_batch_create_message(&$project_results, $message, $success = TR
  * @see update_storage_clear()
  */
 function _update_authorize_clear_update_status(): void {
-  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
 
   \Drupal::keyValueExpirable('update')->deleteAll();
   \Drupal::keyValueExpirable('update_available_release')->deleteAll();

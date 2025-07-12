@@ -38,6 +38,7 @@ class ElementTest extends BrowserTestBase {
     $this->testFormAutocomplete();
     $this->testFormElementErrors();
     $this->testDetailsSummaryAttributes();
+    $this->testDetailsDescriptionAttributes();
   }
 
   /**
@@ -153,10 +154,10 @@ class ElementTest extends BrowserTestBase {
    * Tests the submit_button attribute.
    */
   protected function testSubmitButtonAttribute(): void {
-    // Set the submit_button attribute to true
+    // Set the submit_button attribute to true.
     $this->drupalGet('form-test/submit-button-attribute');
     $this->assertSession()->elementsCount('xpath', '//input[@type="submit"]', 1);
-    // Set the submit_button attribute to false
+    // Set the submit_button attribute to false.
     $this->drupalGet('form-test/submit-button-attribute/1');
     $this->assertSession()->elementsCount('xpath', '//input[@type="button"]', 1);
   }
@@ -228,6 +229,15 @@ class ElementTest extends BrowserTestBase {
   protected function testDetailsSummaryAttributes(): void {
     $this->drupalGet('form-test/group-details');
     $this->assertSession()->elementExists('css', 'summary[data-summary-attribute="test"]');
+  }
+
+  /**
+   * Tests description attributes of details.
+   */
+  protected function testDetailsDescriptionAttributes(): void {
+    $this->drupalGet('form-test/group-details');
+    $this->assertSession()->elementExists('css', 'details[aria-describedby="edit-description-attributes--description"]');
+    $this->assertSession()->elementExists('css', 'div[id="edit-description-attributes--description"]');
   }
 
 }
