@@ -50,7 +50,7 @@ class ThemeCommonElements {
       'datetime_wrapper' => [
         'render element' => 'element',
         'initial preprocess' => DatePreprocess::class . ':preprocessDatetimeWrapper',
-        'deprecated' => 'The "datetime_wrapper" template is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3078334',
+        'deprecated' => 'The "datetime_wrapper" template is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3530128',
       ],
       'status_messages' => [
         'variables' => [
