@@ -204,9 +204,6 @@ class ThemeSuggestionsAlterTest extends KernelTestBase {
           'Template overridden based on new theme suggestion provided by a module via hook_theme_suggestions_alter().',
           "<!-- BEGIN OUTPUT from 'core/modules/system/tests/modules/theme_suggestions_test/templates/theme-test-general-suggestions--module-override$extension' -->",
         ],
-        'unexpected' => [
-          'Template overridden based on new theme suggestion provided by the test_theme theme via hook_theme_suggestions_alter().',
-        ],
       ],
     ];
   }
