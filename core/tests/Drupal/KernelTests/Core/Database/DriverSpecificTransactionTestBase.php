@@ -39,7 +39,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
  * is active, and mysqli does not fail when rolling back and no transaction
  * active.
  */
-class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
+abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
 
   /**
    * Keeps track of the post-transaction callback action executed.
