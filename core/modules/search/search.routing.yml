@@ -6,6 +6,14 @@ entity.search_page.collection:
   requirements:
     _permission: 'administer search'
 
+search.index_settings:
+  path: '/admin/config/search/index-settings'
+  defaults:
+    _form: '\Drupal\search\Form\IndexSettingsForm'
+    _title: 'Search index settings'
+  requirements:
+    _permission: 'administer search'
+
 search.reindex_confirm:
   path: '/admin/config/search/pages/reindex'
   defaults:
