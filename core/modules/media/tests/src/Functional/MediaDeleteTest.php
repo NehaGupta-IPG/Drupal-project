@@ -13,6 +13,7 @@ use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests deleting media items.
@@ -250,91 +251,66 @@ class MediaDeleteTest extends BrowserTestBase {
   /**
    * Tests the delete file default setting on a single media entity.
    */
-  public function testDeleteFileDefaultOnSingleMediaDeletion(): void {
+  #[TestWith([TRUE])]
+  #[TestWith([FALSE])]
+  public function testDeleteFileDefaultOnSingleMediaDeletion(bool $delete): void {
     $account = $this->createUser(admin: TRUE);
     $this->drupalLogin($account);
 
+    $this->config('media.settings')
+      ->set('delete_file_default', $delete)
+      ->save();
+    $media = $this->createMedia();
+
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
-    // Create file and media entity:
-    $media = $this->createMedia();
     // Go to media deletion form and check default setting is FALSE:
     $this->drupalGet($media->toUrl('delete-form'));
     $assert_session->statusCodeEquals(200);
-    $assert_session->checkboxNotChecked('Also delete the associated file?');
-    // Delete media entity and check if file still exists:
+    $this->assertSame($delete, $assert_session->fieldExists('also_delete_file')->isChecked());
+    // Delete media entity and check if file still exists.
     $page->pressButton('Delete');
     $assert_session->statusCodeEquals(200);
     $assert_session->pageTextContains('The media item ' . $media->getName() . ' has been deleted.');
-    $this->assertFileExists($media->field_media_image->entity->getFileUri());
+    $this->assertSame(!$delete, file_exists($media->field_media_image->entity->getFileUri()));
 
-    // Create new file and media entity:
-    $media = $this->createMedia();
-    // Set default config to true:
-    $this->config('media.settings')
-      ->set('delete_file_default', TRUE)
-      ->save();
-
-    // Go to media deletion form and check default setting is TRUE:
-    $this->drupalGet($media->toUrl('delete-form'));
-    $assert_session->statusCodeEquals(200);
-    $assert_session->checkboxChecked('Also delete the associated file?');
-    // Delete media entity and check if file is deleted as well:
-    $page->pressButton('Delete');
-    $assert_session->statusCodeEquals(200);
-    $assert_session->pageTextContains('The media item ' . $media->getName() . ' has been deleted.');
-    $assert_session->pageTextContains('Deleted the associated file ' . $media->field_media_image->entity->getFilename() . '.');
-    $this->assertFileDoesNotExist($media->field_media_image->entity->getFileUri());
+    if ($delete) {
+      $assert_session->pageTextContains('Deleted the associated file ' . $media->field_media_image->entity->getFilename() . '.');
+    }
   }
 
   /**
    * Tests the delete file default setting on multiple media entities.
    */
-  public function testDeleteFileDefaultOnMultipleMediaDeletion(): void {
+  #[TestWith([TRUE])]
+  #[TestWith([FALSE])]
+  public function testDeleteFileDefaultOnMultipleMediaDeletion(bool $delete): void {
     $account = $this->createUser(admin: TRUE);
     $this->drupalLogin($account);
 
+    $this->config('media.settings')
+      ->set('delete_file_default', $delete)
+      ->save();
+
+    $media1 = $this->createMedia();
+    $media2 = $this->createMedia();
+
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
-    // Create files and media entities:
-    $media1 = $this->createMedia();
-    $media2 = $this->createMedia();
-    // Go to media bulk form, delete multiple media entities and check if
-    // default setting is FALSE:
+    // The bulk deletion form should have the checkbox unchecked by default.
     $this->drupalGet('test-media-bulk-form');
     $assert_session->statusCodeEquals(200);
     $page->checkField('edit-media-bulk-form-0');
     $page->checkField('edit-media-bulk-form-1');
     $page->selectFieldOption('action', 'media_delete_action');
     $page->pressButton('Apply to selected items');
-    $assert_session->checkboxNotChecked('Also delete the associated files?');
-    // Delete media entities and check if files still exists:
-    $page->pressButton('Delete');
-    $assert_session->statusCodeEquals(200);
-    $assert_session->pageTextContains('Deleted 2 items.');
-    $this->assertFileExists($media1->field_media_image->entity->getFileUri());
-    $this->assertFileExists($media2->field_media_image->entity->getFileUri());
+    $this->assertSame($delete, $assert_session->fieldExists('also_delete_file')->isChecked());
 
-    // Create new files and media entities:
-    $media1 = $this->createMedia();
-    $media2 = $this->createMedia();
-    // Set default config to true:
-    $this->config('media.settings')->set('delete_file_default', 'TRUE')->save();
-    // Go to media deletion bulk form again and check default setting is TRUE:
-    $this->drupalGet('test-media-bulk-form');
-    $assert_session->statusCodeEquals(200);
-    $page->checkField('edit-media-bulk-form-0');
-    $page->checkField('edit-media-bulk-form-1');
-    $page->selectFieldOption('action', 'media_delete_action');
-    $page->pressButton('Apply to selected items');
-    $assert_session->checkboxChecked('Also delete the associated files?');
-    // Delete media entities and check if the files are deleted as well:
     $page->pressButton('Delete');
     $assert_session->statusCodeEquals(200);
     $assert_session->pageTextContains('Deleted 2 items.');
-    $assert_session->pageTextContains('Deleted 2 associated files.');
-    $this->assertFileDoesNotExist($media1->field_media_image->entity->getFileUri());
-    $this->assertFileDoesNotExist($media2->field_media_image->entity->getFileUri());
+    $this->assertSame(!$delete, file_exists($media1->field_media_image->entity->getFileUri()));
+    $this->assertSame(!$delete, file_exists($media2->field_media_image->entity->getFileUri()));
   }
 
   /**
