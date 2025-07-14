@@ -28,6 +28,16 @@
     line-height: var(--sp);
   }
 
+  & tbody {
+    & tr {
+      &:last-child {
+        & th {
+          border-block-end: 0;
+        }
+      }
+    }
+  }
+
   & tr {
     &:last-child {
       & td {
@@ -48,12 +58,13 @@
     margin-block: 0;
     margin-inline-start: 0;
     margin-inline-end: 0;
+    padding-block: 22px 14px;
     text-align: start;
     letter-spacing: 0.02em;
     color: var(--color-text-neutral-loud);
     border-block-end: 2px solid var(--color--primary-50);
     font-family: var(--font-sans);
-    font-size: 14px;
+    font-size: 16px;
     line-height: var(--sp);
   }
 
