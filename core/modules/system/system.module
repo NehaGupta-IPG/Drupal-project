@@ -64,7 +64,7 @@ function system_hook_info(): array {
  * Implements hook_theme_suggestions_HOOK().
  */
 function system_theme_suggestions_html(array $variables): array {
-  $path_args = explode('/', trim(\Drupal::service('path.current')->getPath(), '/'));
+  $path_args = explode('/', trim(Drupal::service('path.current')->getPath(), '/'));
   return theme_get_suggestions($path_args, 'html');
 }
 
@@ -72,11 +72,11 @@ function system_theme_suggestions_html(array $variables): array {
  * Implements hook_theme_suggestions_HOOK().
  */
 function system_theme_suggestions_page(array $variables): array {
-  $path_args = explode('/', trim(\Drupal::service('path.current')->getPath(), '/'));
+  $path_args = explode('/', trim(Drupal::service('path.current')->getPath(), '/'));
   $suggestions = theme_get_suggestions($path_args, 'page');
 
   $supported_http_error_codes = [401, 403, 404];
-  $exception = \Drupal::requestStack()->getCurrentRequest()->attributes->get('exception');
+  $exception = Drupal::requestStack()->getCurrentRequest()->attributes->get('exception');
   if ($exception instanceof HttpExceptionInterface && in_array($exception->getStatusCode(), $supported_http_error_codes, TRUE)) {
     $suggestions[] = 'page__4xx';
     $suggestions[] = 'page__' . $exception->getStatusCode();
@@ -95,7 +95,7 @@ function system_theme_suggestions_maintenance_page(array $variables): array {
   // allow themers to override the page and the content completely.
   $offline = defined('MAINTENANCE_MODE');
   try {
-    \Drupal::service('path.matcher')->isFrontPage();
+    Drupal::service('path.matcher')->isFrontPage();
   }
   catch (Exception) {
     // The database is not yet available.
@@ -225,7 +225,7 @@ function template_preprocess_entity_add_list(&$variables): void {
 function system_authorized_init($callback, $file, $arguments = [], $page_title = NULL): void {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
 
-  $session = \Drupal::request()->getSession();
+  $session = Drupal::request()->getSession();
   // First, figure out what file transfer backends the site supports, and put
   // all of those in the SESSION so that authorize.php has access to all of
   // them via the class autoloader, even without a full bootstrap.
@@ -351,9 +351,9 @@ function system_check_directory($form_element, FormStateInterface $form_state) {
     return $form_element;
   }
 
-  $logger = \Drupal::logger('file system');
+  $logger = Drupal::logger('file system');
   /** @var \Drupal\Core\File\FileSystemInterface $file_system */
-  $file_system = \Drupal::service('file_system');
+  $file_system = Drupal::service('file_system');
   if (!is_dir($directory) && !$file_system->mkdir($directory, NULL, TRUE)) {
     // If the directory does not exist and cannot be created.
     $form_state->setErrorByName($form_element['#parents'][0], t('The directory %directory does not exist and could not be created.', ['%directory' => $directory]));
@@ -393,12 +393,12 @@ function system_check_directory($form_element, FormStateInterface $form_state) {
  */
 function system_region_list($theme, $show = REGIONS_ALL): array {
   if (!$theme instanceof Extension) {
-    try {
-      $theme = \Drupal::service('theme_handler')->getTheme($theme);
-    }
-    catch (\Drupal\Core\Extension\Exception\UnknownExtensionException $e) {
+    $theme_handler = Drupal::service('theme_handler');
+    if (!$theme_handler->themeExists($theme)) {
       return [];
     }
+    $theme = $theme_handler->getTheme($theme);
+
   }
   $list = [];
   $info = $theme->info;
@@ -465,7 +465,7 @@ function system_default_region($theme) {
 function system_admin_compact_mode() {
   // PHP converts dots into underscores in cookie names to avoid problems with
   // its parser, so we use a converted cookie name.
-  return \Drupal::request()->cookies->get('Drupal_visitor_admin_compact_mode', \Drupal::config('system.site')->get('admin_compact_mode'));
+  return Drupal::request()->cookies->get('Drupal_visitor_admin_compact_mode', Drupal::config('system.site')->get('admin_compact_mode'));
 }
 
 /**
@@ -475,8 +475,8 @@ function system_admin_compact_mode() {
  *   TRUE if Claro is the admin theme but not the active theme.
  */
 function _system_is_claro_admin_and_not_active() {
-  $admin_theme = \Drupal::configFactory()->get('system.theme')->get('admin');
-  $active_theme = \Drupal::theme()->getActiveTheme()->getName();
+  $admin_theme = Drupal::configFactory()->get('system.theme')->get('admin');
+  $active_theme = Drupal::theme()->getActiveTheme()->getName();
   return $active_theme !== 'claro' && $admin_theme === 'claro';
 }
 
