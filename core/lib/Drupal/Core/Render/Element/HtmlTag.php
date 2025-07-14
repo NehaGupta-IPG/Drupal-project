@@ -13,12 +13,17 @@ use Drupal\Core\Template\Attribute;
  * Provides a render element for any HTML tag, with properties and value.
  *
  * Properties:
- * - #tag: The tag name to output.
- * - #attributes: (array, optional) HTML attributes to apply to the tag. The
+ *
+ * @property $tag
+ *   The tag name to output.
+ * @property $attributes
+ *   (array, optional) HTML attributes to apply to the tag. The
  *   attributes are escaped, see \Drupal\Core\Template\Attribute.
- * - #value: (string|MarkupInterface, optional) The textual contents of the tag.
+ * @property $value
+ *   (string|MarkupInterface, optional) The textual contents of the tag.
  *   Strings will be XSS admin filtered.
- * - #noscript: (bool, optional) When set to TRUE, the markup
+ * @property $noscript
+ *   (bool, optional) When set to TRUE, the markup
  *   (including any prefix or suffix) will be wrapped in a <noscript> element.
  *
  * Usage example:
@@ -37,6 +42,9 @@ class HtmlTag extends RenderElementBase {
 
   /**
    * Void elements do not contain values or closing tags.
+   *
+   * @var string[]
+   *
    * @see https://www.w3.org/TR/html5/syntax.html#syntax-start-tag
    * @see https://www.w3.org/TR/html5/syntax.html#void-elements
    */
@@ -50,10 +58,9 @@ class HtmlTag extends RenderElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#pre_render' => [
-        [$class, 'preRenderHtmlTag'],
+        [static::class, 'preRenderHtmlTag'],
       ],
       '#attributes' => [],
       '#value' => NULL,
@@ -79,6 +86,7 @@ class HtmlTag extends RenderElementBase {
    *     any non-empty value here will add the <noscript> tag.)
    *
    * @return array
+   *   The element, after the pre-rendering processing run.
    */
   public static function preRenderHtmlTag($element) {
     $attributes = isset($element['#attributes']) ? new Attribute($element['#attributes']) : '';

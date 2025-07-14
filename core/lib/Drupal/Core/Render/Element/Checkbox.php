@@ -10,7 +10,9 @@ use Drupal\Core\Render\Element;
  * Provides a form element for a single checkbox.
  *
  * Properties:
- * - #return_value: The value to return when the checkbox is checked.
+ *
+ * @property $return_value
+ *   The value to return when the checkbox is checked.
  *
  * Usage example:
  * @code
@@ -29,18 +31,17 @@ class Checkbox extends FormElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#return_value' => 1,
       '#process' => [
-        [$class, 'processCheckbox'],
-        [$class, 'processAjaxForm'],
-        [$class, 'processGroup'],
+        [static::class, 'processCheckbox'],
+        [static::class, 'processAjaxForm'],
+        [static::class, 'processGroup'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderCheckbox'],
-        [$class, 'preRenderGroup'],
+        [static::class, 'preRenderCheckbox'],
+        [static::class, 'preRenderGroup'],
       ],
       '#theme' => 'input__checkbox',
       '#theme_wrappers' => ['form_element'],

@@ -1,3 +1,5 @@
+/* cspell:ignore xmlhttprequest */
+
 /**
  * @file
  * Provides Ajax page updating via jQuery $.ajax.
@@ -456,7 +458,7 @@
 
     // If there isn't a form, jQuery.ajax() will be used instead, allowing us to
     // bind Ajax to links as well.
-    if (this.element && this.element.form) {
+    if (this.element?.form) {
       /**
        * @type {jQuery}
        */
@@ -1335,14 +1337,16 @@
       // Parse response.data into an element collection.
       const parseHTML = (htmlString) => {
         const fragment = document.createDocumentFragment();
-        // Create a temporary div element
-        const tempDiv = fragment.appendChild(document.createElement('div'));
+        // Create a temporary template element.
+        const template = fragment.appendChild(
+          document.createElement('template'),
+        );
 
-        // Set the innerHTML of the div to the provided HTML string
-        tempDiv.innerHTML = htmlString;
+        // Set the innerHTML of the template to the provided HTML string.
+        template.innerHTML = htmlString;
 
-        // Return the contents of the temporary div
-        return tempDiv.childNodes;
+        // Return the contents of the temporary template.
+        return template.content.childNodes;
       };
 
       let $newContent = $(parseHTML(response.data));
@@ -1858,23 +1862,7 @@
      *   Selector to use.
      */
     scrollTop(ajax, response) {
-      const offset = $(response.selector).offset();
-      // We can't guarantee that the scrollable object should be
-      // the body, as the element could be embedded in something
-      // more complex such as a modal popup. Recurse up the DOM
-      // and scroll the first element that has a non-zero top.
-      let scrollTarget = response.selector;
-      while ($(scrollTarget).scrollTop() === 0 && $(scrollTarget).parent()) {
-        scrollTarget = $(scrollTarget).parent();
-      }
-
-      // Only scroll upward.
-      if (offset.top - 10 < $(scrollTarget).scrollTop()) {
-        scrollTarget.get(0).scrollTo({
-          top: offset.top - 10,
-          behavior: 'smooth',
-        });
-      }
+      document.querySelector(response.selector)?.scrollIntoView();
     },
   };
 
@@ -1894,7 +1882,7 @@
       xhr.getResponseHeader('X-Drupal-Ajax-Token') === '1' &&
       // The isInProgress() function might not be defined if the Ajax request
       // was initiated without Drupal.ajax() or new Drupal.Ajax().
-      settings.isInProgress &&
+      typeof settings.isInProgress === 'function' &&
       // Until this is false, the Ajax request isn't completely done (the
       // response's commands might still be running).
       settings.isInProgress()

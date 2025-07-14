@@ -344,10 +344,10 @@ class OptionsWidgetsTest extends FieldTestBase {
     // Test optgroups.
 
     $this->card1->setSetting('allowed_values', []);
-    $this->card1->setSetting('allowed_values_function', 'options_test_allowed_values_callback');
+    $this->card1->setSetting('allowed_values_function', '\Drupal\options_test\OptionsAllowedValues::simpleValues');
     $this->card1->save();
 
-    // Display form: with no field data, nothing is selected
+    // Display form: with no field data, nothing is selected.
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     $this->assertFalse($this->assertSession()->optionExists('card_1', 0)->isSelected());
     $this->assertFalse($this->assertSession()->optionExists('card_1', 1)->isSelected());
@@ -505,7 +505,7 @@ class OptionsWidgetsTest extends FieldTestBase {
 
     // Use a callback function defining optgroups.
     $this->card2->setSetting('allowed_values', []);
-    $this->card2->setSetting('allowed_values_function', 'options_test_allowed_values_callback');
+    $this->card2->setSetting('allowed_values_function', '\Drupal\options_test\OptionsAllowedValues::simpleValues');
     $this->card2->save();
     $field->setRequired(FALSE);
     $field->save();

@@ -12,6 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
 use Drupal\file\Element\ManagedFile;
 use Drupal\file\Entity\File;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -28,16 +29,10 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 class FileWidget extends WidgetBase {
 
   /**
-   * The element info manager.
-   */
-  protected ElementInfoManagerInterface $elementInfo;
-
-  /**
    * {@inheritdoc}
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ElementInfoManagerInterface $element_info) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
-    $this->elementInfo = $element_info;
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $element_info);
   }
 
   /**
@@ -60,6 +55,15 @@ class FileWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
+    $element['notice'] = [
+      '#type' => 'container',
+      '#markup' => $this->t('The UploadProgress PHP extension must be enabled to configure the progress indicator. Check the <a href=":status">status report</a> for more information.', [':status' => Url::fromRoute('system.status')->toString()]),
+      '#weight' => 16,
+      '#access' => !extension_loaded('uploadprogress'),
+      '#attributes' => [
+        'role' => 'status',
+      ],
+    ];
     $element['progress_indicator'] = [
       '#type' => 'radios',
       '#title' => $this->t('Progress indicator'),
@@ -70,7 +74,7 @@ class FileWidget extends WidgetBase {
       '#default_value' => $this->getSetting('progress_indicator'),
       '#description' => $this->t('The throbber display does not show the status of uploads but takes up less space. The progress bar is helpful for monitoring progress on large uploads.'),
       '#weight' => 16,
-      '#access' => extension_loaded('uploadprogress'),
+      '#disabled' => !extension_loaded('uploadprogress'),
     ];
     return $element;
   }
@@ -228,7 +232,7 @@ class FileWidget extends WidgetBase {
 
     // Essentially we use the managed_file type, extended with some
     // enhancements.
-    $element_info = $this->elementInfo->getInfo('managed_file');
+    $element_info = $this->elementInfoManager->getInfo('managed_file');
     $element += [
       '#type' => 'managed_file',
       '#upload_location' => $items[$delta]->getUploadLocation(),

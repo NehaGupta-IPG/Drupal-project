@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore blocknodebundle fieldbody fieldlinks
-
 /**
  * Tests moving blocks via the form.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
 class MoveBlockFormTest extends WebDriverTestBase {
 
   use ContextualLinkClickTrait;
@@ -38,6 +38,8 @@ class MoveBlockFormTest extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    $this->markTestSkipped("Skipped temporarily for random fails.");
+
     parent::setUp();
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
@@ -65,7 +67,6 @@ class MoveBlockFormTest extends WebDriverTestBase {
       '.block-extra-field-blocknodebundle-with-section-fieldlinks',
       '.block-field-blocknodebundle-with-section-fieldbody',
     ];
-    $this->markTestSkipped("Skipped temporarily for random fails.");
     $this->assertRegionBlocksOrder(0, 'content', $expected_block_order);
 
     // Add a top section using the Two column layout.
@@ -236,7 +237,7 @@ class MoveBlockFormTest extends WebDriverTestBase {
    * @return \Behat\Mink\Element\NodeElement
    *   The row handle element.
    */
-  protected function findRowHandle($block_label) {
+  protected function findRowHandle($block_label): NodeElement {
     $assert_session = $this->assertSession();
     return $assert_session->elementExists('css', "[data-drupal-selector=\"edit-components\"] td:contains(\"$block_label\") a.tabledrag-handle");
   }

@@ -132,16 +132,12 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
    */
   public function defaultConfiguration() {
     return [
-      'status' => TRUE,
-      'info' => '',
       'view_mode' => 'full',
     ];
   }
 
   /**
-   * Overrides \Drupal\Core\Block\BlockBase::blockForm().
-   *
-   * Adds body and description fields to the block configuration form.
+   * {@inheritdoc}
    */
   public function blockForm($form, FormStateInterface $form_state) {
     $block = $this->getEntity();
@@ -158,7 +154,6 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
       '#default_value' => $this->configuration['view_mode'],
       '#access' => (count($options) > 1),
     ];
-    $form['title']['#description'] = $this->t('The title of the block as shown to the user.');
     return $form;
   }
 
@@ -197,6 +192,13 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
         '#access' => $this->account->hasPermission('administer blocks'),
       ];
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createPlaceholder(): bool {
+    return TRUE;
   }
 
   /**
