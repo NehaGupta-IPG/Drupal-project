@@ -29,15 +29,9 @@ class DeleteFormSettingsTest extends UpdatePathTestBase {
    * Tests that the update path adds new settings.
    */
   public function testSettingsAreCreated(): void {
-    $config = $this->config('media.settings');
-    $this->assertNull($config->get('delete_file_default'));
-    $this->assertNull($config->get('disable_delete_control'));
-
+    $this->assertNull($this->config('media.settings')->get('delete_files'));
     $this->runUpdates();
-
-    $config = $this->config('media.settings');
-    $this->assertFalse($config->get('delete_file_default'));
-    $this->assertFalse($config->get('disable_delete_control'));
+    $this->assertTrue($this->config('media.settings')->get('delete_files'));
   }
 
 }

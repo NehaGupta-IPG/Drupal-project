@@ -15,12 +15,9 @@ media.settings:
     standalone_url:
       type: boolean
       label: 'Allow media items to be viewed standalone at /media/{id}'
-    delete_file_default:
+    delete_files:
       type: boolean
-      label: 'Delete files attached to media items when the media item is deleted'
-    disable_delete_control:
-      type: boolean
-      label: 'Do not offer users the ability to delete files attached to media items'
+      label: 'When deleting media items, also delete the associated files'
 
 media.type.*:
   type: config_entity
