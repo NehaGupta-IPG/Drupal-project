@@ -75,7 +75,7 @@ class BuildAlter implements ContainerInjectionInterface {
     // Add the revision status after the first column.
     array_splice($build['entity_revisions_table']['#header'], 1, 0, [$this->t('Moderation state')]);
 
-    foreach ($build['entity_revisions_table']['#rows'] as $index => &$row) {
+    foreach ($build['entity_revisions_table']['#rows'] as &$row) {
       // The table rows are keyed numerically, whereas the array of revisions is
       // keyed by the vid. So the only way to get the revision for a row is to
       // rely on the two arrays being in the same order.
