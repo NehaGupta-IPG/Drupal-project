@@ -224,4 +224,34 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
     $this->assertNull($result);
   }
 
+  /**
+   * Tests the file create with incorrect stream wrapper.
+   *
+   * @covers \Drupal\Core\File\FileSystem::prepareDirectory
+   */
+  public function testIncorrectStreamWrapper(): void {
+    $destination = \sprintf('cat://%s.txt', $this->randomMachineName());
+
+    /** @var \Drupal\Core\File\FileSystem $file_system */
+    $file_system = \Drupal::service('file_system');
+
+    // PHPUnit 10 cannot expect warnings, so we have to catch them ourselves.
+    $messages = [];
+    set_error_handler(function (int $errno, string $errstr) use (&$messages): void {
+      $messages[] = [$errno, $errstr];
+    });
+    $status = $file_system->prepareDirectory($destination);
+    restore_error_handler();
+    $this->assertCount(0, $messages);
+    self::assertFalse($status);
+
+    // Validate that file.repository service also throws the exception.
+    self::expectException(InvalidStreamWrapperException::class);
+    self::expectExceptionMessage(\sprintf('Invalid stream wrapper: %s', $destination));
+    $data = $this->randomMachineName();
+    /** @var \Drupal\file\FileRepositoryInterface $file_repository */
+    $file_repository = \Drupal::service('file.repository');
+    $file_repository->writeData($data, $destination, FileExists::Error);
+  }
+
 }

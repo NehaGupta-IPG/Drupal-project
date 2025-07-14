@@ -507,6 +507,12 @@ class FileSystem implements FileSystemInterface {
    * {@inheritdoc}
    */
   public function prepareDirectory(&$directory, $options = self::MODIFY_PERMISSIONS) {
+    // Check the file wrapper scheme derived from the directory path is valid.
+    $scheme = $this->streamWrapperManager->getScheme($directory);
+    if ($this->streamWrapperManager->isValidScheme($scheme) === FALSE) {
+      return FALSE;
+    }
+
     if (!$this->streamWrapperManager->isValidUri($directory)) {
       // Only trim if we're not dealing with a stream.
       $directory = rtrim($directory, '/\\');
