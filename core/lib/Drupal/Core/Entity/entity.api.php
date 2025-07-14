@@ -1967,10 +1967,10 @@ function hook_entity_form_display_alter(\Drupal\Core\Entity\Display\EntityFormDi
  *
  * @see hook_entity_ENTITY_TYPE_revision_overview_alter()
  */
-function hook_entity_revision_overview_alter(array &$build, \Drupal\Core\Entity\EntityInterface $entity, array $context) {
-  array_splice($build['entity_revisions_table']['#header'], 1, 0, [$this->t('Revision author ID')]);
+function hook_entity_revision_overview_alter(array &$build, \Drupal\Core\Entity\EntityInterface $entity, array $context): void {
+  array_splice($build['entity_revisions_table']['#header'], 1, 0, [t('Revision author ID')]);
 
-  foreach ($build['entity_revisions_table']['#rows'] as $index => &$row) {
+  foreach ($build['entity_revisions_table']['#rows'] as &$row) {
     // The table rows are keyed numerically, whereas the array of revisions is
     // keyed by the vid. So the only way to get the revision for a row is to
     // rely on the two arrays being in the same order.
@@ -2004,24 +2004,8 @@ function hook_entity_revision_overview_alter(array &$build, \Drupal\Core\Entity\
  *
  * @see hook_entity_revision_overview_alter()
  */
-function hook_entity_ENTITY_TYPE_revision_overview_alter(array &$build, \Drupal\Core\Entity\EntityInterface $entity, array $context) {
-  array_splice($build['entity_revisions_table']['#header'], 1, 0, [$this->t('Revision author ID')]);
+function hook_entity_ENTITY_TYPE_revision_overview_alter(array &$build, \Drupal\Core\Entity\EntityInterface $entity, array $context): void {
 
-  foreach ($build['entity_revisions_table']['#rows'] as $index => &$row) {
-    // The table rows are keyed numerically, whereas the array of revisions is
-    // keyed by the vid. So the only way to get the revision for a row is to
-    // rely on the two arrays being in the same order.
-    $row_revision = array_shift($displayed_revisions);
-
-    // A table row either is an array of cells, or has a 'data' array which
-    // is the array of cells.
-    if (isset($row['data'])) {
-      array_splice($row['data'], 1, 0, [$row_revision->uid->target_id]);
-    }
-    else {
-      array_splice($row, 1, 0, [$row_revision->uid->target_id]);
-    }
-  }
 }
 
 /**
