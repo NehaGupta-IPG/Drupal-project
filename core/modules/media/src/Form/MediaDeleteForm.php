@@ -56,15 +56,13 @@ class MediaDeleteForm extends ContentEntityDeleteForm {
     $file = $this->getFile($media);
 
     if ($file && $this->config('media.settings')->get('delete_files')) {
-      $access = $file->access('delete', $this->currentUser());
+      $current_user = $this->currentUser();
+      $access = $file->access('delete', $current_user);
       $usages = $this->usage->countUsage($file);
 
       $messenger = $this->messenger();
       if ($usages === 1 && $access) {
         $file->delete();
-        $messenger->addMessage($this->t('Deleted the associated file %name.', [
-          '%name' => $file->getFilename(),
-        ]));
       }
       else {
         // Explain why the file wasn't deleted. Could have been an access thing,

@@ -116,24 +116,11 @@ class MediaSettingsForm extends ConfigFormBase {
       '#description' => $this->t("Allow users to access @media-entities at /media/{id}.", ['@media-entities' => $this->entityTypeManager->getDefinition('media')->getPluralLabel()]),
     ];
 
-    $form['delete_file_default'] = [
+    $form['delete_files'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Delete files from file system when deleting media entities'),
-      '#description' => $this->t('Users will be able to change this when confirming deletion of media entities unless disabled by the setting below.'),
-      '#config_target' => 'media.settings:delete_file_default',
+      '#title' => $this->t('When deleting media items, also delete the associated files'),
+      '#config_target' => 'media.settings:delete_files',
     ];
-    $form['disable_delete_control'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Disable user control of file deletion'),
-      '#description' => $this->t('Prevents changing the default value provided by the previous setting.'),
-      '#config_target' => 'media.settings:disable_delete_control',
-      '#states' => [
-        'visible' => [
-          ':input[name="delete_file_default"]' => ['checked' => TRUE],
-        ],
-      ],
-    ];
-
     return parent::buildForm($form, $form_state);
   }
 
