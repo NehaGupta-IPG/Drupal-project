@@ -717,20 +717,20 @@
   $document.on('state:required', (e) => {
     if (e.trigger) {
       const $target = $(e.target);
-      const $label = $(e.target
-        .closest('.js-form-item:not(.form-no-label), .js-form-wrapper:not(.form-no-label)')
-        .querySelector(
-          // Standard field labels.
-          'label'
-          // Labels within a fieldset.
-          + ', legend > span'
-          // Labels within a summary.
-          + ', details > summary'
-          // Labels for multi-value fields.
-          + ', th.field-label > .label'
-          // Labels for date / datetime fields.
-          + ', h4.label'
-        )
+      const $label = $(
+        e.target
+          .closest(
+            '.js-form-item:not(.form-no-label), .js-form-wrapper:not(.form-no-label)',
+          )
+          .querySelector(
+            [
+              'label', // Standard field labels.
+              'legend > span', // Labels within a fieldset.
+              'details > summary', // Labels within a summary.
+              'th.field-label > .label', // Labels for multi-value fields.
+              'h4.label', // Labels for date / datetime fields.
+            ].join(', '),
+          ),
       );
       if (e.value) {
         $target.attr({ required: 'required' });
@@ -739,7 +739,7 @@
           $label.addClass('js-form-required form-required');
         }
       } else {
-        $target.removeAttr('required')
+        $target.removeAttr('required');
         $label.removeClass('js-form-required form-required');
       }
     }
