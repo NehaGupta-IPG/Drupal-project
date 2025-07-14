@@ -109,10 +109,11 @@ function node_type_get_names() {
  * @return string|false
  *   The node type label or FALSE if the node type is not found.
  *
- * @todo Add this as generic helper method for config entities representing
- *   entity bundles.
+ * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use $node->getBundleEntity()->label() instead.
+ * @see https://www.drupal.org/node/3533301
  */
 function node_get_type_label(NodeInterface $node) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use $node->getBundleEntity()->label(). See https://www.drupal.org/node/3533301', E_USER_DEPRECATED);
   $type = NodeType::load($node->bundle());
   return $type ? $type->label() : FALSE;
 }
@@ -333,10 +334,11 @@ function template_preprocess_node(&$variables): void {
   //   $variables['content'] is more flexible and consistent.
   $submitted_configurable = $node->getFieldDefinition('created')->isDisplayConfigurable('view') || $node->getFieldDefinition('uid')->isDisplayConfigurable('view');
   if (!$skip_custom_preprocessing || !$submitted_configurable) {
-    $variables['date'] = \Drupal::service('renderer')->render($variables['elements']['created']);
-    unset($variables['elements']['created']);
-    $variables['author_name'] = \Drupal::service('renderer')->render($variables['elements']['uid']);
-    unset($variables['elements']['uid']);
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = \Drupal::service('renderer');
+    $variables['date'] = !empty($variables['elements']['created']) ? $renderer->render($variables['elements']['created']) : '';
+    $variables['author_name'] = !empty($variables['elements']['uid']) ? $renderer->render($variables['elements']['uid']) : '';
+    unset($variables['elements']['created'], $variables['elements']['uid']);
   }
 
   if (isset($variables['elements']['title']) && (!$skip_custom_preprocessing || !$node->getFieldDefinition('title')->isDisplayConfigurable('view'))) {
@@ -557,7 +559,7 @@ function node_access_rebuild($batch_mode = FALSE): void {
       }
     }
     else {
-      // Try to allocate enough time to rebuild node grants
+      // Try to allocate enough time to rebuild node grants.
       Environment::setTimeLimit(240);
 
       // Rebuild newest nodes first so that recent content becomes available
