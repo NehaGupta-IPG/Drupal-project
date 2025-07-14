@@ -247,6 +247,9 @@ class TextFormat extends RenderElementBase {
       }
     }
 
+    // Pass the title display to the template.
+    /* @see template_preprocess_text_format_wrapper() */
+    $element['#attributes']['title_display'][] = $element['#title_display'];
     return $element;
   }
 

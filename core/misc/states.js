@@ -716,22 +716,31 @@
 
   $document.on('state:required', (e) => {
     if (e.trigger) {
+      const $target = $(e.target);
+      const $label = $(e.target
+        .closest('.js-form-item:not(.form-no-label), .js-form-wrapper:not(.form-no-label)')
+        .querySelector(
+          // Standard field labels.
+          'label'
+          // Labels within a fieldset.
+          + ', legend > span'
+          // Labels within a summary.
+          + ', details > summary'
+          // Labels for multi-value fields.
+          + ', th.field-label > .label'
+          // Labels for date / datetime fields.
+          + ', h4.label'
+        )
+      );
       if (e.value) {
-        const label = `label${e.target.id ? `[for=${e.target.id}]` : ''}`;
-        const $label = $(e.target)
-          .attr({ required: 'required' })
-          .closest('.js-form-item, .js-form-wrapper')
-          .find(label);
+        $target.attr({ required: 'required' });
         // Avoids duplicate required markers on initialization.
         if (!$label.hasClass('js-form-required').length) {
           $label.addClass('js-form-required form-required');
         }
       } else {
-        $(e.target)
-          .removeAttr('required')
-          .closest('.js-form-item, .js-form-wrapper')
-          .find('label.js-form-required')
-          .removeClass('js-form-required form-required');
+        $target.removeAttr('required')
+        $label.removeClass('js-form-required form-required');
       }
     }
   });

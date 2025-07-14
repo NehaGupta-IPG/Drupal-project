@@ -91,6 +91,9 @@ class FilterThemeHooks {
       // Remove aria-describedby attribute as it shouldn't be visible here.
       unset($variables['attributes']['aria-describedby']);
     }
+
+    $variables['title_display'] = $variables['attributes']['title_display'];
+    unset($variables['attributes']['title_display']);
   }
 
   /**
