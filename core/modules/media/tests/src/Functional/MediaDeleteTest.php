@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media\Functional;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\file\Entity\File;
 use Drupal\media\Entity\Media;
 use Drupal\media\Form\MediaDeleteForm;
@@ -55,9 +56,7 @@ class MediaDeleteTest extends BrowserTestBase {
    * Tests deleting the file associated with a media item.
    */
   public function testDeleteFileAssociatedWithMedia(): void {
-    [$image1, $image2] = $this->getTestFiles('image');
-    $this->assertIsObject($image1);
-    $this->assertObjectHasProperty('uri', $image1);
+    [, $image2] = $this->getTestFiles('image');
     $this->assertIsObject($image2);
     $this->assertObjectHasProperty('uri', $image2);
 
@@ -73,17 +72,9 @@ class MediaDeleteTest extends BrowserTestBase {
       'delete any file',
     ]);
 
-    $file1 = File::create([
-      'uri' => $image1->uri,
-      'uid' => $editor1,
-    ]);
-    $file1->save();
-    $media1 = Media::create([
-      'bundle' => 'image',
-      'name' => $this->randomMachineName(),
-      'field_media_image' => $file1,
-    ]);
-    $media1->save();
+    $media1 = $this->createMedia($editor1);
+    $file1 = $media1->field_media_image->entity;
+
     $file2 = File::create([
       'uri' => $image2->uri,
       'uid' => $editor2->id(),
@@ -138,75 +129,34 @@ class MediaDeleteTest extends BrowserTestBase {
    * Tests deleting multiple media items at once.
    */
   public function testDeleteMultiple(): void {
-    $image1 = $this->getTestFiles('image')[0];
-    $image2 = $this->getTestFiles('image')[1];
-    $image3 = $this->getTestFiles('image')[2];
-    $this->assertIsObject($image1);
-    $this->assertObjectHasProperty('uri', $image1);
-    $this->assertIsObject($image2);
-    $this->assertObjectHasProperty('uri', $image2);
-    $this->assertIsObject($image3);
-    $this->assertObjectHasProperty('uri', $image3);
-    $editor1 = $this->createUser([
+    $common_permissions = [
       'delete any image media',
-      'delete own files',
       'access media overview',
       'view media',
-    ]);
-    $editor2 = $this->createUser([
-      'delete any image media',
-      'delete any file',
-      'access media overview',
-      'view media',
-    ]);
+    ];
+    $editor1 = $this->createUser(['delete own files', ...$common_permissions]);
+    $editor2 = $this->createUser(['delete any file', ...$common_permissions]);
 
-    $file1 = File::create([
-      'uri' => $image1->uri,
-      'status' => 1,
-      'uid' => $editor1->id(),
-    ]);
-    $file1->save();
-    $media1 = Media::create([
-      'bundle' => 'image',
-      'name' => $this->randomMachineName(),
-      'field_media_image' => $file1,
-    ]);
-    $media1->save();
-    $file2 = File::create([
-      'uri' => $image2->uri,
-      'uid' => $editor2->id(),
-    ]);
-    $file2->save();
-    $media2 = Media::create([
-      'bundle' => 'image',
-      'name' => $this->randomMachineName(),
-      'field_media_image' => $file2,
-    ]);
-    $media2->save();
+    $media1 = $this->createMedia($editor1);
+    $file1 = $media1->field_media_image->entity;
+
+    $media2 = $this->createMedia($editor2);
+    $file2 = $media2->field_media_image->entity;
+
     $media3 = Media::create([
       'bundle' => 'image',
       'name' => $this->randomMachineName(),
       'field_media_image' => $file1,
     ]);
     $media3->save();
-    $file3 = File::create([
-      'uri' => $image3->uri,
-      'uid' => $editor1->id(),
-    ]);
-    $file3->save();
-    $media4 = Media::create([
-      'bundle' => 'image',
-      'name' => $this->randomMachineName(),
-      'field_media_image' => $file3,
-    ]);
-    $media4->save();
 
+    $media4 = $this->createMedia($editor1);
+    $file3 = $media4->field_media_image->entity;
+
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
     $this->drupalLogin($editor1);
     $this->drupalGet('test-media-bulk-form');
-    $assert_session = $this->assertSession();
-    $session = $this->getSession();
-    $page = $session->getPage();
-
     $page->checkField('media_bulk_form[0]');
     $page->selectFieldOption('action', 'media_delete_action');
     $page->pressButton('Apply to selected items');
@@ -374,10 +324,13 @@ class MediaDeleteTest extends BrowserTestBase {
   /**
    * Creates a media entity from an image file.
    *
+   * @param \Drupal\Core\Session\AccountInterface|null $file_owner
+   *   (optional) The user account which should own the file.
+   *
    * @return \Drupal\media\Entity\Media
    *   The created media entity.
    */
-  private function createMedia(): Media {
+  private function createMedia(?AccountInterface $file_owner): Media {
     static $test_files;
     $test_files ??= $this->getTestFiles('image');
     $this->assertNotEmpty($test_files);
@@ -392,6 +345,9 @@ class MediaDeleteTest extends BrowserTestBase {
     $file = File::create([
       'uri' => $test_files[$which]->uri,
     ]);
+    if ($file_owner) {
+      $file->setOwner($file_owner);
+    }
     $file->save();
 
     $media = Media::create([
