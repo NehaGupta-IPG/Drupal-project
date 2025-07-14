@@ -113,13 +113,13 @@ class PathItem extends FieldItemBase {
         if (!$path_alias) {
           $path_alias = $path_alias_storage->create([
             'path' => '/' . $entity->toUrl()->getInternalPath(),
-            'alias' => $this->alias,
+            'alias' => $alias,
             'langcode' => $alias_langcode,
           ]);
           $path_alias->save();
           $this->pid = $path_alias->id();
         }
-        elseif ($this->alias != $path_alias->getAlias()) {
+        elseif ($alias != $path_alias->getAlias()) {
           $path_alias->setAlias($alias);
           $path_alias->save();
         }
