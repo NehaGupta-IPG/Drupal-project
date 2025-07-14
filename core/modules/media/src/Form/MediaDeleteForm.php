@@ -43,7 +43,7 @@ class MediaDeleteForm extends ContentEntityDeleteForm {
     if (!$file->access('delete', $this->currentUser())) {
       return $form + [
         'cannot_delete' => [
-          '#markup' => $this->t('The file attached to this media is owned by %name so will be retained.', ['%name' => $file_owner->getDisplayName()]),
+          '#markup' => $this->t('The file attached to this media is owned by another user so will be retained.'),
         ],
       ];
     }
@@ -51,7 +51,7 @@ class MediaDeleteForm extends ContentEntityDeleteForm {
     if ($usages > 1) {
       return $form + [
         'cannot_delete' => [
-          '#markup' => $this->formatPlural($usages - 1, 'The file attached to this media is used in 1 other place and will be retained.', 'The file attached to this media is used in @count other places and will be retained.'),
+          '#markup' => $this->formatPlural($usages - 1, 'The file attached to this media is used in one other place and will be retained.', 'The file attached to this media is used in @count other places and will be retained.'),
         ],
       ];
     }

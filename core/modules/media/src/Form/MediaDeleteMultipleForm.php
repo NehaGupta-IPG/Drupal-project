@@ -49,49 +49,56 @@ class MediaDeleteMultipleForm extends DeleteMultipleForm {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
+    parent::submitForm($form, $form_state);
+
+    if ($this->entityTypeId !== 'media') {
+      return;
+    }
+
     $file_deleted_count = 0;
     $file_inaccessible_count = 0;
     $file_in_use_count = 0;
-    $storage = $this->entityTypeManager->getStorage($this->entityTypeId);
-    $entities = $storage->loadMultiple(array_keys($this->selection));
 
-    parent::submitForm($form, $form_state);
+    // Load all the selected media items that we have permission to delete.
+    $entities = array_filter(
+      $this->entityTypeManager->getStorage('media')->loadMultiple(array_keys($this->selection)),
+      fn (MediaInterface $media): bool => $media->access('delete', $this->currentUser()),
+    );
 
-    if ($entities && $form_state->getValue('also_delete_file')) {
+    if ($form_state->getValue('also_delete_file')) {
       foreach ($entities as $entity) {
-        if ($entity instanceof MediaInterface && $entity->access('delete', $this->currentUser())) {
-          $source = $entity->getSource();
-          $file = $source instanceof FileSourceInterface ? $source->getFile($entity) : NULL;
-          if (empty($file)) {
-            continue;
-          }
-          if (!$file->access('delete', $this->currentUser())) {
-            $file_inaccessible_count++;
-            continue;
-          }
-
-          $usages = $this->usage->countUsage($file);
-          if ($usages > 0) {
-            $file_in_use_count++;
-            continue;
-          }
-
-          $file->delete();
-          $this->logger('media')->notice('Deleted the associated file %name.', [
-            '%name' => $file->getFilename(),
-          ]);
-          $file_deleted_count++;
+        $source = $entity->getSource();
+        $file = $source instanceof FileSourceInterface ? $source->getFile($entity) : NULL;
+        if (empty($file)) {
+          continue;
         }
+        if (!$file->access('delete', $this->currentUser())) {
+          $file_inaccessible_count++;
+          continue;
+        }
+
+        $usages = $this->usage->countUsage($file);
+        if ($usages > 0) {
+          $file_in_use_count++;
+          continue;
+        }
+
+        $file->delete();
+        $this->logger('media')->notice('Deleted the associated file %name.', [
+          '%name' => $file->getFilename(),
+        ]);
+        $file_deleted_count++;
       }
 
+      $messenger = $this->messenger();
       if ($file_deleted_count) {
-        $this->messenger->addStatus($this->formatPlural($file_deleted_count, 'Deleted @count associated file.', 'Deleted @count associated files.'));
+        $messenger->addStatus($this->formatPlural($file_deleted_count, 'Deleted @count associated file.', 'Deleted @count associated files.'));
       }
       if ($file_inaccessible_count) {
-        $this->messenger->addWarning($this->formatPlural($file_inaccessible_count, 'Could not delete @count associated file because of insufficient privilege.', 'Could not delete @count associated files because of insufficient privilege.'));
+        $$messenger->addWarning($this->formatPlural($file_inaccessible_count, 'Could not delete @count associated file because of insufficient privilege.', 'Could not delete @count associated files because of insufficient privilege.'));
       }
       if ($file_in_use_count) {
-        $this->messenger->addWarning($this->formatPlural($file_in_use_count, 'Could not delete @count associated file because it is used in other places.', 'Could not delete @count associated files because they are used in other places.'));
+        $$messenger->addWarning($this->formatPlural($file_in_use_count, 'Could not delete @count associated file because it is used in other places.', 'Could not delete @count associated files because they are used in other places.'));
       }
     }
   }

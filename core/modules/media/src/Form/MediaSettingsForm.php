@@ -119,7 +119,7 @@ class MediaSettingsForm extends ConfigFormBase {
     $form['delete_file_default'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Delete files from file system when deleting media entities'),
-      '#description' => $this->t('Users will be able to change this value when confirming deletion of media entities unless disabled by the setting below.'),
+      '#description' => $this->t('Users will be able to change this when confirming deletion of media entities unless disabled by the setting below.'),
       '#config_target' => 'media.settings:delete_file_default',
     ];
     $form['disable_delete_control'] = [

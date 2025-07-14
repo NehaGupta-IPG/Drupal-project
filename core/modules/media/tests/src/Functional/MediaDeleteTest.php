@@ -356,8 +356,6 @@ class MediaDeleteTest extends BrowserTestBase {
       'field_media_image' => $file,
     ]);
     $media->save();
-
-    // Sanity check.
     $this->assertFileExists($media->field_media_image->entity->getFileUri());
 
     return $media;
