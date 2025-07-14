@@ -68,7 +68,7 @@ class MediaDeleteForm extends ContentEntityDeleteForm {
         // Explain why the file wasn't deleted. Could have been an access thing,
         // a usage thing, or both.
         if (!$access) {
-          $messenger->addStatus('The file attached to the media item was retained because it is owned by another user.');
+          $messenger->addStatus('The file attached to the media item was retained because you do not have permission to delete it.');
         }
         if ($usages > 1) {
           $messenger->addStatus($this->formatPlural(
