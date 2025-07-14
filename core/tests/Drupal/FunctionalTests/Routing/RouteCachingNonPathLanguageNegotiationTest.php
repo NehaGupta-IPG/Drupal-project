@@ -4,24 +4,22 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Routing;
 
-use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the route cache when the language is not in the path.
- *
- * @group language
  */
+#[Group('language')]
 class RouteCachingNonPathLanguageNegotiationTest extends BrowserTestBase {
 
   use PathAliasTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language', 'block'];
 

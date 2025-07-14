@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
+use Drupal\jsonapi\JsonApiSpec;
 use Drupal\Core\Url;
 use Drupal\node\Entity\NodeType;
 
@@ -11,7 +12,6 @@ use Drupal\node\Entity\NodeType;
  * JSON:API integration test for the "NodeType" config entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class NodeTypeTest extends ConfigEntityResourceTestBase {
 
@@ -45,7 +45,7 @@ class NodeTypeTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer content types', 'access content']);
   }
 
@@ -74,10 +74,10 @@ class NodeTypeTest extends ConfigEntityResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
           ],
         ],
-        'version' => '1.0',
+        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
       ],
       'links' => [
         'self' => ['href' => $self_url],
@@ -115,7 +115,7 @@ class NodeTypeTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedUnauthorizedAccessMessage($method) {
+  protected function getExpectedUnauthorizedAccessMessage($method): string {
     return "The 'access content' permission is required.";
   }
 

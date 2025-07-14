@@ -16,9 +16,7 @@ use Drupal\user\Entity\User;
 class NodeAccessGrantsCacheContextTest extends NodeTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node_access_test'];
 
@@ -29,11 +27,15 @@ class NodeAccessGrantsCacheContextTest extends NodeTestBase {
 
   /**
    * User with permission to view content.
+   *
+   * @var \Drupal\user\Entity\User|false
    */
   protected $accessUser;
 
   /**
    * User without permission to view content.
+   *
+   * @var \Drupal\user\Entity\User|false
    */
   protected $noAccessUser;
 
@@ -46,6 +48,10 @@ class NodeAccessGrantsCacheContextTest extends NodeTestBase {
 
   /**
    * User with permission to bypass node access.
+   *
+   * @var \Drupal\user\Entity\User|false
+   *
+   * @see \Drupal\Tests\user\Traits\UserCreationTrait::createUser
    */
   protected $adminUser;
 
@@ -165,7 +171,7 @@ class NodeAccessGrantsCacheContextTest extends NodeTestBase {
       3 => 'view.all',
     ]);
 
-    // Uninstall the node_access_test module
+    // Uninstall the node_access_test module.
     $this->container->get('module_installer')->uninstall(['node_access_test']);
     drupal_static_reset('node_access_view_all_nodes');
     $this->assertUserCacheContext([

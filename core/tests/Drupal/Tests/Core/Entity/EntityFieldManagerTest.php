@@ -190,11 +190,11 @@ class EntityFieldManagerTest extends UnitTestCase {
    * @param \Drupal\Core\Entity\EntityTypeInterface[]|\Prophecy\Prophecy\ProphecyInterface[] $definitions
    *   (optional) An array of entity type definitions.
    */
-  protected function setUpEntityTypeDefinitions($definitions = []) {
+  protected function setUpEntityTypeDefinitions($definitions = []): void {
     foreach ($definitions as $key => $entity_type) {
       // \Drupal\Core\Entity\EntityTypeInterface::getLinkTemplates() is called
-      // by \Drupal\Core\Entity\EntityTypeManager::processDefinition() so it must
-      // always be mocked.
+      // by \Drupal\Core\Entity\EntityTypeManager::processDefinition() so it
+      // must always be mocked.
       $entity_type->getLinkTemplates()->willReturn([]);
 
       $definitions[$key] = $entity_type->reveal();
@@ -280,7 +280,7 @@ class EntityFieldManagerTest extends UnitTestCase {
     $this->assertSame($expected, $this->entityFieldManager->getFieldDefinitions('test_entity_type', 'test_entity_bundle'));
 
     // Test that base fields and bundle fields from the bundle class and
-    // entity class are retrieved
+    // entity class are retrieved.
     $expected = [
       'id' => $field_definition,
       'some_extra_field' => $bundle_fields['the_entity_id']['test_entity_bundle_class']['some_extra_field'],
@@ -313,7 +313,7 @@ class EntityFieldManagerTest extends UnitTestCase {
     $this->moduleHandler->invokeAllWith('entity_base_field_info', Argument::any());
     $this->moduleHandler->invokeAllWith('entity_field_storage_info', Argument::any())
       ->will(function ($arguments) use ($definitions) {
-        [$hook, $callback] = $arguments;
+        [, $callback] = $arguments;
         $callback(
           function () use ($definitions) {
             return $definitions;
@@ -486,7 +486,7 @@ class EntityFieldManagerTest extends UnitTestCase {
 
     $this->moduleHandler->invokeAllWith('entity_field_storage_info', Argument::any())
       ->will(function ($arguments) use ($definitions) {
-        [$hook, $callback] = $arguments;
+        [, $callback] = $arguments;
         $callback(
           function () use ($definitions) {
             return $definitions;
@@ -562,7 +562,7 @@ class EntityFieldManagerTest extends UnitTestCase {
 
     $this->moduleHandler->invokeAllWith(Argument::type('string'), Argument::any())
       ->will(function ($arguments) use ($field_definition, $module) {
-        [$hook, $callback] = $arguments;
+        [, $callback] = $arguments;
         $callback(
           function () use ($field_definition) {
             return [$field_definition->reveal()];
@@ -620,11 +620,11 @@ class EntityFieldManagerTest extends UnitTestCase {
     $storage->loadMultiple(Argument::type('array'))->willReturn([]);
 
     // By default, make the storage entity class lookup return the
-    // EntityTypeManagerTestEntity class
+    // EntityTypeManagerTestEntity class.
     $storage->getEntityClass(NULL)->willReturn(EntityTypeManagerTestEntity::class);
     $storage->getEntityClass(Argument::type('string'))->willReturn(EntityTypeManagerTestEntity::class);
     // When using the "test_entity_bundle_class" bundle, return the
-    // EntityTypeManagerTestEntityBundle class
+    // EntityTypeManagerTestEntityBundle class.
     $storage->getEntityClass('test_entity_bundle_class')->willReturn(EntityTypeManagerTestEntityBundle::class);
 
     $this->entityTypeManager->getStorage('test_entity_type')->willReturn($storage->reveal());
@@ -866,6 +866,9 @@ class EntityFieldManagerTest extends UnitTestCase {
 
 }
 
+/**
+ * Stub class for testing EntityFieldManager.
+ */
 class TestEntityFieldManager extends EntityFieldManager {
 
   /**

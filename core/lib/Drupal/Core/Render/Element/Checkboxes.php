@@ -9,7 +9,9 @@ use Drupal\Core\Render\Attribute\FormElement;
  * Provides a form element for a set of checkboxes.
  *
  * Properties:
- * - #options: An associative array whose keys are the values returned for each
+ *
+ * @property $options
+ *   An associative array whose keys are the values returned for each
  *   checkbox, and whose values are the labels next to each checkbox. The
  *   #options array cannot have a 0 key, as it would not be possible to discern
  *   checked and unchecked states.
@@ -42,14 +44,13 @@ class Checkboxes extends FormElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#process' => [
-        [$class, 'processCheckboxes'],
+        [static::class, 'processCheckboxes'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderCompositeFormElement'],
+        [static::class, 'preRenderCompositeFormElement'],
       ],
       '#theme_wrappers' => ['checkboxes'],
     ];

@@ -10,7 +10,6 @@ use Drupal\file\Entity\File;
 /**
  * @coversDefaultClass \Drupal\file\Plugin\Field\FieldFormatter\FileVideoFormatter
  * @group file
- * @group #slow
  */
 class FileVideoFormatterTest extends FileMediaFormatterTestBase {
 
@@ -74,6 +73,7 @@ class FileVideoFormatterTest extends FileMediaFormatterTestBase {
         'autoplay' => TRUE,
         'loop' => TRUE,
         'muted' => TRUE,
+        'playsinline' => TRUE,
         'width' => 800,
         'height' => 600,
       ]
@@ -103,6 +103,7 @@ class FileVideoFormatterTest extends FileMediaFormatterTestBase {
     $assert_session->elementExists('css', "video[autoplay='autoplay'] > source[src='$file_url'][type='video/mp4']");
     $assert_session->elementExists('css', "video[loop='loop'] > source[src='$file_url'][type='video/mp4']");
     $assert_session->elementExists('css', "video[muted='muted'] > source[src='$file_url'][type='video/mp4']");
+    $assert_session->elementExists('css', "video[playsinline='playsinline'] > source[src='$file_url'][type='video/mp4']");
     $assert_session->elementExists('css', "video[width='800'] > source[src='$file_url'][type='video/mp4']");
     $assert_session->elementExists('css', "video[height='600'] > source[src='$file_url'][type='video/mp4']");
 

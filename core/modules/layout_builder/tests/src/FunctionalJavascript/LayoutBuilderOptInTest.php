@@ -6,12 +6,12 @@ namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\layout_builder\Traits\EnableLayoutBuilderTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the ability for opting in and out of Layout Builder.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
 class LayoutBuilderOptInTest extends WebDriverTestBase {
 
   use EnableLayoutBuilderTrait;
@@ -172,7 +172,7 @@ class LayoutBuilderOptInTest extends WebDriverTestBase {
    * @return string
    *   The path.
    */
-  protected function getPathForFieldBlock($entity_type_id, $bundle, $view_mode, $field_name) {
+  protected function getPathForFieldBlock($entity_type_id, $bundle, $view_mode, $field_name): string {
     $delta = 0;
     /** @var \Drupal\layout_builder\Entity\LayoutEntityDisplayInterface $display */
     $display = $this->container->get('entity_type.manager')->getStorage('entity_view_display')->load("$entity_type_id.$bundle.$view_mode");
