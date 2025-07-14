@@ -4,7 +4,6 @@ namespace Drupal\media\Form;
 
 use Drupal\Core\Entity\ContentEntityDeleteForm;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\file\FileInterface;
 use Drupal\file\FileUsage\FileUsageInterface;
 use Drupal\media\MediaInterface;
@@ -22,16 +21,10 @@ class MediaDeleteForm extends ContentEntityDeleteForm {
   protected FileUsageInterface $usage;
 
   /**
-   * Current user.
-   */
-  protected AccountInterface $currentUser;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container): static {
     $instance = parent::create($container);
-    $instance->currentUser = $container->get(AccountInterface::class);
     $instance->usage = $container->get(FileUsageInterface::class);
     return $instance;
   }
@@ -47,7 +40,7 @@ class MediaDeleteForm extends ContentEntityDeleteForm {
       return $form;
     }
     $file_owner = $file->getOwner();
-    if (!$file->access('delete', $this->currentUser)) {
+    if (!$file->access('delete', $this->currentUser())) {
       return $form + [
         'cannot_delete' => [
           '#markup' => $this->t('The file attached to this media is owned by %name so will be retained.', ['%name' => $file_owner->getDisplayName()]),

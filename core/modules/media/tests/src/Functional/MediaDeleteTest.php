@@ -330,7 +330,7 @@ class MediaDeleteTest extends BrowserTestBase {
    * @return \Drupal\media\Entity\Media
    *   The created media entity.
    */
-  private function createMedia(?AccountInterface $file_owner): Media {
+  private function createMedia(?AccountInterface $file_owner = NULL): Media {
     static $test_files;
     $test_files ??= $this->getTestFiles('image');
     $this->assertNotEmpty($test_files);

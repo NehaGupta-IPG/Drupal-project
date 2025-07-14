@@ -59,13 +59,13 @@ class MediaDeleteMultipleForm extends DeleteMultipleForm {
 
     if ($entities && $form_state->getValue('also_delete_file')) {
       foreach ($entities as $entity) {
-        if ($entity instanceof MediaInterface && $entity->access('delete', $this->currentUser)) {
+        if ($entity instanceof MediaInterface && $entity->access('delete', $this->currentUser())) {
           $source = $entity->getSource();
           $file = $source instanceof FileSourceInterface ? $source->getFile($entity) : NULL;
           if (empty($file)) {
             continue;
           }
-          if (!$file->access('delete', $this->currentUser)) {
+          if (!$file->access('delete', $this->currentUser())) {
             $file_inaccessible_count++;
             continue;
           }
