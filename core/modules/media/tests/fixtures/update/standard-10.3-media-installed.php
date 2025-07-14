@@ -1,5 +1,6 @@
 <?php
 // phpcs:ignoreFile
+// cspell:disable
 
 /**
  * Sets up the Media module in a site installed from the Standard profile.
