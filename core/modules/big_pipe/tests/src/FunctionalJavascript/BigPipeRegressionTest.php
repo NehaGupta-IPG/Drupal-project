@@ -8,13 +8,13 @@ use Drupal\big_pipe\Render\BigPipe;
 use Drupal\big_pipe_regression_test\BigPipeRegressionTestController;
 use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * BigPipe regression tests.
- *
- * @group big_pipe
- * @group #slow
  */
+#[Group('big_pipe')]
+#[Group('#slow')]
 class BigPipeRegressionTest extends WebDriverTestBase {
 
   /**
@@ -22,6 +22,7 @@ class BigPipeRegressionTest extends WebDriverTestBase {
    */
   protected static $modules = [
     'big_pipe',
+    'big_pipe_messages_test',
     'big_pipe_regression_test',
   ];
 

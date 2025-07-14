@@ -272,6 +272,16 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     // Test the primary key columns.
     $this->assertSame(['test_serial', 'test_composite_primary_key'], $method->invoke($this->schema, 'test_table'));
 
+    // Test adding and removing JSON column.
+    $this->schema->addField('test_table', 'test_json', [
+      'description' => 'I heard you liked JSON.',
+      'type' => 'json',
+      'pgsql_type' => 'jsonb',
+      'mysql_type' => 'json',
+      'sqlite_type' => 'json',
+    ]);
+    $this->schema->dropField('test_table', 'test_json');
+
     // Test renaming of keys and constraints.
     $this->schema->dropTable('test_table');
     $table_specification = [
@@ -1282,7 +1292,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertFalse($this->schema->fieldExists($table_name_new, $field_name));
     $this->assertTrue($this->schema->fieldExists($table_name_new, $field_name_new));
 
-    // Adding an unique key
+    // Adding an unique key.
     $unique_key_name = $unique_key_introspect_name = 'unique';
     $this->schema->addUniqueKey($table_name_new, $unique_key_name, [$field_name_new]);
 
@@ -1290,7 +1300,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $introspect_index_schema = new \ReflectionMethod(get_class($this->schema), 'introspectIndexSchema');
     $this->assertEquals([$field_name_new], $introspect_index_schema->invoke($this->schema, $table_name_new)['unique keys'][$unique_key_introspect_name]);
 
-    // Dropping an unique key
+    // Dropping an unique key.
     $this->schema->dropUniqueKey($table_name_new, $unique_key_name);
 
     // Dropping a field.
