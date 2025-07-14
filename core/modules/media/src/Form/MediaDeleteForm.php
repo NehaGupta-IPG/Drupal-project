@@ -32,6 +32,17 @@ class MediaDeleteForm extends ContentEntityDeleteForm {
   }
 
   /**
+<<<<<<< HEAD
+=======
+   * {@inheritdoc}
+   */
+  public function getEntity(): MediaInterface {
+    // Overridden to provide an accurate return type.
+    return parent::getEntity();
+  }
+
+  /**
+>>>>>>> 5fc581ff1a9643498a4eba9711d2d16d7a12a239
    * Gets the file for the given media.
    *
    * @param \Drupal\media\MediaInterface $media
