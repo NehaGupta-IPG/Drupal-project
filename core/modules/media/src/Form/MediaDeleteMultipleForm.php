@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\media\Form;
 
 use Drupal\Core\Entity\Form\DeleteMultipleForm;
@@ -31,7 +33,7 @@ class MediaDeleteMultipleForm extends DeleteMultipleForm {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $entity_type_id = NULL): array {
+  public function buildForm(array $form, FormStateInterface $form_state, ?string $entity_type_id = NULL): array {
     $form = parent::buildForm($form, $form_state, $entity_type_id);
     $config = $this->config('media.settings');
 
