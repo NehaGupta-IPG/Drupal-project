@@ -32,17 +32,17 @@ class MediaDeleteMultipleForm extends DeleteMultipleForm {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, $entity_type_id = NULL): array {
-    $build = parent::buildForm($form, $form_state, $entity_type_id);
-    $config = $this->configFactory()->get('media.settings');
-    return $build + [
-      'also_delete_file' => [
-        '#type' => 'checkbox',
-        '#default_value' => $config->get('delete_file_default'),
-        '#title' => $this->t('Also delete the associated files?'),
-        '#description' => $this->t('After deleting the media items, this will also remove the associated files from the file system.'),
-        '#access' => !$config->get('disable_delete_control'),
-      ],
+    $form = parent::buildForm($form, $form_state, $entity_type_id);
+    $config = $this->config('media.settings');
+
+    $form['also_delete_file'] = [
+      '#type' => 'checkbox',
+      '#default_value' => $config->get('delete_file_default'),
+      '#title' => $this->t('Also delete the associated files?'),
+      '#description' => $this->t('After deleting the media items, this will also remove the associated files from the file system.'),
+      '#access' => !$config->get('disable_delete_control'),
     ];
+    return $form;
   }
 
   /**

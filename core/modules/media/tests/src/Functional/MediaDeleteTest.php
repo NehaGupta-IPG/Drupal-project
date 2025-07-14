@@ -173,7 +173,6 @@ class MediaDeleteTest extends BrowserTestBase {
     $media1->save();
     $file2 = File::create([
       'uri' => $image2->uri,
-      'status' => 1,
       'uid' => $editor2->id(),
     ]);
     $file2->save();
@@ -191,7 +190,6 @@ class MediaDeleteTest extends BrowserTestBase {
     $media3->save();
     $file3 = File::create([
       'uri' => $image3->uri,
-      'status' => 1,
       'uid' => $editor1->id(),
     ]);
     $file3->save();
@@ -263,7 +261,6 @@ class MediaDeleteTest extends BrowserTestBase {
     // Go to media deletion form and check default setting is FALSE:
     $this->drupalGet($media->toUrl('delete-form'));
     $assert_session->statusCodeEquals(200);
-    $assert_session->fieldExists('Also delete the associated file?');
     $assert_session->checkboxNotChecked('Also delete the associated file?');
     // Delete media entity and check if file still exists:
     $page->pressButton('Delete');
@@ -281,7 +278,6 @@ class MediaDeleteTest extends BrowserTestBase {
     // Go to media deletion form and check default setting is TRUE:
     $this->drupalGet($media->toUrl('delete-form'));
     $assert_session->statusCodeEquals(200);
-    $assert_session->fieldExists('Also delete the associated file?');
     $assert_session->checkboxChecked('Also delete the associated file?');
     // Delete media entity and check if file is deleted as well:
     $page->pressButton('Delete');
@@ -331,7 +327,6 @@ class MediaDeleteTest extends BrowserTestBase {
     $page->checkField('edit-media-bulk-form-1');
     $page->selectFieldOption('action', 'media_delete_action');
     $page->pressButton('Apply to selected items');
-    $assert_session->fieldExists('Also delete the associated files?');
     $assert_session->checkboxChecked('Also delete the associated files?');
     // Delete media entities and check if the files are deleted as well:
     $page->pressButton('Delete');
@@ -349,25 +344,19 @@ class MediaDeleteTest extends BrowserTestBase {
     $account = $this->createUser(admin: TRUE);
     $this->drupalLogin($account);
 
-    $session = $this->assertSession();
-    // Create file and media entity:
-    $media = $this->createMedia();
-    // Go to media deletion form and check if the deletion checkbox is present:
-    $this->drupalGet($media->toUrl('delete-form'));
-    $session->statusCodeEquals(200);
-    $session->fieldExists('Also delete the associated file?');
-    $session->pageTextContains('Also delete the associated file?');
+    $assert_session = $this->assertSession();
+    // The checkbox should be present on the media deletion form.
+    $this->drupalGet($this->createMedia()->toUrl('delete-form'));
+    $assert_session->fieldExists('also_delete_file');
 
-    // Set disable_delete_control to true:
     $this->config('media.settings')
       ->set('disable_delete_control', TRUE)
       ->save();
 
-    // Go to media deletion form again and check if the deletion checkbox is not
-    // present anymore:
-    $this->drupalGet($media->toUrl('delete-form'));
-    $session->statusCodeEquals(200);
-    $session->fieldNotExists('Also delete the associated file?');
+    // With the setting changed, the checkbox should be absent.
+    $this->getSession()->reload();
+    $assert_session->statusCodeEquals(200);
+    $assert_session->fieldNotExists('also_delete_file');
   }
 
   /**
@@ -377,29 +366,25 @@ class MediaDeleteTest extends BrowserTestBase {
     $account = $this->createUser(admin: TRUE);
     $this->drupalLogin($account);
 
+    $this->createMedia();
+    $this->createMedia();
+
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
-    // Create file and media entity:
-    $this->createMedia();
-    $this->createMedia();
-    // Go to media deletion bulk form and check if the deletion checkbox is
-    // present:
+    // The deletion checkbox should be present on the bulk deletion form.
     $this->drupalGet('test-media-bulk-form');
-    $assert_session->statusCodeEquals(200);
     $page->checkField('edit-media-bulk-form-0');
     $page->checkField('edit-media-bulk-form-1');
     $page->selectFieldOption('action', 'media_delete_action');
     $page->pressButton('Apply to selected items');
     $assert_session->statusCodeEquals(200);
-    $assert_session->fieldExists('Also delete the associated files?');
+    $assert_session->fieldExists('also_delete_file');
 
-    // Set disable_delete_control to true:
     $this->config('media.settings')
       ->set('disable_delete_control', TRUE)
       ->save();
 
-    // Go to media bulk deletion form again and check if the deletion checkbox
-    // is not present anymore:
+    // The bulk deletion form should not longer have the checkbox.
     $this->drupalGet('test-media-bulk-form');
     $assert_session->statusCodeEquals(200);
     $page->checkField('edit-media-bulk-form-0');
@@ -407,7 +392,7 @@ class MediaDeleteTest extends BrowserTestBase {
     $page->selectFieldOption('action', 'media_delete_action');
     $page->pressButton('Apply to selected items');
     $assert_session->statusCodeEquals(200);
-    $assert_session->fieldNotExists('Also delete the associated files?');
+    $assert_session->fieldNotExists('also_delete_file');
   }
 
   /**

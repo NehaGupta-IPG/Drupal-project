@@ -42,13 +42,13 @@ class MediaDeleteForm extends ContentEntityDeleteForm {
   public function buildForm(array $form, FormStateInterface $form_state): array {
     $media = $this->getEntity();
     $file = $this->getFile($media);
-    $build = parent::buildForm($form, $form_state);
+    $form = parent::buildForm($form, $form_state);
     if (!$file) {
-      return $build;
+      return $form;
     }
     $file_owner = $file->getOwner();
     if (!$file->access('delete', $this->currentUser)) {
-      return $build + [
+      return $form + [
         'cannot_delete' => [
           '#markup' => $this->t('The file attached to this media is owned by %name so will be retained.', ['%name' => $file_owner->getDisplayName()]),
         ],
@@ -56,26 +56,24 @@ class MediaDeleteForm extends ContentEntityDeleteForm {
     }
     $usages = $this->usage->countUsage($file);
     if ($usages > 1) {
-      return $build + [
+      return $form + [
         'cannot_delete' => [
           '#markup' => $this->formatPlural($usages - 1, 'The file attached to this media is used in 1 other place and will be retained.', 'The file attached to this media is used in @count other places and will be retained.'),
         ],
       ];
     }
 
-    $config = $this->configFactory()->get('media.settings');
-
-    return $build + [
-      'also_delete_file' => [
-        '#type' => 'checkbox',
-        '#default_value' => $config->get('delete_file_default'),
-        '#title' => $this->t('Also delete the associated file?'),
-        '#description' => $this->t('After deleting the media item, this will also remove the associated file %file from the file system.', [
-          '%file' => $file->getFilename(),
-        ]),
-        '#access' => !$config->get('disable_delete_control'),
-      ],
+    $config = $this->config('media.settings');
+    $form['also_delete_file'] = [
+      '#type' => 'checkbox',
+      '#default_value' => $config->get('delete_file_default'),
+      '#title' => $this->t('Also delete the associated file?'),
+      '#description' => $this->t('After deleting the media item, this will also remove the associated file %file from the file system.', [
+        '%file' => $file->getFilename(),
+      ]),
+      '#access' => !$config->get('disable_delete_control'),
     ];
+    return $form;
   }
 
   /**
