@@ -45,6 +45,9 @@ class AreaTest extends ViewTestBase {
     $this->enableViewsTestModule();
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function viewsData() {
     $data = parent::viewsData();
     $data['views']['test_example'] = [
