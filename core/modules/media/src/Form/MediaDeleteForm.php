@@ -32,54 +32,6 @@ class MediaDeleteForm extends ContentEntityDeleteForm {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function buildForm(array $form, FormStateInterface $form_state): array {
-    $media = $this->getEntity();
-    $file = $this->getFile($media);
-    $form = parent::buildForm($form, $form_state);
-    if (!$file) {
-      return $form;
-    }
-    $file_owner = $file->getOwner();
-    if (!$file->access('delete', $this->currentUser())) {
-      return $form + [
-        'cannot_delete' => [
-          '#markup' => $this->t('The file attached to this media is owned by another user so will be retained.'),
-        ],
-      ];
-    }
-    $usages = $this->usage->countUsage($file);
-    if ($usages > 1) {
-      return $form + [
-        'cannot_delete' => [
-          '#markup' => $this->formatPlural($usages - 1, 'The file attached to this media is used in one other place and will be retained.', 'The file attached to this media is used in @count other places and will be retained.'),
-        ],
-      ];
-    }
-
-    $config = $this->config('media.settings');
-    $form['also_delete_file'] = [
-      '#type' => 'checkbox',
-      '#default_value' => $config->get('delete_file_default'),
-      '#title' => $this->t('Also delete the associated file?'),
-      '#description' => $this->t('After deleting the media item, this will also remove the associated file %file from the file system.', [
-        '%file' => $file->getFilename(),
-      ]),
-      '#access' => !$config->get('disable_delete_control'),
-    ];
-    return $form;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getEntity(): MediaInterface {
-    // Overridden to provide an accurate return type.
-    return parent::getEntity();
-  }
-
-  /**
    * Gets the file for the given media.
    *
    * @param \Drupal\media\MediaInterface $media
@@ -99,11 +51,35 @@ class MediaDeleteForm extends ContentEntityDeleteForm {
   public function submitForm(array &$form, FormStateInterface $form_state): void {
     parent::submitForm($form, $form_state);
 
-    if (($file = $this->getFile($this->getEntity())) && $form_state->getValue('also_delete_file')) {
-      $file->delete();
-      $this->messenger()->addMessage($this->t('Deleted the associated file %name.', [
-        '%name' => $file->getFilename(),
-      ]));
+    $media = $this->getEntity();
+    assert($media instanceof MediaInterface);
+    $file = $this->getFile($media);
+
+    if ($file && $this->config('media.settings')->get('delete_files')) {
+      $access = $file->access('delete', $this->currentUser());
+      $usages = $this->usage->countUsage($file);
+
+      $messenger = $this->messenger();
+      if ($usages === 1 && $access) {
+        $file->delete();
+        $messenger->addMessage($this->t('Deleted the associated file %name.', [
+          '%name' => $file->getFilename(),
+        ]));
+      }
+      else {
+        // Explain why the file wasn't deleted. Could have been an access thing,
+        // a usage thing, or both.
+        if (!$access) {
+          $messenger->addStatus('The file attached to the media item was retained because it is owned by another user.');
+        }
+        if ($usages > 1) {
+          $messenger->addStatus($this->formatPlural(
+            $usages - 1,
+            'The file attached to the media item was retained because it is used in one other place.',
+            'The file attached to this media item was retained because it is used in @count other places.'
+          ));
+        }
+      }
     }
   }
 
