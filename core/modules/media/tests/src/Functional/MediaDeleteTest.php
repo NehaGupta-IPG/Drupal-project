@@ -39,10 +39,21 @@ class MediaDeleteTest extends BrowserTestBase {
   ];
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    $this->createMediaType('image', [
+      'id' => 'image',
+      'new_revision' => TRUE,
+    ]);
+  }
+
+  /**
    * Tests deleting the file associated with a media item.
    */
   public function testDeleteFileAssociatedWithMedia(): void {
-    $media_type = $this->createMediaType('image')->id();
     [$image1, $image2] = $this->getTestFiles('image');
     $this->assertIsObject($image1);
     $this->assertObjectHasProperty('uri', $image1);
@@ -50,14 +61,14 @@ class MediaDeleteTest extends BrowserTestBase {
     $this->assertObjectHasProperty('uri', $image2);
 
     $editor1 = $this->createUser([
-      "delete any $media_type media",
+      "delete any image media",
       'delete own files',
     ]);
     $editor2 = $this->createUser([
-      "delete any $media_type media",
+      "delete any image media",
     ]);
     $editor3 = $this->createUser([
-      "delete any $media_type media",
+      "delete any image media",
       'delete any file',
     ]);
 
@@ -67,7 +78,7 @@ class MediaDeleteTest extends BrowserTestBase {
     ]);
     $file1->save();
     $media1 = Media::create([
-      'bundle' => $media_type,
+      'bundle' => 'image',
       'name' => $this->randomMachineName(),
       'field_media_image' => $file1,
     ]);
@@ -78,13 +89,13 @@ class MediaDeleteTest extends BrowserTestBase {
     ]);
     $file2->save();
     $media2 = Media::create([
-      'bundle' => $media_type,
+      'bundle' => 'image',
       'name' => $this->randomMachineName(),
       'field_media_image' => $file2,
     ]);
     $media2->save();
     $media3 = Media::create([
-      'bundle' => $media_type,
+      'bundle' => 'image',
       'name' => $this->randomMachineName(),
       'field_media_image' => $file1,
     ]);
@@ -126,7 +137,6 @@ class MediaDeleteTest extends BrowserTestBase {
    * Tests deleting multiple media items at once.
    */
   public function testDeleteMultiple(): void {
-    $image_type = $this->createMediaType('image');
     $image1 = $this->getTestFiles('image')[0];
     $image2 = $this->getTestFiles('image')[1];
     $image3 = $this->getTestFiles('image')[2];
@@ -137,13 +147,13 @@ class MediaDeleteTest extends BrowserTestBase {
     $this->assertIsObject($image3);
     $this->assertObjectHasProperty('uri', $image3);
     $editor1 = $this->createUser([
-      sprintf('delete any %s media', $image_type->id()),
+      'delete any image media',
       'delete own files',
       'access media overview',
       'view media',
     ]);
     $editor2 = $this->createUser([
-      sprintf('delete any %s media', $image_type->id()),
+      'delete any image media',
       'delete any file',
       'access media overview',
       'view media',
@@ -156,7 +166,7 @@ class MediaDeleteTest extends BrowserTestBase {
     ]);
     $file1->save();
     $media1 = Media::create([
-      'bundle' => $image_type->id(),
+      'bundle' => 'image',
       'name' => $this->randomMachineName(),
       'field_media_image' => $file1,
     ]);
@@ -168,13 +178,13 @@ class MediaDeleteTest extends BrowserTestBase {
     ]);
     $file2->save();
     $media2 = Media::create([
-      'bundle' => $image_type->id(),
+      'bundle' => 'image',
       'name' => $this->randomMachineName(),
       'field_media_image' => $file2,
     ]);
     $media2->save();
     $media3 = Media::create([
-      'bundle' => $image_type->id(),
+      'bundle' => 'image',
       'name' => $this->randomMachineName(),
       'field_media_image' => $file1,
     ]);
@@ -186,7 +196,7 @@ class MediaDeleteTest extends BrowserTestBase {
     ]);
     $file3->save();
     $media4 = Media::create([
-      'bundle' => $image_type->id(),
+      'bundle' => 'image',
       'name' => $this->randomMachineName(),
       'field_media_image' => $file3,
     ]);
@@ -237,6 +247,203 @@ class MediaDeleteTest extends BrowserTestBase {
     $this->assertNull($entity_type_manager->getStorage('file')->loadUnchanged($file1->id()));
     // Editor2 can delete any file regardless of file owner.
     $this->assertNull($entity_type_manager->getStorage('file')->loadUnchanged($file3->id()));
+  }
+
+  /**
+   * Tests the delete file default setting on a single media entity.
+   */
+  public function testDeleteFileDefaultOnSingleMediaDeletion(): void {
+    $account = $this->createUser(admin: TRUE);
+    $this->drupalLogin($account);
+
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+    // Create file and media entity:
+    $media = $this->createMedia();
+    // Go to media deletion form and check default setting is FALSE:
+    $this->drupalGet($media->toUrl('delete-form'));
+    $assert_session->statusCodeEquals(200);
+    $assert_session->fieldExists('Also delete the associated file?');
+    $assert_session->checkboxNotChecked('Also delete the associated file?');
+    // Delete media entity and check if file still exists:
+    $page->pressButton('Delete');
+    $assert_session->statusCodeEquals(200);
+    $assert_session->pageTextContains('The media item ' . $media->getName() . ' has been deleted.');
+    $this->assertFileExists($media->field_media_image->entity->getFileUri());
+
+    // Create new file and media entity:
+    $media = $this->createMedia();
+    // Set default config to true:
+    $this->config('media.settings')
+      ->set('delete_file_default', TRUE)
+      ->save();
+
+    // Go to media deletion form and check default setting is TRUE:
+    $this->drupalGet($media->toUrl('delete-form'));
+    $assert_session->statusCodeEquals(200);
+    $assert_session->fieldExists('Also delete the associated file?');
+    $assert_session->checkboxChecked('Also delete the associated file?');
+    // Delete media entity and check if file is deleted as well:
+    $page->pressButton('Delete');
+    $assert_session->statusCodeEquals(200);
+    $assert_session->pageTextContains('The media item ' . $media->getName() . ' has been deleted.');
+    $assert_session->pageTextContains('Deleted the associated file ' . $media->field_media_image->entity->getFilename() . '.');
+    $this->assertFileDoesNotExist($media->field_media_image->entity->getFileUri());
+  }
+
+  /**
+   * Tests the delete file default setting on multiple media entities.
+   */
+  public function testDeleteFileDefaultOnMultipleMediaDeletion(): void {
+    $account = $this->createUser(admin: TRUE);
+    $this->drupalLogin($account);
+
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+    // Create files and media entities:
+    $media1 = $this->createMedia();
+    $media2 = $this->createMedia();
+    // Go to media bulk form, delete multiple media entities and check if
+    // default setting is FALSE:
+    $this->drupalGet('test-media-bulk-form');
+    $assert_session->statusCodeEquals(200);
+    $page->checkField('edit-media-bulk-form-0');
+    $page->checkField('edit-media-bulk-form-1');
+    $page->selectFieldOption('action', 'media_delete_action');
+    $page->pressButton('Apply to selected items');
+    $assert_session->checkboxNotChecked('Also delete the associated files?');
+    // Delete media entities and check if files still exists:
+    $page->pressButton('Delete');
+    $assert_session->statusCodeEquals(200);
+    $assert_session->pageTextContains('Deleted 2 items.');
+    $this->assertFileExists($media1->field_media_image->entity->getFileUri());
+    $this->assertFileExists($media2->field_media_image->entity->getFileUri());
+
+    // Create new files and media entities:
+    $media1 = $this->createMedia();
+    $media2 = $this->createMedia();
+    // Set default config to true:
+    $this->config('media.settings')->set('delete_file_default', 'TRUE')->save();
+    // Go to media deletion bulk form again and check default setting is TRUE:
+    $this->drupalGet('test-media-bulk-form');
+    $assert_session->statusCodeEquals(200);
+    $page->checkField('edit-media-bulk-form-0');
+    $page->checkField('edit-media-bulk-form-1');
+    $page->selectFieldOption('action', 'media_delete_action');
+    $page->pressButton('Apply to selected items');
+    $assert_session->fieldExists('Also delete the associated files?');
+    $assert_session->checkboxChecked('Also delete the associated files?');
+    // Delete media entities and check if the files are deleted as well:
+    $page->pressButton('Delete');
+    $assert_session->statusCodeEquals(200);
+    $assert_session->pageTextContains('Deleted 2 items.');
+    $assert_session->pageTextContains('Deleted 2 associated files.');
+    $this->assertFileDoesNotExist($media1->field_media_image->entity->getFileUri());
+    $this->assertFileDoesNotExist($media2->field_media_image->entity->getFileUri());
+  }
+
+  /**
+   * Tests the disable user control setting on a single media entity.
+   */
+  public function testDisableDeleteControlOnSingleMediaEntityDeletion(): void {
+    $account = $this->createUser(admin: TRUE);
+    $this->drupalLogin($account);
+
+    $session = $this->assertSession();
+    // Create file and media entity:
+    $media = $this->createMedia();
+    // Go to media deletion form and check if the deletion checkbox is present:
+    $this->drupalGet($media->toUrl('delete-form'));
+    $session->statusCodeEquals(200);
+    $session->fieldExists('Also delete the associated file?');
+    $session->pageTextContains('Also delete the associated file?');
+
+    // Set disable_delete_control to true:
+    $this->config('media.settings')
+      ->set('disable_delete_control', TRUE)
+      ->save();
+
+    // Go to media deletion form again and check if the deletion checkbox is not
+    // present anymore:
+    $this->drupalGet($media->toUrl('delete-form'));
+    $session->statusCodeEquals(200);
+    $session->fieldNotExists('Also delete the associated file?');
+  }
+
+  /**
+   * Tests the disable user control setting on a multiple media entities.
+   */
+  public function testDisableDeleteControlOnMultipleMediaEntityDeletion(): void {
+    $account = $this->createUser(admin: TRUE);
+    $this->drupalLogin($account);
+
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+    // Create file and media entity:
+    $this->createMedia();
+    $this->createMedia();
+    // Go to media deletion bulk form and check if the deletion checkbox is
+    // present:
+    $this->drupalGet('test-media-bulk-form');
+    $assert_session->statusCodeEquals(200);
+    $page->checkField('edit-media-bulk-form-0');
+    $page->checkField('edit-media-bulk-form-1');
+    $page->selectFieldOption('action', 'media_delete_action');
+    $page->pressButton('Apply to selected items');
+    $assert_session->statusCodeEquals(200);
+    $assert_session->fieldExists('Also delete the associated files?');
+
+    // Set disable_delete_control to true:
+    $this->config('media.settings')
+      ->set('disable_delete_control', TRUE)
+      ->save();
+
+    // Go to media bulk deletion form again and check if the deletion checkbox
+    // is not present anymore:
+    $this->drupalGet('test-media-bulk-form');
+    $assert_session->statusCodeEquals(200);
+    $page->checkField('edit-media-bulk-form-0');
+    $page->checkField('edit-media-bulk-form-1');
+    $page->selectFieldOption('action', 'media_delete_action');
+    $page->pressButton('Apply to selected items');
+    $assert_session->statusCodeEquals(200);
+    $assert_session->fieldNotExists('Also delete the associated files?');
+  }
+
+  /**
+   * Creates a media entity from an image file.
+   *
+   * @return \Drupal\media\Entity\Media
+   *   The created media entity.
+   */
+  private function createMedia(): Media {
+    static $test_files;
+    $test_files ??= $this->getTestFiles('image');
+    $this->assertNotEmpty($test_files);
+
+    static $which = 0;
+    if ($which > count($test_files)) {
+      $which = 0;
+    }
+    $this->assertIsObject($test_files[$which]);
+    $this->assertObjectHasProperty('uri', $test_files[$which]);
+
+    $file = File::create([
+      'uri' => $test_files[$which]->uri,
+    ]);
+    $file->save();
+
+    $media = Media::create([
+      'bundle' => 'image',
+      'name' => $this->randomMachineName(),
+      'field_media_image' => $file,
+    ]);
+    $media->save();
+
+    // Sanity check.
+    $this->assertFileExists($media->field_media_image->entity->getFileUri());
+
+    return $media;
   }
 
 }
