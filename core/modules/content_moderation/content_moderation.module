@@ -4,9 +4,7 @@
  * @file
  */
 
-use Drupal\content_moderation\BuildAlter;
 use Drupal\content_moderation\ContentPreprocess;
-use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Implements hook_preprocess_HOOK().
@@ -15,13 +13,4 @@ function content_moderation_preprocess_node(&$variables): void {
   \Drupal::service('class_resolver')
     ->getInstanceFromDefinition(ContentPreprocess::class)
     ->preprocessNode($variables);
-}
-
-/**
- * Implements hook_entity_revision_overview_alter().
- */
-function content_moderation_entity_revision_overview_alter(array &$build, EntityInterface $entity, array $context) {
-  \Drupal::service('class_resolver')
-    ->getInstanceFromDefinition(BuildAlter::class)
-    ->entityRevisionOverviewAlter($build, $entity, $context);
 }

@@ -3,6 +3,7 @@
 namespace Drupal\content_moderation\Hook;
 
 use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\views\Plugin\views\filter\Broken;
 use Drupal\views\ViewExecutable;
@@ -374,6 +375,47 @@ class ContentModerationHooks {
       if (str_starts_with($id, 'moderation_state') && $filter instanceof Broken) {
         $view->result = [];
         break;
+      }
+    }
+  }
+
+  /**
+   * Implements entity_revision_overview_alter().
+   *
+   * Add a revision status column to the revisions overview table.
+   */
+  #[Hook('entity_revision_overview_alter')]
+  public function entityRevisionOverviewAlter(array &$build, EntityInterface $entity, array $context): void {
+    /** @var \Drupal\content_moderation\ModerationInformationInterface $moderation_info */
+    $moderation_info = \Drupal::service('content_moderation.moderation_information');
+    if (!$moderation_info->isModeratedEntity($entity)) {
+      return;
+    }
+
+    \assert($entity instanceof ContentEntityInterface);
+    $workflow = $moderation_info->getWorkflowForEntity($entity);
+    if (!$workflow) {
+      return;
+    }
+
+    // Add the revision status after the first column.
+    array_splice($build['entity_revisions_table']['#header'], 1, 0, [$this->t('Moderation state')]);
+
+    $displayed_revisions = $context['displayed_revisions'];
+    foreach ($build['entity_revisions_table']['#rows'] as &$row) {
+      // The table rows are keyed numerically, whereas the array of revisions is
+      // keyed by the vid. So the only way to get the revision for a row is to
+      // rely on the two arrays being in the same order.
+      $row_revision = array_shift($displayed_revisions);
+      $revision_state = $row_revision->moderation_state->value;
+
+      // A table row either is an array of cells, or has a 'data' array which
+      // is the array of cells.
+      if (isset($row['data'])) {
+        array_splice($row['data'], 1, 0, [$workflow->getTypePlugin()->getState($revision_state)->label()]);
+      }
+      else {
+        array_splice($row, 1, 0, [$workflow->getTypePlugin()->getState($revision_state)->label()]);
       }
     }
   }
