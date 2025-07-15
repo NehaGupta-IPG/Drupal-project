@@ -93,12 +93,17 @@
   {% endblock %}
   {% block meta %}
     {% if display_submitted %}
-      <div class="node__meta">
-        <span{{ author_attributes }}>
-          {{ 'By'|t }} <span class="node__author">{{- author_name -}}</span>, {{ date }}
-        </span>
-        {{ metadata }}
-      </div>
+      {% embed "olivero:meta" with {
+        author: author_name,
+        date,
+        metadata,
+        attributes: create_attribute(),
+        author_attributes,
+      } only %}
+        {% block metadata %}
+          {{ metadata }}
+        {% endblock %}
+      {% endembed %}
     {% endif %}
   {% endblock %}
   {% block image %}{{~ content.field_image ~}}{% endblock %}

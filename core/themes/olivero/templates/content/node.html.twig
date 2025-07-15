@@ -83,17 +83,21 @@
     {% endif %}
     {{ title_suffix }}
     {% if display_submitted %}
-      <div class="node__meta">
-      {% if author_picture %}
-        <div class="node__author-image">
-          {{ author_picture }}
-        </div>
-      {% endif %}
-        <span{{ author_attributes }}>
-          {{ 'By'|t }} <span class="node__author">{{- author_name -}}</span>, {{ date }}
-        </span>
-        {{ metadata }}
-      </div>
+      {% embed "olivero:meta" with {
+        avatar: author_picture,
+        author: author_name,
+        date,
+        metadata,
+        attributes: create_attribute({class: 'node__meta'}),
+        author_attributes,
+      } only %}
+        {% block avatar %}
+          {{ avatar }}
+        {% endblock %}
+        {% block metadata %}
+          {{ metadata }}
+        {% endblock %}
+      {% endembed %}
     {% endif %}
   </header>
   <div{{ content_attributes.addClass('node__content', layout) }}>
