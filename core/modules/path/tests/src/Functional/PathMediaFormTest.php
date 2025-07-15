@@ -56,20 +56,22 @@ class PathMediaFormTest extends PathTestBase {
 
     $this->drupalGet('media/add/' . $media_type_id);
 
-    // Make sure we have a vertical tab fieldset and 'Path' field.
-    $assert_session->elementContains('css', '.js-form-type-vertical-tabs #edit-path-0 summary', 'URL alias');
-    $assert_session->fieldExists('path[0][alias]');
+    // Make sure there is no vertical tab fieldset and 'Path' field.
+    $assert_session->elementNotExists('css', '.js-form-type-vertical-tabs #edit-path-0');
+    $assert_session->fieldNotExists('path[0][alias]');
 
-    // Disable the 'Path' field for this content type.
+    // Enable the 'Path' field.
+    \Drupal::configFactory()->getEditable('media.settings')->set('standalone_url', TRUE)->save();
+    drupal_flush_all_caches();
     \Drupal::service('entity_display.repository')->getFormDisplay('media', $media_type_id, 'default')
-      ->removeComponent('path')
+      ->setComponent('path')
       ->save();
 
     $this->drupalGet('media/add/' . $media_type_id);
 
-    // See if the whole fieldset is gone now.
-    $assert_session->elementNotExists('css', '.js-form-type-vertical-tabs #edit-path-0');
-    $assert_session->fieldNotExists('path[0][alias]');
+    // Make sure we have a vertical tab fieldset and 'Path' field now.
+    $assert_session->elementContains('css', '.js-form-type-vertical-tabs #edit-path-0 summary', 'URL alias');
+    $assert_session->fieldExists('path[0][alias]');
   }
 
 }

@@ -113,7 +113,8 @@ class PathHooks {
    */
   #[Hook('entity_base_field_info')]
   public function entityBaseFieldInfo(EntityTypeInterface $entity_type): array {
-    if (in_array($entity_type->id(), ['taxonomy_term', 'node', 'media'], TRUE)) {
+    $media_standalone = ($entity_type->id() === 'media' && \Drupal::configFactory()->get('media.settings')->get('standalone_url'));
+    if (in_array($entity_type->id(), ['taxonomy_term', 'node', 'media'], TRUE) || $media_standalone) {
       $fields['path'] = BaseFieldDefinition::create('path')
         ->setLabel($this->t('URL alias'))
         ->setTranslatable(TRUE)
