@@ -15,12 +15,13 @@
  *     - description: Description of the theme.
  *     - name: Theme name.
  *     - version: The theme's version number.
+ *     - requires: Base theme of the theme if such exist.
  *     - is_default: Boolean indicating whether the theme is the default theme
  *       or not.
  *     - is_admin: Boolean indicating whether the theme is the admin theme or
  *       not.
  *     - notes: Identifies what context this theme is being used in, e.g.,
- *       default theme, admin theme.
+ *       core, sub_theme or experimental.
  *     - incompatible: Text describing any compatibility issues.
  *     - operations: A list of operation links, e.g., Settings, Enable, Disable,
  *       etc. these links should only be displayed if the theme is compatible.
@@ -49,17 +50,33 @@
           ]
         %}
         <div{{ theme.attributes.addClass(theme_classes) }}>
-          {% if theme.screenshot %}
-            {{ theme.screenshot }}
-          {% endif %}
+          <div class="theme-image">
+            {% if theme.screenshot %}
+              {{ theme.screenshot }}
+            {% endif %}
+            {# {% if theme.notes %}
+              <div class="theme-notes">
+                {% for note_type, note_value in theme.notes %}
+                  <div class="theme-note theme-note--type-{{ note_type|replace({'_': '-'}) }}">{{ note_value }}</div>
+                {% endfor %}
+              </div>
+            {% endif %} #}
+          </div>
           <div class="theme-info">
-            <h3 class="theme-info__header">
-              {{- theme.name }} {{ theme.version -}}
-              {% if theme.notes %}
-                ({{ theme.notes|safe_join(', ') }})
-              {%- endif -%}
-            </h3>
+            <h3 class="theme-info__header">{{ theme.name }}</h3>
             <div class="theme-info__description">{{ theme.description }}</div>
+            {% if theme.version %}
++              <div class="theme-info__other-info clearfix">
++                <div class="theme-info__other-info-label">{{ 'Version'|t }}</div>
++                <div class="theme-info__other-info-value">{{ theme.version }}</div>
++              </div>
++            {% endif %}
++            {% if theme.requires %}
++              <div class="theme-info__other-info clearfix">
++                <div class="theme-info__other-info-label">{{ 'Requires'|t }}</div>
++                <div class="theme-info__other-info-value">{{ theme.requires }}</div>
++              </div>
++            {% endif %}
             {# Display operation links if the theme is compatible. #}
             {% if theme.incompatible %}
               <div class="incompatible">{{ theme.incompatible }}</div>

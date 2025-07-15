@@ -52,20 +52,31 @@
           ]
         %}
         <div{{ theme.attributes.addClass(theme_classes) }}>
-          {% if theme.screenshot %}
-            {{ theme.screenshot }}
-          {% endif %}
+          <div class="theme-image">
+            {% if theme.screenshot %}
+              {{ theme.screenshot }}
+            {% endif %}
+            {# {% if theme.notes %}
+              <div class="theme-notes">
+                {% for note_type, note_value in theme.notes %}
+                  <div class="theme-note theme-note--type-{{ note_type|replace({'_': '-'}) }}">{{ note_value }}</div>
+                {% endfor %}
+              </div>
+            {% endif %} #}
+          </div>
           <div class="theme-info">
-            <h3 class="theme-info__header">
-              {{- theme.name }} {{ theme.version -}}
-              {% if theme.notes %}
-                ({{ theme.notes|safe_join(', ') }})
-              {%- endif -%}
-            </h3>
+            <h3 class="theme-info__header">{{ theme.name }}</h3>
             <div class="theme-info__description">{{ theme.description }}</div>
-            {% if theme.module_dependencies %}
-              <div class="theme-info__requires">
-                {{ 'Requires: @module_dependencies'|t({'@module_dependencies': theme.module_dependencies|render}) }}
+            {% if theme.version %}
+              <div class="theme-info__other-info clearfix">
+                <div class="theme-info__other-info-label">{{ 'Version'|t }}</div>
+                <div class="theme-info__other-info-value">{{ theme.version }}</div>
+              </div>
+            {% endif %}
+            {% if theme.requires %}
+              <div class="theme-info__other-info clearfix">
+                <div class="theme-info__other-info-label">{{ 'Requires'|t }}</div>
+                <div class="theme-info__other-info-value">{{ theme.requires }}</div>
               </div>
             {% endif %}
             {# Display operation links if the theme is compatible. #}

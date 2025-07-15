@@ -271,36 +271,16 @@ small .admin-link::after {
 .theme-selector {
   padding-top: 20px;
 }
-.theme-selector .screenshot,
-.theme-selector .no-screenshot {
-  max-width: 100%;
-  height: auto;
-  padding: 2px;
-  text-align: center;
-  vertical-align: bottom;
-  border: 1px solid #e0e0d8;
-}
-.theme-default .screenshot {
-  border: 1px solid #aaa;
-}
-.system-themes-list-uninstalled .screenshot,
-.system-themes-list-uninstalled .no-screenshot {
-  max-width: 194px;
-  height: auto;
-}
 
 /**
  * Theme display without vertical toolbar.
  */
 @media screen and (min-width: 45em) {
-  body:not(.toolbar-vertical) .system-themes-list-installed .screenshot,
-  body:not(.toolbar-vertical) .system-themes-list-installed .no-screenshot {
+  body:not(.toolbar-vertical) .system-themes-list-installed .theme-image {
     float: left; /* LTR */
-    width: 294px;
     margin: 0 20px 0 0; /* LTR */
   }
-  [dir="rtl"] body:not(.toolbar-vertical) .system-themes-list-installed .screenshot,
-  [dir="rtl"] body:not(.toolbar-vertical) .system-themes-list-installed .no-screenshot {
+  [dir="rtl"] body:not(.toolbar-vertical) .system-themes-list-installed .theme-image {
     float: right;
     margin: 0 0 0 20px;
   }
@@ -326,14 +306,11 @@ small .admin-link::after {
  * Theme display with vertical toolbar.
  */
 @media screen and (min-width: 60em) {
-  .toolbar-vertical .system-themes-list-installed .screenshot,
-  .toolbar-vertical .system-themes-list-installed .no-screenshot {
+  .toolbar-vertical .system-themes-list-installed .theme-image {
     float: left; /* LTR */
-    width: 294px;
     margin: 0 20px 0 0; /* LTR */
   }
-  [dir="rtl"] .toolbar-vertical .system-themes-list-installed .screenshot,
-  [dir="rtl"] .toolbar-vertical .system-themes-list-installed .no-screenshot {
+  [dir="rtl"] .toolbar-vertical .system-themes-list-installed .theme-image {
     float: right;
     margin: 0 0 0 20px;
   }
@@ -405,4 +382,83 @@ small .admin-link::after {
 .system-cron-settings__link {
   overflow-wrap: break-word;
   word-wrap: break-word;
+}
+.theme-image {
+  position: relative;
+  padding: 2px;
+  border: 1px solid #e0e0d8;
+}
+
+.theme-image .screenshot,
+.theme-image .no-screenshot {
+  width: 100%;
+  vertical-align: top;
+}
+.theme-default .theme-image .screenshot {
+  border-color: #aaa;
+}
+.system-themes-list-installed .theme-image {
+  max-width: 294px;
+}
+.system-themes-list-uninstalled .theme-image {
+  max-width: 194px;
+}
+
+.theme-notes {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: calc(100% - 10px);
+}
+
+[dir="rtl"] .theme-notes {
+  right: auto;
+  left: 0;
+  justify-content: flex-start;
+}
+
+.theme-note {
+  margin-right: 10px;
+  margin-bottom: 10px;
+  padding: 3px 7px;
+  color: #fff;
+  border-radius: 13px;
+  font-weight: 700;
+}
+
+[dir="rtl"] .theme-note {
+  margin-right: 0;
+  margin-left: 10px;
+}
+
+.theme-note--type-core {
+  background-color: #26a769;
+}
+
+.theme-note--type-sub-theme {
+  background-color: #dc7b03;
+}
+
+.theme-note--type-experimental {
+  background-color: #d72222;
+}
+
+.theme-info__other-info-label {
+  float: left;
+  padding-right: 0.5em;
+  font-weight: bold;
+}
+
+[dir="rtl"] .theme-info__other-info-label {
+  float: right;
+  padding-right: 0;
+  padding-left: 0.5em;
+}
+
+.theme-info__other-info-label:after {
+  content: ":";
 }

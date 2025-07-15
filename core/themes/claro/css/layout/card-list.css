@@ -40,6 +40,22 @@
   flex-basis: 100%;
 }
 
+.card__other-info-label {
+  float: left;
+  padding-right: 0.5em;
+  font-weight: bold;
+}
+
+[dir="rtl"] .card__other-info-label {
+  float: right;
+  padding-right: 0;
+  padding-left: 0.5em;
+}
+
+.card__other-info-label:after {
+  content: ":";
+}
+
 /* 36.75rem theme screenshot width */
 
 @media screen and (min-width: 36.75rem) {
