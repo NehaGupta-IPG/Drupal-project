@@ -25,7 +25,7 @@ class DevDependencyFinderTest extends KernelTestBase {
   /**
    * Data provider for ::testBuildRequirements())
    */
-  public function provideBuildRequirements() {
+  public static function provideBuildRequirements(): array {
     // Data provider methods are run before setUp(), so they can't use
     // constants from *.inc files. REQUIREMENT_OK = 0, REQUIREMENT_WARNING = 1.
     return [
@@ -59,10 +59,10 @@ class DevDependencyFinderTest extends KernelTestBase {
    * @covers ::buildRequirements
    * @dataProvider provideBuildRequirements
    */
-  public function testBuildRequirements($expected, $installed, $dev_requirements) {
+  public function testBuildRequirements($expected, $installed, $dev_requirements): void {
     $mock_root = $this->getMockBuilder(ProjectRootInterface::class)
       ->setMethods(['getInstalledPackages', 'getDevRequirements'])
-      ->getMockForAbstractClass();
+      ->getMock();
     $mock_root->expects($this->once())
       ->method('getInstalledPackages')
       ->willReturn($installed);
@@ -72,7 +72,7 @@ class DevDependencyFinderTest extends KernelTestBase {
 
     $finder = new DevDependencyFinder(
       $mock_root,
-      $this->getMockForAbstractClass(TranslationInterface::class)
+      $this->getMockBuilder(TranslationInterface::class)->getMock()
     );
     $requirements = $finder->buildRequirements();
 

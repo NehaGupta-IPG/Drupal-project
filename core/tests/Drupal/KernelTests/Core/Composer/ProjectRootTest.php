@@ -23,7 +23,7 @@ class ProjectRootTest extends KernelTestBase {
    *
    * @covers ::getProjectVendorDirectory
    */
-  public function testGetProjectVendorDirectory() {
+  public function testGetProjectVendorDirectory(): void {
     $root = new ProjectRoot($this->container->get('app.root'));
     $vendor_root = $root->getProjectVendorDirectory();
     $this->assertFileExists($vendor_root);

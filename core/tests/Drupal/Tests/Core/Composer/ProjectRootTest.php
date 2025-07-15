@@ -26,7 +26,7 @@ class ProjectRootTest extends UnitTestCase {
    * @param string $root_path
    *   The root directory of the vfsStream mock.
    */
-  protected function getMockProjectRoot($root_path) {
+  protected function getMockProjectRoot($root_path): ProjectRoot {
     $root = $this->getMockBuilder(ProjectRoot::class)
       ->setMethods(['getProjectVendorDirectory'])
       ->setConstructorArgs([vfsStream::url($root_path)])
@@ -37,7 +37,7 @@ class ProjectRootTest extends UnitTestCase {
     return $root;
   }
 
-  public function provideEmptyInstalledJson() {
+  public static function provideEmptyInstalledJson(): array {
     return [
       ['no_json' => ['vendor' => ['composer' => []]]],
       ['empty_json' => ['vendor' => ['composer' => ['installed.json' => ' ']]]],
@@ -52,13 +52,13 @@ class ProjectRootTest extends UnitTestCase {
    * @covers ::getInstalledPackages
    * @dataProvider provideEmptyInstalledJson
    */
-  public function testGetInstalledPackagesEmpty($filesystem) {
+  public function testGetInstalledPackagesEmpty($filesystem): void {
     vfsStream::setup('root_test', NULL, $filesystem);
     $root = $this->getMockProjectRoot('root_test');
     $this->assertSame([], $root->getInstalledPackages());
   }
 
-  public function provideInstalledJson() {
+  public static function provideInstalledJson(): array {
     return [
       [
         ['package_name' => 'package_version'],
@@ -71,10 +71,10 @@ class ProjectRootTest extends UnitTestCase {
    * @covers ::getInstalledPackages
    * @dataProvider provideInstalledJson
    */
-  public function testGetInstalledPackages($expected, $filesystem) {
+  public function testGetInstalledPackages($expected, $filesystem): void {
     vfsStream::setup('root_test', NULL, $filesystem);
     $root = $this->getMockProjectRoot('root_test');
-    $this->assertArrayEquals($expected, $root->getInstalledPackages());
+    $this->assertEquals($expected, $root->getInstalledPackages());
   }
 
 }
