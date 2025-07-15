@@ -156,10 +156,10 @@ class BlockContentController extends ControllerBase {
   /**
    * Creates a missing block and presents the edit form.
    *
-   * @param string $uuid
-   *   The UUID of the missing entity.
    * @param \Drupal\block_content\BlockContentTypeInterface $block_content_type
    *   The bundle of the missing entity.
+   * @param string $uuid
+   *   The UUID of the missing entity.
    *
    * @return array
    *   Form if applicable, or access denied if the block already exists.
@@ -167,7 +167,7 @@ class BlockContentController extends ControllerBase {
    * @throws \Drupal\Core\Http\Exception\CacheableAccessDeniedHttpException
    *   When a block with the given UUID already exists.
    */
-  public function addMissing(string $uuid, BlockContentTypeInterface $block_content_type): array {
+  public function addMissing(BlockContentTypeInterface $block_content_type, string $uuid): array {
     if ($this->entityRepository->loadEntityByUuid('block_content', $uuid)) {
       // Cannot create this entity, it already exists.
       throw new CacheableAccessDeniedHttpException($block_content_type);

@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block_content\Functional;
 
 use Drupal\block_content\Entity\BlockContent;
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheTagsInvalidator;
 use Drupal\Core\Url;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Test behavior of block_content blocks when the content entity doesn't exist.
- *
- * @group block_content
  */
+#[Group('block_content')]
 class MissingBlockTest extends BlockContentTestBase {
 
   /**
@@ -23,25 +27,26 @@ class MissingBlockTest extends BlockContentTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->placeBlock('page_title_block', ['region' => 'content']);
-    $this->copyConfig($this->container->get('config.storage'), $this->container->get('config.storage.sync'));
+    $this->copyConfig(\Drupal::service('config.storage'), \Drupal::service('config.storage.sync'));
     $this->configImporter = $this->configImporter();
   }
 
   /**
    * Tests there is a simple way to add a missing block.
    */
-  public function testMissingBlock() {
+  public function testMissingBlock(): void {
     // Create a block config entity that references a block content entity that
     // does not exist.
-    $uuid = $this->container->get('uuid')->generate();
+    $uuid = \Drupal::service('uuid')->generate();
     $block = $this->placeBlock('block_content:' . $uuid, [
       'id' => 'broken_block',
       'region' => 'content',
+      'view_mode' => 'full',
     ]);
     // Update the block configuration entity in the sync directory to force a
     // dependency on the block content entity.
-    $storage = $this->container->get('config.storage');
-    $sync = $this->container->get('config.storage.sync');
+    $storage = \Drupal::service('config.storage');
+    $sync = \Drupal::service('config.storage.sync');
     $block_content = BlockContent::create([
       'uuid' => $uuid,
       'type' => 'basic',
@@ -52,9 +57,8 @@ class MissingBlockTest extends BlockContentTestBase {
     $sync->write($block->getConfigDependencyName(), $block_data);
     // Import which will fire the event.
     $this->configImporter->reset()->import();
-    $missing = $this->container->get('state')
-      ->get('block_content_missing_entities', []);
-    $this->assertTrue(!empty($missing[$uuid]));
+    $missing = \Drupal::state()->get('block_content_missing_entities', []);
+    $this->assertArrayHasKey($uuid, $missing);
     $this->assertEquals('basic', $missing[$uuid]['bundle']);
 
     $this->drupalLogin($this->adminUser);
@@ -62,15 +66,11 @@ class MissingBlockTest extends BlockContentTestBase {
     $this->drupalGet($frontPage);
     $assert = $this->assertSession();
     $addMissingUrl = Url::fromRoute('block_content.add_missing', [
-      'uuid' => $uuid,
       'block_content_type' => 'basic',
-      // Default front page is user, which redirects to user/x for logged in
-      // user.
-    ], ['query' => ['destination' => $this->adminUser->toUrl()->toString()]]);
-    $assert->responseContains(t('The content of the (%bundle) block is missing. <a href=":url">Add missing content</a>.', [
-      '%bundle' => 'basic',
-      ':url' => $addMissingUrl->toString(),
-    ]));
+      'uuid' => $uuid,
+    ]);
+    $assert->pageTextContains('The content of the (basic) block is missing.');
+    $assert->linkByHrefExists($addMissingUrl->setAbsolute()->toString());
     $session = $this->getSession();
     $currentUrl = $session->getCurrentUrl();
     $this->clickLink('Add missing content');
@@ -79,19 +79,20 @@ class MissingBlockTest extends BlockContentTestBase {
     $page->fillField('Block description', 'Missing Block');
     $page->fillField('Body', $body);
     $page->pressButton('Save');
-    // Assert we ended back where we started from.
-    $this->assertEquals($currentUrl, $session->getCurrentUrl());
-    $block_content = $this->container->get('entity.repository')
-      ->loadEntityByUuid('block_content', $uuid);
+    // Assert we ended back where we started from. Just check starts with as
+    // the URL may have the check_logged_in query param.
+    $this->assertStringStartsWith($currentUrl, $session->getCurrentUrl());
+    $block_content = \Drupal::service('entity.repository')->loadEntityByUuid('block_content', $uuid);
     $this->assertNotEmpty($block_content);
     $this->assertEquals('basic', $block_content->bundle());
+    // The render cache will contain the broken block output.
+    Cache::invalidateTags(['rendered']);
     $this->drupalGet($frontPage);
     $assert->pageTextContains($body);
     $this->drupalGet($addMissingUrl);
     $assert->statusCodeEquals(403);
-    $missing = $this->container->get('state')
-      ->get('block_content_missing_entities', []);
-    $this->assertTrue(!empty($missing[$uuid]));
+    $missing = \Drupal::state()->get('block_content_missing_entities', []);
+    $this->assertArrayHasKey($uuid, $missing);
   }
 
 }

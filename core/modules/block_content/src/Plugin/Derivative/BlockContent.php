@@ -15,40 +15,20 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class BlockContent extends DeriverBase implements ContainerDeriverInterface {
 
   /**
-   * The content block storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $blockContentStorage;
-
-  /**
-   * The missing blocks subscriber.
-   *
-   * @var \Drupal\block_content\MissingBlockContentEntitySubscriber
-   */
-  protected $missingBlockContentEntitySubscriber;
-
-  /**
    * Constructs a BlockContent object.
-   *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $block_content_storage
-   *   The content block storage.
-   * @param \Drupal\block_content\MissingBlockContentEntitySubscriber $missing_block_content_entity_subscriber
-   *   Missing blocks subscriber.
    */
-  public function __construct(EntityStorageInterface $block_content_storage, MissingBlockContentEntitySubscriber $missing_block_content_entity_subscriber) {
-    $this->blockContentStorage = $block_content_storage;
-    $this->missingBlockContentEntitySubscriber = $missing_block_content_entity_subscriber;
-  }
+  public function __construct(
+    protected readonly EntityStorageInterface $blockContentStorage,
+    protected readonly MissingBlockContentEntitySubscriber $missingBlockContentEntitySubscriber,
+  ) {}
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $base_plugin_id) {
-    $entity_type_manager = $container->get('entity_type.manager');
     return new static(
-      $entity_type_manager->getStorage('block_content'),
-      $container->get('block_content.missing_entities_subscriber')
+      $container->get('entity_type.manager')->getStorage('block_content'),
+      $container->get(MissingBlockContentEntitySubscriber::class),
     );
   }
 

@@ -32,27 +32,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The Plugin Block Manager.
-   *
-   * @var \Drupal\Core\Block\BlockManagerInterface
-   */
-  protected $blockManager;
-
-  /**
-   * The entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The Drupal account to use for checking for access to block.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $account;
-
-  /**
    * The block content entity.
    *
    * @var \Drupal\block_content\BlockContentInterface
@@ -60,77 +39,22 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
   protected $blockContent;
 
   /**
-   * State service.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
-   * Redirect destination.
-   *
-   * @var \Drupal\Core\Routing\RedirectDestinationInterface
-   */
-  protected $redirectDestination;
-
-  /**
-   * The block content UUID lookup service.
-   *
-   * @var \Drupal\block_content\BlockContentUuidLookup
-   */
-  protected $uuidLookup;
-
-  /**
-   * The entity display repository.
-   *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
-   */
-  protected $entityDisplayRepository;
-
-  /**
-   * Missing block content entities repository.
-   *
-   * @var \Drupal\block_content\MissingBlockContentEntitySubscriber
-   */
-  protected $missingBlockContentEntitySubscriber;
-
-  /**
    * Constructs a new BlockContentBlock.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Block\BlockManagerInterface $block_manager
-   *   The Plugin Block Manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The account for which view access should be checked.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   State service.
-   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirectDestination
-   *   Redirect destination.
-   * @param \Drupal\block_content\BlockContentUuidLookup $uuid_lookup
-   *   UUID lookup.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
-   *   Display repository.
-   * @param \Drupal\block_content\MissingBlockContentEntitySubscriber $missingBlockContentEntitySubscriber
-   *   Missing block content entities subscriber.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, BlockManagerInterface $block_manager, EntityTypeManagerInterface $entity_type_manager, AccountInterface $account, StateInterface $state, RedirectDestinationInterface $redirectDestination, BlockContentUuidLookup $uuid_lookup, EntityDisplayRepositoryInterface $entity_display_repository, MissingBlockContentEntitySubscriber $missingBlockContentEntitySubscriber) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected readonly BlockManagerInterface $blockManager,
+    protected readonly EntityTypeManagerInterface $entityTypeManager,
+    protected readonly AccountInterface $account,
+    protected readonly StateInterface $state,
+    protected readonly RedirectDestinationInterface $redirectDestination,
+    protected readonly BlockContentUuidLookup $uuidLookup,
+    protected readonly EntityDisplayRepositoryInterface $entityDisplayRepository,
+    protected readonly MissingBlockContentEntitySubscriber $missingBlockContentEntitySubscriber,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
-    $this->blockManager = $block_manager;
-    $this->entityTypeManager = $entity_type_manager;
-    $this->account = $account;
-    $this->state = $state;
-    $this->redirectDestination = $redirectDestination;
-    $this->uuidLookup = $uuid_lookup;
-    $this->entityDisplayRepository = $entity_display_repository;
-    $this->missingBlockContentEntitySubscriber = $missingBlockContentEntitySubscriber;
   }
 
   /**
@@ -144,9 +68,11 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
       $container->get('plugin.manager.block'),
       $container->get('entity_type.manager'),
       $container->get('current_user'),
-      $container->get('url_generator'),
+      $container->get('state'),
+      $container->get(RedirectDestinationInterface::class),
       $container->get('block_content.uuid_lookup'),
-      $container->get('entity_display.repository')
+      $container->get('entity_display.repository'),
+      $container->get(MissingBlockContentEntitySubscriber::class),
     );
   }
 
