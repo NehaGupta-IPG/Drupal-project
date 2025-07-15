@@ -19,57 +19,60 @@ class ListPluginTest extends UnitTestCase {
   /**
    * Provides a list of configs to test.
    */
-  public function providerGetDynamicPluginConfig(): array {
+  public static function providerGetDynamicPluginConfig(): array {
     return [
       'startIndex is false' => [
         [
-          'reversed' => TRUE,
-          'startIndex' => FALSE,
+          'properties' => [
+            'reversed' => TRUE,
+            'startIndex' => FALSE,
+            'styles' => TRUE,
+          ],
+          'multiBlock' => TRUE,
         ],
         [
           'list' => [
             'properties' => [
               'reversed' => TRUE,
               'startIndex' => FALSE,
-              'styles' => FALSE,
+              'styles' => [
+                'useAttribute' => TRUE,
+              ],
             ],
+            'multiBlock' => TRUE,
           ],
         ],
       ],
       'reversed is false' => [
         [
-          'reversed' => FALSE,
-          'startIndex' => TRUE,
+          'properties' => [
+            'reversed' => FALSE,
+            'startIndex' => TRUE,
+            'styles' => TRUE,
+          ],
+          'multiBlock' => TRUE,
         ],
         [
           'list' => [
             'properties' => [
               'reversed' => FALSE,
               'startIndex' => TRUE,
-              'styles' => FALSE,
+              'styles' => [
+                'useAttribute' => TRUE,
+              ],
             ],
+            'multiBlock' => TRUE,
           ],
         ],
       ],
-      'both disabled' => [
+      'styles is false' => [
         [
-          'reversed' => FALSE,
-          'startIndex' => FALSE,
-        ],
-        [
-          'list' => [
-            'properties' => [
-              'reversed' => FALSE,
-              'startIndex' => FALSE,
-              'styles' => FALSE,
-            ],
+          'properties' => [
+            'reversed' => TRUE,
+            'startIndex' => TRUE,
+            'styles' => FALSE,
           ],
-        ],
-      ],
-      'both enabled' => [
-        [
-          'reversed' => TRUE,
-          'startIndex' => TRUE,
+          'multiBlock' => TRUE,
         ],
         [
           'list' => [
@@ -78,6 +81,49 @@ class ListPluginTest extends UnitTestCase {
               'startIndex' => TRUE,
               'styles' => FALSE,
             ],
+            'multiBlock' => TRUE,
+          ],
+        ],
+      ],
+      'all disabled' => [
+        [
+          'properties' => [
+            'reversed' => FALSE,
+            'startIndex' => FALSE,
+            'styles' => FALSE,
+          ],
+          'multiBlock' => TRUE,
+        ],
+        [
+          'list' => [
+            'properties' => [
+              'reversed' => FALSE,
+              'startIndex' => FALSE,
+              'styles' => FALSE,
+            ],
+            'multiBlock' => TRUE,
+          ],
+        ],
+      ],
+      'all enabled' => [
+        [
+          'properties' => [
+            'reversed' => TRUE,
+            'startIndex' => TRUE,
+            'styles' => TRUE,
+          ],
+          'multiBlock' => TRUE,
+        ],
+        [
+          'list' => [
+            'properties' => [
+              'reversed' => TRUE,
+              'startIndex' => TRUE,
+              'styles' => [
+                'useAttribute' => TRUE,
+              ],
+            ],
+            'multiBlock' => TRUE,
           ],
         ],
       ],

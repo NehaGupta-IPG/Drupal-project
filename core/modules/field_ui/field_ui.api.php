@@ -2,6 +2,15 @@
 
 /**
  * @file
+ */
+
+use Drupal\Core\Field\FormatterInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Field\WidgetInterface;
+
+/**
+ * @file
  * Hooks provided by the Field UI module.
  */
 
@@ -29,7 +38,7 @@
  *
  * @see \Drupal\field_ui\Form\EntityViewDisplayEditForm::thirdPartySettingsForm()
  */
-function hook_field_formatter_third_party_settings_form(\Drupal\Core\Field\FormatterInterface $plugin, \Drupal\Core\Field\FieldDefinitionInterface $field_definition, $view_mode, array $form, \Drupal\Core\Form\FormStateInterface $form_state) {
+function hook_field_formatter_third_party_settings_form(FormatterInterface $plugin, FieldDefinitionInterface $field_definition, $view_mode, array $form, FormStateInterface $form_state): array {
   $element = [];
   // Add a 'my_setting' checkbox to the settings form for 'foo_formatter' field
   // formatters.
@@ -62,7 +71,7 @@ function hook_field_formatter_third_party_settings_form(\Drupal\Core\Field\Forma
  *
  * @see \Drupal\field_ui\Form\EntityFormDisplayEditForm::thirdPartySettingsForm()
  */
-function hook_field_widget_third_party_settings_form(\Drupal\Core\Field\WidgetInterface $plugin, \Drupal\Core\Field\FieldDefinitionInterface $field_definition, $form_mode, array $form, \Drupal\Core\Form\FormStateInterface $form_state) {
+function hook_field_widget_third_party_settings_form(WidgetInterface $plugin, FieldDefinitionInterface $field_definition, $form_mode, array $form, FormStateInterface $form_state): array {
   $element = [];
   // Add a 'my_setting' checkbox to the settings form for 'foo_widget' field
   // widgets.
@@ -120,32 +129,6 @@ function hook_field_widget_settings_summary_alter(array &$summary, array $contex
       $summary[] = t('My setting enabled.');
     }
   }
-}
-
-/**
- * Provides information about field categories used for the UI.
- *
- * @return array
- *   Returns an array with the field category information.
- */
-function hook_field_type_category_info() {
-  return [
-    'selection_list' => [
-      'label' => t('Selection list'),
-      'description' => t('Field to select from predefined options.'),
-      'weight' => -30,
-    ],
-    'number' => [
-      'label' => t('Number'),
-      'description' => t('Field to store number. I.e. id, price, or quantity.'),
-      'weight' => -20,
-    ],
-    'date_time' => [
-      'label' => t('Date and time'),
-      'description' => t('Field to store date and time values.'),
-      'weight' => -12,
-    ],
-  ];
 }
 
 /**

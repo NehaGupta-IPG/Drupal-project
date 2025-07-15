@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Config operations through the UI.
- *
- * @group config
  */
+#[Group('config')]
 class ConfigEntityTest extends WebDriverTestBase {
 
   /**
@@ -24,7 +26,7 @@ class ConfigEntityTest extends WebDriverTestBase {
   /**
    * Tests ajax operations through the UI on 'Add' page.
    */
-  public function testAjaxOnAddPage() {
+  public function testAjaxOnAddPage(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'administer site configuration',
     ]));

@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Kernel;
 
 use Drupal\block\Entity\Block;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
- * Tests the block_theme_suggestions_block() function.
+ * Tests the block theme suggestions.
  *
  * @group block
  */
@@ -21,16 +23,16 @@ class BlockTemplateSuggestionsTest extends KernelTestBase {
   ];
 
   /**
-   * Tests template suggestions from block_theme_suggestions_block().
+   * Tests template suggestions from the block module.
    */
-  public function testBlockThemeHookSuggestions() {
+  public function testBlockThemeHookSuggestions(): void {
     $this->installConfig(['system']);
 
     // Create a block using a plugin with derivative to be preprocessed.
     $block = Block::create([
       'plugin' => 'system_menu_block:admin',
       'region' => 'footer',
-      'id' => 'machinename',
+      'id' => 'machine_name',
     ]);
 
     $variables = [];
@@ -42,12 +44,13 @@ class BlockTemplateSuggestionsTest extends KernelTestBase {
     $variables['elements']['#base_plugin_id'] = $plugin->getBaseId();
     $variables['elements']['#derivative_plugin_id'] = $plugin->getDerivativeId();
     $variables['elements']['content'] = [];
-    $suggestions = block_theme_suggestions_block($variables);
+    $module_handler = $this->container->get('module_handler');
+    $suggestions = $module_handler->invoke('block', 'theme_suggestions_block', [$variables]);
     $this->assertSame([
       'block__system',
       'block__system_menu_block',
       'block__system_menu_block__admin',
-      'block__machinename',
+      'block__machine_name',
     ], $suggestions);
   }
 

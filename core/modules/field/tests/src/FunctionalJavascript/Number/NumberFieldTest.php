@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\FunctionalJavascript\Number;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\node\Entity\Node;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the numeric field widget.
- *
- * @group field
  */
+#[Group('field')]
 class NumberFieldTest extends WebDriverTestBase {
 
   /**
@@ -44,10 +46,10 @@ class NumberFieldTest extends WebDriverTestBase {
   /**
    * Tests default formatter behavior.
    */
-  public function testNumberFormatter() {
-    $type = mb_strtolower($this->randomMachineName());
-    $float_field = mb_strtolower($this->randomMachineName());
-    $integer_field = mb_strtolower($this->randomMachineName());
+  public function testNumberFormatter(): void {
+    $type = $this->randomMachineName();
+    $float_field = $this->randomMachineName();
+    $integer_field = $this->randomMachineName();
     $thousand_separators = ['', '.', ',', ' ', chr(8201), "'"];
     $decimal_separators = ['.', ','];
     $prefix = $this->randomMachineName();

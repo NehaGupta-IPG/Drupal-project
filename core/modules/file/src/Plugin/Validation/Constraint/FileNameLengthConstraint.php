@@ -2,18 +2,19 @@
 
 namespace Drupal\file\Plugin\Validation\Constraint;
 
-use Symfony\Component\Validator\Constraint;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Validation\Attribute\Constraint;
+use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
 /**
  * File name length constraint.
- *
- * @Constraint(
- *   id = "FileNameLength",
- *   label = @Translation("File Name Length", context = "Validation"),
- *   type = "file"
- * )
  */
-class FileNameLengthConstraint extends Constraint {
+#[Constraint(
+  id: 'FileNameLength',
+  label: new TranslatableMarkup('File Name Length', [], ['context' => 'Validation']),
+  type: 'file'
+)]
+class FileNameLengthConstraint extends SymfonyConstraint {
 
   /**
    * The maximum file name length.
@@ -27,13 +28,13 @@ class FileNameLengthConstraint extends Constraint {
    *
    * @var string
    */
-  public string $messageEmpty = "The file's name is empty. Please give a name to the file.";
+  public string $messageEmpty = "The file's name is empty. Enter a name for the file.";
 
   /**
    * The message when file name is too long.
    *
    * @var string
    */
-  public string $messageTooLong = "The file's name exceeds the %maxLength characters limit. Please rename the file and try again.";
+  public string $messageTooLong = "The file's name exceeds the %maxLength characters limit. Rename the file and try again.";
 
 }

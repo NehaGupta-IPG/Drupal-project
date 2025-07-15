@@ -3,6 +3,7 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 use Drupal\Component\Utility\Html as HtmlUtility;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -11,13 +12,19 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  * Provides a form element for a table with radios or checkboxes in left column.
  *
  * Properties:
- * - #header: An array of table header labels.
- * - #options: An associative array where each key is the value returned when
+ *
+ * @property $header
+ *   An array of table header labels.
+ * @property $options
+ *   An associative array where each key is the value returned when
  *   a user selects the radio button or checkbox, and each value is the row of
  *   table data.
- * - #empty: The message to display if table does not have any options.
- * - #multiple: Set to FALSE to render the table with radios instead checkboxes.
- * - #js_select: Set to FALSE if you don't want the select all checkbox added to
+ * @property $empty
+ *   The message to display if table does not have any options.
+ * @property $multiple
+ *   Set to FALSE to render the table with radios instead checkboxes.
+ * @property $js_select
+ *   Set to FALSE if you don't want the select all checkbox added to
  *   the header.
  *
  * Other properties of the \Drupal\Core\Render\Element\Table element are also
@@ -38,27 +45,25 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  *   3 => ['color' => 'Blue', 'shape' => 'Hexagon', '#disabled' => TRUE],
  * ];
  *
- * $form['table'] = array(
+ * $form['table'] = [
  *   '#type' => 'tableselect',
  *   '#header' => $header,
  *   '#options' => $options,
  *   '#empty' => $this->t('No shapes found'),
- * );
+ * ];
  * @endcode
  *
  * See https://www.drupal.org/node/945102 for a full explanation.
  *
  * @see \Drupal\Core\Render\Element\Table
- *
- * @FormElement("tableselect")
  */
+#[FormElement('tableselect')]
 class Tableselect extends Table {
 
   /**
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#js_select' => TRUE,
@@ -66,11 +71,11 @@ class Tableselect extends Table {
       '#responsive' => TRUE,
       '#sticky' => FALSE,
       '#pre_render' => [
-        [$class, 'preRenderTable'],
-        [$class, 'preRenderTableselect'],
+        [static::class, 'preRenderTable'],
+        [static::class, 'preRenderTableselect'],
       ],
       '#process' => [
-        [$class, 'processTableselect'],
+        [static::class, 'processTableselect'],
       ],
       '#options' => [],
       '#empty' => '',
@@ -118,31 +123,31 @@ class Tableselect extends Table {
    *   table row's HTML attributes; see table.html.twig. An example of per-row
    *   options:
    *   @code
-   *     $options = array(
-   *       array(
+   *     $options = [
+   *       [
    *         'title' => $this->t('How to Learn Drupal'),
    *         'content_type' => $this->t('Article'),
    *         'status' => 'published',
-   *         '#attributes' => array('class' => array('article-row')),
-   *       ),
-   *       array(
+   *         '#attributes' => ['class' => ['article-row']],
+   *       ],
+   *       [
    *         'title' => $this->t('Privacy Policy'),
    *         'content_type' => $this->t('Page'),
    *         'status' => 'published',
-   *         '#attributes' => array('class' => array('page-row')),
-   *       ),
-   *     );
-   *     $header = array(
+   *         '#attributes' => ['class' => ['page-row']],
+   *       ],
+   *     ];
+   *     $header = [
    *       'title' => $this->t('Title'),
    *       'content_type' => $this->t('Content type'),
    *       'status' => $this->t('Status'),
-   *     );
-   *     $form['table'] = array(
+   *     ];
+   *     $form['table'] = [
    *       '#type' => 'tableselect',
    *       '#header' => $header,
    *       '#options' => $options,
    *       '#empty' => $this->t('No content available.'),
-   *     );
+   *     ];
    *   @endcode
    *
    * @return array
@@ -195,8 +200,8 @@ class Tableselect extends Table {
         array_unshift($header, ['class' => ['select-all']]);
       }
       else {
-        // Add an empty header when radio buttons are displayed or a "Select all"
-        // checkbox is not desired.
+        // Add an empty header when radio buttons are displayed or a "Select
+        // all" checkbox is not desired.
         array_unshift($header, '');
       }
     }

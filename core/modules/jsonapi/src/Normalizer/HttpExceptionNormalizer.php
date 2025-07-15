@@ -2,6 +2,7 @@
 
 namespace Drupal\jsonapi\Normalizer;
 
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\jsonapi\Normalizer\Value\HttpExceptionNormalizerValue;
@@ -43,7 +44,18 @@ class HttpExceptionNormalizer extends NormalizerBase {
    */
   public function normalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
     $cacheability = new CacheableMetadata();
-    $cacheability->addCacheableDependency($object);
+    if ($object instanceof CacheableDependencyInterface) {
+      $cacheability->addCacheableDependency($object);
+    }
+    else {
+      $cacheability->setCacheMaxAge(0);
+    }
+
+    $cacheability->addCacheTags(['config:system.logging']);
+    if (\Drupal::config('system.logging')->get('error_level') === ERROR_REPORTING_DISPLAY_VERBOSE) {
+      $cacheability->setCacheMaxAge(0);
+    }
+
     return new HttpExceptionNormalizerValue($cacheability, static::rasterizeValueRecursive($this->buildErrorObjects($object)));
   }
 
@@ -82,7 +94,10 @@ class HttpExceptionNormalizer extends NormalizerBase {
     if ($exception->getCode() !== 0) {
       $error['code'] = (string) $exception->getCode();
     }
-    if ($this->currentUser->hasPermission('access site reports')) {
+
+    $is_verbose_reporting = \Drupal::config('system.logging')->get('error_level') === ERROR_REPORTING_DISPLAY_VERBOSE;
+    $site_report_access = $this->currentUser->hasPermission('access site reports');
+    if ($site_report_access && $is_verbose_reporting) {
       // The following information may contain sensitive information. Only show
       // it to authorized users.
       $error['source'] = [
@@ -111,7 +126,7 @@ class HttpExceptionNormalizer extends NormalizerBase {
    */
   public static function getInfoUrl($status_code) {
     // Depending on the error code we'll return a different URL.
-    $url = 'http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html';
+    $url = 'https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html';
     $sections = [
       '100' => '#sec10.1.1',
       '101' => '#sec10.1.2',
@@ -155,15 +170,6 @@ class HttpExceptionNormalizer extends NormalizerBase {
       '505' => '#sec10.5.6',
     ];
     return empty($sections[$status_code]) ? NULL : $url . $sections[$status_code];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function hasCacheableSupportsMethod(): bool {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use getSupportedTypes() instead. See https://www.drupal.org/node/3359695', E_USER_DEPRECATED);
-
-    return TRUE;
   }
 
   /**

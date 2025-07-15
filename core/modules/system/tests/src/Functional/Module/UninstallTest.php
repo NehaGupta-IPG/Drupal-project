@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Module;
 
 use Drupal\Core\Cache\Cache;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -19,11 +20,17 @@ use Drupal\user\RoleInterface;
 class UninstallTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  protected static $modules = ['module_test', 'user', 'views', 'node'];
+  protected static $modules = [
+    'ckeditor5',
+    'filter',
+    'module_test',
+    'node',
+    'user',
+    'views',
+    'views_ui',
+  ];
 
   /**
    * {@inheritdoc}
@@ -33,7 +40,7 @@ class UninstallTest extends BrowserTestBase {
   /**
    * Tests the hook_modules_uninstalled() of the user module.
    */
-  public function testUserPermsUninstalled() {
+  public function testUserPermsUninstalled(): void {
     // Uninstalls the module_test module, so hook_modules_uninstalled()
     // is executed.
     $this->container->get('module_installer')->uninstall(['module_test']);
@@ -46,7 +53,7 @@ class UninstallTest extends BrowserTestBase {
   /**
    * Tests the Uninstall page and Uninstall confirmation page.
    */
-  public function testUninstallPage() {
+  public function testUninstallPage(): void {
     $account = $this->drupalCreateUser(['administer modules']);
     $this->drupalLogin($account);
 
@@ -119,6 +126,13 @@ class UninstallTest extends BrowserTestBase {
     // Delete the node to allow node to be uninstalled.
     $node->delete();
 
+    // Ensure dependent module full names are shown.
+    $this->assertSession()->pageTextContains('Required by: Views UI');
+    // Ensure matching machine names do not display.
+    $this->assertSession()->pageTextNotContains('Required by: Views UI (views_ui)');
+    // Ensure machine names that do not match do display.
+    $this->assertSession()->pageTextContains('Text Editor (editor)');
+
     // Uninstall module_test.
     $edit = [];
     $edit['uninstall[module_test]'] = TRUE;
@@ -158,7 +172,7 @@ class UninstallTest extends BrowserTestBase {
     // cleared during the uninstall.
     \Drupal::cache()->set('uninstall_test', 'test_uninstall_page', Cache::PERMANENT);
     $cached = \Drupal::cache()->get('uninstall_test');
-    $this->assertEquals('test_uninstall_page', $cached->data, new FormattableMarkup('Cache entry found: @bin', ['@bin' => $cached->data]));
+    $this->assertEquals('test_uninstall_page', $cached->data, "Cache entry found: $cached->data");
 
     $this->submitForm([], 'Uninstall');
     $this->assertSession()->pageTextContains('The selected modules have been uninstalled.');
@@ -171,7 +185,7 @@ class UninstallTest extends BrowserTestBase {
     // Make sure we get an error message when we try to confirm uninstallation
     // of an empty list of modules.
     $this->drupalGet('admin/modules/uninstall/confirm');
-    $this->assertSession()->pageTextContains('The selected modules could not be uninstalled, either due to a website problem or due to the uninstall confirmation form timing out. Please try again.');
+    $this->assertSession()->pageTextContains('The selected modules could not be uninstalled, either due to a website problem or due to the uninstall confirmation form timing out.');
 
     // Make sure confirmation page is accessible only during uninstall process.
     $this->drupalGet('admin/modules/uninstall/confirm');
@@ -188,7 +202,7 @@ class UninstallTest extends BrowserTestBase {
   /**
    * Tests that a module which fails to install can still be uninstalled.
    */
-  public function testFailedInstallStatus() {
+  public function testFailedInstallStatus(): void {
     $account = $this->drupalCreateUser(['administer modules']);
     $this->drupalLogin($account);
 
@@ -197,7 +211,7 @@ class UninstallTest extends BrowserTestBase {
       $this->container->get('module_installer')->install(['module_installer_config_test']);
       $this->fail($message);
     }
-    catch (EntityMalformedException $e) {
+    catch (EntityMalformedException) {
       // Expected exception; just continue testing.
     }
 

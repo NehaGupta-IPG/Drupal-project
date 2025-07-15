@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\BuildTests\Composer;
 
 use Drupal\BuildTests\Framework\BuildTestBase;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use Symfony\Component\Finder\Finder;
 
 /**
  * Base class for Composer build tests.
- *
- * @coversNothing
  */
+#[CoversNothing]
 abstract class ComposerBuildTestBase extends BuildTestBase {
 
   /**
@@ -34,7 +36,7 @@ abstract class ComposerBuildTestBase extends BuildTestBase {
     $this->assertFileExists($drupal_php_path);
 
     // Read back the Drupal version that was set and assert it matches
-    // expectations
+    // expectations.
     $this->executeCommand("php -r 'include \"$drupal_php_path\"; print \Drupal::VERSION;'");
     $this->assertCommandSuccessful();
     $this->assertCommandOutputContains($expectedVersion);
@@ -49,7 +51,7 @@ abstract class ComposerBuildTestBase extends BuildTestBase {
    * @return \Symfony\Component\Finder\Finder
    *   A Finder object with all the composer.json files for components.
    */
-  protected function getComponentPathsFinder(string $drupal_root): Finder {
+  protected static function getComponentPathsFinder(string $drupal_root): Finder {
     $finder = new Finder();
     $finder->name('composer.json')
       ->in($drupal_root . static::$componentsPath)

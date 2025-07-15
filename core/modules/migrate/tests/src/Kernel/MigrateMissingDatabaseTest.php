@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Kernel;
 
 use Drupal\Core\Database\Database;
@@ -47,6 +49,10 @@ class MigrateMissingDatabaseTest extends KernelTestBase {
    * - The checkRequirements() method throws a RequirementsException.
    */
   public function testMissingDatabase(): void {
+    if (Database::getConnection()->driver() === 'sqlite') {
+      $this->markTestSkipped('Not compatible with sqlite');
+    }
+
     $migration = $this->migrationPluginManager->createInstance('missing_database');
     $this->assertInstanceOf(MigrationInterface::class, $migration);
     $this->assertInstanceOf(MigrateIdMapInterface::class, $migration->getIdMap());

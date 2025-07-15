@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_translation\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Field\Entity\BaseFieldOverride;
@@ -15,6 +16,8 @@ use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 /**
  * Tests the content translation settings UI.
  *
+ * @covers \Drupal\language\Form\ContentLanguageSettingsForm
+ * @covers ::_content_translation_form_language_content_settings_form_alter
  * @group content_translation
  */
 class ContentTranslationSettingsTest extends BrowserTestBase {
@@ -23,9 +26,7 @@ class ContentTranslationSettingsTest extends BrowserTestBase {
   use FieldUiTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',
@@ -71,7 +72,7 @@ class ContentTranslationSettingsTest extends BrowserTestBase {
   /**
    * Tests that the settings UI works as expected.
    */
-  public function testSettingsUI() {
+  public function testSettingsUI(): void {
     // Check for the content_translation_menu_links_discovered_alter() changes.
     $this->drupalGet('admin/config');
     $this->assertSession()->linkExists('Content language and translation');
@@ -242,7 +243,7 @@ class ContentTranslationSettingsTest extends BrowserTestBase {
   /**
    * Tests the language settings checkbox on account settings page.
    */
-  public function testAccountLanguageSettingsUI() {
+  public function testAccountLanguageSettingsUI(): void {
     // Make sure the checkbox is available and not checked by default.
     $this->drupalGet('admin/config/people/accounts');
     $this->assertSession()->fieldExists('language[content_translation]');
@@ -258,8 +259,8 @@ class ContentTranslationSettingsTest extends BrowserTestBase {
 
     // Make sure account settings can be saved.
     $this->drupalGet('admin/config/people/accounts');
-    $this->submitForm(['anonymous' => 'Save me please!'], 'Save configuration');
-    $this->assertSession()->fieldValueEquals('anonymous', 'Save me please!');
+    $this->submitForm(['anonymous' => 'Save me!'], 'Save configuration');
+    $this->assertSession()->fieldValueEquals('anonymous', 'Save me!');
     $this->assertSession()->statusMessageContains('The configuration options have been saved.', 'status');
   }
 
@@ -280,15 +281,15 @@ class ContentTranslationSettingsTest extends BrowserTestBase {
   protected function assertSettings(string $entity_type, ?string $bundle, bool $enabled, array $edit): void {
     $this->drupalGet('admin/config/regional/content-language');
     $this->submitForm($edit, 'Save configuration');
-    $args = ['@entity_type' => $entity_type, '@bundle' => $bundle, '@enabled' => $enabled ? 'enabled' : 'disabled'];
-    $message = new FormattableMarkup('Translation for entity @entity_type (@bundle) is @enabled.', $args);
+    $status = $enabled ? 'enabled' : 'disabled';
+    $message = "Translation for entity $entity_type ($bundle) is $status.";
     $this->assertEquals($enabled, \Drupal::service('content_translation.manager')->isEnabled($entity_type, $bundle), $message);
   }
 
   /**
    * Tests that field setting depends on bundle translatability.
    */
-  public function testFieldTranslatableSettingsUI() {
+  public function testFieldTranslatableSettingsUI(): void {
     // At least one field needs to be translatable to enable article for
     // translation. Create an extra field to be used for this purpose. We use
     // the UI to test our form alterations.
@@ -322,7 +323,7 @@ class ContentTranslationSettingsTest extends BrowserTestBase {
   /**
    * Tests the translatable settings checkbox for untranslatable entities.
    */
-  public function testNonTranslatableTranslationSettingsUI() {
+  public function testNonTranslatableTranslationSettingsUI(): void {
     $this->drupalGet('admin/config/regional/content-language');
     $this->assertSession()->fieldNotExists('settings[entity_test][entity_test][translatable]');
   }

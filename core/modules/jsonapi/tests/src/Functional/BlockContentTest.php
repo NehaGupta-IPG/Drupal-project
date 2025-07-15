@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
+use Drupal\jsonapi\JsonApiSpec;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Core\Cache\Cache;
@@ -64,25 +67,37 @@ class BlockContentTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     switch ($method) {
       case 'GET':
-      case 'PATCH':
         $this->grantPermissionsToTestedRole([
           'access block library',
+        ]);
+        break;
+
+      case 'PATCH':
+        $this->grantPermissionsToTestedRole([
           'administer block types',
           'administer block content',
         ]);
         break;
 
       case 'POST':
-        $this->grantPermissionsToTestedRole(['access block library', 'create basic block content']);
+        $this->grantPermissionsToTestedRole(['create basic block content']);
         break;
 
       case 'DELETE':
-        $this->grantPermissionsToTestedRole(['access block library', 'delete any basic block content']);
+        $this->grantPermissionsToTestedRole(['delete any basic block content']);
         break;
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpRevisionAuthorization($method): void {
+    parent::setUpRevisionAuthorization($method);
+    $this->grantPermissionsToTestedRole(['view any basic block content history']);
   }
 
   /**
@@ -116,7 +131,7 @@ class BlockContentTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedDocument() {
+  protected function getExpectedDocument(): array {
     $base_url = Url::fromUri('base:/jsonapi/block_content/basic/' . $this->entity->uuid())->setAbsolute();
     $self_url = clone $base_url;
     $version_identifier = 'id:' . $this->entity->getRevisionId();
@@ -126,10 +141,10 @@ class BlockContentTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
           ],
         ],
-        'version' => '1.0',
+        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
       ],
       'links' => [
         'self' => ['href' => $base_url->toString()],
@@ -149,8 +164,7 @@ class BlockContentTest extends ResourceTestBase {
           ],
           'changed' => (new \DateTime())->setTimestamp($this->entity->getChangedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
           'info' => 'Llama',
-          'revision_log' => NULL,
-          'revision_created' => (new \DateTime())->setTimestamp($this->entity->getRevisionCreationTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
+          'revision_created' => (new \DateTime())->setTimestamp((int) $this->entity->getRevisionCreationTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
           'revision_translation_affected' => TRUE,
           'status' => FALSE,
           'langcode' => 'en',
@@ -188,12 +202,12 @@ class BlockContentTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getPostDocument() {
+  protected function getPostDocument(): array {
     return [
       'data' => [
         'type' => 'block_content--basic',
         'attributes' => [
-          'info' => 'Dramallama',
+          'info' => 'Drama llama',
         ],
       ],
     ];
@@ -205,9 +219,9 @@ class BlockContentTest extends ResourceTestBase {
   protected function getExpectedUnauthorizedAccessMessage($method) {
     return match ($method) {
       'GET' => "The 'access block library' permission is required.",
-      'PATCH' => "The following permissions are required: 'access block library' AND 'edit any basic block content'.",
-      'POST' => "The following permissions are required: 'create basic block content' AND 'access block library'.",
-      'DELETE' => "The following permissions are required: 'access block library' AND 'delete any basic block content'.",
+      'PATCH' => "The 'edit any basic block content' permission is required.",
+      'POST' => "The following permissions are required: 'create basic block content' OR 'administer block content'.",
+      'DELETE' => "The 'delete any basic block content' permission is required.",
       default => parent::getExpectedUnauthorizedAccessMessage($method),
     };
   }
@@ -224,7 +238,7 @@ class BlockContentTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedCacheTags(array $sparse_fieldset = NULL) {
+  protected function getExpectedCacheTags(?array $sparse_fieldset = NULL) {
     $tags = parent::getExpectedCacheTags($sparse_fieldset);
     if ($sparse_fieldset === NULL || in_array('body', $sparse_fieldset)) {
       $tags = Cache::mergeTags($tags, ['config:filter.format.plain_text']);
@@ -235,7 +249,7 @@ class BlockContentTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedCacheContexts(array $sparse_fieldset = NULL) {
+  protected function getExpectedCacheContexts(?array $sparse_fieldset = NULL) {
     $contexts = parent::getExpectedCacheContexts($sparse_fieldset);
     if ($sparse_fieldset === NULL || in_array('body', $sparse_fieldset)) {
       $contexts = Cache::mergeContexts($contexts, ['languages:language_interface', 'theme']);
@@ -246,7 +260,7 @@ class BlockContentTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testCollectionFilterAccess() {
+  public function testCollectionFilterAccess(): void {
     $this->entity->setPublished()->save();
     $this->doTestCollectionFilterAccessForPublishableEntities('info', NULL, 'administer block content');
   }

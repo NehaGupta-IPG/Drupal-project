@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Entity;
 
+use Drupal\Core\Entity\Routing\RevisionHtmlRouteProvider;
 use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests revision route provider.
- *
- * @group Entity
- * @coversDefaultClass \Drupal\Core\Entity\Routing\RevisionHtmlRouteProvider
  */
+#[CoversClass(RevisionHtmlRouteProvider::class)]
+#[Group('Entity')]
 class RevisionRouteProviderTest extends BrowserTestBase {
 
   /**
@@ -54,7 +58,9 @@ class RevisionRouteProviderTest extends BrowserTestBase {
     $entity->save();
 
     // Reload the object.
-    $revision = \Drupal::entityTypeManager()->getStorage('entity_test_rev')->loadRevision($revisionId);
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    $storage = \Drupal::entityTypeManager()->getStorage('entity_test_rev');
+    $revision = $storage->loadRevision($revisionId);
     $this->drupalGet($revision->toUrl('revision'));
     $this->assertSession()->responseContains('first revision');
     $this->assertSession()->responseNotContains('second revision');

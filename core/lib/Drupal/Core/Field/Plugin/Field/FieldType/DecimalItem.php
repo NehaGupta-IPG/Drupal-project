@@ -2,28 +2,29 @@
 
 namespace Drupal\Core\Field\Plugin\Field\FieldType;
 
+use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\TypedData\DataDefinition;
 
 /**
  * Defines the 'decimal' field type.
- *
- * @FieldType(
- *   id = "decimal",
- *   label = @Translation("Number (decimal)"),
- *   description = {
- *     @Translation("Ideal for exact counts and measures (prices, temperatures, distances, volumes, etc.)"),
- *     @Translation("Stores a number in the database in a fixed decimal format"),
- *     @Translation("For example, 12.34 km or € when used for further detailed calculations (such as summing many of these)"),
- *   },
- *   category = "number",
- *   default_widget = "number",
- *   default_formatter = "number_decimal"
- * )
  */
+#[FieldType(
+  id: "decimal",
+  label: new TranslatableMarkup("Number (decimal)"),
+  description: [
+    new TranslatableMarkup("Ideal for exact counts and measures (prices, temperatures, distances, volumes, etc.)"),
+    new TranslatableMarkup("Stores a number in the database in a fixed decimal format"),
+    new TranslatableMarkup("For example, 12.34 km or € when used for further detailed calculations (such as summing many of these)"),
+  ],
+  category: "number",
+  weight: -30,
+  default_widget: "number",
+  default_formatter: "number_decimal"
+)]
 class DecimalItem extends NumericItemBase {
 
   /**
@@ -40,7 +41,7 @@ class DecimalItem extends NumericItemBase {
    * {@inheritdoc}
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
-    $properties['value'] = DataDefinition::create('string')
+    $properties['value'] = DataDefinition::create('decimal')
       ->setLabel(new TranslatableMarkup('Decimal value'))
       ->setRequired(TRUE);
 
@@ -95,24 +96,6 @@ class DecimalItem extends NumericItemBase {
   /**
    * {@inheritdoc}
    */
-  public function getConstraints() {
-    $constraint_manager = \Drupal::typedDataManager()->getValidationConstraintManager();
-    $constraints = parent::getConstraints();
-
-    $constraints[] = $constraint_manager->create('ComplexData', [
-      'value' => [
-        'Regex' => [
-          'pattern' => '/^[+-]?((\d+(\.\d*)?)|(\.\d+))$/i',
-        ],
-      ],
-    ]);
-
-    return $constraints;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function fieldSettingsForm(array $form, FormStateInterface $form_state) {
     $element = parent::fieldSettingsForm($form, $form_state);
     $settings = $this->getSettings();
@@ -144,11 +127,11 @@ class DecimalItem extends NumericItemBase {
     $max = is_numeric($settings['max']) ? $settings['max'] : pow(10, ($precision - $scale)) - 1;
     $min = is_numeric($settings['min']) ? $settings['min'] : -pow(10, ($precision - $scale)) + 1;
 
-    // Get the number of decimal digits for the $max
+    // Get the number of decimal digits for the $max.
     $decimal_digits = self::getDecimalDigits($max);
     // Do the same for the min and keep the higher number of decimal digits.
     $decimal_digits = max(self::getDecimalDigits($min), $decimal_digits);
-    // If $min = 1.234 and $max = 1.33 then $decimal_digits = 3
+    // If $min = 1.234 and $max = 1.33 then $decimal_digits = 3.
     $scale = rand($decimal_digits, $scale);
 
     // @see "Example #1 Calculate a random floating-point number" in

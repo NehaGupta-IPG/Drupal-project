@@ -5,6 +5,7 @@
  * Hooks for the Help system.
  */
 
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 
 /**
@@ -26,14 +27,6 @@ use Drupal\Core\Url;
  * hook_help() documentation and
  * @link https://www.drupal.org/docs/develop/documenting-your-project/help-text-standards Help text standards @endlink
  * for more information.
- *
- * @section sec_tour Tours
- * Modules can provide tours of administrative pages by creating tour config
- * files and placing them in their config/optional subdirectory. See
- * @link https://www.drupal.org/docs/8/api/tour-api/overview Tour API overview @endlink
- * for more information. The contributed
- * @link https://www.drupal.org/project/tour_ui Tour UI module @endlink
- * can also be used to create tour config files.
  * @}
  */
 
@@ -61,7 +54,7 @@ use Drupal\Core\Url;
  * - Module overview help, see content_translation_help(). Module overview
  *   help should follow
  *   @link https://www.drupal.org/node/632280 the standard help template. @endlink
- * - Page-specific help using only routes, see book_help().
+ * - Page-specific help using only routes, see node_help().
  * - Page-specific help using routes and $request, see block_help().
  *
  * @param string $route_name
@@ -72,11 +65,11 @@ use Drupal\Core\Url;
  *   The current route match. This can be used to generate different help
  *   output for different pages that share the same route.
  *
- * @return string|array
+ * @return string|\Stringable|array|null
  *   A render array, localized string, or object that can be rendered into
  *   a string, containing the help text.
  */
-function hook_help($route_name, \Drupal\Core\Routing\RouteMatchInterface $route_match) {
+function hook_help($route_name, RouteMatchInterface $route_match): string|\Stringable|array|null {
   switch ($route_name) {
     // Main module help for the block module.
     case 'help.page.block':
@@ -86,6 +79,7 @@ function hook_help($route_name, \Drupal\Core\Routing\RouteMatchInterface $route_
     case 'block.admin_display':
       return '<p>' . t('This page provides a drag-and-drop interface for assigning a block to a region, and for controlling the order of blocks within regions. Since not all themes implement the same regions, or display regions in the same way, blocks are positioned on a per-theme basis. Remember that your changes will not be saved until you click the <em>Save blocks</em> button at the bottom of the page.') . '</p>';
   }
+  return NULL;
 }
 
 /**

@@ -6,9 +6,9 @@ use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Plugin\CategorizingPluginManagerTrait;
 use Drupal\Core\Plugin\DefaultPluginManager;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 
 /**
@@ -18,21 +18,9 @@ use Drupal\Core\TypedData\TypedDataManagerInterface;
  */
 class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePluginManagerInterface {
 
-  /**
-   * Default category for field types.
-   */
-  const DEFAULT_CATEGORY = 'general';
-
   use CategorizingPluginManagerTrait {
     getGroupedDefinitions as protected getGroupedDefinitionsTrait;
   }
-
-  /**
-   * The typed data manager.
-   *
-   * @var \Drupal\Core\TypedData\TypedDataManagerInterface
-   */
-  protected $typedDataManager;
 
   /**
    * Constructs the FieldTypePluginManager object.
@@ -44,14 +32,29 @@ class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePl
    *   Cache backend instance to use.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typed_data_manager
+   * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typedDataManager
    *   The typed data manager.
+   * @param \Drupal\Core\Field\FieldTypeCategoryManagerInterface $fieldTypeCategoryManager
+   *   The field type category plugin manager.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, TypedDataManagerInterface $typed_data_manager) {
-    parent::__construct('Plugin/Field/FieldType', $namespaces, $module_handler, 'Drupal\Core\Field\FieldItemInterface', 'Drupal\Core\Field\Annotation\FieldType');
+  public function __construct(
+    \Traversable $namespaces,
+    CacheBackendInterface $cache_backend,
+    protected ModuleHandlerInterface $module_handler,
+    protected TypedDataManagerInterface $typedDataManager,
+    protected FieldTypeCategoryManagerInterface $fieldTypeCategoryManager,
+  ) {
+    parent::__construct(
+      'Plugin/Field/FieldType',
+      $namespaces,
+      $module_handler,
+      FieldItemInterface::class,
+      FieldType::class,
+      'Drupal\Core\Field\Annotation\FieldType',
+    );
+
     $this->alterInfo('field_info');
     $this->setCacheBackend($cache_backend, 'field_types_plugins');
-    $this->typedDataManager = $typed_data_manager;
   }
 
   /**
@@ -99,13 +102,8 @@ class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePl
       $definition['list_class'] = '\Drupal\Core\Field\FieldItemList';
     }
 
-    if ($definition['category'] instanceof TranslatableMarkup) {
-      @trigger_error('Using a translatable string as a category for field type is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. See https://www.drupal.org/node/3364271', E_USER_DEPRECATED);
-      $definition['category'] = static::DEFAULT_CATEGORY;
-    }
-    elseif (empty($definition['category'])) {
-      // Ensure that every field type has a category.
-      $definition['category'] = static::DEFAULT_CATEGORY;
+    if (empty($definition['category'])) {
+      $definition['category'] = FieldTypeCategoryManagerInterface::FALLBACK_CATEGORY;
     }
   }
 
@@ -158,20 +156,45 @@ class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePl
   }
 
   /**
-   * {@inheritdoc}
+   * Gets sorted field type definitions grouped by category.
+   *
+   * In addition to grouping, both categories and its entries are sorted,
+   * whereas plugin definitions are sorted by label.
+   *
+   * @param array[]|null $definitions
+   *   (optional) The plugin definitions to group. If omitted, all plugin
+   *   definitions are used.
+   * @param string $label_key
+   *   (optional) The array key to use as the label of the field type.
+   * @param string $category_label_key
+   *   (optional) The array key to use as the label of the category.
+   *
+   * @return array[]
+   *   Keys are category names, and values are arrays of which the keys are
+   *   plugin IDs and the values are plugin definitions.
    */
-  public function getGroupedDefinitions(array $definitions = NULL, $label_key = 'label') {
+  public function getGroupedDefinitions(?array $definitions = NULL, $label_key = 'label', $category_label_key = 'label') {
     $grouped_categories = $this->getGroupedDefinitionsTrait($definitions, $label_key);
-    $category_info = \Drupal::moduleHandler()->invokeAll('field_type_category_info');
+    $category_info = $this->fieldTypeCategoryManager->getDefinitions();
+
+    // Ensure that all the referenced categories exist.
     foreach ($grouped_categories as $group => $definitions) {
-      if (!isset($category_info[$group]) && $group !== static::DEFAULT_CATEGORY) {
-        assert(FALSE, "\"$group\" must be defined in hook_field_type_category_info().");
-        $grouped_categories[static::DEFAULT_CATEGORY] += $definitions;
+      if (!isset($category_info[$group])) {
+        assert(FALSE, "\"$group\" must be defined in MODULE_NAME.field_type_categories.yml");
+        if (!isset($grouped_categories[FieldTypeCategoryManagerInterface::FALLBACK_CATEGORY])) {
+          $grouped_categories[FieldTypeCategoryManagerInterface::FALLBACK_CATEGORY] = [];
+        }
+        $grouped_categories[FieldTypeCategoryManagerInterface::FALLBACK_CATEGORY] += $definitions;
         unset($grouped_categories[$group]);
       }
     }
 
-    return $grouped_categories;
+    $normalized_grouped_categories = [];
+    foreach ($grouped_categories as $group => $definitions) {
+      $normalized_grouped_categories[(string) $category_info[$group][$category_label_key]] = $definitions;
+    }
+
+    return $normalized_grouped_categories;
   }
 
   /**
@@ -198,6 +221,15 @@ class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePl
     }
 
     return $definitions;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEntityTypeUiDefinitions(string $entity_type_id): array {
+    $ui_definitions = $this->getUiDefinitions();
+    $this->moduleHandler->alter('field_info_entity_type_ui_definitions', $ui_definitions, $entity_type_id);
+    return $ui_definitions;
   }
 
   /**

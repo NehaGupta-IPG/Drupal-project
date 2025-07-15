@@ -9,6 +9,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\OptGroup;
+use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
@@ -45,6 +46,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
   /**
    * Tracks whether the field has a value.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected bool $has_value;
 
   /**
@@ -55,8 +57,8 @@ abstract class OptionsWidgetBase extends WidgetBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ?ElementInfoManagerInterface $elementInfoManager = NULL) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $elementInfoManager);
     $property_names = $this->fieldDefinition->getFieldStorageDefinition()->getPropertyNames();
     $this->column = $property_names[0];
   }
@@ -221,6 +223,8 @@ abstract class OptionsWidgetBase extends WidgetBase {
    * @return string|null
    *   Either a label of the empty option, or NULL.
    */
-  protected function getEmptyLabel() {}
+  protected function getEmptyLabel() {
+    return NULL;
+  }
 
 }

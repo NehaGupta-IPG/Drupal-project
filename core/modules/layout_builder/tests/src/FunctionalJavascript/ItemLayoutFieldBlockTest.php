@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Field blocks tests for the override layout.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
 class ItemLayoutFieldBlockTest extends WebDriverTestBase {
 
   /**
@@ -47,7 +49,7 @@ class ItemLayoutFieldBlockTest extends WebDriverTestBase {
   /**
    * Tests configuring a field block for a user field.
    */
-  public function testAddAjaxBlock() {
+  public function testAddAjaxBlock(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -69,7 +71,7 @@ class ItemLayoutFieldBlockTest extends WebDriverTestBase {
     $this->clickLink('Add block');
     $assert_session->assertWaitOnAjaxRequest();
 
-    // Validate that only field blocks for layouted bundle are present.
+    // Validate that only field blocks for layout bundles are present.
     $valid_links = $page->findAll('css', 'a[href$="field_block%3Anode%3Abundle_with_layout_overrides%3Abody"]');
     $this->assertCount(1, $valid_links);
     $invalid_links = $page->findAll('css', 'a[href$="field_block%3Anode%3Afiller_bundle%3Abody"]');

@@ -11,12 +11,16 @@ shortcut.set.*:
       # dashes but not underscores.
       # @see \Drupal\shortcut\ShortcutSetForm::form()
       constraints:
-        Regex: '/^[a-z0-9-]+$/'
+        Regex:
+          pattern: '/^[a-z0-9-]+$/'
+          message: "The %value machine name is not valid."
         Length:
           max: 23
     label:
-      type: label
+      type: required_label
       label: 'Label'
+  constraints:
+    FullyValidatable: ~
 
 # Schema for theme settings.
 theme_settings.third_party.shortcut:

@@ -12,11 +12,13 @@ use Drupal\Core\Ajax\OpenModalDialogCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -31,19 +33,16 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 /**
  * Plugin implementation of the 'media_library_widget' widget.
  *
- * @FieldWidget(
- *   id = "media_library_widget",
- *   label = @Translation("Media library"),
- *   description = @Translation("Allows you to select items from the media library."),
- *   field_types = {
- *     "entity_reference"
- *   },
- *   multiple_values = TRUE,
- * )
- *
  * @internal
  *   Plugin classes are internal.
  */
+#[FieldWidget(
+  id: 'media_library_widget',
+  label: new TranslatableMarkup('Media library'),
+  description: new TranslatableMarkup('Allows you to select items from the media library.'),
+  field_types: ['entity_reference'],
+  multiple_values: TRUE,
+)]
 class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface {
 
   /**
@@ -71,7 +70,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    * Constructs a MediaLibraryWidget widget.
    *
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
@@ -80,6 +79,8 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *   The widget settings.
    * @param array $third_party_settings
    *   Any third party settings.
+   * @param \Drupal\Core\Render\ElementInfoManagerInterface $elementInfoManager
+   *   The element info manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   Entity type manager service.
    * @param \Drupal\Core\Session\AccountInterface $current_user
@@ -87,8 +88,8 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, ModuleHandlerInterface $module_handler) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ElementInfoManagerInterface $elementInfoManager, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, ModuleHandlerInterface $module_handler) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $elementInfoManager);
     $this->entityTypeManager = $entity_type_manager;
     $this->currentUser = $current_user;
     $this->moduleHandler = $module_handler;
@@ -104,6 +105,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['third_party_settings'],
+      $container->get('plugin.manager.element_info'),
       $container->get('entity_type.manager'),
       $container->get('current_user'),
       $container->get('module_handler')
@@ -527,9 +529,6 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
           'type' => 'throbber',
           'message' => $this->t('Opening media library.'),
         ],
-        // The AJAX system automatically moves focus to the first tabbable
-        // element of the modal, so we need to disable refocus on the button.
-        'disable-refocus' => TRUE,
       ],
       // Allow the media library to be opened even if there are form errors.
       '#limit_validation_errors' => [],
@@ -632,7 +631,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
   protected function getNoMediaTypesAvailableMessage() {
     $entity_type_id = $this->fieldDefinition->getTargetEntityTypeId();
 
-    $default_message = $this->t('There are no allowed media types configured for this field. Please contact the site administrator.');
+    $default_message = $this->t('There are no allowed media types configured for this field. Contact the site administrator.');
 
     // Show the default message if the user does not have the permissions to
     // configure the fields for the entity type.
@@ -928,8 +927,8 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    */
   protected static function getNewMediaItems(array $element, FormStateInterface $form_state) {
     // Get the new media IDs passed to our hidden button. We need to use the
-    // actual user input, since when #limit_validation_errors is used, the
-    // unvalidated user input is not added to the form state.
+    // actual user input, since when #limit_validation_errors is used, any
+    // non validated user input is not added to the form state.
     // @see FormValidator::handleErrorsWithLimitedValidation()
     $values = $form_state->getUserInput();
     $path = $element['#parents'];
@@ -939,7 +938,6 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       $ids = explode(',', $value['media_library_selection']);
       $ids = array_filter($ids, 'is_numeric');
       if (!empty($ids)) {
-        /** @var \Drupal\media\MediaInterface[] $media */
         return Media::loadMultiple($ids);
       }
     }
@@ -964,7 +962,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     // Default to using the current selection if the form is new.
     $path = $element['#parents'];
     // We need to use the actual user input, since when #limit_validation_errors
-    // is used, the unvalidated user input is not added to the form state.
+    // is used, the non validated user input is not added to the form state.
     // @see FormValidator::handleErrorsWithLimitedValidation()
     $values = NestedArray::getValue($form_state->getUserInput(), $path);
     $selection = $values['selection'] ?? [];

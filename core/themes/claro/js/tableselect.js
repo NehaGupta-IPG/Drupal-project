@@ -73,10 +73,7 @@
         // To prevent this potential miscalculation, the spacer is momentarily
         // removed when blur occurs on rows preceding it. The spacer is
         // reintroduced immediately after the next item receives focus.
-        if (
-          nextSibling &&
-          nextSibling.getAttribute('data-drupal-table-row-spacer')
-        ) {
+        if (nextSibling?.getAttribute('data-drupal-table-row-spacer')) {
           nextSibling.parentNode.removeChild(nextSibling);
         }
       }
@@ -123,8 +120,9 @@
         '[data-drupal-table-row-spacer] { display: none; }';
 
       if (!this.ignoreScrollEvent) {
-        // Remove the timeout that unhides the spacer. If this function is called,
-        // then scrolling is still happening and spacers should stay hidden.
+        // Remove the timeout that un-hides the spacer. If this function is
+        // called, then scrolling is still happening and spacers should stay
+        // hidden.
         clearTimeout(this.scrollingTimeout);
 
         // Shortly after scrolling tops, the spacer is re-added.
@@ -199,9 +197,9 @@
                 // be set to bypass scroll handler actions in just those
                 // instances.
                 const oldScrollTop =
-                  window.pageYOffset || document.documentElement.scrollTop;
+                  window.scrollY || document.documentElement.scrollTop;
                 const scrollLeft =
-                  window.pageXOffset || document.documentElement.scrollLeft;
+                  window.scrollX || document.documentElement.scrollLeft;
                 const rowContainsActiveElement = row.contains(
                   document.activeElement,
                 );
@@ -224,7 +222,7 @@
                 // Will be used to determine if a scroll position change
                 // occurred due to adding the spacer.
                 const newScrollTop =
-                  window.pageYOffset || document.documentElement.scrollTop;
+                  window.scrollY || document.documentElement.scrollTop;
 
                 // If the browser pushed the row back into the viewport after
                 // the spacer was added, return the scroll position to the

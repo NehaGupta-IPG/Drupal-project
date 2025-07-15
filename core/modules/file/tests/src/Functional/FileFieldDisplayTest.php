@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Functional;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -24,8 +26,8 @@ class FileFieldDisplayTest extends FileFieldTestBase {
   /**
    * Tests normal formatter display on node display.
    */
-  public function testNodeDisplay() {
-    $field_name = strtolower($this->randomMachineName());
+  public function testNodeDisplay(): void {
+    $field_name = $this->randomMachineName();
     $type_name = 'article';
     $field_storage_settings = [
       'display_field' => '1',
@@ -75,7 +77,6 @@ class FileFieldDisplayTest extends FileFieldTestBase {
 
     // Check that the default formatter is displaying with the file name.
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
-    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
     $node_file = File::load($node->{$field_name}->target_id);
     $file_link = [
@@ -85,7 +86,8 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     $default_output = \Drupal::service('renderer')->renderRoot($file_link);
     $this->assertSession()->responseContains($default_output);
 
-    // Turn the "display" option off and check that the file is no longer displayed.
+    // Turn the "display" option off and check that the file is no longer
+    // displayed.
     $edit = [$field_name . '[0][display]' => FALSE];
     $this->drupalGet('node/' . $nid . '/edit');
     $this->submitForm($edit, 'Save');
@@ -130,8 +132,8 @@ class FileFieldDisplayTest extends FileFieldTestBase {
   /**
    * Tests default display of File Field.
    */
-  public function testDefaultFileFieldDisplay() {
-    $field_name = strtolower($this->randomMachineName());
+  public function testDefaultFileFieldDisplay(): void {
+    $field_name = $this->randomMachineName();
     $type_name = 'article';
     $field_storage_settings = [
       'display_field' => '1',
@@ -157,10 +159,10 @@ class FileFieldDisplayTest extends FileFieldTestBase {
   /**
    * Tests description toggle for field instance configuration.
    */
-  public function testDescToggle() {
+  public function testDescToggle(): void {
     $type_name = 'test';
     $field_type = 'file';
-    $field_name = strtolower($this->randomMachineName());
+    $field_name = $this->randomMachineName();
     // Use the UI to add a new content type that also contains a file field.
     $edit = [
       'name' => $type_name,
@@ -189,8 +191,8 @@ class FileFieldDisplayTest extends FileFieldTestBase {
   /**
    * Tests description display of File Field.
    */
-  public function testDescriptionDefaultFileFieldDisplay() {
-    $field_name = strtolower($this->randomMachineName());
+  public function testDescriptionDefaultFileFieldDisplay(): void {
+    $field_name = $this->randomMachineName();
     $type_name = 'article';
     $field_storage_settings = [
       'display_field' => '1',
@@ -232,6 +234,16 @@ class FileFieldDisplayTest extends FileFieldTestBase {
 
     $this->drupalGet('node/' . $nid);
     $this->assertSession()->elementTextContains('xpath', '//a[@href="' . $node->{$field_name}->entity->createFileUrl() . '"]', $description);
+
+    // Test that null file size is rendered as "Unknown".
+    $nonexistent_file = File::create([
+      'uri' => 'temporary://' . $this->randomMachineName() . '.txt',
+    ]);
+    $nonexistent_file->save();
+    $node->set($field_name, $nonexistent_file->id());
+    $node->save();
+    $this->drupalGet('node/' . $nid);
+    $this->assertSession()->elementTextEquals('xpath', '//a[@href="' . $node->{$field_name}->entity->createFileUrl() . '"]/../../../td[2]', 'Unknown');
   }
 
 }

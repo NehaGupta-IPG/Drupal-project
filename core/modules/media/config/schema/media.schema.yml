@@ -7,6 +7,7 @@ media.settings:
       label: 'Full URI to a folder where the media icons will be installed'
     iframe_domain:
       type: uri
+      nullable: true
       label: 'Domain from which to serve oEmbed content in an iframe'
     oembed_providers_url:
       type: uri
@@ -28,7 +29,7 @@ media.type.*:
           # @see \Drupal\media\MediaTypeForm::form()
           max: 32
     label:
-      type: label
+      type: required_label
       label: 'Name'
     description:
       type: text
@@ -36,6 +37,10 @@ media.type.*:
     source:
       type: string
       label: 'Source'
+      constraints:
+        PluginExists:
+          manager: plugin.manager.media.source
+          interface: 'Drupal\media\MediaSourceInterface'
     queue_thumbnail_downloads:
       type: boolean
       label: 'Whether the thumbnail downloads should be queued'
@@ -118,7 +123,7 @@ media.source.field_aware:
       label: 'Source field'
 
 filter_settings.media_embed:
-  type: filter
+  type: mapping
   label: 'Media Embed'
   mapping:
     default_view_mode:

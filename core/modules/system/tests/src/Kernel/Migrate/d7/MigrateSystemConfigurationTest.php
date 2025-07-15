@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Migrate\d7;
 
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
@@ -11,18 +13,25 @@ use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
  */
 class MigrateSystemConfigurationTest extends MigrateDrupal7TestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['file', 'system'];
 
+  /**
+   * The expected configuration after migration.
+   *
+   * @var array
+   */
   protected $expectedConfig = [
     'system.authorize' => [],
     'system.cron' => [
       'threshold' => [
-        // autorun is not handled by the migration.
-        // 'autorun' => 0,
+        // Auto-run is not handled by the migration, so ignore "'autorun' => 0".
         'requirements_warning' => 172800,
         'requirements_error' => 1209600,
       ],
-      'logging' => 1,
+      'logging' => TRUE,
     ],
     'system.date' => [
       'first_day' => 1,
@@ -59,9 +68,17 @@ class MigrateSystemConfigurationTest extends MigrateDrupal7TestBase {
       'interface' => [
         'default' => 'php_mail',
       ],
+      'mailer_dsn' => [
+        'scheme' => 'sendmail',
+        'host' => 'default',
+        'user' => NULL,
+        'password' => NULL,
+        'port' => NULL,
+        'options' => [],
+      ],
     ],
     'system.maintenance' => [
-      // langcode is not handled by the migration.
+      // Langcode is not handled by the migration.
       'langcode' => 'en',
       'message' => 'This is a custom maintenance mode message.',
     ],
@@ -73,7 +90,7 @@ class MigrateSystemConfigurationTest extends MigrateDrupal7TestBase {
       ],
       'css' => [
         'preprocess' => TRUE,
-        // gzip is not handled by the migration.
+        // Gzip is not handled by the migration.
         'gzip' => TRUE,
       ],
       // fast_404 is not handled by the migration.
@@ -85,7 +102,7 @@ class MigrateSystemConfigurationTest extends MigrateDrupal7TestBase {
       ],
       'js' => [
         'preprocess' => FALSE,
-        // gzip is not handled by the migration.
+        // Gzip is not handled by the migration.
         'gzip' => TRUE,
       ],
     ],
@@ -95,9 +112,9 @@ class MigrateSystemConfigurationTest extends MigrateDrupal7TestBase {
       ],
     ],
     'system.site' => [
-      // langcode and default_langcode are not handled by the migration.
+      // Neither langcode nor default_langcode are not handled by the migration.
       'langcode' => 'en',
-      // uuid is not handled by the migration.
+      // UUID is not handled by the migration.
       'uuid' => '',
       'name' => 'The Site Name',
       'mail' => 'joseph@flattandsons.com',
@@ -110,6 +127,7 @@ class MigrateSystemConfigurationTest extends MigrateDrupal7TestBase {
       'admin_compact_mode' => TRUE,
       'weight_select_max' => 100,
       'default_langcode' => 'en',
+      'mail_notification' => NULL,
     ],
   ];
 
@@ -166,7 +184,7 @@ class MigrateSystemConfigurationTest extends MigrateDrupal7TestBase {
   /**
    * Tests that all expected configuration gets migrated.
    */
-  public function testConfigurationMigration() {
+  public function testConfigurationMigration(): void {
     foreach ($this->expectedConfig as $config_id => $values) {
       if ($config_id == 'system.mail') {
         $actual = \Drupal::config($config_id)->getRawData();

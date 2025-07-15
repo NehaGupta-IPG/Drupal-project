@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\Access\AccessResult;
@@ -44,8 +46,9 @@ class EntityCreateAccessCheckTest extends UnitTestCase {
    * Provides test data for testAccess.
    *
    * @return array
+   *   An array of test data for testAccess.
    */
-  public function providerTestAccess() {
+  public static function providerTestAccess() {
     $no_access = FALSE;
     $access = TRUE;
 
@@ -68,7 +71,7 @@ class EntityCreateAccessCheckTest extends UnitTestCase {
    *
    * @dataProvider providerTestAccess
    */
-  public function testAccess($entity_bundle, $requirement, $access, $expected, $expect_permission_context = TRUE) {
+  public function testAccess($entity_bundle, $requirement, $access, $expected, $expect_permission_context = TRUE): void {
 
     // Set up the access result objects for allowing or denying access.
     $access_result = $access ? AccessResult::allowed()->cachePerPermissions() : AccessResult::neutral()->cachePerPermissions();
