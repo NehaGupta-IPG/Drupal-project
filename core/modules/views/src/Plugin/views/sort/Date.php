@@ -55,15 +55,17 @@ class Date extends SortPluginBase {
     $this->ensureMyTable();
 
     // Determine whether to use a formula in the query.
-    $formula = match ($this->options['granularity']) {
-      'year' => $this->getDateFormat('Y'),
-      'month' => $this->getDateFormat('Ym'),
-      'week' => $this->getDateFormat('W'),
-      'day' => $this->getDateFormat('Ymd'),
-      'hour' => $this->getDateFormat('YmdH'),
-      'minute' => $this->getDateFormat('YmdHi'),
-      default => NULL,
+    $date_formula = match ($this->options['granularity']) {
+        'year' => 'Y',
+        'month' => 'Ym',
+        'week' => 'W',
+        'day' => 'Ymd',
+        'hour' => 'YmdH',
+        'minute' => 'YmdHi',
+        default => null,
     };
+
+    $formula = $date_formula ? $this->getDateFormat($date_formula) : null;
 
     // Add the field.
     if ($formula !== NULL) {
