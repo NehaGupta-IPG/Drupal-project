@@ -257,6 +257,14 @@ class DependencyTest extends ModuleTestBase {
     // depends on help.
     $expected_order = ['help', 'config', 'dblog'];
 
+    // Check the module install text with 1 module dependencies.
+    $edit = [];
+    $edit['modules[file][enable]'] = 'file';
+    $this->drupalGet('admin/modules');
+    $this->submitForm($edit, 'Install');
+    $this->assertModules(['file'], FALSE);
+    $this->assertSession()->pageTextContains('You must install the Field module to install File.');
+
     // Enable the modules through the UI, verifying that the dependency chain
     // is correct.
     $edit = [];
@@ -266,7 +274,15 @@ class DependencyTest extends ModuleTestBase {
     $this->assertModules(['dblog'], FALSE);
     // Note that dependencies are sorted alphabetically in the confirmation
     // message.
-    $this->assertSession()->pageTextContains('You must install the Configuration Manager, Help modules to install Database Logging.');
+    $this->assertSession()->pageTextContains('You must install the Configuration Manager and Help modules to install Database Logging.');
+
+    // Check the module install text with more than 3 module dependencies.
+    $edit = [];
+    $edit['modules[navigation][enable]'] = 'navigation';
+    $this->drupalGet('admin/modules');
+    $this->submitForm($edit, 'Install');
+    $this->assertModules(['navigation'], FALSE);
+    $this->assertSession()->pageTextContains('You must install the Block, File, Field, Layout Builder, Layout Discovery, and Contextual Links modules to install Navigation.');
 
     $edit['modules[config][enable]'] = 'config';
     $edit['modules[help][enable]'] = 'help';
