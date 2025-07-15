@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Composer;
 
 use Drupal\Core\Composer\ProjectRoot;
@@ -21,7 +23,7 @@ class ProjectRootTest extends UnitTestCase {
    * that it returns a reasonable value. This allows us to test the rest of the
    * class.
    *
-   * @param string $root
+   * @param string $root_path
    *   The root directory of the vfsStream mock.
    */
   protected function getMockProjectRoot($root_path) {

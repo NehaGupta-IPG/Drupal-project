@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Composer\Dependencies;
 
 use Drupal\Core\Composer\Dependencies\DevDependencyFinder;
@@ -20,6 +22,9 @@ use Drupal\KernelTests\KernelTestBase;
  */
 class DevDependencyFinderTest extends KernelTestBase {
 
+  /**
+   * Data provider for ::testBuildRequirements())
+   */
   public function provideBuildRequirements() {
     // Data provider methods are run before setUp(), so they can't use
     // constants from *.inc files. REQUIREMENT_OK = 0, REQUIREMENT_WARNING = 1.

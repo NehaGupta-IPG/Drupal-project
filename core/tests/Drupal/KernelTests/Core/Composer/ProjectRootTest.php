@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Composer;
 
 use Drupal\Core\Composer\ProjectRoot;

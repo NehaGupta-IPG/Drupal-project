@@ -2,7 +2,7 @@
 
 namespace Drupal\Core\Composer;
 
-use Drupal\Core\Composer\ProjectRootInterface;
+use Composer\Autoload\ClassLoader;
 
 /**
  * Provides information about the Composer project root.
@@ -47,7 +47,7 @@ class ProjectRoot implements ProjectRootInterface {
       // use reflection to deduce the location of vendor/.
       $vendor_dir = $this->appRoot . '/vendor';
       $autoload = require $this->appRoot . '/autoload.php';
-      if ($autoload instanceof \Composer\Autoload\ClassLoader) {
+      if ($autoload instanceof ClassLoader) {
         $ref_loader = new \ReflectionClass($autoload);
         $vendor_dir = dirname(dirname($ref_loader->getFileName()));
       }
@@ -91,7 +91,7 @@ class ProjectRoot implements ProjectRootInterface {
     // Since the default setup for Drupal is to have both a root package and a
     // pre-installed package for drupal/core, we have to merge requirements to
     // emulate the composer-merge plugin.
-    // @todo: Possibly change this when the drupal/core subtree split happens in
+    // @todo Possibly change this when the drupal/core subtree split happens in
     // https://www.drupal.org/node/2352091
     return array_merge(
       $this->getDevRequires($this->appRoot . '/composer.json'),
