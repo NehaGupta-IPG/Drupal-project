@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\CommentManagerInterface;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\node\Entity\Node;
 
 /**
@@ -288,17 +287,17 @@ class CommentPagerTest extends CommentTestBase {
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.');
 
     $expected_pages = [
-      // Page of comment 5
+      // Page of comment 5.
       1 => 5,
-      // Page of comment 4
+      // Page of comment 4.
       2 => 4,
-      // Page of comment 3
+      // Page of comment 3.
       3 => 3,
-      // Page of comment 2
+      // Page of comment 2.
       4 => 2,
-      // Page of comment 1
+      // Page of comment 1.
       5 => 1,
-      // Page of comment 0
+      // Page of comment 0.
       6 => 0,
     ];
 
@@ -312,17 +311,17 @@ class CommentPagerTest extends CommentTestBase {
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Switched to threaded mode.');
 
     $expected_pages = [
-      // Page of comment 5
+      // Page of comment 5.
       1 => 5,
-      // Page of comment 4
+      // Page of comment 4.
       2 => 1,
-      // Page of comment 4
+      // Page of comment 4.
       3 => 1,
-      // Page of comment 4
+      // Page of comment 4.
       4 => 1,
-      // Page of comment 4
+      // Page of comment 4.
       5 => 1,
-      // Page of comment 0
+      // Page of comment 0.
       6 => 0,
     ];
 
@@ -446,7 +445,7 @@ class CommentPagerTest extends CommentTestBase {
       $url_target = $this->getAbsoluteUrl($urls[$index]->getAttribute('href'));
       return $this->drupalGet($url_target);
     }
-    $this->fail(new FormattableMarkup('Link %label does not exist on @url_before', ['%label' => $xpath, '@url_before' => $url_before]));
+    $this->fail("Link $xpath does not exist on $url_before");
     return FALSE;
   }
 

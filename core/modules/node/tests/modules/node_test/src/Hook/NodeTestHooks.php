@@ -32,14 +32,14 @@ class NodeTestHooks {
       ];
       // Add content that should be displayed only in the RSS feed.
       $build['extra_feed_content'] = [
-        '#markup' => '<p>' . 'Extra data that should appear only in the RSS feed for node ' . $node->id() . '.</p>',
+        '#markup' => '<p>Extra data that should appear only in the RSS feed for node ' . $node->id() . '.</p>',
         '#weight' => 10,
       ];
     }
     if ($view_mode != 'rss') {
       // Add content that should NOT be displayed in the RSS feed.
       $build['extra_non_feed_content'] = [
-        '#markup' => '<p>' . 'Extra data that should appear everywhere except the RSS feed for node ' . $node->id() . '.</p>',
+        '#markup' => '<p>Extra data that should appear everywhere except the RSS feed for node ' . $node->id() . '.</p>',
       ];
     }
   }
@@ -130,7 +130,7 @@ class NodeTestHooks {
   #[Hook('node_presave')]
   public function nodePresave(NodeInterface $node): void {
     if ($node->getTitle() == 'testing_node_presave') {
-      // Sun, 19 Nov 1978 05:00:00 GMT
+      // Sun, 19 Nov 1978 05:00:00 GMT.
       $node->setCreatedTime(280299600);
       // Drupal 1.0 release.
       $node->changed = 979534800;

@@ -56,7 +56,7 @@ function locale_translation_build_projects() {
     // to fall back to the latest stable release for that branch.
     if (isset($data['info']['version']) && strpos($data['info']['version'], '-dev')) {
       if (preg_match("/^(\d+\.x-\d+\.).*$/", $data['info']['version'], $matches)) {
-        // Example matches: 8.x-1.x-dev, 8.x-1.0-alpha1+5-dev => 8.x-1.x
+        // Example matches: "8.x-1.x-dev", "8.x-1.0-alpha1+5-dev => 8.x-1.x".
         $data['info']['version'] = $matches[1] . 'x';
       }
       elseif (preg_match("/^(\d+\.\d+\.).*$/", $data['info']['version'], $matches)) {
@@ -99,15 +99,15 @@ function locale_translation_project_list() {
   if (empty($projects)) {
     $projects = [];
 
-    $additional_whitelist = [
+    $additional_allow_list = [
       'interface translation project',
       'interface translation server pattern',
     ];
     $module_data = _locale_translation_prepare_project_list(\Drupal::service('extension.list.module')->getList(), 'module');
     $theme_data = _locale_translation_prepare_project_list(\Drupal::service('extension.list.theme')->reset()->getList(), 'theme');
     $project_info = new ProjectInfo();
-    $project_info->processInfoList($projects, $module_data, 'module', TRUE, $additional_whitelist);
-    $project_info->processInfoList($projects, $theme_data, 'theme', TRUE, $additional_whitelist);
+    $project_info->processInfoList($projects, $module_data, 'module', TRUE, $additional_allow_list);
+    $project_info->processInfoList($projects, $theme_data, 'theme', TRUE, $additional_allow_list);
 
     // Allow other modules to alter projects before fetching and comparing.
     \Drupal::moduleHandler()->alter('locale_translation_projects', $projects);
