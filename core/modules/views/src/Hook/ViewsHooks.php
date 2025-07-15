@@ -83,7 +83,6 @@ class ViewsHooks {
             'view_display_id' => $view->current_display,
             'view_args' => Html::escape(implode('/', $view->args)),
             // We're adding the view_path client-side.
-            //'view_path' => Html::escape(Url::fromRoute('<current>')->toString()),
             'view_base_path' => $view->getPath(),
             'view_dom_id' => $view->dom_id,
                     // To fit multiple views on a page, the programmer may have
@@ -91,7 +90,7 @@ class ViewsHooks {
             'pager_element' => isset($view->pager) ? $view->pager->getPagerId() : 0,
           ],
         ],
-      ];
+      ]);
       $view->element['#attached']['library'][] = 'views/views.ajax';
     }
 

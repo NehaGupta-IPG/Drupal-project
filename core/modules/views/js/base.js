@@ -113,18 +113,18 @@
   };
 
   Drupal.Views.updatePagerLinkHref = function (link) {
-    var href = link.href,
-        hrefArgs = Drupal.Views.parseQueryString(href),
-        urlArgs = Drupal.Views.parseQueryString(location.search),
-        updated = false,
-        sep = hrefArgs === {} ? '?' : '&';
-    for (var arg in urlArgs) {
+    let href = link.href;
+    const hrefArgs = Drupal.Views.parseQueryString(href);
+    const urlArgs = Drupal.Views.parseQueryString(window.location.search);
+    let updated = false;
+    let sep = hrefArgs === {} ? '?' : '&';
+    Object.keys(urlArgs).forEach(function (arg) {
       if (urlArgs.hasOwnProperty(arg) && !hrefArgs[arg]) {
-        href += sep + arg + (urlArgs[arg] ? '=' + urlArgs[arg] : '');
+        href += sep + arg + (urlArgs[arg] ? `=${urlArgs[arg]}` : '');
         sep = '&';
         updated = true;
       }
-    }
+    });
     if (updated) {
       link.href = href;
     }
@@ -132,17 +132,20 @@
 
   Drupal.behaviors.Views = {};
   Drupal.behaviors.Views.attach = function (context) {
-    var $links = $('.view .pager__items .pager__item > a', context);
-    $links.once('js-pager-query-args').each(Drupal.behaviors.Views.addClientQueryArgs);
+    const $links = $('.view .pager__items .pager__item > a', context);
+    $links
+      .once('js-pager-query-args')
+      .each(Drupal.behaviors.Views.addClientQueryArgs);
   };
 
   Drupal.behaviors.Views.addClientQueryArgs = function (i, link) {
-    var $link = $(link),
-        $view = $link.closest('.view'),
-        view_dom_id = $view.attr('data-views-dom-id');
+    const $link = $(link);
+    const $view = $link.closest('.view');
+    const viewDomId = $view.attr('data-views-dom-id');
     if (drupalSettings.views && drupalSettings.views.instances) {
-      var settings = drupalSettings.views.instances['views_dom_id:' + view_dom_id] || {};
-      if (settings.pager_strict_query_args == true) {
+      const settings =
+        drupalSettings.views.instances[`views_dom_id:${viewDomId}`] || {};
+      if (settings.pager_strict_query_args === true) {
         Drupal.Views.updatePagerLinkHref(link);
       }
     }

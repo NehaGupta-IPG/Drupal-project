@@ -292,16 +292,20 @@ abstract class PagerPluginBase extends PluginBase {
     return FALSE;
   }
 
+  /**
+   * Returns the pager uses strict query args.
+   */
   public function usesStrictQueryArgs() {
     return FALSE;
   }
 
   /**
-   * Filter an array of query parameters down to those considered by this view
-   * according to it's cache contexts.
+   * Filter an array of query parameters.
+   *
+   * Only keep those considered by this view according to it's cache contexts.
    *
    * @param array $query
-   *  The query parameters for this request which will be filtered if possible.
+   *   The query parameters for this request which will be filtered if possible.
    */
   public function filterQueryArgs(&$query = []) {
     $filtered_query = [];
@@ -312,14 +316,17 @@ abstract class PagerPluginBase extends PluginBase {
         $query_arg = explode(':', $cacheContext);
         if (count($query_arg) > 1) {
           $query_arg = $query_arg[1];
-        } else {
+        }
+        else {
           continue;
         }
-        // get the query parameter and add it to the filtered array of query args to return.
+        // Get the query parameter and add it
+        // to the filtered array of query args to return.
         if (isset($query[$query_arg])) {
           $filtered_query[$query_arg] = $query[$query_arg];
         }
-      } else if (in_array($cacheContext, $escape_cache_contexts)) {
+      }
+      elseif (in_array($cacheContext, $escape_cache_contexts)) {
         // This view has a cache context in the url context hierarchy above
         // individual query_args; as a result, we cannot filter the query_args.
         return;

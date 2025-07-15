@@ -41,7 +41,8 @@ class PagerParameters implements PagerParametersInterface {
         /** @var \Drupal\views\Plugin\views\pager\PagerPluginBase $pager */
         $pager = $context['view']->display_handler->getPlugin('pager');
         if ($pager && $pager->usesStrictQueryArgs()) {
-          // Filter out $parameters based on the views url.query_args:* cache contexts.
+          // Filter out $parameters based on
+          // the views url.query_args:* cache contexts.
           $pager->filterQueryArgs($parameters);
         }
       }

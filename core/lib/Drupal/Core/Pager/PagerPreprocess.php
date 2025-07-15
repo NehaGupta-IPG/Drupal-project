@@ -43,7 +43,7 @@ class PagerPreprocess {
     $quantity = empty($variables['pager']['#quantity']) ? 0 : $variables['pager']['#quantity'];
     $route_name = $variables['pager']['#route_name'];
     $route_parameters = $variables['pager']['#route_parameters'] ?? [];
-    $view = isset($variables['pager']['#view']) ? $variables['pager']['#view'] : NULL;
+    $view = $variables['pager']['#view'] ?? NULL;
     $context = [];
     if ($view) {
       $context['view'] = $view;

@@ -65,7 +65,7 @@
     this.$view = $(selector);
 
     // Add the view_path client-side instead of server-side to avoid requiring the route context.
-    settings.view_path = location.pathname;
+    settings.view_path = window.location.pathname;
 
     // Retrieve the path to use for views' ajax.
     let ajaxPath = drupalSettings.views.ajax_path;

@@ -91,7 +91,7 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
         'next' => ['default' => $this->t('Next ›')],
       ],
     ];
-    $options['js_pager_query_args'] = ['default' => '0'];
+    $options['strict_query_args'] = ['default' => '0'];
     return $options;
   }
 
@@ -240,7 +240,7 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
       '#type' => 'checkbox',
       '#title' => $this->t('Use strict pager url query argument caching.'),
       '#description' => $this->t('This setting improves views cache performance by only adding cache contexts for query arguments specifically used by the view. Query arguments not exposed by the view as cache contexts will be stripped from paging links and will not affect the caching of results or rendered output.<br>However, it is important to note that this setting may cause unexpected results without javascript enabled as non-views query parameters will not be preserved, in this case.'),
-      '#default_value' => $this->options['strict_query_args']
+      '#default_value' => $this->options['strict_query_args'],
     ];
   }
 
@@ -434,8 +434,11 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
     }
   }
 
-  public function usesJavaScriptQueryArgs() {
-    return $this->options['js_pager_query_args'] == '1';
+  /**
+   * {@inheritdoc}
+   */
+  public function usesStrictQueryArgs() {
+    return $this->options['strict_query_args'] == '1';
   }
 
   /**
@@ -456,9 +459,11 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
       'url.query_args:items_per_page',
     ];
 
-    // and any url.query_args cache contexts defined by other plugins.
+    // And any url.query_args cache contexts defined by other plugins.
     foreach (Views::getPluginTypes('plugin') as $plugin_type) {
-      if ($plugin_type == 'pager') { continue; }
+      if ($plugin_type == 'pager') {
+        continue;
+      }
       $plugin = $this->view->display_handler->getPlugin($plugin_type);
       if ($plugin instanceof CacheableDependencyInterface) {
         foreach ($plugin->getCacheContexts() as $cacheContext) {
