@@ -62,6 +62,9 @@ class BooleanCheckboxWidget extends WidgetBase {
       '#default_value' => !empty($items[0]->value),
     ];
 
+    // Add our custom validator.
+    $element['value']['#element_validate'][] = [static::class, 'validateElement'];
+
     // Override the title from the incoming $element.
     if ($this->getSetting('display_label')) {
       $element['value']['#title'] = $this->fieldDefinition->getLabel();
