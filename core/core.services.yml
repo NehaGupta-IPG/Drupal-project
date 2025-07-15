@@ -404,6 +404,12 @@ services:
     tags:
       - { name: page_cache_response_policy }
       - { name: dynamic_page_cache_response_policy }
+  composer.project_root:
+    class: Drupal\Core\Composer\ProjectRoot
+    arguments: ['@app.root']
+  composer.dev_dependency_finder:
+    class: Drupal\Core\Composer\Dependencies\DevDependencyFinder
+    arguments: ['@composer.project_root', '@string_translation']
   config.manager:
     class: Drupal\Core\Config\ConfigManager
     arguments: ['@entity_type.manager', '@config.factory', '@config.typed', '@string_translation', '@config.storage', '@event_dispatcher', '@entity.repository', '@extension.path.resolver']

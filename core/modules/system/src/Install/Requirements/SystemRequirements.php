@@ -223,6 +223,12 @@ class SystemRequirements implements InstallRequirementsInterface {
         ];
       }
       self::systemAdvisoriesRequirements($requirements);
+
+      // Add warning about core's Composer-based dev requirements.
+      $requirements = array_merge(
+        $requirements,
+        \Drupal::service('composer.dev_dependency_finder')->buildRequirements()
+      );
     }
 
     // Web server information.
