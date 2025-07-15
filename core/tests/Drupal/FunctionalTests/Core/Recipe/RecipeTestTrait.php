@@ -63,6 +63,11 @@ trait RecipeTestTrait {
   protected function applyRecipe(string $path, int $expected_exit_code = 0, array $options = [], string $command = 'recipe'): Process {
     assert($this instanceof BrowserTestBase);
 
+    // If we're applying the recipe, always apply it to the test site.
+    if ($command === 'recipe') {
+      $options[] = '--site=' . substr($this->siteDirectory, 6);
+    }
+
     $arguments = [
       (new PhpExecutableFinder())->find(),
       'core/scripts/drupal',

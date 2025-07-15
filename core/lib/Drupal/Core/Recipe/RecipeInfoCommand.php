@@ -46,7 +46,9 @@ final class RecipeInfoCommand extends Command {
       $io->error(sprintf('The supplied path %s is not a directory', $recipe_path));
       return 1;
     }
-    $this->boot();
+    // This command should not normally need to boot any site but the default,
+    // but in certain cases (like testing) we might need to override that.
+    $this->boot(getenv('DRUPAL_DEV_SITE_PATH') ?: 'sites/default');
 
     $recipe = Recipe::createFromDirectory($recipe_path);
     $io->section('Description');

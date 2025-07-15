@@ -16,6 +16,7 @@ use Psr\Log\LogLevel;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -48,7 +49,8 @@ final class RecipeCommand extends Command {
   protected function configure(): void {
     $this
       ->setDescription('Applies a recipe to a site.')
-      ->addArgument('path', InputArgument::REQUIRED, 'The path to the recipe\'s folder to apply');
+      ->addArgument('path', InputArgument::REQUIRED, 'The path to the recipe\'s folder to apply')
+      ->addOption('site', mode: InputOption::VALUE_REQUIRED, description: 'The name of a site directory against which to apply the recipe.', default: 'default');
 
     ConsoleInputCollector::configureCommand($this);
   }
@@ -65,7 +67,7 @@ final class RecipeCommand extends Command {
       return 1;
     }
     // Recipes can only be applied to an already-installed site.
-    $container = $this->boot()->getContainer();
+    $container = $this->boot('sites/' . $input->getOption('site'))->getContainer();
 
     /** @var \Drupal\Core\Config\Checkpoint\CheckpointStorageInterface $checkpoint_storage */
     $checkpoint_storage = $container->get('config.storage.checkpoint');
