@@ -87,11 +87,11 @@ class NavigationMenuLinkTreeTest extends KernelTestBase {
 
     $output = $this->linkTree->load('menu1', new MenuTreeParameters());
     $this->assertCount(2, $output);
-    $output = $this->linkTree->transform($output, []);
+    $output = $this->linkTree->transform($output, [], $this);
     $this->assertCount(0, $output);
     $output = $this->linkTree->load('menu2', new MenuTreeParameters());
     $this->assertCount(1, $output);
-    $output = $this->linkTree->transform($output, []);
+    $output = $this->linkTree->transform($output, [], $this);
     $this->assertCount(1, $output);
     $item = reset($output);
     $this->assertSame('New Link Title', $item->link->getTitle());

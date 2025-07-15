@@ -93,7 +93,7 @@ class ToolbarController extends ControllerBase implements TrustedCallbackInterfa
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
       ['callable' => 'toolbar_menu_navigation_links'],
     ];
-    $tree = $menu_tree->transform($tree, $manipulators, __METHOD__);
+    $tree = $menu_tree->transform($tree, $manipulators, __CLASS__);
     $element['administration_menu'] = $menu_tree->build($tree);
     return $element;
   }
@@ -120,7 +120,7 @@ class ToolbarController extends ControllerBase implements TrustedCallbackInterfa
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
       ['callable' => 'toolbar_menu_navigation_links'],
     ];
-    $tree = $menu_tree->transform($tree, $manipulators, __METHOD__);
+    $tree = $menu_tree->transform($tree, $manipulators, __CLASS__);
     $subtrees = [];
     // Calculated the combined cacheability of all subtrees.
     $cacheability = CacheableMetadata::createFromRenderArray($data);
