@@ -68,7 +68,8 @@ class Date extends SortPluginBase {
     $formula = $date_formula ? $this->getDateFormat($date_formula) : NULL;
 
     // Add the field.
-    if ($formula !== NULL) {
+    if ($date_formula !== NULL) {
+      $formula = $this->getDateFormat($date_formula);
       $this->query->addOrderBy(NULL, $formula, $this->options['order'], $this->tableAlias . '_' . $this->field . '_' . $this->options['granularity']);
     }
     else {
