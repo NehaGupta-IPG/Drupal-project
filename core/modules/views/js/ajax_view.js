@@ -64,6 +64,9 @@
     const selector = `.js-view-dom-id-${settings.view_dom_id}`;
     this.$view = $(selector);
 
+    // Add the view_path client-side instead of server-side to avoid requiring the route context.
+    settings.view_path = location.pathname;
+
     // Retrieve the path to use for views' ajax.
     let ajaxPath = drupalSettings.views.ajax_path;
 

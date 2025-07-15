@@ -4,18 +4,24 @@ views.module:
     component:
       css/views.module.css: {}
 
-views.ajax:
+views.base:
   version: VERSION
   js:
     js/base.js: {}
-    js/ajax_view.js: {}
   dependencies:
     - core/jquery
     - core/drupal
     - core/drupalSettings
     - core/once
+
+views.ajax:
+  version: VERSION
+  js:
+    js/ajax_view.js: {}
+  dependencies:
     - core/internal.jquery.form
     - core/drupal.ajax
+    - views/views.base
 
 views.responsive-grid:
   version: VERSION

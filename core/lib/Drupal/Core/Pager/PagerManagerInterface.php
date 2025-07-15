@@ -157,11 +157,13 @@ interface PagerManagerInterface {
    *   An integer to distinguish between multiple pagers on one page.
    * @param int $index
    *   The index of the target page, for the given element, in the pager array.
+   * @param array $context
+   *   Additional options for processing the pager arguments such as a view.
    *
    * @return array
    *   The altered $query parameter array.
    */
-  public function getUpdatedParameters(array $query, $element, $index);
+  public function getUpdatedParameters(array $query, $element, $index, $context = []);
 
   /**
    * Gets the extent of the pager page element IDs.

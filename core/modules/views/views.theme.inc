@@ -65,6 +65,7 @@ function template_preprocess_views_view(&$variables): void {
     // identifier for each view. This identifier is written to both
     // drupalSettings and the DIV wrapper.
     $variables['dom_id'] = $view->dom_id;
+    $variables['attributes']['data-views-dom-id'][] = $view->dom_id;
   }
 }
 
@@ -1067,13 +1068,18 @@ function template_preprocess_views_mini_pager(&$variables): void {
   }
   $current = $pager->getCurrentPage();
   $total = $pager->getTotalPages();
+  $view = isset($variables['view']) ? $variables['view'] : NULL;
+  $context = [];
+  if ($view) {
+    $context['view'] = $view;
+  }
 
   // Current is the page we are currently paged to.
   $variables['items']['current'] = $current + 1;
 
   if ($total > 1 && $current > 0) {
     $options = [
-      'query' => $pager_manager->getUpdatedParameters($parameters, $element, $current - 1),
+      'query' => $pager_manager->getUpdatedParameters($parameters, $element, $current - 1, $context),
     ];
     $variables['items']['previous']['href'] = Url::fromRoute('<current>', [], $options)->toString();
     if (isset($tags[1])) {
@@ -1084,7 +1090,7 @@ function template_preprocess_views_mini_pager(&$variables): void {
 
   if ($current < ($total - 1)) {
     $options = [
-      'query' => $pager_manager->getUpdatedParameters($parameters, $element, $current + 1),
+      'query' => $pager_manager->getUpdatedParameters($parameters, $element, $current + 1, $context),
     ];
     $variables['items']['next']['href'] = Url::fromRoute('<current>', [], $options)->toString();
     if (isset($tags[3])) {
@@ -1093,11 +1099,13 @@ function template_preprocess_views_mini_pager(&$variables): void {
     $variables['items']['next']['attributes'] = new Attribute();
   }
 
-  // This is based on the entire current query string. We need to ensure
-  // cacheability is affected accordingly.
-  $variables['#cache']['contexts'][] = 'url.query_args';
+  if (!$view || (!$view->pager->usesStrictQueryArgs())){
+    // This is based on the entire current query string. We need to ensure
+    // cacheability is affected accordingly.
+    $variables['#cache']['contexts'][] = 'url.query_args';
 
   $variables['heading_id'] = Html::getUniqueId('pagination-heading');
+  }
 }
 
 /**
