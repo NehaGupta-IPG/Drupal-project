@@ -71,5 +71,7 @@ block_content.add_missing:
   defaults:
     _controller: '\Drupal\block_content\Controller\BlockContentController::addMissing'
     _title_callback: 'Drupal\block_content\Controller\BlockContentController::getAddFormTitle'
+  options:
+    _admin_route: TRUE
   requirements:
     _permission: 'administer blocks'
