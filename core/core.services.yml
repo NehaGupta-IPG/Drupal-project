@@ -407,9 +407,11 @@ services:
   composer.project_root:
     class: Drupal\Core\Composer\ProjectRoot
     arguments: ['%app.root%']
+  Drupal\Core\Composer\ProjectRootInterface: '@composer.project_root'
   composer.dev_dependency_finder:
     class: Drupal\Core\Composer\Dependencies\DevDependencyFinder
     arguments: ['@composer.project_root', '@string_translation']
+  Drupal\Core\Composer\Dependencies\DevDependencyFinder: '@composer.dev_dependency_finder'
   config.manager:
     class: Drupal\Core\Config\ConfigManager
     arguments: ['@entity_type.manager', '@config.factory', '@config.typed', '@string_translation', '@config.storage', '@event_dispatcher', '@entity.repository', '@extension.path.resolver']
