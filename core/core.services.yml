@@ -406,7 +406,7 @@ services:
       - { name: dynamic_page_cache_response_policy }
   composer.project_root:
     class: Drupal\Core\Composer\ProjectRoot
-    arguments: ['@app.root']
+    arguments: ['%app.root%']
   composer.dev_dependency_finder:
     class: Drupal\Core\Composer\Dependencies\DevDependencyFinder
     arguments: ['@composer.project_root', '@string_translation']

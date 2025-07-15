@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Composer\Dependencies;
 
 use Drupal\Core\Composer\Dependencies\DevDependencyFinder;
 use Drupal\Core\Composer\ProjectRootInterface;
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\KernelTests\KernelTestBase;
 
@@ -29,15 +30,15 @@ class DevDependencyFinderTest extends KernelTestBase {
     // Data provider methods are run before setUp(), so they can't use
     // constants from *.inc files. REQUIREMENT_OK = 0, REQUIREMENT_WARNING = 1.
     return [
-      'no_dev_no_install' => [0, [], []],
-      'no_dev_requirements' => [0, ['any_requirement' => '0.0.1'], []],
+      'no_dev_no_install' => [RequirementSeverity::OK, [], []],
+      'no_dev_requirements' => [RequirementSeverity::OK, ['any_requirement' => '0.0.1'], []],
       'dev_requirements_installed' => [
-        1,
+        RequirementSeverity::Warning,
         ['dev_requirement' => '0.0.1'],
         ['dev_requirement' => '0.0.*'],
       ],
       'dev_package_installed' => [
-        1,
+        RequirementSeverity::Warning,
         [
           'dev_requirement' => '999999-dev',
           'dev_requirement_2' => '1.0.3',
@@ -48,7 +49,7 @@ class DevDependencyFinderTest extends KernelTestBase {
         ],
       ],
       'contrib_needs_other_version' => [
-        0,
+        RequirementSeverity::OK,
         ['dev_requirement' => '2.0.0'],
         ['dev_requirement' => '1.0.*'],
       ],
@@ -61,7 +62,7 @@ class DevDependencyFinderTest extends KernelTestBase {
    */
   public function testBuildRequirements($expected, $installed, $dev_requirements): void {
     $mock_root = $this->getMockBuilder(ProjectRootInterface::class)
-      ->setMethods(['getInstalledPackages', 'getDevRequirements'])
+      ->onlyMethods(['getInstalledPackages', 'getDevRequirements', 'getProjectVendorDirectory'])
       ->getMock();
     $mock_root->expects($this->once())
       ->method('getInstalledPackages')

@@ -3,6 +3,7 @@
 namespace Drupal\Core\Composer\Dependencies;
 
 use Drupal\Core\Composer\ProjectRootInterface;
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Composer\Semver\Semver;
@@ -89,7 +90,7 @@ class DevDependencyFinder {
         'description' => $this->t('This Drupal installation does not appear to have development packages installed. <a href=":documentation">Documentation on drupal.org</a>', [
           ':documentation' => 'https://www.drupal.org/docs/develop/using-composer',
         ]),
-        'severity' => REQUIREMENT_OK,
+        'severity' => RequirementSeverity::OK,
       ],
     ];
 
@@ -98,7 +99,7 @@ class DevDependencyFinder {
         $this->t('This Drupal installation appears to include development packages. This can lead to performance and security issues. Read the <a href=":documentation">documentation on drupal.org</a>', [
           ':documentation' => 'https://www.drupal.org/docs/develop/using-composer',
         ]);
-      $requirements['composer_dev_dependencies']['severity'] = REQUIREMENT_WARNING;
+      $requirements['composer_dev_dependencies']['severity'] = RequirementSeverity::Warning;
     }
 
     return $requirements;
