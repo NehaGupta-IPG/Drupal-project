@@ -28,7 +28,7 @@ class ProjectRootTest extends UnitTestCase {
    */
   protected function getMockProjectRoot($root_path): ProjectRoot {
     $root = $this->getMockBuilder(ProjectRoot::class)
-      ->setMethods(['getProjectVendorDirectory'])
+      ->onlyMethods(['getProjectVendorDirectory'])
       ->setConstructorArgs([vfsStream::url($root_path)])
       ->getMock();
     $root->expects($this->once())
@@ -39,10 +39,10 @@ class ProjectRootTest extends UnitTestCase {
 
   public static function provideEmptyInstalledJson(): array {
     return [
-      ['no_json' => ['vendor' => ['composer' => []]]],
-      ['empty_json' => ['vendor' => ['composer' => ['installed.json' => ' ']]]],
-      ['empty_json_array' => ['vendor' => ['composer' => ['installed.json' => '[]']]]],
-      ['bad_json' => ['vendor' => ['composer' => ['installed.json' => '[{"key": "value"}]']]]],
+      ['filesystem' => ['vendor' => ['composer' => []]]],
+      ['filesystem' => ['vendor' => ['composer' => ['installed.json' => ' ']]]],
+      ['filesystem' => ['vendor' => ['composer' => ['installed.json' => '[]']]]],
+      ['filesystem' => ['vendor' => ['composer' => ['installed.json' => '[{"key": "value"}]']]]],
     ];
   }
 
