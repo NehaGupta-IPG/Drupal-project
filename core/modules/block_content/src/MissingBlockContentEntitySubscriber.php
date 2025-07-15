@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\block_content;
 
-use Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface;
+use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\Config\Importer\MissingContentEvent;
 use Drupal\Core\State\StateInterface;
@@ -14,38 +16,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class MissingBlockContentEntitySubscriber implements EventSubscriberInterface {
 
   /**
-   * The state service.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
-   * The block plugin manager.
-   *
-   * @var \Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface
-   */
-  protected $blockPluginManager;
-
-  /**
-   * Static cache of the missing content entities.
-   *
-   * @var array
-   */
-  protected $cache;
-
-  /**
    * Constructs a new MissingBlockContentEntitySubscriber object.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   State service.
-   * @param \Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface $blockPluginManager
-   *   Block plugin manager.
    */
-  public function __construct(StateInterface $state, CachedDiscoveryInterface $blockPluginManager) {
-    $this->state = $state;
-    $this->blockPluginManager = $blockPluginManager;
-  }
+  public function __construct(
+    protected readonly StateInterface $state,
+    protected readonly BlockManagerInterface $blockPluginManager,
+  ) {}
 
   /**
    * Handles the missing content event.
@@ -57,7 +33,7 @@ class MissingBlockContentEntitySubscriber implements EventSubscriberInterface {
    * @see \Drupal\block_content\Plugin\Derivative\BlockContent::getDerivativeDefinitions
    * @see \Drupal\block_content\Plugin\Block\BlockContentBlock::build
    */
-  public function onMissingContent(MissingContentEvent $event) {
+  public function onMissingContent(MissingContentEvent $event): void {
     $missingBlockContentEntities = $this->getAll() + array_filter($event->getMissingContent(), function (array $item) {
       return $item['entity_type'] === 'block_content';
     });
@@ -83,7 +59,7 @@ class MissingBlockContentEntitySubscriber implements EventSubscriberInterface {
    *   Array of missing block content information keyed by UUID where each item
    *   in the array has keys 'uuid' and 'bundle'.
    */
-  public function getMissing() {
+  public function getMissing(): array {
     return $this->getAll();
   }
 
@@ -93,7 +69,7 @@ class MissingBlockContentEntitySubscriber implements EventSubscriberInterface {
    * @param string $uuid
    *   UUID of missing entity that has since been recreated and can be removed.
    */
-  public function remove($uuid) {
+  public function remove(string $uuid): void {
     $missing = $this->getAll();
     unset($missing[$uuid]);
     $this->set($missing);
@@ -110,9 +86,9 @@ class MissingBlockContentEntitySubscriber implements EventSubscriberInterface {
    *   a missing block content entity or FALSE if the UUID does not correspond
    *   to a missing block content entity.
    */
-  public function isMissing($uuid) {
+  public function isMissing(string $uuid): array|bool {
     $missing = $this->getAll();
-    return isset($missing[$uuid]) ? $missing[$uuid] : FALSE;
+    return $missing[$uuid] ?? FALSE;
   }
 
   /**
@@ -121,7 +97,7 @@ class MissingBlockContentEntitySubscriber implements EventSubscriberInterface {
    * @return array
    *   Missing entities.
    */
-  protected function getAll() {
+  protected function getAll(): array {
     return $this->state->get('block_content_missing_entities', []);
   }
 
@@ -133,7 +109,7 @@ class MissingBlockContentEntitySubscriber implements EventSubscriberInterface {
    *
    * @return $this
    */
-  protected function set(array $missing) {
+  protected function set(array $missing): self {
     $this->state->set('block_content_missing_entities', $missing);
     return $this;
   }

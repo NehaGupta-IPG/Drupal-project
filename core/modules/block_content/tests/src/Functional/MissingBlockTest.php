@@ -6,7 +6,6 @@ namespace Drupal\Tests\block_content\Functional;
 
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Cache\CacheTagsInvalidator;
 use Drupal\Core\Url;
 use PHPUnit\Framework\Attributes\Group;
 
