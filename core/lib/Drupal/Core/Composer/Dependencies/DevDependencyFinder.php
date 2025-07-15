@@ -73,7 +73,7 @@ class DevDependencyFinder {
     if ($installed_dev && (count($installed_dev) === count($dev_requirements))) {
       $dev_installed = TRUE;
       foreach ($dev_requirements as $package_name => $version_constraint) {
-        // Special case for @dev packages, which can generate unparseable local
+        // Special case for @dev packages, which can generate un-parseable local
         // version numbers, such as [behat/mink] => 9999999-dev.
         if (strpos($version_constraint, 'dev') === FALSE) {
           if (!Semver::satisfies($installed_dev[$package_name], $version_constraint)) {
