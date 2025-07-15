@@ -295,7 +295,7 @@ abstract class PagerPluginBase extends PluginBase {
   /**
    * Returns the pager uses strict query args.
    */
-  public function usesStrictQueryArgs(): false {
+  public function usesStrictQueryArgs(): bool {
     return FALSE;
   }
 
