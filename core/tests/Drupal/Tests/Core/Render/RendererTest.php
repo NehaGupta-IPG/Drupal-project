@@ -553,6 +553,40 @@ class RendererTest extends RendererTestBase {
   }
 
   /**
+   * Tests that element defaults are added.
+   *
+   * @covers ::render
+   * @covers ::doRender
+   */
+  public function testElementDefaultsAdded(): void {
+    $build = ['#type' => 'details'];
+    $this->renderer->renderInIsolation($build);
+    $this->assertTrue($build['#defaults_loaded'], "An element with a type had said type's defaults loaded.");
+
+    $build = [
+      '#lazy_builder' => [
+        'Drupal\Tests\Core\Render\TestCallables::lazyBuilder',
+        [FALSE],
+      ],
+      '#create_placeholder' => FALSE,
+    ];
+
+    $this->renderer->renderInIsolation($build);
+    $this->assertArrayNotHasKey('#defaults_loaded', $build, "A lazy builder that did not set a type had no type defaults loaded.");
+
+    $build = [
+      '#lazy_builder' => [
+        'Drupal\Tests\Core\Render\TestCallables::lazyBuilder',
+        [TRUE],
+      ],
+      '#create_placeholder' => FALSE,
+    ];
+
+    $this->renderer->renderInIsolation($build);
+    $this->assertTrue($build['#defaults_loaded'], "A lazy builder that set a type had said type's defaults loaded.");
+  }
+
+  /**
    * @covers ::render
    * @covers ::doRender
    *
@@ -1063,7 +1097,7 @@ class RendererTest extends RendererTestBase {
             'max-age' => 600,
           ],
         ],
-        new \stdClass(),
+        (new CacheableMetadata())->setCacheMaxAge(0),
         [
           '#cache' => [
             'contexts' => ['theme'],
@@ -1090,6 +1124,68 @@ class RendererTest extends RendererTestBase {
     // Test that the method works with no current request.
     $this->requestStack->pop();
     $this->assertFalse($this->renderer->hasRenderContext());
+  }
+
+  /**
+   * @covers ::executeInRenderContext
+   */
+  public function testExecuteInRenderContext(): void {
+    $return = $this->renderer->executeInRenderContext(new RenderContext(), function () {
+      $fiber_callback = function () {
+
+        // Create a #pre_render callback that renders a render array in
+        // isolation. This has its own #pre_render callback that calls
+        // Fiber::suspend(). This ensures that suspending a Fiber within
+        // multiple nested calls to ::executeInRenderContext() doesn't
+        // allow render context to get out of sync. This simulates similar
+        // conditions to BigPipe placeholder rendering.
+        $fiber_suspend_pre_render = function ($elements) {
+          $fiber_suspend = function ($elements) {
+            \Fiber::suspend();
+            return $elements;
+          };
+          $build = [
+            'foo' => [
+              '#markup' => 'foo',
+              '#pre_render' => [$fiber_suspend],
+            ],
+          ];
+          $markup = $this->renderer->renderInIsolation($build);
+          $elements['#markup'] = $markup;
+          return $elements;
+        };
+        $build = [
+          'foo' => [
+            '#pre_render' => [$fiber_suspend_pre_render],
+          ],
+        ];
+        return $this->renderer->render($build);
+      };
+
+      // Build an array of two fibers that executes the code defined above. This
+      // ensures that Fiber::suspend() is called from within two
+      // ::renderInIsolation() calls without either having been completed.
+      $fibers = [];
+      foreach ([0, 1] as $key) {
+        $fibers[] = new \Fiber(static fn () => $fiber_callback());
+      }
+      while ($fibers) {
+        foreach ($fibers as $key => $fiber) {
+          if ($fiber->isTerminated()) {
+            unset($fibers[$key]);
+            continue;
+          }
+          if ($fiber->isSuspended()) {
+            $fiber->resume();
+          }
+          else {
+            $fiber->start();
+          }
+        }
+      }
+      return $fiber->getReturn();
+    });
+    $this->assertEquals(Markup::create('foo'), $return);
   }
 
 }
@@ -1134,11 +1230,19 @@ class TestCallables implements TrustedCallbackInterface {
     return $elements;
   }
 
+  public static function lazyBuilder(bool $set_type): array {
+    $build['content'] = ['#markup' => 'Content'];
+    if ($set_type) {
+      $build['#type'] = 'details';
+    }
+    return $build;
+  }
+
   /**
    * {@inheritdoc}
    */
   public static function trustedCallbacks() {
-    return ['preRenderPrinted'];
+    return ['preRenderPrinted', 'lazyBuilder'];
   }
 
 }

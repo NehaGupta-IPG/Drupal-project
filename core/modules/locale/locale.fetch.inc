@@ -5,7 +5,7 @@
  */
 
 use Drupal\Core\Batch\BatchBuilder;
-use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
+use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 
 /**
  * Load the common translation API.
@@ -28,7 +28,7 @@ require_once __DIR__ . '/locale.translation.inc';
  * @return array
  *   Batch definition array.
  */
-#[StopProceduralHookScan]
+#[ProceduralHookScanStop]
 function locale_translation_batch_update_build($projects = [], $langcodes = [], $options = []) {
   \Drupal::moduleHandler()->loadInclude('locale', 'inc', 'locale.compare');
   $projects = $projects ?: array_keys(locale_translation_get_projects());
@@ -96,7 +96,7 @@ function locale_translation_batch_fetch_build($projects = [], $langcodes = [], $
  * @return array
  *   Array of batch operations.
  */
-function _locale_translation_fetch_operations($projects, $langcodes, $options) {
+function _locale_translation_fetch_operations($projects, $langcodes, $options): array {
   $operations = [];
 
   foreach ($projects as $project) {

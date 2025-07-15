@@ -208,7 +208,8 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    * Gets the availableSorts property.
    *
    * @return array
-   *   An array of available sorts, keyed by sort ID, containing sort information.
+   *   An array whose keys are the available sort options and whose
+   *   corresponding values are human readable labels.
    */
   public function getAvailableSorts() {
     return $this->availableSorts;
@@ -483,7 +484,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
   }
 
   /**
-   * Gets the current value of a #select element, from within a form constructor function.
+   * Gets the current value of a #select element.
    *
    * This function is intended for use in highly dynamic forms (in particular
    * the add view wizard) which are rebuilt in different ways depending on which
@@ -583,7 +584,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
       $options = $this->rowStyleOptions();
       $style_form['row_plugin'] = [
         '#type' => 'select',
-        '#title' => $this->t('of'),
+        '#title' => $this->t('output as'),
         '#options' => $options,
         '#access' => count($options) > 1,
       ];
@@ -721,7 +722,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *   arrays of options for that display.
    */
   protected function buildDisplayOptions($form, FormStateInterface $form_state) {
-    // Display: Default
+    // Display: Default.
     $display_options['default'] = $this->defaultDisplayOptions();
     $display_options['default'] += [
       'filters' => [],
@@ -730,17 +731,17 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
     $display_options['default']['filters'] += $this->defaultDisplayFilters($form, $form_state);
     $display_options['default']['sorts'] += $this->defaultDisplaySorts($form, $form_state);
 
-    // Display: Page
+    // Display: Page.
     if (!$form_state->isValueEmpty(['page', 'create'])) {
       $display_options['page'] = $this->pageDisplayOptions($form, $form_state);
 
-      // Display: Feed (attached to the page)
+      // Display: Feed (attached to the page).
       if (!$form_state->isValueEmpty(['page', 'feed'])) {
         $display_options['feed'] = $this->pageFeedDisplayOptions($form, $form_state);
       }
     }
 
-    // Display: Block
+    // Display: Block.
     if (!$form_state->isValueEmpty(['block', 'create'])) {
       $display_options['block'] = $this->blockDisplayOptions($form, $form_state);
     }
@@ -772,13 +773,13 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
     // instances.
     $executable = $view->getExecutable();
 
-    // Display: Default
+    // Display: Default.
     $default_display = $executable->newDisplay('default', 'Default', 'default');
     foreach ($display_options['default'] as $option => $value) {
       $default_display->setOption($option, $value);
     }
 
-    // Display: Page
+    // Display: Page.
     if (isset($display_options['page'])) {
       $display = $executable->newDisplay('page', 'Page', 'page_1');
       // The page display is usually the main one (from the user's point of

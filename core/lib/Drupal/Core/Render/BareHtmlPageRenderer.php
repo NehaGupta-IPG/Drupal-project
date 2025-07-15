@@ -88,7 +88,8 @@ class BareHtmlPageRenderer implements BareHtmlPageRendererInterface {
    *   The page to attach to.
    */
   public function systemPageAttachments(array &$page): void {
-    // Ensure the same CSS is loaded in template_preprocess_maintenance_page().
+    // Ensure the same CSS is loaded in
+    // \Drupal\Core\Theme\ThemePreprocess::preprocessMaintenancePage().
     $page['#attached']['library'][] = 'system/base';
     if (\Drupal::service('router.admin_context')->isAdminRoute()) {
       $page['#attached']['library'][] = 'system/admin';
@@ -168,7 +169,7 @@ class BareHtmlPageRenderer implements BareHtmlPageRendererInterface {
     // - applying a response filter if the current user is anonymous.
     // @see \Drupal\Core\Link
     // @see \Drupal\Core\Utility\LinkGenerator::generate()
-    // @see template_preprocess_links()
+    // @see \Drupal\Core\Theme\ThemePreprocess::preprocessLinks()
     // @see \Drupal\Core\EventSubscriber\ActiveLinkResponseFilter
     $page['#cache']['contexts'][] = 'user.roles:authenticated';
     if (\Drupal::currentUser()->isAuthenticated()) {

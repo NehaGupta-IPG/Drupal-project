@@ -47,7 +47,7 @@ class EntityContentBaseTest extends EntityTestBase {
     // Syncing should be set once.
     $entity->setSyncing(Argument::exact(TRUE))
       ->shouldBeCalledTimes(1);
-    // Set an id for the entity
+    // Set an id for the entity.
     $entity->id()
       ->willReturn(5);
     $destination->setEntity($entity->reveal());
@@ -122,14 +122,23 @@ class EntityTestDestination extends EntityContentBase {
    */
   private $entity = NULL;
 
+  /**
+   * Sets the test entity.
+   */
   public function setEntity($entity): void {
     $this->entity = $entity;
   }
 
+  /**
+   * Gets the test entity.
+   */
   protected function getEntity(Row $row, array $old_destination_id_values) {
     return $this->entity;
   }
 
+  /**
+   * Gets the test entity ID.
+   */
   public static function getEntityTypeId($plugin_id) {
     return 'foo';
   }
