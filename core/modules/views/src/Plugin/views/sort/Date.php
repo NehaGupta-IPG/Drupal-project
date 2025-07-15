@@ -56,16 +56,16 @@ class Date extends SortPluginBase {
 
     // Determine whether to use a formula in the query.
     $date_formula = match ($this->options['granularity']) {
-        'year' => 'Y',
-        'month' => 'Ym',
-        'week' => 'W',
-        'day' => 'Ymd',
-        'hour' => 'YmdH',
-        'minute' => 'YmdHi',
-        default => null,
+      'year' => 'Y',
+      'month' => 'Ym',
+      'week' => 'W',
+      'day' => 'Ymd',
+      'hour' => 'YmdH',
+      'minute' => 'YmdHi',
+      default => NULL,
     };
 
-    $formula = $date_formula ? $this->getDateFormat($date_formula) : null;
+    $formula = $date_formula ? $this->getDateFormat($date_formula) : NULL;
 
     // Add the field.
     if ($formula !== NULL) {
