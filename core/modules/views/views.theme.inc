@@ -1068,7 +1068,7 @@ function template_preprocess_views_mini_pager(&$variables): void {
   }
   $current = $pager->getCurrentPage();
   $total = $pager->getTotalPages();
-  $view = isset($variables['view']) ? $variables['view'] : NULL;
+  $view = $variables['view'] ?? NULL;
   $context = [];
   if ($view) {
     $context['view'] = $view;
@@ -1099,12 +1099,12 @@ function template_preprocess_views_mini_pager(&$variables): void {
     $variables['items']['next']['attributes'] = new Attribute();
   }
 
-  if (!$view || (!$view->pager->usesStrictQueryArgs())){
+  if (!$view || (!$view->pager->usesStrictQueryArgs())) {
     // This is based on the entire current query string. We need to ensure
     // cacheability is affected accordingly.
     $variables['#cache']['contexts'][] = 'url.query_args';
 
-  $variables['heading_id'] = Html::getUniqueId('pagination-heading');
+    $variables['heading_id'] = Html::getUniqueId('pagination-heading');
   }
 }
 

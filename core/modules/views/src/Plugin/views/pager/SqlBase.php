@@ -437,7 +437,7 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
   /**
    * {@inheritdoc}
    */
-  public function usesStrictQueryArgs() {
+  public function usesStrictQueryArgs(): bool {
     return $this->options['strict_query_args'] == '1';
   }
 

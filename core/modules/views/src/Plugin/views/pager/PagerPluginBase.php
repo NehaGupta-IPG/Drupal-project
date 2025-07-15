@@ -295,7 +295,7 @@ abstract class PagerPluginBase extends PluginBase {
   /**
    * Returns the pager uses strict query args.
    */
-  public function usesStrictQueryArgs() {
+  public function usesStrictQueryArgs(): false {
     return FALSE;
   }
 
@@ -307,7 +307,7 @@ abstract class PagerPluginBase extends PluginBase {
    * @param array $query
    *   The query parameters for this request which will be filtered if possible.
    */
-  public function filterQueryArgs(&$query = []) {
+  public function filterQueryArgs(array &$query = []): void {
     $filtered_query = [];
     $escape_cache_contexts = ['url', 'url.query_args'];
     foreach ($this->view->display_handler->display['cache_metadata']['contexts'] as $cacheContext) {
