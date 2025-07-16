@@ -483,13 +483,15 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
     // Initially select the deepest element.
     $expected_labels = [
       'Boolean format settings',
-      "Bool field label    Field: field_boolean, type: Boolean",
+      "Bool field label Field: field_boolean, type: Boolean",
       'Field formatters',
     ];
     $xpath = new \DOMXPath(Html::load($this->getSession()->getPage()->getHtml()));
     $element = $xpath->query('//details/summary[text()=" format settings"]')->item(0)->parentNode;
     foreach ($expected_labels as $expected_label) {
-      $this->assertStringStartsWith($expected_label, trim($element->nodeValue));
+      // Remove extra spaces and newlines.
+      $actual_label = trim(preg_replace('/\s+/u', ' ', $element->nodeValue));
+      $this->assertStringStartsWith($expected_label, $actual_label);
       $element = $element->parentNode;
     }
 
@@ -523,7 +525,7 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
     $xpath = new \DOMXPath(Html::load($this->getSession()->getPage()->getHtml()));
     $expected_labels = [
       'Boolean format settings',
-      "Bool field label    Field: field_boolean, type: Boolean",
+      "Bool field label Field: field_boolean, type: Boolean",
       'Block settings',
       'Bool field label',
       'Components',
@@ -535,7 +537,9 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
     // Initially select the deepest element.
     $element = $xpath->query('//details/summary[text()=" format settings"]')->item(0)->parentNode;
     foreach ($expected_labels as $expected_label) {
-      $this->assertStringStartsWith($expected_label, trim($element->nodeValue));
+      // Remove extra spaces and newlines.
+      $actual_label = trim(preg_replace('/\s+/u', ' ', $element->nodeValue));
+      $this->assertStringStartsWith($expected_label, $actual_label);
       $element = $element->parentNode;
     }
 
