@@ -182,24 +182,38 @@ class HookAlterOrderTest extends KernelTestBase {
    */
   public function testAlterWithNonUniqueTypes(): void {
     // Repeating a type with no implementations results in an empty list.
-    $this->assertAlterCallOrder([], ['non_implemented_type', 'non_implemented_type']);
+    // Still there is a notice for non-unique alter types.
+    $notices = $this->assertAlterCallOrderAndCaptureErrors([], $type = ['non_implemented_type', 'non_implemented_type']);
+    $this->assertSame([
+      "The list of alter types passed to ->alter() is not unique: ['non_implemented_type', 'non_implemented_type'].",
+    ], $notices);
 
-    // Non-unique alter types are silently removed.
-    $this->assertAlterCallOrder($expected = [
+    // Repeated calls produce more notices.
+    $repeat_notices = $this->assertAlterCallOrderAndCaptureErrors([], $type);
+    $this->assertSame($notices, $repeat_notices);
+
+    // Repeated alter types are removed.
+    $notices = $this->assertAlterCallOrderAndCaptureErrors($expected = [
       CAlterHooks::class . '::testAlter',
       AAlterHooks::class . '::testAlterAfterC',
       DAlterHooks::class . '::testAlter',
     ], ['test', 'test']);
+    $this->assertSame([
+      "The list of alter types passed to ->alter() is not unique: ['test', 'test'].",
+    ], $notices);
 
     // Reorder rules from repeated types are not applied.
     $this->assertAlterCallOrder([
       AAlterHooks::class . '::testSummerAlter',
       AAlterHooks::class . '::testWinterAlter',
     ], ['test_summer', 'test_winter']);
-    $this->assertAlterCallOrder([
+    $notices = $this->assertAlterCallOrderAndCaptureErrors([
       AAlterHooks::class . '::testSummerAlter',
       AAlterHooks::class . '::testWinterAlter',
     ], ['test_summer', 'test_winter', 'test_summer']);
+    $this->assertSame([
+      "The list of alter types passed to ->alter() is not unique: ['test_summer', 'test_winter', 'test_summer'].",
+    ], $notices);
 
     // Run the existing test with a callback that inserts repeated types.
     // This verifies that appending repeated types has no effect.
@@ -220,7 +234,15 @@ class HookAlterOrderTest extends KernelTestBase {
       $this->assertAlterCallOrder($expected, $non_unique_types);
     };
 
-    $this->doTestAlterOrder($assert_alter_call_order);
+    $do_test = fn () => $this->doTestAlterOrder($assert_alter_call_order);
+
+    $notices = $this->callAndCaptureErrors($do_test, E_USER_NOTICE);
+
+    // At least some invocations should produce notices.
+    $this->assertNotEmpty($notices);
+    foreach ($notices as $notice) {
+      $this->assertMatchesRegularExpression('#^The list of alter types passed to ->alter\(\) is not unique: \[.*\].$#', $notice);
+    }
   }
 
   /**
