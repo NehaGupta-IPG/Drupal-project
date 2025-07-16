@@ -142,20 +142,6 @@
   /* @TODO: create image-style for profile's avatar to have image squared by default. */
 }
 
-@media all and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-  .add-comment__picture img,
-  .comment__picture img {
-    position: absolute;
-    /* stylelint-disable csstools/use-logical */
-    top: 50%;
-    left: 50%;
-    /* stylelint-enable csstools/use-logical */
-    width: 100%;
-    height: auto;
-    transform: translate(-50%, -50%);
-  }
-}
-
 @media (min-width: 43.75rem) {
   .add-comment__picture,
   .comment__picture {
