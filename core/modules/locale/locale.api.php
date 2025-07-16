@@ -41,9 +41,9 @@
  * @code
  * 'interface translation server pattern': public://translations/%project-%version.%language.po
  * @endcode
- * Streamwrapper "module://" addresses paths relative to the current project.
+ * Streamwrapper "extension://" addresses paths relative to the current project.
  * @code
- * 'interface translation server pattern': module://translations/%version.%language.po
+ * 'interface translation server pattern': extension://translations/%version.%language.po
  * @endcode
  *
  * Multiple custom modules or themes sharing the same po file should have
