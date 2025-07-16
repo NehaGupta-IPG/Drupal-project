@@ -224,6 +224,7 @@ class UrlHelper {
         }
       }
     }
+    // Internal URLs.
     else {
       // parse_url() does not support relative URLs, so make it absolute. For
       // instance, the relative URL "foo/bar:1" isn't properly parsed.
