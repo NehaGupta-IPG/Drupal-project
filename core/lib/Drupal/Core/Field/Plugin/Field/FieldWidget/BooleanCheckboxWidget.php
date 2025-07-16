@@ -76,4 +76,24 @@ class BooleanCheckboxWidget extends WidgetBase {
     return $element;
   }
 
+  /**
+   * Element validation handler.
+   *
+   * @param array $element
+   *   The form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   */
+  public static function validateElement(array &$element, FormStateInterface $form_state) {
+    $value = $form_state->getValue($element['#parents']);
+    // Checking if required and empty value.
+    if (!empty($element['#required']) && empty($value)) {
+      $form_state->setError(
+        $element,
+        $element['#required_error']
+          ?? new TranslatableMarkup('@name field is required.', ['@name' => $element['#title']])
+      );
+    }
+  }
+
 }
