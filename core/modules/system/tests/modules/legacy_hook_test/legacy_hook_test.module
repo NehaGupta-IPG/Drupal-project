@@ -8,11 +8,10 @@ declare(strict_types=1);
 
 use Drupal\Core\Hook\Attribute\LegacyHook;
 
-#[LegacyHook]
-
 /**
  * A test hook that will cause a fatal error.
  */
+#[LegacyHook]
 function legacy_hook_test_test1(): void {
   1 / 0;
 }
@@ -20,6 +19,7 @@ function legacy_hook_test_test1(): void {
 /**
  * A valid legacy hook.
  */
+#[LegacyHook]
 function legacy_hook_test_test2(): string {
   return 'ok';
 }
