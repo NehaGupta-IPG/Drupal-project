@@ -384,9 +384,6 @@ class HookAlterOrderTest extends KernelTestBase {
   /**
    * Asserts the call order from an alter call.
    *
-   * Also asserts additional $type argument values that are meant to produce the
-   * same result.
-   *
    * @param list<string> $expected
    *   Expected call list, as strings from __METHOD__ or __FUNCTION__.
    * @param string|list<string> $type
