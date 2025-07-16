@@ -3,4 +3,5 @@ props:
   type: object
   properties: {}
 slots:
-  nested_slot: {}
+  nested_slot:
+    title: Nested slot
