@@ -184,28 +184,19 @@ class HookAlterOrderTest extends KernelTestBase {
     // Repeating a type with no implementations results in an empty list.
     $this->assertAlterCallOrder([], ['non_implemented_type', 'non_implemented_type']);
 
-    // Repeating a single type results in a specific notice.
-    $notices = $this->assertAlterCallOrderAndCaptureErrors($expected = [
+    // Non-unique alter types are silently removed.
+    $this->assertAlterCallOrder($expected = [
       CAlterHooks::class . '::testAlter',
       AAlterHooks::class . '::testAlterAfterC',
       DAlterHooks::class . '::testAlter',
-    ], $type = ['test', 'test']);
-    $this->assertSame([
-      'The method Drupal\ccc_hook_order_test\Hook\CAlterHooks::testAlter() is registered for more than one of the alter hooks [&#039;test_alter&#039;, &#039;test_alter&#039;] from the current ->alter() call. Only one instance will be part of the implementation list for this hook combination.',
-      'The method Drupal\aaa_hook_order_test\Hook\AAlterHooks::testAlterAfterC() is registered for more than one of the alter hooks [&#039;test_alter&#039;, &#039;test_alter&#039;] from the current ->alter() call. Only one instance will be part of the implementation list for this hook combination.',
-      'The method Drupal\ddd_hook_order_test\Hook\DAlterHooks::testAlter() is registered for more than one of the alter hooks [&#039;test_alter&#039;, &#039;test_alter&#039;] from the current ->alter() call. Only one instance will be part of the implementation list for this hook combination.',
-    ], $notices);
-
-    // Repeated calls do not produce more notices, due to caching.
-    $notices = $this->assertAlterCallOrderAndCaptureErrors($expected, $type);
-    $this->assertSame([], $notices);
+    ], ['test', 'test']);
 
     // Reorder rules from repeated types are still applied.
     $this->assertAlterCallOrder([
       AAlterHooks::class . '::testSummerAlter',
       AAlterHooks::class . '::testWinterAlter',
     ], ['test_summer', 'test_winter']);
-    $this->assertAlterCallOrderAndCaptureErrors([
+    $this->assertAlterCallOrder([
       AAlterHooks::class . '::testWinterAlter',
       AAlterHooks::class . '::testSummerAlter',
     ], ['test_summer', 'test_winter', 'test_summer']);
@@ -229,13 +220,7 @@ class HookAlterOrderTest extends KernelTestBase {
       $this->assertAlterCallOrder($expected, $non_unique_types);
     };
 
-    $notices = $this->callAndCaptureErrors(
-      fn () => $this->doTestAlterOrder($assert_alter_call_order),
-      E_USER_NOTICE,
-    );
-
-    // At least some invocations should produce notices.
-    $this->assertNotEmpty($notices);
+    $this->doTestAlterOrder($assert_alter_call_order);
   }
 
   /**
