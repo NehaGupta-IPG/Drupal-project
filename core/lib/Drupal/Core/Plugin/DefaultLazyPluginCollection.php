@@ -72,6 +72,9 @@ class DefaultLazyPluginCollection extends LazyPluginCollection {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   *    Thrown when the required plugin key is missing in the configuration.
    */
   protected function initializePlugin($instance_id) {
     $configuration = $this->configurations[$instance_id] ?? [];
