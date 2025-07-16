@@ -351,120 +351,128 @@
      *   The element to attach the editor to.
      * @param {string} format
      *   The text format for the editor.
+     *
+     * @return {Promise<unknown>}
+     *   A promise that resolves when the editor has been attached.
      */
     attach(element, format) {
-      const { editorClassic } = CKEditor5;
-      const { toolbar, plugins, config, language } = format.editorSettings;
-      const extraPlugins = selectPlugins(plugins);
-      const pluginConfig = processConfig(config);
-      const editorConfig = {
-        extraPlugins,
-        toolbar,
-        ...pluginConfig,
-        // Language settings have a conflict between the editor localization
-        // settings and the "language" plugin.
-        language: { ...pluginConfig.language, ...language },
-      };
-      // Set the id immediately so that it is available when onChange is called.
-      const id = setElementId(element);
-      const { ClassicEditor } = editorClassic;
+      return new Promise((resolveEA, rejectEA) => {
+        const { editorClassic } = CKEditor5;
+        const { toolbar, plugins, config, language } = format.editorSettings;
+        const extraPlugins = selectPlugins(plugins);
+        const pluginConfig = processConfig(config);
+        const editorConfig = {
+          extraPlugins,
+          toolbar,
+          ...pluginConfig,
+          // Language settings have a conflict between the editor localization
+          // settings and the "language" plugin.
+          language: { ...pluginConfig.language, ...language },
+        };
+        // Set the id immediately so that it is available when onChange is called.
+        const id = setElementId(element);
+        const { ClassicEditor } = editorClassic;
 
-      ClassicEditor.create(element, editorConfig)
-        .then((editor) => {
-          /**
-           * Injects a temporary <p> into CKEditor and then calculates the entire
-           * height of the amount of the <p> tags from the passed in rows value.
-           *
-           * This takes into account collapsing margins, and line-height of the
-           * current theme.
-           *
-           * @param {number} - the number of rows.
-           *
-           * @returns {number} - the height of a div in pixels.
-           */
-          function calculateLineHeight(rows) {
-            const element = document.createElement('p');
-            element.setAttribute('style', 'visibility: hidden;');
-            element.innerHTML = '&nbsp;';
-            editor.ui.view.editable.element.append(element);
+        ClassicEditor.create(element, editorConfig)
+          .then((editor) => {
+            /**
+             * Injects a temporary <p> into CKEditor and then calculates the entire
+             * height of the amount of the <p> tags from the passed in rows value.
+             *
+             * This takes into account collapsing margins, and line-height of the
+             * current theme.
+             *
+             * @param {integer} rows - the number of rows.
+             *
+             * @return {number} - the height of a div in pixels.
+             */
+            function calculateLineHeight(rows) {
+              const tempElement = document.createElement('p');
+              tempElement.setAttribute('style', 'visibility: hidden;');
+              tempElement.innerHTML = '&nbsp;';
+              editor.ui.view.editable.element.append(tempElement);
 
-            const styles = window.getComputedStyle(element);
-            const height = element.clientHeight;
-            const marginTop = parseInt(styles.marginTop, 10);
-            const marginBottom = parseInt(styles.marginBottom, 10);
-            const mostMargin =
-              marginTop >= marginBottom ? marginTop : marginBottom;
+              const styles = window.getComputedStyle(tempElement);
+              const height = tempElement.clientHeight;
+              const marginTop = parseInt(styles.marginTop, 10);
+              const marginBottom = parseInt(styles.marginBottom, 10);
+              const mostMargin =
+                marginTop >= marginBottom ? marginTop : marginBottom;
 
-            element.remove();
-            return (
-              (height + mostMargin) * (rows - 1) +
-              marginTop +
-              height +
-              marginBottom
-            );
-          }
-
-          // Save a reference to the initialized instance.
-          Drupal.CKEditor5Instances.set(id, editor);
-
-          // Set the minimum height of the editable area to correspond with the
-          // value of the number of rows. We attach this custom property to
-          // the `.ck-editor` element, as that doesn't get its inline styles
-          // cleared on focus. The editable element is then set to use this
-          // property within the stylesheet.
-          const rows = editor.sourceElement.getAttribute('rows');
-          editor.ui.view.editable.element
-            .closest('.ck-editor')
-            .style.setProperty(
-              '--ck-min-height',
-              `${calculateLineHeight(rows)}px`,
-            );
-
-          // CKEditor 4 had a feature to remove the required attribute
-          // see: https://www.drupal.org/project/drupal/issues/1954968
-          if (element.hasAttribute('required')) {
-            required.add(id);
-            element.removeAttribute('required');
-          }
-
-          // If the textarea is disabled, enable CKEditor's read-only mode.
-          if (element.hasAttribute('disabled')) {
-            editor.enableReadOnlyMode('ckeditor5_disabled');
-          }
-
-          // Integrate CKEditor 5 viewport offset with Drupal displace.
-          // @see \Drupal\Tests\ckeditor5\FunctionalJavascript\CKEditor5ToolbarTest
-          // @see https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editorui-EditorUI.html#member-viewportOffset
-          $(document).on(
-            `drupalViewportOffsetChange.ckeditor5.${id}`,
-            (event, offsets) => {
-              editor.ui.viewportOffset = offsets;
-            },
-          );
-
-          editor.model.document.on('change:data', () => {
-            const callback = callbacks.get(id);
-            if (callback) {
-              // Marks the field as changed.
-              // @see Drupal.editorAttach
-              callback();
+              tempElement.remove();
+              return (
+                (height + mostMargin) * (rows - 1) +
+                marginTop +
+                height +
+                marginBottom
+              );
             }
+
+            // Save a reference to the initialized instance.
+            Drupal.CKEditor5Instances.set(id, editor);
+
+            // Set the minimum height of the editable area to correspond with the
+            // value of the number of rows. We attach this custom property to
+            // the `.ck-editor` element, as that doesn't get its inline styles
+            // cleared on focus. The editable element is then set to use this
+            // property within the stylesheet.
+            const rows = editor.sourceElement.getAttribute('rows');
+            editor.ui.view.editable.element
+              .closest('.ck-editor')
+              .style.setProperty(
+                '--ck-min-height',
+                `${calculateLineHeight(rows)}px`,
+              );
+
+            // CKEditor 4 had a feature to remove the required attribute
+            // see: https://www.drupal.org/project/drupal/issues/1954968
+            if (element.hasAttribute('required')) {
+              required.add(id);
+              element.removeAttribute('required');
+            }
+
+            // If the textarea is disabled, enable CKEditor's read-only mode.
+            if (element.hasAttribute('disabled')) {
+              editor.enableReadOnlyMode('ckeditor5_disabled');
+            }
+
+            // Integrate CKEditor 5 viewport offset with Drupal displace.
+            // @see \Drupal\Tests\ckeditor5\FunctionalJavascript\CKEditor5ToolbarTest
+            // @see https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editorui-EditorUI.html#member-viewportOffset
+            $(document).on(
+              `drupalViewportOffsetChange.ckeditor5.${id}`,
+              (event, offsets) => {
+                editor.ui.viewportOffset = offsets;
+              },
+            );
+
+            editor.model.document.on('change:data', () => {
+              const callback = callbacks.get(id);
+              if (callback) {
+                // Marks the field as changed.
+                // @see Drupal.editorAttach
+                callback();
+              }
+            });
+
+            const isOffCanvas = element.closest('#drupal-off-canvas');
+
+            if (isOffCanvas) {
+              offCanvasCss(element);
+            }
+
+            resolveEA(editor);
+          })
+          .catch((error) => {
+            // eslint-disable-next-line no-console
+            console.info(
+              'Debugging can be done with an unminified version of CKEditor by installing from the source file. Consult documentation at https://www.drupal.org/node/3258901',
+            );
+            // eslint-disable-next-line no-console
+            console.error(error);
+            rejectEA(error);
           });
-
-          const isOffCanvas = element.closest('#drupal-off-canvas');
-
-          if (isOffCanvas) {
-            offCanvasCss(element);
-          }
-        })
-        .catch((error) => {
-          // eslint-disable-next-line no-console
-          console.info(
-            'Debugging can be done with an unminified version of CKEditor by installing from the source file. Consult documentation at https://www.drupal.org/node/3258901',
-          );
-          // eslint-disable-next-line no-console
-          console.error(error);
-        });
+      });
     },
 
     /**
@@ -553,8 +561,8 @@
       DecoupledEditor.create(element, config)
         .then((editor) => {
           Drupal.CKEditor5Instances.set(id, editor);
-          const toolbar = document.getElementById(mainToolbarId);
-          toolbar.appendChild(editor.ui.view.toolbar.element);
+          const mainToolbar = document.getElementById(mainToolbarId);
+          mainToolbar.appendChild(editor.ui.view.toolbar.element);
           editor.model.document.on('change:data', () => {
             const callback = callbacks.get(id);
             if (callback) {
