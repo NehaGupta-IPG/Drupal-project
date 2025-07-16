@@ -100,6 +100,9 @@ class EditorCreatedTest extends WebDriverTestBase {
     $this->drupalLogin($this->user);
   }
 
+  /**
+   * Tests that the editor:attached JS event fires.
+   */
   public function testEditorAttachedEvent(): void {
     // Load the node add form, starts with no_ckeditor format, so no editor.
     $this->drupalGet('node/add/article');
