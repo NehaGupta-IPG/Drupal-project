@@ -84,7 +84,7 @@ class BooleanCheckboxWidget extends WidgetBase {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    */
-  public static function validateElement(array &$element, FormStateInterface $form_state) {
+  public static function validateElement(array &$element, FormStateInterface $form_state): void {
     $value = $form_state->getValue($element['#parents']);
     // Checking if required and empty value.
     if (!empty($element['#required']) && empty($value)) {
