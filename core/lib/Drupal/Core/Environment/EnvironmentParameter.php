@@ -18,7 +18,7 @@ final class EnvironmentParameter {
    */
   public function __construct(
     public readonly string $name,
-    public readonly bool|int|float|string|null $value = NULL
+    public readonly bool|int|float|string|null $value = NULL,
   ) {}
 
 }

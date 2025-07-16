@@ -17,7 +17,7 @@ class EnvironmentManager implements EnvironmentManagerInterface {
    */
   public function __construct(
     #[AutowireIterator(tag: 'environment_substitution')]
-    protected iterable $substitutions
+    protected iterable $substitutions,
   ) {
   }
 
