@@ -7,8 +7,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\file\FileUsage\FileUsageInterface;
+use Drupal\file\Plugin\Field\FieldType\FileItem;
 use Drupal\media\MediaInterface;
-use Drupal\media\Plugin\media\Source\FileSourceInterface;
 use Drupal\views\ViewExecutable;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldTypeCategoryManagerInterface;
@@ -319,8 +319,20 @@ class MediaHooks {
   #[Hook('media_delete')]
   public function mediaDelete(MediaInterface $media): void {
     $source = $media->getSource();
+    $source_field = $source->getSourceFieldDefinition($media->bundle->entity);
 
-    if ($source instanceof FileSourceInterface && $this->configFactory->get('media.settings')->get('delete_files') && ($file = $source->getFile($media))) {
+    // If the source field is not a file field, there's nothing else to do.
+    if (!is_a($source_field->getItemDefinition()->getClass(), FileItem::class, TRUE)) {
+      return;
+    }
+    // If we're not configured to delete files associated with media items,
+    // there's nothing else to do.
+    if (!$this->configFactory->get('media.settings')->get('delete_files')) {
+      return;
+    }
+
+    $file = $media->get($source_field->getName())->entity;
+    if ($file) {
       $access = $file->access('delete', $this->currentUser);
       $usages = $this->fileUsage->countUsage($file);
       $logger = $this->loggerFactory->get('media');
