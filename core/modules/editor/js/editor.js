@@ -110,7 +110,7 @@
    */
   function onTextFormatChange(event) {
     const select = event.target;
-    const field = event.data.field;
+    const { field } = event.data;
     const activeFormatID = field.getAttribute('data-editor-active-text-format');
     const newFormatID = select.value;
 
@@ -303,7 +303,10 @@
       // Attach the text editor.
       Promise.resolve(Drupal.editors[format.editor].attach(field, format))
         .then((editor) => {
-          $(document).trigger('editor:attached', [editor]);
+          const event = new CustomEvent('editor:attached', {
+            detail: [editor],
+          });
+          document.dispatchEvent(event);
         })
         .catch((error) => {
           // eslint-disable-next-line no-console
