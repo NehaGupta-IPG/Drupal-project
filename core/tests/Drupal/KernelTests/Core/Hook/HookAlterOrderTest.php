@@ -205,6 +205,16 @@ class HookAlterOrderTest extends KernelTestBase {
     $notices = $this->assertAlterCallOrderAndCaptureErrors($expected, $type);
     $this->assertSame([], $notices);
 
+    // Reorder rules from repeated types are still applied.
+    $this->assertAlterCallOrder([
+      AAlterHooks::class . '::testSummerAlter',
+      AAlterHooks::class . '::testWinterAlter',
+    ], ['test_summer', 'test_winter']);
+    $this->assertAlterCallOrderAndCaptureErrors([
+      AAlterHooks::class . '::testWinterAlter',
+      AAlterHooks::class . '::testSummerAlter',
+    ], ['test_summer', 'test_winter', 'test_summer']);
+
     // Run the existing test with a callback that inserts repeated types.
     // This verifies that appending repeated types has no effect.
     $assert_alter_call_order = function (array $expected, array|string $original_type): void {
