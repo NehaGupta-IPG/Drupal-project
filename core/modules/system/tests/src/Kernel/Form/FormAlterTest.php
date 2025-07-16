@@ -36,48 +36,11 @@ class FormAlterTest extends KernelTestBase {
       FormTestHooks::class . '::formTestWithBaseFormIdFormAlter',
     ], $form['#alter_calls'] ?? NULL);
 
-    $notices = $this->callAndCaptureErrors(function () use (&$form, $form_builder) {
-      $form = $form_builder->getForm(FormTestFormIdEqualsBaseFormIdForm::class);
-    });
+    $form = $form_builder->getForm(FormTestFormIdEqualsBaseFormIdForm::class);
     $this->assertSame([
       FormTestHooks::class . '::formAlter',
       FormTestHooks::class . '::formTestFormIdEqualsBaseFormIdFormAlter',
     ], $form['#alter_calls'] ?? NULL);
-    $this->assertSame([
-      "The list of alter types passed to ->alter() is not unique: ['form', 'form_form_test_form_id_equals_base_form_id_form', 'form_form_test_form_id_equals_base_form_id_form'].",
-    ], $notices);
-  }
-
-  /**
-   * Invokes a callback and captures errors of a specific level.
-   *
-   * @param \Closure(): void $callback
-   *   Callback that may or may not produce notices.
-   * @param int $captured_level
-   *   The error level for captured errors.
-   *   Errors with a different type are not captured.
-   *
-   * @return list<string>
-   *   Captured error messages.
-   */
-  protected function callAndCaptureErrors(\Closure $callback, int $captured_level = E_USER_NOTICE): array {
-    $messages = [];
-    $previous_error_handler = get_error_handler();
-    $capturing_error_handler = function (int $level, string $message, ...$args) use (&$messages, $previous_error_handler, $captured_level): bool {
-      if ($level !== $captured_level) {
-        return $previous_error_handler($level, $message, ...$args);
-      }
-      $messages[] = $message;
-      return TRUE;
-    };
-    $previous_error_handler = set_error_handler($capturing_error_handler);
-    try {
-      $callback();
-    }
-    finally {
-      restore_error_handler();
-    }
-    return $messages;
   }
 
 }
