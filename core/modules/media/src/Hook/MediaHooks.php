@@ -337,7 +337,7 @@ class MediaHooks {
       $usages = $this->fileUsage->countUsage($file);
       $logger = $this->loggerFactory->get('media');
 
-      if ($access && $usages === 1) {
+      if ($access && $usages <= 1) {
         $file->delete();
         $logger->notice('The file attached to media item %name was deleted.', [
           '%name' => $media->label(),
