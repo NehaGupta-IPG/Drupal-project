@@ -24,4 +24,5 @@ settings:
   level: 1
   depth: null
   expand_all_items: false
+  hide_untranslated_menu_links: false
 visibility: {  }
