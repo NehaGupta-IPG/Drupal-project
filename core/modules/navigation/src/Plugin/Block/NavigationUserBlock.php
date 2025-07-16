@@ -78,7 +78,7 @@ final class NavigationUserBlock extends BlockBase {
       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
     ];
-    $tree = $menu_tree->transform([$tree], $manipulators);
+    $tree = $menu_tree->transform([$tree], $manipulators, __CLASS__);
     $build = $menu_tree->build($tree);
     $build['#title'] = $label;
     $build['#cache']['contexts'][] = 'user';
