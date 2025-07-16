@@ -459,6 +459,7 @@ class ModuleHandler implements ModuleHandlerInterface {
     // the array is a generic type, and additional items in the array are more
     // specific variants of it, as in the case of ['form', 'form_FORM_ID'].
     if (is_array($type)) {
+      $type = array_unique($type);
       $cid = implode(',', $type);
     }
     else {
@@ -489,8 +490,6 @@ class ModuleHandler implements ModuleHandlerInterface {
    *   List of implementation callables.
    */
   protected function getCombinedListeners(array $hooks): array {
-    $original_hooks = $hooks;
-    $hooks = array_unique($hooks);
     // Get implementation lists for each hook.
     $listener_lists = array_map($this->getFlatHookListeners(...), $hooks);
     // Remove empty lists.
@@ -541,8 +540,7 @@ class ModuleHandler implements ModuleHandlerInterface {
       fn (string $module) => $identifiers_by_module[$module],
       $modules,
     ));
-    // Include order operations for repeated hooks, to keep existing behavior.
-    foreach ($original_hooks as $hook) {
+    foreach ($hooks as $hook) {
       foreach ($this->getHookOrderingRules($hook) as $rule) {
         $rule->apply($identifiers, $modules_by_identifier);
         // Order operations must not:
