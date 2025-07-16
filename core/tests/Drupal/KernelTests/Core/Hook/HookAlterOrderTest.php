@@ -293,6 +293,36 @@ class HookAlterOrderTest extends KernelTestBase {
   }
 
   /**
+   * Tests alter calls where the same implementation occurs more than once.
+   */
+  public function testDuplicateAlterHookListener(): void {
+    $notices = $this->assertAlterCallOrderAndCaptureErrors([
+      AAlterHooks::class . '::testTomatoTomatoAlter',
+    ], ['test_tomato']);
+    // No notices are produced. The duplicate call is silently removed during
+    // discovery.
+    $this->assertSame([], $notices);
+
+    $notices = $this->assertAlterCallOrderAndCaptureErrors($expected = [
+      AAlterHooks::class . '::testAppleOrangeAlter',
+    ], $type = ['test_apple', 'test_orange']);
+    $this->assertSame([
+      'The method Drupal\aaa_hook_order_test\Hook\AAlterHooks::testAppleOrangeAlter() is registered for more than one of the alter hooks [&#039;test_apple_alter&#039;, &#039;test_orange_alter&#039;] from the current ->alter() call. Only one instance will be part of the implementation list for this hook combination.',
+    ], $notices);
+
+    // On repeated call, the notices are empty, because of caching.
+    $notices = $this->assertAlterCallOrderAndCaptureErrors($expected, $type);
+    $this->assertSame([], $notices);
+
+    $warnings = $this->assertAlterCallOrderAndCaptureErrors([
+      AAlterHooks::class . '::testMothButterflyAlter',
+    ], ['test_moth', 'test_butterfly'], E_USER_WARNING);
+    $this->assertSame([
+      'The method Drupal\aaa_hook_order_test\Hook\AAlterHooks::testMothButterflyAlter() is registered for more than one of the alter hooks [&#039;test_moth_alter&#039;, &#039;test_butterfly_alter&#039;] from the current ->alter() call, on behalf of different modules &#039;bbb_hook_order_test&#039; and &#039;aaa_hook_order_test&#039;. Only one instance will be part of the implementation list for this hook combination. For the purpose of ordering, the module &#039;bbb_hook_order_test&#039; will be used.',
+    ], $warnings);
+  }
+
+  /**
    * Invokes a callback and captures errors of a specific level.
    *
    * @param \Closure(): void $callback
