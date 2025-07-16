@@ -355,6 +355,7 @@ class SystemMenuBlockTest extends KernelTestBase {
       'level' => $menu_block_level,
       'depth' => NULL,
       'expand_all_items' => TRUE,
+      'hide_untranslated_menu_links' => FALSE,
     ]);
 
     $route = $this->container->get('router.route_provider')->getRouteByName($active_route);

@@ -315,6 +315,7 @@ class MenuUiTest extends BrowserTestBase {
       'level' => 1,
       'depth' => NULL,
       'expand_all_items' => FALSE,
+      'hide_untranslated_menu_links' => FALSE,
     ]);
     $this->blockPlacements[$menu_name] = $block->id();
     return Menu::load($menu_name);

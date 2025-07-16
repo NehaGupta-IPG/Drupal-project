@@ -126,6 +126,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label_display' => 'visible',
       'level' => 1,
       'expand_all_items' => FALSE,
+      'hide_untranslated_menu_links' => FALSE,
       'depth' => 0,
     ];
     $this->assertEntity('user_1', $visibility, 'sidebar', 'olivero', -11, $settings);
@@ -197,6 +198,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'level' => 1,
       'depth' => NULL,
       'expand_all_items' => FALSE,
+      'hide_untranslated_menu_links' => FALSE,
     ];
     $this->assertEntity('menu', [], 'header', 'olivero', -5, $settings);
 

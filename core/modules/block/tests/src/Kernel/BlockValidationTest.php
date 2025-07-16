@@ -261,6 +261,7 @@ class BlockValidationTest extends ConfigEntityValidationTestBase {
         'level' => $level,
         'depth' => $depth,
         'expand_all_items' => FALSE,
+        'hide_untranslated_menu_links' => FALSE,
       ],
       'region' => 'content',
     ]);
