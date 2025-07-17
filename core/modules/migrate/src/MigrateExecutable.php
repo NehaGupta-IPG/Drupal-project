@@ -132,6 +132,18 @@ class MigrateExecutable implements MigrateExecutableInterface {
   }
 
   /**
+   * Returns the migration.
+   *
+   * Get the migration object.
+   *
+   * @return \Drupal\migrate\Plugin\MigrationInterface
+   *   The migration object.
+   */
+  public function getMigration() {
+    return $this->migration;
+  }
+
+  /**
    * Gets the event dispatcher.
    *
    * @return \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
