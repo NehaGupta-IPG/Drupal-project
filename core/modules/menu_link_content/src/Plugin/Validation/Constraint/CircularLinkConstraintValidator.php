@@ -17,7 +17,7 @@ class CircularLinkConstraintValidator extends ConstraintValidator {
     $url_object = $entity->getUrlObject();
     $entity_url = $entity->toUrl()->getInternalPath();
 
-    if ( $url_object->isRouted() && $url_object->getInternalPath() === $entity_url) {
+    if ($url_object->isRouted() && $url_object->getInternalPath() === $entity_url) {
       $this->context->buildViolation($constraint->message)
         ->atPath('url')
         ->addViolation();
