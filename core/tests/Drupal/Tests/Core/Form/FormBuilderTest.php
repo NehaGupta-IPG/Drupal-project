@@ -910,6 +910,52 @@ class FormBuilderTest extends FormTestBase {
   /**
    * @covers ::prepareForm
    *
+   * @dataProvider providerThemeTestPrepareFormWithBaseForm
+   */
+  public function testThemePrepareFormWithBaseForm($base_form_id, $expected_theme) {
+    $form_id = 'test_form_id';
+    $form = $form_id();
+    $form['#method'] = 'post';
+
+    $form_arg = $this->createMock('Drupal\Core\Form\BaseFormIdInterface');
+    $form_arg->expects($this->once())
+      ->method('getFormId')
+      ->will($this->returnValue($form_id));
+    $form_arg->expects($this->once())
+      ->method('getBaseFormId')
+      ->will($this->returnValue($base_form_id));
+    $form_arg->expects($this->once())
+      ->method('buildForm')
+      ->will($this->returnValue($form));
+
+    $form_state = new FormState();
+    $built_form = $this->formBuilder->buildForm($form_arg, $form_state);
+
+    $this->assertSame($expected_theme, $built_form['#theme']);
+  }
+
+  /**
+   * Data provider for testThemePrepareFormWithBaseForm.
+   *
+   * @return array
+   *   The data set.
+   */
+  public function providerThemeTestPrepareFormWithBaseForm() {
+    return [
+      'normal_base_form_id' => [
+        'normal_base_form_id',
+        ['test_form_id', 'normal_base_form_id'],
+      ],
+      'false_base_form_id' => [
+        FALSE,
+        ['test_form_id'],
+      ],
+    ];
+  }
+
+  /**
+   * @covers ::prepareForm
+   *
    * @dataProvider providerTestFormTokenCacheability
    */
   public function testFormTokenCacheability($token, $is_authenticated, $method, $opted_in_for_cache): void {

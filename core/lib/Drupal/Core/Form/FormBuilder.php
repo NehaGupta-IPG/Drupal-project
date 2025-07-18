@@ -819,7 +819,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // for rendering the inner form elements, not the form itself.
     if (!isset($form['#theme'])) {
       $form['#theme'] = [$form_id];
-      if (isset($build_info['base_form_id'])) {
+      if (!empty($build_info['base_form_id'])) {
         $form['#theme'][] = $build_info['base_form_id'];
       }
     }
