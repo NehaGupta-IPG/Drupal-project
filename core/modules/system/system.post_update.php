@@ -99,29 +99,11 @@ function system_post_update_remove_rss_cdata_subscriber(): void {
 function system_post_update_convert_empty_system_site_settings_to_null(): void {
   $system_site_settings = \Drupal::configFactory()->getEditable('system.site');
   $changed = FALSE;
-  if ($system_site_settings->get('uuid') === '') {
-    $system_site_settings->set('uuid', NULL);
-    $changed = TRUE;
-  }
-  if ($system_site_settings->get('name') === '') {
-    $system_site_settings->set('name', NULL);
-    $changed = TRUE;
-  }
-  if ($system_site_settings->get('mail') === '') {
-    $system_site_settings->set('mail', NULL);
-    $changed = TRUE;
-  }
-  if ($system_site_settings->get('slogan') === '') {
-    $system_site_settings->set('slogan', NULL);
-    $changed = TRUE;
-  }
-  if ($system_site_settings->get('page.403') === '') {
-    $system_site_settings->set('page.403', NULL);
-    $changed = TRUE;
-  }
-  if ($system_site_settings->get('page.404') === '') {
-    $system_site_settings->set('page.404', NULL);
-    $changed = TRUE;
+  foreach (['uuid', 'name', 'mail', 'slogan', 'page.403', 'page.404'] as $key) {
+    if ($system_site_settings->get($key) === '') {
+      $system_site_settings->set($key, NULL);
+      $changed = TRUE;
+    }
   }
   if ($changed) {
     $system_site_settings->save();
