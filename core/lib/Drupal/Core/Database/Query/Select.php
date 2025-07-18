@@ -167,15 +167,15 @@ class Select extends Query implements SelectInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasAllTags() {
-    return !(boolean) array_diff(func_get_args(), array_keys($this->alterTags));
+  public function hasAllTags(string ...$tags) {
+    return !(boolean) array_diff($tags, array_keys($this->alterTags));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function hasAnyTag() {
-    return (boolean) array_intersect(func_get_args(), array_keys($this->alterTags));
+  public function hasAnyTag(string ...$tags) {
+    return (boolean) array_intersect($tags, array_keys($this->alterTags));
   }
 
   /**
