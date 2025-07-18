@@ -17,9 +17,7 @@ class NotBlankAfterInstallConstraint extends SymfonyConstraint {
 
   /**
    * The error message.
-   *
-   * @var string
    */
-  public $message = 'The %field field cannot be blank after installation.';
+  public string $message = 'The %field field cannot be blank after installation.';
 
 }
