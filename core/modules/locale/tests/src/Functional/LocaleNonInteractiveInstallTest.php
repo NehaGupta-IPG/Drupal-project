@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Tests\BrowserTestBase;
@@ -30,7 +32,7 @@ class LocaleNonInteractiveInstallTest extends BrowserTestBase {
    * @return string
    *   The version string to test, for example, '8.0.0' or '8.6.x'.
    */
-  protected function getVersionStringToTest() {
+  protected function getVersionStringToTest(): string {
     include_once $this->root . '/core/includes/install.core.inc';
     $version = _install_get_version_info(\Drupal::VERSION);
     return $version['major'] . '.0.0';
@@ -46,14 +48,14 @@ class LocaleNonInteractiveInstallTest extends BrowserTestBase {
     // Create a po file so we don't attempt to download one from
     // localize.drupal.org and to have a test translation that will not change.
     \Drupal::service('file_system')->mkdir($this->publicFilesDirectory . '/translations', NULL, TRUE);
-    $contents = <<<ENDPO
+    $contents = <<<PO
 msgid ""
 msgstr ""
 
 msgid "Enter the password that accompanies your username."
 msgstr "Geben sie das Passwort für ihren Benutzernamen ein."
 
-ENDPO;
+PO;
     $version = $this->getVersionStringToTest();
     file_put_contents($this->publicFilesDirectory . "/translations/drupal-{$version}.de.po", $contents);
     return $parameters;
@@ -62,7 +64,7 @@ ENDPO;
   /**
    * Tests that the expected translated text appears on the login screen.
    */
-  public function testInstallerTranslations() {
+  public function testInstallerTranslations(): void {
     $this->drupalGet('user/login');
     // cSpell:disable-next-line
     $this->assertSession()->responseContains('Geben sie das Passwort für ihren Benutzernamen ein.');

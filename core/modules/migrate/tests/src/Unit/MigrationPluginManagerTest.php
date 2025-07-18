@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit;
 
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -38,7 +40,7 @@ class MigrationPluginManagerTest extends UnitTestCase {
    *
    * @dataProvider dependencyProvider
    */
-  public function testDependencyBuilding($migrations_data, $result_ids) {
+  public function testDependencyBuilding($migrations_data, $result_ids): void {
     $migrations = [];
     foreach ($migrations_data as $migration_id => $migration_data) {
       $migrations[$migration_id] = new TestMigrationMock($migration_id, $migration_data['migration_dependencies']);
@@ -69,7 +71,7 @@ class MigrationPluginManagerTest extends UnitTestCase {
   /**
    * Tests that expandPluginIds returns all derivatives.
    */
-  public function testExpandPluginIds() {
+  public function testExpandPluginIds(): void {
     $backend = $this->prophesize(CacheBackendInterface::class);
     $cache = new \stdClass();
     $cache->data = [
@@ -88,7 +90,7 @@ class MigrationPluginManagerTest extends UnitTestCase {
   /**
    * Provide dependency data for testing.
    */
-  public function dependencyProvider() {
+  public static function dependencyProvider() {
     return [
       // Just one migration, with no dependencies.
       [
@@ -226,7 +228,7 @@ class TestMigrationMock extends Migration {
   /**
    * {@inheritdoc}
    */
-  public function getMigrationDependencies(bool $expand = FALSE) {
+  public function getMigrationDependencies() {
     // For the purpose of testing, do not expand dependencies.
     return $this->migration_dependencies;
   }
@@ -234,7 +236,7 @@ class TestMigrationMock extends Migration {
   /**
    * {@inheritdoc}
    */
-  public function set($prop, $value) {
+  public function set($prop, $value): void {
     $this->set[] = func_get_args();
   }
 

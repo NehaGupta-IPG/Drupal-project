@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Unit\Upload;
 
 use Drupal\file\Upload\ContentDispositionFilenameParser;
@@ -54,13 +56,13 @@ class ContentDispositionFilenameParserTest extends UnitTestCase {
     $this->expectException(BadRequestHttpException::class);
     $this->expectExceptionMessage('The extended "filename*" format is currently not supported in the "Content-Disposition" header.');
     $request = $this->createRequest('filename*="UTF-8 \' \' example.txt"');
-    $filename = ContentDispositionFilenameParser::parseFilename($request);
+    ContentDispositionFilenameParser::parseFilename($request);
   }
 
   /**
    * A data provider for invalid headers.
    */
-  public function invalidHeaderProvider(): array {
+  public static function invalidHeaderProvider(): array {
     return [
       'multiple' => ['file; filename=""'],
       'empty' => ['filename=""'],

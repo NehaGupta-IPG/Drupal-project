@@ -28,12 +28,16 @@ trait AutowireTrait {
     if (method_exists(static::class, '__construct')) {
       $constructor = new \ReflectionMethod(static::class, '__construct');
       foreach ($constructor->getParameters() as $parameter) {
-        $service = (string) $parameter->getType();
+        $service = ltrim((string) $parameter->getType(), '?');
         foreach ($parameter->getAttributes(Autowire::class) as $attribute) {
           $service = (string) $attribute->newInstance()->value;
         }
 
         if (!$container->has($service)) {
+          if ($parameter->allowsNull()) {
+            $args[] = NULL;
+            continue;
+          }
           throw new AutowiringFailedException($service, sprintf('Cannot autowire service "%s": argument "$%s" of method "%s::_construct()", you should configure its value explicitly.', $service, $parameter->getName(), static::class));
         }
 

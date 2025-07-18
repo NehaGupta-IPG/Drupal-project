@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Unit\EventSubscriber;
 
 use Drupal\jsonapi\EventSubscriber\ResourceResponseValidator;
@@ -56,7 +58,7 @@ class ResourceResponseValidatorTest extends UnitTestCase {
    * @covers ::validateResponse
    * @dataProvider validateResponseProvider
    */
-  public function testValidateResponse($request, $response, $expected, $description) {
+  public function testValidateResponse($request, $response, $expected, $description): void {
     // Expose protected ResourceResponseSubscriber::validateResponse() method.
     $object = new \ReflectionObject($this->subscriber);
     $method = $object->getMethod('validateResponse');
@@ -70,7 +72,7 @@ class ResourceResponseValidatorTest extends UnitTestCase {
    * @return array
    *   An array of test cases.
    */
-  public function validateResponseProvider() {
+  public static function validateResponseProvider() {
     $defaults = [
       'route_name' => 'jsonapi.node--article.individual',
       'resource_type' => new ResourceType('node', 'article', NULL),

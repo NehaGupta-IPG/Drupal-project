@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Functional;
 
 use Drupal\node\Entity\Node;
@@ -18,9 +20,7 @@ class ModerationActionsTest extends BrowserTestBase {
   use ContentModerationTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'content_moderation',
@@ -61,7 +61,7 @@ class ModerationActionsTest extends BrowserTestBase {
    *
    * @dataProvider nodeStatusActionsTestCases
    */
-  public function testNodeStatusActions($action, $bundle, $warning_appears, $starting_status, $final_status) {
+  public function testNodeStatusActions($action, $bundle, $warning_appears, $starting_status, $final_status): void {
     // Create and run an action on a node.
     $node = Node::create([
       'type' => $bundle,
@@ -80,11 +80,12 @@ class ModerationActionsTest extends BrowserTestBase {
     ], 'Apply to selected items');
 
     if ($warning_appears) {
+      $typeLabel = $node->getBundleEntity()->label();
       if ($action == 'node_publish_action') {
-        $this->assertSession()->statusMessageContains(node_get_type_label($node) . ' content items were skipped as they are under moderation and may not be directly published.', 'warning');
+        $this->assertSession()->statusMessageContains($typeLabel . ' content items were skipped as they are under moderation and may not be directly published.', 'warning');
       }
       else {
-        $this->assertSession()->statusMessageContains(node_get_type_label($node) . ' content items were skipped as they are under moderation and may not be directly unpublished.', 'warning');
+        $this->assertSession()->statusMessageContains($typeLabel . ' content items were skipped as they are under moderation and may not be directly unpublished.', 'warning');
       }
     }
     else {
@@ -102,7 +103,7 @@ class ModerationActionsTest extends BrowserTestBase {
    * @return array
    *   An array of test cases.
    */
-  public function nodeStatusActionsTestCases() {
+  public static function nodeStatusActionsTestCases() {
     return [
       'Moderated bundle shows warning (publish action)' => [
         'node_publish_action',

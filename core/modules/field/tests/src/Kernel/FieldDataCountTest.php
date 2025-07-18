@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\entity_test\Entity\EntityTest;
@@ -47,7 +48,7 @@ class FieldDataCountTest extends FieldKernelTestBase {
   /**
    * Tests entityCount() and hadData() methods.
    */
-  public function testEntityCountAndHasData() {
+  public function testEntityCountAndHasData(): void {
     // Create a field with a cardinality of 2 to show that we are counting
     // entities and not rows in a table.
     /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
@@ -139,13 +140,13 @@ class FieldDataCountTest extends FieldKernelTestBase {
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = $this->container->get('entity_type.manager')->getStorage($entity_type);
     $entity = $storage->loadRevision($first_revision);
-    $this->assertCount($cardinality, $entity->{$this->fieldTestData->field_name_2}, new FormattableMarkup('Revision %revision_id: expected number of values.', ['%revision_id' => $first_revision]));
+    $this->assertCount($cardinality, $entity->{$this->fieldTestData->field_name_2}, "Revision $first_revision: expected number of values.");
   }
 
   /**
    * Verify that we can count a table that contains an entry with index 0.
    */
-  public function testCountWithIndex0() {
+  public function testCountWithIndex0(): void {
     // Create a field that will require dedicated storage.
     /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
     $field_storage = FieldStorageConfig::create([

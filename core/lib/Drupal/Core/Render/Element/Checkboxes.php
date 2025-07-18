@@ -3,24 +3,27 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Attribute\FormElement;
 
 /**
  * Provides a form element for a set of checkboxes.
  *
  * Properties:
- * - #options: An associative array whose keys are the values returned for each
+ *
+ * @property $options
+ *   An associative array whose keys are the values returned for each
  *   checkbox, and whose values are the labels next to each checkbox. The
  *   #options array cannot have a 0 key, as it would not be possible to discern
  *   checked and unchecked states.
  *
  * Usage example:
  * @code
- * $form['favorites']['colors'] = array(
+ * $form['favorites']['colors'] = [
  *   '#type' => 'checkboxes',
- *   '#options' => array('blue' => $this->t('Blue'), 'red' => $this->t('Red')),
+ *   '#options' => ['blue' => $this->t('Blue'), 'red' => $this->t('Red')],
  *   '#title' => $this->t('Which colors do you like?'),
  *   ...
- * );
+ * ];
  * @endcode
  *
  * Element properties may be set on single option items as follows.
@@ -31,10 +34,9 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @see \Drupal\Core\Render\Element\Radios
  * @see \Drupal\Core\Render\Element\Checkbox
- *
- * @FormElement("checkboxes")
  */
-class Checkboxes extends FormElement {
+#[FormElement('checkboxes')]
+class Checkboxes extends FormElementBase {
 
   use CompositeFormElementTrait;
 
@@ -42,14 +44,13 @@ class Checkboxes extends FormElement {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#process' => [
-        [$class, 'processCheckboxes'],
+        [static::class, 'processCheckboxes'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderCompositeFormElement'],
+        [static::class, 'preRenderCompositeFormElement'],
       ],
       '#theme_wrappers' => ['checkboxes'],
     ];

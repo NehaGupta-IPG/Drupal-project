@@ -1,17 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 use Drupal\Tests\system\Traits\OffCanvasTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
+// cspell:ignore blocknodebundle testbody
 /**
  * Tests toggling of content preview.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
 class ContentPreviewToggleTest extends WebDriverTestBase {
 
   use ContextualLinkClickTrait;
@@ -54,7 +57,7 @@ class ContentPreviewToggleTest extends WebDriverTestBase {
   /**
    * Tests the content preview toggle.
    */
-  public function testContentPreviewToggle() {
+  public function testContentPreviewToggle(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $links_field_placeholder_label = '"Links" field';

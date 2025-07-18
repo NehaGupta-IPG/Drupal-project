@@ -1,39 +1,44 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Plugin\Attribute;
 
 use Drupal\Component\Plugin\Attribute\AttributeBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \Drupal\Component\Plugin\Attribute\AttributeBase
- * @group Attribute
+ * Tests Drupal\Component\Plugin\Attribute\AttributeBase.
  */
+#[CoversClass(AttributeBase::class)]
+#[Group('Attribute')]
 class AttributeBaseTest extends TestCase {
 
   /**
-   * @covers ::getProvider
-   * @covers ::setProvider
+   * @legacy-covers ::getProvider
+   * @legacy-covers ::setProvider
    */
-  public function testSetProvider() {
+  public function testSetProvider(): void {
     $plugin = new AttributeBaseStub(id: '1');
     $plugin->setProvider('example');
     $this->assertEquals('example', $plugin->getProvider());
   }
 
   /**
-   * @covers ::getId
+   * @legacy-covers ::getId
    */
-  public function testGetId() {
+  public function testGetId(): void {
     $plugin = new AttributeBaseStub(id: 'example');
     $this->assertEquals('example', $plugin->getId());
   }
 
   /**
-   * @covers ::getClass
-   * @covers ::setClass
+   * @legacy-covers ::getClass
+   * @legacy-covers ::setClass
    */
-  public function testSetClass() {
+  public function testSetClass(): void {
     $plugin = new AttributeBaseStub(id: '1');
     $plugin->setClass('example');
     $this->assertEquals('example', $plugin->getClass());

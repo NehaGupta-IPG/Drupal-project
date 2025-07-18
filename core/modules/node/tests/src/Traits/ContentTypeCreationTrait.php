@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Traits;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\node\Entity\NodeType;
+use Drupal\Tests\field\Traits\BodyFieldCreationTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -12,6 +15,8 @@ use PHPUnit\Framework\TestCase;
  * This trait is meant to be used only by test classes.
  */
 trait ContentTypeCreationTrait {
+
+  use BodyFieldCreationTrait;
 
   /**
    * Creates a custom content type based on default settings.
@@ -39,7 +44,8 @@ trait ContentTypeCreationTrait {
     ];
     $type = NodeType::create($values);
     $status = $type->save();
-    node_add_body_field($type);
+
+    $this->createBodyField('node', $type->id());
 
     if ($this instanceof TestCase) {
       $this->assertSame($status, SAVED_NEW, (new FormattableMarkup('Created content type %type.', ['%type' => $type->id()]))->__toString());

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\StringTranslation;
 
 use Drupal\Component\Utility\Bytes;
@@ -18,7 +20,7 @@ class ByteSizeMarkupTest extends UnitTestCase {
    * @covers ::create
    * @dataProvider providerTestCommonFormatSize
    */
-  public function testCommonFormatSize($expected, $input) {
+  public function testCommonFormatSize($expected, $input): void {
     $size = ByteSizeMarkup::create($input, NULL, $this->getStringTranslationStub());
     $this->assertInstanceOf(TranslatableMarkup::class, $size);
     $this->assertEquals($expected, $size);
@@ -27,7 +29,7 @@ class ByteSizeMarkupTest extends UnitTestCase {
   /**
    * Provides a list of byte size to test.
    */
-  public function providerTestCommonFormatSize() {
+  public static function providerTestCommonFormatSize() {
     $kb = Bytes::KILOBYTE;
     return [
       ['0 bytes', 0],
@@ -49,15 +51,15 @@ class ByteSizeMarkupTest extends UnitTestCase {
       ['1 ZB', pow($kb, 7)],
       ['1 YB', pow($kb, 8)],
       ['1024 YB', pow($kb, 9)],
-      // Rounded to 1 MB - not 1000 or 1024 kilobytes
+      // Rounded to 1 MB - not 1000 or 1024 kilobytes.
       ['1 MB', ($kb * $kb) - 1],
       ['-1 MB', -(($kb * $kb) - 1)],
-      // Decimal Megabytes
+      // Decimal Megabytes.
       ['3.46 MB', 3623651],
       ['3.77 GB', 4053371676],
-      // Decimal Petabytes
+      // Decimal Petabytes.
       ['59.72 PB', 67234178751368124],
-      // Decimal Yottabytes
+      // Decimal Yottabytes.
       ['194.67 YB', 235346823821125814962843827],
     ];
   }

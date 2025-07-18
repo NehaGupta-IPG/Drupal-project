@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional\Views;
 
 use Drupal\Core\Language\LanguageInterface;
@@ -8,6 +10,8 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\views\Plugin\views\PluginBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+
+// cspell:ignore nodo nœud tercera
 
 /**
  * Tests node language fields, filters, and sorting.
@@ -88,7 +92,7 @@ class NodeLanguageTest extends NodeTestBase {
       $node = $this->drupalCreateNode(['title' => $title, 'langcode' => 'es', 'type' => 'page', 'promote' => 1]);
       foreach (['en', 'fr'] as $langcode) {
         if (isset($this->nodeTitles[$langcode][$index])) {
-          $translation = $node->addTranslation($langcode, ['title' => $this->nodeTitles[$langcode][$index]]);
+          $translation = $node->addTranslation($langcode, ['title' => $this->nodeTitles[$langcode][$index], 'promote' => TRUE]);
           $translation->body->value = $this->randomMachineName(32);
         }
       }
@@ -111,7 +115,7 @@ class NodeLanguageTest extends NodeTestBase {
   /**
    * Tests translation language filter, field, and sort.
    */
-  public function testLanguages() {
+  public function testLanguages(): void {
     // Test the page with no arguments. It is filtered to Spanish and French.
     // The page shows node titles and languages.
     $this->drupalGet('test-language');
@@ -251,7 +255,7 @@ class NodeLanguageTest extends NodeTestBase {
   /**
    * Tests native name display in language field.
    */
-  public function testNativeLanguageField() {
+  public function testNativeLanguageField(): void {
     $this->assertLanguageNames();
 
     // Modify test view to display native language names and set translations.

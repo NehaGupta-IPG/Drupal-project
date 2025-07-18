@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views_ui\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests views creation wizard.
  *
  * @see core/modules/views_ui/js/views-admin.js
- * @group views_ui
  */
+#[Group('views_ui')]
 class ViewsWizardTest extends WebDriverTestBase {
 
   /**
@@ -38,7 +41,7 @@ class ViewsWizardTest extends WebDriverTestBase {
   /**
    * Tests creating a View using the wizard.
    */
-  public function testCreateViewWizard() {
+  public function testCreateViewWizard(): void {
     $this->drupalGet('admin/structure/views/add');
     $page = $this->getSession()->getPage();
 

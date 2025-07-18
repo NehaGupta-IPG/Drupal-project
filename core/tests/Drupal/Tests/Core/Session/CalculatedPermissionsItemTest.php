@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Session;
 
 use Drupal\Core\Session\CalculatedPermissionsItem;
@@ -22,7 +24,7 @@ class CalculatedPermissionsItemTest extends UnitTestCase {
    * @covers ::getPermissions
    * @covers ::isAdmin
    */
-  public function testConstructor() {
+  public function testConstructor(): void {
     $scope = 'some_scope';
 
     $item = new CalculatedPermissionsItem(['bar', 'baz', 'bar'], FALSE, $scope, 'foo');
@@ -42,7 +44,7 @@ class CalculatedPermissionsItemTest extends UnitTestCase {
    * @covers ::hasPermission
    * @depends testConstructor
    */
-  public function testHasPermission() {
+  public function testHasPermission(): void {
     $item = new CalculatedPermissionsItem(['bar'], FALSE, 'some_scope', 'foo');
     $this->assertFalse($item->hasPermission('baz'), 'Missing permission was not found.');
     $this->assertTrue($item->hasPermission('bar'), 'Existing permission was found.');
@@ -54,7 +56,7 @@ class CalculatedPermissionsItemTest extends UnitTestCase {
    * @covers ::hasPermission
    * @depends testConstructor
    */
-  public function testHasPermissionWithAdminFlag() {
+  public function testHasPermissionWithAdminFlag(): void {
     $item = new CalculatedPermissionsItem(['bar'], TRUE, 'some_scope', 'foo');
     $this->assertTrue($item->hasPermission('baz'), 'Missing permission was found.');
     $this->assertTrue($item->hasPermission('bar'), 'Existing permission was found.');

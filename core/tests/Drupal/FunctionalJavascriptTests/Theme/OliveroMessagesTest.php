@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalJavascriptTests\Theme;
 
 use Drupal\FunctionalJavascriptTests\Core\JsMessageTest;
 use Drupal\js_message_test\Controller\JSMessageTestController;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Runs OliveroMessagesTest in Olivero.
  *
- * @group olivero
- *
  * @see \Drupal\FunctionalJavascriptTests\Core\JsMessageTest.
  */
+#[Group('olivero')]
 class OliveroMessagesTest extends JsMessageTest {
 
   /**
@@ -44,7 +46,7 @@ class OliveroMessagesTest extends JsMessageTest {
   /**
    * Tests data-drupal-selector="messages" exists.
    */
-  public function testDataDrupalSelectors() {
+  public function testDataDrupalSelectors(): void {
     $web_assert = $this->assertSession();
     $this->drupalGet('js_message_test_link');
 

@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Asset;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests asset aggregation.
- *
- * @group asset
  */
+#[Group('asset')]
 class UnversionedAssetTest extends BrowserTestBase {
 
   /**
@@ -18,6 +20,8 @@ class UnversionedAssetTest extends BrowserTestBase {
 
   /**
    * The file assets path settings value.
+   *
+   * @var string
    */
   protected $fileAssetsPath;
 

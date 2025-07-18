@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block_content\Kernel;
 
 use Drupal\block_content\BlockContentAccessControlHandler;
@@ -11,6 +13,7 @@ use Drupal\Core\Access\AccessResultForbidden;
 use Drupal\Core\Access\AccessResultNeutral;
 use Drupal\Core\Access\AccessResultReasonInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 
@@ -22,6 +25,8 @@ use Drupal\user\Entity\User;
  * @group block_content
  */
 class BlockContentAccessHandlerTest extends KernelTestBase {
+
+  use UserCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -120,7 +125,7 @@ class BlockContentAccessHandlerTest extends KernelTestBase {
    *   assert parent will not be called.
    * @param string $expected_access
    *   The expected access for the user and block content. Valid values are
-   *   class names of classes implementing AccessResultInterface
+   *   class names of classes implementing AccessResultInterface.
    * @param string|null $expected_access_message
    *   The expected access message.
    *
@@ -131,7 +136,7 @@ class BlockContentAccessHandlerTest extends KernelTestBase {
    * @phpstan-param class-string<\Drupal\Core\Access\AccessResultInterface>|null $parent_access
    * @phpstan-param class-string<\Drupal\Core\Access\AccessResultInterface> $expected_access
    */
-  public function testAccess(string $operation, bool $published, bool $reusable, array $permissions, bool $isLatest, ?string $parent_access, string $expected_access, ?string $expected_access_message = NULL) {
+  public function testAccess(string $operation, bool $published, bool $reusable, array $permissions, bool $isLatest, ?string $parent_access, string $expected_access, ?string $expected_access_message = NULL): void {
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $entityStorage */
     $entityStorage = \Drupal::entityTypeManager()->getStorage('block_content');
 
@@ -157,8 +162,7 @@ class BlockContentAccessHandlerTest extends KernelTestBase {
       }
       $this->role->save();
     }
-    $user->addRole($this->role->id());
-    $user->save();
+    $user->addRole($this->role->id())->save();
 
     if ($parent_access !== NULL) {
       $parent_entity = $this->prophesize(AccessibleInterface::class);
@@ -188,7 +192,7 @@ class BlockContentAccessHandlerTest extends KernelTestBase {
   /**
    * Data provider for testAccess().
    */
-  public function providerTestAccess(): array {
+  public static function providerTestAccess(): array {
     $cases = [
       'view:published:reusable' => [
         'view',
@@ -590,6 +594,28 @@ class BlockContentAccessHandlerTest extends KernelTestBase {
     ];
 
     return $cases;
+  }
+
+  /**
+   * Tests revision log access.
+   */
+  public function testRevisionLogAccess(): void {
+    $admin = $this->createUser([
+      'administer block content',
+      'access content',
+    ]);
+    $editor = $this->createUser([
+      'access content',
+      'access block library',
+      'view any square block content history',
+    ]);
+    $viewer = $this->createUser([
+      'access content',
+    ]);
+
+    $this->assertTrue($this->blockEntity->get('revision_log')->access('view', $admin));
+    $this->assertTrue($this->blockEntity->get('revision_log')->access('view', $editor));
+    $this->assertFalse($this->blockEntity->get('revision_log')->access('view', $viewer));
   }
 
 }

@@ -2,21 +2,23 @@
 
 namespace Drupal\Core\Field\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element\ElementInterface;
+use Drupal\Core\Render\Element\Textfield;
+use Drupal\Core\Render\Element\Widget;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Plugin implementation of the 'string_textfield' widget.
- *
- * @FieldWidget(
- *   id = "string_textfield",
- *   label = @Translation("Textfield"),
- *   field_types = {
- *     "string"
- *   }
- * )
  */
+#[FieldWidget(
+  id: 'string_textfield',
+  label: new TranslatableMarkup('Textfield'),
+  field_types: ['string'],
+)]
 class StringTextfieldWidget extends WidgetBase {
 
   /**
@@ -67,17 +69,14 @@ class StringTextfieldWidget extends WidgetBase {
   /**
    * {@inheritdoc}
    */
-  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    $element['value'] = $element + [
-      '#type' => 'textfield',
-      '#default_value' => $items[$delta]->value ?? NULL,
-      '#size' => $this->getSetting('size'),
-      '#placeholder' => $this->getSetting('placeholder'),
-      '#maxlength' => $this->getFieldSetting('max_length'),
-      '#attributes' => ['class' => ['js-text-full', 'text-full']],
-    ];
-
-    return $element;
+  public function singleElementObject(FieldItemListInterface $items, $delta, Widget $widget, ElementInterface $form, FormStateInterface $form_state): ElementInterface {
+    $value = $widget->createChild('value', Textfield::class, copyProperties: TRUE);
+    $value->default_value = $items[$delta]->value ?? NULL;
+    $value->size = $this->getSetting('size');
+    $value->placeholder = $this->getSetting('placeholder');
+    $value->maxlength = $this->getFieldSetting('max_length');
+    $value->attributes = ['class' => ['js-text-full', 'text-full']];
+    return $widget;
   }
 
 }

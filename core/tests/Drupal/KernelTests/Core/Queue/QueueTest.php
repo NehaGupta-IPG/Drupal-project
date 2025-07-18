@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Queue;
 
 use Drupal\Core\Database\Database;
@@ -8,7 +10,7 @@ use Drupal\Core\Queue\Memory;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
- * Queues and dequeues a set of items to check the basic queue functionality.
+ * Queues and unqueues a set of items to check the basic queue functionality.
  *
  * @group Queue
  */
@@ -17,7 +19,7 @@ class QueueTest extends KernelTestBase {
   /**
    * Tests the System queue.
    */
-  public function testSystemQueue() {
+  public function testSystemQueue(): void {
     // Create two queues.
     $queue1 = new DatabaseQueue($this->randomMachineName(), Database::getConnection());
     $queue1->createQueue();
@@ -30,7 +32,7 @@ class QueueTest extends KernelTestBase {
   /**
    * Tests the Memory queue.
    */
-  public function testMemoryQueue() {
+  public function testMemoryQueue(): void {
     // Create two queues.
     $queue1 = new Memory($this->randomMachineName());
     $queue1->createQueue();
@@ -41,14 +43,14 @@ class QueueTest extends KernelTestBase {
   }
 
   /**
-   * Queues and dequeues a set of items to check the basic queue functionality.
+   * Queues and unqueues a set of items to check the basic queue functionality.
    *
    * @param \Drupal\Core\Queue\QueueInterface $queue1
    *   An instantiated queue object.
    * @param \Drupal\Core\Queue\QueueInterface $queue2
    *   An instantiated queue object.
    */
-  protected function runQueueTest($queue1, $queue2) {
+  protected function runQueueTest($queue1, $queue2): void {
     // Create four items.
     $data = [];
     for ($i = 0; $i < 4; $i++) {

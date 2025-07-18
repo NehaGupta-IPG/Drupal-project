@@ -2,13 +2,19 @@
 
 namespace Drupal\workspaces;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Error;
 use Drupal\workspaces\Event\WorkspacePostPublishEvent;
 use Drupal\workspaces\Event\WorkspacePrePublishEvent;
 use Psr\Log\LoggerInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+
+// cspell:ignore differring
 
 /**
  * Default implementation of the workspace publisher.
@@ -19,81 +25,19 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
 
   use StringTranslationTrait;
 
-  /**
-   * The source workspace entity.
-   *
-   * @var \Drupal\workspaces\WorkspaceInterface
-   */
-  protected $sourceWorkspace;
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $database;
-
-  /**
-   * The workspace manager.
-   *
-   * @var \Drupal\workspaces\WorkspaceManagerInterface
-   */
-  protected $workspaceManager;
-
-  /**
-   * The workspace association service.
-   *
-   * @var \Drupal\workspaces\WorkspaceAssociationInterface
-   */
-  protected $workspaceAssociation;
-
-  /**
-   * The event dispatcher.
-   *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
-   */
-  protected $eventDispatcher;
-
-  /**
-   * Constructs a new WorkspacePublisher.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Database\Connection $database
-   *   Database connection.
-   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspace_manager
-   *   The workspace manager.
-   * @param \Drupal\workspaces\WorkspaceAssociationInterface $workspace_association
-   *   The workspace association service.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   The event dispatcher.
-   * @param \Drupal\workspaces\WorkspaceInterface $source
-   *   The source workspace entity.
-   * @param \Psr\Log\LoggerInterface|null $logger
-   *   The logger.
-   */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, Connection $database, WorkspaceManagerInterface $workspace_manager, WorkspaceAssociationInterface $workspace_association, $event_dispatcher, WorkspaceInterface $source = NULL, protected ?LoggerInterface $logger = NULL) {
-    $this->entityTypeManager = $entity_type_manager;
-    $this->database = $database;
-    $this->workspaceManager = $workspace_manager;
-    $this->workspaceAssociation = $workspace_association;
-    if ($event_dispatcher instanceof WorkspaceInterface) {
-      @trigger_error('Calling WorkspacePublisher::__construct() without the $event_dispatcher argument is deprecated in drupal:10.1.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3242573', E_USER_DEPRECATED);
-      $source = $event_dispatcher;
-      $event_dispatcher = \Drupal::service('event_dispatcher');
-    }
-    $this->eventDispatcher = $event_dispatcher;
-    $this->sourceWorkspace = $source;
-    if ($this->logger === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $logger argument is deprecated in drupal:10.1.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/2932520', E_USER_DEPRECATED);
-      $this->logger = \Drupal::service('logger.channel.workspaces');
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected Connection $database,
+    protected WorkspaceManagerInterface $workspaceManager,
+    protected WorkspaceAssociationInterface $workspaceAssociation,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected WorkspaceInterface $sourceWorkspace,
+    protected LoggerInterface $logger,
+    protected ?TimeInterface $time = NULL,
+  ) {
+    if ($time === NULL) {
+      @trigger_error('Calling ' . __CLASS__ . ' constructor without the $time argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3531037', E_USER_DEPRECATED);
+      $this->time = \Drupal::time();
     }
   }
 
@@ -119,9 +63,11 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
 
     try {
       $transaction = $this->database->startTransaction();
-      // @todo Handle the publishing of a workspace with a batch operation in
-      //   https://www.drupal.org/node/2958752.
       $this->workspaceManager->executeOutsideWorkspace(function () use ($tracked_entities) {
+        $max_execution_time = ini_get('max_execution_time');
+        $step_size = Settings::get('entity_update_batch_size', 50);
+        $counter = 0;
+
         foreach ($tracked_entities as $entity_type_id => $revision_difference) {
           $entity_revisions = $this->entityTypeManager->getStorage($entity_type_id)
             ->loadMultipleRevisions(array_keys($revision_difference));
@@ -136,12 +82,25 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
             $entity->setSyncing(TRUE);
             $entity->isDefaultRevision(TRUE);
 
+            // Update the changed time of the entity to be the publishing time.
+            if ($entity instanceof EntityChangedInterface) {
+              $entity->setChangedTime($this->time->getRequestTime());
+            }
+
             // The default revision is not workspace-specific anymore.
             $field_name = $entity->getEntityType()->getRevisionMetadataKey('workspace');
             $entity->{$field_name}->target_id = NULL;
 
-            $entity->original = $default_revisions[$entity->id()];
+            $entity->setOriginal($default_revisions[$entity->id()]);
             $entity->save();
+            $counter++;
+
+            // Extend the execution time in order to allow processing workspaces
+            // that contain a large number of items.
+            if ((int) ($counter / $step_size) >= 1) {
+              set_time_limit($max_execution_time);
+              $counter = 0;
+            }
           }
         }
       });

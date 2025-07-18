@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Entity\Access;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
@@ -213,7 +215,7 @@ class EntityFormDisplayAccessControlHandlerTest extends UnitTestCase {
    * @covers ::access
    * @covers ::checkAccess
    */
-  public function testAccess() {
+  public function testAccess(): void {
     $this->assertAllowOperations([], $this->anon);
     $this->assertAllowOperations(['view', 'update', 'delete'], $this->member);
     $this->assertAllowOperations(['view', 'update', 'delete'], $this->parentMember);

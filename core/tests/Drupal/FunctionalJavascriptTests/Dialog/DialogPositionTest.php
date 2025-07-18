@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalJavascriptTests\Dialog;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the JavaScript functionality of the dialog position.
- *
- * @group dialog
  */
+#[Group('dialog')]
 class DialogPositionTest extends WebDriverTestBase {
 
   /**
@@ -24,7 +26,7 @@ class DialogPositionTest extends WebDriverTestBase {
   /**
    * Tests if the dialog UI works properly with block layout page.
    */
-  public function testDialogOpenAndClose() {
+  public function testDialogOpenAndClose(): void {
     $admin_user = $this->drupalCreateUser(['administer blocks']);
     $this->drupalLogin($admin_user);
     $this->drupalGet('admin/structure/block');

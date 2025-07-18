@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Database;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Schema;
@@ -52,7 +53,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    * @param string|null $column
    *   Optional column to test.
    */
-  abstract public function checkSchemaComment(string $description, string $table, string $column = NULL): void;
+  abstract public function checkSchemaComment(string $description, string $table, ?string $column = NULL): void;
 
   /**
    * Tests inserting data into an existing table.
@@ -71,7 +72,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
         ->execute();
       return TRUE;
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       return FALSE;
     }
   }
@@ -95,7 +96,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
         ->execute();
       return TRUE;
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       return FALSE;
     }
   }
@@ -114,7 +115,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
         ->execute();
       $this->fail('Expected IntegrityConstraintViolationException not thrown');
     }
-    catch (IntegrityConstraintViolationException $e) {
+    catch (IntegrityConstraintViolationException) {
       // Do nothing, it's the expected behavior.
     }
   }
@@ -271,6 +272,16 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     // Test the primary key columns.
     $this->assertSame(['test_serial', 'test_composite_primary_key'], $method->invoke($this->schema, 'test_table'));
 
+    // Test adding and removing JSON column.
+    $this->schema->addField('test_table', 'test_json', [
+      'description' => 'I heard you liked JSON.',
+      'type' => 'json',
+      'pgsql_type' => 'jsonb',
+      'mysql_type' => 'json',
+      'sqlite_type' => 'json',
+    ]);
+    $this->schema->dropField('test_table', 'test_json');
+
     // Test renaming of keys and constraints.
     $this->schema->dropTable('test_table');
     $table_specification = [
@@ -342,8 +353,8 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
 
     // Finally, check each column and try to insert invalid values into them.
     foreach ($table_spec['fields'] as $column_name => $column_spec) {
-      $this->assertTrue($this->schema->fieldExists($table_name, $column_name), new FormattableMarkup('Unsigned @type column was created.', ['@type' => $column_spec['type']]));
-      $this->assertFalse($this->tryUnsignedInsert($table_name, $column_name), new FormattableMarkup('Unsigned @type column rejected a negative value.', ['@type' => $column_spec['type']]));
+      $this->assertTrue($this->schema->fieldExists($table_name, $column_name), "Unsigned {$column_spec['type']} column was created.");
+      $this->assertFalse($this->tryUnsignedInsert($table_name, $column_name), "Unsigned {$column_spec['type']} column rejected a negative value.");
     }
   }
 
@@ -508,7 +519,8 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
   protected function assertFieldCharacteristics(string $table_name, string $field_name, array $field_spec): void {
     // Check that the initial value has been registered.
     if (isset($field_spec['initial'])) {
-      // There should be no row with a value different then $field_spec['initial'].
+      // There should be no row with a value different then
+      // $field_spec['initial'].
       $count = $this->connection
         ->select($table_name)
         ->fields($table_name, ['serial_column'])
@@ -650,7 +662,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    * @return array
    *   An array of test cases for SchemaTest::testSchemaCreateTablePrimaryKey().
    */
-  public function providerTestSchemaCreateTablePrimaryKey() {
+  public static function providerTestSchemaCreateTablePrimaryKey() {
     $tests = [];
 
     $tests['simple_primary_key'] = [
@@ -729,7 +741,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
         ->execute();
       $this->fail('Expected IntegrityConstraintViolationException not thrown');
     }
-    catch (IntegrityConstraintViolationException $e) {
+    catch (IntegrityConstraintViolationException) {
     }
 
     // Ensure auto numbering now works.
@@ -1280,7 +1292,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertFalse($this->schema->fieldExists($table_name_new, $field_name));
     $this->assertTrue($this->schema->fieldExists($table_name_new, $field_name_new));
 
-    // Adding an unique key
+    // Adding an unique key.
     $unique_key_name = $unique_key_introspect_name = 'unique';
     $this->schema->addUniqueKey($table_name_new, $unique_key_name, [$field_name_new]);
 
@@ -1288,7 +1300,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $introspect_index_schema = new \ReflectionMethod(get_class($this->schema), 'introspectIndexSchema');
     $this->assertEquals([$field_name_new], $introspect_index_schema->invoke($this->schema, $table_name_new)['unique keys'][$unique_key_introspect_name]);
 
-    // Dropping an unique key
+    // Dropping an unique key.
     $this->schema->dropUniqueKey($table_name_new, $unique_key_name);
 
     // Dropping a field.

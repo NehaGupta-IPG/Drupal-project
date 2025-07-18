@@ -3,7 +3,8 @@
 namespace Drupal\filter\Element;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element\RenderElement;
+use Drupal\Core\Render\Attribute\RenderElement;
+use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
 
@@ -11,38 +12,40 @@ use Drupal\Core\Url;
  * Provides a text format render element.
  *
  * Properties:
- * - #base_type: The form element #type to use for the 'value' element.
+ *
+ * @property $base_type
+ *   The form element #type to use for the 'value' element.
  *   'textarea' by default.
- * - #format: (optional) The text format ID to preselect. If omitted, the
+ * @property $format
+ *   (optional) The text format ID to preselect. If omitted, the
  *   default format for the current user will be used.
- * - #allowed_formats: (optional) An array of text format IDs that are available
+ * @property $allowed_formats
+ *   (optional) An array of text format IDs that are available
  *   for this element. If omitted, all text formats that the current user has
  *   access to will be allowed.
  *
  * Usage Example:
  * @code
- * $form['body'] = array(
+ * $form['body'] = [
  *   '#type' => 'text_format',
  *   '#title' => 'Body',
  *   '#format' => 'full_html',
  *   '#default_value' => '<p>The quick brown fox jumped over the lazy dog.</p>',
- * );
+ * ];
  * @endcode
  *
  * @see \Drupal\Core\Render\Element\Textarea
- *
- * @RenderElement("text_format")
  */
-class TextFormat extends RenderElement {
+#[RenderElement('text_format')]
+class TextFormat extends RenderElementBase {
 
   /**
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#process' => [
-        [$class, 'processFormat'],
+        [static::class, 'processFormat'],
       ],
       '#base_type' => 'textarea',
       '#theme_wrappers' => ['text_format_wrapper'],
@@ -295,6 +298,7 @@ class TextFormat extends RenderElement {
    * Wraps the config factory.
    *
    * @return \Drupal\Core\Config\ConfigFactoryInterface
+   *   The configuration factory service.
    */
   protected static function configFactory() {
     return \Drupal::configFactory();
@@ -304,6 +308,7 @@ class TextFormat extends RenderElement {
    * Wraps the element info service.
    *
    * @return \Drupal\Core\Render\ElementInfoManagerInterface
+   *   The element info service.
    */
   protected static function elementInfo() {
     return \Drupal::service('element_info');

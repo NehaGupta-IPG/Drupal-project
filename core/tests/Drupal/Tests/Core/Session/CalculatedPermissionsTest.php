@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Session;
 
 use Drupal\Core\Session\CalculatedPermissions;
@@ -19,7 +21,7 @@ class CalculatedPermissionsTest extends UnitTestCase {
   /**
    * Tests that the object values were set in the constructor.
    */
-  public function testConstructor() {
+  public function testConstructor(): void {
     $item_a = new CalculatedPermissionsItem(['baz'], FALSE, 'scope_a', 'foo');
     $item_b = new CalculatedPermissionsItem(['bob', 'charlie'], FALSE, 'scope_b', 1);
 
