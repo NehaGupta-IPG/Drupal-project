@@ -9,6 +9,7 @@ use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\Schema\ConfigSchemaAlterException;
 use Drupal\Core\Config\Schema\Ignore;
 use Drupal\Core\Config\Schema\Mapping;
+use Drupal\Core\Config\Schema\Sequence;
 use Drupal\Core\Config\Schema\Undefined;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\DataDefinitionInterface;
@@ -54,11 +55,11 @@ class ConfigSchemaTest extends KernelTestBase {
     $this->assertInstanceOf($expected_class, \Drupal::service('config.typed')->create($definition));
   }
 
-  public function providerCreate(): array {
+  public static function providerCreate(): array {
     return [
+      'sequence' => [MapDataDefinition::create('sequence'), Sequence::class],
       'boolean' => [DataDefinition::create('boolean'), BooleanData::class],
       'string' => [DataDefinition::create('string'), StringData::class],
-      'mapping' => [MapDataDefinition::create('mapping'), Mapping::class],
     ];
   }
 
