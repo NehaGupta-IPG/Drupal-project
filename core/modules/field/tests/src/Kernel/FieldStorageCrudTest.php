@@ -27,7 +27,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
   // @todo Test creation with
   // - a full fledged $field structure, check that all the values are there
   // - a minimal $field structure, check all default values are set
-  // defer actual $field comparison to a helper function, used for the two cases above
+  // defer actual $field comparison to a helper function, used for the two cases above.
 
   /**
    * Tests the creation of a field storage.
@@ -357,7 +357,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
     $this->assertEmpty($field_storage, 'Field storage was deleted');
 
     // Try to load the field normally and make sure it does not show up.
-    $field = FieldConfig::load('entity_test.' . '.' . $field_definition['bundle'] . '.' . $field_definition['field_name']);
+    $field = FieldConfig::load('entity_test.' . $field_definition['bundle'] . '.' . $field_definition['field_name']);
     $this->assertEmpty($field, 'Field was deleted');
 
     // Make sure the other field and its storage are not deleted.
@@ -375,13 +375,13 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
     $field = FieldConfig::load('entity_test.' . $field_definition['bundle'] . '.' . $field_definition['field_name']);
     $this->assertFalse($field->isDeleted());
 
-    // Save an entity with data for the field
+    // Save an entity with data for the field.
     $entity = EntityTest::create();
     $values[0]['value'] = mt_rand(1, 127);
     $entity->{$field_storage->getName()}->value = $values[0]['value'];
     $entity = $this->entitySaveReload($entity);
 
-    // Verify the field is present on load
+    // Verify the field is present on load.
     $this->assertCount(1, $entity->{$field_storage->getName()}, "Data in previously deleted field saves and loads correctly");
     foreach ($values as $delta => $value) {
       $this->assertEquals($values[$delta]['value'], $entity->{$field_storage->getName()}[$delta]->value, "Data in previously deleted field saves and loads correctly");

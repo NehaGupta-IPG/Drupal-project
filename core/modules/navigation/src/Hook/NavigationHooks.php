@@ -7,9 +7,12 @@ use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Config\Action\ConfigActionManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Attribute\RemoveHook;
+use Drupal\Core\Hook\Order\Order;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\layout_builder\Hook\LayoutBuilderHooks;
 use Drupal\navigation\NavigationContentLinks;
 use Drupal\navigation\NavigationRenderer;
 use Drupal\navigation\Plugin\SectionStorage\NavigationSectionStorage;
@@ -31,8 +34,6 @@ class NavigationHooks {
    *   The module handler.
    * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
-   *   The route match.
    * @param \Drupal\navigation\NavigationRenderer $navigationRenderer
    *   The navigation renderer.
    * @param \Drupal\Core\Config\Action\ConfigActionManager $configActionManager
@@ -43,7 +44,6 @@ class NavigationHooks {
   public function __construct(
     protected ModuleHandlerInterface $moduleHandler,
     protected AccountInterface $currentUser,
-    protected RouteMatchInterface $routeMatch,
     protected NavigationRenderer $navigationRenderer,
     #[Autowire('@plugin.manager.config_action')]
     protected ConfigActionManager $configActionManager,
@@ -55,13 +55,14 @@ class NavigationHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
+  #[RemoveHook('help', class: LayoutBuilderHooks::class, method: 'help')]
   public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.navigation':
         $output = '';
         $output .= '<h3>' . $this->t('About') . '</h3>';
         $output .= '<p>' . $this->t('The Navigation module provides a left-aligned, collapsible, vertical sidebar navigation.') . '</p>';
-        $output .= '<p>' . $this->t('For more information, see the <a href=":docs">online documentation for the Navigation module</a>.', [':docs' => 'https://www.drupal.org/project/navigation']) . '</p>';
+        $output .= '<p>' . $this->t('For more information, see the <a href=":docs">online documentation for the Navigation module</a>.', [':docs' => 'https://www.drupal.org/docs/develop/core-modules-and-themes/core-modules/navigation-module']) . '</p>';
         return $output;
     }
     $configuration_route = 'layout_builder.navigation.';
@@ -70,7 +71,7 @@ class NavigationHooks {
     }
     if (str_starts_with($route_name, $configuration_route)) {
       $output = '<p>' . $this->t('This layout builder tool allows you to configure the blocks in the navigation toolbar.') . '</p>';
-      $output .= '<p>' . $this->t('Forms and links inside the content of the layout builder tool have been disabled.') . '</p>';
+      $output .= '<p>' . $this->t('Forms and links inside the content of the layout builder tool are disabled in Edit mode.') . '</p>';
       return $output;
     }
     return NULL;
@@ -79,29 +80,13 @@ class NavigationHooks {
   /**
    * Implements hook_page_top().
    */
-  #[Hook('page_top')]
+  #[Hook('page_top', order: Order::Last)]
   public function pageTop(array &$page_top): void {
     if (!$this->currentUser->hasPermission('access navigation')) {
       return;
     }
     $this->navigationRenderer->removeToolbar($page_top);
-    if ($this->routeMatch->getRouteName() !== 'layout_builder.navigation.view') {
-      // Don't render the admin toolbar if in layout edit mode.
-      $this->navigationRenderer->buildNavigation($page_top);
-      $this->navigationRenderer->buildTopBar($page_top);
-      return;
-    }
-    // But if in layout mode, add an empty element to leave space. We need to
-    // use an empty .admin-toolbar element because the css uses the adjacent
-    // sibling selector. The actual rendering of the navigation blocks/layout
-    // occurs in the layout form.
-    $page_top['navigation'] = [
-      '#type' => 'html_tag',
-      '#tag' => 'aside',
-      '#attributes' => [
-        'class' => 'admin-toolbar',
-      ],
-    ];
+    $this->navigationRenderer->buildNavigation($page_top);
     $this->navigationRenderer->buildTopBar($page_top);
   }
 

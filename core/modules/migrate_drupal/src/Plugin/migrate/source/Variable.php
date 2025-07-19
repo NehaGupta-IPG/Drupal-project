@@ -4,7 +4,6 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\State\StateInterface;
-use Drupal\migrate\Attribute\MigrateSource;
 use Drupal\migrate\Plugin\MigrationInterface;
 
 /**
@@ -75,11 +74,12 @@ use Drupal\migrate\Plugin\MigrationInterface;
  *
  * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
  * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
+ *
+ * @MigrateSource(
+ *   id = "variable",
+ *   source_module = "system",
+ * )
  */
-#[MigrateSource(
-  id: 'variable',
-  source_module: 'system',
-)]
 class Variable extends DrupalSqlBase {
 
   /**
@@ -129,7 +129,10 @@ class Variable extends DrupalSqlBase {
     // Create an ID field so we can record migration in the map table.
     // Arbitrarily, use the first variable name.
     $values['id'] = reset($this->variables);
-    return $values + array_map('unserialize', $this->prepareQuery()->execute()->fetchAllKeyed());
+    return $values + array_map(
+      fn($data) => unserialize($data, ['allowed_classes' => FALSE]),
+      $this->prepareQuery()->execute()->fetchAllKeyed(),
+    );
   }
 
   /**
