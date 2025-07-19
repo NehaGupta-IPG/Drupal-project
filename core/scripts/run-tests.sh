@@ -514,16 +514,16 @@ function command_line_definition(): InputDefinition {
 /**
  * Parse execution argument and ensure that all are valid.
  *
- * @return array
- *   The list of arguments.
+ * @return \Symfony\Component\Console\Input\InputInterface
+ *   The input options and argument.
  */
 function parse_command_line(InputDefinition $input_definition): InputInterface {
   try {
     $input = new ArgvInput(NULL, $input_definition);
   }
   catch (ConsoleRuntimeException $e) {
-    simpletest_script_print_error($input, $e->getMessage() . ' ' . 'Use the --help option for the list and usage of the options available.');
-    simpletest_script_print($input, $input_definition->getSynopsis(), SIMPLETEST_SCRIPT_COLOR_PASS);
+    simpletest_script_print_error(NULL, $e->getMessage() . ' ' . "Use the --help option for the list and usage of the options available.\n");
+    simpletest_script_print(NULL, $input_definition->getSynopsis(), SIMPLETEST_SCRIPT_COLOR_PASS);
     exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
   }
 
@@ -586,7 +586,7 @@ function simpletest_script_init(InputInterface $input, ClassLoader $autoloader):
     exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
   }
   else {
-    $php = $input->setOption('php', $php);
+    $input->setOption('php', $php);
   }
 
   // Detect if we're in the top-level process using the private 'execute-test'
@@ -925,8 +925,6 @@ function simpletest_script_run_one_test(InputInterface $input, TestRun $test_run
 /**
  * Return a command used to run a test in a separate process.
  *
- * @param int $test_id
- *   The current test ID.
  * @param string $test_class
  *   The name of the test class to run.
  *
@@ -1148,7 +1146,7 @@ function sort_tests_by_type_and_methods(array &$tests): void {
  *   An array of test class names.
  */
 function sort_tests_by_public_method_count(array &$tests): void {
-  uasort($tests, function ($a, $b) {
+  uasort($tests, function (array $a, array $b) {
     return $b['tests_count'] <=> $a['tests_count'];
   });
 }
@@ -1520,7 +1518,7 @@ function simpletest_script_format_result(InputInterface $input, $result): void {
  * @param string $message
  *   The message to print.
  */
-function simpletest_script_print_error(InputInterface $input, $message): void {
+function simpletest_script_print_error(?InputInterface $input, $message): void {
   simpletest_script_print($input, "  ERROR: $message\n", SIMPLETEST_SCRIPT_COLOR_FAIL);
 }
 
@@ -1529,11 +1527,11 @@ function simpletest_script_print_error(InputInterface $input, $message): void {
  *
  * @param string $message
  *   The message to print.
- * @param int $color_code
+ * @param string|int $color_code
  *   The color code to use for coloring.
  */
-function simpletest_script_print(InputInterface $input, $message, $color_code): void {
-  if ($input->getOption('color')) {
+function simpletest_script_print(?InputInterface $input, $message, $color_code): void {
+  if ($input && $input->getOption('color')) {
     echo "\033[" . $color_code . "m" . $message . "\033[0m";
   }
   else {
