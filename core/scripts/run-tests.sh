@@ -485,15 +485,13 @@ function command_line_definition(): InputDefinition {
   $inputDefinition->addOption(new InputOption(
     'ci-parallel-node-index',
     NULL,
-    InputOption::VALUE_REQUIRED, 'The index of the job in the job set.',
-    1,
+    InputOption::VALUE_OPTIONAL, 'The index of the job in the job set.',
   ));
   $inputDefinition->addOption(new InputOption(
     'ci-parallel-node-total',
     NULL,
-    InputOption::VALUE_REQUIRED,
+    InputOption::VALUE_OPTIONAL,
     'The total number of instances of this job running in parallel.',
-    1,
   ));
   $inputDefinition->addOption(new InputOption(
     'debug-discovery',
@@ -528,12 +526,10 @@ function parse_command_line(InputDefinition $input_definition): InputInterface {
   }
 
   // Validate the concurrency argument.
-  if ($input->hasOption('concurrency')) {
-    $concurrency = $input->getOption('concurrency');
-    if (!is_numeric($concurrency) || $concurrency <= 0) {
-      simpletest_script_print_error($input, "--concurrency must be a strictly positive integer.");
-      exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
-    }
+  $concurrency = $input->getOption('concurrency');
+  if (!is_numeric($concurrency) || $concurrency <= 0) {
+    simpletest_script_print_error($input, "--concurrency must be a strictly positive integer.");
+    exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
   }
 
   if ($input->getArgument('tests')) {
@@ -542,6 +538,14 @@ function parse_command_line(InputDefinition $input_definition): InputInterface {
 
   if ($input->getOption('types')) {
     $input->setOption('types', explode(',', $input->getOption('types')));
+  }
+
+  if ($input->getOption('ci-parallel-node-index') === NULL) {
+    $input->setOption('ci-parallel-node-index', 1);
+  }
+
+  if ($input->getOption('ci-parallel-node-total') === NULL) {
+    $input->setOption('ci-parallel-node-total', 1);
   }
 
   return $input;
