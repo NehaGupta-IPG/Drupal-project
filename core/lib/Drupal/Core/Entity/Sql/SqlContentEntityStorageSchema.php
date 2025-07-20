@@ -2576,11 +2576,13 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   public static function castValue(array $info, $value) {
     // Preserve legal NULL values.
     if (isset($value) || !empty($info['not null'])) {
-      if ($info['type'] === 'int' || $info['type'] === 'serial') {
-        return (int) $value;
-      }
-      elseif ($info['type'] === 'float') {
-        return (float) $value;
+      if (isset($info['type'])) {
+        if ($info['type'] === 'int' || $info['type'] === 'serial') {
+          return (int) $value;
+        }
+        elseif ($info['type'] === 'float') {
+          return (float) $value;
+        }
       }
       return (string) $value;
     }
