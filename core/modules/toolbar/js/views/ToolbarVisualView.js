@@ -20,9 +20,7 @@
         };
 
         const keyDownSpaceToClick = function (event) {
-          // Check for SPACE alone should be enough, but tests are failing
-          // without the condition for ENTER.
-          if (event.key === ' ' || event.key === 'Enter') {
+          if (event.key === ' ') {
             event.preventDefault();
             event.target.click();
           }
