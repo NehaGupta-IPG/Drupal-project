@@ -222,7 +222,7 @@ module.exports = {
       },
     );
   },
-  'Toggle menu with SPACE': (browser) => {
+  'Toggle tray with SPACE': (browser) => {
     // Go to a long page that will scroll and get Manage link after
     // page has loaded.
     // URL was found by experimentation on what URL will actually cause
@@ -234,12 +234,12 @@ module.exports = {
     const manageSubTray = browser.element('#toolbar-item-administration-tray');
 
     // Check initial state.
-    manageSubTray.assert.visible('The Manage menu is open initially');
+    manageSubTray.assert.visible('The Manage tray is open initially');
 
     // Close with SPACE.
     manageLink.sendKeys(browser.Keys.SPACE);
     manageSubTray.assert.not.visible(
-      'The Manage menu is closed by pressing SPACE',
+      'The Manage tray is closed by pressing SPACE',
     );
     browser.assert.domPropertyEquals(
       'html',
@@ -251,10 +251,10 @@ module.exports = {
     // Open again with SPACE.
     manageLink.sendKeys(browser.Keys.SPACE);
     manageSubTray.assert.visible(
-      'The Manage menu is open again by pressing SPACE',
+      'The Manage tray is open again by pressing SPACE',
     );
   },
-  'Toggle menu with ENTER': (browser) => {
+  'Toggle tray with ENTER': (browser) => {
     // Scroll check is not necessary with ENTER because the browser fires
     // a `click` event.
     // The default behavior in that case on an `a` tag with an `href` attribute
@@ -268,18 +268,18 @@ module.exports = {
     const manageSubTray = browser.element('#toolbar-item-administration-tray');
 
     // Check initial state.
-    manageSubTray.assert.visible('The Manage menu is open initially');
+    manageSubTray.assert.visible('The Manage tray is open initially');
 
     // Close with ENTER.
     manageLink.sendKeys(browser.Keys.ENTER);
     manageSubTray.assert.not.visible(
-      'The Manage menu is closed by pressing ENTER',
+      'The Manage tray is closed by pressing ENTER',
     );
 
     // Open again with ENTER.
     manageLink.sendKeys(browser.Keys.ENTER);
     manageSubTray.assert.visible(
-      'The Manage menu is open again by pressing ENTER',
+      'The Manage tray is open again by pressing ENTER',
     );
   },
   'Open submenu': (browser) => {

@@ -206,7 +206,7 @@
       },
 
       /**
-       * Prevents default behavior of scrolling when SPACE is pressed.
+       * Prevents default scrolling behavior when SPACE is pressed.
        *
        * Not necessary with ENTER, because browsers fire a `click`
        * event instead.
@@ -215,7 +215,6 @@
        *   The event triggered.
        */
       keyDownPreventScroll(event) {
-        console.log(event);
         if (event.key === ' ') {
           event.preventDefault();
         }
@@ -224,7 +223,7 @@
       /**
        * Transforms `keyup` event for SPACE to `click` event.
        *
-       * Done with `keyup` instead of `keydown` because `keydown` is
+       * `keyup` is used instead of `keydown` because `keydown` is
        * fired repeatedly while key is held down.
        *
        * @param {jQuery.Event} event
