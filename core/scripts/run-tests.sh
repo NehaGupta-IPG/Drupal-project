@@ -535,9 +535,15 @@ function parse_command_line(InputDefinition $input_definition): InputInterface {
   if ($input->getArgument('tests')) {
     $input->setArgument('tests', explode(',', $input->getArgument('tests')));
   }
+  else {
+    $input->setArgument('tests', []);
+  }
 
   if ($input->getOption('types')) {
     $input->setOption('types', explode(',', $input->getOption('types')));
+  }
+  else {
+    $input->setOption('types', []);
   }
 
   if ($input->getOption('ci-parallel-node-index') === NULL) {
