@@ -222,7 +222,7 @@ module.exports = {
       },
     );
   },
-  'Toggle tray with SPACE': (browser) => {
+  'Toggle tray with SPACE key': (browser) => {
     // Go to a long page that will scroll and get Manage link after
     // page has loaded.
     // URL was found by experimentation on what URL will actually cause
@@ -254,7 +254,7 @@ module.exports = {
       'The Manage tray is open again by pressing SPACE',
     );
   },
-  'Toggle tray with ENTER': (browser) => {
+  'Toggle tray with ENTER key': (browser) => {
     // Scroll check is not necessary with ENTER because the browser fires
     // a `click` event.
     // The default behavior in that case on an `a` tag with an `href` attribute
