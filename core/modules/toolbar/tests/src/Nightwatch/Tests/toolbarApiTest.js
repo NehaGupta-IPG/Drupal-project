@@ -238,12 +238,21 @@ module.exports = {
 
     // Close with SPACE.
     manageLink.sendKeys(browser.Keys.SPACE);
-    manageSubTray.assert.not.visible('The Manage menu is closed by pressing SPACE');
-    browser.assert.domPropertyEquals('html', 'scrollTop', 0, 'Page did not scroll');
+    manageSubTray.assert.not.visible(
+      'The Manage menu is closed by pressing SPACE',
+    );
+    browser.assert.domPropertyEquals(
+      'html',
+      'scrollTop',
+      0,
+      'Page did not scroll',
+    );
 
     // Open again with SPACE.
     manageLink.sendKeys(browser.Keys.SPACE);
-    manageSubTray.assert.visible('The Manage menu is open again by pressing SPACE');
+    manageSubTray.assert.visible(
+      'The Manage menu is open again by pressing SPACE',
+    );
   },
   'Toggle menu with ENTER': (browser) => {
     // Scroll check is not necessary with ENTER because the browser fires
@@ -251,8 +260,10 @@ module.exports = {
     // The default behavior in that case on an `a` tag with an `href` attribute
     // is to go to the URL. If it's a different URL than what was initially
     // loaded here, the test will error.
-    const manageLink = browser
-      .element({ selector: 'Manage', locateStrategy: 'link text' });
+    const manageLink = browser.element({
+      selector: 'Manage',
+      locateStrategy: 'link text',
+    });
 
     const manageSubTray = browser.element('#toolbar-item-administration-tray');
 
@@ -261,11 +272,15 @@ module.exports = {
 
     // Close with ENTER.
     manageLink.sendKeys(browser.Keys.ENTER);
-    manageSubTray.assert.not.visible('The Manage menu is closed by pressing ENTER');
+    manageSubTray.assert.not.visible(
+      'The Manage menu is closed by pressing ENTER',
+    );
 
     // Open again with ENTER.
     manageLink.sendKeys(browser.Keys.ENTER);
-    manageSubTray.assert.visible('The Manage menu is open again by pressing ENTER');
+    manageSubTray.assert.visible(
+      'The Manage menu is open again by pressing ENTER',
+    );
   },
   'Open submenu': (browser) => {
     browser.executeAsync(

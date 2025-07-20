@@ -27,7 +27,7 @@
           'touchend .toolbar-bar .toolbar-tab .trigger': touchEndToClick,
           'touchend .toolbar-toggle-orientation button': touchEndToClick,
           'keydown .toolbar-bar .toolbar-tab .trigger': 'keyDownPreventScroll',
-          'keyup .toolbar-bar .toolbar-tab .trigger': 'keyUpToClick'
+          'keyup .toolbar-bar .toolbar-tab .trigger': 'keyUpToClick',
         };
       },
 
