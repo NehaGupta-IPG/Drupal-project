@@ -10,7 +10,6 @@ use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\node\NodeInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\Form\NodePreviewForm;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Component\Utility\Xss;
@@ -109,37 +108,6 @@ class NodeHooks1 {
         return !empty($help) ? Xss::filterAdmin($help) : '';
     }
     return NULL;
-  }
-
-  /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return [
-      'node' => [
-        'render element' => 'elements',
-      ],
-      'node_add_list' => [
-        'variables' => [
-          'content' => NULL,
-        ],
-      ],
-      'node_edit_form' => [
-        'render element' => 'form',
-      ],
-          // @todo Delete the next three entries as part of
-          // https://www.drupal.org/node/3015623
-      'field__node__title' => [
-        'base hook' => 'field',
-      ],
-      'field__node__uid' => [
-        'base hook' => 'field',
-      ],
-      'field__node__created' => [
-        'base hook' => 'field',
-      ],
-    ];
   }
 
   /**
@@ -286,28 +254,6 @@ class NodeHooks1 {
         'view_mode' => \Drupal::formBuilder()->getForm(NodePreviewForm::class, $route_match->getParameter('node_preview')),
       ];
     }
-  }
-
-  /**
-   * Implements hook_form_FORM_ID_alter().
-   *
-   * Alters the theme form to use the admin theme on node editing.
-   *
-   * @see node_form_system_themes_admin_form_submit()
-   */
-  #[Hook('form_system_themes_admin_form_alter')]
-  public function formSystemThemesAdminFormAlter(&$form, FormStateInterface $form_state, $form_id) : void {
-    $form['admin_theme']['use_admin_theme'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Use the administration theme when editing or creating content'),
-      '#description' => $this->t('Control which roles can "View the administration theme" on the <a href=":permissions">Permissions page</a>.', [
-        ':permissions' => Url::fromRoute('user.admin_permissions.module', [
-          'modules' => 'system',
-        ])->toString(),
-      ]),
-      '#default_value' => \Drupal::configFactory()->getEditable('node.settings')->get('use_admin_theme'),
-    ];
-    $form['#submit'][] = 'node_form_system_themes_admin_form_submit';
   }
 
   /**
@@ -515,39 +461,6 @@ class NodeHooks1 {
   public function configurableLanguageDelete(ConfigurableLanguageInterface $language): void {
     // On nodes with this language, unset the language.
     \Drupal::entityTypeManager()->getStorage('node')->clearRevisionsLanguage($language);
-  }
-
-  /**
-   * Implements hook_ENTITY_TYPE_insert() for comment entities.
-   */
-  #[Hook('comment_insert')]
-  public function commentInsert($comment): void {
-    // Reindex the node when comments are added.
-    if ($comment->getCommentedEntityTypeId() == 'node') {
-      node_reindex_node_search($comment->getCommentedEntityId());
-    }
-  }
-
-  /**
-   * Implements hook_ENTITY_TYPE_update() for comment entities.
-   */
-  #[Hook('comment_update')]
-  public function commentUpdate($comment): void {
-    // Reindex the node when comments are changed.
-    if ($comment->getCommentedEntityTypeId() == 'node') {
-      node_reindex_node_search($comment->getCommentedEntityId());
-    }
-  }
-
-  /**
-   * Implements hook_ENTITY_TYPE_delete() for comment entities.
-   */
-  #[Hook('comment_delete')]
-  public function commentDelete($comment): void {
-    // Reindex the node when comments are deleted.
-    if ($comment->getCommentedEntityTypeId() == 'node') {
-      node_reindex_node_search($comment->getCommentedEntityId());
-    }
   }
 
   /**
