@@ -1,6 +1,7 @@
 /**
  * @file
- * A Backbone view for the toolbar element. Listens to mouse & touch.
+ * A Backbone view for the toolbar element. Listens to mouse, touch,
+ * click, keydown, and keyup.
  */
 
 (function ($, Drupal, drupalSettings, Backbone) {
@@ -19,32 +20,14 @@
           event.target.click();
         };
 
-        // Prevent default behavior of scrolling when SPACE is pressed.
-        // Not necessary with ENTER, because browsers fire a `click`
-        // event instead.
-        const keyDownPreventScroll = function (event) {
-          if (event.key === ' ') {
-            event.preventDefault();
-          }
-        };
-
-        // Transform `keyup` event for SPACE to `click` event.
-        // Done with `keyup` instead of `keydown` because `keydown` is
-        // fired repeatedly while key is held down.
-        const keyUpToClick = function (event) {
-          if (event.key === ' ') {
-            event.target.click();
-          }
-        };
-
         return {
           'click .toolbar-bar .toolbar-tab .trigger': 'onTabClick',
           'click .toolbar-toggle-orientation button':
             'onOrientationToggleClick',
           'touchend .toolbar-bar .toolbar-tab .trigger': touchEndToClick,
           'touchend .toolbar-toggle-orientation button': touchEndToClick,
-          'keydown .toolbar-bar .toolbar-tab .trigger': keyDownPreventScroll,
-          'keyup .toolbar-bar .toolbar-tab .trigger': keyUpToClick
+          'keydown .toolbar-bar .toolbar-tab .trigger': 'keyDownPreventScroll',
+          'keyup .toolbar-bar .toolbar-tab .trigger': 'keyUpToClick'
         };
       },
 
@@ -220,6 +203,37 @@
 
         event.preventDefault();
         event.stopPropagation();
+      },
+
+      /**
+       * Prevents default behavior of scrolling when SPACE is pressed.
+       *
+       * Not necessary with ENTER, because browsers fire a `click`
+       * event instead.
+       *
+       * @param {jQuery.Event} event
+       *   The event triggered.
+       */
+      keyDownPreventScroll(event) {
+        console.log(event);
+        if (event.key === ' ') {
+          event.preventDefault();
+        }
+      },
+
+      /**
+       * Transforms `keyup` event for SPACE to `click` event.
+       *
+       * Done with `keyup` instead of `keydown` because `keydown` is
+       * fired repeatedly while key is held down.
+       *
+       * @param {jQuery.Event} event
+       *   The event triggered.
+       */
+      keyUpToClick(event) {
+        if (event.key === ' ') {
+          event.target.click();
+        }
       },
 
       /**
