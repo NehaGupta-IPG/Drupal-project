@@ -19,9 +19,20 @@
           event.target.click();
         };
 
-        const keyDownSpaceToClick = function (event) {
+        // Prevent default behavior of scrolling when SPACE is pressed.
+        // Not necessary with ENTER, because browsers fire a `click`
+        // event instead.
+        const keyDownPreventScroll = function (event) {
           if (event.key === ' ') {
             event.preventDefault();
+          }
+        };
+
+        // Transform `keyup` event for SPACE to `click` event.
+        // Done with `keyup` instead of `keydown` because `keydown` is
+        // fired repeatedly while key is held down.
+        const keyUpToClick = function (event) {
+          if (event.key === ' ') {
             event.target.click();
           }
         };
@@ -32,7 +43,8 @@
             'onOrientationToggleClick',
           'touchend .toolbar-bar .toolbar-tab .trigger': touchEndToClick,
           'touchend .toolbar-toggle-orientation button': touchEndToClick,
-          'keydown .toolbar-bar .toolbar-tab .trigger': keyDownSpaceToClick,
+          'keydown .toolbar-bar .toolbar-tab .trigger': keyDownPreventScroll,
+          'keyup .toolbar-bar .toolbar-tab .trigger': keyUpToClick
         };
       },
 

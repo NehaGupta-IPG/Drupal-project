@@ -222,6 +222,51 @@ module.exports = {
       },
     );
   },
+  'Toggle menu with SPACE': (browser) => {
+    // Go to a long page that will scroll and get Manage link after
+    // page has loaded.
+    // URL was found by experimentation on what URL will actually cause
+    // a failing scroll test.
+    const manageLink = browser
+      .drupalRelativeURL('/admin/reports/status')
+      .element({ selector: 'Manage', locateStrategy: 'link text' });
+
+    const manageSubTray = browser.element('#toolbar-item-administration-tray');
+
+    // Check initial state.
+    manageSubTray.assert.visible('The Manage menu is open initially');
+
+    // Close with SPACE.
+    manageLink.sendKeys(browser.Keys.SPACE);
+    manageSubTray.assert.not.visible('The Manage menu is closed by pressing SPACE');
+    browser.assert.domPropertyEquals('html', 'scrollTop', 0, 'Page did not scroll');
+
+    // Open again with SPACE.
+    manageLink.sendKeys(browser.Keys.SPACE);
+    manageSubTray.assert.visible('The Manage menu is open again by pressing SPACE');
+  },
+  'Toggle menu with ENTER': (browser) => {
+    // Scroll check is not necessary with ENTER because the browser fires
+    // a `click` event.
+    // The default behavior in that case on an `a` tag with an `href` attribute
+    // is to go to the URL. If it's a different URL than what was initially
+    // loaded here, the test will error.
+    const manageLink = browser
+      .element({ selector: 'Manage', locateStrategy: 'link text' });
+
+    const manageSubTray = browser.element('#toolbar-item-administration-tray');
+
+    // Check initial state.
+    manageSubTray.assert.visible('The Manage menu is open initially');
+
+    // Close with ENTER.
+    manageLink.sendKeys(browser.Keys.ENTER);
+    manageSubTray.assert.not.visible('The Manage menu is closed by pressing ENTER');
+
+    // Open again with ENTER.
+    manageLink.sendKeys(browser.Keys.ENTER);
+    manageSubTray.assert.visible('The Manage menu is open again by pressing ENTER');
+  },
   'Open submenu': (browser) => {
     browser.executeAsync(
       function (done) {
