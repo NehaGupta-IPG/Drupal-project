@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Provides permissions per bundle configuration action derivatives.
+ * Provides permissions per bundle for configuration action derivatives.
  *
  * @internal
  *   This API is experimental.

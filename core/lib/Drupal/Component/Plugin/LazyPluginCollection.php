@@ -143,7 +143,7 @@ abstract class LazyPluginCollection implements \IteratorAggregate, \Countable {
   }
 
   /**
-   * {@inheritdoc}
+   * Returns an iterator for plugins.
    *
    * @return \Traversable<string, mixed>
    *   A traversable generator.
