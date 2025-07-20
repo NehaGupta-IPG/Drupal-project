@@ -2279,7 +2279,7 @@ function hook_mail($key, &$message, $params): void {
     $variables += [
       '%uid' => $node->getOwnerId(),
       '%url' => $node->toUrl('canonical', ['absolute' => TRUE])->toString(),
-      '%node_type' => node_get_type_label($node),
+      '%node_type' => $node->getBundleEntity()->label(),
       '%title' => $node->getTitle(),
       '%teaser' => $node->teaser,
       '%body' => $node->body,
@@ -2707,9 +2707,10 @@ function hook_validation_constraint_alter(array &$definitions) {
  * the proxy service, and not on all the dependencies of the lazy service.
  *
  * To define a service as lazy, add "lazy: true" to the service definition, and
- * use the "core/scripts/generate-proxy.sh" script to generate the proxy class.
+ * use the "core/scripts/generate-proxy-class.php" script to generate the proxy
+ * class.
  *
- * @see core/scripts/generate-proxy.sh
+ * @see core/scripts/generate-proxy-class.php
  */
 
 /**
