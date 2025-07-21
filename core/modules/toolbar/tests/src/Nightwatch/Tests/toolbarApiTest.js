@@ -223,22 +223,32 @@ module.exports = {
     );
   },
   'Toggle tray with SPACE key': (browser) => {
-    // Go to a long page that will scroll and get Manage link after
-    // page has loaded.
-    // URL was found by experimentation on what URL will actually cause
-    // a failing scroll test.
-    const manageLink = browser
-      .drupalRelativeURL('/admin/reports/status')
-      .element({ selector: 'Manage', locateStrategy: 'link text' });
+    // Load a long page that will scroll.
+    browser
+      .drupalRelativeURL('/admin/modules')
+      // Confirm that loaded page is actually the modules page and not
+      // a Not Found or Access Denied page. Otherwise, the check for
+      // page scrolling will pass falsely because those are too short
+      // for scrolling to occur.
+      .assert.titleMatches('^Extend');
 
-    const manageSubTray = browser.element('#toolbar-item-administration-tray');
+    const manageLink = browser.element({
+      selector: 'Manage',
+      locateStrategy: 'link text',
+    });
+
+    // The link in the tray that is tested for visibility.
+    const extendLink = browser.element({
+      selector: 'Extend',
+      locateStrategy: 'link text',
+    });
 
     // Check initial state.
-    manageSubTray.assert.visible('The Manage tray is open initially');
+    extendLink.assert.visible('The Manage tray is open initially');
 
     // Close with SPACE.
     manageLink.sendKeys(browser.Keys.SPACE);
-    manageSubTray.assert.not.visible(
+    extendLink.assert.not.visible(
       'The Manage tray is closed by pressing SPACE',
     );
     browser.assert.domPropertyEquals(
@@ -250,7 +260,7 @@ module.exports = {
 
     // Open again with SPACE.
     manageLink.sendKeys(browser.Keys.SPACE);
-    manageSubTray.assert.visible(
+    extendLink.assert.visible(
       'The Manage tray is open again by pressing SPACE',
     );
   },
@@ -265,20 +275,24 @@ module.exports = {
       locateStrategy: 'link text',
     });
 
-    const manageSubTray = browser.element('#toolbar-item-administration-tray');
+    // The link in the tray that is tested for visibility.
+    const extendLink = browser.element({
+      selector: 'Extend',
+      locateStrategy: 'link text',
+    });
 
     // Check initial state.
-    manageSubTray.assert.visible('The Manage tray is open initially');
+    extendLink.assert.visible('The Manage tray is open initially');
 
     // Close with ENTER.
     manageLink.sendKeys(browser.Keys.ENTER);
-    manageSubTray.assert.not.visible(
+    extendLink.assert.not.visible(
       'The Manage tray is closed by pressing ENTER',
     );
 
     // Open again with ENTER.
     manageLink.sendKeys(browser.Keys.ENTER);
-    manageSubTray.assert.visible(
+    extendLink.assert.visible(
       'The Manage tray is open again by pressing ENTER',
     );
   },
