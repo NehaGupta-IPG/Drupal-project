@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Plugin\Block;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\Cache;
@@ -194,7 +195,11 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
     ];
     $tree = $this->menuTree->transform($tree, $manipulators);
-    return $this->menuTree->build($tree);
+    $build = $this->menuTree->build($tree);
+    if (!empty($build['#menu_name'])) {
+      $build['#attributes']['id'] = Html::getUniqueId('block-' . $build['#menu_name']);
+    }
+    return $build;
   }
 
   /**
