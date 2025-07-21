@@ -189,7 +189,6 @@ class CommentDefaultFormatter extends FormatterBase {
       // display below the entity. Do not show the form for the print view mode.
       if ($status == CommentItemInterface::OPEN && $comment_settings['form_location'] == CommentItemInterface::FORM_BELOW && $this->viewMode != 'print') {
         // Only show the add comment form if the user has permission.
-        $elements['#cache']['contexts'][] = 'user.roles';
         if ($this->currentUser->hasPermission('post comments')) {
           $output['comment_form'] = [
             '#lazy_builder' => [
