@@ -38,7 +38,7 @@ final class NavigationMenuLinkTree extends MenuLinkTree {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|null $eventDispatcher
-   * The event dispatcher.
+   *   The event dispatcher.
    */
   public function __construct(
     MenuTreeStorageInterface $treeStorage,

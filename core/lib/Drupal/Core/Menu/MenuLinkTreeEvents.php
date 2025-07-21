@@ -15,7 +15,8 @@ final class MenuLinkTreeEvents {
    * Name of the event fired during menu link tree manipulator collection.
    *
    * This event allows modules to modify menu tree manipulators. The event
-   * listener method receives a \Drupal\Core\Menu\MenuLinkTreeManipulatorsAlterEvent instance.
+   * listener method receives a
+   * \Drupal\Core\Menu\MenuLinkTreeManipulatorsAlterEvent instance.
    *
    * @Event
    *
