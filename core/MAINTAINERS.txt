@@ -203,7 +203,6 @@ Dynamic Page Cache
 - Wim Leers 'Wim Leers' https://www.drupal.org/u/wim-leers
 
 Editor
-- Henrik Danielsson 'TwoD' https://www.drupal.org/u/TwoD
 - Wim Leers 'Wim Leers' https://www.drupal.org/u/wim-leers
 
 Entity API
