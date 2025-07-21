@@ -7,7 +7,7 @@
         "webflo/drupal-core-strict": "*"
     },
     "require": {
-        "drupal/core": "11.x-dev",
+        "drupal/core": "11.2.x-dev",
         "asm89/stack-cors": "~v2.3.0",
         "composer/semver": "~3.4.3",
         "doctrine/annotations": "~2.0.2",
@@ -32,7 +32,7 @@
         "psr/log": "~3.0.2",
         "ralouphie/getallheaders": "~3.0.3",
         "revolt/event-loop": "~v1.0.7",
-        "sebastian/diff": "~6.0.2",
+        "sebastian/diff": "~5.1.1",
         "symfony/console": "~v7.3.0",
         "symfony/dependency-injection": "~v7.3.0",
         "symfony/deprecation-contracts": "~v3.6.0",
@@ -52,7 +52,6 @@
         "symfony/polyfill-intl-normalizer": "~v1.32.0",
         "symfony/polyfill-mbstring": "~v1.32.0",
         "symfony/polyfill-php84": "~v1.32.0",
-        "symfony/polyfill-php85": "~v1.32.0",
         "symfony/process": "~v7.3.0",
         "symfony/psr-http-message-bridge": "~v7.3.0",
         "symfony/routing": "~v7.3.0",

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7e45f46f86addf53ba6170d650e30fc2",
+    "content-hash": "0b356b72476248f0c15d28e56afc2952",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -493,11 +493,11 @@
         },
         {
             "name": "drupal/core",
-            "version": "11.x-dev",
+            "version": "11.2.x-dev",
             "dist": {
                 "type": "path",
                 "url": "core",
-                "reference": "cc47b8e83dc7fe1fb24f2baa25102b85a24212de"
+                "reference": "74581f4e5f24dbea4ac0099e4a79f0e0bff77f55"
             },
             "require": {
                 "asm89/stack-cors": "^2.3",
@@ -541,7 +541,6 @@
                 "symfony/mime": "^7.3",
                 "symfony/polyfill-iconv": "^1.32",
                 "symfony/polyfill-php84": "^1.32",
-                "symfony/polyfill-php85": "^1.32",
                 "symfony/process": "^7.3",
                 "symfony/psr-http-message-bridge": "^7.3",
                 "symfony/routing": "^7.3",
@@ -663,7 +662,7 @@
         },
         {
             "name": "drupal/core-project-message",
-            "version": "11.x-dev",
+            "version": "11.2.x-dev",
             "dist": {
                 "type": "path",
                 "url": "composer/Plugin/ProjectMessage",
@@ -696,7 +695,7 @@
         },
         {
             "name": "drupal/core-recipe-unpack",
-            "version": "11.x-dev",
+            "version": "11.2.x-dev",
             "dist": {
                 "type": "path",
                 "url": "composer/Plugin/RecipeUnpack",
@@ -732,7 +731,7 @@
         },
         {
             "name": "drupal/core-vendor-hardening",
-            "version": "11.x-dev",
+            "version": "11.2.x-dev",
             "dist": {
                 "type": "path",
                 "url": "composer/Plugin/VendorHardening",
@@ -10205,8 +10204,8 @@
     },
     "prefer-stable": true,
     "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": [],
+    "platform": {},
+    "platform-dev": {},
     "platform-overrides": {
         "php": "8.3.0"
     },

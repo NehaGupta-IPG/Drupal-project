@@ -415,6 +415,10 @@ class Registry implements DestructableInterface {
    * @see hook_theme_registry_alter()
    */
   protected function build() {
+    $cache = [
+      self::PREPROCESS_INVOKES => [],
+    ];
+    $fixed_preprocess_functions = $this->collectModulePreprocess($cache, 'preprocess');
     // First, preprocess the theme hooks advertised by modules. This will
     // serve as the basic registry. Since the list of enabled modules is the
     // same regardless of the theme used, this is cached in its own entry to
@@ -936,6 +940,35 @@ class Registry implements DestructableInterface {
     }
 
     return $grouped_functions;
+  }
+
+  /**
+   * Adds $prefix_preprocess functions to every hook.
+   *
+   * @param array $cache
+   *   The theme registry, as documented in
+   *   \Drupal\Core\Theme\Registry::processExtension().
+   * @param array $fixed_preprocess_functions
+   *   A list of preprocess functions.
+   * @param array $old_cache
+   *   An already processed theme registry.
+   */
+  protected function addFixedPreprocessFunctions(array &$cache, array $fixed_preprocess_functions, array $old_cache = []): void {
+    foreach (array_keys(array_diff_key($cache, $old_cache)) as $hook) {
+      if ($hook == self::PREPROCESS_INVOKES) {
+        continue;
+      }
+      if (!isset($cache[$hook]['preprocess functions'])) {
+        $cache[$hook]['preprocess functions'] = $fixed_preprocess_functions;
+      }
+      else {
+        $offset = 0;
+        while (isset($cache[$hook]['preprocess functions'][$offset]) && is_string($cache[$hook]['preprocess functions'][$offset]) && str_starts_with($cache[$hook]['preprocess functions'][$offset], 'template_')) {
+          $offset++;
+        }
+        array_splice($cache[$hook]['preprocess functions'], $offset, 0, $fixed_preprocess_functions);
+      }
+    }
   }
 
   /**
