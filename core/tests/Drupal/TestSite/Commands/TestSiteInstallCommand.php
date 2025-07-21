@@ -179,7 +179,7 @@ class TestSiteInstallCommand extends Command {
     if (empty($new_classes)) {
       throw new \InvalidArgumentException("The file $file does not contain a class.");
     }
-    $class = array_pop($new_classes);
+    $class = array_shift($new_classes);
 
     if (!is_subclass_of($class, TestSetupInterface::class) && !is_subclass_of($class, TestPreinstallInterface::class)) {
       throw new \InvalidArgumentException("The class $class contained in $file needs to implement \Drupal\TestSite\TestSetupInterface or \Drupal\TestSite\TestPreinstallInterface");
