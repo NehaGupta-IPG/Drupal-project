@@ -90,3 +90,7 @@ editor.image_upload_settings.1:
               # @see editor_image_upload_settings_form()
               min: 1
               max: 99999
+    enable_absolute_path:
+      type: boolean
+      label: 'Enable absolute path'
+      description: 'When enabled, the absolute path will be used for the image upload directory. When disabled, the relative path will be used.'

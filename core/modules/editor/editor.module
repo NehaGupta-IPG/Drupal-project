@@ -670,6 +670,9 @@ function editor_editor_presave(EditorInterface $editor) {
     if (array_key_exists('directory', $image_upload_settings) && $image_upload_settings['directory'] === '') {
       $image_upload_settings['directory'] = NULL;
     }
+    if (array_key_exists('enable_absolute_path', $image_upload_settings) && $image_upload_settings['enable_absolute_path'] === '') {
+      $image_upload_settings['enable_absolute_path'] = FALSE;
+    }
     if (array_key_exists('max_size', $image_upload_settings) && $image_upload_settings['max_size'] === '') {
       $image_upload_settings['max_size'] = NULL;
     }
