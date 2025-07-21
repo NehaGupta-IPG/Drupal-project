@@ -166,11 +166,11 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
       $build = [];
       $view = $entity->get($this->fieldName)->view($display_settings);
       if ($view) {
+        $field_label = $this->getConfiguration()['field_label'];
+        if (isset($view['#title']) && !empty($field_label)) {
+          $view['#title'] = $field_label;
+        }
         $build = [$view];
-      }
-      $field_label = $this->getConfiguration()['field_label'];
-      if (isset($build['#title']) && !empty($field_label)) {
-        $build['#title'] = $field_label;
       }
     }
     // @todo Remove in https://www.drupal.org/project/drupal/issues/2367555.
