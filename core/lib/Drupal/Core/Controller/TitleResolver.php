@@ -57,8 +57,14 @@ class TitleResolver implements TitleResolverInterface {
       $arguments = $this->argumentResolver->getArguments($request, $callable);
       $route_title = call_user_func_array($callable, $arguments);
     }
-    elseif ($route->hasDefault('_title') && strlen($route->getDefault('_title') ?? '') > 0) {
-      $title = $route->getDefault('_title');
+    elseif ($route->hasDefault('_title') && strlen($route->getDefault('_title') ?? '') >= 0) {
+      if (is_null($route->getDefault('_title'))) {
+        $title = '';
+        @trigger_error('The route _title is null. An empty string is used instead.', E_USER_NOTICE);
+      }
+      else {
+        $title = $route->getDefault('_title');
+      }
       $options = [];
       if ($route->hasDefault('_title_context')) {
         $options['context'] = $route->getDefault('_title_context');
