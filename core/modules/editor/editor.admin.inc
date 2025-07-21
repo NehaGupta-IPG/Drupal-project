@@ -79,6 +79,14 @@ function editor_image_upload_settings_form(Editor $editor) {
     '#states' => $show_if_image_uploads_enabled,
   ];
 
+  $form['enable_absolute_path'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Enable absolute path'),
+    '#default_value' => $image_upload['enable_absolute_path'] ?? FALSE,
+    '#description' => t('When enabled, then return absolute image URLs.'),
+    '#states' => $show_if_image_uploads_enabled,
+  ];
+
   $default_max_size = ByteSizeMarkup::create(Environment::getUploadMaxSize());
   $form['max_size'] = [
     '#type' => 'textfield',

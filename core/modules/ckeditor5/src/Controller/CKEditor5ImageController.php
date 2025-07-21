@@ -189,8 +189,9 @@ class CKEditor5ImageController extends ControllerBase {
     $this->lock->release($lock_id);
 
     $file = $uploadResult->getFile();
+    $enable_absolute_path = $settings['enable_absolute_path'] ?? FALSE;
     return new JsonResponse([
-      'url' => $file->createFileUrl(),
+      'url' => $file->createFileUrl(!$enable_absolute_path),
       'uuid' => $file->uuid(),
       'entity_type' => $file->getEntityTypeId(),
     ], 201);
