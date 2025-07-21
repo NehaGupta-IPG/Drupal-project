@@ -89,6 +89,12 @@ abstract class AreaPluginBase extends HandlerBase {
     }
 
     $form['area_id'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Machine name of the area'),
+      '#weight' => 151,
+    ];
+
+    $form['area_id']['area_id'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Machine name of the area'),
       '#default_value' => $this->options['new_id'] ?? $form_state->get('id'),
@@ -101,11 +107,11 @@ abstract class AreaPluginBase extends HandlerBase {
    * {@inheritdoc}
    */
   public function validateOptionsForm(&$form, FormStateInterface $form_state): void {
-    $area_id = $form_state->getValue(['options', 'area_id']);
+    $area_id = $form_state->getValue(['options', 'area_id', 'area_id']);
     if ($area_id) {
       if (preg_match(
         '/[^a-z0-9_]/',
-        $form_state->getValue(['options', 'area_id']))
+        $form_state->getValue(['options', 'area_id', 'area_id']))
       ) {
         $form_state->setError($form['area_id'], $this->t(
           'Area id must contain only lowercase letters, numbers, or underscores.'
@@ -128,8 +134,8 @@ abstract class AreaPluginBase extends HandlerBase {
   public function submitOptionsForm(&$form, FormStateInterface $form_state) {
     $current_area_id = $form_state->get('id');
 
-    if ($form_state->getValue(['options', 'area_id']) != $current_area_id) {
-      $this->options['new_id'] = $form_state->getValue(['options', 'area_id']);
+    if ($form_state->getValue(['options', 'area_id', 'area_id']) != $current_area_id) {
+      $this->options['new_id'] = $form_state->getValue(['options', 'area_id', 'area_id']);
     }
     else {
       unset($this->options['new_id']);

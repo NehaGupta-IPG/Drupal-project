@@ -46,7 +46,7 @@ class AreaTest extends ViewTestBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Provides additional Views data for testing.
    */
   protected function viewsData() {
     $data = parent::viewsData();
@@ -96,11 +96,11 @@ class AreaTest extends ViewTestBase {
       }
 
       // Test that the editable machine id input is accessible.
-      $this->assertSession()->fieldExists('options[area_id]');
+      $this->assertSession()->fieldExists('options[area_id][area_id]');
 
       // Change the machine name.
       $new_id = $this->randomMachineName();
-      $this->submitForm(['options[area_id]' => $new_id], 'Apply');
+      $this->submitForm(['options[area_id][area_id]' => $new_id], 'Apply');
 
       // Save the view, and test the new ID has been saved.
       $this->submitForm([], 'Save');
