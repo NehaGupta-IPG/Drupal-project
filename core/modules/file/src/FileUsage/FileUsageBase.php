@@ -3,20 +3,12 @@
 namespace Drupal\file\FileUsage;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\File\Exception\FileException;
-use Drupal\Core\File\FileSystemInterface;
-use Drupal\Core\Utility\Error;
 use Drupal\file\FileInterface;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\NullLogger;
 
 /**
  * Defines the base class for database file usage backend.
  */
-abstract class FileUsageBase implements FileUsageInterface, LoggerAwareInterface {
-
-  use LoggerAwareTrait;
+abstract class FileUsageBase implements FileUsageInterface {
 
   /**
    * The config factory.
@@ -26,22 +18,13 @@ abstract class FileUsageBase implements FileUsageInterface, LoggerAwareInterface
   protected $configFactory;
 
   /**
-   * The file system service.
+   * Creates a FileUsageBase object.
    *
-   * @var \Drupal\Core\File\FileSystemInterface
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory.
    */
-  protected FileSystemInterface $fileSystem;
-
-  public function __construct(
-    protected ConfigFactoryInterface $config_factory,
-    ?FileSystemInterface $file_system = NULL,
-  ) {
-    if ($file_system === NULL) {
-      @trigger_error('The $fileSystem argument to ' . __METHOD__ . '() is required in drupal:11.3.0.', E_USER_DEPRECATED);
-      $file_system = \Drupal::service(FileSystemInterface::class);
-    }
-    $this->fileSystem = $file_system;
-    $this->setLogger(new NullLogger());
+  public function __construct(ConfigFactoryInterface $config_factory) {
+    $this->configFactory = $config_factory;
   }
 
   /**
@@ -59,28 +42,18 @@ abstract class FileUsageBase implements FileUsageInterface, LoggerAwareInterface
    * {@inheritdoc}
    */
   public function delete(FileInterface $file, $module, $type = NULL, $id = NULL, $count = 1) {
-    $set_temporary = $this->configFactory->get('file.settings')
-      ->get('make_unused_managed_files_temporary');
+    // Do not actually mark files as temporary when the behavior is disabled.
+    $set_temporary = $this->configFactory->get('file.settings')->get('make_unused_managed_files_temporary');
 
+    // If there are no more remaining usages of this file, mark it as temporary,
+    // which result in a delete through system_cron().
     $usage = \Drupal::service('file.usage')->listUsage($file);
-    if ($usage) {
-      return;
-    }
-
-    if ($set_temporary) {
-      // Mark the file as temporary, which will result in it being deleted by
-      // system_cron().
-      $file->setTemporary();
-      $file->save();
-    }
-    else {
-      try {
-        $this->fileSystem->delete($file->getFileUri());
+    if (empty($usage)) {
+      if ($set_temporary) {
+        $file->setTemporary();
+        $file->save();
       }
-      catch (FileException $e) {
-        Error::logException($this->logger, $e);
-      }
-      finally {
+      else {
         $file->delete();
       }
     }

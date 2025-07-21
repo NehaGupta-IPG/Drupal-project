@@ -12,6 +12,8 @@ services:
     arguments: ['@config.factory', '@database', 'file_usage']
     tags:
       - { name: backend_overridable }
+    calls:
+      - [setLogger', ['@logger.channel.default']]
   Drupal\file\FileUsage\FileUsageInterface: '@file.usage'
   file.upload_handler:
     class: Drupal\file\Upload\FileUploadHandler
