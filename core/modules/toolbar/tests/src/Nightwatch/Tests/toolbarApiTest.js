@@ -263,6 +263,23 @@ module.exports = {
     extendLink.assert.visible(
       'The Manage tray is open again by pressing SPACE',
     );
+
+    // Does *not* toggle with `keydown` event.
+    browser.execute(
+      function (id) {
+        document.querySelector(`#${id}`).dispatchEvent(
+          new KeyboardEvent('keydown', {
+            key: ' ',
+            bubbles: true,
+          }),
+        );
+      },
+      [manageLink.getAttribute('id')],
+    );
+
+    extendLink.assert.visible(
+      'The Manage tray is still open after an explicit keydown event with SPACE',
+    );
   },
   'Toggle tray with ENTER key': (browser) => {
     // Scroll check is not necessary with ENTER because the browser fires
