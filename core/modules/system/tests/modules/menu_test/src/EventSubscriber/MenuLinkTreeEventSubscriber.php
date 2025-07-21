@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\menu_test\EventSubscriber;
 
-use Drupal\Core\Menu\MenuLinkTreeEvents;
 use Drupal\Core\Menu\MenuLinkTreeManipulatorsAlterEvent;
 use Drupal\menu_test\MenuLinkManipulators;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -32,7 +31,7 @@ class MenuLinkTreeEventSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents(): array {
     return [
-      MenuLinkTreeEvents::ALTER_MANIPULATORS => ['alterMenuLinkManipulators'],
+      MenuLinkTreeManipulatorsAlterEvent::class => ['alterMenuLinkManipulators'],
     ];
   }
 
