@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\menu_link_content\Kernel\Plugin\migrate\source\d6;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -203,7 +205,7 @@ class MenuLinkTranslationTest extends MigrateSqlSourceTestBase {
       ],
     ];
 
-    $test[0]['expected_results'] = [
+    $test[0]['expected_data'] = [
       [
         'menu_name' => 'menu-test-menu',
         'mlid' => 139,

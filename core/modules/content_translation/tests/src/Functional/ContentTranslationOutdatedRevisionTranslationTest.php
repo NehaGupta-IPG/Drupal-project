@@ -31,7 +31,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
   /**
    * Tests that outdated revision translations work correctly.
    */
-  public function testFlagAsOutdatedHidden() {
+  public function testFlagAsOutdatedHidden(): void {
     // Create a test node.
     $values = [
       'title' => 'Test 1.1 EN',

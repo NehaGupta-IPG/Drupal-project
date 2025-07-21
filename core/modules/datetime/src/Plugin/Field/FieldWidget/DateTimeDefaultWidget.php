@@ -3,23 +3,23 @@
 namespace Drupal\datetime\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\ElementInfoManagerInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'datetime_default' widget.
- *
- * @FieldWidget(
- *   id = "datetime_default",
- *   label = @Translation("Date and time"),
- *   field_types = {
- *     "datetime"
- *   }
- * )
  */
+#[FieldWidget(
+  id: 'datetime_default',
+  label: new TranslatableMarkup('Date and time'),
+  field_types: ['datetime'],
+)]
 class DateTimeDefaultWidget extends DateTimeWidgetBase {
 
   /**
@@ -32,8 +32,8 @@ class DateTimeDefaultWidget extends DateTimeWidgetBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityStorageInterface $date_storage) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ElementInfoManagerInterface $elementInfoManager, EntityStorageInterface $date_storage) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $elementInfoManager);
 
     $this->dateStorage = $date_storage;
   }
@@ -48,7 +48,8 @@ class DateTimeDefaultWidget extends DateTimeWidgetBase {
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['third_party_settings'],
-      $container->get('entity_type.manager')->getStorage('date_format')
+      $container->get('plugin.manager.element_info'),
+      $container->get('entity_type.manager')->getStorage('date_format'),
     );
   }
 

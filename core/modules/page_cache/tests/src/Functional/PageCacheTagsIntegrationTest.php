@@ -34,8 +34,7 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
   protected $defaultTheme = 'olivero';
 
   /**
-   * Modules to enable.
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'big_pipe',
@@ -62,7 +61,7 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
   /**
    * Tests that cache tags are properly bubbled up to the page level.
    */
-  public function testPageCacheTags() {
+  public function testPageCacheTags(): void {
     $config = $this->config('language.types');
     $config->set('configurable', [LanguageInterface::TYPE_INTERFACE, LanguageInterface::TYPE_CONTENT]);
     $config->set('negotiation.language_content.enabled', [
@@ -156,10 +155,10 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
       'config:block.block.olivero_messages',
       'config:block.block.olivero_primary_local_tasks',
       'config:block.block.olivero_secondary_local_tasks',
-      'config:block.block.olivero_syndicate',
       'config:block.block.olivero_primary_admin_actions',
       'config:block.block.olivero_page_title',
       'node_view',
+      'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form',
       'node:' . $node_1->id(),
       'user:' . $author_1->id(),
       'config:filter.format.basic_html',
@@ -195,10 +194,10 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
       'config:block.block.olivero_messages',
       'config:block.block.olivero_primary_local_tasks',
       'config:block.block.olivero_secondary_local_tasks',
-      'config:block.block.olivero_syndicate',
       'config:block.block.olivero_primary_admin_actions',
       'config:block.block.olivero_page_title',
       'node_view',
+      'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form',
       'node:' . $node_2->id(),
       'user:' . $author_2->id(),
       'config:filter.format.full_html',

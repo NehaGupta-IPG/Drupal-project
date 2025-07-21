@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Installer;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Verifies that the installer uses the profile's site configuration.
- *
- * @group Installer
  */
+#[Group('Installer')]
 class InstallerSiteConfigProfileTest extends InstallerTestBase {
 
   /**
@@ -61,7 +62,7 @@ class InstallerSiteConfigProfileTest extends InstallerTestBase {
   /**
    * Verify the correct site config was set.
    */
-  public function testInstaller() {
+  public function testInstaller(): void {
     $this->assertEquals(self::EXPECTED_SITE_MAIL, $this->config('system.site')->get('mail'));
     $this->assertEquals(self::EXPECTED_TIMEZONE, $this->config('system.date')->get('timezone.default'));
   }

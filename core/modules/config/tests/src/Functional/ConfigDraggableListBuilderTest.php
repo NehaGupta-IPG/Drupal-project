@@ -28,7 +28,7 @@ class ConfigDraggableListBuilderTest extends BrowserTestBase {
   /**
    * Tests draggable lists.
    */
-  public function testDraggableList() {
+  public function testDraggableList(): void {
     $this->drupalLogin($this->drupalCreateUser(['administer permissions']));
 
     // Create more than 50 roles.
@@ -40,7 +40,7 @@ class ConfigDraggableListBuilderTest extends BrowserTestBase {
       $role->save();
     }
 
-    // Navigate to Roles page
+    // Navigate to Roles page.
     $this->drupalGet('admin/people/roles');
 
     // Test for the page title.

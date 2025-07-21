@@ -13,6 +13,9 @@ use Drupal\Tests\BrowserTestBase;
  */
 class ContentTranslationEntityBundleUITest extends BrowserTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = [
     'language',
     'content_translation',
@@ -43,7 +46,7 @@ class ContentTranslationEntityBundleUITest extends BrowserTestBase {
   /**
    * Tests content types default translation behavior.
    */
-  public function testContentTypeUI() {
+  public function testContentTypeUI(): void {
     // Create first content type.
     $this->drupalCreateContentType(['type' => 'article']);
     // Enable content translation.

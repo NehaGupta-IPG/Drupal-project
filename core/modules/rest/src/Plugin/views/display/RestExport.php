@@ -10,6 +10,8 @@ use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\State\StateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\views\Attribute\ViewsDisplay;
 use Drupal\views\Plugin\views\display\ResponseDisplayPluginInterface;
 use Drupal\views\Render\ViewsRenderPipelineMarkup;
 use Drupal\views\ViewExecutable;
@@ -22,16 +24,15 @@ use Symfony\Component\Routing\RouteCollection;
  * The plugin that handles Data response callbacks for REST resources.
  *
  * @ingroup views_display_plugins
- *
- * @ViewsDisplay(
- *   id = "rest_export",
- *   title = @Translation("REST export"),
- *   help = @Translation("Create a REST export resource."),
- *   uses_route = TRUE,
- *   admin = @Translation("REST export"),
- *   returns_response = TRUE
- * )
  */
+#[ViewsDisplay(
+  id: "rest_export",
+  title: new TranslatableMarkup("REST export"),
+  help: new TranslatableMarkup("Create a REST export resource."),
+  admin: new TranslatableMarkup("REST export"),
+  uses_route: TRUE,
+  returns_response: TRUE
+)]
 class RestExport extends PathPluginBase implements ResponseDisplayPluginInterface {
 
   /**
@@ -107,7 +108,7 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
@@ -153,7 +154,7 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
   /**
    * {@inheritdoc}
    */
-  public function initDisplay(ViewExecutable $view, array &$display, array &$options = NULL) {
+  public function initDisplay(ViewExecutable $view, array &$display, ?array &$options = NULL) {
     parent::initDisplay($view, $display, $options);
 
     // If the default 'json' format is not selected as a format option in the
@@ -263,7 +264,8 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
     $options['defaults']['default']['style'] = FALSE;
     $options['defaults']['default']['row'] = FALSE;
 
-    // Remove css/exposed form settings, as they are not used for the data display.
+    // Remove css/exposed form settings, as they are not used for the data
+    // display.
     unset($options['exposed_form']);
     unset($options['exposed_block']);
     unset($options['css_class']);

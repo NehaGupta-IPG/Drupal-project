@@ -3,7 +3,6 @@
 namespace Drupal\Core\DependencyInjection;
 
 use Drupal\Component\DependencyInjection\ContainerInterface;
-use Drupal\Component\DependencyInjection\ServiceIdHashTrait;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder as SymfonyContainerBuilder;
 use Symfony\Component\DependencyInjection\Container as SymfonyContainer;
@@ -19,12 +18,10 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInterface {
 
-  use ServiceIdHashTrait;
-
   /**
    * {@inheritdoc}
    */
-  public function __construct(ParameterBagInterface $parameterBag = NULL) {
+  public function __construct(?ParameterBagInterface $parameterBag = NULL) {
     parent::__construct($parameterBag);
     $this->setResourceTracking(FALSE);
   }
@@ -78,7 +75,7 @@ class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInter
   /**
    * {@inheritdoc}
    */
-  public function __sleep() {
+  public function __sleep(): array {
     assert(FALSE, 'The container was serialized.');
     return array_keys(get_object_vars($this));
   }

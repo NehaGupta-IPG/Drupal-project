@@ -31,7 +31,7 @@ class Action extends Plugin {
    * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $category
    *   (optional) The category under which the action should be listed in the
    *   UI.
-   * @param string|null $deriver
+   * @param class-string|null $deriver
    *   (optional) The deriver class.
    * @param string|null $confirm_form_route_name
    *   (optional) The route name for a confirmation form for this action.
@@ -45,7 +45,7 @@ class Action extends Plugin {
     public readonly ?TranslatableMarkup $category = NULL,
     public readonly ?string $deriver = NULL,
     public readonly ?string $confirm_form_route_name = NULL,
-    public readonly ?string $type = NULL
+    public readonly ?string $type = NULL,
   ) {}
 
 }

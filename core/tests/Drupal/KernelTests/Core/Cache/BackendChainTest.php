@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Cache;
 
 use Drupal\Component\Datetime\TimeInterface;
@@ -13,6 +15,9 @@ use Drupal\Core\Cache\MemoryBackend;
  */
 class BackendChainTest extends GenericCacheBackendUnitTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected function createCacheBackend($bin) {
     $chain = new BackendChain();
 

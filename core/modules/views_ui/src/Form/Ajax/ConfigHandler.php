@@ -49,7 +49,7 @@ class ConfigHandler extends ViewsFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, Request $request = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?Request $request = NULL) {
     /** @var \Drupal\views\Entity\View $view */
     $view = $form_state->get('view');
     $display_id = $form_state->get('display_id');
@@ -94,13 +94,13 @@ class ConfigHandler extends ViewsFormBase {
         $relationship_options = [];
 
         foreach ($relationships as $relationship) {
-          // relationships can't link back to self. But also, due to ordering,
+          // Relationships can't link back to self. But also, due to ordering,
           // relationships can only link to prior relationships.
           if ($type == 'relationship' && $id == $relationship['id']) {
             break;
           }
           $relationship_handler = Views::handlerManager('relationship')->getHandler($relationship);
-          // ignore invalid/broken relationships.
+          // Ignore invalid/broken relationships.
           if (empty($relationship_handler)) {
             continue;
           }
@@ -244,7 +244,7 @@ class ConfigHandler extends ViewsFormBase {
     // extra stuff on the form is not sent through.
     $handler->unpackOptions($handler->options, $options, NULL, FALSE);
 
-    // Store the item back on the view
+    // Store the item back on the view.
     $executable->setHandler($display_id, $type, $id, $handler->options);
 
     // Ensure any temporary options are removed.
@@ -252,7 +252,7 @@ class ConfigHandler extends ViewsFormBase {
       unset($view->temporary_options[$type][$id]);
     }
 
-    // Write to cache
+    // Write to cache.
     $view->cacheSet();
   }
 
@@ -264,7 +264,7 @@ class ConfigHandler extends ViewsFormBase {
     $display_id = $form_state->get('display_id');
     $type = $form_state->get('type');
     $id = $form_state->get('id');
-    // Store the item back on the view
+    // Store the item back on the view.
     [$was_defaulted, $is_defaulted] = $view->getOverrideValues($form, $form_state);
     $executable = $view->getExecutable();
     // If the display selection was changed toggle the override value.
@@ -274,7 +274,7 @@ class ConfigHandler extends ViewsFormBase {
     }
     $executable->removeHandler($display_id, $type, $id);
 
-    // Write to cache
+    // Write to cache.
     $view->cacheSet();
   }
 

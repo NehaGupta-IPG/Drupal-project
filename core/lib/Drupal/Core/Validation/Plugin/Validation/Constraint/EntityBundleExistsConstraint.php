@@ -4,21 +4,22 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
-use Symfony\Component\Validator\Constraint;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Validation\Attribute\Constraint;
+use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
 /**
  * Checks if a bundle exists on a certain content entity type.
  *
  * This differs from the `Bundle` constraint in that checks that the validated
  * value is the *name of a bundle* of a particular entity type.
- *
- * @Constraint(
- *   id = "EntityBundleExists",
- *   label = @Translation("Entity bundle exists", context = "Validation"),
- *   type = "entity",
- * )
  */
-class EntityBundleExistsConstraint extends Constraint {
+#[Constraint(
+  id: 'EntityBundleExists',
+  label: new TranslatableMarkup('Entity bundle exists', [], ['context' => 'Validation']),
+  type: 'entity'
+)]
+class EntityBundleExistsConstraint extends SymfonyConstraint {
 
   /**
    * The error message if validation fails.
@@ -32,23 +33,23 @@ class EntityBundleExistsConstraint extends Constraint {
    *
    * This can contain variable values (e.g., `%parent`) that will be replaced.
    *
-   * @see \Drupal\Core\Config\Schema\TypeResolver::replaceVariable()
-   *
    * @var string
+   *
+   * @see \Drupal\Core\Config\Schema\TypeResolver::replaceVariable()
    */
   public string $entityTypeId;
 
   /**
    * {@inheritdoc}
    */
-  public function getDefaultOption() {
+  public function getDefaultOption(): ?string {
     return 'entityTypeId';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getRequiredOptions() {
+  public function getRequiredOptions(): array {
     return ['entityTypeId'];
   }
 

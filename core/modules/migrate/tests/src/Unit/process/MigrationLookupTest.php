@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit\process;
 
-use Drupal\migrate\MigrateException;
+use Drupal\migrate\MigrateSkipRowException;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\process\MigrationLookup;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
@@ -20,7 +20,7 @@ class MigrationLookupTest extends MigrationLookupTestCase {
   /**
    * @covers ::transform
    */
-  public function testTransformWithStubSkipping() {
+  public function testTransformWithStubSkipping(): void {
     $migration_plugin = $this->prophesize(MigrationInterface::class);
     $migration_plugin_manager = $this->prophesize(MigrationPluginManagerInterface::class);
 
@@ -48,8 +48,10 @@ class MigrationLookupTest extends MigrationLookupTestCase {
 
   /**
    * @covers ::transform
+   *
+   * @dataProvider providerTestTransformWithStubbing
    */
-  public function testTransformWithStubbing() {
+  public function testTransformWithStubbing($exception_class, $exception_message, $expected_message): void {
     $migration_plugin = $this->prophesize(MigrationInterface::class);
     $this->migrateLookup->lookup('destination_migration', [1])->willReturn(NULL);
     $this->migrateStub->createStub('destination_migration', [1], [], FALSE)->willReturn([2]);
@@ -63,11 +65,35 @@ class MigrationLookupTest extends MigrationLookupTestCase {
     $result = $migration->transform(1, $this->migrateExecutable, $this->row, '');
     $this->assertEquals(2, $result);
 
-    $this->migrateStub->createStub('destination_migration', [1], [], FALSE)->willThrow(new \Exception('Oh noes!'));
+    $this->migrateStub->createStub('destination_migration', [1], [], FALSE)->willThrow(new $exception_class($exception_message));
     $migration = MigrationLookup::create($this->prepareContainer(), $configuration, '', [], $migration_plugin->reveal());
-    $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage('Exception was thrown while attempting to stub: Oh noes!');
+    $this->expectException($exception_class);
+    $this->expectExceptionMessage($expected_message);
     $migration->transform(1, $this->migrateExecutable, $this->row, '');
+
+  }
+
+  /**
+   * Provides data for testTransformWithStubbing().
+   */
+  public static function providerTestTransformWithStubbing(): array {
+    return [
+      [
+        \Exception::class,
+        'Oh noes!',
+        'Exception was thrown while attempting to stub: Oh noes!',
+      ],
+      [
+        MigrateSkipRowException::class,
+        'Oh noes!',
+        "Migration lookup for destination '' attempted to create a stub using migration destination_migration, which resulted in a row skip, with message 'Oh noes!'",
+      ],
+      [
+        MigrateSkipRowException::class,
+        '',
+        "Migration lookup for destination '' attempted to create a stub using migration destination_migration, which resulted in a row skip",
+      ],
+    ];
   }
 
   /**
@@ -78,7 +104,7 @@ class MigrationLookupTest extends MigrationLookupTestCase {
    *
    * @dataProvider skipInvalidDataProvider
    */
-  public function testSkipInvalid($value) {
+  public function testSkipInvalid($value): void {
     $migration_plugin = $this->prophesize(MigrationInterface::class);
     $migration_plugin_manager = $this->prophesize(MigrationPluginManagerInterface::class);
 
@@ -117,7 +143,7 @@ class MigrationLookupTest extends MigrationLookupTestCase {
    *
    * @dataProvider noSkipValidDataProvider
    */
-  public function testNoSkipValid($value) {
+  public function testNoSkipValid($value): void {
     $migration_plugin = $this->prophesize(MigrationInterface::class);
     $migration_plugin_manager = $this->prophesize(MigrationPluginManagerInterface::class);
     $id_map = $this->prophesize(MigrateIdMapInterface::class);
@@ -169,7 +195,7 @@ class MigrationLookupTest extends MigrationLookupTestCase {
    *
    * @dataProvider successfulLookupDataProvider
    */
-  public function testSuccessfulLookup(array $source_id_values, array $destination_id_values, $source_value, $expected_value) {
+  public function testSuccessfulLookup(array $source_id_values, array $destination_id_values, $source_value, $expected_value): void {
     $migration_plugin = $this->prophesize(MigrationInterface::class);
     $this->migrateLookup->lookup('foo', $source_id_values)->willReturn([$destination_id_values]);
 
@@ -250,7 +276,7 @@ class MigrationLookupTest extends MigrationLookupTestCase {
   /**
    * Tests processing multiple source IDs.
    */
-  public function testMultipleSourceIds() {
+  public function testMultipleSourceIds(): void {
     $migration_plugin = $this->prophesize(MigrationInterface::class);
     $this->migrateLookup->lookup('foo', ['id', 6])->willReturn([[2]]);
     $configuration = [
@@ -264,7 +290,7 @@ class MigrationLookupTest extends MigrationLookupTestCase {
   /**
    * Tests processing multiple migrations and source IDs.
    */
-  public function testMultipleMigrations() {
+  public function testMultipleMigrations(): void {
     $migration_plugin = $this->prophesize(MigrationInterface::class);
     $this->migrateLookup->lookup('example', [1])->willReturn([[2]]);
     $this->migrateLookup->lookup('example', [2])->willReturn([]);

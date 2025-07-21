@@ -14,9 +14,7 @@ use Drupal\Tests\views\Functional\ViewTestBase;
 class ViewsFormTest extends ViewTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['action_bulk_test'];
 
@@ -28,7 +26,7 @@ class ViewsFormTest extends ViewTestBase {
   /**
    * Tests the Views form wrapper.
    */
-  public function testFormWrapper() {
+  public function testFormWrapper(): void {
     $this->drupalGet('test_bulk_form');
     // Ensure we have the form tag on the page.
     $xpath = $this->cssSelect('.views-form form');

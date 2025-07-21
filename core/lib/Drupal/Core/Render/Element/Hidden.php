@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Render\Element;
 
+use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 
 /**
@@ -10,34 +11,35 @@ use Drupal\Core\Render\Element;
  * Specify either #default_value or #value but not both.
  *
  * Properties:
- * - #default_value: The initial value of the form element. JavaScript may
+ *
+ * @property $default_value
+ *   The initial value of the form element. JavaScript may
  *   alter the value prior to submission.
- * - #value: The value of the form element. The Form API ensures that this
+ * @property $value
+ *   The value of the form element. The Form API ensures that this
  *   value remains unchanged by the browser.
  *
  * Usage example:
  * @code
- * $form['entity_id'] = array('#type' => 'hidden', '#value' => $entity_id);
+ * $form['entity_id'] = ['#type' => 'hidden', '#value' => $entity_id];
  * @endcode
  *
  * @see \Drupal\Core\Render\Element\Value
- *
- * @FormElement("hidden")
  */
-class Hidden extends FormElement {
+#[FormElement('hidden')]
+class Hidden extends FormElementBase {
 
   /**
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#process' => [
-        [$class, 'processAjaxForm'],
+        [static::class, 'processAjaxForm'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderHidden'],
+        [static::class, 'preRenderHidden'],
       ],
       '#theme' => 'input__hidden',
     ];

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\FunctionalJavascript\Form;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the tableselect form element for expected behavior.
- *
- * @group Form
  */
+#[Group('Form')]
 class ElementsTableSelectTest extends WebDriverTestBase {
 
   /**
@@ -26,7 +26,7 @@ class ElementsTableSelectTest extends WebDriverTestBase {
   /**
    * Tests the presence of ajax functionality for all options.
    */
-  public function testAjax() {
+  public function testAjax(): void {
     // Test checkboxes (#multiple == TRUE).
     $this->drupalGet('form_test/tableselect/multiple-true');
     $session = $this->getSession();
@@ -51,7 +51,7 @@ class ElementsTableSelectTest extends WebDriverTestBase {
       $this->click($row);
       $this->assertSession()->assertWaitOnAjaxRequest();
       $page->hasCheckedField($row);
-      // Check other rows are not checked
+      // Check other rows are not checked.
       for ($j = 1; $j <= 3; $j++) {
         if ($j == $i) {
           continue;
@@ -65,7 +65,7 @@ class ElementsTableSelectTest extends WebDriverTestBase {
   /**
    * Tests table select with disabled rows.
    */
-  public function testDisabledRows() {
+  public function testDisabledRows(): void {
     // Asserts that a row number (1 based) is enabled.
     $assert_row_enabled = function ($delta) {
       $row = $this->assertSession()->elementExists('xpath', "//table/tbody/tr[$delta]");

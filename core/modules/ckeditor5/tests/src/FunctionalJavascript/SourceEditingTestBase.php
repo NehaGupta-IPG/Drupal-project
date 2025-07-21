@@ -8,7 +8,7 @@ use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
-use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 // cspell:ignore sourceediting
 
@@ -87,6 +87,7 @@ abstract class SourceEditingTestBase extends CKEditor5TestBase {
             'properties' => [
               'reversed' => FALSE,
               'startIndex' => FALSE,
+              'styles' => FALSE,
             ],
             'multiBlock' => TRUE,
           ],
@@ -97,7 +98,7 @@ abstract class SourceEditingTestBase extends CKEditor5TestBase {
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolation $v) {
+      function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(

@@ -15,9 +15,7 @@ use Drupal\Tests\BrowserTestBase;
 class EmailTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['form_test'];
 
@@ -29,7 +27,7 @@ class EmailTest extends BrowserTestBase {
   /**
    * Tests that #type 'email' fields are properly validated.
    */
-  public function testFormEmail() {
+  public function testFormEmail(): void {
     $edit = [];
     $edit['email'] = 'invalid';
     $edit['email_required'] = ' ';

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block_content\Kernel\Migrate\d6;
 
 use Drupal\block_content\Entity\BlockContent;
@@ -36,7 +38,7 @@ class MigrateBlockContentTest extends MigrateDrupal6TestBase {
   /**
    * Tests the Drupal 6 content block to Drupal 8 migration.
    */
-  public function testBlockMigration() {
+  public function testBlockMigration(): void {
     /** @var \Drupal\block_content\Entity\BlockContent $block */
     $block = BlockContent::load(1);
     $this->assertSame('My block 1', $block->label());

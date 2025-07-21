@@ -8,12 +8,12 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests AJAX-enabled forms when multiple instances of the form are on a page.
- *
- * @group Ajax
  */
+#[Group('Ajax')]
 class MultiFormTest extends WebDriverTestBase {
 
   /**
@@ -58,7 +58,7 @@ class MultiFormTest extends WebDriverTestBase {
   /**
    * Tests that pages with the 'node_page_form' included twice work correctly.
    */
-  public function testMultiForm() {
+  public function testMultiForm(): void {
     // HTML IDs for elements within the field are potentially modified with
     // each Ajax submission, but these variables are stable and help target the
     // desired elements.
@@ -91,7 +91,7 @@ class MultiFormTest extends WebDriverTestBase {
 
     for ($i = 0; $i < 2; $i++) {
       $forms = $page->findAll('xpath', $form_xpath);
-      foreach ($forms as $offset => $form) {
+      foreach ($forms as $form) {
         $button = $form->findButton('Add another item');
         $this->assertNotNull($button, 'Add Another Item button exists');
         $button->press();

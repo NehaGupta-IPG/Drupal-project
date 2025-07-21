@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Theme;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -15,9 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 class ImageTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system'];
 
@@ -53,14 +53,14 @@ class ImageTest extends KernelTestBase {
 
     $this->testImages = [
       'core/misc/druplicon.png',
-      'core/misc/loading.gif',
+      'core/misc/loading.svg',
     ];
   }
 
   /**
    * Tests that an image with the sizes attribute is output correctly.
    */
-  public function testThemeImageWithSizes() {
+  public function testThemeImageWithSizes(): void {
     // Test with multipliers.
     $sizes = '(max-width: ' . rand(10, 30) . 'em) 100vw, (max-width: ' . rand(30, 50) . 'em) 50vw, 30vw';
     $image = [
@@ -81,7 +81,7 @@ class ImageTest extends KernelTestBase {
   /**
    * Tests that an image with the src attribute is output correctly.
    */
-  public function testThemeImageWithSrc() {
+  public function testThemeImageWithSrc(): void {
 
     $image = [
       '#theme' => 'image',
@@ -100,7 +100,7 @@ class ImageTest extends KernelTestBase {
   /**
    * Tests that an image with the srcset and multipliers is output correctly.
    */
-  public function testThemeImageWithSrcsetMultiplier() {
+  public function testThemeImageWithSrcsetMultiplier(): void {
     // Test with multipliers.
     $image = [
       '#theme' => 'image',
@@ -128,7 +128,7 @@ class ImageTest extends KernelTestBase {
   /**
    * Tests that an image with the srcset and widths is output correctly.
    */
-  public function testThemeImageWithSrcsetWidth() {
+  public function testThemeImageWithSrcsetWidth(): void {
     // Test with multipliers.
     $widths = [
       rand(0, 500) . 'w',

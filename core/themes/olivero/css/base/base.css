@@ -27,7 +27,6 @@ html {
 body {
   margin: 0;
   word-wrap: break-word;
-  -webkit-hyphens: auto;
   hyphens: auto;
   color: var(--color-text-neutral-medium);
   background-color: var(--color--gray-100);
@@ -156,6 +155,5 @@ ul {
   margin-inline-start: 1.5em;
   margin-inline-end: 0;
   padding-inline-start: 0;
-  list-style-type: disc;
   list-style-image: none;
 }

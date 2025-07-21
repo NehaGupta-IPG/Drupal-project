@@ -88,7 +88,7 @@ class EntityFilteringThemeTest extends BrowserTestBase {
     $listing = new ExtensionDiscovery(\Drupal::root());
     $this->themes = $listing->scan('theme', FALSE);
     /** @var \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler */
-    $theme_data = \Drupal::service('theme_handler')->rebuildThemeData();
+    $theme_data = \Drupal::service('extension.list.theme')->reset()->getList();
     foreach (array_keys($this->themes) as $theme) {
       // Skip obsolete and deprecated themes.
       $info = $theme_data[$theme]->info;
@@ -140,7 +140,7 @@ class EntityFilteringThemeTest extends BrowserTestBase {
   /**
    * Checks each themed entity for XSS filtering in available themes.
    */
-  public function testThemedEntity() {
+  public function testThemedEntity(): void {
     // Check paths where various view modes of the entities are rendered.
     $paths = [
       'user',

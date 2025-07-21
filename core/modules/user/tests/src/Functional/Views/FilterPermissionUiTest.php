@@ -22,9 +22,7 @@ class FilterPermissionUiTest extends ViewTestBase {
   public static $testViews = ['test_filter_permission'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['user', 'user_test_views', 'views_ui'];
 
@@ -45,7 +43,7 @@ class FilterPermissionUiTest extends ViewTestBase {
   /**
    * Tests basic filter handler settings in the UI.
    */
-  public function testHandlerUI() {
+  public function testHandlerUI(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'administer views',
       'administer users',

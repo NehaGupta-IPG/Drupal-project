@@ -5,6 +5,7 @@ namespace Drupal\Core\Render\Element;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Html as HtmlUtility;
 use Drupal\Core\Form\FormHelper;
+use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url as CoreUrl;
@@ -13,8 +14,11 @@ use Drupal\Core\Url as CoreUrl;
  * Provides a link render element.
  *
  * Properties:
- * - #title: The link text.
- * - #url: \Drupal\Core\Url object containing URL information pointing to an
+ *
+ * @property $title
+ *   The link text.
+ * @property $url
+ *   \Drupal\Core\Url object containing URL information pointing to an
  *   internal or external link. See \Drupal\Core\Utility\LinkGeneratorInterface.
  *
  * Usage example:
@@ -25,19 +29,17 @@ use Drupal\Core\Url as CoreUrl;
  *   '#url' => \Drupal\Core\Url::fromRoute('examples.description')
  * ];
  * @endcode
- *
- * @RenderElement("link")
  */
-class Link extends RenderElement {
+#[RenderElement('link')]
+class Link extends RenderElementBase {
 
   /**
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#pre_render' => [
-        [$class, 'preRenderLink'],
+        [static::class, 'preRenderLink'],
       ],
     ];
   }
@@ -68,10 +70,13 @@ class Link extends RenderElement {
     // in #options.
     $element += ['#options' => []];
     // However, within the scope of renderable elements, #attributes is a valid
-    // way to specify attributes, too. Take them into account, but do not override
-    // attributes from #options.
+    // way to specify attributes, too. Take them into account, but do not
+    // override attributes from #options. Merge class as a string or array.
     if (isset($element['#attributes'])) {
       $element['#options'] += ['attributes' => []];
+      $element_class = $element['#attributes']['class'] ?? [];
+      $option_class = $element['#options']['attributes']['class'] ?? [];
+      $element['#options']['attributes']['class'] = array_merge((array) $option_class, (array) $element_class);
       $element['#options']['attributes'] += $element['#attributes'];
     }
 
@@ -126,24 +131,24 @@ class Link extends RenderElement {
    * A typical example comes from node links, which are stored in a renderable
    * array similar to this:
    * @code
-   * $build['links'] = array(
+   * $build['links'] = [
    *   '#theme' => 'links__node',
-   *   '#pre_render' => array(Link::class, 'preRenderLinks'),
-   *   'comment' => array(
+   *   '#pre_render' => [Link::class, 'preRenderLinks'],
+   *   'comment' => [
    *     '#theme' => 'links__node__comment',
-   *     '#links' => array(
+   *     '#links' => [
    *       // An array of links associated with node comments, suitable for
    *       // passing in to links.html.twig.
    *     ),
    *   ),
-   *   'translation' => array(
+   *   'translation' => [
    *     '#theme' => 'links__node__translation',
-   *     '#links' => array(
+   *     '#links' => [
    *       // An array of links associated with node translation, suitable for
    *       // passing in to links.html.twig.
-   *     ),
-   *   ),
-   * );
+   *     ],
+   *   ],
+   * ];
    * @endcode
    *
    * In this example, the links are grouped by functionality, which can be

@@ -6,12 +6,12 @@ namespace Drupal\Tests\block\FunctionalJavascript;
 
 use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the JavaScript functionality of the block add filter.
- *
- * @group block
  */
+#[Group('block')]
 class BlockFilterTest extends WebDriverTestBase {
 
   /**
@@ -40,7 +40,7 @@ class BlockFilterTest extends WebDriverTestBase {
   /**
    * Tests block filter.
    */
-  public function testBlockFilter() {
+  public function testBlockFilter(): void {
     $this->drupalGet('admin/structure/block');
     $assertSession = $this->assertSession();
     $session = $this->getSession();
@@ -89,8 +89,9 @@ class BlockFilterTest extends WebDriverTestBase {
    *   An array of node elements.
    *
    * @return \Behat\Mink\Element\NodeElement[]
+   *   An array of visible elements.
    */
-  protected function filterVisibleElements(array $elements) {
+  protected function filterVisibleElements(array $elements): array {
     $elements = array_filter($elements, function (NodeElement $element) {
       return $element->isVisible();
     });

@@ -21,9 +21,7 @@ class ToolbarMenuTranslationTest extends BrowserTestBase {
   protected $adminUser;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'toolbar',
@@ -58,7 +56,7 @@ class ToolbarMenuTranslationTest extends BrowserTestBase {
   /**
    * Tests that toolbar classes don't change when adding a translation.
    */
-  public function testToolbarClasses() {
+  public function testToolbarClasses(): void {
     $langcode = 'es';
 
     // Add Spanish.

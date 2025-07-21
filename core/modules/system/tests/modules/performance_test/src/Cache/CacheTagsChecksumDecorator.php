@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Drupal\performance_test\Cache;
 
 use Drupal\Core\Cache\CacheTagsChecksumInterface;
+use Drupal\Core\Cache\CacheTagsChecksumPreloadInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\performance_test\PerformanceDataCollector;
 
 /**
  * Wraps an existing cache tags checksum invalidator to track calls separately.
  */
-class CacheTagsChecksumDecorator implements CacheTagsChecksumInterface, CacheTagsInvalidatorInterface {
+class CacheTagsChecksumDecorator implements CacheTagsChecksumInterface, CacheTagsInvalidatorInterface, CacheTagsChecksumPreloadInterface {
 
   public function __construct(protected readonly CacheTagsChecksumInterface $checksumInvalidator, protected readonly PerformanceDataCollector $performanceDataCollector) {}
 
@@ -28,7 +29,7 @@ class CacheTagsChecksumDecorator implements CacheTagsChecksumInterface, CacheTag
     $start = microtime(TRUE);
     $return = $this->checksumInvalidator->getCurrentChecksum($tags);
     $stop = microtime(TRUE);
-    $this->logCacheTagOperation($tags, $start, $stop, CacheTagOperation::getCurrentChecksum);
+    $this->logCacheTagOperation($tags, $start, $stop, CacheTagOperation::GetCurrentChecksum);
     return $return;
   }
 
@@ -44,7 +45,7 @@ class CacheTagsChecksumDecorator implements CacheTagsChecksumInterface, CacheTag
     $start = microtime(TRUE);
     $return = $this->checksumInvalidator->isValid($checksum, $tags);
     $stop = microtime(TRUE);
-    $this->logCacheTagOperation($tags, $start, $stop, CacheTagOperation::isValid);
+    $this->logCacheTagOperation($tags, $start, $stop, CacheTagOperation::IsValid);
     return $return;
   }
 
@@ -60,7 +61,7 @@ class CacheTagsChecksumDecorator implements CacheTagsChecksumInterface, CacheTag
     $start = microtime(TRUE);
     $return = $this->checksumInvalidator->invalidateTags($tags);
     $stop = microtime(TRUE);
-    $this->logCacheTagOperation($tags, $start, $stop, CacheTagOperation::invalidateTags);
+    $this->logCacheTagOperation($tags, $start, $stop, CacheTagOperation::InvalidateTags);
     return $return;
   }
 
@@ -69,6 +70,13 @@ class CacheTagsChecksumDecorator implements CacheTagsChecksumInterface, CacheTag
    */
   public function reset() {
     $this->checksumInvalidator->reset();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function registerCacheTagsForPreload(array $cache_tags): void {
+    $this->checksumInvalidator->registerCacheTagsForPreload($cache_tags);
   }
 
   /**
@@ -82,8 +90,6 @@ class CacheTagsChecksumDecorator implements CacheTagsChecksumInterface, CacheTag
    *   The stop microtime.
    * @param \Drupal\performance_test\Cache\CacheTagOperation $operation
    *   The type of operation being logged.
-   *
-   * @return void
    */
   protected function logCacheTagOperation(array $tags, float $start, float $stop, CacheTagOperation $operation): void {
     $this->performanceDataCollector->addCacheTagOperation([

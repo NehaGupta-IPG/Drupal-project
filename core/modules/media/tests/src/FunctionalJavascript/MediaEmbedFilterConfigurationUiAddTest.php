@@ -4,18 +4,25 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media\FunctionalJavascript;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+
 /**
- * @covers ::media_filter_format_edit_form_validate
- * @group media
- * @group #slow
+ * Tests Media Embed Filter Configuration Ui Add.
+ *
+ * @legacy-covers ::media_filter_format_edit_form_validate
  */
+#[Group('media')]
+#[Group('#slow')]
 class MediaEmbedFilterConfigurationUiAddTest extends MediaEmbedFilterTestBase {
 
   /**
-   * @covers ::media_form_filter_format_add_form_alter
-   * @dataProvider providerTestValidations
+   * Tests validation when adding.
+   *
+   * @legacy-covers \Drupal\media\Hook\MediaHooks::formFilterFormatAddFormAlter
    */
-  public function testValidationWhenAdding($filter_html_status, $filter_align_status, $filter_caption_status, $filter_html_image_secure_status, $media_embed, $allowed_html, $expected_error_message) {
+  #[DataProvider('providerTestValidations')]
+  public function testValidationWhenAdding($filter_html_status, $filter_align_status, $filter_caption_status, $filter_html_image_secure_status, $media_embed, $allowed_html, $expected_error_message): void {
     $this->drupalGet('admin/config/content/formats/add');
 
     // Enable the `filter_html` and `media_embed` filters.

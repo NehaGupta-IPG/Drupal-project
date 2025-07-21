@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\entity_test\Entity\EntityTestComputedBundleField;
+use Drupal\entity_test\EntityTestHelper;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
@@ -23,9 +26,7 @@ class ComputedBundleFieldTest extends ViewsKernelTestBase {
   public static $testViews = ['computed_bundle_field_view'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test'];
 
@@ -39,13 +40,13 @@ class ComputedBundleFieldTest extends ViewsKernelTestBase {
     $this->installEntitySchema('entity_test_comp_bund_fld');
 
     // Create a default bundle that has a computed field.
-    entity_test_create_bundle('entity_test_comp_bund_fld_bund', NULL, 'entity_test_comp_bund_fld');
+    EntityTestHelper::createBundle('entity_test_comp_bund_fld_bund', NULL, 'entity_test_comp_bund_fld');
 
     // Create a second bundle that also has a computed field.
-    entity_test_create_bundle('entity_test_comp_bund_fld_bund_2', NULL, 'entity_test_comp_bund_fld');
+    EntityTestHelper::createBundle('entity_test_comp_bund_fld_bund_2', NULL, 'entity_test_comp_bund_fld');
 
     // Create a bundle that does not have the computed field.
-    entity_test_create_bundle('entity_test_bundle_no_comp_field', NULL, 'entity_test_comp_bund_fld');
+    EntityTestHelper::createBundle('entity_test_bundle_no_comp_field', NULL, 'entity_test_comp_bund_fld');
 
     ViewTestData::createTestViews(static::class, ['views_test_config']);
 
@@ -74,7 +75,7 @@ class ComputedBundleFieldTest extends ViewsKernelTestBase {
   /**
    * Tests the computed field handler.
    */
-  public function testComputedFieldHandler() {
+  public function testComputedFieldHandler(): void {
     \Drupal::state()->set('entity_test_computed_field_item_list_value', ['computed string']);
     \Drupal::state()->set('entity_test_comp_bund_fld_item_list_value', ['some other string that is also computed']);
 
@@ -84,9 +85,9 @@ class ComputedBundleFieldTest extends ViewsKernelTestBase {
 
     // Entities 1 and 2 should have the computed bundle field. But entity 3
     // should not.
-    $this->assertStringContainsString('some other string that is also computed', $view->field['computed_bundle_field']->render($view->result[0]));
-    $this->assertStringContainsString('some other string that is also computed', $view->field['computed_bundle_field']->render($view->result[1]));
-    $this->assertStringNotContainsString('some other string that is also computed', $view->field['computed_bundle_field']->render($view->result[2]));
+    $this->assertStringContainsString('some other string that is also computed', (string) $view->field['computed_bundle_field']->render($view->result[0]));
+    $this->assertStringContainsString('some other string that is also computed', (string) $view->field['computed_bundle_field']->render($view->result[1]));
+    $this->assertStringNotContainsString('some other string that is also computed', (string) $view->field['computed_bundle_field']->render($view->result[2]));
 
     $view->destroy();
   }

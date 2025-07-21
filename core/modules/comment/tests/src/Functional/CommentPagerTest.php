@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\CommentManagerInterface;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\node\Entity\Node;
 
 /**
@@ -23,7 +22,7 @@ class CommentPagerTest extends CommentTestBase {
   /**
    * Confirms comment paging works correctly with flat and threaded comments.
    */
-  public function testCommentPaging() {
+  public function testCommentPaging(): void {
     $this->drupalLogin($this->adminUser);
 
     // Set comment variables.
@@ -40,8 +39,8 @@ class CommentPagerTest extends CommentTestBase {
 
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.');
 
-    // Set "Comments per page" as zero and verify that all comments are appearing
-    // on the page.
+    // Set "Comments per page" as zero and verify that all comments are
+    // appearing on the page.
     $this->setCommentsPerPage(0);
     $this->drupalGet('node/' . $node->id());
     $this->assertTrue($this->commentExists($comments[0]), 'Comment 1 appears on page.');
@@ -113,7 +112,7 @@ class CommentPagerTest extends CommentTestBase {
   /**
    * Confirms comment paging works correctly with flat and threaded comments.
    */
-  public function testCommentPermalink() {
+  public function testCommentPermalink(): void {
     $this->drupalLogin($this->adminUser);
 
     // Set comment variables.
@@ -145,7 +144,7 @@ class CommentPagerTest extends CommentTestBase {
   /**
    * Tests comment ordering and threading.
    */
-  public function testCommentOrderingThreading() {
+  public function testCommentOrderingThreading(): void {
     $this->drupalLogin($this->adminUser);
 
     // Set comment variables.
@@ -246,7 +245,7 @@ class CommentPagerTest extends CommentTestBase {
   /**
    * Tests calculation of first page with new comment.
    */
-  public function testCommentNewPageIndicator() {
+  public function testCommentNewPageIndicator(): void {
     $this->drupalLogin($this->adminUser);
 
     // Set comment variables.
@@ -288,17 +287,17 @@ class CommentPagerTest extends CommentTestBase {
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.');
 
     $expected_pages = [
-      // Page of comment 5
+      // Page of comment 5.
       1 => 5,
-      // Page of comment 4
+      // Page of comment 4.
       2 => 4,
-      // Page of comment 3
+      // Page of comment 3.
       3 => 3,
-      // Page of comment 2
+      // Page of comment 2.
       4 => 2,
-      // Page of comment 1
+      // Page of comment 1.
       5 => 1,
-      // Page of comment 0
+      // Page of comment 0.
       6 => 0,
     ];
 
@@ -312,17 +311,17 @@ class CommentPagerTest extends CommentTestBase {
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Switched to threaded mode.');
 
     $expected_pages = [
-      // Page of comment 5
+      // Page of comment 5.
       1 => 5,
-      // Page of comment 4
+      // Page of comment 4.
       2 => 1,
-      // Page of comment 4
+      // Page of comment 4.
       3 => 1,
-      // Page of comment 4
+      // Page of comment 4.
       4 => 1,
-      // Page of comment 4
+      // Page of comment 4.
       5 => 1,
-      // Page of comment 0
+      // Page of comment 0.
       6 => 0,
     ];
 
@@ -338,7 +337,7 @@ class CommentPagerTest extends CommentTestBase {
   /**
    * Confirms comment paging works correctly with two pagers.
    */
-  public function testTwoPagers() {
+  public function testTwoPagers(): void {
     // Add another field to article content-type.
     $this->addDefaultCommentField('node', 'article', 'comment_2');
     // Set default to display comment list with unique pager id.
@@ -446,7 +445,7 @@ class CommentPagerTest extends CommentTestBase {
       $url_target = $this->getAbsoluteUrl($urls[$index]->getAttribute('href'));
       return $this->drupalGet($url_target);
     }
-    $this->fail(new FormattableMarkup('Link %label does not exist on @url_before', ['%label' => $xpath, '@url_before' => $url_before]));
+    $this->fail("Link $xpath does not exist on $url_before");
     return FALSE;
   }
 

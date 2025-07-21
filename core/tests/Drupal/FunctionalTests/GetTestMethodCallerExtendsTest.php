@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Test for BrowserTestBase::getTestMethodCaller() in child classes.
- *
- * @group browsertestbase
  */
+#[Group('browsertestbase')]
 class GetTestMethodCallerExtendsTest extends GetTestMethodCallerTest {
 
   /**
@@ -21,7 +21,7 @@ class GetTestMethodCallerExtendsTest extends GetTestMethodCallerTest {
   /**
    * A test method that is not present in the parent class.
    */
-  public function testGetTestMethodCallerChildClass() {
+  public function testGetTestMethodCallerChildClass(): void {
     $method_caller = $this->getTestMethodCaller();
     $expected = [
       'file' => __FILE__,

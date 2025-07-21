@@ -4,33 +4,37 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Component\Render;
 
-use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\Component\Render\PlainTextOutput;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophet;
 
 /**
- * @coversDefaultClass \Drupal\Component\Render\PlainTextOutput
- * @group Utility
+ * Tests Drupal\Component\Render\PlainTextOutput.
  */
+#[CoversClass(PlainTextOutput::class)]
+#[Group('Utility')]
 class PlainTextOutputTest extends TestCase {
 
   /**
    * Tests ::renderFromHtml().
    *
-   * @param $expected
+   * @param string $expected
    *   The expected formatted value.
-   * @param $string
+   * @param string $string
    *   A string to be formatted.
    * @param array $args
    *   (optional) An associative array of replacements to make. Defaults to
    *   none.
    *
-   * @covers ::renderFromHtml
-   * @dataProvider providerRenderFromHtml
+   * @legacy-covers ::renderFromHtml
    */
-  public function testRenderFromHtml($expected, $string, $args = []) {
+  #[DataProvider('providerRenderFromHtml')]
+  public function testRenderFromHtml($expected, $string, $args = []): void {
     $markup = new FormattableMarkup($string, $args);
     $output = PlainTextOutput::renderFromHtml($markup);
     $this->assertSame($expected, $output);

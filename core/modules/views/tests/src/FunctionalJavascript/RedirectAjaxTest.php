@@ -7,12 +7,12 @@ namespace Drupal\Tests\views\FunctionalJavascript;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that the redirects work with Ajax enabled views.
- *
- * @group views
  */
+#[Group('views')]
 class RedirectAjaxTest extends WebDriverTestBase {
 
   use ContentTypeCreationTrait;
@@ -53,7 +53,7 @@ class RedirectAjaxTest extends WebDriverTestBase {
   /**
    * Ensures that redirects work with ajax.
    */
-  public function testRedirectWithAjax() {
+  public function testRedirectWithAjax(): void {
     $this->drupalGet('admin/content');
     $original_url = $this->getSession()->getCurrentUrl();
 

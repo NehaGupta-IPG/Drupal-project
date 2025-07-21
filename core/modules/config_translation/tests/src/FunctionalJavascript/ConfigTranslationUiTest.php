@@ -6,12 +6,12 @@ namespace Drupal\Tests\config_translation\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Translate settings and entities to various languages.
- *
- * @group config_translation
  */
+#[Group('config_translation')]
 class ConfigTranslationUiTest extends WebDriverTestBase {
 
   /**
@@ -33,7 +33,7 @@ class ConfigTranslationUiTest extends WebDriverTestBase {
   /**
    * Tests that contextual link related to views.
    */
-  public function testViewContextualLink() {
+  public function testViewContextualLink(): void {
     $user = $this->drupalCreateUser([
       'translate configuration',
       'access contextual links',
@@ -49,7 +49,7 @@ class ConfigTranslationUiTest extends WebDriverTestBase {
   /**
    * Tests that the add, edit and delete operations open in a modal.
    */
-  public function testConfigTranslationDialog() {
+  public function testConfigTranslationDialog(): void {
     $page = $this->getSession()->getPage();
     ConfigurableLanguage::createFromLangcode('fi')->save();
 

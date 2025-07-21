@@ -7,12 +7,13 @@ namespace Drupal\Tests\system\FunctionalJavascript;
 use Drupal\file\Entity\File;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that theme form settings works correctly.
- *
- * @group system
  */
+#[Group('system')]
 class ThemeSettingsFormTest extends WebDriverTestBase {
 
   use TestFileCreationTrait;
@@ -39,10 +40,9 @@ class ThemeSettingsFormTest extends WebDriverTestBase {
 
   /**
    * Tests that submission handler works correctly.
-   *
-   * @dataProvider providerTestFormSettingsSubmissionHandler
    */
-  public function testFormSettingsSubmissionHandler($theme) {
+  #[DataProvider('providerTestFormSettingsSubmissionHandler')]
+  public function testFormSettingsSubmissionHandler($theme): void {
 
     \Drupal::service('theme_installer')->install([$theme]);
 

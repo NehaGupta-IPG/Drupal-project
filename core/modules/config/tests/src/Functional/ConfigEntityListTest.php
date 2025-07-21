@@ -20,9 +20,7 @@ class ConfigEntityListTest extends BrowserTestBase {
   use RedirectDestinationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'config_test'];
 
@@ -45,7 +43,7 @@ class ConfigEntityListTest extends BrowserTestBase {
   /**
    * Tests entity list builder methods.
    */
-  public function testList() {
+  public function testList(): void {
     $controller = \Drupal::entityTypeManager()->getListBuilder('config_test');
 
     // Test getStorage() method.
@@ -216,7 +214,7 @@ class ConfigEntityListTest extends BrowserTestBase {
   /**
    * Tests the listing UI.
    */
-  public function testListUI() {
+  public function testListUI(): void {
     // Log in as an administrative user to access the full menu trail.
     $this->drupalLogin($this->drupalCreateUser([
       'access administration pages',
@@ -314,7 +312,7 @@ class ConfigEntityListTest extends BrowserTestBase {
   /**
    * Tests paging.
    */
-  public function testPager() {
+  public function testPager(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'administer site configuration',
     ]));

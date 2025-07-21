@@ -11,7 +11,6 @@ use Drupal\Tests\Core\DependencyInjection\Fixture\FinalTestHttpMiddlewareClass;
 use Drupal\Tests\Core\DependencyInjection\Fixture\FinalTestNonTerminableHttpMiddlewareClass;
 use Drupal\Tests\UnitTestCase;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -46,7 +45,7 @@ class StackedKernelPassTest extends UnitTestCase {
   /**
    * @covers ::process
    */
-  public function testProcessWithStackedKernel() {
+  public function testProcessWithStackedKernel(): void {
     $stacked_kernel = new Definition(StackedHttpKernel::class);
     $stacked_kernel->setPublic(TRUE);
     $this->containerBuilder->setDefinition('http_kernel', $stacked_kernel);
@@ -88,7 +87,7 @@ class StackedKernelPassTest extends UnitTestCase {
   /**
    * @covers ::process
    */
-  public function testProcessWithHttpKernel() {
+  public function testProcessWithHttpKernel(): void {
     $kernel = new Definition('Symfony\Component\HttpKernel\HttpKernelInterface');
     $kernel->setPublic(TRUE);
     $this->containerBuilder->setDefinition('http_kernel', $kernel);
@@ -144,12 +143,7 @@ class StackedKernelPassTest extends UnitTestCase {
         'responder' => TRUE,
       ]));
     $this->stackedKernelPass->process($this->containerBuilder);
-    try {
-      $this->containerBuilder->get('http_kernel');
-    }
-    catch (InvalidArgumentException $e) {
-      $this->fail($e->getMessage());
-    }
+    $this->assertIsObject($this->containerBuilder->get('http_kernel'));
   }
 
   /**
@@ -161,6 +155,7 @@ class StackedKernelPassTest extends UnitTestCase {
    *   The priority to be used for the tag.
    *
    * @return \Symfony\Component\DependencyInjection\Definition
+   *   The middleware definition.
    */
   protected function createMiddlewareServiceDefinition($tag = TRUE, $priority = 0) {
     $definition = new Definition('Symfony\Component\HttpKernel\HttpKernelInterface', ['test']);

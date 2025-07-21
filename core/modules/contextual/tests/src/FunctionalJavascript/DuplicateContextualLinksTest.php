@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\contextual\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the UI for correct contextual links.
- *
- * @group contextual
  */
+#[Group('contextual')]
 class DuplicateContextualLinksTest extends WebDriverTestBase {
 
   /**
@@ -33,7 +33,7 @@ class DuplicateContextualLinksTest extends WebDriverTestBase {
   /**
    * Tests the contextual links with same id.
    */
-  public function testSameContextualLinks() {
+  public function testSameContextualLinks(): void {
     $this->drupalPlaceBlock('views_block:contextual_recent-block_1', ['id' => 'first']);
     $this->drupalPlaceBlock('views_block:contextual_recent-block_1', ['id' => 'second']);
     $this->drupalCreateContentType(['type' => 'page']);

@@ -5,16 +5,16 @@ namespace Drupal\file\Plugin\migrate\process\d6;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\MigrateLookupInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
+use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @MigrateProcessPlugin(
- *   id = "d6_field_file"
- * )
+ * Determines the settings for a Drupal 6 file field.
  */
+#[MigrateProcess('d6_field_file')]
 class FieldFile extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
   /**
@@ -53,7 +53,7 @@ class FieldFile extends ProcessPluginBase implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
     return new static(
       $configuration,
       $plugin_id,

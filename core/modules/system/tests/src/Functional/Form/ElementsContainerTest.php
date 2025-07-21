@@ -14,9 +14,7 @@ use Drupal\Tests\BrowserTestBase;
 class ElementsContainerTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['form_test'];
 
@@ -28,7 +26,7 @@ class ElementsContainerTest extends BrowserTestBase {
   /**
    * Tests the #optional container property.
    */
-  public function testOptionalContainerElements() {
+  public function testOptionalContainerElements(): void {
     $this->drupalGet('form-test/optional-container');
     $assertSession = $this->assertSession();
     $assertSession->elementNotExists('css', 'div.empty_optional');

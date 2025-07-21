@@ -6,12 +6,13 @@ namespace Drupal\Tests\field_ui\FunctionalJavascript;
 
 use Drupal\Core\Entity\Entity\EntityFormMode;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the bundle selection for view & form display modes.
- *
- * @group field_ui
  */
+#[Group('field_ui')]
 class DisplayModeBundleSelectionTest extends WebDriverTestBase {
 
   /**
@@ -66,10 +67,9 @@ class DisplayModeBundleSelectionTest extends WebDriverTestBase {
    *   Display mode path.
    * @param string $custom_mode
    *   Custom mode to test.
-   *
-   * @dataProvider providerBundleSelection
    */
-  public function testBundleSelection($display_mode, $path, $custom_mode) {
+  #[DataProvider('providerBundleSelection')]
+  public function testBundleSelection($display_mode, $path, $custom_mode): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 

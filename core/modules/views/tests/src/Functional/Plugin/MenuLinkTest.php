@@ -22,9 +22,7 @@ class MenuLinkTest extends ViewTestBase {
   public static $testViews = ['test_menu_link'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'views',
@@ -66,7 +64,7 @@ class MenuLinkTest extends ViewTestBase {
   /**
    * Tests that menu links using menu_link_content as parent are visible.
    */
-  public function testHierarchicalMenuLinkVisibility() {
+  public function testHierarchicalMenuLinkVisibility(): void {
     $this->drupalLogin($this->adminUser);
 
     $node = $this->drupalCreateNode(['type' => 'page']);

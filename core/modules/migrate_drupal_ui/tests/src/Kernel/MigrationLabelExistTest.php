@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal_ui\Kernel;
 
 use Drupal\KernelTests\FileSystemModuleDiscoveryDataProviderTrait;
@@ -17,7 +19,7 @@ class MigrationLabelExistTest extends MigrateDrupalTestBase {
   /**
    * Tests that labels exist for all migrations.
    */
-  public function testLabelExist() {
+  public function testLabelExist(): void {
     // Install all available modules.
     $module_handler = $this->container->get('module_handler');
     $modules = $this->coreModuleListDataProvider();
@@ -27,7 +29,7 @@ class MigrationLabelExistTest extends MigrateDrupalTestBase {
 
     /** @var \Drupal\migrate\Plugin\MigrationPluginManager $plugin_manager */
     $plugin_manager = $this->container->get('plugin.manager.migration');
-    // Get all the migrations
+    // Get all the migrations.
     $migrations = $plugin_manager->createInstances(array_keys($plugin_manager->getDefinitions()));
     /** @var \Drupal\migrate\Plugin\Migration $migration */
     foreach ($migrations as $migration) {

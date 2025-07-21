@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element\Textfield;
 use Drupal\Core\Site\Settings;
 
@@ -18,29 +19,38 @@ use Drupal\Core\Site\Settings;
  * entities, which can come from all or specific bundles of an entity type.
  *
  * Properties:
- * - #target_type: (required) The ID of the target entity type.
- * - #tags: (optional) TRUE if the element allows multiple selection. Defaults
+ *
+ * @property $target_type
+ *   (required) The ID of the target entity type.
+ * @property $tags
+ *   (optional) TRUE if the element allows multiple selection. Defaults
  *   to FALSE.
- * - #default_value: (optional) The default entity or an array of default
+ * @property $default_value
+ *   (optional) The default entity or an array of default
  *   entities, depending on the value of #tags.
- * - #selection_handler: (optional) The plugin ID of the entity reference
+ * @property $selection_handler
+ *   (optional) The plugin ID of the entity reference
  *   selection handler (a plugin of type EntityReferenceSelection). The default
  *   value is the lowest-weighted plugin that is compatible with #target_type.
- * - #selection_settings: (optional) An array of settings for the selection
+ * @property $selection_settings
+ *   (optional) An array of settings for the selection
  *   handler. Settings for the default selection handler
  *   \Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection are:
  *   - target_bundles: Array of bundles to allow (omit to allow all bundles).
  *   - sort: Array with 'field' and 'direction' keys, determining how results
  *     will be sorted. Defaults to unsorted.
- * - #autocreate: (optional) Array of settings used to auto-create entities
+ * @property $autocreate
+ *   (optional) Array of settings used to auto-create entities
  *   that do not exist (omit to not auto-create entities). Elements:
  *   - bundle: (required) Bundle to use for auto-created entities.
  *   - uid: User ID to use as the author of auto-created entities. Defaults to
  *     the current user.
- * - #process_default_value: (optional) Set to FALSE if the #default_value
+ * @property $process_default_value
+ *   (optional) Set to FALSE if the #default_value
  *   property is processed and access checked elsewhere (such as by a Field API
  *   widget). Defaults to TRUE.
- * - #validate_reference: (optional) Set to FALSE if validation of the selected
+ * @property $validate_reference
+ *   (optional) Set to FALSE if validation of the selected
  *   entities is performed elsewhere. Defaults to TRUE.
  *
  * Usage example:
@@ -62,9 +72,8 @@ use Drupal\Core\Site\Settings;
  * @endcode
  *
  * @see \Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection
- *
- * @FormElement("entity_autocomplete")
  */
+#[FormElement('entity_autocomplete')]
 class EntityAutocomplete extends Textfield {
 
   /**
@@ -72,7 +81,6 @@ class EntityAutocomplete extends Textfield {
    */
   public function getInfo() {
     $info = parent::getInfo();
-    $class = static::class;
 
     // Apply default form element properties.
     $info['#target_type'] = NULL;
@@ -88,8 +96,8 @@ class EntityAutocomplete extends Textfield {
     // its value is properly checked for access.
     $info['#process_default_value'] = TRUE;
 
-    $info['#element_validate'] = [[$class, 'validateEntityAutocomplete']];
-    array_unshift($info['#process'], [$class, 'processEntityAutocomplete']);
+    $info['#element_validate'] = [[static::class, 'validateEntityAutocomplete']];
+    array_unshift($info['#process'], [static::class, 'processEntityAutocomplete']);
 
     return $info;
   }
@@ -259,7 +267,10 @@ class EntityAutocomplete extends Textfield {
           $valid_ids = $handler->validateReferenceableEntities($ids);
           if ($invalid_ids = array_diff($ids, $valid_ids)) {
             foreach ($invalid_ids as $invalid_id) {
-              $form_state->setError($element, t('The referenced entity (%type: %id) does not exist.', ['%type' => $element['#target_type'], '%id' => $invalid_id]));
+              $form_state->setError($element, t('The referenced entity (%type: %id) does not exist.', [
+                '%type' => $element['#target_type'],
+                '%id' => $invalid_id,
+              ]));
             }
           }
         }
@@ -285,7 +296,10 @@ class EntityAutocomplete extends Textfield {
 
           foreach ($invalid_new_entities as $entity) {
             /** @var \Drupal\Core\Entity\EntityInterface $entity */
-            $form_state->setError($element, t('This entity (%type: %label) cannot be referenced.', ['%type' => $element['#target_type'], '%label' => $entity->label()]));
+            $form_state->setError($element, t('This entity (%type: %label) cannot be referenced.', [
+              '%type' => $element['#target_type'],
+              '%label' => $entity->label(),
+            ]));
           }
         }
       }
