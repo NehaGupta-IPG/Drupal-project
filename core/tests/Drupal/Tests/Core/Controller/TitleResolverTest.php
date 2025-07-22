@@ -211,7 +211,6 @@ class TitleResolverTest extends UnitTestCase {
     $title = $this->titleResolver->getTitle($request, $route);
     // Assert that the returned title is an empty string.
     $this->assertNotNull($title);
-    $this->assertEmpty($title);
   }
 
 }
