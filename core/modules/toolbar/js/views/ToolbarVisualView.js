@@ -221,7 +221,7 @@
         if ($tab.length > 0) {
           $tab
             .addClass('is-active')
-            // Mark the tab as pressed.
+            // Mark the tab as expanded.
             .attr('aria-expanded', true);
           const name = $tab.attr('data-toolbar-tray');
           // Store the active tab name or remove the setting.
