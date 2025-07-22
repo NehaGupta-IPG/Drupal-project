@@ -20,7 +20,7 @@ class EntityReferenceTestHooks {
    * Implements hook_entity_base_field_info().
    */
   #[Hook('entity_base_field_info')]
-  public function entityBaseFieldInfo(EntityTypeInterface $entity_type) {
+  public function entityBaseFieldInfo(EntityTypeInterface $entity_type): array {
     $fields = [];
     if ($entity_type->id() === 'entity_test') {
       $fields['user_role'] = BaseFieldDefinition::create('entity_reference')->setLabel($this->t('User role'))->setDescription($this->t('The role of the associated user.'))->setSetting('target_type', 'user_role')->setSetting('handler', 'default');
@@ -35,7 +35,12 @@ class EntityReferenceTestHooks {
   public function entityBaseFieldInfoAlter(&$fields, EntityTypeInterface $entity_type): void {
     if ($entity_type->id() === 'entity_test') {
       // Allow user_id field to use configurable widget.
-      $fields['user_id']->setSetting('handler', 'default')->setDisplayOptions('form', ['type' => 'entity_reference_autocomplete', 'weight' => 0])->setDisplayConfigurable('form', TRUE);
+      $fields['user_id']->setSetting('handler', 'default')
+        ->setDisplayOptions('form', [
+          'type' => 'entity_reference_autocomplete',
+          'weight' => 0,
+        ])
+        ->setDisplayConfigurable('form', TRUE);
     }
   }
 

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Theme;
 
-use Drupal\Tests\BrowserTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Olivero theme.
- *
- * @group olivero
  */
+#[Group('olivero')]
 class OliveroTest extends BrowserTestBase {
 
   /**
@@ -160,6 +160,18 @@ class OliveroTest extends BrowserTestBase {
       $this->assertTrue($link->hasAttribute('pager-test'), 'Pager item has attribute pager-test');
       $this->assertTrue($link->hasClass('lizards'));
     }
+  }
+
+  /**
+   * Tests slogan of system branding block.
+   */
+  public function testSystemSiteBrandingSlogan(): void {
+    $this->config('system.site')
+      ->set('slogan', 'Community carpentry')
+      ->save();
+
+    $this->drupalGet('<front>');
+    $this->assertSession()->pageTextContains('Community carpentry');
   }
 
 }

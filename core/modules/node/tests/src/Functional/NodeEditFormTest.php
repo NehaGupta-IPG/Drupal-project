@@ -87,7 +87,8 @@ class NodeEditFormTest extends NodeTestBase {
     $this->clickLink('Edit');
     $this->assertSession()->addressEquals($node->toUrl('edit-form'));
 
-    // Check that the title and body fields are displayed with the correct values.
+    // Check that the title and body fields are displayed with the correct
+    // values.
     // @todo Ideally assertLink would support HTML, but it doesn't.
     $this->assertSession()->responseContains('Edit');
     $this->assertSession()->fieldValueEquals($title_key, $edit[$title_key]);
@@ -100,7 +101,8 @@ class NodeEditFormTest extends NodeTestBase {
     // Stay on the current page, without reloading.
     $this->submitForm($edit, 'Save');
 
-    // Check that the title and body fields are displayed with the updated values.
+    // Check that the title and body fields are displayed with the updated
+    // values.
     $this->assertSession()->pageTextContains($edit[$title_key]);
     $this->assertSession()->pageTextContains($edit[$body_key]);
 
@@ -249,10 +251,25 @@ class NodeEditFormTest extends NodeTestBase {
     $edit['body[0][value]'] = $this->randomMachineName(16);
     $this->submitForm($edit, 'Save');
 
+    // Enable user_hooks_test to test the users display name is visible on the
+    // edit form.
+    \Drupal::service('module_installer')->install(['user_hooks_test']);
+    \Drupal::keyValue('user_hooks_test')->set('user_format_name_alter', TRUE);
     $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
-    $this->drupalGet("node/" . $node->id() . "/edit");
+    $this->drupalGet($node->toUrl('edit-form'));
     $this->assertSession()->pageTextContains('Published');
     $this->assertSession()->pageTextContains($this->container->get('date.formatter')->format($node->getChangedTime(), 'short'));
+    $this->assertSession()->responseContains('<em>' . $this->adminUser->id() . '</em>');
+  }
+
+  /**
+   * Tests the node form when the author is NULL.
+   */
+  public function testNodeFormNullAuthor(): void {
+    \Drupal::service('module_installer')->install(['node_no_default_author']);
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet('node/add/page');
+    $this->assertSession()->statusCodeEquals(200);
   }
 
   /**

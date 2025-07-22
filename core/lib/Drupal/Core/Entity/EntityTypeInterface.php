@@ -195,10 +195,12 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *     handler's constructor, so that one class can be used for multiple
    *     entity forms when the forms are similar. The classes must implement
    *     \Drupal\Core\Entity\EntityFormInterface.
-   *   - list_builder: The name of the class that provides listings of the entities. The
-   *     class must implement \Drupal\Core\Entity\EntityListBuilderInterface.
-   *   - view_builder: The name of the class that is used to render the entities. The
-   *     class must implement \Drupal\Core\Entity\EntityViewBuilderInterface.
+   *   - list_builder: The name of the class that provides listings of the
+   *     entities. The class must implement
+   *     \Drupal\Core\Entity\EntityListBuilderInterface.
+   *   - view_builder: The name of the class that is used to render the
+   *     entities. The class must implement
+   *     \Drupal\Core\Entity\EntityViewBuilderInterface.
    *   - access: The name of the class that is used for access checks. The class
    *     must implement \Drupal\Core\Entity\EntityAccessControlHandlerInterface.
    *     Defaults to \Drupal\Core\Entity\EntityAccessControlHandler.
@@ -378,9 +380,9 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
   /**
    * Gets the name of the default administrative permission.
    *
-   * The default \Drupal\Core\Entity\EntityAccessControlHandler class checks this
-   * permission for all operations in its checkAccess() method. Entities with
-   * more complex permissions can extend this class to do their own access
+   * The default \Drupal\Core\Entity\EntityAccessControlHandler class checks
+   * this permission for all operations in its checkAccess() method. Entities
+   * with more complex permissions can extend this class to do their own access
    * checks.
    *
    * @return string|bool
@@ -730,6 +732,17 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *   An array of the cache tags for this entity type.
    */
   public function getListCacheTags();
+
+  /**
+   * The list cache tags associated with a specific bundle.
+   *
+   * Enables code listing entities of this type and bundle to ensure that newly
+   * created entities show up immediately.
+   *
+   * @return string[]
+   *   An array of the cache tags for this bundle.
+   */
+  public function getBundleListCacheTags(string $bundle): array;
 
   /**
    * Gets the key that is used to store configuration dependencies.

@@ -5,10 +5,7 @@
  */
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Render\Element\RenderElementBase;
-use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 
 /**
@@ -23,7 +20,6 @@ use Drupal\Core\Url;
  *   - name: The label for the media item.
  *   - view_mode: View mode; e.g., 'full', 'teaser', etc.
  */
-#[StopProceduralHookScan]
 function template_preprocess_media(array &$variables): void {
   $variables['media'] = $variables['elements']['#media'];
   $variables['view_mode'] = $variables['elements']['#view_mode'];
@@ -32,31 +28,6 @@ function template_preprocess_media(array &$variables): void {
   // Helpful $content variable for templates.
   foreach (Element::children($variables['elements']) as $key) {
     $variables['content'][$key] = $variables['elements'][$key];
-  }
-}
-
-/**
- * Implements hook_preprocess_HOOK() for media reference widgets.
- */
-function media_preprocess_media_reference_help(&$variables): void {
-  // Most of these attribute checks are copied from
-  // template_preprocess_fieldset(). Our template extends
-  // field-multiple-value-form.html.twig to provide our help text, but also
-  // groups the information within a semantic fieldset with a legend. So, we
-  // incorporate parity for both.
-  $element = $variables['element'];
-  Element::setAttributes($element, ['id']);
-  RenderElementBase::setAttributes($element);
-  $variables['attributes'] = $element['#attributes'] ?? [];
-  $variables['legend_attributes'] = new Attribute();
-  $variables['header_attributes'] = new Attribute();
-  $variables['description']['attributes'] = new Attribute();
-  $variables['legend_span_attributes'] = new Attribute();
-
-  if (!empty($element['#media_help'])) {
-    foreach ($element['#media_help'] as $key => $text) {
-      $variables[substr($key, 1)] = $text;
-    }
   }
 }
 
@@ -92,7 +63,7 @@ function _media_get_add_url($allowed_bundles) {
 /**
  * Validate callback to ensure filter order and allowed_html are compatible.
  */
-function media_filter_format_edit_form_validate($form, FormStateInterface $form_state) {
+function media_filter_format_edit_form_validate($form, FormStateInterface $form_state): void {
   if ($form_state->getTriggeringElement()['#name'] !== 'op') {
     return;
   }

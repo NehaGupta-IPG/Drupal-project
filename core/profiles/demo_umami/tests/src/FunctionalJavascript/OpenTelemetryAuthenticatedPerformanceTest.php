@@ -20,6 +20,9 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
    */
   protected $profile = 'demo_umami';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
     $user = $this->drupalCreateUser();
@@ -41,23 +44,30 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
       'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "10" AND "u"."default_langcode" = 1',
       'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "10"',
-      'SELECT "config"."name" AS "name" FROM "config" "config" WHERE ("collection" = "") AND ("name" LIKE "language.entity.%" ESCAPE ' . "'\\\\'" . ') ORDER BY "collection" ASC, "name" ASC',
     ];
     $recorded_queries = $performance_data->getQueries();
     $this->assertSame($expected_queries, $recorded_queries);
 
     $expected = [
-      'QueryCount' => 4,
+      'QueryCount' => 3,
       'CacheGetCount' => 42,
+      'CacheGetCountByBin' => [
+        'config' => 22,
+        'bootstrap' => 5,
+        'discovery' => 5,
+        'data' => 5,
+        'dynamic_page_cache' => 2,
+        'menu' => 1,
+        'render' => 2,
+      ],
       'CacheSetCount' => 0,
       'CacheDeleteCount' => 0,
-      'CacheTagChecksumCount' => 0,
-      'CacheTagIsValidCount' => 11,
       'CacheTagInvalidationCount' => 0,
+      'CacheTagLookupQueryCount' => 5,
       'ScriptCount' => 1,
-      'ScriptBytes' => 123850,
+      'ScriptBytes' => 73031,
       'StylesheetCount' => 2,
-      'StylesheetBytes' => 43600,
+      'StylesheetBytes' => 39163,
     ];
     $this->assertMetrics($expected, $performance_data);
   }

@@ -13,6 +13,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\views\Plugin\views\cache\CachePluginBase;
 use Drupal\views\Plugin\views\PluginBase;
+use Drupal\views\Plugin\views\query\QueryPluginBase;
 use Drupal\views\ViewExecutable;
 
 /**
@@ -317,7 +318,7 @@ function hook_views_data(): array {
       // ID of relationship handler plugin to use.
       'id' => 'standard',
       // Default label for relationship in the UI.
-      'label' => t('Example node'),
+      'title' => t('Example node'),
       // Description shown within the add relationship handler in the UI.
       'help' => t('Relationship between the node and node field data'),
     ],
@@ -396,7 +397,7 @@ function hook_views_data(): array {
       'id' => 'boolean',
       // Override the generic field title, so that the filter uses a different
       // label in the UI.
-      'label' => t('Published'),
+      'title' => t('Published'),
       // Override the default BooleanOperator filter handler's 'type' setting,
       // to display this as a "Yes/No" filter instead of a "True/False" filter.
       'type' => 'yes-no',
@@ -517,7 +518,7 @@ function hook_views_data_alter(array &$data) {
       'field' => 'fid',
       // ID of relationship handler plugin to use.
       'id' => 'standard',
-      'label' => t('Default label for relationship'),
+      'title' => t('Default label for relationship'),
       // Description shown within the add relationship handler in the UI.
       'help' => t('Description of the placeholder field relationship'),
     ],
@@ -532,8 +533,9 @@ function hook_views_data_alter(array &$data) {
  * When collecting the views data, views_views_data() invokes this hook for each
  * field storage definition, on the module that provides the field storage
  * definition. If the return value is empty, the result of
- * FieldViewsDataProvider::defaultFieldImplementation() is used instead. Then the result is altered
- * by invoking hook_field_views_data_alter() on all modules.
+ * FieldViewsDataProvider::defaultFieldImplementation() is used instead. Then
+ * the result is altered by invoking hook_field_views_data_alter() on all
+ * modules.
  *
  * If no hook implementation exists, hook_views_data() falls back to
  * FieldViewsDataProvider::defaultFieldImplementation().
@@ -557,7 +559,7 @@ function hook_field_views_data(FieldStorageConfigInterface $field_storage): arra
       'id' => 'standard',
       'base' => 'file_managed',
       'base field' => 'target_id',
-      'label' => t('image from @field_name', ['@field_name' => $field_storage->getName()]),
+      'title' => t('image from @field_name', ['@field_name' => $field_storage->getName()]),
     ];
   }
 
@@ -726,7 +728,8 @@ function hook_views_form_substitutions() {
  */
 function hook_views_pre_view(ViewExecutable $view, $display_id, array &$args) {
 
-  // Modify contextual filters for my_special_view if user has 'my special permission'.
+  // Modify contextual filters for my_special_view if user has
+  // 'my special permission'.
   $account = \Drupal::currentUser();
 
   if ($view->id() == 'my_special_view' && $account->hasPermission('my special permission') && $display_id == 'public_display') {
@@ -842,7 +845,7 @@ function hook_views_post_execute(ViewExecutable $view) {
  *
  * @see \Drupal\views\ViewExecutable
  */
-function hook_views_pre_render(ViewExecutable $view) {
+function hook_views_pre_render(ViewExecutable $view): void {
   // Scramble the order of the rows shown on this result page.
   // Note that this could be done earlier, but not later in the view execution
   // process.
@@ -880,7 +883,7 @@ function hook_views_pre_render(ViewExecutable $view) {
  *
  * @see \Drupal\views\ViewExecutable
  */
-function hook_views_post_render(ViewExecutable $view, array &$output, CachePluginBase $cache) {
+function hook_views_post_render(ViewExecutable $view, array &$output, CachePluginBase $cache): void {
   // When using full pager, disable any time-based caching if there are fewer
   // than 10 results.
   if ($view->pager instanceof Full && $cache instanceof Time && count($view->result) < 10) {

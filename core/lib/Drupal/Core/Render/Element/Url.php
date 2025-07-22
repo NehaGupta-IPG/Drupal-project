@@ -11,9 +11,13 @@ use Drupal\Core\Render\Element;
  * Provides a form element for input of a URL.
  *
  * Properties:
- * - #default_value: A valid URL string.
- * - #size: The size of the input element in characters.
- * - #pattern: A string for the native HTML5 pattern attribute.
+ *
+ * @property $default_value
+ *   A valid URL string.
+ * @property $size
+ *   The size of the input element in characters.
+ * @property $pattern
+ *   A string for the native HTML5 pattern attribute.
  *
  * Usage example:
  * @code
@@ -59,7 +63,8 @@ class Url extends FormElementBase {
   /**
    * Form element validation handler for #type 'url'.
    *
-   * Note that #maxlength and #required is validated by _form_validate() already.
+   * Note that #maxlength and #required is validated by _form_validate()
+   * already.
    */
   public static function validateUrl(&$element, FormStateInterface $form_state, &$complete_form) {
     $value = trim($element['#value']);
