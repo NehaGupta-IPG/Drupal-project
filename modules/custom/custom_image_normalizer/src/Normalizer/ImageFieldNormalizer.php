@@ -2,7 +2,6 @@
 
 namespace Drupal\custom_image_normalizer\Normalizer;
 
-use ArrayObject;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Image\ImageFactory;
@@ -17,8 +16,25 @@ use Drupal\Core\File\FileUrlGeneratorInterface;
  */
 class ImageFieldNormalizer extends FieldItemNormalizer {
 
+    /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
   protected $entityTypeManager;
+
+  /**
+   * The image factory.
+   *
+   * @var \Drupal\Core\Image\ImageFactory
+   */
   protected $imageFactory;
+
+  /**
+   * The file URL generator.
+   *
+   * @var \Drupal\Core\File\FileUrlGeneratorInterface
+   */
   protected $fileUrlGenerator;
 
   /**
@@ -38,7 +54,7 @@ class ImageFieldNormalizer extends FieldItemNormalizer {
   /**
    * {@inheritdoc}
    */
-  public function normalize($object, $format = null, array $context = []): ArrayObject|array|string|int|float|bool|null {
+  public function normalize($object, $format = NULL, array $context = []): \ArrayObject|array|string|int|float|bool|null {
     if (!$object instanceof FieldItemInterface) {
       return parent::normalize($object, $format, $context);
     }
@@ -112,6 +128,3 @@ class ImageFieldNormalizer extends FieldItemNormalizer {
   }
 
 }
-
-
-
