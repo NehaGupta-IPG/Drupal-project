@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Core\Database\Database;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore drupaldriver testdriverdatabasedrivertestmysql
 // cspell:ignore testdriverdatabasedrivertestpgsql
-
 /**
  * Tests the interactive installer.
- *
- * @group Installer
  */
+#[Group('Installer')]
 class InstallerNonDefaultDatabaseDriverTest extends InstallerTestBase {
 
   /**
@@ -90,8 +89,26 @@ class InstallerNonDefaultDatabaseDriverTest extends InstallerTestBase {
     // uninstalled being dependencies of the "driver_test" module.
     $this->drupalGet('admin/modules/uninstall');
     $this->assertSession()->elementTextContains('xpath', '//tr[@data-drupal-selector="edit-driver-test"]', "The following reason prevents Contrib database driver test from being uninstalled: The module 'Contrib database driver test' is providing the database driver '{$this->testDriverName}'.");
-    $this->assertSession()->elementTextContains('xpath', '//tr[@data-drupal-selector="edit-mysql"]', "The following reason prevents MySQL from being uninstalled: Required by: driver_test");
-    $this->assertSession()->elementTextContains('xpath', '//tr[@data-drupal-selector="edit-pgsql"]', "The following reason prevents PostgreSQL from being uninstalled: Required by: driver_test");
+    $this->assertSession()->elementTextContains('xpath', '//tr[@data-drupal-selector="edit-mysql"]', "The following reason prevents MySQL from being uninstalled: Required by: Contrib database driver test (driver_test)");
+    $this->assertSession()->elementTextContains('xpath', '//tr[@data-drupal-selector="edit-pgsql"]', "The following reason prevents PostgreSQL from being uninstalled: Required by: Contrib database driver test (driver_test)");
+  }
+
+  /**
+   * Returns the databases setup from the SUT's settings.php.
+   *
+   * @return array<string,mixed>
+   *   The value of the $databases variable.
+   */
+  protected function getInstalledDatabaseSettings(): array {
+    // The $app_root and $site_path variables are required by the settings.php
+    // file to be parsed correctly. The $databases variable is set in the
+    // included file, we need to inform PHPStan about that since PHPStan itself
+    // is unable to determine it.
+    $app_root = $this->container->getParameter('app.root');
+    $site_path = $this->siteDirectory;
+    include $app_root . '/' . $site_path . '/settings.php';
+    assert(isset($databases));
+    return $databases;
   }
 
   /**

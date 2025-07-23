@@ -170,12 +170,6 @@ class Node extends EditorialContentEntityBase implements NodeInterface {
       $grants = $access_control_handler->acquireGrants($this);
       \Drupal::service('node.grant_storage')->write($this, $grants, NULL, $update);
     }
-
-    // Reindex the node when it is updated. The node is automatically indexed
-    // when it is added, simply by being added to the node table.
-    if ($update) {
-      node_reindex_node_search($this->id());
-    }
   }
 
   /**
@@ -357,7 +351,7 @@ class Node extends EditorialContentEntityBase implements NodeInterface {
       ->setLabel(t('Promoted to front page'))
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
-      ->setDefaultValue(TRUE)
+      ->setDefaultValue(FALSE)
       ->setDisplayOptions('form', [
         'type' => 'boolean_checkbox',
         'settings' => [

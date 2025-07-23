@@ -179,10 +179,18 @@ if (!Composer::upgradePHPUnitCheck(Version::id())) {
 
 echo "\n";
 echo "Drupal test run\n\n";
-echo sprintf("Drupal Version:  %s\n", \Drupal::VERSION);
-echo sprintf("PHP Version:     %s\n", \PHP_VERSION);
-echo sprintf("PHP Binary:      %s\n", $php ?? getenv('_'));
-echo sprintf("PHPUnit Version: %s\n", Version::id());
+echo sprintf("Drupal Version:   %s\n", \Drupal::VERSION);
+echo sprintf("PHP Version:      %s\n", \PHP_VERSION);
+echo sprintf("PHP Binary:       %s\n", $php ?? getenv('_'));
+echo sprintf("PHPUnit Version:  %s\n", Version::id());
+if ($args['dburl']) {
+  $sut_connection_info = Database::getConnectionInfo();
+  $sut_tasks_class = $sut_connection_info['default']['namespace'] . "\\Install\\Tasks";
+  $sut_installer = new $sut_tasks_class();
+  $sut_connection = Database::getConnection();
+  echo sprintf("Database:         %s\n", (string) $sut_installer->name());
+  echo sprintf("Database Version: %s\n", $sut_connection->version());
+}
 echo "-------------------------------\n";
 echo "\n";
 
@@ -667,7 +675,7 @@ function simpletest_script_setup_database($new = FALSE): void {
     // Remove a possibly existing default connection (from settings.php).
     Database::removeConnection('default');
     try {
-      $databases['default']['default'] = Database::convertDbUrlToConnectionInfo($args['dburl'], DRUPAL_ROOT, TRUE);
+      $databases['default']['default'] = Database::convertDbUrlToConnectionInfo($args['dburl'], TRUE);
     }
     catch (\InvalidArgumentException $e) {
       simpletest_script_print_error('Invalid --dburl. Reason: ' . $e->getMessage());

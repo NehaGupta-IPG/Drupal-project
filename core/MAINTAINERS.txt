@@ -72,6 +72,7 @@ maintainer. Current subsystem maintainers:
 
 Ajax
 - Alex Bronstein 'effulgentsia' https://www.drupal.org/u/effulgentsia
+- Shawn Duncan 'fathershawn' https://www.drupal.org/u/fathershawn
 - Tim Plunkett 'tim.plunkett' https://www.drupal.org/u/tim.plunkett
 
 Asset Library API
@@ -90,7 +91,7 @@ Base system
 - See "Framework managers" above.
 
 Basic Auth
-- Juampy Novillo Requena 'juampy' https://www.drupal.org/u/juampy
+- ?
 
 Batch API
 - John Cook 'John Cook' https://www.drupal.org/u/john-cook
@@ -101,7 +102,6 @@ BigPipe
 
 Block
 - Tim Plunkett 'tim.plunkett' https://www.drupal.org/u/tim.plunkett
-- Ben Dougherty 'benjy' https://www.drupal.org/u/benjy
 
 Block Content
 - Adam Bramley 'acbramley' https://www.drupal.org/u/acbramley
@@ -120,14 +120,12 @@ Cache
 - Kristiaan Van den Eynde 'kristiaanvandeneynde' https://www.drupal.org/u/kristiaanvandeneynde
 
 CKEditor 5
-- Lauri Timmanee 'lauriii' https://www.drupal.org/u/lauriii
 - Wim Leers 'Wim Leers' https://www.drupal.org/u/wim-leers
 - Ben Mullins 'bnjmnm' https://www.drupal.org/u/bnjmnm
 
 Claro
 - Cristina Chumillas 'ckrina' https://www.drupal.org/u/ckrina
 - Sascha Eggenberger 'saschaeggi' https://www.drupal.org/u/saschaeggi
-- Lauri Timmanee 'lauriii' https://www.drupal.org/u/lauriii
 - Ben Mullins 'bnjmnm' https://www.drupal.org/u/bnjmnm
 
 Comment
@@ -154,7 +152,7 @@ Contact
 - Andrey Postnikov 'andypost' https://www.drupal.org/u/andypost
 
 Content Moderation
-- Sam Becker 'Sam152' https://www.drupal.org/u/sam152
+- ?
 
 Content Translation
 - ?
@@ -224,6 +222,7 @@ Field UI
 - Andrei Mateescu 'amateescu' https://www.drupal.org/u/amateescu
 
 File
+- Mohit Aghera 'mohit_aghera' https://www.drupal.org/u/mohit_aghera
 - Kim Pepper 'kim.pepper' https://www.drupal.org/u/kimpepper
 
 Filter
@@ -260,7 +259,6 @@ JavaScript
 JSON:API
 - Mateu Aguiló Bosch 'e0ipso' https://www.drupal.org/u/e0ipso
 - Björn Brala 'bbrala' https://www.drupal.org/u/bbrala
-- Gabe Sullice 'gabesullice' https://www.drupal.org/u/gabesullice
 - Wim Leers 'Wim Leers' https://www.drupal.org/u/wim-leers
 
 Language
@@ -453,7 +451,7 @@ Views
 - Len Swaneveld 'Lendude' https://www.drupal.org/u/lendude
 
 Workflows
-- Sam Becker 'Sam152' https://www.drupal.org/u/sam152
+- ?
 
 Workspaces
 - Andrei Mateescu 'amateescu' https://www.drupal.org/u/amateescu
@@ -485,7 +483,6 @@ Testing
 
 Usability
 - Cristina Chumillas 'ckrina' https://www.drupal.org/u/ckrina
-- Roy Scholten 'yoroy' https://www.drupal.org/u/yoroy
 - Bojhan Somers 'Bojhan' https://www.drupal.org/u/bojhan
 
 
