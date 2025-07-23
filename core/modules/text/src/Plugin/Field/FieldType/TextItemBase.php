@@ -8,6 +8,8 @@ use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\field\FieldConfigInterface;
+use Drupal\filter\FilterFormatInterface;
 
 /**
  * Base class for 'text' configurable field types.
@@ -68,6 +70,32 @@ abstract class TextItemBase extends FieldItemBase {
     $config = $dependencies['config'] ?? [];
     $dependencies['config'] = array_merge($config, $format_dependencies);
     return $dependencies;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function onDependencyRemoval(FieldDefinitionInterface $field_definition, array $dependencies) {
+    if ((parent::onDependencyRemoval($field_definition, $dependencies))) {
+      return TRUE;
+    }
+
+    if (!($field_definition instanceof FieldConfigInterface) || !isset($dependencies['config'])) {
+      return FALSE;
+    }
+
+    foreach ($dependencies['config'] as $config) {
+      // Remove deleted filter formats from allowed_formats so that the field
+      // configuration entity is not deleted.
+      if ($config instanceof FilterFormatInterface) {
+        $settings = $field_definition->getSettings();
+        $settings['allowed_formats'] = array_diff($settings['allowed_formats'] ?? [], [$config->id()]);
+        $field_definition->set('settings', $settings);
+        return TRUE;
+      }
+    }
+
+    return FALSE;
   }
 
   /**
