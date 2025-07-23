@@ -84,6 +84,7 @@ abstract class TextItemBase extends FieldItemBase {
       return FALSE;
     }
 
+    $changed = FALSE;
     foreach ($dependencies['config'] as $config) {
       // Remove deleted filter formats from allowed_formats so that the field
       // configuration entity is not deleted.
@@ -91,11 +92,11 @@ abstract class TextItemBase extends FieldItemBase {
         $settings = $field_definition->getSettings();
         $settings['allowed_formats'] = array_diff($settings['allowed_formats'] ?? [], [$config->id()]);
         $field_definition->set('settings', $settings);
-        return TRUE;
+        $changed = TRUE;
       }
     }
 
-    return FALSE;
+    return $changed;
   }
 
   /**
