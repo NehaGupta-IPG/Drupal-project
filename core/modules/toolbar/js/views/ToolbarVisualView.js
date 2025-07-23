@@ -62,6 +62,18 @@
           .has('.toolbar-menu')
           .append(Drupal.theme('toolbarOrientationToggle'));
 
+        // Add accessibility attributes to tray trigger "buttons".
+        this.$el
+          .find('.toolbar-bar .toolbar-tab .trigger')
+          .each((_, element) => {
+            // Initialize to 'false'. Opening the tray will set to 'true'.
+            element.setAttribute('aria-expanded', 'false');
+
+            if (element.tagName === 'A' && element.href) {
+              element.setAttribute('role', 'button');
+            }
+          });
+
         // Trigger an activeTab change so that listening scripts can respond on
         // page load. This will call render.
         this.model.trigger('change:activeTab');
