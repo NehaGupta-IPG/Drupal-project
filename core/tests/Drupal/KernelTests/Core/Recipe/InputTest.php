@@ -369,4 +369,70 @@ YAML
     $this->assertSame('', $config->get('slogan'));
   }
 
+  /**
+   * @covers \Drupal\Core\Recipe\ConsoleInputCollector::collectValue
+   */
+  public function testPromptArgumentsAreCastedForAskMethod(): void {
+    $io = $this->createMock(StyleInterface::class);
+    $io->expects($this->once())
+      ->method('ask')
+      ->with('What is the number?', '2')
+      ->willReturn('2');
+
+    $recipe = $this->createRecipe(<<<YAML
+name: 'Collecting prompt input'
+input:
+  number:
+    data_type: integer
+    description: The number.
+    prompt:
+      method: ask
+      arguments:
+        question: What is the number?
+    default:
+      source: value
+      value: 2
+YAML
+    );
+    $collector = new ConsoleInputCollector(
+      $this->createMock(InputInterface::class),
+      $io,
+    );
+    $recipe->input->collectAll($collector);
+    $this->assertSame(['number' => '2'], $recipe->input->getValues());
+  }
+
+  /**
+   * @covers \Drupal\Core\Recipe\ConsoleInputCollector::collectValue
+   */
+  public function testPromptArgumentsAreCastedForConfirmMethod(): void {
+    $io = $this->createMock(StyleInterface::class);
+    $io->expects($this->once())
+      ->method('confirm')
+      ->with('Do you agree?', '1')
+      ->willReturn(TRUE);
+
+    $recipe = $this->createRecipe(<<<YAML
+name: 'Collecting prompt input'
+input:
+  decision:
+    data_type: boolean
+    description: The decision.
+    prompt:
+      method: confirm
+      arguments:
+        question: Do you agree?
+    default:
+      source: value
+      value: '1'
+YAML
+    );
+    $collector = new ConsoleInputCollector(
+      $this->createMock(InputInterface::class),
+      $io,
+    );
+    $recipe->input->collectAll($collector);
+    $this->assertSame(['decision' => TRUE], $recipe->input->getValues());
+  }
+
 }
