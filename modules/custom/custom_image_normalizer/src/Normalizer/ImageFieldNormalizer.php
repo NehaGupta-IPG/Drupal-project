@@ -88,11 +88,11 @@ class ImageFieldNormalizer extends FieldItemNormalizer {
     }
 
     return [
-    'url' => $url,
-    'alt' => $object->alt,
-    'title' => $object->title,
-    'width' => $width,
-    'height' => $height,
+      'url' => $url,
+      'alt' => $object->alt,
+      'title' => $object->title,
+      'width' => $width,
+      'height' => $height,
     ];
   }
 
