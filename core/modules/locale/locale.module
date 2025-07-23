@@ -210,7 +210,12 @@ function locale_get_plural($count, $langcode = NULL) {
  * Updates default configuration when new modules or themes are installed.
  */
 function locale_system_set_config_langcodes(): void {
-  \Drupal::service('locale.config_manager')->updateDefaultConfigLangcodes();
+  // Read update_default_config_langcodes from locale settings, fallback to the
+  // default value (TRUE) if it's not overridden.
+  $update_default_config_langcodes = \Drupal::config('locale.settings')->get('translation.update_default_config_langcodes') ?? TRUE;
+  if ($update_default_config_langcodes) {
+    \Drupal::service('locale.config_manager')->updateDefaultConfigLangcodes();
+  }
 }
 
 /**
@@ -254,7 +259,11 @@ function locale_system_update(array $components): void {
     // components. Do this even if import is not enabled because parsing new
     // configuration may expose new source strings.
     $module_handler->loadInclude('locale', 'inc', 'locale.bulk');
-    if ($batch = locale_config_batch_update_components([], [], [], TRUE)) {
+    // Read update_default_config_langcodes from locale settings, fallback to
+    // the default value (TRUE) if it's not overridden.
+    $update_default_config_langcodes = \Drupal::config('locale.settings')->get('translation.update_default_config_langcodes') ?? TRUE;
+    if ($update_default_config_langcodes) {
+      $batch = locale_config_batch_update_components([], [], [], $update_default_config_langcodes);
       batch_set($batch);
     }
   }
