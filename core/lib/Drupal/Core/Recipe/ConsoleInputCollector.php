@@ -97,7 +97,11 @@ final class ConsoleInputCollector implements InputCollectorInterface {
       // Most of the input-collecting methods of StyleInterface have a `default`
       // parameter.
       $arguments += [
-        'default' => $default_value,
+        'default' => match ($method) {
+          'ask' => (string) $default_value,
+          'confirm' => (bool) $default_value,
+          default => $default_value,
+        },
       ];
     }
 
