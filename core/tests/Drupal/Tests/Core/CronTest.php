@@ -92,7 +92,7 @@ class CronTest extends UnitTestCase {
     // Create a mock config factory and config object.
     $config_factory = $this->prophesize(ConfigFactoryInterface::class);
     $config = $this->prophesize(ImmutableConfig::class);
-    $config->get('logging')->willReturn(FALSE);
+    $config->get('logging')->willReturn(TRUE);
     $config_factory->get('system.cron')->willReturn($config->reveal());
 
     // Build the container using the resulting mock objects.
@@ -161,7 +161,7 @@ class CronTest extends UnitTestCase {
     $queue_worker_manager->createInstance($queue_worker)->willReturn($queue_worker_plugin->reveal());
 
     // Construct the Cron class to test.
-    $this->cron = new Cron($module_handler->reveal(), $lock_backend->reveal(), $queue_factory->reveal(), $state->reveal(), $account_switcher->reveal(), $logger->reveal(), $queue_worker_manager->reveal(), $time->reveal(), $queueConfig);
+    $this->cron = new Cron($module_handler->reveal(), $lock_backend->reveal(), $queue_factory->reveal(), $state->reveal(), $account_switcher->reveal(), $logger->reveal(), $queue_worker_manager->reveal(), $config_factory->reveal(), $time->reveal(), $queueConfig);
   }
 
   /**

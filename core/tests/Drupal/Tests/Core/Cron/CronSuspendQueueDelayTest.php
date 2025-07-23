@@ -60,17 +60,6 @@ final class CronSuspendQueueDelayTest extends UnitTestCase {
     $lock->expects($this->any())
       ->method('acquire')
       ->willReturn(TRUE);
-    $this->cronConstructorArguments = [
-      'moduleHandler' => $this->createMock(ModuleHandlerInterface::class),
-      'lock' => $lock,
-      'queueFactory' => $this->createMock(QueueFactory::class),
-      'state' => $this->createMock(StateInterface::class),
-      'accountSwitcher' => $this->createMock(AccountSwitcherInterface::class),
-      'logger' => $this->createMock(LoggerInterface::class),
-      'queueManager' => $this->createMock(QueueWorkerManagerInterface::class),
-      'time' => $this->createMock(TimeInterface::class),
-      'queue_config' => [],
-    ];
 
     // Capture error logs.
     $config = $this->createMock(ImmutableConfig::class);
@@ -86,6 +75,19 @@ final class CronSuspendQueueDelayTest extends UnitTestCase {
     $container = new ContainerBuilder();
     $container->set('config.factory', $configFactory);
     \Drupal::setContainer($container);
+
+    $this->cronConstructorArguments = [
+      'moduleHandler' => $this->createMock(ModuleHandlerInterface::class),
+      'lock' => $lock,
+      'queueFactory' => $this->createMock(QueueFactory::class),
+      'state' => $this->createMock(StateInterface::class),
+      'accountSwitcher' => $this->createMock(AccountSwitcherInterface::class),
+      'logger' => $this->createMock(LoggerInterface::class),
+      'configFactory' => $configFactory,
+      'queueManager' => $this->createMock(QueueWorkerManagerInterface::class),
+      'time' => $this->createMock(TimeInterface::class),
+      'queue_config' => [],
+    ];
 
     $this->workerA = $this->createMock(QueueWorkerInterface::class);
     $this->workerA->expects($this->any())
