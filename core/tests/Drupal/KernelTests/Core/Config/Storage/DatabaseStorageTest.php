@@ -25,20 +25,32 @@ class DatabaseStorageTest extends ConfigStorageTestBase {
     $this->invalidStorage = new DatabaseStorage($this->container->get('database'), 'invalid');
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function read($name) {
     $data = Database::getConnection()->select('config', 'c')->fields('c', ['data'])->condition('name', $name)->execute()->fetchField();
     return unserialize($data);
   }
 
-  protected function insert($name, $data) {
+  /**
+   * {@inheritdoc}
+   */
+  protected function insert($name, $data): void {
     Database::getConnection()->insert('config')->fields(['name' => $name, 'data' => $data])->execute();
   }
 
-  protected function update($name, $data) {
+  /**
+   * {@inheritdoc}
+   */
+  protected function update($name, $data): void {
     Database::getConnection()->update('config')->fields(['data' => $data])->condition('name', $name)->execute();
   }
 
-  protected function delete($name) {
+  /**
+   * {@inheritdoc}
+   */
+  protected function delete($name): void {
     Database::getConnection()->delete('config')->condition('name', $name)->execute();
   }
 

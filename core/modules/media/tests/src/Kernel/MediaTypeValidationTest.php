@@ -11,7 +11,6 @@ use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
  * Tests validation of media_type entities.
  *
  * @group media
- * @group #slow
  */
 class MediaTypeValidationTest extends ConfigEntityValidationTestBase {
 
@@ -20,13 +19,17 @@ class MediaTypeValidationTest extends ConfigEntityValidationTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['field', 'media', 'media_test_source'];
+  protected static $modules = ['field', 'media', 'media_test_source', 'user', 'image'];
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
+
+    $this->installEntitySchema('user');
+    $this->installEntitySchema('media');
+
     $this->entity = $this->createMediaType('test', ['id' => 'test_media']);
   }
 
