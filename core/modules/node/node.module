@@ -272,11 +272,6 @@ function template_preprocess_node(&$variables): void {
  */
 
 /**
- * @addtogroup node_access
- * @{
- */
-
-/**
  * Fetches an array of permission IDs granted to the given user ID.
  *
  * The implementation here provides only the universal "all" grant. A node
