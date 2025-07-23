@@ -37,7 +37,7 @@ class LocaleSettingsForm extends ConfigFormBase {
     $form['update_default_config_langcodes'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Update default configuration when new modules or themes are installed.'),
-      '#config_target' => 'locale.settings:translation.update_default_config_langcodes',
+      '#config_target' => 'locale.settings:update_default_config_langcodes',
       '#description' => $this->t("With this setting enabled, configuration langcodes will be updated to site's default language when installing new modules or themes. If this behavior is not desired in your setup (i.e., langcodes need to be in a different language then the site's default one), disable it."),
     ];
     $form['update_interval_days'] = [
