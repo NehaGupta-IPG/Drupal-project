@@ -4,6 +4,7 @@ namespace Drupal\user;
 
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityEmailInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -11,7 +12,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @ingroup user_api
  */
-interface UserInterface extends ContentEntityInterface, EntityChangedInterface, AccountInterface {
+interface UserInterface extends ContentEntityInterface, EntityChangedInterface, AccountInterface, EntityEmailInterface {
 
   /**
    * Maximum length of username text field.

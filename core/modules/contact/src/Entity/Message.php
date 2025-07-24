@@ -10,6 +10,10 @@ use Drupal\Core\Entity\ContentEntityNullStorage;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\contact\MessageInterface;
+use Drupal\contact\PageMessageBuilder;
+use Drupal\contact\ReplyMessageBuilder;
+use Drupal\contact\PersonalMessageBuilder;
+use Drupal\Core\Entity\EntityEmailTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 
@@ -32,6 +36,13 @@ use Drupal\Core\Field\BaseFieldDefinition;
     'storage' => ContentEntityNullStorage::class,
     'view_builder' => MessageViewBuilder::class,
     'form' => ['default' => MessageForm::class],
+    'email' => [
+      'page_mail' => PageMessageBuilder::class,
+      'page_copy' => PageMessageBuilder::class,
+      'page_autoreply' => ReplyMessageBuilder::class,
+      'user_mail' => PersonalMessageBuilder::class,
+      'user_copy' => PersonalMessageBuilder::class,
+    ],
   ],
   admin_permission: 'administer contact forms',
   bundle_entity_type: 'contact_form',
@@ -43,6 +54,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
   field_ui_base_route: 'entity.contact_form.edit_form'
 )]
 class Message extends ContentEntityBase implements MessageInterface {
+
+  use EntityEmailTrait;
 
   /**
    * {@inheritdoc}
