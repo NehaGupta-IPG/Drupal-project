@@ -326,37 +326,37 @@ function command_line_definition(): InputDefinition {
   $inputDefinition->addOption(new InputOption(
     'help',
     NULL,
-    NULL,
+    InputOption::VALUE_NONE,
     'Print this page.',
   ));
   $inputDefinition->addOption(new InputOption(
     'phpunit-configuration',
     NULL,
-    NULL,
+    InputOption::VALUE_REQUIRED,
     'Path to the configuration file for PHPUnit. If not specified, it defaults to core configuration.',
   ));
   $inputDefinition->addOption(new InputOption(
     'list',
     NULL,
-    NULL,
+    InputOption::VALUE_NONE,
     'Display all available test groups.',
   ));
   $inputDefinition->addOption(new InputOption(
     'list-files',
     NULL,
-    NULL,
+    InputOption::VALUE_NONE,
     'Display all discoverable test file paths.',
   ));
   $inputDefinition->addOption(new InputOption(
     'list-files-json',
     NULL,
-    NULL,
+    InputOption::VALUE_NONE,
     "Display all discoverable test files as JSON.\nThe array key will be the test class name, and the value will be the file path of the test.",
   ));
   $inputDefinition->addOption(new InputOption(
     'clean',
     NULL,
-    NULL,
+    InputOption::VALUE_NONE,
     'Cleans up database tables or directories from previous, failed, tests and then exits (no tests are run).',
   ));
   $inputDefinition->addOption(new InputOption(
@@ -393,7 +393,7 @@ function command_line_definition(): InputDefinition {
   $inputDefinition->addOption(new InputOption(
     'all',
     NULL,
-    NULL,
+    InputOption::VALUE_NONE,
     'Run all available tests.',
   ));
   $inputDefinition->addOption(new InputOption(
@@ -405,13 +405,13 @@ function command_line_definition(): InputDefinition {
   $inputDefinition->addOption(new InputOption(
     'class',
     NULL,
-    NULL,
+    InputOption::VALUE_NONE,
     'Run tests identified by specific class names, instead of group names.',
   ));
   $inputDefinition->addOption(new InputOption(
     'file',
     NULL,
-    NULL,
+    InputOption::VALUE_NONE,
     "Run tests identified by specific file names, instead of group names.\nSpecify the path and the extension (i.e. 'core/modules/user/tests/src/Functional/UserCreateTest.php').",
   ));
   $inputDefinition->addOption(new InputOption(
@@ -429,25 +429,25 @@ function command_line_definition(): InputDefinition {
   $inputDefinition->addOption(new InputOption(
     'color',
     NULL,
-    NULL,
+    InputOption::VALUE_NONE,
     'Output text format results with color highlighting.',
   ));
   $inputDefinition->addOption(new InputOption(
     'verbose',
     NULL,
-    NULL,
+    InputOption::VALUE_NONE,
     'Output detailed assertion messages in addition to summary.',
   ));
   $inputDefinition->addOption(new InputOption(
     'keep-results',
     NULL,
-    NULL,
+    InputOption::VALUE_NONE,
     "Keeps detailed assertion results (in the database) after tests have completed. By default, assertion results are cleared.",
   ));
   $inputDefinition->addOption(new InputOption(
     'keep-results-table',
     NULL,
-    NULL,
+    InputOption::VALUE_NONE,
     "Boolean flag to indicate to not cleanup the simpletest result table. For testbots or repeated execution of a single test it can be helpful to not cleanup the simpletest result table.",
   ));
   $inputDefinition->addOption(new InputOption(
@@ -460,13 +460,13 @@ function command_line_definition(): InputDefinition {
   $inputDefinition->addOption(new InputOption(
     'die-on-fail',
     NULL,
-    NULL,
+    InputOption::VALUE_NONE,
     "Exit test execution immediately upon any failed assertion.\nThis allows to access the test site by changing settings.php to use the test database and configuration directories.\nUse in combination with --repeat for debugging random test failures.",
   ));
   $inputDefinition->addOption(new InputOption(
     'suppress-deprecations',
     NULL,
-    NULL,
+    InputOption::VALUE_NONE,
     "Stops tests from failing if deprecation errors are triggered.\nIf this is not set the value specified in the SYMFONY_DEPRECATIONS_HELPER environment variable, or the value specified in core/phpunit.xml (if it exists), or the default value will be used.\nThe default is that any unexpected silenced deprecation error will fail tests.",
   ));
   $inputDefinition->addOption(new InputOption(
@@ -490,13 +490,14 @@ function command_line_definition(): InputDefinition {
   $inputDefinition->addOption(new InputOption(
     'non-html',
     NULL,
-    NULL,
+    InputOption::VALUE_NONE,
     'Removes escaping from output. Useful for reading results on the CLI.',
   ));
   $inputDefinition->addOption(new InputOption(
     'ci-parallel-node-index',
     NULL,
-    InputOption::VALUE_OPTIONAL, 'The index of the job in the job set.',
+    InputOption::VALUE_OPTIONAL,
+    'The index of the job in the job set.',
   ));
   $inputDefinition->addOption(new InputOption(
     'ci-parallel-node-total',
@@ -507,7 +508,7 @@ function command_line_definition(): InputDefinition {
   $inputDefinition->addOption(new InputOption(
     'debug-discovery',
     NULL,
-    NULL,
+    InputOption::VALUE_NONE,
     'If provided, dumps detailed information on the tests selected for execution, before the execution starts.'
   ));
 
