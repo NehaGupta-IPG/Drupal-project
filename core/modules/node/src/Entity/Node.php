@@ -2,7 +2,17 @@
 
 namespace Drupal\node\Entity;
 
+use Drupal\Core\Entity\Attribute\AccessHandler;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
+use Drupal\Core\Entity\Attribute\EntityKey;
+use Drupal\Core\Entity\Attribute\FormHandler;
+use Drupal\Core\Entity\Attribute\Handler;
+use Drupal\Core\Entity\Attribute\Label;
+use Drupal\Core\Entity\Attribute\LinkTemplate;
+use Drupal\Core\Entity\Attribute\ListBuilderHandler;
+use Drupal\Core\Entity\Attribute\RouteProviderHandler;
+use Drupal\Core\Entity\Attribute\StorageHandler;
+use Drupal\Core\Entity\Attribute\ViewBuilderHandler;
 use Drupal\Core\Entity\EditorialContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -27,53 +37,9 @@ use Drupal\user\EntityOwnerTrait;
  */
 #[ContentEntityType(
   id: 'node',
-  label: new TranslatableMarkup('Content'),
-  label_collection: new TranslatableMarkup('Content'),
-  label_singular: new TranslatableMarkup('content item'),
-  label_plural: new TranslatableMarkup('content items'),
-  entity_keys: [
-    'id' => 'nid',
-    'revision' => 'vid',
-    'bundle' => 'type',
-    'label' => 'title',
-    'langcode' => 'langcode',
-    'uuid' => 'uuid',
-    'status' => 'status',
-    'published' => 'status',
-    'uid' => 'uid',
-    'owner' => 'uid',
-  ],
-  handlers: [
-    'storage' => NodeStorage::class,
-    'storage_schema' => NodeStorageSchema::class,
-    'view_builder' => NodeViewBuilder::class,
-    'access' => NodeAccessControlHandler::class,
-    'views_data' => NodeViewsData::class,
-    'form' => [
-      'default' => NodeForm::class,
-      'delete' => NodeDeleteForm::class,
-      'edit' => NodeForm::class,
-      'delete-multiple-confirm' => DeleteMultiple::class,
-    ],
-    'route_provider' => [
-      'html' => NodeRouteProvider::class,
-    ],
-    'list_builder' => NodeListBuilder::class,
-    'translation' => NodeTranslationHandler::class,
-  ],
-  links: [
-    'canonical' => '/node/{node}',
-    'delete-form' => '/node/{node}/delete',
-    'delete-multiple-form' => '/admin/content/node/delete',
-    'edit-form' => '/node/{node}/edit',
-    'version-history' => '/node/{node}/revisions',
-    'revision' => '/node/{node}/revisions/{node_revision}/view',
-    'create' => '/node',
-  ],
   collection_permission: 'access content overview',
   permission_granularity: 'bundle',
   bundle_entity_type: 'node_type',
-  bundle_label: new TranslatableMarkup('Content type'),
   base_table: 'node',
   data_table: 'node_field_data',
   revision_table: 'node_revision',
@@ -93,6 +59,40 @@ use Drupal\user\EntityOwnerTrait;
     'revision_log_message' => 'revision_log',
   ],
 )]
+#[Label(new TranslatableMarkup('Content'))]
+#[Label(new TranslatableMarkup('Content'), 'collection')]
+#[Label(new TranslatableMarkup('content item'), 'singular')]
+#[Label(new TranslatableMarkup('content items'), 'plural')]
+#[Label(new TranslatableMarkup('Content type'), 'bundle')]
+#[EntityKey('id', 'nid')]
+#[EntityKey('revision', 'vid')]
+#[EntityKey('bundle', 'type')]
+#[EntityKey('label', 'title')]
+#[EntityKey('langcode')]
+#[EntityKey('uuid')]
+#[EntityKey('status')]
+#[EntityKey('published', 'status')]
+#[EntityKey('uid')]
+#[EntityKey('owner', 'uid')]
+#[AccessHandler(NodeAccessControlHandler::class)]
+#[FormHandler('default', NodeForm::class)]
+#[FormHandler('delete', NodeDeleteForm::class)]
+#[FormHandler('edit', NodeForm::class)]
+#[FormHandler('delete-multiple-confirm', DeleteMultiple::class)]
+#[Handler('storage_schema', NodeStorageSchema::class)]
+#[Handler('translation', NodeTranslationHandler::class)]
+#[Handler('views_data', NodeViewsData::class)]
+#[ListBuilderHandler(NodeListBuilder::class)]
+#[RouteProviderHandler(NodeRouteProvider::class)]
+#[StorageHandler(NodeStorage::class)]
+#[ViewBuilderHandler(NodeViewBuilder::class)]
+#[LinkTemplate('canonical', '/node/{node}')]
+#[LinkTemplate('delete-form', '/node/{node}/delete')]
+#[LinkTemplate('delete-multiple-form', '/admin/content/node/delete')]
+#[LinkTemplate('edit-form', '/node/{node}/edit')]
+#[LinkTemplate('version-history', '/node/{node}/revisions')]
+#[LinkTemplate('revision', '/node/{node}/revisions/{node_revision}/view')]
+#[LinkTemplate('create', '/node')]
 class Node extends EditorialContentEntityBase implements NodeInterface {
 
   use EntityOwnerTrait;

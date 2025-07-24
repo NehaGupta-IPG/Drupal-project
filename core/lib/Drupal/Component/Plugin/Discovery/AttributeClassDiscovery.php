@@ -7,6 +7,8 @@ use Drupal\Component\Plugin\Attribute\AttributeInterface;
 use Drupal\Component\Plugin\Attribute\Plugin;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\FileCache\FileCacheInterface;
+use Drupal\Component\Plugin\Attribute\PluginPropertyInterface;
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 
 /**
  * Defines a discovery mechanism to find plugins with attributes.
@@ -203,6 +205,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
    *
    * @throws \ReflectionException
    * @throws \Error
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
   protected function parseClass(string $class, \SplFileInfo $fileinfo): array {
     // @todo Consider performance improvements over using reflection.
@@ -217,6 +220,12 @@ class AttributeClassDiscovery implements DiscoveryInterface {
 
       $id = $attribute->getId();
       $content = $attribute->get();
+
+      if ($property_reflectors = $reflection_class->getAttributes(PluginPropertyInterface::class, \ReflectionAttribute::IS_INSTANCEOF)) {
+        foreach ($property_reflectors as $property_reflector) {
+          $content = $this->parseAdditionalProperty($property_reflector, $attribute, $content);
+        }
+      }
     }
     return ['id' => $id, 'content' => $content];
   }
@@ -241,6 +250,38 @@ class AttributeClassDiscovery implements DiscoveryInterface {
    */
   protected function getPluginNamespaces(): array {
     return $this->pluginNamespaces;
+  }
+
+  /**
+   * Parses the plugin property attribute and adds to definition.
+   *
+   * @param \ReflectionAttribute $property_reflector
+   *   Reflection object for the plugin property attribute.
+   * @param \Drupal\Component\Plugin\Attribute\AttributeInterface $plugin_attribute
+   *   The plugin attribute object.
+   * @param array|object $content
+   *   The plugin definition content retrieved from the plugin attribute. Plugin
+   *   property attributes that do not have third-party dependencies will add
+   *   property value to the definition content, which is passed by reference.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   */
+  protected function parseAdditionalProperty(\ReflectionAttribute $property_reflector, AttributeInterface $plugin_attribute, array|object $content): array|object {
+    $property_class = $property_reflector->getName();
+    $id = $plugin_attribute->getId();
+    $plugin_class = $plugin_attribute->getClass();
+
+    /** @var \Drupal\Component\Plugin\Attribute\PluginPropertyInterface $property_attribute */
+    $property_attribute = $property_reflector->newInstance();
+    $property_attribute->setPluginClass($plugin_class);
+    // Check that the property attribute is allowed to work with the plugin
+    // attribute.
+    if (!$property_attribute->isValidPluginAttribute($plugin_attribute::class)) {
+      throw new InvalidPluginDefinitionException($id, sprintf('May not use plugin property class %s with main plugin attribute class "%s for plugin class %s".', $property_class, $plugin_attribute::class, $plugin_class));
+    }
+    // Add properties from attributes if they do not dependencies, because
+    // they are not conditional.
+    return $property_attribute->addToDefinition($content);
   }
 
 }

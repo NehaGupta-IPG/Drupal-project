@@ -4,6 +4,7 @@ namespace Drupal\Core\Plugin\Discovery;
 
 use Drupal\Component\Plugin\Attribute\AttributeInterface;
 use Drupal\Component\Plugin\Discovery\AttributeClassDiscovery as ComponentAttributeClassDiscovery;
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 
 /**
  * Defines a discovery mechanism to find plugins using attributes.
@@ -119,6 +120,22 @@ class AttributeClassDiscovery extends ComponentAttributeClassDiscovery {
     }
 
     return $plugin_namespaces;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function parseAdditionalProperty(\ReflectionAttribute $property_reflector, AttributeInterface $plugin_attribute, array|object $content): array|object {
+    $property_class = $property_reflector->getName();
+    $id = $plugin_attribute->getId();
+    $plugin_class = $plugin_attribute->getClass();
+    $property_provider = $this->getProviderFromNamespace($property_class);
+    $allowed_providers = ['component', 'core'];
+    if (!in_array($property_provider, $allowed_providers)) {
+      throw new InvalidPluginDefinitionException($id, sprintf('Invalid plugin property class: %s used in plugin class %s. Plugin property classes can be implemented only in core.', $property_class, $plugin_class));
+    }
+
+    return parent::parseAdditionalProperty($property_reflector, $plugin_attribute, $content);
   }
 
 }
