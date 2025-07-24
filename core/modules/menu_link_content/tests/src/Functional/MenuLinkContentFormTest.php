@@ -135,7 +135,7 @@ class MenuLinkContentFormTest extends BrowserTestBase {
   /**
    * Tests that a menu link cannot reference itself as a parent.
    */
-  public function testMenuLinkCannotReferenceItself() {
+  public function testMenuLinkCannotReferenceItself(): void {
     $menu_link = MenuLinkContent::create([
       'title' => 'Menu link reference test',
       'provider' => 'menu_link_content',
