@@ -99,6 +99,11 @@ if (!class_exists(TestCase::class)) {
   exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
 }
 
+// Defaults the PHPUnit configuration file path.
+if (empty($input->getOption('phpunit-configuration'))) {
+  $input->setOption('phpunit-configuration', \Drupal::root() . \DIRECTORY_SEPARATOR . 'core');
+}
+
 if ($input->getOption('execute-test')) {
   simpletest_script_setup_database($input);
   $test_run_results_storage = simpletest_script_setup_test_run_results_storage($input);
@@ -112,12 +117,10 @@ if ($input->getOption('list')) {
   // Display all available tests organized by one @group annotation.
   echo "\nAvailable test groups & classes\n";
   echo "-------------------------------\n\n";
-  $test_discovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath(\Drupal::root() . \DIRECTORY_SEPARATOR . 'core');
+  $test_discovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath($args['phpunit-configuration']);
   try {
     $groups = $test_discovery->getTestClasses($input->getOption('module'));
-    foreach ($test_discovery->getWarnings() as $warning) {
-      simpletest_script_print($input, $warning . "\n", SIMPLETEST_SCRIPT_COLOR_EXCEPTION);
-    }
+    dump_discovery_warnings();
   }
   catch (Exception $e) {
     error_log((string) $e);
@@ -145,7 +148,7 @@ if ($input->getOption('list')) {
 // @see https://www.drupal.org/node/2569585
 if ($input->getOption('list-files') || $input->getOption('list-files-json')) {
   // List all files which could be run as tests.
-  $test_discovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath(\Drupal::root() . \DIRECTORY_SEPARATOR . 'core');
+  $test_discovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath($args['phpunit-configuration']);
   // PhpUnitTestDiscovery::findAllClassFiles() gives us a classmap similar to a
   // Composer 'classmap' array.
   $test_classes = $test_discovery->findAllClassFiles();
@@ -202,18 +205,20 @@ if (!Composer::upgradePHPUnitCheck(Version::id())) {
 
 echo "\n";
 echo "Drupal test run\n\n";
-echo sprintf("Drupal Version:   %s\n", \Drupal::VERSION);
-echo sprintf("PHP Version:      %s\n", \PHP_VERSION);
-echo sprintf("PHP Binary:       %s\n", $php ?? getenv('_'));
-echo sprintf("PHPUnit Version:  %s\n", Version::id());
+echo sprintf("Drupal Version.......: %s\n", \Drupal::VERSION);
+echo sprintf("PHP Version..........: %s\n", \PHP_VERSION);
+echo sprintf("PHP Binary...........: %s\n", $php ?? getenv('_'));
+echo sprintf("PHPUnit Version......: %s\n", Version::id());
+echo sprintf("PHPUnit configuration: %s\n", $input->getOption('phpunit-configuration'));
 if ($input->getOption('dburl')) {
   $sut_connection_info = Database::getConnectionInfo();
   $sut_tasks_class = $sut_connection_info['default']['namespace'] . "\\Install\\Tasks";
   $sut_installer = new $sut_tasks_class();
   $sut_connection = Database::getConnection();
-  echo sprintf("Database:         %s\n", (string) $sut_installer->name());
-  echo sprintf("Database Version: %s\n", $sut_connection->version());
+  echo sprintf("Database.............: %s\n", (string) $sut_installer->name());
+  echo sprintf("Database Version.....: %s\n", $sut_connection->version());
 }
+echo sprintf("Working directory....: %s\n", getcwd());
 echo "-------------------------------\n";
 echo "\n";
 
@@ -323,6 +328,12 @@ function command_line_definition(): InputDefinition {
     NULL,
     NULL,
     'Print this page.',
+  ));
+  $inputDefinition->addOption(new InputOption(
+    'phpunit-configuration',
+    NULL,
+    NULL,
+    'Path to the configuration file for PHPUnit. If not specified, it defaults to core configuration.',
   ));
   $inputDefinition->addOption(new InputOption(
     'list',
@@ -899,7 +910,7 @@ function simpletest_script_execute_batch(InputInterface $input, TestRunResultsSt
  * Run a PHPUnit-based test.
  */
 function simpletest_script_run_phpunit(InputInterface $input, TestRun $test_run, $class) {
-  $runner = PhpUnitTestRunner::create(\Drupal::getContainer());
+  $runner = PhpUnitTestRunner::create(\Drupal::getContainer())->setConfigurationFilePath($input->getOption('phpunit-configuration'));
   $start = microtime(TRUE);
   $results = $runner->execute($test_run, $class, $status, $input->getOption('color'));
   $time = microtime(TRUE) - $start;
@@ -981,21 +992,13 @@ function simpletest_script_command(InputInterface $input, TestRun $test_run, str
  *   List of tests.
  */
 function simpletest_script_get_test_list(InputInterface $input) {
-  $test_discovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath(\Drupal::root() . \DIRECTORY_SEPARATOR . 'core');
+  $test_discovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath($input->getOption('phpunit-configuration'));
   $test_list = [];
   $slow_tests = [];
   if ($input->getOption('all') || $input->getOption('module') || $input->getOption('directory')) {
     try {
       $groups = $test_discovery->getTestClasses($input->getOption('module'), $input->getOption('types'), $input->getOption('directory'));
-      $warnings = $test_discovery->getWarnings();
-      if (!empty($warnings)) {
-        simpletest_script_print($input, "Test discovery warnings\n", SIMPLETEST_SCRIPT_COLOR_BRIGHT_WHITE);
-        simpletest_script_print($input, "-----------------------\n", SIMPLETEST_SCRIPT_COLOR_BRIGHT_WHITE);
-        foreach ($warnings as $warning) {
-          simpletest_script_print($input, '* ' . $warning . "\n\n", SIMPLETEST_SCRIPT_COLOR_EXCEPTION);
-        }
-        echo "\n";
-      }
+      dump_discovery_warnings();
     }
     catch (Exception $e) {
       echo (string) $e;
@@ -1060,9 +1063,7 @@ function simpletest_script_get_test_list(InputInterface $input) {
         else {
           try {
             $groups = $test_discovery->getTestClasses(NULL, $input->getOption('types'));
-            foreach ($test_discovery->getWarnings() as $warning) {
-              simpletest_script_print($input, $warning . "\n", SIMPLETEST_SCRIPT_COLOR_EXCEPTION);
-            }
+            dump_discovery_warnings();
           }
           catch (Exception $e) {
             echo (string) $e;
@@ -1095,9 +1096,7 @@ function simpletest_script_get_test_list(InputInterface $input) {
     else {
       try {
         $groups = $test_discovery->getTestClasses(NULL, $input->getOption('types'));
-        foreach ($test_discovery->getWarnings() as $warning) {
-          simpletest_script_print($input, $warning . "\n", SIMPLETEST_SCRIPT_COLOR_EXCEPTION);
-        }
+        dump_discovery_warnings();
       }
       catch (Exception $e) {
         echo (string) $e;
@@ -1670,4 +1669,23 @@ function trim_with_ellipsis(string $input, int $length, int $side): string {
       };
   }
   return $input;
+}
+
+/**
+ * Outputs the discovery warning messages.
+ */
+function dump_discovery_warnings(): void {
+  $warnings = PhpUnitTestDiscovery::instance()->getWarnings();
+  if (!empty($warnings)) {
+    simpletest_script_print("Test discovery warnings\n", SIMPLETEST_SCRIPT_COLOR_BRIGHT_WHITE);
+    simpletest_script_print("-----------------------\n", SIMPLETEST_SCRIPT_COLOR_BRIGHT_WHITE);
+    foreach ($warnings as $warning) {
+      $tmp = explode("\n", $warning);
+      simpletest_script_print('* ' . array_shift($tmp) . "\n", SIMPLETEST_SCRIPT_COLOR_EXCEPTION);
+      foreach ($tmp as $sub) {
+        simpletest_script_print('  ' . $sub . "\n", SIMPLETEST_SCRIPT_COLOR_EXCEPTION);
+      }
+      echo "\n";
+    }
+  }
 }
