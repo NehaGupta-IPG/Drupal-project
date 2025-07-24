@@ -117,10 +117,10 @@ if ($input->getOption('list')) {
   // Display all available tests organized by one @group annotation.
   echo "\nAvailable test groups & classes\n";
   echo "-------------------------------\n\n";
-  $test_discovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath($args['phpunit-configuration']);
+  $test_discovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath($input->getOption('phpunit-configuration'));
   try {
     $groups = $test_discovery->getTestClasses($input->getOption('module'));
-    dump_discovery_warnings();
+    dump_discovery_warnings($input);
   }
   catch (Exception $e) {
     error_log((string) $e);
@@ -148,7 +148,7 @@ if ($input->getOption('list')) {
 // @see https://www.drupal.org/node/2569585
 if ($input->getOption('list-files') || $input->getOption('list-files-json')) {
   // List all files which could be run as tests.
-  $test_discovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath($args['phpunit-configuration']);
+  $test_discovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath($input->getOption('phpunit-configuration'));
   // PhpUnitTestDiscovery::findAllClassFiles() gives us a classmap similar to a
   // Composer 'classmap' array.
   $test_classes = $test_discovery->findAllClassFiles();
@@ -998,7 +998,7 @@ function simpletest_script_get_test_list(InputInterface $input) {
   if ($input->getOption('all') || $input->getOption('module') || $input->getOption('directory')) {
     try {
       $groups = $test_discovery->getTestClasses($input->getOption('module'), $input->getOption('types'), $input->getOption('directory'));
-      dump_discovery_warnings();
+      dump_discovery_warnings($input);
     }
     catch (Exception $e) {
       echo (string) $e;
@@ -1063,7 +1063,7 @@ function simpletest_script_get_test_list(InputInterface $input) {
         else {
           try {
             $groups = $test_discovery->getTestClasses(NULL, $input->getOption('types'));
-            dump_discovery_warnings();
+            dump_discovery_warnings($input);
           }
           catch (Exception $e) {
             echo (string) $e;
@@ -1096,7 +1096,7 @@ function simpletest_script_get_test_list(InputInterface $input) {
     else {
       try {
         $groups = $test_discovery->getTestClasses(NULL, $input->getOption('types'));
-        dump_discovery_warnings();
+        dump_discovery_warnings($input);
       }
       catch (Exception $e) {
         echo (string) $e;
@@ -1674,16 +1674,16 @@ function trim_with_ellipsis(string $input, int $length, int $side): string {
 /**
  * Outputs the discovery warning messages.
  */
-function dump_discovery_warnings(): void {
+function dump_discovery_warnings(InputInterface $input): void {
   $warnings = PhpUnitTestDiscovery::instance()->getWarnings();
   if (!empty($warnings)) {
-    simpletest_script_print("Test discovery warnings\n", SIMPLETEST_SCRIPT_COLOR_BRIGHT_WHITE);
-    simpletest_script_print("-----------------------\n", SIMPLETEST_SCRIPT_COLOR_BRIGHT_WHITE);
+    simpletest_script_print($input, "Test discovery warnings\n", SIMPLETEST_SCRIPT_COLOR_BRIGHT_WHITE);
+    simpletest_script_print($input, "-----------------------\n", SIMPLETEST_SCRIPT_COLOR_BRIGHT_WHITE);
     foreach ($warnings as $warning) {
       $tmp = explode("\n", $warning);
-      simpletest_script_print('* ' . array_shift($tmp) . "\n", SIMPLETEST_SCRIPT_COLOR_EXCEPTION);
+      simpletest_script_print($input, '* ' . array_shift($tmp) . "\n", SIMPLETEST_SCRIPT_COLOR_EXCEPTION);
       foreach ($tmp as $sub) {
-        simpletest_script_print('  ' . $sub . "\n", SIMPLETEST_SCRIPT_COLOR_EXCEPTION);
+        simpletest_script_print($input, '  ' . $sub . "\n", SIMPLETEST_SCRIPT_COLOR_EXCEPTION);
       }
       echo "\n";
     }
