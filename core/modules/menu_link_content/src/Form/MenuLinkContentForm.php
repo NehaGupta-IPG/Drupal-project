@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Menu\MenuParentFormSelectorInterface;
 use Drupal\Core\Path\PathValidatorInterface;
+use Drupal\Core\Url;
 use Drupal\system\MenuInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -129,6 +130,36 @@ class MenuLinkContentForm extends ContentEntityForm {
     $this->messenger()->addStatus($this->t('The menu link has been saved.'));
 
     $form_state->setRedirectUrl($menu_link->toUrl('canonical'));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    parent::validateForm($form, $form_state);
+    $entity = $this->entity;
+
+    if ($entity->isNew()) {
+      return;
+    }
+
+    // Get the submitted link URI and turn it into a Url object.
+    $submitted_uri = $form_state->getValue(['link', 0, 'uri']);
+    $url = Url::fromUri($submitted_uri);
+
+    // Comparing with menu internal paths.
+    if ($url->isRouted()) {
+      $submitted_path = $url->getInternalPath();
+
+      // Get this entity's edit form path.
+      $self_edit_path = Url::fromRoute('entity.menu_link_content.edit_form', [
+        'menu_link_content' => $entity->id(),
+      ])->getInternalPath();
+
+      if ($submitted_path === $self_edit_path) {
+        $form_state->setErrorByName('link', $this->t('The menu link cannot point to its own edit form.'));
+      }
+    }
   }
 
 }

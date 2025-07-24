@@ -132,4 +132,27 @@ class MenuLinkContentFormTest extends BrowserTestBase {
     $this->assertSession()->linkExists('Custom Home');
   }
 
+  /**
+   * Tests that a menu link cannot reference itself as a parent.
+   */
+  public function testMenuLinkCannotReferenceItself() {
+    $menu_link = MenuLinkContent::create([
+      'title' => 'Menu link reference test',
+      'provider' => 'menu_link_content',
+      'menu_name' => 'main',
+      'link' => ['uri' => 'internal:/user/login'],
+    ]);
+    $menu_link->save();
+
+    // Navigating to menu edit page.
+    $this->drupalGet('/admin/structure/menu/item/' . $menu_link->id() . '/edit');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->submitForm([
+      'title' => 'Menu link reference test',
+      'link[0][uri]' => '/admin/structure/menu/item/' . $menu_link->id() . '/edit',
+    ], 'Save');
+    // Assert an error message appears and infinite loop is avoided.
+    $this->assertSession()->pageTextContains('The menu link cannot point to its own edit form.');
+  }
+
 }
