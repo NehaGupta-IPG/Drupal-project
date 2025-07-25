@@ -15,6 +15,7 @@ use Drupal\path\PathAliasForm;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Hook implementations for path.
@@ -150,6 +151,28 @@ class PathHooks {
       }
       if ($field_name === 'alias') {
         $element['value']['#description'] = $this->t('Specify an alternative path by which this data can be accessed. For example, type "/about" when writing an about page.');
+      }
+    }
+  }
+
+  /**
+   * Implements hook_entity_presave().
+   */
+  #[Hook('entity_presave')]
+  public function entityPreSave(EntityInterface $entity): void {
+    // Perform actions before the content entity is saved.
+    if ($entity->getEntityTypeId() != 'path_alias' && $entity instanceof ContentEntityInterface) {
+      $original_langcode = $entity->original?->langcode->value ?? NULL;
+      $langcode = $entity->langcode->value ?? NULL;
+      if (isset($original_langcode) && isset($langcode) && $langcode !== $original_langcode) {
+        $alias = $entity->original?->path?->alias ?? NULL;
+        if (isset($alias)) {
+          $entity->set('path', [
+            'alias' => $alias,
+            'langcode' => $langcode,
+            'pathauto' => FALSE,
+          ]);
+        }
       }
     }
   }
