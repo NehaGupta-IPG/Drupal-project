@@ -205,7 +205,7 @@ class Cron implements CronInterface {
     $end = $this->time->getCurrentTime() + $lease_time;
     while ($this->time->getCurrentTime() < $end && ($item = $queue->claimItem($lease_time))) {
       try {
-        $worker->processItem($item->data);
+        $worker->processItem($item->data, $item);
         $queue->deleteItem($item);
       }
       catch (DelayedRequeueException $e) {

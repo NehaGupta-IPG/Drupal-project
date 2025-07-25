@@ -79,7 +79,7 @@ class LocaleTranslation extends QueueWorkerBase implements ContainerFactoryPlugi
    * data is needed to continue the batch task is stored in the queue with the
    * queue data.
    */
-  public function processItem($data) {
+  public function processItem($data, ?object $metadata = NULL) {
     $this->moduleHandler->loadInclude('locale', 'batch.inc');
     [$function, $args] = $data;
 

@@ -65,13 +65,14 @@ interface QueueInterface {
    *   - data: the same as what passed into createItem().
    *   - item_id: the unique ID returned from createItem().
    *   - created: timestamp when the item was put into the queue.
+   *   - claimed_count: the number of times the same item has been claimed.
    */
   public function claimItem($lease_time = 3600);
 
   /**
    * Deletes a finished item from the queue.
    *
-   * @param bool|object $item
+   * @param object $item
    *   The item returned by \Drupal\Core\Queue\QueueInterface::claimItem().
    */
   public function deleteItem($item);
@@ -81,7 +82,7 @@ interface QueueInterface {
    *
    * Another worker can come in and process it before the timeout expires.
    *
-   * @param bool|object $item
+   * @param object $item
    *   The item returned by \Drupal\Core\Queue\QueueInterface::claimItem().
    *
    * @return bool

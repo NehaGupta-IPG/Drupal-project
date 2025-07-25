@@ -22,6 +22,15 @@ interface QueueWorkerInterface extends PluginInspectionInterface {
    * @param mixed $data
    *   The data that was passed to
    *   \Drupal\Core\Queue\QueueInterface::createItem() when the item was queued.
+   * phpcs:disable Drupal.Commenting
+   * @todo Uncomment new method parameter before drupal:12.0.0.
+   * @see https://www.drupal.org/project/drupal/issues/3525399
+   *
+   * @param object{'data': mixed, item_id: int|string, 'created': int, 'claimed_count'?: int}|null $metadata
+   *   The queue item metadata, typically including the created time and claimed
+   *   count. The worker must still work correctly if this is NULL or expected
+   *   properties are missing.
+   * phpcs:enable
    *
    * @throws \Drupal\Core\Queue\RequeueException
    *   Processing is not yet finished. This will allow another process to claim
@@ -43,6 +52,6 @@ interface QueueWorkerInterface extends PluginInspectionInterface {
    *
    * @see \Drupal\Core\Cron::processQueues()
    */
-  public function processItem($data);
+  public function processItem($data, /* ?object $metadata = NULL */);
 
 }

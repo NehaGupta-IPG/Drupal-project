@@ -135,16 +135,16 @@ class CronTest extends UnitTestCase {
     $queue_worker_plugin = $this->prophesize('Drupal\Core\Queue\QueueWorkerInterface');
     $queue_worker_plugin->getPluginId()->willReturn($queue_worker);
     $queue_worker_plugin->getPluginDefinition()->willReturn($queue_worker_definition);
-    $queue_worker_plugin->processItem('Complete')->willReturn();
-    $queue_worker_plugin->processItem('Exception')->willThrow(\Exception::class);
-    $queue_worker_plugin->processItem('DelayedRequeueException')->willThrow(DelayedRequeueException::class);
-    $queue_worker_plugin->processItem('SuspendQueueException')->willThrow(SuspendQueueException::class);
+    $queue_worker_plugin->processItem('Complete', Argument::any())->willReturn();
+    $queue_worker_plugin->processItem('Exception', Argument::any())->willThrow(\Exception::class);
+    $queue_worker_plugin->processItem('DelayedRequeueException', Argument::any())->willThrow(DelayedRequeueException::class);
+    $queue_worker_plugin->processItem('SuspendQueueException', Argument::any())->willThrow(SuspendQueueException::class);
     // 'RequeueException' would normally result in an infinite loop.
     //
     // This is avoided by throwing RequeueException for the first few calls to
     // ::processItem() and then returning void. ::testRequeueException()
     // establishes sanity assertions for this case.
-    $queue_worker_plugin->processItem('RequeueException')->will(function ($args, $mock, $method) {
+    $queue_worker_plugin->processItem('RequeueException', Argument::any())->will(function ($args, $mock, $method) {
       // Fetch the number of calls to this prophesied method. This value will
       // start at zero during the first call.
       $method_calls = count($mock->findProphecyMethodCalls($method->getMethodName(), new ArgumentsWildcard($args)));
