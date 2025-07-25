@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * Change the include_unknown_files_in_project_root setting to a sequence.
+ */
+function package_manager_update_11201(): void {
+  $config = \Drupal::configFactory()->getEditable('package_manager.settings');
+  $setting = $config->get('include_unknown_files_in_project_root');
+  if (!is_array($setting)) {
+    $config->set('include_unknown_files_in_project_root', $setting ? ['*'] : []);
+    $config->save();
+  }
+}

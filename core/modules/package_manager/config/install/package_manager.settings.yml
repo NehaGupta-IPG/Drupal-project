@@ -1,3 +1,2 @@
 additional_trusted_composer_plugins: []
-additional_known_files_in_project_root: []
-include_unknown_files_in_project_root: false
+include_unknown_files_in_project_root: []
