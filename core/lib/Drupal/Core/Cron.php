@@ -105,7 +105,9 @@ class Cron implements CronInterface {
       $this->lock->release('cron');
 
       // Add watchdog message.
-      $this->logger->info('Cron run completed.');
+      if ($this->isDetailedLoggingEnabled()) {
+        $this->logger->info('Cron run completed.');
+      }
 
       // Return TRUE so other functions can check if it did run successfully
       $return = TRUE;
@@ -251,8 +253,7 @@ class Cron implements CronInterface {
     $module_previous = '';
 
     // If detailed logging isn't enabled, don't log individual execution times.
-    $time_logging_enabled = \Drupal::config('system.cron')->get('logging');
-    $logger = $time_logging_enabled ? $this->logger : new NullLogger();
+    $logger = $this->isDetailedLoggingEnabled() ? $this->logger : new NullLogger();
 
     // Iterate through the modules calling their cron handlers (if any):
     $this->moduleHandler->invokeAllWith('cron', function (callable $hook, string $module) use (&$module_previous, $logger) {
@@ -287,6 +288,16 @@ class Cron implements CronInterface {
         '@time' => Timer::read('cron_' . $module_previous) . 'ms',
       ]);
     }
+  }
+
+  /**
+   * Check whether logging is enabled.
+   *
+   * @return bool
+   *   True if cron logging is enabled.
+   */
+  protected function isDetailedLoggingEnabled(): bool {
+    return !empty(\Drupal::configFactory()->get('system.cron')->get('logging'));
   }
 
   /**
