@@ -147,6 +147,11 @@ interface FieldableEntityInterface extends EntityInterface {
    *
    * @throws \InvalidArgumentException
    *   If an invalid field name is given.
+   *
+   * @todo Update this documentation before Drupal 12 to reflect that this
+   *   method will return NULL on an unknown field name and will not throw an
+   *   exception.
+   * @see https://www.drupal.org/node/352222
    */
   public function get($field_name);
 
