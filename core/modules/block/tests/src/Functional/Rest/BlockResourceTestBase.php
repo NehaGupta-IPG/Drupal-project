@@ -7,6 +7,7 @@ namespace Drupal\Tests\block\Functional\Rest;
 use Drupal\block\Entity\Block;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
+use Drupal\user\Entity\Role;
 
 /**
  * Resource test base for the block entity.
@@ -51,6 +52,12 @@ abstract class BlockResourceTestBase extends ConfigEntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function createEntity() {
+    if (!Role::load('non_existing_role')) {
+      Role::create([
+        'id' => 'non_existing_role',
+        'label' => 'Testing role',
+      ])->save();
+    }
     $block = Block::create([
       'plugin' => 'llama_block',
       'region' => 'header',
@@ -67,7 +74,7 @@ abstract class BlockResourceTestBase extends ConfigEntityResourceTestBase {
     // @todo Fix this in https://www.drupal.org/node/2820315.
     $block->setVisibilityConfig('user_role', [
       'id' => 'user_role',
-      'roles' => ['non-existing-role' => 'non-existing-role'],
+      'roles' => ['non_existing_role' => 'non_existing_role'],
       'negate' => FALSE,
       'context_mapping' => [
         'user' => '@user.current_user_context:current_user',
