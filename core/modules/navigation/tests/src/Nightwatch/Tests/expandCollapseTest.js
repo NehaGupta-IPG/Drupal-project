@@ -29,7 +29,7 @@ module.exports = {
         .setWindowSize(1220, 800)
         .click(selectors.clearCacheButton)
         .waitForElementPresent(
-          '[data-once="admin-toolbar-document-triggers-listener"]',
+          '[data-once*="admin-toolbar-document-triggers-listener"]',
         )
         // This pause required to wait for first init event.
         .waitForElementNotPresent(selectors.expandButton.expanded)

@@ -142,7 +142,7 @@
         viewportResizeListener,
       );
 
-      document.addEventListener('dialogDisableViewportResizeListener', () => {
+      window.addEventListener('dialog:beforeclose', () => {
         document.removeEventListener(
           'drupalViewportOffsetChange',
           viewportResizeListener,
@@ -154,8 +154,5 @@
   window.addEventListener('dialog:beforeclose', () => {
     $(window).off('.dialogResize');
     $(document).off('.dialogResize');
-    document.dispatchEvent(
-      new CustomEvent('dialogDisableViewportResizeListener'),
-    );
   });
 })(jQuery, Drupal, drupalSettings, Drupal.debounce, Drupal.displace);
