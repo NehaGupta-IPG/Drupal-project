@@ -11,3 +11,25 @@
 function content_moderation_update_last_removed(): int {
   return 8700;
 }
+
+/**
+ * Add database index to make moderation_state computed field lookups faster.
+ */
+function content_moderation_update_10401(&$sandbox) {
+  $databaseSchema = \Drupal::database()->schema();
+  $entityDefinitionUpdateManager = \Drupal::entityDefinitionUpdateManager();
+
+  // See \Drupal\content_moderation\ContentModerationStateStorageSchema::getEntitySchema().
+  $table = 'content_moderation_state_field_revision';
+  $fieldName = 'content_entity_revision_id';
+  $indexName = 'content_moderation_state__content_entity_revision_id';
+
+  // If an index does not exist with the given name, then add one.
+  if (!$databaseSchema->indexExists($table, $indexName)) {
+    $fieldSchema = $entityDefinitionUpdateManager
+      ->getFieldStorageDefinition($fieldName, 'content_moderation_state')
+      ?->getSchema();
+
+    $databaseSchema->addIndex($table, $indexName, [$fieldName], $fieldSchema);
+  }
+}
