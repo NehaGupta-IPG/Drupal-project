@@ -24,6 +24,106 @@ class NumberTest extends TestCase {
   use ExpectDeprecationTrait;
 
   /**
+   * @covers \Drupal\Component\Utility\Number::normalize
+   *
+   * @param int|float|string $number
+   *   The number to test the count on.
+   * @param int $expected
+   *   The expected number of significant decimals.
+   *
+   * @dataProvider providerNormalize
+   */
+  public function testNormalize($number, $expected) {
+    $this->assertEquals($expected, Number::normalize($number));
+  }
+
+  /**
+   * Provides data to self::testNormalize().
+   */
+  public static function providerNormalize() {
+    return [
+          ['', ''],
+          [0, 0],
+          [123456, 123456],
+          [-123456, -123456],
+          [0.0, 0.0],
+          [0.12300000000000000001, 0.123],
+          [1 / 3, 0.33333333333333],
+          [10.00000000000000000999, 10],
+          [1234.1234567800000000000000001, 1234.12345678],
+          ['1234.1234567800000000000000001', '1234.1234567800000000000000001'],
+    ];
+  }
+
+  /**
+   * @covers \Drupal\Component\Utility\Number::countDecimals
+   *
+   * @param int $expected
+   *   The expected number of significant decimals.
+   * @param int|float|string $number
+   *   The number to test the count on.
+   *
+   * @dataProvider providerCountDecimals
+   */
+  public function testCountDecimals($expected, $number) {
+    $this->assertEquals($expected, Number::countDecimals($number));
+  }
+
+  /**
+   * Provides data to self::testCountDecimals().
+   */
+  public static function providerCountDecimals() {
+    return [
+          [0, ''],
+          [0, 0],
+          [0, '0'],
+          [0, 9],
+          [0, '9'],
+          [0, -9],
+          [0, '-9'],
+          [0, 999999999],
+          [0, '999999999'],
+          [0, -999999999],
+          [0, '-999999999'],
+          [0, 0.0],
+          [1, '0.0'],
+          [0, -0.0],
+          [1, '-0.0'],
+          // The maximum supported number of significant float decimals is 15.
+          [0, 0.0000000000000],
+          [0, -0.0000000000000],
+          [9, -0.0000000090000],
+          [9, -0.0000000090000],
+          [9, -0.00000000900000],
+          [9, -0.000000009000000000],
+          [15, -0.0000000090000009],
+          [15, -0.00000000900000099],
+          [15, -0.000000009000000900009],
+          [15, 0.000000009000000900009],
+          // The floats are limited to the precision guaranteed by PHP.
+          [14, 0.12345678901234567890],
+          [12, 12.123456789012],
+          [15, 123.12345678901234567890],
+          [14, 1234.12345678901234567890],
+          [14, 12345.12345678901234567890],
+          [14, -12345.12345678901234567890],
+          [14, 1 / 3],
+          // Numeric strings do not suffer from the system-specific limitations
+          // to float precision, so they can contain many more significant
+          // decimals. This is especially useful when working with solutions
+          // such as BCMath (https://secure.php.net/manual/en/book.bc.php)
+          [15, '0.000000000000000'],
+          [15, '-0.000000000000000'],
+          [15, '-0.000000009000000'],
+          [16, '-0.0000000090000000'],
+          [20, '-0.00000000900000000000'],
+          [20, '1234567890.12345678901234567890'],
+          [20, '-1234567890.12345678901234567890'],
+          [20, '1,234,567,890.12345678901234567890'],
+    ];
+  }
+
+  /**
    * Tests Number::validStep() without offset.
    *
    * @param numeric $value

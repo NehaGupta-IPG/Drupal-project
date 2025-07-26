@@ -442,6 +442,8 @@ sess
 settingstray
 shorterthan
 shortlink
+significand
+significands
 singlebyte
 sirbrillig
 sitewide
@@ -557,6 +559,7 @@ undoable
 unfieldable
 ungroup
 ungroupable
+unguaranteed
 unindexed
 uninstallations
 unminified
