@@ -12,7 +12,7 @@ use Drupal\Core\Render\Markup;
 class TestController {
 
   /**
-   * Returns markup for testing.
+   * Returns test markup for a script tag containing JavaScript.
    */
   public function page() {
     $markup = <<<JS

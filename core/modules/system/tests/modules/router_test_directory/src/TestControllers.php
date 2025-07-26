@@ -153,7 +153,7 @@ class TestControllers {
   }
 
   /**
-   * Removes the exception logger service.
+   * Removes the exception logger service from the event dispatcher.
    */
   protected function removeExceptionLogger() {
     // Remove the exception logger from the event dispatcher. We are going to

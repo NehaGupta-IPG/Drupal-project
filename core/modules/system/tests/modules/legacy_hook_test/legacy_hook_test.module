@@ -9,7 +9,7 @@ declare(strict_types=1);
 use Drupal\Core\Hook\Attribute\LegacyHook;
 
 /**
- * A test hook that will cause a fatal error.
+ * Implements a test hook that will cause a fatal error.
  */
 #[LegacyHook]
 function legacy_hook_test_test1(): void {
@@ -17,7 +17,7 @@ function legacy_hook_test_test1(): void {
 }
 
 /**
- * A valid legacy hook.
+ * Implements a valid legacy hook.
  */
 function legacy_hook_test_test2(): string {
   return 'ok';

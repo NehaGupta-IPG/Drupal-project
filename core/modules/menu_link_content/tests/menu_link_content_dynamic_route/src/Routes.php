@@ -10,7 +10,7 @@ namespace Drupal\menu_link_content_dynamic_route;
 class Routes {
 
   /**
-   * Gets the menu link dynamic routes.
+   * Gets the dynamic array of route objects currently stored in state.
    */
   public function dynamic() {
     return \Drupal::state()->get('menu_link_content_dynamic_route.routes', []);

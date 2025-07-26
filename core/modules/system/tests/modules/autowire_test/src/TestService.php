@@ -44,21 +44,21 @@ class TestService {
   }
 
   /**
-   * Gets the testInjection service.
+   * Gets the TestInjection service.
    */
   public function getTestInjection(): TestInjectionInterface {
     return $this->testInjection;
   }
 
   /**
-   * Gets the testInjection service.
+   * Gets the TestInjection2 service.
    */
   public function getTestInjection2(): TestInjection2 {
     return $this->testInjection2;
   }
 
   /**
-   * Gets the testInjection3 service.
+   * Gets the TestInjection3 service.
    */
   public function getTestInjection3(): TestInjection3 {
     return $this->testInjection3;

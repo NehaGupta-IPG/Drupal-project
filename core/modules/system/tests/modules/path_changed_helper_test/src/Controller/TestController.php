@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 class TestController {
 
   /**
-   * Returns a response with content.
+   * Returns a simple response with test content.
    */
   public function test(): Response {
     return new Response('test');

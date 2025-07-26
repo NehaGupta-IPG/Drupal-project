@@ -77,7 +77,7 @@ class EarlyRenderingTestController extends ControllerBase {
   }
 
   /**
-   * Returns a rendered array.
+   * Renders the early-render content and returns it as a #markup element.
    */
   public function renderArrayEarly() {
     $render_array = $this->earlyRenderContent();
@@ -96,7 +96,7 @@ class EarlyRenderingTestController extends ControllerBase {
   }
 
   /**
-   * Returns an Ajax response with early rendering content.
+   * Returns an Ajax response with the content rendered early.
    */
   public function ajaxResponseEarly() {
     $response = new AjaxResponse();
@@ -112,7 +112,7 @@ class EarlyRenderingTestController extends ControllerBase {
   }
 
   /**
-   * Returns the rendered response with early rendering content.
+   * Renders the content, casts it to a string, and returns it as a response.
    */
   public function responseEarly() {
     $render_array = $this->earlyRenderContent();
@@ -135,14 +135,14 @@ class EarlyRenderingTestController extends ControllerBase {
   }
 
   /**
-   * Returns a cacheable response.
+   * Returns a cacheable "Hello world" response.
    */
   public function cacheableResponse() {
     return new CacheableTestResponse('Hello world!');
   }
 
   /**
-   * Returns a cacheable response with early rendering content.
+   * Returns a cacheable response with the content rendered early.
    */
   public function cacheableResponseEarly() {
     $render_array = $this->earlyRenderContent();
@@ -157,7 +157,7 @@ class EarlyRenderingTestController extends ControllerBase {
   }
 
   /**
-   * Returns the test domain object with early rendering content.
+   * Returns the test domain object with the content rendered early.
    */
   public function domainObjectEarly() {
     $render_array = $this->earlyRenderContent();
