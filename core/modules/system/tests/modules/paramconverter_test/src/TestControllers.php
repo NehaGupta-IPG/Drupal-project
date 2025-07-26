@@ -28,7 +28,7 @@ class TestControllers {
   }
 
   /**
-   * Returns render array with markup for the node label and is cacheable.
+   * Returns a cacheable render array containing the node label.
    */
   public function testEntityLanguage(NodeInterface $node) {
     $build = ['#markup' => $node->label()];

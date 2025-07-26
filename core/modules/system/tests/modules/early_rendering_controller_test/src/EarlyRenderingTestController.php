@@ -127,7 +127,7 @@ class EarlyRenderingTestController extends ControllerBase {
   }
 
   /**
-   * Returns a response with an attachment the early rendering content.
+   * Returns a response with the early-rendered content and an attachment.
    */
   public function responseWithAttachmentsEarly() {
     $render_array = $this->earlyRenderContent();
