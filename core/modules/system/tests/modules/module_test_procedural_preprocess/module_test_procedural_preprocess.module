@@ -30,14 +30,20 @@ function template_preprocess_test($arg): mixed {
 }
 
 /**
- * Allows testing that procedural preprocess hooks execute.
+ * Implements hook_preprocess().
+ *
+ * This implementation tests a procedural preprocess hook with a prefix and
+ * suffix is executed.
  */
 function module_test_procedural_preprocess_preprocess($arg): mixed {
   return $arg;
 }
 
 /**
- * Allows testing that procedural preprocess hooks execute.
+ * Implements hook_preprocess().
+ *
+ * This implementation tests a procedural preprocess hook with a prefix and
+ * suffix is executed.
  */
 function module_test_procedural_preprocess_preprocess_test($arg): mixed {
   return $arg;

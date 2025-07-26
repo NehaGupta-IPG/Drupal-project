@@ -11,8 +11,6 @@ use Drupal\Core\Hook\Attribute\Hook;
  *
  * By default, these will be called in module order, which is predictable due
  * to the alphabetical module names.
- *
- * @see \Drupal\KernelTests\Core\Hook\HookAlterOrderTest
  */
 class DAlterHooks {
 
@@ -22,6 +20,7 @@ class DAlterHooks {
    * This implementation has no ordering modifications.
    */
   #[Hook('test_alter')]
+  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
   public function testAlter(array &$calls): void {
     $calls[] = __METHOD__;
   }
@@ -32,6 +31,7 @@ class DAlterHooks {
    * This implementation has no ordering modifications.
    */
   #[Hook('test_subtype_alter')]
+  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
   public function testSubtypeAlter(array &$calls): void {
     $calls[] = __METHOD__;
   }

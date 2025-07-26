@@ -8,8 +8,6 @@ use Drupal\Core\Hook\Attribute\Hook;
 
 /**
  * Hook implementations for module_test_oop_preprocess.
- *
- * @see \Drupal\Tests\system\Kernel\Extension\ModuleHandlerTest::testProceduralPreprocess()
  */
 class ModuleTestOopPreprocessThemeHooks {
 

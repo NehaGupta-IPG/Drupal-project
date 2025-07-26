@@ -36,6 +36,7 @@ class AHooks {
    * This implementation has no ordering modifications.
    */
   #[Hook('test_hook')]
+  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
   public function testHook(): string {
     return __METHOD__;
   }
@@ -46,6 +47,7 @@ class AHooks {
    * This implementation changes its order to be first.
    */
   #[Hook('test_hook', order: Order::First)]
+  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
   public function testHookFirst(): string {
     return __METHOD__;
   }
@@ -56,6 +58,7 @@ class AHooks {
    * This implementation changes its order to be last.
    */
   #[Hook('test_hook', order: Order::Last)]
+  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
   public function testHookLast(): string {
     return __METHOD__;
   }
@@ -67,6 +70,7 @@ class AHooks {
    * bbb_hook_order_test.
    */
   #[Hook('test_hook', order: new OrderAfter(modules: ['bbb_hook_order_test']))]
+  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
   public function testHookAfterB(): string {
     return __METHOD__;
   }
@@ -85,6 +89,7 @@ class AHooks {
       classesAndMethods: [[CHooks::class, 'testBothParametersHook']]
     )
   )]
+  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
   public function testBothParametersHook(): string {
     return __METHOD__;
   }

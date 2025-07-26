@@ -35,6 +35,7 @@ class DHooks {
    * This implementation has no ordering modifications.
    */
   #[Hook('test_hook')]
+  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
   public function testHook(): string {
     return __METHOD__;
   }
@@ -45,6 +46,7 @@ class DHooks {
    * This implementation has no ordering modifications.
    */
   #[Hook('sparse_test_hook')]
+  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
   public function sparseTestHook(): string {
     return __METHOD__;
   }

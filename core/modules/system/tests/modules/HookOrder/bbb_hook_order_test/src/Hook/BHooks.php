@@ -24,6 +24,7 @@ class BHooks {
    * This implementation has no ordering modifications.
    */
   #[Hook('test_hook')]
+  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
   public function testHook(): string {
     return __METHOD__;
   }
@@ -34,6 +35,7 @@ class BHooks {
    * This implementation has no ordering modifications.
    */
   #[Hook('sparse_test_hook')]
+  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
   public function sparseTestHook(): string {
     return __METHOD__;
   }
@@ -46,6 +48,7 @@ class BHooks {
    * before \Drupal\aaa_hook_order_test\Hook\AHooks::testBothParametersHook().
    */
   #[Hook('test_both_parameters_hook')]
+  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
   public function testBothParametersHook(): string {
     return __METHOD__;
   }
