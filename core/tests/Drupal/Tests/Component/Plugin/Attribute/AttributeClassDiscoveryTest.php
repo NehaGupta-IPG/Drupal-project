@@ -80,4 +80,22 @@ class AttributeClassDiscoveryTest extends TestCase {
     $this->assertEquals([], $empty_discovery->getDefinitions());
   }
 
+  /**
+   * Tests third party attributes on plugins.
+   */
+  public function testThirdParty(): void {
+    $discovery = new AttributeClassDiscovery(['com\example' => [__DIR__ . '/Fixtures/Plugins']]);
+    $this->assertEquals([
+      'discovery_test_1' => [
+        'id' => 'discovery_test_1',
+        'class' => 'com\example\PluginNamespace\AttributeDiscoveryWithThirdPartyTest',
+        'title' => 'Discovery test plugin',
+        // The value from the third-party attribute is taken, because the
+        // property with the same name on the main attribute class is marked as
+        // deprecated.
+        'third_party_property' => 'override',
+      ],
+    ], $discovery->getDefinitions());
+  }
+
 }

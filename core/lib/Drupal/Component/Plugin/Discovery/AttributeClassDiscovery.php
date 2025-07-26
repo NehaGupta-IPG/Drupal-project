@@ -7,6 +7,9 @@ use Drupal\Component\Plugin\Attribute\AttributeInterface;
 use Drupal\Component\Plugin\Attribute\Plugin;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\FileCache\FileCacheInterface;
+use Drupal\Component\Plugin\Attribute\PluginExtender;
+use Drupal\Component\Plugin\Attribute\PluginDeprecatedProperty;
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 
 /**
  * Defines a discovery mechanism to find plugins with attributes.
@@ -212,12 +215,43 @@ class AttributeClassDiscovery implements DiscoveryInterface {
     $id = $content = NULL;
     if ($attributes = $reflection_class->getAttributes($this->pluginDefinitionAttributeName, \ReflectionAttribute::IS_INSTANCEOF)) {
       /** @var \Drupal\Component\Plugin\Attribute\AttributeInterface $attribute */
-      $attribute = $attributes[0]->newInstance();
-      $this->prepareAttributeDefinition($attribute, $class);
+      $plugin_attribute = $attributes[0]->newInstance();
+      $this->prepareAttributeDefinition($plugin_attribute, $class);
 
-      $id = $attribute->getId();
-      $content = $attribute->get();
+      $id = $plugin_attribute->getId();
+      $content = $plugin_attribute->get();
+
+      // Get third-party plugin attributes.
+      if ($third_party_attributes = $reflection_class->getAttributes(PluginExtender::class, \ReflectionAttribute::IS_INSTANCEOF)) {
+        foreach ($third_party_attributes as $attribute) {
+          $attribute_class = $attribute->getName();
+          // Attribute classes may come from modules which are not enabled, so
+          // skip these.
+          if (!class_exists($attribute_class)) {
+            continue;
+          }
+
+          // Ensure that none of the properties in the 3rd party attribute
+          // overwrite a non-deprecated property in the base plugin attribute.
+          $attribute_properties = $attribute->getArguments();
+          foreach ($attribute_properties as $name => $value) {
+            if (array_key_exists($name, $content)) {
+              // If the property is deprecated on the plugin attribute, we allow
+              // it in the third-party attribute. This allows legacy annotation
+              // properties to be gradually moved to third-party attributes.
+              $reflection_attribute_class = new \ReflectionClass($plugin_attribute::class);
+              $reflection_property_on_plugin_attribute_class = $reflection_attribute_class->getProperty($name);
+              if (empty($reflection_property_on_plugin_attribute_class->getAttributes(PluginDeprecatedProperty::class))) {
+                throw new InvalidPluginDefinitionException($id, "May not reuse plugin property $name in third-party attribute class '$attribute_class', as the main plugin attribute class '$plugin_attribute::class' already uses it.");
+              }
+            }
+
+            $content[$name] = $value;
+          }
+        }
+      }
     }
+
     return ['id' => $id, 'content' => $content];
   }
 
