@@ -91,7 +91,7 @@ class Test {
   }
 
   /**
-   * Triggers an error.
+   * Triggers an error for testing exceptions in BrowserTestBase.
    */
   public function error() {
     trigger_error('foo', E_USER_NOTICE);

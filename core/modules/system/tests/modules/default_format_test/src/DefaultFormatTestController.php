@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 class DefaultFormatTestController {
 
   /**
-   * Returns a test string with the requested format.
+   * Returns a response with the MIME type for the format of the request.
    */
   public function content(Request $request) {
     $format = $request->getRequestFormat();
