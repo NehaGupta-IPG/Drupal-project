@@ -101,7 +101,7 @@ class Test {
   }
 
   /**
-   * Provides an HTML string with escaped characters.
+   * Returns a render array with a #plain_text element with escaped characters.
    */
   public function escapedCharacters() {
     return [
@@ -112,7 +112,7 @@ class Test {
   }
 
   /**
-   * Provides an HTML string with a escaped script.
+   * Returns a render array with a #plain_text element with an escaped script.
    */
   public function escapedScript() {
     return [
@@ -125,7 +125,7 @@ class Test {
   }
 
   /**
-   * Provides an HTML string with a script that is not escaped.
+   * Returns a render array with a #plain_text element with a plain script.
    */
   public function unEscapedScript() {
     return [

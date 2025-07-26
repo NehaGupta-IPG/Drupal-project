@@ -87,7 +87,7 @@ class EarlyRenderingTestController extends ControllerBase {
   }
 
   /**
-   * Returns an Ajax response.
+   * Returns an Ajax response with the content rendered.
    */
   public function ajaxResponse() {
     $response = new AjaxResponse();

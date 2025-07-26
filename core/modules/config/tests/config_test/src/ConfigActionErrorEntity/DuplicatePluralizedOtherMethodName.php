@@ -13,14 +13,14 @@ use Drupal\Core\Config\Action\Attribute\ActionMethod;
 class DuplicatePluralizedOtherMethodName extends ConfigTest {
 
   /**
-   * A test action that can be pluralized.
+   * Provides an action method that can be pluralized.
    */
   #[ActionMethod(pluralize: 'testMethod2')]
   public function testMethod() {
   }
 
   /**
-   * The plural action for testMethod().
+   * Provides the plural action for testMethod().
    */
   #[ActionMethod()]
   public function testMethod2() {
