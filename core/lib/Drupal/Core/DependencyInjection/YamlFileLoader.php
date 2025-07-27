@@ -5,6 +5,7 @@
 
 namespace Drupal\Core\DependencyInjection;
 
+use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Core\Serialization\Yaml;
@@ -246,6 +247,8 @@ class YamlFileLoader
 
         if (isset($service['parent'])) {
             $definition = new ChildDefinition($service['parent']);
+        } elseif (str_contains($service['class'], 'EventDispatcher') && is_a($service['class'], ContainerAwareEventDispatcher::class, true)) {
+            $definition = new ContainerAwareEventDispatcherDefinition();
         } else {
             $definition = new Definition();
         }
