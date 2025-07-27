@@ -1672,7 +1672,7 @@ class SystemRequirements implements InstallRequirementsInterface {
       $forwarded_header_exist = FALSE;
       foreach ($reverse_proxy_trusted_headers as $header) {
         if ($value = $request_object->headers->get($header)) {
-          $request_info[] = t('Header <code>@headername: @value</code>', ['@headername' => $header, '@value' => $value]);
+          $request_info[] = t('Header <code>@header_name: @value</code>', ['@header_name' => $header, '@value' => $value]);
           $forwarded_header_exist = TRUE;
         }
       }
