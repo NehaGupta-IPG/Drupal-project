@@ -34,7 +34,10 @@ class FieldViewsDataProviderTest extends UnitTestCase {
   }
 
   /**
-   * Data provider for testGetHandlers().
+   * Provides test data for testGetHandlers().
+   *
+   * @return array[]
+   *    Test cases. See testGetHandlers() for key documentation.
    */
   public static function providerGetHandlers(): array {
     return [
