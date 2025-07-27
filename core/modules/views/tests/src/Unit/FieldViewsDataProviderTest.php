@@ -25,9 +25,9 @@ class FieldViewsDataProviderTest extends UnitTestCase {
    *
    * @param string $column_type
    *   The type of data stored in the field's database table column.
-   * @param string $field_type.
+   * @param string $field_type
    *   The ID of the field's type plugin.
-   * @param array $expected.
+   * @param array $expected
    *   The expected output of getHandlers().
    *
    * @legacy-covers ::getHandlers
