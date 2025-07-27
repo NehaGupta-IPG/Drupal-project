@@ -28,6 +28,7 @@ use Drupal\Core\Utility\Error;
 use Drupal\Core\Utility\PhpRequirements;
 use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 
 /**
  * Install time requirements for the system module.
@@ -1668,12 +1669,19 @@ class SystemRequirements implements InstallRequirementsInterface {
         'x-forwarded-prefix',
       ];
 
-      $forwarded_for = $request_object->headers->get('x-forwarded-for') ?? '';
+      $x_forwarded_for = $request_object->headers->get('x-forwarded-for') ?? '';
+      $forwarded_for = '';
       $forwarded_header_exist = FALSE;
       foreach ($reverse_proxy_trusted_headers as $header) {
         if ($value = $request_object->headers->get($header)) {
           $request_info[] = t('Header <code>@header_name: @value</code>', ['@header_name' => $header, '@value' => $value]);
           $forwarded_header_exist = TRUE;
+          if ($header == 'forwarded') {
+            $parts = HeaderUtils::split($value, ',;=');
+            foreach ($parts as $subParts) {
+              $forwarded_for .= HeaderUtils::combine($subParts)['for'] . ',';
+            }
+          }
         }
       }
 
@@ -1685,10 +1693,11 @@ class SystemRequirements implements InstallRequirementsInterface {
 
         $trusted_proxies_text = $trusted_proxies ? implode(', ', $trusted_proxies) : t('missing value');
         $request_info[] = t(
-          'Trusted proxies list declared in <code>settings.php</code>: <code>"@trusted_proxies"</code>. It should match all the IPs but the left most one in <code>x-forwarded-for + REMOTE_ADDR: "@suggested_value"</code>.',
+          'Trusted proxies list declared in <code>settings.php</code>: <code>"@trusted_proxies"</code>. It should match all the IPs but the leftmost in <code>@header + REMOTE_ADDR: "@suggested_value"</code>.',
           [
             '@trusted_proxies' => $trusted_proxies_text,
-            '@suggested_value' => trim($forwarded_for . ',' . $raw_remote_address, ','),
+            '@header' => $forwarded_for != '' ? 'forwarded:for' : 'x-forwarded-for',
+            '@suggested_value' => ($forwarded_for != '' ? trim($forwarded_for, ',') : $x_forwarded_for) . ' + ' . $raw_remote_address,
           ]
           );
         if ($is_from_trusted_proxies) {
@@ -1700,7 +1709,7 @@ class SystemRequirements implements InstallRequirementsInterface {
         else {
           $requirements['reverse_proxies'] = [
             'value' => t(
-              'Reverse proxy is enabled but does not seem correctly set: the current detected scheme, host, port and remote address could not be correct. See "Trusted proxies list line" below and <a href=":link"  target="_blank">Drupal proxy documentation</a>.',
+              'Reverse proxy is enabled but does not seem to be correctly set: the current detected scheme, host, port and remote address could false or forged. See "Trusted proxies list line" below and <a href=":link"  target="_blank">Drupal proxy documentation</a>.',
               [
                 ':link' => 'https://www.drupal.org/docs/getting-started/installing-drupal/using-a-load-balancer-or-reverse-proxy',
               ]
