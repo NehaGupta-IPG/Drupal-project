@@ -288,7 +288,7 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
     if (!isset($definition['callable'])) {
       $definition['callable'] = [
         $this->container->get($definition['service'][0]),
-        $definition['service'][1]
+        $definition['service'][1],
       ];
     }
     if (is_array($definition['callable']) && isset($definition['callable'][0]) && $definition['callable'][0] instanceof \Closure) {
