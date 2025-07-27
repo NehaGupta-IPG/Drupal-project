@@ -315,6 +315,7 @@ class HookCollectorPass implements CompilerPassInterface {
       foreach ($hookImplementations as $class_and_method => $module) {
         [$class, $method] = explode('::', $class_and_method);
         $tagsInfoByClass[$class][] = [
+          'dispatcher' => 'hook_event_dispatcher',
           'event' => "drupal_hook.$hook",
           'method' => $method,
           'priority' => $priority,
