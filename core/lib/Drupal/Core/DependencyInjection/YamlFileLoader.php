@@ -247,7 +247,7 @@ class YamlFileLoader
 
         if (isset($service['parent'])) {
             $definition = new ChildDefinition($service['parent']);
-        } elseif (str_contains($service['class'], 'EventDispatcher') && is_a($service['class'], ContainerAwareEventDispatcher::class, true)) {
+        } elseif (isset($service['class']) && str_contains($service['class'], 'EventDispatcher') && is_a($service['class'], ContainerAwareEventDispatcher::class, true)) {
             $definition = new ContainerAwareEventDispatcherDefinition();
         } else {
             $definition = new Definition();
