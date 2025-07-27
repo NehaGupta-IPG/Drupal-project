@@ -1643,6 +1643,16 @@ class SystemRequirements implements InstallRequirementsInterface {
       $trusted_proxies = $request_object->getTrustedProxies();
       $is_from_trusted_proxies = $request_object->isFromTrustedProxy();
 
+      // Information deducted from request.
+      $requirements['request_info_url'] = [
+        'title' => t('Detected scheme, host & port'),
+        'value' => $scheme . '://' . $host . ':' . $port,
+      ];
+      $requirements['request_info_remote_ip'] = [
+        'title' => t('Detected remote client IP'),
+        'value' => $client_ip,
+      ];
+
       $request_info[] = t(
         'Current detected scheme, host and port are <code>@scheme://@host:@port</code>.',
         [

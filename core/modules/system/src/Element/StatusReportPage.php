@@ -57,6 +57,8 @@ class StatusReportPage extends RenderElementBase {
         case 'webserver':
         case 'database_system':
         case 'database_system_version':
+        case 'request_info_url':
+        case 'request_info_remote_ip':
         case 'php':
         case 'php_memory_limit':
           $element['#general_info']['#' . $key] = $requirement;
