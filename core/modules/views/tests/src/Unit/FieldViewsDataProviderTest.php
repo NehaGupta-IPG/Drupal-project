@@ -21,7 +21,16 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class FieldViewsDataProviderTest extends UnitTestCase {
 
   /**
-   * Covers ::getHandlers.
+   * Tests get handlers.
+   *
+   * @param string $column_type
+   *   The type of data stored in the field's database table column.
+   * @param string $field_type.
+   *   The ID of the field's type plugin.
+   * @param array $expected.
+   *   The expected output of getHandlers().
+   *
+   * @legacy-covers ::getHandlers
    */
   #[DataProvider('providerGetHandlers')]
   public function testGetHandlers(string $column_type, string $field_type, array $expected): void {
@@ -37,50 +46,59 @@ class FieldViewsDataProviderTest extends UnitTestCase {
    * Provides test data for testGetHandlers().
    *
    * @return array[]
-   *    Test cases. See testGetHandlers() for key documentation.
+   *   Test cases. See testGetHandlers() for key documentation.
    */
   public static function providerGetHandlers(): array {
     return [
+      // Tests fields with int columns.
       'int' => [
         'int',
         'some_field',
         ['numeric', 'numeric', 'standard'],
       ],
+      // Tests fields with mediumint columns.
       'mediumint' => [
         'mediumint',
         'some_field',
         ['numeric', 'numeric', 'standard'],
       ],
+      // Tests fields with tinyint columns.
       'tinyint' => [
         'tinyint',
         'some_field',
         ['numeric', 'numeric', 'standard'],
       ],
+      // Tests fields with bigint columns.
       'bigint' => [
         'bigint',
         'some_field',
         ['numeric', 'numeric', 'standard'],
       ],
+      // Tests fields with serial columns.
       'serial' => [
         'serial',
         'some_field',
         ['numeric', 'numeric', 'standard'],
       ],
+      // Tests fields with numeric columns.
       'numeric' => [
         'numeric',
         'some_field',
         ['numeric', 'numeric', 'standard'],
       ],
+      // Tests fields with float columns.
       'float' => [
         'float',
         'some_field',
         ['numeric', 'numeric', 'standard'],
       ],
+      // Tests boolean fields with tinyint columns.
       'boolean' => [
         'tinyint',
         'boolean',
         ['boolean', 'numeric', 'standard'],
       ],
+      // Tests timestamp fields with int columns.
       'timestamp' => [
         'int',
         'timestamp',
