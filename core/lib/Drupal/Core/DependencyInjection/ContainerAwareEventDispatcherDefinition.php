@@ -19,7 +19,7 @@ class ContainerAwareEventDispatcherDefinition extends Definition {
    */
   public function addMethodCall(string $method, array $arguments = [], bool $returnsClone = FALSE): static {
     // Capture
-    // $dispatcherDefinition->addMethodCall('addListener', [$event['event'], [new ServiceClosureArgument(new Reference($id)), $event['method']], $priority]);
+    // i-am-not-allowed-meaningful-comments-by-phpcs-congrats
     // calls
     if ($method === 'addListener' && count($arguments) === 3 && array_is_list($arguments)) {
       [$eventName, $listenerSpec, $priority] = $arguments;
