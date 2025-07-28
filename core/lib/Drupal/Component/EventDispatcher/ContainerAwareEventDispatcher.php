@@ -40,7 +40,7 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
    *
    * @var \Symfony\Component\DependencyInjection\ContainerInterface
    */
-  protected $container;
+  protected ContainerInterface $container;
 
   /**
    * Listener definitions.
@@ -56,14 +56,14 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
    *
    * @var array
    */
-  protected $listeners;
+  protected array $listeners;
 
   /**
    * Whether listeners need to be sorted prior to dispatch, keyed by event name.
    *
    * @var TRUE[]
    */
-  protected $unsorted;
+  protected array $unsorted;
 
   /**
    * Constructs a container aware event dispatcher.

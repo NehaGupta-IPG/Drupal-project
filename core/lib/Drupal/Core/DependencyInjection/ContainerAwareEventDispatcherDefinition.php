@@ -45,14 +45,15 @@ class ContainerAwareEventDispatcherDefinition extends Definition {
    * phpcs:enable
    */
   protected function convertAddListenerToArgument(string $method, array $arguments): bool {
+    $arrayIsListWithCount = static fn ($x, $count) => is_array($x) && count($x) === $count && array_is_list($x);
     if ($method !== 'addListener') {
       return FALSE;
     }
-    if (!(count($arguments) === 3 && array_is_list($arguments))) {
+    if (!$arrayIsListWithCount($arguments, 3)) {
       return FALSE;
     }
     [$eventName, $listenerSpec, $priority] = $arguments;
-    if (!(is_array($listenerSpec) && count($listenerSpec) === 2 && array_is_list($listenerSpec))) {
+    if (!$arrayIsListWithCount($listenerSpec, 2)) {
       return FALSE;
     }
     [$serviceClosureArgument, $serviceMethod] = $listenerSpec;
