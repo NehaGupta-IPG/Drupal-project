@@ -11,7 +11,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
-use Symfony\Component\EventDispatcher\GenericEvent;
 use Drupal\Component\EventDispatcher\Event;
 
 /**
