@@ -367,8 +367,9 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     //   numeric keys. Allow to override this per field. As this function is
     //   called twice, we have to prevent it from getting the array keys twice.
 
-    if (is_string(key($form_state->getValue('roles')))) {
-      $form_state->setValue('roles', array_keys(array_filter($form_state->getValue('roles'))));
+    $roles = $form_state->getValue('roles');
+    if (!empty($roles) && is_string(key($roles))) {
+      $form_state->setValue('roles', array_keys(array_filter($roles)));
     }
 
     /** @var \Drupal\user\UserInterface $account */
