@@ -88,8 +88,8 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
   /**
    * {@inheritdoc}
    */
-  public function dispatch(object $event, ?string $event_name = NULL): object {
-    $event_name ??= get_class($event);
+  public function dispatch(object $event, ?string $eventName = NULL): object {
+    $event_name = $eventName ?? get_class($event);
 
     if (isset($this->listeners[$event_name])) {
       // Sort listeners if necessary.
@@ -103,7 +103,12 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
       // Invoke listeners and resolve callables if necessary.
       foreach ($this->listeners[$event_name] as &$definitions) {
         foreach ($definitions as &$definition) {
-          $this->resolveCallables($definition);
+          if (!isset($definition['callable'])) {
+            $definition['callable'] = [$this->container->get($definition['service'][0]), $definition['service'][1]];
+          }
+          if (is_array($definition['callable']) && isset($definition['callable'][0]) && $definition['callable'][0] instanceof \Closure) {
+            $definition['callable'][0] = $definition['callable'][0]();
+          }
           $definition['callable']($event, $event_name, $this);
           if ($stoppable && $event->isPropagationStopped()) {
             return $event;
@@ -140,7 +145,13 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
       // Collect listeners and resolve callables if necessary.
       foreach ($this->listeners[$event_name] as &$definitions) {
         foreach ($definitions as &$definition) {
-          $this->resolveCallables($definition);
+          if (!isset($definition['callable'])) {
+            $definition['callable'] = [$this->container->get($definition['service'][0]), $definition['service'][1]];
+          }
+          if (is_array($definition['callable']) && isset($definition['callable'][0]) && $definition['callable'][0] instanceof \Closure) {
+            $definition['callable'][0] = $definition['callable'][0]();
+          }
+
           $result[] = $definition['callable'];
         }
       }
@@ -275,24 +286,6 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
       else {
         $this->removeListener($event_name, [$subscriber, is_string($params) ? $params : $params[0]]);
       }
-    }
-  }
-
-  /**
-   * Resolve callables.
-   *
-   * @param array $definition
-   *   The definition.
-   */
-  protected function resolveCallables(array &$definition): void {
-    if (!isset($definition['callable'])) {
-      $definition['callable'] = [
-        $this->container->get($definition['service'][0]),
-        $definition['service'][1],
-      ];
-    }
-    if (is_array($definition['callable']) && isset($definition['callable'][0]) && $definition['callable'][0] instanceof \Closure) {
-      $definition['callable'][0] = $definition['callable'][0]();
     }
   }
 

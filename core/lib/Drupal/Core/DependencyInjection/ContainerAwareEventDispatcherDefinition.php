@@ -32,7 +32,7 @@ class ContainerAwareEventDispatcherDefinition extends Definition {
     // phpcs:enable
     if ($method === 'addListener' && count($arguments) === 3 && array_is_list($arguments)) {
       [$eventName, $listenerSpec, $priority] = $arguments;
-      if (count($listenerSpec) === 2 && array_is_list($listenerSpec) && $listenerSpec[0] instanceof ServiceClosureArgument) {
+      if (is_array($listenerSpec) && count($listenerSpec) === 2 && array_is_list($listenerSpec) && $listenerSpec[0] instanceof ServiceClosureArgument) {
         // A ServiceClosureArgument holds one and only one value.
         $ref = $listenerSpec[0]->getValues()[0];
         if ($ref instanceof Reference) {
