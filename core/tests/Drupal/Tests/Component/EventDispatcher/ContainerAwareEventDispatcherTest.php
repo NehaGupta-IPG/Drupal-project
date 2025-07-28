@@ -554,6 +554,9 @@ class ContainerAwareEventDispatcherTest extends TestCase {
 
 }
 
+/**
+ * Callable class for invoking.
+ */
 class CallableClass {
 
   public function __invoke() {
@@ -562,19 +565,34 @@ class CallableClass {
 
 }
 
+/**
+ * Test event listeners.
+ */
 class TestEventListener {
 
+  /**
+   * Name.
+   */
   public $name;
+  /**
+   * Pre invoked.
+   */
   public $preFooInvoked = FALSE;
+  /**
+   * Post invoked.
+   */
   public $postFooInvoked = FALSE;
 
   /**
-   * Listener methods.
+   * Listener method.
    */
   public function preFoo(object $e) {
     $this->preFooInvoked = TRUE;
   }
 
+  /**
+   * Listener method.
+   */
   public function postFoo(Event $e) {
     $this->postFooInvoked = TRUE;
 
@@ -583,11 +601,17 @@ class TestEventListener {
 
 }
 
+/**
+ * Test with event dispatcher.
+ */
 class TestWithDispatcher {
 
   public $name;
   public $dispatcher;
 
+  /**
+   * Listener method with dispatcher.
+   */
   public function foo(Event $e, $name, $dispatcher) {
     $this->name = $name;
     $this->dispatcher = $dispatcher;
@@ -595,16 +619,28 @@ class TestWithDispatcher {
 
 }
 
+/**
+ * Subscribed event test.
+ */
 class TestEventSubscriber implements EventSubscriberInterface {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getSubscribedEvents(): array {
     return ['pre.foo' => 'preFoo', 'post.foo' => 'postFoo'];
   }
 
 }
 
+/**
+ * Get subscribers with priorities.
+ */
 class TestEventSubscriberWithPriorities implements EventSubscriberInterface {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getSubscribedEvents(): array {
     return [
       'pre.foo' => ['preFoo', 10],
@@ -614,8 +650,14 @@ class TestEventSubscriberWithPriorities implements EventSubscriberInterface {
 
 }
 
+/**
+ * Test single subscriber with multiple listeners.
+ */
 class TestEventSubscriberWithMultipleListeners implements EventSubscriberInterface {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getSubscribedEvents(): array {
     return [
       'pre.foo' => [
@@ -627,4 +669,7 @@ class TestEventSubscriberWithMultipleListeners implements EventSubscriberInterfa
 
 }
 
+/**
+ * Test inherited events.
+ */
 class SymfonyInheritedEvent extends SymfonyEvent {}

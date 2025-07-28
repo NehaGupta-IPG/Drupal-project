@@ -133,7 +133,7 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
  */
   #[DataProvider('providerTestDestinationRedirectToExternalUrl')]
   public function testDestinationRedirectToExternalUrl($request, $expected): void {
-    $dispatcher = new EventDispatcher((\Drupal::getContainer());
+    $dispatcher = new EventDispatcher(\Drupal::getContainer());
     $kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
     $response = new RedirectResponse('http://other-example.com');
 
@@ -150,7 +150,7 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
    * @legacy-covers ::checkRedirectUrl
    */
   public function testRedirectWithOptInExternalUrl(): void {
-    $dispatcher = new EventDispatcher((\Drupal::getContainer());
+    $dispatcher = new EventDispatcher(\Drupal::getContainer());
     $kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
     $response = new TrustedRedirectResponse('http://external-url.com');
     $request = Request::create('');
@@ -184,7 +184,7 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
  */
   #[DataProvider('providerTestDestinationRedirectWithInvalidUrl')]
   public function testDestinationRedirectWithInvalidUrl(Request $request): void {
-    $dispatcher = new EventDispatcher((\Drupal::getContainer());
+    $dispatcher = new EventDispatcher(\Drupal::getContainer());
     $kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
     $response = new RedirectResponse('http://example.com/drupal');
 
