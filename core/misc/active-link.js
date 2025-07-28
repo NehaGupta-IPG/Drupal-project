@@ -51,8 +51,25 @@
       selectors = selectors.map((current) => current + querySelector);
 
       context.querySelectorAll(selectors.join(',')).forEach((activeLink) => {
-        activeLink.classList.add('is-active');
-        activeLink.setAttribute('aria-current', 'page');
+        // Get the relative URL.
+        let currentRelativeUrl = window.location.pathname;
+
+        // Check if there's an anchor. If so, append it to the
+        // currentRelativeUrl variable.
+        if (window.location.hash) {
+          currentRelativeUrl += window.location.hash;
+        }
+
+        // Check if there's a query string.If so, append it to the
+        // currentRelativeUrl variable.
+        if (window.location.search) {
+          currentRelativeUrl += window.location.search;
+        }
+
+        if (activeLink.getAttribute('href') === currentRelativeUrl) {
+          activeLink.classList.add('is-active');
+          activeLink.setAttribute('aria-current', 'page');
+        }
       });
     },
     detach(context, settings, trigger) {
