@@ -13,7 +13,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Drupal\Component\EventDispatcher\Event;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * Unit tests for the ContainerAwareEventDispatcher.
@@ -29,8 +28,6 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
  */
 class ContainerAwareEventDispatcherTest extends TestCase {
 
-  use ExpectDeprecationTrait;
-
   /* Some pseudo events */
   const PRE_FOO = 'pre.foo';
   const POST_FOO = 'post.foo';
@@ -42,7 +39,7 @@ class ContainerAwareEventDispatcherTest extends TestCase {
    */
   private $dispatcher;
   /**
-   * Listeners
+   * Listeners.
    *
    * @var mixed
    */
