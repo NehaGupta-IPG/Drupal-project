@@ -25,24 +25,50 @@ class ContainerAwareEventDispatcherDefinition extends Definition {
    * {@inheritdoc}
    */
   public function addMethodCall(string $method, array $arguments = [], bool $returnsClone = FALSE): static {
-    // phpcs:disable
-    // Capture
-    // $dispatcherDefinition->addMethodCall('addListener', [$event['event'], [new ServiceClosureArgument(new Reference($id)), $event['method']], $priority]);
-    // calls.
-    // phpcs:enable
-    if ($method === 'addListener' && count($arguments) === 3 && array_is_list($arguments)) {
-      [$eventName, $listenerSpec, $priority] = $arguments;
-      if (is_array($listenerSpec) && count($listenerSpec) === 2 && array_is_list($listenerSpec) && $listenerSpec[0] instanceof ServiceClosureArgument) {
-        // A ServiceClosureArgument holds one and only one value.
-        $ref = $listenerSpec[0]->getValues()[0];
-        if ($ref instanceof Reference) {
-          $this->arguments[1][$eventName][$priority][] = ['service' => [(string) $ref, $listenerSpec[1]]];
-          $this->sorted = FALSE;
-          return $this;
-        }
-      }
+    if ($method === 'addListener' && ($info = $this->parseAddListener($arguments))) {
+      ['eventName' => $eventName, 'priority' => $priority, 'service' => $service] = $info;
+      $this->arguments[1][$eventName][$priority][] = $service;
+      $this->sorted = FALSE;
+      return $this;
     }
-    return parent::addMethodCall($method, $arguments, $returnsClone);
+    else {
+      return parent::addMethodCall($method, $arguments, $returnsClone);
+    }
+  }
+
+  /**
+   * Parses the arguments of $this->methodCall('addListener').
+   *
+   * @param array $arguments
+   *   The arguments.
+   *
+   * phpcs:disable
+   * @return array
+   *   An associative array with keys eventName, service and priority with
+   *   corresponding value if the call looks like
+   *   $dispatcherDefinition->addMethodCall('addListener', [$event['event'], [new ServiceClosureArgument(new Reference($id)), $event['method']], $priority]);
+   *   which is how RegisterListenerPass registers listeners. An empty array
+   *   otherwise.
+   * phpcs:enable
+   */
+  protected function parseAddListener(array $arguments): array {
+    if (!(count($arguments) === 3 && array_is_list($arguments))) {
+      return [];
+    }
+    [$eventName, $listenerSpec, $priority] = $arguments;
+    if (!(is_array($listenerSpec) && count($listenerSpec) === 2 && array_is_list($listenerSpec) && $listenerSpec[0] instanceof ServiceClosureArgument)) {
+      return [];
+    }
+    // A ServiceClosureArgument holds one and only one value.
+    $ref = $listenerSpec[0]->getValues()[0];
+    if (!$ref instanceof Reference) {
+      return [];
+    }
+    return [
+      'eventName' => $eventName,
+      'service' => ['service' => [(string) $ref, $listenerSpec[1]]],
+      'priority' => $priority,
+    ];
   }
 
   /**
