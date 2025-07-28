@@ -52,10 +52,13 @@ class ContainerAwareEventDispatcherDefinition extends Definition {
       return FALSE;
     }
     [$eventName, $listenerSpec, $priority] = $arguments;
-    if (!(is_array($listenerSpec) && count($listenerSpec) === 2 && array_is_list($listenerSpec) && $listenerSpec[0] instanceof ServiceClosureArgument)) {
+    if (!(is_array($listenerSpec) && count($listenerSpec) === 2 && array_is_list($listenerSpec))) {
       return FALSE;
     }
     [$serviceClosureArgument, $method] = $listenerSpec;
+    if (!$serviceClosureArgument instanceof ServiceClosureArgument) {
+      return FALSE;
+    }
     // To quote ServiceClosureArgument::setValues(): A ServiceClosureArgument
     // must hold one and only one value.
     $ref = $serviceClosureArgument->getValues()[0];
