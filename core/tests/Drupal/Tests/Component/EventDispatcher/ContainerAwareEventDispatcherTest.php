@@ -503,7 +503,7 @@ class ContainerAwareEventDispatcherTest extends TestCase {
 
   public function testDispatchLazyListener(): void {
     $called = 0;
-    $factory = function () use (&$called): void {
+    $factory = function () use (&$called): TestWithDispatcher {
       ++$called;
 
       return new TestWithDispatcher();
@@ -517,9 +517,7 @@ class ContainerAwareEventDispatcherTest extends TestCase {
 
   public function testRemoveFindsLazyListeners(): void {
     $test = new TestWithDispatcher();
-    $factory = function () use ($test): void {
-      return $test;
-    };
+    $factory = fn() => $test;
 
     $this->dispatcher->addListener('foo', [$factory, 'foo']);
     $this->assertTrue($this->dispatcher->hasListeners('foo'));
@@ -534,9 +532,7 @@ class ContainerAwareEventDispatcherTest extends TestCase {
 
   public function testPriorityFindsLazyListeners(): void {
     $test = new TestWithDispatcher();
-    $factory = function () use ($test): void {
-      return $test;
-    };
+    $factory = fn() => $test;
 
     $this->dispatcher->addListener('foo', [$factory, 'foo'], 3);
     $this->assertSame(3, $this->dispatcher->getListenerPriority('foo', [$test, 'foo']));
@@ -548,9 +544,7 @@ class ContainerAwareEventDispatcherTest extends TestCase {
 
   public function testGetLazyListeners(): void {
     $test = new TestWithDispatcher();
-    $factory = function () use ($test): void {
-      return $test;
-    };
+    $factory = fn() => $test;
 
     $this->dispatcher->addListener('foo', [$factory, 'foo'], 3);
     $this->assertSame([[$test, 'foo']], $this->dispatcher->getListeners('foo'));
