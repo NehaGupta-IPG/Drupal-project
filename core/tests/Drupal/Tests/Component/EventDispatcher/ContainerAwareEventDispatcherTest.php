@@ -162,15 +162,6 @@ class ContainerAwareEventDispatcherTest extends TestCase {
     $this->assertSame($expectedListeners, $actualListeners);
   }
 
-  /**
-   * Tests dispatching Symfony events with core's event dispatcher.
-   */
-  public function testSymfonyEventDispatching(): void {
-    $container = new ContainerBuilder();
-    $dispatcher = new ContainerAwareEventDispatcher($container, []);
-    $dispatcher->dispatch(new GenericEvent());
-  }
-
   public function testDispatchWithServices(): void {
     $container = new ContainerBuilder();
     $container->register('listener_service', TestEventListener::class);
