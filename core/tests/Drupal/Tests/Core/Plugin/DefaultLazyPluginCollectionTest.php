@@ -53,8 +53,8 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
    */
   public function testGetNotExistingPlugin(): void {
     $this->setupPluginCollection();
-    $this->expectException(PluginNotFoundException::class);
-    $this->expectExceptionMessage("Plugin ID 'pear' was not found.");
+    $this->expectException(PluginException::class);
+    $this->expectExceptionMessage("Missing key \"id\" in configuration for plugin ID \"pear\".");
     $this->defaultPluginCollection->get('pear');
   }
 
