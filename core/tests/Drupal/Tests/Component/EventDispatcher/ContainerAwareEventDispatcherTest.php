@@ -22,9 +22,9 @@ use Drupal\Component\EventDispatcher\Event;
  * This file does NOT follow Drupal coding standards, so as to simplify future
  * synchronizations.
  *
- * @group EventDispatcher
- * @group legacy
  */
+#[PHPUnit\Framework\Attributes\Group('EventDispatcher')]
+#[PHPUnit\Framework\Attributes\Group('legacy')]
 class ContainerAwareEventDispatcherTest extends TestCase {
 
   /* Some pseudo events */
