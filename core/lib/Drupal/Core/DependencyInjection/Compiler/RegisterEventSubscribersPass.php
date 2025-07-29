@@ -57,6 +57,11 @@ class RegisterEventSubscribersPass implements CompilerPassInterface {
   /**
    * Convert container aware dispatcher definitions.
    *
+   * \Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass
+   * builds the definition expecting their dispatcher, convert it to the
+   * data structure expected by
+   * \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher::__construct().
+   *
    * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
    *   The container.
    */
@@ -65,7 +70,9 @@ class RegisterEventSubscribersPass implements CompilerPassInterface {
       if (($class = $definition->getClass()) && str_contains($class, 'EventDispatcher') && is_a($class, ContainerAwareEventDispatcher::class, TRUE)) {
         $definitionArgument = $definition->getArguments[1] ?? [];
         $methodCalls = $this->convertMethodCalls($definitionArgument, $definition->getMethodCalls());
+        // There should be no method calls left after conversion.
         assert(count($methodCalls) === 0);
+        // Still, if there are any those should not get lost.
         $definition->setMethodCalls($methodCalls);
         foreach (array_keys($definitionArgument) as $event_name) {
           krsort($definitionArgument[$event_name]);
@@ -96,6 +103,25 @@ class RegisterEventSubscribersPass implements CompilerPassInterface {
     return $newMethodCalls;
   }
 
+  /**
+   * Convert an addMethodCall('addListener') call if possible.
+   *
+   * @param array &$definitionArgument
+   *   The listener definitions to be passed as a second argument to
+   *   \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher::__construct()
+   * @param string $method
+   *   The method name to call.
+   * @param array $arguments
+   *   An array of arguments to pass to the method call.
+   *
+   * phpcs:disable
+   * @return bool
+   *   TRUE when the call looks like
+   *   $dispatcherDefinition->addMethodCall('addListener', [$event['event'], [new ServiceClosureArgument(new Reference($id)), $event['method']], $priority]);
+   *   which is how \Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass
+   *   registers listeners. FALSE otherwise.
+   * phpcs:enable
+   */
   protected function convertAddListenerToArgument(array &$definitionArgument, string $method, array $arguments): bool {
     $arrayIsListWithCount = static fn ($x, int $count) => is_array($x) && count($x) === $count && array_is_list($x);
     if (
