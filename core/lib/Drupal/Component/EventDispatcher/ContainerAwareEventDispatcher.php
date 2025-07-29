@@ -82,8 +82,13 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
           if (!isset($definition['callable'])) {
             $definition['callable'] = [$this->container->get($definition['service'][0]), $definition['service'][1]];
           }
-          if (is_array($definition['callable']) && isset($definition['callable'][0]) && $definition['callable'][0] instanceof \Closure) {
-            $definition['callable'][0] = $definition['callable'][0]();
+          if (is_array($definition['callable'])) {
+            if (($definition['callable'][0] ?? NULL) instanceof \Closure) {
+              $definition['callable'][0] = $definition['callable'][0]();
+            }
+            if (!isset($definition['callable'][1])) {
+              $definition['callable'][1] = '__invoke';
+            }
           }
           $definition['callable']($event, $eventName, $this);
           if ($stoppable && $event->isPropagationStopped()) {
@@ -124,8 +129,13 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
           if (!isset($definition['callable'])) {
             $definition['callable'] = [$this->container->get($definition['service'][0]), $definition['service'][1]];
           }
-          if (is_array($definition['callable']) && isset($definition['callable'][0]) && $definition['callable'][0] instanceof \Closure) {
-            $definition['callable'][0] = $definition['callable'][0]();
+          if (is_array($definition['callable'])) {
+            if (($definition['callable'][0] ?? NULL) instanceof \Closure) {
+              $definition['callable'][0] = $definition['callable'][0]();
+            }
+            if (!isset($definition['callable'][1])) {
+              $definition['callable'][1] = '__invoke';
+            }
           }
 
           $result[] = $definition['callable'];
@@ -139,12 +149,13 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
   /**
    * {@inheritdoc}
    */
-  public function getListenerPriority(string $eventName, callable $listener): ?int {
+  public function getListenerPriority(string $eventName, callable|array $listener): ?int {
     if (!isset($this->listeners[$eventName])) {
       return NULL;
     }
     if (is_array($listener) && isset($listener[0]) && $listener[0] instanceof \Closure) {
       $listener[0] = $listener[0]();
+      $listener[1] ??= '__invoke';
     }
     // Resolve service definitions if the listener has not been found so far.
     foreach ($this->listeners[$eventName] as $priority => &$definitions) {
@@ -157,10 +168,15 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
             $definition['service'][1],
           ];
         }
-        if (is_array($definition['callable']) && isset($definition['callable'][0]) && $definition['callable'][0] instanceof \Closure) {
-          $definition['callable'][0] = $definition['callable'][0]();
+        if (is_array($definition['callable'])) {
+          if (($definition['callable'][0] ?? NULL) instanceof \Closure) {
+            $definition['callable'][0] = $definition['callable'][0]();
+          }
+          if (!isset($definition['callable'][1])) {
+            $definition['callable'][1] = '__invoke';
+          }
         }
-        if ($definition['callable'] === $listener) {
+        if ($definition['callable'] === $listener || ($listener instanceof \Closure && $definition['callable'] == $listener)) {
           return $priority;
         }
       }
@@ -188,7 +204,7 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
   /**
    * {@inheritdoc}
    */
-  public function addListener(string $eventName, callable $listener, int $priority = 0): void {
+  public function addListener(string $eventName, callable|array $listener, int $priority = 0): void {
     $this->listeners[$eventName][$priority][] = ['callable' => $listener];
     $this->unsorted[$eventName] = TRUE;
   }
@@ -196,7 +212,7 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
   /**
    * {@inheritdoc}
    */
-  public function removeListener(string $eventName, callable $listener): void {
+  public function removeListener(string $eventName, callable|array $listener): void {
     if (!isset($this->listeners[$eventName])) {
       return;
     }
@@ -217,7 +233,7 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
         if (is_array($definition['callable']) && isset($definition['callable'][0]) && !$definition['callable'][0] instanceof \Closure && is_array($listener) && isset($listener[0]) && $listener[0] instanceof \Closure) {
           $listener[0] = $listener[0]();
         }
-        if ($definition['callable'] === $listener) {
+        if ($definition['callable'] === $listener || ($listener instanceof \Closure && $definition['callable'] == $listener)) {
           unset($definitions[$key]);
         }
       }
