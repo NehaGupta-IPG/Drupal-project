@@ -23,9 +23,9 @@ use Drupal\Component\EventDispatcher\Event;
 #[Group('EventDispatcher')]
 class ContainerAwareEventDispatcherTest extends TestCase {
   /* Some pseudo events */
-  private const PREFOO = 'pre.foo';
-  private const POSTFOO = 'post.foo';
-  private const PREBAR = 'pre.bar';
+  private const PRE_FOO = 'pre.foo';
+  private const POST_FOO = 'post.foo';
+  private const PRE_BAR = 'pre.bar';
 
   /**
    * Dispatcher.
@@ -62,18 +62,18 @@ class ContainerAwareEventDispatcherTest extends TestCase {
 
   public function testInitialState(): void {
     $this->assertEquals([], $this->dispatcher->getListeners());
-    $this->assertFALSE($this->dispatcher->hasListeners(self::PREFOO));
-    $this->assertFALSE($this->dispatcher->hasListeners(self::POSTFOO));
+    $this->assertFALSE($this->dispatcher->hasListeners(self::PRE_FOO));
+    $this->assertFALSE($this->dispatcher->hasListeners(self::POST_FOO));
   }
 
   public function testAddListener(): void {
     $this->dispatcher->addListener('pre.foo', [$this->listener, 'preFoo']);
     $this->dispatcher->addListener('post.foo', $this->listener->postFoo(...));
     $this->assertTRUE($this->dispatcher->hasListeners());
-    $this->assertTRUE($this->dispatcher->hasListeners(self::PREFOO));
-    $this->assertTRUE($this->dispatcher->hasListeners(self::POSTFOO));
-    $this->assertCount(1, $this->dispatcher->getListeners(self::PREFOO));
-    $this->assertCount(1, $this->dispatcher->getListeners(self::POSTFOO));
+    $this->assertTRUE($this->dispatcher->hasListeners(self::PRE_FOO));
+    $this->assertTRUE($this->dispatcher->hasListeners(self::POST_FOO));
+    $this->assertCount(1, $this->dispatcher->getListeners(self::PRE_FOO));
+    $this->assertCount(1, $this->dispatcher->getListeners(self::POST_FOO));
     $this->assertCount(2, $this->dispatcher->getListeners());
   }
 
@@ -141,13 +141,13 @@ class ContainerAwareEventDispatcherTest extends TestCase {
   public function testDispatch(): void {
     $this->dispatcher->addListener('pre.foo', [$this->listener, 'preFoo']);
     $this->dispatcher->addListener('post.foo', $this->listener->postFoo(...));
-    $this->dispatcher->dispatch(new Event(), self::PREFOO);
+    $this->dispatcher->dispatch(new Event(), self::PRE_FOO);
     $this->assertTRUE($this->listener->preFooInvoked);
     $this->assertFALSE($this->listener->postFooInvoked);
     $this->assertInstanceOf(Event::class, $this->dispatcher->dispatch(new Event(), 'noEvent'));
-    $this->assertInstanceOf(Event::class, $this->dispatcher->dispatch(new Event(), self::PREFOO));
+    $this->assertInstanceOf(Event::class, $this->dispatcher->dispatch(new Event(), self::PRE_FOO));
     $event = new Event();
-    $return = $this->dispatcher->dispatch($event, self::PREFOO);
+    $return = $this->dispatcher->dispatch($event, self::PRE_FOO);
     $this->assertSame($event, $return);
   }
 
@@ -158,7 +158,7 @@ class ContainerAwareEventDispatcherTest extends TestCase {
     };
     $this->dispatcher->addListener('pre.foo', $listener);
     $this->dispatcher->addListener('post.foo', $listener);
-    $this->dispatcher->dispatch(new Event(), self::PREFOO);
+    $this->dispatcher->dispatch(new Event(), self::PRE_FOO);
     $this->assertEquals(1, $invoked);
   }
 
@@ -170,7 +170,7 @@ class ContainerAwareEventDispatcherTest extends TestCase {
     // Manually set priority to enforce $this->listener to be called first
     $this->dispatcher->addListener('post.foo', [$this->listener, 'postFoo'], 10);
     $this->dispatcher->addListener('post.foo', $otherListener->postFoo(...));
-    $this->dispatcher->dispatch(new Event(), self::POSTFOO);
+    $this->dispatcher->dispatch(new Event(), self::POST_FOO);
     $this->assertTRUE($this->listener->postFooInvoked);
     $this->assertFALSE($otherListener->postFooInvoked);
   }
@@ -189,23 +189,23 @@ class ContainerAwareEventDispatcherTest extends TestCase {
     $this->dispatcher->addListener('pre.foo', $listener1, -10);
     $this->dispatcher->addListener('pre.foo', $listener2);
     $this->dispatcher->addListener('pre.foo', $listener3, 10);
-    $this->dispatcher->dispatch(new Event(), self::PREFOO);
+    $this->dispatcher->dispatch(new Event(), self::PRE_FOO);
     $this->assertEquals(['3', '2', '1'], $invoked);
   }
 
   public function testRemoveListener(): void {
     $this->dispatcher->addListener('pre.bar', $this->listener);
-    $this->assertTRUE($this->dispatcher->hasListeners(self::PREBAR));
+    $this->assertTRUE($this->dispatcher->hasListeners(self::PRE_BAR));
     $this->dispatcher->removeListener('pre.bar', $this->listener);
-    $this->assertFALSE($this->dispatcher->hasListeners(self::PREBAR));
+    $this->assertFALSE($this->dispatcher->hasListeners(self::PRE_BAR));
     $this->dispatcher->removeListener('notExists', $this->listener);
   }
 
   public function testAddSubscriber(): void {
     $eventSubscriber = new TestEventSubscriber();
     $this->dispatcher->addSubscriber($eventSubscriber);
-    $this->assertTRUE($this->dispatcher->hasListeners(self::PREFOO));
-    $this->assertTRUE($this->dispatcher->hasListeners(self::POSTFOO));
+    $this->assertTRUE($this->dispatcher->hasListeners(self::PRE_FOO));
+    $this->assertTRUE($this->dispatcher->hasListeners(self::POST_FOO));
   }
 
   public function testAddSubscriberWithPriorities(): void {
@@ -216,7 +216,7 @@ class ContainerAwareEventDispatcherTest extends TestCase {
     $this->dispatcher->addSubscriber($eventSubscriber);
 
     $listeners = $this->dispatcher->getListeners('pre.foo');
-    $this->assertTRUE($this->dispatcher->hasListeners(self::PREFOO));
+    $this->assertTRUE($this->dispatcher->hasListeners(self::PRE_FOO));
     $this->assertCount(2, $listeners);
     $this->assertInstanceOf(TestEventSubscriberWithPriorities::class, $listeners[0][0]);
   }
@@ -226,7 +226,7 @@ class ContainerAwareEventDispatcherTest extends TestCase {
     $this->dispatcher->addSubscriber($eventSubscriber);
 
     $listeners = $this->dispatcher->getListeners('pre.foo');
-    $this->assertTRUE($this->dispatcher->hasListeners(self::PREFOO));
+    $this->assertTRUE($this->dispatcher->hasListeners(self::PRE_FOO));
     $this->assertCount(2, $listeners);
     $this->assertEquals('preFoo2', $listeners[0][1]);
   }
@@ -234,28 +234,28 @@ class ContainerAwareEventDispatcherTest extends TestCase {
   public function testRemoveSubscriber(): void {
     $eventSubscriber = new TestEventSubscriber();
     $this->dispatcher->addSubscriber($eventSubscriber);
-    $this->assertTRUE($this->dispatcher->hasListeners(self::PREFOO));
-    $this->assertTRUE($this->dispatcher->hasListeners(self::POSTFOO));
+    $this->assertTRUE($this->dispatcher->hasListeners(self::PRE_FOO));
+    $this->assertTRUE($this->dispatcher->hasListeners(self::POST_FOO));
     $this->dispatcher->removeSubscriber($eventSubscriber);
-    $this->assertFALSE($this->dispatcher->hasListeners(self::PREFOO));
-    $this->assertFALSE($this->dispatcher->hasListeners(self::POSTFOO));
+    $this->assertFALSE($this->dispatcher->hasListeners(self::PRE_FOO));
+    $this->assertFALSE($this->dispatcher->hasListeners(self::POST_FOO));
   }
 
   public function testRemoveSubscriberWithPriorities(): void {
     $eventSubscriber = new TestEventSubscriberWithPriorities();
     $this->dispatcher->addSubscriber($eventSubscriber);
-    $this->assertTRUE($this->dispatcher->hasListeners(self::PREFOO));
+    $this->assertTRUE($this->dispatcher->hasListeners(self::PRE_FOO));
     $this->dispatcher->removeSubscriber($eventSubscriber);
-    $this->assertFALSE($this->dispatcher->hasListeners(self::PREFOO));
+    $this->assertFALSE($this->dispatcher->hasListeners(self::PRE_FOO));
   }
 
   public function testRemoveSubscriberWithMultipleListeners(): void {
     $eventSubscriber = new TestEventSubscriberWithMultipleListeners();
     $this->dispatcher->addSubscriber($eventSubscriber);
-    $this->assertTRUE($this->dispatcher->hasListeners(self::PREFOO));
-    $this->assertCount(2, $this->dispatcher->getListeners(self::PREFOO));
+    $this->assertTRUE($this->dispatcher->hasListeners(self::PRE_FOO));
+    $this->assertCount(2, $this->dispatcher->getListeners(self::PRE_FOO));
     $this->dispatcher->removeSubscriber($eventSubscriber);
-    $this->assertFALSE($this->dispatcher->hasListeners(self::PREFOO));
+    $this->assertFALSE($this->dispatcher->hasListeners(self::PRE_FOO));
   }
 
   public function testEventReceivesTheDispatcherInstanceAsArgument(): void {
