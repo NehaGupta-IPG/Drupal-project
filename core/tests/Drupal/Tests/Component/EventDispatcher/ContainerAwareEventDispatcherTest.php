@@ -22,7 +22,6 @@ use Drupal\Component\EventDispatcher\Event;
  *
  * This file does NOT follow Drupal coding standards, so as to simplify future
  * synchronizations.
- *
  */
 #[Group('EventDispatcher')]
 #[Group('legacy')]
