@@ -27,6 +27,11 @@ class TranslateFilterForm extends TranslateFormBase {
 
     $form['#attached']['library'][] = 'locale/drupal.locale.admin';
 
+    $form['#attached']['library'][] = 'core/drupal.htmx';
+    $form['#attributes']['data-hx-swap'] = 'outerHTML';
+    $form['#attributes']['data-hx-select'] = '#locale-translate-edit-form';
+    $form['#attributes']['data-hx-target'] = '#locale-translate-edit-form';
+
     $form['filters'] = [
       '#type' => 'details',
       '#title' => $this->t('Filter translatable strings'),

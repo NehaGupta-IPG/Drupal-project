@@ -35,6 +35,10 @@ class TranslateEditForm extends TranslateFormBase {
 
     $form['#attached']['library'][] = 'locale/drupal.locale.admin';
 
+    $form['#attached']['library'][] = 'core/drupal.htmx';
+    $form['#attributes']['data-hx-swap'] = 'outerHTML';
+    $form['#attributes']['data-hx-select'] = '#locale-translate-edit-form';
+
     $form['langcode'] = [
       '#type' => 'value',
       '#value' => $filter_values['langcode'],
