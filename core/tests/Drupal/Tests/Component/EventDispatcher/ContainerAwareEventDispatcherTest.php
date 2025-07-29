@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\EventDispatcher;
 
 use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -23,8 +24,8 @@ use Drupal\Component\EventDispatcher\Event;
  * synchronizations.
  *
  */
-#[PHPUnit\Framework\Attributes\Group('EventDispatcher')]
-#[PHPUnit\Framework\Attributes\Group('legacy')]
+#[Group('EventDispatcher')]
+#[Group('legacy')]
 class ContainerAwareEventDispatcherTest extends TestCase {
 
   /* Some pseudo events */

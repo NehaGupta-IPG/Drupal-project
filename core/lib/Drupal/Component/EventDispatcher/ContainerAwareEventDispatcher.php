@@ -65,19 +65,19 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
    * {@inheritdoc}
    */
   public function dispatch(object $event, ?string $eventName = NULL): object {
-    $event_name = $eventName ?? get_class($event);
+    $eventName ??= get_class($event);
 
-    if (isset($this->listeners[$event_name])) {
+    if (isset($this->listeners[$eventName])) {
       // Sort listeners if necessary.
-      if (isset($this->unsorted[$event_name])) {
-        krsort($this->listeners[$event_name]);
-        unset($this->unsorted[$event_name]);
+      if (isset($this->unsorted[$eventName])) {
+        krsort($this->listeners[$eventName]);
+        unset($this->unsorted[$eventName]);
       }
 
       $stoppable = $event instanceof StoppableEventInterface;
 
       // Invoke listeners and resolve callables if necessary.
-      foreach ($this->listeners[$event_name] as &$definitions) {
+      foreach ($this->listeners[$eventName] as &$definitions) {
         foreach ($definitions as &$definition) {
           if (!isset($definition['callable'])) {
             $definition['callable'] = [$this->container->get($definition['service'][0]), $definition['service'][1]];
@@ -85,7 +85,7 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
           if (is_array($definition['callable']) && isset($definition['callable'][0]) && $definition['callable'][0] instanceof \Closure) {
             $definition['callable'][0] = $definition['callable'][0]();
           }
-          $definition['callable']($event, $event_name, $this);
+          $definition['callable']($event, $eventName, $this);
           if ($stoppable && $event->isPropagationStopped()) {
             return $event;
           }
@@ -99,27 +99,27 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
   /**
    * {@inheritdoc}
    */
-  public function getListeners(?string $event_name = NULL): array {
+  public function getListeners(?string $eventName = NULL): array {
     $result = [];
 
-    if ($event_name === NULL) {
+    if ($eventName === NULL) {
       // If event name was omitted, collect all listeners of all events.
-      foreach (array_keys($this->listeners) as $event_name) {
-        $listeners = $this->getListeners($event_name);
+      foreach (array_keys($this->listeners) as $eventName) {
+        $listeners = $this->getListeners($eventName);
         if (!empty($listeners)) {
-          $result[$event_name] = $listeners;
+          $result[$eventName] = $listeners;
         }
       }
     }
-    elseif (isset($this->listeners[$event_name])) {
+    elseif (isset($this->listeners[$eventName])) {
       // Sort listeners if necessary.
-      if (isset($this->unsorted[$event_name])) {
-        krsort($this->listeners[$event_name]);
-        unset($this->unsorted[$event_name]);
+      if (isset($this->unsorted[$eventName])) {
+        krsort($this->listeners[$eventName]);
+        unset($this->unsorted[$eventName]);
       }
 
       // Collect listeners and resolve callables if necessary.
-      foreach ($this->listeners[$event_name] as &$definitions) {
+      foreach ($this->listeners[$eventName] as &$definitions) {
         foreach ($definitions as &$definition) {
           if (!isset($definition['callable'])) {
             $definition['callable'] = [$this->container->get($definition['service'][0]), $definition['service'][1]];
@@ -139,15 +139,15 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
   /**
    * {@inheritdoc}
    */
-  public function getListenerPriority(string $event_name, callable $listener): ?int {
-    if (!isset($this->listeners[$event_name])) {
+  public function getListenerPriority(string $eventName, callable $listener): ?int {
+    if (!isset($this->listeners[$eventName])) {
       return NULL;
     }
     if (is_array($listener) && isset($listener[0]) && $listener[0] instanceof \Closure) {
       $listener[0] = $listener[0]();
     }
     // Resolve service definitions if the listener has not been found so far.
-    foreach ($this->listeners[$event_name] as $priority => &$definitions) {
+    foreach ($this->listeners[$eventName] as $priority => &$definitions) {
       foreach ($definitions as &$definition) {
         if (!isset($definition['callable'])) {
           // Once the callable is retrieved we keep it for subsequent method
@@ -171,9 +171,9 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasListeners(?string $event_name = NULL): bool {
-    if ($event_name !== NULL) {
-      return !empty($this->listeners[$event_name]);
+  public function hasListeners(?string $eventName = NULL): bool {
+    if ($eventName !== NULL) {
+      return !empty($this->listeners[$eventName]);
     }
 
     foreach ($this->listeners as $event_listeners) {
@@ -189,19 +189,19 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
    * {@inheritdoc}
    */
   public function addListener(string $eventName, callable $listener, int $priority = 0): void {
-    $this->listeners[$event_name][$priority][] = ['callable' => $listener];
-    $this->unsorted[$event_name] = TRUE;
+    $this->listeners[$eventName][$priority][] = ['callable' => $listener];
+    $this->unsorted[$eventName] = TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
   public function removeListener(string $eventName, callable $listener): void {
-    if (!isset($this->listeners[$event_name])) {
+    if (!isset($this->listeners[$eventName])) {
       return;
     }
 
-    foreach ($this->listeners[$event_name] as $priority => $definitions) {
+    foreach ($this->listeners[$eventName] as $priority => $definitions) {
       foreach ($definitions as $key => $definition) {
         if (!isset($definition['callable'])) {
           if (!$this->container->initialized($definition['service'][0])) {
@@ -222,10 +222,10 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
         }
       }
       if ($definitions) {
-        $this->listeners[$event_name][$priority] = $definitions;
+        $this->listeners[$eventName][$priority] = $definitions;
       }
       else {
-        unset($this->listeners[$event_name][$priority]);
+        unset($this->listeners[$eventName][$priority]);
       }
     }
   }
