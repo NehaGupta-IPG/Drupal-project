@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Recipe;
 
+use Drupal\Core\DependencyInjection\Compiler\RegisterEventSubscribersPass;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeAppliedEvent;
@@ -50,7 +51,8 @@ class RecipeEventsTest extends KernelTestBase implements EventSubscriberInterfac
     // Every time the container is rebuilt, ensure this object is subscribing to
     // events.
     $container->getDefinition('event_dispatcher')
-      ->addMethodCall('addSubscriber', [$this]);
+      ->addMethodCall('addSubscriber', [$this])
+      ->addTag(RegisterEventSubscribersPass::CALLS, ['value' => 1]);
   }
 
   /**

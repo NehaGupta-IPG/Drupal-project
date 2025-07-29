@@ -15,6 +15,30 @@ use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 class RegisterEventSubscribersPass implements CompilerPassInterface {
 
   /**
+   * A tag to pass the number of expected method calls after conversion.
+   *
+   * For example, if a test does
+   *
+   * @code
+   * $container->getDefinition('event_dispatcher')
+   *   ->addMethodCall('addSubscriber', [$this])
+   * @endcode
+   *
+   * then it should also signal there will be a method call which can't be
+   * converted to service get calls:
+   *
+   * @code
+   * $container->getDefinition('event_dispatcher')
+   *   ->addMethodCall('addSubscriber', [$this])
+   *  ->addTag(RegisterEventSubscribersPass::CALLS, ['value' => 1]);
+   * @endcode
+   *
+   * There is no known use cases for this outside of tests although perhaps
+   * install code might use it, there's no devilry install doesn't do.
+   */
+  public const string CALLS = 'drupal.event_subscriber.conversion';
+
+  /**
    * Constructs a RegisterEventSubscribersPass object.
    *
    * @param \Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass $pass
@@ -70,8 +94,13 @@ class RegisterEventSubscribersPass implements CompilerPassInterface {
       if (($class = $definition->getClass()) && str_contains($class, 'EventDispatcher') && is_a($class, ContainerAwareEventDispatcher::class, TRUE)) {
         $definitionArgument = $definition->getArguments[1] ?? [];
         $methodCalls = $this->convertMethodCalls($definitionArgument, $definition->getMethodCalls());
-        // There should be no method calls left after conversion.
-        assert(count($methodCalls) === 0);
+        // There should be no method calls left after conversion
+        $expectedMethodCalls = 0;
+        // Or perhaps a test did a addMethodCall() which can't be converted.
+        foreach ($definition->getTag(static::CALLS) as $tag) {
+          $expectedMethodCalls = $tag['value'];
+        }
+        assert(count($methodCalls) === $expectedMethodCalls);
         // Still, if there are any those should not get lost.
         $definition->setMethodCalls($methodCalls);
         foreach (array_keys($definitionArgument) as $event_name) {
