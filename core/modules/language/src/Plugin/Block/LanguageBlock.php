@@ -95,6 +95,11 @@ class LanguageBlock extends BlockBase implements ContainerFactoryPluginInterface
     $cache_metadata = BubbleableMetadata::createFromRenderArray($build)
       ->addCacheContexts(['url.path', 'url.query_args', 'url.site', 'languages:' . $type]);
     if (isset($links->links)) {
+      // Add the active state.
+      $current_language_code = $this->languageManager->getCurrentLanguage()->getId();
+      if (isset($links->links[$current_language_code])) {
+        $links->links[$current_language_code]['attributes']['class'][] = 'is-active';
+      }
       $build = [
         '#theme' => 'links__language_block',
         '#links' => $links->links,
