@@ -10,8 +10,10 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Flood\FloodInterface;
 use Drupal\Core\Http\Exception\CacheableUnauthorizedHttpException;
+use Drupal\Core\Site\Settings;
 use Drupal\user\UserAuthenticationInterface;
 use Drupal\user\UserAuthInterface;
+use Drupal\user\UserInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
@@ -76,7 +78,20 @@ class BasicAuth implements AuthenticationProviderInterface, AuthenticationProvid
   public function applies(Request $request) {
     $username = $request->headers->get('PHP_AUTH_USER');
     $password = $request->headers->get('PHP_AUTH_PW');
-    return isset($username) && isset($password);
+    if (isset($username) && isset($password)) {
+      if (Settings::get('basic_auth_3241232_sa_username_enumeration', FALSE)) {
+        // Apply the basic auth authentication only if the username is valid.
+        // This behavior should typically be turned off as it can expose your
+        // site to potential username enumeration attacks.
+        // And should only be enabled if there's potentially conflict between
+        // server-level basic auth prompts and the basic auth prompts provided
+        // within the site.
+        // See https://www.drupal.org/project/drupal/issues/3241232.
+        return (bool) $this->getUserAccount($username, FALSE);
+      }
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**
@@ -94,17 +109,7 @@ class BasicAuth implements AuthenticationProviderInterface, AuthenticationProvid
     // in to many different user accounts.  We have a reasonably high limit
     // since there may be only one apparent IP for all users at an institution.
     if ($this->flood->isAllowed('basic_auth.failed_login_ip', $flood_config->get('ip_limit'), $flood_config->get('ip_window'))) {
-      $account = FALSE;
-      if ($this->userAuth instanceof UserAuthenticationInterface) {
-        $lookup = $this->userAuth->lookupAccount($username);
-        if ($lookup && !$lookup->isBlocked()) {
-          $account = $lookup;
-        }
-      }
-      else {
-        $accounts = $this->entityTypeManager->getStorage('user')->loadByProperties(['name' => $username, 'status' => 1]);
-        $account = reset($accounts);
-      }
+      $account = $this->getUserAccount($username, TRUE);
       if ($account) {
         if ($flood_config->get('uid_only')) {
           // Register flood events based on the uid only, so they apply for any
@@ -178,6 +183,43 @@ class BasicAuth implements AuthenticationProviderInterface, AuthenticationProvid
     return $request->isMethodCacheable()
       ? new CacheableUnauthorizedHttpException($cacheability, (string) $challenge, 'No authentication credentials provided.', $previous)
       : new UnauthorizedHttpException((string) $challenge, 'No authentication credentials provided.', $previous);
+  }
+
+  /**
+   * Returns the user account for a given identifier.
+   *
+   * @param string $identifier
+   *   The user identifier to authenticate. Usually the username.
+   * @param bool $check_status
+   *   Check the user account status.
+   *
+   * @return \Drupal\User\UserInterface|false
+   *   The user account on success, or FALSE on failure to authenticate.
+   */
+  protected function getUserAccount(string $identifier, bool $check_status): UserInterface|false {
+    $account = FALSE;
+    if ($this->userAuth instanceof UserAuthenticationInterface) {
+      if ($lookup = $this->userAuth->lookupAccount($identifier)) {
+        if ($check_status) {
+          if (!$lookup->isBlocked()) {
+            $account = $lookup;
+          }
+        }
+        else {
+          $account = $lookup;
+        }
+      }
+    }
+    else {
+      $properties = ['name' => $identifier];
+      if ($check_status) {
+        $properties['status'] = 1;
+      }
+      $accounts = $this->entityTypeManager->getStorage('user')->loadByProperties($properties);
+      $account = reset($accounts);
+    }
+
+    return $account;
   }
 
 }
