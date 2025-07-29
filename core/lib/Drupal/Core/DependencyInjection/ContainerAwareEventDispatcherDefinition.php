@@ -46,28 +46,26 @@ class ContainerAwareEventDispatcherDefinition extends Definition {
    */
   protected function convertAddListenerToArgument(string $method, array $arguments): bool {
     $arrayIsListWithCount = static fn ($x, $count) => is_array($x) && count($x) === $count && array_is_list($x);
-    if ($method !== 'addListener') {
-      return FALSE;
+    if (
+      $method === 'addListener' &&
+      // phpcs:disable
+      // The expected arguments are:
+      // [$event['event'], [new ServiceClosureArgument(new Reference($id)), $event['method']], $priority]
+      // phpcs:enable
+      $arrayIsListWithCount($arguments, 3) &&
+      ([$eventName, $listenerSpec, $priority] = $arguments) &&
+      // The listener should be an array of two elements:
+      // [new ServiceClosureArgument(new Reference($id)), $event['method']].
+      $arrayIsListWithCount($listenerSpec, 2) &&
+      ([$serviceClosureArgument, $serviceMethod] = $listenerSpec) &&
+      // If it's a service closure, those hold exactly one argument,
+      // extract it and check it is as expected.
+      $serviceClosureArgument instanceof ServiceClosureArgument &&
+      ($ref = $serviceClosureArgument->getValues()[0]) instanceof Reference) {
+      $this->arguments[1][$eventName][$priority][] = ['service' => [(string) $ref, $serviceMethod]];
+      return TRUE;
     }
-    if (!$arrayIsListWithCount($arguments, 3)) {
-      return FALSE;
-    }
-    [$eventName, $listenerSpec, $priority] = $arguments;
-    if (!$arrayIsListWithCount($listenerSpec, 2)) {
-      return FALSE;
-    }
-    [$serviceClosureArgument, $serviceMethod] = $listenerSpec;
-    if (!$serviceClosureArgument instanceof ServiceClosureArgument) {
-      return FALSE;
-    }
-    // To quote ServiceClosureArgument::setValues(): A ServiceClosureArgument
-    // must hold one and only one value.
-    $ref = $serviceClosureArgument->getValues()[0];
-    if (!$ref instanceof Reference) {
-      return FALSE;
-    }
-    $this->arguments[1][$eventName][$priority][] = ['service' => [(string) $ref, $serviceMethod]];
-    return TRUE;
+    return FALSE;
   }
 
   /**
