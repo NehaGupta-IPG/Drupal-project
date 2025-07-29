@@ -61,7 +61,7 @@ class RegisterEventSubscribersPass implements CompilerPassInterface {
    *   The container.
    */
   protected function convertEventDispatcherDefinitions(ContainerBuilder $container): void {
-    foreach ($container->getDefinitions() as $id => $definition) {
+    foreach ($container->getDefinitions() as $definition) {
       if (($class = $definition->getClass()) && str_contains($class, 'EventDispatcher') && is_a($class, ContainerAwareEventDispatcher::class, TRUE)) {
         $argument = $definition->getArguments[1] ?? [];
         $methodCalls = $this->convertMethodCalls($definition->getMethodCalls(), $argument);
@@ -72,12 +72,16 @@ class RegisterEventSubscribersPass implements CompilerPassInterface {
     }
   }
 
-
   /**
+   * Convert method calls.
+   *
    * @param array $methodCalls
+   *   Method calls.
    * @param array $argument
+   *   The event dispatcher service argument.
    *
    * @return array
+   *   The new method calls, hopefully an empty array.
    */
   protected function convertMethodCalls(array $methodCalls, array &$argument): array {
     $newMethodCalls = [];
@@ -112,6 +116,5 @@ class RegisterEventSubscribersPass implements CompilerPassInterface {
     }
     return FALSE;
   }
-
 
 }
