@@ -186,12 +186,11 @@ class BasicAuthTest extends BrowserTestBase {
     $this->assertSession()->pageTextNotContains('Exception');
     $this->assertSession()->pageTextContains('Log in to access this page.');
 
-    // Case when empty credentials are passed, a user friendly access
+    // Case when empty credentials are passed, a user friendly access denied
     // message is displayed.
     $this->basicAuthGet($url, NULL, NULL);
-    $this->assertSession()->statusCodeEquals(401);
-    $this->assertSession()->pageTextNotContains('Exception');
-    $this->assertSession()->pageTextContains('Log in to access this page');
+    $this->assertSession()->statusCodeEquals(403);
+    $this->assertSession()->pageTextContains('Access denied');
 
     // Case when wrong credentials are passed, a user friendly access denied
     // message is displayed.
@@ -205,6 +204,18 @@ class BasicAuthTest extends BrowserTestBase {
     $this->basicAuthGet($url, $account->getAccountName(), $account->pass_raw);
     $this->assertSession()->statusCodeEquals(403);
     $this->assertSession()->pageTextContains('Access denied');
+  }
+
+  /**
+   * Tests that non-basic auth routes are unaffected.
+   */
+  public function testNonBasicAuthRoutes(): void {
+    $account = $this->drupalCreateUser();
+    $string = $this->randomMachineName();
+    $url = Url::fromRoute('router_test.3', ['value' => $string]);
+    $this->basicAuthGet($url, $account->getAccountName(), $account->pass_raw);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains($string);
   }
 
   /**

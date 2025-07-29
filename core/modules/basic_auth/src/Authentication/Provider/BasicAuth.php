@@ -9,11 +9,10 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Flood\FloodInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Http\Exception\CacheableUnauthorizedHttpException;
+use Drupal\Core\Routing\RouteMatch;
 use Drupal\user\UserAuthenticationInterface;
 use Drupal\user\UserAuthInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
@@ -21,6 +20,8 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
  * HTTP Basic authentication provider.
  */
 class BasicAuth implements AuthenticationProviderInterface, AuthenticationProviderChallengeInterface {
+
+  protected const PROVIDER_ID = 'basic_auth';
 
   /**
    * The config factory.
@@ -75,12 +76,8 @@ class BasicAuth implements AuthenticationProviderInterface, AuthenticationProvid
    *   The flood service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, UserAuthInterface|UserAuthenticationInterface $user_auth, FloodInterface $flood, EntityTypeManagerInterface $entity_type_manager, RouteMatchInterface $route_match, RequestStack $request_stack) {
+  public function __construct(ConfigFactoryInterface $config_factory, UserAuthInterface|UserAuthenticationInterface $user_auth, FloodInterface $flood, EntityTypeManagerInterface $entity_type_manager) {
     $this->configFactory = $config_factory;
     if (!$user_auth instanceof UserAuthenticationInterface) {
       @trigger_error('The $user_auth parameter implementing UserAuthInterface is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. Implement UserAuthenticationInterface instead. See https://www.drupal.org/node/3411040');
@@ -88,28 +85,18 @@ class BasicAuth implements AuthenticationProviderInterface, AuthenticationProvid
     $this->userAuth = $user_auth;
     $this->flood = $flood;
     $this->entityTypeManager = $entity_type_manager;
-    $this->requestStack = $request_stack;
-    $this->routeMatch = $route_match;
   }
 
   /**
    * {@inheritdoc}
    */
   public function applies(Request $request) {
-    $request = $this->requestStack->getCurrentRequest();
-
-    if ($request) {
-      $username = $request->headers->get('PHP_AUTH_USER');
-      $password = $request->headers->get('PHP_AUTH_PW');
-      if (isset($username) && isset($password)) {
-        $route = $this->routeMatch->getRouteObject();
-        if ($route) {
-          $options = $route->getOptions();
-          return isset($options['_auth']) && in_array('basic_auth', $options['_auth']);
-        }
-      }
+    $username = $request->headers->get('PHP_AUTH_USER');
+    $password = $request->headers->get('PHP_AUTH_PW');
+    if (isset($username) && isset($password)) {
+      $route = RouteMatch::createFromRequest($request)->getRouteObject();
+      return isset($route) && $route->hasOption('_auth') && in_array(static::PROVIDER_ID, $route->getOption('_auth'), TRUE);
     }
-
     return FALSE;
   }
 
