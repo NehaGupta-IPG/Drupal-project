@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Definition;
@@ -45,7 +47,7 @@ class ContainerAwareEventDispatcherDefinition extends Definition {
    * phpcs:enable
    */
   protected function convertAddListenerToArgument(string $method, array $arguments): bool {
-    $arrayIsListWithCount = static fn ($x, $count) => is_array($x) && count($x) === $count && array_is_list($x);
+    $arrayIsListWithCount = static fn ($x, int $count) => is_array($x) && count($x) === $count && array_is_list($x);
     if (
       $method === 'addListener' &&
       // phpcs:disable

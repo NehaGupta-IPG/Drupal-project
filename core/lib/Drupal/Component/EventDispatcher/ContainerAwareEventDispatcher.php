@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Component\EventDispatcher;
 
 use Psr\EventDispatcher\StoppableEventInterface;
@@ -123,7 +125,7 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
   /**
    * {@inheritdoc}
    */
-  public function getListeners($event_name = NULL): array {
+  public function getListeners(?string $event_name = NULL): array {
     $result = [];
 
     if ($event_name === NULL) {
@@ -163,7 +165,7 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
   /**
    * {@inheritdoc}
    */
-  public function getListenerPriority($event_name, $listener): ?int {
+  public function getListenerPriority(string $event_name, callable $listener): ?int {
     if (!isset($this->listeners[$event_name])) {
       return NULL;
     }
@@ -195,7 +197,7 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasListeners($event_name = NULL): bool {
+  public function hasListeners(?string $event_name = NULL): bool {
     if ($event_name !== NULL) {
       return !empty($this->listeners[$event_name]);
     }
@@ -212,7 +214,7 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
   /**
    * {@inheritdoc}
    */
-  public function addListener($event_name, $listener, $priority = 0): void {
+  public function addListener(string $eventName, callable $listener, int $priority = 0): void {
     $this->listeners[$event_name][$priority][] = ['callable' => $listener];
     $this->unsorted[$event_name] = TRUE;
   }
@@ -220,7 +222,7 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
   /**
    * {@inheritdoc}
    */
-  public function removeListener($event_name, $listener): void {
+  public function removeListener(string $eventName, callable $listener): void {
     if (!isset($this->listeners[$event_name])) {
       return;
     }
