@@ -63,11 +63,14 @@ class RegisterEventSubscribersPass implements CompilerPassInterface {
   protected function convertEventDispatcherDefinitions(ContainerBuilder $container): void {
     foreach ($container->getDefinitions() as $definition) {
       if (($class = $definition->getClass()) && str_contains($class, 'EventDispatcher') && is_a($class, ContainerAwareEventDispatcher::class, TRUE)) {
-        $argument = $definition->getArguments[1] ?? [];
-        $methodCalls = $this->convertMethodCalls($definition->getMethodCalls(), $argument);
+        $definitionArgument = $definition->getArguments[1] ?? [];
+        $methodCalls = $this->convertMethodCalls($definitionArgument, $definition->getMethodCalls());
         assert(count($methodCalls) === 0);
         $definition->setMethodCalls($methodCalls);
-        $definition->setArgument(1, $argument);
+        foreach (array_keys($definitionArgument) as $event_name) {
+          krsort($definitionArgument[$event_name]);
+        }
+        $definition->setArgument(1, $definitionArgument);
       }
     }
   }
@@ -75,25 +78,25 @@ class RegisterEventSubscribersPass implements CompilerPassInterface {
   /**
    * Convert method calls.
    *
-   * @param array $methodCalls
+   * @param array $definitionArgument
    *   Method calls.
-   * @param array $argument
+   * @param array $methodCalls
    *   The event dispatcher service argument.
    *
    * @return array
    *   The new method calls, hopefully an empty array.
    */
-  protected function convertMethodCalls(array $methodCalls, array &$argument): array {
+  protected function convertMethodCalls(array &$definitionArgument, array $methodCalls): array {
     $newMethodCalls = [];
     foreach ($methodCalls as $methodCall) {
-      if (!$this->convertAddListenerToArgument($argument, ... $methodCall)) {
+      if (!$this->convertAddListenerToArgument($definitionArgument, ... $methodCall)) {
         $newMethodCalls[] = $methodCall;
       }
     }
     return $newMethodCalls;
   }
 
-  protected function convertAddListenerToArgument(array &$argument, string $method, array $arguments): bool {
+  protected function convertAddListenerToArgument(array &$definitionArgument, string $method, array $arguments): bool {
     $arrayIsListWithCount = static fn ($x, int $count) => is_array($x) && count($x) === $count && array_is_list($x);
     if (
       $method === 'addListener' &&
@@ -111,7 +114,7 @@ class RegisterEventSubscribersPass implements CompilerPassInterface {
       // extract it and check it is as expected.
       $serviceClosureArgument instanceof ServiceClosureArgument &&
       ($ref = $serviceClosureArgument->getValues()[0]) instanceof Reference) {
-      $argument[$eventName][$priority][] = ['service' => [(string) $ref, $serviceMethod]];
+      $definitionArgument[$eventName][$priority][] = ['service' => [(string) $ref, $serviceMethod]];
       return TRUE;
     }
     return FALSE;
