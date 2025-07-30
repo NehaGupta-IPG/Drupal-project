@@ -53,6 +53,13 @@ class RouteProvider implements PreloadableRouteProviderInterface {
   /**
    * {@inheritdoc}
    */
+  public function routeExists(string $name): bool {
+    return $this->lazyLoadItself()->routeExists($name);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function preLoadRoutes($names) {
     return $this->lazyLoadItself()->preLoadRoutes($names);
   }

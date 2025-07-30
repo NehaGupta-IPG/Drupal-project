@@ -75,6 +75,17 @@ interface RouteProviderInterface {
   public function getRoutesByNames($names);
 
   /**
+   * Determines if a route exists by name.
+   *
+   * @param string $name
+   *   The name of the route to check.
+   *
+   * @return bool
+   *   Whether a route with that route name exists.
+   */
+  public function routeExists(string $name): bool;
+
+  /**
    * Get all routes which match a certain pattern.
    *
    * @param string $pattern
