@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
 use Drupal\Core\Render\RendererInterface;
@@ -744,7 +745,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
    */
   protected function filterTerms(array $tree, string $searchString): array {
     $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
-    $langcode = $this->languageManager->getCurrentLanguage()->getId();
+    $langcode = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
     return array_filter($tree, static function (\stdClass $term) use ($searchString, $term_storage, $langcode) {
       // Loads taxonomy terms to handle translations.
       if ($term->langcode !== $langcode) {
