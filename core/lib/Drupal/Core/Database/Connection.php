@@ -246,6 +246,15 @@ abstract class Connection {
   }
 
   /**
+   * Indicates if the connection object is currently available.
+   *
+   * @return bool
+   */
+  public function hasClientConnection(): bool {
+    return $this->connection !== NULL;
+  }
+
+  /**
    * Returns the default query options for any given query.
    *
    * A given query can be customized with a number of option flags in an
