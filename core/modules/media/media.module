@@ -5,10 +5,7 @@
  */
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Render\Element\RenderElementBase;
-use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 
 /**
@@ -35,31 +32,6 @@ function template_preprocess_media(array &$variables): void {
 }
 
 /**
- * Implements hook_preprocess_HOOK() for media reference widgets.
- */
-function media_preprocess_media_reference_help(&$variables): void {
-  // Most of these attribute checks are copied from
-  // template_preprocess_fieldset(). Our template extends
-  // field-multiple-value-form.html.twig to provide our help text, but also
-  // groups the information within a semantic fieldset with a legend. So, we
-  // incorporate parity for both.
-  $element = $variables['element'];
-  Element::setAttributes($element, ['id']);
-  RenderElementBase::setAttributes($element);
-  $variables['attributes'] = $element['#attributes'] ?? [];
-  $variables['legend_attributes'] = new Attribute();
-  $variables['header_attributes'] = new Attribute();
-  $variables['description']['attributes'] = new Attribute();
-  $variables['legend_span_attributes'] = new Attribute();
-
-  if (!empty($element['#media_help'])) {
-    foreach ($element['#media_help'] as $key => $text) {
-      $variables[substr($key, 1)] = $text;
-    }
-  }
-}
-
-/**
  * Returns the appropriate URL to add media for the current user.
  *
  * @todo Remove in https://www.drupal.org/project/drupal/issues/2938116
@@ -73,7 +45,6 @@ function media_preprocess_media_reference_help(&$variables): void {
  * @internal
  *   This function is internal and may be removed in a minor release.
  */
-#[ProceduralHookScanStop]
 function _media_get_add_url($allowed_bundles) {
   $access_handler = \Drupal::entityTypeManager()->getAccessControlHandler('media');
   $create_bundles = array_filter($allowed_bundles, [$access_handler, 'createAccess']);
