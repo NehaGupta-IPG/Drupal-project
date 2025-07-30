@@ -106,7 +106,7 @@ final class ConsoleInputCollector implements InputCollectorInterface {
     // Methods that take a 'question' argument: ask, askHidden, confirm, choice.
     if (!empty($arguments['question'])) {
       // @phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
-      $arguments['question'] = is_string($arguments['question']) ? (string)$this->t($arguments['question']) : (string)$arguments['question'];
+      $arguments['question'] = is_string($arguments['question']) ? (string) $this->t($arguments['question']) : (string) $arguments['question'];
     }
 
     // We don't support using Symfony Console's inline validation; instead,
