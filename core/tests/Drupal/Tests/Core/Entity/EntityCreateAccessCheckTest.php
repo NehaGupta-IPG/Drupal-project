@@ -51,18 +51,27 @@ class EntityCreateAccessCheckTest extends UnitTestCase {
   public static function providerTestAccess() {
     $no_access = FALSE;
     $access = TRUE;
+    $emptyParameters = new InputBag();
+    $parameters = new InputBag();
+    $parameters->set('llamas', 'entity_test');
 
     return [
-      ['', 'entity_test', $no_access, $no_access],
-      ['', 'entity_test', $access, $access],
-      ['test_entity', 'entity_test:test_entity', $access, $access],
-      ['test_entity', 'entity_test:test_entity', $no_access, $no_access],
-      ['test_entity', 'entity_test:{bundle_argument}', $access, $access],
-      ['test_entity', 'entity_test:{bundle_argument}', $no_access, $no_access],
-      ['', 'entity_test:{bundle_argument}', $no_access, $no_access, FALSE],
+      ['', 'entity_test', $emptyParameters, $no_access, $no_access],
+      ['', 'entity_test', $emptyParameters, $access, $access],
+      ['', 'llamas', $emptyParameters, $no_access, $no_access],
+      ['', 'llamas', $emptyParameters, $access, $access],
+      ['test_entity', 'entity_test:test_entity', $emptyParameters, $access, $access],
+      ['test_entity', 'entity_test:test_entity', $emptyParameters, $no_access, $no_access],
+      ['test_entity', 'llamas:test_entity', $parameters, $access, $access],
+      ['test_entity', 'llamas:test_entity', $parameters, $no_access, $no_access],
+      ['test_entity', 'entity_test:{bundle_argument}', $emptyParameters, $access, $access],
+      ['test_entity', 'entity_test:{bundle_argument}', $emptyParameters, $no_access, $no_access],
+      ['test_entity', 'llamas:{bundle_argument}', $emptyParameters, $access, $access],
+      ['test_entity', 'llamas:{bundle_argument}', $emptyParameters, $no_access, $no_access],
+      ['', 'entity_test:{bundle_argument}', $emptyParameters, $no_access, $no_access, FALSE],
       // When the bundle is not provided, access should be denied even if the
       // access control handler would allow access.
-      ['', 'entity_test:{bundle_argument}', $access, $no_access, FALSE],
+      ['', 'entity_test:{bundle_argument}', $emptyParameters, $access, $no_access, FALSE],
     ];
   }
 
@@ -71,7 +80,7 @@ class EntityCreateAccessCheckTest extends UnitTestCase {
    *
    * @dataProvider providerTestAccess
    */
-  public function testAccess($entity_bundle, $requirement, $access, $expected, $expect_permission_context = TRUE): void {
+  public function testAccess($entity_bundle, $requirement, InputBag $parameters, $access, $expected, $expect_permission_context = TRUE): void {
 
     // Set up the access result objects for allowing or denying access.
     $access_result = $access ? AccessResult::allowed()->cachePerPermissions() : AccessResult::neutral()->cachePerPermissions();
@@ -116,6 +125,9 @@ class EntityCreateAccessCheckTest extends UnitTestCase {
     $route_match->expects($this->any())
       ->method('getRawParameters')
       ->willReturn($raw_variables);
+    $route_match->expects($this->any())
+      ->method('getParameters')
+      ->willReturn($parameters);
 
     $account = $this->createMock('Drupal\Core\Session\AccountInterface');
     $this->assertEquals($expected_access_result, $applies_check->access($route, $route_match, $account));

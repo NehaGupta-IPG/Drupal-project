@@ -53,6 +53,12 @@ class EntityCreateAccessCheck implements AccessInterface {
   public function access(Route $route, RouteMatchInterface $route_match, AccountInterface $account) {
     [$entity_type, $bundle] = explode(':', $route->getRequirement($this->requirementsKey) . ':');
 
+    // Allow dynamic entity types.
+    $parameters = $route_match->getParameters();
+    if ($parameters->has($entity_type)) {
+      $entity_type = $parameters->get($entity_type);
+    }
+
     // The bundle argument can contain request argument placeholders like
     // {name}, loop over the raw variables and attempt to replace them in the
     // bundle name. If a placeholder does not exist, it won't get replaced.
