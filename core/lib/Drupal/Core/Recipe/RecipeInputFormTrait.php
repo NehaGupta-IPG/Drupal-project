@@ -75,6 +75,13 @@ trait RecipeInputFormTrait {
             '#default_value' => $default_value,
             '#type' => 'value',
           ];
+          // Localize title, description if they are plain strings.
+          foreach (['#title', '#description'] as $property) {
+            if (!empty($element[$property]) && is_string($element[$property])) {
+              // @phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
+              $element[$property] = t($element[$property]);
+            }
+          }
           // Recipe inputs are required by default, unless they are single
           // checkboxes, in which case the `#required` behavior doesn't make
           // a lot of sense because it forces the user to check the box.
