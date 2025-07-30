@@ -475,7 +475,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * Processes the post-transaction callbacks.
    */
   protected function processPostTransactionCallbacks(): void {
-    if (!empty($this->postTransactionCallbacks)) {
+    if (!empty($this->postTransactionCallbacks) && $this->connection->hasClientConnection()) {
       $callbacks = $this->postTransactionCallbacks;
       $this->postTransactionCallbacks = [];
       foreach ($callbacks as $callback) {
