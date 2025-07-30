@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
@@ -48,6 +49,13 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
   protected ?string $termFilter;
 
   /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * Constructs an OverviewTerms object.
    */
   public function __construct(
@@ -56,6 +64,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
     private readonly RendererInterface $renderer,
     private readonly EntityRepositoryInterface $entityRepository,
     private readonly PagerManagerInterface $pagerManager,
+    private readonly LanguageManagerInterface $language_manager,
   ) {
     $this->setModuleHandler($module_handler);
     $this->setEntityTypeManager($entity_type_manager);
@@ -72,7 +81,8 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
       $container->get('entity_type.manager'),
       $container->get('renderer'),
       $container->get('entity.repository'),
-      $container->get('pager.manager')
+      $container->get('pager.manager'),
+      $container->get('language_manager')
     );
   }
 
@@ -733,7 +743,21 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
    *   The terms from the taxonomy tree that match the filter.
    */
   protected function filterTerms(array $tree, string $searchString): array {
-    return array_filter($tree, static function (\stdClass $term) use ($searchString) {
+    $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
+    $langcode = $this->languageManager->getCurrentLanguage()->getId();
+    return array_filter($tree, static function (\stdClass $term) use ($searchString, $term_storage, $langcode) {
+      // Loads taxonomy terms to handle translations.
+      if ($term->langcode !== $langcode) {
+        $taxonomy_term = $term_storage->load($term->tid);
+        if ($taxonomy_term instanceof TermInterface && $taxonomy_term->hasTranslation($langcode)) {
+          $taxonomy_term = $taxonomy_term->getTranslation($langcode);
+
+          return stripos($taxonomy_term->label(), $searchString) !== FALSE;
+        }
+
+        return FALSE;
+      }
+
       return stripos($term->name, $searchString) !== FALSE;
     });
   }
