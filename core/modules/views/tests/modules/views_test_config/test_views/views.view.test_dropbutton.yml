@@ -318,6 +318,7 @@ display:
             delete_node: delete_node
             nid: '0'
           destination: true
+          dropbutton_type: extrasmall
       filters:
         status:
           value: '1'
