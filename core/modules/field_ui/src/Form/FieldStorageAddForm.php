@@ -444,7 +444,7 @@ class FieldStorageAddForm extends FormBase {
       $field_storage_entity = $this->entityTypeManager->getStorage('field_storage_config')->create($field_storage_values);
     }
     catch (\Exception $e) {
-      $this->messenger()->addError($this->t('There was a problem creating field :@message', ['@message' => $e->getMessage()]));
+      $this->messenger()->addError($this->t('There was a problem creating field: @message', ['@message' => $e->getMessage()]));
       return;
     }
 
