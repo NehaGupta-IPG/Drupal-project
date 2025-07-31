@@ -33,9 +33,6 @@ class FormPreprocess {
     if (empty($element['#attributes']['accept-charset'])) {
       $element['#attributes']['accept-charset'] = "UTF-8";
     }
-    if (!empty($element['#attributes']['action']) && in_array('core/drupal.htmx', $element['#attached']['library'])) {
-      $element['#attributes']['data-hx-' . $element['#attributes']['method']] = $element['#attributes']['action'];
-    }
     $variables['attributes'] = $element['#attributes'];
     $variables['children'] = $element['#children'];
   }
