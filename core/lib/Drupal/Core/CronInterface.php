@@ -19,7 +19,7 @@ interface CronInterface {
    *   checks are bypassed for system tasks.
    * - Attempts to acquire a cron lock to prevent parallel executions.
    * - With the lock acquired, invokes handlers, runs queues, and sets
-   *   timestamp.
+   *   the timestamp of the last successful cron run.
    * - Restores the original user session after the cron run.
    *
    * For PHPUnit tests, avoid calling this method simulating a cron run.
