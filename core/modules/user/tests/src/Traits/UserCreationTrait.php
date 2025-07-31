@@ -143,12 +143,14 @@ trait UserCreationTrait {
    * @param array $values
    *   (optional) An array of initial user field values.
    *
-   * @return \Drupal\user\Entity\User|false
+   * @return \Drupal\user\Entity\User
    *   A fully loaded user object with pass_raw property, or FALSE if account
    *   creation fails.
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    *   If the user creation fails.
+   * @throws \LogicException
+   *   If other criteria failed.
    */
   protected function createUser(array $permissions = [], $name = NULL, $admin = FALSE, array $values = []): UserInterface|false {
     // Create a role with the given permission set, if any.
@@ -156,7 +158,7 @@ trait UserCreationTrait {
     if ($permissions) {
       $rid = $this->createRole($permissions);
       if (!$rid) {
-        return FALSE;
+        throw new \LogicException('Role creation failed.');
       }
     }
 
@@ -187,7 +189,7 @@ trait UserCreationTrait {
     $valid_user = $account->id() !== NULL;
     $this->assertTrue($valid_user, "User created with name {$edit['name']} and pass {$edit['pass']}");
     if (!$valid_user) {
-      return FALSE;
+      throw new \LogicException('This is impossible as above exits.');
     }
 
     // Add the raw password so that we can log in as this user.
