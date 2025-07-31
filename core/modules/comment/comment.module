@@ -26,13 +26,9 @@ define('COMMENT_NEW_LIMIT', ((int) $_SERVER['REQUEST_TIME']) - 30 * 24 * 60 * 60
  * Entity URI callback.
  */
 function comment_uri(CommentInterface $comment) {
-  return new Url(
-    'entity.comment.canonical',
-    [
-      'comment' => $comment->id(),
-    ],
-    ['fragment' => 'comment-' . $comment->id()]
-  );
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\comment\Entity\Comment::permalink() instead. See https://www.drupal.org/node/3384294', E_USER_DEPRECATED);
+
+  return $comment->permalink();
 }
 
 /**
@@ -255,33 +251,4 @@ function template_preprocess_comment(&$variables): void {
   $variables['attributes']['data-comment-user-id'] = $comment->getOwnerId();
   // Add anchor for each comment.
   $variables['attributes']['id'] = 'comment-' . $comment->id();
-}
-
-/**
- * Prepares variables for comment field templates.
- *
- * Default template: field--comment.html.twig.
- *
- * @param array $variables
- *   An associative array containing:
- *   - element: An associative array containing render arrays for the list of
- *     comments, and the comment form. Array keys: comments, comment_form.
- *
- * @todo Rename to template_preprocess_field__comment() once
- *   https://www.drupal.org/node/939462 is resolved.
- */
-function comment_preprocess_field(&$variables): void {
-  $element = $variables['element'];
-  if ($element['#field_type'] == 'comment') {
-    // Provide contextual information.
-    $variables['comment_display_mode'] = $element[0]['#comment_display_mode'];
-    $variables['comment_type'] = $element[0]['#comment_type'];
-
-    // Append additional attributes from the first field item.
-    $variables['attributes'] += $variables['items'][0]['attributes']->storage();
-
-    // Create separate variables for the comments and comment form.
-    $variables['comments'] = $element[0]['comments'];
-    $variables['comment_form'] = $element[0]['comment_form'];
-  }
 }

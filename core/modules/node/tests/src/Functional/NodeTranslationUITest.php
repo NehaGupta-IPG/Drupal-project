@@ -79,6 +79,15 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
    * Tests the basic translation UI.
    */
   public function testTranslationUI(): void {
+    // Enable promote and sticky fields.
+    \Drupal::service('entity_display.repository')->getFormDisplay('node', 'article')
+      ->setComponent('promote', [
+        'type' => 'boolean_checkbox',
+      ])
+      ->setComponent('sticky', [
+        'type' => 'boolean_checkbox',
+      ])
+      ->save();
     parent::testTranslationUI();
     $this->doUninstallTest();
   }
@@ -479,7 +488,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
       ->getStorage($this->entityTypeId);
     $entity = $storage->load($this->entityId);
     $languages = $this->container->get('language_manager')->getLanguages();
-    $type_name = node_get_type_label($entity);
+    $type_name = $entity->getBundleEntity()->label();
 
     foreach ($this->langcodes as $langcode) {
       // We only want to test the title for non-english translations.

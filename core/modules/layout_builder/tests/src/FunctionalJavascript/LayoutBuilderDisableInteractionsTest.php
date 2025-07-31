@@ -7,20 +7,18 @@ namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 use Behat\Mink\Element\NodeElement;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\FunctionalJavascriptTests\JSWebAssert;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 use Drupal\Tests\system\Traits\OffCanvasTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore blocknodebundle fieldbody
-
 /**
  * Tests the Layout Builder disables interactions of rendered blocks.
- *
- * @group layout_builder
- * @group #slow
  */
+#[Group('layout_builder')]
+#[Group('#slow')]
 class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
 
   use ContextualLinkClickTrait;
@@ -190,7 +188,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
     try {
       $element->click();
       $tag_name = $element->getTagName();
-      $this->fail(new FormattableMarkup("@tag_name was clickable when it shouldn't have been", ['@tag_name' => $tag_name]));
+      $this->fail("$tag_name was clickable when it shouldn't have been");
     }
     catch (\Exception $e) {
       $this->assertTrue(JSWebAssert::isExceptionNotClickable($e));

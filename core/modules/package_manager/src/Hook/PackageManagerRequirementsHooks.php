@@ -2,9 +2,11 @@
 
 namespace Drupal\package_manager\Hook;
 
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\Url;
 use Drupal\package_manager\ComposerInspector;
 use Drupal\package_manager\Exception\FailureMarkerExistsException;
 use Drupal\package_manager\FailureMarker;
@@ -41,7 +43,7 @@ class PackageManagerRequirementsHooks {
           '@version' => $this->composerInspector->getVersion(),
           '@path' => $this->executableFinder->find('composer'),
         ]),
-        'severity' => REQUIREMENT_INFO,
+        'severity' => RequirementSeverity::Info,
       ];
     }
     catch (\Throwable $e) {
@@ -52,10 +54,11 @@ class PackageManagerRequirementsHooks {
 
       $requirements['package_manager_composer'] = [
         'title' => $title,
-        'description' => $this->t('Composer was not found. The error message was: @message', [
+        'description' => $this->t('Composer was not found. The error message was: @message. The path to Composer can be configured in <a href=":settings-form">the settings form</a>.', [
           '@message' => $message,
+          ':settings-form' => Url::fromRoute('package_manager.settings')->toString(),
         ]),
-        'severity' => REQUIREMENT_ERROR,
+        'severity' => RequirementSeverity::Error,
       ];
     }
 
@@ -90,7 +93,7 @@ class PackageManagerRequirementsHooks {
       $requirements['testing_package_manager'] = [
         'title' => 'Package Manager',
         'description' => $this->t("Package Manager is available for early testing. To install the module set the value of 'testing_package_manager' to TRUE in your settings.php file."),
-        'severity' => REQUIREMENT_ERROR,
+        'severity' => RequirementSeverity::Error,
       ];
     }
 
@@ -125,7 +128,7 @@ class PackageManagerRequirementsHooks {
         $requirements['package_manager_failure_marker'] = [
           'title' => $this->t('Failed Package Manager update detected'),
           'description' => $exception->getMessage(),
-          'severity' => REQUIREMENT_ERROR,
+          'severity' => RequirementSeverity::Error,
         ];
       }
     }

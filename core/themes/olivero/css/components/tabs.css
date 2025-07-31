@@ -42,13 +42,6 @@
 .tabs__tab.is-active {
   display: flex;
 }
-@media (min-width: 43.75rem) {
-  .tabs__tab {
-    display: flex;
-    margin-block-end: 0;
-    margin-inline-start: calc(-1 * var(--tabs-border-width));
-  }
-}
 /* Show tabs when JavaScript disabled. */
 html:not(.js) .tabs__tab {
   display: flex;
@@ -64,6 +57,13 @@ html:not(.js) .tabs__tab {
 @media (min-width: 43.75rem) {
   .tabs--secondary .tabs__tab {
     display: flex;
+  }
+}
+@media (min-width: 43.75rem) {
+  .tabs__tab {
+    display: flex;
+    margin-block-end: 0;
+    margin-inline-start: calc(-1 * var(--tabs-border-width));
   }
 }
 .tabs__link {
@@ -172,23 +172,23 @@ html:not(.js) .tabs__trigger {
     top var(--tabs-transition-duration);
   border-block-start: solid 2px var(--tabs-highlight-color);
 }
-.tabs__trigger-icon > span:nth-child(1) {
+:is(.tabs__trigger-icon > span):nth-child(1) {
   inset-block-start: 0;
 }
-.tabs__trigger[aria-expanded="true"] :is(.tabs__trigger-icon > span:nth-child(1)) {
+.tabs__trigger[aria-expanded="true"] :is(.tabs__trigger-icon > span):nth-child(1) {
   inset-block-start: calc(50% + 1px);
   transform: rotate(45deg);
 }
-.tabs__trigger-icon > span:nth-child(2) {
+:is(.tabs__trigger-icon > span):nth-child(2) {
   inset-block-start: calc(50% + 1px);
 }
-.tabs__trigger[aria-expanded="true"] :is(.tabs__trigger-icon > span:nth-child(2)) {
+.tabs__trigger[aria-expanded="true"] :is(.tabs__trigger-icon > span):nth-child(2) {
   opacity: 0;
 }
-.tabs__trigger-icon > span:nth-child(3) {
+:is(.tabs__trigger-icon > span):nth-child(3) {
   inset-block-start: calc(100% + 2px);
 }
-.tabs__trigger[aria-expanded="true"] :is(.tabs__trigger-icon > span:nth-child(3)) {
+.tabs__trigger[aria-expanded="true"] :is(.tabs__trigger-icon > span):nth-child(3) {
   inset-block-start: calc(50% + 1px);
   transform: rotate(-45deg);
 }
