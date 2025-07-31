@@ -99,7 +99,7 @@ class ImageStyleTest extends UnitTestCase {
    * @covers ::getDerivativeExtension
    */
   public function testGetDerivativeExtension(): void {
-    $image_effect_id = $this->randomMachineName();
+    $image_effect_id = 'image_scale';
     $logger = $this->getMockBuilder('\Psr\Log\LoggerInterface')->getMock();
     $image_effect = $this->getMockBuilder('\Drupal\image\ImageEffectBase')
       ->setConstructorArgs([[], $image_effect_id, [], $logger])
@@ -122,7 +122,7 @@ class ImageStyleTest extends UnitTestCase {
    */
   public function testBuildUri(): void {
     // Image style that changes the extension.
-    $image_effect_id = $this->randomMachineName();
+    $image_effect_id = 'image_scale';
     $logger = $this->getMockBuilder('\Psr\Log\LoggerInterface')->getMock();
     $image_effect = $this->getMockBuilder('\Drupal\image\ImageEffectBase')
       ->setConstructorArgs([[], $image_effect_id, [], $logger])
@@ -156,7 +156,7 @@ class ImageStyleTest extends UnitTestCase {
     $hash_salt = $this->randomMachineName();
 
     // Image style that changes the extension.
-    $image_effect_id = $this->randomMachineName();
+    $image_effect_id = 'image_scale';
     $image_effect = $this->getMockBuilder('\Drupal\image\ImageEffectBase')
       ->setConstructorArgs([[], $image_effect_id, [], $logger])
       ->getMock();
