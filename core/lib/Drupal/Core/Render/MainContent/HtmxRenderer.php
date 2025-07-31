@@ -108,9 +108,11 @@ class HtmxRenderer implements MainContentRendererInterface {
   public function renderResponse(array $main_content, Request $request, RouteMatchInterface $route_match) {
     [$page, $title] = $this->prepare($main_content, $request, $route_match);
 
+    /*
     if (!isset($page['#type']) || $page['#type'] !== 'page') {
       throw new \LogicException('Must be #type page');
     }
+    */
 
     $page['#title'] = $title;
 
@@ -195,12 +197,7 @@ class HtmxRenderer implements MainContentRendererInterface {
       $page_display
         ->setMainContent($main_content);
 
-      // Generate a #type => page render array using the page display variant,
-      // the page display will build the content for the various page regions.
-      $page = [
-        '#type' => 'page',
-      ];
-      $page += $page_display->build();
+      $page = $page_display->build();
     }
 
     /*
@@ -219,7 +216,7 @@ class HtmxRenderer implements MainContentRendererInterface {
       $this->invokePageAttachmentHooks($page);
     });
 
-    return [$page, NULL];
+    return [$page, FALSE];
   }
 
   /**
