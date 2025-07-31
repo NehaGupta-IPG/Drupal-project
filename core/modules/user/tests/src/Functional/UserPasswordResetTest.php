@@ -354,7 +354,14 @@ class UserPasswordResetTest extends BrowserTestBase {
    *
    * @dataProvider languageHookTestProvider
    */
-  public function testUserPasswordResetHookLanguage($setPreferredLangcode, $activeLangcode, $prefix, $visitingUrl, $expectedResetUrl, $unexpectedResetUrl): void {
+  public function testUserPasswordResetHookLanguage(
+    string $setPreferredLangcode,
+    string $activeLangcode,
+    string $prefix,
+    string $visitingUrl,
+    string $expectedResetUrl,
+    string $unexpectedResetUrl
+  ): void {
     // Enable the newly mail language alter hook.
     \Drupal::state()->set('user_hooks_test_user_mail_language_alter', TRUE);
     \Drupal::service('module_installer')->install(['user_hooks_test']);
