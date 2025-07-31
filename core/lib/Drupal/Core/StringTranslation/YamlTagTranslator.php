@@ -36,7 +36,7 @@ class YamlTagTranslator {
    * @return \Drupal\Core\StringTranslation\TranslatableMarkup
    *   The translatable string object.
    */
-  public static function translateTaggedValue(TaggedValue $tagged_value, $options = []) {
+  public static function translateTaggedValue(TaggedValue $tagged_value, array $options = []): TranslatableMarkup {
     $value = $tagged_value->getValue();
     if (is_array($value) && isset($value['string'])) {
       $string = $value['string'];

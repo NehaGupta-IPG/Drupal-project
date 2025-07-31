@@ -58,7 +58,7 @@ class Yaml implements SerializationInterface {
    * Tag objects will be replaced by their raw value or, if a callback
    * exists for that tag it will be used.
    *
-   * The only tag custom tag supported by default is the '!translate' tag.
+   * The only custom tag supported by default is the '!translate' tag.
    *
    * @param mixed $data
    *   Parsed YAML data.
@@ -68,7 +68,7 @@ class Yaml implements SerializationInterface {
    * @return mixed
    *   Parsed data with parsed tag values.
    */
-  public static function decodeTags($data, array $tag_callbacks = []) {
+  public static function decodeTags(mixed $data, array $tag_callbacks = []): mixed {
     if (is_array($data)) {
       foreach ($data as $key => $value) {
         if (is_object($value) && $value instanceof TaggedValue) {
