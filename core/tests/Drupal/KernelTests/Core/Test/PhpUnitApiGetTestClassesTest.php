@@ -31,23 +31,22 @@ class PhpUnitApiGetTestClassesTest extends KernelTestBase {
   #[DataProvider('argumentsProvider')]
   #[IgnoreDeprecations]
   public function testEquality(array $suites, ?string $extension = NULL, ?string $directory = NULL): void {
+    // PHPUnit discovery.
+    $configurationFilePath = $this->container->getParameter('app.root') . \DIRECTORY_SEPARATOR . 'core';
+    // @todo once PHPUnit 10 is no longer used, remove the condition.
+    // @see https://www.drupal.org/project/drupal/issues/3497116
+    if (RunnerVersion::getMajor() < 11) {
+      $configurationFilePath .= \DIRECTORY_SEPARATOR . '.phpunit-10.xml';
+    }
+    $phpUnitTestDiscovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath($configurationFilePath);
+    $phpUnitList = $phpUnitTestDiscovery->getTestClasses($extension, $suites, $directory);
+
+    // Legacy TestDiscovery.
     $testDiscovery = new TestDiscovery(
       $this->container->getParameter('app.root'),
       $this->container->get('class_loader')
     );
     $internalList = $testDiscovery->getTestClasses($extension, $suites, $directory);
-
-    // Location of PHPUnit configuration file.
-    $configurationFilePath = $this->container->getParameter('app.root') . \DIRECTORY_SEPARATOR . 'core';
-    // @todo once PHPUnit 10 is no longer used, remove the condition.
-    // @see https://www.drupal.org/project/drupal/issues/3497116
-    if (RunnerVersion::getMajor() >= 11) {
-      $configurationFilePath .= \DIRECTORY_SEPARATOR . '.phpunit-next.xml';
-    }
-
-    $phpUnitTestDiscovery = new PhpUnitTestDiscovery($configurationFilePath);
-
-    $phpUnitList = $phpUnitTestDiscovery->getTestClasses($extension, $suites, $directory);
 
     // Downgrade results to make them comparable, working around bugs and
     // additions.

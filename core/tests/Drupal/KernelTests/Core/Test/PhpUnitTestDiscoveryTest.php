@@ -9,8 +9,6 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\TestTools\PhpUnitCompatibility\RunnerVersion;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
-use PHPUnit\TextUI\Configuration\Builder;
-use PHPUnit\TextUI\Configuration\TestSuiteBuilder;
 use Symfony\Component\Process\Process;
 
 /**
@@ -28,6 +26,7 @@ use Symfony\Component\Process\Process;
 #[Group('TestSuites')]
 #[Group('Test')]
 #[Group('#slow')]
+#[IgnoreDeprecations]
 class PhpUnitTestDiscoveryTest extends KernelTestBase {
 
   private const TEST_LIST_MISMATCH_MESSAGE =
@@ -62,7 +61,6 @@ class PhpUnitTestDiscoveryTest extends KernelTestBase {
   /**
    * Tests equality of test discovery between run-tests.sh and PHPUnit CLI.
    */
-  #[IgnoreDeprecations]
   public function testPhpUnitTestDiscoveryEqualsInternal(): void {
     // Drupal's test discovery, used by run-tests.sh.
     $testDiscovery = new TestDiscovery(
@@ -82,8 +80,8 @@ class PhpUnitTestDiscoveryTest extends KernelTestBase {
     $configurationFilePath = $this->root . \DIRECTORY_SEPARATOR . 'core';
     // @todo once PHPUnit 10 is no longer used, remove the condition.
     // @see https://www.drupal.org/project/drupal/issues/3497116
-    if (RunnerVersion::getMajor() >= 11) {
-      $configurationFilePath .= \DIRECTORY_SEPARATOR . '.phpunit-next.xml';
+    if (RunnerVersion::getMajor() < 11) {
+      $configurationFilePath .= \DIRECTORY_SEPARATOR . '.phpunit-10.xml';
     }
 
     // PHPUnit's test discovery - via CLI execution.
@@ -122,21 +120,6 @@ class PhpUnitTestDiscoveryTest extends KernelTestBase {
 
     // Check against Drupal's discovery.
     $this->assertEquals(implode("\n", $phpUnitClientList), implode("\n", $internalList), self::TEST_LIST_MISMATCH_MESSAGE);
-
-    // PHPUnit's test discovery - via API.
-    $phpUnitConfiguration = (new Builder())->build(['--configuration', $configurationFilePath]);
-    $phpUnitTestSuite = (new TestSuiteBuilder())->build($phpUnitConfiguration);
-    $phpUnitApiList = [];
-    foreach ($phpUnitTestSuite->tests() as $testSuite) {
-      foreach ($testSuite->tests() as $test) {
-        $phpUnitApiList[] = $test->name();
-      }
-    }
-    asort($phpUnitApiList);
-
-    // Check against Drupal's discovery.
-    $this->assertEquals(implode("\n", $phpUnitApiList), implode("\n", $internalList), self::TEST_LIST_MISMATCH_MESSAGE);
-
   }
 
 }
