@@ -110,3 +110,22 @@ function views_post_update_block_items_per_page(?array &$sandbox = NULL): void {
       return FALSE;
     });
 }
+
+/**
+ * Re-save all views using arguments to update cache metadata.
+ */
+function views_post_update_views_argument_cache_contexts(&$sandbox = NULL) {
+  // Load all views with arguments.
+  $storage = \Drupal::entityTypeManager()->getStorage('view');
+  $query = $storage->getQuery()
+    ->exists("display.*.display_options.arguments.*")
+    ->execute();
+  $views = $storage->loadMultiple($query);
+
+  // Fix the cache context in the cacheability metadata.
+  // @see https://www.drupal.org/node/2514784
+  /** @var \Drupal\views\Entity\View[] $views */
+  foreach ($views as $view) {
+    $view->save();
+  }
+}
