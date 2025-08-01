@@ -206,8 +206,12 @@ function node_add_body_field(NodeTypeInterface $type, $label = 'Body') {
  *
  * @return bool
  *   TRUE if this is a full page view, otherwise FALSE.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use the NodeRepository::isPage() method instead.
+ * @see https://www.drupal.org/node/3532277
  */
 function node_is_page(NodeInterface $node) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use the NodeRepository::isPage() method instead. See https://www.drupal.org/node/3532277', E_USER_DEPRECATED);
   $route_match = \Drupal::routeMatch();
   if ($route_match->getRouteName() == 'entity.node.canonical') {
     $page_node = $route_match->getParameter('node');
