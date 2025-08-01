@@ -117,7 +117,7 @@
       const options = {
         class: 'toolbar-icon toolbar-handle',
         expanded: 'false',
-        labelledby: '',
+        text: '',
       };
       // Initialize items and their links.
       $menu.find('li > a').wrap('<div class="toolbar-box">');
@@ -127,7 +127,9 @@
         if ($item.children('ul.toolbar-menu').length) {
           const $box = $item.children('.toolbar-box');
           const $link = $box.find('a');
-          options.labelledby = $link.attr('id');
+          options.text = Drupal.t('@label menu', {
+            '@label': $link.length ? $link[0].textContent : '',
+          });
           $item
             .children('.toolbar-box')
             .append(
@@ -234,13 +236,13 @@
    *   Class to set on the button.
    * @param {string} options.expanded
    *   The button's aria-expanded attribute.
-   * @param {string} options.labelledby
-   *   The button's aria-labelledby attribute.
+   * @param {string} options.text
+   *   Used as label for the button.
    *
    * @return {string}
    *   A string representing a DOM fragment.
    */
   Drupal.theme.toolbarMenuItemToggle = function (options) {
-    return `<button aria-expanded="${options.expanded}" aria-labelledby="${options.labelledby}" class="${options.class}"></button>`;
+    return `<button aria-expanded="${options.expanded}" class="${options.class}"><span class="label">${options.text}</span></button>`;
   };
 })(jQuery, Drupal, drupalSettings);
