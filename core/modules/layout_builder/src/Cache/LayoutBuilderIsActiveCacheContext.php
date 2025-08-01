@@ -69,10 +69,18 @@ class LayoutBuilderIsActiveCacheContext implements CalculatedCacheContextInterfa
       return new CacheableMetadata();
     }
     $cacheable_metadata = new CacheableMetadata();
-    $display = EntityViewDisplay::load(\sprintf('%s.%s.full', $entity_type_id, $entity->bundle()));
+
+    // Try to load the display for the full and default view modes.
+    // In most cases, one of these will exist.
+    foreach (['full', 'default'] as $view_mode) {
+      $display = EntityViewDisplay::load(\sprintf('%s.%s.%s', $entity_type_id, $entity->bundle(), $view_mode));
+      if ($display) {
+        break;
+      }
+    }
+    // If the display can't be directly loaded, fallback to generating it
+    // from the entity type.
     if ($display === NULL) {
-      // If the display can't be directly loaded, fallback to generating it
-      // from the entity type.
       $display = $this->getDisplay($entity_type_id);
     }
     $cacheable_metadata->addCacheableDependency($display);
