@@ -40,7 +40,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $this->setCommentPreview(DRUPAL_DISABLED);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(FALSE);
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
+    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED);
   }
 
   /**

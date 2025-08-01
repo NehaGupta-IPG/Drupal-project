@@ -37,7 +37,7 @@ class CommentPagerTest extends CommentTestBase {
     $comments[] = $this->postComment($node, $this->randomMachineName(), $this->randomMachineName(), TRUE);
     $comments[] = $this->postComment($node, $this->randomMachineName(), $this->randomMachineName(), TRUE);
 
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.');
+    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT);
 
     // Set "Comments per page" as zero and verify that all comments are
     // appearing on the page.
@@ -85,7 +85,8 @@ class CommentPagerTest extends CommentTestBase {
     // If we switch to threaded mode, the replies on the oldest comment
     // should be bumped to the first page and comment 6 should be bumped
     // to the second page.
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Switched to threaded mode.');
+    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED);
+
     $this->drupalGet('node/' . $node->id(), ['query' => ['page' => 0]]);
     $this->assertTrue($this->commentExists($reply, TRUE), 'In threaded mode, reply appears on page 1.');
     $this->assertFalse($this->commentExists($comments[1]), 'In threaded mode, comment 2 has been bumped off of page 1.');
@@ -127,7 +128,7 @@ class CommentPagerTest extends CommentTestBase {
     $comments[] = $this->postComment($node, 'comment 2: ' . $this->randomMachineName(), $this->randomMachineName(), TRUE);
     $comments[] = $this->postComment($node, 'comment 3: ' . $this->randomMachineName(), $this->randomMachineName(), TRUE);
 
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.');
+    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT);
 
     // Set comments to one per page so that we are able to test paging without
     // needing to insert large numbers of comments.
@@ -187,7 +188,7 @@ class CommentPagerTest extends CommentTestBase {
     // - 2
     //   - 5
 
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.');
+    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT);
 
     $expected_order = [
       0,
@@ -201,7 +202,7 @@ class CommentPagerTest extends CommentTestBase {
     $this->drupalGet('node/' . $node->id());
     $this->assertCommentOrder($comments, $expected_order);
 
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Switched to threaded mode.');
+    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED);
 
     $expected_order = [
       0,
@@ -284,7 +285,7 @@ class CommentPagerTest extends CommentTestBase {
     // - 2
     //   - 5
 
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.');
+    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT);
 
     $expected_pages = [
       // Page of comment 5.
@@ -308,7 +309,7 @@ class CommentPagerTest extends CommentTestBase {
       $this->assertSame($expected_page, $returned_page, "Flat mode, $new_replies replies: expected page $expected_page, returned page $returned_page.");
     }
 
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Switched to threaded mode.');
+    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED);
 
     $expected_pages = [
       // Page of comment 5.
@@ -380,7 +381,7 @@ class CommentPagerTest extends CommentTestBase {
     foreach (['comment', 'comment_2'] as $field_name) {
       $this->setCommentForm(TRUE, $field_name);
       $this->setCommentPreview(DRUPAL_OPTIONAL, $field_name);
-      $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.', $field_name);
+      $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, NULL, $field_name);
 
       // Set comments to one per page so that we are able to test paging without
       // needing to insert large numbers of comments.

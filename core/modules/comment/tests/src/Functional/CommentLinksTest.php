@@ -75,16 +75,16 @@ class CommentLinksTest extends CommentTestBase {
 
     // Tests that reply link is not visible when threading is disabled.
     $this->drupalLogin($this->webUser);
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.');
+    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT);
     $this->drupalGet('node/' . $this->node->id());
     $this->assertSession()->linkNotExists('Reply');
     // Tests that reply link is visible when threading is enabled.
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
+    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED);
     $this->drupalGet('node/' . $this->node->id());
     $this->assertSession()->linkExists('Reply');
 
     // Change comment settings.
-    $this->setCommentSettings('form_location', CommentItemInterface::FORM_BELOW, 'Set comment form location');
+    $this->setCommentSettings('form_location', CommentItemInterface::FORM_BELOW);
     $this->node->comment = CommentItemInterface::OPEN;
     $this->node->save();
 

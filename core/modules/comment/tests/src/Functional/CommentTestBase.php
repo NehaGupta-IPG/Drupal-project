@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\comment\Entity\CommentType;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\CommentInterface;
@@ -265,20 +264,7 @@ abstract class CommentTestBase extends BrowserTestBase {
    *   Defaults to 'comment'.
    */
   protected function setCommentPreview($mode, $field_name = 'comment') {
-    switch ($mode) {
-      case DRUPAL_DISABLED:
-        $mode_text = 'disabled';
-        break;
-
-      case DRUPAL_OPTIONAL:
-        $mode_text = 'optional';
-        break;
-
-      case DRUPAL_REQUIRED:
-        $mode_text = 'required';
-        break;
-    }
-    $this->setCommentSettings('preview', $mode, new FormattableMarkup('Comment preview @mode_text.', ['@mode_text' => $mode_text]), $field_name);
+    $this->setCommentSettings('preview', $mode, NULL, $field_name);
   }
 
   /**
@@ -292,7 +278,7 @@ abstract class CommentTestBase extends BrowserTestBase {
    *   Defaults to 'comment'.
    */
   protected function setCommentForm($enabled, $field_name = 'comment') {
-    $this->setCommentSettings('form_location', ($enabled ? CommentItemInterface::FORM_BELOW : CommentItemInterface::FORM_SEPARATE_PAGE), 'Comment controls ' . ($enabled ? 'enabled' : 'disabled') . '.', $field_name);
+    $this->setCommentSettings('form_location', ($enabled ? CommentItemInterface::FORM_BELOW : CommentItemInterface::FORM_SEPARATE_PAGE), NULL, $field_name);
   }
 
   /**
@@ -305,7 +291,7 @@ abstract class CommentTestBase extends BrowserTestBase {
    *   - 2: Contact information required.
    */
   protected function setCommentAnonymous($level) {
-    $this->setCommentSettings('anonymous', $level, new FormattableMarkup('Anonymous commenting set to level @level.', ['@level' => $level]));
+    $this->setCommentSettings('anonymous', $level);
   }
 
   /**
@@ -318,7 +304,7 @@ abstract class CommentTestBase extends BrowserTestBase {
    *   Defaults to 'comment'.
    */
   protected function setCommentsPerPage($number, $field_name = 'comment') {
-    $this->setCommentSettings('per_page', $number, new FormattableMarkup('Number of comments per page set to @number.', ['@number' => $number]), $field_name);
+    $this->setCommentSettings('per_page', $number, NULL, $field_name);
   }
 
   /**
@@ -328,13 +314,16 @@ abstract class CommentTestBase extends BrowserTestBase {
    *   Name of variable.
    * @param string|int $value
    *   Value of variable.
-   * @param string|\Stringable $message
-   *   Status message to display.
+   * @param string|\Stringable|null $message
+   *   (deprecated) Status message to display.
    * @param string $field_name
    *   (optional) Field name through which the comment should be posted.
    *   Defaults to 'comment'.
    */
-  protected function setCommentSettings($name, $value, $message, $field_name = 'comment') {
+  protected function setCommentSettings($name, $value, $message = NULL, $field_name = 'comment') {
+    if ($message !== NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() with the $message argument is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310', E_USER_DEPRECATED);
+    }
     $field = FieldConfig::loadByName('node', 'article', $field_name);
     $field->setSetting($name, $value);
     $field->save();

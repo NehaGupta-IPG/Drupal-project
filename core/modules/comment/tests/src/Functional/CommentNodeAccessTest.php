@@ -56,7 +56,7 @@ class CommentNodeAccessTest extends CommentTestBase {
     $this->setCommentPreview(DRUPAL_DISABLED);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
+    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED);
 
     // Post comment.
     $this->drupalLogin($this->webUser);
