@@ -56,7 +56,6 @@ workflow:
 ################
 
 variables:
-  CI_DEBUG_SERVICES: "true"
   FF_USE_FASTZIP: 1
   _CONFIG_DOCKERHUB_ROOT: "registry.gitlab.com/drupal-infrastructure/drupalci/drupalci-environments"
   CACHE_TARGET: "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}${CI_COMMIT_BRANCH}"
