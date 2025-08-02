@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Database\Database;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -17,7 +18,7 @@ class ErrorHandlerTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['error_test'];
+  protected static $modules = ['dblog', 'error_test'];
 
   /**
    * {@inheritdoc}
@@ -26,6 +27,11 @@ class ErrorHandlerTest extends BrowserTestBase {
 
   /**
    * Tests the error handler.
+   *
+   * Since this tests the logging of deprecation messages, it is in the 'legacy'
+   * group.
+   *
+   * @group legacy
    */
   public function testErrorHandler(): void {
     $config = $this->config('system.logging');
@@ -90,6 +96,55 @@ class ErrorHandlerTest extends BrowserTestBase {
     $this->assertNoErrorMessage($error_user_notice);
     $this->assertNoMessages();
     $this->assertSession()->responseNotContains('<pre class="backtrace">');
+
+    // Login as a user with access to the logging and errors page.
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer site configuration',
+      'access administration pages',
+      'access site reports',
+      'administer users',
+    ]));
+
+    // Test the default of no logging.
+    $this->drupalGet('error-test/trigger-deprecation');
+    $this->assertLogCount('0');
+
+    // Enable logging. The default ignored file patterns are '/vendor/' and
+    // '/core'/ so there should be no logged messages.
+    $this->drupalGet('/admin/config/development/logging');
+    $edits = [
+      'log_deprecations' => TRUE,
+    ];
+    $this->submitForm($edits, 'Save configuration');
+    $this->drupalGet('error-test/trigger-deprecation');
+    $this->assertLogCount('0');
+
+    // Allow logging of messages from the 'core' file path.
+    $this->drupalGet('/admin/config/development/logging');
+    $edits = [
+      'log_deprecations' => TRUE,
+      'deprecations_ignored_file_patterns' => '/vendor/',
+    ];
+    $this->submitForm($edits, 'Save configuration');
+    $this->resetAll();
+
+    // There should now be one logged message.
+    $this->drupalGet('error-test/trigger-deprecation');
+    $this->assertLogCount('1');
+
+    // Test ignoring a deprecation message.
+    $this->drupalGet('/admin/config/development/logging');
+    $edits = [
+      'log_deprecations' => TRUE,
+      'deprecations_ignored_file_patterns' => '/vendor/',
+      'ignored_deprecations' => 'Foo is deprecated.',
+    ];
+    $this->submitForm($edits, 'Save configuration');
+    $this->resetAll();
+
+    // The message should not be logged again. The count remains at 1.
+    $this->drupalGet('error-test/trigger-deprecation');
+    $this->assertLogCount('1');
   }
 
   /**
@@ -209,6 +264,23 @@ class ErrorHandlerTest extends BrowserTestBase {
    */
   protected function assertNoMessages(): void {
     $this->assertSession()->elementNotExists('xpath', '//div[contains(@class, "messages")]');
+  }
+
+  /**
+   * Asserts the number of 'deprecation' type messaged logged.
+   *
+   * @param string $expected_count
+   *   The expected number of deprecation messages.
+   *
+   * @internal
+   */
+  protected function assertLogCount(string $expected_count): void {
+    $count = Database::getConnection()->select('watchdog')
+      ->condition('type', 'deprecation')
+      ->countQuery()
+      ->execute()
+      ->fetchField();
+    $this->assertSame($expected_count, $count);
   }
 
 }

@@ -183,6 +183,21 @@ system.logging:
             - 'some'
             - 'all'
             - 'verbose'
+    log_deprecations:
+      type: boolean
+      label: 'Should deprecations be logged'
+    deprecations_ignored_file_patterns:
+      type: sequence
+      label: 'List of ignored deprecation source file patterns'
+      sequence:
+        type: string
+        label: 'Ignored deprecation source file pattern'
+    ignored_deprecations:
+      type: sequence
+      label: 'List of ignored deprecations'
+      sequence:
+        type: string
+        label: 'Ignored deprecation'
 
 system.performance:
   type: config_object

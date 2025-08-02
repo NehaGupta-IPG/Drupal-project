@@ -40,3 +40,10 @@ error_test.trigger_renderer_exception:
     _controller: '\Drupal\error_test\Controller\ErrorTestController::triggerRendererException'
   requirements:
     _access: 'TRUE'
+
+error_test.trigger_deprecation:
+  path: '/error-test/trigger-deprecation'
+  defaults:
+    _controller: '\Drupal\error_test\Controller\ErrorTestController::triggerDeprecation'
+  requirements:
+    _access: 'TRUE'

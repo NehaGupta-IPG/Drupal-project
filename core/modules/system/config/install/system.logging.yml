@@ -1,1 +1,6 @@
 error_level: hide
+log_deprecations: false
+deprecations_ignored_file_patterns:
+  - /vendor/
+  - /core/
+ignored_deprecations: { }

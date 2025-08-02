@@ -65,6 +65,12 @@ class MigrateSystemConfigurationTest extends MigrateDrupal6TestBase {
     ],
     'system.logging' => [
       'error_level' => 'some',
+      'log_deprecations' => FALSE,
+      'deprecations_ignored_file_patterns' => [
+        0 => '/vendor/',
+        1 => '/core/',
+      ],
+      'ignored_deprecations' => [],
     ],
     'system.maintenance' => [
       // Langcode is not handled by the migration.

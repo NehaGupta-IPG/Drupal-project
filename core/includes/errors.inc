@@ -55,7 +55,24 @@ function drupal_error_levels(): array {
  *   The line number the error was raised at.
  */
 function _drupal_error_handler_real($error_level, $message, $filename, $line): void {
-  if ($error_level & error_reporting()) {
+  if (($error_level & error_reporting()) || ($error_level === E_USER_DEPRECATED && _drupal_get_deprecation_setting('log_deprecations', FALSE))) {
+    // Filter out deprecations depending on the deprecation settings.
+    $channel = 'php';
+    if ($error_level === E_USER_DEPRECATED) {
+      $ignored_file_patterns = _drupal_get_deprecation_setting('deprecations_ignored_file_patterns', []);
+      foreach ($ignored_file_patterns as $pattern) {
+        if (preg_match($pattern, $filename) === 1) {
+          return;
+        }
+      }
+
+      $ignored_deprecations = _drupal_get_deprecation_setting('ignored_deprecations', []);
+      if (in_array($message, $ignored_deprecations, TRUE)) {
+        return;
+      }
+      $channel = 'deprecation';
+    }
+
     $types = drupal_error_levels();
     [$severity_msg, $severity_level] = $types[$error_level];
     $backtrace = debug_backtrace();
@@ -79,7 +96,7 @@ function _drupal_error_handler_real($error_level, $message, $filename, $line): v
       'backtrace' => $backtrace,
       '@backtrace_string' => (new \Exception())->getTraceAsString(),
       'exception' => NULL,
-    ], $recoverable || $to_string);
+    ], $recoverable || $to_string, $channel);
   }
   // If the site is a test site then fail for user deprecations so they can be
   // caught by the deprecation error handler.
@@ -144,8 +161,10 @@ function error_displayable($error = NULL) {
  *   - An exception is thrown and not caught by something else.
  *   - A recoverable fatal error, which is a fatal error.
  *   Non-recoverable fatal errors cannot be logged by Drupal.
+ * @param string $channel
+ *   The logger channel to use.
  */
-function _drupal_log_error($error, $fatal = FALSE): void {
+function _drupal_log_error($error, $fatal = FALSE, $channel = 'php') : void {
   $is_installer = InstallerKernel::installationAttempted() && \Drupal::hasContainer();
 
   // Backtrace, exception and 'severity_level' are not valid replacement values
@@ -171,7 +190,7 @@ function _drupal_log_error($error, $fatal = FALSE): void {
       // Provide the PHP backtrace and exception to logger implementations. Add
       // 'severity_level' to the context to maintain BC and allow logging
       // implementations to use it.
-      \Drupal::logger('php')->log($severity, '%type: @message in %function (line %line of %file) @backtrace_string.', $error + ['backtrace' => $backtrace, 'exception' => $exception, 'severity_level' => $severity]);
+      \Drupal::logger($channel)->log($severity, '%type: @message in %function (line %line of %file) @backtrace_string.', $error + ['backtrace' => $backtrace, 'exception' => $exception, 'severity_level' => $severity]);
     }
     catch (\Throwable) {
       // We can't log, for example because the database connection is not
@@ -337,6 +356,28 @@ function _drupal_get_error_level() {
   // possibly in an edge-case error situation while trying to serve a regular
   // request on a public site, so use the non-verbose default value.
   return $error_level ?: ERROR_REPORTING_DISPLAY_ALL;
+}
+
+/**
+ * Gets a deprecation logging settings.
+ *
+ * @param string $setting
+ *   The setting to get.
+ * @param mixed $default
+ *   The default value.
+ *
+ * @return mixed
+ *   The configuration value.
+ */
+function _drupal_get_deprecation_setting(string $setting, $default): mixed {
+  try {
+    $value = \Drupal::config('system.logging')->get($setting);
+  }
+  catch (\Exception) {
+    $value = $GLOBALS['config']['system.logging'][$setting] ?? $default;
+  }
+
+  return $value;
 }
 
 /**
