@@ -658,7 +658,7 @@ services:
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
   module_handler:
     class: Drupal\Core\Extension\ModuleHandler
-    arguments: ['%app.root%', '%container.modules%', '@event_dispatcher', '%hook_implementations_map%']
+    arguments: ['%app.root%', '%container.modules%', '@hook_event_dispatcher', '%hook_implementations_map%']
   Drupal\Core\Extension\ModuleHandlerInterface: '@module_handler'
   module_installer:
     class: Drupal\Core\Extension\ModuleInstaller
@@ -904,6 +904,8 @@ services:
     class: Symfony\Component\EventDispatcher\EventDispatcher
   Psr\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
   Symfony\Contracts\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
+  hook_event_dispatcher:
+    class: Symfony\Component\EventDispatcher\EventDispatcher
   controller_resolver:
     class: Drupal\Core\Controller\ControllerResolver
     arguments: ['@callable_resolver']
