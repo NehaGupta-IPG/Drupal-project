@@ -145,48 +145,54 @@ class ThemeManager implements ThemeManagerInterface {
 
     $theme_registry = $this->themeRegistry->getRuntime();
 
-    // If an array of hook candidates were passed, use the first one that has an
-    // implementation.
-    if (is_array($hook)) {
-      foreach ($hook as $candidate) {
-        if ($theme_registry->has($candidate)) {
-          break;
-        }
-      }
-      $hook = $candidate;
-    }
-    // Save the original theme hook, so it can be supplied to theme variable
-    // preprocess callbacks.
-    $original_hook = $hook;
+    // $hook is normally a string, but it can be an array. We only log error
+    // messages below if it was a string.
+    $is_hook_array = is_array($hook);
 
-    // If there's no implementation, check for more generic fallbacks.
-    // If there's still no implementation, log an error and return an empty
-    // string.
-    if (!$theme_registry->has($hook)) {
-      // Iteratively strip everything after the last '__' delimiter, until an
-      // implementation is found.
-      while ($pos = strrpos($hook, '__')) {
-        $hook = substr($hook, 0, $pos);
-        if ($theme_registry->has($hook)) {
-          break;
+    // While we search for templates, we create a full list of template
+    // suggestions that is later passed to theme_suggestions alter hooks.
+    $template_suggestions = $is_hook_array ? array_values($hook) : [$hook];
+
+    // The last element in our template suggestions gets special treatment.
+    // While the other elements must match exactly, the final element is
+    // expanded to create multiple possible matches by iteratively striping
+    // everything after the last '__' delimiter.
+    $suggestion = $original_hook = $template_suggestions[array_key_last($template_suggestions)];
+    while ($pos = strrpos($suggestion, '__')) {
+      $suggestion = substr($suggestion, 0, $pos);
+      $template_suggestions[] = $suggestion;
+    }
+
+    // Use the first hook candidate that has an implementation.
+    foreach ($template_suggestions as $candidate) {
+      if ($theme_registry->has($candidate)) {
+        // Save the original theme hook, so it can be supplied to theme variable
+        // preprocess callbacks.
+        if ($is_hook_array && in_array($candidate, $hook)) {
+          $original_hook = $candidate;
         }
-      }
-      if (!$theme_registry->has($hook)) {
-        // Only log a message when not trying theme suggestions ($hook being an
-        // array).
-        if (!isset($candidate)) {
-          \Drupal::logger('theme')->warning('Theme hook %hook not found.', ['%hook' => $hook]);
-        }
-        // There is no theme implementation for the hook passed. Return FALSE so
-        // the function calling
-        // \Drupal\Core\Theme\ThemeManagerInterface::render() can differentiate
-        // between a hook that exists and renders an empty string, and a hook
-        // that is not implemented.
-        return FALSE;
+        $hook = $candidate;
+        $info = $theme_registry->get($hook);
+        break;
       }
     }
 
-    $info = $theme_registry->get($hook);
+    // If there's no implementation, log an error and return an empty string.
+    if (!isset($info)) {
+      // Only log a message if we #theme was a string. By default, all forms set
+      // #theme to an array containing the form ID and don't implement that as a
+      // theme hook, so we want to prevent errors for that common use case.
+      if (!$is_hook_array) {
+        \Drupal::logger('theme')->warning('Theme hook %hook not found.', ['%hook' => $original_hook]);
+      }
+      // There is no theme implementation for the hook passed. Return FALSE so
+      // the function calling
+      // \Drupal\Core\Theme\ThemeManagerInterface::render() can differentiate
+      // between a hook that exists and renders an empty string, and a hook
+      // that is not implemented.
+      return FALSE;
+    }
+
     $invoke_map = $theme_registry->getPreprocessInvokes();
     if (isset($info['deprecated'])) {
       @trigger_error($info['deprecated'], E_USER_DEPRECATED);
@@ -204,7 +210,7 @@ class ThemeManager implements ThemeManagerInterface {
           }
         }
       }
-      else {
+      elseif (isset($info['render element'])) {
         $variables[$info['render element']] = $element;
         // Give a hint to render engines to prevent infinite recursion.
         $variables[$info['render element']]['#render_children'] = TRUE;
@@ -223,19 +229,14 @@ class ThemeManager implements ThemeManagerInterface {
       'theme_hook_original' => $original_hook,
     ];
 
+    // Add two read-only variables that help the template engine understand
+    // how the template was chosen from among all suggestions.
+    $variables['template_suggestions'] = $template_suggestions;
+    $variables['template_suggestion'] = $hook;
+
     $suggestions = $this->buildThemeHookSuggestions($hook, $info['base hook'] ?? '', $variables);
 
-    // Check if each suggestion exists in the theme registry, and if so,
-    // use it instead of the base hook. For example, a function may use
-    // '#theme' => 'node', but a module can add 'node__article' as a suggestion
-    // via hook_theme_suggestions_HOOK_alter(), enabling a theme to have
-    // an alternate template file for article nodes.
-    foreach (array_reverse($suggestions) as $suggestion) {
-      if ($theme_registry->has($suggestion)) {
-        $info = $theme_registry->get($suggestion);
-        break;
-      }
-    }
+    $info = $variables['info'] ?? $info;
 
     // Include a file if the variable preprocessor is held elsewhere.
     if (!empty($info['includes'])) {
@@ -360,15 +361,13 @@ class ThemeManager implements ThemeManagerInterface {
     // The theme engine may use a different extension and a different
     // renderer.
     $theme_engine = $active_theme->getEngine();
-    if (isset($theme_engine)) {
-      if ($info['type'] != 'module') {
-        if (function_exists($theme_engine . '_render_template')) {
-          $render_function = $theme_engine . '_render_template';
-        }
-        $extension_function = $theme_engine . '_extension';
-        if (function_exists($extension_function)) {
-          $extension = $extension_function();
-        }
+    if ($info['type'] != 'module') {
+      if (function_exists($theme_engine . '_render_template')) {
+        $render_function = $theme_engine . '_render_template';
+      }
+      $extension_function = $theme_engine . '_extension';
+      if (function_exists($extension_function)) {
+        $extension = $extension_function();
       }
     }
 
@@ -402,6 +401,7 @@ class ThemeManager implements ThemeManagerInterface {
     if (isset($theme_hook_suggestion)) {
       $variables['theme_hook_suggestion'] = $theme_hook_suggestion;
     }
+
     $output = $render_function($template_file, $variables);
     return ($output instanceof MarkupInterface) ? $output : (string) $output;
   }
@@ -426,19 +426,47 @@ class ThemeManager implements ThemeManagerInterface {
    *   This method may change at any time. It is not for use outside this class.
    */
   protected function buildThemeHookSuggestions(string $hook, string $info_base_hook, array &$variables): array {
+    $template_suggestion = &$variables['template_suggestion'];
+    $template_suggestions = &$variables['template_suggestions'];
+
     // Set base hook for later use. For example if '#theme' => 'node__article'
     // is called, we run hook_theme_suggestions_node_alter() rather than
     // hook_theme_suggestions_node__article_alter(), and also pass in the base
     // hook as the last parameter to the suggestions alter hooks.
     $base_theme_hook = $info_base_hook ?: $hook;
 
+    // The $hook's theme registry may specify a "base hook" that differs from
+    // the base string of $hook. If so, we need to be aware of both strings.
+    $base_of_hook = explode('__', $hook)[0];
+
     // Invoke hook_theme_suggestions_HOOK().
     $suggestions = $this->moduleHandler->invokeAll('theme_suggestions_' . $base_theme_hook, [$variables]);
+
     // If the theme implementation was invoked with a direct theme suggestion
     // like '#theme' => 'node__article', add it to the suggestions array before
     // invoking suggestion alter hooks.
     if ($info_base_hook) {
       $suggestions[] = $hook;
+    }
+
+    // Add all the template suggestions with the same base to the suggestions
+    // array before invoking suggestion alter hooks.
+    $contains_base_hook = in_array($base_theme_hook, $template_suggestions);
+    foreach (array_reverse($template_suggestions, TRUE) as $key => $suggestion) {
+      $suggestion_base = explode('__', $suggestion)[0];
+      if ($suggestion_base === $base_of_hook || $suggestion_base === $base_theme_hook) {
+        if ($suggestion !== $base_theme_hook) {
+          $suggestions[] = $suggestion;
+        }
+        // Temporarily remove from $template_suggestions the suggestions that we
+        // are adding to $suggestions given to the alter hooks. However, ensure
+        // that we leave one entry for the base hook so we can splice those
+        // $suggestions back into $template_suggestions later.
+        if ($contains_base_hook && $suggestion !== $base_theme_hook
+          || !$contains_base_hook && $suggestion !== $hook) {
+          unset($template_suggestions[$key]);
+        }
+      }
     }
 
     // Invoke hook_theme_suggestions_alter() and
@@ -450,7 +478,32 @@ class ThemeManager implements ThemeManagerInterface {
     $this->moduleHandler->alter($hooks, $suggestions, $variables, $base_theme_hook);
     $this->alter($hooks, $suggestions, $variables, $base_theme_hook);
 
-    return $suggestions;
+    // Merge $suggestions back into $template_suggestions before the "base hook"
+    // entry.
+    $template_suggestions = array_values($template_suggestions);
+    array_splice(
+      $template_suggestions,
+      array_search($contains_base_hook ? $base_theme_hook : $hook, $template_suggestions),
+      $contains_base_hook ? 0 : 1,
+      array_reverse($suggestions)
+    );
+
+    // Check if each suggestion exists in the theme registry, and if so,
+    // use it instead of the base hook. For example, a function may use
+    // '#theme' => 'node', but a module can add 'node__article' as a suggestion
+    // via hook_theme_suggestions_HOOK_alter(), enabling a theme to have
+    // an alternate template file for article nodes.
+    $theme_registry = $this->themeRegistry->getRuntime();
+    foreach (array_reverse($suggestions) as $suggestion) {
+      if ($theme_registry->has($suggestion)) {
+        $template_suggestion = $suggestion;
+        $variables['info'] = $theme_registry->get($suggestion);
+        break;
+      }
+    }
+
+    $variables['template_suggestions'] = array_unique($template_suggestions);
+    return array_unique($suggestions);
   }
 
   /**

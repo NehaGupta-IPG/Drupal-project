@@ -5,7 +5,7 @@ id: test_page_display
 label: test_page_display
 module: views
 description: ''
-tag: ''
+tag: 'tag1,tag2'
 base_table: views_test_data
 base_field: nid
 display:

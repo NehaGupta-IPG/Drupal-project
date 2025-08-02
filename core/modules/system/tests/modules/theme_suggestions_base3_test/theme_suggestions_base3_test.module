@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Support module for testing theme suggestions.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_theme().
+ */
+function theme_suggestions_base3_test_theme($existing, $type, $theme, $path): array {
+  $items['theme_test_base3'] = [
+    'variables' => [],
+  ];
+  return $items;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+function theme_suggestions_base3_test_theme_suggestions_theme_test_base3_alter(array &$suggestions, array $variables, $hook): void {
+  $from_theme_array = array_search('theme_test_base3__from_theme_property', $suggestions);
+  if ($from_theme_array !== FALSE) {
+    $suggestions[$from_theme_array] .= '__seen_by_alter';
+  }
+  $suggestions[] = 'theme_test_base3__from_hook_theme_suggestions_hook_alter';
+}

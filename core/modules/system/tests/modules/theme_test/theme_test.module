@@ -21,6 +21,16 @@ function template_preprocess_theme_test_render_element(&$variables): void {
 }
 
 /**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function theme_test_theme_suggestions_theme_test_xss_suggestion(array $variables): array {
+  $xss = '<script type="text/javascript">alert(\'yo\');</script>';
+  $suggestions[] = 'theme_test_xss_suggestion__' . $xss;
+
+  return $suggestions;
+}
+
+/**
  * Implements template_preprocess_HOOK() for theme_test_registered_by_module.
  */
 function template_preprocess_theme_test_registered_by_module(): void {

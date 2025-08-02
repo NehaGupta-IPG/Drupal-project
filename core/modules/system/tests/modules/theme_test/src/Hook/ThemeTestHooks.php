@@ -24,6 +24,9 @@ class ThemeTestHooks {
     $items['theme_test_suggestion_provided'] = ['variables' => []];
     $items['theme_test_specific_suggestions'] = ['variables' => []];
     $items['theme_test_suggestions'] = ['variables' => []];
+    $items['theme_test_base1'] = ['variables' => []];
+    $items['theme_test_base2'] = ['variables' => []];
+    $items['theme_test_xss_suggestion'] = ['variables' => []];
     $items['theme_test_general_suggestions'] = [
       'variables' => [
         'module_hook' => 'theme_test_theme',

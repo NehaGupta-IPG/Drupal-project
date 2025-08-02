@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * @file
+ * Support module for testing theme suggestions.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_theme().
+ */
+function theme_suggestions_base1_test_theme($existing, $type, $theme, $path): array {
+  $items['theme_suggestions_base4_test_alternate__from_hook_theme_suggestions_hook_alter'] = [
+    'variables' => [],
+  ];
+  return $items;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function theme_suggestions_base1_test_theme_suggestions_theme_test_base1(array $variables): array {
+  return [
+    'theme_test_base1__from_hook_theme_suggestions_hook',
+    'theme_test_base1__from_hook_theme_suggestions_hook_too',
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+function theme_suggestions_base1_test_theme_suggestions_theme_test_base1_alter(array &$suggestions, array $variables, $hook): void {
+  $suggestions[] = $hook . '__from_hook_theme_suggestions_hook_alter__but_reordered';
+
+  // We move a suggestion from hook_theme_suggestions_HOOK() to come after our
+  // first suggestion above. We also create an intentional gap in the numeric
+  // keys using this common method; Drupal core should handle non-contiguous
+  // index keys.
+  $moved_suggestion = $hook . '__from_hook_theme_suggestions_hook_too';
+  unset($suggestions[array_search($moved_suggestion, $suggestions)]);
+  $suggestions[] = $moved_suggestion;
+
+  $suggestions[] = $hook . '__from_hook_theme_suggestions_hook_alter';
+}

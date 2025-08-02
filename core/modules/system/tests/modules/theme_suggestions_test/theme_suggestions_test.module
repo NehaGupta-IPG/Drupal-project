@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * @file
+ * Support module for testing theme suggestions.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_theme().
+ */
+function theme_suggestions_test_theme($existing, $type, $theme, $path): array {
+  $items['theme_test_general_suggestions__module_override'] = [
+    'base hook' => 'theme_test_general_suggestions',
+    'variables' => [],
+  ];
+  $items['theme_test_suggestions__module_override'] = [
+    'base hook' => 'theme_test_suggestions',
+    'variables' => [],
+  ];
+  return $items;
+}
+
+/**
+ * Implements hook_theme_suggestions_alter().
+ */
+function theme_suggestions_test_theme_suggestions_alter(array &$suggestions, array $variables, $hook): void {
+  if ($hook === 'theme_test_suggestions') {
+    \Drupal::messenger()->addStatus(__FUNCTION__ . '() executed.');
+  }
+  if ($hook === 'theme_test_general_suggestions') {
+    $suggestions[] = $hook . '__module_override';
+    $variables['module_hook'] = 'theme_suggestions_test_theme_suggestions_alter';
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+function theme_suggestions_test_theme_suggestions_theme_test_suggestions_alter(array &$suggestions, array $variables, $hook): void {
+  \Drupal::messenger()->addStatus(__FUNCTION__ . '() executed.');
+  $suggestions[] = $hook . '__module_override';
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+function theme_suggestions_test_theme_suggestions_theme_test_specific_suggestions_alter(array &$suggestions, array $variables, $hook): void {
+  $suggestions[] = $hook . '__variant__foo';
+}

@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * @file
+ * Support module for testing theme suggestions.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+function theme_suggestions_base2_ignored_test_theme_suggestions_theme_test_base1_alter(array &$suggestions, array $variables, $hook): void {
+  // Add a suggestion just to confirm that the theme_test_base2 suggestion is
+  // normally ignored.
+  $suggestions[] = 'theme_test_base2';
+}

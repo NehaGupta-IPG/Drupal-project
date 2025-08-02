@@ -61,6 +61,8 @@ class ViewsTemplateTest extends ViewsKernelTestBase {
     $expected = '<!-- FILE NAME SUGGESTIONS:' . PHP_EOL
       . '   ▪️ container--more-link--test-page-display--default' . $extension . PHP_EOL
       . '   ▪️ container--more-link--default' . $extension . PHP_EOL
+      . '   ▪️ container--more-link--tag1' . $extension . PHP_EOL
+      . '   ▪️ container--more-link--tag2' . $extension . PHP_EOL
       . '   ▪️ container--more-link--test-page-display' . $extension . PHP_EOL
       . '   ▪️ container--more-link' . $extension . PHP_EOL
       . '   ✅ container' . $extension . PHP_EOL

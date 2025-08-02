@@ -1,0 +1,5 @@
+name: 'Theme suggestions base1 test'
+type: module
+description: 'Support module for testing the theme_test_base1 base theme hook'
+package: Testing
+version: VERSION

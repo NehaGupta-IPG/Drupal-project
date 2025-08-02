@@ -1,0 +1,5 @@
+name: 'Theme suggestions base2 ignored test'
+type: module
+description: 'Support module for testing the ignored theme_test_base2 base theme hook'
+package: Testing
+version: VERSION
