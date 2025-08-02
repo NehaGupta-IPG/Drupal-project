@@ -292,12 +292,19 @@ function template_preprocess_node(&$variables): void {
  *   arrays of grants for those realms.
  */
 function node_access_grants($operation, AccountInterface $account) {
-  // Fetch node access grants from other modules.
-  $grants = \Drupal::moduleHandler()->invokeAll('node_grants', [$account, $operation]);
-  // Allow modules to alter the assigned grants.
-  \Drupal::moduleHandler()->alter('node_grants', $grants, $account, $operation);
+  static $grants_cache = [];
+  $account_id = $account->id();
 
-  return array_merge(['all' => [0]], $grants);
+  if (!isset($grants_cache[$operation][$account_id])) {
+    // Fetch node access grants from other modules.
+    $grants = \Drupal::moduleHandler()->invokeAll('node_grants', [$account, $operation]);
+    // Allow modules to alter the assigned grants.
+    \Drupal::moduleHandler()->alter('node_grants', $grants, $account, $operation);
+
+    $grants_cache[$operation][$account_id] = array_merge(['all' => [0]], $grants);
+  }
+
+  return $grants_cache[$operation][$account_id];
 }
 
 /**
@@ -329,7 +336,7 @@ function node_access_view_all_nodes($account = NULL) {
   }
 
   // Statically cache results in an array keyed by $account->id().
-  $access = &drupal_static(__FUNCTION__);
+  static $access = [];
   if (isset($access[$account->id()])) {
     return $access[$account->id()];
   }

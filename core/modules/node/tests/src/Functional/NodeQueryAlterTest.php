@@ -189,7 +189,7 @@ class NodeQueryAlterTest extends NodeTestBase {
 
     // Test that the noAccessUser still doesn't have the 'view'
     // privilege after adding the node_access record.
-    drupal_static_reset('node_access_view_all_nodes');
+    array_map('drupal_static_reset', ['node_access_view_all_nodes', 'node_access_grants']);
     try {
       $query = $connection->select('node', 'n')
         ->fields('n');
@@ -211,7 +211,7 @@ class NodeQueryAlterTest extends NodeTestBase {
     // noAccessUser2.
     $this->drupalLogin($this->noAccessUser2);
     \Drupal::state()->set('node_access_test.no_access_uid', $this->noAccessUser->id());
-    drupal_static_reset('node_access_view_all_nodes');
+    array_map('drupal_static_reset', ['node_access_view_all_nodes', 'node_access_grants']);
     try {
       $query = $connection->select('node', 'n')
         ->fields('n');
