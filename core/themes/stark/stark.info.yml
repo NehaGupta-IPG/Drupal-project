@@ -5,3 +5,4 @@ package: Core
 version: VERSION
 base theme: false
 starterkit: false
+hidden: true
