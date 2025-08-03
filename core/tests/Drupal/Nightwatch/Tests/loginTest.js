@@ -13,7 +13,7 @@ module.exports = {
       .drupalCreateUser({
         name: 'user',
         password: '123',
-        permissions: ['access site reports', 'administer site configuration'],
+        permissions: ['access dblog reports', 'access site reports', 'administer site configuration'],
       })
       .drupalLogin({ name: 'user', password: '123' })
       .drupalRelativeURL('/admin/reports')
