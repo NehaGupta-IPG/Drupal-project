@@ -118,8 +118,7 @@ function dblog_update_last_removed(): int {
 }
 
 /**
- * Add access dblog reports permission to roles with access site reports
- * permission.
+ * Replace access site reports permission with new dblog-specific permission.
  */
 function dblog_update_112001(&$sandbox): void {
   // Get all installed roles.
