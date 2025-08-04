@@ -15,6 +15,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\Exception\BrokenPostRequestException;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\ElementInfoManagerInterface;
+use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -567,7 +568,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // #process functions and mapping user input, if any, to #value properties,
     // and also storing the values in $form_state->getValues(). We need to
     // retain the unprocessed $form in case it needs to be cached.
-    $unprocessed_form = $this->elementInfo->copy($form);
+    // $unprocessed_form = $this->elementInfo->copy($form);
+    $unprocessed_form = $form;
     $form = $this->doBuildForm($form_id, $form, $form_state);
 
     // Only process the input if we have a correct form submission.
@@ -911,6 +913,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
    * {@inheritdoc}
    */
   public function doBuildForm($form_id, &$element, FormStateInterface &$form_state) {
+    RenderElementBase::unset($element);
+
     // Initialize as unprocessed.
     $element['#processed'] = FALSE;
 

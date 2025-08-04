@@ -192,7 +192,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
    *
    * @internal
    */
-  protected array $storage = [];
+  protected ?array $storage = [];
 
   /**
    * The parent element.
@@ -624,6 +624,17 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
    */
   public function __unset(string $name): void {
     unset($this->storage['#' . $name]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function unset(&$element): void {
+    if (isset($element['##object']) && $element['##object'] instanceof static) {
+      $a = [];
+      $element['##object']->storage = &$a;
+      unset($element['##object']);
+    }
   }
 
   /**

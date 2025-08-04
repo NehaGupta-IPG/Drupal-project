@@ -165,4 +165,12 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
    */
   public function changeType(string $class): ElementInterface;
 
+  /**
+   * Unset nested references.
+   *
+   * @param mixed $element
+   *   Elements.
+   */
+  public static function unset(&$element): void;
+
 }
