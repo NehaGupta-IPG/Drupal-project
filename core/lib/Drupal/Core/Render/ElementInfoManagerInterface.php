@@ -124,12 +124,13 @@ interface ElementInfoManagerInterface extends DiscoveryInterface, FactoryInterfa
   /**
    * Copy that breaks the ##object reference.
    *
-   * @param array $form
+   * @param array $element
    *   Nested array of form elements that comprise the form.
    *
    * @return array
-   *   A copy of the form without the object reference.
+   *   A copy of the form without the object reference and with dereferenced
+   *   children elements.
    */
-  public function copy($form): array;
+  public function copy($element): array;
 
 }
