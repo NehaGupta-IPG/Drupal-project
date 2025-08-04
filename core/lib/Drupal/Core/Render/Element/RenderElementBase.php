@@ -742,25 +742,9 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
     // new copy. Usually breaking the reference is done by unsetting the
     // reference variable, but in this case it is not possible to unset the
     // 'storage' property without causing problems for the magic getter.
-    $copy = $this->storage;
+    $copy = Element::copyRenderArrayDeep($this->storage);
     $this->storage = &$copy;
-    $this->recursiveCopyStorage($this->storage);
     $this->storage['##object'] = $this;
-  }
-
-  /**
-   * Recurse through the storage array to break references.
-   */
-  protected function recursiveCopyStorage(array &$storage): void {
-    unset($storage['##object']);
-    foreach (Element::children($storage) as $key) {
-      $copy = $storage[$key];
-      $this->recursiveCopyStorage($copy);
-      // Break reference by unsetting property.
-      unset($storage[$key]);
-      // Reset property value to the copy.
-      $storage[$key] = $copy;
-    }
   }
 
 }
