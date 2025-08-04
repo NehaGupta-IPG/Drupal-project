@@ -567,11 +567,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // #process functions and mapping user input, if any, to #value properties,
     // and also storing the values in $form_state->getValues(). We need to
     // retain the unprocessed $form in case it needs to be cached.
-    try {
-      $unprocessed_form = serialize($form);
-    }
-    catch (\Throwable) {
-    }
+    $unprocessed_form = $this->elementInfo->copy($form);
     $form = $this->doBuildForm($form_id, $form, $form_state);
 
     // Only process the input if we have a correct form submission.
@@ -637,8 +633,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // prior to self::doBuildForm(), because self::doBuildForm() must run for
     // each request to accommodate new user input. Rebuilt forms are not cached
     // here, because self::rebuildForm() already takes care of that.
-    if (isset($unprocessed_form) && !$form_state->isRebuilding() && $form_state->isCached()) {
-      $this->setCache($form['#build_id'], unserialize($unprocessed_form), $form_state);
+    if (!$form_state->isRebuilding() && $form_state->isCached()) {
+      $this->setCache($form['#build_id'], $unprocessed_form, $form_state);
     }
   }
 

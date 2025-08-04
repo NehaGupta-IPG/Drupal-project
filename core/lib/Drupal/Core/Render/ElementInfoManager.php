@@ -275,4 +275,13 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
     return $this->createInstance($type, element: $element);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function copy($form): array {
+    $copy = $form;
+    unset($copy['##object']);
+    return $copy;
+  }
+
 }

@@ -121,4 +121,15 @@ interface ElementInfoManagerInterface extends DiscoveryInterface, FactoryInterfa
    */
   public function getIdFromClass(string $class): ?string;
 
+  /**
+   * Copy that breaks the ##object reference.
+   *
+   * @param array $form
+   *   Nested array of form elements that comprise the form.
+   *
+   * @return array
+   *   A copy of the form without the object reference.
+   */
+  public function copy($form): array;
+
 }
