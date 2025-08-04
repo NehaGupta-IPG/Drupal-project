@@ -570,11 +570,18 @@ abstract class ExtensionList {
     if (!isset($info['version']) || $info['version'] == NULL || empty($info['version'])) {
       $filename = $extension->getPathname();
       if ($filename) {
-        $package_name = 'drupal/' . basename($filename, '.info.yml');
-        if (InstalledVersions::isInstalled($package_name)) {
-          $info['version'] = InstalledVersions::getPrettyVersion($package_name);
-          if (str_ends_with($info['version'], '-dev')) {
-            $info['version'] .= '#' . InstalledVersions::getReference($package_name);
+        $package_path = dirname(realpath($filename));
+        foreach (InstalledVersions::getInstalledPackages() as $package_name) {
+          $installedPath = InstalledVersions::getInstallPath($package_name);
+          if ($installedPath) {
+            $composer_package_path = realpath($installedPath);
+            if (str_starts_with($package_path, $composer_package_path)) {
+              $info['version'] = InstalledVersions::getPrettyVersion($package_name);
+              if (str_ends_with($info['version'], '-dev')) {
+                $info['version'] .= '#' . InstalledVersions::getReference($package_name);
+              }
+              break;
+            }
           }
         }
       }
