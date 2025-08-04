@@ -307,8 +307,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       $form_state->disableRedirect();
     }
 
-    // If this form is an AJAX request, disable all form redirects.
-    if ($htmx_form_request = $request->query->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_htmx') {
+    // If this form is an HTMX request, disable all form redirects.
+    if ($request->query->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_htmx') {
       $form_state->disableRedirect();
     }
 
