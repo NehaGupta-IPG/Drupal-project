@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Database;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Transaction;
 use Drupal\Core\Database\Transaction\ClientConnectionTransactionState;
@@ -1314,6 +1315,19 @@ class TransactionTest extends DatabaseTestBase {
     $this->assertRowPresent('David');
     $this->assertRowPresent('Roger');
     unset($transaction, $savepoint);
+  }
+
+  /**
+   * Tests that mocking transactions works fine.
+   */
+  public function testMockTransaction(): void {
+    $connection = $this->getMockBuilder(Connection::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->getMockBuilder(Transaction::class)
+      ->setConstructorArgs([$connection, '', ''])
+      ->getMock();
+    $this->assertTrue(TRUE);
   }
 
 }
