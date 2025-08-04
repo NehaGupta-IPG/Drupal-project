@@ -1279,7 +1279,7 @@ services:
       - { name: render.main_content_renderer, format: html }
   main_content_renderer.htmx:
     class: Drupal\Core\Render\MainContent\HtmxRenderer
-    arguments: ['@plugin.manager.display_variant', '@module_handler', '@renderer', '@render_cache', '%renderer.config%', '@theme.manager']
+    arguments: ['@renderer', '@render_cache', '%renderer.config%']
     tags:
       - { name: render.main_content_renderer, format: drupal_htmx }
   main_content_renderer.ajax:

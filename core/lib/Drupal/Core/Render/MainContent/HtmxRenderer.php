@@ -2,15 +2,13 @@
 
 namespace Drupal\Core\Render\MainContent;
 
-use Drupal\Component\Plugin\PluginManagerInterface;
+use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Render\RenderCacheInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -29,74 +27,13 @@ use Symfony\Component\HttpFoundation\Request;
 class HtmxRenderer implements MainContentRendererInterface {
 
   /**
-   * The display variant manager.
-   *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   * Constructs a new HtmxRenderer.
    */
-  protected $displayVariantManager;
-
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The renderer service.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
-   * The render cache service.
-   *
-   * @var \Drupal\Core\Render\RenderCacheInterface
-   */
-  protected $renderCache;
-
-  /**
-   * The renderer configuration array.
-   *
-   * @var array
-   *
-   * @see sites/default/default.services.yml
-   */
-  protected $rendererConfig;
-
-  /**
-   * The theme manager.
-   *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface
-   */
-  protected $themeManager;
-
-  /**
-   * Constructs a new HtmlRenderer.
-   *
-   * @param \Drupal\Core\Controller\TitleResolverInterface $title_resolver
-   *   The title resolver.
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $display_variant_manager
-   *   The display variant manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
-   * @param \Drupal\Core\Render\RenderCacheInterface $render_cache
-   *   The render cache service.
-   * @param array $renderer_config
-   *   The renderer configuration array.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
-   *   The theme manager.
-   */
-  public function __construct(PluginManagerInterface $display_variant_manager, ModuleHandlerInterface $module_handler, RendererInterface $renderer, RenderCacheInterface $render_cache, array $renderer_config, ThemeManagerInterface $theme_manager) {
-    $this->displayVariantManager = $display_variant_manager;
-    $this->moduleHandler = $module_handler;
-    $this->renderer = $renderer;
-    $this->renderCache = $render_cache;
-    $this->rendererConfig = $renderer_config;
-    $this->themeManager = $theme_manager;
+  public function __construct(
+    protected RendererInterface $renderer,
+    protected RenderCacheInterface $renderCache,
+    protected array $rendererConfig,
+  ) {
   }
 
   /**
@@ -105,17 +42,41 @@ class HtmxRenderer implements MainContentRendererInterface {
    * The entire HTML: takes a #type 'page' and wraps it in a #type 'html'.
    */
   public function renderResponse(array $main_content, Request $request, RouteMatchInterface $route_match) {
-    [$page, $title] = $this->prepare($main_content, $request, $route_match);
-
-    $page['#title'] = $title;
-
-    // Now render the rendered page.html.twig template inside the html.html.twig
-    // template, and use the bubbled #attached metadata from $page to ensure we
-    // load all attached assets.
+    $token = Crypt::randomBytesBase64(55);
     $html = [
-      '#type' => 'html',
-      'page' => $page,
+      'content' => [
+        '#type' => 'inline_template',
+        '#template' => <<<TOKEN_TEMPLATE
+<!doctype html>
+<html>
+<head>
+<css-placeholder token="{{ placeholder_token }}">
+<js-placeholder token="{{ placeholder_token }}">
+<js-bottom-placeholder token="{{ placeholder_token }}">
+</head>
+<body>{{ content }}</body>
+</html>
+TOKEN_TEMPLATE,
+        '#context' => [
+          'content' => [
+            'messages' => ['#type' => 'status_messages'],
+            'main_content' => $main_content,
+          ],
+          'placeholder_token' => $token,
+        ],
+      ],
     ];
+    // Create placeholder strings for these keys.
+    // @see \Drupal\Core\Render\HtmlResponseSubscriber
+    $types = [
+      'styles' => 'css',
+      'scripts' => 'js',
+      'scripts_bottom' => 'js-bottom',
+    ];
+    foreach ($types as $type => $placeholder_name) {
+      $placeholder = '<' . $placeholder_name . '-placeholder token="' . $token . '">';
+      $html['content']['#attached']['html_response_attachment_placeholders'][$type] = $placeholder;
+    }
 
     // Render, but don't replace placeholders yet, because that happens later in
     // the render pipeline. To not replace placeholders yet, we use
@@ -149,89 +110,6 @@ class HtmxRenderer implements MainContentRendererInterface {
     ]);
 
     return $response;
-  }
-
-  /**
-   * Prepares the HTML body: wraps the main content in #type 'page'.
-   *
-   * @param array $main_content
-   *   The render array representing the main content.
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The request object, for context.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The route match, for context.
-   *
-   * @return array
-   *   An array with two values:
-   *   0. A #type 'page' render array.
-   *   1. The page title.
-   *
-   * @throws \LogicException
-   *   If the selected display variant does not implement PageVariantInterface.
-   */
-  protected function prepare(array $main_content, Request $request, RouteMatchInterface $route_match) {
-
-    // If the _controller result already is #type => page,
-    // we have no work to do: The "main content" already is an entire "page"
-    // (see html.html.twig).
-    if (isset($main_content['#type']) && $main_content['#type'] === 'page') {
-      $page = $main_content;
-    }
-    // Otherwise, render it as the main content of a #type => page, by selecting
-    // page display variant to do that and building that page display variant.
-    else {
-      // Instantiate the page display, and give it the main content.
-      $page_display = $this->displayVariantManager->createInstance('simple_page');
-      $page_display
-        ->setMainContent($main_content);
-
-      $page = $page_display->build();
-    }
-
-    // Allow hooks to add attachments to $page['#attached'].
-    $this->renderer->executeInRenderContext(new RenderContext(), function () use (&$page) {
-      $this->invokePageAttachmentHooks($page);
-    });
-
-    return [$page, FALSE];
-  }
-
-  /**
-   * Invokes the page attachment hooks.
-   *
-   * @param array &$page
-   *   A #type 'page' render array, for which the page attachment hooks will be
-   *   invoked and to which the results will be added.
-   *
-   * @throws \LogicException
-   *
-   * @internal
-   *
-   * @see hook_page_attachments()
-   * @see hook_page_attachments_alter()
-   */
-  public function invokePageAttachmentHooks(array &$page) : void {
-    // Modules can add attachments.
-    $attachments = [];
-    $this->moduleHandler->invokeAllWith(
-      'page_attachments',
-      function (callable $hook, string $module) use (&$attachments) {
-        $hook($attachments);
-      }
-    );
-    if (array_diff(array_keys($attachments), ['#attached', '#cache']) !== []) {
-      throw new \LogicException('Only #attached and #cache may be set in hook_page_attachments().');
-    }
-
-    // Modules and themes can alter page attachments.
-    $this->moduleHandler->alter('page_attachments', $attachments);
-    $this->themeManager->alter('page_attachments', $attachments);
-    if (array_diff(array_keys($attachments), ['#attached', '#cache']) !== []) {
-      throw new \LogicException('Only #attached and #cache may be set in hook_page_attachments_alter().');
-    }
-
-    // Merge the attachments onto the $page render array.
-    $page = $this->renderer->mergeBubbleableMetadata($page, $attachments);
   }
 
 }
