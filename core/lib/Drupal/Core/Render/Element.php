@@ -239,10 +239,10 @@ class Element {
   public static function copyRenderArrayDeep(array $build): array {
     unset($build['##object']);
     foreach (Element::children($build) as $key) {
-      $copy = $build[$key];
+      $copy = static::copyRenderArrayDeep($build[$key]);
       // Break reference by unsetting property.
       unset($build[$key]);
-      $build[$key] = static::copyRenderArrayDeep($copy);
+      $build[$key] = $copy;
     }
     return $build;
   }
