@@ -732,4 +732,35 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
     $this->storage['##object'] = $this;
   }
 
+  /**
+   * Magic method: acts on a new clone of a render element object.
+   */
+  public function __clone(): void {
+    // The storage property of an element object can be a reference to an array.
+    // In the new clone, break the reference by copying the contents to a new
+    // array, then setting the 'storage' property as a reference to the
+    // new copy. Usually breaking the reference is done by unsetting the
+    // reference variable, but in this case it is not possible to unset the
+    // 'storage' property without causing problems for the magic getter.
+    $copy = $this->storage;
+    $this->storage = &$copy;
+    $this->recursiveCopyStorage($this->storage);
+    $this->storage['##object'] = $this;
+  }
+
+  /**
+   * Recurse through the storage array to break references.
+   */
+  protected function recursiveCopyStorage(array &$storage): void {
+    unset($storage['##object']);
+    foreach (Element::children($storage) as $key) {
+      $copy = $storage[$key];
+      $this->recursiveCopyStorage($copy);
+      // Break reference by unsetting property.
+      unset($storage[$key]);
+      // Reset property value to the copy.
+      $storage[$key] = $copy;
+    }
+  }
+
 }
