@@ -32,7 +32,7 @@ class FormArrayCacheTest extends KernelTestBase implements FormInterface {
    * {@inheritdoc}
    */
   public function getFormId(): string {
-    return 'form_test_state_persist';
+    return 'form_array_cache';
   }
 
   /**
