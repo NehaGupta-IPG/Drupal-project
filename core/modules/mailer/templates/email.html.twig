@@ -1,0 +1,17 @@
+{#
+/**
+ * @file
+ * Default theme implementation to render an email.
+ *
+ * Available variables:
+ * - content: Email content.
+ *
+ * @see template_preprocess_media()
+ *
+ * @ingroup themeable
+ */
+#}
+<div{{ attributes }}>
+  {{ title_suffix.contextual_links }}
+  {{ content }}
+</div>
