@@ -4,7 +4,6 @@ namespace Drupal\Core\Render\MainContent;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Controller\TitleResolverInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Render\RenderCacheInterface;
@@ -19,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * Attachments in HTML responses are handled by
  * \Drupal\Core\Render\AttachmentsResponseProcessorInterface and
- * \Drupal\Core\Render\HtmlResponseAttachmentsProcessor
+ * \Drupal\Core\Render\HtmlResponseAttachmentsProcessor.
  *
  * @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
  * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface
@@ -108,12 +107,6 @@ class HtmxRenderer implements MainContentRendererInterface {
   public function renderResponse(array $main_content, Request $request, RouteMatchInterface $route_match) {
     [$page, $title] = $this->prepare($main_content, $request, $route_match);
 
-    /*
-    if (!isset($page['#type']) || $page['#type'] !== 'page') {
-      throw new \LogicException('Must be #type page');
-    }
-    */
-
     $page['#title'] = $title;
 
     // Now render the rendered page.html.twig template inside the html.html.twig
@@ -123,11 +116,6 @@ class HtmxRenderer implements MainContentRendererInterface {
       '#type' => 'html',
       'page' => $page,
     ];
-
-    // The special page regions will appear directly in html.html.twig, not in
-    // page.html.twig, hence add them here, just before rendering
-    // html.html.twig.
-    //$this->buildPageTopAndBottom($html);
 
     // Render, but don't replace placeholders yet, because that happens later in
     // the render pipeline. To not replace placeholders yet, we use
@@ -200,17 +188,6 @@ class HtmxRenderer implements MainContentRendererInterface {
       $page = $page_display->build();
     }
 
-    /*
-    // $page is now fully built. Find all non-empty page regions, and add a
-    // theme wrapper function that allows them to be consistently themed.
-    $regions = $this->themeManager->getActiveTheme()->getRegions();
-    foreach ($regions as $region) {
-      if (!empty($page[$region])) {
-        $page[$region]['#theme_wrappers'][] = 'region';
-        $page[$region]['#region'] = $region;
-      }
-    }*/
-
     // Allow hooks to add attachments to $page['#attached'].
     $this->renderer->executeInRenderContext(new RenderContext(), function () use (&$page) {
       $this->invokePageAttachmentHooks($page);
@@ -233,7 +210,7 @@ class HtmxRenderer implements MainContentRendererInterface {
    * @see hook_page_attachments()
    * @see hook_page_attachments_alter()
    */
-  public function invokePageAttachmentHooks(array &$page) {
+  public function invokePageAttachmentHooks(array &$page) : void {
     // Modules can add attachments.
     $attachments = [];
     $this->moduleHandler->invokeAllWith(
