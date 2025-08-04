@@ -1393,7 +1393,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // representing the coordinates of the click on the button image. This means
     // that image buttons MUST have unique $form['#name'] values, but the
     // details of their \Drupal::request()->request data should be ignored.
-    elseif (!empty($element['#has_garbage_value']) && isset($element['#value']) && $element['#value'] !== '') {
+    elseif (!empty($element['#has_garbage_value']) && isset($input[$element['#name'] . '_x']) && isset($input[$element['#name'] . '_y'])) {
       return TRUE;
     }
     return FALSE;
