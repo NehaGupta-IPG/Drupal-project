@@ -44,9 +44,8 @@ class HtmxRenderer implements MainContentRendererInterface {
   public function renderResponse(array $main_content, Request $request, RouteMatchInterface $route_match) {
     $token = Crypt::randomBytesBase64(55);
     $html = [
-      'content' => [
-        '#type' => 'inline_template',
-        '#template' => <<<TOKEN_TEMPLATE
+      '#type' => 'inline_template',
+      '#template' => <<<TOKEN_TEMPLATE
 <!doctype html>
 <html>
 <head>
@@ -57,13 +56,12 @@ class HtmxRenderer implements MainContentRendererInterface {
 <body>{{ content }}</body>
 </html>
 TOKEN_TEMPLATE,
-        '#context' => [
-          'content' => [
-            'messages' => ['#type' => 'status_messages'],
-            'main_content' => $main_content,
-          ],
-          'placeholder_token' => $token,
+      '#context' => [
+        'content' => [
+          'messages' => ['#type' => 'status_messages'],
+          'main_content' => $main_content,
         ],
+        'placeholder_token' => $token,
       ],
     ];
     // Create placeholder strings for these keys.
@@ -75,7 +73,7 @@ TOKEN_TEMPLATE,
     ];
     foreach ($types as $type => $placeholder_name) {
       $placeholder = '<' . $placeholder_name . '-placeholder token="' . $token . '">';
-      $html['content']['#attached']['html_response_attachment_placeholders'][$type] = $placeholder;
+      $html['#attached']['html_response_attachment_placeholders'][$type] = $placeholder;
     }
 
     // Render, but don't replace placeholders yet, because that happens later in
