@@ -22,7 +22,7 @@ class TextareaTest extends UnitTestCase {
    * Tests value callback.
    */
   #[DataProvider('providerTestValueCallback')]
-  public function testValueCallback($expected, $input, array $element = []): void {
+  public function testValueCallback(?string $expected, mixed $input, array $element = []): void {
     $form_state = $this->prophesize(FormStateInterface::class)->reveal();
     $this->assertSame($expected, Textarea::valueCallback($element, $input, $form_state));
   }
