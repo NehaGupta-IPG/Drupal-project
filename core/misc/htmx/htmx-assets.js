@@ -39,6 +39,8 @@
   htmx.on('htmx:configRequest', ({ detail }) => {
     const url = new URL(detail.path, document.location.href);
     if (Drupal.url.isLocal(url.toString())) {
+      // This will make Drupal return a simplified HTML page.
+      // @see \Drupal\Core\Render\MainContent\HtmxRenderer
       url.searchParams.set('_wrapper_format', 'drupal_htmx');
       detail.path = url.toString();
       // Allow Drupal to return new JavaScript and CSS files to load without
