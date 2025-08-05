@@ -106,7 +106,7 @@
     });
 
     // The response is the whole page without the assets we handle with loadjs.
-    detail.serverResponse = responseHTML.documentElement.outerHTML;
+    detail.serverResponse = responseHTML.body.querySelector('template').innerHTML;
 
     // Helps with memory management.
     responseHTML = null;

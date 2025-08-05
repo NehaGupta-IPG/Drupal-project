@@ -57,7 +57,7 @@ class HtmxRenderer implements MainContentRendererInterface {
 <js-placeholder token="{{ placeholder_token }}">
 <js-bottom-placeholder token="{{ placeholder_token }}">
 </head>
-<body>{{ content }}</body>
+<body><template>{{ content }}</template></body>
 </html>
 HTMX_RESPONSE,
       '#context' => [
