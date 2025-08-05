@@ -307,11 +307,6 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       $form_state->disableRedirect();
     }
 
-    // If this form is an HTMX request, disable all form redirects.
-    if ($request->query->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_htmx') {
-      $form_state->disableRedirect();
-    }
-
     // Now that we have a constructed form, process it. This is where:
     // - Element #process functions get called to further refine $form.
     // - User input, if any, gets incorporated in the #value property of the
