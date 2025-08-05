@@ -1781,7 +1781,6 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
           $real_name = $this->getFieldIndexName($storage_definition, $name);
           $this->database->schema()->dropIndex($table, $real_name);
           if (isset($revision_table)) {
-            // If the entity type supports revisions, update the revision table.
             $this->database->schema()->dropIndex($revision_table, $real_name);
           }
         }
@@ -1811,7 +1810,6 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
           // created as part of the earlier entity type update event.
           $this->addIndex($table, $real_name, $real_columns, $actual_schema[$table]);
           if (isset($revision_table)) {
-            // If the entity type supports revisions, update the revision table.
             $this->addIndex($revision_table, $real_name, $real_columns, $actual_schema[$revision_table]);
           }
         }
