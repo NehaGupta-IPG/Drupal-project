@@ -310,8 +310,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // If this form is an HTMX request, disable all form redirects.
     if ($request->query->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_htmx') {
       $form_state->disableRedirect();
-      $form_id_attribute = Html::getId($form['#form_id']);
-      $form['form_build_id']['#attributes']['data-hx-swap-oob'] = 'outerHTML:#' . $form_id_attribute . ' input[name="form_build_id"]';
+      $form['form_build_id']['#attributes']['data-hx-swap-oob'] = 'outerHTML:#' . $form['#id'] . ' input[name="form_build_id"]';
     }
 
     // Now that we have a constructed form, process it. This is where:
@@ -326,6 +325,14 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // All of the handlers in the pipeline receive $form_state by reference and
     // can use it to know or update information about the state of the form.
     $response = $this->processForm($form_id, $form, $form_state);
+
+    // If this form is an HTMX request, disable all form redirects.
+    if ($request->query->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_htmx') {
+      $form_state->disableRedirect();
+      if (!empty($form['#build_id_old'])) {
+        $form['form_build_id']['#attributes']['data-hx-swap-oob'] = 'outerHTML:input[name="form_build_id"][value="' . $form['#build_id_old'] . '"]';
+      }
+    }
 
     // In case the post request exceeds the configured allowed size
     // (post_max_size), the post request is potentially broken. Add some
