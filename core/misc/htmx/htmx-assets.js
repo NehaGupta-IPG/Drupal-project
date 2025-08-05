@@ -67,6 +67,11 @@
     // htmx cleans up too many things to be able to rely on their dom fragment.
     let responseHTML = Document.parseHTMLUnsafe(detail.serverResponse);
 
+    // Remove all noscript tags to avoid loading fallback JS and CSS assets.
+    responseHTML
+      .querySelectorAll('noscript')
+      .forEach((element) => element.remove());
+
     // Update drupalSettings
     // Use direct child elements to harden against XSS exploits when CSP is on.
     const settingsElement = responseHTML.querySelector(
