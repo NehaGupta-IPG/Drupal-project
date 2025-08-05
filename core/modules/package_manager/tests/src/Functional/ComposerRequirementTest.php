@@ -21,6 +21,16 @@ class ComposerRequirementTest extends PackageManagerTestBase {
   protected static $modules = ['package_manager'];
 
   /**
+   * {@inheritdoc}
+   */
+  protected static $configSchemaCheckerExclusions = [
+    // We test what happens when the configured path to Composer is invalid,
+    // so we need to be able to skip schema-based validation, which would
+    // normally confirm that the configured path to Composer is executable.
+    'package_manager.settings',
+  ];
+
+  /**
    * Tests that Composer version and path are listed on the status report.
    */
   public function testComposerInfoShown(): void {
@@ -47,7 +57,10 @@ class ComposerRequirementTest extends PackageManagerTestBase {
     $config->set('executables.composer', '/path/to/composer')->save();
     $this->getSession()->reload();
     $assert_session->statusCodeEquals(200);
-    $assert_session->pageTextContains('Composer was not found. The error message was: Failed to run process: The command "\'/path/to/composer\' \'--format=json\'" failed.');
+    $assert_session->pageTextContains('Composer was not found. The error message was: ');
+    // Check for the part of the command string that is constant (the path to
+    // the PHP interpreter will vary).
+    $assert_session->pageTextContains("/php' '/path/to/composer' '--format=json'\" failed.");
   }
 
 }
