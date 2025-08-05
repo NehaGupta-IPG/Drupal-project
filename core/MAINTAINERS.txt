@@ -72,6 +72,7 @@ maintainer. Current subsystem maintainers:
 
 Ajax
 - Alex Bronstein 'effulgentsia' https://www.drupal.org/u/effulgentsia
+- Shawn Duncan 'fathershawn' https://www.drupal.org/u/fathershawn
 - Tim Plunkett 'tim.plunkett' https://www.drupal.org/u/tim.plunkett
 
 Asset Library API
@@ -90,7 +91,7 @@ Base system
 - See "Framework managers" above.
 
 Basic Auth
-- Juampy Novillo Requena 'juampy' https://www.drupal.org/u/juampy
+- ?
 
 Batch API
 - John Cook 'John Cook' https://www.drupal.org/u/john-cook
@@ -101,7 +102,6 @@ BigPipe
 
 Block
 - Tim Plunkett 'tim.plunkett' https://www.drupal.org/u/tim.plunkett
-- Ben Dougherty 'benjy' https://www.drupal.org/u/benjy
 
 Block Content
 - Adam Bramley 'acbramley' https://www.drupal.org/u/acbramley
@@ -171,7 +171,7 @@ Database API
 - David Bekker 'daffie' https://www.drupal.org/u/daffie
 
   MySQL DB driver
-  - David Strauss 'David Strauss' https://www.drupal.org/u/david-strauss
+  - ?
 
   PostgreSQL DB driver
   - ?
@@ -187,11 +187,9 @@ Database Update API
 
 DateTime
 - Jonathan Hedstrom 'jhedstrom' https://www.drupal.org/u/jhedstrom
-- Matthew Donadio 'mpdonadio' https://www.drupal.org/u/mpdonadio
 
 DateTime Range
 - Jonathan Hedstrom 'jhedstrom' https://www.drupal.org/u/jhedstrom
-- Matthew Donadio 'mpdonadio' https://www.drupal.org/u/mpdonadio
 
 Default Content
 - Alex Pott 'alexpott' https://www.drupal.org/u/alexpott
@@ -262,7 +260,7 @@ JSON:API
 - Wim Leers 'Wim Leers' https://www.drupal.org/u/wim-leers
 
 Language
-- Daniel F. Kudwien 'sun' https://www.drupal.org/u/sun
+- ?
 
 Layout Builder
 - Ted Bowman 'tedbow' https://www.drupal.org/u/tedbow
@@ -271,6 +269,7 @@ Layout Builder
 - Daniel Veza 'DanielVeza' https://www.drupal.org/u/DanielVeza
 
 Link Field
+- David Cameron 'dcam' https://www.drupal.org/u/dcam
 - Weber Macedo 'Mac_Weber' https://www.drupal.org/u/mac_weber
 
 Lock
@@ -465,9 +464,7 @@ proposed changes must pass. https://www.drupal.org/contribute/core/maintainers
 provides more information on their responsibilities.
 
 Accessibility
-- Rain Breaw Michaels 'rainbreaw' https://www.drupal.org/u/rainbreaw
 - Mike Gifford 'mgifford' https://www.drupal.org/u/mgifford
-- Andrew Macpherson 'andrewmacpherson' https://www.drupal.org/u/andrewmacpherson
 - Ben Mullins 'bnjmnm' https://www.drupal.org/u/bnjmnm
 
 Documentation
@@ -483,7 +480,6 @@ Testing
 
 Usability
 - Cristina Chumillas 'ckrina' https://www.drupal.org/u/ckrina
-- Bojhan Somers 'Bojhan' https://www.drupal.org/u/bojhan
 
 
 Security team
