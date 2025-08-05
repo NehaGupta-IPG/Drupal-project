@@ -1765,7 +1765,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       // exist unchanged.
       $table_mapping = $this->getTableMapping($this->entityType, [$storage_definition]);
       $table = $table_mapping->getDedicatedDataTableName($original);
-      $revision_table = $table_mapping->getDedicatedRevisionTableName($original);
+      if ($this->entityType->isRevisionable()) {
+        $revision_table = $table_mapping->getDedicatedRevisionTableName($original);
+      }
 
       // Get the field schemas.
       $schema = $storage_definition->getSchema();
@@ -1778,11 +1780,16 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
         if (!isset($schema['indexes'][$name]) || $columns != $schema['indexes'][$name]) {
           $real_name = $this->getFieldIndexName($storage_definition, $name);
           $this->database->schema()->dropIndex($table, $real_name);
-          $this->database->schema()->dropIndex($revision_table, $real_name);
+          if (isset($revision_table)) {
+            // If the entity type supports revisions, update the revision table.
+            $this->database->schema()->dropIndex($revision_table, $real_name);
+          }
         }
       }
       $table = $table_mapping->getDedicatedDataTableName($storage_definition);
-      $revision_table = $table_mapping->getDedicatedRevisionTableName($storage_definition);
+      if ($this->entityType->isRevisionable()) {
+        $revision_table = $table_mapping->getDedicatedRevisionTableName($storage_definition);
+      }
       foreach ($schema['indexes'] as $name => $columns) {
         if (!isset($original_schema['indexes'][$name]) || $columns != $original_schema['indexes'][$name]) {
           $real_name = $this->getFieldIndexName($storage_definition, $name);
@@ -1803,7 +1810,10 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
           // Check if the index exists because it might already have been
           // created as part of the earlier entity type update event.
           $this->addIndex($table, $real_name, $real_columns, $actual_schema[$table]);
-          $this->addIndex($revision_table, $real_name, $real_columns, $actual_schema[$revision_table]);
+          if (isset($revision_table)) {
+            // If the entity type supports revisions, update the revision table.
+            $this->addIndex($revision_table, $real_name, $real_columns, $actual_schema[$revision_table]);
+          }
         }
       }
       $this->saveFieldSchemaData($storage_definition, $this->getDedicatedTableSchema($storage_definition));
