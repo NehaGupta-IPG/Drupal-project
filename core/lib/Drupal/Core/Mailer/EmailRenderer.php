@@ -129,11 +129,11 @@ class EmailRenderer implements EmailRendererInterface {
 
     foreach ($params as $key => $value) {
       if (!str_starts_with('_', $key)) {
-        if (is_scalar($value)) {
-          $scalars[$key] = $value;
+        if (is_object($value)) {
+          $objects[$key] = $value;
         }
         else {
-          $objects[$key] = $value;
+          $scalars[$key] = $value;
         }
       }
     }
