@@ -4,6 +4,7 @@ namespace Drupal\Core\Render\MainContent;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Controller\TitleResolverInterface;
 use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Render\RenderCacheInterface;
 use Drupal\Core\Render\RenderContext;
@@ -30,6 +31,7 @@ class HtmxRenderer implements MainContentRendererInterface {
    * Constructs a new HtmxRenderer.
    */
   public function __construct(
+    protected TitleResolverInterface $titleResolver,
     protected RendererInterface $renderer,
     protected RenderCacheInterface $renderCache,
     protected array $rendererConfig,
@@ -49,6 +51,7 @@ class HtmxRenderer implements MainContentRendererInterface {
 <!doctype html>
 <html>
 <head>
+<title>{{ title }}</title>
 <css-placeholder token="{{ placeholder_token }}">
 <js-placeholder token="{{ placeholder_token }}">
 <js-bottom-placeholder token="{{ placeholder_token }}">
@@ -57,6 +60,7 @@ class HtmxRenderer implements MainContentRendererInterface {
 </html>
 TOKEN_TEMPLATE,
       '#context' => [
+        'title' => $main_content['#title'] ?? $this->titleResolver->getTitle($request, $route_match->getRouteObject()),
         'content' => [
           'messages' => ['#type' => 'status_messages'],
           'main_content' => $main_content,
