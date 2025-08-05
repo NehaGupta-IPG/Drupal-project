@@ -75,6 +75,9 @@ class ConfigSingleExportForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, $config_type = NULL, $config_name = NULL) {
+
+    $form['#attached']['library'][] = 'core/drupal.htmx';
+
     $form['#prefix'] = '<div id="js-config-form-wrapper">';
     $form['#suffix'] = '</div>';
     foreach ($this->entityTypeManager->getDefinitions() as $entity_type => $definition) {
@@ -94,8 +97,14 @@ class ConfigSingleExportForm extends FormBase {
       '#title' => $this->t('Configuration type'),
       '#type' => 'select',
       '#options' => $config_types,
-      '#default_value' => $config_type,
-      '#ajax' => [
+      '#default_value' => $config_type ?? $form_state->getValue('config_type'),
+      '#attributes' => [
+        'data-hx-post' => '',
+        'data-hx-swap' => 'outerHTML',
+        'data-hx-select' => '[name="config_name"]',
+        'data-hx-target' => '[name="config_name"]',
+      ],
+      '#axjax' => [
         'callback' => '::updateConfigurationType',
         'wrapper' => 'js-config-form-wrapper',
       ],
@@ -108,7 +117,7 @@ class ConfigSingleExportForm extends FormBase {
       '#default_value' => $config_name,
       '#prefix' => '<div id="edit-config-type-wrapper">',
       '#suffix' => '</div>',
-      '#ajax' => [
+      '#axjax' => [
         'callback' => '::updateExport',
         'wrapper' => 'edit-export-wrapper',
       ],
@@ -128,6 +137,7 @@ class ConfigSingleExportForm extends FormBase {
       ]);
       $form['export'] = $this->updateExport($form, $fake_form_state);
     }
+    #$form['submit'] = ['#type' => 'submit', '#value' => $this->t('Export')];
     return $form;
   }
 

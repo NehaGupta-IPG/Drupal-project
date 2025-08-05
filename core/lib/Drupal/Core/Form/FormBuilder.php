@@ -310,6 +310,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // If this form is an HTMX request, disable all form redirects.
     if ($request->query->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_htmx') {
       $form_state->disableRedirect();
+      $form_id_attribute = Html::getId($form['#form_id']);
+      $form['form_build_id']['#attributes']['data-hx-swap-oob'] = 'outerHTML:#' . $form_id_attribute . ' input[name="form_build_id"]';
     }
 
     // Now that we have a constructed form, process it. This is where:
