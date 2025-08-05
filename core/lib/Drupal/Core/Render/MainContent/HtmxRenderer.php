@@ -13,7 +13,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Default main content renderer for HTML requests.
+ * Main content renderer for HTMX requests.
  *
  * Attachments in HTML responses are handled by
  * \Drupal\Core\Render\AttachmentsResponseProcessorInterface and
@@ -41,13 +41,14 @@ class HtmxRenderer implements MainContentRendererInterface {
   /**
    * {@inheritdoc}
    *
-   * The entire HTML: takes a #type 'page' and wraps it in a #type 'html'.
+   * We only wrap the necessary content into a full HTML document to be
+   * processed by HTMX on the frontend.
    */
   public function renderResponse(array $main_content, Request $request, RouteMatchInterface $route_match) {
     $token = Crypt::randomBytesBase64(55);
     $html = [
       '#type' => 'inline_template',
-      '#template' => <<<TOKEN_TEMPLATE
+      '#template' => <<<HTMX_RESPONSE
 <!doctype html>
 <html>
 <head>
@@ -58,7 +59,7 @@ class HtmxRenderer implements MainContentRendererInterface {
 </head>
 <body>{{ content }}</body>
 </html>
-TOKEN_TEMPLATE,
+HTMX_RESPONSE,
       '#context' => [
         'title' => $main_content['#title'] ?? $this->titleResolver->getTitle($request, $route_match->getRouteObject()),
         'content' => [
