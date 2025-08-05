@@ -73,6 +73,9 @@ class StringTextareaWidget extends WidgetBase {
       '#rows' => $this->getSetting('rows'),
       '#placeholder' => $this->getSetting('placeholder'),
       '#attributes' => ['class' => ['js-text-full', 'text-full']],
+      // Do not normalize newlines so that data is the saved the same when
+      // submitted by form or JSON:API.
+      '#normalize_newlines' => FALSE,
     ];
 
     return $element;

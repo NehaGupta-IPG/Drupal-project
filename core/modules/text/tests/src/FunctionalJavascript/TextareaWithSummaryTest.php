@@ -7,6 +7,7 @@ namespace Drupal\Tests\text\FunctionalJavascript;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\node\Entity\Node;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -176,6 +177,41 @@ class TextareaWithSummaryTest extends WebDriverTestBase {
     $summary_field = $page->findField('edit-' . $field_name . '-0-summary');
 
     $this->assertEquals(TRUE, $summary_field->isVisible());
+  }
+
+  /**
+   * Test that submitted values for body containing newlines are not normalized.
+   *
+   * Textarea form elements in textarea field widgets should not normalize
+   * line endings from "\r\n" to "\n", so that field values submitted via form
+   * or JSON:API are the same.
+   */
+  public function testTextareaSummaryNewlineSubmit(): void {
+    $node = Node::create([
+      'title' => 'New line test',
+      'type' => 'page',
+    ]);
+    $node->save();
+    $web_user = $this->drupalCreateUser([
+      'create page content',
+      'edit any page content',
+    ]);
+    $this->drupalLogin($web_user);
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $summary = "This is summary text with a newline.\r\n";
+    $value = "This is the body value text with a newline.\r\n";
+    $edit = [
+      'body[0][summary]' => $summary,
+      'body[0][value]' => $value,
+    ];
+    $widget = $this->getSession()->getPage()->findById('edit-body-wrapper');
+    $summary_field = $widget->findField('edit-body-0-summary');
+    $this->assertEquals(FALSE, $summary_field->isVisible());
+    $widget->pressButton('Edit summary');
+    $this->submitForm($edit, 'Save');
+    $node = Node::load($node->id());
+    $this->assertEquals($summary, $node->get('body')->summary);
+    $this->assertEquals($value, $node->get('body')->value);
   }
 
 }
