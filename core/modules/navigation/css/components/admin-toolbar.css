@@ -140,13 +140,13 @@ body {
   height: calc(2.25 * var(--admin-toolbar-rem));
   margin-inline-start: calc(0.125 * var(--admin-toolbar-rem));
   cursor: pointer;
-  color: var(--admin-toolbar-color-gray-500);
+  color: var(--admin-toolbar-color-gray-800);
   border: 1px solid var(--admin-toolbar-color-gray-300);
   border-radius: 50%;
   background-color: transparent;
 }
 .admin-toolbar__expand-button:hover {
-  color: var(--admin-toolbar-color-blue-700);
+  color: var(--admin-toolbar-color-gray-990);
 }
 @media (min-width: 64rem) {
   .admin-toolbar__expand-button {
@@ -294,7 +294,7 @@ body {
   border-block-start: 1px solid var(--admin-toolbar-color-gray-200);
   border-inline-end: 1px solid var(--admin-toolbar-color-gray-100);
 }
-.admin-toolbar__footer > .toolbar-block:last-of-type {
+:is(.admin-toolbar__footer > .toolbar-block):last-of-type {
   margin-block-end: var(--admin-toolbar-space-12);
 }
 @media (min-width: 64rem) {
@@ -317,8 +317,7 @@ body {
     display: flex;
   }
 }
-[data-admin-toolbar="expanded"] :is([data-drupal-tooltip]:hover + .admin-toolbar__tooltip),
-[data-admin-toolbar="expanded"] :is([data-drupal-tooltip]:focus + .admin-toolbar__tooltip) {
+[data-admin-toolbar="expanded"] :is([data-drupal-tooltip]:hover + .admin-toolbar__tooltip, [data-drupal-tooltip]:focus + .admin-toolbar__tooltip) {
   display: none;
 }
 /**
