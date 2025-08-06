@@ -12,6 +12,10 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\Entity\Term;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 57905ec2c27 (Suggestions)
 
 /**
  * Entity hook implementations for taxonomy.
