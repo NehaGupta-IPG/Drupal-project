@@ -1986,4 +1986,3 @@ services:
       ]
     tags:
       - { name: needs_destruction }
-  Drupal\Core\Entity\EntityViewDisplayConfigUpdater: ~

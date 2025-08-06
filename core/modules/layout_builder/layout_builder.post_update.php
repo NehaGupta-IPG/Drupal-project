@@ -5,10 +5,6 @@
  * Post update functions for Layout Builder.
  */
 
-use Drupal\Core\Config\Entity\ConfigEntityUpdater;
-use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
-use Drupal\Core\Entity\EntityViewDisplayConfigUpdater;
-
 /**
  * Implements hook_removed_post_updates().
  */
@@ -35,16 +31,4 @@ function layout_builder_removed_post_updates(): array {
     'layout_builder_post_update_timestamp_formatter' => '11.0.0',
     'layout_builder_post_update_enable_expose_field_block_feature_flag' => '11.0.0',
   ];
-}
-
-/**
- * Add third_party_settings key to all section components.
- */
-function layout_builder_post_update_section_component_third_party(?array &$sandbox = NULL): void {
-  /** @var \Drupal\Core\Entity\EntityViewDisplayConfigUpdater $entityViewDisplayUpdater */
-  $entityViewDisplayUpdater = \Drupal::service(EntityViewDisplayConfigUpdater::class);
-  $entityViewDisplayUpdater->setDeprecationsEnabled(FALSE);
-  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'entity_view_display', function (EntityViewDisplayInterface $display) use ($entityViewDisplayUpdater): bool {
-    return $entityViewDisplayUpdater->needsThirdPartySettingsUpdate($display);
-  });
 }
