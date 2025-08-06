@@ -1518,8 +1518,10 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
         // Value can be optional, For example for 'empty' and 'not empty'
         // filters.
         if (isset($selected_group_options['value']) && $selected_group_options['value'] !== '') {
-          // If this is the first conversion for a grouped filter, then override with group values.
-          // For subsequent conversions, group options should be appended to the options list.
+          // If this is the first conversion for a grouped filter, then override
+          // with group values.
+          // For subsequent conversions, group options should be appended to the
+          // options list.
           if (!$combine_options) {
             $input[$this->options['group_info']['identifier']] = $selected_group_options['value'];
           }
