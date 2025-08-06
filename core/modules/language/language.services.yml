@@ -29,5 +29,5 @@ services:
     tags:
       - { name: paramconverter }
   Drupal\language\Environment\MultilingualSubstitutionDecorator:
-    decorates: Drupal\language\LanguageSubstitution
+    decorates: Drupal\Core\Environment\LanguageSubstitution
     autowire: true
