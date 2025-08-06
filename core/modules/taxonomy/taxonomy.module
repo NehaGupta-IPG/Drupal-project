@@ -137,3 +137,7 @@ function taxonomy_delete_node_index(EntityInterface $node): void {
     \Drupal::database()->delete('taxonomy_index')->condition('nid', $node->id())->execute();
   }
 }
+
+/**
+ * @} End of "addtogroup taxonomy_index".
+ */
