@@ -41,7 +41,12 @@ class EnvironmentManager implements EnvironmentManagerInterface {
         }
       }
 
-      throw new \InvalidArgumentException(sprintf('Failed to find environment substitution implementation for param %s', $param->name));
+      if ($param->optional) {
+        return $this->executeInEnvironments($params, $callback);
+      }
+      else {
+        throw new \InvalidArgumentException(sprintf('Failed to find environment substitution implementation for param %s', $param->name));
+      }
     }
   }
 

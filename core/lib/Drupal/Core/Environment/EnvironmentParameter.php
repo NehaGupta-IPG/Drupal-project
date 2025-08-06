@@ -15,10 +15,14 @@ final class EnvironmentParameter {
    *   an environment substitution service.
    * @param bool|int|float|string|null $value
    *   Parameter value.
+   * @param bool $optional
+   *   By default an exception is thrown when a parameter doesn't lead to any
+   *   substitution. If this is set to TRUE, then such a failure is ignored.
    */
   public function __construct(
     public readonly string $name,
     public readonly bool|int|float|string|null $value = NULL,
+    public readonly bool $optional = FALSE,
   ) {}
 
 }

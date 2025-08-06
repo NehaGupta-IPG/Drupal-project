@@ -48,7 +48,7 @@ abstract class LanguageSubstitutionBase implements SubstitutionInterface {
       if ($overrideLanguage) {
         $this->overrideLanguage($overrideLanguage);
       }
-      else {
+      elseif (!$param->optional) {
         throw new \InvalidArgumentException(sprintf('Failed to load the specified override language %s', $overrideLangcode));
       }
     }

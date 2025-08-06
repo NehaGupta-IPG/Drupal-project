@@ -33,13 +33,10 @@ class CurrentUserSubstitution implements SubstitutionInterface {
    * {@inheritdoc}
    */
   public function executeInEnvironment(EnvironmentParameter $param, callable $callback): mixed {
-    $uid = $param->value;
-    if ($uid) {
-      assert(is_string($uid) || is_int($uid));
-      $account = $this->loadUser($uid);
-    }
-    else {
-      $account = new AnonymousUserSession();
+    $account = $this->getAccount($param);
+
+    if (!$account) {
+      return $callback();
     }
 
     $this->accountSwitcher->switchTo($account);
@@ -52,20 +49,35 @@ class CurrentUserSubstitution implements SubstitutionInterface {
   }
 
   /**
-   * Load a user account from storage.
+   * Loads the account specified in the environment parameter.
    *
-   * @param string|int $uid
-   *   The user id.
+   * @param \Drupal\Core\Environment\EnvironmentParameter $param
+   *   The environment parameter.
+   *
+   * @return \Drupal\Core\Session\AccountInterface|null
+   *   Returns the specified account or NULL if none was found.
+   *
+   * @throws \InvalidArgumentException
+   *   If the account cannot be found and the parameter is not optional.
    */
-  protected function loadUser(string|int $uid): AccountInterface {
-    $account = $this->entityTypeManager->getStorage('user')->load($uid);
-
-    if (!$account) {
-      throw new \InvalidArgumentException(sprintf('Failed to load the specified user with uid %s', (string) $uid));
+  protected function getAccount(EnvironmentParameter $param): ?AccountInterface {
+    $uid = $param->value;
+    if (!$uid) {
+      return new AnonymousUserSession();
     }
 
-    assert($account instanceof AccountInterface);
-    return $account;
+    assert(is_string($uid) || is_int($uid));
+    $account = $this->entityTypeManager->getStorage('user')->load($uid);
+    if ($account) {
+      assert($account instanceof AccountInterface);
+      return $account;
+    }
+
+    if ($param->optional) {
+      return NULL;
+    }
+
+    throw new \InvalidArgumentException(sprintf('Failed to load the specified user with uid %s', (string) $uid));
   }
 
 }
