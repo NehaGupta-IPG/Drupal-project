@@ -492,7 +492,7 @@ final class HTMLRestrictions {
     }
 
     // When allowing all tags on an attribute, transform FilterHtml output from
-    // ['tag' => ['*'=> TRUE]] to ['tag' => TRUE]
+    // "['tag' => ['*'=> TRUE]]" to "['tag' => TRUE]".
     $allowed = $restrictions['allowed'];
     foreach ($allowed as $element => $attributes) {
       if (is_array($attributes) && isset($attributes['*']) && $attributes['*'] === TRUE) {
@@ -580,7 +580,7 @@ final class HTMLRestrictions {
     }
 
     // When allowing all tags on an attribute, transform FilterHtml output from
-    // ['tag' => ['*'=> TRUE]] to ['tag' => TRUE]
+    // "['tag' => ['*'=> TRUE]]" to "['tag' => TRUE]".
     foreach ($allowed_elements as $element => $attributes) {
       if (is_array($attributes) && isset($attributes['*']) && $attributes['*'] === TRUE) {
         $allowed_elements[$element] = TRUE;
@@ -1102,7 +1102,7 @@ final class HTMLRestrictions {
   }
 
   /**
-   * Extracts the subset of plain tags (attributes omitted) from allowed elements.
+   * Extracts plain tags (attributes omitted) from allowed elements.
    *
    * @return \Drupal\ckeditor5\HTMLRestrictions
    *   The extracted subset of the given set of HTML restrictions.

@@ -4,7 +4,6 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source\d7;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\State\StateInterface;
-use Drupal\migrate\Attribute\MigrateSource;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
@@ -30,11 +29,12 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
  *
  * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
  * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
+ *
+ * @MigrateSource(
+ *   id = "d7_variable_translation",
+ *   source_module = "i18n_variable",
+ * )
  */
-#[MigrateSource(
-  id: 'd7_variable_translation',
-  source_module: 'i18n_variable',
-)]
 class VariableTranslation extends DrupalSqlBase {
   /**
    * The variable names to fetch.
@@ -78,7 +78,7 @@ class VariableTranslation extends DrupalSqlBase {
       foreach ($values as $key => $value) {
         if ($values[$key]['language'] === $variable_store['realm_key']) {
           if ($variable_store['serialized']) {
-            $values[$key][$variable_store['name']] = unserialize($variable_store['value']);
+            $values[$key][$variable_store['name']] = unserialize($variable_store['value'], ['allowed_classes' => FALSE]);
             break;
           }
           else {

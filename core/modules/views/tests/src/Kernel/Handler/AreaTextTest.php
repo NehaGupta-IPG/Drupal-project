@@ -37,13 +37,16 @@ class AreaTextTest extends ViewsKernelTestBase {
     $this->installEntitySchema('user');
   }
 
+  /**
+   * Tests the rendering of a text area.
+   */
   public function testAreaText(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $view = Views::getView('test_view');
     $view->setDisplay();
 
-    // Add a text header
+    // Add a text header.
     $string = $this->randomMachineName();
     $view->displayHandlers->get('default')->overrideOption('header', [
       'area' => [

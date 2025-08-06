@@ -253,6 +253,9 @@ class PagerTest extends ViewTestBase {
     $this->assertEquals(0, $view->pager->getItemsPerPage());
   }
 
+  /**
+   * Tests the total row count in a view without a pager.
+   */
   public function testViewTotalRowsWithoutPager(): void {
     $this->drupalCreateContentType(['type' => 'page']);
     for ($i = 0; $i < 23; $i++) {
@@ -331,7 +334,7 @@ class PagerTest extends ViewTestBase {
     $this->executeView($view);
     $this->assertCount(3, $view->result, 'Make sure that only a certain count of items is returned');
 
-    // Test items per page = 0
+    // Test items per page = 0.
     $view = Views::getView('test_view_pager_full_zero_items_per_page');
     $this->executeView($view);
 

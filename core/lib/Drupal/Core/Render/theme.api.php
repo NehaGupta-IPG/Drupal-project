@@ -107,8 +107,9 @@
  * the data is preprocessed, before it is passed to the theme template:
  * - ThemeManager::addDefaultTemplateVariables(&$variables): Creates a default
  *   set of variables for all theme hooks. Provided by Drupal Core.
- * - template_preprocess_HOOK(&$variables): Should be implemented by the module
- *   that registers the theme hook, to set up default variables.
+ * - initial preprocess: A callback set on the theme hook definition,
+ *   to set up default variables. Supports services with the service:method
+ *   syntax, see \Drupal\Core\Utility\CallableResolver and hook_theme().
  * - MODULE_preprocess(&$variables, $hook): hook_preprocess() is invoked on all
  *   implementing modules.
  * - MODULE_preprocess_HOOK(&$variables): hook_preprocess_HOOK() is invoked on
@@ -604,8 +605,9 @@ function hook_preprocess(&$variables, $hook): void {
  *   The variables array (modify in place).
  */
 function hook_preprocess_HOOK(&$variables): void {
-  // This example is from node_preprocess_html(). It adds the node type to
-  // the body classes, when on an individual node page or node preview page.
+  // This example is from \Drupal\node\Hook\NodeThemeHooks::preprocessHtml().
+  // It adds the node type to the body classes, when on an individual node page
+  // or node preview page.
   if (($node = \Drupal::routeMatch()->getParameter('node')) || ($node = \Drupal::routeMatch()->getParameter('node_preview'))) {
     if ($node instanceof NodeInterface) {
       $variables['node_type'] = $node->getType();
@@ -664,6 +666,11 @@ function hook_theme_suggestions_HOOK(array $variables): array {
   $suggestions = [];
 
   $suggestions[] = 'hookname__' . $variables['elements']['#langcode'];
+
+  // Theme suggestions can be deprecated by specifying them in the __DEPRECATED
+  // key.
+  $suggestions[] = 'hookname__outdated';
+  $suggestions['__DEPRECATED']['hookname__outdated'] = 'Theme suggestion hookname__outdated is deprecated in drupal:X.0.0 and is removed from drupal:Y.0.0. See http://drupal.org/node/the-change-notice-nid.';
 
   return $suggestions;
 }
@@ -1231,9 +1238,13 @@ function hook_page_bottom(array &$page_bottom): void {
  *     implementation to have a dynamic name. The default is to use __ to
  *     differentiate the dynamic portion of the theme. Implementations
  *     can specify a different pattern if required.
+ *   - initial preprocess: A string or array callback supported by
+ *     \Drupal\Core\Utility\CallableResolver to set up the initial and default
+ *     variables for the template. Replaces automatically discovered
+ *     template_preprocess_HOOK functions. Can be set as
+ *     static::class . ':preprocessSomething' on hook classes.
  *   - preprocess functions: A list of functions used to preprocess this data.
- *     Ordinarily this won't be used; it's automatically filled in. By default,
- *     for a module this will be filled in as template_preprocess_HOOK. For
+ *     Ordinarily this won't be used; it's automatically filled in. For
  *     a theme this will be filled in as twig_preprocess and
  *     twig_preprocess_HOOK as well as themename_preprocess and
  *     themename_preprocess_HOOK.
@@ -1265,6 +1276,7 @@ function hook_theme($existing, $type, $theme, $path): array {
         'sortby' => NULL,
         'my_module_per_page' => NULL,
       ],
+      'initial preprocess' => 'PreprocessClass::preprocessDisplay',
     ],
     'my_module_list' => [
       'variables' => [
@@ -1272,6 +1284,7 @@ function hook_theme($existing, $type, $theme, $path): array {
         'parents' => NULL,
         'tid' => NULL,
       ],
+      'initial preprocess' => 'service.name:preprocessList',
     ],
     'my_module_icon' => [
       'variables' => [

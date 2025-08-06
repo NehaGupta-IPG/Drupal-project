@@ -229,7 +229,7 @@ class Sql extends QueryPluginBase {
       'join' => NULL,
     ];
 
-    // Init the tables with our primary table
+    // Init the tables with our primary table.
     $this->tables[$base_table][$base_table] = [
       'count' => 1,
       'alias' => $base_table,
@@ -625,7 +625,7 @@ class Sql extends QueryPluginBase {
    *   cannot be ensured.
    */
   public function ensureTable($table, $relationship = NULL, ?JoinPluginBase $join = NULL) {
-    // Ensure a relationship
+    // Ensure a relationship.
     if (empty($relationship)) {
       $relationship = $this->view->storage->get('base_table');
     }
@@ -782,7 +782,7 @@ class Sql extends QueryPluginBase {
       }
 
       // First, if this is our link point/anchor table, just use the
-      // relationship
+      // relationship.
       if ($join->leftTable == $this->relationships[$relationship]['table']) {
         $join->leftTable = $relationship;
       }
@@ -882,14 +882,14 @@ class Sql extends QueryPluginBase {
       $alias = $table . '_' . $field;
     }
 
-    // Make sure an alias is assigned
+    // Make sure an alias is assigned.
     $alias = $alias ?: $field;
 
     // PostgreSQL truncates aliases to 63 characters:
     // https://www.drupal.org/node/571548.
 
     // We limit the length of the original alias up to 60 characters
-    // to get a unique alias later if its have duplicates
+    // to get a unique alias later if its have duplicates.
     $alias = strtolower(substr($alias, 0, 60));
 
     // Create a field info array.
@@ -995,11 +995,11 @@ class Sql extends QueryPluginBase {
    *   If the group does not yet exist it will be created as an AND group.
    * @param string $snippet
    *   The snippet to check. This can be either a column or
-   *   a complex expression like "UPPER(table.field) = 'value'"
+   *   a complex expression like "UPPER(table.field) = 'value'".
    * @param array $args
    *   An associative array of arguments.
    *
-   * @see QueryConditionInterface::where()
+   * @see ConditionInterface::where()
    */
   public function addWhereExpression($group, $snippet, $args = []) {
     // Ensure all variants of 0 are actually 0. Thus '', 0 and NULL are all
@@ -1033,11 +1033,11 @@ class Sql extends QueryPluginBase {
    *   If the group does not yet exist it will be created as an AND group.
    * @param string $snippet
    *   The snippet to check. This can be either a column or
-   *   a complex expression like "COUNT(table.field) > 3"
+   *   a complex expression like "COUNT(table.field) > 3".
    * @param array $args
    *   An associative array of arguments.
    *
-   * @see QueryConditionInterface::having()
+   * @see SelectInterface::having()
    */
   public function addHavingExpression($group, $snippet, $args = []) {
     // Ensure all variants of 0 are actually 0. Thus '', 0 and NULL are all

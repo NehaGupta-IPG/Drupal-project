@@ -70,7 +70,7 @@ use Drupal\Component\Utility\Xss;
  *   An array whose keys are "realms" of grants, and whose values are arrays of
  *   the grant IDs within this realm that this user is being granted.
  *
- * @see node_access_view_all_nodes()
+ * @see \Drupal\node\NodeGrantDatabaseStorage::checkAllGrants()
  * @see node_access_rebuild()
  * @ingroup node_access
  */
@@ -408,8 +408,8 @@ function hook_ranking(): array {
  * @param array &$context
  *   Various aspects of the context in which the node links are going to be
  *   displayed, with the following keys:
- *   - 'view_mode': the view mode in which the node is being viewed
- *   - 'langcode': the language in which the node is being viewed
+ *   - 'view_mode': the view mode in which the node is being viewed.
+ *   - 'langcode': the language in which the node is being viewed.
  *
  * @see \Drupal\node\NodeViewBuilder::renderLinks()
  * @see \Drupal\node\NodeViewBuilder::buildLinks()

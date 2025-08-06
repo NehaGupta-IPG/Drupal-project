@@ -109,16 +109,19 @@ function hook_file_url_alter(&$uri) {
 /**
  * Alter MIME type mappings used to determine MIME type from a file extension.
  *
- * Invoked by
- * \Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser::guessMimeType(). It is
- * used to allow modules to add to or modify the default mapping from
- * \Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser::$defaultMapping.
- *
  * @param array $mapping
  *   An array of mimetypes correlated to the extensions that relate to them.
  *   The array has 'mimetypes' and 'extensions' elements, each of which is an
  *   array.
  *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Create a
+ *   \Drupal\Core\File\Event\MimeTypeMapLoadedEvent subscriber instead.
+ *
+ * It is used to allow modules to add to or modify the default mapping of
+ * MIME type to file extensions.
+ *
+ * @see https://www.drupal.org/node/3494040
+ * @see \Drupal\Core\File\EventSubscriber\LegacyMimeTypeMapLoadedSubscriber
  * @see \Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser::guessMimeType()
  * @see \Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser::$defaultMapping
  */
@@ -169,6 +172,10 @@ function hook_archiver_info_alter(&$info) {
  *   - 'weight': Optional. Integer weight used for sorting connection types on
  *     the authorize.php form.
  *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no
+ *   replacement. Use composer to manage the code for your site.
+ *
+ * @see https://www.drupal.org/node/3512364
  * @see \Drupal\Core\FileTransfer\FileTransfer
  * @see authorize.php
  * @see hook_filetransfer_info_alter()
@@ -190,6 +197,10 @@ function hook_filetransfer_info(): array {
  *   Reference to a nested array containing information about the FileTransfer
  *   class registry.
  *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no
+ *   replacement. Use composer to manage the code for your site.
+ *
+ * @see https://www.drupal.org/node/3512364
  * @see hook_filetransfer_info()
  */
 function hook_filetransfer_info_alter(&$filetransfer_info) {

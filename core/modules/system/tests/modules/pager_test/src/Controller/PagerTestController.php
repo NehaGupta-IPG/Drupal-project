@@ -118,6 +118,7 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
       '#attributes' => ['class' => ['test-pager-0']],
       'pager' => [
         '#type' => 'pager',
+        '#route_name' => '<current>',
         '#element' => 0,
       ],
     ];
@@ -128,6 +129,7 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
       '#attributes' => ['class' => ['test-pager-1']],
       'pager' => [
         '#type' => 'pager',
+        '#route_name' => '<current>',
         '#element' => 1,
       ],
     ];
@@ -138,6 +140,7 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
       '#attributes' => ['class' => ['test-pager-4']],
       'pager' => [
         '#type' => 'pager',
+        '#route_name' => '<current>',
         '#element' => 4,
       ],
     ];
@@ -146,7 +149,9 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
   }
 
   /**
-   * #pre_render callback for #type => pager that shows the pager cache context.
+   * Render API callback: Shows the pager cache context for type pager.
+   *
+   * This function is assigned as a #pre_render callback.
    */
   public static function showPagerCacheContext(array $pager) {
     \Drupal::messenger()->addStatus(\Drupal::service('cache_contexts_manager')->convertTokensToKeys(['url.query_args.pagers:' . $pager['#element']])->getKeys()[0]);

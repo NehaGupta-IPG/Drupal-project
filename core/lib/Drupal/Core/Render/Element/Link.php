@@ -14,8 +14,11 @@ use Drupal\Core\Url as CoreUrl;
  * Provides a link render element.
  *
  * Properties:
- * - #title: The link text.
- * - #url: \Drupal\Core\Url object containing URL information pointing to an
+ *
+ * @property $title
+ *   The link text.
+ * @property $url
+ *   \Drupal\Core\Url object containing URL information pointing to an
  *   internal or external link. See \Drupal\Core\Utility\LinkGeneratorInterface.
  *
  * Usage example:
@@ -68,9 +71,12 @@ class Link extends RenderElementBase {
     $element += ['#options' => []];
     // However, within the scope of renderable elements, #attributes is a valid
     // way to specify attributes, too. Take them into account, but do not
-    // override attributes from #options.
+    // override attributes from #options. Merge class as a string or array.
     if (isset($element['#attributes'])) {
       $element['#options'] += ['attributes' => []];
+      $element_class = $element['#attributes']['class'] ?? [];
+      $option_class = $element['#options']['attributes']['class'] ?? [];
+      $element['#options']['attributes']['class'] = array_merge((array) $option_class, (array) $element_class);
       $element['#options']['attributes'] += $element['#attributes'];
     }
 

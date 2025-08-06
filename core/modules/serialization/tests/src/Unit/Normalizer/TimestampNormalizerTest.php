@@ -103,6 +103,7 @@ class TimestampNormalizerTest extends UnitTestCase {
    * Data provider for testDenormalizeValidFormats.
    *
    * @return array
+   *   An array of test data.
    */
   public static function providerTestDenormalizeValidFormats() {
     $expected_stamp = 1478422920;
@@ -171,6 +172,9 @@ class TimestampNormalizerTest extends UnitTestCase {
  */
 class TimestampNormalizerTestDrupalDateTime extends DrupalDateTime {
 
+  /**
+   * Sets the timezone.
+   */
   public function setTimezone(\DateTimeZone $timezone) {
     parent::setTimezone($timezone);
   }
