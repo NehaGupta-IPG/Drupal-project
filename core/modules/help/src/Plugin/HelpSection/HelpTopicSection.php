@@ -4,6 +4,7 @@ namespace Drupal\help\Plugin\HelpSection;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Environment\EnvironmentManagerInterface;
+use Drupal\Core\Environment\EnvironmentParameter;
 use Drupal\Core\Environment\LanguageSubstitution;
 use Drupal\Core\Environment\RenderContextSubstitution;
 use Drupal\help\Attribute\HelpSection;
@@ -142,8 +143,8 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
     // then restore the default language so we do not affect other cron
     // processes.
     $environmentParams = [
-      RenderContextSubstitution::class => TRUE,
-      LanguageSubstitution::class => $language->getId(),
+      new EnvironmentParameter(RenderContextSubstitution::class),
+      new EnvironmentParameter(LanguageSubstitution::class, $language->getId()),
     ];
     return $this->environmentManager->executeInEnvironments($environmentParams, function () use ($plugin) {
       $topic = [];

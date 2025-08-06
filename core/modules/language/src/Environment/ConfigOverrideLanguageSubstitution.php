@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Core\Environment;
+namespace Drupal\language\Environment;
 
+use Drupal\Core\Environment\SubstitutionApplyTrait;
+use Drupal\Core\Environment\SubstitutionInterface;
 use Drupal\Core\Language\Language;
 
 /**

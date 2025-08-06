@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Core\Environment;
+namespace Drupal\language\Environment;
 
+use Drupal\Core\Environment\EnvironmentParameter;
+use Drupal\Core\Environment\SubstitutionInterface;
 use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\StringTranslation\TranslationManager;
