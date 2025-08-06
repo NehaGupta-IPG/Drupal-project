@@ -9,6 +9,7 @@ use Drupal\Core\Environment\SubstitutionInterface;
 use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\StringTranslation\TranslationManager;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 
 /**
@@ -26,6 +27,7 @@ class MultilingualSubstitutionDecorator {
     protected readonly SubstitutionInterface $monolingual,
     protected readonly LanguageManagerInterface $languageManager,
     protected readonly LanguageDefault $languageDefault,
+    #[Autowire('string_translation')]
     protected readonly TranslationManager $translationManager,
   ) {
     $this->multilingual = new MultilingualSubstitution($languageManager, $languageDefault, $translationManager);
