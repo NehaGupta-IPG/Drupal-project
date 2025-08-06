@@ -6,6 +6,14 @@ use Drupal\Core\Database\Connection;
 
 /**
  * Query builder for SELECT statements.
+ * 
+ * This class provides methods to build SELECT queries using a fluent interface.
+ * Use ->condition(), ->fields(), ->join(), etc., to build your query safely.
+ *
+ * @note
+ * This class does not have a public '$where' property.
+ * Use the condition-related methods to add WHERE clauses.
+ * Attempting to access $query->where will result in an error.
  *
  * @ingroup database
  */
