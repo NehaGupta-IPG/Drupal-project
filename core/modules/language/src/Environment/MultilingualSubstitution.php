@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Environment;
 
+use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\StringTranslation\TranslationManager;
 
 /**
  * Switches the language.
@@ -13,37 +15,39 @@ class MultilingualSubstitution implements SubstitutionInterface {
 
   use SubstitutionApplyTrait;
 
+  /**
+   * Config override substitution.
+   */
+  protected readonly ConfigOverrideLanguageSubstitution $configOverrideSubstitution;
+
+  /**
+   * Default language substitution.
+   */
+  protected readonly DefaultLanguageSubstitution $defaultLanguageSubstitution;
+
+  /**
+   * String translation substitution.
+   */
+  protected readonly StringTranslationSubstitution $stringTranslationSubstitution;
+
   public function __construct(
     protected readonly LanguageManagerInterface $languageManager,
-  ) {}
+    protected readonly LanguageDefault $languageDefault,
+    protected readonly TranslationManager $translationManager,
+  ) {
+    $this->configOverrideSubstitution = new ConfigOverrideLanguageSubstitution($languageManager);
+    $this->defaultLanguageSubstitution = new DefaultLanguageSubstitution($languageManager, $languageDefault);
+    $this->stringTranslationSubstitution = new StringTranslationSubstitution($languageManager, $languageDefault, $translationManager);
+  }
 
   /**
    * {@inheritdoc}
    */
   public function executeInEnvironment(EnvironmentParameter $param, callable $callback): mixed {
-    $originalLanguage = $this->languageManager->getConfigOverrideLanguage();
-    $overrideLanguage = NULL;
-
-    $overrideLangcode = (string) $param->value;
-
-    if ($overrideLangcode !== $originalLanguage->getId()) {
-      $overrideLanguage = $this->languageManager->getLanguage($overrideLangcode);
-      if ($overrideLanguage) {
-        $this->languageManager->setConfigOverrideLanguage($overrideLanguage);
-      }
-      else {
-        throw new \InvalidArgumentException(sprintf('Failed to load the specified override language %s', $overrideLangcode));
-      }
-    }
-    try {
-      return $callback();
-    }
-    finally {
-      $currentLanguage = $this->languageManager->getConfigOverrideLanguage();
-      if ($currentLanguage->getId() !== $originalLanguage->getId()) {
-        $this->languageManager->setConfigOverrideLanguage($originalLanguage);
-      }
-    }
+    $configOverrideSwitch = fn () => $this->configOverrideSubstitution->executeInEnvironment($param, $callback);
+    $defaultLanguageSwitch = fn () => $this->defaultLanguageSubstitution->executeInEnvironment($param, $configOverrideSwitch);
+    $translationSwitch = fn() => $this->stringTranslationSubstitution->executeInEnvironment($param, $defaultLanguageSwitch);
+    return $translationSwitch();
   }
 
 }

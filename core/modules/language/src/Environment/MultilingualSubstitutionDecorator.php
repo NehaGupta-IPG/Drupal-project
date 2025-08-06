@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Environment;
 
+use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\StringTranslation\TranslationManager;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 
 /**
@@ -21,8 +23,10 @@ class MultilingualSubstitutionDecorator {
     #[AutowireDecorated]
     protected readonly SubstitutionInterface $monolingual,
     protected readonly LanguageManagerInterface $languageManager,
+    protected readonly LanguageDefault $languageDefault,
+    protected readonly TranslationManager $translationManager,
   ) {
-    $this->multilingual = new MultilingualSubstitution($languageManager);
+    $this->multilingual = new MultilingualSubstitution($languageManager, $languageDefault, $translationManager);
   }
 
   /**
