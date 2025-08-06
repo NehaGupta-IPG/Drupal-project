@@ -27,12 +27,12 @@ abstract class LanguageSubstitutionBase implements SubstitutionInterface {
   /**
    * Sets the override language.
    */
-  abstract protected function overrideLanguage(Language $overrideLanguage);
+  abstract protected function overrideLanguage(Language $overrideLanguage): void;
 
   /**
    * Restores the original language.
    */
-  abstract protected function restoreLanguage(Language $originalLanguage);
+  abstract protected function restoreLanguage(Language $originalLanguage): void;
 
   /**
    * {@inheritdoc}
