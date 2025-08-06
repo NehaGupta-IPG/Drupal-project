@@ -7,18 +7,12 @@ namespace Drupal\Core\Environment;
 use Drupal\Core\Language\LanguageManagerInterface;
 
 /**
- * Overrides the config language.
+ * Switches the language.
  */
-class ConfigOverrideLanguageSubstitution implements SubstitutionInterface {
+class MultilingualSubstitution implements SubstitutionInterface {
 
   use SubstitutionApplyTrait;
 
-  /**
-   * Constructs a new config override language substitution.
-   *
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
-   *   The language manager service.
-   */
   public function __construct(
     protected readonly LanguageManagerInterface $languageManager,
   ) {}
