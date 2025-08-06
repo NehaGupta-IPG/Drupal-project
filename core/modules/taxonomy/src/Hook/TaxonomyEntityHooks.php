@@ -2,16 +2,17 @@
 
 namespace Drupal\taxonomy\Hook;
 
-use Drupal\taxonomy\Entity\Term;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
-use Drupal\node\NodeInterface;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
+use Drupal\node\NodeInterface;
+use Drupal\taxonomy\Entity\Term;
+
 
 /**
  * Entity hook implementations for taxonomy.
