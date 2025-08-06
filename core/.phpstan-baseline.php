@@ -1730,6 +1730,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Block/BlockBase.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Core\\\\Block\\\\BlockBase\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Block/BlockBase.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Block\\\\BlockBase\\:\\:traitBuildConfigurationForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -13046,6 +13052,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/comment/tests/src/Kernel/CommentUninstallTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Kernel\\\\CommentUriDeprecationTest\\:\\:addDefaultCommentField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/comment/tests/src/Kernel/CommentUriDeprecationTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Kernel\\\\CommentValidationTest\\:\\:addDefaultCommentField\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -17115,12 +17127,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileFieldTestBase\\:\\:assertFileEntryExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileFieldTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileFieldTestBase\\:\\:assertFileEntryNotExists\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileFieldTestBase.php',
@@ -25353,12 +25359,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/mysql/src/Driver/Database/mysql/Schema.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\mysql\\\\Driver\\\\Database\\\\mysql\\\\Schema\\:\\:getComment\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/mysql/src/Driver/Database/mysql/Schema.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\mysql\\\\Driver\\\\Database\\\\mysql\\\\Schema\\:\\:processField\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -27184,12 +27184,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\pgsql\\\\Driver\\\\Database\\\\pgsql\\\\Schema\\:\\:createPrimaryKeySql\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Schema.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\pgsql\\\\Driver\\\\Database\\\\pgsql\\\\Schema\\:\\:getComment\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Schema.php',
