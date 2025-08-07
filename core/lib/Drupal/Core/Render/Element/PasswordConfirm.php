@@ -68,66 +68,27 @@ class PasswordConfirm extends FormElementBase {
   }
 
   /**
-   * Combine password element attribute arrays.
-   *
-   * Normalize the autocomplete attribute to remove invalid cases.
-   *
-   * @param mixed[] $default_attributes
-   *   Set of default attributes for a password element.
-   * @param mixed|null $passed_attributes
-   *   Attributes passed in via #attributes or #pass2_attributes.
-   *
-   * @return mixed[]
-   *   Combined attribute array.
-   */
-  protected static function combineAttributes(array $default_attributes = [], $passed_attributes = NULL): array {
-    $combined_attributes = is_array($passed_attributes) ?
-      array_merge_recursive($passed_attributes, $default_attributes) :
-      $default_attributes;
-
-    // Since autocomplete="off" can't be combined with any other hints,
-    // we normalize it to a single "off" hint.
-    if (!empty($combined_attributes['autocomplete'])) {
-      if (
-        is_array($combined_attributes['autocomplete']) &&
-        in_array('off', $combined_attributes['autocomplete'])
-      ) {
-        $combined_attributes['autocomplete'] = ['off'];
-      }
-      elseif (
-        is_string($combined_attributes['autocomplete']) &&
-        in_array('off', explode(' ', $combined_attributes['autocomplete']))
-      ) {
-        $combined_attributes['autocomplete'] = ['off'];
-      }
-    }
-    return $combined_attributes;
-  }
-
-  /**
    * Expand a password_confirm field into two text boxes.
    */
   public static function processPasswordConfirm(&$element, FormStateInterface $form_state, &$complete_form) {
     $pass1_attributes = [
       'class' => ['password-field', 'js-password-field'],
-      'autocomplete' => ['new-password'],
+      'autocomplete' => $element['#attributes']['autocomplete'] ?? ['new-password'],
     ];
-    $pass1_combined_attributes = static::combineAttributes(
-      $pass1_attributes,
-      $element['#attributes'],
-    );
     $element['pass1'] = [
       '#type' => 'password',
       '#title' => t('Password'),
       '#value' => empty($element['#value']) ? NULL : $element['#value']['pass1'],
       '#required' => $element['#required'],
-      '#attributes' => $pass1_combined_attributes,
+      '#attributes' => is_array($element['#attributes']) ?
+        array_merge_recursive($element['#attributes'], $pass1_attributes) :
+        $pass1_attributes,
       '#error_no_message' => TRUE,
     ];
 
     $pass2_attributes = [
       'class' => ['password-confirm', 'js-password-confirm'],
-      'autocomplete' => ['new-password'],
+      'autocomplete' => $element['#pass2_attributes']['autocomplete'] ?? ['new-password'],
     ];
     $element['pass2'] = [
       '#type' => 'password',
@@ -138,10 +99,9 @@ class PasswordConfirm extends FormElementBase {
       '#error_no_message' => TRUE,
     ];
     if (isset($element['#pass2_attributes'])) {
-      $element['pass2']['#attributes'] = static::combineAttributes(
-        $pass2_attributes,
-        $element['#pass2_attributes'],
-      );
+      $element['pass2']['#attributes'] = is_array($element['#pass2_attributes']) ?
+        array_merge_recursive($element['#pass2_attributes'], $pass2_attributes) :
+        $pass2_attributes;
     }
     $element['#element_validate'] = [[static::class, 'validatePasswordConfirm']];
     $element['#tree'] = TRUE;
