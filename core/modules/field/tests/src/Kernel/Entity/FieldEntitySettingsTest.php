@@ -19,13 +19,14 @@ class FieldEntitySettingsTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['entity_test', 'field'];
+  protected static $modules = ['entity_test', 'field', 'user'];
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installEntitySchema('entity_test_with_bundle');
     EntityTestBundle::create(['id' => 'test', 'label' => 'Test'])->save();
   }
 

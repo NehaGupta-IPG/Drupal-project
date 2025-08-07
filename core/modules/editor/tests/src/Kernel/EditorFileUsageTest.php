@@ -7,12 +7,12 @@ namespace Drupal\Tests\editor\Kernel;
 use Drupal\editor\Entity\Editor;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\node\Entity\Node;
-use Drupal\node\Entity\NodeType;
 use Drupal\file\Entity\File;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 
 /**
  * Tests tracking of file usage by the Text Editor module.
@@ -21,10 +21,10 @@ use Drupal\filter\Entity\FilterFormat;
  */
 class EditorFileUsageTest extends EntityKernelTestBase {
 
+  use ContentTypeCreationTrait;
+
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['editor', 'editor_test', 'node', 'file'];
 
@@ -63,9 +63,7 @@ class EditorFileUsageTest extends EntityKernelTestBase {
     $editor->save();
 
     // Create a node type for testing.
-    $type = NodeType::create(['type' => 'page', 'name' => 'page']);
-    $type->save();
-    node_add_body_field($type);
+    $this->createContentType(['type' => 'page', 'name' => 'page']);
     FieldStorageConfig::create([
       'field_name' => 'description',
       'entity_type' => 'node',

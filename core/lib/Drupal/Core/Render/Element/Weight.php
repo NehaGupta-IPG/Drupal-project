@@ -12,7 +12,9 @@ use Drupal\Core\Render\Attribute\FormElement;
  * the order.
  *
  * Properties:
- * - #delta: The range of possible weight values used. A delta of 10 would
+ *
+ * @property $delta
+ *   The range of possible weight values used. A delta of 10 would
  *   indicate possible weight values between -10 and 10.
  *
  * Usage example:
@@ -32,14 +34,13 @@ class Weight extends FormElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#delta' => 10,
       '#default_value' => 0,
       '#process' => [
-        [$class, 'processWeight'],
-        [$class, 'processAjaxForm'],
+        [static::class, 'processWeight'],
+        [static::class, 'processAjaxForm'],
       ],
     ];
   }

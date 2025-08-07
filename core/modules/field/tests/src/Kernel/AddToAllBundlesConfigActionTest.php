@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
@@ -35,6 +36,7 @@ class AddToAllBundlesConfigActionTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installEntitySchema('node');
     NodeType::create([
       'type' => 'one',
       'name' => 'One',
@@ -74,7 +76,7 @@ class AddToAllBundlesConfigActionTest extends KernelTestBase {
     // Expect an error when the 'addToAllBundles' action is invoked on anything
     // other than a field storage config entity.
     $this->expectException(PluginNotFoundException::class);
-    $this->expectExceptionMessage('The "addToAllBundles" plugin does not exist.');
+    $this->expectExceptionMessage('The "user_role" entity does not support the "addToAllBundles" config action.');
     $this->applyAction('user.role.anonymous');
   }
 
@@ -83,7 +85,15 @@ class AddToAllBundlesConfigActionTest extends KernelTestBase {
    */
   public function testFailIfExists(): void {
     $this->installConfig('node');
-    node_add_body_field(NodeType::load('one'));
+
+    $field_storage = FieldStorageConfig::loadByName('node', 'body');
+    // Manually create the field.
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => 'one',
+      'label' => 'Body',
+    ]);
+    $field->save();
 
     $this->expectException(ConfigActionException::class);
     $this->expectExceptionMessage('Field node.one.body already exists.');
@@ -96,10 +106,14 @@ class AddToAllBundlesConfigActionTest extends KernelTestBase {
   public function testIgnoreExistingFields(): void {
     $this->installConfig('node');
 
-    node_add_body_field(NodeType::load('one'))
-      ->setLabel('Original label')
-      ->setDescription('Original description')
-      ->save();
+    $field_storage = FieldStorageConfig::loadByName('node', 'body');
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => 'one',
+      'label' => 'Original label',
+      'description' => 'Original description',
+    ]);
+    $field->save();
 
     $this->applyAction('field.storage.node.body');
 

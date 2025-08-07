@@ -48,7 +48,7 @@ class RedirectDestinationTest extends UnitTestCase {
     $this->redirectDestination = new RedirectDestination($this->requestStack, $this->urlGenerator);
   }
 
-  protected function setupUrlGenerator() {
+  protected function setupUrlGenerator(): void {
     $this->urlGenerator->expects($this->any())
       ->method('generateFromRoute')
       ->willReturnCallback(function ($route, $parameters, $options) {
@@ -104,7 +104,7 @@ class RedirectDestinationTest extends UnitTestCase {
     // A request with a destination query.
     $data[] = [$request, '/example'];
 
-    // A request without a destination query,
+    // A request without a destination query.
     $request = Request::create('/');
     $data[] = [$request, '/current-path'];
 

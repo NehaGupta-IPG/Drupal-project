@@ -13,14 +13,21 @@ use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
  */
 class MigrateSystemConfigurationTest extends MigrateDrupal7TestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['file', 'system'];
 
+  /**
+   * The expected configuration after migration.
+   *
+   * @var array
+   */
   protected $expectedConfig = [
     'system.authorize' => [],
     'system.cron' => [
       'threshold' => [
-        // Auto-run is not handled by the migration.
-        // 'autorun' => 0,
+        // Auto-run is not handled by the migration, so ignore "'autorun' => 0".
         'requirements_warning' => 172800,
         'requirements_error' => 1209600,
       ],

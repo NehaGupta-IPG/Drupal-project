@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 
-// cspell:ignore sourceediting
+use PHPUnit\Framework\Attributes\Group;
 
+// cspell:ignore sourceediting xmlhttprequest
 /**
  * Tests for CKEditor 5 in the admin UI.
  *
- * @group ckeditor5
  * @internal
  */
+#[Group('ckeditor5')]
 class AdminUiTest extends CKEditor5TestBase {
 
   /**
@@ -29,8 +30,8 @@ class AdminUiTest extends CKEditor5TestBase {
   public function testSettingsOnlyFireAjaxWithCkeditor5(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
-    $this->addNewTextFormat($page, $assert_session);
-    $this->addNewTextFormat($page, $assert_session, 'unicorn');
+    $this->addNewTextFormat();
+    $this->addNewTextFormat('unicorn');
 
     $this->drupalGet('admin/config/content/formats/manage/ckeditor5');
 
@@ -184,7 +185,7 @@ JS;
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
-    $this->addNewTextFormat($page, $assert_session);
+    $this->addNewTextFormat();
     $this->drupalGet('admin/config/content/formats/manage/ckeditor5');
 
     // Add the image plugin to the CKEditor 5 toolbar.
@@ -233,7 +234,7 @@ JS;
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
-    $this->addNewTextFormat($page, $assert_session);
+    $this->addNewTextFormat();
     $this->drupalGet('admin/config/content/formats/manage/ckeditor5');
 
     // Add the source editing plugin to the CKEditor 5 toolbar.

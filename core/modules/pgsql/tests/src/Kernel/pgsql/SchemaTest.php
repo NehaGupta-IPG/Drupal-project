@@ -6,8 +6,8 @@ namespace Drupal\Tests\pgsql\Kernel\pgsql;
 
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
 
-// cSpell:ignore relkind objid refobjid regclass attname attrelid attnum
-// cSpell:ignore refobjsubid
+// cSpell:ignore attname attnum attrelid objid refobjid refobjsubid regclass
+// cspell:ignore relkind relname
 
 /**
  * Tests schema API for the PostgreSQL driver.
@@ -19,7 +19,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   /**
    * {@inheritdoc}
    */
-  public function checkSchemaComment(string $description, string $table, ?string $column = NULL): void {
+  public function checkSchemaComment(string|false $description, string $table, ?string $column = NULL): void {
     $this->assertSame($description, $this->schema->getComment($table, $column), 'The comment matches the schema description.');
   }
 
@@ -200,7 +200,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     $this->assertFalse($this->schema->fieldExists($table_name_new, $field_name));
     $this->assertTrue($this->schema->fieldExists($table_name_new, $field_name_new));
 
-    // Adding an unique key
+    // Adding an unique key.
     $unique_key_name = $unique_key_introspect_name = 'unique';
     $this->schema->addUniqueKey($table_name_new, $unique_key_name, [$field_name_new]);
 
@@ -210,7 +210,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     $unique_key_introspect_name = $ensure_identifiers_length->invoke($this->schema, $table_name_new, $unique_key_name, 'key');
     $this->assertEquals([$field_name_new], $introspect_index_schema->invoke($this->schema, $table_name_new)['unique keys'][$unique_key_introspect_name]);
 
-    // Dropping an unique key
+    // Dropping an unique key.
     $this->schema->dropUniqueKey($table_name_new, $unique_key_name);
 
     // Dropping a field.
@@ -366,6 +366,35 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   }
 
   /**
+   * Tests renaming a table which name contains drupal_ with multiple indexes.
+   */
+  public function testRenameTableWithNameContainingDrupalUnderscoreAndMultipleIndexes(): void {
+    $table_name_old = 'field_drupal_foo';
+    $table_name_new = 'field_drupal_bar';
+    $table_specification = [
+      'fields' => [
+        'one'  => [
+          'type' => 'int',
+          'default' => NULL,
+        ],
+        'two'  => [
+          'type' => 'int',
+          'default' => NULL,
+        ],
+      ],
+      'indexes' => [
+        'one' => ['one'],
+        'two' => ['two'],
+      ],
+    ];
+    $this->schema->createTable($table_name_old, $table_specification);
+
+    $this->schema->renameTable($table_name_old, $table_name_new);
+
+    $this->assertTrue($this->schema->tableExists($table_name_new));
+  }
+
+  /**
    * Tests column name escaping in field constraints.
    */
   public function testUnsignedField(): void {
@@ -381,6 +410,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       'primary key' => ['order'],
     ];
     $this->schema->createTable($table_name, $table_spec);
+    $this->assertTrue($this->schema->tableExists($table_name));
   }
 
 }

@@ -8,12 +8,12 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the exposed filter ajax functionality in a block.
- *
- * @group views
  */
+#[Group('views')]
 class BlockExposedFilterAJAXTest extends WebDriverTestBase {
 
   use ContentTypeCreationTrait;
@@ -24,6 +24,11 @@ class BlockExposedFilterAJAXTest extends WebDriverTestBase {
    */
   protected static $modules = ['node', 'views', 'block', 'views_test_config'];
 
+  /**
+   * The views to use for testing.
+   *
+   * @var string[]
+   */
   public static $testViews = ['test_block_exposed_ajax', 'test_block_exposed_ajax_with_page'];
 
   /**
