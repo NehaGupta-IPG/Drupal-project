@@ -88,7 +88,7 @@ class EntityReferenceEntityFormatter extends EntityReferenceFormatterBase {
       $container->get('logger.factory'),
       $container->get('entity_type.manager'),
       $container->get('entity_display.repository'),
-      $container->get('entity.repository')
+      $container->get('entity.repository'),
     );
   }
 

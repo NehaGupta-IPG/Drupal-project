@@ -54,7 +54,8 @@ class ImageWidget extends FileWidget {
       $configuration['third_party_settings'],
       $container->get('element_info'),
       $container->get('image.factory'),
-      $container->get('entity.repository'));
+      $container->get('entity.repository'),
+    );
   }
 
   /**

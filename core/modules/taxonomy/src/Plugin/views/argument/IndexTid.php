@@ -31,7 +31,7 @@ class IndexTid extends ManyToOne implements ContainerFactoryPluginInterface {
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity.repository')
+      $container->get('entity.repository'),
     );
   }
 

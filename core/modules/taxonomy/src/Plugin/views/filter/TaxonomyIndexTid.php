@@ -54,7 +54,7 @@ class TaxonomyIndexTid extends ManyToOne {
       $container->get('entity_type.manager')->getStorage('taxonomy_vocabulary'),
       $container->get('entity_type.manager')->getStorage('taxonomy_term'),
       $container->get('current_user'),
-      $container->get('entity.repository')
+      $container->get('entity.repository'),
     );
   }
 
