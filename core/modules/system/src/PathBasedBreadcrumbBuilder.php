@@ -156,6 +156,14 @@ class PathBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
       return $breadcrumb;
     }
 
+    // Set request context from passed in $route_match if route is available.
+    $url = $route_match->getRouteObject() ? Url::fromRouteMatch($route_match) : NULL;
+    if ($url && $request = $this->getRequestForPath($url->toString(), [])) {
+      $route_match_context = new RequestContext();
+      $route_match_context->fromRequest($request);
+      $this->context = $route_match_context;
+    }
+
     // General path-based breadcrumbs. Use the actual request path, prior to
     // resolving path aliases, so the breadcrumb can be defined by simply
     // creating a hierarchy of path aliases.

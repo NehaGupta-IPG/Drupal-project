@@ -9,6 +9,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Link;
 use Drupal\Core\Access\AccessResultAllowed;
 use Drupal\Core\Path\PathMatcherInterface;
+use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\LinkGeneratorInterface;
@@ -407,6 +408,64 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
       'user.permissions',
     ], $breadcrumb->getCacheContexts());
     $this->assertEqualsCanonicalizing([], $breadcrumb->getCacheTags());
+    $this->assertEquals(Cache::PERMANENT, $breadcrumb->getCacheMaxAge());
+  }
+
+  /**
+   * Tests the breadcrumb with custom route match.
+   *
+   * @covers ::build
+   * @covers ::getRequestForPath
+   */
+  public function testBuildWithRouteMatchPath(): void {
+    $this->context->expects($this->never())
+      ->method('getPathInfo');
+    $this->setupStubPathProcessor();
+
+    $route_1 = new Route('/example');
+    $route_2 = new Route('/foo');
+    $route_3 = new Route('/foo/baz');
+
+    $this->requestMatcher->expects($this->exactly(2))
+      ->method('matchRequest')
+      ->will($this->returnCallback(function (Request $request) use ($route_1, $route_2, $route_3) {
+        if ($request->getPathInfo() == '/example') {
+          return [
+            RouteObjectInterface::ROUTE_NAME => 'example',
+            RouteObjectInterface::ROUTE_OBJECT => $route_1,
+            '_raw_variables' => new ParameterBag([]),
+          ];
+        }
+        elseif ($request->getPathInfo() == '/foo') {
+          return [
+            RouteObjectInterface::ROUTE_NAME => 'foo',
+            RouteObjectInterface::ROUTE_OBJECT => $route_2,
+            '_raw_variables' => new ParameterBag([]),
+          ];
+        }
+        elseif ($request->getPathInfo() == '/foo/baz') {
+          return [
+            RouteObjectInterface::ROUTE_NAME => 'foo_baz',
+            RouteObjectInterface::ROUTE_OBJECT => $route_3,
+            '_raw_variables' => new ParameterBag([]),
+          ];
+        }
+      }));
+
+    $url_generator = $this->getMockBuilder('Drupal\Core\Routing\UrlGeneratorInterface')->getMock();
+    $url_generator->expects($this->once())
+      ->method('generateFromRoute')
+      ->with('foo_baz', [], [])
+      ->willReturn('foo/baz');
+    $container = \Drupal::getContainer();
+    $container->set('url_generator', $url_generator);
+
+    $this->setupAccessManagerToAllow();
+
+    $breadcrumb = $this->builder->build(new RouteMatch('foo_baz', $route_3, []));
+    $this->assertEquals([0 => new Link('Home', new Url('<front>')), 1 => new Link('Foo', new Url('foo'))], $breadcrumb->getLinks());
+    $this->assertEquals(['url.path.parent', 'user.permissions'], $breadcrumb->getCacheContexts());
+    $this->assertEquals([], $breadcrumb->getCacheTags());
     $this->assertEquals(Cache::PERMANENT, $breadcrumb->getCacheMaxAge());
   }
 
