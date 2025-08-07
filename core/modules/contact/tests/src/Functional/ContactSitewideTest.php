@@ -275,6 +275,10 @@ class ContactSitewideTest extends BrowserTestBase {
     $this->submitContact($this->randomMachineName(16), $recipients[0], $this->randomMachineName(16), $id, $this->randomMachineName(64));
     $this->assertSession()->pageTextContains('You cannot send more than ' . $this->config('contact.settings')->get('flood.limit') . ' messages in 10 min. Try again later.');
 
+    // Submit with no subject.
+    $this->submitContact($this->randomMachineName(16), $recipients[0], NULL, $id, $this->randomMachineName(64));
+    $this->assertSession()->pageTextContains('Your message has been sent.');
+
     // Test listing controller.
     $this->drupalLogin($admin_user);
 

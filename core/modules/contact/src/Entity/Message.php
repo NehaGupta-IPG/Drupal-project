@@ -163,6 +163,7 @@ class Message extends ContentEntityBase implements MessageInterface {
     $fields['subject'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Subject'))
       ->setRequired(TRUE)
+      ->setDefaultValue('')
       ->setSetting('max_length', 100)
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
