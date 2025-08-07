@@ -33,26 +33,6 @@ class ImageWidget extends FileWidget {
    */
   protected $imageFactory;
 
-  /**
-   * Constructs an ImageWidget object.
-   *
-   * @param string $plugin_id
-   *   The plugin ID for the widget.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
-   *   The definition of the field to which the widget is associated.
-   * @param array $settings
-   *   The widget settings.
-   * @param array $third_party_settings
-   *   Any third party settings.
-   * @param \Drupal\Core\Render\ElementInfoManagerInterface $element_info
-   *   The element info manager service.
-   * @param \Drupal\Core\Image\ImageFactory|null $image_factory
-   *   The image factory service.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface|null $entityRepository
-   *   The entity repository.
-   */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ElementInfoManagerInterface $element_info, ?ImageFactory $image_factory = NULL, protected ?EntityRepositoryInterface $entityRepository = NULL) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $element_info);
     $this->imageFactory = $image_factory ?: \Drupal::service('image.factory');

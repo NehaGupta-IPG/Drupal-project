@@ -31,24 +31,6 @@ class TaxonomyIndexTid extends ManyToOne {
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $validated_exposed_input = NULL;
 
-  /**
-   * Constructs a TaxonomyIndexTid object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\taxonomy\VocabularyStorageInterface $vocabularyStorage
-   *   The vocabulary storage.
-   * @param \Drupal\taxonomy\TermStorageInterface $termStorage
-   *   The term storage.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
-   *   The current user.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
-   *   The entity repository.
-   */
   public function __construct(
     array $configuration,
     $plugin_id,

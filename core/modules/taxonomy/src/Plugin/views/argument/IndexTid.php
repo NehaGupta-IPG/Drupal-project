@@ -19,9 +19,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 )]
 class IndexTid extends ManyToOne implements ContainerFactoryPluginInterface {
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityRepositoryInterface $entityRepository) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
