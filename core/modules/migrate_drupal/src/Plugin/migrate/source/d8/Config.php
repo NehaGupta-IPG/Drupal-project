@@ -4,7 +4,6 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source\d8;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\State\StateInterface;
-use Drupal\migrate\Attribute\MigrateSource;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
@@ -54,11 +53,12 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
  *
  * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
  * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
+ *
+ * @MigrateSource(
+ *   id = "d8_config",
+ *   source_module = "system",
+ * )
  */
-#[MigrateSource(
-  id: 'd8_config',
-  source_module: 'system',
-)]
 class Config extends DrupalSqlBase {
 
   /**
@@ -88,7 +88,8 @@ class Config extends DrupalSqlBase {
    * {@inheritdoc}
    */
   public function prepareRow(Row $row) {
-    $row->setSourceProperty('data', unserialize($row->getSourceProperty('data')));
+    // @see \Drupal\Core\Config\DatabaseStorage::decode()
+    $row->setSourceProperty('data', unserialize($row->getSourceProperty('data'), ['allowed_classes' => FALSE]));
     return parent::prepareRow($row);
   }
 

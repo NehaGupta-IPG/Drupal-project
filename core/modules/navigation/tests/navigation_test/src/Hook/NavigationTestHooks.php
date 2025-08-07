@@ -97,10 +97,27 @@ class NavigationTestHooks {
         unset($tree[$key]);
       }
 
-      // Updates title for items in menu2
+      // Updates title for items in menu2.
       if ($menu_name == 'menu2') {
         $item->link->updateLink(['title' => 'New Link Title'], FALSE);
       }
+    }
+  }
+
+  /**
+   * Implements hook_menu_links_discovered_alter().
+   */
+  #[Hook('menu_links_discovered_alter')]
+  public function menuLinksDiscoveredAlter(array &$links): void {
+    if (\Drupal::keyValue('navigation_test')->get('menu_links_discovered_alter')) {
+      $links['navigation_test.navigation__no_icon']['options']['icon'] = [
+        'icon_id' => 'radioactive',
+        'pack_id' => 'navigation_test',
+      ];
+      $links['navigation_test.navigation__default_item']['options']['icon'] = [
+        'icon_id' => 'foo',
+        'pack_id' => 'bar',
+      ];
     }
   }
 

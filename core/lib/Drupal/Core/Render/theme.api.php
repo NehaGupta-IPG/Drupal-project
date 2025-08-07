@@ -605,8 +605,9 @@ function hook_preprocess(&$variables, $hook): void {
  *   The variables array (modify in place).
  */
 function hook_preprocess_HOOK(&$variables): void {
-  // This example is from node_preprocess_html(). It adds the node type to
-  // the body classes, when on an individual node page or node preview page.
+  // This example is from \Drupal\node\Hook\NodeThemeHooks::preprocessHtml().
+  // It adds the node type to the body classes, when on an individual node page
+  // or node preview page.
   if (($node = \Drupal::routeMatch()->getParameter('node')) || ($node = \Drupal::routeMatch()->getParameter('node_preview'))) {
     if ($node instanceof NodeInterface) {
       $variables['node_type'] = $node->getType();
@@ -665,6 +666,11 @@ function hook_theme_suggestions_HOOK(array $variables): array {
   $suggestions = [];
 
   $suggestions[] = 'hookname__' . $variables['elements']['#langcode'];
+
+  // Theme suggestions can be deprecated by specifying them in the __DEPRECATED
+  // key.
+  $suggestions[] = 'hookname__outdated';
+  $suggestions['__DEPRECATED']['hookname__outdated'] = 'Theme suggestion hookname__outdated is deprecated in drupal:X.0.0 and is removed from drupal:Y.0.0. See http://drupal.org/node/the-change-notice-nid.';
 
   return $suggestions;
 }

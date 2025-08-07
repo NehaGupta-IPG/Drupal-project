@@ -171,7 +171,7 @@ abstract class Schema implements PlaceholderInterface {
   protected function buildTableNameCondition($table_name, $operator = '=', $add_prefix = TRUE) {
     $info = $this->connection->getConnectionOptions();
 
-    // Retrieve the table name and schema
+    // Retrieve the table name and schema.
     $table_info = $this->getPrefixInfo($table_name, $add_prefix);
 
     $condition = $this->connection->condition('AND');
@@ -194,6 +194,7 @@ abstract class Schema implements PlaceholderInterface {
    */
   public function tableExists($table, bool $add_prefix = TRUE) {
     $condition = $this->buildTableNameCondition($table, '=', $add_prefix);
+    $condition->condition('table_type', 'BASE TABLE');
     $condition->compile($this->connection, $this);
     // Normally, we would heartily discourage the use of string
     // concatenation for conditionals like this however, we
@@ -221,6 +222,7 @@ abstract class Schema implements PlaceholderInterface {
     // Load all the tables up front in order to take into account per-table
     // prefixes. The actual matching is done at the bottom of the method.
     $condition = $this->buildTableNameCondition('%', 'LIKE');
+    $condition->condition('table_type', 'BASE TABLE');
     $condition->compile($this->connection, $this);
 
     $prefix = $this->connection->getPrefix();
@@ -539,6 +541,7 @@ abstract class Schema implements PlaceholderInterface {
    * @param string $table
    *   The name of the table.
    *
+   * phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
    * @return array
    *   A schema array with the following keys: 'primary key', 'unique keys' and
    *   'indexes', and values as arrays of database columns.
@@ -548,7 +551,6 @@ abstract class Schema implements PlaceholderInterface {
    * @throws \RuntimeException
    *   If the driver does not implement this method.
    */
-  // phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn, Drupal.Commenting.FunctionComment.Missing
   protected function introspectIndexSchema($table) {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("The table $table doesn't exist.");
@@ -658,6 +660,7 @@ abstract class Schema implements PlaceholderInterface {
    * @param array $table
    *   A Schema API table definition array.
    *
+   * phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
    * @return array
    *   An array of SQL statements to create the table.
    *
@@ -670,7 +673,6 @@ abstract class Schema implements PlaceholderInterface {
    *   method, or to make it private for each driver, and ::createTable actually
    *   an abstract method here for implementation in each driver.
    */
-  // phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn, Drupal.Commenting.FunctionComment.Missing
   protected function createTableSql($name, $table) {
     throw new \BadMethodCallException(get_class($this) . '::createTableSql() not implemented.');
   }
