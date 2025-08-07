@@ -13,7 +13,6 @@ use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\Entity\Term;
 
-
 /**
  * Entity hook implementations for taxonomy.
  */
