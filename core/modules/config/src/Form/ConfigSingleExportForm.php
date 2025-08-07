@@ -76,8 +76,6 @@ class ConfigSingleExportForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state, $config_type = NULL, $config_name = NULL) {
 
-    $form['#attached']['library'][] = 'core/drupal.htmx';
-
     foreach ($this->entityTypeManager->getDefinitions() as $entity_type => $definition) {
       if ($definition->entityClassImplements(ConfigEntityInterface::class)) {
         $this->definitions[$entity_type] = $definition;
@@ -92,7 +90,9 @@ class ConfigSingleExportForm extends FormBase {
       'system.simple' => $this->t('Simple configuration'),
     ] + $entity_types;
 
-    $default_type = $form_state->getValue('config_type', $config_type);
+    $form['#attached']['library'][] = 'core/drupal.htmx';
+
+    $default_type = $form_state->getValue('config_type');
     $form['config_type'] = [
       '#title' => $this->t('Configuration type'),
       '#type' => 'select',
@@ -103,15 +103,17 @@ class ConfigSingleExportForm extends FormBase {
         'data-hx-swap' => 'outerHTML',
         'data-hx-select' => '[name="config_name"]',
         'data-hx-target' => '[name="config_name"]',
+        // Prevent form validation errors, when changing the type.
+        'data-hx-params' => 'not config_name',
       ],
     ];
 
-    $default_name = $form_state->getValue('config_name', $config_name);
+    $default_name = $form_state->getValue('config_name');
     $form['config_name'] = [
       '#title' => $this->t('Configuration name'),
       '#type' => 'select',
       '#options' => $this->findConfiguration($default_type),
-      '#default_value' => $config_name,
+      '#default_value' => $default_name,
       '#attributes' => [
         'data-hx-post' => '',
         'data-hx-swap' => 'outerHTML',
@@ -125,35 +127,23 @@ class ConfigSingleExportForm extends FormBase {
       '#type' => 'textarea',
       '#rows' => 24,
     ];
-    if ($config_type && $config_name) {
-      $fake_form_state = (new FormState())->setValues([
-        'config_type' => $config_type,
-        'config_name' => $config_name,
-      ]);
-      $form['export'] = $this->updateExport($form, $fake_form_state);
-    }
-    #$form['submit'] = ['#type' => 'submit', '#value' => $this->t('Export')];
-    return $form;
-  }
 
-  /**
-   * Handles switching the export textarea.
-   */
-  public function updateExport($form, FormStateInterface $form_state) {
-    // Determine the full config name for the selected config entity.
-    if ($form_state->getValue('config_type') !== 'system.simple') {
-      $definition = $this->entityTypeManager->getDefinition($form_state->getValue('config_type'));
-      $name = $definition->getConfigPrefix() . '.' . $form_state->getValue('config_name');
-    }
-    // The config name is used directly for simple configuration.
-    else {
-      $name = $form_state->getValue('config_name');
-    }
-    // Read the raw data for this config name, encode it, and display it.
-    $exists = $this->configStorage->exists($name);
-    $form['export']['#value'] = !$exists ? NULL : Yaml::encode($this->configStorage->read($name));
-    $form['export']['#description'] = !$exists ? NULL : $this->t('Filename: %name', ['%name' => $name . '.yml']);
-    return $form['export'];
+    $form['filename'] = [
+      '#title' => $this->t('Filename'),
+      '#type' => 'textfield',
+      '#attributes' => [
+        'data-hx-post' => '',
+        'data-hx-swap-oob' => 'outerHTML:#edit-filename',
+      ],
+    ];
+
+    // Need this so that the submit callback is triggered.
+    $form['submit'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('View'),
+    ];
+
+    return $form;
   }
 
   /**
@@ -201,7 +191,24 @@ class ConfigSingleExportForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    // Nothing to submit.
+    $form['export']['#value'] = NULL;
+    $form['export']['#description'] = NULL;
+
+    if ($form_state->getValue('config_type') && $form_state->getValue('config_name')) {
+      // Determine the full config name for the selected config entity.
+      if ($form_state->getValue('config_type') !== 'system.simple') {
+        $definition = $this->entityTypeManager->getDefinition($form_state->getValue('config_type'));
+        $name = $definition->getConfigPrefix() . '.' . $form_state->getValue('config_name');
+      }
+      // The config name is used directly for simple configuration.
+      else {
+        $name = $form_state->getValue('config_name');
+      }
+      // Read the raw data for this config name, encode it, and display it.
+      $exists = $this->configStorage->exists($name);
+      $form['export']['#value'] = !$exists ? NULL : Yaml::encode($this->configStorage->read($name));
+      $form['filename']['#value'] = !$exists ? NULL : $name . '.yml';
+    }
   }
 
 }
