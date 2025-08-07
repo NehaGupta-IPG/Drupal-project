@@ -55,32 +55,31 @@ class Yaml implements SerializationInterface {
   /**
    * Parses custom YAML tags and convert values to primitive types.
    *
-   * Tag objects will be replaced by their raw value or, if a callback
-   * exists for that tag it will be used.
-   *
-   * The only custom tag supported by default is the '!translate' tag.
+   * Tag objects will be replaced by their raw value or, if a class exists for
+   * that tag it will be used.
    *
    * @param mixed $data
    *   Parsed YAML data.
-   * @param callable[] $tag_callbacks
-   *   Optional callbacks for tag value, indexed by tag.
+   * @param callable[] $tag_classes
+   *   Optional classes to use to construct from tag values, indexed by tag.
    *
    * @return mixed
    *   Parsed data with parsed tag values.
    */
-  public static function decodeTags(mixed $data, array $tag_callbacks = []): mixed {
+  public static function decodeTags(mixed $data, array $tag_classes = []): mixed {
     if (is_array($data)) {
       foreach ($data as $key => $value) {
-        if (is_object($value) && $value instanceof TaggedValue) {
-          if (isset($tag_callbacks[$value->getTag()])) {
-            $data[$key] = call_user_func($tag_callbacks[$value->getTag()], $value);
+        if ($value instanceof TaggedValue) {
+          if (isset($tag_classes[$value->getTag()])) {
+            $data_value = (array) $value->getValue();
+            $data[$key] = new ($tag_classes[$value->getTag()])(...$data_value);
           }
           else {
             $data[$key] = $value->getValue();
           }
         }
         elseif (is_array($value)) {
-          $data[$key] = static::decodeTags($value, $tag_callbacks);
+          $data[$key] = static::decodeTags($value, $tag_classes);
         }
       }
     }
