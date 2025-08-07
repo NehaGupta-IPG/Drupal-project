@@ -80,9 +80,7 @@ class PasswordConfirm extends FormElementBase {
       '#title' => t('Password'),
       '#value' => empty($element['#value']) ? NULL : $element['#value']['pass1'],
       '#required' => $element['#required'],
-      '#attributes' => is_array($element['#attributes']) ?
-        array_merge_recursive($element['#attributes'], $pass1_attributes) :
-        $pass1_attributes,
+      '#attributes' => is_array($element['#attributes']) ? array_merge_recursive($element['#attributes'], $pass1_attributes) : $pass1_attributes,
       '#error_no_message' => TRUE,
     ];
 
