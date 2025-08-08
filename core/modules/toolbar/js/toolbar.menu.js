@@ -243,6 +243,6 @@
    *   A string representing a DOM fragment.
    */
   Drupal.theme.toolbarMenuItemToggle = function (options) {
-    return `<button aria-expanded="${options.expanded}" class="${options.class}"><span class="label">${options.text}</span></button>`;
+    return `<button aria-expanded="${options.expanded}" class="${options.class}"><span class="label visually-hidden">${options.text}</span></button>`;
   };
 })(jQuery, Drupal, drupalSettings);
