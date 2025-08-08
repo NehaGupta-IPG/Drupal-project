@@ -6,6 +6,7 @@ namespace Drupal\Tests\Component\Serialization;
 
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Serialization\Yaml;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -87,6 +88,42 @@ class YamlTest extends YamlTestBase {
     YAML;
 
     Yaml::decode($yaml);
+  }
+
+  /**
+   * Tests decoding tags with no tag classes.
+   *
+   * @covers ::decodeTags
+   */
+  public function testDecodeTagsNoTagClasses(): void {
+    $yaml = <<<YAML
+    test: !translate test
+    message: !translate {string: 'Your message has been sent.', options: {context: 'Contact form'}}
+    YAML;
+
+    $data = Yaml::decodeTags(Yaml::decode($yaml));
+    $this->assertSame('test', $data['test']);
+    $this->assertSame(['string' => 'Your message has been sent.', 'options' => ['context' => 'Contact form']], $data['message']);
+  }
+
+  /**
+   * Tests decoding tags with tag classes.
+   *
+   * @covers ::decodeTags
+   */
+  public function testDecodeTagsWithTagClasses(): void {
+    $yaml = <<<YAML
+    test: !translate test
+    message: !translate {string: 'Your message has been sent.', options: {context: 'Contact form'}}
+    YAML;
+
+    $data = Yaml::decodeTags(Yaml::decode($yaml), ['translate' => TranslatableMarkup::class]);
+    $this->assertInstanceOf(TranslatableMarkup::class, $data['test']);
+    $this->assertInstanceOf(TranslatableMarkup::class, $data['message']);
+    $this->assertSame('test', $data['test']->getUntranslatedString());
+    $this->assertSame('', $data['test']->getOption('context'));
+    $this->assertSame('Your message has been sent.', $data['message']->getUntranslatedString());
+    $this->assertSame('Contact form', $data['message']->getOption('context'));
   }
 
 }
