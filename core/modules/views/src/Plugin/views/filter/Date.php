@@ -185,9 +185,14 @@ class Date extends NumericFilter {
     $b = intval(strtotime($this->value['max'], 0));
 
     if ($this->value['type'] == 'date') {
-      // Check if max value has no time part.
-      if (date('H:i:s', strtotime($this->value['max'])) == '00:00:00') {
-        $b = intval(strtotime($this->value['max'] . ' +1 day', 0)) - 1;
+      // Check if min and max are the same date.
+      $min_date = date('Y-m-d', strtotime($this->value['min']));
+      $max_date = date('Y-m-d', strtotime($this->value['max']));
+      if ($min_date == $max_date) {
+        // Check if max value has no time part.
+        if (date('H:i:s', strtotime($this->value['max'])) == '00:00:00') {
+          $b = intval(strtotime($this->value['max'] . ' +1 day', 0)) - 1;
+        }
       }
     }
 
