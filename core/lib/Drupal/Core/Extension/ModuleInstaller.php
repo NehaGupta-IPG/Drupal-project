@@ -455,7 +455,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
         $config_installer->installDefaultConfig('module', $module, DefaultConfigMode::InstallEntities);
       }
       catch (SchemaIncompleteException $e) {
-        throw new SchemaIncompleteException("Error installing entity configuration for module '$module': " . $e->getMessage(), $e->getCode(), $e);
+        throw new SchemaIncompleteException("Error installing configuration entities for module '$module': " . $e->getMessage(), $e->getCode(), $e);
       }
 
       // Allow the module to perform install tasks.
