@@ -19,11 +19,6 @@ class EmailDefinition extends PluginDefinition implements PluginDefinitionInterf
   const CONTROLLER_NAME = '_controller';
 
   /**
-   * Key for the plugin configuration.
-   */
-  const PLUGIN_CONFIG_NAME = '_plugin_configuration';
-
-  /**
    * The email label.
    */
   protected string|\Stringable $label;

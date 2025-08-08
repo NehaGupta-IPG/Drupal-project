@@ -45,8 +45,10 @@ class EmailRenderer implements EmailRendererInterface {
     // @see: https://www.drupal.org/i/3536307
     return $this->renderer->executeInRenderContext(new RenderContext(), function () use ($definition, $params, $langcode) {
       // Build render array.
-      $pluginConfig = $params[EmailDefinition::PLUGIN_CONFIG_NAME] ?? [];
-      $email = $this->emailManager->createEmail($definition->id(), $pluginConfig);
+      $email = $this->emailManager->createEmail($definition->id(), [
+        'langcode' => $langcode,
+        'params' => $params,
+      ]);
       $build = $this->build($email, $definition, $params, $langcode);
 
       // Render the result.
