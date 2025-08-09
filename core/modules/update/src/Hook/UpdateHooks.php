@@ -170,7 +170,47 @@ class UpdateHooks {
   public function mail($key, &$message, $params): void {
     $langcode = $message['langcode'];
     $language = \Drupal::languageManager()->getLanguage($langcode);
-    $message['subject'] .= $this->t('New release(s) available for @site_name', ['@site_name' => \Drupal::config('system.site')->get('name')], ['langcode' => $langcode]);
+
+    // Set the message subject.
+    $subject = '';
+    $all_reasons = array_unique(array_values($params));
+    // If any of the update reasons in $params are security-related, then use
+    // the security subject.
+    $security = array_filter($all_reasons, function ($item) {
+      return in_array($item, [UpdateManagerInterface::NOT_SECURE, UpdateManagerInterface::REVOKED]);
+    });
+    if ($security) {
+      $subject = $this->t('Security release(s) available for @site_name', [
+        '@site_name' => \Drupal::config('system.site')->get('name'),
+        'langcode' => $langcode,
+      ]);
+    }
+
+    // If security updates are not included, check next for fetch failures. If
+    // all the reasons are fetch failures, then use that as the subject.
+    if (empty($subject)) {
+      $fetch = array_filter($all_reasons, function ($item) {
+        return $item > 0;
+      });
+      if (empty($fetch) && !empty($all_reasons)) {
+        $subject = $this->t('Failed to get release information for @site_name', [
+          '@site_name' => \Drupal::config('system.site')->get('name'),
+          'langcode' => $langcode,
+        ]);
+      }
+    }
+
+    // If the subject still has not been set, then there are only non-security
+    // updates. Use the subject for non-security updates.
+    if (empty($subject)) {
+      $subject = $this->t('New release(s) available for @site_name', [
+        '@site_name' => \Drupal::config('system.site')->get('name'),
+        'langcode' => $langcode,
+      ]);
+    }
+    // Append the update message to the existing subject.
+    $message['subject'] .= $subject;
+
     foreach ($params as $msg_type => $msg_reason) {
       $message['body'][] = _update_message_text($msg_type, $msg_reason, $langcode, TRUE);
     }
