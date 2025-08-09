@@ -171,6 +171,6 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
    * @param mixed $element
    *   Elements.
    */
-  public static function unset(&$element): void;
+  public static function copy($element): mixed;
 
 }

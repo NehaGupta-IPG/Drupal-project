@@ -629,12 +629,15 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
   /**
    * {@inheritdoc}
    */
-  public static function unset(&$element): void {
-    if (isset($element['##object']) && $element['##object'] instanceof static) {
-      $a = [];
-      $element['##object']->storage = &$a;
-      unset($element['##object']);
+  public static function copy($element): mixed {
+    $copy = $element;
+    unset($copy['##object']);
+    foreach (Element::children($copy) as $child_key) {
+      $child_copy = static::copy($copy[$child_key]);
+      unset($copy[$child_key]);
+      $copy[$child_key] = $child_copy;
     }
+    return $copy;
   }
 
   /**

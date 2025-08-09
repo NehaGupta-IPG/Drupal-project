@@ -912,7 +912,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
    * {@inheritdoc}
    */
   public function doBuildForm($form_id, &$element, FormStateInterface &$form_state) {
-    RenderElementBase::unset($element);
+    $element = RenderElementBase::copy($element);
 
     // Initialize as unprocessed.
     $element['#processed'] = FALSE;

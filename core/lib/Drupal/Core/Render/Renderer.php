@@ -271,7 +271,7 @@ class Renderer implements RendererInterface {
    * See the docs for ::render().
    */
   protected function doRender(array &$elements, RenderContext $context): string|MarkupInterface {
-    RenderElementBase::unset($elements);
+    $elements = RenderElementBase::copy($elements);
 
     if (empty($elements)) {
       return '';
