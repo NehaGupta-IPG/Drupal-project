@@ -10,6 +10,7 @@ use Drupal\Core\Render\MetadataBubblingUrlGenerator;
 use Drupal\Core\Session\AccountProxy;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\Tests\UnitTestCase;
+use Drupal\update\UpdateFetcherInterface;
 use Drupal\update\Hook\UpdateHooks;
 use Drupal\update\UpdateManagerInterface;
 use PHPUnit\Framework\Attributes\CoversMethod;
@@ -76,11 +77,12 @@ class UpdateMailTest extends UnitTestCase {
    * Test the subject and body of update text.
    */
   #[DataProvider('providerTestUpdateEmail')]
-  public function testUpdateEmail(string $notification_threshold, array $params, array $expected_body): void {
+  public function testUpdateEmail(string $notification_threshold, array $params, string $expected_subject, array $expected_body): void {
     $langcode = 'en';
     $available_updates_url = 'https://example.com/admin/reports/updates';
     $update_settings_url = 'https://example.com/admin/reports/updates/settings';
     $site_name = 'Test site';
+    $expected_subject .= ' ' . $site_name;
 
     // Initialize update_mail input parameters.
     $key = NULL;
@@ -100,7 +102,7 @@ class UpdateMailTest extends UnitTestCase {
     // Create three config entities.
     $config_site_name = $this->createMock('Drupal\Core\Config\Config');
     $config_site_name
-      ->expects($this->once())
+      ->expects($this->any())
       ->method('get')
       ->with('name')
       ->willReturn($site_name);
@@ -112,7 +114,7 @@ class UpdateMailTest extends UnitTestCase {
       ->willReturn($notification_threshold);
 
     $this->configFactory
-      ->expects($this->exactly(2))
+      ->expects($this->any())
       ->method('get')
       ->willReturnMap([
         ['system.site', $config_site_name],
@@ -120,10 +122,11 @@ class UpdateMailTest extends UnitTestCase {
       ]);
 
     $this->urlGenerator
-      ->expects($this->exactly(2))
+      ->expects($this->any())
       ->method('generateFromRoute')
       ->willReturnMap([
         ['update.status', [], ['absolute' => TRUE, 'language' => $langcode], FALSE, $available_updates_url],
+        ['update.status', [], [], FALSE, $available_updates_url],
         ['update.settings', [], ['absolute' => TRUE], FALSE, $update_settings_url],
       ]);
 
@@ -139,7 +142,7 @@ class UpdateMailTest extends UnitTestCase {
     $updateMail->mail($key, $message, $params);
 
     // Confirm the subject.
-    $this->assertSame("New release(s) available for $site_name", $message['subject']);
+    $this->assertSame($expected_subject, $message['subject']);
 
     // Confirm each part of the body.
     for ($i = 0; $i < count($expected_body); $i++) {
@@ -154,6 +157,7 @@ class UpdateMailTest extends UnitTestCase {
    * @return array
    *   - The value of the update setting 'notification.threshold'.
    *   - An array of parameters for update_mail.
+   *   - The subject string without the trailing site name.
    *   - An array of expected message body strings.
    */
   public static function providerTestUpdateEmail(): array {
@@ -165,6 +169,7 @@ class UpdateMailTest extends UnitTestCase {
         [
           'core' => UpdateManagerInterface::NOT_CURRENT,
         ],
+        'New release(s) available for',
         [
           'There are updates available for your version of Drupal. To ensure the proper functioning of your site, you should update as soon as possible.',
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
@@ -178,6 +183,7 @@ class UpdateMailTest extends UnitTestCase {
         [
           'core' => UpdateManagerInterface::NOT_SECURE,
         ],
+        'Security release(s) available for',
         [
           'There is a security update available for your version of Drupal. To ensure the security of your server, you should update immediately!',
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
@@ -192,6 +198,7 @@ class UpdateMailTest extends UnitTestCase {
           'core' => UpdateManagerInterface::NOT_CURRENT,
           'contrib' => UpdateManagerInterface::CURRENT,
         ],
+        'New release(s) available for',
         [
           'There are updates available for your version of Drupal. To ensure the proper functioning of your site, you should update as soon as possible.',
           '',
@@ -207,6 +214,7 @@ class UpdateMailTest extends UnitTestCase {
           'core' => UpdateManagerInterface::CURRENT,
           'contrib' => UpdateManagerInterface::NOT_CURRENT,
         ],
+        'New release(s) available for',
         [
           '',
           'There are updates available for one or more of your modules or themes. To ensure the proper functioning of your site, you should update as soon as possible.',
@@ -222,6 +230,7 @@ class UpdateMailTest extends UnitTestCase {
           'core' => UpdateManagerInterface::NOT_CURRENT,
           'contrib' => UpdateManagerInterface::NOT_CURRENT,
         ],
+        'New release(s) available for',
         [
           'There are updates available for your version of Drupal. To ensure the proper functioning of your site, you should update as soon as possible.',
           'There are updates available for one or more of your modules or themes. To ensure the proper functioning of your site, you should update as soon as possible.',
@@ -237,6 +246,7 @@ class UpdateMailTest extends UnitTestCase {
           'core' => UpdateManagerInterface::NOT_SECURE,
           'contrib' => UpdateManagerInterface::CURRENT,
         ],
+        'Security release(s) available for',
         [
           'There is a security update available for your version of Drupal. To ensure the security of your server, you should update immediately!',
           '',
@@ -252,6 +262,7 @@ class UpdateMailTest extends UnitTestCase {
           'core' => UpdateManagerInterface::NOT_SECURE,
           'contrib' => UpdateManagerInterface::NOT_CURRENT,
         ],
+        'Security release(s) available for',
         [
           'There is a security update available for your version of Drupal. To ensure the security of your server, you should update immediately!',
           'There are updates available for one or more of your modules or themes. To ensure the proper functioning of your site, you should update as soon as possible.',
@@ -267,6 +278,7 @@ class UpdateMailTest extends UnitTestCase {
           'core' => UpdateManagerInterface::CURRENT,
           'contrib' => UpdateManagerInterface::NOT_SECURE,
         ],
+        'Security release(s) available for',
         [
           '',
           'There are security updates available for one or more of your modules or themes. To ensure the security of your server, you should update immediately!',
@@ -282,6 +294,7 @@ class UpdateMailTest extends UnitTestCase {
           'core' => UpdateManagerInterface::NOT_CURRENT,
           'contrib' => UpdateManagerInterface::NOT_SECURE,
         ],
+        'Security release(s) available for',
         [
           'There are updates available for your version of Drupal. To ensure the proper functioning of your site, you should update as soon as possible.',
           'There are security updates available for one or more of your modules or themes. To ensure the security of your server, you should update immediately!',
@@ -297,6 +310,7 @@ class UpdateMailTest extends UnitTestCase {
           'core' => UpdateManagerInterface::NOT_SECURE,
           'contrib' => UpdateManagerInterface::NOT_SECURE,
         ],
+        'Security release(s) available for',
         [
           'There is a security update available for your version of Drupal. To ensure the security of your server, you should update immediately!',
           'There are security updates available for one or more of your modules or themes. To ensure the security of your server, you should update immediately!',
@@ -311,6 +325,7 @@ class UpdateMailTest extends UnitTestCase {
         [
           'core' => UpdateManagerInterface::NOT_SECURE,
         ],
+        'Security release(s) available for',
         [
           'There is a security update available for your version of Drupal. To ensure the security of your server, you should update immediately!',
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
@@ -325,6 +340,7 @@ class UpdateMailTest extends UnitTestCase {
           'core' => UpdateManagerInterface::NOT_SECURE,
           'contrib' => UpdateManagerInterface::CURRENT,
         ],
+        'Security release(s) available for',
         [
           'There is a security update available for your version of Drupal. To ensure the security of your server, you should update immediately!',
           '',
@@ -340,6 +356,7 @@ class UpdateMailTest extends UnitTestCase {
           'core' => UpdateManagerInterface::NOT_SECURE,
           'contrib' => UpdateManagerInterface::NOT_CURRENT,
         ],
+        'Security release(s) available for',
         [
           'There is a security update available for your version of Drupal. To ensure the security of your server, you should update immediately!',
           'There are updates available for one or more of your modules or themes. To ensure the proper functioning of your site, you should update as soon as possible.',
@@ -355,6 +372,7 @@ class UpdateMailTest extends UnitTestCase {
           'core' => UpdateManagerInterface::CURRENT,
           'contrib' => UpdateManagerInterface::NOT_SECURE,
         ],
+        'Security release(s) available for',
         [
           '',
           'There are security updates available for one or more of your modules or themes. To ensure the security of your server, you should update immediately!',
@@ -370,6 +388,7 @@ class UpdateMailTest extends UnitTestCase {
           'core' => UpdateManagerInterface::NOT_CURRENT,
           'contrib' => UpdateManagerInterface::NOT_SECURE,
         ],
+        'Security release(s) available for',
         [
           'There are updates available for your version of Drupal. To ensure the proper functioning of your site, you should update as soon as possible.',
           'There are security updates available for one or more of your modules or themes. To ensure the security of your server, you should update immediately!',
@@ -385,11 +404,76 @@ class UpdateMailTest extends UnitTestCase {
           'core' => UpdateManagerInterface::NOT_SECURE,
           'contrib' => UpdateManagerInterface::NOT_SECURE,
         ],
+        'Security release(s) available for',
         [
           'There is a security update available for your version of Drupal. To ensure the security of your server, you should update immediately!',
           'There are security updates available for one or more of your modules or themes. To ensure the security of your server, you should update immediately!',
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, https://example.com/admin/reports/updates/settings.',
+        ],
+      ],
+      // Failure to fetch available update data for Drupal Core.
+      'core only fetcher failed' => [
+        'all',
+        [
+          'core' => UpdateFetcherInterface::UNKNOWN,
+        ],
+        'Failed to get release information for',
+        [
+          'There was a problem checking <a href="https://example.com/admin/reports/updates">available updates</a> for Drupal.',
+          "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
+          'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates/settings.',
+        ],
+      ],
+      // Failed to fetch release history for core, but contrib is missing
+      // available updates. Subject should say there are new releases available,
+      // but the body should mention the error fetching info for core.
+      'core fetch fail' => [
+        'all',
+        [
+          'core' => UpdateFetcherInterface::UNKNOWN,
+          'contrib' => UpdateManagerInterface::NOT_CURRENT,
+        ],
+        'New release(s) available for',
+        [
+          'There was a problem checking <a href="https://example.com/admin/reports/updates">available updates</a> for Drupal.',
+          'There are updates available for one or more of your modules or themes. To ensure the proper functioning of your site, you should update as soon as possible.',
+          "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
+          'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates/settings.',
+        ],
+      ],
+      // Core is missing available updates, error fetching history for
+      // contrib. Subject should mention the new release for core, body should
+      // mention the problem fetching contrib info.
+      'contrib, fetch fail' => [
+        'all',
+        [
+          'core' => UpdateManagerInterface::NOT_CURRENT,
+          'contrib' => UpdateFetcherInterface::NOT_FETCHED,
+        ],
+        'New release(s) available for',
+        [
+          "There are updates available for your version of Drupal. To ensure the proper functioning of your site, you should update as soon as possible.",
+          'There was a problem checking <a href="https://example.com/admin/reports/updates">available updates</a> for your modules or themes.',
+          "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
+          'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates/settings.',
+        ],
+      ],
+      // Errors fetching release history for both core and contrib. Subject
+      // should mention the error case, and the body should mention both
+      // failures.
+      'all fetch fail' => [
+        'all',
+        [
+          'core' => UpdateFetcherInterface::NOT_FETCHED,
+          'contrib' => UpdateFetcherInterface::NOT_FETCHED,
+        ],
+        'Failed to get release information for',
+        [
+          'There was a problem checking <a href="https://example.com/admin/reports/updates">available updates</a> for Drupal.',
+          'There was a problem checking <a href="https://example.com/admin/reports/updates">available updates</a> for your modules or themes.',
+          "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
+          'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates/settings.',
         ],
       ],
     ];
