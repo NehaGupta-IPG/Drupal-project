@@ -4,7 +4,7 @@ namespace Drupal\Core\Database;
 
 use Drupal\Component\Assertion\Inspector;
 use Drupal\Core\Database\Event\DatabaseEvent;
-use Drupal\Core\Database\Exception\EventException;
+use Drupal\Core\Database\EventSubscriber\StatementExecutionSubscriber;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\Delete;
 use Drupal\Core\Database\Query\Insert;
@@ -15,6 +15,8 @@ use Drupal\Core\Database\Query\Update;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Base Database API class.
@@ -27,6 +29,13 @@ use Drupal\Core\Pager\PagerManagerInterface;
  * @see http://php.net/manual/book.pdo.php
  */
 abstract class Connection {
+
+  /**
+   * Subscribers to be registered for early event dispatcher.
+   */
+  const array SUBSCRIBERS = [
+    StatementExecutionSubscriber::class,
+  ];
 
   /**
    * The database target this connection is for.
@@ -167,6 +176,29 @@ abstract class Connection {
   protected TransactionManagerInterface $transactionManager;
 
   /**
+   * A callable returning the event dispatcher.
+   *
+   * This is a closure because injecting the event dispatcher too early
+   * breaks it.
+   *
+   * @var callable
+   * @internal
+   */
+  public $eventDispatcherCallable;
+
+  /**
+   * Fixed event dispatcher.
+   *
+   * Normally the service definition in core.services.yml overrides this but
+   * sometimes for eg in the installer the connection is opened directly
+   * and then a minimal event dispatcher with a fixed list of subscribers is
+   * used.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected EventDispatcherInterface $fixedEventDispatcher;
+
+  /**
    * Constructs a Connection object.
    *
    * @param object $connection
@@ -193,6 +225,7 @@ abstract class Connection {
 
     $this->connection = $connection;
     $this->connectionOptions = $connection_options;
+    $this->eventDispatcherCallable = fn () => $this->getFixedEventDispatcher();
   }
 
   /**
@@ -1539,10 +1572,22 @@ abstract class Connection {
    *   If the container is not initialized.
    */
   public function dispatchEvent(DatabaseEvent $event, ?string $eventName = NULL): DatabaseEvent {
-    if (\Drupal::hasService('event_dispatcher')) {
-      return \Drupal::service('event_dispatcher')->dispatch($event, $eventName);
+    return ($this->eventDispatcherCallable)()->dispatch($event, $eventName);
+  }
+
+  /**
+   * Get the fixed event dispatcher.
+   *
+   * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   *   The event dispatcher with the subscribers from ::SUBSCRIBERS registered
+   *   on it.
+   */
+  protected function getFixedEventDispatcher(): EventDispatcherInterface {
+    if (!isset($this->fixedEventDispatcher)) {
+      $this->fixedEventDispatcher = new EventDispatcher();
+      array_map(fn ($subscriber) => $this->fixedEventDispatcher->addSubscriber(new $subscriber()), self::SUBSCRIBERS);
     }
-    throw new EventException('The event dispatcher service is not available. Database API events can only be fired if the container is initialized');
+    return $this->fixedEventDispatcher;
   }
 
   /**
