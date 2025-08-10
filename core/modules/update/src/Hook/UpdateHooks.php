@@ -4,6 +4,7 @@ namespace Drupal\update\Hook;
 
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\update\UpdateManagerInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -171,56 +172,22 @@ class UpdateHooks {
     $langcode = $message['langcode'];
     $language = \Drupal::languageManager()->getLanguage($langcode);
 
-    // Set the message subject.
-    $subject = '';
-    $all_reasons = array_unique(array_values($params));
-    // If any of the update reasons in $params are security-related, then use
-    // the security subject.
-    $security = array_filter($all_reasons, function ($item) {
-      return in_array($item, [UpdateManagerInterface::NOT_SECURE, UpdateManagerInterface::REVOKED]);
-    });
-    if ($security) {
-      $subject = $this->t('Security release(s) available for @site_name', [
-        '@site_name' => \Drupal::config('system.site')->get('name'),
-        'langcode' => $langcode,
-      ]);
-    }
-
-    // If security updates are not included, check next for fetch failures. If
-    // all the reasons are fetch failures, then use that as the subject.
-    if (empty($subject)) {
-      $fetch = array_filter($all_reasons, function ($item) {
-        return $item > 0;
-      });
-      if (empty($fetch) && !empty($all_reasons)) {
-        $subject = $this->t('Failed to get release information for @site_name', [
-          '@site_name' => \Drupal::config('system.site')->get('name'),
-          'langcode' => $langcode,
-        ]);
-      }
-    }
-
-    // If the subject still has not been set, then there are only non-security
-    // updates. Use the subject for non-security updates.
-    if (empty($subject)) {
-      $subject = $this->t('New release(s) available for @site_name', [
-        '@site_name' => \Drupal::config('system.site')->get('name'),
-        'langcode' => $langcode,
-      ]);
-    }
     // Append the update message to the existing subject.
-    $message['subject'] .= $subject;
+    $message['subject'] .= $this->getSubject($params, $langcode);
 
+    // Append paragraphs to the body for each notification reason.
     foreach ($params as $msg_type => $msg_reason) {
       $message['body'][] = _update_message_text($msg_type, $msg_reason, $langcode, TRUE);
     }
+
+    // Add the message "footer" that appears regardless of reasons.
     $message['body'][] = $this->t('See the available updates page for more information:',
-      [],
-      ['langcode' => $langcode]
-    ) . "\n" . Url::fromRoute('update.status', [], [
-      'absolute' => TRUE,
-      'language' => $language,
-    ])->toString();
+        [],
+        ['langcode' => $langcode]) . "\n" . Url::fromRoute('update.status', [], [
+        'absolute' => TRUE,
+        'language' => $language,
+      ])->toString();
+
     $settings_url = Url::fromRoute('update.settings', [], ['absolute' => TRUE])->toString();
     if (\Drupal::config('update.settings')->get('notification.threshold') == 'all') {
       $message['body'][] = $this->t('Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, @url.', ['@url' => $settings_url]);
@@ -228,6 +195,109 @@ class UpdateHooks {
     else {
       $message['body'][] = $this->t('Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, @url.', ['@url' => $settings_url]);
     }
+  }
+
+  /**
+   * Determines the subject line for 'status_notify' email notifications.
+   *
+   * @param array $params
+   *   The parameters passed to hook_mail for the 'status_notify' message.
+   * @param string $params
+   *   The parameters passed to hook_mail for the 'status_notify' message.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   *   The subject header to use for notification emails given a set of reasons.
+   */
+  protected function getSubject(array $params, string $langcode): TranslatableMarkup {
+    $all_reasons = array_unique(array_values($params));
+    // If any of the update reasons in $params are security-related, then use
+    // the security subject.
+    $security = array_filter($all_reasons, function ($item) {
+      return in_array($item, [UpdateManagerInterface::NOT_SECURE, UpdateManagerInterface::REVOKED]);
+    });
+    if ($security) {
+      return $this->t('Security release(s) available for @site_name', [
+        '@site_name' => \Drupal::config('system.site')->get('name'),
+        'langcode' => $langcode,
+      ]);
+    }
+
+    // If security updates are not included, check next for fetch failures. If
+    // all the reasons are fetch failures, then use that as the subject.
+    $fetch = array_filter($all_reasons, function ($item) {
+      return $item > 0;
+    });
+    if (empty($fetch) && !empty($all_reasons)) {
+      return $this->t('Failed to get release information for @site_name', [
+        '@site_name' => \Drupal::config('system.site')->get('name'),
+        'langcode' => $langcode,
+      ]);
+    }
+
+    // Otherwise, there are only non-security updates, use the default subject.
+    return $this->t('New release(s) available for @site_name', [
+      '@site_name' => \Drupal::config('system.site')->get('name'),
+      'langcode' => $langcode,
+    ]);
+  }
+
+  /**
+   * Implements hook_verify_update_archive().
+   *
+   * First, we ensure that the archive isn't a copy of Drupal core, which the
+   * update manager does not yet support. See
+   * https://www.drupal.org/node/606592.
+   *
+   * Then, we make sure that at least one module included in the archive file
+   * has an .info.yml file which claims that the code is compatible with the
+   * current version of Drupal core.
+   *
+   * @see \Drupal\Core\Extension\ExtensionDiscovery
+   */
+  #[Hook('verify_update_archive')]
+  public function verifyUpdateArchive($project, $archive_file, $directory): array {
+    $errors = [];
+    // Make sure this isn't a tarball of Drupal core.
+    if (file_exists("{$directory}/{$project}/index.php") && file_exists("{$directory}/{$project}/core/install.php") && file_exists("{$directory}/{$project}/core/includes/bootstrap.inc") && file_exists("{$directory}/{$project}/core/modules/node/node.module") && file_exists("{$directory}/{$project}/core/modules/system/system.module")) {
+      return [
+        'no-core' => $this->t('Automatic updating of Drupal core is not supported. See the <a href=":update-guide">Updating Drupal guide</a> for information on how to update Drupal core manually.', [
+          ':update-guide' => 'https://www.drupal.org/docs/updating-drupal',
+        ]),
+      ];
+    }
+    // Parse all the .info.yml files and make sure at least one is compatible
+    // with this version of Drupal core. If one is compatible, then the project
+    // as a whole is considered compatible (since, for example, the project may
+    // ship with some out-of-date modules that are not necessary for its overall
+    // functionality).
+    $compatible_project = FALSE;
+    $incompatible = [];
+    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+    $file_system = \Drupal::service('file_system');
+    $files = $file_system->scanDirectory("{$directory}/{$project}", '/.*\.info.yml$/', ['key' => 'name', 'min_depth' => 0]);
+    foreach ($files as $file) {
+      // Get the .info.yml file for the module or theme this file belongs to.
+      $info = \Drupal::service('info_parser')->parse($file->uri);
+      // If the module or theme is incompatible with Drupal core, set an error.
+      if ($info['core_incompatible']) {
+        $incompatible[] = !empty($info['name']) ? $info['name'] : $this->t('Unknown');
+      }
+      else {
+        $compatible_project = TRUE;
+        break;
+      }
+    }
+    if (empty($files)) {
+      $errors[] = $this->t('%archive_file does not contain any .info.yml files.', ['%archive_file' => basename($archive_file)]);
+    }
+    elseif (!$compatible_project) {
+      $errors[] = \Drupal::translation()->formatPlural(count($incompatible), '%archive_file contains a version of %names that is not compatible with Drupal @version.', '%archive_file contains versions of modules or themes that are not compatible with Drupal @version: %names', [
+        '@version' => \Drupal::VERSION,
+        '%archive_file' => basename($archive_file),
+        '%names' => implode(', ', $incompatible),
+      ]);
+    }
+    return $errors;
   }
 
 }
