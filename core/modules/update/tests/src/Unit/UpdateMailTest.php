@@ -476,6 +476,38 @@ class UpdateMailTest extends UnitTestCase {
           'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates/settings.',
         ],
       ],
+      // Configured to only show security notifications. Core is missing a
+      // security release, errors fetching contrib history.
+      'security: core not secure, contrib not fetched' => [
+        'security',
+        [
+          'core' => UpdateManagerInterface::NOT_SECURE,
+          'contrib' => UpdateFetcherInterface::NOT_FETCHED,
+        ],
+        'Security release(s) available for',
+        [
+          'There is a security update available for your version of Drupal. To ensure the security of your server, you should update immediately!',
+          'There was a problem checking <a href="https://example.com/admin/reports/updates">available updates</a> for your modules or themes.',
+          "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
+          'Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, https://example.com/admin/reports/updates/settings.',
+        ],
+      ],
+      // Configured to only show security notifications. Errors fetching core
+      // history, contrib is missing a security release.
+      'security: core not fetched, contrib not secure' => [
+        'security',
+        [
+          'core' => UpdateFetcherInterface::NOT_FETCHED,
+          'contrib' => UpdateManagerInterface::NOT_SECURE,
+        ],
+        'Security release(s) available for',
+        [
+          'There was a problem checking <a href="https://example.com/admin/reports/updates">available updates</a> for Drupal.',
+          'There are security updates available for one or more of your modules or themes. To ensure the security of your server, you should update immediately!',
+          "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
+          'Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, https://example.com/admin/reports/updates/settings.',
+        ],
+      ],
     ];
   }
 
