@@ -413,7 +413,7 @@ class UpdateMailTest extends UnitTestCase {
         ],
       ],
       // Failure to fetch available update data for Drupal Core.
-      'core only fetcher failed' => [
+      'all: only core, fetcher failed' => [
         'all',
         [
           'core' => UpdateFetcherInterface::UNKNOWN,
@@ -428,7 +428,7 @@ class UpdateMailTest extends UnitTestCase {
       // Failed to fetch release history for core, but contrib is missing
       // available updates. Subject should say there are new releases available,
       // but the body should mention the error fetching info for core.
-      'core fetch fail' => [
+      'all: core fetch fail, contrib not current' => [
         'all',
         [
           'core' => UpdateFetcherInterface::UNKNOWN,
@@ -445,7 +445,7 @@ class UpdateMailTest extends UnitTestCase {
       // Core is missing available updates, error fetching history for
       // contrib. Subject should mention the new release for core, body should
       // mention the problem fetching contrib info.
-      'contrib, fetch fail' => [
+      'all: core not current, contrib not fetched' => [
         'all',
         [
           'core' => UpdateManagerInterface::NOT_CURRENT,
@@ -462,7 +462,7 @@ class UpdateMailTest extends UnitTestCase {
       // Errors fetching release history for both core and contrib. Subject
       // should mention the error case, and the body should mention both
       // failures.
-      'all fetch fail' => [
+      'all: core and contrib not fetched' => [
         'all',
         [
           'core' => UpdateFetcherInterface::NOT_FETCHED,
