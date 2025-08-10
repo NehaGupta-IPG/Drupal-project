@@ -202,8 +202,8 @@ class UpdateHooks {
    *
    * @param array $params
    *   The parameters passed to hook_mail for the 'status_notify' message.
-   * @param string $params
-   *   The parameters passed to hook_mail for the 'status_notify' message.
+   * @param string $langcode
+   *   The language code.
    *
    * @return \Drupal\Core\StringTranslation\TranslatableMarkup
    *   The subject header to use for notification emails given a set of reasons.
