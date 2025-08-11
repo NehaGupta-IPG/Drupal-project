@@ -111,31 +111,25 @@ class YamlTest extends YamlTestBase {
    * @covers ::decodeTags
    */
   public function testDecodeTagsWithTagClasses(): void {
-    // Construct an object so the Test class so the autoloader is primed.
-    new Test('blah');
+    $test_class = new class {
+
+      public function __construct(public readonly string $string = '', public readonly array $options = []) {
+      }
+
+    };
 
     $yaml = <<<YAML
     test: !test test
     message: !test {string: 'Your message has been sent.', options: {context: 'Contact form'}}
     YAML;
 
-    $data = Yaml::decodeTags(Yaml::decode($yaml), ['test' => Test::class]);
-    $this->assertInstanceOf(Test::class, $data['test']);
-    $this->assertInstanceOf(Test::class, $data['message']);
+    $data = Yaml::decodeTags(Yaml::decode($yaml), ['test' => get_class($test_class)]);
+    $this->assertInstanceOf(get_class($test_class), $data['test']);
+    $this->assertInstanceOf(get_class($test_class), $data['message']);
     $this->assertSame('test', $data['test']->string);
     $this->assertSame([], $data['test']->options);
     $this->assertSame('Your message has been sent.', $data['message']->string);
     $this->assertSame('Contact form', $data['message']->options['context']);
-  }
-
-}
-
-/**
- * Class for testing custom Yaml tags.
- */
-class Test {
-
-  public function __construct(public readonly string $string, public readonly array $options = []) {
   }
 
 }
