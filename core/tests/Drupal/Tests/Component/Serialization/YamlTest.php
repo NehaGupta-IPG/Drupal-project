@@ -6,7 +6,6 @@ namespace Drupal\Tests\Component\Serialization;
 
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Serialization\Yaml;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -97,8 +96,8 @@ class YamlTest extends YamlTestBase {
    */
   public function testDecodeTagsNoTagClasses(): void {
     $yaml = <<<YAML
-    test: !translate test
-    message: !translate {string: 'Your message has been sent.', options: {context: 'Contact form'}}
+    test: !test test
+    message: !test {string: 'Your message has been sent.', options: {context: 'Contact form'}}
     YAML;
 
     $data = Yaml::decodeTags(Yaml::decode($yaml));
@@ -112,18 +111,31 @@ class YamlTest extends YamlTestBase {
    * @covers ::decodeTags
    */
   public function testDecodeTagsWithTagClasses(): void {
+    // Construct an object so the Test class so the autoloader is primed.
+    new Test('blah');
+
     $yaml = <<<YAML
-    test: !translate test
-    message: !translate {string: 'Your message has been sent.', options: {context: 'Contact form'}}
+    test: !test test
+    message: !test {string: 'Your message has been sent.', options: {context: 'Contact form'}}
     YAML;
 
-    $data = Yaml::decodeTags(Yaml::decode($yaml), ['translate' => TranslatableMarkup::class]);
-    $this->assertInstanceOf(TranslatableMarkup::class, $data['test']);
-    $this->assertInstanceOf(TranslatableMarkup::class, $data['message']);
-    $this->assertSame('test', $data['test']->getUntranslatedString());
-    $this->assertSame('', $data['test']->getOption('context'));
-    $this->assertSame('Your message has been sent.', $data['message']->getUntranslatedString());
-    $this->assertSame('Contact form', $data['message']->getOption('context'));
+    $data = Yaml::decodeTags(Yaml::decode($yaml), ['test' => Test::class]);
+    $this->assertInstanceOf(Test::class, $data['test']);
+    $this->assertInstanceOf(Test::class, $data['message']);
+    $this->assertSame('test', $data['test']->string);
+    $this->assertSame([], $data['test']->options);
+    $this->assertSame('Your message has been sent.', $data['message']->string);
+    $this->assertSame('Contact form', $data['message']->options['context']);
+  }
+
+}
+
+/**
+ * Class for testing custom Yaml tags.
+ */
+class Test {
+
+  public function __construct(public readonly string $string, public readonly array $options = []) {
   }
 
 }
