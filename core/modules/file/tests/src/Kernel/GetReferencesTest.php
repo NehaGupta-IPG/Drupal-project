@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Kernel;
 
 use Drupal\field\Entity\FieldConfig;
@@ -17,7 +19,7 @@ class GetReferencesTest extends FileManagedUnitTestBase {
   /**
    * Tests get references.
    */
-  public function testGetReferences() {
+  public function testGetReferences(): void {
     $this->enableModules(['node']);
     $this->installEntitySchema('node');
     $this->installSchema('node', ['node_access']);

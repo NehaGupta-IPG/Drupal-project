@@ -683,15 +683,16 @@ function file_get_file_references(FileInterface $file, ?FieldDefinitionInterface
   $list_tags_cache = $memory_cache->get('list_cache_tags');
   if ($list_tags_cache === FALSE) {
     $list_tags = [];
-    // @todo: Gracefully get a list of entity types with file fields.
-    // We can not get via \Drupal::service('entity_field.manager')->getFieldMapByFieldType('file')
-    // as there are additional types (e.g image and potentially other contrib)
-    // that can be in use that will trigger file usage counts.
+    // @todo Gracefully get a list of entity types with file fields.
+    // We can not get via \Drupal::service('entity_field.manager')
+    // ->getFieldMapByFieldType('file') as there are additional types (e.g image
+    // and potentially other contrib) that can be in use that will trigger file
+    // usage counts.
     // Idea - this could be a more long lived cache that can filter through
-    // all field definitions to check the schema for a foreign key reference to the
-    // file_managed table similar to how file_field_find_file_reference_column
-    // currently works. We could them use the bundles on the field storage to
-    // get bundle specific list tags.
+    // all field definitions to check the schema for a foreign key reference to
+    // the file_managed table similar to how
+    // file_field_find_file_reference_column currently works. We could them use
+    // the bundles on the field storage to get bundle specific list tags.
     foreach (\Drupal::entityTypeManager()->getDefinitions() as $entity_type) {
       if ($entity_type instanceof ContentEntityTypeInterface) {
         $list_tags = Cache::mergeTags($list_tags, $entity_type->getListCacheTags());
