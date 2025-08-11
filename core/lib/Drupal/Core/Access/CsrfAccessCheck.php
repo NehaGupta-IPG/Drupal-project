@@ -34,10 +34,8 @@ class CsrfAccessCheck implements RoutingAccessInterface {
 
   /**
    * The session configuration.
-   *
-   * @var \Drupal\Core\Session\SessionConfigurationInterface
    */
-  protected $sessionConfiguration;
+  protected SessionConfigurationInterface $sessionConfiguration;
 
   /**
    * Constructs a CsrfAccessCheck object.
