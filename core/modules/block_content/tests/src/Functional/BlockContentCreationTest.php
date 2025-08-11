@@ -106,7 +106,7 @@ class BlockContentCreationTest extends BlockContentTestBase {
     $this->drupalGet('block/add/basic');
     $this->submitForm($edit, 'Save and configure');
 
-    // Save our block permanently
+    // Save our block permanently.
     $this->submitForm(['region' => 'content'], 'Save block');
 
     // Set test_view_mode as a custom display to be available on the list.
@@ -155,11 +155,7 @@ class BlockContentCreationTest extends BlockContentTestBase {
     // Create a block and place in block layout.
     $this->drupalGet('/admin/content/block');
     $this->clickLink('Add content block');
-    // Verify destination URL, when clicking "Save and configure" this
-    // destination will be ignored.
-    $base = base_path();
-    $url = 'block/add?destination=' . $base . 'admin/content/block';
-    $this->assertSession()->addressEquals($url);
+    $this->assertSession()->addressEquals('/block/add/basic');
     $edit = [];
     $edit['info[0][value]'] = 'Test Block';
     $edit['body[0][value]'] = $this->randomMachineName(16);

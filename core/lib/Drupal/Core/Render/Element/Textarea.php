@@ -9,11 +9,16 @@ use Drupal\Core\Render\Attribute\FormElement;
  * Provides a form element for input of multiple-line text.
  *
  * Properties:
- * - #rows: Number of rows in the text box.
- * - #cols: Number of columns in the text box.
- * - #resizable: Controls whether the text area is resizable.  Allowed values
+ *
+ * @property $rows
+ *   Number of rows in the text box.
+ * @property $cols
+ *   Number of columns in the text box.
+ * @property $resizable
+ *   Controls whether the text area is resizable.  Allowed values
  *   are "none", "vertical", "horizontal", or "both" (defaults to "vertical").
- * - #maxlength: The maximum amount of characters to accept as input.
+ * @property $maxlength
+ *   The maximum amount of characters to accept as input.
  *
  * Usage example:
  * @code
@@ -44,10 +49,19 @@ class Textarea extends FormElementBase {
       ],
       '#pre_render' => [
         [static::class, 'preRenderGroup'],
+        [static::class, 'preRenderAttachments'],
       ],
       '#theme' => 'textarea',
       '#theme_wrappers' => ['form_element'],
     ];
+  }
+
+  /**
+   * Adds the textarea resize library.
+   */
+  public static function preRenderAttachments($element): array {
+    $element['#attached']['library'][] = 'core/drupal.textarea-resize';
+    return $element;
   }
 
   /**

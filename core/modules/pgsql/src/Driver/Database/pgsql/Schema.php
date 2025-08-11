@@ -243,6 +243,7 @@ EOD;
    *   - t: constraint trigger;
    *   - x: exclusion constraint.
    *   Defaults to 'c' for a CHECK constraint.
+   *   phpcs:ignore Drupal.Commenting.FunctionComment.ParamCommentFullStop
    *   @see https://www.postgresql.org/docs/current/catalog-pg-constraint.html
    *
    * @return array
@@ -579,7 +580,7 @@ EOD;
       // exceed the 63 chars limit of PostgreSQL, we need to take care of that.
       // cSpell:disable-next-line
       // Example (drupal_Gk7Su_T1jcBHVuvSPeP22_I3Ni4GrVEgTYlIYnBJkro_idx).
-      if (str_contains($index->indexname, 'drupal_')) {
+      if (str_starts_with($index->indexname, 'drupal_')) {
         preg_match('/^drupal_(.*)_' . preg_quote($index_type, NULL) . '/', $index->indexname, $matches);
         $index_name = $matches[1];
       }
@@ -1055,23 +1056,32 @@ EOD;
   }
 
   /**
-   * Retrieve a table or column comment.
+   * Retrieves a table or column comment.
+   *
+   * @param string $table
+   *   The table name.
+   * @param string|null $column
+   *   (optional) The column name.
+   *
+   * @return string|false
+   *   The table or column comment. FALSE if the table or column does not exist.
    */
   public function getComment($table, $column = NULL) {
     $info = $this->getPrefixInfo($table);
     // Don't use {} around pg_class, pg_attribute tables.
     if (isset($column)) {
-      return $this->connection->query('SELECT col_description(oid, attnum) FROM pg_class, pg_attribute WHERE attrelid = oid AND relname = ? AND attname = ?', [$info['table'], $column])->fetchField();
+      return $this->connection->query('SELECT col_description(oid, attnum) FROM pg_class, pg_attribute WHERE attrelid = oid AND relname = ? AND attname = ?', [$info['table'], $column])->fetchField() ?? FALSE;
     }
     else {
-      return $this->connection->query('SELECT obj_description(oid, ?) FROM pg_class WHERE relname = ?', ['pg_class', $info['table']])->fetchField();
+      return $this->connection->query('SELECT obj_description(oid, ?) FROM pg_class WHERE relname = ?', ['pg_class', $info['table']])->fetchField() ?? FALSE;
     }
   }
 
   /**
    * Calculates a base-64 encoded PostgreSQL-safe sha-256 hash.
    *
-   * The hash is modified to according to  @link https://www.postgresql.org/docs/current/sql-syntax-lexical.html PostgreSQL Lexical Structure@endlink.
+   * The hash is modified to according to PostgreSQL Lexical Structure. See
+   * https://www.postgresql.org/docs/current/sql-syntax-lexical.html.
    *
    * @param string $data
    *   String to be hashed.

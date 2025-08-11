@@ -393,6 +393,12 @@ abstract class EntityBase implements EntityInterface {
     if ($entity_type->hasKey('uuid')) {
       $duplicate->{$entity_type->getKey('uuid')} = $this->uuidGenerator()->generate();
     }
+
+    // Modules might need to add or change the data initially held by the new
+    // entity object, for instance to fill-in default values.
+    \Drupal::moduleHandler()->invokeAll($this->getEntityTypeId() . '_duplicate', [$duplicate, $this]);
+    \Drupal::moduleHandler()->invokeAll('entity_duplicate', [$duplicate, $this]);
+
     return $duplicate;
   }
 
@@ -411,7 +417,7 @@ abstract class EntityBase implements EntityInterface {
     if ($this->getEntityType()->getBundleOf()) {
       // Throw an exception if the bundle ID is longer than 32 characters.
       if (mb_strlen($this->id()) > EntityTypeInterface::BUNDLE_MAX_LENGTH) {
-        throw new ConfigEntityIdLengthException("Attempt to create a bundle with an ID longer than " . EntityTypeInterface::BUNDLE_MAX_LENGTH . " characters: $this->id().");
+        throw new ConfigEntityIdLengthException("Attempt to create a bundle with an ID longer than " . EntityTypeInterface::BUNDLE_MAX_LENGTH . " characters: " . $this->id() . ".");
       }
     }
   }
@@ -477,7 +483,10 @@ abstract class EntityBase implements EntityInterface {
   protected function getListCacheTagsToInvalidate() {
     $tags = $this->getEntityType()->getListCacheTags();
     if ($this->getEntityType()->hasKey('bundle')) {
-      $tags[] = $this->getEntityTypeId() . '_list:' . $this->bundle();
+      $tags = Cache::mergeTags(
+        $tags,
+        $this->getEntityType()->getBundleListCacheTags($this->bundle())
+      );
     }
     return $tags;
   }

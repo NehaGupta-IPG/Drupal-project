@@ -5,18 +5,23 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\Number;
+use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Tests number manipulation utilities.
  *
- * @group Utility
- *
- * @coversDefaultClass \Drupal\Component\Utility\Number
- *
  * @see \Drupal\Component\Utility\Number
  */
+#[CoversClass(Number::class)]
+#[Group('Utility')]
 class NumberTest extends TestCase {
+
+  use ExpectDeprecationTrait;
 
   /**
    * Tests Number::validStep() without offset.
@@ -28,9 +33,9 @@ class NumberTest extends TestCase {
    * @param bool $expected
    *   Expected return value from Number::validStep().
    *
-   * @dataProvider providerTestValidStep
-   * @covers ::validStep
+   * @legacy-covers ::validStep
    */
+  #[DataProvider('providerTestValidStep')]
   public function testValidStep($value, $step, $expected): void {
     $return = Number::validStep($value, $step);
     $this->assertEquals($expected, $return);
@@ -48,9 +53,9 @@ class NumberTest extends TestCase {
    * @param bool $expected
    *   Expected return value from Number::validStep().
    *
-   * @dataProvider providerTestValidStepOffset
-   * @covers ::validStep
+   * @legacy-covers ::validStep
    */
+  #[DataProvider('providerTestValidStepOffset')]
   public function testValidStepOffset($value, $step, $offset, $expected): void {
     $return = Number::validStep($value, $step, $offset);
     $this->assertEquals($expected, $return);
@@ -126,10 +131,10 @@ class NumberTest extends TestCase {
    * @param string $expected
    *   The expected alphadecimal value.
    *
-   * @dataProvider providerTestConversions
-   * @covers ::intToAlphadecimal
-   * @covers ::alphadecimalToInt
+   * @legacy-covers ::intToAlphadecimal
+   * @legacy-covers ::alphadecimalToInt
    */
+  #[DataProvider('providerTestConversions')]
   public function testConversions($value, $expected): void {
     $this->assertSame(Number::intToAlphadecimal($value), $expected);
     $this->assertSame($value, Number::alphadecimalToInt($expected));
@@ -155,6 +160,37 @@ class NumberTest extends TestCase {
       [36, '110'],
       [100, '12s'],
     ];
+  }
+
+  /**
+   * Tests the alphadecimal conversion function input parameter checking.
+   *
+   * Number::alphadecimalToInt() must throw an exception
+   * when non-alphanumeric characters are passed as input.
+   *
+   * @legacy-covers ::alphadecimalToInt
+   */
+  public function testAlphadecimalToIntThrowsExceptionWithMalformedStrings(): void {
+    $this->expectException(\InvalidArgumentException::class);
+    $nonAlphanumericChar = '#';
+    Number::alphadecimalToInt($nonAlphanumericChar);
+  }
+
+  /**
+   * Tests the alphadecimal conversion function keeps backward compatibility.
+   *
+   * Many tests and code rely on Number::alphadecimalToInt() returning 0
+   * for degenerate values '' and NULL. We must ensure they are accepted.
+   *
+   * @legacy-covers ::alphadecimalToInt
+   */
+  #[IgnoreDeprecations]
+  public function testAlphadecimalToIntReturnsZeroWithNullAndEmptyString(): void {
+    $deprecationMessage = 'Passing NULL or an empty string to Drupal\Component\Utility\Number::alphadecimalToInt() is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3494472';
+    $this->expectDeprecation($deprecationMessage);
+    $this->assertSame(0, Number::alphadecimalToInt(NULL));
+    $this->expectDeprecation($deprecationMessage);
+    $this->assertSame(0, Number::alphadecimalToInt(''));
   }
 
 }

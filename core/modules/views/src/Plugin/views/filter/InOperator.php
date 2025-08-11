@@ -25,6 +25,8 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
 
   /**
    * The default form type.
+   *
+   * @var string
    */
   protected $valueFormType = 'checkboxes';
 
@@ -469,11 +471,13 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
     }
     if (is_array($this->value)) {
       if (!isset($this->valueOptions)) {
-        // Don't validate if there are none value options provided, for example for special handlers.
+        // Don't validate if there are none value options provided, for example
+        // for special handlers.
         return $errors;
       }
       if ($this->options['exposed'] && !$this->options['expose']['required'] && empty($this->value)) {
-        // Don't validate if the field is exposed and no default value is provided.
+        // Don't validate if the field is exposed and no default value is
+        // provided.
         return $errors;
       }
 

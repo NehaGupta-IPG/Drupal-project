@@ -15,6 +15,8 @@ use Symfony\Component\Routing\Route;
  */
 class RouteProcessorCsrf implements OutboundRouteProcessorInterface, TrustedCallbackInterface {
 
+  use RoutePathGenerationTrait;
+
   /**
    * Constructs a RouteProcessorCsrf object.
    *
@@ -43,11 +45,7 @@ class RouteProcessorCsrf implements OutboundRouteProcessorInterface, TrustedCall
     // Per https://www.drupal.org/node/2319205 anonymous users do not need
     // CSRF checking.
     if ($route->hasRequirement('_csrf_token') && $this->sessionConfiguration->hasSession($this->requestStack->getCurrentRequest())) {
-      $path = ltrim($route->getPath(), '/');
-      // Replace the path parameters with values from the parameters array.
-      foreach ($parameters as $param => $value) {
-        $path = str_replace("{{$param}}", $value, $path);
-      }
+      $path = $this->generateRoutePath($route, $parameters);
       // Adding this to the parameters means it will get merged into the query
       // string when the route is compiled.
       if (!$bubbleable_metadata || $this->requestStack->getCurrentRequest()->getRequestFormat() !== 'html') {
@@ -57,10 +55,7 @@ class RouteProcessorCsrf implements OutboundRouteProcessorInterface, TrustedCall
         // Generate a placeholder and a render array to replace it.
         $placeholder = Crypt::hashBase64($path);
         $placeholder_render_array = [
-          '#lazy_builder' => [
-            'route_processor_csrf:renderPlaceholderCsrfToken',
-            (array) $path,
-          ],
+          '#lazy_builder' => ['route_processor_csrf:renderPlaceholderCsrfToken', [$path]],
         ];
         // Instead of setting an actual CSRF token as the query string, we set
         // the placeholder, which will be replaced at the very last moment. This
@@ -72,9 +67,9 @@ class RouteProcessorCsrf implements OutboundRouteProcessorInterface, TrustedCall
   }
 
   /**
-   * Gets a CSRF token for the given path.
+   * Render API callback: Adds a CSRF token for the given path to the markup.
    *
-   * #lazy_builder callback; gets a CSRF token for the given path.
+   * This function is assigned as a #lazy_builder callback.
    *
    * @param string $path
    *   The path to get a CSRF token for.

@@ -24,6 +24,7 @@ class EntityTypeTest extends UnitTestCase {
    *   An array of values to use for the EntityType.
    *
    * @return \Drupal\Core\Entity\EntityTypeInterface
+   *   The EntityType object.
    */
   protected function setUpEntityType($definition) {
     $definition += [
@@ -484,6 +485,17 @@ class EntityTypeTest extends UnitTestCase {
     $entity_type = $this->setUpEntityType(['class' => EntityFormMode::class]);
     $this->assertTrue($entity_type->entityClassImplements(ConfigEntityInterface::class));
     $this->assertFalse($entity_type->entityClassImplements(\DateTimeInterface::class));
+  }
+
+  /**
+   * Tests the ::getBundleListCacheTags() method.
+   *
+   * @covers ::getBundleListCacheTags
+   */
+  public function testGetBundleListCacheTags(): void {
+    $entity_type = $this->setUpEntityType(['entity_keys' => ['id' => 'id']]);
+    $bundle = $this->randomMachineName();
+    $this->assertEquals([$entity_type->id() . '_list:' . $bundle], $entity_type->getBundleListCacheTags($bundle));
   }
 
 }

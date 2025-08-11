@@ -23,16 +23,14 @@ use Drupal\KernelTests\KernelTestBase;
 class UrlTest extends KernelTestBase {
 
   /**
-   * The modules list.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['common_test', 'url_alter_test'];
 
   /**
    * Confirms that invalid URLs are filtered in link generating functions.
    */
-  public function testLinkXss(): void {
+  public function testLinkXSS(): void {
     // Test link generator.
     $text = $this->randomMachineName();
     $path = "<SCRIPT>alert('XSS')</SCRIPT>";
@@ -61,11 +59,7 @@ class UrlTest extends KernelTestBase {
         'Regular link',
         'internal:/user',
         [],
-        [
-          'contexts' => [],
-          'tags' => [],
-          'max-age' => Cache::PERMANENT,
-        ],
+        ['contexts' => [], 'tags' => [], 'max-age' => Cache::PERMANENT],
         [],
       ],
       [
@@ -105,11 +99,7 @@ class UrlTest extends KernelTestBase {
         'Path processor link',
         'internal:/user/1',
         [],
-        [
-          'contexts' => [],
-          'tags' => ['user:1'],
-          'max-age' => Cache::PERMANENT,
-        ],
+        ['contexts' => [], 'tags' => ['user:1'], 'max-age' => Cache::PERMANENT],
         [],
       ],
       [
@@ -207,7 +197,6 @@ class UrlTest extends KernelTestBase {
     $l = Link::fromTextAndUrl('foo', Url::fromUri('https://www.drupal.org'))->toString();
 
     // Test a renderable array passed to the link generator.
-    // @codingStandardsIgnoreLine
     $renderer->executeInRenderContext(new RenderContext(), function () use ($l) {
       $renderable_text = ['#markup' => 'foo'];
       $l_renderable_text = \Drupal::service('link_generator')->generate($renderable_text, Url::fromUri('https://www.drupal.org'));
@@ -238,7 +227,7 @@ class UrlTest extends KernelTestBase {
    *
    * @param string $attribute
    *   Attribute to be checked.
-   * @param \Drupal\Core\Render\RenderableInterface|string $link
+   * @param string $link
    *   URL to search.
    * @param string $class
    *   Element class to search for.
@@ -283,12 +272,7 @@ class UrlTest extends KernelTestBase {
     // Multiple exclusions.
     $result = $original;
     unset($result['a'], $result['b']['e'], $result['c']);
-    $this->assertEquals(
-      UrlHelper::filterQueryParameters(
-        $original,
-        ['a', 'b[e]', 'c']
-      ), $result, "'a', 'b[e]', 'c' were removed."
-    );
+    $this->assertEquals(UrlHelper::filterQueryParameters($original, ['a', 'b[e]', 'c']), $result, "'a', 'b[e]', 'c' were removed.");
   }
 
   /**

@@ -67,7 +67,7 @@ class QueryTest extends QueryPluginBase {
     parent::buildOptionsForm($form, $form_state);
 
     $form['test_setting'] = [
-      '#title' => $this->t('Test setting'),
+      '#title' => 'Test setting',
       '#type' => 'textfield',
       '#default_value' => $this->options['test_setting'],
     ];
@@ -145,7 +145,7 @@ class QueryTest extends QueryPluginBase {
       }
       if ($match) {
         // If the query explicit defines fields to use, filter all others out.
-        // Filter out fields
+        // Filter out fields.
         if ($this->fields) {
           $element = array_intersect_key($element, $this->fields);
         }

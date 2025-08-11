@@ -25,12 +25,12 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class CsrfAccessCheck implements RoutingAccessInterface {
 
+  use RoutePathGenerationTrait;
+
   /**
    * The CSRF token generator.
-   *
-   * @var \Drupal\Core\Access\CsrfTokenGenerator
    */
-  protected $csrfToken;
+  protected CsrfTokenGenerator $csrfToken;
 
   /**
    * The session configuration.
@@ -67,11 +67,7 @@ class CsrfAccessCheck implements RoutingAccessInterface {
    */
   public function access(Route $route, Request $request, RouteMatchInterface $route_match) {
     $parameters = $route_match->getRawParameters();
-    $path = ltrim($route->getPath(), '/');
-    // Replace the path parameters with values from the parameters array.
-    foreach ($parameters as $param => $value) {
-      $path = str_replace("{{$param}}", $value, $path);
-    }
+    $path = $this->generateRoutePath($route, $route_match->getRawParameters()->all());
 
     // Per https://www.drupal.org/node/2319205 anonymous users do not need
     // CSRF checking.

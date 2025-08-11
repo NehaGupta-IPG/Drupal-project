@@ -3,11 +3,14 @@
 namespace Drupal\Core\Render;
 
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
+use Drupal\Component\Plugin\Factory\FactoryInterface;
+use Drupal\Core\Render\Element\ElementInterface;
+use Drupal\Core\Render\Element\Form;
 
 /**
  * Collects available render array element types.
  */
-interface ElementInfoManagerInterface extends DiscoveryInterface {
+interface ElementInfoManagerInterface extends DiscoveryInterface, FactoryInterface {
 
   /**
    * Retrieves the default properties for the defined element type.
@@ -23,11 +26,9 @@ interface ElementInfoManagerInterface extends DiscoveryInterface {
    *   The machine name of an element type plugin.
    *
    * @return array
-   *   An associative array describing the element types being defined. The
-   *   array contains a sub-array for each element type, with the
-   *   machine-readable type name as the key. Each sub-array has a number of
-   *   possible attributes:
-   *   - #input: boolean indicating whether or not this element carries a value
+   *   An associative array describing the element type being defined. The
+   *   array has a number of possible attributes:
+   *   - #input: boolean indicating whether this element carries a value
    *     (even if it's hidden).
    *   - #process: array of callback functions taking $element, $form_state,
    *     and $complete_form.
@@ -62,5 +63,62 @@ interface ElementInfoManagerInterface extends DiscoveryInterface {
    *   default value, which can be NULL.
    */
   public function getInfoProperty($type, $property_name, $default = NULL);
+
+  /**
+   * Creates a render object from a render array.
+   *
+   * @param \Drupal\Core\Render\Element\ElementInterface|array $element
+   *   A render array or render objects. The latter is returned unchanged.
+   * @param class-string<T> $class
+   *   The class of the render object being created.
+   *
+   * @return T
+   *   A render object.
+   *
+   * @template T of ElementInterface
+   */
+  public function fromRenderable(ElementInterface|array &$element, string $class = Form::class): ElementInterface;
+
+  /**
+   * {@inheritdoc}
+   *
+   * @return \Drupal\Core\Render\Element\ElementInterface
+   *   A fully configured render object.
+   */
+  public function createInstance($plugin_id, array $configuration = []): ElementInterface;
+
+  /**
+   * Creates a render object based on the provided class and configuration.
+   *
+   * @param class-string<T> $class
+   *   The class of the render object being instantiated.
+   * @param array $configuration
+   *   An array of configuration relevant to the render object.
+   *
+   * @return T
+   *   A fully configured render object.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   *   If the render object cannot be created, such as if the class is invalid.
+   *
+   * @template T of ElementInterface
+   */
+  public function fromClass(string $class, array $configuration = []): ElementInterface;
+
+  /**
+   * Get the plugin ID from the class.
+   *
+   * Whenever possible, use the class type inference. Calling this method
+   * should not be necessary.
+   *
+   * @param string $class
+   *   The class of an element object.
+   *
+   * @return ?string
+   *   The plugin ID or null if not found.
+   *
+   * @internal
+   */
+  public function getIdFromClass(string $class): ?string;
 
 }

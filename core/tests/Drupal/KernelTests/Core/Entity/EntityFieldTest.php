@@ -79,6 +79,7 @@ class EntityFieldTest extends EntityKernelTestBase {
    * Creates a test entity.
    *
    * @return \Drupal\Core\Entity\EntityInterface
+   *   The created entity.
    */
   protected function createTestEntity($entity_type): EntityInterface {
     $this->entityName = $this->randomMachineName();
@@ -253,7 +254,7 @@ class EntityFieldTest extends EntityKernelTestBase {
     // Test emptying a field by assigning an empty value, NULL and an empty
     // array behave the same.
     foreach ([NULL, [], 'unset'] as $empty) {
-      // Make sure a value is present
+      // Make sure a value is present.
       $entity->name->value = 'a value';
       $this->assertTrue(isset($entity->name->value), "$entity_type: Name is set.");
       // Now, empty the field.

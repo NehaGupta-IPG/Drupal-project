@@ -6,6 +6,7 @@ namespace Drupal\Tests\migrate\Kernel;
 
 use Drupal\Core\Database\Query\ConditionInterface;
 use Drupal\Core\Database\Query\SelectInterface;
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\migrate\Exception\RequirementsException;
 use Drupal\Core\Database\Database;
@@ -175,7 +176,7 @@ class SqlBaseTest extends MigrateTestBase {
     }
 
     $statement = $this->createMock(StatementInterface::class);
-    $statement->expects($this->atLeastOnce())->method('setFetchMode')->with(\PDO::FETCH_ASSOC);
+    $statement->expects($this->atLeastOnce())->method('setFetchMode')->with(FetchAs::Associative);
     $query = $this->createMock(SelectInterface::class);
     $query->method('execute')->willReturn($statement);
     $query->expects($this->atLeastOnce())->method('orderBy')->with('order', 'ASC');
@@ -205,7 +206,7 @@ class SqlBaseTest extends MigrateTestBase {
    */
   public function testPrepareQuery(): void {
     $this->prepareSourceData();
-    $this->enableModules(['migrate_sql_prepare_query_test', 'entity_test']);
+    $this->enableModules(['migrate_sql_prepare_query_test', 'entity_test', 'user']);
 
     /** @var \Drupal\migrate\Plugin\MigrationInterface $migration */
     $migration = $this->container->get('plugin.manager.migration')
