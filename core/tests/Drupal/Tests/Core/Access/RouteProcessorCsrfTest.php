@@ -64,7 +64,6 @@ class RouteProcessorCsrfTest extends UnitTestCase {
       ->method('getCurrentRequest')
       ->willReturn($request);
 
-    $this->processor = new RouteProcessorCsrf($this->csrfToken, $this->requestStack);
     $this->sessionConfiguration = $this->createMock(SessionConfigurationInterface::class);
     $request_stack = $this->createMock(RequestStack::class);
     // The number this is called differs between tests and is completely

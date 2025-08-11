@@ -9,6 +9,7 @@ use Drupal\Core\Access\CsrfAccessCheck;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Access\RouteProcessorCsrf;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\SessionConfigurationInterface;
 use Drupal\Tests\UnitTestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\InputBag;
@@ -60,7 +61,7 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
     });
     $this->requestStack = $this->createMock(RequestStack::class);
     $this->processor = new RouteProcessorCsrf($this->csrfToken, $this->requestStack);
-    $this->accessCheck = new CsrfAccessCheck($this->csrfToken);
+    $this->accessCheck = new CsrfAccessCheck($this->csrfToken, $this->createMock(SessionConfigurationInterface::class));
   }
 
   /**

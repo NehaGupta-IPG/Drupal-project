@@ -66,7 +66,6 @@ class CsrfAccessCheck implements RoutingAccessInterface {
    *   The access result.
    */
   public function access(Route $route, Request $request, RouteMatchInterface $route_match) {
-    $parameters = $route_match->getRawParameters();
     $path = $this->generateRoutePath($route, $route_match->getRawParameters()->all());
 
     // Per https://www.drupal.org/node/2319205 anonymous users do not need

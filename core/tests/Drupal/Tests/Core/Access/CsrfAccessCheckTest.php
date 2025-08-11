@@ -101,7 +101,7 @@ class CsrfAccessCheckTest extends UnitTestCase {
       ->willReturn(FALSE);
     $this->routeMatch->expects($this->once())
       ->method('getRawParameters')
-      ->will($this->returnValue(['node' => 42]));
+      ->willReturn(['node' => 42]);
 
     $route = new Route('/test-path/{node}', [], ['_csrf_token' => 'TRUE']);
     $request = Request::create('/test-path/42?token=test_query');
