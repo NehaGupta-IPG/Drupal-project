@@ -29,6 +29,11 @@ use Symfony\Component\Process\Process;
 class PhpUnitTestRunner implements ContainerInjectionInterface {
 
   /**
+   * Path to PHPUnit's configuration file.
+   */
+  private string $configurationFilePath;
+
+  /**
    * Constructs a test runner.
    *
    * @param string $appRoot
@@ -51,6 +56,14 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
       (string) $container->getParameter('app.root'),
       (string) $container->get('file_system')->realpath('public://simpletest')
     );
+  }
+
+  /**
+   * Sets the configuration file path.
+   */
+  public function setConfigurationFilePath(string $configurationFilePath): self {
+    $this->configurationFilePath = $configurationFilePath;
+    return $this;
   }
 
   /**
@@ -150,6 +163,8 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     // Build the command line for the PHPUnit CLI invocation.
     $command = [
       $phpunit_bin,
+      '--configuration',
+      $this->configurationFilePath,
       '--testdox',
       '--log-junit',
       $log_junit_file_path,
@@ -235,7 +250,8 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
       $results[] = [
         'test_id' => $test_run->id(),
         'test_class' => $test_class_name,
-        'status' => $status < TestStatus::SYSTEM ? 'debug' : 'exception',
+        'status' => $status < TestStatus::SYSTEM ? 'cli_fail' : 'exception',
+        'exit_code' => $status,
         'message' => $message,
         'message_group' => 'Other',
         'function' => '*** Process execution output ***',
@@ -260,7 +276,9 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    */
   public function processPhpUnitResults(TestRun $test_run, array $phpunit_results): void {
     foreach ($phpunit_results as $result) {
-      $test_run->insertLogEntry($result);
+      if (!$test_run->insertLogEntry($result)) {
+        throw new \RuntimeException('Failed insertion of a test log entry');
+      }
     }
   }
 
@@ -285,9 +303,11 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
           '#fail' => 0,
           '#error' => 0,
           '#skipped' => 0,
+          '#cli_fail' => 0,
           '#exception' => 0,
           '#debug' => 0,
           '#time' => 0,
+          '#exit_code' => 0,
         ];
       }
 
@@ -308,6 +328,11 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
 
         case 'skipped':
           $summaries[$result['test_class']]['#skipped']++;
+          break;
+
+        case 'cli_fail':
+          $summaries[$result['test_class']]['#cli_fail']++;
+          $summaries[$result['test_class']]['#exit_code'] = max($summaries[$result['test_class']]['#exit_code'], $result['exit_code']);
           break;
 
         case 'exception':
