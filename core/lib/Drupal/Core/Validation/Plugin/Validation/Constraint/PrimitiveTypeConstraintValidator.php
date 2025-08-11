@@ -59,15 +59,8 @@ class PrimitiveTypeConstraintValidator extends ConstraintValidator {
     //   not).
     // Exclude protocol relative URLs (start with "//").
     if ($typed_data instanceof UriInterface) {
-      if (str_starts_with($value, '//')) {
-        if (parse_url($value) === FALSE) {
-          $valid = FALSE;
-        }
-      }
-      elseif (in_array(parse_url($value, PHP_URL_SCHEME), [
-        NULL,
-        FALSE,
-      ], TRUE)) {
+      $url_parts = parse_url($value);
+      if ($url_parts === FALSE || (!str_starts_with($value, '//') && empty($url_parts['scheme']))) {
         $valid = FALSE;
       }
     }
