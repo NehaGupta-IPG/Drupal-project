@@ -12,6 +12,7 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Form\FormHelper;
 use Drupal\Core\Render\Element\RenderCallbackInterface;
+use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
 use Drupal\Core\Theme\ThemeManagerInterface;
@@ -270,6 +271,8 @@ class Renderer implements RendererInterface {
    * See the docs for ::render().
    */
   protected function doRender(array &$elements, RenderContext $context): string|MarkupInterface {
+    $elements = RenderElementBase::copy($elements);
+
     if (empty($elements)) {
       return '';
     }

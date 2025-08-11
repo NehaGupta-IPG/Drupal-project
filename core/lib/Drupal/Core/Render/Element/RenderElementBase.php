@@ -627,6 +627,20 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public static function copy($element): mixed {
+    $copy = $element;
+    unset($copy['##object']);
+    foreach (Element::children($copy) as $child_key) {
+      $child_copy = static::copy($copy[$child_key]);
+      unset($copy[$child_key]);
+      $copy[$child_key] = $child_copy;
+    }
+    return $copy;
+  }
+
+  /**
    * Magic method: checks if a property value is set.
    *
    * @param string $name
