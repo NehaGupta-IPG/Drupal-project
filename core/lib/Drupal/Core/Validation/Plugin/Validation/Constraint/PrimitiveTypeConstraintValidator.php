@@ -64,7 +64,7 @@ class PrimitiveTypeConstraintValidator extends ConstraintValidator {
           $valid = FALSE;
         }
       }
-      else if (in_array(parse_url($value, PHP_URL_SCHEME), [
+      elseif (in_array(parse_url($value, PHP_URL_SCHEME), [
         NULL,
         FALSE,
       ], TRUE)) {
