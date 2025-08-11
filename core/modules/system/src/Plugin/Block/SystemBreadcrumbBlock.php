@@ -77,7 +77,7 @@ class SystemBreadcrumbBlock extends BlockBase implements ContainerFactoryPluginI
    * {@inheritdoc}
    */
   public function createPlaceholder(): bool {
-    return TRUE;
+    return FALSE;
   }
 
 }
