@@ -39,3 +39,9 @@ services:
     class: Drupal\file\Upload\InputStreamFileWriter
     arguments: ['@file_system']
   Drupal\file\Upload\InputStreamFileWriterInterface: '@file.input_stream_file_writer'
+  cache.file_memory:
+    class: Drupal\Core\Cache\MemoryCache\MemoryCacheInterface
+    tags:
+      - { name: cache.bin.memory, default_backend: cache.backend.memory.memory }
+    factory: ['@cache_factory', 'get']
+    arguments: [file_memory]
