@@ -24,7 +24,6 @@ class CHooks {
    * This implementation has no ordering modifications.
    */
   #[Hook('test_hook')]
-  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
   public function testHook(): string {
     return __METHOD__;
   }
@@ -35,7 +34,6 @@ class CHooks {
    * This implementation is modified to be first.
    */
   #[Hook('test_hook', order: Order::First)]
-  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
   public function testHookFirst(): string {
     return __METHOD__;
   }
@@ -74,7 +72,6 @@ class CHooks {
    * OrderAfter attribute.
    */
   #[Hook('test_both_parameters_hook')]
-  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
   public function testBothParametersHook(): string {
     return __METHOD__;
   }

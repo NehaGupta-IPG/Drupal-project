@@ -20,7 +20,6 @@ class DAlterHooks {
    * This implementation has no ordering modifications.
    */
   #[Hook('test_alter')]
-  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
   public function testAlter(array &$calls): void {
     $calls[] = __METHOD__;
   }
@@ -31,7 +30,6 @@ class DAlterHooks {
    * This implementation has no ordering modifications.
    */
   #[Hook('test_subtype_alter')]
-  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
   public function testSubtypeAlter(array &$calls): void {
     $calls[] = __METHOD__;
   }
