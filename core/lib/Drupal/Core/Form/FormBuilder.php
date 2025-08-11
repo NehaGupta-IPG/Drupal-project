@@ -566,7 +566,12 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // self::doBuildForm() finishes building the form by calling element
     // #process functions and mapping user input, if any, to #value properties,
     // and also storing the values in $form_state->getValues(). We need to
-    // retain the unprocessed $form in case it needs to be cached.
+    // retain the unprocessed $form in case it needs to be cached. We use
+    // Element::copyRenderArrayDeep() here to make the copy of the form array,
+    // because otherwise if nested child properties in $form are references to
+    // arrays and element objects, then changes to $form in doBuildForm() can
+    // make unwanted changes to $unprocessed_form. Making a deep copy unsets all
+    // references recursively and decouples $unprocessed_form from $form.
     $unprocessed_form = Element::copyRenderArrayDeep($form);
     $form = $this->doBuildForm($form_id, $form, $form_state);
 
