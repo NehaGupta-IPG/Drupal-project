@@ -158,9 +158,7 @@ interface FieldableEntityInterface extends EntityInterface {
    * @param mixed $value
    *   The value to set, or NULL to unset the field.
    * @param bool $notify
-   *   (optional) Whether to notify the entity of the change. Defaults to
-   *   TRUE. If the update stems from the entity, set it to FALSE to avoid
-   *   being notified again.
+   *   (deprecated) Whether to notify the entity of the change. Unused.
    *
    * @return $this
    *
