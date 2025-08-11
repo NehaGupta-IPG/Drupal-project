@@ -567,7 +567,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // #process functions and mapping user input, if any, to #value properties,
     // and also storing the values in $form_state->getValues(). We need to
     // retain the unprocessed $form in case it needs to be cached.
-    $unprocessed_form = $form;
+    $unprocessed_form = $this->elementInfo->copy($form);
     $form = $this->doBuildForm($form_id, $form, $form_state);
 
     // Only process the input if we have a correct form submission.
