@@ -46,14 +46,14 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
   /**
    * Checks that a table or column comment matches a given description.
    *
-   * @param string $description
-   *   The asserted description.
+   * @param string|false $description
+   *   The asserted description. Use FALSE to assert there is no description.
    * @param string $table
    *   The table to test.
    * @param string|null $column
    *   Optional column to test.
    */
-  abstract public function checkSchemaComment(string $description, string $table, ?string $column = NULL): void;
+  abstract public function checkSchemaComment(string|false $description, string $table, ?string $column = NULL): void;
 
   /**
    * Tests inserting data into an existing table.
@@ -1155,6 +1155,49 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
   }
 
   /**
+   * Tests table schema methods when a view exists.
+   */
+  public function testSchemaMethodsWithView(): void {
+    // We will be testing with three tables.
+    $test_schema = Database::getConnection()->schema();
+
+    // Create the tables.
+    $table_specification = [
+      'description' => 'Test table.',
+      'fields' => [
+        'id'  => [
+          'type' => 'int',
+          'default' => NULL,
+          'description' => 'Test field.',
+        ],
+      ],
+    ];
+    $test_schema->createTable('test_table', $table_specification);
+
+    // Create a view to ensure it is not found.
+    Database::getConnection()->query('create view {test_view} as select * from {test_table}');
+
+    // Test \Drupal\Core\Database\Schema::tableExists().
+    $this->assertTrue($this->schema->tableExists('test_table'), 'Table exists');
+    $this->assertFalse($this->schema->tableExists('test_view'), 'View is not checked by tableExists() method');
+
+    // Test \Drupal\Core\Database\Schema::findTables().
+    $tables = array_values($test_schema->findTables('t%'));
+    $this->assertEquals(['test_table'], $tables, 'All tables were found.');
+
+    // Test \Drupal\Core\Database\Schema::getComment().
+    $this->checkSchemaComment('Test table.', 'test_table');
+    $this->checkSchemaComment('Test field.', 'test_table', 'id');
+    $this->checkSchemaComment(FALSE, 'test_view');
+    $this->checkSchemaComment(FALSE, 'test_view', 'id');
+    $this->checkSchemaComment(FALSE, 'does_not_exist');
+    $this->checkSchemaComment(FALSE, 'does_not_exist', 'id');
+
+    // Clean up the view.
+    Database::getConnection()->query('drop view {test_view}');
+  }
+
+  /**
    * Tests default values after altering table.
    */
   public function testDefaultAfterAlter(): void {
@@ -1292,7 +1335,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertFalse($this->schema->fieldExists($table_name_new, $field_name));
     $this->assertTrue($this->schema->fieldExists($table_name_new, $field_name_new));
 
-    // Adding an unique key
+    // Adding an unique key.
     $unique_key_name = $unique_key_introspect_name = 'unique';
     $this->schema->addUniqueKey($table_name_new, $unique_key_name, [$field_name_new]);
 
@@ -1300,7 +1343,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $introspect_index_schema = new \ReflectionMethod(get_class($this->schema), 'introspectIndexSchema');
     $this->assertEquals([$field_name_new], $introspect_index_schema->invoke($this->schema, $table_name_new)['unique keys'][$unique_key_introspect_name]);
 
-    // Dropping an unique key
+    // Dropping an unique key.
     $this->schema->dropUniqueKey($table_name_new, $unique_key_name);
 
     // Dropping a field.

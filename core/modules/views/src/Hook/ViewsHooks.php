@@ -96,7 +96,7 @@ class ViewsHooks {
     \Drupal::moduleHandler()->loadInclude('views', 'inc', 'views.theme');
     // Some quasi clever array merging here.
     $base = ['file' => 'views.theme.inc'];
-    // Our extra version of pager
+    // Our extra version of pager.
     $hooks['views_mini_pager'] = $base + [
       'variables' => [
         'tags' => [],
@@ -151,7 +151,7 @@ class ViewsHooks {
         'parameters' => [],
       ],
     ];
-    // Default view themes
+    // Default view themes.
     $hooks['views_view_field'] = $base + ['variables' => ['view' => NULL, 'field' => NULL, 'row' => NULL]];
     $hooks['views_view_grouping'] = $base + [
       'variables' => [
@@ -375,7 +375,7 @@ class ViewsHooks {
   #[Hook('view_presave')]
   public function viewPresave(ViewEntityInterface $view): void {
     /** @var \Drupal\views\ViewsConfigUpdater $config_updater */
-    $config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+    $config_updater = \Drupal::service(ViewsConfigUpdater::class);
     $config_updater->updateAll($view);
   }
 

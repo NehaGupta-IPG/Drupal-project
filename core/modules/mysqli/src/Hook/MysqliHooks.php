@@ -2,15 +2,18 @@
 
 namespace Drupal\mysqli\Hook;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\mysql\RequirementsTrait;
 
 /**
  * Hook implementations for mysqli.
  */
 class MysqliHooks {
 
+  use RequirementsTrait;
   use StringTranslationTrait;
 
   /**
@@ -27,6 +30,24 @@ class MysqliHooks {
 
     }
     return NULL;
+  }
+
+  /**
+   * Implements hook_runtime_requirements().
+   */
+  #[Hook('runtime_requirements')]
+  public function runtimeRequirements(): array {
+    if (!Database::isActiveConnection()) {
+      return [];
+    }
+
+    $connection = Database::getConnection();
+    // Only show requirements when MySQLi is the default database connection.
+    if (!($connection->driver() === 'mysqli' && $connection->getProvider() === 'mysqli')) {
+      return [];
+    }
+
+    return $this->getRuntimeRequirements($connection);
   }
 
 }

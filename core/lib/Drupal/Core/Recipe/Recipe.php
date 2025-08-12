@@ -209,7 +209,7 @@ final class Recipe {
                 ]),
               ],
               // The `prompt` and `form` elements, though optional, have their
-              // own sets of constraints,
+              // own sets of constraints.
               'prompt' => new Optional([
                 new Collection([
                   'method' => [
@@ -250,6 +250,9 @@ final class Recipe {
                       ]),
                     ]),
                   ]),
+                  // An optional fallback value if trying to get a default value
+                  // from a non-existent config object.
+                  'fallback' => new Optional(),
                   'env' => new Optional([
                     new Type('string'),
                     new NotBlank(),
