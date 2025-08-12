@@ -1,0 +1,84 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - comment
+    - views
+id: test_comment_last_updated_click_sort
+label: 'Test comment last updated click sort'
+module: views
+description: 'Lists nodes in a table with the last updated/commented field as default click-sort column.'
+tag: ''
+base_table: node_field_data
+base_field: nid
+display:
+  default:
+    display_plugin: default
+    id: default
+    display_title: Default
+    position: 0
+    display_options:
+      access:
+        type: perm
+        options:
+          perm: 'access content'
+      cache:
+        type: tag
+        options: {  }
+      query:
+        type: views_query
+      pager:
+        type: none
+      style:
+        type: table
+        options:
+          default: comment_entity_statistics_last_updated  # Make it default sort col.
+          columns:
+            nid: nid
+            comment_entity_statistics_last_updated: comment_entity_statistics_last_updated
+          info:
+            nid:
+              sortable: false
+              default_sort_order: asc
+            comment_entity_statistics_last_updated:
+              sortable: true
+              default_sort_order: desc
+      row:
+        type: fields
+      fields:
+        nid:
+          id: nid
+          table: node_field_data
+          field: nid
+          plugin_id: field
+        comment_entity_statistics_last_updated:
+          id: comment_entity_statistics_last_updated
+          table: comment_entity_statistics
+          field: last_updated
+          plugin_id: comment_ces_last_updated
+          label: 'Last updated/commented'
+          click_sort_column: value
+      filters:
+        status:
+          value: '1'
+          table: node_field_data
+          field: status
+          plugin_id: boolean
+          entity_type: node
+          entity_field: status
+          id: status
+          expose:
+            operator: ''
+            operator_limit_selection: false
+            operator_list: {  }
+          group: 1
+  page_1:
+    display_plugin: page
+    id: page_1
+    display_title: Page
+    position: 1
+    display_options:
+      path: test-comment-last-updated-click-sort
+      menu: {  }
+      display_extenders: {  }
