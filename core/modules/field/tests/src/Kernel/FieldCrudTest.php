@@ -65,7 +65,7 @@ class FieldCrudTest extends FieldKernelTestBase {
   // - a full fledged $field structure, check that all the values are there
   // - a minimal $field structure, check all default values are set
   // defer actual $field comparison to a helper function, used for the two cases above,
-  // and for testUpdateField
+  // and for testUpdateField.
 
   /**
    * Tests the creation of a field.
@@ -289,17 +289,31 @@ class FieldCrudTest extends FieldKernelTestBase {
     FieldConfig::create($another_field_definition)->save();
 
     // Test that the first field is not deleted, and then delete it.
-    $field = current(\Drupal::entityTypeManager()->getStorage('field_config')->loadByProperties(['entity_type' => 'entity_test', 'field_name' => $this->fieldDefinition['field_name'], 'bundle' => $this->fieldDefinition['bundle'], 'include_deleted' => TRUE]));
+    $field = current(\Drupal::entityTypeManager()
+      ->getStorage('field_config')
+      ->loadByProperties([
+        'entity_type' => 'entity_test',
+        'field_name' => $this->fieldDefinition['field_name'],
+        'bundle' => $this->fieldDefinition['bundle'],
+        'include_deleted' => TRUE,
+      ]));
     $this->assertFalse($field->isDeleted());
     $field->delete();
 
     // Make sure the field was deleted without being marked for purging as there
     // was no data.
-    $fields = \Drupal::entityTypeManager()->getStorage('field_config')->loadByProperties(['entity_type' => 'entity_test', 'field_name' => $this->fieldDefinition['field_name'], 'bundle' => $this->fieldDefinition['bundle'], 'include_deleted' => TRUE]);
+    $fields = \Drupal::entityTypeManager()
+      ->getStorage('field_config')
+      ->loadByProperties([
+        'entity_type' => 'entity_test',
+        'field_name' => $this->fieldDefinition['field_name'],
+        'bundle' => $this->fieldDefinition['bundle'],
+        'include_deleted' => TRUE,
+      ]);
     $this->assertCount(0, $fields, 'A deleted field is marked for deletion.');
 
     // Try to load the field normally and make sure it does not show up.
-    $field = FieldConfig::load('entity_test.' . '.' . $this->fieldDefinition['bundle'] . '.' . $this->fieldDefinition['field_name']);
+    $field = FieldConfig::load('entity_test.' . $this->fieldDefinition['bundle'] . '.' . $this->fieldDefinition['field_name']);
     $this->assertTrue(empty($field), 'Field was deleted');
 
     // Make sure the other field is not deleted.

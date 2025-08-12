@@ -102,6 +102,8 @@ class ModuleHandlerTest extends UnitTestCase {
    * Tests loading all modules.
    *
    * @covers ::loadAll
+   *
+   * @group legacy
    */
   public function testLoadAllModules(): void {
     $moduleList = [
@@ -273,8 +275,10 @@ class ModuleHandlerTest extends UnitTestCase {
 
   /**
    * @covers ::loadAllIncludes
+   * @group legacy
    */
   public function testLoadAllIncludes(): void {
+    $this->expectDeprecation('ModuleHandler::loadAllIncludes() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3536432');
     $this->assertTrue(TRUE);
     $module_handler = $this->getMockBuilder(ModuleHandler::class)
       ->setConstructorArgs([
@@ -330,7 +334,6 @@ class ModuleHandlerTest extends UnitTestCase {
    * Tests implementations methods when module is enabled.
    *
    * @covers ::hasImplementations
-   * @covers ::loadAllIncludes
    */
   public function testImplementsHookModuleEnabled(): void {
     $implementations = [
@@ -352,6 +355,8 @@ class ModuleHandlerTest extends UnitTestCase {
    * Tests invoke all.
    *
    * @covers ::invokeAll
+   *
+   * @group legacy
    */
   public function testInvokeAll(): void {
     $implementations = [
@@ -382,7 +387,7 @@ class ModuleHandlerTest extends UnitTestCase {
 
     };
     $implementations['some_hook'][get_class($c)]['some_method'] = 'some_module';
-    $module_handler = new ModuleHandler($this->root, [], $this->eventDispatcher, $implementations, []);
+    $module_handler = new ModuleHandler($this->root, [], $this->eventDispatcher, $implementations);
     $module_handler->setModuleList(['some_module' => TRUE]);
     $r = new \ReflectionObject($module_handler);
 

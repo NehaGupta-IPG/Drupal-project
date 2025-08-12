@@ -73,7 +73,11 @@ class EntityDisplayTest extends KernelTestBase {
     $this->assertEquals($expected['component_2'], $display->getComponent('component_2'));
 
     // Check that arbitrary options are correctly stored.
-    $expected['component_3'] = ['weight' => 10, 'third_party_settings' => ['field_test' => ['foo' => 'bar']], 'settings' => []];
+    $expected['component_3'] = [
+      'weight' => 10,
+      'third_party_settings' => ['field_test' => ['foo' => 'bar']],
+      'settings' => [],
+    ];
     $display->setComponent('component_3', $expected['component_3']);
     $this->assertEquals($expected['component_3'], $display->getComponent('component_3'));
 
@@ -281,7 +285,13 @@ class EntityDisplayTest extends KernelTestBase {
     // Check that the display has dependencies on the field and the module that
     // provides the formatter.
     $dependencies = $display->calculateDependencies()->getDependencies();
-    $this->assertEquals(['config' => ['field.field.entity_test.entity_test.test_field'], 'module' => ['entity_test', 'field_test']], $dependencies);
+    $this->assertEquals(
+      [
+        'config' => ['field.field.entity_test.entity_test.test_field'],
+        'module' => ['entity_test', 'field_test'],
+      ],
+      $dependencies
+    );
   }
 
   /**
@@ -357,7 +367,6 @@ class EntityDisplayTest extends KernelTestBase {
       'name' => 'Article',
     ]);
     $type->save();
-    node_add_body_field($type);
     /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
     $display_repository = \Drupal::service('entity_display.repository');
     $display_repository->getViewDisplay('node', 'article')->save();

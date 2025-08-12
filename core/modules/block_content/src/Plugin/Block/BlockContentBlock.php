@@ -132,8 +132,6 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
    */
   public function defaultConfiguration() {
     return [
-      'status' => TRUE,
-      'info' => '',
       'view_mode' => 'full',
     ];
   }
@@ -194,6 +192,13 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
         '#access' => $this->account->hasPermission('administer blocks'),
       ];
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createPlaceholder(): bool {
+    return TRUE;
   }
 
   /**

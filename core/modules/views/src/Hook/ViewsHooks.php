@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Hook;
 
+use Drupal\block\BlockInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\views\ViewsConfigUpdater;
 use Drupal\views\ViewEntityInterface;
@@ -95,7 +96,7 @@ class ViewsHooks {
     \Drupal::moduleHandler()->loadInclude('views', 'inc', 'views.theme');
     // Some quasi clever array merging here.
     $base = ['file' => 'views.theme.inc'];
-    // Our extra version of pager
+    // Our extra version of pager.
     $hooks['views_mini_pager'] = $base + [
       'variables' => [
         'tags' => [],
@@ -150,7 +151,7 @@ class ViewsHooks {
         'parameters' => [],
       ],
     ];
-    // Default view themes
+    // Default view themes.
     $hooks['views_view_field'] = $base + ['variables' => ['view' => NULL, 'field' => NULL, 'row' => NULL]];
     $hooks['views_view_grouping'] = $base + [
       'variables' => [
@@ -374,8 +375,23 @@ class ViewsHooks {
   #[Hook('view_presave')]
   public function viewPresave(ViewEntityInterface $view): void {
     /** @var \Drupal\views\ViewsConfigUpdater $config_updater */
-    $config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+    $config_updater = \Drupal::service(ViewsConfigUpdater::class);
     $config_updater->updateAll($view);
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_presave() for blocks.
+   */
+  #[Hook('block_presave')]
+  public function blockPresave(BlockInterface $block): void {
+    if (str_starts_with($block->getPluginId(), 'views_block:')) {
+      $settings = $block->get('settings');
+      if (isset($settings['items_per_page']) && $settings['items_per_page'] === 'none') {
+        @trigger_error('Saving a views block with "none" items per page is deprecated in drupal:11.2.0 and removed in drupal:12.0.0. To use the items per page defined by the view, use NULL. See https://www.drupal.org/node/3522240', E_USER_DEPRECATED);
+        $settings['items_per_page'] = NULL;
+        $block->set('settings', $settings);
+      }
+    }
   }
 
 }
