@@ -5,7 +5,7 @@ namespace Drupal\Core\Render;
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Component\Plugin\Factory\FactoryInterface;
 use Drupal\Core\Render\Element\ElementInterface;
-use Drupal\Core\Render\Element\Form;
+use Drupal\Core\Render\Element\Generic;
 
 /**
  * Collects available render array element types.
@@ -77,7 +77,7 @@ interface ElementInfoManagerInterface extends DiscoveryInterface, FactoryInterfa
    *
    * @template T of ElementInterface
    */
-  public function fromRenderable(ElementInterface|array &$element, string $class = Form::class): ElementInterface;
+  public function fromRenderable(ElementInterface|array &$element, string $class = Generic::class): ElementInterface;
 
   /**
    * {@inheritdoc}

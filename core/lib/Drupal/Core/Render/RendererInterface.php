@@ -19,8 +19,9 @@ interface RendererInterface {
    *
    * (Cannot be executed within another render context.)
    *
-   * @param array $elements
-   *   The structured array describing the data to be rendered.
+   * @param array|\Drupal\Core\Render\Element\ElementInterface $elements
+   *   The structured array describing the data to be rendered or a render
+   *   element object wrapping such an array.
    *
    * @return \Drupal\Component\Render\MarkupInterface
    *   The rendered HTML.
@@ -30,7 +31,7 @@ interface RendererInterface {
    *
    * @see \Drupal\Core\Render\RendererInterface::render()
    */
-  public function renderRoot(&$elements);
+  public function renderRoot(/* array|ElementInterface */&$elements);
 
   /**
    * Renders final HTML in situations where no assets are needed.
@@ -50,8 +51,9 @@ interface RendererInterface {
    *
    * (Can be executed within another render context: it runs in isolation.)
    *
-   * @param array $elements
-   *   The structured array describing the data to be rendered.
+   * @param array|\Drupal\Core\Render\Element\ElementInterface $elements
+   *   The structured array describing the data to be rendered or a render
+   *   element object wrapping such an array.
    *
    * @return \Drupal\Component\Render\MarkupInterface
    *   The rendered HTML.
@@ -59,7 +61,7 @@ interface RendererInterface {
    * @see \Drupal\Core\Render\RendererInterface::renderRoot()
    * @see \Drupal\Core\Render\RendererInterface::render()
    */
-  public function renderInIsolation(&$elements);
+  public function renderInIsolation(/* array|ElementInterface */&$elements);
 
   /**
    * @deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use
@@ -77,18 +79,19 @@ interface RendererInterface {
    * @param string $placeholder
    *   An attached placeholder to render. (This must be a key of one of the
    *   values of $elements['#attached']['placeholders'].)
-   * @param array $elements
-   *   The structured array describing the data to be rendered.
+   * @param \Drupal\Core\Render\Element\ElementInterface|array $elements
+   *   The structured array describing the data to be rendered or a render
+   *   element object wrapping such an array.
    *
    * @return array
    *   The updated $elements.
    *
    * @see \Drupal\Core\Render\RendererInterface::render()
    */
-  public function renderPlaceholder($placeholder, array $elements);
+  public function renderPlaceholder($placeholder, /* ElementInterface|*/array $elements);
 
   /**
-   * Renders HTML given a structured array tree.
+   * Renders HTML given a structured array tree or its wrapping render object.
    *
    * Renderable arrays have two kinds of key/value pairs: properties and
    * children. Properties have keys starting with '#' and their values influence
@@ -240,6 +243,7 @@ interface RendererInterface {
    *   #theme_wrappers hook by setting the hook name as the key and an array
    *   of overrides as the value in #theme_wrappers array.
    *   For example, if we have a render element as follows:
+   *
    *   @code
    *   [
    *     '#theme' => 'image',
@@ -317,8 +321,9 @@ interface RendererInterface {
    * - The final value of #children for this element is returned as the
    *   rendered output.
    *
-   * @param array $elements
-   *   The structured array describing the data to be rendered.
+   * @param array|\Drupal\Core\Render\Element\ElementInterface $elements
+   *   The structured array describing the data to be rendered or a render
+   *   element object wrapping such an array.
    * @param bool $is_root_call
    *   (Internal use only.) Whether this is a recursive call or not. See
    *   ::renderRoot().
@@ -340,7 +345,7 @@ interface RendererInterface {
    * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface::processAttachments()
    * @see \Drupal\Core\Render\RendererInterface::renderRoot()
    */
-  public function render(/* array */&$elements, $is_root_call = FALSE);
+  public function render(/* array|ElementInterface */&$elements, $is_root_call = FALSE);
 
   /**
    * Checks whether a render context is active.
