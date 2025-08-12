@@ -229,4 +229,22 @@ class Element {
     return TRUE;
   }
 
+  /**
+   * Make a copy of a render array that breaks any child element references.
+   *
+   * @return array
+   *   The render array without any ##object properties and all child elements
+   *   are not references to other arrays.
+   */
+  public static function copyRenderArrayDeep(array $build): array {
+    unset($build['##object']);
+    foreach (Element::children($build) as $key) {
+      $copy = static::copyRenderArrayDeep($build[$key]);
+      // Break reference by unsetting property.
+      unset($build[$key]);
+      $build[$key] = $copy;
+    }
+    return $build;
+  }
+
 }
