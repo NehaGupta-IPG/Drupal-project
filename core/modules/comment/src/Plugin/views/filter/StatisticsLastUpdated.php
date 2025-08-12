@@ -2,6 +2,8 @@
 
 namespace Drupal\comment\Plugin\views\filter;
 
+use Drupal\Core\Entity\EntityChangedInterface;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\views\Attribute\ViewsFilter;
 use Drupal\views\Plugin\views\filter\Date;
@@ -21,7 +23,7 @@ class StatisticsLastUpdated extends Date {
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected ?string $node_table;
 
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityTypeManagerInterface $entityTypeManager, protected EntityFieldManagerInterface $entityFieldManager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
@@ -33,7 +35,8 @@ class StatisticsLastUpdated extends Date {
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('entity_field.manager')
     );
   }
 
@@ -44,8 +47,20 @@ class StatisticsLastUpdated extends Date {
     $this->ensureMyTable();
 
     $entity_type = $this->entityTypeManager->getDefinition($this->getEntityType());
-    $entity_data_table = $this->query->ensureTable($entity_type->getDataTable(), $this->relationship);
-    $field = 'GREATEST(' . $entity_data_table . '.changed, ' . $this->tableAlias . '.last_comment_timestamp)';
+    $base_fields = $this->entityFieldManager->getBaseFieldDefinitions($this->getEntityType());
+
+    if ($entity_type->entityClassImplements(EntityChangedInterface::class) && isset($base_fields['changed'])) {
+      // Entity implements EntityChangedInterface and has a 'changed' field.
+      // Use GREATEST function to filter by the newer of entity changed time and last comment time.
+      $entity_data_table = $this->query->ensureTable($entity_type->getDataTable(), $this->relationship);
+      $field = 'GREATEST(' . $entity_data_table . '.changed, ' . $this->tableAlias . '.last_comment_timestamp)';
+    }
+    else {
+      // Entity doesn't implement EntityChangedInterface or doesn't have a 'changed' field.
+      // Just filter by the last comment timestamp.
+      $field = $this->tableAlias . '.last_comment_timestamp';
+    }
+
     $info = $this->operators();
     if (!empty($info[$this->operator]['method'])) {
       $this->{$info[$this->operator]['method']}($field);

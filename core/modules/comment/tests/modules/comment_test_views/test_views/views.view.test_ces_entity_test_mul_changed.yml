@@ -77,7 +77,7 @@ display:
       fields:
         last_updated:
           id: last_updated
-          table: comment_entity_statistics_and_entity_changed
+          table: comment_entity_statistics
           field: last_updated
           relationship: none
           group_type: group
@@ -130,7 +130,7 @@ display:
       filters:
         last_updated:
           id: last_updated
-          table: comment_entity_statistics_and_entity_changed
+          table: comment_entity_statistics
           field: last_updated
           relationship: none
           group_type: group
@@ -178,7 +178,7 @@ display:
       sorts:
         last_updated:
           id: last_updated
-          table: comment_entity_statistics_and_entity_changed
+          table: comment_entity_statistics
           field: last_updated
           relationship: none
           group_type: group

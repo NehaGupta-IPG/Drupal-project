@@ -237,8 +237,6 @@ class CommentViewsData extends EntityViewsData {
     // Define the base group of this table. Fields that don't have a group
     // defined will go into this field by default.
     $data['comment_entity_statistics']['table']['group'] = $this->t('Comment Statistics');
-    $data['comment_entity_statistics_and_entity_changed']['table']['group'] = $this->t('Comment Statistics');
-    $data['comment_entity_statistics_and_entity_changed']['table']['real table'] = 'comment_entity_statistics';
 
     // Provide a relationship for each entity type except comment.
     foreach ($entities_types as $type => $entity_type) {
@@ -264,14 +262,6 @@ class CommentViewsData extends EntityViewsData {
             ],
           ],
         ];
-
-        if ($entity_type->entityClassImplements(EntityChangedInterface::class)) {
-          $base_fields = $this->entityFieldManager->getBaseFieldDefinitions($type);
-          // @todo Lookup changed field in keys https://www.drupal.org/node/2209971
-          if (isset($base_fields['changed']) && $base_fields['changed']->getFieldStorageDefinition()->getPropertyDefinition($base_fields['changed']->getFieldStorageDefinition()->getMainPropertyName())->getDataType() === 'timestamp') {
-            $data['comment_entity_statistics_and_entity_changed']['table']['join'][$table] = $data['comment_entity_statistics']['table']['join'][$table];
-          }
-        }
       }
     }
 
@@ -319,9 +309,12 @@ class CommentViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['comment_entity_statistics_and_entity_changed']['last_updated'] = [
+    // Provide last_updated for comment_entity_statistics table.
+    // The handler will determine whether to use GREATEST() with entity changed time
+    // or just the comment timestamp based on whether the entity implements EntityChangedInterface.
+    $data['comment_entity_statistics']['last_updated'] = [
       'title' => $this->t('Updated/commented date'),
-      'help' => $this->t('The most recent of last comment posted or entity updated time.'),
+      'help' => $this->t('The most recent of last comment posted or entity updated time. For entities without a changed field, this is just the last comment timestamp.'),
       'field' => [
         'id' => 'comment_ces_last_updated',
         'no group by' => TRUE,
