@@ -1,3 +1,6 @@
+parameters:
+  navigation.skip_procedural_hook_scan: true
+
 services:
   _defaults:
     autoconfigure: true
@@ -15,7 +18,6 @@ services:
         '@request_stack',
         '@extension.list.module',
         '@current_user',
-        '%renderer.config%',
         '@navigation.entity_route_helper',
       ]
   Drupal\navigation\NavigationRenderer: '@navigation.renderer'
@@ -29,6 +31,7 @@ services:
         '@router.route_provider',
         '@menu.active_trail',
         '@callable_resolver',
+        '@module_handler',
       ]
 
   navigation.entity_route_helper:
@@ -41,12 +44,10 @@ services:
       ]
   Drupal\navigation\EntityRouteHelper: '@navigation.entity_route_helper'
 
-  navigation.user_lazy_builder:
-    class: Drupal\navigation\UserLazyBuilder
-    arguments: ['@current_user']
-  Drupal\navigation\UserLazyBuilders: '@navigation.user_lazy_builder'
-
   plugin.manager.top_bar_item:
     class: Drupal\navigation\TopBarItemManager
     parent: default_plugin_manager
   Drupal\navigation\TopBarItemManagerInterface: '@plugin.manager.top_bar_item'
+
+  Drupal\navigation\Menu\NavigationMenuLinkTreeManipulators:
+    autowire: true

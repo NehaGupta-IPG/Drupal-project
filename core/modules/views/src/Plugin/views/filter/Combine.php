@@ -35,7 +35,7 @@ class Combine extends StringFilter {
     parent::buildOptionsForm($form, $form_state);
     $this->view->initStyle();
 
-    // Allow to choose all fields as possible
+    // Allow to choose all fields as possible.
     if ($this->view->style_plugin->usesFields()) {
       $options = [];
       foreach ($this->view->display_handler->getHandlers('field') as $name => $field) {
@@ -78,7 +78,8 @@ class Combine extends StringFilter {
         continue;
       }
       $field = $this->view->field[$id];
-      // Always add the table of the selected fields to be sure a table alias exists.
+      // Always add the table of the selected fields to be sure a table alias
+      // exists.
       $field->ensureMyTable();
       if (!empty($field->tableAlias) && !empty($field->realField)) {
         $fields[] = "$field->tableAlias.$field->realField";

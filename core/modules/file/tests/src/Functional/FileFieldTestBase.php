@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\file\FileInterface;
@@ -222,16 +221,21 @@ abstract class FileFieldTestBase extends BrowserTestBase {
   public function assertFileEntryExists($file, $message = NULL) {
     $this->container->get('entity_type.manager')->getStorage('file')->resetCache();
     $db_file = File::load($file->id());
-    $message = $message ?? new FormattableMarkup('File %file exists in database at the correct path.', ['%file' => $file->getFileUri()]);
+    $message = $message ?? sprintf('File %s exists in database at the correct path.', $file->getFileUri());
     $this->assertEquals($file->getFileUri(), $db_file->getFileUri(), $message);
   }
 
   /**
    * Asserts that a file does not exist in the database.
+   *
+   * @param \Drupal\file\FileInterface $file
+   *   The file to be validated.
+   * @param string|null $message
+   *   (optional) A message to display with the assertion.
    */
-  public function assertFileEntryNotExists($file, $message) {
+  public function assertFileEntryNotExists(FileInterface $file, ?string $message = NULL): void {
     $this->container->get('entity_type.manager')->getStorage('file')->resetCache();
-    $message = $message ?? new FormattableMarkup('File %file exists in database at the correct path.', ['%file' => $file->getFileUri()]);
+    $message = $message ?? sprintf('File %s exists in database at the correct path.', $file->getFileUri());
     $this->assertNull(File::load($file->id()), $message);
   }
 
@@ -239,7 +243,7 @@ abstract class FileFieldTestBase extends BrowserTestBase {
    * Asserts that a file's status is set to permanent in the database.
    */
   public function assertFileIsPermanent(FileInterface $file, $message = NULL) {
-    $message = $message ?? new FormattableMarkup('File %file is permanent.', ['%file' => $file->getFileUri()]);
+    $message = $message ?? sprintf('File %s is permanent.', $file->getFileUri());
     $this->assertTrue($file->isPermanent(), $message);
   }
 

@@ -3,6 +3,7 @@
 namespace Drupal\views;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\views\Plugin\views\HandlerBase;
 use Drupal\views\Plugin\views\ViewsHandlerInterface;
 
@@ -20,6 +21,8 @@ use Drupal\views\Plugin\views\ViewsHandlerInterface;
  *            queries.
  */
 class ManyToOneHelper {
+
+  use StringTranslationTrait;
 
   /**
    * Should the field use formula or alias.
@@ -46,8 +49,8 @@ class ManyToOneHelper {
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     $form['reduce_duplicates'] = [
       '#type' => 'checkbox',
-      '#title' => t('Reduce duplicates'),
-      '#description' => t("This filter can cause items that have more than one of the selected options to appear as duplicate results. If this filter causes duplicate results to occur, this checkbox can reduce those duplicates; however, the more terms it has to search for, the less performant the query will be, so use this with caution. Shouldn't be set on single-value fields, as it may cause values to disappear from display, if used on an incompatible field."),
+      '#title' => $this->t('Reduce duplicates'),
+      '#description' => $this->t("This filter can cause items that have more than one of the selected options to appear as duplicate results. If this filter causes duplicate results to occur, this checkbox can reduce those duplicates; however, the more terms it has to search for, the less performant the query will be, so use this with caution. Shouldn't be set on single-value fields, as it may cause values to disappear from display, if used on an incompatible field."),
       '#default_value' => !empty($this->handler->options['reduce_duplicates']),
       '#weight' => 4,
     ];
@@ -85,11 +88,11 @@ class ManyToOneHelper {
       $join = $this->getJoin();
     }
 
-    // See if there's a chain between us and the base relationship. If so, we need
-    // to create a new relationship to use.
+    // See if there's a chain between us and the base relationship. If so, we
+    // need to create a new relationship to use.
     $relationship = $this->handler->relationship;
 
-    // Determine the primary table to seek
+    // Determine the primary table to seek.
     if (empty($this->handler->query->relationships[$relationship])) {
       $base_table = $this->handler->view->storage->get('base_table');
     }
@@ -137,7 +140,7 @@ class ManyToOneHelper {
     $field = $this->handler->relationship . '_' . $this->handler->table . '.' . $this->handler->field;
     $join = $this->getJoin();
 
-    // Shortcuts
+    // Shortcuts.
     $options = $this->handler->options;
     $view = $this->handler->view;
     $query = $this->handler->query;

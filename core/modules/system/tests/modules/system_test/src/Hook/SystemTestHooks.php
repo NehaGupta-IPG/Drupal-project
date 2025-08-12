@@ -20,7 +20,7 @@ class SystemTestHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.system_test':
         $output = '';
@@ -28,6 +28,7 @@ class SystemTestHooks {
         $output .= '<p>' . $this->t('This is a test help page for the system_test module for the purpose of testing if the "Help" link displays properly.') . '</p>';
         return $output;
     }
+    return NULL;
   }
 
   /**
@@ -55,8 +56,8 @@ class SystemTestHooks {
     // Save the config.installer isSyncing() value to state to check that it is
     // correctly set when installing module during config import.
     \Drupal::state()->set('system_test_modules_uninstalled_config_installer_syncing', \Drupal::service('config.installer')->isSyncing());
-    // Save the $is_syncing parameter value to state to check that it is correctly
-    // set when installing module during config import.
+    // Save the $is_syncing parameter value to state to check that it is
+    // correctly set when installing module during config import.
     \Drupal::state()->set('system_test_modules_uninstalled_syncing_param', $is_syncing);
   }
 
@@ -65,14 +66,10 @@ class SystemTestHooks {
    */
   #[Hook('system_info_alter')]
   public function systemInfoAlter(&$info, Extension $file, $type): void {
-    // We need a static otherwise the last test will fail to alter common_test.
-    static $test;
-    if (($dependencies = \Drupal::state()->get('system_test.dependencies')) || $test) {
+    if (($dependencies = \Drupal::state()->get('system_test.dependency'))) {
       if ($file->getName() == 'module_test') {
         $info['hidden'] = FALSE;
-        $info['dependencies'][] = array_shift($dependencies);
-        \Drupal::state()->set('system_test.dependencies', $dependencies);
-        $test = TRUE;
+        $info['dependencies'][] = $dependencies;
       }
       if ($file->getName() == 'common_test') {
         $info['hidden'] = FALSE;
@@ -135,8 +132,8 @@ class SystemTestHooks {
     // Save the config.installer isSyncing() value to state to check that it is
     // correctly set when installing module during config import.
     \Drupal::state()->set('system_test_preinstall_module_config_installer_syncing', \Drupal::service('config.installer')->isSyncing());
-    // Save the $is_syncing parameter value to state to check that it is correctly
-    // set when installing module during config import.
+    // Save the $is_syncing parameter value to state to check that it is
+    // correctly set when installing module during config import.
     \Drupal::state()->set('system_test_preinstall_module_syncing_param', $is_syncing);
   }
 
@@ -149,8 +146,8 @@ class SystemTestHooks {
     // Save the config.installer isSyncing() value to state to check that it is
     // correctly set when uninstalling module during config import.
     \Drupal::state()->set('system_test_preuninstall_module_config_installer_syncing', \Drupal::service('config.installer')->isSyncing());
-    // Save the $is_syncing parameter value to state to check that it is correctly
-    // set when installing module during config import.
+    // Save the $is_syncing parameter value to state to check that it is
+    // correctly set when installing module during config import.
     \Drupal::state()->set('system_test_preuninstall_module_syncing_param', $is_syncing);
   }
 

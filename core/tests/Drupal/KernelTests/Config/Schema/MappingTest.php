@@ -100,7 +100,6 @@ class MappingTest extends KernelTestBase {
           // Avoid showing "Powered by Drupal" on 404 responses.
           'visibility' => [
             'I_CAN_CHOOSE_THIS' => [
-              // This is what determines the
               'id' => 'response_status',
               'negate' => FALSE,
               'status_codes' => [
@@ -167,6 +166,7 @@ class MappingTest extends KernelTestBase {
    * @see https://www.drupal.org/files/ConfigSchemaCheatSheet2.0.pdf
    *
    * @return \Generator
+   *   The test cases.
    */
   public static function providerMappingInterpretation(): \Generator {
     $available_block_settings_types = [
@@ -218,7 +218,7 @@ class MappingTest extends KernelTestBase {
     // Special case: deprecated  is needed for deprecated config schema:
     // - deprecated keys are treated as optional
     // - if a deprecated property path is itself a mapping, then the keys inside
-    //   are not optional
+    //   are not optional.
     yield 'No dynamic type: config_schema_deprecated_test.settings' => [
       'config_schema_deprecated_test.settings',
       NULL,
@@ -227,7 +227,8 @@ class MappingTest extends KernelTestBase {
         // @see core/config/schema/core.data_types.schema.yml
         '_core',
         'langcode',
-        // Keys defined locally, in `type: config_schema_deprecated_test.settings`.
+        // Keys defined locally, in `type:
+        // config_schema_deprecated_test.settings`.
         // @see core/modules/config/tests/config_schema_deprecated_test/config/schema/config_schema_deprecated_test.schema.yml
         'complex_structure_deprecated',
       ],
@@ -238,7 +239,8 @@ class MappingTest extends KernelTestBase {
       'config_schema_deprecated_test.settings',
       'complex_structure_deprecated',
       [
-        // Keys defined locally, in `type: config_schema_deprecated_test.settings`.
+        // Keys defined locally, in `type:
+        // config_schema_deprecated_test.settings`.
         // @see core/modules/config/tests/config_schema_deprecated_test/config/schema/config_schema_deprecated_test.schema.yml
         'type',
         'products',
@@ -316,7 +318,8 @@ class MappingTest extends KernelTestBase {
         'label_display',
         'provider',
         'context_mapping',
-        // Keys defined locally, in `type: block.settings.system_branding_block`.
+        // Keys defined locally, in `type:
+        // block.settings.system_branding_block`.
         // @see core/modules/block/config/schema/block.schema.yml
         ...$available_block_settings_types['block.settings.system_branding_block'],
       ],
@@ -373,6 +376,7 @@ class MappingTest extends KernelTestBase {
         'field.value.decimal' => ['value'],
         'field.value.float' => ['value'],
         'field.value.timestamp' => ['value'],
+        'field.value.language' => ['value'],
         'field.value.comment' => [
           'status',
           'cid',

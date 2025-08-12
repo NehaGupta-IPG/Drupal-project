@@ -10,12 +10,12 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the basic AJAX functionality of the Glossary View.
- *
- * @group node
  */
+#[Group('node')]
 class GlossaryViewTest extends WebDriverTestBase {
 
   use ContentTypeCreationTrait;
@@ -37,8 +37,9 @@ class GlossaryViewTest extends WebDriverTestBase {
   protected $defaultTheme = 'starterkit_theme';
 
   /**
-   * @var array
    * The test Views to enable.
+   *
+   * @var array
    */
   public static $testViews = ['test_glossary'];
 

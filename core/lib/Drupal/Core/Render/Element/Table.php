@@ -14,19 +14,27 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  * context of a form.
  *
  * Properties:
- * - #header: An array of table header labels.
- * - #rows: An array of the rows to be displayed. Each row is either an array
+ *
+ * @property $header
+ *   An array of table header labels.
+ * @property $rows
+ *   An array of the rows to be displayed. Each row is either an array
  *   of cell contents or an array of properties as described in table.html.twig
  *   Alternatively specify the data for the table as child elements of the table
  *   element. Table elements would contain rows elements that would in turn
  *   contain column elements.
- * - #empty: Text to display when no rows are present.
- * - #responsive: Indicates whether to add the drupal.tableresponsive library
+ * @property $empty
+ *   Text to display when no rows are present.
+ * @property $responsive
+ *   Indicates whether to add the drupal.tableresponsive library
  *   providing responsive tables.  Defaults to TRUE.
- * - #sticky: Indicates whether to make the table headers sticky at
+ * @property $sticky
+ *   Indicates whether to make the table headers sticky at
  *   the top of the page. Defaults to FALSE.
- * - #footer: Table footer rows, in the same format as the #rows property.
- * - #caption: A localized string for the <caption> tag.
+ * @property $footer
+ *   Table footer rows, in the same format as the #rows property.
+ * @property $caption
+ *   A localized string for the <caption> tag.
  *
  * Usage example 1: A simple form with an additional information table which
  * doesn't include any other form field.
@@ -151,7 +159,8 @@ class Table extends FormElementBase {
    * {@inheritdoc}
    */
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
-    // If #multiple is FALSE, the regular default value of radio buttons is used.
+    // If #multiple is FALSE, the regular default value of radio buttons is
+    // used.
     if (!empty($element['#tableselect']) && !empty($element['#multiple'])) {
       // Contrary to #type 'checkboxes', the default value of checkboxes in a
       // table is built from the array keys (instead of array values) of the
@@ -169,7 +178,9 @@ class Table extends FormElementBase {
   }
 
   /**
-   * #process callback for #type 'table' to add tableselect support.
+   * Render API callback: Adds tableselect support to #type 'table'.
+   *
+   * This function is assigned as a #process callback.
    *
    * @param array $element
    *   An associative array containing the properties and children of the
@@ -296,7 +307,9 @@ class Table extends FormElementBase {
   }
 
   /**
-   * #element_validate callback for #type 'table'.
+   * Render API callback: Validates the #type 'table'.
+   *
+   * This function is assigned as a #element_validate callback.
    *
    * @param array $element
    *   An associative array containing the properties and children of the
@@ -324,7 +337,9 @@ class Table extends FormElementBase {
   }
 
   /**
-   * #pre_render callback to transform children of an element of #type 'table'.
+   * Render API callback: Transform children of an element of #type 'table'.
+   *
+   * This function is assigned as a #pre_render callback.
    *
    * This function converts sub-elements of an element of #type 'table' to be
    * suitable for table.html.twig:
@@ -334,6 +349,7 @@ class Table extends FormElementBase {
    *   corresponding first-level table row.
    *
    * Simple example usage:
+   *
    * @code
    * $form['table'] = [
    *   '#type' => 'table',
@@ -386,7 +402,7 @@ class Table extends FormElementBase {
    * @return array
    *   Associative array of rendered child elements for a table.
    *
-   * @see template_preprocess_table()
+   * @see \Drupal\Core\Theme\ThemePreprocess::preprocessTable()
    * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface::processAttachments()
    * @see drupal_attach_tabledrag()
    */
@@ -424,9 +440,10 @@ class Table extends FormElementBase {
       $element['#attached']['library'][] = 'core/drupal.tableheader';
       $element['#attributes']['class'][] = 'sticky-header';
     }
-    // If the table has headers and it should react responsively to columns hidden
-    // with the classes represented by the constants RESPONSIVE_PRIORITY_MEDIUM
-    // and RESPONSIVE_PRIORITY_LOW, add the tableresponsive behaviors.
+    // If the table has headers and it should react responsively to columns
+    // hidden with the classes represented by the constants
+    // RESPONSIVE_PRIORITY_MEDIUM and RESPONSIVE_PRIORITY_LOW, add the
+    // tableresponsive behaviors.
     if (count($element['#header']) && $element['#responsive']) {
       $element['#attached']['library'][] = 'core/drupal.tableresponsive';
       // Add 'responsive-enabled' class to the table to identify it for JS.

@@ -207,7 +207,7 @@ class ViewsOperations {
       }
     }
 
-    // @todo Handle $query->orderby, $query->groupby, $query->having and
+    // @todo Handle $query->orderby, $query->groupBy, $query->having and
     //   $query->count_field in https://www.drupal.org/node/2968165.
   }
 
@@ -289,8 +289,8 @@ class ViewsOperations {
         // first.
         if (!$this->adjustedTables->offsetExists($table_queue[$alias]['join'])) {
           $table_queue[$alias]['join'] = $this->getRevisionTableJoin($relationship, $base_revision_table, $revision_field, $workspace_association_table, $entity_type);
-          // We also have to ensure that our 'workspace_association' comes before
-          // this.
+          // We also have to ensure that our 'workspace_association' comes
+          // before this.
           $this->moveEntityTable($query, $workspace_association_table, $alias);
         }
 

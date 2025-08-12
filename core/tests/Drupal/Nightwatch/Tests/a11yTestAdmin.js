@@ -92,9 +92,33 @@ const testCases = [
     },
   },
   {
+    // Tests long breadcrumb for https://drupal.org/i/3223147.
+    name: 'Manage text format, mobile',
+    path: '/admin/config/content/formats/manage/restricted_html',
+    windowSize: {
+      // Dimensions used by Lighthouse for mobile.
+      width: 415,
+      height: 823,
+    },
+    options: {
+      runOnly: {
+        type: 'tag',
+        values: [
+          'wcag2a',
+          'wcag2aa',
+          'wcag21a',
+          'wcag21aa',
+          'best-practice',
+          'wcag22a',
+          'wcag22aa',
+        ],
+      },
+    },
+  },
+  {
     name: 'Structure | Block',
     path: '/admin/structure/block',
-    // @todo remove the disabled 'region' rule in https://drupal.org/i/3318396.},
+    // @todo remove the disabled 'region' rule in https://drupal.org/i/3318396.
     // @todo remove the skipped rules below in https://drupal.org/i/3318394.
     options: {
       rules: {
@@ -109,6 +133,13 @@ const testCases = [
 
 testCases.forEach((testCase) => {
   adminTest[`Accessibility - Admin Theme: ${testCase.name}`] = (browser) => {
+    if (testCase.windowSize) {
+      browser.setWindowSize(
+        testCase.windowSize.width,
+        testCase.windowSize.height,
+      );
+    }
+
     browser.drupalLoginAsAdmin(() => {
       browser
         .drupalRelativeURL(testCase.path)

@@ -28,6 +28,8 @@ class PageTitleTest extends BrowserTestBase {
 
   /**
    * The test user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
    */
   protected $contentUser;
 
@@ -124,7 +126,7 @@ class PageTitleTest extends BrowserTestBase {
     $this->assertSession()->titleEquals('Foo | Drupal');
     $this->assertSession()->elementTextEquals('xpath', '//h1[@class="page-title"]', 'Foo');
 
-    // Test forms
+    // Test forms.
     $this->drupalGet('form-test/object-builder');
 
     $this->assertSession()->titleEquals('Test dynamic title | Drupal');

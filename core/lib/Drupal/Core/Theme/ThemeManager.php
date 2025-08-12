@@ -7,6 +7,8 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Template\Attribute;
+use Drupal\Core\Template\AttributeHelper;
+use Drupal\Core\Utility\CallableResolver;
 
 /**
  * Provides the default implementation of a theme manager.
@@ -56,6 +58,13 @@ class ThemeManager implements ThemeManagerInterface {
   protected $root;
 
   /**
+   * Default variables.
+   *
+   * @var array|null
+   */
+  protected ?array $defaultVariables = NULL;
+
+  /**
    * Constructs a new ThemeManager object.
    *
    * @param string $root
@@ -66,8 +75,10 @@ class ThemeManager implements ThemeManagerInterface {
    *   The theme initialization.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
+   * @param \Drupal\Core\Utility\CallableResolver $callableResolver
+   *   The callable resolver.
    */
-  public function __construct($root, ThemeNegotiatorInterface $theme_negotiator, ThemeInitializationInterface $theme_initialization, ModuleHandlerInterface $module_handler) {
+  public function __construct($root, ThemeNegotiatorInterface $theme_negotiator, ThemeInitializationInterface $theme_initialization, ModuleHandlerInterface $module_handler, protected CallableResolver $callableResolver) {
     $this->root = $root;
     $this->themeNegotiator = $theme_negotiator;
     $this->themeInitialization = $theme_initialization;
@@ -109,6 +120,7 @@ class ThemeManager implements ThemeManagerInterface {
    */
   public function resetActiveTheme() {
     $this->activeTheme = NULL;
+    $this->defaultVariables = NULL;
     return $this;
   }
 
@@ -175,6 +187,7 @@ class ThemeManager implements ThemeManagerInterface {
     }
 
     $info = $theme_registry->get($hook);
+    $invoke_map = $theme_registry->getPreprocessInvokes();
     if (isset($info['deprecated'])) {
       @trigger_error($info['deprecated'], E_USER_DEPRECATED);
     }
@@ -212,6 +225,12 @@ class ThemeManager implements ThemeManagerInterface {
 
     $suggestions = $this->buildThemeHookSuggestions($hook, $info['base hook'] ?? '', $variables);
 
+    $deprecated_suggestions = [];
+    if (isset($suggestions['__DEPRECATED'])) {
+      $deprecated_suggestions = $suggestions['__DEPRECATED'];
+      unset($suggestions['__DEPRECATED']);
+    }
+
     // Check if each suggestion exists in the theme registry, and if so,
     // use it instead of the base hook. For example, a function may use
     // '#theme' => 'node', but a module can add 'node__article' as a suggestion
@@ -220,6 +239,9 @@ class ThemeManager implements ThemeManagerInterface {
     foreach (array_reverse($suggestions) as $suggestion) {
       if ($theme_registry->has($suggestion)) {
         $info = $theme_registry->get($suggestion);
+        if (isset($deprecated_suggestions[$suggestion])) {
+          @trigger_error($deprecated_suggestions[$suggestion], E_USER_DEPRECATED);
+        }
         break;
       }
     }
@@ -248,30 +270,96 @@ class ThemeManager implements ThemeManagerInterface {
         $theme_hook_suggestion = $hook;
       }
     }
+
+    // Set default variables before preprocess hooks.
+    $variables += $this->getDefaultTemplateVariables();
+
+    // When theming a render element, merge its #attributes into
+    // $variables['attributes'].
+    if (isset($info['render element'])) {
+      $key = $info['render element'];
+      if (isset($variables[$key]['#attributes'])) {
+        $variables['attributes'] = AttributeHelper::mergeCollections($variables['attributes'], $variables[$key]['#attributes']);
+      }
+    }
+
+    // Invoke initial preprocess callbacks.
+    if (!empty($info['initial preprocess'])) {
+      $callable = $info['initial preprocess'];
+      try {
+        if (!is_callable($callable)) {
+          $callable = $this->callableResolver->getCallableFromDefinition($callable);
+        }
+        $callable($variables, $hook, $info);
+      }
+      catch (\InvalidArgumentException $e) {
+        \Drupal::logger('theme')->warning('Preprocess callback is not valid: %error.', ['%error' => $e->getMessage()]);
+      }
+    }
+
+    $invoke_preprocess_callback = function (mixed $preprocessor_function) use ($invoke_map, &$variables, $hook, $info): mixed {
+      // Preprocess hooks are stored as strings resembling functions.
+      // This is for backwards compatibility and may represent OOP
+      // implementations as well.
+      if (is_string($preprocessor_function) && isset($invoke_map[$preprocessor_function])) {
+        // Invoke module preprocess functions.
+        $this->moduleHandler->invoke(... $invoke_map[$preprocessor_function], args: [&$variables, $hook, $info]);
+      }
+      // Invoke preprocess callbacks that are not in the invoke map, such as
+      // those from themes or an alter hook.
+      elseif (is_callable($preprocessor_function)) {
+        call_user_func_array($preprocessor_function, [&$variables, $hook, $info]);
+      }
+      return $variables;
+    };
+
+    // Global preprocess functions are always called, after initial and
+    // template preprocess and before regular module and theme preprocess
+    // callbacks. template preprocess callbacks are deprecated but still
+    // supported, so they need to be called before the first non-template
+    // preprocess callback, and if that doesn't happen, after the loop.
+    $global_preprocess = $theme_registry->getGlobalPreprocess();
+    $global_preprocess_called = FALSE;
+
+    // Invoke preprocess hooks.
     if (isset($info['preprocess functions'])) {
       foreach ($info['preprocess functions'] as $preprocessor_function) {
-        if (is_callable($preprocessor_function)) {
-          call_user_func_array($preprocessor_function, [&$variables, $hook, $info]);
+        // If global preprocess functions have not been called yet and this is
+        // not a template preprocess function, invoke them now.
+        if (!$global_preprocess_called && is_string($preprocessor_function) && !str_starts_with($preprocessor_function, 'template_')) {
+          $global_preprocess_called = TRUE;
+          foreach ($global_preprocess as $global_preprocess_callback) {
+            $invoke_preprocess_callback($global_preprocess_callback);
+          }
         }
+        $invoke_preprocess_callback($preprocessor_function);
       }
-      // Allow theme preprocess functions to set $variables['#attached'] and
-      // $variables['#cache'] and use them like the corresponding element
-      // properties on render arrays. In Drupal 8, this is the (only) officially
-      // supported method of attaching bubbleable metadata from preprocess
-      // functions. Assets attached here should be associated with the template
-      // that we are preprocessing variables for.
-      $preprocess_bubbleable = [];
-      foreach (['#attached', '#cache'] as $key) {
-        if (isset($variables[$key])) {
-          $preprocess_bubbleable[$key] = $variables[$key];
-        }
+    }
+
+    // If global process hasn't been invoked yet, do that now.
+    if (!$global_preprocess_called) {
+      foreach ($global_preprocess as $global_preprocess_callback) {
+        $invoke_preprocess_callback($global_preprocess_callback);
       }
-      // We do not allow preprocess functions to define cacheable elements.
-      unset($preprocess_bubbleable['#cache']['keys']);
-      if ($preprocess_bubbleable) {
-        // @todo Inject the Renderer in https://www.drupal.org/node/2529438.
-        \Drupal::service('renderer')->render($preprocess_bubbleable);
+    }
+
+    // Allow theme preprocess functions to set $variables['#attached'] and
+    // $variables['#cache'] and use them like the corresponding element
+    // properties on render arrays. This is the officially supported
+    // method of attaching bubbleable metadata from preprocess functions.
+    // Assets attached here should be associated with the template
+    // that we are preprocessing variables for.
+    $preprocess_bubbleable = [];
+    foreach (['#attached', '#cache'] as $key) {
+      if (isset($variables[$key])) {
+        $preprocess_bubbleable[$key] = $variables[$key];
       }
+    }
+    // We do not allow preprocess functions to define cacheable elements.
+    unset($preprocess_bubbleable['#cache']['keys']);
+    if ($preprocess_bubbleable) {
+      // @todo Inject the Renderer in https://www.drupal.org/node/2529438.
+      \Drupal::service('renderer')->render($preprocess_bubbleable);
     }
 
     // Generate the output using a template.
@@ -293,21 +381,6 @@ class ThemeManager implements ThemeManagerInterface {
       }
     }
 
-    // In some cases, a template implementation may not have had
-    // template_preprocess() run (for example, if the default implementation
-    // is a function, but a template overrides that default implementation).
-    // In these cases, a template should still be able to expect to have
-    // access to the variables provided by template_preprocess(), so we add
-    // them here if they don't already exist. We don't want the overhead of
-    // running template_preprocess() twice, so we use the 'directory' variable
-    // to determine if it has already run, which while not completely
-    // intuitive, is reasonably safe, and allows us to save on the overhead of
-    // adding some new variable to track that.
-    if (!isset($variables['directory'])) {
-      $default_template_variables = [];
-      template_preprocess($default_template_variables, $hook, $info);
-      $variables += $default_template_variables;
-    }
     if (!isset($default_attributes)) {
       $default_attributes = new Attribute();
     }
@@ -329,10 +402,12 @@ class ThemeManager implements ThemeManagerInterface {
       $template_file = $info['path'] . '/' . $template_file;
     }
     // Add the theme suggestions to the variables array just before rendering
-    // the template for backwards compatibility with template engines.
+    // the template to expose it to the template engine, for example to
+    // display debug information.
     $variables['theme_hook_suggestions'] = $suggestions;
-    // For backwards compatibility, pass 'theme_hook_suggestion' on to the
-    // template engine. This is only set when calling a direct suggestion like
+    $variables['theme_hook_suggestions__DEPRECATED'] = $deprecated_suggestions;
+    // Pass 'theme_hook_suggestion' on to the template engine. This is only
+    // set when calling a direct suggestion like
     // '#theme' => 'menu__shortcut_default' when the template exists in the
     // current theme.
     if (isset($theme_hook_suggestion)) {
@@ -396,8 +471,9 @@ class ThemeManager implements ThemeManagerInterface {
    *   The current route match.
    */
   protected function initTheme(?RouteMatchInterface $route_match = NULL) {
-    // Determine the active theme for the theme negotiator service. This includes
-    // the default theme as well as really specific ones like the ajax base theme.
+    // Determine the active theme for the theme negotiator service. This
+    // includes the default theme as well as really specific ones like the ajax
+    // base theme.
     if (!$route_match) {
       $route_match = \Drupal::routeMatch();
     }
@@ -422,8 +498,8 @@ class ThemeManager implements ThemeManagerInterface {
       $extra_types = $type;
       $type = array_shift($extra_types);
       // Allow if statements in this function to use the faster isset() rather
-      // than !empty() both when $type is passed as a string, or as an array with
-      // one item.
+      // than !empty() both when $type is passed as a string, or as an array
+      // with one item.
       if (empty($extra_types)) {
         unset($extra_types);
       }
@@ -458,6 +534,41 @@ class ThemeManager implements ThemeManagerInterface {
   public function alter($type, &$data, &$context1 = NULL, &$context2 = NULL) {
     $theme = $this->getActiveTheme();
     $this->alterForTheme($theme, $type, $data, $context1, $context2);
+  }
+
+  /**
+   * Returns default template variables.
+   *
+   * These are set for every template before template preprocessing hooks.
+   *
+   * See the @link themeable Default theme implementations topic @endlink for
+   * details.
+   *
+   * @return array
+   *   An array of default template variables.
+   *
+   * @internal
+   */
+  public function getDefaultTemplateVariables(): array {
+    if (!isset($this->defaultVariables)) {
+      // Variables that don't depend on a database connection.
+      $this->defaultVariables = [
+        'attributes' => [],
+        'title_attributes' => [],
+        'content_attributes' => [],
+        'title_prefix' => [],
+        'title_suffix' => [],
+        'db_is_active' => !defined('MAINTENANCE_MODE'),
+        'is_admin' => FALSE,
+        'logged_in' => FALSE,
+      ];
+
+      // Give modules a chance to alter default template variables.
+      $this->moduleHandler->alter('template_preprocess_default_variables', $this->defaultVariables);
+      // Tell all templates where they are located.
+      $this->defaultVariables['directory'] = $this->getActiveTheme()->getPath();
+    }
+    return $this->defaultVariables;
   }
 
 }
