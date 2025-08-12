@@ -106,6 +106,7 @@ const testCases = [
     options: {
       rules: {
         'landmark-unique': { enabled: false },
+        region: { enabled: false },
       },
       runOnly: {
         type: 'tag',
