@@ -25,6 +25,10 @@ class PathWidget extends WidgetBase {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $entity = $items->getEntity();
 
+    // Fix alias if it is set in values but not in the alias property.
+    if (!$items[$delta]->alias) {
+      $items[$delta]->alias = $items[$delta]->getValue()['alias'] ?? $items[$delta]->alias;
+    }
     $element += [
       '#element_validate' => [[static::class, 'validateFormElement']],
     ];
