@@ -24,7 +24,13 @@ function module_test_procedural_preprocess_theme(): array {
   ];
 }
 
-// phpcs:ignore Drupal.Commenting.FunctionComment.Missing
+/**
+ * Implements template_preprocess_HOOK().
+ *
+ * This implementation tests that template_preprocess_HOOK functions are
+ * gathered and executed when there is no initial preprocess key set on
+ * hook_theme.
+ */
 function template_preprocess_test($arg): mixed {
   return $arg;
 }
@@ -32,8 +38,8 @@ function template_preprocess_test($arg): mixed {
 /**
  * Implements hook_preprocess().
  *
- * This implementation tests a procedural preprocess hook with a prefix and
- * suffix is executed.
+ * This implementation tests that a procedural preprocess hook with a prefix is
+ * executed.
  */
 function module_test_procedural_preprocess_preprocess($arg): mixed {
   return $arg;
@@ -42,7 +48,7 @@ function module_test_procedural_preprocess_preprocess($arg): mixed {
 /**
  * Implements hook_preprocess().
  *
- * This implementation tests a procedural preprocess hook with a prefix and
+ * This implementation tests that a procedural preprocess hook with a prefix and
  * suffix is executed.
  */
 function module_test_procedural_preprocess_preprocess_test($arg): mixed {
