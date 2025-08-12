@@ -46,6 +46,7 @@ class DateTimeComputed extends TypedData {
     $item = $this->getParent();
     $value = $item->{($this->definition->getSetting('date source'))};
 
+    // Check if the value is a valid string.
     if (!is_string($value) && $value !== '') {
       return NULL;
     }
