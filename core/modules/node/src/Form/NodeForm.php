@@ -260,7 +260,7 @@ class NodeForm extends ContentEntityForm {
   public function preview(array $form, FormStateInterface $form_state) {
     $store = $this->tempStoreFactory->get('node_preview');
     $this->entity->in_preview = TRUE;
-    $previewKey = $this->entity->getPreviewUuid();
+    $previewKey = NodePreviewForm::getPreviewUuid($this->entity);
     $store->set($previewKey, $form_state);
 
     $route_parameters = [

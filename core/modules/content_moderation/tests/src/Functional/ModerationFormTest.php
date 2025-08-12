@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\content_moderation\Functional;
 
 use Drupal\Core\Url;
+use Drupal\node\Form\NodePreviewForm;
 use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -121,7 +122,7 @@ class ModerationFormTest extends ModerationStateTestBase {
 
     // The preview view should not have a moderation form.
     $preview_url = Url::fromRoute('entity.node.preview', [
-      'node_preview' => $node->getPreviewUuid(),
+      'node_preview' => NodePreviewForm::getPreviewUuid($node),
       'view_mode_id' => 'full',
     ]);
     $this->assertSession()->statusCodeEquals(200);

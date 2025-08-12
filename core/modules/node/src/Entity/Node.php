@@ -277,13 +277,6 @@ class Node extends EditorialContentEntityBase implements NodeInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPreviewUuid(): string {
-    return \sprintf('%s-%s', $this->uuid(), $this->language()?->getId() ?? LanguageInterface::LANGCODE_DEFAULT);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
     $fields += static::ownerBaseFieldDefinitions($entity_type);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional;
 
+use Drupal\node\Form\NodePreviewForm;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\language\Traits\LanguageTestTrait;
 
@@ -77,7 +78,7 @@ class NodePreviewTranslationTest extends BrowserTestBase {
 
     // Simulate clicking the Back to content editing link from the spanish
     // translation.
-    $this->drupalGet($esTranslation->toUrl('edit-form', ['query' => ['uuid' => $esTranslation->getPreviewUuid()]]));
+    $this->drupalGet($esTranslation->toUrl('edit-form', ['query' => ['uuid' => NodePreviewForm::getPreviewUuid($esTranslation)]]));
     // The title should match the updated title from the first preview.
     $this->assertSession()->fieldValueEquals('title[0][value]', 'Spanish node updated');
   }
