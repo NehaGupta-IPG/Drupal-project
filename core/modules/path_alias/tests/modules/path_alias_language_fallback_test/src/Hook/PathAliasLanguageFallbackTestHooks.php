@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\path_alias_language_fallback_test\Hook;
 
 use Drupal\Core\Database\Query\AlterableInterface;
