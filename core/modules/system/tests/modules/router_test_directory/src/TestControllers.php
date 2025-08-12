@@ -14,6 +14,9 @@ use GuzzleHttp\Psr7\Response as Psr7Response;
 
 /**
  * Controller routines for testing the routing system.
+ *
+ * @todo Add missing function comments and enable phpcs in
+ *   https://www.drupal.org/project/drupal/issues/3517369.
  */
 class TestControllers {
 
