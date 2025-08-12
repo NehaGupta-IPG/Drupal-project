@@ -57,8 +57,8 @@ class AliasLanguageFallbackTest extends LanguageTestBase {
    * Ensure aliases can be looked up with extended language fallbacks.
    *
    * @covers ::lookupByAlias
-   * @see path_alias_language_fallback_test_language_fallback_candidates_path_alias_alter()
-   * @see path_alias_language_fallback_test_query_path_alias_language_fallback_alter()
+   * @see PathAliasLanguageFallbackTestHooks::language_fallback_candidates_path_alias_alter()
+   * @see PathAliasLanguageFallbackTestHooks::query_path_alias_language_fallback_alter()
    */
   public function testLookupByAlias(): void {
     // Create an alias for a path in Afrikaans.
@@ -89,8 +89,8 @@ class AliasLanguageFallbackTest extends LanguageTestBase {
    * Ensure looking up aliases for paths works with extended language fallbacks.
    *
    * @covers ::lookupBySystemPath
-   * @see path_alias_language_fallback_test_language_fallback_candidates_path_alias_alter()
-   * @see path_alias_language_fallback_test_query_path_alias_language_fallback_alter()
+   * @see PathAliasLanguageFallbackTestHooks::language_fallback_candidates_path_alias_alter()
+   * @see PathAliasLanguageFallbackTestHooks::query_path_alias_language_fallback_alter()
    */
   public function testLookupBySystemPath(): void {
     // Create an alias for a path in Afrikaans.
