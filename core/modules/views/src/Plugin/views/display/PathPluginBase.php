@@ -446,7 +446,7 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
         $form['path'] = [
           '#type' => 'textfield',
           '#title' => $this->t('Path'),
-          '#description' => $this->t('This view will be displayed by visiting this path on your site. You may use "%" or named route parameters like "%node" in your URL to represent values that will be used for contextual filters: For example, "node/%node/feed" or "view_path/%". Named route parameters are required when this path matches an existing path. For example, paths such as "taxonomy/term/%taxonomy_term" or "user/%user/custom-view".'),
+          '#description' => $this->t('This view will be displayed by visiting this path on your site. You may use "%" or named route parameters like "%node" in your URL to represent values that will be used for contextual filters: For example, "node/%node/feed" or "view_path/%". Named route parameters are required when this path matches an existing path. For example, paths such as "taxonomy/term/%taxonomy_term" or "user/%user/custom-view". Paths such as "core", "libraries", "modules", "profiles", "sites", and "themes" are reserved, due to the web root folders.'),
           '#default_value' => $this->getOption('path'),
           '#field_prefix' => '<span dir="ltr">' . Url::fromRoute('<none>', [], ['absolute' => TRUE])->toString() . '</span>&lrm;',
           '#attributes' => ['dir' => LanguageInterface::DIRECTION_LTR],
