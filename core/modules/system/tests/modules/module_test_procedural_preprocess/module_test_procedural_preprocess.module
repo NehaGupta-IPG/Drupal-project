@@ -46,7 +46,7 @@ function module_test_procedural_preprocess_preprocess($arg): mixed {
 }
 
 /**
- * Implements hook_preprocess().
+ * Implements hook_preprocess_HOOK().
  *
  * This implementation tests that a procedural preprocess hook with a prefix and
  * suffix is executed.
