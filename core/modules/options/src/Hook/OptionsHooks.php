@@ -73,7 +73,7 @@ class OptionsHooks {
    */
   #[Hook('field_storage_config_update_forbid')]
   public function fieldStorageConfigUpdateForbid(FieldStorageConfigInterface $field_storage, FieldStorageConfigInterface $prior_field_storage): void {
-    if ($field_storage->getTypeProvider() == 'options' && $field_storage->hasData()) {
+    if ($field_storage->getTypeProvider() == 'options' && $field_storage->hasData() && empty($field_storage->getSetting('allowed_values_function'))) {
       // Forbid any update that removes allowed values with actual data.
       $allowed_values = $field_storage->getSetting('allowed_values');
       $prior_allowed_values = $prior_field_storage->getSetting('allowed_values');
