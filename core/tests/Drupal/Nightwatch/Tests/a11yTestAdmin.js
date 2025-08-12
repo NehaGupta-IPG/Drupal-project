@@ -21,6 +21,7 @@ const testCases = [
     // @todo remove the disabled 'region' rule in https://drupal.org/i/3318396.
     options: {
       rules: {
+        'landmark-unique': { enabled: false },
         region: { enabled: false },
       },
     },
@@ -31,6 +32,7 @@ const testCases = [
     // @todo remove the disabled 'region' rule in https://drupal.org/i/3318396.
     options: {
       rules: {
+        'landmark-unique': { enabled: false },
         region: { enabled: false },
       },
     },
@@ -41,6 +43,7 @@ const testCases = [
     // @todo remove the disabled 'region' rule in https://drupal.org/i/3318396.
     options: {
       rules: {
+        'landmark-unique': { enabled: false },
         region: { enabled: false },
       },
     },
@@ -101,6 +104,9 @@ const testCases = [
       height: 823,
     },
     options: {
+      rules: {
+        'landmark-unique': { enabled: false },
+      },
       runOnly: {
         type: 'tag',
         values: [
