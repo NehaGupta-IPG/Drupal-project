@@ -174,9 +174,28 @@ class TableDragTestForm extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     // Provide a default set of five rows.
     $form['table'] = $this->buildTestTable();
+
+    // Add a checkbox that must not be checked so we can cause validation to
+    // fail. A required element could trigger clientside validation and avoid
+    // the rebuild.
+    $form['fail_validation'] = [
+      '#title' => "Fail validation",
+      '#type' => 'checkbox',
+    ];
+
     $form['actions'] = $this->buildFormActions();
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
+    parent::validateForm($form, $form_state);
+    if ($form_state->getValue('fail_validation')) {
+      $form_state->setErrorByName('fail_validation', "Validation failed");
+    }
   }
 
   /**

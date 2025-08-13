@@ -318,6 +318,45 @@ class TableDragTest extends WebDriverTestBase {
   }
 
   /**
+   * Tests the behaviour when a form fails validation.
+   */
+  public function testFailedValidationOrder(): void {
+    $this->drupalGet('tabledrag_test');
+
+    $row1 = $this->findRowById(1);
+    $handle1 = $this->findDragHandle($row1);
+    $row2 = $this->findRowById(2);
+    $handle2 = $this->findDragHandle($row2);
+
+    // Swap row 1 and 2.
+    $handle1->dragTo($handle2);
+
+    $page = $this->getSession()->getPage();
+
+    // Prevent the form from validating and submit.
+    $page->checkField('fail_validation');
+    $page->pressButton('Save');
+
+    $this->assertSession()->waitForText('Validation failed');
+    $rows = $this->getSession()
+      ->getPage()
+      ->findAll('css', '#tabledrag-test-table tbody tr');
+
+    // Get the IDs of the first and second row of the table.
+    $first_id = $this->getId($rows[0]);
+    $second_id = $this->getId($rows[1]);
+    // Get the weights of rows with IDs 1 and 2.
+    $row1_weight = $this->getWeight($this->findRowById(1));
+    $row2_weight = $this->getWeight($this->findRowById(2));
+
+    // Check the row weight field values still show that row 2 is above row 1.
+    $this->assertLessThan($row1_weight, $row2_weight);
+    // Check explicitly that row 2 is now the first row and 1 is the second.
+    $this->assertSame('2', $first_id);
+    $this->assertSame('1', $second_id);
+  }
+
+  /**
    * Asserts that several pieces of markup are in a given order in the page.
    *
    * @param string[] $items
@@ -564,6 +603,21 @@ class TableDragTest extends WebDriverTestBase {
   }
 
   /**
+   * Finds the drag handle from a row.
+   *
+   * @param \Behat\Mink\Element\NodeElement $row
+   *   The row element.
+   *
+   * @return \Behat\Mink\Element\NodeElement
+   *   The drag handle element.
+   */
+  protected function findDragHandle(NodeElement $row): NodeElement {
+    $handle = $row->find('css', 'a.tabledrag-handle');
+    $this->assertNotEmpty($handle);
+    return $handle;
+  }
+
+  /**
    * Finds the show/hide weight toggle element.
    *
    * @param string $expected_text
@@ -576,6 +630,32 @@ class TableDragTest extends WebDriverTestBase {
     $toggle = $this->getSession()->getPage()->findButton($expected_text);
     $this->assertNotEmpty($toggle);
     return $toggle;
+  }
+
+  /**
+   * Returns the row's ID.
+   *
+   * @param \Behat\Mink\Element\NodeElement $row
+   *   The row element.
+   *
+   * @return string
+   *   The ID.
+   */
+  protected function getId(NodeElement $row): string {
+    return $row->find('css', 'input[name$="[id]"]')->getValue();
+  }
+
+  /**
+   * Returns the row's weight field value.
+   *
+   * @param \Behat\Mink\Element\NodeElement $row
+   *   The row element.
+   *
+   * @return string
+   *   The weight.
+   */
+  protected function getWeight(NodeElement $row): string {
+    return $row->find('css', 'select[name$="[weight]"]')->getValue();
   }
 
   /**
