@@ -10,6 +10,9 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Discovery\YamlDiscovery;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
 /**
@@ -29,7 +32,17 @@ use Symfony\Component\Mime\Email;
  */
 class EmailPluginManager extends DefaultPluginManager implements EmailManagerInterface {
 
-  public function __construct(ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend) {
+  public function __construct(
+    ModuleHandlerInterface $module_handler,
+    #[Autowire(service: 'cache.discovery')]
+    CacheBackendInterface $cache_backend,
+    #[AutowireServiceClosure(EmailRendererInterface::class)]
+    protected readonly \Closure $emailRenderer,
+    #[AutowireServiceClosure('logger.channel.mail')]
+    protected readonly \Closure $logger,
+    #[AutowireServiceClosure(MailerInterface::class)]
+    protected readonly \Closure $mailer,
+  ) {
     $this->factory = new EmailFactory($this);
     $this->moduleHandler = $module_handler;
     $this->alterInfo('email_info');
@@ -74,6 +87,13 @@ class EmailPluginManager extends DefaultPluginManager implements EmailManagerInt
       'key' => $declaredDefinition->getKey(),
       'defaults' => $declaredDefaults + $callerDefaults,
     ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBuilder(): EmailBuilderInterface {
+    return new EmailBuilder($this->emailRenderer, fn() => $this, $this->mailer, $this->logger);
   }
 
   /**

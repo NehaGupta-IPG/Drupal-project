@@ -24,6 +24,11 @@ interface EmailManagerInterface {
   public function getEmailDefinition(string $id, array|\Closure|null $defaults = NULL): EmailDefinition;
 
   /**
+   * Returns the email builder.
+   */
+  public function getBuilder(): EmailBuilderInterface;
+
+  /**
    * Returns a new email instance.
    *
    * @param string $id

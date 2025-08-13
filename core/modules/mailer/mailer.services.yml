@@ -51,7 +51,7 @@ services:
   Symfony\Component\Mailer\MailerInterface: '@Symfony\Component\Mailer\Mailer'
   plugin.manager.email:
     class: Drupal\Core\Mailer\EmailPluginManager
-    arguments: ['@module_handler', '@cache.discovery']
+    autowire: true
   Drupal\Core\Mailer\EmailManagerInterface: '@plugin.manager.email'
   Drupal\Core\Mailer\EmailRenderer:
     autowire: true
