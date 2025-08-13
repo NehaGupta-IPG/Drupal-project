@@ -318,7 +318,7 @@ class TableDragTest extends WebDriverTestBase {
   }
 
   /**
-   * Tests the behaviour when a form fails validation.
+   * Tests the behavior when a form fails validation.
    */
   public function testFailedValidationOrder(): void {
     $this->drupalGet('tabledrag_test');

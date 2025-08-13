@@ -176,7 +176,7 @@ class TableDragTestForm extends FormBase {
     $form['table'] = $this->buildTestTable();
 
     // Add a checkbox that must not be checked so we can cause validation to
-    // fail. A required element could trigger clientside validation and avoid
+    // fail. A required element could trigger client-side validation and avoid
     // the rebuild.
     $form['fail_validation'] = [
       '#title' => "Fail validation",
