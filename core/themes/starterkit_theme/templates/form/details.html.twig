@@ -23,7 +23,12 @@
         required ? 'form-required',
       ]
     %}
-    <summary{{ summary_attributes.addClass(summary_classes) }}>{{ title }}</summary>
+    <summary{{ summary_attributes.addClass(summary_classes) }}>
+      {{- title -}}
+      {%- if required -%}
+        <span aria-hidden="true" class="hidden"> {{ '(required)'|t }}</span>
+      {%- endif -%}
+    </summary>
   {%- endif -%}
   <div class="details-wrapper">
     {% if errors %}

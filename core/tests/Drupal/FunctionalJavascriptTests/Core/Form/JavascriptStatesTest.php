@@ -91,6 +91,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $textfield_invisible_element = $page->findField('textfield_invisible_when_checkbox_trigger_checked');
     $this->assertNotEmpty($textfield_invisible_element);
     $textfield_required_element = $page->findField('textfield_required_when_checkbox_trigger_checked');
+    $textfield_required_element_label_required_text_xpath = '//label[@for="edit-textfield-required-when-checkbox-trigger-checked"]//span[@aria-hidden="true" and @class="js-required hidden" and contains(text(), "(required)")]';
     $this->assertNotEmpty($textfield_required_element);
     $textfield_readonly_element = $page->findField('textfield_readonly_when_checkbox_trigger_checked');
     $this->assertNotEmpty($textfield_readonly_element);
@@ -173,6 +174,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertFalse($textfield_in_details->isVisible());
     $this->assertFalse($textfield_required_element->hasAttribute('required'));
     $this->assertFalse($textfield_required_element->hasAttribute('aria-required'));
+    $this->assertSession()->elementNotExists('xpath', $textfield_required_element_label_required_text_xpath);
     $this->assertFalse($textfield_readonly_element->hasAttribute('readonly'));
     $this->assertFalse($textarea_readonly_element->hasAttribute('readonly'));
     $this->assertFalse($checkbox_checked_element->isChecked());
@@ -209,6 +211,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertFalse($textfield_invisible_element->isVisible());
     $this->assertEquals('required', $textfield_required_element->getAttribute('required'));
     $this->assertFalse($textfield_required_element->hasAttribute('aria-required'));
+    $this->assertSession()->elementExists('xpath', $textfield_required_element_label_required_text_xpath);
     $this->assertTrue($textfield_readonly_element->hasAttribute('readonly'));
     $this->assertTrue($textarea_readonly_element->hasAttribute('readonly'));
     $this->assertTrue($details->hasAttribute('open'));
@@ -254,6 +257,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertFalse($details->hasAttribute('open'));
     $this->assertFalse($textfield_in_details->isVisible());
     $this->assertFalse($textfield_required_element->hasAttribute('required'));
+    $this->assertSession()->elementNotExists('xpath', $textfield_required_element_label_required_text_xpath);
     $this->assertFalse($textfield_readonly_element->hasAttribute('readonly'));
     $this->assertFalse($textarea_readonly_element->hasAttribute('readonly'));
     $this->assertFalse($checkbox_checked_element->isChecked());

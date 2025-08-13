@@ -725,13 +725,22 @@
         // Avoids duplicate required markers on initialization.
         if (!$label.hasClass('js-form-required').length) {
           $label.addClass('js-form-required form-required');
+          if (!$label.find('.js-required').length) {
+            $label.append(
+              `<span class="js-required hidden" aria-hidden="true">${Drupal.t(
+                '(required)',
+              )}</span>`,
+            );
+          }
         }
       } else {
         $(e.target)
           .removeAttr('required')
           .closest('.js-form-item, .js-form-wrapper')
           .find('label.js-form-required')
-          .removeClass('js-form-required form-required');
+          .removeClass('js-form-required form-required')
+          .find('.js-required')
+          .remove();
       }
     }
   });

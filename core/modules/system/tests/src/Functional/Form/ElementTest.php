@@ -200,10 +200,12 @@ class ElementTest extends BrowserTestBase {
     $this->assertEmpty($this->cssSelect('summary.form-required'));
     $this->drupalGet('form-test/group-details/1');
     $this->assertNotEmpty($this->cssSelect('summary.form-required'));
+    $this->assertEquals('(required)', $this->cssSelect('summary.form-required span.hidden[aria-hidden="true"]')[0]->getText());
     $this->drupalGet('form-test/group-fieldset');
     $this->assertEmpty($this->cssSelect('span.form-required'));
     $this->drupalGet('form-test/group-fieldset/1');
     $this->assertNotEmpty($this->cssSelect('span.form-required'));
+    $this->assertEquals('(required)', $this->cssSelect('span.form-required span.hidden[aria-hidden="true"]')[0]->getText());
   }
 
   /**
