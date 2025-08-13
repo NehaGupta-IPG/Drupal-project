@@ -53,19 +53,10 @@ class ComposerRunnerTest extends UnitTestCase {
     // is, plus 5 seconds.
     $database = $this->prophesize(Connection::class);
     $database->databaseType()->willReturn($db_type);
-    $database->query(
-      match ($db_type) {
-        'mysql' => 'SET SESSION wait_timeout = :timeout',
-        'pgsql' => 'SET SESSION idle_session_timeout = :timeout',
-      },
-      [
-        ':timeout' => match ($db_type) {
-          'mysql' => 15,
-          // PostgreSQL's idle timeout is in milliseconds.
-          'pgsql' => 15000,
-        },
-      ],
-    )->shouldBeCalled();
+    $database->query(match ($db_type) {
+      'mysql' => 'SET SESSION wait_timeout = 15',
+      'pgsql' => 'SET SESSION idle_session_timeout = 15000',
+    })->shouldBeCalled();
 
     $runner = new ComposerRunner(
       $executable_finder->reveal(),

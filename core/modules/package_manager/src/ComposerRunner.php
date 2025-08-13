@@ -47,17 +47,15 @@ final class ComposerRunner implements ComposerProcessRunnerInterface {
     $this->fileSystem->prepareDirectory($home, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
 
     // Set the database connection timeout long enough to stay alive for the
-    // duration of the Composer command.
+    // duration of the Composer command. It's okay to not use parameterized
+    // queries here, because $timeout is guaranteed to be an int (and is
+    // enforced by strict typing).
     $db_type = $this->database->databaseType();
     if ($db_type === 'mysql') {
-      $this->database->query('SET SESSION wait_timeout = :timeout', [
-        ':timeout' => $timeout + 5,
-      ]);
+      $this->database->query('SET SESSION wait_timeout = ' . ($timeout + 5));
     }
     elseif ($db_type === 'pgsql') {
-      $this->database->query('SET SESSION idle_session_timeout = :timeout', [
-        ':timeout' => ($timeout + 5) * 1000,
-      ]);
+      $this->database->query('SET SESSION idle_session_timeout = ' . (($timeout + 5) * 1000));
     }
 
     $process = $this->processFactory->create($command, $cwd, $env + ['COMPOSER_HOME' => $home]);
