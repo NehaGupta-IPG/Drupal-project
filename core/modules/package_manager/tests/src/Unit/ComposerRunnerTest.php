@@ -70,6 +70,12 @@ class ComposerRunnerTest extends UnitTestCase {
       $database->reveal(),
     );
     $runner->run(['--version'], timeout: 10);
+
+    // Since the timeout query is not parameterized, confirm that timeout cannot
+    // be a string, even a numeric one.
+    $this->expectException(\TypeError::class);
+    $this->expectExceptionMessage('Argument #5 ($timeout) must be of type int, string given');
+    $runner->run(['--version'], timeout: '13');
   }
 
 }
