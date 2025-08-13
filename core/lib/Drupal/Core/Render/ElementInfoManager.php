@@ -5,8 +5,11 @@ namespace Drupal\Core\Render;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
+use Drupal\Core\Plugin\PreWarmablePluginManagerTrait;
 use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\Core\PreWarm\PreWarmableInterface;
 use Drupal\Core\Render\Attribute\RenderElement;
+use Drupal\Core\Render\Element\ElementInterface;
 use Drupal\Core\Render\Element\FormElementInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 
@@ -21,7 +24,9 @@ use Drupal\Core\Theme\ThemeManagerInterface;
  * @see \Drupal\Core\Render\Element\FormElementInterface
  * @see plugin_api
  */
-class ElementInfoManager extends DefaultPluginManager implements ElementInfoManagerInterface {
+class ElementInfoManager extends DefaultPluginManager implements ElementInfoManagerInterface, PreWarmableInterface {
+
+  use PreWarmablePluginManagerTrait;
 
   /**
    * Stores the available element information.
@@ -53,7 +58,7 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
     protected ThemeManagerInterface $themeManager,
   ) {
     $this->setCacheBackend($cache_backend, 'element_info');
-    parent::__construct('Element', $namespaces, $module_handler, 'Drupal\Core\Render\Element\ElementInterface', RenderElement::class, 'Drupal\Core\Render\Annotation\RenderElement');
+    parent::__construct('Element', $namespaces, $module_handler, ElementInterface::class, RenderElement::class, 'Drupal\Core\Render\Annotation\RenderElement');
     $this->alterInfo('element_plugin');
   }
 
@@ -97,7 +102,8 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
 
     // Otherwise, rebuild and cache.
     $info = [];
-    $previous_error_handler = set_error_handler(function ($severity, $message, $file, $line) use (&$previous_error_handler) {
+    $previous_error_handler = get_error_handler();
+    set_error_handler(function ($severity, $message, $file, $line) use (&$previous_error_handler) {
       // Ignore deprecations while building element information.
       if ($severity === E_USER_DEPRECATED) {
         // Don't execute PHP internal error handler.
@@ -137,8 +143,8 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
    * {@inheritdoc}
    *
    * @return \Drupal\Core\Render\Element\ElementInterface
+   *   The render element plugin instance.
    */
-  // phpcs:ignore Drupal.Commenting.FunctionComment.MissingReturnComment
   public function createInstance($plugin_id, array $configuration = []) {
     return parent::createInstance($plugin_id, $configuration);
   }

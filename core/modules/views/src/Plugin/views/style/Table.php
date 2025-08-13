@@ -71,6 +71,7 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
     $options = parent::defineOptions();
 
     $options['columns'] = ['default' => []];
+    $options['class'] = ['default' => ''];
     $options['default'] = ['default' => ''];
     $options['info'] = ['default' => []];
     $options['override'] = ['default' => TRUE];
@@ -190,7 +191,7 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
       }
 
       // If the field is the column, mark it so, or the column
-      // it's set to is a column, that's ok
+      // it's set to is a column, that's ok.
       if ($field == $column || $columns[$column] == $column && !empty($sanitized[$column])) {
         $sanitized[$field] = $column;
       }
@@ -214,6 +215,13 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
       ];
       return;
     }
+
+    $form['class'] = [
+      '#title' => $this->t('Table CSS classes'),
+      '#type' => 'textfield',
+      '#description' => $this->t('Classes to provide on the table. Separate multiple classes with a space. Example: classA classB'),
+      '#default_value' => $this->options['class'],
+    ];
 
     $form['override'] = [
       '#type' => 'checkbox',
@@ -324,7 +332,7 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
           '#return_value' => $field,
           '#parents' => ['style_options', 'default'],
           '#id' => $radio_id,
-          // Because 'radio' doesn't fully support '#id' =(
+          // Because 'radio' doesn't fully support "'#id' =(".
           '#attributes' => ['id' => $radio_id],
           '#default_value' => $default,
           '#states' => [
@@ -387,13 +395,13 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
         ],
       ];
 
-      // Markup for the field name
+      // Markup for the field name.
       $form['info'][$field]['name'] = [
         '#markup' => $field_names[$field],
       ];
     }
 
-    // Provide a radio for no default sort
+    // Provide a radio for no default sort.
     $form['default'][-1] = [
       '#title' => $this->t('No default sort'),
       '#title_display' => 'invisible',

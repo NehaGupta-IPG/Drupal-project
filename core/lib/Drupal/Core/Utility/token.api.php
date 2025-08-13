@@ -105,7 +105,7 @@ function hook_tokens($type, $tokens, array $data, array $options, \Drupal\Core\R
 
         // Default values for the chained tokens handled below.
         case 'author':
-          $account = $node->getOwner() ? $node->getOwner() : User::load(0);
+          $account = $node->getOwner() ?: User::load(0);
           $replacements[$original] = $account->label();
           $bubbleable_metadata->addCacheableDependency($account);
           break;
@@ -137,10 +137,10 @@ function hook_tokens($type, $tokens, array $data, array $options, \Drupal\Core\R
  *   The context in which hook_tokens() was called. An associative array with
  *   the following keys, which have the same meaning as the corresponding
  *   parameters of hook_tokens():
- *   - 'type'
- *   - 'tokens'
- *   - 'data'
- *   - 'options'
+ *   - 'type'.
+ *   - 'tokens'.
+ *   - 'data'.
+ *   - 'options'.
  * @param \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata
  *   The bubbleable metadata. In case you alter an existing token based upon
  *   a data source that isn't in $context['data'], you must add that
@@ -208,7 +208,7 @@ function hook_tokens_alter(array &$replacements, array $context, \Drupal\Core\Re
  * @see hook_token_info_alter()
  * @see hook_tokens()
  */
-function hook_token_info() {
+function hook_token_info(): array {
   $type = [
     'name' => t('Nodes'),
     'description' => t('Tokens related to individual nodes.'),

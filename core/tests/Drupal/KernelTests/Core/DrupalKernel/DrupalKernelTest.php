@@ -7,7 +7,6 @@ namespace Drupal\KernelTests\Core\DrupalKernel;
 use Composer\Autoload\ClassLoader;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
-use Drupal\Core\Utility\Error;
 use Drupal\KernelTests\KernelTestBase;
 use org\bovigo\vfs\vfsStream;
 use Prophecy\Argument;
@@ -27,8 +26,7 @@ class DrupalKernelTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected function tearDown(): void {
-    $currentErrorHandler = Error::currentErrorHandler();
-    if (is_string($currentErrorHandler) && $currentErrorHandler === '_drupal_error_handler') {
+    if (get_error_handler() === '_drupal_error_handler') {
       restore_error_handler();
     }
     parent::tearDown();
@@ -45,8 +43,8 @@ class DrupalKernelTest extends KernelTestBase {
    * Build a kernel for testings.
    *
    * Because the bootstrap is in DrupalKernel::boot and that involved loading
-   * settings from the filesystem we need to go to extra lengths to build a kernel
-   * for testing.
+   * settings from the filesystem we need to go to extra lengths to build a
+   * kernel for testing.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   A request object to use in booting the kernel.
@@ -205,6 +203,8 @@ class DrupalKernelTest extends KernelTestBase {
    * Data provider for self::testClassLoaderAutoDetect.
    *
    * @return array
+   *   An array of test cases. Each test case is an array containing a single boolean value
+   *   that represents the class_loader_auto_detect setting to be tested.
    */
   public static function providerClassLoaderAutoDetect() {
     return [
@@ -219,13 +219,13 @@ class DrupalKernelTest extends KernelTestBase {
    * This test runs in a separate process since it registers class loaders and
    * results in statics being set.
    *
+   * @param bool $value
+   *   The value to set class_loader_auto_detect to.
+   *
    * @runInSeparateProcess
    * @preserveGlobalState disabled
    * @covers ::boot
    * @dataProvider providerClassLoaderAutoDetect
-   *
-   * @param bool $value
-   *   The value to set class_loader_auto_detect to.
    */
   public function testClassLoaderAutoDetect($value): void {
     // Create a virtual file system containing items that should be
@@ -248,7 +248,7 @@ class DrupalKernelTest extends KernelTestBase {
     $classloader = $this->prophesize(ClassLoader::class);
 
     // Assert that we call the setApcuPrefix on the classloader if
-    // class_loader_auto_detect is set to TRUE;
+    // class_loader_auto_detect is set to TRUE.
     if ($value) {
       $classloader->setApcuPrefix(Argument::type('string'))->shouldBeCalled();
     }
