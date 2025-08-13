@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\package_manager;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\File\FileSystemInterface;
 use PhpTuf\ComposerStager\API\Finder\Service\ExecutableFinderInterface;
 use PhpTuf\ComposerStager\API\Path\Value\PathInterface;
@@ -13,8 +14,6 @@ use PhpTuf\ComposerStager\API\Process\Service\ComposerProcessRunnerInterface;
 use PhpTuf\ComposerStager\API\Process\Service\OutputCallbackInterface;
 use PhpTuf\ComposerStager\API\Process\Service\ProcessInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
-
-// cspell:ignore BINDIR
 
 /**
  * Runs Composer through the current PHP interpreter.
@@ -31,6 +30,7 @@ final class ComposerRunner implements ComposerProcessRunnerInterface {
     private readonly ProcessFactoryInterface $processFactory,
     private readonly FileSystemInterface $fileSystem,
     private readonly ConfigFactoryInterface $configFactory,
+    private readonly Connection $database,
   ) {}
 
   /**
@@ -45,6 +45,14 @@ final class ComposerRunner implements ComposerProcessRunnerInterface {
     $home .= '/package_manager_composer_home-';
     $home .= $this->configFactory->get('system.site')->get('uuid');
     $this->fileSystem->prepareDirectory($home, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
+
+    // Set the database connection timeout long enough to stay alive for the
+    // duration of the Composer command.
+    if ($this->database->databaseType() === 'mysql') {
+      $this->database->query('SET SESSION wait_timeout = :timeout', [
+        ':timeout' => $timeout + 5,
+      ]);
+    }
 
     $process = $this->processFactory->create($command, $cwd, $env + ['COMPOSER_HOME' => $home]);
     $process->setTimeout($timeout);
