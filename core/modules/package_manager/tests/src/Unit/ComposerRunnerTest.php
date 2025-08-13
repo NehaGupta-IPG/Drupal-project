@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\package_manager\Unit;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\package_manager\ComposerRunner;
 use Drupal\Tests\UnitTestCase;
@@ -11,9 +12,8 @@ use PhpTuf\ComposerStager\API\Finder\Service\ExecutableFinderInterface;
 use PhpTuf\ComposerStager\API\Process\Factory\ProcessFactoryInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 use Prophecy\Argument;
-
-// cspell:ignore BINDIR
 
 /**
  * Tests Package Manager's Composer runner service.
@@ -27,7 +27,9 @@ class ComposerRunnerTest extends UnitTestCase {
   /**
    * Tests that the Composer runner runs Composer through the PHP interpreter.
    */
-  public function testRunner(): void {
+  #[TestWith(['mysql'])]
+  #[TestWith(['pgsql'])]
+  public function testRunner(string $db_type): void {
     $executable_finder = $this->prophesize(ExecutableFinderInterface::class);
     $executable_finder->find('composer')
       ->willReturn('/mock/composer')
@@ -47,6 +49,24 @@ class ComposerRunnerTest extends UnitTestCase {
     $file_system->getTempDirectory()->shouldBeCalled();
     $file_system->prepareDirectory(Argument::cetera())->shouldBeCalled();
 
+    // The database's idle timeout should be set to whatever the passed timeout
+    // is, plus 5 seconds.
+    $database = $this->prophesize(Connection::class);
+    $database->databaseType()->willReturn($db_type);
+    $database->query(
+      match ($db_type) {
+        'mysql' => 'SET SESSION wait_timeout = :timeout',
+        'pgsql' => 'SET SESSION idle_session_timeout = :timeout',
+      },
+      [
+        ':timeout' => match ($db_type) {
+          'mysql' => 15,
+          // PostgreSQL's idle timeout is in milliseconds.
+          'pgsql' => 15000,
+        },
+      ],
+    )->shouldBeCalled();
+
     $runner = new ComposerRunner(
       $executable_finder->reveal(),
       $process_factory->reveal(),
@@ -56,8 +76,9 @@ class ComposerRunnerTest extends UnitTestCase {
           'uuid' => 'testing',
         ],
       ]),
+      $database->reveal(),
     );
-    $runner->run(['--version']);
+    $runner->run(['--version'], timeout: 10);
   }
 
 }
