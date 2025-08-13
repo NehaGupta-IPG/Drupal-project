@@ -152,7 +152,7 @@ class EntityReference extends DisplayPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function query() {
+  public function query($group_by = FALSE) {
     if (!empty($this->view->live_preview)) {
       return;
     }
@@ -160,7 +160,11 @@ class EntityReference extends DisplayPluginBase {
     // Make sure the id field is included in the results.
     $id_field = $this->view->storage->get('base_field');
     $id_table = $this->view->storage->get('base_table');
-    $this->id_field_alias = $this->view->query->addField($id_table, $id_field);
+    $group_by_params = [];
+    if ($group_by) {
+      $group_by_params = ['function' => 'group', 'aggregate' => FALSE];
+    }
+    $this->id_field_alias = $this->view->query->addField($id_table, $id_field, 'entity_reference_id', $group_by_params);
 
     $options = $this->getOption('entity_reference_options') ?? [];
     // The entity_reference_options are typically set during a call to
