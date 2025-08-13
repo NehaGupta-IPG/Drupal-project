@@ -48,9 +48,15 @@ final class ComposerRunner implements ComposerProcessRunnerInterface {
 
     // Set the database connection timeout long enough to stay alive for the
     // duration of the Composer command.
-    if ($this->database->databaseType() === 'mysql') {
+    $db_type = $this->database->databaseType();
+    if ($db_type === 'mysql') {
       $this->database->query('SET SESSION wait_timeout = :timeout', [
         ':timeout' => $timeout + 5,
+      ]);
+    }
+    elseif ($db_type === 'pgsql') {
+      $this->database->query('SET SESSION idle_session_timeout = :timeout', [
+        ':timeout' => ($timeout + 5) * 1000,
       ]);
     }
 
