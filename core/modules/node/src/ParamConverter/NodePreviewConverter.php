@@ -34,7 +34,14 @@ class NodePreviewConverter implements ParamConverterInterface {
   public function convert($value, $definition, $name, array $defaults) {
     $store = $this->tempStoreFactory->get('node_preview');
     if ($form_state = $store->get($value)) {
-      return $form_state->getFormObject()->getEntity();
+      $language = \Drupal::languageManager()->getCurrentLanguage();
+      $langcode = $language->getId();
+      $entity = $form_state->getFormObject()->getEntity();
+      if ($entity->hasTranslation($langcode)) {
+        // Preview node in requested language.
+        $entity = $entity->getTranslation($langcode);
+      }
+      return $entity;
     }
   }
 
