@@ -774,6 +774,15 @@
 
       once('textarea-listener', selectedButtons).forEach((textarea) => {
         textarea.addEventListener('change', (e) => {
+          // Block submit button, in order to wait for ajax response with
+          // updated form.
+          const form = document.querySelector(
+            '#filter-format-edit-form, #filter-format-add-form',
+          );
+          if (form) {
+            form.querySelector('[data-drupal-selector="edit-actions-submit"]').setAttribute('disabled', 'disabled');
+          }
+          Drupal.announce(Drupal.t('The toolbar was updated'));
           const buttonName = document.activeElement.getAttribute('data-id');
           if (!buttonName) {
             // If there is no 'data-id' attribute, then the config
