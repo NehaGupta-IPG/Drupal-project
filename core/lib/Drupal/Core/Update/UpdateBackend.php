@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Update;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\NullBackend;
 
@@ -49,6 +50,34 @@ class UpdateBackend extends NullBackend {
    */
   public function deleteAll() {
     $this->backend->deleteAll();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function set($cid, $data, $expire = Cache::PERMANENT, array $tags = []) {
+    $this->backend->delete($cid);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function invalidate($cid) {
+    $this->backend->invalidate($cid);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function invalidateMultiple(array $cids) {
+    $this->backend->invalidateMultiple($cids);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function invalidateAll() {
+    $this->backend->invalidateAll();
   }
 
 }
