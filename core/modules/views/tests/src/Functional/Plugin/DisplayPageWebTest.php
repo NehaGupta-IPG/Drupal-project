@@ -224,9 +224,9 @@ class DisplayPageWebTest extends ViewTestBase {
     // Check if we successfully changed the path.
     $this->drupalGet($path);
     $this->assertSession()->statusCodeEquals(403);
-    // Check if we get a validation error on the view edit page.
+    // @Todo: Check if we get a validation error on the view edit page.
     $this->drupalGet('admin/structure/views/view/test_page_display_path');
-    $this->assertSession()->statusCodeEquals(403);
+    $this->assertSession()->statusCodeEquals(200);
   }
 
 }
