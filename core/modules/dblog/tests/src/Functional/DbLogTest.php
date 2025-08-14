@@ -81,17 +81,19 @@ class DbLogTest extends BrowserTestBase {
       'administer site configuration',
       'access administration pages',
       'access help pages',
+      'access dblog reports',
       'access site reports',
       'administer users',
     ]);
     $this->userWithSiteReportsPermissions = $this->drupalCreateUser([
       'access administration pages',
+      'access dblog reports',
       'access site reports',
     ]);
     $this->userWithDblogReportsPermissions = $this->drupalCreateUser([
       'access administration pages',
-      'access site reports',
       'access dblog reports',
+      'access site reports',
     ]);
     $this->webUser = $this->drupalCreateUser([]);
   }
