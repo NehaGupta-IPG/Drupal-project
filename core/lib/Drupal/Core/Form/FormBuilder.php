@@ -755,8 +755,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // - The target is a different form from the one that triggered the
       //   call, update the build id of the calling form.
       $request = $this->requestStack->getCurrentRequest();
-      $hx_target = $request->headers->get('hx-target') ?? NULL;
-      $hx_trigger = $request->headers->get('hx-trigger') ?? NULL;
+      $hx_target = $request->headers->get('hx-target');
+      $hx_trigger = $request->headers->get('hx-trigger');
       $target_is_form = str_ends_with($hx_target ?? '', '-form');
       if (!$target_is_form || ($target_is_form && $hx_target !== $hx_trigger)) {
         $form['form_build_id']['#attributes']['data-hx-swap-oob'] = 'true';
