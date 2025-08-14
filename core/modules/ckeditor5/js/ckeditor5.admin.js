@@ -780,7 +780,8 @@
             '#filter-format-edit-form, #filter-format-add-form',
           );
           if (form) {
-            form.querySelector('[data-drupal-selector="edit-actions-submit"]').setAttribute('disabled', 'disabled');
+            form
+              .querySelector('[data-drupal-selector="edit-actions-submit"]').setAttribute('disabled', 'disabled');
           }
           Drupal.announce(Drupal.t('The toolbar was updated'));
           const buttonName = document.activeElement.getAttribute('data-id');
