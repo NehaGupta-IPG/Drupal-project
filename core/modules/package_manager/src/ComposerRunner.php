@@ -49,9 +49,9 @@ final class ComposerRunner implements ComposerProcessRunnerInterface {
     try {
       $this->database->setIdleTimeout($timeout + 5);
     }
-    catch (\BadMethodCallException) {
-      // The database driver doesn't support setting the idle timeout. At least
-      // we gave it a try, so continue anyway.
+    catch (\Throwable) {
+      // If we weren't able to set the idle timeout for whatever reason, bravely
+      // continue anyway and hope for the best.
     }
     $process = $this->processFactory->create($command, $cwd, $env + ['COMPOSER_HOME' => $home]);
     $process->setTimeout($timeout);
