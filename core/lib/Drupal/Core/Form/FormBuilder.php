@@ -759,7 +759,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       $hx_trigger = $request->headers->get('hx-trigger') ?? NULL;
       $target_is_form = str_ends_with($hx_target ?? '', '-form');
       if (!$target_is_form || ($target_is_form && $hx_target !== $hx_trigger)) {
-        $form['form_build_id']['#attributes']['data-hx-swap-oob'] = 'outerHTML:input[name="form_build_id"][value="' . $old_build_id . '"]';
+        $form['form_build_id']['#attributes']['data-hx-swap-oob'] = 'true';
       }
     }
 
@@ -826,6 +826,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
         // and #parents being set elsewhere.
         '#parents' => ['form_id'],
       ];
+      // Ensure the form_build_id element has a stable id we can use with HTMX.
+      $form['form_build_id']['#attributes']['id'] = Html::getId($form['form_id']['#id'] . '_build_id');
     }
     if (!isset($form['#id'])) {
       $form['#id'] = Html::getUniqueId($form_id);

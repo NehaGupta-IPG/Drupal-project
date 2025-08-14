@@ -99,9 +99,7 @@ class ConfigSingleExportForm extends FormBase {
       '#default_value' => $config_type,
       '#attributes' => [
         'data-hx-post' => '',
-        'data-hx-swap' => 'outerHTML',
-        'data-hx-select' => '*:has(>select[name="config_name"])',
-        'data-hx-target' => '*:has(>select[name="config_name"])',
+        'data-hx-swap' => 'none',
       ],
     ];
 
@@ -114,12 +112,15 @@ class ConfigSingleExportForm extends FormBase {
       '#attributes' => [
         'data-hx-post' => '',
         'data-hx-swap' => 'none',
+        'data-hx-swap-oob' => 'true',
       ],
     ];
 
     $form['export'] = [
-      '#prefix' => '<div id="edit-export-wrapper" data-hx-swap-oob="true">',
-      '#suffix' => '</div>',
+      '#wrapper_attributes' => [
+        'id' => 'export-wrapper',
+        'data-hx-swap-oob' => 'true',
+      ],
       '#title' => $this->t('Here is your configuration:'),
       '#type' => 'textarea',
       '#rows' => 24,
