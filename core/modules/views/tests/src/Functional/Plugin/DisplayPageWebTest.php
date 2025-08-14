@@ -207,7 +207,7 @@ class DisplayPageWebTest extends ViewTestBase {
     $this->assertSession()->statusCodeEquals(200);
   }
 
-    /**
+  /**
    * Tests that we cannot change a view page display path to reserved words.
    *
    * @param string $path
