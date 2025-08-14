@@ -15,6 +15,10 @@ props:
   type: object
 
   properties:
+    attributes:
+      title: Attributes
+      description: HTML attributes for the toolbar button.
+      type: object
     action:
       type: string
       title: Action
