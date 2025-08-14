@@ -30,9 +30,7 @@ class TranslateFilterForm extends TranslateFormBase {
     $form['#attached']['library'][] = 'core/drupal.htmx';
     // Use GET to work around the form using session to save the values.
     $form['#attributes']['data-hx-get'] = '';
-    $form['#attributes']['data-hx-swap'] = 'outerHTML';
-    $form['#attributes']['data-hx-select'] = '#locale-translate-edit-form';
-    $form['#attributes']['data-hx-target'] = '#locale-translate-edit-form';
+    $form['#attributes']['data-hx-swap'] = 'none';
 
     $form['filters'] = [
       '#type' => 'details',
