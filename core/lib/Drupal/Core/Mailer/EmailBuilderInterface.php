@@ -43,6 +43,26 @@ interface EmailBuilderInterface {
   public function controller(?\Closure $controller): static;
 
   /**
+   * Sets or replaces the recipients.
+   */
+  public function to(Address|string ...$addresses): static;
+
+  /**
+   * Sets or replaces the Cc recipients.
+   */
+  public function cc(Address|string ...$addresses): static;
+
+  /**
+   * Sets or replaces the Bcc recipients.
+   */
+  public function bcc(Address|string ...$addresses): static;
+
+  /**
+   * Sets or replaces the Reply-To addresses.
+   */
+  public function replyTo(Address|string ...$addresses): static;
+
+  /**
    * Renders and returns the built email.
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
@@ -53,26 +73,12 @@ interface EmailBuilderInterface {
   /**
    * Renders and sends the built email.
    *
-   * @param \Symfony\Component\Mime\Address|string|array<\Symfony\Component\Mime\Address|string>|null $to
-   *   The recipients.
-   * @param \Symfony\Component\Mime\Address|string|array<\Symfony\Component\Mime\Address|string>|null $cc
-   *   The cc recipients.
-   * @param \Symfony\Component\Mime\Address|string|array<\Symfony\Component\Mime\Address|string>|null $bcc
-   *   The cc recipients.
-   * @param \Symfony\Component\Mime\Address|string|array<\Symfony\Component\Mime\Address|string>|null $replyTo
-   *   The reply-to addresses.
    * @param (\Closure():\Psr\Log\LoggerInterface)|null $logger
    *   The logger closure to use when an error occures.
    *
    * @return bool
    *   TRUE when a mail has been queued successfully, FALSE otherwise.
    */
-  public function send(
-    Address|string|array|null $to = NULL,
-    Address|string|array|null $cc = NULL,
-    Address|string|array|null $bcc = NULL,
-    Address|string|array|null $replyTo = NULL,
-    ?\Closure $logger = NULL,
-  ): bool;
+  public function send(?\Closure $logger = NULL): bool;
 
 }

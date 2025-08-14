@@ -34,6 +34,14 @@ class EmailBuilder implements EmailBuilderInterface {
    *   All email parameters.
    * @param \Closure|null $controller
    *   Controller used to build the email render array.
+   * @param array<\Symfony\Component\Mime\Address|string> $to
+   *   The email recipients.
+   * @param array<\Symfony\Component\Mime\Address|string> $cc
+   *   The email cc recipients.
+   * @param array<\Symfony\Component\Mime\Address|string> $bcc
+   *   The email bcc recipients.
+   * @param array<\Symfony\Component\Mime\Address|string> $replyTo
+   *   The email reply-to addresses.
    *
    * @internal Use EmailManagerInterface::getEmailBuilder() instead.
    */
@@ -46,6 +54,10 @@ class EmailBuilder implements EmailBuilderInterface {
     protected string $langcode = '',
     protected array $params = [],
     protected ?\Closure $controller = NULL,
+    protected array $to = [],
+    protected array $cc = [],
+    protected array $bcc = [],
+    protected array $replyTo = [],
   ) {
   }
 
@@ -97,6 +109,38 @@ class EmailBuilder implements EmailBuilderInterface {
   /**
    * {@inheritdoc}
    */
+  public function to(Address|string ...$addresses): static {
+    $this->to = $addresses;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function cc(Address|string ...$addresses): static {
+    $this->cc = $addresses;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function bcc(Address|string ...$addresses): static {
+    $this->bcc = $addresses;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function replyTo(Address|string ...$addresses): static {
+    $this->replyTo = $addresses;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function build(): Email {
     if (empty($this->id)) {
       throw new \InvalidArgumentException('Email builders must explicitly set the email id. See Drupal\Core\Mailer\EmailBuilderInterface::id().');
@@ -106,35 +150,31 @@ class EmailBuilder implements EmailBuilderInterface {
     }
 
     $definition = ($this->emailManager)()->getEmailDefinition($this->id, $this->controller);
-    return ($this->emailRenderer)()->render($definition, $this->params, $this->langcode);
+    $email = ($this->emailRenderer)()->render($definition, $this->params, $this->langcode);
+    if (!empty($this->to)) {
+      $email->to(...$this->to);
+    }
+    if (!empty($this->cc)) {
+      $email->cc(...$this->cc);
+    }
+    if (!empty($this->bcc)) {
+      $email->bcc(...$this->bcc);
+    }
+    if (!empty($this->replyTo)) {
+      $email->replyTo(...$this->replyTo);
+    }
+    return $email;
   }
 
   /**
    * {@inheritdoc}
    */
   public function send(
-    Address|string|array|null $to = NULL,
-    Address|string|array|null $cc = NULL,
-    Address|string|array|null $bcc = NULL,
-    Address|string|array|null $replyTo = NULL,
     ?\Closure $logger = NULL,
   ): bool {
     $result = FALSE;
     try {
-      $email = $this->build();
-      if (!empty($to)) {
-        $email->to(...(is_array($to) ? $to : [$to]));
-      }
-      if (!empty($cc)) {
-        $email->cc(...(is_array($cc) ? $cc : [$cc]));
-      }
-      if (!empty($bcc)) {
-        $email->bcc(...(is_array($bcc) ? $bcc : [$bcc]));
-      }
-      if (!empty($replyTo)) {
-        $email->replyTo(...(is_array($replyTo) ? $replyTo : [$replyTo]));
-      }
-      ($this->mailer)()->send($email);
+      ($this->mailer)()->send($this->build());
       $result = TRUE;
     }
     catch (\InvalidArgumentException | PluginException | TransportException $e) {
