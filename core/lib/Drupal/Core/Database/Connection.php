@@ -1288,7 +1288,7 @@ abstract class Connection {
    * @param int $timeout
    *   How long the timeout should be, in seconds.
    */
-  public function setIdleTimeout(int $timeout) {
+  public function setIdleTimeout(int $timeout): void {
     $message = sprintf('The %s database driver does not support setting an idle timeout.', $this->driver());
     throw new \BadMethodCallException($message);
   }
