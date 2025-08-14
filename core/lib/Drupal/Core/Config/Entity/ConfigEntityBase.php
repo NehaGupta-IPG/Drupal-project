@@ -297,71 +297,68 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
     parent::preSave($storage);
 
     if ($this instanceof EntityWithPluginCollectionInterface && !$this->isSyncing()) {
-        // Any changes to the plugin configuration must be saved to the entity's
-        // copy as well.
-        foreach ($this->getPluginCollections() as $plugin_config_key => $plugin_collection) {
-            $this->set($plugin_config_key, $plugin_collection->getConfiguration());
-        }
+      // Any changes to the plugin configuration must be saved to the entity's
+      // copy as well.
+      foreach ($this->getPluginCollections() as $plugin_config_key => $plugin_collection) {
+        $this->set($plugin_config_key, $plugin_collection->getConfiguration());
+      }
     }
 
     // Ensure this entity's UUID does not exist with a different ID, regardless
     // of whether it's new or updated.
     $matching_entities = $storage->getQuery()
-        ->condition('uuid', $this->uuid())
-        ->execute();
+      ->condition('uuid', $this->uuid())
+      ->execute();
     $matched_entity = reset($matching_entities);
     if (!empty($matched_entity) && ($matched_entity != $this->id()) && $matched_entity != $this->getOriginalId()) {
-        throw new ConfigDuplicateUUIDException("Attempt to save a configuration entity '{$this->id()}' with UUID '{$this->uuid()}' when this UUID is already used for '$matched_entity'");
+      throw new ConfigDuplicateUUIDException("Attempt to save a configuration entity '{$this->id()}' with UUID '{$this->uuid()}' when this UUID is already used for '$matched_entity'");
     }
 
     // If this entity is not new, load the original entity for comparison.
     if (!$this->isNew()) {
-        $original = $storage->loadUnchanged($this->getOriginalId());
-        // Ensure that the UUID cannot be changed for an existing entity.
-        if ($original && ($original->uuid() != $this->uuid())) {
-            throw new ConfigDuplicateUUIDException("Attempt to save a configuration entity '{$this->id()}' with UUID '{$this->uuid()}' when this entity already exists with UUID '{$original->uuid()}'");
-        }
+      $original = $storage->loadUnchanged($this->getOriginalId());
+      // Ensure that the UUID cannot be changed for an existing entity.
+      if ($original && ($original->uuid() != $this->uuid())) {
+        throw new ConfigDuplicateUUIDException("Attempt to save a configuration entity '{$this->id()}' with UUID '{$this->uuid()}' when this entity already exists with UUID '{$original->uuid()}'");
+      }
     }
-
     if (!$this->isSyncing()) {
-        // Check for deprecated configuration keys.
-        $schema = \Drupal::service('config.typed')->getDefinition($this->getConfigTarget());
-        foreach ($this->toArray() as $key => $value) {
-            if (isset($schema['mapping'][$key]['deprecated'])) {
-                $deprecated = $schema['mapping'][$key]['deprecated'];
-                $message = sprintf(
-                    'The configuration key "%s" is deprecated as of Drupal %s: %s',
-                    $key,
-                    $deprecated['version'] ?? 'unknown',
-                    $deprecated['message'] ?? 'No additional details provided.'
-                );
-                trigger_error($message, E_USER_DEPRECATED);
-            }
+      // Check for deprecated configuration keys.
+      $schema = \Drupal::service('config.typed')->getDefinition($this->getConfigTarget());
+      foreach ($this->toArray() as $key => $value) {
+        if (isset($schema['mapping'][$key]['deprecated'])) {
+          $deprecated = $schema['mapping'][$key]['deprecated'];
+          $message = sprintf(
+            'The configuration key "%s" is deprecated as of Drupal %s: %s',
+            $key,
+            $deprecated['version'] ?? 'unknown',
+            $deprecated['message'] ?? 'No additional details provided.'
+          );
+          trigger_error($message, E_USER_DEPRECATED);
         }
+      }
 
-        // Ensure the correct dependencies are present. If the configuration is
-        // being written during a configuration synchronization then there is no
-        // need to recalculate the dependencies.
-        $this->calculateDependencies();
-
-        // If the data is trusted we need to ensure that the dependencies are
-        // sorted as per their schema. If the save is not trusted then the
-        // configuration will be sorted by StorableConfigBase.
-        if ($this->trustedData) {
-            $mapping = ['config' => 0, 'content' => 1, 'module' => 2, 'theme' => 3, 'enforced' => 4];
-            $dependency_sort = function ($dependencies) use ($mapping) {
-                // Only sort the keys that exist.
-                $mapping_to_replace = array_intersect_key($mapping, $dependencies);
-                return array_replace($mapping_to_replace, $dependencies);
-            };
-            $this->dependencies = $dependency_sort($this->dependencies);
-            if (isset($this->dependencies['enforced'])) {
-                $this->dependencies['enforced'] = $dependency_sort($this->dependencies['enforced']);
-            }
+      // Ensure the correct dependencies are present. If the configuration is
+      // being written during a configuration synchronization then there is no
+      // need to recalculate the dependencies.
+      $this->calculateDependencies();
+      // If the data is trusted we need to ensure that the dependencies are
+      // sorted as per their schema. If the save is not trusted then the
+      // configuration will be sorted by StorableConfigBase.
+      if ($this->trustedData) {
+        $mapping = ['config' => 0, 'content' => 1, 'module' => 2, 'theme' => 3, 'enforced' => 4];
+        $dependency_sort = function ($dependencies) use ($mapping) {
+          // Only sort the keys that exist.
+          $mapping_to_replace = array_intersect_key($mapping, $dependencies);
+          return array_replace($mapping_to_replace, $dependencies);
+        };
+        $this->dependencies = $dependency_sort($this->dependencies);
+        if (isset($this->dependencies['enforced'])) {
+          $this->dependencies['enforced'] = $dependency_sort($this->dependencies['enforced']);
         }
+      }
     }
-}
-
+  }
 
   /**
    * {@inheritdoc}
