@@ -112,8 +112,11 @@ class ConfigSingleExportForm extends FormBase {
       '#attributes' => [
         'data-hx-post' => '',
         'data-hx-swap' => 'none',
-        'data-hx-swap-oob' => 'true',
       ],
+      '#wrapper_attributes' => [
+        'id' => 'config-name-wrapper',
+        'data-hx-swap-oob' => 'true',
+      ]
     ];
 
     $form['export'] = [
