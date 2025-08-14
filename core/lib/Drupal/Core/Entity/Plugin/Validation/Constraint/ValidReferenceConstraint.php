@@ -22,21 +22,21 @@ class ValidReferenceConstraint extends SymfonyConstraint {
    *
    * @var string
    */
-  public $message = 'This entity (%type: %id) cannot be referenced.';
+  public $message = 'This entity (%type - %bundle: %id) cannot be referenced.';
 
   /**
    * Violation message when the entity does not exist.
    *
    * @var string
    */
-  public $nonExistingMessage = 'The referenced entity (%type: %id) does not exist.';
+  public $nonExistingMessage = 'The referenced entity (%type - %bundle: %id) does not exist.';
 
   /**
    * Violation message when a new entity ("autocreate") is invalid.
    *
    * @var string
    */
-  public $invalidAutocreateMessage = 'This entity (%type: %label) cannot be referenced.';
+  public $invalidAutocreateMessage = 'This entity (%type - %bundle: %label) cannot be referenced.';
 
   /**
    * Violation message when the target_id is empty.
