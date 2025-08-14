@@ -310,24 +310,6 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // If this form is an HTMX request, disable all form redirects.
     if ($request->query->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_htmx') {
       $form_state->disableRedirect();
-
-      // Figure out if we need to update the form_build_id value.
-      // Make sure that we're looking at the right form if there are several on
-      // the page.
-      $old_build_id = $request->get('form_build_id');
-      if ($form_id === $request->get('form_id') &&  $old_build_id) {
-        // Update the build_id by using a oob swap only in the following situation:
-        // - The target to replace is not a whole form, the build_id will not be
-        //   part of the main swap.
-        // - The target is a different form from the one that triggered the
-        //   call, update the build id of the calling form.
-        $hx_target = $request->headers->get('hx-target');
-        $hx_trigger = $request->headers->get('hx-trigger');
-        $target_is_form = str_ends_with($hx_target, '-form');
-        if (!$target_is_form || ($target_is_form && $hx_target !== $hx_trigger)) {
-          $form['form_build_id']['#attributes']['data-hx-swap-oob'] = 'outerHTML:input[name="form_build_id"][value="' . $old_build_id . '"]';
-        }
-      }
     }
 
     // Now that we have a constructed form, process it. This is where:
@@ -758,6 +740,28 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // autocomplete off prevents the input from being retained.
       '#attributes' => ['autocomplete' => 'off'],
     ];
+
+    // Figure out if we need to update the form_build_id value.
+    // Make sure that we're looking at the right form if there are several on
+    // the page.
+    $input = $form_state->getUserInput();
+    $old_build_id = $input['form_build_id'] ?? NULL;
+    $returned_form_id = $input['form_id'] ?? NULL;
+    if ($form_id === $returned_form_id &&  $old_build_id) {
+      // Update the build_id by using an oob swap only
+      // in the following situation:
+      // - The target to replace is not a whole form, the build_id will not be
+      //   part of the main swap.
+      // - The target is a different form from the one that triggered the
+      //   call, update the build id of the calling form.
+      $request = $this->requestStack->getCurrentRequest();
+      $hx_target = $request->headers->get('hx-target') ?? NULL;
+      $hx_trigger = $request->headers->get('hx-trigger') ?? NULL;
+      $target_is_form = str_ends_with($hx_target ?? '', '-form');
+      if (!$target_is_form || ($target_is_form && $hx_target !== $hx_trigger)) {
+        $form['form_build_id']['#attributes']['data-hx-swap-oob'] = 'outerHTML:input[name="form_build_id"][value="' . $old_build_id . '"]';
+      }
+    }
 
     // Add a token, based on either #token or form_id, to any form displayed to
     // authenticated users. This ensures that any submitted form was actually
