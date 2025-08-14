@@ -68,12 +68,24 @@ class EmailRenderer implements EmailRendererInterface {
         $build['#props'] = $context;
         $email->html((string) $this->renderer->render($build));
 
-        // Let modules alter the resulting email. Also make render metadata
-        // available in context (contains #attachments and #cache).
-        $context['metadata'] = BubbleableMetadata::createFromRenderArray($build);
-        unset($context['email']);
-        $this->moduleHandler->alter('email_post_render', $email, $context);
+        // Make render metadata available to email_alter (contains #attachments
+        // and #cache).
+        $metadata = BubbleableMetadata::createFromRenderArray($build);
       }
+      else {
+        $metadata = new BubbleableMetadata();
+      }
+
+      // Let modules alter the resulting email.
+      $context = [
+        'id' => $definition->id(),
+        'module' => $definition->getModule(),
+        'key' => $definition->getKey(),
+        'langcode' => $langcode,
+        'params' => $params,
+        'metadata' => $metadata,
+      ];
+      $this->moduleHandler->alter('email', $email, $context);
 
       return $email;
     });
