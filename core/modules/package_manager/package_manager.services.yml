@@ -176,6 +176,8 @@ services:
     class: PhpTuf\ComposerStager\Internal\Process\Factory\ProcessFactory
   PhpTuf\ComposerStager\API\Process\Service\ComposerProcessRunnerInterface:
     class: Drupal\package_manager\ComposerRunner
+    calls:
+      - [setLogger, ['@logger.channel.package_manager']]
   PhpTuf\ComposerStager\API\Process\Service\OutputCallbackInterface:
     class: PhpTuf\ComposerStager\Internal\Process\Service\OutputCallback
   PhpTuf\ComposerStager\API\Process\Service\ProcessInterface:

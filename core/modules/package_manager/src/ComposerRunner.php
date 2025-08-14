@@ -13,6 +13,8 @@ use PhpTuf\ComposerStager\API\Process\Factory\ProcessFactoryInterface;
 use PhpTuf\ComposerStager\API\Process\Service\ComposerProcessRunnerInterface;
 use PhpTuf\ComposerStager\API\Process\Service\OutputCallbackInterface;
 use PhpTuf\ComposerStager\API\Process\Service\ProcessInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
@@ -23,7 +25,9 @@ use Symfony\Component\Process\PhpExecutableFinder;
  *   at any time without warning. External code should not interact with this
  *   class.
  */
-final class ComposerRunner implements ComposerProcessRunnerInterface {
+final class ComposerRunner implements ComposerProcessRunnerInterface, LoggerAwareInterface {
+
+  use LoggerAwareTrait;
 
   public function __construct(
     private readonly ExecutableFinderInterface $executableFinder,
@@ -49,9 +53,13 @@ final class ComposerRunner implements ComposerProcessRunnerInterface {
     try {
       $this->database->setIdleTimeout($timeout + 5);
     }
-    catch (\Throwable) {
+    catch (\Throwable $e) {
       // If we weren't able to set the idle timeout for whatever reason, bravely
-      // continue anyway and hope for the best.
+      // continue anyway and hope for the best, but do log the problem for
+      // forensic purposes.
+      $this->logger?->warning("Could not adjust the database server's idle timeout before running Composer: @message", [
+        '@message' => $e->getMessage(),
+      ]);
     }
     $process = $this->processFactory->create($command, $cwd, $env + ['COMPOSER_HOME' => $home]);
     $process->setTimeout($timeout);

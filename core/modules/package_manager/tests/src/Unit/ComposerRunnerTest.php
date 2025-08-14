@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\package_manager\Unit;
 
+use ColinODell\PsrTestLogger\TestLogger;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\package_manager\ComposerRunner;
@@ -13,6 +14,7 @@ use PhpTuf\ComposerStager\API\Process\Factory\ProcessFactoryInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
+use Psr\Log\LogLevel;
 
 /**
  * Tests Package Manager's Composer runner service.
@@ -49,7 +51,11 @@ class ComposerRunnerTest extends UnitTestCase {
     // The database's idle timeout should be set to whatever the passed timeout
     // is, plus 5 seconds.
     $database = $this->prophesize(Connection::class);
-    $database->setIdleTimeout(15)->shouldBeCalled();
+    $database->setIdleTimeout(15)
+      ->willThrow(new \Exception("Nope!"))
+      ->shouldBeCalled();
+
+    $logger = new TestLogger();
 
     $runner = new ComposerRunner(
       $executable_finder->reveal(),
@@ -62,7 +68,18 @@ class ComposerRunnerTest extends UnitTestCase {
       ]),
       $database->reveal(),
     );
+    $runner->setLogger($logger);
     $runner->run(['--version'], timeout: 10);
+
+    // The idle timeout error should have been logged.
+    $predicate = static function (array $record): bool {
+      return (
+        $record['level'] === LogLevel::WARNING &&
+        $record['message'] === "Could not adjust the database server's idle timeout before running Composer: @message" &&
+        $record['context']['@message'] === 'Nope!'
+      );
+    };
+    $this->assertTrue($logger->hasRecordThatPasses($predicate));
   }
 
 }
