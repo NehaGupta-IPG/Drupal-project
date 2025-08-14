@@ -113,9 +113,7 @@ class ConfigSingleExportForm extends FormBase {
       '#default_value' => $config_name,
       '#attributes' => [
         'data-hx-post' => '',
-        'data-hx-swap' => 'outerHTML',
-        'data-hx-select' => '*:has(>select[name="config_name"])',
-        'data-hx-target' => '*:has(>select[name="config_name"])',
+        'data-hx-swap' => 'none',
       ],
     ];
 
