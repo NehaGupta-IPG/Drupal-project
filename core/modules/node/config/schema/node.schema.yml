@@ -102,5 +102,5 @@ core.entity_view_display.node.article.default:
       type: string
       label: 'Default argument skip URL'
       deprecated:
-        version: '10.4.0'
-        message: 'This configuration key is deprecated and will be removed in Drupal 11.'
+        version: '11.3.0'
+        message: 'This configuration key is deprecated and will be removed in Drupal 12.'
