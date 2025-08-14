@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.node.teaser
+    - filter.format.basic_html
     - node.type.article
     - taxonomy.vocabulary.tags
   module:

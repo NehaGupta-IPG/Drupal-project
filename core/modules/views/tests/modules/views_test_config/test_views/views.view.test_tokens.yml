@@ -1,6 +1,8 @@
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  config:
+    - filter.format.plain_text
 id: test_tokens
 label: 'Test tokens'
 module: views
@@ -105,7 +107,7 @@ display:
           tokenize: false
           content:
             value: "Total rows: [view:total-rows] - Page count: [view:page-count]"
-            format: basic_html
+            format: plain_text
           plugin_id: text
   page_4:
     display_plugin: page
@@ -137,5 +139,5 @@ display:
           tokenize: false
           content:
             value: "Total rows: [view:total-rows]"
-            format: basic_html
+            format: plain_text
           plugin_id: text

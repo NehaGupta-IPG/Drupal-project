@@ -4,6 +4,7 @@ dependencies:
   config:
     - core.entity_view_mode.node.card_common
     - core.entity_view_mode.node.rss
+    - filter.format.full_html
     - node.type.recipe
   module:
     - node

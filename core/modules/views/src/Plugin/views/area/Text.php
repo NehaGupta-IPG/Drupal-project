@@ -2,8 +2,10 @@
 
 namespace Drupal\views\Plugin\views\area;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Attribute\ViewsArea;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Views area text handler.
@@ -12,6 +14,22 @@ use Drupal\views\Attribute\ViewsArea;
  */
 #[ViewsArea("text")]
 class Text extends TokenizeAreaPluginBase {
+
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityTypeManagerInterface $entityTypeManager) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('entity_type.manager')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -38,7 +56,7 @@ class Text extends TokenizeAreaPluginBase {
       '#type' => 'text_format',
       '#default_value' => $this->options['content']['value'],
       '#rows' => 6,
-      '#format' => $this->options['content']['format'] ?? filter_default_format(),
+      '#format' => $this->getFormatId(),
       '#editor' => FALSE,
     ];
   }
@@ -58,7 +76,7 @@ class Text extends TokenizeAreaPluginBase {
    * {@inheritdoc}
    */
   public function render($empty = FALSE) {
-    $format = $this->options['content']['format'] ?? filter_default_format();
+    $format = $this->getFormatId();
     if (!$empty || !empty($this->options['empty'])) {
       return [
         '#type' => 'processed_text',
@@ -68,6 +86,27 @@ class Text extends TokenizeAreaPluginBase {
     }
 
     return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function calculateDependencies() {
+    $format = $this->entityTypeManager->getStorage('filter_format')
+      ->load($this->getFormatId());
+    return [
+      $format->getConfigDependencyKey() => [$format->getConfigDependencyName()],
+    ];
+  }
+
+  /**
+   * Returns the ID of the text format used for this area.
+   *
+   * @return string
+   *   The text format ID.
+   */
+  protected function getFormatId() {
+    return $this->options['content']['format'] ?? filter_default_format();
   }
 
 }

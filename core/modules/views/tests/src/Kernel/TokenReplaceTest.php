@@ -18,7 +18,7 @@ class TokenReplaceTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system'];
+  protected static $modules = ['filter', 'system'];
 
   /**
    * Views used by this test.
@@ -26,6 +26,14 @@ class TokenReplaceTest extends ViewsKernelTestBase {
    * @var array
    */
   public static $testViews = ['test_tokens', 'test_invalid_tokens'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpFixtures(): void {
+    $this->installConfig('filter');
+    parent::setUpFixtures();
+  }
 
   /**
    * Tests core token replacements generated from a view.

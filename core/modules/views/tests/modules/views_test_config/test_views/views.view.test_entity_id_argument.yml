@@ -3,6 +3,7 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.node.teaser
+    - filter.format.plain_text
     - node.type.article
     - taxonomy.vocabulary.tags
   module:
@@ -156,7 +157,7 @@ display:
           tokenize: true
           content:
             value: 'title {{ arguments.field_views_testing_tags_target_id }}, input {{ raw_arguments.field_views_testing_tags_target_id }}'
-            format: basic_html
+            format: plain_text
           plugin_id: text
       footer: {  }
       empty: {  }

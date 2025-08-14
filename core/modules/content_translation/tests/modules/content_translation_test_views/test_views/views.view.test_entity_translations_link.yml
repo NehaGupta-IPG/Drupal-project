@@ -1,6 +1,8 @@
 langcode: en
 status: true
 dependencies:
+  config:
+    - filter.format.plain_text
   module:
     - content_translation
     - user
