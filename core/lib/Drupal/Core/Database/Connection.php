@@ -1283,6 +1283,17 @@ abstract class Connection {
   }
 
   /**
+   * Sets the number of seconds before this connection is dropped if idle.
+   *
+   * @param int $timeout
+   *   How long the timeout should be, in seconds.
+   */
+  public function setIdleTimeout(int $timeout) {
+    $message = sprintf('The %s database driver does not support setting an idle timeout.', $this->driver());
+    throw new \BadMethodCallException($message);
+  }
+
+  /**
    * Extracts the SQLSTATE error from a PDOException.
    *
    * @param \Exception $e

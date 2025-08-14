@@ -12,7 +12,6 @@ use PhpTuf\ComposerStager\API\Finder\Service\ExecutableFinderInterface;
 use PhpTuf\ComposerStager\API\Process\Factory\ProcessFactoryInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\TestWith;
 use Prophecy\Argument;
 
 /**
@@ -27,9 +26,7 @@ class ComposerRunnerTest extends UnitTestCase {
   /**
    * Tests that the Composer runner runs Composer through the PHP interpreter.
    */
-  #[TestWith(['mysql'])]
-  #[TestWith(['pgsql'])]
-  public function testRunner(string $db_type): void {
+  public function testRunner(): void {
     $executable_finder = $this->prophesize(ExecutableFinderInterface::class);
     $executable_finder->find('composer')
       ->willReturn('/mock/composer')
@@ -52,11 +49,7 @@ class ComposerRunnerTest extends UnitTestCase {
     // The database's idle timeout should be set to whatever the passed timeout
     // is, plus 5 seconds.
     $database = $this->prophesize(Connection::class);
-    $database->databaseType()->willReturn($db_type);
-    $database->query(match ($db_type) {
-      'mysql' => 'SET SESSION wait_timeout = 15',
-      'pgsql' => 'SET SESSION idle_session_timeout = 15000',
-    })->shouldBeCalled();
+    $database->setIdleTimeout(15)->shouldBeCalled();
 
     $runner = new ComposerRunner(
       $executable_finder->reveal(),
@@ -70,12 +63,6 @@ class ComposerRunnerTest extends UnitTestCase {
       $database->reveal(),
     );
     $runner->run(['--version'], timeout: 10);
-
-    // Since the timeout query is not parameterized, confirm that timeout cannot
-    // be a string, even a numeric one.
-    $this->expectException(\TypeError::class);
-    $this->expectExceptionMessage('Argument #5 ($timeout) must be of type int, string given');
-    $runner->run(['--version'], timeout: '13');
   }
 
 }
