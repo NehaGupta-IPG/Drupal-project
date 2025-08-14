@@ -781,7 +781,8 @@
           );
           if (form) {
             form
-              .querySelector('[data-drupal-selector="edit-actions-submit"]').setAttribute('disabled', 'disabled');
+              .querySelector('[data-drupal-selector="edit-actions-submit"]')
+              .setAttribute('disabled', 'disabled');
           }
           Drupal.announce(Drupal.t('The toolbar was updated'));
           const buttonName = document.activeElement.getAttribute('data-id');
