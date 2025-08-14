@@ -75,9 +75,6 @@ class ConfigSingleExportForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, $config_type = NULL, $config_name = NULL) {
-
-    $form['#attached']['library'][] = 'core/drupal.htmx';
-
     foreach ($this->entityTypeManager->getDefinitions() as $entity_type => $definition) {
       if ($definition->entityClassImplements(ConfigEntityInterface::class)) {
         $this->definitions[$entity_type] = $definition;
@@ -94,28 +91,26 @@ class ConfigSingleExportForm extends FormBase {
 
     $form['#attached']['library'][] = 'core/drupal.htmx';
 
-    $default_type = $form_state->getValue('config_type');
+    $config_type = $config_type ?? $form_state->getValue('config_type');
     $form['config_type'] = [
       '#title' => $this->t('Configuration type'),
       '#type' => 'select',
       '#options' => $config_types,
-      '#default_value' => $default_type,
+      '#default_value' => $config_type,
       '#attributes' => [
         'data-hx-post' => '',
         'data-hx-swap' => 'outerHTML',
         'data-hx-select' => '*:has(>select[name="config_name"])',
         'data-hx-target' => '*:has(>select[name="config_name"])',
-        // Prevent form validation errors, when changing the type.
-        //'data-hx-params' => 'not config_name',
       ],
     ];
 
-    $default_name = $form_state->getValue('config_name');
+    $config_name = $config_name ?? $form_state->getValue('config_name');
     $form['config_name'] = [
       '#title' => $this->t('Configuration name'),
       '#type' => 'select',
-      '#options' => $this->findConfiguration($default_type),
-      '#default_value' => $default_name,
+      '#options' => $this->findConfiguration($config_type),
+      '#default_value' => $config_name,
       '#attributes' => [
         'data-hx-post' => '',
         'data-hx-swap' => 'outerHTML',
@@ -132,10 +127,10 @@ class ConfigSingleExportForm extends FormBase {
       '#rows' => 24,
       '#value' => '',
     ];
-    if ($default_type && $default_name) {
+    if ($config_type && $config_name) {
       $fake_form_state = (new FormState())->setValues([
-        'config_type' => $default_type,
-        'config_name' => $default_name,
+        'config_type' => $config_type,
+        'config_name' => $config_name,
       ]);
       $form['export'] = $this->updateExport($form, $fake_form_state);
     }
