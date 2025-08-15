@@ -44,6 +44,8 @@ class ViewsHooks {
         $output .= '<dl>';
         $output .= '<dt>' . $this->t('Adding functionality to administrative pages') . '</dt>';
         $output .= '<dd>' . $this->t('The Views module adds functionality to some core administration pages. For example, <em>admin/content</em> uses Views to filter and sort content. With Views uninstalled, <em>admin/content</em> is more limited.') . '</dd>';
+        $output .= '<dt>' . $this->t('Reserved paths') . '</dt>';
+        $output .= '<dd>' . $this->t('Some paths such as "core", "libraries", "modules", "profiles", "sites", and "themes" are reserved, and cannot be used since they are Drupal web root folders.') . '</dd>';
         $output .= '<dt>' . $this->t('Expanding Views functionality') . '</dt>';
         $output .= '<dd>' . $this->t('Contributed projects that support the Views module can be found in the <a href=":node">online documentation for Views-related contributed modules</a>.', [':node' => 'https://www.drupal.org/documentation/modules/views/add-ons']) . '</dd>';
         $output .= '<dt>' . $this->t('Improving table accessibility') . '</dt>';
