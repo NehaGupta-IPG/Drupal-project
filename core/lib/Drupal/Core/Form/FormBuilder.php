@@ -303,7 +303,9 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     }
 
     // If this form is an AJAX request, disable all form redirects.
-    if ($ajax_form_request = $request->query->has(static::AJAX_FORM_REQUEST)) {
+    $ajax_form_request = $request->query->has(static::AJAX_FORM_REQUEST);
+    $htmx_request = $request->headers->has(static::HTMX_REQUEST);
+    if ($ajax_form_request || $htmx_request) {
       $form_state->disableRedirect();
     }
 
@@ -736,6 +738,28 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       '#attributes' => ['autocomplete' => 'off'],
     ];
 
+    // Figure out if we need to update the form_build_id value.
+    // Make sure that we're looking at the right form if there are several on
+    // the page.
+    $input = $form_state->getUserInput();
+    $old_build_id = $input['form_build_id'] ?? NULL;
+    $returned_form_id = $input['form_id'] ?? NULL;
+    if ($form_id === $returned_form_id &&  $old_build_id) {
+      // Update the build_id by using an oob swap only
+      // in the following situation:
+      // - The target to replace is not a whole form, the build_id will not be
+      //   part of the main swap.
+      // - The target is a different form from the one that triggered the
+      //   call, update the build id of the calling form.
+      $request = $this->requestStack->getCurrentRequest();
+      $hx_target = $request->headers->get('hx-target');
+      $hx_trigger = $request->headers->get('hx-trigger');
+      $target_is_form = str_ends_with($hx_target ?? '', '-form');
+      if (!$target_is_form || ($target_is_form && $hx_target !== $hx_trigger)) {
+        $form['form_build_id']['#attributes']['data-hx-swap-oob'] = 'true';
+      }
+    }
+
     // Add a token, based on either #token or form_id, to any form displayed to
     // authenticated users. This ensures that any submitted form was actually
     // requested previously by the user and protects against cross site request
@@ -799,6 +823,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
         // and #parents being set elsewhere.
         '#parents' => ['form_id'],
       ];
+      // Ensure the form_build_id element has a stable id we can use with HTMX.
+      $form['form_build_id']['#attributes']['id'] = Html::getId($form['form_id']['#id'] . '_build_id');
     }
     if (!isset($form['#id'])) {
       $form['#id'] = Html::getUniqueId($form_id);

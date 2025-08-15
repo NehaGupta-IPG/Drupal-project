@@ -75,8 +75,6 @@ class ConfigSingleExportForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, $config_type = NULL, $config_name = NULL) {
-    $form['#prefix'] = '<div id="js-config-form-wrapper">';
-    $form['#suffix'] = '</div>';
     foreach ($this->entityTypeManager->getDefinitions() as $entity_type => $definition) {
       if ($definition->entityClassImplements(ConfigEntityInterface::class)) {
         $this->definitions[$entity_type] = $definition;
@@ -90,36 +88,46 @@ class ConfigSingleExportForm extends FormBase {
     $config_types = [
       'system.simple' => $this->t('Simple configuration'),
     ] + $entity_types;
+
+    $form['#attached']['library'][] = 'core/drupal.htmx';
+
+    $config_type = $config_type ?? $form_state->getValue('config_type');
     $form['config_type'] = [
       '#title' => $this->t('Configuration type'),
       '#type' => 'select',
       '#options' => $config_types,
       '#default_value' => $config_type,
-      '#ajax' => [
-        'callback' => '::updateConfigurationType',
-        'wrapper' => 'js-config-form-wrapper',
-      ],
-    ];
-    $default_type = $form_state->getValue('config_type', $config_type);
-    $form['config_name'] = [
-      '#title' => $this->t('Configuration name'),
-      '#type' => 'select',
-      '#options' => $this->findConfiguration($default_type),
-      '#default_value' => $config_name,
-      '#prefix' => '<div id="edit-config-type-wrapper">',
-      '#suffix' => '</div>',
-      '#ajax' => [
-        'callback' => '::updateExport',
-        'wrapper' => 'edit-export-wrapper',
+      '#attributes' => [
+        'data-hx-post' => '',
+        'data-hx-swap' => 'none',
       ],
     ];
 
+    $config_name = $config_name ?? $form_state->getValue('config_name');
+    $form['config_name'] = [
+      '#title' => $this->t('Configuration name'),
+      '#type' => 'select',
+      '#options' => $this->findConfiguration($config_type),
+      '#default_value' => $config_name,
+      '#attributes' => [
+        'data-hx-post' => '',
+        'data-hx-swap' => 'none',
+      ],
+      '#wrapper_attributes' => [
+        'id' => 'config-name-wrapper',
+        'data-hx-swap-oob' => 'true',
+      ]
+    ];
+
     $form['export'] = [
+      '#wrapper_attributes' => [
+        'id' => 'export-wrapper',
+        'data-hx-swap-oob' => 'true',
+      ],
       '#title' => $this->t('Here is your configuration:'),
       '#type' => 'textarea',
       '#rows' => 24,
-      '#prefix' => '<div id="edit-export-wrapper">',
-      '#suffix' => '</div>',
+      '#value' => '',
     ];
     if ($config_type && $config_name) {
       $fake_form_state = (new FormState())->setValues([
@@ -128,15 +136,6 @@ class ConfigSingleExportForm extends FormBase {
       ]);
       $form['export'] = $this->updateExport($form, $fake_form_state);
     }
-    return $form;
-  }
-
-  /**
-   * Handles switching the configuration type selector.
-   */
-  public function updateConfigurationType($form, FormStateInterface $form_state) {
-    $form['config_name']['#options'] = $this->findConfiguration($form_state->getValue('config_type'));
-    $form['export']['#value'] = NULL;
     return $form;
   }
 
