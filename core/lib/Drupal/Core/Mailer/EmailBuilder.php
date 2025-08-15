@@ -32,8 +32,6 @@ class EmailBuilder implements EmailBuilderInterface {
    *   Email language code.
    * @param array $params
    *   All email parameters.
-   * @param \Closure|null $controller
-   *   Controller used to build the email render array.
    * @param array<\Symfony\Component\Mime\Address|string> $to
    *   The email recipients.
    * @param array<\Symfony\Component\Mime\Address|string> $cc
@@ -53,7 +51,6 @@ class EmailBuilder implements EmailBuilderInterface {
     protected string $id = '',
     protected string $langcode = '',
     protected array $params = [],
-    protected ?\Closure $controller = NULL,
     protected array $to = [],
     protected array $cc = [],
     protected array $bcc = [],
@@ -101,14 +98,6 @@ class EmailBuilder implements EmailBuilderInterface {
   /**
    * {@inheritdoc}
    */
-  public function controller(?\Closure $controller): static {
-    $this->controller = $controller;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function to(Address|string ...$addresses): static {
     $this->to = $addresses;
     return $this;
@@ -149,7 +138,7 @@ class EmailBuilder implements EmailBuilderInterface {
       throw new \InvalidArgumentException('Email builders must explicitly set the email langcode. See Drupal\Core\Mailer\EmailBuilderInterface::langcode().');
     }
 
-    $definition = ($this->emailManager)()->getEmailDefinition($this->id, $this->controller);
+    $definition = ($this->emailManager)()->getEmailDefinition($this->id);
     $email = ($this->emailRenderer)()->render($definition, $this->params, $this->langcode);
     if (!empty($this->to)) {
       $email->to(...$this->to);

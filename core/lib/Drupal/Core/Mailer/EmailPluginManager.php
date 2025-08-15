@@ -67,26 +67,8 @@ class EmailPluginManager extends DefaultPluginManager implements EmailManagerInt
   /**
    * {@inheritdoc}
    */
-  public function getEmailDefinition(string $id, array|\Closure|null $defaults = NULL): EmailDefinition {
-    $declaredDefinition = $this->getDefinition($id);
-    assert($declaredDefinition instanceof EmailDefinition);
-    $declaredDefaults = $declaredDefinition->getDefaults();
-    $callerDefaults = match(TRUE) {
-      is_array($defaults) => $defaults,
-      $defaults instanceof \Closure => [EmailDefinition::CONTROLLER_NAME => $defaults],
-      default => [],
-    };
-
-    return new EmailDefinition([
-      'id' => $declaredDefinition->id(),
-      'class' => $declaredDefinition->getClass(),
-      'provider' => $declaredDefinition->getProvider(),
-      'label' => $declaredDefinition->getLabel(),
-      'description' => $declaredDefinition->getDescription(),
-      'module' => $declaredDefinition->getModule(),
-      'key' => $declaredDefinition->getKey(),
-      'defaults' => $declaredDefaults + $callerDefaults,
-    ]);
+  public function getEmailDefinition(string $id): EmailDefinition {
+    return $this->getDefinition($id);
   }
 
   /**

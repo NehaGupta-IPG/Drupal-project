@@ -36,13 +36,6 @@ interface EmailBuilderInterface {
   public function param(string $name, mixed $value = NULL): static;
 
   /**
-   * Sets or replaces the controller.
-   *
-   * @todo Remove this eventually.
-   */
-  public function controller(?\Closure $controller): static;
-
-  /**
    * Sets or replaces the recipients.
    */
   public function to(Address|string ...$addresses): static;

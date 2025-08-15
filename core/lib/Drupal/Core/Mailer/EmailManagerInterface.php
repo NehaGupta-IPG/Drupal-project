@@ -16,12 +16,8 @@ interface EmailManagerInterface {
    *
    * @param string $id
    *   The email plugin id.
-   * @param array|\Closure|null $defaults
-   *   The call site defaults to be merged with the plugin definition parameter
-   *   defaults. A closure is converted into ['_controller' => $defaults] before
-   *   merged with plugin defaults.
    */
-  public function getEmailDefinition(string $id, array|\Closure|null $defaults = NULL): EmailDefinition;
+  public function getEmailDefinition(string $id): EmailDefinition;
 
   /**
    * Returns the email builder.
@@ -33,7 +29,9 @@ interface EmailManagerInterface {
    *
    * @param string $id
    *   The email plugin id.
+   * @param array $configuration
+   *   An array of configuration relevant to the plugin instance.
    */
-  public function createEmail(string $id): Email;
+  public function createEmail(string $id, array $configuration = []): Email;
 
 }
