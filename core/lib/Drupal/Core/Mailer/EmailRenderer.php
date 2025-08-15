@@ -52,13 +52,13 @@ class EmailRenderer implements EmailRendererInterface {
       if (is_array($build)) {
         // Let modules alter the render array.
         $context = [
+          ...$params->getArguments(),
           'id' => $params->definition->id(),
           'module' => $params->definition->getModule(),
           'key' => $params->definition->getKey(),
           'langcode' => $params->environment['langcode'],
           'email' => $email,
-        ] + ($build['#props'] ?? []);
-        unset($build['#props']);
+        ];
         $this->moduleHandler->alter('email_build', $build, $context);
 
         $build['#theme'] = 'email';
@@ -102,7 +102,7 @@ class EmailRenderer implements EmailRendererInterface {
   protected function build(Email $email, EmailControllerParams $params): mixed {
     // Resolve controller and arguments.
     try {
-      $callable = $this->callableResolver->getCallableFromDefinition($params->attributes[EmailDefinition::CONTROLLER_NAME]);
+      $callable = $this->callableResolver->getCallableFromDefinition($params->getControllerDefinition());
     }
     catch (\InvalidArgumentException $e) {
       throw new \InvalidArgumentException(sprintf('The controller for Email "%s" is not callable.', $params->definition->id()), 0, $e);
@@ -139,14 +139,12 @@ class EmailRenderer implements EmailRendererInterface {
     ];
     $wildcards = [];
 
-    foreach ($params->attributes as $key => $value) {
-      if (!str_starts_with('_', $key)) {
-        if (is_object($value)) {
-          $objects[$key] = $value;
-        }
-        else {
-          $scalars[$key] = $value;
-        }
+    foreach ($params->getArguments() as $key => $value) {
+      if (is_object($value)) {
+        $objects[$key] = $value;
+      }
+      else {
+        $scalars[$key] = $value;
       }
     }
 

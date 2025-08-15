@@ -19,9 +19,80 @@ class EmailControllerParams {
    */
   public function __construct(
     public readonly EmailDefinition $definition,
-    public array $attributes,
+    protected array $attributes,
     public array $environment,
   ) {
+  }
+
+  /**
+   * Returns all attributes.
+   */
+  public function getAttributes(): array {
+    return $this->attributes;
+  }
+
+  /**
+   * Returns TRUE if an attribute is defined.
+   *
+   * @param string $key
+   *   The attribute key.
+   */
+  public function hasAttribute(string $key): bool {
+    return isset($this->attributes[$key]);
+  }
+
+  /**
+   * Returns an attribute.
+   */
+  public function getAttribute(string $key): mixed {
+    return $this->attributes[$key] ?? NULL;
+  }
+
+  /**
+   * Sets an attribute.
+   *
+   * @param string $key
+   *   The attribute key.
+   * @param mixed $value
+   *   The attribute value.
+   */
+  public function setAttribute(string $key, mixed $value): static {
+    if (isset($value)) {
+      $this->attributes[$key] = $value;
+    }
+    else {
+      unset($this->attributes[$key]);
+    }
+    return $this;
+  }
+
+  /**
+   * Returns all arguments.
+   *
+   * Non-prefixed attributes (arguments) are made available to the controller
+   * and also to the twig template.
+   */
+  public function getArguments(): array {
+    $arguments = [];
+    foreach ($this->attributes as $key => $value) {
+      if (!str_starts_with('_', $key)) {
+        $arguments[$key] = $value;
+      }
+    }
+    return $arguments;
+  }
+
+  /**
+   * Returns the controller definition.
+   *
+   * Looks up the _controller attribute and returns its value. This can be
+   * passed on to the callable resolver in order to retrieve the controller
+   * method as a callable.
+   *
+   * @see \Drupal\Core\Utility\CallableResolver::getCallableFromDefinition()
+   */
+  public function getControllerDefinition(): callable|array|string {
+    return $this->attributes[EmailDefinition::CONTROLLER_NAME] ?? '';
   }
 
 }
