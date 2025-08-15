@@ -304,8 +304,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
 
     // If this form is an AJAX request, disable all form redirects.
     $ajax_form_request = $request->query->has(static::AJAX_FORM_REQUEST);
-    $htmx_form_request = $request->headers->has(static::HTMX_REQUEST);
-    if ($ajax_form_request || $htmx_form_request) {
+    $htmx_request = $request->headers->has(static::HTMX_REQUEST);
+    if ($ajax_form_request || $htmx_request) {
       $form_state->disableRedirect();
     }
 
