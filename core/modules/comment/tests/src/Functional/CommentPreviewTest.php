@@ -9,6 +9,8 @@ use Drupal\comment\CommentPreviewMode;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\comment\Entity\Comment;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\TestFileCreationTrait;
 
 /**
@@ -224,6 +226,56 @@ class CommentPreviewTest extends CommentTestBase {
     $comment_loaded = Comment::load($comment->id());
     $this->assertEquals($expected_created_time, $comment_loaded->getCreatedTime(), 'Expected date and time for comment edited.');
     $this->drupalLogout();
+  }
+
+  /**
+   * Tests preview of a comment on a translated node.
+   */
+  public function testCommentPreviewOnTranslatedNode(): void {
+    \Drupal::service('module_installer')->install(['content_translation', 'language']);
+    $admin_user = $this->drupalCreateUser([
+      'administer site configuration',
+      'administer languages',
+      'access administration pages',
+      'administer content types',
+      'administer comments',
+      'create article content',
+      'access comments',
+      'post comments',
+      'skip comment approval',
+      'administer content translation',
+      'translate any entity',
+    ]);
+    $this->drupalLogin($admin_user);
+
+    // Add language.
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+
+    // Enable translation for node and comments.
+    \Drupal::service('content_translation.manager')->setEnabled('node', 'article', TRUE);
+    \Drupal::service('content_translation.manager')->setEnabled('comment', 'comment', TRUE);
+
+    // Create comment field on article.
+    $this->addDefaultCommentField('node', 'article');
+
+    // Make comment body translatable.
+    $field_storage = FieldStorageConfig::loadByName('comment', 'comment_body');
+    $field_storage->setTranslatable(TRUE);
+    $field_storage->save();
+    $this->assertTrue($field_storage->isTranslatable(), 'Comment body is translatable.');
+
+    // Create an article and add a translation.
+    $node = $this->drupalCreateNode(['type' => 'article', 'uid' => $this->webUser->id()]);
+    $node->addTranslation('fr', ['title' => 'French title'])->save();
+
+    // Preview a comment on the translated node.
+    $this->drupalGet('fr/node/' . $node->id());
+    $edit = [
+      'subject[0][value]' => $this->randomMachineName(8),
+      'comment_body[0][value]' => $this->randomMachineName(16),
+    ];
+    $this->submitForm($edit, 'Preview');
+    $this->assertSession()->pageTextContains('Preview comment');
   }
 
 }

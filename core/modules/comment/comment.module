@@ -94,10 +94,14 @@ function comment_preview(CommentInterface $comment, FormStateInterface $form_sta
     // the commented entity is rendered, it excludes the comment field output.
     $field_name = $comment->getFieldName();
     $entity = clone $entity;
-    $entity->$field_name->status = CommentItemInterface::HIDDEN;
     $build = \Drupal::entityTypeManager()
       ->getViewBuilder($entity->getEntityTypeId())
       ->view($entity, 'full');
+
+    // If content translation is enabled and translated content
+    // is available then the entity is replaced with the translated entity.
+    // Set the status to hidden after the build is done.
+    $build['#' . $entity->getEntityTypeId()]->$field_name->status = CommentItemInterface::HIDDEN;
   }
 
   $preview_build['comment_output_below'] = $build;

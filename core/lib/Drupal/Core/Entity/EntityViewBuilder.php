@@ -148,16 +148,39 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
       '#pre_render' => [[$this, 'buildMultiple']],
     ];
     $weight = 0;
+
     foreach ($entities as $key => $entity) {
       // Ensure that from now on we are dealing with the proper translation
       // object.
       $entity = $this->entityRepository->getTranslationFromContext($entity, $langcode);
+
+      // Clone the entity to avoid modifying the original entity.
+      $entity = clone $entity;
+
+      // Retrieve the field name dynamically from the comment (assuming it's passed or available).
+      $field_name = $comment->getFieldName(); // Ensure $comment is available or passed correctly.
+
+      // Loop through all translations and apply changes.
+      foreach ($entity->getTranslationLanguages() as $language) {
+        $translation = $entity->getTranslation($language->getId());
+
+        // Apply the 'HIDDEN' status to the field in each translation.
+        if ($translation->hasField($field_name)) {
+          $translation->$field_name->status = CommentItemInterface::HIDDEN;
+        }
+      }
+
+      // Render the entity view.
+      $build = \Drupal::entityTypeManager()
+        ->getViewBuilder($entity->getEntityTypeId())
+        ->view($entity, 'full');
 
       // Set build defaults.
       $build_list[$key] = $this->getBuildDefaults($entity, $view_mode);
       $entityType = $this->entityTypeId;
       $this->moduleHandler()->alter([$entityType . '_build_defaults', 'entity_build_defaults'], $build_list[$key], $entity, $view_mode);
 
+      // Assign a weight to control the order of rendering.
       $build_list[$key]['#weight'] = $weight++;
     }
 
