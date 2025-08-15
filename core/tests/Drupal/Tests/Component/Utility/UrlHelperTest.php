@@ -660,6 +660,15 @@ class UrlHelperTest extends TestCase {
       ['http://www.example.ca\@example.com', 'http://example.com', FALSE],
       // Some browsers ignore or strip leading control characters.
       ["\x00//www.example.ca", 'http://example.com', FALSE],
+      // Different port numbers.
+      ['http://example.com', 'http://example.com:80', TRUE],
+      ['http://example.com:80', 'http://example.com', TRUE],
+      ['http://example.com:80', 'http://example.com:80', TRUE],
+      ['http://example.com:80', 'http://example.com:443', FALSE],
+      ['http://example.com:443', 'http://example.com:80', FALSE],
+      ['https://example.com', 'https://example.com', TRUE],
+      ['https://example.com:80', 'https://example.com:443', FALSE],
+      ['https://example.com:443', 'https://example.com:80', FALSE],
     ];
   }
 

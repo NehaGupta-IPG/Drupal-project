@@ -312,6 +312,36 @@ class UrlHelper {
       throw new \InvalidArgumentException('A path was passed when a fully qualified domain was expected.');
     }
 
+    // Check for different port numbers.
+    $url_port = $url_parts['port'] ?? '';
+    $base_port = $base_parts['port'] ?? '';
+
+    if (empty($url_port) && !empty($url_parts['scheme'])) {
+      switch( $url_parts['scheme'] ){
+        case 'http':
+          $url_port = 80;
+          break;
+        case 'https':
+          $url_port = 443;
+          break;
+      }
+    }
+
+    if (empty($base_port) && !empty($base_parts['scheme'])) {
+      switch( $base_parts['scheme'] ){
+        case 'http':
+          $base_port = 80;
+          break;
+        case 'https':
+          $base_port = 443;
+          break;
+      }
+    }
+
+    if ($url_port !== $base_port) {
+      return FALSE;
+    }
+
     if (!isset($url_parts['path']) || !isset($base_parts['path'])) {
       return (!isset($base_parts['path']) || $base_parts['path'] == '/')
         && ($url_parts['host'] == $base_parts['host']);
