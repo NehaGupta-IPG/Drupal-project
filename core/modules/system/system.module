@@ -5,8 +5,13 @@
  */
 
 use Drupal\Component\FileSecurity\FileSecurity;
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Extension\Extension;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -373,4 +378,17 @@ function _system_is_claro_admin_and_not_active() {
   $admin_theme = \Drupal::configFactory()->get('system.theme')->get('admin');
   $active_theme = \Drupal::theme()->getActiveTheme()->getName();
   return $active_theme !== 'claro' && $admin_theme === 'claro';
+}
+
+/**
+ * Implements hook_entity_field_access().
+ */
+function system_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemListInterface $items = NULL): AccessResultInterface {
+  if ($items) {
+    $entity_type = $items->getEntity()->getEntityType();
+    if ($entity_type->hasKey('langcode') && $entity_type->getKey('langcode') === $field_definition->getName()) {
+      return AccessResult::forbidden();
+    }
+  }
+  return AccessResult::neutral();
 }
