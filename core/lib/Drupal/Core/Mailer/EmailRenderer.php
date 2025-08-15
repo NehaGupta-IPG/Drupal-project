@@ -86,6 +86,12 @@ class EmailRenderer implements EmailRendererInterface {
    *   The result returned from the controller.
    */
   protected function build(Email $email, EmailControllerParams $params): mixed {
+    if (!$params->hasControllerDefinition()) {
+      // If a definition has no controller, the email is rendered using only the
+      // template.
+      return [];
+    }
+
     // Resolve controller and arguments.
     try {
       $callable = $this->callableResolver->getCallableFromDefinition($params->getControllerDefinition());

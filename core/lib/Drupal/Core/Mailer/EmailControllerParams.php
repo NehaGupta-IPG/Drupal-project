@@ -92,6 +92,13 @@ class EmailControllerParams {
   }
 
   /**
+   * Returns TRUE if a controller is defined.
+   */
+  public function hasControllerDefinition(): bool {
+    return $this->hasAttribute(EmailDefinition::CONTROLLER_NAME);
+  }
+
+  /**
    * Returns the controller definition.
    *
    * Looks up the _controller attribute and returns its value. This can be
@@ -101,7 +108,14 @@ class EmailControllerParams {
    * @see \Drupal\Core\Utility\CallableResolver::getCallableFromDefinition()
    */
   public function getControllerDefinition(): callable|array|string {
-    return $this->attributes[EmailDefinition::CONTROLLER_NAME] ?? '';
+    return $this->getAttribute(EmailDefinition::CONTROLLER_NAME) ?? '';
+  }
+
+  /**
+   * Sets the controller definition.
+   */
+  public function setControllerDefinition(callable|array|string|null $value): static {
+    return $this->setAttribute(EmailDefinition::CONTROLLER_NAME, $value);
   }
 
 }
