@@ -43,7 +43,7 @@ class ViewsTokensHooks {
     ];
     $info['tokens']['view']['total-rows'] = [
       'name' => $this->t('Total rows'),
-      'description' => $this->t('The total amount of results returned from the view. The current display will be used.'),
+      'description' => $this->t('The total amount of results returned from the view prior to any limits applied by the pager. To get the current page record count, consider adding a Results Summary with the @current_record_count token.'),
     ];
     $info['tokens']['view']['items-per-page'] = [
       'name' => $this->t('Items per page'),
