@@ -32,33 +32,30 @@ class EmailRenderer implements EmailRendererInterface {
   public function render(EmailDefinition $definition, array $params, string $langcode): Email {
     // Add defaults from the plugin definition to the params and let modules
     // alter them.
-    $params += $definition->getDefaults();
-    $context = [
-      'id' => $definition->id(),
-      'module' => $definition->getModule(),
-      'key' => $definition->getKey(),
-      'langcode' => $langcode,
-    ];
-    $this->moduleHandler->alter('email_params', $params, $context);
+    $params = new EmailControllerParams(
+      $definition,
+      $params + $definition->getDefaults(),
+      ['langcode' => $langcode],
+    );
+    $this->moduleHandler->alter('email_params', $params);
 
     // @todo Replace with execution environment once that is available.
     // @see: https://www.drupal.org/i/3536307
-    return $this->renderer->executeInRenderContext(new RenderContext(), function () use ($definition, $params, $langcode) {
+    return $this->renderer->executeInRenderContext(new RenderContext(), function () use ($params) {
       // Build render array.
-      $email = $this->emailManager->createEmail($definition->id(), [
-        'langcode' => $langcode,
+      $email = $this->emailManager->createEmail($params->definition->id(), [
         'params' => $params,
       ]);
-      $build = $this->build($email, $definition, $params, $langcode);
+      $build = $this->build($email, $params);
 
       // Render the result.
       if (is_array($build)) {
         // Let modules alter the render array.
         $context = [
-          'id' => $definition->id(),
-          'module' => $definition->getModule(),
-          'key' => $definition->getKey(),
-          'langcode' => $langcode,
+          'id' => $params->definition->id(),
+          'module' => $params->definition->getModule(),
+          'key' => $params->definition->getKey(),
+          'langcode' => $params->environment['langcode'],
           'email' => $email,
         ] + ($build['#props'] ?? []);
         unset($build['#props']);
@@ -78,10 +75,10 @@ class EmailRenderer implements EmailRendererInterface {
 
       // Let modules alter the resulting email.
       $context = [
-        'id' => $definition->id(),
-        'module' => $definition->getModule(),
-        'key' => $definition->getKey(),
-        'langcode' => $langcode,
+        'id' => $params->definition->id(),
+        'module' => $params->definition->getModule(),
+        'key' => $params->definition->getKey(),
+        'langcode' => $params->environment['langcode'],
         'params' => $params,
         'metadata' => $metadata,
       ];
@@ -96,25 +93,21 @@ class EmailRenderer implements EmailRendererInterface {
    *
    * @param \Symfony\Component\Mime\Email $email
    *   The email instance.
-   * @param \Drupal\Core\Mailer\EmailDefinition $definition
-   *   The email plugin definition.
-   * @param array $params
-   *   Parameters to pass to the controller.
-   * @param string $langcode
-   *   The langauge code.
+   * @param \Drupal\Core\Mailer\EmailControllerParams $params
+   *   The email controller parameters.
    *
    * @return mixed
    *   The result returned from the controller.
    */
-  protected function build(Email $email, EmailDefinition $definition, array $params, string $langcode): mixed {
+  protected function build(Email $email, EmailControllerParams $params): mixed {
     // Resolve controller and arguments.
     try {
-      $callable = $this->callableResolver->getCallableFromDefinition($params[EmailDefinition::CONTROLLER_NAME]);
+      $callable = $this->callableResolver->getCallableFromDefinition($params->attributes[EmailDefinition::CONTROLLER_NAME]);
     }
     catch (\InvalidArgumentException $e) {
-      throw new \InvalidArgumentException(sprintf('The controller for Email "%s" is not callable.', $definition->id()), 0, $e);
+      throw new \InvalidArgumentException(sprintf('The controller for Email "%s" is not callable.', $params->definition->id()), 0, $e);
     }
-    $resolver = $this->getArgumentResolver($email, $definition, $params, $langcode);
+    $resolver = $this->getArgumentResolver($email, $params);
     $arguments = $resolver->getArguments($callable);
 
     // Build the render array.
@@ -128,20 +121,25 @@ class EmailRenderer implements EmailRendererInterface {
 
   /**
    * Returns an argument resolver instance suitable for the given params.
+   *
+   * @param \Symfony\Component\Mime\Email $email
+   *   The email instance.
+   * @param \Drupal\Core\Mailer\EmailControllerParams $params
+   *   The email controller parameters.
    */
-  protected function getArgumentResolver(Email $email, EmailDefinition $definition, array $params, string $langcode): ArgumentsResolver {
+  protected function getArgumentResolver(Email $email, EmailControllerParams $params): ArgumentsResolver {
     $scalars = [
-      'id' => $definition->id(),
-      'module' => $definition->getModule(),
-      'key' => $definition->getKey(),
-      'langcode' => $langcode,
+      'id' => $params->definition->id(),
+      'module' => $params->definition->getModule(),
+      'key' => $params->definition->getKey(),
+      'langcode' => $params->environment['langcode'],
     ];
     $objects = [
       'email' => $email,
     ];
     $wildcards = [];
 
-    foreach ($params as $key => $value) {
+    foreach ($params->attributes as $key => $value) {
       if (!str_starts_with('_', $key)) {
         if (is_object($value)) {
           $objects[$key] = $value;
