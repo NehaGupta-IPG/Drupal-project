@@ -98,7 +98,7 @@ module.exports = {
     );
     browser.assert.textEquals(
       '#toolbar-item-administration-tray li:nth-child(2) button',
-      'Structure menu',
+      'Configuration menu',
     );
     browser.click('#toolbar-item-administration-tray li:nth-child(2) button');
     browser.assert.hasClass(
@@ -116,7 +116,7 @@ module.exports = {
     );
     browser.assert.textEquals(
       '#toolbar-item-administration-tray li:nth-child(2) button',
-      'Structure menu',
+      'Configuration menu',
     );
     browser.expect
       .element('#toolbar-link-user-admin_index')
