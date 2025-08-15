@@ -80,6 +80,15 @@ class RoleListBuilder extends DraggableListBuilder {
   /**
    * {@inheritdoc}
    */
+  public function render() {
+    $build = parent::render();
+    $build['entities']['#sticky'] = TRUE;
+    return $build;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getDefaultOperations(EntityInterface $entity) {
     $operations = parent::getDefaultOperations($entity);
 
