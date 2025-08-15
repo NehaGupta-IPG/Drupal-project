@@ -89,17 +89,15 @@ class ConfigSingleExportForm extends FormBase {
       'system.simple' => $this->t('Simple configuration'),
     ] + $entity_types;
 
-    $form['#attached']['library'][] = 'core/drupal.htmx';
-
     $config_type = $config_type ?? $form_state->getValue('config_type');
     $form['config_type'] = [
       '#title' => $this->t('Configuration type'),
       '#type' => 'select',
       '#options' => $config_types,
       '#default_value' => $config_type,
-      '#attributes' => [
-        'data-hx-post' => '',
-        'data-hx-swap' => 'none',
+      '#htmx' => [
+        'post' => TRUE,
+        'swap' => 'none',
       ],
     ];
 
@@ -109,20 +107,16 @@ class ConfigSingleExportForm extends FormBase {
       '#type' => 'select',
       '#options' => $this->findConfiguration($config_type),
       '#default_value' => $config_name,
-      '#attributes' => [
-        'data-hx-post' => '',
-        'data-hx-swap' => 'none',
+      '#htmx' => [
+        'post' => TRUE,
+        'swap-oob' => TRUE,
+        'swap' => 'none',
       ],
-      '#wrapper_attributes' => [
-        'id' => 'config-name-wrapper',
-        'data-hx-swap-oob' => 'true',
-      ]
     ];
 
     $form['export'] = [
-      '#wrapper_attributes' => [
-        'id' => 'export-wrapper',
-        'data-hx-swap-oob' => 'true',
+      '#htmx' => [
+        'swap-oob' => TRUE,
       ],
       '#title' => $this->t('Here is your configuration:'),
       '#type' => 'textarea',
