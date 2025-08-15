@@ -55,8 +55,11 @@ class MediaLocalTasksTest extends LocalTaskIntegrationTestBase {
 
   /**
    * Provides a list of routes to test.
+   *
+   * @return array[]
+   *   An array of routes and expected local tasks.
    */
-  public static function getMediaReportRoutes() {
+  public static function getMediaReportRoutes(): array {
     return [
       ['entity.media_type.edit_form', [['entity.media_type.edit_form']]],
       ['entity.media_type.collection', [['entity.media_type.collection']]],
