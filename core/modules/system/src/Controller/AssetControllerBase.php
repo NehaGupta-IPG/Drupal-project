@@ -170,7 +170,7 @@ abstract class AssetControllerBase extends FileDownloadController {
 
     // Check that library names are in the correct format.
     $validate = function ($libraries_to_check) {
-      foreach ($libraries_to_check as $library) {
+      foreach (array_filter($libraries_to_check) as $library) {
         if (substr_count($library, '/') === 0) {
           throw new BadRequestHttpException(sprintf('The "%s" library name must include at least one slash.', $library));
         }
