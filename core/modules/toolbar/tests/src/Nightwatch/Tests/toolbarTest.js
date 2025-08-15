@@ -96,6 +96,10 @@ module.exports = {
       'aria-expanded',
       'false',
     );
+    browser.assert.textEquals(
+      '#toolbar-item-administration-tray li:nth-child(2) button',
+      'Structure menu',
+    );
     browser.click('#toolbar-item-administration-tray li:nth-child(2) button');
     browser.assert.hasClass(
       '#toolbar-item-administration-tray li:nth-child(2)',
@@ -109,6 +113,10 @@ module.exports = {
       '#toolbar-item-administration-tray li:nth-child(2) button',
       'aria-expanded',
       'true',
+    );
+    browser.assert.textEquals(
+      '#toolbar-item-administration-tray li:nth-child(2) button',
+      'Structure menu',
     );
     browser.expect
       .element('#toolbar-link-user-admin_index')
