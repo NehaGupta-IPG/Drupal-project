@@ -67,11 +67,7 @@ class EmailRenderer implements EmailRendererInterface {
       }
 
       // Let modules alter the resulting email.
-      $context = [
-        ...$params->getArguments(),
-        'params' => $params,
-        'metadata' => $metadata,
-      ];
+      $context = [...$params->getArguments(), 'metadata' => $metadata];
       $this->moduleHandler->alter('email', $email, $context);
 
       return $email;

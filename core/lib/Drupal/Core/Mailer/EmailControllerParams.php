@@ -72,6 +72,9 @@ class EmailControllerParams {
    * Non-prefixed attributes (arguments) are made available to the controller
    * and also to the twig template. Additionaly the email id, module, key and
    * langcode are added in order to simplify access to them.
+   *
+   * Finally the controller params object itself is added to allow generic
+   * controllers.
    */
   public function getArguments(): array {
     foreach ($this->attributes as $key => $value) {
@@ -84,6 +87,7 @@ class EmailControllerParams {
       'module' => $this->definition->getModule(),
       'key' => $this->definition->getKey(),
       'langcode' => $this->environment['langcode'],
+      'params' => $this,
     ] + $arguments;
   }
 
