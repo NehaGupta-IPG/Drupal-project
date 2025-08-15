@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Database;
 
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\Event\DatabaseEvent;
 use Drupal\Core\Database\Event\StatementEvent;
 use Drupal\Core\Database\Event\StatementExecutionEndEvent;
 use Drupal\Core\Database\Event\StatementExecutionFailureEvent;
 use Drupal\Core\Database\Event\StatementExecutionStartEvent;
-use Drupal\Core\Database\Exception\EventException;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
 use Drupal\Tests\Core\Database\Stub\StubPDO;
 use Drupal\Tests\UnitTestCase;
@@ -74,15 +72,6 @@ class DatabaseEventsTest extends UnitTestCase {
     $this->expectException(\AssertionError::class);
     $this->expectExceptionMessage('Event class bar does not exist');
     $this->connection->disableEvents(['bar']);
-  }
-
-  /**
-   * @covers ::dispatchEvent
-   */
-  public function testEventDispatchingWhenNoContainerAvailable(): void {
-    $this->expectException(EventException::class);
-    $this->expectExceptionMessage('The event dispatcher service is not available. Database API events can only be fired if the container is initialized');
-    $this->connection->dispatchEvent($this->createMock(DatabaseEvent::class));
   }
 
 }

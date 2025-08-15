@@ -4,7 +4,7 @@ namespace Drupal\Core\Database;
 
 use Drupal\Component\Assertion\Inspector;
 use Drupal\Core\Database\Event\DatabaseEvent;
-use Drupal\Core\Database\Exception\EventException;
+use Drupal\Core\Database\EventSubscriber\StatementExecutionSubscriber;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\Delete;
 use Drupal\Core\Database\Query\Insert;
@@ -14,6 +14,7 @@ use Drupal\Core\Database\Query\Truncate;
 use Drupal\Core\Database\Query\Update;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
+use Drupal\Core\EventSubscriber\FixedEventSubscriberTrait;
 use Drupal\Core\Pager\PagerManagerInterface;
 
 /**
@@ -27,6 +28,10 @@ use Drupal\Core\Pager\PagerManagerInterface;
  * @see http://php.net/manual/book.pdo.php
  */
 abstract class Connection {
+
+  use FixedEventSubscriberTrait {
+    dispatchEvent as traitDispatchEvent;
+  }
 
   /**
    * The database target this connection is for.
@@ -1525,24 +1530,19 @@ abstract class Connection {
   }
 
   /**
-   * Dispatches a database API event via the container dispatcher.
-   *
-   * @param \Drupal\Core\Database\Event\DatabaseEvent $event
-   *   The database event.
-   * @param string|null $eventName
-   *   (Optional) the name of the event to dispatch.
-   *
-   * @return \Drupal\Core\Database\Event\DatabaseEvent
-   *   The database event.
-   *
-   * @throws \Drupal\Core\Database\Exception\EventException
-   *   If the container is not initialized.
+   * {@inheritdoc}
    */
   public function dispatchEvent(DatabaseEvent $event, ?string $eventName = NULL): DatabaseEvent {
-    if (\Drupal::hasService('event_dispatcher')) {
-      return \Drupal::service('event_dispatcher')->dispatch($event, $eventName);
-    }
-    throw new EventException('The event dispatcher service is not available. Database API events can only be fired if the container is initialized');
+    return $this->traitDispatchEvent($event, $eventName);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getSubscribers(): array {
+    return [
+      new StatementExecutionSubscriber(),
+    ];
   }
 
   /**

@@ -472,11 +472,15 @@ services:
     class: Drupal\Core\Database\Connection
     factory: Drupal\Core\Database\Database::getConnection
     arguments: [default]
+    properties:
+      eventDispatcherCallable: !service_closure '@event_dispatcher'
   Drupal\Core\Database\Connection: '@database'
   database.replica:
     class: Drupal\Core\Database\Connection
     factory: Drupal\Core\Database\Database::getConnection
     arguments: [replica]
+    properties:
+      eventDispatcherCallable: !service_closure '@event_dispatcher'
   database.replica_kill_switch:
     class: Drupal\Core\Database\ReplicaKillSwitch
     arguments: ['@settings', '@datetime.time', '@session']
