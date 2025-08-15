@@ -6,11 +6,11 @@ namespace Drupal\Tests\image\Functional;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Url;
+use Drupal\Tests\TestFileCreationTrait;
 use Drupal\file\Entity\File;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\image\ImageStyleInterface;
 use Drupal\node\Entity\Node;
-use Drupal\Tests\TestFileCreationTrait;
 
 /**
  * Tests creation, deletion, and editing of image styles and effects.
@@ -114,7 +114,6 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     ];
 
     // Add style form.
-
     $edit = [
       'name' => $style_name,
       'label' => $style_label,
@@ -130,7 +129,6 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $this->assertSession()->linkByHrefExists($style_path . '/delete');
 
     // Add effect form.
-
     // Add each sample effect to the style.
     foreach ($effect_edits as $effect => $edit) {
       $edit_data = [];
@@ -177,7 +175,6 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     }
 
     // Image style overview form (ordering and renaming).
-
     // Confirm the order of effects is maintained according to the order we
     // added the fields.
     $effect_edits_order = array_keys($effect_edits);
@@ -244,7 +241,6 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $this->assertTrue($order_correct, 'The order of the effects is correctly set by default.');
 
     // Image effect deletion form.
-
     // Create an image to make sure it gets flushed after deleting an effect.
     $image_path = $this->createSampleImage($style);
     $this->assertEquals(1, $this->getImageCount($style), "Image style {$style->label()} image $image_path successfully generated.");
@@ -278,7 +274,6 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $this->assertCount(6, $style->getEffects(), 'Rotate effect with transparent background was added.');
 
     // Style deletion form.
-
     // Delete the style.
     $this->drupalGet($style_path . '/delete');
     $this->submitForm([], 'Delete');
@@ -289,8 +284,16 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
 
     $this->assertNull(ImageStyle::load($style_name), "Image style {$style->label()} successfully deleted.");
 
-    // Test empty text when there are no image styles.
+    // Test if search image style form exists.
+    $this->drupalGet($admin_path);
+    $image_styles = ImageStyle::loadMultiple();
+    $xpath = '//input[@placeholder="Filter by style name"]';
+    if (count($image_styles) > 1) {
+      $this->assertSession()
+        ->elementExists('xpath', $xpath);
+    }
 
+    // Test empty text when there are no image styles.
     // Delete all image styles.
     foreach (ImageStyle::loadMultiple() as $image_style) {
       $image_style->delete();

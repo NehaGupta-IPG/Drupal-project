@@ -3,3 +3,10 @@ admin:
   css:
     theme:
       css/image.admin.css: {}
+image_style.list:
+  version: VERSION
+  js:
+    js/image_style.listing.js: { }
+  dependencies:
+    - core/drupal
+    - core/once
