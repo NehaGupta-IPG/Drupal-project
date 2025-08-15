@@ -51,14 +51,7 @@ class EmailRenderer implements EmailRendererInterface {
       // Render the result.
       if (is_array($build)) {
         // Let modules alter the render array.
-        $context = [
-          ...$params->getArguments(),
-          'id' => $params->definition->id(),
-          'module' => $params->definition->getModule(),
-          'key' => $params->definition->getKey(),
-          'langcode' => $params->environment['langcode'],
-          'email' => $email,
-        ];
+        $context = [...$params->getArguments(), 'email' => $email];
         $this->moduleHandler->alter('email_build', $build, $context);
 
         $build['#theme'] = 'email';
@@ -75,10 +68,7 @@ class EmailRenderer implements EmailRendererInterface {
 
       // Let modules alter the resulting email.
       $context = [
-        'id' => $params->definition->id(),
-        'module' => $params->definition->getModule(),
-        'key' => $params->definition->getKey(),
-        'langcode' => $params->environment['langcode'],
+        ...$params->getArguments(),
         'params' => $params,
         'metadata' => $metadata,
       ];
@@ -128,12 +118,7 @@ class EmailRenderer implements EmailRendererInterface {
    *   The email controller parameters.
    */
   protected function getArgumentResolver(Email $email, EmailControllerParams $params): ArgumentsResolver {
-    $scalars = [
-      'id' => $params->definition->id(),
-      'module' => $params->definition->getModule(),
-      'key' => $params->definition->getKey(),
-      'langcode' => $params->environment['langcode'],
-    ];
+    $scalars = [];
     $objects = [
       'email' => $email,
     ];
