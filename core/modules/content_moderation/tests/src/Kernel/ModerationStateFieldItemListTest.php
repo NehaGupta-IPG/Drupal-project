@@ -443,7 +443,7 @@ class ModerationStateFieldItemListTest extends KernelTestBase {
     $workflow->getTypePlugin()->addEntityTypeAndBundle('node', 'unmoderated');
     $workflow->save();
 
-    $translation = $node->addTranslation('de');
+    $translation = $node->addTranslation('de', $node->toArray());
     $translation->moderation_state = 'draft';
     $translation->save();
 
