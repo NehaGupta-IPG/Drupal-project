@@ -16,6 +16,10 @@ class EmailControllerParams {
    *   Email parameters merged with defaults from the plugin definition.
    * @param array $environment
    *   Environment parameters for the controller invocation.
+   *
+   * @todo Change visibility of environment property to protected and add access
+   * methods once environment switching is implemented.
+   * @see: https://www.drupal.org/i/3536307
    */
   public function __construct(
     public readonly EmailDefinition $definition,
