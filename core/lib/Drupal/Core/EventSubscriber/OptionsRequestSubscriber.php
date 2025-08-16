@@ -2,8 +2,6 @@
 
 namespace Drupal\Core\EventSubscriber;
 
-use Drupal\Core\Routing\RouteProviderInterface;
-use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -19,9 +17,7 @@ use Symfony\Component\Routing\Route;
  */
 class OptionsRequestSubscriber implements EventSubscriberInterface {
 
-  public function __construct(
-    protected readonly \Closure $routeProvider
-  ) {
+  public function __construct(protected readonly \Closure $routeProvider) {
   }
 
   /**

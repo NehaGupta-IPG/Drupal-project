@@ -6,7 +6,6 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Render\BareHtmlPageRendererInterface;
 use Drupal\Core\Routing\RouteMatch;
-use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Site\MaintenanceModeEvents;
 use Drupal\Core\Site\MaintenanceModeInterface;
