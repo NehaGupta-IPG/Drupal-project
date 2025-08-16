@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\layout_builder\Unit;
 
-use Drupal\Component\Plugin\Context\ContextInterface;
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
-use Drupal\Component\Plugin\Exception\ContextException;
 use Drupal\Component\Plugin\Factory\FactoryInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
@@ -14,11 +12,13 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
-use Drupal\Core\Plugin\Context\ContextHandlerInterface;
+use Drupal\Core\Plugin\Context\ContextHandler;
+use Drupal\Core\Plugin\Context\ContextInterface;
 use Drupal\layout_builder\SectionStorage\SectionStorageDefinition;
 use Drupal\layout_builder\SectionStorage\SectionStorageManager;
 use Drupal\layout_builder\SectionStorageInterface;
 use Drupal\Tests\UnitTestCase;
+use Prophecy\Argument;
 
 /**
  * @coversDefaultClass \Drupal\layout_builder\SectionStorage\SectionStorageManager
@@ -70,8 +70,8 @@ class SectionStorageManagerTest extends UnitTestCase {
 
     $cache = $this->prophesize(CacheBackendInterface::class);
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
-    $this->contextHandler = $this->prophesize(ContextHandlerInterface::class);
-    $this->manager = new SectionStorageManager(new \ArrayObject(), $cache->reveal(), $module_handler->reveal(), $this->contextHandler->reveal());
+    $this->contextHandler = new ContextHandler();
+    $this->manager = new SectionStorageManager(new \ArrayObject(), $cache->reveal(), $module_handler->reveal(), $this->contextHandler);
 
     $this->discovery = $this->prophesize(DiscoveryInterface::class);
     $reflection_property = new \ReflectionProperty($this->manager, 'discovery');
@@ -101,7 +101,8 @@ class SectionStorageManagerTest extends UnitTestCase {
       'the_context' => $this->prophesize(ContextInterface::class)->reveal(),
     ];
 
-    $this->contextHandler->applyContextMapping($this->plugin, $contexts)->shouldBeCalled();
+    $this->plugin->getContextDefinitions()->willReturn([]);
+    $this->plugin->getContextMapping()->willReturn([]);
 
     $result = $this->manager->load('the_plugin_id', $contexts);
     $this->assertSame($this->plugin->reveal(), $result);
@@ -111,11 +112,18 @@ class SectionStorageManagerTest extends UnitTestCase {
    * @covers ::load
    */
   public function testLoadNull(): void {
+    $context = $this->prophesize(ContextInterface::class);
+    $context->getContextDefinition()->willReturn(new ContextDefinition('boolean'));
     $contexts = [
-      'the_context' => $this->prophesize(ContextInterface::class)->reveal(),
+      'the_context' => $context->reveal(),
     ];
 
-    $this->contextHandler->applyContextMapping($this->plugin, $contexts)->willThrow(new ContextException());
+    $context_definitions = [
+      'my_string' => new ContextDefinition('string'),
+    ];
+    $this->plugin->getContextDefinitions()->willReturn($context_definitions);
+    $this->plugin->getContextMapping()->willReturn([]);
+    $this->plugin->getContext('my_string')->shouldNotBeCalled();
 
     $result = $this->manager->load('the_plugin_id', $contexts);
     $this->assertNull($result);
@@ -164,17 +172,21 @@ class SectionStorageManagerTest extends UnitTestCase {
 
     $provider_access = $this->prophesize(SectionStorageInterface::class);
     $provider_access->isApplicable($cacheability)->willReturn($plugin_is_applicable);
+    $provider_access->getContextDefinitions()->willReturn([]);
+    $provider_access->getContextMapping()->willReturn([]);
+    $provider_access->getContext(Argument::any())->shouldNotBeCalled();
 
     $no_access = $this->prophesize(SectionStorageInterface::class);
     $no_access->isApplicable($cacheability)->willReturn(FALSE);
+    $no_access->getContextDefinitions()->willReturn([]);
+    $no_access->getContextMapping()->willReturn([]);
+    $no_access->getContext(Argument::any())->shouldNotBeCalled();
 
     $missing_contexts = $this->prophesize(SectionStorageInterface::class);
-
-    // Do not do any filtering based on context.
-    $this->contextHandler->filterPluginDefinitionsByContexts($contexts, $definitions)->willReturnArgument(1);
-    $this->contextHandler->applyContextMapping($no_access, $contexts)->shouldBeCalled();
-    $this->contextHandler->applyContextMapping($provider_access, $contexts)->shouldBeCalled();
-    $this->contextHandler->applyContextMapping($missing_contexts, $contexts)->willThrow(new ContextException());
+    $missing_contexts->isApplicable(Argument::cetera())->shouldNotBeCalled();
+    $missing_contexts->getContextDefinitions()->willReturn(['bool' => new ContextDefinition('boolean')]);
+    $missing_contexts->getContextMapping()->willReturn([]);
+    $missing_contexts->getContext(Argument::any())->shouldNotBeCalled();
 
     $this->factory->createInstance('no_access', [])->willReturn($no_access->reveal());
     $this->factory->createInstance('missing_contexts', [])->willReturn($missing_contexts->reveal());
@@ -223,6 +235,8 @@ class SectionStorageManagerTest extends UnitTestCase {
     $first_plugin->getCacheContexts()->shouldNotBeCalled();
     $first_plugin->getCacheTags()->shouldNotBeCalled();
     $first_plugin->getCacheMaxAge()->shouldNotBeCalled();
+    $first_plugin->getContextDefinitions()->willReturn([]);
+    $first_plugin->getContextMapping()->willReturn([]);
     $first_plugin->isApplicable($cacheability)->will(function ($arguments) {
       $arguments[0]->addCacheTags(['first_plugin']);
       return FALSE;
@@ -235,14 +249,11 @@ class SectionStorageManagerTest extends UnitTestCase {
       $arguments[0]->addCacheTags(['second_plugin']);
       return TRUE;
     });
+    $second_plugin->getContextDefinitions()->willReturn([]);
+    $second_plugin->getContextMapping()->willReturn([]);
 
     $this->factory->createInstance('first', [])->willReturn($first_plugin->reveal());
     $this->factory->createInstance('second', [])->willReturn($second_plugin->reveal());
-
-    // Do not do any filtering based on context.
-    $this->contextHandler->filterPluginDefinitionsByContexts($contexts, $definitions)->willReturnArgument(1);
-    $this->contextHandler->applyContextMapping($first_plugin, $contexts)->shouldBeCalled();
-    $this->contextHandler->applyContextMapping($second_plugin, $contexts)->shouldBeCalled();
 
     $result = $this->manager->findByContext($contexts, $cacheability);
     $this->assertSame($second_plugin->reveal(), $result);

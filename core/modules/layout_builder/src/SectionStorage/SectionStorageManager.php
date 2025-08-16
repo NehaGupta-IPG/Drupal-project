@@ -72,6 +72,12 @@ class SectionStorageManager extends DefaultPluginManager implements SectionStora
    */
   public function load($type, array $contexts = []) {
     $plugin = $this->loadEmpty($type);
+
+    // Explicitly check the requirements of the plugin's context definitions.
+    if (!$this->contextHandler->checkRequirements($contexts, $plugin->getContextDefinitions())) {
+      return NULL;
+    }
+
     try {
       $this->contextHandler->applyContextMapping($plugin, $contexts);
     }
@@ -85,7 +91,7 @@ class SectionStorageManager extends DefaultPluginManager implements SectionStora
    * {@inheritdoc}
    */
   public function findByContext(array $contexts, RefinableCacheableDependencyInterface $cacheability) {
-    $storage_types = array_keys($this->contextHandler->filterPluginDefinitionsByContexts($contexts, $this->getDefinitions()));
+    $storage_types = array_keys($this->getDefinitions());
 
     // Add the manager as a cacheable dependency in order to vary by changes to
     // the plugin definitions.
