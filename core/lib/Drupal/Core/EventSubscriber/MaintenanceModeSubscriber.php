@@ -47,9 +47,9 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
   protected $config;
 
   /**
-   * The URL generator.
+   * The URL generator as a service closure.
    *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface
+   * @var \Closure
    */
   protected $urlGenerator;
 
@@ -94,7 +94,7 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    */
-  public function __construct(MaintenanceModeInterface $maintenance_mode, ConfigFactoryInterface $config_factory, TranslationInterface $translation, UrlGeneratorInterface $url_generator, AccountInterface $account, BareHtmlPageRendererInterface $bare_html_page_renderer, MessengerInterface $messenger, EventDispatcherInterface $event_dispatcher) {
+  public function __construct(MaintenanceModeInterface $maintenance_mode, ConfigFactoryInterface $config_factory, TranslationInterface $translation, \Closure $url_generator, AccountInterface $account, BareHtmlPageRendererInterface $bare_html_page_renderer, MessengerInterface $messenger, EventDispatcherInterface $event_dispatcher) {
     $this->maintenanceMode = $maintenance_mode;
     $this->config = $config_factory;
     $this->stringTranslation = $translation;
@@ -135,7 +135,7 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
 
           if ($show_message) {
             if ($this->account->hasPermission('administer site configuration')) {
-              $this->messenger->addMessage($this->t('Operating in maintenance mode. <a href=":url">Go online.</a>', [':url' => $this->urlGenerator->generate('system.site_maintenance_mode')]), 'status', FALSE);
+              $this->messenger->addMessage($this->t('Operating in maintenance mode. <a href=":url">Go online.</a>', [':url' => ($this->urlGenerator)()->generate('system.site_maintenance_mode')]), 'status', FALSE);
             }
             else {
               $this->messenger->addMessage($this->t('Operating in maintenance mode.'), 'status', FALSE);
