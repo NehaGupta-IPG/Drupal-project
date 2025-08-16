@@ -131,7 +131,7 @@ class ViewsModerationStateFilterTest extends ViewsKernelTestBase {
     ]);
     $fourth_node->save();
 
-    // Create a translated published revision.
+    // Create a translated draft revision.
     $translated_forward_revision = $third_node->addTranslation('fr');
     $translated_forward_revision->title = 'Translated Node';
     $translated_forward_revision->setNewRevision(TRUE);
@@ -145,8 +145,8 @@ class ViewsModerationStateFilterTest extends ViewsKernelTestBase {
       'test_content_moderation_state_filter_base_table_filter_group_or',
     ];
     foreach ($base_table_views as $view_id) {
-      // The three default revisions are listed when no filter is specified.
-      $this->assertNodesWithFilters([$node, $second_node, $third_node], [], $view_id);
+      // The four default revisions are listed when no filter is specified.
+      $this->assertNodesWithFilters([$node, $second_node, $third_node, $translated_forward_revision], [], $view_id);
 
       // The default revision of node one and three are published.
       $this->assertNodesWithFilters([$node, $third_node], [
