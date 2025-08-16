@@ -87,16 +87,16 @@ class ContentTranslationRevisionTranslationDeletionTest extends ContentTranslati
     $it_revision = $this->loadRevisionTranslation($entity, 'it');
     $this->assertTrue($it_revision->hasTranslation('it'));
 
-    // Check that translations cannot be deleted in drafts.
+    // Check that translations can be deleted in drafts.
     $overview_url = $entity->toUrl('drupal:content-translation-overview');
     $this->drupalGet($overview_url);
     $it_delete_url = $this->getDeleteUrl($it_revision);
     $it_delete_href = $it_delete_url->toString();
-    $this->assertSession()->linkByHrefNotExists($it_delete_href);
+    $this->assertSession()->linkByHrefExists($it_delete_href);
     $warning = 'The "Delete translation" action is only available for published translations.';
-    $this->assertSession()->statusMessageContains($warning, 'warning');
+    $this->assertSession()->statusMessageNotContains($warning, 'warning');
     $this->drupalGet($this->getEditUrl($it_revision));
-    $this->assertSession()->linkNotExistsExact('Delete translation');
+    $this->assertSession()->linkExistsExact('Delete translation');
 
     // Publish the translation and verify it can be deleted.
     $edit = [
