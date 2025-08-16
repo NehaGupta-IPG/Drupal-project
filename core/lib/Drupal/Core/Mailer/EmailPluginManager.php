@@ -11,8 +11,6 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
-use Symfony\Component\Mailer\MailerInterface;
 
 /**
  * Defines a plugin manager to collect information on emails.
@@ -35,12 +33,6 @@ class EmailPluginManager extends DefaultPluginManager implements EmailManagerInt
     ModuleHandlerInterface $module_handler,
     #[Autowire(service: 'cache.discovery')]
     CacheBackendInterface $cache_backend,
-    #[AutowireServiceClosure(EmailRendererInterface::class)]
-    protected readonly \Closure $emailRenderer,
-    #[AutowireServiceClosure('logger.channel.mail')]
-    protected readonly \Closure $logger,
-    #[AutowireServiceClosure(MailerInterface::class)]
-    protected readonly \Closure $mailer,
   ) {
     $this->moduleHandler = $module_handler;
     $this->alterInfo('email_info');
@@ -67,13 +59,6 @@ class EmailPluginManager extends DefaultPluginManager implements EmailManagerInt
    */
   public function getEmailDefinition(string $id): EmailDefinition {
     return $this->getDefinition($id);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getBuilder(): EmailBuilderInterface {
-    return new EmailBuilder($this->emailRenderer, fn() => $this, $this->mailer, $this->logger);
   }
 
 }

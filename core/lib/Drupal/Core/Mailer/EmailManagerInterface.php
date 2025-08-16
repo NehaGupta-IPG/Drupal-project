@@ -17,9 +17,4 @@ interface EmailManagerInterface {
    */
   public function getEmailDefinition(string $id): EmailDefinition;
 
-  /**
-   * Returns the email builder.
-   */
-  public function getBuilder(): EmailBuilderInterface;
-
 }
