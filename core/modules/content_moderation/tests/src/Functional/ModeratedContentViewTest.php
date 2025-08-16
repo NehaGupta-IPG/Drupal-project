@@ -176,6 +176,13 @@ class ModeratedContentViewTest extends BrowserTestBase {
     $this->drupalGet('admin/content/moderated');
     $this->assertSession()->linkExists('fr draft revision');
     $this->assertSession()->linkExists('en draft revision');
+
+    // Verify that we can see the content type labels.
+    $node_type_labels = $this->xpath('//td[contains(@class, "views-field-type")]');
+    $this->assertCount(2, $node_type_labels);
+    foreach ($node_type_labels as $label) {
+      $this->assertEquals('Article', $label->getText());
+    }
   }
 
 }
