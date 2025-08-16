@@ -410,7 +410,7 @@ class AliasManagerTest extends UnitTestCase {
   }
 
   /**
-   * Tests the getAliasByPath cache with an un-preloaded path without alias.
+   * Tests the cache of getAliasByPath with a path that hasn't been preloaded and has no alias.
    *
    * @covers ::getAliasByPath
    * @covers ::writeCache
@@ -494,7 +494,7 @@ class AliasManagerTest extends UnitTestCase {
   }
 
   /**
-   * Tests the getAliasByPath cache with an un-preloaded path with alias.
+   * Tests the cache of getAliasByPath with a path that hasn't been preloaded but still has an alias.
    *
    * @covers ::getAliasByPath
    * @covers ::writeCache

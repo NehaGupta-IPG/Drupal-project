@@ -71,7 +71,7 @@ class CommentUninstallTest extends KernelTestBase {
   }
 
   /**
-   * Tests if uninstallation succeeds if the field has been deleted beforehand.
+   * Tests if uninstall succeeds if the field has been deleted beforehand.
    */
   public function testCommentUninstallWithoutField(): void {
     // Tests if uninstall succeeds if the field has been deleted beforehand.

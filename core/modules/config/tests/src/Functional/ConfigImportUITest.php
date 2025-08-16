@@ -117,7 +117,7 @@ class ConfigImportUITest extends BrowserTestBase {
     // file in sync will already contain them.
     \Drupal::service('module_installer')->uninstall(['text', 'options']);
 
-    // Set the state system to record installations and uninstallations.
+    // Set the state system to record installs and uninstalls.
     \Drupal::state()->set('ConfigImportUITest.core.extension.modules_installed', []);
     \Drupal::state()->set('ConfigImportUITest.core.extension.modules_uninstalled', []);
 
@@ -161,7 +161,7 @@ class ConfigImportUITest extends BrowserTestBase {
     $this->assertTrue(\Drupal::moduleHandler()->moduleExists('text'), 'Text module installed during import.');
     $this->assertTrue(\Drupal::service('theme_handler')->themeExists('olivero'), 'Olivero theme installed during import.');
 
-    // Ensure installations and uninstallation occur as expected.
+    // Ensure install and uninstall occur as expected.
     $uninstalled = \Drupal::state()->get('ConfigImportUITest.core.extension.modules_uninstalled', []);
     $expected = ['automated_cron', 'config_install_schema_test', 'text', 'options'];
     $installed = \Drupal::state()->get('config_import_test_modules_installed.list');
@@ -195,7 +195,7 @@ class ConfigImportUITest extends BrowserTestBase {
     ];
     $sync->write('system.theme', $system_theme);
 
-    // Set the state system to record installations and uninstallations.
+    // Set the state system to record installs and uninstalls.
     \Drupal::state()->set('ConfigImportUITest.core.extension.modules_installed', []);
     \Drupal::state()->set('ConfigImportUITest.core.extension.modules_uninstalled', []);
 
@@ -218,7 +218,7 @@ class ConfigImportUITest extends BrowserTestBase {
     $this->assertFalse(\Drupal::moduleHandler()->moduleExists('options'), 'Options module uninstalled during import.');
     $this->assertFalse(\Drupal::moduleHandler()->moduleExists('text'), 'Text module uninstalled during import.');
 
-    // Ensure installations and uninstallation occur as expected.
+    // Ensure install and uninstall occur as expected.
     $installed = \Drupal::state()->get('ConfigImportUITest.core.extension.modules_installed', []);
     $uninstalled = \Drupal::state()->get('ConfigImportUITest.core.extension.modules_uninstalled', []);
     $expected = ['options', 'text', 'config_install_schema_test', 'automated_cron'];

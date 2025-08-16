@@ -91,7 +91,7 @@ class FieldBlockTest extends EntityKernelTestBase {
   }
 
   /**
-   * Tests unfieldable entity.
+   * Tests an entity that does not have fields.
    *
    * @covers ::blockAccess
    */

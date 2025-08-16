@@ -82,7 +82,7 @@ class InstallTest extends KernelTestBase {
   }
 
   /**
-   * Ensures that post update functions are removed on uninstallation.
+   * Ensures that post update functions are removed on uninstall.
    */
   public function testUninstallPostUpdateFunctions(): void {
     // First, to avoid false positives, ensure that the post_update function

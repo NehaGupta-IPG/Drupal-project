@@ -9,7 +9,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 
 /**
- * Prevents uninstallation of modules providing used filter plugins.
+ * Prevents uninstall of modules providing used filter plugins.
  */
 class FilterUninstallValidator implements ModuleUninstallValidatorInterface {
 
