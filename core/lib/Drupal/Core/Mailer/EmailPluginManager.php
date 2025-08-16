@@ -13,7 +13,6 @@ use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
 
 /**
  * Defines a plugin manager to collect information on emails.
@@ -43,7 +42,6 @@ class EmailPluginManager extends DefaultPluginManager implements EmailManagerInt
     #[AutowireServiceClosure(MailerInterface::class)]
     protected readonly \Closure $mailer,
   ) {
-    $this->factory = new EmailFactory($this);
     $this->moduleHandler = $module_handler;
     $this->alterInfo('email_info');
     $this->setCacheBackend($cache_backend, 'email_plugins');
@@ -76,13 +74,6 @@ class EmailPluginManager extends DefaultPluginManager implements EmailManagerInt
    */
   public function getBuilder(): EmailBuilderInterface {
     return new EmailBuilder($this->emailRenderer, fn() => $this, $this->mailer, $this->logger);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function createEmail(string $id, array $configuration = []): Email {
-    return $this->createInstance($id, $configuration);
   }
 
 }

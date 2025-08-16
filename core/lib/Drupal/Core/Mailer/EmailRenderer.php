@@ -21,7 +21,6 @@ class EmailRenderer implements EmailRendererInterface {
   public function __construct(
     protected readonly CallableResolver $callableResolver,
     protected readonly RendererInterface $renderer,
-    protected readonly EmailManagerInterface $emailManager,
     protected readonly ModuleHandlerInterface $moduleHandler,
   ) {
   }
@@ -42,10 +41,9 @@ class EmailRenderer implements EmailRendererInterface {
     // @todo Replace with execution environment once that is available.
     // @see: https://www.drupal.org/i/3536307
     return $this->renderer->executeInRenderContext(new RenderContext(), function () use ($params) {
+      // @todo Allow contrib and custom code to provide a custom Email class.
+      $email = new Email();
       // Build render array.
-      $email = $this->emailManager->createEmail($params->definition->id(), [
-        'params' => $params,
-      ]);
       $build = $this->build($email, $params);
 
       // Render the result.

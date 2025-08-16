@@ -6,7 +6,6 @@ namespace Drupal\Core\Mailer;
 
 use Drupal\Component\Plugin\Definition\PluginDefinition;
 use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
-use Symfony\Component\Mime\Email;
 
 /**
  * An email plugin definition as declared in a {module}.email.yml file.
@@ -48,7 +47,7 @@ class EmailDefinition extends PluginDefinition implements PluginDefinitionInterf
    */
   public function __construct(array $definition) {
     $this->id = $definition['id'];
-    $this->class = $definition['class'] ?? Email::class;
+    $this->class = '';
     $this->provider = $definition['provider'];
     $this->label = $definition['label'];
     $this->description = $definition['description'] ?? '';
