@@ -11,7 +11,7 @@ class EmailControllerParams {
 
   /**
    * @param \Drupal\Core\Mailer\EmailDefinition $definition
-   *   The email plugin definiton.
+   *   The email plugin definition.
    * @param array $attributes
    *   Email parameters merged with defaults from the plugin definition.
    * @param array $environment

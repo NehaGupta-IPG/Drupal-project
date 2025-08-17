@@ -118,7 +118,7 @@ use Symfony\Component\Mime\Email;
  * Alter all the email definitions discovered by the email plugin manager.
  *
  * @param array<string,\Drupal\Core\Mailer\EmailDefinition> &$definitions
- *   The discovered email defintions to be altered. Each definition has a key
+ *   The discovered email definitions to be altered. Each definition has a key
  *   that is the machine name, which must be unique.
  *
  *   The value corresponding to each machine name key is an EmailDefinition
@@ -132,7 +132,7 @@ function hook_email_info_alter(array &$definitions): void {
 }
 
 /**
- * Alters the parameters before they are passed to the email controller.
+ * Alter the parameters before they are passed to the email controller.
  *
  * @param \Drupal\Core\Mailer\EmailControllerParams $params
  *   A value object representing the controller params.
