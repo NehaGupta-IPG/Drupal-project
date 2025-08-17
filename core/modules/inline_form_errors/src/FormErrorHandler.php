@@ -5,6 +5,7 @@ namespace Drupal\inline_form_errors;
 use Drupal\Core\Form\FormElementHelper;
 use Drupal\Core\Form\FormErrorHandler as CoreFormErrorHandler;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\FormStateMultipleErrorsInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Render\Element;
@@ -75,7 +76,7 @@ class FormErrorHandler extends CoreFormErrorHandler {
     }
 
     $error_links = [];
-    $errors = $form_state->getErrors();
+    $errors = $form_state instanceof FormStateMultipleErrorsInterface ? $form_state->getAllErrors() : $form_state->getErrors();
     // Loop through all form errors and check if we need to display a link.
     foreach ($errors as $name => $error) {
       $form_element = FormElementHelper::getElementByName($name, $form);
@@ -101,8 +102,11 @@ class FormErrorHandler extends CoreFormErrorHandler {
     }
 
     // Set normal error messages for all remaining errors.
-    foreach ($errors as $error) {
-      $this->messenger->addError($error);
+    foreach ($errors as $multiple_errors) {
+      $multiple_errors = (array) $multiple_errors;
+      foreach ($multiple_errors as $error) {
+        $this->messenger()->addMessage($error, 'error');
+      }
     }
 
     if (!empty($error_links)) {
