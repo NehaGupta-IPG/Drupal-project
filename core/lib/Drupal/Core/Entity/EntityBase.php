@@ -271,7 +271,7 @@ abstract class EntityBase implements EntityInterface {
    */
   public function toLink($text = NULL, $rel = 'canonical', array $options = []) {
     if (!isset($text)) {
-      $text = $this->label();
+      $text = $this->label() ?? $this->id() ?? '';
     }
     $url = $this->toUrl($rel);
     $options += $url->getOptions();
