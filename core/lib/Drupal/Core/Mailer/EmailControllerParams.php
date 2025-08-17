@@ -81,6 +81,7 @@ class EmailControllerParams {
    * controllers.
    */
   public function getArguments(): array {
+    $arguments = [];
     foreach ($this->attributes as $key => $value) {
       if (!str_starts_with('_', $key)) {
         $arguments[$key] = $value;
