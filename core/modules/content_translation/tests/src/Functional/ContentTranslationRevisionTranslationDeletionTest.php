@@ -62,8 +62,8 @@ class ContentTranslationRevisionTranslationDeletionTest extends ContentTranslati
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $this->storage->load($id);
 
-    // Add a draft translation and check that it is available only in the latest
-    // revision.
+    // Add a draft translation and check that it is available as the
+    // default revision.
     $add_translation_url = Url::fromRoute("entity.{$this->entityTypeId}.content_translation_add",
       [
         $entity->getEntityTypeId() => $id,
@@ -83,9 +83,10 @@ class ContentTranslationRevisionTranslationDeletionTest extends ContentTranslati
     ];
     $this->submitForm($edit, 'Save (this translation)');
     $entity = $this->storage->loadUnchanged($id);
-    $this->assertFalse($entity->hasTranslation('it'));
+    $this->assertTrue($entity->hasTranslation('it'));
     $it_revision = $this->loadRevisionTranslation($entity, 'it');
     $this->assertTrue($it_revision->hasTranslation('it'));
+    $this->assertEquals($entity->getRevisionId(), $it_revision->getRevisionId());
 
     // Check that translations can be deleted in drafts.
     $overview_url = $entity->toUrl('drupal:content-translation-overview');
