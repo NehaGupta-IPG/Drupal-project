@@ -38,11 +38,14 @@ class FormErrorHandler implements FormErrorHandlerInterface {
    *   The current state of the form.
    */
   protected function displayErrorMessages(array $form, FormStateInterface $form_state) {
-    $errors = $form_state->getErrors();
+    $errors = $form_state instanceof FormStateMultipleErrorsInterface ? $form_state->getAllErrors() : $form_state->getErrors();
 
     // Loop through all form errors and set an error message.
-    foreach ($errors as $error) {
-      $this->messenger()->addMessage($error, 'error');
+    foreach ($errors as $multiple_errors) {
+      $multiple_errors = (array) $multiple_errors;
+      foreach ($multiple_errors as $error) {
+        $this->messenger()->addMessage($error, 'error');
+      }
     }
   }
 
@@ -163,7 +166,7 @@ class FormErrorHandler implements FormErrorHandlerInterface {
     }
 
     // Store the errors for this element on the element directly.
-    $elements['#errors'] = $form_state->getError($elements);
+    $elements['#errors'] = $form_state instanceof FormStateMultipleErrorsInterface ? $form_state->getAllErrorsForElement($elements) : $form_state->getError($elements);
   }
 
 }
