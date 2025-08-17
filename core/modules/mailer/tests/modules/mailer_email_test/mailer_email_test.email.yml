@@ -1,0 +1,23 @@
+mailer_email_test.minimal:
+  label: 'Email without parameters'
+  key: 'minimal'
+  defaults:
+    _controller: 'Drupal\mailer_email_test\EmailTestController::minimal'
+
+mailer_email_test.scalars:
+  label: 'Email with scalars'
+  key: 'scalars'
+  defaults:
+    _controller: 'Drupal\mailer_email_test\EmailTestController::scalars'
+
+mailer_email_test.entity:
+  label: 'Email with entity parameter'
+  key: 'entity'
+  defaults:
+    _controller: 'Drupal\mailer_email_test\EmailTestController::entity'
+
+mailer_email_test.generic:
+  label: 'Email with generic controller'
+  key: 'generic'
+  defaults:
+    _controller: 'Drupal\mailer_email_test\EmailTestController::generic'

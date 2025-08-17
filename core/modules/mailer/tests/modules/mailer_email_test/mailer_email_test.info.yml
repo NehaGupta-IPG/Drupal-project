@@ -1,0 +1,5 @@
+name: 'Mailer email test'
+type: module
+description: 'Support module for mailer email testing.'
+package: Testing
+version: VERSION
