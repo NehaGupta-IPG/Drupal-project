@@ -2,6 +2,8 @@
 
 namespace Drupal\content_moderation\Form;
 
+use Drupal\content_moderation\ModerationInformationInterface;
+use Drupal\content_moderation\StateRevertValidationInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\Form\NodeRevisionRevertForm;
 use Drupal\node\NodeInterface;
@@ -18,14 +20,14 @@ class RevisionRevertForm extends NodeRevisionRevertForm {
    *
    * @var \Drupal\content_moderation\ModerationInformationInterface
    */
-  protected $moderationInformation;
+  protected ModerationInformationInterface $moderationInformation;
 
   /**
    * The transition validation service.
    *
    * @var \Drupal\content_moderation\StateRevertValidationInterface
    */
-  protected $validation;
+  protected StateRevertValidationInterface $validation;
 
   /**
    * {@inheritdoc}

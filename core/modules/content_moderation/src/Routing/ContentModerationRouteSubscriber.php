@@ -62,7 +62,7 @@ class ContentModerationRouteSubscriber extends RouteSubscriberBase {
    * @param \Drupal\Core\Routing\RouteBuildEvent $event
    *   The routing alter event.
    */
-  public function onRoutingRouteAlterRevisionForm(RouteBuildEvent $event) {
+  public function onRoutingRouteAlterRevisionForm(RouteBuildEvent $event): void {
     // @todo Make this applicable to all revisionable entities.
     // @see https://www.drupal.org/project/drupal/issues/2350939
     foreach ($event->getRouteCollection() as $name => $route) {

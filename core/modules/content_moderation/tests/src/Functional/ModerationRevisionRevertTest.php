@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Drupal\Tests\content_moderation\Functional;
 
 use Drupal\node\NodeInterface;
+use Drupal\node\NodeStorageInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -39,14 +41,14 @@ class ModerationRevisionRevertTest extends BrowserTestBase {
    *
    * @var \Drupal\node\NodeStorageInterface
    */
-  protected $nodeStorage;
+  protected NodeStorageInterface $nodeStorage;
 
   /**
    * An array of admin permissions.
    *
    * @var array
    */
-  protected $adminPermissions = [
+  protected array $adminPermissions = [
     'access content overview',
     'administer nodes',
     'bypass node access',
@@ -134,7 +136,7 @@ class ModerationRevisionRevertTest extends BrowserTestBase {
   /**
    * Test reverting to a chosen state.
    */
-  public function testRevertingToState() {
+  public function testRevertingToState(): void {
     $this->drupalGet('node/add/moderated_bundle');
     $this->submitForm([
       'title[0][value]' => 'First revision (originally draft)',
@@ -201,7 +203,7 @@ class ModerationRevisionRevertTest extends BrowserTestBase {
    * @return \Drupal\user\Entity\User
    *   The new account that was created.
    */
-  protected function loginAsAdmin($additional_permissions = []) {
+  protected function loginAsAdmin($additional_permissions = []): User {
     $account = $this->drupalCreateUser(array_merge($this->adminPermissions, $additional_permissions));
     $this->drupalLogin($account);
     return $account;
@@ -213,7 +215,7 @@ class ModerationRevisionRevertTest extends BrowserTestBase {
    * @param \Drupal\node\NodeInterface $node_revision
    *   The node revision to revert to.
    */
-  protected function getRevisionRevert(NodeInterface $node_revision) {
+  protected function getRevisionRevert(NodeInterface $node_revision): void {
     $this->drupalGet("node/{$node_revision->id()}/revisions/{$node_revision->getRevisionId()}/revert");
   }
 
@@ -232,7 +234,7 @@ class ModerationRevisionRevertTest extends BrowserTestBase {
    * @return \Drupal\node\NodeInterface
    *   The revision which was asserted.
    */
-  protected function assertLatestRevision($id, $moderation_state, $published, $default) {
+  protected function assertLatestRevision($id, $moderation_state, $published, $default): NodeInterface {
     $this->nodeStorage->resetCache();
     /** @var \Drupal\node\NodeInterface $revision */
     $revision = $this->nodeStorage->loadRevision($this->nodeStorage->getLatestRevisionId($id));
