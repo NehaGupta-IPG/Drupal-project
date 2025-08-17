@@ -57,6 +57,25 @@ class EmailDefinition extends PluginDefinition implements PluginDefinitionInterf
   }
 
   /**
+   * Gets an array of all property values.
+   *
+   * @return mixed[]
+   *   An array of property values, keyed by property name.
+   */
+  public function toArray(): array {
+    return [
+      'id' => $this->id,
+      'class' => $this->class,
+      'provider' => $this->provider,
+      'label' => $this->label,
+      'description' => $this->description,
+      'module' => $this->module,
+      'key' => $this->key,
+      'defaults' => $this->defaults,
+    ];
+  }
+
+  /**
    * Returns the label of the email definition.
    */
   public function getLabel(): string|\Stringable {
