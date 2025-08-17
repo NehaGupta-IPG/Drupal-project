@@ -438,6 +438,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
 
     // Create an English draft (revision 3) and verify that the Italian draft
     // values are used as source values.
+    $en_language = \Drupal::languageManager()->getLanguage("en");
     $url = $node->toUrl('drupal:content-translation-add');
     $url->setRouteParameter('source', 'it');
     $url->setRouteParameter('target', 'en');
@@ -446,8 +447,15 @@ class ModerationLocaleTest extends ModerationStateTestBase {
     $this->submitNodeForm('Test 1.3 EN', 'draft');
     // Draft translations does not have latest version because never
     // were published.
-    $this->assertEquals($node->toUrl()->setAbsolute()->toString(), $this->getSession()->getCurrentUrl());
-    $this->assertModerationForm($node);
+    $this->assertEquals($node->toUrl("canonical", ["language" => $en_language])->setAbsolute()->toString(), $this->getSession()->getCurrentUrl());
+
+    // Create another English draft (revision 4) and verify that this is the
+    // latest version of the English translation.
+    $this->drupalGet($node->toUrl("edit-form", ["language" => $en_language])->setAbsolute()->toString());
+    $this->assertSession()->pageTextContains('Test 1.3 EN');
+    $this->submitNodeForm('Test 1.4 EN', 'draft');
+    $node = \Drupal::entityTypeManager()->getStorage('node')->loadUnchanged($node->id());
+    $this->assertLatestVersionPage($node->getTranslation('en'));
 
     // Create a French draft (without saving) and verify that the Italian draft
     // values are used as source values.
@@ -459,7 +467,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
     // used as source values.
     $url->setRouteParameter('source', 'en');
     $this->drupalGet($url);
-    $this->assertSession()->pageTextContains('Test 1.3 EN');
+    $this->assertSession()->pageTextContains('Test 1.4 EN');
   }
 
   /**
