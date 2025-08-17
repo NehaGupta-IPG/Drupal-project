@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\Form;
 
-use Drupal\Component\Serialization\Json;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Template\AttributeJson;
 
 /**
  * Provides helpers to operate on forms.
@@ -209,7 +209,7 @@ class FormHelper {
     // those like 'password_confirm' that have child elements,
     // use #wrapper_attributes.
     $key = (($elements['#markup'] ?? FALSE) === '' && ($elements['#input'] ?? FALSE) === TRUE) ? '#wrapper_attributes' : '#attributes';
-    $elements[$key]['data-drupal-states'] = Json::encode($elements['#states']);
+    $elements[$key]['data-drupal-states'] = new AttributeJson('data-drupal-states', $elements['#states']);
   }
 
 }

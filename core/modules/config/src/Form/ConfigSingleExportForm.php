@@ -9,6 +9,8 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Htmx\Htmx;
+use Drupal\Core\Htmx\HtmxSwapStyle;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -95,11 +97,12 @@ class ConfigSingleExportForm extends FormBase {
       '#type' => 'select',
       '#options' => $config_types,
       '#default_value' => $config_type,
-      '#htmx' => [
-        'post' => TRUE,
-        'swap' => 'none',
-      ],
     ];
+    (new Htmx())
+      ->post()
+      ->swap(HtmxSwapStyle::none)
+      ->vals(['test' => 'test'])
+      ->applyTo($form['config_type']);
 
     $config_name = $config_name ?? $form_state->getValue('config_name');
     $form['config_name'] = [
@@ -107,22 +110,23 @@ class ConfigSingleExportForm extends FormBase {
       '#type' => 'select',
       '#options' => $this->findConfiguration($config_type),
       '#default_value' => $config_name,
-      '#htmx' => [
-        'post' => TRUE,
-        'swap-oob' => TRUE,
-        'swap' => 'none',
-      ],
     ];
+    (new Htmx())
+      ->post()
+      ->swapOob()
+      ->swap(HtmxSwapStyle::none)
+      ->applyTo($form['config_name']);
+
 
     $form['export'] = [
-      '#htmx' => [
-        'swap-oob' => TRUE,
-      ],
       '#title' => $this->t('Here is your configuration:'),
       '#type' => 'textarea',
       '#rows' => 24,
       '#value' => '',
     ];
+    (new Htmx())
+      ->swapOob()
+      ->applyTo($form['export']);
     if ($config_type && $config_name) {
       $fake_form_state = (new FormState())->setValues([
         'config_type' => $config_type,
