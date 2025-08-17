@@ -534,4 +534,42 @@ class AssetOptimizationTest extends BrowserTestBase {
     return $this->getAbsoluteUrl($parts['path'] . '?' . $query . '#' . $parts['fragment']);
   }
 
+  /**
+   * Replaces the 'include' query parameter with an empty value.
+   *
+   * @param string $url
+   *   The source URL.
+   *
+   * @return string
+   *   The URL with 'include' set to an arbitrary string.
+   */
+  protected function emptyInclude(string $url): string {
+    // First replace the hash, so we don't get served the actual file on disk.
+    $url = $this->replaceGroupHash($url);
+    $parts = UrlHelper::parse($url);
+    $include = UrlHelper::compressQueryParameter('');
+    $parts['query']['include'] = $include;
+    $query = UrlHelper::buildQuery($parts['query']);
+    return $this->getAbsoluteUrl($parts['path'] . '?' . $query . '#' . $parts['fragment']);
+  }
+
+  /**
+   * Adds an invalid 'exclude' query parameter with an empty value.
+   *
+   * @param string $url
+   *   The source URL.
+   *
+   * @return string
+   *   The URL with 'exclude' set to an arbitrary string.
+   */
+  protected function emptyExclude(string $url): string {
+    // First replace the hash, so we don't get served the actual file on disk.
+    $url = $this->replaceGroupHash($url);
+    $parts = UrlHelper::parse($url);
+    $exclude = UrlHelper::compressQueryParameter('');
+    $parts['query']['exclude'] = $exclude;
+    $query = UrlHelper::buildQuery($parts['query']);
+    return $this->getAbsoluteUrl($parts['path'] . '?' . $query . '#' . $parts['fragment']);
+  }
+
 }
