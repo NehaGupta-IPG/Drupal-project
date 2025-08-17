@@ -40,8 +40,8 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
-   * @param \Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy|\SessionHandlerInterface|null $handler
-   *   The object to register as a PHP session handler.
+   * @param \Closure $connectionClosure
+   *   The database connection closure.
    * @param \Drupal\Core\Session\MetadataBag $metadata_bag
    *   The session metadata bag.
    * @param \Drupal\Core\Session\SessionConfigurationInterface $sessionConfiguration
@@ -53,7 +53,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
    */
   public function __construct(
     protected RequestStack $requestStack,
-    AbstractProxy|\SessionHandlerInterface|null $handler,
+    protected \Closure $connectionClosure,
     MetadataBag $metadata_bag,
     protected SessionConfigurationInterface $sessionConfiguration,
     protected TimeInterface $time,
@@ -176,6 +176,24 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
     }
 
     return parent::regenerate($destroy, $lifetime);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function delete($uid) {
+    // Nothing to do if we are not allowed to change the session.
+    if (!$this->writeSafeHandler->isSessionWritable() || $this->isCli()) {
+      return;
+    }
+    // The sessions table may not have been created yet.
+    try {
+      ($this->connectionClosure)()->delete('sessions')
+        ->condition('uid', $uid)
+        ->execute();
+    }
+    catch (\Exception) {
+    }
   }
 
   /**

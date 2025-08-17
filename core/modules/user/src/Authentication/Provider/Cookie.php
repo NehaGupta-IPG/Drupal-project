@@ -25,41 +25,11 @@ class Cookie implements AuthenticationProviderInterface, EventSubscriberInterfac
 
   use StringTranslationTrait;
 
-  /**
-   * The session configuration.
-   *
-   * @var \Drupal\Core\Session\SessionConfigurationInterface
-   */
-  protected $sessionConfiguration;
-
-  /**
-   * The database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $connection;
-
-  /**
-   * The messenger.
-   *
-   * @var \Drupal\Core\Messenger\MessengerInterface
-   */
-  protected $messenger;
-
-  /**
-   * Constructs a new cookie authentication provider.
-   *
-   * @param \Drupal\Core\Session\SessionConfigurationInterface $session_configuration
-   *   The session configuration.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
-   */
-  public function __construct(SessionConfigurationInterface $session_configuration, Connection $connection, MessengerInterface $messenger) {
-    $this->sessionConfiguration = $session_configuration;
-    $this->connection = $connection;
-    $this->messenger = $messenger;
+  public function __construct(
+    protected SessionConfigurationInterface $sessionConfiguration,
+    protected \Closure $connectionClosure,
+    protected MessengerInterface $messenger
+  ) {
   }
 
   /**
@@ -95,14 +65,14 @@ class Cookie implements AuthenticationProviderInterface, EventSubscriberInterfac
     if ($uid = $session->get('uid')) {
       // @todo Load the User entity in SessionHandler so we don't need queries.
       // @see https://www.drupal.org/node/2345611
-      $values = $this->connection
+      $values = ($this->connectionClosure)()
         ->query('SELECT * FROM {users_field_data} [u] WHERE [u].[uid] = :uid AND [u].[default_langcode] = 1', [':uid' => $uid])
         ->fetchAssoc();
 
       // Check if the user data was found and the user is active.
       if (!empty($values) && $values['status'] == 1) {
         // Add the user's roles.
-        $rids = $this->connection
+        $rids = ($this->connectionClosure)()
           ->query('SELECT [roles_target_id] FROM {user__roles} WHERE [entity_id] = :uid', [':uid' => $values['uid']])
           ->fetchCol();
         $values['roles'] = array_merge([AccountInterface::AUTHENTICATED_ROLE], $rids);
