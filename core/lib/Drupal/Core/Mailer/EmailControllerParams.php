@@ -74,7 +74,7 @@ class EmailControllerParams {
    * Returns all arguments.
    *
    * Non-prefixed attributes (arguments) are made available to the controller
-   * and also to the twig template. Additionaly the email id, module, key and
+   * and also to the twig template. Additionally the email id, module, key and
    * langcode are added in order to simplify access to them.
    *
    * Finally the controller params object itself is added to allow generic
