@@ -2,10 +2,15 @@
 
 namespace Drupal\field\Plugin\migrate\process\d7;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\migrate\Attribute\MigrateProcess;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\MigrateExecutableInterface;
+use Drupal\migrate\MigrateLookupInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
+use Drupal\user\RoleInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 // cspell:ignore entityreference
 
@@ -15,7 +20,53 @@ use Drupal\migrate\Row;
 #[MigrateProcess(
  id: "d7_field_instance_settings"
 )]
-class FieldInstanceSettings extends ProcessPluginBase {
+class FieldInstanceSettings extends ProcessPluginBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The migrate lookup service.
+   *
+   * @var \Drupal\migrate\MigrateLookupInterface
+   */
+  protected $migrateLookup;
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected EntityTypeManagerInterface $entityTypeManager;
+
+  /**
+   * Constructs a FieldInstanceSettings object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\migrate\MigrateLookupInterface $migrate_lookup
+   *   The migrate lookup service.
+   */
+  // @codingStandardsIgnoreLine
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrateLookupInterface $migrate_lookup, EntityTypeManagerInterface $entity_type_manager) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->migrateLookup = $migrate_lookup;
+    $this->entityTypeManager = $entity_type_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('migrate.lookup'),
+      $container->get('entity_type.manager'),
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -72,12 +123,28 @@ class FieldInstanceSettings extends ProcessPluginBase {
     if ($row->getSourceProperty('type') == 'node_reference') {
       $instance_settings['handler'] = 'default:node';
 
+      $target_bundles = array_filter($field_data['settings']['referenceable_types']);
+      if (!empty($target_bundles)) {
+        $dest_bundles = [];
+        foreach ($target_bundles as $bundle) {
+          $lookup_result = $this->migrateLookup->lookup('d7_node_type', [$bundle]);
+          if ($lookup_result) {
+            $dest_bundles[$lookup_result[0]['type']] = $lookup_result[0]['type'];
+          }
+        }
+        $target_bundles = $dest_bundles;
+      }
+      else {
+        // @see field_field_config_presave()
+        $target_bundles = array_keys($this->entityTypeManager->getStorage('node_type')->loadMultiple());
+      }
+
       $instance_settings['handler_settings'] = [
         'sort' => [
           'field' => '_none',
           'direction' => 'ASC',
         ],
-        'target_bundles' => array_filter($field_data['settings']['referenceable_types'] ?? []),
+        'target_bundles' => $target_bundles,
       ];
     }
 
@@ -97,10 +164,20 @@ class FieldInstanceSettings extends ProcessPluginBase {
       ];
 
       if ($row->hasSourceProperty('roles')) {
-        $instance_settings['handler_settings']['filter']['type'] = 'role';
         foreach ($row->get('roles') as $role) {
+          $lookup_result = $this->migrateLookup->lookup('d7_user_role', [$role['rid']]);
+          if (!$lookup_result) {
+            continue;
+          }
+          $dest_role_id = $lookup_result[0]['id'];
+          // @see \Drupal\user\Plugin\EntityReferenceSelection\UserSelection::buildConfigurationForm()
+          if ($dest_role_id === RoleInterface::AUTHENTICATED_ID) {
+            $instance_settings['handler_settings']['include_anonymous'] = FALSE;
+            continue;
+          }
+          $instance_settings['handler_settings']['filter']['type'] = 'role';
           $instance_settings['handler_settings']['filter']['role'] = [
-            $role['name'] => $role['name'],
+            $dest_role_id => $dest_role_id,
           ];
         }
       }
