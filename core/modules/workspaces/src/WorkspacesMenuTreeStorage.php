@@ -4,7 +4,6 @@ namespace Drupal\workspaces;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
-use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Menu\MenuTreeStorage as CoreMenuTreeStorage;
@@ -25,7 +24,7 @@ class WorkspacesMenuTreeStorage extends CoreMenuTreeStorage {
    *   The workspace association service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param \Closure $connectionClosure
    *   A Database connection to use for reading and writing configuration data.
    * @param \Drupal\Core\Cache\CacheBackendInterface $menu_cache_backend
    *   Cache backend instance for the extracted tree data.
@@ -40,13 +39,13 @@ class WorkspacesMenuTreeStorage extends CoreMenuTreeStorage {
     protected readonly WorkspaceManagerInterface $workspaceManager,
     protected readonly WorkspaceAssociationInterface $workspaceAssociation,
     protected readonly EntityTypeManagerInterface $entityTypeManager,
-    Connection $connection,
+    \Closure $connectionClosure,
     CacheBackendInterface $menu_cache_backend,
     CacheTagsInvalidatorInterface $cache_tags_invalidator,
     string $table,
     array $options = [],
   ) {
-    parent::__construct($connection, $menu_cache_backend, $cache_tags_invalidator, $table, $options);
+    parent::__construct($connectionClosure, $menu_cache_backend, $cache_tags_invalidator, $table, $options);
   }
 
   /**

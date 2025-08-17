@@ -110,16 +110,16 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
   /**
    * Constructs a new PathMatcher.
    *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   A database connection object.
+   * @param \Closure $connectionClosure
+   *   A database connection closure.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state.
    * @param \Drupal\Core\Path\CurrentPathStack $current_path
    *   The current path.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
    *   The cache backend.
-   * @param \Drupal\Core\PathProcessor\InboundPathProcessorInterface $path_processor
-   *   The path processor.
+   * @param \Closure $pathProcessorClosure
+   *   The path processor closure.
    * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cache_tag_invalidator
    *   The cache tag invalidator.
    * @param string $table
@@ -128,13 +128,11 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   (Optional) The language manager.
    */
-  public function __construct(Connection $connection, StateInterface $state, CurrentPathStack $current_path, CacheBackendInterface $cache_backend, InboundPathProcessorInterface $path_processor, CacheTagsInvalidatorInterface $cache_tag_invalidator, $table = 'router', ?LanguageManagerInterface $language_manager = NULL) {
-    $this->connection = $connection;
+  public function __construct(protected \Closure $connectionClosure, StateInterface $state, CurrentPathStack $current_path, CacheBackendInterface $cache_backend, protected \Closure $pathProcessorClosure, CacheTagsInvalidatorInterface $cache_tag_invalidator, $table = 'router', ?LanguageManagerInterface $language_manager = NULL) {
     $this->state = $state;
     $this->currentPath = $current_path;
     $this->cache = $cache_backend;
     $this->cacheTagInvalidator = $cache_tag_invalidator;
-    $this->pathProcessor = $path_processor;
     $this->tableName = $table;
     $this->languageManager = $language_manager ?: \Drupal::languageManager();
   }
@@ -181,7 +179,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
       // Just trim on the right side.
       $path = $request->getPathInfo();
       $path = $path === '/' ? $path : rtrim($request->getPathInfo(), '/');
-      $path = $this->pathProcessor->processInbound($path, $request);
+      $path = ($this->pathProcessorClosure)()->processInbound($path, $request);
       $this->currentPath->setPath($path, $request);
       // Incoming path processors may also set query parameters.
       $query_parameters = $request->query->all();
@@ -243,7 +241,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
       }
       else {
         try {
-          $result = $this->connection->query('SELECT [name], [route] FROM {' . $this->connection->escapeTable($this->tableName) . '} WHERE [name] IN ( :names[] )', [':names[]' => $routes_to_load]);
+          $result = ($this->connectionClosure)()->query('SELECT [name], [route] FROM {' . ($this->connectionClosure)()->escapeTable($this->tableName) . '} WHERE [name] IN ( :names[] )', [':names[]' => $routes_to_load]);
           $routes = $result->fetchAllKeyed();
 
           $this->cache->set($cid, $routes, Cache::PERMANENT, ['routes']);
@@ -380,7 +378,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
     // trailing wildcard parts as long as the pattern matches, since we
     // dump the route pattern without those optional parts.
     try {
-      $routes = $this->connection->query("SELECT [name], [route], [fit] FROM {" . $this->connection->escapeTable($this->tableName) . "} WHERE [pattern_outline] IN ( :patterns[] ) AND [number_parts] >= :count_parts", [
+      $routes = ($this->connectionClosure)()->query("SELECT [name], [route], [fit] FROM {" . ($this->connectionClosure)()->escapeTable($this->tableName) . "} WHERE [pattern_outline] IN ( :patterns[] ) AND [number_parts] >= :count_parts", [
         ':patterns[]' => $ancestors,
         ':count_parts' => count($parts),
       ])
@@ -417,7 +415,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    * {@inheritdoc}
    */
   public function getAllRoutes() {
-    $select = $this->connection->select($this->tableName, 'router')
+    $select = ($this->connectionClosure)()->select($this->tableName, 'router')
       ->fields('router', ['name', 'route'])
       ->isNull('alias');
     $routes = $select->execute()->fetchAllKeyed();
@@ -547,7 +545,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    * {@inheritdoc}
    */
   public function getRouteAliases(string $route_name): iterable {
-    $alias_route_names = $this->connection->select($this->tableName, 'router')
+    $alias_route_names = ($this->connectionClosure)()->select($this->tableName, 'router')
       ->fields('router', ['name'])
       ->condition('alias', $route_name)
       ->execute()->fetchCol();

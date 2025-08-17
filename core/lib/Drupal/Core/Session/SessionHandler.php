@@ -22,14 +22,14 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
+   * @param \Closure $connectionClosure
+   *   The database connection closure.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    */
   public function __construct(
     protected RequestStack $requestStack,
-    protected Connection $connection,
+    protected \Closure $connectionClosure,
     protected TimeInterface $time,
   ) {
   }
@@ -49,7 +49,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
     if (!empty($sessionId)) {
       try {
         // Read the session data from the database.
-        $query = $this->connection
+        $query = ($this->connectionClosure)()
           ->queryRange('SELECT [session] FROM {sessions} WHERE [sid] = :sid', 0, 1, [':sid' => Crypt::hashBase64($sessionId)]);
         $data = (string) $query->fetchField();
       }
@@ -73,7 +73,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
       'timestamp' => $this->time->getRequestTime(),
     ];
     $doWrite = fn() =>
-      $this->connection->merge('sessions')
+    ($this->connectionClosure)()->merge('sessions')
         ->keys(['sid' => Crypt::hashBase64($sessionId)])
         ->fields($fields)
         ->execute();
@@ -116,7 +116,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
   protected function doDestroy(#[\SensitiveParameter] string $sessionId): bool {
     try {
       // Delete session data.
-      $this->connection->delete('sessions')
+      ($this->connectionClosure)()->delete('sessions')
         ->condition('sid', Crypt::hashBase64($sessionId))
         ->execute();
     }
@@ -137,7 +137,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
     // to '1814400'. At that value, only after a user doesn't log in after
     // three weeks (1814400 seconds) will their session be removed.
     try {
-      return $this->connection->delete('sessions')
+      return ($this->connectionClosure)()->delete('sessions')
         ->condition('timestamp', $this->time->getRequestTime() - $lifetime, '<')
         ->execute();
     }
@@ -225,7 +225,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
    */
   protected function ensureTableExists(): bool {
     try {
-      $database_schema = $this->connection->schema();
+      $database_schema = ($this->connectionClosure)()->schema();
       $schema_definition = $this->schemaDefinition();
       $database_schema->createTable('sessions', $schema_definition);
     }

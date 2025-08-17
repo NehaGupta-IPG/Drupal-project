@@ -402,12 +402,11 @@ services:
   Drupal\Core\Config\ConfigInstallerInterface: '@config.installer'
   config.storage:
     class: Drupal\Core\Config\CachedStorage
-    arguments: ['@config.storage.active', '@cache.config']
+    arguments: ['@>config.storage.active', '@cache.config', '']
   Drupal\Core\Config\StorageCacheInterface: '@config.storage'
   config.storage.active:
     class: Drupal\Core\Config\DatabaseStorage
     arguments: ['@database', 'config']
-    public: false
     tags:
       - { name: backend_overridable }
   config.storage.checkpoint:
@@ -589,7 +588,7 @@ services:
   Drupal\Core\Site\Settings: '@settings'
   state:
     class: Drupal\Core\State\State
-    arguments: ['@keyvalue', '@cache.bootstrap', '@lock']
+    arguments: ['@>keyvalue', '@cache.bootstrap', '@lock']
     tags:
       - { name: needs_destruction }
   Drupal\Core\State\StateInterface: '@state'
@@ -878,11 +877,11 @@ services:
     class: Drupal\Core\ParamConverter\MenuLinkPluginConverter
     tags:
       - { name: paramconverter }
-    arguments: ['@plugin.manager.menu.link']
+    arguments: ['@>plugin.manager.menu.link']
     lazy: true
   menu.tree_storage:
     class: Drupal\Core\Menu\MenuTreeStorage
-    arguments: ['@database', '@cache.menu', '@cache_tags.invalidator', 'menu_tree']
+    arguments: ['@>database', '@cache.menu', '@cache_tags.invalidator', 'menu_tree']
     public: false  # Private to plugin.manager.menu.link and menu.link_tree
     tags:
       - { name: backend_overridable }
@@ -1074,7 +1073,7 @@ services:
   Drupal\Core\Routing\AdminContext: '@router.admin_context'
   router.route_provider:
     class: Drupal\Core\Routing\RouteProvider
-    arguments: ['@database', '@state', '@path.current', '@cache.data', '@path_processor_manager', '@cache_tags.invalidator', 'router', '@language_manager']
+    arguments: ['@>database', '@state', '@path.current', '@cache.data', '@>path_processor_manager', '@cache_tags.invalidator', 'router', '@language_manager']
     tags:
       - { name: backend_overridable }
   Drupal\Core\Routing\RouteProviderInterface: '@router.route_provider'
@@ -1665,7 +1664,7 @@ services:
     alias: session_handler.storage
   session_handler.storage:
     class: Drupal\Core\Session\SessionHandler
-    arguments: ['@request_stack', '@database', '@datetime.time']
+    arguments: ['@request_stack', '@>database', '@datetime.time']
     tags:
       - { name: backend_overridable }
   session_handler.write_safe:
@@ -1675,7 +1674,7 @@ services:
   Drupal\Core\Session\WriteSafeSessionHandlerInterface: '@session_handler.write_safe'
   session_manager:
     class: Drupal\Core\Session\SessionManager
-    arguments: ['@request_stack', '@database', '@session_manager.metadata_bag', '@session_configuration', '@datetime.time', '@session_handler']
+    arguments: ['@request_stack', '@>database', '@session_manager.metadata_bag', '@session_configuration', '@datetime.time', '@session_handler']
     tags:
       - { name: backend_overridable }
     calls:
