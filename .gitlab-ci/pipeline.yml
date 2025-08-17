@@ -135,6 +135,7 @@ variables:
   variables:
     REPEAT_TEST_CLASS: '\Drupal\Tests\package_manager\Build\PackageUpdateTest'
     REPEAT_COUNT: 100
+    KUBERNETES_CPU_REQUEST: "8"
+    CONCURRENCY: "5"
   services:
     - <<: *with-database
-    - <<: *with-selenium-chrome
