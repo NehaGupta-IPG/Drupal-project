@@ -32,7 +32,7 @@ class RevisionRevertForm extends NodeRevisionRevertForm {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     $instance = parent::create($container);
     $instance->moderationInformation = $container->get('content_moderation.moderation_information');
     $instance->validation = $container->get('content_moderation.state_revert_validation');
