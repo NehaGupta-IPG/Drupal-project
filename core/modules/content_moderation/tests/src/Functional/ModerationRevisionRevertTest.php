@@ -115,7 +115,6 @@ class ModerationRevisionRevertTest extends BrowserTestBase {
     $revision = $this->nodeStorage->loadRevision($this->nodeStorage->getLatestRevisionId($node->id()));
     $this->assertEquals('draft', $revision->moderation_state->value);
 
-    // @todo, test reverting to a published revision remains published.
     // Check that it reverted.
     $this->drupalGet('node/1/edit');
     $this->assertSession()
