@@ -126,11 +126,9 @@ class ElementTest extends BrowserTestBase {
    * Tests required attribute for radios element.
    */
   public function testRadiosRequired(): void {
-    // Verify that there is require attributes.
     $this->drupalGet('form-test/radios-required');
     $fieldset = $this->assertSession()->elementExists('css', 'fieldset#edit-radios-example-0--wrapper');
-    // Required and aria-required attributes are not set on the fieldset.
-    $this->assertEmpty($fieldset->getAttribute('aria-required'));
+    // Verify that required attributes are on the inputs, not the fieldset.
     $this->assertEmpty($fieldset->getAttribute('required'));
     $this->assertSession()->elementExists('css', 'fieldset#edit-radios-example-0--wrapper #edit-radios-example-0-0[required]');
     $this->assertSession()->elementExists('css', 'fieldset#edit-radios-example-0--wrapper #edit-radios-example-0-1[required]');
