@@ -142,8 +142,8 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
     $next_id = $storage->getQuery()->accessCheck(FALSE)->count()->execute() + 1;
 
     // Create test entities with two translations and two revisions.
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     for ($i = $next_id; $i <= $next_id + 2; $i++) {
+      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
       $entity = $storage->create([
         'id' => $i,
         'type' => 'test_bundle',

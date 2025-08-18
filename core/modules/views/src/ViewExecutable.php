@@ -1465,7 +1465,6 @@ class ViewExecutable {
     $module_handler->invokeAll('views_pre_execute', [$this]);
 
     // Check for already-cached results.
-    /** @var \Drupal\views\Plugin\views\cache\CachePluginBase $cache */
     if (!empty($this->live_preview)) {
       $cache = \Drupal::service('plugin.manager.views.cache')->createInstance('none');
     }
@@ -1473,6 +1472,7 @@ class ViewExecutable {
       $cache = $this->display_handler->getPlugin('cache');
     }
 
+    /** @var \Drupal\views\Plugin\views\cache\CachePluginBase $cache */
     if ($cache->cacheGet('results')) {
       if ($this->usePager()) {
         $this->pager->total_items = $this->total_rows;
@@ -1530,7 +1530,6 @@ class ViewExecutable {
     $theme_manager = \Drupal::theme();
 
     // Check for already-cached output.
-    /** @var \Drupal\views\Plugin\views\cache\CachePluginBase $cache */
     if (!empty($this->live_preview)) {
       $cache = \Drupal::service('plugin.manager.views.cache')->createInstance('none');
     }
@@ -1587,6 +1586,7 @@ class ViewExecutable {
 
     $exposed_form->postRender($this->display_handler->output);
 
+    /** @var \Drupal\views\Plugin\views\cache\CachePluginBase $cache */
     $cache->postRender($this->display_handler->output);
 
     // Let modules modify the view output after it is rendered.

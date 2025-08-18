@@ -183,10 +183,10 @@ class JsonApiFilterRegressionTest extends JsonApiFunctionalTestBase {
     $role_llamalovers = $this->drupalCreateRole([], 'llamalovers', 'Llama Lovers');
     $role_catcuddlers = $this->drupalCreateRole([], 'catcuddlers', 'Cat Cuddlers');
 
-    /** @var \Drupal\user\UserInterface[] $users */
     for ($i = 0; $i < 3; $i++) {
       // Create 3 users, one with the first role and two with the second role.
       $users[$i] = $this->drupalCreateUser();
+      /** @var \Drupal\user\UserInterface[] $users */
       $users[$i]->addRole($i === 0 ? $role_llamalovers : $role_catcuddlers)
         ->save();
       // For each user, create a node that is owned by that user. The node's
