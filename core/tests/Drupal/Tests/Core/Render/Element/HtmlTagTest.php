@@ -217,6 +217,8 @@ class HtmlTagTest extends RendererTestBase {
       '#tag' => 'link',
     ];
     $tags['link'] = [$element, '<link />' . "\n"];
+    // Empty #tag.
+    $tags['empty-tag'] = [['#tag' => '', '#value' => ''], ''];
 
     return $tags;
   }

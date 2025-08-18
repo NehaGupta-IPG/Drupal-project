@@ -85,6 +85,9 @@ class HtmlTag extends RenderElementBase {
    */
   public static function preRenderHtmlTag($element) {
     $attributes = isset($element['#attributes']) ? new Attribute($element['#attributes']) : '';
+    if (strlen(trim($element['#tag'])) === 0) {
+      return $element;
+    }
 
     // An HTML tag should not contain any special characters. Escape them to
     // ensure this cannot be abused.
