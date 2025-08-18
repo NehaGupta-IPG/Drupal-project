@@ -10,9 +10,7 @@ use Drupal\Core\Render\Attribute\FormElement;
  * Provides a form element for a set of radio buttons.
  *
  * Properties:
- *
- * @property $options
- *   An associative array, where the keys are the returned values for
+ * - #options: An associative array, where the keys are the returned values for
  *   each radio button, and the values are the labels next to each radio button.
  *
  * Usage example:
@@ -133,7 +131,7 @@ class Radios extends FormElementBase {
     $element['#attributes']['role'] = 'radiogroup';
     // Remove the required attribute from the fieldset wrapper.
     if ($element['#required']) {
-      $element["#has_required_children"] = TRUE;
+      $element['#has_required_children'] = TRUE;
     }
     $element['#required'] = FALSE;
     return $element;
