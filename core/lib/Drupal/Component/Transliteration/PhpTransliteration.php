@@ -153,9 +153,9 @@ class PhpTransliteration implements TransliterationInterface {
     }
 
     // Checks if the Normalizer class exists and ensures the string is in
-    // NFC (Normalization Form C). If not, it normalizes it.
-    if (class_exists('Normalizer') && !\Normalizer::isNormalized($string, \Normalizer::FORM_C)) {
-      $string = \Normalizer::normalize($string, \Normalizer::FORM_C);
+    // NFC (Normalization Form C). If not normalizes it.
+    if (class_exists('Normalizer') && !\Normalizer::isNormalized($string)) {
+      $string = \Normalizer::normalize($string);
     }
 
     // Split into Unicode characters and transliterate each one.
