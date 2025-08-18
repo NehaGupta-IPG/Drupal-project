@@ -14,8 +14,7 @@ function menu_link_content_update_last_removed(): int {
   return 8601;
 }
 
-function menu_link_content_update_11002() {
-
+function menu_link_content_update_11002(): void {
   $field_storage_definition = BaseFieldDefinition::create('string')
     ->setLabel(t('Admin Description'))
     ->setDescription(t('Shown when displaying on the admin menu interface.'))
@@ -33,5 +32,4 @@ function menu_link_content_update_11002() {
     'not null' => FALSE,
     'default' => NULL,
   ]);
-
 }
