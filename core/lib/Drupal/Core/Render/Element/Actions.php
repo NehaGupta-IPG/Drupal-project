@@ -32,10 +32,11 @@ class Actions extends Container {
   public function getInfo() {
     return [
       '#process' => [
-        // @todo Move this to #pre_render.
-        [static::class, 'preRenderActionsDropbutton'],
         [static::class, 'processActions'],
         [static::class, 'processContainer'],
+      ],
+      '#pre_render' => [
+        [static::class, 'preRenderActionsDropbutton'],
       ],
       '#weight' => 100,
       '#theme_wrappers' => ['container'],
@@ -78,16 +79,12 @@ class Actions extends Container {
    *
    * @param array $element
    *   The #type 'actions' element to process.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   * @param array $complete_form
-   *   The complete form structure.
    *
    * @return array
    *   The processed #type 'actions' element, including individual buttons
    *   grouped into new #type 'dropbutton' elements.
    */
-  public static function preRenderActionsDropbutton(&$element, FormStateInterface $form_state, &$complete_form) {
+  public static function preRenderActionsDropbutton($element) {
     $dropbuttons = [];
     foreach (Element::children($element, TRUE) as $key) {
       if (isset($element[$key]['#dropbutton'])) {
