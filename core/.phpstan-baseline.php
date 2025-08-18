@@ -17204,6 +17204,78 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileFieldWidgetTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileListingTest\\:\\:assertNoTitle\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileListingTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileListingTest\\:\\:assertOption\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileListingTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileListingTest\\:\\:assertOptionByText\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileListingTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileListingTest\\:\\:assertOptionWithDrupalSelector\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileListingTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileListingTest\\:\\:assertThemeOutput\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileListingTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileListingTest\\:\\:assertTitle\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileListingTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileListingTest\\:\\:getRawContent\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileListingTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileListingTest\\:\\:getTextContent\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileListingTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileListingTest\\:\\:removeWhiteSpace\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileListingTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileListingTest\\:\\:setDrupalSettings\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileListingTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileListingTest\\:\\:setRawContent\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileListingTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$value in isset\\(\\) always exists and is not nullable\\.$#',
+	'identifier' => 'isset.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileListingTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileManagedTestBase\\:\\:assertDifferentFile\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
