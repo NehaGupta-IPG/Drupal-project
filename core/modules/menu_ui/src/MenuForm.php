@@ -358,7 +358,7 @@ class MenuForm extends EntityForm {
           $element['title'],
         ];
         $form['links'][$id]['description'] = [
-          '#markup' => $element['#item']->link->getAdminDescription() ?: '',
+          '#markup' => $element['#item']->link->getAdminDescription(),
         ];
         $form['links'][$id]['enabled'] = $element['enabled'];
         $form['links'][$id]['enabled']['#wrapper_attributes']['class'] = ['checkbox', 'menu-enabled'];
