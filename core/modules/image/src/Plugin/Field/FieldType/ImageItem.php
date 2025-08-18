@@ -60,6 +60,26 @@ class ImageItem extends FileItem {
   use LoggerChannelTrait;
 
   /**
+   * Keeps a reference to the width.
+   *
+   * This helps avoid losing the width value when the same reference is set
+   * again without an explicit width value.
+   *
+   * @see ::setValue
+   */
+  protected ?int $width;
+
+  /**
+   * Keeps a reference to the height.
+   *
+   * This helps avoid losing the height value when the same reference is set
+   * again without an explicit height value.
+   *
+   * @see ::setValue
+   */
+  protected ?int $height;
+
+  /**
    * {@inheritdoc}
    */
   public static function defaultStorageSettings() {

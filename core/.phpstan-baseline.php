@@ -14968,6 +14968,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/image/tests/src/Functional/ImageFieldValidateTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\image\\\\Functional\\\\ImageOnTranslatedEntityTest\\:\\:addEntityTypeAndBundleToWorkflow\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/image/tests/src/Functional/ImageOnTranslatedEntityTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\image\\\\Functional\\\\ImageStyleFlushTest\\:\\:createSampleImage\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
