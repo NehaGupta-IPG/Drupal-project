@@ -65,7 +65,7 @@ class EmailTemplateTest extends KernelTestBase {
     assert($emailRenderer instanceof EmailRendererInterface);
 
     $definition = new EmailDefinition([
-      'id' => 'mailer.custom-template',
+      'id' => 'mailer.custom_template',
       'provider' => 'mailer',
       'label' => 'Test Email',
       'key' => 'custom_template',
