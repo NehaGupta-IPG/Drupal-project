@@ -152,6 +152,12 @@ class PhpTransliteration implements TransliterationInterface {
       }
     }
 
+    // Checks if the Normalizer class exists and ensures the string is in
+    // NFC (Normalization Form C). If not, it normalizes it.
+    if (class_exists('Normalizer') && !\Normalizer::isNormalized($string, \Normalizer::FORM_C)) {
+      $string = \Normalizer::normalize($string, \Normalizer::FORM_C);
+    }
+
     // Split into Unicode characters and transliterate each one.
     foreach (preg_split('//u', $string, 0, PREG_SPLIT_NO_EMPTY) as $character) {
       $code = self::ordUTF8($character);
