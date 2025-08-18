@@ -76,6 +76,8 @@ services:
     arguments: ['@config.manager', '@config.storage', '@config.typed', '@config.factory']
   Drupal\Core\DefaultContent\Importer:
     autowire: true
+  Drupal\Core\DefaultContent\Exporter:
+    autowire: true
   Drupal\Core\DefaultContent\AdminAccountSwitcher:
     arguments:
       $isSuperUserAccessEnabled: '%security.enable_super_user%'
@@ -512,6 +514,8 @@ services:
     arguments: ['%app.root%', '@keyvalue.expirable', '@module_handler', '@current_user', '@csrf_token', '@logger.channel.form', '@request_stack', '@page_cache_request_policy']
     public: false  # Private to form_builder
   Drupal\Core\Form\FormCacheInterface: '@form_cache'
+  Drupal\Core\Form\FormPreprocess:
+    class: Drupal\Core\Form\FormPreprocess
   keyvalue:
     class: Drupal\Core\KeyValueStore\KeyValueFactory
     arguments: ['@service_container', '%factory.keyvalue%']
@@ -900,6 +904,7 @@ services:
     class: Symfony\Component\EventDispatcher\EventDispatcher
   Psr\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
   Symfony\Contracts\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
+  Symfony\Component\EventDispatcher\EventDispatcher: '@event_dispatcher'
   controller_resolver:
     class: Drupal\Core\Controller\ControllerResolver
     arguments: ['@callable_resolver']
@@ -1110,7 +1115,7 @@ services:
   Drupal\Core\Routing\AccessAwareRouterInterface: '@router'
   router.no_access_checks:
     class: \Drupal\Core\Routing\Router
-    arguments: ['@router.route_provider', '@path.current', '@url_generator']
+    arguments: ['@router.route_provider', '@path.current']
     tags:
       - { name: service_collector, tag: route_enhancer, call: addRouteEnhancer  }
       - { name: service_collector, tag: route_filter, call: addRouteFilter }
