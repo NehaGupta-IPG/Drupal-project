@@ -45,12 +45,13 @@
     attributes.hasClass('fieldgroup') ? 'fieldset__wrapper--group',
   ]
 %}
+{% set is_required = required or has_required_children %}
 {%
   set legend_span_classes = [
     'fieldset__label',
     attributes.hasClass('fieldgroup') ? 'fieldset__label--group',
-    required ? 'js-form-required',
-    required ? 'form-required',
+    is_required ? 'js-form-required',
+    is_required ? 'form-required',
   ]
 %}
 {%
