@@ -10,6 +10,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestBaseFieldDisplay;
+use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 
@@ -98,6 +99,9 @@ class FormTest extends FieldTestBase {
     ];
   }
 
+  /**
+   * Tests the single-value field form functionality.
+   */
   public function testFieldFormSingle(): void {
     $field_storage = $this->fieldStorageSingle;
     $field_name = $field_storage['field_name'];
@@ -134,7 +138,7 @@ class FormTest extends FieldTestBase {
     $this->assertSession()->pageTextContains("{$this->field['label']} does not accept the value -1.");
     // @todo check that the correct field is flagged for error.
 
-    // Create an entity
+    // Create an entity.
     $value = mt_rand(1, 127);
     $edit = [
       "{$field_name}[0][value]" => $value,
@@ -208,6 +212,9 @@ class FormTest extends FieldTestBase {
     $this->assertTrue($entity->{$field_name}->isEmpty(), 'Field is now empty.');
   }
 
+  /**
+   * Tests the required single-value field form.
+   */
   public function testFieldFormSingleRequired(): void {
     $field_storage = $this->fieldStorageSingle;
     $field_name = $field_storage['field_name'];
@@ -226,7 +233,7 @@ class FormTest extends FieldTestBase {
     $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains("{$this->field['label']} field is required.");
 
-    // Create an entity
+    // Create an entity.
     $value = mt_rand(1, 127);
     $edit = [
       "{$field_name}[0][value]" => $value,
@@ -248,6 +255,9 @@ class FormTest extends FieldTestBase {
     $this->assertSession()->pageTextContains("{$this->field['label']} field is required.");
   }
 
+  /**
+   * Tests the unlimited-value field form.
+   */
   public function testFieldFormUnlimited(): void {
     $field_storage = $this->fieldStorageUnlimited;
     $field_name = $field_storage['field_name'];
@@ -306,7 +316,7 @@ class FormTest extends FieldTestBase {
       $pattern[$weight] = "<input [^>]*value=\"$value\" [^>]*";
     }
 
-    // Press 'add more' button -> 4 widgets
+    // Press 'add more' button -> 4 widgets.
     $this->submitForm($edit, 'Add another item');
     for ($delta = 0; $delta <= $delta_range; $delta++) {
       $this->assertSession()->fieldValueEquals("{$field_name}[$delta][value]", $values[$delta]);
@@ -337,7 +347,7 @@ class FormTest extends FieldTestBase {
     // Submit: check that the entity is updated with correct values
     // Re-submit: check that the field can be emptied.
 
-    // Test with several multiple fields in a form
+    // Test with several multiple fields in a form.
   }
 
   /**
@@ -598,7 +608,7 @@ class FormTest extends FieldTestBase {
     $this->drupalLogin($user);
 
     // Ensure that the 'bar' bundle exists, to avoid config validation errors.
-    entity_test_create_bundle('bar', entity_type: 'entity_test_base_field_display');
+    EntityTestHelper::createBundle('bar', entity_type: 'entity_test_base_field_display');
 
     FieldStorageConfig::create([
       'entity_type' => 'entity_test_base_field_display',

@@ -27,6 +27,8 @@ use Symfony\Component\Serializer\Serializer;
 class TimestampItemNormalizerTest extends UnitTestCase {
 
   /**
+   * The time stamp normalizer.
+   *
    * @var \Drupal\serialization\Normalizer\TimestampItemNormalizer
    */
   protected $normalizer;
@@ -173,6 +175,7 @@ class TimestampItemNormalizerTest extends UnitTestCase {
    * Creates a TimestampItem prophecy.
    *
    * @return \Prophecy\Prophecy\ObjectProphecy<\Drupal\Core\Field\Plugin\Field\FieldType\TimestampItem>
+   *   The TimestampItem prophecy.
    */
   protected function createTimestampItemProphecy(): ObjectProphecy {
     $timestamp_item = $this->prophesize(TimestampItem::class);

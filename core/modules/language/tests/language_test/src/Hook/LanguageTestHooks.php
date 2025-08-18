@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\language_test\Hook;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUI;
 use Drupal\Core\Language\LanguageInterface;
@@ -14,6 +15,8 @@ use Drupal\Core\Hook\Attribute\Hook;
  */
 class LanguageTestHooks {
 
+  use StringTranslationTrait;
+
   /**
    * Implements hook_page_top().
    */
@@ -21,7 +24,7 @@ class LanguageTestHooks {
   public function pageTop(): void {
     if (\Drupal::moduleHandler()->moduleExists('language')) {
       $this->storeLanguageNegotiation();
-      \Drupal::messenger()->addStatus(t('Language negotiation method: @name', [
+      \Drupal::messenger()->addStatus($this->t('Language negotiation method: @name', [
         '@name' => \Drupal::languageManager()->getNegotiatedLanguageMethod() ?? 'Not defined',
       ]));
     }
@@ -31,12 +34,12 @@ class LanguageTestHooks {
    * Implements hook_language_types_info().
    */
   #[Hook('language_types_info')]
-  public function languageTypesInfo() {
+  public function languageTypesInfo(): array {
     if (\Drupal::keyValue('language_test')->get('language_types')) {
       return [
         'test_language_type' => [
-          'name' => t('Test'),
-          'description' => t('A test language type.'),
+          'name' => $this->t('Test'),
+          'description' => $this->t('A test language type.'),
         ],
         'fixed_test_language_type' => [
           'fixed' => [
@@ -46,6 +49,7 @@ class LanguageTestHooks {
         ],
       ];
     }
+    return [];
   }
 
   /**

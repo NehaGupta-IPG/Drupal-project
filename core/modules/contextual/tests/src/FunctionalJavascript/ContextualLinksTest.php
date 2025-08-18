@@ -7,12 +7,12 @@ namespace Drupal\Tests\contextual\FunctionalJavascript;
 use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the UI for correct contextual links.
- *
- * @group contextual
  */
+#[Group('contextual')]
 class ContextualLinksTest extends WebDriverTestBase {
 
   use ContextualLinkClickTrait;
@@ -62,7 +62,7 @@ class ContextualLinksTest extends WebDriverTestBase {
     $contextualLinks = $this->assertSession()->waitForElement('css', '.contextual button');
     $this->assertNotEmpty($contextualLinks);
 
-    // Confirm touchevents detection is loaded with Contextual Links
+    // Confirm touchevents detection is loaded with Contextual Links.
     $this->assertSession()->elementExists('css', 'html.no-touchevents');
 
     // Ensure visibility remains correct after cached paged load.

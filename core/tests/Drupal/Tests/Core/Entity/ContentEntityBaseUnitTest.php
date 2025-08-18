@@ -281,6 +281,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
     // The last call changed the return value for this call.
     $this->assertFalse($this->entity->isDefaultRevision());
     // The revision for a new entity should always be the default revision.
+    $this->entity->isDefaultRevision(TRUE);
     $this->entity->expects($this->any())
       ->method('isNew')
       ->willReturn(TRUE);
@@ -659,7 +660,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
    * @covers ::set
    */
   public function testSet(): void {
-    // Exercise set(), check if it returns $this
+    // Exercise set(), check if it returns $this.
     $this->assertSame(
       $this->entity,
       $this->entity->set('id', 0)
