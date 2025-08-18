@@ -41,6 +41,8 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
   protected $schema;
 
   /**
+   * An array of custom indexes for the field schema.
+   *
    * @var array
    */
   protected $indexes = [];
@@ -365,8 +367,9 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
    * Unless this method is called, the field remains invisible (or requires
    * ad-hoc rendering logic).
    *
-   * @param string $display_context
-   *   The display context. Either 'view' or 'form'.
+   * @param string|\Drupal\Core\Field\DisplayContext $display_context
+   *   The display context. Either 'view' or 'form', or a DisplayContext
+   *   enum value.
    * @param array $options
    *   An array of display options. Refer to
    *   \Drupal\Core\Field\FieldDefinitionInterface::getDisplayOptions() for
@@ -378,16 +381,23 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
    * @return static
    *   The object itself for chaining.
    */
-  public function setDisplayOptions($display_context, array $options) {
-    $this->definition['display'][$display_context]['options'] = $options;
+  public function setDisplayOptions(string|DisplayContext $display_context, array $options) {
+    // Handle backward compatibility for string values.
+    if (is_string($display_context) && !in_array($display_context, ['view', 'form'], TRUE)) {
+      @trigger_error(sprintf('Passing a string other than "view" or "form" to %s() is deprecated in drupal:11.1.0 and will be removed from drupal:12.0.0. Use DisplayContext enum values instead. See https://www.drupal.org/node/0000000', __METHOD__), E_USER_DEPRECATED);
+    }
+
+    $context_value = $display_context instanceof DisplayContext ? $display_context->value : $display_context;
+    $this->definition['display'][$context_value]['options'] = $options;
     return $this;
   }
 
   /**
    * Sets whether the display for the field can be configured.
    *
-   * @param string $display_context
-   *   The display context. Either 'view' or 'form'.
+   * @param string|\Drupal\Core\Field\DisplayContext $display_context
+   *   The display context. Either 'view' or 'form', or a DisplayContext
+   *   enum value.
    * @param bool $configurable
    *   Whether the display options can be configured (e.g., via the "Manage
    *   display" / "Manage form display" UI screens). If TRUE, the options
@@ -396,12 +406,24 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
    * @return static
    *   The object itself for chaining.
    */
-  public function setDisplayConfigurable($display_context, $configurable) {
-    // If no explicit display options have been specified, default to 'hidden'.
-    if (empty($this->definition['display'][$display_context])) {
-      $this->definition['display'][$display_context]['options'] = ['region' => 'hidden'];
+  public function setDisplayConfigurable(string|DisplayContext $display_context, $configurable) {
+    // Handle backward compatibility for string values.
+    if (is_string($display_context) && !in_array($display_context, ['view', 'form'], TRUE)) {
+      @trigger_error(
+        sprintf(
+          'Passing a string other than "view" or "form" to %s() is deprecated in drupal:11.1.0 and will be removed from drupal:12.0.0. Use DisplayContext enum values instead. See https://www.drupal.org/node/0000000',
+          __METHOD__
+        ),
+        E_USER_DEPRECATED
+      );
     }
-    $this->definition['display'][$display_context]['configurable'] = $configurable;
+
+    // If no explicit display options have been specified, default to 'hidden'.
+    $context_value = $display_context instanceof DisplayContext ? $display_context->value : $display_context;
+    if (empty($this->definition['display'][$context_value])) {
+      $this->definition['display'][$context_value]['options'] = ['region' => 'hidden'];
+    }
+    $this->definition['display'][$context_value]['configurable'] = $configurable;
     return $this;
   }
 
@@ -486,8 +508,7 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
    *
    * @return array
    *   The initial value for the field, as a numerically indexed array of items,
-   *   each item being a property/value array. An empty array when there is no
-   *   default value.
+   *   each item being a property/value array (array() for no default value).
    */
   public function getInitialValue() {
     return $this->normalizeValue($this->definition['initial_value'], $this->getMainPropertyName());
