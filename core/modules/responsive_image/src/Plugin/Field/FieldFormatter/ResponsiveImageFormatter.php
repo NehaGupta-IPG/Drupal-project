@@ -293,8 +293,8 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
   public function calculateDependencies() {
     $dependencies = parent::calculateDependencies();
     $style_id = $this->getSetting('responsive_image_style');
-    /** @var \Drupal\responsive_image\ResponsiveImageStyleInterface $style */
     if ($style_id && $style = ResponsiveImageStyle::load($style_id)) {
+      /** @var \Drupal\responsive_image\ResponsiveImageStyleInterface $style */
       // Add the responsive image style as dependency.
       $dependencies[$style->getConfigDependencyKey()][] = $style->getConfigDependencyName();
     }

@@ -67,8 +67,8 @@ class ContentTranslationManageAccessCheck implements AccessInterface {
    *   The access result.
    */
   public function access(Route $route, RouteMatchInterface $route_match, AccountInterface $account, $source = NULL, $target = NULL, $language = NULL, $entity_type_id = NULL) {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     if ($entity = $route_match->getParameter($entity_type_id)) {
+      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
       $operation = $route->getRequirement('_access_content_translation_manage');
       if ($language !== NULL) {
         $language = $this->languageManager->getLanguage($language);

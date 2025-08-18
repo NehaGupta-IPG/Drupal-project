@@ -59,8 +59,8 @@ class ThumbnailDownloader extends QueueWorkerBase implements ContainerFactoryPlu
    * {@inheritdoc}
    */
   public function processItem($data) {
-    /** @var \Drupal\media\Entity\Media $media */
     if ($media = $this->entityTypeManager->getStorage('media')->load($data['id'])) {
+      /** @var \Drupal\media\Entity\Media $media */
       $media->updateQueuedThumbnail();
       $media->save();
     }

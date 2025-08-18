@@ -31,8 +31,8 @@ class MenuUiUtility {
    * @internal
    */
   public function menuUiNodeSave(NodeInterface $node, array $values): void {
-    /** @var \Drupal\menu_link_content\MenuLinkContentInterface $entity */
     if (!empty($values['entity_id'])) {
+      /** @var \Drupal\menu_link_content\MenuLinkContentInterface $entity */
       $entity = $this->entityRepository->getActive('menu_link_content', $values['entity_id']);
       if ($entity->isTranslatable() && $node->isTranslatable()) {
         if (!$entity->hasTranslation($node->language()->getId())) {

@@ -56,8 +56,8 @@ class AttributeDiscoveryWithAnnotationsAutomatedProviders extends AttributeDisco
     $reflection_class = $parser->getReflectionClass();
     // @todo Handle deprecating definitions discovery via annotations in
     // https://www.drupal.org/project/drupal/issues/3522409.
-    /** @var \Drupal\Component\Annotation\AnnotationInterface $annotation */
     if ($annotation = $this->getAnnotationReader()->getClassAnnotation($reflection_class, $this->pluginDefinitionAnnotationName)) {
+      /** @var \Drupal\Component\Annotation\AnnotationInterface $annotation */
       $this->prepareAnnotationDefinition($annotation, $class, $parser);
       return ['id' => $annotation->getId(), 'content' => $annotation->get()];
     }

@@ -2391,8 +2391,8 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       }
     }
 
-    /** @var \Drupal\views\Plugin\views\cache\CachePluginBase $cache_plugin */
     if ($cache_plugin = $this->getPlugin('cache')) {
+      /** @var \Drupal\views\Plugin\views\cache\CachePluginBase $cache_plugin */
       $cache_plugin->alterCacheMetadata($cache_metadata);
     }
 

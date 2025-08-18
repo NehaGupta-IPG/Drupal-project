@@ -59,8 +59,8 @@ class PathElement extends Textfield {
    */
   public static function validateMatchedPath(&$element, FormStateInterface $form_state, &$complete_form) {
     if (!empty($element['#value']) && ($element['#validate_path'] || $element['#convert_path'] != self::CONVERT_NONE)) {
-      /** @var \Drupal\Core\Url $url */
       if ($url = \Drupal::service('path.validator')->getUrlIfValid($element['#value'])) {
+        /** @var \Drupal\Core\Url $url */
         if ($url->isExternal()) {
           $form_state->setError($element, t('You cannot use an external URL. Enter a relative path.'));
           return;

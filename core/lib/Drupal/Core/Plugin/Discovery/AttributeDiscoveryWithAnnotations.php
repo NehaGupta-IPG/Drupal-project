@@ -88,8 +88,8 @@ class AttributeDiscoveryWithAnnotations extends AttributeClassDiscovery {
     $parser = new StaticReflectionParser($class, $finder, TRUE);
 
     $reflection_class = $parser->getReflectionClass();
-    /** @var \Drupal\Component\Annotation\AnnotationInterface $annotation */
     if ($annotation = $this->getAnnotationReader()->getClassAnnotation($reflection_class, $this->pluginDefinitionAnnotationName)) {
+      /** @var \Drupal\Component\Annotation\AnnotationInterface $annotation */
       $this->prepareAnnotationDefinition($annotation, $class);
 
       $id = $annotation->getId();

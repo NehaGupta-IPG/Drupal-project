@@ -346,8 +346,8 @@ class EditorHooks {
     if (($status = $format->status()) === $original->status()) {
       return;
     }
-    /** @var \Drupal\editor\EditorInterface $editor */
     if ($editor = Editor::load($format->id())) {
+      /** @var \Drupal\editor\EditorInterface $editor */
       $editor->setStatus($status)->save();
     }
   }
