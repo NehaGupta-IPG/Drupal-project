@@ -34,13 +34,12 @@
     'form-wrapper',
   ]
 %}
-{% set is_required = required or has_required_children %}
 <fieldset{{ attributes.addClass(classes) }}>
   {%
     set legend_span_classes = [
       'fieldset-legend',
-      is_required ? 'js-form-required',
-      is_required ? 'form-required',
+      required ? 'js-form-required',
+      required ? 'form-required',
     ]
   %}
   {# Always wrap fieldset legends in a <span> for CSS positioning. #}

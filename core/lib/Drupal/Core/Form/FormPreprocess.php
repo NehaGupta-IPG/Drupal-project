@@ -295,8 +295,11 @@ class FormPreprocess {
     $variables['suffix'] = $element['#field_suffix'] ?? NULL;
     $variables['title_display'] = $element['#title_display'] ?? NULL;
     $variables['children'] = $element['#children'];
-    $variables['required'] = !empty($element['#required']) ? $element['#required'] : NULL;
-    $variables['has_required_children'] = !empty($element['#has_required_children']) ? $element['#has_required_children'] : FALSE;
+    // Set the required variable on the fieldset based on either the element
+    // itself being required, or it having required children (e.g radios).
+    $elementRequired = $element['#required'] ?? NULL;
+    $hasRequiredChildren = $element['#has_required_children'] ?? FALSE;
+    $variables['required'] = $elementRequired || $hasRequiredChildren;
 
     if (isset($element['#title']) && $element['#title'] !== '') {
       $variables['legend']['title'] = ['#markup' => $element['#title']];
