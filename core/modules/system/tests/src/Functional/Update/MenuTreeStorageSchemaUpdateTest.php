@@ -28,7 +28,6 @@ class MenuTreeStorageSchemaUpdateTest extends UpdatePathTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    /** @var \Drupal\Core\Database\Connection $connection */
     $this->connection = \Drupal::service('database');
   }
 

@@ -288,7 +288,6 @@ class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
     $db_schema = $this->database->schema();
 
     // Create two entities before adding the base field.
-    /** @var \Drupal\entity_test_update\Entity\EntityTestUpdate $entity */
     $storage->create([
       'name' => 'First entity',
       'test_single_property' => 'test existing value',
