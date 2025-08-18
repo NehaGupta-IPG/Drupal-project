@@ -46,7 +46,11 @@
               {
                 text: Drupal.t('Leave preview'),
                 click() {
-                  window.top.location.href = event.currentTarget.href;
+                  let href = event.currentTarget.href;
+                  if (href === undefined) {
+                    href = event.target.href;
+                  }
+                  window.top.location.href = href;
                 },
               },
             ],
