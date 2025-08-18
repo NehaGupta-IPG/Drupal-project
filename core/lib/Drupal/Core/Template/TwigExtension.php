@@ -16,6 +16,7 @@ use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Url;
 use Twig\Environment;
+use Twig\Error\RuntimeError;
 use Twig\Extension\AbstractExtension;
 use Twig\Markup as TwigMarkup;
 use Twig\Node\Expression\ArrayExpression;
@@ -34,6 +35,8 @@ use Twig\Runtime\EscaperRuntime;
  * @see \Drupal\Core\CoreServiceProvider
  */
 class TwigExtension extends AbstractExtension {
+
+  private const DEFAULT_TRIM_CHARS = " \t\n\r\0\x0B";
 
   /**
    * The URL generator.
@@ -156,6 +159,9 @@ class TwigExtension extends AbstractExtension {
       new TwigFilter('format_date', [$this->dateFormatter, 'format']),
       // Add new theme hook suggestions directly from a Twig template.
       new TwigFilter('add_suggestion', [$this, 'suggestThemeHook']),
+
+      // Add support for trimming Drupal markup.
+      new TwigFilter('trim', [$this, 'trim']),
     ];
   }
 
@@ -737,6 +743,42 @@ class TwigExtension extends AbstractExtension {
     }
 
     return $element;
+  }
+
+  /**
+   * Returns a trimmed string.
+   *
+   * @param string|\Stringable|null $string
+   *   The string to trim.
+   * @param string|null $character_mask
+   *   The characters to strip.
+   * @param string $side
+   *   Which sides to strip from. Should be 'left', 'right', or 'both'.
+   *
+   * @throws \Twig\Error\RuntimeError
+   *   When an invalid trimming side is used.
+   */
+  public static function trim($string, $character_mask = NULL, $side = 'both'): string|\Stringable {
+    if (NULL === $character_mask) {
+      $character_mask = self::DEFAULT_TRIM_CHARS;
+    }
+
+    $trimmed = match ($side) {
+      'both' => trim($string ?? '', $character_mask),
+      'left' => ltrim($string ?? '', $character_mask),
+      'right' => rtrim($string ?? '', $character_mask),
+      default => throw new RuntimeError('Trimming side must be "left", "right" or "both".'),
+    };
+
+    // Trimming a safe string with the default character mask always returns a
+    // safe string (independently of the context).
+    if ($string instanceof TwigMarkup || $string instanceof MarkupInterface) {
+      if (self::DEFAULT_TRIM_CHARS === $character_mask || empty(trim($character_mask, self::DEFAULT_TRIM_CHARS))) {
+        return Markup::create($trimmed);
+      }
+    }
+
+    return $trimmed;
   }
 
   /**

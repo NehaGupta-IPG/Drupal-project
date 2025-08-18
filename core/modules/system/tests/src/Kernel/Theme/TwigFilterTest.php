@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel\Theme;
 
+use Drupal\Core\Render\Markup;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Twig\Error\RuntimeError;
+use Twig\Markup as TwigMarkup;
 
 /**
  * Tests Drupal's Twig filters.
@@ -135,6 +138,88 @@ class TwigFilterTest extends KernelTestBase {
 
     foreach ($elements as $element) {
       $this->assertRaw($element['expected'], $element['message']);
+    }
+  }
+
+  /**
+   * Tests Twig "trim" filter.
+   */
+  public function testTwigTrimFilter(): void {
+    $elements = [
+      'twig_markup' => [
+        'text' => new TwigMarkup("\x0B <p>hello</p> \r\n\t\0", 'utf8'),
+        'expected' => '<p>hello</p>',
+      ],
+      'twig_markup_left' => [
+        'text' => new TwigMarkup("\x0B <p>hello</p> \r\n\t\0", 'utf8'),
+        'expected' => "<p>hello</p> \r\n\t\0",
+        'template' => '{{ item|trim(side: "left") }}',
+      ],
+      'twig_markup_right' => [
+        'text' => new TwigMarkup("\x0B <p>hello</p> \r\n\t\0", 'utf8'),
+        'expected' => "\x0B <p>hello</p>",
+        'template' => '{{ item|trim(side: "right") }}',
+      ],
+      'twig_markup_unsafe_trim' => [
+        'text' => new TwigMarkup('| <p>hello</p> |', 'utf8'),
+        'expected' => '&lt;p&gt;hello&lt;/p&gt;',
+        'template' => '{{ item|trim("| ") }}',
+      ],
+      'drupal_markup_unsafe_trim' => [
+        // The markup should be escaped because there is no guarantee it will be
+        // a safe markup.
+        'text' => Markup::create('| <p>hello</p> |'),
+        'expected' => '&lt;p&gt;hello&lt;/p&gt;',
+        'template' => '{{ item|trim("| ") }}',
+      ],
+
+      'drupal_markup' => [
+        'text' => Markup::create("\n <p>hello</p> \r\n\t\0"),
+        'expected' => '<p>hello</p>',
+      ],
+      'drupal_markup_left' => [
+        'text' => Markup::create("\n <p>hello</p> \r\n\t\0"),
+        'expected' => "<p>hello</p> \r\n\t\0",
+        'template' => '{{ item|trim(side: "left") }}',
+      ],
+      'drupal_markup_right' => [
+        'text' => Markup::create("\n <p>hello</p> \r\n\t\0"),
+        'expected' => "\n <p>hello</p>",
+        'template' => '{{ item|trim(side: "right") }}',
+      ],
+      'drupal_markup_safe_trim' => [
+        // Using a single character from the approved whitespace character list
+        // should still yield trusted markup.
+        'text' => Markup::create(" <p>hello</p>\t "),
+        'expected' => "<p>hello</p>\t",
+        'template' => '{{ item|trim(" ", "both") }}',
+      ],
+      // An exception should be thrown if an invalid argument is used.
+      // Do note that any test cases added after this one will fail to run, so
+      // this should be the last entry in the array.
+      'invalid_side' => [
+        'text' => Markup::create(" <p>hello</p>\t "),
+        'template' => '{{ item|trim(side: "LEFT") }}',
+        'expected' => "this will not be compared to",
+        'expect_error' => 'Trimming side must be "left", "right" or "both"',
+      ],
+    ];
+
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = $this->container->get('renderer');
+    foreach ($elements as $index => $element) {
+      $build = [
+        '#type' => 'inline_template',
+        '#template' => $element['template'] ?? '{{ item|trim }}',
+        '#context' => [
+          'item' => $element['text'],
+        ],
+      ];
+      if (!empty($element['expect_error'])) {
+        $this->expectException(RuntimeError::class);
+        $this->expectExceptionMessage($element['expect_error']);
+      }
+      self::assertEquals($element['expected'], (string) $renderer->renderInIsolation($build), "[$index]");
     }
   }
 
