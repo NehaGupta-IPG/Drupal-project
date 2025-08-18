@@ -60,26 +60,6 @@ class ImageItem extends FileItem {
   use LoggerChannelTrait;
 
   /**
-   * Keeps a reference to the width.
-   *
-   * This helps avoid losing the width value when the same reference is set
-   * again without an explicit width value.
-   *
-   * @see ::setValue
-   */
-  protected ?int $width;
-
-  /**
-   * Keeps a reference to the height.
-   *
-   * This helps avoid losing the height value when the same reference is set
-   * again without an explicit height value.
-   *
-   * @see ::setValue
-   */
-  protected ?int $height;
-
-  /**
    * {@inheritdoc}
    */
   public static function defaultStorageSettings() {
@@ -390,16 +370,18 @@ class ImageItem extends FileItem {
    * {@inheritdoc}
    */
   public function setValue($values, $notify = TRUE): void {
+    $width = $this->get('width')->getValue();
+    $height = $this->get('height')->getValue();
     // Avoid losing the width and height values when the same reference is
     // set again and there already is a width and height.
-    if (is_array($values) && !isset($values['width']) && !isset($values['height']) && $this->target_id && $this->width && $this->height) {
+    if (is_array($values) && !isset($values['width']) && !isset($values['height']) && $this->target_id && $width && $height) {
       if (isset($values['entity']) && $values['entity'] instanceof FileInterface && $values['entity']->id() == $this->target_id) {
-        $values['width'] = $this->width;
-        $values['height'] = $this->height;
+        $values['width'] = $width;
+        $values['height'] = $height;
       }
       if (isset($values['target_id']) && $values['target_id'] == $this->target_id) {
-        $values['width'] = $this->width;
-        $values['height'] = $this->height;
+        $values['width'] = $width;
+        $values['height'] = $height;
       }
     }
 
