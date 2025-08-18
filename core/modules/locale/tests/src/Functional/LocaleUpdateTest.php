@@ -7,6 +7,7 @@ namespace Drupal\Tests\locale\Functional;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Tests\locale\Traits\TranslationImportTestTrait;
 
 // cspell:ignore extraday lundi
 
@@ -18,11 +19,17 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 class LocaleUpdateTest extends LocaleUpdateBase {
 
   use StringTranslationTrait;
+  use TranslationImportTestTrait;
 
   /**
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $modules = ['dblog'];
 
   /**
    * {@inheritdoc}
@@ -340,7 +347,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     $this->submitForm($edit, 'Install');
 
     // Check if translations have been imported.
-    $this->assertSession()->pageTextContains("One translation file imported. 7 translations were added, 0 translations were updated and 0 translations were removed.");
+    $this->assertImport(7, 0, 0);
     // cSpell:disable-next-line
     $this->assertTranslation('Tuesday', 'Dienstag', 'de');
 
@@ -389,7 +396,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     $this->submitForm($edit, 'Add language');
 
     // Check if the right number of translations are added.
-    $this->assertSession()->pageTextContains("One translation file imported. 8 translations were added, 0 translations were updated and 0 translations were removed.");
+    $this->assertImport(8, 0, 0);
     // cSpell:disable-next-line
     $this->assertTranslation('Extra day', 'extra dag', 'nl');
 
@@ -449,7 +456,6 @@ class LocaleUpdateTest extends LocaleUpdateBase {
 
     // Ensure the translation file is automatically imported when the language
     // was added.
-    $this->assertSession()->pageTextContains('One translation file imported.');
     $this->assertSession()->pageTextContains('One translation string was skipped because of disallowed or malformed HTML');
 
     // Ensure the strings were successfully imported.

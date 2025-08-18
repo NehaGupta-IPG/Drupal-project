@@ -397,11 +397,6 @@ function locale_translate_batch_finished($success, array $results): void {
           }
         }
       }
-      \Drupal::messenger()->addStatus(\Drupal::translation()->formatPlural(count($results['files']),
-        'One translation file imported. %number translations were added, %update translations were updated and %delete translations were removed.',
-        '@count translation files imported. %number translations were added, %update translations were updated and %delete translations were removed.',
-        ['%number' => $additions, '%update' => $updates, '%delete' => $deletes]
-      ));
       $logger->notice('Translations imported: %number added, %update updated, %delete removed.', ['%number' => $additions, '%update' => $updates, '%delete' => $deletes]);
 
       if ($skips) {
@@ -701,11 +696,9 @@ function locale_config_batch_finished($success, array $results): void {
   if ($success) {
     $configuration = $results['stats']['config'] ?? 0;
     if ($configuration) {
-      \Drupal::messenger()->addStatus(t('The configuration was successfully updated. There are %number configuration objects updated.', ['%number' => $configuration]));
       \Drupal::logger('locale')->notice('The configuration was successfully updated. %number configuration objects updated.', ['%number' => $configuration]);
     }
     else {
-      \Drupal::messenger()->addStatus(t('No configuration objects have been updated.'));
       \Drupal::logger('locale')->warning('No configuration objects have been updated.');
     }
   }
