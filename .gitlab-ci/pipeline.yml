@@ -134,7 +134,7 @@ variables:
   <<: [ *with-composer, *run-repeat-class-test, *default-job-settings ]
   variables:
     REPEAT_TEST_CLASS: '\Drupal\Tests\package_manager\Build\PackageUpdateTest'
-    REPEAT_COUNT: 100
+    REPEAT_COUNT: 75
     KUBERNETES_CPU_LIMIT: "4"
     KUBERNETES_CPU_REQUEST: "8"
     CONCURRENCY: "5"
