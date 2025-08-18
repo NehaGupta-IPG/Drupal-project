@@ -17,6 +17,9 @@ class HtmxHelper {
 
   const ATTRIBUTE_PREFIX = 'data-hx-';
 
+  /**
+   *
+   */
   protected static function getWrapperKey(array $elements) {
     $wrapper_key = (($elements['#markup'] ?? FALSE) === '' && ($elements['#input'] ?? FALSE) === TRUE) ? '#wrapper_attributes' : '#attributes';
     if ($elements['#type'] === 'textarea' || $elements['#theme'] === 'item_list') {
@@ -49,17 +52,20 @@ class HtmxHelper {
           if ($value instanceof Url) {
             $attribute_value = $value->toString();
           }
+          elseif ($value === TRUE) {
+            $attribute_value = '';
+          }
           else {
-            $attribute_value = $value === TRUE ? '' : $value;
+            $attribute_value = $value;
           }
           break;
 
         case 'swap':
-          $attribute_value = new AttributeArray('swap', [$value['style']->name, $value['modifiers']->__toString()]);
+          $attribute_value = new AttributeArray($key, [$value['style']->name, $value['modifiers']->__toString()]);
           break;
 
         case 'select-oob':
-          $attribute_value = new AttributeArray('select-oob', $value);
+          $attribute_value = implode(',', $value);
           break;
 
         case 'swap-oob':
@@ -69,15 +75,9 @@ class HtmxHelper {
           $attribute_value = $value === TRUE ? 'true' : $value;
           break;
 
-        case 'on':
-          foreach ($value as $event => $handler) {
-            $key = self::ensureKebabCase($event);
-            $elements[$wrapper_key][self::ATTRIBUTE_PREFIX . 'on' . $key] = $handler;
-          }
-          break;
-
+        case 'request':
         case 'vals':
-          $attribute_value = new AttributeJson('vals', $value);
+          $attribute_value = new AttributeJson($key, $value);
           break;
 
         default:
@@ -85,6 +85,9 @@ class HtmxHelper {
             $attribute_value = $value;
           }
           break;
+      }
+      if (str_starts_with($key, 'on:')) {
+        $key = self::ensureKebabCase($key);
       }
       if (!is_null($attribute_value)) {
         $elements[$wrapper_key][self::ATTRIBUTE_PREFIX . $key] = $attribute_value;
@@ -119,4 +122,5 @@ class HtmxHelper {
     $snakeCase = $converter->normalize($identifier);
     return preg_replace('#[_:]#', '-', $snakeCase);
   }
+
 }

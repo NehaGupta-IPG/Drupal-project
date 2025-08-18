@@ -171,8 +171,7 @@ class Htmx {
    * @see https://htmx.org/attributes/hx-on/
    */
   public function on(string $event, string $action): static {
-    $this->storage['on'][$event] = $action;
-    return $this;
+    return $this->setValue('on:' . $event, $action);
   }
 
   /**
