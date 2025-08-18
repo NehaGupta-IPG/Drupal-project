@@ -1,0 +1,7 @@
+name: Mailer Theme Test
+type: theme
+description: A base theme for email testing.
+package: Core
+version: VERSION
+base theme: false
+hidden: true

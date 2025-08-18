@@ -36,4 +36,12 @@ class EmailTestController {
     $email->text(json_encode($argnames, JSON_THROW_ON_ERROR));
   }
 
+  public function html(Email $email, string $id): array {
+    $email->subject(sprintf('HTML Email (%s)', $id));
+    $build['colors'] = [
+      '#markup' => '<em>All</em> <strong>colors</strong> <u>are</u> <span class="rainbow">beautiful</span>',
+    ];
+    return $build;
+  }
+
 }

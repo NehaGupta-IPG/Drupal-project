@@ -22,6 +22,12 @@
  * @ingroup themeable
  */
 #}
-<div{{ attributes }}>
+{%
+  set classes = [
+    'email',
+    'email--' ~ module ~ '--' ~ key,
+  ]
+%}
+<div{{ attributes.addClass(classes).setAttribute('lang', langcode) }}>
   {{ content }}
 </div>
