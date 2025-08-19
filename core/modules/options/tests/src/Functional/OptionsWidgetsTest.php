@@ -402,12 +402,12 @@ class OptionsWidgetsTest extends FieldTestBase {
     $entity->save();
 
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
-    // A required field without any value has a "none" option.
-    $option = $this->assertSession()->optionExists('edit-card-1', '_none');
+    // A required field without any value has a "empty" option.
+    $option = $this->assertSession()->optionExists('edit-card-1', '');
     $this->assertSame('- Select a value -', $option->getText());
 
-    // Submit form: select invalid 'none' option.
-    $edit = ['card_1' => '_none'];
+    // Submit form: select invalid 'empty' option.
+    $edit = ['card_1' => ''];
     $this->submitForm($edit, 'Save');
     $this->assertSession()->responseContains('This is custom message for required field.');
   }
@@ -682,9 +682,9 @@ class OptionsWidgetsTest extends FieldTestBase {
     ]);
     $entity->save();
 
-    // Display form: check that _none options are present.
+    // Display form: check that '' options are present.
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
-    $xpath = '//select[@id=:id]//option[@value="_none" and text()=:label]';
+    $xpath = '//select[@id=:id]//option[@value="" and text()=:label]';
     $xpath_args = [':id' => 'edit-card-1', ':label' => '- None -'];
     $this->assertSession()->elementExists('xpath', $this->assertSession()->buildXPathQuery($xpath, $xpath_args));
     $xpath_args = [':id' => 'edit-card-4', ':label' => '- Select something -'];
