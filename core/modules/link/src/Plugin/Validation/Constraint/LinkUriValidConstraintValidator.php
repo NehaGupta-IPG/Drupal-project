@@ -34,7 +34,7 @@ class LinkUriValidConstraintValidator extends UrlValidator {
           // Create a new URL constraint for parent validation.
           $urlConstraint = new Url([
             'message' => $constraint->message,
-            'requireTld' => false,
+            'requireTld' => FALSE,
             'protocols' => UrlHelper::getAllowedProtocols(),
           ]);
           parent::validate($url, $urlConstraint);
