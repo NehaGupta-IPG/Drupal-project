@@ -190,11 +190,16 @@ class LinkFieldTest extends BrowserTestBase {
     $validation_error_1 = "The path '@link_path' is invalid.";
     $validation_error_2 = 'Manually entered paths should start with one of the following characters: / ? #';
     $validation_error_3 = "The path '@link_path' is inaccessible.";
+    $validation_error_4 = 'The path <em class="placeholder">&quot;@link_path&quot;</em> contains invalid characters.';
     $invalid_external_entries = [
       // Invalid protocol.
       'invalid://not-a-valid-protocol' => $validation_error_1,
       // Missing host name.
       'http://' => $validation_error_1,
+      // Invalid characters.
+      'http://www.example.com/invalid space' => $validation_error_4,
+      // Invalid multiple comma separated URLs.
+      'http://www.example.com,http://www.example.com' => $validation_error_4,
     ];
     $invalid_internal_entries = [
       'no-leading-slash' => $validation_error_2,

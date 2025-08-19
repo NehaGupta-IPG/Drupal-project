@@ -1,0 +1,57 @@
+<?php
+
+namespace Drupal\link\Plugin\Validation\Constraint;
+
+use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Utility\Error;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Url;
+use Symfony\Component\Validator\Constraints\UrlValidator;
+
+/**
+ * Validates the LinkUriValid constraint.
+ */
+class LinkUriValidConstraintValidator extends UrlValidator {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validate($value, Constraint $constraint): void {
+    if (isset($value)) {
+      try {
+        /** @var \Drupal\Core\Url $urlObject */
+        $urlObject = $value->getUrl();
+        $url = $urlObject->setAbsolute()->toString();
+        $parts = parse_url($url) + ['scheme' => ''];
+        // Disallow external URLs using untrusted protocols.
+        if ($urlObject->isExternal() && in_array($parts['scheme'], UrlHelper::getAllowedProtocols())) {
+          $this->context->setNode(
+            $this->context->getValue(),
+            $this->context->getObject(),
+            $this->context->getMetadata(),
+            $this->context->getPropertyPath() . '.uri'
+          );
+          // Create a new URL constraint for parent validation.
+          $urlConstraint = new Url([
+            'message' => $constraint->message,
+            'requireTld' => false,
+            'protocols' => UrlHelper::getAllowedProtocols(),
+          ]);
+          parent::validate($url, $urlConstraint);
+        }
+        if ($parts['scheme'] === 'mailto' && !filter_var($parts['path'], FILTER_VALIDATE_EMAIL)) {
+          $this->context->buildViolation($constraint->message)
+            ->setParameter('{{ value }}', $this->formatValue($value))
+            ->setCode(Url::INVALID_URL_ERROR)
+            ->atPath('uri')
+            ->addViolation();
+        }
+      }
+      catch (\Exception $e) {
+        $variables = Error::decodeException($e);
+        \Drupal::logger('update')->error('%type: @message in %function (line %line of %file).', $variables);
+      }
+    }
+  }
+
+}
