@@ -29,7 +29,7 @@ class LinkUriValidConstraintValidator extends UrlValidator {
       try {
         $parts = parse_url($url->getUri());
         // Disallow external URLs using untrusted protocols.
-        if ($url->isExternal() && in_array($parts['scheme'], UrlHelper::getAllowedProtocols())) {
+        if ($url->isExternal() && in_array($parts['scheme'], UrlHelper::getAllowedProtocols()) && $parts['scheme'] !== 'mailto') {
           $this->context->setNode(
             $this->context->getValue(),
             $this->context->getObject(),
@@ -44,9 +44,9 @@ class LinkUriValidConstraintValidator extends UrlValidator {
           ]);
           parent::validate($url->getUri(), $urlConstraint);
         }
-        if ($parts['scheme'] === 'mailto' && !filter_var($parts['path'], FILTER_VALIDATE_EMAIL)) {
+        if ($parts['scheme'] === 'mailto' && (empty($parts['path']) || !filter_var($parts['path'], FILTER_VALIDATE_EMAIL))) {
           $this->context->buildViolation($constraint->message)
-            ->setParameter('{{ value }}', $this->formatValue($value))
+            ->setParameter('{{ value }}', $this->formatValue($url->getUri()))
             ->setCode(Url::INVALID_URL_ERROR)
             ->atPath('uri')
             ->addViolation();
