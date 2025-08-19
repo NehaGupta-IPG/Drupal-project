@@ -160,14 +160,6 @@ class ViewListBuilder extends ConfigEntityListBuilder {
     // Remove destination redirect for Edit operation.
     $operations['edit']['url'] = $entity->toUrl('edit-form');
 
-    if ($entity->hasLinkTemplate('duplicate-form')) {
-      $operations['duplicate'] = [
-        'title' => $this->t('Duplicate'),
-        'weight' => 15,
-        'url' => $entity->toUrl('duplicate-form'),
-      ];
-    }
-
     // Add AJAX functionality to enable/disable operations.
     foreach (['enable', 'disable'] as $op) {
       if (isset($operations[$op])) {

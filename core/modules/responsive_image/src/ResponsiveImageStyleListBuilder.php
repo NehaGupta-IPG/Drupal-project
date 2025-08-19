@@ -26,17 +26,4 @@ class ResponsiveImageStyleListBuilder extends ConfigEntityListBuilder {
     return $row + parent::buildRow($entity);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getDefaultOperations(EntityInterface $entity) {
-    $operations = parent::getDefaultOperations($entity);
-    $operations['duplicate'] = [
-      'title' => $this->t('Duplicate'),
-      'weight' => 15,
-      'url' => $entity->toUrl('duplicate-form'),
-    ];
-    return $operations;
-  }
-
 }

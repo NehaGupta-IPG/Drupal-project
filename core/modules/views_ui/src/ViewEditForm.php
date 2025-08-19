@@ -770,10 +770,6 @@ class ViewEditForm extends ViewFormBase {
           'url' => Url::fromRoute('views_ui.form_analyze', ['js' => 'nojs', 'view' => $view->id(), 'display_id' => $display_id]),
           'attributes' => ['class' => ['views-ajax-link']],
         ],
-        'duplicate' => [
-          'title' => $this->t('Duplicate view'),
-          'url' => $view->toUrl('duplicate-form'),
-        ],
         'reorder' => [
           'title' => $this->t('Reorder displays'),
           'url' => Url::fromRoute('views_ui.form_reorder_displays', ['js' => 'nojs', 'view' => $view->id(), 'display_id' => $display_id]),

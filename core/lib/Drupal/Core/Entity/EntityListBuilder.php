@@ -199,6 +199,14 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
       ];
     }
 
+    if ($entity->access('duplicate') && $entity->hasLinkTemplate('duplicate-form')) {
+      $operations['duplicate'] = [
+        'title' => $this->t('Duplicate'),
+        'weight' => 15,
+        'url' => $entity->toUrl('duplicate-form'),
+      ];
+    }
+
     return $operations;
   }
 

@@ -28,7 +28,7 @@ entity.responsive_image_style.duplicate_form:
     _entity_form: 'responsive_image_style.duplicate'
     _title: 'Duplicate responsive image style'
   requirements:
-    _permission: 'administer responsive images'
+    _entity_access: picture_mapping.duplicate
 
 entity.responsive_image_style.delete_form:
   path: '/admin/config/media/responsive-image-style/{responsive_image_style}/delete'

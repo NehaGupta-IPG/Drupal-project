@@ -98,7 +98,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
     // - At least one module says to grant access.
     $access = array_merge(
       $this->moduleHandler()->invokeAll('entity_access', [$entity, $operation, $account]),
-      $this->moduleHandler()->invokeAll($entity->getEntityTypeId() . '_access', [$entity, $operation, $account])
+      $this->moduleHandler()->invokeAll($this->entityTypeId . '_access', [$entity, $operation, $account])
     );
 
     $return = $this->processAccessHookResults($access);
@@ -162,6 +162,13 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     if ($operation == 'delete' && $entity->isNew()) {
       return AccessResult::forbidden()->addCacheableDependency($entity);
+    }
+    // Duplication is the act of creating a new entity based on the information
+    // that an existing entity contains. A user therefore needs to 'view' the
+    // existing entity in order to create a new one.
+    if ($operation === 'duplicate') {
+      return $this->access($entity, 'view', $account, TRUE)
+        ->andIf($this->createAccess($entity->bundle(), $account, [], TRUE));
     }
     if ($admin_permission = $this->entityType->getAdminPermission()) {
       return AccessResult::allowedIfHasPermission($account, $admin_permission);
