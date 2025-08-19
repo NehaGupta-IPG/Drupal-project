@@ -613,7 +613,7 @@ class OptionsWidgetsTest extends FieldTestBase {
 
     // Display form: check that empty '' option is present and has label.
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
-	$this->assertNotEmpty($this->xpath('//div[@id=:id]//input[@value=:value]', [':id' => 'edit-card-1', ':value' => '']), 'A test radio button has a "None" choice.');
+    $this->assertNotEmpty($this->xpath('//div[@id=:id]//input[@value=:value]', [':id' => 'edit-card-1', ':value' => '']), 'A test radio button has a "None" choice.');
 
     // Change it to the select widget.
     $display_repository->getFormDisplay('entity_test', 'entity_test')
