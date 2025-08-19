@@ -30,10 +30,10 @@ class EmailTestController {
 
   public function generic(Email $email, EmailControllerParams $params): void {
     $email->subject(sprintf('Generic Test Email (%s)', $params->definition->id()));
-    $argnames = array_keys($params->getArguments());
-    sort($argnames);
+    $keys = array_keys($params->getArguments());
+    sort($keys);
 
-    $email->text(json_encode($argnames, JSON_THROW_ON_ERROR));
+    $email->text(json_encode($keys, JSON_THROW_ON_ERROR));
   }
 
   public function html(Email $email, string $id): array {

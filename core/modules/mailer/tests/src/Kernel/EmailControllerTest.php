@@ -204,10 +204,10 @@ class EmailControllerTest extends KernelTestBase {
       ->willReturn('alpaca');
     $entity->expects($this->once())
       ->method('getEntityTypeId')
-      ->willReturn('tylopoda');
+      ->willReturn('animal');
     $params = ['entity' => $entity];
     $email = $emailRenderer->render($definition, $params, 'en');
-    $this->assertSame('Drupal\mailer_email_test\EmailTestController::entity(id: 1, bundle: alpaca, type: tylopoda)', $email->getTextBody());
+    $this->assertSame('Drupal\mailer_email_test\EmailTestController::entity(id: 1, bundle: alpaca, type: animal)', $email->getTextBody());
     $this->assertSame('Entity Test Email', $email->getSubject());
   }
 
