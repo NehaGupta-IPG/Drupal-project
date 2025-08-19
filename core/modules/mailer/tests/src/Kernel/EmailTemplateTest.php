@@ -44,7 +44,7 @@ class EmailTemplateTest extends KernelTestBase {
     $email = $emailRenderer->render($definition, [], 'en');
     $lines = [
       '<div class="email email--mailer--test" lang="en">',
-      '  <em>All</em> <strong>colors</strong> <u>are</u> <span class="rainbow">beautiful</span>',
+      '  <p><em>All</em> <strong>colors</strong> <u>are</u> <span class="rainbow">beautiful</span></p>',
       '</div>',
       '',
     ];

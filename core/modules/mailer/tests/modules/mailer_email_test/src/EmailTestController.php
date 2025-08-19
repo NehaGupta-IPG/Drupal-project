@@ -39,7 +39,7 @@ class EmailTestController {
   public function html(Email $email, string $id): array {
     $email->subject(sprintf('HTML Email (%s)', $id));
     $build['colors'] = [
-      '#markup' => '<em>All</em> <strong>colors</strong> <u>are</u> <span class="rainbow">beautiful</span>',
+      '#markup' => '<p><em>All</em> <strong>colors</strong> <u>are</u> <span class="rainbow">beautiful</span></p>',
     ];
     return $build;
   }
