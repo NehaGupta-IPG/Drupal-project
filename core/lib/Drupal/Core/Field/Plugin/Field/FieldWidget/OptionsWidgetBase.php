@@ -90,7 +90,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
    *   The form state.
    */
   public static function validateElement(array $element, FormStateInterface $form_state) {
-    if ($element['#required'] && $element['#value'] == '_none') {
+    if ($element['#required'] && $element['#value'] === '') {
       if (isset($element['#required_error'])) {
         $form_state->setError($element, $element['#required_error']);
       }
@@ -113,7 +113,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
 
     // Filter out the 'none' option. Use a strict comparison, because
     // 0 == 'any string'.
-    $index = array_search('_none', $values, TRUE);
+    $index = array_search('', $values, TRUE);
     if ($index !== FALSE) {
       unset($values[$index]);
     }
@@ -145,7 +145,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
 
       // Add an empty option if the widget needs one.
       if ($empty_label = $this->getEmptyLabel()) {
-        $options = ['_none' => $empty_label] + $options;
+        $options = ['' => $empty_label] + $options;
       }
 
       $module_handler = \Drupal::moduleHandler();

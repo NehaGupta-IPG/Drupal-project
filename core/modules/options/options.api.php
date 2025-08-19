@@ -33,7 +33,7 @@ function hook_options_list_alter(array &$options, array $context) {
   // Check if this is the field we want to change.
   if ($context['fieldDefinition']->getName() == 'field_option') {
     // Change the label of the empty option.
-    $options['_none'] = t('== Empty ==');
+    $options[''] = t('== Empty ==');
   }
 }
 
