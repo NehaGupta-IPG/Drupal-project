@@ -90,6 +90,7 @@ class LinkItemUrlValidationTest extends FieldKernelTestBase {
       ["http://⌘.ws/", []],
       ["http://foo.com/blah_(wikipedia)#cite-1", []],
       ["http://foo.com/blah_(wikipedia)_blah#cite-1", []],
+      ["mailto:valid@example.com", []],
       // The following invalid URLs produce false positives.
       ["http://foo.com/unicode_(✪)_in_parens", []],
       ["http://foo.com/(something)?after=parens", []],
@@ -121,6 +122,7 @@ class LinkItemUrlValidationTest extends FieldKernelTestBase {
       ["http:///a", [$violation_0, $violation_1]],
       ["http://www.example.com/invalid space", [$violation_2]],
       ["http://www.example.com,http://www.example.com", [$violation_2]],
+      ["mailto:invalid-email", [$violation_2]],
     ];
   }
 

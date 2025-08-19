@@ -137,6 +137,8 @@ class LinkFieldTest extends BrowserTestBase {
       'http://www.example.com/strings_(string_within_parenthesis)' => 'http://www.example.com/strings_(string_within_parenthesis)',
       // Numbers within parenthesis without leading space char.
       'http://www.example.com/numbers_(9999)' => 'http://www.example.com/numbers_(9999)',
+      // Valid mailto.
+      'mailto:valid@example.com' => 'mailto:valid@example.com',
     ];
     $valid_internal_entries = [
       '/entity_test/add' => '/entity_test/add',
@@ -200,6 +202,8 @@ class LinkFieldTest extends BrowserTestBase {
       'http://www.example.com/invalid space' => $validation_error_4,
       // Invalid multiple comma separated URLs.
       'http://www.example.com,http://www.example.com' => $validation_error_4,
+      // Invalid mailto.
+      'mailto:invalid-email' => $validation_error_4,
     ];
     $invalid_internal_entries = [
       'no-leading-slash' => $validation_error_2,
