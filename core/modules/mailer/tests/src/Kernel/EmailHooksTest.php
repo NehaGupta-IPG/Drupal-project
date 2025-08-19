@@ -6,6 +6,7 @@ namespace Drupal\Tests\mailer\Kernel;
 
 use Drupal\Core\Mailer\EmailDefinition;
 use Drupal\Core\Mailer\EmailRendererInterface;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\KernelTests\KernelTestBase;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
@@ -194,6 +195,48 @@ class EmailHooksTest extends KernelTestBase {
     $this->assertContainsEquals(new TagHeader('mailer.test'), $headers);
     $this->assertContainsEquals(new MetadataHeader('X-Drupal-Module', 'mailer'), $headers);
     $this->assertContainsEquals(new MetadataHeader('X-Drupal-Key', 'test'), $headers);
+  }
+
+  /**
+   * @covers ::render
+   */
+  public function testEmailBuildAlterMetadata(): void {
+    $emailRenderer = \Drupal::service(EmailRendererInterface::class);
+    assert($emailRenderer instanceof EmailRendererInterface);
+
+    \Drupal::state()->set('email_build_alter.set_elements', [
+      '#attached' => [
+        'library' => [
+          'core/drupal.message',
+        ],
+        'drupalSettings' => [
+          'test' => 'setting',
+        ],
+      ],
+    ]);
+    \Drupal::state()->set('email_alter.capture_render_metadata', TRUE);
+
+    $definition = new EmailDefinition([
+      'id' => 'mailer.test',
+      'provider' => 'mailer',
+      'label' => 'Test Email',
+      'key' => 'test',
+      'defaults' => [
+        EmailDefinition::CONTROLLER_NAME => 'Drupal\mailer_email_test\EmailTestController::html',
+      ],
+    ]);
+
+    $emailRenderer->render($definition, [], 'en');
+    $metadata = \Drupal::state()->get('email_alter.render_metadata');
+    assert($metadata instanceof BubbleableMetadata);
+    $this->assertEquals([
+      'library' => [
+        'core/drupal.message',
+      ],
+      'drupalSettings' => [
+        'test' => 'setting',
+      ],
+    ], $metadata->getAttachments());
   }
 
 }

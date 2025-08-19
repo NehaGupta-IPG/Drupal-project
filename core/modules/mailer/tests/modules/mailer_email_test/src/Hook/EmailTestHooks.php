@@ -62,8 +62,11 @@ class EmailTestHooks {
     foreach ($this->state->get('email_alter.set_tags', []) as $tag) {
       $email->getHeaders()->add(new TagHeader($tag));
     }
-    foreach ($this->state->get('email_alter.set_metadata') as $key => $value) {
+    foreach ($this->state->get('email_alter.set_metadata', []) as $key => $value) {
       $email->getHeaders()->add(new MetadataHeader($key, $value));
+    }
+    if ($this->state->get('email_alter.capture_render_metadata')) {
+      $this->state->set('email_alter.render_metadata', $context['metadata']);
     }
   }
 
