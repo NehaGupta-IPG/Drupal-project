@@ -19,12 +19,17 @@ class LinkUriValidConstraintValidator extends UrlValidator {
   public function validate($value, Constraint $constraint): void {
     if (isset($value)) {
       try {
-        /** @var \Drupal\Core\Url $urlObject */
-        $urlObject = $value->getUrl();
-        $url = $urlObject->setAbsolute()->toString();
-        $parts = parse_url($url) + ['scheme' => ''];
+        /** @var \Drupal\Core\Url $url */
+        $url = $value->getUrl();
+      }
+      // If the URL is malformed this constraint cannot check further.
+      catch (\InvalidArgumentException) {
+        return;
+      }
+      try {
+        $parts = parse_url($url->getUri());
         // Disallow external URLs using untrusted protocols.
-        if ($urlObject->isExternal() && in_array($parts['scheme'], UrlHelper::getAllowedProtocols())) {
+        if ($url->isExternal() && in_array($parts['scheme'], UrlHelper::getAllowedProtocols())) {
           $this->context->setNode(
             $this->context->getValue(),
             $this->context->getObject(),
@@ -37,7 +42,7 @@ class LinkUriValidConstraintValidator extends UrlValidator {
             'requireTld' => FALSE,
             'protocols' => UrlHelper::getAllowedProtocols(),
           ]);
-          parent::validate($url, $urlConstraint);
+          parent::validate($url->getUri(), $urlConstraint);
         }
         if ($parts['scheme'] === 'mailto' && !filter_var($parts['path'], FILTER_VALIDATE_EMAIL)) {
           $this->context->buildViolation($constraint->message)
