@@ -87,6 +87,7 @@ function _node_mass_update_helper(NodeInterface $node, array $updates, $langcode
       $node->getTranslation($langcode)->$name = $value;
     }
   }
+  $node->setSyncing(TRUE);
   $node->save();
   return $node;
 }
