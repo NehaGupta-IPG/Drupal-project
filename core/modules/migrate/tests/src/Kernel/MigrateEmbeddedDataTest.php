@@ -57,7 +57,7 @@ class MigrateEmbeddedDataTest extends KernelTestBase {
     }
     $this->assertSame($data_rows, $results);
 
-    // Validate the public APIs.
+    // Validate the public API.
     $this->assertSameSize($data_rows, $source);
     $this->assertSame($ids, $source->getIds());
     $expected_fields = [
