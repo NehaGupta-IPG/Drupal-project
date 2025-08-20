@@ -219,7 +219,6 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
   protected function formMultipleElements(FieldItemListInterface $items, array &$form, FormStateInterface $form_state) {
     $field_name = $this->fieldDefinition->getName();
     $cardinality = $this->fieldDefinition->getFieldStorageDefinition()->getCardinality();
-    $cardinality_display = $this->fieldDefinition->getFieldStorageDefinition()->getCardinalityDisplay() ?? 1;
     $is_multiple = $this->fieldDefinition->getFieldStorageDefinition()->isMultiple();
     $is_unlimited_not_programmed = FALSE;
     $parents = $form['#parents'];
@@ -244,8 +243,9 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     $wrapper_id = Html::getUniqueId($id_prefix . '-add-more-wrapper');
     $is_new_entity = $items->getEntity()->isNew();
     $elements = [];
-    // Update max items to be displayed.
-    if ($cardinality === FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED && $cardinality_display != 1) {
+    // Update max items to be displayed:
+    $cardinality_display = $this->getSetting('cardinality_display');
+    if ($this->isCardinalityMultiple() && $cardinality_display != 1) {
       $max_add_more_calculated = $form_state->getTemporaryValue($field_name . '_max_calculated');
       $max = $max_add_more_calculated ?? $max;
       if (empty($max_add_more_calculated)) {
