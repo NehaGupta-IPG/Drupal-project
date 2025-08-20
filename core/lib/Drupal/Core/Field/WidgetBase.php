@@ -172,9 +172,11 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
   protected function formMultipleElements(FieldItemListInterface $items, array &$form, FormStateInterface $form_state) {
     $field_name = $this->fieldDefinition->getName();
     $cardinality = $this->fieldDefinition->getFieldStorageDefinition()->getCardinality();
+    $cardinality_display = $this->fieldDefinition->getFieldStorageDefinition()->getCardinalityDisplay() ?? 1;
     $is_multiple = $this->fieldDefinition->getFieldStorageDefinition()->isMultiple();
     $is_unlimited_not_programmed = FALSE;
     $parents = $form['#parents'];
+    $user_input = $form_state->getUserInput();
 
     // Determine the number of widgets to display.
     switch ($cardinality) {
@@ -193,8 +195,62 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     $description = $this->getFilteredDescription();
     $id_prefix = implode('-', array_merge($parents, [$field_name]));
     $wrapper_id = Html::getUniqueId($id_prefix . '-add-more-wrapper');
-
+    $is_new_entity = $items->getEntity()->isNew();
     $elements = [];
+    // Update max items to be displayed.
+    if ($cardinality === FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED && $cardinality_display != 1) {
+      $max_add_more_calculated = $form_state->getTemporaryValue($field_name . '_max_calculated');
+      $max = $max_add_more_calculated ?? $max;
+      if (empty($max_add_more_calculated)) {
+        $triggered_value = $user_input['_triggering_element_value'] ?? NULL;
+        $is_adding_more = $triggered_value === (string) $this->t('Add another item');
+        $is_removing_item = $triggered_value === (string) $this->t('Remove');
+        $has_button_triggered = $is_adding_more || $is_removing_item;
+
+        // Count total inputs displayed.
+        $inputs_displayed = NULL;
+        if (isset($user_input[$field_name])) {
+          $inputs_displayed = count(array_filter($user_input[$field_name], function ($item) {
+            $value_not_null = isset($item['value']) && !is_null($item['value']);
+            $target_id_not_null = isset($item['target_id']) && !is_null($item['target_id']);
+            return $value_not_null || $target_id_not_null;
+          }));
+        }
+
+        // If the count items is less than configured value.
+        // The user are editing the element and added fewer items than
+        // was configured to show in the first time.
+        // In this case, we need to follow the order of items added just
+        // adding on more item per time.
+        if ($inputs_displayed && $inputs_displayed <= $cardinality_display) {
+          $cardinality_display = $inputs_displayed;
+        }
+
+        // On page load set the display quantity items if was defined.
+        if ($is_new_entity && !$has_button_triggered && $cardinality_display) {
+          $max = $cardinality_display;
+        }
+
+        // Decrease one item because the for condition is <=.
+        $max = $max > 0 ? $max - 1 : $max;
+
+        // If user are adding or removing item, update the max value.
+        if ($has_button_triggered) {
+          if ($is_adding_more) {
+            $max = $inputs_displayed;
+          }
+          // If removing decrease one item to be displayed.
+          elseif ($inputs_displayed > 1) {
+            $max = $inputs_displayed - 1;
+          }
+
+          // If max found set it calculated.
+          if ($max > 0 && $is_adding_more) {
+            $form_state->setTemporaryValue($field_name . '_max_calculated', $max);
+          }
+        }
+      }
+    }
 
     for ($delta = 0; $delta <= $max; $delta++) {
       // Add a new empty item if it doesn't exist yet at this delta.
