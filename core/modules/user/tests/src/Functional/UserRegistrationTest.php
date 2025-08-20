@@ -15,14 +15,11 @@ use Drupal\user\UserInterface;
  * Tests registration of user under different configurations.
  *
  * @group user
- * @group #slow
  */
 class UserRegistrationTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field_test'];
 
@@ -31,6 +28,9 @@ class UserRegistrationTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * Tests user registration with email verification enabled.
+   */
   public function testRegistrationWithEmailVerification(): void {
     $config = $this->config('user.settings');
     // Require email verification.
@@ -73,6 +73,9 @@ class UserRegistrationTest extends BrowserTestBase {
     $this->assertFalse($new_user->isActive(), 'New account is blocked until approved by an administrator.');
   }
 
+  /**
+   * Tests user registration without email verification.
+   */
   public function testRegistrationWithoutEmailVerification(): void {
     $config = $this->config('user.settings');
     // Don't require email verification and allow registration by site visitors
@@ -145,6 +148,9 @@ class UserRegistrationTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Member for');
   }
 
+  /**
+   * Tests user registration with email duplicates.
+   */
   public function testRegistrationEmailDuplicates(): void {
     // Don't require email verification and allow registration by site visitors
     // without administrator approval.
@@ -165,7 +171,8 @@ class UserRegistrationTest extends BrowserTestBase {
     $this->submitForm($edit, 'Create new account');
     $this->assertSession()->pageTextContains('The email address ' . $duplicate_user->getEmail() . ' is already taken.');
 
-    // Attempt to bypass duplicate email registration validation by adding spaces.
+    // Attempt to bypass duplicate email registration validation by adding
+    // spaces.
     $edit['mail'] = '   ' . $duplicate_user->getEmail() . '   ';
 
     $this->drupalGet('user/register');
@@ -243,6 +250,9 @@ class UserRegistrationTest extends BrowserTestBase {
     $this->assertNotEmpty($user_storage->loadByProperties(['name' => $edit['name']]));
   }
 
+  /**
+   * Tests user registration with default values.
+   */
   public function testRegistrationDefaultValues(): void {
     // Don't require email verification and allow registration by site visitors
     // without administrator approval.

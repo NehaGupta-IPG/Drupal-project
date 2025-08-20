@@ -18,9 +18,7 @@ class BlockContentTypeTest extends BlockContentTestBase {
 
   use AssertBreadcrumbTrait;
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field_ui'];
 
@@ -60,14 +58,26 @@ class BlockContentTypeTest extends BlockContentTestBase {
   }
 
   /**
-   * Tests the order of the block content types on the add page.
+   * Tests the block types on the block/add page.
    */
-  public function testBlockContentAddPageOrder(): void {
-    $this->createBlockContentType(['id' => 'bundle_1', 'label' => 'Bundle 1']);
-    $this->createBlockContentType(['id' => 'bundle_2', 'label' => 'Aaa Bundle 2']);
+  public function testBlockContentAddPage(): void {
+    $this->createBlockContentType([
+      'id' => 'bundle_1',
+      'label' => 'Bundle 1',
+      'description' => 'Bundle 1 description',
+    ]);
+    $this->createBlockContentType([
+      'id' => 'bundle_2',
+      'label' => 'Aaa Bundle 2',
+      'description' => 'Bundle 2 description',
+    ]);
     $this->drupalLogin($this->adminUser);
     $this->drupalGet('block/add');
+    // Ensure bundles are ordered by their label, not id.
     $this->assertSession()->pageTextMatches('/Aaa Bundle 2(.*)Bundle 1/');
+    // Block type descriptions should display.
+    $this->assertSession()->pageTextContains('Bundle 1 description');
+    $this->assertSession()->pageTextContains('Bundle 2 description');
   }
 
   /**
@@ -96,19 +106,16 @@ class BlockContentTypeTest extends BlockContentTestBase {
     $block_type = BlockContentType::load('foo');
     $this->assertInstanceOf(BlockContentType::class, $block_type);
 
-    $field_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('block_content', 'foo');
-    $this->assertTrue(isset($field_definitions['body']), 'Body field created when using the UI to create block content types.');
-
     // Check that the block type was created in site default language.
     $default_langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
     $this->assertEquals($block_type->language()->getId(), $default_langcode);
 
     // Create block types programmatically.
-    $this->createBlockContentType('basic', TRUE);
+    $this->createBlockContentType(['id' => 'basic'], TRUE);
     $field_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('block_content', 'basic');
     $this->assertTrue(isset($field_definitions['body']), "Body field for 'basic' block type created when using the testing API to create block content types.");
 
-    $this->createBlockContentType('other');
+    $this->createBlockContentType(['id' => 'other']);
     $field_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('block_content', 'other');
     $this->assertFalse(isset($field_definitions['body']), "Body field for 'other' block type not created when using the testing API to create block content types.");
 
@@ -125,11 +132,11 @@ class BlockContentTypeTest extends BlockContentTestBase {
   public function testBlockContentTypeEditing(): void {
     $this->drupalPlaceBlock('system_breadcrumb_block');
     // Now create an initial block-type.
-    $this->createBlockContentType('basic', TRUE);
+    $this->createBlockContentType(['id' => 'basic'], TRUE);
 
     $this->drupalLogin($this->adminUser);
     // We need two block types to prevent /block/add redirecting.
-    $this->createBlockContentType('other');
+    $this->createBlockContentType(['id' => 'other']);
 
     $field_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('block_content', 'other');
     $this->assertFalse(isset($field_definitions['body']), 'Body field was not created when using the API to create block content types.');
@@ -176,10 +183,10 @@ class BlockContentTypeTest extends BlockContentTestBase {
    */
   public function testBlockContentTypeDeletion(): void {
     // Now create an initial block-type.
-    $this->createBlockContentType('basic', TRUE);
+    $this->createBlockContentType(['id' => 'basic'], TRUE);
 
     // Create a block type programmatically.
-    $type = $this->createBlockContentType('foo');
+    $type = $this->createBlockContentType(['id' => 'foo']);
 
     $this->drupalLogin($this->adminUser);
 
@@ -203,12 +210,12 @@ class BlockContentTypeTest extends BlockContentTestBase {
    */
   public function testsBlockContentAddTypes(): void {
     // Now create an initial block-type.
-    $this->createBlockContentType('basic', TRUE);
+    $this->createBlockContentType(['id' => 'basic'], TRUE);
 
     $this->drupalLogin($this->adminUser);
     // Create two block types programmatically.
-    $this->createBlockContentType('foo');
-    $this->createBlockContentType('bar');
+    $this->createBlockContentType(['id' => 'foo']);
+    $this->createBlockContentType(['id' => 'bar']);
 
     // Get the content block storage.
     $storage = $this->container
@@ -226,8 +233,8 @@ class BlockContentTypeTest extends BlockContentTestBase {
 
       // For each installed theme, go to its block page and test the redirects.
       foreach ($themes as $theme) {
-        // Test that adding a block from the 'place blocks' form sends you to the
-        // block configure form.
+        // Test that adding a block from the 'place blocks' form sends you to
+        // the block configure form.
         $path = $theme == $default_theme ? 'admin/structure/block' : "admin/structure/block/list/$theme";
         $this->drupalGet($path);
         $this->clickLink('Place block');

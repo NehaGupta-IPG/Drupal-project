@@ -13,7 +13,6 @@ use Drupal\views\ViewExecutable;
  * Tests handler UI for views.
  *
  * @group views_ui
- * @group #slow
  * @see \Drupal\views\Plugin\views\HandlerBase
  */
 class HandlerTest extends UITestBase {
@@ -140,13 +139,14 @@ class HandlerTest extends UITestBase {
       // Test that the  handler edit link has the right label.
       $this->assertSession()->elementExists('xpath', "//a[starts-with(normalize-space(text()), '{$random_label}')]");
 
-      // Save the view and have a look whether the handler was added as expected.
+      // Save the view and have a look whether the handler was added as
+      // expected.
       $this->submitForm([], 'Save');
       $view = $this->container->get('entity_type.manager')->getStorage('view')->load('test_view_empty');
       $display = $view->getDisplay('default');
       $this->assertTrue(isset($display['display_options'][$type_info['plural']][$id]), 'Ensure the field was added to the view itself.');
 
-      // Remove the item and check that it's removed
+      // Remove the item and check that it's removed.
       $this->drupalGet($edit_handler_url);
       $this->submitForm([], 'Remove');
       $this->assertSession()->linkByHrefNotExists($edit_handler_url, 0, 'The handler edit link does not appears in the UI after removing.');
@@ -233,7 +233,7 @@ class HandlerTest extends UITestBase {
 
       // Test that the handler edit link is present.
       $this->assertSession()->elementsCount('xpath', "//a[contains(@href, '{$href}')]", 1);
-      $result = $this->assertSession()->elementTextEquals('xpath', "//a[contains(@href, '{$href}')]", $text);
+      $this->assertSession()->elementTextEquals('xpath', "//a[contains(@href, '{$href}')]", $text);
 
       $this->drupalGet($href);
       $this->assertSession()->elementTextContains('xpath', '//h1', $text);

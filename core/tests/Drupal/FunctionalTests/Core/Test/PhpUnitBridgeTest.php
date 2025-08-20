@@ -6,15 +6,19 @@ namespace Drupal\FunctionalTests\Core\Test;
 
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests Drupal's extension to manage code deprecation.
- *
- * @group Test
- * @group legacy
  */
+#[Group('Test')]
+#[IgnoreDeprecations]
 class PhpUnitBridgeTest extends BrowserTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['deprecation_test'];
 
   /**

@@ -56,7 +56,7 @@
  * - teaser: Flag for the teaser state. Will be true if view_mode is 'teaser'.
  * - page: Flag for the full page state. Will be true if view_mode is 'full'.
  *
- * @see template_preprocess_node()
+ * @see \Drupal\node\Hook\NodeThemeHooks::preprocessNode()
  */
 #}
 
@@ -90,7 +90,7 @@
         </div>
       {% endif %}
         <span{{ author_attributes }}>
-          {{ 'By'|t }} {% apply spaceless %}{{ author_name }}{% endapply %}, {{ date }}
+          {{ 'By'|t }} <span class="node__author">{{- author_name -}}</span>, {{ date }}
         </span>
         {{ metadata }}
       </div>

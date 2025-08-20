@@ -16,9 +16,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 class NestedFormTest extends FieldTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field_test', 'entity_test'];
 
@@ -85,7 +83,7 @@ class NestedFormTest extends FieldTestBase {
     /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
     $display_repository = \Drupal::service('entity_display.repository');
 
-    // Add two fields on the 'entity_test'
+    // Add two fields on the 'entity_test'.
     FieldStorageConfig::create($this->fieldStorageSingle)->save();
     FieldStorageConfig::create($this->fieldStorageUnlimited)->save();
     $this->field['field_name'] = 'field_single';

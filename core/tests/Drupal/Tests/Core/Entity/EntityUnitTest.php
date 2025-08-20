@@ -7,7 +7,6 @@ namespace Drupal\Tests\Core\Entity;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\Entity\EntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeRepositoryInterface;
@@ -103,6 +102,10 @@ class EntityUnitTest extends UnitTestCase {
     $this->entityType->expects($this->any())
       ->method('getListCacheTags')
       ->willReturn([$this->entityTypeId . '_list']);
+    $this->entityType->expects($this->any())
+      ->method('getBundleListCacheTags')
+      ->with($this->entityTypeId)
+      ->willReturn([$this->entityTypeId . '_list:' . $this->entityTypeId]);
 
     $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
     $this->entityTypeManager->expects($this->any())
@@ -127,7 +130,7 @@ class EntityUnitTest extends UnitTestCase {
     $container->set('cache_tags.invalidator', $this->cacheTagsInvalidator->reveal());
     \Drupal::setContainer($container);
 
-    $this->entity = new EntityBaseTest($this->values, $this->entityTypeId);
+    $this->entity = new StubEntityBase($this->values, $this->entityTypeId);
   }
 
   /**
@@ -231,7 +234,7 @@ class EntityUnitTest extends UnitTestCase {
   /**
    * Setup for the tests of the ::load() method.
    */
-  public function setupTestLoad() {
+  public function setupTestLoad(): void {
     // Base our mocked entity on a real entity class so we can test if calling
     // EntityBase::load() on the base class will bubble up to an actual entity.
     $this->entityTypeId = 'entity_test_mul';
@@ -603,13 +606,5 @@ class EntityUnitTest extends UnitTestCase {
     $this->entity->mergeCacheMaxAge(1800);
     $this->assertEquals(600, $this->entity->getCacheMaxAge());
   }
-
-}
-
-class EntityBaseTest extends EntityBase {
-  public $id;
-  public $langcode;
-  public $uuid;
-  public $label;
 
 }

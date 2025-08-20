@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Installer;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Verifies that installing from existing configuration without a profile works.
- *
- * @group Installer
  */
+#[Group('Installer')]
 class InstallerExistingConfigNoProfileTest extends InstallerExistingConfigTest {
 
   /**
-   * Tests the install from config without a profile.
+   * {@inheritdoc}
    */
   protected $profile = FALSE;
 

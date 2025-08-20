@@ -7,7 +7,7 @@ namespace Drupal\Tests\Composer\Plugin\Scaffold\Functional;
 use Composer\Util\Filesystem;
 use Drupal\Tests\Composer\Plugin\Scaffold\Fixtures;
 use Drupal\Tests\Composer\Plugin\Scaffold\AssertUtilsTrait;
-use Drupal\Tests\Composer\Plugin\Scaffold\ExecTrait;
+use Drupal\Tests\Composer\Plugin\ExecTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -82,7 +82,7 @@ class ManageGitIgnoreTest extends TestCase {
    * @return string
    *   The path to the fixture directory.
    */
-  protected function createSutWithGit($fixture_name) {
+  protected function createSutWithGit($fixture_name): string {
     $this->fixturesDir = $this->fixtures->tmpDir($this->name());
     $sut = $this->fixturesDir . '/' . $fixture_name;
     $replacements = ['SYMLINK' => 'false', 'PROJECT_ROOT' => $this->projectRoot];

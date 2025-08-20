@@ -11,7 +11,6 @@ use Drupal\Component\Utility\Unicode;
  * Enable module without dependency enabled.
  *
  * @group Module
- * @group #slow
  */
 class DependencyTest extends ModuleTestBase {
 
@@ -19,6 +18,16 @@ class DependencyTest extends ModuleTestBase {
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    if ($this->name() === 'testCoreCompatibility') {
+      $this->markTestSkipped('Skipped due to major version-specific logic. See https://www.drupal.org/project/drupal/issues/3359322');
+    }
+    parent::setUp();
+  }
 
   /**
    * Checks functionality of project namespaces for dependencies.
@@ -133,7 +142,7 @@ class DependencyTest extends ModuleTestBase {
     $this->assertSession()->fieldEnabled('modules[system_no_module_version_dependency_test][enable]');
     $this->assertSession()->fieldDisabled('modules[system_no_module_version_test][enable]');
 
-    // Remove the version requirement from the dependency definition
+    // Remove the version requirement from the dependency definition.
     $info = [
       'type' => 'module',
       'core_version_requirement' => '*',
@@ -174,7 +183,6 @@ class DependencyTest extends ModuleTestBase {
    * Tests enabling modules with different core version specifications.
    */
   public function testCoreCompatibility(): void {
-    $this->markTestSkipped('Skipped due to major version-specific logic. See https://www.drupal.org/project/drupal/issues/3359322');
     $assert_session = $this->assertSession();
 
     // Test incompatible 'core_version_requirement'.
@@ -245,9 +253,8 @@ class DependencyTest extends ModuleTestBase {
     $this->resetAll();
     $this->assertModules(['module_test'], TRUE);
     \Drupal::state()->set('module_test.dependency', 'dependency');
-    // module_test creates a dependency chain:
-    // - dblog depends on config
-    // - config depends on help
+    // module_test creates a dependency chain: dblog depends on config which
+    // depends on help.
     $expected_order = ['help', 'config', 'dblog'];
 
     // Enable the modules through the UI, verifying that the dependency chain

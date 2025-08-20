@@ -17,9 +17,7 @@ use Drupal\KernelTests\KernelTestBase;
 class ConfigEntityUpdaterTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['config_test', 'system'];
 
@@ -120,7 +118,7 @@ class ConfigEntityUpdaterTest extends KernelTestBase {
    * @covers ::update
    */
   public function testUpdateException(): void {
-    $this->enableModules(['entity_test']);
+    $this->enableModules(['user', 'entity_test']);
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage('The provided entity type ID \'entity_test_mul_changed\' is not a configuration entity type');
     $updater = $this->container->get('class_resolver')->getInstanceFromDefinition(ConfigEntityUpdater::class);

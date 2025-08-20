@@ -32,7 +32,7 @@ class RequirementsTest extends BrowserTestBase {
 
     // The isolation_level option is only available for MySQL.
     $connection = Database::getConnection();
-    if ($connection->driver() !== 'mysql') {
+    if (!in_array($connection->driver(), ['mysql', 'mysqli'])) {
       $this->markTestSkipped("This test does not support the {$connection->driver()} database driver.");
     }
   }
@@ -112,7 +112,7 @@ class RequirementsTest extends BrowserTestBase {
    * @param string $isolation_level
    *   The isolation level.
    */
-  private function writeIsolationLevelSettings(string $isolation_level) {
+  private function writeIsolationLevelSettings(string $isolation_level): void {
     $settings['databases']['default']['default']['init_commands'] = (object) [
       'value' => [
         'isolation_level' => "SET SESSION TRANSACTION ISOLATION LEVEL {$isolation_level}",

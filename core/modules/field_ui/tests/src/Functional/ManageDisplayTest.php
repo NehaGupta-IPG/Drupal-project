@@ -19,16 +19,13 @@ use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
  * Tests the Field UI "Manage display" and "Manage form display" screens.
  *
  * @group field_ui
- * @group #slow
  */
 class ManageDisplayTest extends BrowserTestBase {
 
   use FieldUiTestTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node',
@@ -128,7 +125,8 @@ class ManageDisplayTest extends BrowserTestBase {
     ];
 
     // Check that the field is displayed with the default formatter in 'rss'
-    // mode (uses 'default'), and hidden in 'teaser' mode (uses custom settings).
+    // mode (uses 'default'), and hidden in 'teaser' mode (uses custom
+    // settings).
     $this->assertNodeViewText($node, 'rss', $output['field_test_default'], "The field is displayed as expected in view modes that use 'default' settings.");
     $this->assertNodeViewNoText($node, 'teaser', $value, "The field is hidden in view modes that use custom settings.");
 
@@ -272,6 +270,7 @@ class ManageDisplayTest extends BrowserTestBase {
       'id' => 'node.big',
       'label' => 'Big Form',
       'targetEntityType' => 'node',
+      'description' => 'Test description',
     ])->save();
     EntityFormMode::create([
       'id' => 'node.little',
@@ -408,7 +407,7 @@ class ManageDisplayTest extends BrowserTestBase {
       $options[] = $option->getValue();
     }
 
-    // Loops trough all the option groups
+    // Loops trough all the option groups.
     foreach ($element->optgroup as $optgroup) {
       $options = array_merge($this->getAllOptionsList($optgroup), $options);
     }

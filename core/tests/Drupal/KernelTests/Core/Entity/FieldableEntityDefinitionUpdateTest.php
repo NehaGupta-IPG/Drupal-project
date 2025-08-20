@@ -16,7 +16,6 @@ use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
  * @coversDefaultClass \Drupal\Core\Entity\EntityDefinitionUpdateManager
  *
  * @group Entity
- * @group #slow
  */
 class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
 
@@ -79,9 +78,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
   protected $testEntities = [];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'content_translation',
@@ -110,8 +107,8 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
     // updated, so add it to the entity type that is being tested in order to
     // provide test coverage for this special case.
     $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the content block was last edited.'))
+      ->setLabel('Changed')
+      ->setDescription('The time that the content block was last edited.')
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE);
     $this->state->set('entity_test_update.additional_base_field_definitions', $fields);
@@ -135,7 +132,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
    * @param bool $translatable
    *   Whether the entity type is translatable or not.
    */
-  protected function insertData($revisionable, $translatable) {
+  protected function insertData($revisionable, $translatable): void {
     // Add three test entities in order to make the "data copy" step run at
     // least three times.
     /** @var \Drupal\Core\Entity\TranslatableRevisionableStorageInterface|\Drupal\Core\Entity\EntityStorageInterface $storage */
@@ -232,7 +229,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
   protected function assertEntityData(bool $revisionable, bool $translatable): void {
     $entities = $this->entityTypeManager->getStorage($this->entityTypeId)->loadMultiple();
     $this->assertCount(3, $entities);
-    foreach ($entities as $entity_id => $entity) {
+    foreach ($entities as $entity) {
       /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
       $this->assertEquals("test entity - {$entity->id()} - en", $entity->label());
       $this->assertEquals("bundle field - {$entity->id()} - en", $entity->new_bundle_field->value);
@@ -567,8 +564,8 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
       $new_entity_type = $this->lastInstalledSchemaRepository->getLastInstalledDefinition('entity_test_update');
       $this->assertFalse($new_entity_type->isRevisionable(), 'The entity type is kept unchanged.');
 
-      // Check that the last installed field storage definitions did not change by
-      // looking at the 'langcode' field, which is updated automatically.
+      // Check that the last installed field storage definitions did not change
+      // by looking at the 'langcode' field, which is updated automatically.
       $new_storage_definitions = $this->lastInstalledSchemaRepository->getLastInstalledFieldStorageDefinitions('entity_test_update');
       $langcode_key = $original_entity_type->getKey('langcode');
       $this->assertEquals($original_storage_definitions[$langcode_key]->isRevisionable(), $new_storage_definitions[$langcode_key]->isRevisionable(), "The 'langcode' field is kept unchanged.");

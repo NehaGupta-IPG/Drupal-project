@@ -36,8 +36,10 @@ class PermissionsPerBundleTest extends KernelTestBase {
    */
   protected static $modules = [
     'field',
+    'file',
     'media',
     'media_test_source',
+    'image',
     'node',
     'system',
     'taxonomy',
@@ -50,6 +52,7 @@ class PermissionsPerBundleTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installEntitySchema('node');
     $this->installConfig('node');
 
     $this->createRole([], 'super_editor');
@@ -58,6 +61,7 @@ class PermissionsPerBundleTest extends KernelTestBase {
     $this->createContentType(['type' => 'blog']);
     $this->createContentType(['type' => 'landing_page']);
 
+    $this->installEntitySchema('media');
     $this->createMediaType('test', ['id' => 'beautiful']);
     $this->createMediaType('test', ['id' => 'controversial']);
     $this->createMediaType('test', ['id' => 'special']);
@@ -124,7 +128,7 @@ config:
 YAML;
 
     $this->expectException(PluginNotFoundException::class);
-    $this->expectExceptionMessage('The "grantPermissionsForEachNodeType" plugin does not exist.');
+    $this->expectExceptionMessage('The "field_storage_config" entity does not support the "grantPermissionsForEachNodeType" config action.');
     $this->applyRecipeFromString($recipe_data);
   }
 

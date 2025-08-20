@@ -15,9 +15,7 @@ use Drupal\block\Entity\Block;
 class BlockInvalidRegionTest extends BrowserTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'block_test'];
 
@@ -61,7 +59,8 @@ class BlockInvalidRegionTest extends BrowserTestBase {
 
     $warning_message = 'The block ' . $block->id() . ' was assigned to the invalid region invalid_region and has been disabled.';
 
-    // Clearing the cache should disable the test block placed in the invalid region.
+    // Clearing the cache should disable the test block placed in the invalid
+    // region.
     $this->drupalGet('admin/config/development/performance');
     $this->submitForm([], 'Clear all caches');
     $this->assertSession()->statusMessageContains($warning_message, 'warning');

@@ -26,9 +26,7 @@ class LocalePluralFormatTest extends BrowserTestBase {
   protected $adminUser;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['locale'];
 
@@ -223,7 +221,7 @@ class LocalePluralFormatTest extends BrowserTestBase {
     $this->drupalGet($path);
     $this->submitForm($edit, 'Save translations');
 
-    // User interface input for translating seconds should not be duplicated
+    // User interface input for translating seconds should not be duplicated.
     $this->assertSession()->pageTextContainsOnce('@count seconds');
 
     // Member for time should be translated. Change the created time to ensure
@@ -387,7 +385,7 @@ class LocalePluralFormatTest extends BrowserTestBase {
    * @param array $options
    *   Additional options to pass to the translation import form.
    */
-  public function importPoFile($contents, array $options = []) {
+  public function importPoFile($contents, array $options = []): void {
     $file_system = \Drupal::service('file_system');
     $name = $file_system->tempnam('temporary://', "po_") . '.po';
     file_put_contents($name, $contents);

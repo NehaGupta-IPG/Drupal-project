@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
+use Drupal\jsonapi\JsonApiSpec;
 use Drupal\Core\Url;
 use Drupal\responsive_image\Entity\ResponsiveImageStyle;
 
@@ -11,7 +12,6 @@ use Drupal\responsive_image\Entity\ResponsiveImageStyle;
  * JSON:API integration test for the "ResponsiveImageStyle" config entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class ResponsiveImageStyleTest extends ConfigEntityResourceTestBase {
 
@@ -45,7 +45,7 @@ class ResponsiveImageStyleTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer responsive images']);
   }
 
@@ -88,10 +88,10 @@ class ResponsiveImageStyleTest extends ConfigEntityResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
           ],
         ],
-        'version' => '1.0',
+        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
       ],
       'links' => [
         'self' => ['href' => $self_url],

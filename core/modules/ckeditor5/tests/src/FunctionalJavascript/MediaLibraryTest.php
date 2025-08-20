@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 
+use Drupal\ckeditor5\Plugin\CKEditor5Plugin\MediaLibrary;
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\editor\Entity\Editor;
 use Drupal\file\Entity\File;
@@ -13,15 +14,18 @@ use Drupal\media\Entity\Media;
 use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\TestFileCreationTrait;
-use Symfony\Component\Validator\ConstraintViolation;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 // cspell:ignore arrakis complote détruire harkonnen
-
 /**
- * @coversDefaultClass \Drupal\ckeditor5\Plugin\CKEditor5Plugin\MediaLibrary
- * @group ckeditor5
+ * Tests Drupal\ckeditor5\Plugin\CKEditor5Plugin\MediaLibrary.
+ *
  * @internal
  */
+#[CoversClass(MediaLibrary::class)]
+#[Group('ckeditor5')]
 class MediaLibraryTest extends WebDriverTestBase {
 
   use MediaTypeCreationTrait;
@@ -62,6 +66,10 @@ class MediaLibraryTest extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    if ($this->name() === 'testButton') {
+      $this->markTestSkipped('Skipped due to frequent random test failures. See https://www.drupal.org/i/3351597');
+    }
+
     parent::setUp();
 
     FilterFormat::create([
@@ -97,7 +105,7 @@ class MediaLibraryTest extends WebDriverTestBase {
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolation $v) {
+      function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -156,9 +164,6 @@ class MediaLibraryTest extends WebDriverTestBase {
    * Tests using drupalMedia button to embed media into CKEditor 5.
    */
   public function testButton(): void {
-    // Skipped due to frequent random test failures.
-    // @todo Fix this and stop skipping it at https://www.drupal.org/i/3351597.
-    $this->markTestSkipped();
     $media_preview_selector = '.ck-content .ck-widget.drupal-media .media';
     $this->drupalGet('/node/add/blog');
     $this->waitForEditor();

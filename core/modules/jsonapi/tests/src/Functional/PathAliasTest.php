@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
+use Drupal\jsonapi\JsonApiSpec;
 use Drupal\path_alias\Entity\PathAlias;
 use Drupal\Core\Url;
 
@@ -12,7 +13,6 @@ use Drupal\Core\Url;
  *
  * @group jsonapi
  * @group path
- * @group #slow
  */
 class PathAliasTest extends ResourceTestBase {
 
@@ -56,7 +56,7 @@ class PathAliasTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer url aliases']);
   }
 
@@ -85,10 +85,10 @@ class PathAliasTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
           ],
         ],
-        'version' => '1.0',
+        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
       ],
       'links' => [
         'self' => ['href' => $base_url->toString()],

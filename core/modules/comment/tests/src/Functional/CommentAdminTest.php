@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\CommentInterface;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\user\RoleInterface;
@@ -46,7 +45,7 @@ class CommentAdminTest extends CommentTestBase {
     // Ensure that doesn't require contact info.
     $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
 
-    // Test that the comments page loads correctly when there are no comments
+    // Test that the comments page loads correctly when there are no comments.
     $this->drupalGet('admin/content/comment');
     $this->assertSession()->pageTextContains('No comments available.');
 
@@ -281,8 +280,8 @@ class CommentAdminTest extends CommentTestBase {
     ];
     $this->drupalGet('admin/content/comment');
     $this->submitForm($edit, 'Update');
-    $this->assertSession()->responseContains(new FormattableMarkup('@label (Original translation) - <em>The following comment translations will be deleted:</em>', ['@label' => $comment1->label()]));
-    $this->assertSession()->responseContains(new FormattableMarkup('@label (Original translation) - <em>The following comment translations will be deleted:</em>', ['@label' => $comment2->label()]));
+    $this->assertSession()->responseContains($comment1->label() . " (Original translation) - <em>The following comment translations will be deleted:</em>");
+    $this->assertSession()->responseContains($comment2->label() . " (Original translation) - <em>The following comment translations will be deleted:</em>");
     $this->assertSession()->pageTextContains('English');
     $this->assertSession()->pageTextContains('Urdu');
     $this->submitForm([], 'Delete');
