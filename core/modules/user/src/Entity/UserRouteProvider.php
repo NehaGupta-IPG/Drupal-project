@@ -36,7 +36,7 @@ class UserRouteProvider implements EntityRouteProviderInterface {
       ->setRequirement('_entity_access', 'user.update');
     $route_collection->add('entity.user.edit_form', $route);
 
-    $route = (new Route($entity_type->getLinkTemplate('delete-form')))
+    $route = (new Route($entity_type->getLinkTemplate('cancel-form')))
       ->setDefaults([
         '_title' => 'Cancel account',
         '_entity_form' => 'user.cancel',
