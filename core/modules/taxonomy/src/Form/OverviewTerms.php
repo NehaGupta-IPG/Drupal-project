@@ -330,7 +330,9 @@ class OverviewTerms extends FormBase {
       ],
     ];
 
-    if (!$operations_access && $update_tree_access->isAllowed()) {
+    $weight_reset_allowed = !$operations_access && $update_tree_access->isAllowed();
+
+    if ($weight_reset_allowed) {
       $form['terms']['#header']['weight'] = $this->t('Weight');
     }
 
@@ -341,7 +343,6 @@ class OverviewTerms extends FormBase {
         'term' => [],
         'status' => [],
         'operations' => [],
-        'weight' => $update_tree_access->isAllowed() ? [] : NULL,
       ];
       /** @var \Drupal\Core\Entity\EntityInterface $term */
       $term = $this->entityRepository->getTranslationFromContext($term);
@@ -372,7 +373,7 @@ class OverviewTerms extends FormBase {
         $form['terms'][$key]['#attributes']['class'][] = 'taxonomy-term--pending-revision';
       }
 
-      if ($update_tree_access->isAllowed() && count($tree) > 1) {
+      if ($weight_reset_allowed && count($tree) > 1) {
         $parent_fields = TRUE;
         $form['terms'][$key]['term']['tid'] = [
           '#type' => 'hidden',
@@ -401,7 +402,7 @@ class OverviewTerms extends FormBase {
         ];
       }
 
-      if ($update_tree_access->isAllowed()) {
+      if ($weight_reset_allowed) {
         $form['terms'][$key]['weight'] = [
           '#type' => 'weight',
           '#delta' => $delta,
@@ -447,7 +448,7 @@ class OverviewTerms extends FormBase {
     }
 
     $this->renderer->addCacheableDependency($form['terms'], $update_tree_access);
-    if ($update_tree_access->isAllowed()) {
+    if ($weight_reset_allowed) {
       if ($parent_fields) {
         $form['terms']['#tabledrag'][] = [
           'action' => 'match',
@@ -476,7 +477,7 @@ class OverviewTerms extends FormBase {
       ];
     }
 
-    if ($update_tree_access->isAllowed() && count($tree) > 1) {
+    if ($weight_reset_allowed && count($tree) > 1) {
       $form['actions'] = ['#type' => 'actions', '#tree' => FALSE];
       $form['actions']['submit'] = [
         '#type' => 'submit',
