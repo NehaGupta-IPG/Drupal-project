@@ -47,6 +47,7 @@ class ContentTranslationOperationsTest extends NodeTestBase {
     'node',
     'views',
     'block',
+    'content_translation_test',
   ];
 
   /**
@@ -168,6 +169,42 @@ class ContentTranslationOperationsTest extends NodeTestBase {
     $this->drupalLogin($user);
     $this->assertFalse(content_translation_translate_access($node)->isAllowed());
     $access_control_handler->resetCache();
+  }
+
+  /**
+   * Test the access of "hook_entity_translation_access()" hook.
+   */
+  public function testContentTranslationAccessHookTest() {
+    $node = $this->drupalCreateNode(['type' => 'article', 'langcode' => 'en']);
+    // baseUser1 doesn't have any specific permission and we override all the
+    // permissions via entity_translation_access hook to ensure that they
+    // can access it. See: content_translation_test_entity_translation_access().
+
+    // Login and ensure that page is not accessible.
+    $this->drupalLogin($this->baseUser1);
+    $this->drupalGet('es/node/' . $node->id() . '/translations/add/en/es');
+    $this->assertSession()->statusCodeEquals(403);
+
+    \Drupal::state()->set('content_translation_test.entity_translation_access.override.' . $node->getEntityTypeId(), [
+      'create' => TRUE,
+      'update' => TRUE,
+      'delete' => TRUE,
+    ]);
+    $this->drupalGet('es/node/' . $node->id() . '/translations/add/en/es');
+    $this->assertSession()->statusCodeEquals(200);
+    $edit = [
+      'title[0][value]' => 'es',
+    ];
+    $this->submitForm($edit, 'Save (this translation)');
+
+    // Visit the translations edit page.
+    $this->drupalGet('es/node/' . $node->id() . '/translations/edit/es');
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Visit the translations delete page.
+    $this->drupalGet('es/node/' . $node->id() . '/translations/delete/es');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->drupalLogout();
   }
 
 }
