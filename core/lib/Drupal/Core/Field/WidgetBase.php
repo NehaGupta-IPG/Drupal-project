@@ -35,6 +35,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
+    $element = [];
     if ($this->isCardinalityMultiple()) {
       $element['cardinality_display'] = [
         '#type' => 'number',

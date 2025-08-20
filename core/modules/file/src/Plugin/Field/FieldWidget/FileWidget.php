@@ -61,6 +61,7 @@ class FileWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
+    $element = parent::settingsForm($form, $form_state);
     $element['notice'] = [
       '#type' => 'container',
       '#markup' => $this->t('The UploadProgress PHP extension must be enabled to configure the progress indicator. Check the <a href=":status">status report</a> for more information.', [':status' => Url::fromRoute('system.status')->toString()]),
