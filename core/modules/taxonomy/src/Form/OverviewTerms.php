@@ -324,12 +324,16 @@ class OverviewTerms extends FormBase {
         'term' => $this->t('Name'),
         'status' => $this->t('Status'),
         'operations' => $this->t('Operations'),
-        'weight' => !$operations_access ? $this->t('Weight') : NULL,
       ],
       '#attributes' => [
         'id' => 'taxonomy',
       ],
     ];
+
+    if (!$operations_access && $update_tree_access->isAllowed()) {
+      $form['terms']['#header']['weight'] = $this->t('Weight');
+    }
+
     $this->renderer->addCacheableDependency($form['terms'], $create_access);
 
     foreach ($current_page as $key => $term) {
