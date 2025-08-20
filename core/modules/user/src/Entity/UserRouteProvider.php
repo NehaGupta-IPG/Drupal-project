@@ -17,7 +17,7 @@ class UserRouteProvider implements EntityRouteProviderInterface {
    */
   public function getRoutes(EntityTypeInterface $entity_type) {
     $route_collection = new RouteCollection();
-    $route = (new Route('/user/{user}'))
+    $route = (new Route($entity_type->getLinkTemplate('canonical')))
       ->setDefaults([
         '_entity_view' => 'user.full',
         '_title_callback' => 'Drupal\user\Controller\UserController::userTitle',
@@ -26,7 +26,7 @@ class UserRouteProvider implements EntityRouteProviderInterface {
       ->setRequirement('_entity_access', 'user.view');
     $route_collection->add('entity.user.canonical', $route);
 
-    $route = (new Route('/user/{user}/edit'))
+    $route = (new Route($entity_type->getLinkTemplate('edit-form')))
       ->setDefaults([
         '_entity_form' => 'user.default',
         '_title_callback' => 'Drupal\user\Controller\UserController::userTitle',
@@ -36,7 +36,7 @@ class UserRouteProvider implements EntityRouteProviderInterface {
       ->setRequirement('_entity_access', 'user.update');
     $route_collection->add('entity.user.edit_form', $route);
 
-    $route = (new Route('/user/{user}/cancel'))
+    $route = (new Route($entity_type->getLinkTemplate('delete-form')))
       ->setDefaults([
         '_title' => 'Cancel account',
         '_entity_form' => 'user.cancel',
