@@ -23,6 +23,48 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface, ContainerFactoryPluginInterface {
 
   /**
+   * {@inheritdoc}
+   */
+  public static function defaultSettings() {
+    return [
+      'cardinality_display' => 1,
+    ] + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    if ($this->isCardinalityMultiple()) {
+      $element['cardinality_display'] = [
+        '#type' => 'number',
+        '#title' => $this->t('Extra inputs to display'),
+        '#description' => $this->t('<ul>
+          <li><strong>0</strong>: None extra input will be displayed for the user. In add form only the input will be displayed and none extra input on the edit form.</li>
+          <li><strong>1 (Default)</strong>: An extra input will be displayed for the user on add/edit form.</li>
+          <li><strong>More than 1</strong>: The quantity of input that will be displayed on add form. In edit form if field is empty display the quantity defined, otherwise the inputs values with none extra input.</li>
+        </ul>'),
+        '#default_value' => $this->getSetting('cardinality_display'),
+        '#min' => 0,
+      ];
+    }
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary() {
+    $summary = [];
+
+    if ($this->isCardinalityMultiple()) {
+      $summary[] = $this->t('Cardinality Display: @cardinality_display', ['@cardinality_display' => $this->getSetting('cardinality_display')]);
+    }
+
+    return $summary;
+  }
+
+  /**
    * The field definition.
    *
    * @var \Drupal\Core\Field\FieldDefinitionInterface
@@ -62,6 +104,11 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static($plugin_id, $plugin_definition, $configuration['field_definition'], $configuration['settings'], $configuration['third_party_settings']);
+  }
+
+  protected function isCardinalityMultiple() {
+    $cardinality = $this->fieldDefinition->getFieldStorageDefinition()->getCardinality();
+    return $cardinality === FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED || $cardinality > 1;
   }
 
   /**
@@ -687,20 +734,6 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     // to avoid clashes between field names and $parents parts.
     // phpcs:enable
     return array_merge(['field_storage', '#parents'], $parents, ['#fields', $field_name]);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function settingsForm(array $form, FormStateInterface $form_state) {
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function settingsSummary() {
-    return [];
   }
 
   /**
