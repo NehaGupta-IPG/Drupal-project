@@ -51,7 +51,7 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
           return;
         }
         if ($constraint->mustBeInstalled) {
-          if (!in_array($extension_name, $this->moduleExtensionList->getInstalledExtensionNames(), TRUE)) {
+          if (!array_key_exists($extension_name, $this->moduleExtensionList->getAllInstalledInfo())) {
             $this->context->addViolation($constraint->moduleNotInstalledMessage, $variables);
           }
         }
@@ -66,7 +66,7 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
           return;
         }
         if ($constraint->mustBeInstalled) {
-          if (!in_array($extension_name, $this->themeExtensionList->getInstalledExtensionNames(), TRUE)) {
+          if (!array_key_exists($extension_name, $this->themeExtensionList->getAllInstalledInfo())) {
             $this->context->addViolation($constraint->themeNotInstalledMessage, $variables);
           }
         }
