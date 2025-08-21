@@ -3,12 +3,12 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Attribute\FormElement;
 
 /**
  * Provides a year range configuration element.
- *
- * @FormElement("date_year_range")
  */
+#[FormElement('date_year_range')]
 class YearRange extends FormElementBase {
 
   /**

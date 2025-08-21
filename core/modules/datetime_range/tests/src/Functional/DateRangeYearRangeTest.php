@@ -131,7 +131,7 @@ class DateRangeYearRangeTest extends BrowserTestBase {
     return [
       'year:year' => ['1978', '2017'],
       'positive:year' => ['+3', '2040', date('Y') + 3],
-      'negative:year' => ['-3', '2017', date('Y') - 3],
+      'negative:year' => ['-3', '2040', date('Y') - 3],
       'year:positive' => ['1978', '+3', NULL, date('Y') + 3],
       'year:negative' => ['1978', '-3', NULL, date('Y') - 3],
       'positive:positive' => ['+3', '+9', date('Y') + 3, date('Y') + 9],
