@@ -41,12 +41,20 @@ class DateTimeWidgetBase extends WidgetBase {
 
   /**
    * {@inheritdoc}
+   *
+   * The widget form element type may have transformed the value to a
+   * DrupalDateTime object at this point. If so we need to convert it back to
+   * the storage timezone and format.
+   *
+   * Otherwise, if the value is not a DrupalDateTime object, the submitted form
+   * value did not pass validation and will still be an array. We need to set
+   * the value to NULL to prevent issues with the expected value type in
+   * DateTimeComputed::getValue().
+   *
+   * @see \Drupal\Core\Datetime\Element\Datetime::validateDatetime()
+   * @see \Drupal\datetime\DateTimeComputed::getValue()
    */
-  public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
-    // The widget form element type has transformed the value to a
-    // DrupalDateTime object at this point. We need to convert it back to the
-    // storage timezone and format.
-
+  public function massageFormValues(array $values, array $form, FormStateInterface $form_state): array {
     $datetime_type = $this->getFieldSetting('datetime_type');
     if ($datetime_type === DateTimeItem::DATETIME_TYPE_DATE) {
       $storage_format = DateTimeItemInterface::DATE_STORAGE_FORMAT;
@@ -58,12 +66,18 @@ class DateTimeWidgetBase extends WidgetBase {
     $storage_timezone = new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE);
 
     foreach ($values as &$item) {
-      if (!empty($item['value']) && $item['value'] instanceof DrupalDateTime) {
-        /** @var \Drupal\Core\Datetime\DrupalDateTime $date */
-        $date = $item['value'];
+      if (!empty($item['value'])) {
+        if ($item['value'] instanceof DrupalDateTime) {
+          $date = $item['value'];
 
-        // Adjust the date for storage.
-        $item['value'] = $date->setTimezone($storage_timezone)->format($storage_format);
+          // Adjust the date for storage.
+          $item['value'] = $date->setTimezone($storage_timezone)
+            ->format($storage_format);
+        }
+        else {
+          // Value did not pass validation as is still an array, Set to NULL.
+          $item['value'] = NULL;
+        }
       }
     }
     return $values;
