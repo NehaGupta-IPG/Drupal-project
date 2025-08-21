@@ -213,6 +213,33 @@ class PathItemTest extends KernelTestBase {
     $path_field->generateSampleItems();
     $node->save();
     $this->assertStringStartsWith('/', $node->get('path')->alias);
+
+    // Test that the new path alias is created on entity creation even if the
+    // alias ID was programmatically specified on it (for example, after
+    // cloning an existing entity with the path item that has already been
+    // computed).
+    $node = Node::create([
+      'langcode' => 'en',
+      'title' => $this->randomString(),
+      'type' => 'foo',
+      'path' => ['alias' => '/foo-first'],
+    ]);
+    $node->save();
+    $node_storage->resetCache();
+    $node = $node_storage->load($node->id());
+    $path_id = $node->get('path')->pid;
+    $this->assertTrue($path_id && is_numeric($path_id));
+
+    $second_node = $node->createDuplicate();
+    $this->assertTrue($second_node->isNew());
+    $second_node->get('path')->alias = '/foo-second';
+    $this->assertSame($path_id, $second_node->get('path')->pid);
+    $second_node->save();
+    $node_storage->resetCache();
+    $second_node = $node_storage->load($second_node->id());
+    $this->assertSame('/foo-second', $second_node->get('path')->alias);
+    $node = $node_storage->load($node->id());
+    $this->assertSame('/foo-first', $node->get('path')->alias);
   }
 
 }

@@ -6,6 +6,7 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 
 /**
  * Provides the default path alias lookup operations.
@@ -24,9 +25,15 @@ class AliasRepository implements AliasRepositoryInterface {
    *
    * @param \Drupal\Core\Database\Connection $connection
    *   A database connection for reading and writing path aliases.
+   * @param \Drupal\Core\Language\LanguageManagerInterface|null $languageManager
+   *   The language manager service.
    */
-  public function __construct(Connection $connection) {
+  public function __construct(Connection $connection, protected ?LanguageManagerInterface $languageManager = NULL) {
     $this->connection = $connection;
+    if (!$languageManager) {
+      @trigger_error('Calling AliasRepository::__construct() without the $languageManager argument is deprecated in drupal:11.2.0 and the $languageManager argument will be required in drupal:12.0.0. See https://www.drupal.org/node/3108585', E_USER_DEPRECATED);
+      $this->languageManager = \Drupal::service('language_manager');
+    }
   }
 
   /**
@@ -132,20 +139,43 @@ class AliasRepository implements AliasRepositoryInterface {
    *   that language it will search paths without language.
    */
   protected function addLanguageFallback(SelectInterface $query, $langcode) {
-    // Always get the language-specific alias before the language-neutral one.
-    // For example 'de' is less than 'und' so the order needs to be ASC, while
-    // 'xx-lolspeak' is more than 'und' so the order needs to be DESC.
-    $langcode_list = [$langcode, LanguageInterface::LANGCODE_NOT_SPECIFIED];
-    if ($langcode === LanguageInterface::LANGCODE_NOT_SPECIFIED) {
-      array_pop($langcode_list);
-    }
-    elseif ($langcode > LanguageInterface::LANGCODE_NOT_SPECIFIED) {
-      $query->orderBy('base_table.langcode', 'DESC');
-    }
-    else {
-      $query->orderBy('base_table.langcode', 'ASC');
+    $is_multilingual = $this->languageManager->isMultilingual();
+
+    $langcode_list = [$langcode => $langcode];
+    if ($langcode !== LanguageInterface::LANGCODE_NOT_SPECIFIED) {
+      // Always get the language-specific alias before the language-neutral one,
+      // and always ensure those are candidates even if the language manager
+      // does not return them. For example 'de' is less than 'und' so the order
+      // needs to be ASC, while 'xx-lolspeak' is more than 'und' so the order
+      // needs to be DESC.
+      if ($is_multilingual) {
+        // Modules that extend the list of languages to fall back on by
+        // implementing hook_language_fallback_candidates_path_alias_alter() may
+        // also need to alter the ordering in the query, which they can do via
+        // hook_query_path_alias_language_fallback_alter().
+        $fallback_candidates = $this->languageManager->getFallbackCandidates([
+          'langcode' => $langcode,
+          'operation' => 'path_alias',
+        ]);
+        $langcode_list += array_combine($fallback_candidates, $fallback_candidates);
+      }
+
+      $langcode_list += [LanguageInterface::LANGCODE_NOT_SPECIFIED => LanguageInterface::LANGCODE_NOT_SPECIFIED];
+
+      if ($langcode > LanguageInterface::LANGCODE_NOT_SPECIFIED) {
+        $query->orderBy('base_table.langcode', 'DESC');
+      }
+      else {
+        $query->orderBy('base_table.langcode', 'ASC');
+      }
     }
     $query->condition('base_table.langcode', $langcode_list, 'IN');
+
+    // Allow altering the query when there are additional languages to order
+    // (beyond the requested one and the standard fallback).
+    if ($is_multilingual && count($langcode_list) > 2) {
+      $query->addTag('path_alias_language_fallback');
+    }
   }
 
 }

@@ -19,7 +19,7 @@ services:
   Drupal\path_alias\AliasManagerInterface: '@path_alias.manager'
   path_alias.repository:
     class: Drupal\path_alias\AliasRepository
-    arguments: ['@database']
+    arguments: ['@database', '@language_manager']
     tags:
       - { name: backend_overridable }
   Drupal\path_alias\AliasRepositoryInterface: '@path_alias.repository'
