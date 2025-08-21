@@ -23,6 +23,7 @@ class DateTimeWidgetBase extends WidgetBase {
       '#default_value' => NULL,
       '#date_increment' => 1,
       '#date_timezone' => date_default_timezone_get(),
+      '#date_year_range' => $this->getSetting('year_range'),
       '#required' => $element['#required'],
     ];
 
@@ -97,6 +98,38 @@ class DateTimeWidgetBase extends WidgetBase {
       $date->setDate($year, $month, $day);
     }
     return $date;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultSettings() {
+    return parent::defaultSettings() + [
+      'year_range' => '1900:2050',
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $build = parent::settingsForm($form, $form_state);
+    $build['year_range'] = [
+      '#type' => 'date_year_range',
+      '#default_value' => $this->getSetting('year_range'),
+    ];
+    return $build;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary() {
+    return array_merge(parent::settingsSummary(), [
+      $this->t('Year range: @range', [
+        '@range' => $this->getSetting('year_range'),
+      ]),
+    ]);
   }
 
 }

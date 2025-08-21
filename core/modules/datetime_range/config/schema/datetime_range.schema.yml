@@ -79,7 +79,7 @@ field.formatter.settings.daterange_custom:
       translation context: 'Date range separator'
 
 field.widget.settings.daterange_datelist:
-  type: mapping
+  type: field.widget.settings.daterange_default
   label: 'Date range select list display format settings'
   mapping:
     increment:
@@ -95,3 +95,7 @@ field.widget.settings.daterange_datelist:
 field.widget.settings.daterange_default:
   type: mapping
   label: 'Date range default display format settings'
+  mapping:
+    year_range:
+      type: string
+      label: 'Year range'
