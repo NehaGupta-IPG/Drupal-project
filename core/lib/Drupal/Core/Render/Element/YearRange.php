@@ -9,7 +9,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @FormElement("date_year_range")
  */
-class YearRange extends FormElement {
+class YearRange extends FormElementBase {
 
   /**
    * {@inheritdoc}
@@ -46,7 +46,7 @@ class YearRange extends FormElement {
   /**
    * Process callback.
    */
-  public static function processRange(&$element, FormStateInterface $form_state, &$complete_form) {
+  public static function processRange(&$element, FormStateInterface $form_state, &$complete_form): array {
     // Year range is stored in the -3:+3 format, but collected as two separate
     // textfields.
     $element['years_back'] = [
@@ -74,7 +74,7 @@ class YearRange extends FormElement {
   /**
    * Validate callback.
    */
-  public static function validateRange(&$element, FormStateInterface $form_state, &$complete_form) {
+  public static function validateRange(&$element, FormStateInterface $form_state, &$complete_form): void {
     // Recombine the two submitted form values into the -3:+3 format we will
     // validate and save.
     $year_range_submitted = $form_state->getValue($element['#parents']);
@@ -98,16 +98,6 @@ class YearRange extends FormElement {
   public static function rangeIsValid($range) {
     $matches = preg_match('@^([\+|\-][0-9]+|[0-9]{4}):([\+|\-][0-9]+|[0-9]{4})$@', $range);
     return !($matches < 1);
-  }
-
-}
-
-namespace Drupal\Core\Render\Element;
-
-if (!function_exists('Drupal\Core\Render\Element\t')) {
-
-  function t($string, array $args = []) {
-    return strtr($string, $args);
   }
 
 }

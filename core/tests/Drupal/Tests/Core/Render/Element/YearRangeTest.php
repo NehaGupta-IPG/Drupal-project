@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Render\Element;
 
 use Drupal\Core\Form\FormState;
@@ -16,7 +18,7 @@ class YearRangeTest extends UnitTestCase {
   /**
    * @covers ::valueCallback
    */
-  public function testValueCallback() {
+  public function testValueCallback(): void {
     $expected = ['years_back' => '-3', 'years_forward' => '+3'];
     $element = ['#default_value' => '-3:+3'];
     $form_state = $this->prophesize(FormStateInterface::class)->reveal();
@@ -26,7 +28,7 @@ class YearRangeTest extends UnitTestCase {
   /**
    * @covers ::processRange
    */
-  public function testProcessRange() {
+  public function testProcessRange(): void {
     $form_state = new FormState();
 
     $element = [
@@ -59,16 +61,6 @@ class YearRangeTest extends UnitTestCase {
     $this->assertEquals($expected_years_back, $element['years_back']);
     $this->assertEquals($expected_years_forward, $element['years_forward']);
     $this->assertTrue($element['#tree']);
-  }
-
-}
-
-namespace Drupal\Core\Render\Element;
-
-if (!function_exists('Drupal\Core\Render\Element\t')) {
-
-  function t($string, array $args = []) {
-    return strtr($string, $args);
   }
 
 }

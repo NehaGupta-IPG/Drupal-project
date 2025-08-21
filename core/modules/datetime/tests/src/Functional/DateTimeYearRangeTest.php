@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\datetime\Functional;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
@@ -94,7 +96,7 @@ class DateTimeYearRangeTest extends BrowserTestBase {
   /**
    * Test the year range widget setting.
    */
-  public function testDateTimeYearRange() {
+  public function testDateTimeYearRange(): void {
     $this->drupalLogin($this->drupalCreateUser([], NULL, TRUE));
     $this->drupalGet('/entity_test/add');
     $assert = $this->assertSession();

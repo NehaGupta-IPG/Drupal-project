@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\datetime_range\Functional;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
@@ -97,7 +99,7 @@ class DateRangeYearRangeTest extends BrowserTestBase {
    *
    * @dataProvider providerTestDateRangeYearRange
    */
-  public function testDateRangeYearRange($from, $to, $from_year = NULL, $to_year = NULL) {
+  public function testDateRangeYearRange($from, $to, $from_year = NULL, $to_year = NULL): void {
     $from_year = $from_year ?: $from;
     $to_year = $to_year ?: $to;
     $from_year_not_exists = $from_year - 1;
@@ -125,7 +127,7 @@ class DateRangeYearRangeTest extends BrowserTestBase {
   /**
    * Data provider for testDateRangeYearRange().
    */
-  public function providerTestDateRangeYearRange() {
+  public static function providerTestDateRangeYearRange(): array {
     return [
       'year:year' => ['1978', '2017'],
       'positive:year' => ['+3', '2040', date('Y') + 3],
