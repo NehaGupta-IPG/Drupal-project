@@ -13,6 +13,8 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 
 /**
  * Tests for the DateTime field.
+ *
+ * @group datetime
  */
 class DateTimeFieldTest extends WebDriverTestBase {
 
