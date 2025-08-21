@@ -33,20 +33,19 @@ class DateTimeFieldTest extends WebDriverTestBase {
     parent::setUp();
 
     // Add datetime field to entity_test.
-    $this->fieldStorage = FieldStorageConfig::create([
+    $field_storage = FieldStorageConfig::create([
       'field_name' => 'field_test_datetime',
       'entity_type' => 'entity_test',
       'type' => 'datetime',
       'settings' => ['datetime_type' => DateTimeItem::DATETIME_TYPE_DATETIME],
     ]);
-    $this->fieldStorage->save();
-    $this->field = FieldConfig::create([
-      'field_storage' => $this->fieldStorage,
+    $field_storage->save();
+    FieldConfig::create([
+      'field_storage' => $field_storage,
       'label' => 'Test DateTime',
       'bundle' => 'entity_test',
       'required' => TRUE,
-    ]);
-    $this->field->save();
+    ])->save();
 
     EntityFormDisplay::load('entity_test.entity_test.default')
       ->setComponent('field_test_datetime', ['type' => 'datetime_default'])
@@ -65,19 +64,18 @@ class DateTimeFieldTest extends WebDriverTestBase {
   public function testNestedFormDatetimeFieldAjax(): void {
     // Add unlimited field to entity test which is used to trigger ajax on
     // the nested form.
-    $this->fieldStorage = FieldStorageConfig::create([
+    $field_storage = FieldStorageConfig::create([
       'field_name' => 'field_unlimited',
       'entity_type' => 'entity_test',
       'type' => 'test_field',
       'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
     ]);
-    $this->fieldStorage->save();
-    $this->field = FieldConfig::create([
-      'field_storage' => $this->fieldStorage,
+    $field_storage->save();
+    FieldConfig::create([
+      'field_storage' => $field_storage,
       'label' => 'Unlimited field',
       'bundle' => 'entity_test',
-    ]);
-    $this->field->save();
+    ])->save();
     EntityFormDisplay::load('entity_test.entity_test.default')
       ->setComponent('field_unlimited', [])
       ->save();

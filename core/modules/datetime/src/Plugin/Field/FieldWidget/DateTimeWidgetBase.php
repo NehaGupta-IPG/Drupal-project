@@ -54,7 +54,7 @@ class DateTimeWidgetBase extends WidgetBase {
    * @see \Drupal\Core\Datetime\Element\Datetime::validateDatetime()
    * @see \Drupal\datetime\DateTimeComputed::getValue()
    */
-  public function massageFormValues(array $values, array $form, FormStateInterface $form_state): array {
+  public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     $datetime_type = $this->getFieldSetting('datetime_type');
     if ($datetime_type === DateTimeItem::DATETIME_TYPE_DATE) {
       $storage_format = DateTimeItemInterface::DATE_STORAGE_FORMAT;
