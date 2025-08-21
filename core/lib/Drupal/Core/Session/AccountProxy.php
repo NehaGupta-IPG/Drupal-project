@@ -8,13 +8,15 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * A proxied implementation of AccountInterface.
  *
- * The reason why we need an account proxy is that we don't want to have global
- * state directly stored in the container.
+ * AccountProxy provides a lazy, proxied access to the current user.
+ * It avoids storing global state and prevents multiple calls to the
+ * authentication manager when the current user is accessed in constructors.
  *
- * This proxy object avoids multiple invocations of the authentication manager
- * which can happen if the current user is accessed in constructors. It also
- * allows legacy code to change the current user where the user cannot be
- * directly injected into dependent code.
+ * It also allows legacy code to read or change the current user where
+ * dependency injection is not possible.
+ *
+ * Serialization is now safely handled by DependencySerializationTrait,
+ * ensuring service dependencies are not serialized.
  */
 class AccountProxy implements AccountProxyInterface {
 
