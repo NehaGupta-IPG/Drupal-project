@@ -180,7 +180,10 @@ class AccountSettingsForm extends ConfigFormBase {
       '#type' => 'details',
       '#title' => $this->t('Welcome (new user created by administrator)'),
       '#open' => $config->get('register') == UserInterface::REGISTER_ADMINISTRATORS_ONLY,
-      '#description' => $this->t('Edit the welcome email messages sent to new member accounts created by an administrator.') . ' ' . $email_token_help,
+      '#description' => $this->t(
+        'Edit the welcome email messages sent to new member accounts created by an administrator. @email_token_help',
+        ['@email_token_help' => $email_token_help]
+      ),
       '#group' => 'email',
     ];
     $form['email_admin_created']['user_mail_register_admin_created_subject'] = [
@@ -201,7 +204,10 @@ class AccountSettingsForm extends ConfigFormBase {
       '#type' => 'details',
       '#title' => $this->t('Welcome (awaiting approval)'),
       '#open' => $config->get('register') == UserInterface::REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL,
-      '#description' => $this->t('Edit the welcome email messages sent to new members upon registering, when administrative approval is required.') . ' ' . $email_token_help,
+      '#description' => $this->t(
+        'Edit the welcome email messages sent to new members upon registering, when administrative approval is required. @email_token_help',
+        ['@email_token_help' => $email_token_help]
+      ),
       '#group' => 'email',
     ];
     $form['email_pending_approval']['user_mail_register_pending_approval_subject'] = [
@@ -222,7 +228,10 @@ class AccountSettingsForm extends ConfigFormBase {
       '#type' => 'details',
       '#title' => $this->t('Admin (user awaiting approval)'),
       '#open' => $config->get('register') == UserInterface::REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL,
-      '#description' => $this->t('Edit the email notifying the site administrator that there are new members awaiting administrative approval.') . ' ' . $email_token_help,
+      '#description' => $this->t(
+        'Edit the email notifying the site administrator that there are new members awaiting administrative approval. @email_token_help',
+        ['@email_token_help' => $email_token_help]
+      ),
       '#group' => 'email',
     ];
     $form['email_pending_approval_admin']['register_pending_approval_admin_subject'] = [
@@ -243,7 +252,10 @@ class AccountSettingsForm extends ConfigFormBase {
       '#type' => 'details',
       '#title' => $this->t('Welcome (no approval required)'),
       '#open' => $config->get('register') == UserInterface::REGISTER_VISITORS,
-      '#description' => $this->t('Edit the welcome email messages sent to new members upon registering, when no administrator approval is required.') . ' ' . $email_token_help,
+      '#description' => $this->t(
+        'Edit the welcome email messages sent to new members upon registering, when no administrator approval is required. @email_token_help',
+        ['@email_token_help' => $email_token_help]
+      ),
       '#group' => 'email',
     ];
     $form['email_no_approval_required']['user_mail_register_no_approval_required_subject'] = [
@@ -263,7 +275,10 @@ class AccountSettingsForm extends ConfigFormBase {
     $form['email_password_reset'] = [
       '#type' => 'details',
       '#title' => $this->t('Password recovery'),
-      '#description' => $this->t('Edit the email messages sent to users who request a new password.') . ' ' . $email_token_help,
+      '#description' => $this->t(
+        'Edit the email messages sent to users who request a new password. @email_token_help',
+        ['@email_token_help' => $email_token_help]
+      ),
       '#group' => 'email',
       '#weight' => 10,
     ];
@@ -284,7 +299,10 @@ class AccountSettingsForm extends ConfigFormBase {
     $form['email_activated'] = [
       '#type' => 'details',
       '#title' => $this->t('Account activation'),
-      '#description' => $this->t('Enable and edit email messages sent to users upon account activation (when an administrator activates an account of a user who has already registered, on a site where administrative approval is required).') . ' ' . $email_token_help,
+      '#description' => $this->t(
+        'Enable and edit email messages sent to users upon account activation (when an administrator activates an account of a user who has already registered, on a site where administrative approval is required). @email_token_help',
+        ['@email_token_help' => $email_token_help]
+      ),
       '#group' => 'email',
     ];
     $form['email_activated']['user_mail_status_activated_notify'] = [
@@ -322,7 +340,10 @@ class AccountSettingsForm extends ConfigFormBase {
     $form['email_blocked'] = [
       '#type' => 'details',
       '#title' => $this->t('Account blocked'),
-      '#description' => $this->t('Enable and edit email messages sent to users when their accounts are blocked.') . ' ' . $email_token_help,
+      '#description' => $this->t(
+        'Enable and edit email messages sent to users when their accounts are blocked. @email_token_help',
+        ['@email_token_help' => $email_token_help]
+      ),
       '#group' => 'email',
     ];
     $form['email_blocked']['user_mail_status_blocked_notify'] = [
@@ -360,7 +381,10 @@ class AccountSettingsForm extends ConfigFormBase {
     $form['email_cancel_confirm'] = [
       '#type' => 'details',
       '#title' => $this->t('Account cancellation confirmation'),
-      '#description' => $this->t('Edit the email messages sent to users when they attempt to cancel their accounts.') . ' ' . $email_token_help,
+      '#description' => $this->t(
+        'Edit the email messages sent to users when they attempt to cancel their accounts. @email_token_help',
+        ['@email_token_help' => $email_token_help]
+      ),
       '#group' => 'email',
     ];
     $form['email_cancel_confirm']['user_mail_cancel_confirm_subject'] = [
