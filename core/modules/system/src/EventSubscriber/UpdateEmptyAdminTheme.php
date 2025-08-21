@@ -5,7 +5,6 @@ namespace Drupal\system\EventSubscriber;
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Updates system.theme:admin config when it is an empty string.
