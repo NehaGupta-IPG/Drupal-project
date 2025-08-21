@@ -51,13 +51,6 @@ class DateTimeComputed extends TypedData {
       return NULL;
     }
 
-    // When the field is empty, the returned value will be an array with empty
-    // values. Treat it as an empty value. Valid values will return a formatted
-    // string.
-    if (is_array($value)) {
-      return NULL;
-    }
-
     $datetime_type = $item->getFieldDefinition()->getSetting('datetime_type');
     $storage_format = $datetime_type === DateTimeItem::DATETIME_TYPE_DATE ? DateTimeItemInterface::DATE_STORAGE_FORMAT : DateTimeItemInterface::DATETIME_STORAGE_FORMAT;
     try {
