@@ -181,7 +181,7 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
     // values.
     array_walk_recursive($values, function ($current) use (&$output, $key) {
       if (is_scalar($current)) {
-        $current = $key . ':' . $current;
+        $current = substr($key . ':' . $current, 0, 128);
       }
       $output[] = $current;
     });
