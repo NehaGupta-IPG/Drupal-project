@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use Drupal\system\EventSubscriber\UpdateEmptyAdminTheme;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group system
- * @group Update
- * @group legacy
- * @covers \Drupal\system\EventSubscriber\UpdateEmptyAdminTheme
- */
+#[CoversClass(UpdateEmptyAdminTheme::class)]
+#[Group('system')]
+#[Group('Update')]
+#[Group('legacy')]
 class ThemeAdminUpdateTest extends UpdatePathTestBase {
 
   /**
