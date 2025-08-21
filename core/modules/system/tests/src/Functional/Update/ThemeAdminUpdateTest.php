@@ -9,6 +9,11 @@ use Drupal\system\EventSubscriber\UpdateEmptyAdminTheme;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 
+/**
+ * Tests Drupal\system\EventSubscriber\UpdateEmptyAdminTheme.
+ *
+ * @internal
+ */
 #[CoversClass(UpdateEmptyAdminTheme::class)]
 #[Group('system')]
 #[Group('Update')]
