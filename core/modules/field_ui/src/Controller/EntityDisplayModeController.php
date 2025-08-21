@@ -38,11 +38,6 @@ class EntityDisplayModeController extends ControllerBase {
     return [
       '#theme' => 'admin_block_content',
       '#content' => $entity_types,
-      '#attached' => [
-        'library' => [
-          'core/drupal.dialog.ajax',
-        ],
-      ],
     ];
   }
 
@@ -73,11 +68,6 @@ class EntityDisplayModeController extends ControllerBase {
     return [
       '#theme' => 'admin_block_content',
       '#content' => $entity_types,
-      '#attached' => [
-        'library' => [
-          'core/drupal.dialog.ajax',
-        ],
-      ],
     ];
   }
 

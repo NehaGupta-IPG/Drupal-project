@@ -472,11 +472,6 @@ class AjaxTestController {
         // @see \Drupal\FunctionalJavascriptTests\Ajax\DialogTest::testHttpMethod()
         'data-ajax-http-method' => \Drupal::state()->get('ajax_test.http_method', 'POST'),
       ],
-      '#attached' => [
-        'library' => [
-          'core/drupal.dialog.ajax',
-        ],
-      ],
     ];
   }
 
@@ -506,11 +501,6 @@ class AjaxTestController {
           'use-ajax',
         ],
         'data-dialog-type' => 'dialog',
-      ],
-      '#attached' => [
-        'library' => [
-          'core/drupal.dialog.ajax',
-        ],
       ],
     ];
   }

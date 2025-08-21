@@ -33,7 +33,6 @@ class CKEditor5DialogTestController {
         ]),
       ],
     ];
-    $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
     return $build;
   }
 

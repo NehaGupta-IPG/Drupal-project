@@ -160,7 +160,6 @@ class EntityDisplayModeListBuilder extends ConfigEntityListBuilder {
           ],
           '#attached' => [
             'library' => [
-              'core/drupal.dialog.ajax',
               'field_ui/drupal.field_ui_table',
             ],
           ],

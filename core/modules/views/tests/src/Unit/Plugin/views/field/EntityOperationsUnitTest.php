@@ -134,9 +134,6 @@ class EntityOperationsUnitTest extends UnitTestCase {
     $expected_build = [
       '#type' => 'operations',
       '#links' => $operations,
-      '#attached' => [
-        'library' => ['core/drupal.dialog.ajax'],
-      ],
     ];
     $expected_build['#links']['foo']['query'] = ['destination' => 'foobar'];
     $build = $this->plugin->render($result);
@@ -179,9 +176,6 @@ class EntityOperationsUnitTest extends UnitTestCase {
     $expected_build = [
       '#type' => 'operations',
       '#links' => $operations,
-      '#attached' => [
-        'library' => ['core/drupal.dialog.ajax'],
-      ],
     ];
     $build = $this->plugin->render($result);
     $this->assertSame($expected_build, $build);

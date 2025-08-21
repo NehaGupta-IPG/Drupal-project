@@ -38,9 +38,6 @@ class DialogFormLink {
           'data-dialog-renderer' => 'off_canvas',
         ],
       ],
-      '#attached' => [
-        'library' => ['core/drupal.dialog.ajax'],
-      ],
     ];
   }
 

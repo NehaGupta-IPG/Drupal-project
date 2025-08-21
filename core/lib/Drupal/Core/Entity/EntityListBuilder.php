@@ -246,10 +246,6 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
     $build = [
       '#type' => 'operations',
       '#links' => $this->getOperations($entity),
-      // Allow links to use modals.
-      '#attached' => [
-        'library' => ['core/drupal.dialog.ajax'],
-      ],
     ];
 
     return $build;
