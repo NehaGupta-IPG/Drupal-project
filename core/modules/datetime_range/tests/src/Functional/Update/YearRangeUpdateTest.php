@@ -56,10 +56,10 @@ class YearRangeUpdateTest extends UpdatePathTestBase {
     ])->save();
     EntityFormDisplay::load('node.page.default')
       ->setComponent('date', [
-      'type' => 'daterange_datelist',
-      'weight' => 10,
-      'settings' => [],
-    ])->save();
+        'type' => 'daterange_datelist',
+        'weight' => 10,
+        'settings' => [],
+      ])->save();
 
     // Restore the config to its state before
     // datetime_range_post_update_default_date_range
