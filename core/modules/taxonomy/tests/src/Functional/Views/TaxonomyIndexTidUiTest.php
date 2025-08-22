@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Functional\Views;
 
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\views_ui\Functional\UITestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Entity\View;
+
+// cspell:ignore banane ananas
 
 /**
  * Tests the taxonomy index filter handler UI.
@@ -41,6 +46,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    'content_translation',
     'node',
     'taxonomy',
     'views',
@@ -368,6 +374,89 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     // Make sure the unpublished term isn't shown to the anonymous user.
     $this->assertNotEmpty($this->cssSelect('option[value="' . $this->terms[0][0]->id() . '"]'));
     $this->assertEmpty($this->cssSelect('option[value="' . $this->terms[1][0]->id() . '"]'));
+  }
+
+  public function testExposedFilterWithTranslatedTerms() {
+    // Add FR as language.
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+
+    // Create a vocabulary fruit.
+    Vocabulary::create([
+      'vid' => 'fruit',
+      'name' => 'Fruit',
+    ])->save();
+
+    // Make the fruit vocabulary translatable.
+    $config = ContentLanguageSettings::loadByEntityTypeBundle('taxonomy_term', 'fruit');
+    $config->setDefaultLangcode('en')
+      ->setLanguageAlterable(TRUE)
+      ->save();
+
+    // Create some translated terms.
+    $banana = Term::create([
+      'vid' => 'fruit',
+      'name' => 'Banana',
+    ]);
+    $banana->addTranslation('fr', [
+      'name' => 'Banane',
+    ])->save();
+    $pineapple = Term::create([
+      'vid' => 'fruit',
+      'name' => 'Pineapple',
+    ]);
+    $pineapple->addTranslation('fr', [
+      'name' => 'Ananas',
+    ])->save();
+    $lemon = Term::create([
+      'vid' => 'fruit',
+      'name' => 'Lemon',
+      'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
+    ]);
+    $lemon->save();
+
+    $node_type = $this->drupalCreateContentType(['type' => 'page']);
+
+    // Create the term reference field itself.
+    $field_name = 'taxonomy_tags';
+    $this->createEntityReferenceField('node', $node_type->id(), $field_name, NULL, 'taxonomy_term');
+
+    $this->drupalCreateNode([
+      $field_name => [['target_id' => $banana->id()]],
+    ]);
+    $this->drupalCreateNode([
+      $field_name => [['target_id' => $pineapple->id()]],
+    ]);
+    $this->drupalCreateNode([
+      $field_name => [['target_id' => $lemon->id()]],
+    ]);
+
+    // Update the filter to use the fruit vocabulary and disable hierarchy.
+    $this->drupalGet('admin/structure/views/nojs/handler-extra/test_filter_taxonomy_index_tid/default/filter/tid');
+    $this->submitForm([
+      'options[vid]' => 'fruit',
+      'options[hierarchy]' => FALSE,
+    ], 'Apply');
+
+    // Expose the filter.
+    $this->drupalGet('admin/structure/views/nojs/handler/test_filter_taxonomy_index_tid/default/filter/tid');
+    $this->submitForm([], 'Expose filter');
+    // Set the operator to 'empty' and remove the default term ID.
+    $this->submitForm([
+      'options[operator]' => 'empty',
+      'options[value][]' => [],
+    ], 'Apply');
+    // Save the view.
+    $this->submitForm([], 'Save');
+
+    // Check that the order
+    $this->drupalGet('test-filter-taxonomy-index-tid');
+    $this->assertSession()->elementTextContains('css', 'select[name="tid"] option:nth-child(2)', 'Banana');
+    $this->assertSession()->elementTextContains('css', 'select[name="tid"] option:nth-child(3)', 'Lemon');
+    $this->assertSession()->elementTextContains('css', 'select[name="tid"] option:nth-child(4)', 'Pineapple');
+    $this->drupalGet('fr/test-filter-taxonomy-index-tid');
+    $this->assertSession()->elementTextContains('css', 'select[name="tid"] option:nth-child(2)', 'Ananas');
+    $this->assertSession()->elementTextContains('css', 'select[name="tid"] option:nth-child(3)', 'Banane');
+    $this->assertSession()->elementTextContains('css', 'select[name="tid"] option:nth-child(4)', 'Lemon');
   }
 
   /**

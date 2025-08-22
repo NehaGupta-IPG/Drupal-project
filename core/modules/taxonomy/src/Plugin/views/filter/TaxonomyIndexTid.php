@@ -4,6 +4,7 @@ namespace Drupal\taxonomy\Plugin\views\filter;
 
 use Drupal\Core\Entity\Element\EntityAutocomplete;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\TermStorageInterface;
@@ -52,6 +53,13 @@ class TaxonomyIndexTid extends ManyToOne {
   protected $currentUser;
 
   /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface|null
+   */
+  protected $languageManager;
+
+  /**
    * Constructs a TaxonomyIndexTid object.
    *
    * @param array $configuration
@@ -66,12 +74,19 @@ class TaxonomyIndexTid extends ManyToOne {
    *   The term storage.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
+   * @param \Drupal\Core\Language\LanguageManagerInterface|null $language_manager
+   *   The language manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, VocabularyStorageInterface $vocabulary_storage, TermStorageInterface $term_storage, AccountInterface $current_user) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, VocabularyStorageInterface $vocabulary_storage, TermStorageInterface $term_storage, AccountInterface $current_user, ?LanguageManagerInterface $language_manager = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->vocabularyStorage = $vocabulary_storage;
     $this->termStorage = $term_storage;
     $this->currentUser = $current_user;
+    if (!$language_manager) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $language_manager argument is deprecated in drupal:11.1.0 and will be required in drupal:12.0.0.', E_USER_DEPRECATED);
+      $language_manager = \Drupal::languageManager();
+    }
+    $this->languageManager = $language_manager;
   }
 
   /**
@@ -84,7 +99,8 @@ class TaxonomyIndexTid extends ManyToOne {
       $plugin_definition,
       $container->get('entity_type.manager')->getStorage('taxonomy_vocabulary'),
       $container->get('entity_type.manager')->getStorage('taxonomy_term'),
-      $container->get('current_user')
+      $container->get('current_user'),
+      $container->get('language_manager')
     );
   }
 
@@ -220,16 +236,17 @@ class TaxonomyIndexTid extends ManyToOne {
         }
       }
       else {
+        $langcode = $this->languageManager->getCurrentLanguage()->getId();
         $options = [];
         $query = \Drupal::entityQuery('taxonomy_term')
           ->accessCheck(TRUE)
           // @todo Sorting on vocabulary properties -
           //   https://www.drupal.org/node/1821274.
-          ->sort('weight')
-          ->sort('name')
+          ->sort('weight', 'ASC', $langcode)
+          ->sort('name', 'ASC', $langcode)
           ->addTag('taxonomy_term_access');
         if (!$this->currentUser->hasPermission('administer taxonomy')) {
-          $query->condition('status', 1);
+          $query->condition('status', 1, '=', $langcode);
         }
         if ($this->options['limit']) {
           $query->condition('vid', $vocabulary->id());
