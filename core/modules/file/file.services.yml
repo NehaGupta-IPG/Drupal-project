@@ -6,7 +6,7 @@ services:
     autoconfigure: true
   file.event.subscriber:
     class: Drupal\file\EventSubscriber\FileEventSubscriber
-    arguments: ['@config.factory', '@transliteration', '@language_manager']
+    arguments: ['@file.sanitize_name']
   file.usage:
     class: Drupal\file\FileUsage\DatabaseFileUsageBackend
     arguments: ['@config.factory', '@database', 'file_usage']
@@ -39,3 +39,7 @@ services:
     class: Drupal\file\Upload\InputStreamFileWriter
     arguments: ['@file_system']
   Drupal\file\Upload\InputStreamFileWriterInterface: '@file.input_stream_file_writer'
+  file.sanitize_name:
+    class: Drupal\file\FilenameSanitizer
+    arguments: ['@config.factory', '@transliteration', '@language_manager']
+  Drupal\file\FilenameSanitizer: '@file.sanitize_name'
