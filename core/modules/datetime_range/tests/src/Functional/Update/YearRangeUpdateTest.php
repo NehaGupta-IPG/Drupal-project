@@ -19,6 +19,9 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
  */
 class YearRangeUpdateTest extends UpdatePathTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['datetime_range'];
 
   /**
