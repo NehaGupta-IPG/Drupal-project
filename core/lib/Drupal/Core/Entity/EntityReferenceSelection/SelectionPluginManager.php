@@ -62,6 +62,13 @@ class SelectionPluginManager extends DefaultPluginManager implements SelectionPl
     // Get all available selection plugins for this entity type.
     $selection_handler_groups = $this->getSelectionGroups($target_type);
 
+    // Fallback to default for unknown $base_plugin_id.
+    // @see https://www.drupal.org/project/drupal/issues/3542643
+    $base_plugin_id = empty($selection_handler_groups[$base_plugin_id]) || empty($base_plugin_id) ? 'default' : $base_plugin_id;
+    if (empty($selection_handler_groups[$base_plugin_id])) {
+      throw new \InvalidArgumentException(sprintf('No selection handler group found for "%s" by "%s". Available groups: %s', $target_type, $base_plugin_id, implode(', ', array_keys($selection_handler_groups))));
+    }
+
     // Sort the selection plugins by weight and select the best match.
     uasort($selection_handler_groups[$base_plugin_id], ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
     $plugin_id = array_key_last($selection_handler_groups[$base_plugin_id]);
