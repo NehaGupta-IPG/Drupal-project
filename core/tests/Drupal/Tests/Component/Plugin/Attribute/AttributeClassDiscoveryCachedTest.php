@@ -67,7 +67,6 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
 
     // Gain access to the file cache.
     $ref_file_cache = new \ReflectionProperty($discovery, 'fileCache');
-    $ref_file_cache->setAccessible(TRUE);
     /** @var \Drupal\Component\FileCache\FileCacheInterface $file_cache */
     $file_cache = $ref_file_cache->getValue($discovery);
 
@@ -125,7 +124,6 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
 
     // Gain access to the file cache.
     $ref_file_cache = new \ReflectionProperty($discovery, 'fileCache');
-    $ref_file_cache->setAccessible(TRUE);
     /** @var \Drupal\Component\FileCache\FileCacheInterface $file_cache */
     $file_cache = $ref_file_cache->getValue($discovery);
 
@@ -146,6 +144,9 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
         'id' => 'discovery_test_missing_trait',
         'class' => 'com\example\PluginNamespace\AttributeDiscoveryTestMissingTrait',
         'title' => 'Discovery test plugin missing trait',
+        'dependencies' => [
+          'trait' => ['Drupal\a_module_that_does_not_exist\Plugin\CustomTrait'],
+        ],
       ],
     ], $discovery->getDefinitions());
 
