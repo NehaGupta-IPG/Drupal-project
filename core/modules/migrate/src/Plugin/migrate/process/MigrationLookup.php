@@ -33,6 +33,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   any stub entities.
  * - no_stub: (optional) Prevents the creation of a stub entity when no
  *   relationship is found in the migration map.
+ * - allow_multiple: (optional) Whether migration lookup should return multiple
+ *   results (if any). Defaults to FALSE.
  *
  * Examples:
  *
@@ -110,6 +112,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     plugin: migration_lookup
  *     migration: users
  *     no_stub: true
+ *     source: author
+ * @endcode
+ *
+ * Migration lookup can find multiple results. By default, only the first
+ * result will be returned. This behavior can be overridden (in order to return
+ * all the results) by setting 'allow_multiple' to true . See the example below.
+ * @code
+ * process:
+ *   uid:
+ *     plugin: migration_lookup
+ *     migration: users
+ *     allow_multiple: true
  *     source: author
  * @endcode
  *
@@ -224,7 +238,12 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
       }
 
       if ($destination_id_array) {
-        $destination_ids = array_values(reset($destination_id_array));
+        if (empty($this->configuration['allow_multiple'])) {
+          $destination_ids = array_values(reset($destination_id_array));
+        }
+        else {
+          $destination_ids = $destination_id_array;
+        }
         break;
       }
     }
@@ -283,7 +302,7 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
       }
     }
     if ($destination_ids) {
-      if (count($destination_ids) == 1) {
+      if (empty($this->configuration['allow_multiple']) && (count($destination_ids) == 1)) {
         return reset($destination_ids);
       }
       else {

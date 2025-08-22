@@ -189,18 +189,22 @@ class MigrationLookupTest extends MigrationLookupTestCase {
    *   The source value(s) for the migration process plugin.
    * @param string|array $expected_value
    *   The expected value(s) of the migration process plugin.
+   * @param bool $allow_multiple
+   *   Boolean flag indicating whether to allow returning of multiple lookup
+   *   results or not. Defaults to FALSE.
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    * @throws \Drupal\migrate\MigrateException
    *
    * @dataProvider successfulLookupDataProvider
    */
-  public function testSuccessfulLookup(array $source_id_values, array $destination_id_values, $source_value, $expected_value): void {
+  public function testSuccessfulLookup(array $source_id_values, array $destination_id_values, $source_value, $expected_value, bool $allow_multiple = FALSE): void {
     $migration_plugin = $this->prophesize(MigrationInterface::class);
-    $this->migrateLookup->lookup('foo', $source_id_values)->willReturn([$destination_id_values]);
+    $this->migrateLookup->lookup('foo', $source_id_values)->willReturn($destination_id_values);
 
     $configuration = [
       'migration' => 'foo',
+      'allow_multiple' => $allow_multiple,
     ];
 
     $migration = MigrationLookup::create($this->prepareContainer(), $configuration, '', [], $migration_plugin->reveal());
@@ -220,7 +224,7 @@ class MigrationLookupTest extends MigrationLookupTestCase {
         // Source ID of the migration map.
         [1],
         // Destination ID of the migration map.
-        [3],
+        [[3]],
         // Input value for the migration plugin.
         1,
         // Expected output value of the migration plugin.
@@ -231,7 +235,7 @@ class MigrationLookupTest extends MigrationLookupTestCase {
         // Source ID of the migration map.
         [0],
         // Destination ID of the migration map.
-        [3],
+        [[3]],
         // Input value for the migration plugin.
         0,
         // Expected output value of the migration plugin.
@@ -242,7 +246,7 @@ class MigrationLookupTest extends MigrationLookupTestCase {
         // Source ID of the migration map.
         [1],
         // Destination IDs of the migration map.
-        [3, 'foo'],
+        [[3, 'foo']],
         // Input value for the migration plugin.
         1,
         // Expected output values of the migration plugin.
@@ -253,7 +257,7 @@ class MigrationLookupTest extends MigrationLookupTestCase {
         // Source IDs of the migration map.
         [1, 3],
         // Destination ID of the migration map.
-        ['foo'],
+        [['foo']],
         // Input values for the migration plugin.
         [1, 3],
         // Expected output value of the migration plugin.
@@ -264,11 +268,23 @@ class MigrationLookupTest extends MigrationLookupTestCase {
         // Source IDs of the migration map.
         [1, 3],
         // Destination IDs of the migration map.
-        [3, 'foo'],
+        [[3, 'foo']],
         // Input values for the migration plugin.
         [1, 3],
         // Expected output values of the migration plugin.
         [3, 'foo'],
+      ],
+      // Test data for array to array.
+      [
+        // Source IDs of the migration map.
+        [1, NULL],
+        // Destination IDs of the migration map.
+        [[3, 'foo'], [4, 'bar']],
+        // Input values for the migration plugin.
+        [1, NULL],
+        // Expected output values of the migration plugin.
+        [[3, 'foo'], [4, 'bar']],
+        TRUE,
       ],
     ];
   }
