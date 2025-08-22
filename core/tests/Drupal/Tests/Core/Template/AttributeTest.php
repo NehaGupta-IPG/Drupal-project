@@ -64,6 +64,7 @@ class AttributeTest extends UnitTestCase {
 
     // Update an existing attribute to a different type (string instead of array).
     $attribute->setAttribute('class', 'single-class');
+    $this->assertTrue(isset($attribute['class']));
     $this->assertEquals('single-class', $attribute['class']->value());
 
     // Ensure adding a new attribute works.
