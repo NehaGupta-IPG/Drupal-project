@@ -6,6 +6,7 @@ use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Serialization\Attribute\JsonSchema;
+use Psr\Log\LoggerInterface;
 
 /**
  * Collects, sanitizes, and renders HTML attributes.
@@ -77,15 +78,25 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
   protected $storage = [];
 
   /**
+   * The logger.
+   *
+   * @var \Psr\Log\LoggerInterface
+   */
+  protected $logger;
+
+  /**
    * Constructs a \Drupal\Core\Template\Attribute object.
    *
    * @param array $attributes
    *   An associative array of key-value pairs to be converted to attributes.
+   * @param \Psr\Log\LoggerInterface $logger
+   *   The logger.
    */
-  public function __construct($attributes = []) {
+  public function __construct($attributes = [], LoggerInterface $logger = NULL) {
     foreach ($attributes as $name => $value) {
       $this->offsetSet($name, $value);
     }
+    $this->logger = $logger;
   }
 
   /**
@@ -111,8 +122,10 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
   public function offsetSet($name, $value): void {
     // Check if the attribute name contains a space.
     if (strpos($name, ' ') !== FALSE) {
-      \Drupal::logger('system')->warning('Invalid attribute name "@name" detected. Attribute names cannot contain spaces.', ['@name' => $name]);
-      return;
+      if ($this->logger) {
+        $this->logger->warning('Invalid attribute name "@name" detected. Attribute names cannot contain spaces.', ['@name' => $name]);
+        return;
+      }
     }
     $this->storage[$name] = $this->createAttributeValue($name, $value);
   }
