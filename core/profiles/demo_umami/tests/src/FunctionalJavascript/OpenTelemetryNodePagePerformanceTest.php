@@ -114,7 +114,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 190,
-      'CacheGetCount' => 210,
+      'CacheGetCount' => 209,
       'CacheSetCount' => 65,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
