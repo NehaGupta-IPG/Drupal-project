@@ -360,7 +360,7 @@ class UserPasswordResetTest extends BrowserTestBase {
     string $prefix,
     string $visitingUrl,
     string $expectedResetUrl,
-    string $unexpectedResetUrl
+    string $unexpectedResetUrl,
   ): void {
     // Enable the newly mail language alter hook.
     \Drupal::state()->set('user_hooks_test_user_mail_language_alter', TRUE);

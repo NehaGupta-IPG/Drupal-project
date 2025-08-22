@@ -646,9 +646,9 @@ function _user_mail_notify($op, AccountInterface $account) {
     }
     if ($account->getEmail()) {
       $preferred_langcode = $account->getPreferredLangcode();
-    // Allow modules to alter the user mail notification language.
-    \Drupal::moduleHandler()->alter('user_mail_language', $account, $preferred_langcode);
-    $mail = \Drupal::service('plugin.manager.mail')->mail('user', $op, $account->getEmail(), $preferred_langcode, $params, $site_mail);
+      // Allow modules to alter the user mail notification language.
+      \Drupal::moduleHandler()->alter('user_mail_language', $account, $preferred_langcode);
+      $mail = \Drupal::service('plugin.manager.mail')->mail('user', $op, $account->getEmail(), $preferred_langcode, $params, $site_mail);
     }
     else {
       \Drupal::logger('user')->info('The User module could not send an email for the operation "%op" because the user account %account does not have an email address.', [
