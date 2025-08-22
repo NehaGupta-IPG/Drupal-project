@@ -92,7 +92,7 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger.
    */
-  public function __construct($attributes = [], LoggerInterface $logger = NULL) {
+  public function __construct($attributes = [], ?LoggerInterface $logger = NULL) {
     foreach ($attributes as $name => $value) {
       $this->offsetSet($name, $value);
     }
