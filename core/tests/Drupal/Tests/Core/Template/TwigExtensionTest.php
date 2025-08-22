@@ -322,10 +322,10 @@ class TwigExtensionTest extends UnitTestCase {
     ]);
 
     $twig->addExtension($this->systemUnderTest);
-    $link = new GeneratedLink();
-    $link->setGeneratedLink('<a href="http://example.com"></a>');
-    $link->addCacheTags(['foo']);
-    $link->addAttachments(['library' => ['system/base']]);
+    $link = (new GeneratedLink())
+      ->setGeneratedLink('<a href="http://example.com"></a>')
+      ->addCacheTags(['foo'])
+      ->addAttachments(['library' => ['system/base']]);
 
     $this->renderer->expects($this->atLeastOnce())
       ->method('render')
@@ -338,7 +338,7 @@ class TwigExtensionTest extends UnitTestCase {
         "#attached" => ['library' => ['system/base']],
       ]);
     $result = $this->systemUnderTest->escapeFilter($twig, $link, 'html', NULL, TRUE);
-    $this->assertEquals('<a href="http://example.com"></a>', $result);
+    $this->assertEquals('<a href="http://example.com"></a>', (string) $result);
   }
 
   /**
