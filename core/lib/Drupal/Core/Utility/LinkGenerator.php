@@ -3,7 +3,6 @@
 namespace Drupal\Core\Utility;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\Component\Utility\Html;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\GeneratedLink;
@@ -11,7 +10,6 @@ use Drupal\Core\GeneratedButton;
 use Drupal\Core\GeneratedNoLink;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
-use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 
 /**
@@ -158,13 +156,13 @@ class LinkGenerator implements LinkGeneratorInterface {
 
     // External URLs can not have cacheable metadata.
     if ($url->isExternal()) {
-      $generated_link = new GeneratedLink();
       $attributes['href'] = $url->toString(FALSE);
+      $generated_link = GeneratedLink::create($attributes, $variables['text']);
       return $this->doGenerate($generated_link, $attributes, $variables);
     }
     if ($url->isRouted() && $url->getRouteName() === '<nolink>') {
-      $generated_link = new GeneratedNoLink();
       unset($attributes['href'], $attributes['hreflang']);
+      $generated_link = GeneratedNoLink::create($attributes, $variables['text']);
       return $this->doGenerate($generated_link, $attributes, $variables);
     }
     if ($url->isRouted() && $url->getRouteName() === '<button>') {
@@ -174,10 +172,10 @@ class LinkGenerator implements LinkGeneratorInterface {
       return $this->doGenerate($generated_link, $attributes, $variables);
     }
     $generated_url = $url->toString(TRUE);
-    $generated_link = GeneratedLink::createFromObject($generated_url);
     // The result of the URL generator is a plain-text URL to use as the href
     // attribute, and it is escaped by \Drupal\Core\Template\Attribute.
     $attributes['href'] = $generated_url->getGeneratedUrl();
+    $generated_link = GeneratedLink::create($attributes, $variables['text'], $generated_url);
     return $this->doGenerate($generated_link, $attributes, $variables);
   }
 
@@ -195,13 +193,7 @@ class LinkGenerator implements LinkGeneratorInterface {
    *   The generated link, along with its associated cacheability metadata.
    */
   protected function doGenerate($generated_link, $attributes, $variables) {
-    if (!($variables['text'] instanceof MarkupInterface)) {
-      $variables['text'] = Html::escape($variables['text']);
-    }
-    $attributes = new Attribute($attributes);
-    // This is safe because Attribute does escaping and $variables['text'] is
-    // either rendered or escaped.
-    return $generated_link->setGeneratedLink('<' . $generated_link::TAG . $attributes . '>' . $variables['text'] . '</' . $generated_link::TAG . '>');
+    return $generated_link;
   }
-
+  
 }

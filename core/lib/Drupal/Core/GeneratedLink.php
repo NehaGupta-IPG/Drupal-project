@@ -3,7 +3,9 @@
 namespace Drupal\Core;
 
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Template\Attribute;
 
 /**
  * Used to return generated links, along with associated cacheability metadata.
@@ -22,9 +24,58 @@ class GeneratedLink extends BubbleableMetadata implements MarkupInterface, \Coun
   /**
    * The HTML string value containing a link.
    *
+   * This property is generated automatically now, so its needed to use
+   * ::getGeneratedLink().
+   *
    * @var string
    */
-  protected $generatedLink = '';
+  protected $generatedLink;
+
+  /**
+   * The link attributes.
+   *
+   * @var array
+   */
+  protected $attributes = [];
+
+  /**
+   * The link text.
+   *
+   * @var string|\Drupal\Component\Render\MarkupInterface
+   */
+  protected $text;
+
+  /**
+   * Creates a new GeneratedLink instance.
+   *
+   * @internal Use \Drupal\Core\GeneratedLink::create instance.
+   */
+  public function __construct() {
+  }
+
+  /**
+   * Creates a new GeneratedLink instance.
+   *
+   * @param array $attributes
+   *   The link attributes.
+   * @param string|\Drupal\Component\Render\MarkupInterface $text
+   *   The link text.
+   * @param \Drupal\Core\Cache\CacheableDependencyInterface|mixed $object
+   *   Adds the object's bubble metadata to the generated link.
+   *
+   * @return static
+   */
+  public static function create(array $attributes, $text, $object = NULL) {
+    if ($object) {
+      $generated_link = static::createFromObject($object);
+    }
+    else {
+      $generated_link = new static();
+    }
+    $generated_link->attributes = $attributes;
+    $generated_link->text = $text;
+    return $generated_link;
+  }
 
   /**
    * Gets the generated link.
@@ -33,6 +84,16 @@ class GeneratedLink extends BubbleableMetadata implements MarkupInterface, \Coun
    *   The generated link.
    */
   public function getGeneratedLink() {
+    if (!isset($this->generatedLink)) {
+      $attributes = new Attribute($this->attributes);
+      $text = $this->text;
+      if (!($text instanceof MarkupInterface)) {
+        $text = Html::escape($text);
+      }
+      // This is safe because Attribute does escaping and $variables['text'] is
+      // either rendered or escaped.
+      $this->generatedLink = '<' . static::TAG . $attributes . '>' . $text . '</' . static::TAG . '>';
+    }
     return $this->generatedLink;
   }
 
@@ -42,18 +103,21 @@ class GeneratedLink extends BubbleableMetadata implements MarkupInterface, \Coun
    * @param string $generated_link
    *   The generated link.
    *
-   * @return $this
+   * @return static
+   *  A new generated link.
    */
   public function setGeneratedLink($generated_link) {
-    $this->generatedLink = $generated_link;
-    return $this;
+    // Copy over all bubbleable metadata.
+    $new_generated_link = static::createFromObject($this);
+    $new_generated_link->generatedLink = $generated_link;
+    return $new_generated_link;
   }
 
   /**
    * {@inheritdoc}
    */
   public function __toString() {
-    return (string) $this->generatedLink;
+    return (string) $this->getGeneratedLink();
   }
 
   /**
