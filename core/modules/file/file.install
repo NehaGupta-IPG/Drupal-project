@@ -63,3 +63,23 @@ function file_schema(): array {
 function file_update_last_removed(): int {
   return 8700;
 }
+
+/**
+ * Update "Files Overview" view pager to a full pager.
+ */
+function file_update_10100(&$sandbox = NULL) {
+  $config_factory = \Drupal::configFactory();
+  $view = $config_factory->getEditable('views.view.files');
+  if (!empty($view->getRawData())) {
+    $displays = $view->get('display');
+    if (isset($displays['default']['display_options']['pager'])
+      && $displays['default']['display_options']['pager']['type'] === 'mini') {
+      $base = "display.default.display_options.pager";
+      $view->set($base . '.type', 'full');
+      $view->set($base . '.options.tags.first', '« First');
+      $view->set($base . '.options.tags.last', 'Last »');
+      $view->set($base . '.options.quantity', 9);
+    }
+    $view->save(TRUE);
+  }
+}

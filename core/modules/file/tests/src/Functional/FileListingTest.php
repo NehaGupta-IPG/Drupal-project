@@ -10,6 +10,7 @@ use Drupal\node\Entity\Node;
 use Drupal\file\Entity\File;
 use Drupal\entity_test\Entity\EntityTestConstraints;
 use Drupal\user\Entity\Role;
+use Drupal\views\Views;
 
 /**
  * Tests file listing page functionality.
@@ -146,6 +147,11 @@ class FileListingTest extends FileFieldTestBase {
     $this->assertSession()->responseContains('admin/content/files/usage/' . $file->id() . '">' . $usage);
 
     $this->assertSession()->elementsCount('xpath', "//td[contains(@class, 'views-field-status') and contains(text(), 'Temporary')]", 1);
+
+    // Test the pager type of "Files Overview" view.
+    $view = Views::getView('files');
+    $view->setDisplay('page_1');
+    $this->assertEquals('full', $view->display_handler->getOption('pager')['type']);
 
     // Test file usage page.
     foreach ($nodes as $node) {
