@@ -114,7 +114,7 @@ class FilterCaption extends FilterBase implements ContainerFactoryPluginInterfac
           // We pass the unsanitized string because this is a text format
           // filter, and after filtering, we always assume the output is safe.
           // @see \Drupal\filter\Element\ProcessedText::preRenderText()
-          '#node' => FilteredMarkup::create($node->C14N()),
+          '#content' => FilteredMarkup::create($node->C14N()),
           '#tag' => $tag,
           '#caption' => $caption,
           '#classes' => $classes,
