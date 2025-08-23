@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\config_translation\Functional;
 
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 
 // cspell:ignore anonyme viewsviewfiles
 
@@ -16,6 +21,8 @@ use Drupal\Core\Language\LanguageInterface;
  * @group #slow
  */
 class ConfigTranslationUiTest extends ConfigTranslationUiTestBase {
+
+  use ContentTypeCreationTrait;
 
   /**
    * Tests the account settings translation interface.
@@ -291,6 +298,65 @@ class ConfigTranslationUiTest extends ConfigTranslationUiTestBase {
     $this->assertSession()->pageTextContains('Name');
     $this->assertSession()->pageTextNotContains('Account cancellation confirmation');
     $this->assertSession()->pageTextNotContains('Password recovery');
+  }
+
+  /**
+   * Tests translation of a default value of a text with summary field.
+   */
+  public function testTextWithSummaryDefaultValue() {
+    $this->createContentType(['type' => 'article', 'name' => 'Article']);
+
+    $field_name = 'translatable_field';
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'node',
+      'type' => 'text_with_summary',
+    ]);
+
+    $field_storage->setSetting('translatable_storage_setting', 'translatable_storage_setting');
+    $field_storage->save();
+    $field = FieldConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'default_value' => [
+        [
+          'value' => 'Default text',
+          'summary' => 'Default summary',
+          'format' => 'filtered_html',
+        ],
+      ],
+    ]);
+    $field->save();
+
+    $form_display = EntityFormDisplay::load('node.article.default');
+    $form_display->setComponent($field_name, ['weight' => 10]);
+    $form_display->save();
+
+    $this->drupalLogin($this->adminUser);
+
+    $this->drupalGet('node/add/article');
+    $this->assertSession()->pageTextContains('Default text');
+    $this->assertSession()->pageTextContains('Default summary');
+
+    $this->drupalGet("entity_test/structure/article/fields/node.article.$field_name/translate");
+    $this->clickLink('Add');
+
+    $form_values = [
+      'translation[config_names][field.field.node.article.translatable_field][default_value][0][value]' => 'FR default text',
+      'translation[config_names][field.field.node.article.translatable_field][default_value][0][summary]' => 'FR default summary',
+    ];
+    $this->submitForm($form_values, 'Save translation');
+    $this->assertSession()->pageTextContains('Successfully saved French translation.');
+
+    // Check that the translations are saved.
+    $this->clickLink('Add');
+    $this->assertSession()->pageTextContains('FR default text');
+    $this->assertSession()->pageTextContains('FR default summary');
+    $language = ConfigurableLanguage::load('fr');
+    $this->drupalGet('fr/node/add/article', ['language' => $language]);
+    $this->assertSession()->pageTextContains('FR default text');
+    $this->assertSession()->pageTextContains('FR default summary');
   }
 
   /**

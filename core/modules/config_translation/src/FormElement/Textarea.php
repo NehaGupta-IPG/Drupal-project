@@ -2,6 +2,7 @@
 
 namespace Drupal\config_translation\FormElement;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Language\LanguageInterface;
 
 /**
@@ -20,10 +21,11 @@ class Textarea extends FormElementBase {
       $rows = max($rows_words, $rows_newlines);
     }
 
-    return [
+    return NestedArray::mergeDeep(parent::getTranslationElement($translation_language, $source_config, $translation_config), [
       '#type' => 'textarea',
       '#rows' => $rows ?? 1,
-    ] + parent::getTranslationElement($translation_language, $source_config, $translation_config);
+      '#attributes' => ['class' => ['js-text-full', 'text-full']],
+    ]);
   }
 
 }

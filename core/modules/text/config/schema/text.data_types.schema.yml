@@ -1,0 +1,19 @@
+# See the 'text_format' type in core.data_types.schema.yml.
+text_format_with_summary:
+  label: 'Default'
+  type: mapping
+  translatable: true
+  # Integrate with the Configuration Translation module.
+  form_element_class: 'Drupal\text\FormElement\TextFormatWithSummary'
+  mapping:
+    value:
+      type: text
+      label: 'Body'
+      translatable: true
+    summary:
+      type: string
+      label: 'Summary'
+      translatable: true
+    format:
+      type: string
+      label: 'Text format'

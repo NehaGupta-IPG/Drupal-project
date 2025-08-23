@@ -2,6 +2,7 @@
 
 namespace Drupal\config_translation\FormElement;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Language\LanguageInterface;
 
 /**
@@ -27,14 +28,15 @@ class TextFormat extends FormElementBase {
    * {@inheritdoc}
    */
   public function getTranslationElement(LanguageInterface $translation_language, $source_config, $translation_config) {
-    return [
+    return NestedArray::mergeDeep(parent::getTranslationElement($translation_language, $source_config, $translation_config), [
       '#type' => 'text_format',
       // Override the #default_value property from the parent class.
       '#default_value' => $translation_config['value'],
       '#format' => $translation_config['format'],
       // @see \Drupal\config_translation\Element\FormElementBase::getTranslationElement()
       '#allowed_formats' => [$source_config['format']],
-    ] + parent::getTranslationElement($translation_language, $source_config, $translation_config);
+      '#attributes' => ['class' => ['js-text-full', 'text-full']],
+    ]);
   }
 
 }
