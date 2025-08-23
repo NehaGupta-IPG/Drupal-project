@@ -51,7 +51,7 @@ class ElementsLabelsTest extends KernelTestBase {
    * @group legacy
    */
   protected function testFormLabels(): void {
-    $this->expectDeprecation('Form elements must have a #title attribute as of Drupal 11.0.0. Form element "form_textfield_test_title_no_show" of #type "textfield" from form "form_label_test_form" is missing a #title attribute.');
+    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "form_textfield_test_title_no_show" of #type "textfield" from form "form_label_test_form" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
 
     $this->drupalGet('form_test/form-labels');
 
@@ -123,7 +123,7 @@ class ElementsLabelsTest extends KernelTestBase {
    * @group legacy
    */
   protected function testTitleEscaping(): void {
-    $this->expectDeprecation('Form elements must have a #title attribute as of Drupal 11.0.0. Form element "form_textfield_test_title_no_show" of #type "textfield" from form "form_label_test_form" is missing a #title attribute.');
+    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "form_textfield_test_title_no_show" of #type "textfield" from form "form_label_test_form" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
 
     $this->drupalGet('form_test/form-labels');
     foreach (FormTestLabelForm::$typesWithTitle as $type) {
