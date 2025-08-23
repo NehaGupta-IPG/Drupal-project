@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\language\Functional;
 
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Url;
+use Drupal\Tests\BrowserTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
-use Drupal\Core\Language\LanguageInterface;
-use Drupal\Tests\BrowserTestBase;
-use Drupal\Core\Url;
 
 // cspell:ignore publi publié
 
@@ -29,6 +29,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
     'language',
     'block',
     'language_test',
+    'content_translation',
     'menu_ui',
     'node',
   ];
@@ -55,6 +56,29 @@ class LanguageSwitchingTest extends BrowserTestBase {
       'access content',
     ]);
     $this->drupalLogin($admin_user);
+  }
+
+  /**
+   * Language switcher block label test.
+   */
+  public function testLanguageBlockTitle(): void {
+    // Default block with singular name Language.
+    $this->drupalGet('admin/structure/block/list/' . $this->defaultTheme);
+    $this->clickLink('Place block');
+    $this->assertSession()->pageTextNotContains('Language switcher (Interface text)');
+    $this->assertSession()->pageTextContains('Language switcher');
+
+    // Language block with plural label name.
+    // Editing language detection config.
+    $test_type = LanguageInterface::TYPE_CONTENT;
+    $edit = [$test_type . '[configurable]' => TRUE];
+    $this->drupalGet('admin/config/regional/language/detection');
+    $this->submitForm($edit, 'Save settings');
+
+    $this->drupalGet('admin/structure/block/list/' . $this->defaultTheme);
+    $this->clickLink('Place block');
+    $this->assertSession()->pageTextContains('Language switcher (Content)');
+    $this->assertSession()->pageTextContains('Language switcher (Interface text)');
   }
 
   /**
