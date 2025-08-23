@@ -180,6 +180,9 @@ class AccountSettingsForm extends ConfigFormBase {
       '#type' => 'details',
       '#title' => $this->t('Welcome (new user created by administrator)'),
       '#open' => $config->get('register') == UserInterface::REGISTER_ADMINISTRATORS_ONLY,
+      // @email_token_help is used to allow translations in right-to-left
+      // languages to place the list of the email tokens in the right place.
+      // See https://www.drupal.org/node/3542416 for more information.
       '#description' => $this->t(
         'Edit the welcome email messages sent to new member accounts created by an administrator. @email_token_help',
         ['@email_token_help' => $email_token_help]
