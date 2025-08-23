@@ -235,4 +235,5 @@ class Date extends NumericFilter {
 
     return $operators;
   }
+  
 }
