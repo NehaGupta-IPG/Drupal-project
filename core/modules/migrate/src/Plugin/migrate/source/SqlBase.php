@@ -33,6 +33,103 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   joined. Using expressions in the query may result in column aliases in the
  *   JOIN clause which would be invalid SQL. If you run into this, set
  *   ignore_map to TRUE.
+ * - conditions: (optional) Conditions to add to the query. This should be in
+ *   array format with each array item providing values for field, value
+ *   (optional, defaults to NULL) and operator (optional, defaults to '=').
+ *   Defaults to an empty array. For more documentation refer to
+ *   \Drupal\Core\Database\Query\ConditionInterface::condition().
+ * - joins: (optional) A list of joins against other tables in the database.
+ *   Typically, it can be used to add some conditions by Field API values, which
+ *   are located in separate database tables. This value should be in array
+ *   format with each array item providing values for table, alias, condition,
+ *   and type (optional, defaults to INNER). Defaults to an empty array.
+ *   For more documentation refer to
+ *   \Drupal\Core\Database\Query\SelectInterface::addJoin().
+ * - fields: (optional) Add extra fields to the query. This is useful when using
+ *   'joins' - we can retrieve an extra migration source from the joined table.
+ *   This should be in array format with each array item providing values for
+ *   table_alias, field, alias (optional, defaults to NULL). Defaults to an
+ *   empty array. For more documentation refer to
+ *   \Drupal\Core\Database\Query\SelectInterface::addField().
+ * - distinct: (optional) Sets the source plugin query to be DISTINCT if set to
+ *   TRUE. If set to FALSE, the distinct flag will be disabled.
+ *
+ * Examples:
+ *
+ * @code
+ * source:
+ *   plugin: d7_node
+ *   conditions:
+ *     -
+ *       field: n.status
+ *       value: 1
+ *     -
+ *       field: type
+ *       value: article
+ *       operator: <>
+ * @endcode
+ *
+ * In this example only published nodes of all types except 'article' are
+ * retrieved from the source database.
+ *
+ * @code
+ * source:
+ *   plugin: d7_user
+ *   joins:
+ *     -
+ *       table: field_data_field_group
+ *       alias: g
+ *       condition: u.uid = g.entity_id
+ *   conditions:
+ *     -
+ *       field: g.field_group_value
+ *       value: foo
+ * @endcode
+ *
+ * In this example users with 'foo' field_group value are retrieved from the
+ * source database. field_group field values are located in another database
+ * table, which should be joined against base table (users).
+ *
+ * @code
+ * source:
+ *   plugin: d7_user
+ *   joins:
+ *     -
+ *       table: users_roles
+ *       alias: ur
+ *       condition: u.uid = ur.uid
+ *   conditions:
+ *     -
+ *       field: ur.rid
+ *       value: [1, 2, 3]
+ *       operator: IN
+ *   distinct: TRUE
+ * @endcode
+ *
+ * In this example users of certain roles are retrieved from the source
+ * database. The distinct is required to remove duplicate records, because each
+ * user can have multiple roles.
+ *
+ * @code
+ * source:
+ *   plugin: d7_user
+ *   joins:
+ *     -
+ *       table: foo
+ *       alias: f
+ *       type: LEFT
+ *       condition: u.uid = f.uid
+ *   fields:
+ *     -
+ *       table_alias: f
+ *       field: bar
+ *       alias: my_bar
+ * @endcode
+ *
+ * In this example adds an extra user field 'bar'. The 'bar' field values are
+ * located in another custom database table 'foo', which should be joined
+ * against base table (users). This will provide a new source of migration
+ * 'my_bar'.
  *
  * For other optional configuration keys inherited from the parent class, refer
  * to \Drupal\migrate\Plugin\migrate\source\SourcePluginBase.
@@ -112,6 +209,30 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, StateInterface $state) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     $this->state = $state;
+
+    // Validate 'conditions' and 'joins' configuration keys.
+    foreach (['conditions', 'joins', 'fields'] as $config_key) {
+      $this->configuration[$config_key] = $this->configuration[$config_key] ?? [];
+
+      if (!is_array($this->configuration[$config_key])) {
+        throw new \InvalidArgumentException("'$config_key' configuration key should be an array of arrays.");
+      }
+    }
+    foreach ($this->configuration['conditions'] as $condition) {
+      if (!is_array($condition) || !isset($condition['field'])) {
+        throw new \InvalidArgumentException("Each 'conditions' array item must be an array including field, value (optional), and operator (optional) keys.");
+      }
+    }
+    foreach ($this->configuration['joins'] as $join) {
+      if (!isset($join['table'], $join['alias'], $join['condition']) || !is_array($join)) {
+        throw new \InvalidArgumentException("Each 'joins' array item must be an array including table, alias, condition, and type (optional) keys.");
+      }
+    }
+    foreach ($this->configuration['fields'] as $field) {
+      if (!isset($field['table_alias'], $field['field']) || !is_array($field)) {
+        throw new \InvalidArgumentException("Each 'fields' array item must be an array including table_alias, field, alias (optional) keys.");
+      }
+    }
   }
 
   /**
@@ -230,16 +351,36 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
   }
 
   /**
-   * Adds tags and metadata to the query.
+   * Adds tags, metadata, and configured sql to the query.
    *
    * @return \Drupal\Core\Database\Query\SelectInterface
-   *   The query with additional tags and metadata.
+   *   The query.
    */
   protected function prepareQuery() {
     $this->query = clone $this->query();
     $this->query->addTag('migrate');
     $this->query->addTag('migrate_' . $this->migration->id());
     $this->query->addMetaData('migration', $this->migration);
+
+    // Add any configured conditions.
+    foreach ($this->configuration['conditions'] as $condition) {
+      $this->query->condition($condition['field'], $condition['value'] ?? NULL, $condition['operator'] ?? '=');
+    }
+
+    // Add any configured joins.
+    foreach ($this->configuration['joins'] as $join) {
+      $this->query->addJoin($join['type'] ?? 'INNER', $join['table'], $join['alias'], $join['condition']);
+    }
+
+    // Add any configured fields.
+    foreach ($this->configuration['fields'] as $field) {
+      $this->query->addField($field['table_alias'], $field['field'], $field['alias'] ?? NULL);
+    }
+
+    // Add distinct, if configured.
+    if (isset($this->configuration['distinct'])) {
+      $this->query->distinct((bool) $this->configuration['distinct']);
+    }
 
     return $this->query;
   }
