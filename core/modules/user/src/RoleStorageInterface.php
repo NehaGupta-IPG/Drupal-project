@@ -4,8 +4,14 @@ namespace Drupal\user;
 
 use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 
+@trigger_error('The ' . __NAMESPACE__ . '\RoleStorageInterface is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3477235', E_USER_DEPRECATED);
+
 /**
  * Defines an interface for role entity storage classes.
+ *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no
+ *    replacement.
+ * @see https://www.drupal.org/node/3477235
  */
 interface RoleStorageInterface extends ConfigEntityStorageInterface {
 

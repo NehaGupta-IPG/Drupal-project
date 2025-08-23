@@ -82,7 +82,7 @@ class UserRoleDeleteTest extends KernelTestBase {
    */
   public function testDependenciesRemoval(): void {
     $this->enableModules(['node', 'filter']);
-    /** @var \Drupal\user\RoleStorage $role_storage */
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorage $role_storage */
     $role_storage = $this->container->get('entity_type.manager')->getStorage('user_role');
 
     /** @var \Drupal\user\RoleInterface $role */

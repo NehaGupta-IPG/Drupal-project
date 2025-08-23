@@ -21,7 +21,7 @@ class Permissions extends PrerenderList {
   /**
    * The role storage.
    *
-   * @var \Drupal\user\RoleStorageInterface
+   * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
    */
   protected $roleStorage;
 

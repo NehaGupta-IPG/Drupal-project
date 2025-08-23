@@ -2,10 +2,10 @@
 
 namespace Drupal\user\Form;
 
+use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\user\RoleInterface;
-use Drupal\user\RoleStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -16,17 +16,17 @@ class RoleSettingsForm extends FormBase {
   /**
    * The role storage used when changing the admin role.
    *
-   * @var \Drupal\user\RoleStorageInterface
+   * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
    */
   protected $roleStorage;
 
   /**
    * Constructs a \Drupal\user\Form\RoleSettingsForm object.
    *
-   * @param \Drupal\user\RoleStorageInterface $role_storage
+   * @param \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $role_storage
    *   The role storage.
    */
-  public function __construct(RoleStorageInterface $role_storage) {
+  public function __construct(ConfigEntityStorageInterface $role_storage) {
     $this->roleStorage = $role_storage;
   }
 

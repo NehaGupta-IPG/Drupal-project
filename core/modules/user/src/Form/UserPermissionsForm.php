@@ -2,12 +2,12 @@
 
 namespace Drupal\user\Form;
 
+use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\user\PermissionHandlerInterface;
-use Drupal\user\RoleStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -27,7 +27,7 @@ class UserPermissionsForm extends FormBase {
   /**
    * The role storage.
    *
-   * @var \Drupal\user\RoleStorageInterface
+   * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
    */
   protected $roleStorage;
 
@@ -43,14 +43,14 @@ class UserPermissionsForm extends FormBase {
    *
    * @param \Drupal\user\PermissionHandlerInterface $permission_handler
    *   The permission handler.
-   * @param \Drupal\user\RoleStorageInterface $role_storage
+   * @param \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $role_storage
    *   The role storage.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
    * @param \Drupal\Core\Extension\ModuleExtensionList|null $moduleExtensionList
    *   The module extension list.
    */
-  public function __construct(PermissionHandlerInterface $permission_handler, RoleStorageInterface $role_storage, ModuleHandlerInterface $module_handler, protected ?ModuleExtensionList $moduleExtensionList = NULL) {
+  public function __construct(PermissionHandlerInterface $permission_handler, ConfigEntityStorageInterface $role_storage, ModuleHandlerInterface $module_handler, protected ?ModuleExtensionList $moduleExtensionList = NULL) {
     $this->permissionHandler = $permission_handler;
     $this->roleStorage = $role_storage;
     $this->moduleHandler = $module_handler;

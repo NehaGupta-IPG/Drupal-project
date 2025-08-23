@@ -579,7 +579,7 @@ class User extends ContentEntityBase implements UserInterface {
   /**
    * Returns the role storage object.
    *
-   * @return \Drupal\user\RoleStorageInterface
+   * @return \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
    *   The role storage object.
    */
   protected function getRoleStorage() {

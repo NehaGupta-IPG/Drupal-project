@@ -2,6 +2,7 @@
 
 namespace Drupal\user;
 
+use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -28,7 +29,7 @@ class AccountSettingsForm extends ConfigFormBase {
   /**
    * The role storage used when changing the admin role.
    *
-   * @var \Drupal\user\RoleStorageInterface
+   * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
    */
   protected $roleStorage;
 
@@ -41,10 +42,10 @@ class AccountSettingsForm extends ConfigFormBase {
    *   The typed config manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\user\RoleStorageInterface $role_storage
+   * @param \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $role_storage
    *   The role storage.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, ModuleHandlerInterface $module_handler, RoleStorageInterface $role_storage) {
+  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, ModuleHandlerInterface $module_handler, ConfigEntityStorageInterface $role_storage) {
     parent::__construct($config_factory, $typedConfigManager);
     $this->moduleHandler = $module_handler;
     $this->roleStorage = $role_storage;

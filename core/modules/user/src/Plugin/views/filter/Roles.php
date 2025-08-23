@@ -2,8 +2,8 @@
 
 namespace Drupal\user\Plugin\views\filter;
 
+use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\user\RoleInterface;
-use Drupal\user\RoleStorageInterface;
 use Drupal\views\Attribute\ViewsFilter;
 use Drupal\views\Plugin\views\filter\ManyToOne;
 use Psr\Log\LoggerInterface;
@@ -26,7 +26,7 @@ class Roles extends ManyToOne {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\user\RoleStorageInterface $roleStorage
+   * @param \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $roleStorage
    *   The role storage.
    * @param \Psr\Log\LoggerInterface|null $logger
    *   The logger service.
@@ -35,7 +35,7 @@ class Roles extends ManyToOne {
     array $configuration,
     $plugin_id,
     $plugin_definition,
-    protected readonly RoleStorageInterface $roleStorage,
+    protected readonly ConfigEntityStorageInterface $roleStorage,
     protected LoggerInterface $logger,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);

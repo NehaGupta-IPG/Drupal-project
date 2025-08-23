@@ -6,6 +6,7 @@ namespace Drupal\Tests\Core\Session;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\Context\CacheContextsManager;
+use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccessPolicyInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -14,7 +15,6 @@ use Drupal\Core\Session\RefinableCalculatedPermissions;
 use Drupal\Core\Session\UserRolesAccessPolicy;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\RoleInterface;
-use Drupal\user\RoleStorageInterface;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -93,7 +93,7 @@ class UserRolesAccessPolicyTest extends UnitTestCase {
       $mocked_roles[$role_id] = $mocked_role->reveal();
     }
 
-    $role_storage = $this->prophesize(RoleStorageInterface::class);
+    $role_storage = $this->prophesize(ConfigEntityStorageInterface::class);
     $role_storage->loadMultiple(array_keys($roles))->willReturn($mocked_roles);
     $this->entityTypeManager->getStorage('user_role')->willReturn($role_storage->reveal());
 

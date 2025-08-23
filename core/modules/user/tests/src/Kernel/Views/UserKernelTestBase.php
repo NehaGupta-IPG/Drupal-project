@@ -27,7 +27,7 @@ abstract class UserKernelTestBase extends ViewsKernelTestBase {
   /**
    * The entity storage for roles.
    *
-   * @var \Drupal\user\RoleStorage
+   * @var \Drupal\Core\Config\Entity\ConfigEntityStorage
    */
   protected $roleStorage;
 

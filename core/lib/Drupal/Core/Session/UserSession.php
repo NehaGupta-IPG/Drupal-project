@@ -205,7 +205,7 @@ class UserSession implements AccountInterface {
   /**
    * Returns the role storage object.
    *
-   * @return \Drupal\user\RoleStorageInterface
+   * @return \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
    *   The role storage object.
    */
   protected function getRoleStorage() {

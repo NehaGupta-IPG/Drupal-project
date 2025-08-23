@@ -20,7 +20,7 @@ class RolesRid extends ManyToOne {
   /**
    * The role entity storage.
    *
-   * @var \Drupal\user\RoleStorage
+   * @var \Drupal\Core\Config\Entity\ConfigEntityStorage
    */
   protected $roleStorage;
 

@@ -43,7 +43,7 @@ class EntityListBuilderTest extends UnitTestCase {
   /**
    * The role storage used for testing.
    *
-   * @var \Drupal\user\RoleStorageInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $roleStorage;
 
@@ -82,7 +82,7 @@ class EntityListBuilderTest extends UnitTestCase {
     parent::setUp();
 
     $this->role = $this->createMock('Drupal\user\RoleInterface');
-    $this->roleStorage = $this->createMock('\Drupal\user\RoleStorageInterface');
+    $this->roleStorage = $this->createMock('\Drupal\Core\Config\Entity\ConfigEntityStorageInterface');
     $this->moduleHandler = $this->createMock('\Drupal\Core\Extension\ModuleHandlerInterface');
     $this->entityType = $this->createMock('\Drupal\Core\Entity\EntityTypeInterface');
     $this->translationManager = $this->createMock('\Drupal\Core\StringTranslation\TranslationInterface');

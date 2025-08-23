@@ -5,6 +5,7 @@ namespace Drupal\user\Form;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Config\ConfigManagerInterface;
+use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
@@ -12,7 +13,6 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\user\PermissionHandlerInterface;
-use Drupal\user\RoleStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
 
@@ -51,7 +51,7 @@ class EntityPermissionsForm extends UserPermissionsForm {
    *
    * @param \Drupal\user\PermissionHandlerInterface $permission_handler
    *   The permission handler.
-   * @param \Drupal\user\RoleStorageInterface $role_storage
+   * @param \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $role_storage
    *   The role storage.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
@@ -62,7 +62,7 @@ class EntityPermissionsForm extends UserPermissionsForm {
    * @param \Drupal\Core\Extension\ModuleExtensionList|null $module_extension_list
    *   The module extension list.
    */
-  public function __construct(PermissionHandlerInterface $permission_handler, RoleStorageInterface $role_storage, ModuleHandlerInterface $module_handler, ConfigManagerInterface $config_manager, EntityTypeManagerInterface $entity_type_manager, ?ModuleExtensionList $module_extension_list = NULL) {
+  public function __construct(PermissionHandlerInterface $permission_handler, ConfigEntityStorageInterface $role_storage, ModuleHandlerInterface $module_handler, ConfigManagerInterface $config_manager, EntityTypeManagerInterface $entity_type_manager, ?ModuleExtensionList $module_extension_list = NULL) {
     if ($module_extension_list === NULL) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $module_extension_list argument is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
       $module_extension_list = \Drupal::service('extension.list.module');
