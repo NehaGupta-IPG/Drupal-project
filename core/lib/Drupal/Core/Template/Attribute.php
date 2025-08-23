@@ -78,13 +78,6 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
   protected $storage = [];
 
   /**
-   * The logger.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
    * Constructs a \Drupal\Core\Template\Attribute object.
    *
    * @param array $attributes
@@ -92,11 +85,13 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger.
    */
-  public function __construct($attributes = [], ?LoggerInterface $logger = NULL) {
+  public function __construct(
+    array $attributes = [],
+    protected LoggerInterface $logger = NULL,
+  ) {
     foreach ($attributes as $name => $value) {
       $this->offsetSet($name, $value);
     }
-    $this->logger = $logger;
   }
 
   /**
