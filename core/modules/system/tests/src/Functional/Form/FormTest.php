@@ -390,9 +390,10 @@ class FormTest extends BrowserTestBase {
    * @see \Drupal\form_test\Form\FormTestValidateRequiredNoTitleForm
    *
    * @group legacy
-   * @expectedDeprecation Form elements must have a #title attribute as of Drupal 11.0.0. Form element "textfield" of #type "textfield" from form "form_test_validate_required_form_no_title" is missing a #title attribute.
    */
   public function testRequiredTextfieldNoTitle(): void {
+    $this->expectDeprecation('Form elements must have a #title attribute as of Drupal 11.0.0. Form element "textfield" of #type "textfield" from form "form_test_validate_required_form_no_title" is missing a #title attribute.');
+
     // Attempt to submit the form with no required field set.
     $edit = [];
     $this->drupalGet('form-test/validate-required-no-title');
