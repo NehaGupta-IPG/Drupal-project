@@ -170,8 +170,7 @@ class SelectionTest extends BrowserTestBase {
       'name[0][value]' => $this->randomMachineName(),
       'test_field[0][target_id]' => $new_title,
     ];
-    $this->drupalGet('/entity_test/add');
-    $this->submitForm($edit, 'Save');
+    $this->drupalPostForm("/entity_test/add", $edit, 'Save');
 
     // Assert referenced node was created.
     $referenced_node = $this->drupalGetNodeByTitle($new_title);
@@ -179,9 +178,7 @@ class SelectionTest extends BrowserTestBase {
     $this->assertSame($type3, $referenced_node->getType());
 
     // Assert the referenced node is associated with referencing node.
-    $result = \Drupal::entityQuery('entity_test')
-      ->accessCheck(TRUE)
-      ->execute();
+    $result = \Drupal::entityQuery('entity_test')->execute();
 
     $referencing_nid = key($result);
     $referencing_node = EntityTest::load($referencing_nid);
