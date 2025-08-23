@@ -475,7 +475,7 @@ function template_preprocess_views_view_table(&$variables): void {
         if ($active == $field) {
           $variables['header'][$field]['sort_indicator'] = [
             '#theme' => 'tablesort_indicator',
-            '#style' => $initial,
+            '#style' => $order,
           ];
         }
 
