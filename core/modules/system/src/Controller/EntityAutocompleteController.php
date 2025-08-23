@@ -77,6 +77,7 @@ class EntityAutocompleteController extends ControllerBase {
    */
   public function handleAutocomplete(Request $request, $target_type, $selection_handler, $selection_settings_key) {
     $matches = [];
+    $target_types = explode(',', $target_type);
 
     // Get the typed string from the URL, if it exists.
     $input = $request->query->get('q');
@@ -113,8 +114,13 @@ class EntityAutocompleteController extends ControllerBase {
           }
         }
       }
+      foreach ($target_types as $t_type) {
+        $target_matches = $this->matcher->getMatches($t_type, $selection_handler, $selection_settings, $typed_string);
+        if ($target_matches) {
+          $matches = array_merge($matches, $target_matches);
+        }
+      }
 
-      $matches = $this->matcher->getMatches($target_type, $selection_handler, $selection_settings, $typed_string);
     }
 
     return new JsonResponse($matches);
