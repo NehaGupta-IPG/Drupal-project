@@ -127,7 +127,6 @@ class DateFilterTest extends ViewTestBase {
     $this->assertSession()->pageTextContains('From');
     $this->assertSession()->pageTextContains('To');
 
-
     // Set the default to an excluded operator.
     $edit = [];
     $edit['options[operator]'] = '=';
