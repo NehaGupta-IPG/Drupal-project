@@ -151,6 +151,74 @@ class TokenTest extends UnitTestCase {
   }
 
   /**
+   * @covers ::alias_scan
+   */
+  public function testAliasScan(): void {
+    $result = $this->token->alias_scan('[node{alias1}:title] is the first title. ID is [node{alias1}:nid]. [node{alias2}:title] is the second title.');
+
+    $this->assertEquals($result, [
+      'node' => [
+        'alias1' => [
+          'title' => 'node:title',
+          'nid' => 'node:nid',
+        ],
+        'alias2' => [
+          'title' => 'node:title',
+        ],
+      ],
+    ]);
+  }
+
+  /**
+   * @covers ::replace
+   */
+  public function testAliasReplacement(): void {
+
+    $node1 = $this->prophesize('Drupal\node\NodeInterface');
+    $node1->id()->willReturn(1);
+    $node1->getCacheTags()->willReturn(['node:1']);
+    $node1->getCacheContexts()->willReturn(['custom_context']);
+    $node1->getCacheMaxAge()->willReturn(10);
+    $node1 = $node1->reveal();
+
+    $node2 = $this->prophesize('Drupal\node\NodeInterface');
+    $node2->id()->willReturn(2);
+    $node2->getCacheTags()->willReturn(['node:2']);
+    $node2->getCacheContexts()->willReturn(['custom_context']);
+    $node2->getCacheMaxAge()->willReturn(10);
+    $node2 = $node2->reveal();
+
+    $data = ['node{alias1}' => $node1, 'node{alias2}' => $node2];
+
+    $this->moduleHandler->expects($this->any())
+      ->method('invokeAll')
+      ->willReturnCallback(function ($alterHook, $args) {
+        // Data is the third argument in the arguments passed to the invokeAll method.
+        // web/core/lib/Drupal/Core/Utility/Token.php:458
+        $entity = $args[2]['node'];
+
+        if ($entity->id() == 1) {
+          return [
+            '[node:title]' => 'Episode IV – A New Hope',
+            '[node:nid]' => '1',
+          ];
+        }
+        elseif ($entity->id() == 2) {
+          return [
+            '[node:title]' => 'Episode V – The Empire Strikes Back',
+            '[node:nid]' => '2',
+          ];
+        }
+        else {
+          return [];
+        }
+      });
+
+    $replacedString = $this->token->replace('"[node{alias1}:title]" is the first film. Its ID is "[node{alias1}:nid]". "[node{alias2}:title]" is the second film.', $data);
+    $this->assertEquals('"Episode IV – A New Hope" is the first film. Its ID is "1". "Episode V – The Empire Strikes Back" is the second film.', $replacedString);
+  }
+
+  /**
    * @covers ::replace
    */
   public function testReplaceWithBubbleableMetadataObject(): void {
