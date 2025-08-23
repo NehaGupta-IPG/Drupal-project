@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\help\Functional;
 
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -40,7 +41,9 @@ class HelpBlockTest extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->helpBlock = $this->placeBlock('help_block');
+    $this->helpBlock = $this->placeBlock('help_block', [
+      'label_display' => BlockPluginInterface::BLOCK_LABEL_VISIBLE,
+    ]);
   }
 
   /**

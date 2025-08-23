@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views_ui\Functional;
 
+use Drupal\Core\Block\BlockPluginInterface;
+
 /**
  * Tests that displays can be correctly overridden via the user interface.
  *
@@ -69,7 +71,9 @@ class OverrideDisplaysTest extends UITestBase {
 
     // Place the block.
     $this->container->get('plugin.manager.block')->clearCachedDefinitions();
-    $this->drupalPlaceBlock("views_block:{$view['id']}-block_1");
+    $this->drupalPlaceBlock("views_block:{$view['id']}-block_1", [
+      'label_display' => BlockPluginInterface::BLOCK_LABEL_VISIBLE,
+    ]);
 
     // Make sure the title appears in the block.
     $this->drupalGet('');
@@ -136,6 +140,7 @@ class OverrideDisplaysTest extends UITestBase {
     // presence/absence of the view's title in both the page and the block).
     $this->container->get('plugin.manager.block')->clearCachedDefinitions();
     $this->drupalPlaceBlock("views_block:{$view['id']}-block_1", [
+      'label_display' => BlockPluginInterface::BLOCK_LABEL_VISIBLE,
       'visibility' => [
         'request_path' => [
           'pages' => '/' . $view['page[path]'],

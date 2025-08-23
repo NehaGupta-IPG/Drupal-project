@@ -7,6 +7,7 @@ namespace Drupal\Tests\language\Functional;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Core\Url;
@@ -81,6 +82,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
       'id' => 'test_language_block',
       // Ensure a 2-byte UTF-8 sequence is in the tested output.
       'label' => $this->randomMachineName(8) . '×',
+      'label_display' => BlockPluginInterface::BLOCK_LABEL_VISIBLE,
     ]);
 
     $this->doTestLanguageBlockAuthenticated($block->label());

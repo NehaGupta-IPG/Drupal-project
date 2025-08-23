@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\workspaces\Functional;
 
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 
@@ -40,7 +41,7 @@ class WorkspaceBypassTest extends BrowserTestBase {
       'bypass entity access own workspace',
     ];
 
-    $this->createContentType(['type' => 'test', 'label' => 'Test']);
+    $this->createContentType(['type' => 'test', 'label' => 'Test', 'label_display' => BlockPluginInterface::BLOCK_LABEL_VISIBLE]);
     $this->setupWorkspaceSwitcherBlock();
 
     $coach = $this->drupalCreateUser(array_merge($permissions, ['create test content']));

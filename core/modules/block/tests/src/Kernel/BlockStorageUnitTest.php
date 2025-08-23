@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block\Kernel;
 
-use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\block_test\Plugin\Block\TestHtmlBlock;
@@ -97,7 +96,7 @@ class BlockStorageUnitTest extends KernelTestBase {
       'settings' => [
         'id' => 'test_html',
         'label' => '',
-        'label_display' => BlockPluginInterface::BLOCK_LABEL_VISIBLE,
+        'label_display' => '',
         'provider' => 'block_test',
       ],
       'visibility' => [],

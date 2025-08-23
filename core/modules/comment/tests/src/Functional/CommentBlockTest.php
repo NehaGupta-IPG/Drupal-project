@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
+use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\user\RoleInterface;
 
 /**
@@ -12,6 +14,8 @@ use Drupal\user\RoleInterface;
  * @group comment
  */
 class CommentBlockTest extends CommentTestBase {
+
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -45,7 +49,10 @@ class CommentBlockTest extends CommentTestBase {
    */
   public function testRecentCommentBlock(): void {
     $this->drupalLogin($this->adminUser);
-    $this->drupalPlaceBlock('views_block:comments_recent-block_1');
+    $this->drupalPlaceBlock('views_block:comments_recent-block_1', [
+      'label' => $this->t('Recent comments'),
+      'label_display' => BlockPluginInterface::BLOCK_LABEL_VISIBLE,
+    ]);
 
     // Add some test comments, with and without subjects. Because the 10 newest
     // comments should be shown by the block, we create 11 to test that behavior

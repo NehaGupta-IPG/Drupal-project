@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\search\Functional;
 
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 
@@ -58,7 +59,9 @@ class SearchBlockTest extends BrowserTestBase {
     $this->assertSession()->linkByHrefExists('/admin/structure/block/add/search_form_block/stark', 0,
       'Did not find the search block in block candidate list.');
 
-    $block = $this->drupalPlaceBlock('search_form_block');
+    $block = $this->drupalPlaceBlock('search_form_block', [
+      'label_display' => BlockPluginInterface::BLOCK_LABEL_VISIBLE,
+    ]);
 
     $this->drupalGet('');
     $this->assertSession()->pageTextContains($block->label());

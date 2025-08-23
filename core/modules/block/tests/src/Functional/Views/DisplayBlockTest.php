@@ -6,6 +6,7 @@ namespace Drupal\Tests\block\Functional\Views;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\Tests\block\Functional\AssertBlockAppearsTrait;
@@ -264,6 +265,7 @@ class DisplayBlockTest extends ViewTestBase {
     // Create a block and set a custom title.
     $block = $this->drupalPlaceBlock('views_block:test_view_block-block_1', [
       'label' => 'test_view_block-block_1:1',
+      'label_display' => BlockPluginInterface::BLOCK_LABEL_VISIBLE,
       'views_label' => 'Custom title',
       'region' => 'sidebar_first',
     ]);

@@ -120,7 +120,7 @@ class ContextualFiltersBlockContextTest extends ViewTestBase {
       'id' => 'views_block:test_view_block_with_context-block_1',
       'label' => '',
       'provider' => 'views',
-      'label_display' => 'visible',
+      'label_display' => '0',
       'views_label' => '',
       'items_per_page' => NULL,
       'context_mapping' => ['nid' => '@node.node_route_context:node'],

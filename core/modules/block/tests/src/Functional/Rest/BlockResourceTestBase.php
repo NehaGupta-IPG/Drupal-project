@@ -101,7 +101,7 @@ abstract class BlockResourceTestBase extends ConfigEntityResourceTestBase {
         'id' => 'broken',
         'label' => '',
         'provider' => 'core',
-        'label_display' => 'visible',
+        'label_display' => '',
       ],
       'visibility' => [],
     ];

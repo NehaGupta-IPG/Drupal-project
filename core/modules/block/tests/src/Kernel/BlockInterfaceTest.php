@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block\Kernel;
 
-use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
 
@@ -44,7 +43,7 @@ class BlockInterfaceTest extends KernelTestBase {
     $expected_configuration = [
       'id' => 'test_block_instantiation',
       'label' => 'Custom Display Message',
-      'label_display' => BlockPluginInterface::BLOCK_LABEL_VISIBLE,
+      'label_display' => '',
       'provider' => 'block_test',
       'display_message' => 'no message set',
     ];
@@ -79,7 +78,7 @@ class BlockInterfaceTest extends KernelTestBase {
       'label_display' => [
         '#type' => 'checkbox',
         '#title' => 'Display title',
-        '#default_value' => TRUE,
+        '#default_value' => FALSE,
         '#return_value' => 'visible',
       ],
       'context_mapping' => [],

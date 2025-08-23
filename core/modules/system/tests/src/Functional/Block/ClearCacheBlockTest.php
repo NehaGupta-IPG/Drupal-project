@@ -53,7 +53,7 @@ class ClearCacheBlockTest extends BrowserTestBase {
    */
   public function testCacheClearBlock(): void {
     $this->drupalGet('<front>');
-    $this->assertSession()->pageTextContains('Clear cache block');
+    $this->assertSession()->pageTextContains('Clear all caches');
     $page = $this->getSession()->getPage();
     $page->pressButton('Clear all caches');
     $this->assertSession()->statusMessageContains('Caches cleared.');

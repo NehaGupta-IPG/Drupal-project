@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\block\Kernel;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Language\LanguageInterface;
@@ -127,6 +128,7 @@ class BlockViewBuilderTest extends KernelTestBase {
       'plugin' => 'test_html',
       'settings' => [
         'label' => 'Powered by Bananas',
+        'label_display' => BlockPluginInterface::BLOCK_LABEL_VISIBLE,
       ],
     ]);
     $entity->save();
