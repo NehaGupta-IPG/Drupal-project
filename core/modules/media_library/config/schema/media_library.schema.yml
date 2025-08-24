@@ -8,6 +8,9 @@ field.widget.settings.media_library_widget:
       sequence:
         type: string
         label: 'Media type ID'
+    add_button_text:
+      type: string
+      label: 'Add button text'
 
 media_library.settings:
   type: config_object
