@@ -60,7 +60,7 @@ class Yaml implements SerializationInterface {
    *
    * @param mixed $data
    *   Parsed YAML data.
-   * @param callable[] $tag_classes
+   * @param class-string[] $tag_classes
    *   Optional classes to use to construct from tag values, indexed by tag.
    *
    * @return mixed
