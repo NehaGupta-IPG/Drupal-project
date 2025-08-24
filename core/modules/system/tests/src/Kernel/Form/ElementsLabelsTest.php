@@ -31,8 +31,11 @@ class ElementsLabelsTest extends KernelTestBase {
 
   /**
    * Tests form elements.
+   * @group legacy
    */
   public function testFormElements(): void {
+    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "form_textfield_test_title_no_show" of #type "textfield" from form "form_label_test_form" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+
     $this->testFormLabels();
     $this->testTitleEscaping();
     $this->testFormDescriptions();
@@ -47,12 +50,8 @@ class ElementsLabelsTest extends KernelTestBase {
    * - Rendering of the "Required" field marker.
    * - Prefix and suffix render element placement.
    * - Form element title attributes.
-   *
-   * @group legacy
    */
   protected function testFormLabels(): void {
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "form_textfield_test_title_no_show" of #type "textfield" from form "form_label_test_form" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
-
     $this->drupalGet('form_test/form-labels');
 
     // Check that the checkbox/radio processing is not interfering with
@@ -119,12 +118,8 @@ class ElementsLabelsTest extends KernelTestBase {
 
   /**
    * Tests XSS-protection of element labels.
-   *
-   * @group legacy
    */
   protected function testTitleEscaping(): void {
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "form_textfield_test_title_no_show" of #type "textfield" from form "form_label_test_form" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
-
     $this->drupalGet('form_test/form-labels');
     foreach (FormTestLabelForm::$typesWithTitle as $type) {
       $this->assertSession()->responseContains("$type alert('XSS') is XSS filtered!");
