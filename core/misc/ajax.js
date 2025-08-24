@@ -644,7 +644,10 @@
         );
       }
 
-      if ($(ajax.element).attr('type') === 'submit' && !$(ajax.element).attr('formnovalidate')) {
+      if (
+        $(ajax.element).attr('type') === 'submit' &&
+        !$(ajax.element).attr('formnovalidate')
+      ) {
         const formValidationEvent = $.Event('drupalAjaxFormValidate');
         $(event.target).trigger(formValidationEvent);
         if (formValidationEvent.result === false) {
