@@ -71,6 +71,7 @@ class WeightTest extends KernelTestBase {
         ->get('system.site')
         ->get('weight_select_max'),
       // Expected by the "doBuildForm()" method of "form_builder" service.
+      '#title' => 'weight',
       '#parents' => ['test'],
     ];
 
