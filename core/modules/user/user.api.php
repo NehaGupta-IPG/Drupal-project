@@ -91,7 +91,7 @@ function hook_user_cancel($edit, UserInterface $account, $method): void {
  * @see user_cancel_methods()
  * @see \Drupal\user\Form\UserCancelForm
  */
-function hook_user_cancel_methods_alter(&$methods) {
+function hook_user_cancel_methods_alter(&$methods): void {
   $account = \Drupal::currentUser();
   // Limit access to disable account and unpublish content method.
   $methods['user_cancel_block_unpublish']['access'] = $account->hasPermission('administer site configuration');
@@ -134,7 +134,7 @@ function hook_user_cancel_methods_alter(&$methods) {
  * @see \Drupal\Core\Session\AccountInterface::getDisplayName()
  * @see sanitization
  */
-function hook_user_format_name_alter(&$name, AccountInterface $account) {
+function hook_user_format_name_alter(&$name, AccountInterface $account): void {
   // Display the user's uid instead of name.
   if ($account->id()) {
     $name = t('User @uid', ['@uid' => $account->id()]);

@@ -36,7 +36,7 @@ use Drupal\update\UpdateFetcherInterface;
  * @see \Drupal\update\UpdateManager::getProjects()
  * @see \Drupal\Core\Utility\ProjectInfo::processInfoList()
  */
-function hook_update_projects_alter(&$projects) {
+function hook_update_projects_alter(&$projects): void {
   // Hide a site-specific module from the list.
   unset($projects['site_specific_module']);
 
@@ -84,7 +84,7 @@ function hook_update_projects_alter(&$projects) {
  *
  * @see update_calculate_project_data()
  */
-function hook_update_status_alter(&$projects) {
+function hook_update_status_alter(&$projects): void {
   $settings = \Drupal::config('update_advanced.settings')->get('projects');
   foreach ($projects as $project => $project_info) {
     if (isset($settings[$project]) && isset($settings[$project]['check']) &&

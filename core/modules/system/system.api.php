@@ -20,7 +20,7 @@ use Drupal\Core\Url;
  *
  * @see system_themes_page()
  */
-function hook_system_themes_page_alter(&$theme_groups) {
+function hook_system_themes_page_alter(&$theme_groups): void {
   foreach ($theme_groups as $state => &$group) {
     foreach ($theme_groups[$state] as &$theme) {
       // Add a foo link to each list of theme operations.

@@ -217,7 +217,7 @@ function hook_node_access_records(NodeInterface $node): array {
  * @see hook_node_grants_alter()
  * @ingroup node_access
  */
-function hook_node_access_records_alter(&$grants, NodeInterface $node) {
+function hook_node_access_records_alter(&$grants, NodeInterface $node): void {
   // Our module allows editors to mark specific articles with the 'is_preview'
   // field. If the node being saved has a TRUE value for that field, then only
   // our grants are retained, and other grants are removed. Doing so ensures
@@ -262,7 +262,7 @@ function hook_node_access_records_alter(&$grants, NodeInterface $node) {
  * @see hook_node_access_records_alter()
  * @ingroup node_access
  */
-function hook_node_grants_alter(&$grants, AccountInterface $account, $operation) {
+function hook_node_grants_alter(&$grants, AccountInterface $account, $operation): void {
   // Our sample module never allows certain roles to edit or delete
   // content. Since some other node access modules might allow this
   // permission, we expressly remove it by returning an empty $grants
@@ -415,7 +415,7 @@ function hook_ranking(): array {
  * @see \Drupal\node\NodeViewBuilder::buildLinks()
  * @see entity_crud
  */
-function hook_node_links_alter(array &$links, NodeInterface $entity, array &$context) {
+function hook_node_links_alter(array &$links, NodeInterface $entity, array &$context): void {
   $links['my_module'] = [
     '#theme' => 'links__node__my_module',
     '#attributes' => ['class' => ['links', 'inline']],

@@ -96,7 +96,7 @@ function hook_help($route_name, RouteMatchInterface $route_match): string|\Strin
  * @see \Drupal\help\Annotation\HelpSection
  * @see \Drupal\help\HelpSectionManager
  */
-function hook_help_section_info_alter(array &$info) {
+function hook_help_section_info_alter(array &$info): void {
   // Alter the header for the module overviews section.
   $info['hook_help']['title'] = t('Overviews of modules');
   // Move the module overviews section to the end.
@@ -109,7 +109,7 @@ function hook_help_section_info_alter(array &$info) {
  * @param array $info
  *   Array of help topic plugin definitions keyed by their plugin ID.
  */
-function hook_help_topics_info_alter(array &$info) {
+function hook_help_topics_info_alter(array &$info): void {
   // Alter the help topic to be displayed on admin/help.
   $info['example.help_topic']['top_level'] = TRUE;
 }

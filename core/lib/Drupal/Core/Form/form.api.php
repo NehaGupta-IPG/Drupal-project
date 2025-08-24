@@ -153,7 +153,7 @@ function callback_batch_finished($success, $results, $operations, $elapsed) {
  * @param \Drupal\Core\Ajax\CommandInterface[] $data
  *   An array of all the rendered commands that will be sent to the client.
  */
-function hook_ajax_render_alter(array &$data) {
+function hook_ajax_render_alter(array &$data): void {
   // Inject any new status messages into the content area.
   $status_messages = ['#type' => 'status_messages'];
   $command = new \Drupal\Core\Ajax\PrependCommand('#block-system-main .content', \Drupal::service('renderer')->renderRoot($status_messages));
@@ -336,7 +336,7 @@ function hook_form_BASE_FORM_ID_alter(&$form, \Drupal\Core\Form\FormStateInterfa
  *
  * @ingroup batch
  */
-function hook_batch_alter(&$batch) {
+function hook_batch_alter(&$batch): void {
 }
 
 /**

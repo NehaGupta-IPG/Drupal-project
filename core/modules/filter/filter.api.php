@@ -16,7 +16,7 @@
  * @param array $info
  *   Array of information on filters exposed by filter plugins.
  */
-function hook_filter_info_alter(&$info) {
+function hook_filter_info_alter(&$info): void {
   // Alter the default settings of the URL filter provided by core.
   $info['filter_url']['default_settings'] = [
     'filter_url_length' => 100,
@@ -33,7 +33,7 @@ function hook_filter_info_alter(&$info) {
  * @param DOMElement $image
  *   An IMG node to format, parsed from the filtered text.
  */
-function hook_filter_secure_image_alter(&$image) {
+function hook_filter_secure_image_alter(&$image): void {
   // Turn an invalid image into an error indicator.
   $image->setAttribute('src', base_path() . 'core/misc/icons/e32700/error.svg');
   $image->setAttribute('alt', t('Image removed.'));

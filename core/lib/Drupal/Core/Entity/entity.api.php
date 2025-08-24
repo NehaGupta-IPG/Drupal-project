@@ -861,7 +861,7 @@ function hook_entity_type_alter(array &$entity_types): void {
  * @see \Drupal\Core\Entity\EntityDisplayRepositoryInterface::getAllViewModes()
  * @see \Drupal\Core\Entity\EntityDisplayRepositoryInterface::getViewModes()
  */
-function hook_entity_view_mode_info_alter(&$view_modes) {
+function hook_entity_view_mode_info_alter(&$view_modes): void {
   $view_modes['user']['full']['status'] = TRUE;
 }
 
@@ -901,7 +901,7 @@ function hook_entity_bundle_info(): array {
  * @see Drupal\Core\Entity\EntityTypeBundleInfo::getBundleInfo()
  * @see hook_entity_bundle_info()
  */
-function hook_entity_bundle_info_alter(&$bundles) {
+function hook_entity_bundle_info_alter(&$bundles): void {
   $bundles['user']['user']['label'] = t('Full account');
   // Override the bundle class for the "article" node type in a custom module.
   $bundles['node']['article']['class'] = 'Drupal\my_module\Entity\Article';
@@ -1147,7 +1147,7 @@ function hook_entity_storage_load(array $entities, $entity_type): void {
  *
  * @see hook_entity_storage_load()
  */
-function hook_ENTITY_TYPE_storage_load(array $entities) {
+function hook_ENTITY_TYPE_storage_load(array $entities): void {
   foreach ($entities as $entity) {
     $entity->foo = my_module_add_something_uncached($entity);
   }
@@ -2000,7 +2000,7 @@ function hook_entity_base_field_info(\Drupal\Core\Entity\EntityTypeInterface $en
  * @todo WARNING: This hook will be changed in
  * https://www.drupal.org/node/2346329.
  */
-function hook_entity_base_field_info_alter(&$fields, \Drupal\Core\Entity\EntityTypeInterface $entity_type) {
+function hook_entity_base_field_info_alter(&$fields, \Drupal\Core\Entity\EntityTypeInterface $entity_type): void {
   // Alter the my_module_text field to use a custom class.
   if ($entity_type->id() == 'node' && !empty($fields['my_module_text'])) {
     $fields['my_module_text']->setClass('\Drupal\another_module\EntityComputedText');
@@ -2064,7 +2064,7 @@ function hook_entity_bundle_field_info(\Drupal\Core\Entity\EntityTypeInterface $
  * @todo WARNING: This hook will be changed in
  * https://www.drupal.org/node/2346347.
  */
-function hook_entity_bundle_field_info_alter(&$fields, \Drupal\Core\Entity\EntityTypeInterface $entity_type, $bundle) {
+function hook_entity_bundle_field_info_alter(&$fields, \Drupal\Core\Entity\EntityTypeInterface $entity_type, $bundle): void {
   if ($entity_type->id() == 'node' && $bundle == 'article' && !empty($fields['my_module_text'])) {
     // Alter the my_module_text field to use a custom class.
     $fields['my_module_text']->setClass('\Drupal\another_module\EntityComputedText');
@@ -2118,7 +2118,7 @@ function hook_entity_field_storage_info(\Drupal\Core\Entity\EntityTypeInterface 
  *
  * @see hook_entity_field_storage_info()
  */
-function hook_entity_field_storage_info_alter(&$fields, \Drupal\Core\Entity\EntityTypeInterface $entity_type) {
+function hook_entity_field_storage_info_alter(&$fields, \Drupal\Core\Entity\EntityTypeInterface $entity_type): void {
   // Alter the max_length setting.
   if ($entity_type->id() == 'node' && !empty($fields['my_module_text'])) {
     $fields['my_module_text']->setSetting('max_length', 128);
@@ -2157,7 +2157,7 @@ function hook_entity_operation(\Drupal\Core\Entity\EntityInterface $entity): arr
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity on which the linked operations will be performed.
  */
-function hook_entity_operation_alter(array &$operations, \Drupal\Core\Entity\EntityInterface $entity) {
+function hook_entity_operation_alter(array &$operations, \Drupal\Core\Entity\EntityInterface $entity): void {
   // Alter the title and weight.
   $operations['translate']['title'] = t('Translate @entity_type', [
     '@entity_type' => $entity->getEntityTypeId(),
@@ -2217,7 +2217,7 @@ function hook_entity_field_access($operation, \Drupal\Core\Field\FieldDefinition
  *   - items: (optional) The entity field items
  *     (\Drupal\Core\Field\FieldItemListInterface).
  */
-function hook_entity_field_access_alter(array &$grants, array $context) {
+function hook_entity_field_access_alter(array &$grants, array $context): void {
   /** @var \Drupal\Core\Field\FieldDefinitionInterface $field_definition */
   $field_definition = $context['field_definition'];
   if ($field_definition->getName() == 'field_of_interest' && $grants['node']->isForbidden()) {
@@ -2328,7 +2328,7 @@ function hook_entity_extra_field_info(): array {
  *
  * @see hook_entity_extra_field_info()
  */
-function hook_entity_extra_field_info_alter(&$info) {
+function hook_entity_extra_field_info_alter(&$info): void {
   // Force node title to always be at the top of the list by default.
   foreach (NodeType::loadMultiple() as $bundle) {
     if (isset($info['node'][$bundle->id()]['form']['title'])) {

@@ -98,7 +98,7 @@ function hook_field_widget_third_party_settings_form(WidgetInterface $plugin, Fi
  *
  * @see \Drupal\field_ui\Form\EntityViewDisplayEditForm::alterSettingsSummary()
  */
-function hook_field_formatter_settings_summary_alter(array &$summary, array $context) {
+function hook_field_formatter_settings_summary_alter(array &$summary, array $context): void {
   // Append a message to the summary when an instance of foo_formatter has
   // my_setting set to TRUE for the current view mode.
   if ($context['formatter']->getPluginId() == 'foo_formatter') {
@@ -121,7 +121,7 @@ function hook_field_formatter_settings_summary_alter(array &$summary, array $con
  *
  * @see \Drupal\field_ui\Form\EntityFormDisplayEditForm::alterSettingsSummary()
  */
-function hook_field_widget_settings_summary_alter(array &$summary, array $context) {
+function hook_field_widget_settings_summary_alter(array &$summary, array $context): void {
   // Append a message to the summary when an instance of foo_widget has
   // my_setting set to TRUE for the current view mode.
   if ($context['widget']->getPluginId() == 'foo_widget') {

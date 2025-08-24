@@ -37,7 +37,7 @@ use Drupal\Core\Session\AccountInterface;
  *   The name of the shortcut set that this module recommends for that user, if
  *   there is one.
  */
-function hook_shortcut_default_set(AccountInterface $account) {
+function hook_shortcut_default_set(AccountInterface $account): string {
   // Use a special set of default shortcuts for administrators only.
   $roles = \Drupal::entityTypeManager()->getStorage('user_role')->loadByProperties(['is_admin' => TRUE]);
   $user_admin_roles = array_intersect(array_keys($roles), $account->getRoles());

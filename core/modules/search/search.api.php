@@ -73,7 +73,7 @@ function hook_search_preprocess($text, $langcode = NULL): string {
  * @see \Drupal\search\Annotation\SearchPlugin
  * @see \Drupal\search\SearchPluginManager
  */
-function hook_search_plugin_alter(array &$definitions) {
+function hook_search_plugin_alter(array &$definitions): void {
   if (isset($definitions['node_search'])) {
     $definitions['node_search']['title'] = t('Nodes');
   }

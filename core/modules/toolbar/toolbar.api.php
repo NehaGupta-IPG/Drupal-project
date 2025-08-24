@@ -160,7 +160,7 @@ function hook_toolbar(): array {
  * @param array $items
  *   Associative array of toolbar menu definitions returned from hook_toolbar().
  */
-function hook_toolbar_alter(&$items) {
+function hook_toolbar_alter(&$items): void {
   // Move the User tab to the right.
   $items['commerce']['#weight'] = 5;
 }

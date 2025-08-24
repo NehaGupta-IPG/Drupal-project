@@ -473,7 +473,7 @@ function hook_views_data(): array {
  *
  * @see hook_views_data()
  */
-function hook_views_data_alter(array &$data) {
+function hook_views_data_alter(array &$data): void {
   // Alter the title of the node_field_data:nid field in the Views UI.
   $data['node_field_data']['nid']['title'] = t('Node-Nid');
 
@@ -584,7 +584,7 @@ function hook_field_views_data(FieldStorageConfigInterface $field_storage): arra
  * @see hook_field_views_data()
  * @see hook_field_views_data_views_data_alter()
  */
-function hook_field_views_data_alter(array &$data, FieldStorageConfigInterface $field_storage) {
+function hook_field_views_data_alter(array &$data, FieldStorageConfigInterface $field_storage): void {
   $entity_type_id = $field_storage->getTargetEntityTypeId();
   $field_name = $field_storage->getName();
   $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
@@ -640,7 +640,7 @@ function hook_field_views_data_alter(array &$data, FieldStorageConfigInterface $
  * @see hook_field_views_data_alter()
  * @see views_views_data_alter()
  */
-function hook_field_views_data_views_data_alter(array &$data, FieldStorageConfigInterface $field) {
+function hook_field_views_data_views_data_alter(array &$data, FieldStorageConfigInterface $field): void {
   $field_name = $field->getName();
   $data_key = 'field_data_' . $field_name;
   $entity_type_id = $field->getTargetEntityTypeId();
@@ -705,7 +705,7 @@ function hook_views_query_substitutions(ViewExecutable $view): array {
  *   corresponding value is its replacement. The value will be escaped unless it
  *   is already marked safe.
  */
-function hook_views_form_substitutions() {
+function hook_views_form_substitutions(): array {
   return [
     '<!--views-form-example-substitutions-->' => 'Example Substitution',
   ];
@@ -726,7 +726,7 @@ function hook_views_form_substitutions() {
  *
  * @see \Drupal\views\ViewExecutable
  */
-function hook_views_pre_view(ViewExecutable $view, $display_id, array &$args) {
+function hook_views_pre_view(ViewExecutable $view, $display_id, array &$args): void {
 
   // Modify contextual filters for my_special_view if user has
   // 'my special permission'.
@@ -748,7 +748,7 @@ function hook_views_pre_view(ViewExecutable $view, $display_id, array &$args) {
  *
  * @see \Drupal\views\ViewExecutable
  */
-function hook_views_pre_build(ViewExecutable $view) {
+function hook_views_pre_build(ViewExecutable $view): void {
   // Because of some inexplicable business logic, we should remove all
   // attachments from all views on Mondays.
   // (This alter could be done later in the execution process as well.)
@@ -769,7 +769,7 @@ function hook_views_pre_build(ViewExecutable $view) {
  *
  * @see \Drupal\views\ViewExecutable
  */
-function hook_views_post_build(ViewExecutable $view) {
+function hook_views_post_build(ViewExecutable $view): void {
   // If the exposed field 'type' is set, hide the column containing the content
   // type. (Note that this is a solution for a particular view, and makes
   // assumptions about both exposed filter settings and the fields in the view.
@@ -794,7 +794,7 @@ function hook_views_post_build(ViewExecutable $view) {
  *
  * @see \Drupal\views\ViewExecutable
  */
-function hook_views_pre_execute(ViewExecutable $view) {
+function hook_views_pre_execute(ViewExecutable $view): void {
   // Whenever a view queries more than two tables, show a message that notifies
   // view administrators that the query might be heavy.
   // (This action could be performed later in the execution process, but not
@@ -820,7 +820,7 @@ function hook_views_pre_execute(ViewExecutable $view) {
  *
  * @see \Drupal\views\ViewExecutable
  */
-function hook_views_post_execute(ViewExecutable $view) {
+function hook_views_post_execute(ViewExecutable $view): void {
   // If there are more than 100 results, show a message that encourages the user
   // to change the filter settings.
   // (This action could be performed later in the execution process, but not
@@ -903,7 +903,7 @@ function hook_views_post_render(ViewExecutable $view, array &$output, CachePlugi
  * @see hook_views_query_substitutions()
  * @see \Drupal\views\Plugin\views\query\Sql
  */
-function hook_views_query_alter(ViewExecutable $view, QueryPluginBase $query) {
+function hook_views_query_alter(ViewExecutable $view, QueryPluginBase $query): void {
   // (Example assuming a view with an exposed filter on node title.)
   // If the input for the title filter is a positive integer, filter against
   // node ID instead of node title.
@@ -944,7 +944,7 @@ function hook_views_query_alter(ViewExecutable $view, QueryPluginBase $query) {
  * @see \Drupal\views_ui\ViewUI
  * @see table.html.twig
  */
-function hook_views_preview_info_alter(array &$rows, ViewExecutable $view) {
+function hook_views_preview_info_alter(array &$rows, ViewExecutable $view): void {
   // Adds information about the tables being queried by the view to the query
   // part of the info box.
   $rows['query'][] = [
@@ -978,7 +978,7 @@ function hook_views_invalidate_cache(): void {
  *
  * @see \Drupal\views\Plugin\ViewsPluginManager
  */
-function hook_views_plugins_access_alter(array &$plugins) {
+function hook_views_plugins_access_alter(array &$plugins): void {
   // Remove the available plugin because the users should not have access to it.
   unset($plugins['role']);
 }
@@ -994,7 +994,7 @@ function hook_views_plugins_access_alter(array &$plugins) {
  *
  * @see \Drupal\views\Plugin\ViewsPluginManager
  */
-function hook_views_plugins_argument_default_alter(array &$plugins) {
+function hook_views_plugins_argument_default_alter(array &$plugins): void {
   // Remove the available plugin because the users should not have access to it.
   unset($plugins['php']);
 }
@@ -1010,7 +1010,7 @@ function hook_views_plugins_argument_default_alter(array &$plugins) {
  *
  * @see \Drupal\views\Plugin\ViewsPluginManager
  */
-function hook_views_plugins_argument_validator_alter(array &$plugins) {
+function hook_views_plugins_argument_validator_alter(array &$plugins): void {
   // Remove the available plugin because the users should not have access to it.
   unset($plugins['php']);
 }
@@ -1026,7 +1026,7 @@ function hook_views_plugins_argument_validator_alter(array &$plugins) {
  *
  * @see \Drupal\views\Plugin\ViewsPluginManager
  */
-function hook_views_plugins_cache_alter(array &$plugins) {
+function hook_views_plugins_cache_alter(array &$plugins): void {
   // Change the title.
   $plugins['time']['title'] = t('Custom title');
 }
@@ -1042,7 +1042,7 @@ function hook_views_plugins_cache_alter(array &$plugins) {
  *
  * @see \Drupal\views\Plugin\ViewsPluginManager
  */
-function hook_views_plugins_display_extenders_alter(array &$plugins) {
+function hook_views_plugins_display_extenders_alter(array &$plugins): void {
   // Alter the title of an existing plugin.
   $plugins['time']['title'] = t('Custom title');
 }
@@ -1058,7 +1058,7 @@ function hook_views_plugins_display_extenders_alter(array &$plugins) {
  *
  * @see \Drupal\views\Plugin\ViewsPluginManager
  */
-function hook_views_plugins_display_alter(array &$plugins) {
+function hook_views_plugins_display_alter(array &$plugins): void {
   // Alter the title of an existing plugin.
   $plugins['rest_export']['title'] = t('Export');
 }
@@ -1074,7 +1074,7 @@ function hook_views_plugins_display_alter(array &$plugins) {
  *
  * @see \Drupal\views\Plugin\ViewsPluginManager
  */
-function hook_views_plugins_exposed_form_alter(array &$plugins) {
+function hook_views_plugins_exposed_form_alter(array &$plugins): void {
   // Remove the available plugin because the users should not have access to it.
   unset($plugins['input_required']);
 }
@@ -1090,7 +1090,7 @@ function hook_views_plugins_exposed_form_alter(array &$plugins) {
  *
  * @see \Drupal\views\Plugin\ViewsPluginManager
  */
-function hook_views_plugins_join_alter(array &$plugins) {
+function hook_views_plugins_join_alter(array &$plugins): void {
   // Print out all join plugin names for debugging purposes.
   dump($plugins);
 }
@@ -1106,7 +1106,7 @@ function hook_views_plugins_join_alter(array &$plugins) {
  *
  * @see \Drupal\views\Plugin\ViewsPluginManager
  */
-function hook_views_plugins_pager_alter(array &$plugins) {
+function hook_views_plugins_pager_alter(array &$plugins): void {
   // Remove the sql based plugin to force good performance.
   unset($plugins['full']);
 }
@@ -1122,7 +1122,7 @@ function hook_views_plugins_pager_alter(array &$plugins) {
  *
  * @see \Drupal\views\Plugin\ViewsPluginManager
  */
-function hook_views_plugins_query_alter(array &$plugins) {
+function hook_views_plugins_query_alter(array &$plugins): void {
   // Print out all query plugin names for debugging purposes.
   dump($plugins);
 }
@@ -1138,7 +1138,7 @@ function hook_views_plugins_query_alter(array &$plugins) {
  *
  * @see \Drupal\views\Plugin\ViewsPluginManager
  */
-function hook_views_plugins_row_alter(array &$plugins) {
+function hook_views_plugins_row_alter(array &$plugins): void {
   // Change the used class of a plugin.
   $plugins['entity:node']['class'] = 'Drupal\node\Plugin\views\row\NodeRow';
   $plugins['entity:node']['module'] = 'node';
@@ -1155,7 +1155,7 @@ function hook_views_plugins_row_alter(array &$plugins) {
  *
  * @see \Drupal\views\Plugin\ViewsPluginManager
  */
-function hook_views_plugins_style_alter(array &$plugins) {
+function hook_views_plugins_style_alter(array &$plugins): void {
   // Change the theme hook of a plugin.
   $plugins['html_list']['theme'] = 'custom_views_view_list';
 }
@@ -1171,7 +1171,7 @@ function hook_views_plugins_style_alter(array &$plugins) {
  *
  * @see \Drupal\views\Plugin\ViewsPluginManager
  */
-function hook_views_plugins_wizard_alter(array &$plugins) {
+function hook_views_plugins_wizard_alter(array &$plugins): void {
   // Change the title of a plugin.
   $plugins['node_revision']['title'] = t('Node revision wizard');
 }
@@ -1187,7 +1187,7 @@ function hook_views_plugins_wizard_alter(array &$plugins) {
  *
  * @see \Drupal\views\Plugin\ViewsHandlerManager
  */
-function hook_views_plugins_area_alter(array &$plugins) {
+function hook_views_plugins_area_alter(array &$plugins): void {
   // Change the 'title' handler class.
   $plugins['title']['class'] = 'Drupal\\example\\ExampleClass';
 }
@@ -1203,7 +1203,7 @@ function hook_views_plugins_area_alter(array &$plugins) {
  *
  * @see \Drupal\views\Plugin\ViewsHandlerManager
  */
-function hook_views_plugins_argument_alter(array &$plugins) {
+function hook_views_plugins_argument_alter(array &$plugins): void {
   // Change the 'title' handler class.
   $plugins['title']['class'] = 'Drupal\\example\\ExampleClass';
 }
@@ -1219,7 +1219,7 @@ function hook_views_plugins_argument_alter(array &$plugins) {
  *
  * @see \Drupal\views\Plugin\ViewsHandlerManager
  */
-function hook_views_plugins_field_alter(array &$plugins) {
+function hook_views_plugins_field_alter(array &$plugins): void {
   // Change the 'title' handler class.
   $plugins['title']['class'] = 'Drupal\\example\\ExampleClass';
 }
@@ -1235,7 +1235,7 @@ function hook_views_plugins_field_alter(array &$plugins) {
  *
  * @see \Drupal\views\Plugin\ViewsHandlerManager
  */
-function hook_views_plugins_filter_alter(array &$plugins) {
+function hook_views_plugins_filter_alter(array &$plugins): void {
   // Change the 'title' handler class.
   $plugins['title']['class'] = 'Drupal\\example\\ExampleClass';
 }
@@ -1251,7 +1251,7 @@ function hook_views_plugins_filter_alter(array &$plugins) {
  *
  * @see \Drupal\views\Plugin\ViewsHandlerManager
  */
-function hook_views_plugins_relationship_alter(array &$plugins) {
+function hook_views_plugins_relationship_alter(array &$plugins): void {
   // Change the 'title' handler class.
   $plugins['title']['class'] = 'Drupal\\example\\ExampleClass';
 }
@@ -1267,7 +1267,7 @@ function hook_views_plugins_relationship_alter(array &$plugins) {
  *
  * @see \Drupal\views\Plugin\ViewsHandlerManager
  */
-function hook_views_plugins_sort_alter(array &$plugins) {
+function hook_views_plugins_sort_alter(array &$plugins): void {
   // Change the 'title' handler class.
   $plugins['title']['class'] = 'Drupal\\example\\ExampleClass';
 }

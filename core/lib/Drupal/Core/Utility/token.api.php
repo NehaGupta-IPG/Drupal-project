@@ -148,7 +148,7 @@ function hook_tokens($type, $tokens, array $data, array $options, \Drupal\Core\R
  *
  * @see hook_tokens()
  */
-function hook_tokens_alter(array &$replacements, array $context, \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata) {
+function hook_tokens_alter(array &$replacements, array $context, \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata): void {
   if ($context['type'] == 'node' && !empty($context['data']['node'])) {
     $node = $context['data']['node'];
 
@@ -252,7 +252,7 @@ function hook_token_info(): array {
  *
  * @see hook_token_info()
  */
-function hook_token_info_alter(&$data) {
+function hook_token_info_alter(&$data): void {
   // Modify description of node tokens for our site.
   $data['tokens']['node']['nid'] = [
     'name' => t("Node ID"),

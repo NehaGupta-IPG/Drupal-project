@@ -169,7 +169,7 @@ use Drupal\Core\Language\LanguageInterface;
  * @param \Drupal\Core\Url $url
  *   The URL the switch links will be relative to.
  */
-function hook_language_switch_links_alter(array &$links, $type, \Drupal\Core\Url $url) {
+function hook_language_switch_links_alter(array &$links, $type, \Drupal\Core\Url $url): void {
   $language_interface = \Drupal::languageManager()->getCurrentLanguage();
 
   if ($type == LanguageInterface::TYPE_CONTENT && isset($links[$language_interface->getId()])) {
@@ -247,7 +247,7 @@ function hook_language_switch_links_alter(array &$links, $type, \Drupal\Core\Url
  *
  * @ingroup hooks
  */
-function hook_transliteration_overrides_alter(&$overrides, $langcode) {
+function hook_transliteration_overrides_alter(&$overrides, $langcode): void {
   // Provide special overrides for German for a custom site.
   if ($langcode == 'de') {
     // The core-provided transliteration of Ä is Ae, but we want just A.

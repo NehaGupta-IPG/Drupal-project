@@ -31,7 +31,7 @@
  * @see hook_contextual_links_plugins_alter()
  * @see \Drupal\contextual\Element\ContextualLinks::preRenderLinks()
  */
-function hook_contextual_links_view_alter(&$element, $items) {
+function hook_contextual_links_view_alter(&$element, $items): void {
   // Add another class to all contextual link lists to facilitate custom
   // styling.
   $element['#attributes']['class'][] = 'custom-class';

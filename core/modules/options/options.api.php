@@ -29,7 +29,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
  * @ingroup hooks
  * @see hook_options_list()
  */
-function hook_options_list_alter(array &$options, array $context) {
+function hook_options_list_alter(array &$options, array $context): void {
   // Check if this is the field we want to change.
   if ($context['fieldDefinition']->getName() == 'field_option') {
     // Change the label of the empty option.

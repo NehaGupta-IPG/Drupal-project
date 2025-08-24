@@ -482,7 +482,7 @@ use Drupal\Core\Database\Query\SelectInterface;
  *
  * @ingroup database
  */
-function hook_query_alter(Drupal\Core\Database\Query\AlterableInterface $query) {
+function hook_query_alter(Drupal\Core\Database\Query\AlterableInterface $query): void {
   if ($query->hasTag('micro_limit')) {
     $query->range(0, 2);
   }
@@ -507,7 +507,7 @@ function hook_query_alter(Drupal\Core\Database\Query\AlterableInterface $query) 
  *
  * @ingroup database
  */
-function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $query) {
+function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $query): void {
   // This is an example of a possible hook_query_media_access_alter()
   // implementation. In other words, alter queries of media entities that
   // require access control (have the 'media_access' query tag).

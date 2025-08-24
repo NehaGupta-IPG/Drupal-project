@@ -16,7 +16,7 @@
  * @param array $effects
  *   The array of image effects, keyed on the machine-readable effect name.
  */
-function hook_image_effect_info_alter(&$effects) {
+function hook_image_effect_info_alter(&$effects): void {
   // Override the Image module's 'Scale and Crop' effect label.
   $effects['image_scale_and_crop']['label'] = t('Bangers and Mash');
 }

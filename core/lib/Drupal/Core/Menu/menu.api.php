@@ -267,7 +267,7 @@
  *
  * @ingroup menu
  */
-function hook_menu_links_discovered_alter(&$links) {
+function hook_menu_links_discovered_alter(&$links): void {
   // Change the weight and title of the user.logout link.
   $links['user.logout']['weight'] = -10;
   $links['user.logout']['title'] = new \Drupal\Core\StringTranslation\TranslatableMarkup('Logout');
@@ -314,7 +314,7 @@ function hook_menu_links_discovered_alter(&$links) {
  *
  * @ingroup menu
  */
-function hook_menu_local_tasks_alter(&$data, $route_name, \Drupal\Core\Cache\RefinableCacheableDependencyInterface &$cacheability) {
+function hook_menu_local_tasks_alter(&$data, $route_name, \Drupal\Core\Cache\RefinableCacheableDependencyInterface &$cacheability): void {
 
   // Add a tab linking to node/add to all pages.
   $data['tabs'][0]['node.add_page'] = [
@@ -344,7 +344,7 @@ function hook_menu_local_tasks_alter(&$data, $route_name, \Drupal\Core\Cache\Ref
  *
  * @ingroup menu
  */
-function hook_menu_local_actions_alter(&$local_actions) {
+function hook_menu_local_actions_alter(&$local_actions): void {
 }
 
 /**
@@ -359,7 +359,7 @@ function hook_menu_local_actions_alter(&$local_actions) {
  *
  * @ingroup menu
  */
-function hook_local_tasks_alter(&$local_tasks) {
+function hook_local_tasks_alter(&$local_tasks): void {
   // Remove a specified local task plugin.
   unset($local_tasks['example_plugin_id']);
 }
@@ -397,7 +397,7 @@ function hook_local_tasks_alter(&$local_tasks) {
  *
  * @ingroup menu
  */
-function hook_contextual_links_alter(array &$links, $group, array $route_parameters) {
+function hook_contextual_links_alter(array &$links, $group, array $route_parameters): void {
   if ($group == 'menu') {
     // Dynamically use the menu name for the title of the menu_edit contextual
     // link.
@@ -421,7 +421,7 @@ function hook_contextual_links_alter(array &$links, $group, array $route_paramet
  *
  * @ingroup menu
  */
-function hook_contextual_links_plugins_alter(array &$contextual_links) {
+function hook_contextual_links_plugins_alter(array &$contextual_links): void {
   $contextual_links['menu_edit']['title'] = 'Edit the menu';
 }
 
@@ -440,7 +440,7 @@ function hook_contextual_links_plugins_alter(array &$contextual_links) {
  *
  * @ingroup menu
  */
-function hook_system_breadcrumb_alter(\Drupal\Core\Breadcrumb\Breadcrumb &$breadcrumb, \Drupal\Core\Routing\RouteMatchInterface $route_match, array $context) {
+function hook_system_breadcrumb_alter(\Drupal\Core\Breadcrumb\Breadcrumb &$breadcrumb, \Drupal\Core\Routing\RouteMatchInterface $route_match, array $context): void {
   // Add an item to the end of the breadcrumb.
   $breadcrumb->addLink(\Drupal\Core\Link::createFromRoute(t('Text'), 'example_route_name'));
 }

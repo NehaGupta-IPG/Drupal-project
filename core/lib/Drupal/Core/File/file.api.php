@@ -58,7 +58,7 @@ function hook_file_download($uri): array|int|null {
  *   The URI to a file for which we need an external URL, or the path to a
  *   shipped file.
  */
-function hook_file_url_alter(&$uri) {
+function hook_file_url_alter(&$uri): void {
   $user = \Drupal::currentUser();
 
   // User 1 will always see the local file in this example.
@@ -125,7 +125,7 @@ function hook_file_url_alter(&$uri) {
  * @see \Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser::guessMimeType()
  * @see \Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser::$defaultMapping
  */
-function hook_file_mimetype_mapping_alter(&$mapping) {
+function hook_file_mimetype_mapping_alter(&$mapping): void {
   // Add new MIME type 'drupal/info'.
   $mapping['mimetypes']['example_info'] = 'drupal/info';
   // Add new extension '.info.yml' and map it to the 'drupal/info' MIME type.
@@ -144,7 +144,7 @@ function hook_file_mimetype_mapping_alter(&$mapping) {
  * @see \Drupal\Core\Archiver\ArchiverManager
  * @see \Drupal\Core\Archiver\Attribute\Archiver
  */
-function hook_archiver_info_alter(&$info) {
+function hook_archiver_info_alter(&$info): void {
   $info['tar']['extensions'][] = 'tgz';
 }
 
@@ -203,7 +203,7 @@ function hook_filetransfer_info(): array {
  * @see https://www.drupal.org/node/3512364
  * @see hook_filetransfer_info()
  */
-function hook_filetransfer_info_alter(&$filetransfer_info) {
+function hook_filetransfer_info_alter(&$filetransfer_info): void {
   // Remove the FTP option entirely.
   unset($filetransfer_info['ftp']);
   // Make sure the SSH option is listed first.

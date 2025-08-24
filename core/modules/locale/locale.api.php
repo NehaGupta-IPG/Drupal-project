@@ -114,7 +114,7 @@
  * @see locale_translation_project_list()
  * @ingroup interface_translation_properties
  */
-function hook_locale_translation_projects_alter(&$projects) {
+function hook_locale_translation_projects_alter(&$projects): void {
   // The translations are located at a custom translation sever.
   $projects['existing_project'] = [
     'info' => [
