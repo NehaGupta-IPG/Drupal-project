@@ -190,12 +190,12 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
     $this->assertSame($link_titles, $expected_link_titles);
     $this->drupalGet('admin/structure/types/manage/basic_page/form-display');
 
-    // Ensure that the widget settings form is not displayed when only
-    // one media type is allowed.
+    // Ensure that the widget settings form is always there.
     $assert_session->pageTextContains('Single media type');
-    $assert_session->buttonNotExists('field_single_media_type_settings_edit');
+    $assert_session->buttonExists('field_single_media_type_settings_edit');
 
     $assert_session->buttonExists('field_twin_media_settings_edit')->press();
+    $assert_session->fieldExists('fields[field_twin_media][settings_edit_form][settings][add_button_text]');
     $this->assertElementExistsAfterWait('css', '#field-twin-media .tabledrag-toggle-weight')->press();
     $assert_session->fieldExists('fields[field_twin_media][settings_edit_form][settings][media_types][type_one][weight]')->selectOption('0');
     $assert_session->fieldExists('fields[field_twin_media][settings_edit_form][settings][media_types][type_three][weight]')->selectOption('1');
