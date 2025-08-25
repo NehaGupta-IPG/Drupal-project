@@ -397,7 +397,7 @@ class NodeRevisionsTest extends NodeTestBase {
   public function testRevisionsPager(): void {
     $nodes = $this->nodes;
     $logs = $this->revisionLogs;
-    
+
     // Create 50 more revisions in order to trigger paging on the revisions
     // overview screen.
     $node = $nodes[0];
