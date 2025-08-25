@@ -32,6 +32,7 @@
         "psr/log": "~3.0.2",
         "ralouphie/getallheaders": "~3.0.3",
         "revolt/event-loop": "~v1.0.7",
+        "stevebauman/unfinalize": "~v2.1.1",
         "symfony/console": "~v7.3.0",
         "symfony/dependency-injection": "~v7.3.0",
         "symfony/deprecation-contracts": "~v3.6.0",
