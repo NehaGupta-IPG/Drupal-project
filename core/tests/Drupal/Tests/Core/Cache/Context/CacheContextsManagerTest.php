@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Cache\Context;
 
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\Context\CacheContextOptimizableInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\CacheContextInterface;
 use Drupal\Core\Cache\Context\CalculatedCacheContextInterface;
@@ -57,6 +58,16 @@ class CacheContextsManagerTest extends UnitTestCase {
           Container::EXCEPTION_ON_INVALID_REFERENCE,
           new NoOptimizeCacheContext(),
         ],
+        [
+          'cache_context.x.non-standard',
+          Container::EXCEPTION_ON_INVALID_REFERENCE,
+          new NonStandardOptimizeCacheContext(),
+        ],
+        [
+          'cache_context.x.global',
+          Container::EXCEPTION_ON_INVALID_REFERENCE,
+          new GlobalOptimizeCacheContext(),
+        ],
       ]);
     $cache_contexts_manager = new CacheContextsManager($container, $this->getContextsFixture());
 
@@ -95,6 +106,24 @@ class CacheContextsManagerTest extends UnitTestCase {
       [['a', 'a.b.c:foo'], ['a']],
       [['a.b.c:foo', 'a'], ['a']],
       [['a.b.c:foo', 'a.b.c'], ['a.b.c']],
+
+      // Non-standard parents.
+      [['a.b', 'x.non-standard'], ['a.b']],
+      // Calculated cache contexts are supported as well but there is no
+      // argument granularity.
+      [['a.b', 'x.non-standard:argument'], ['a.b']],
+      [['a', 'a.b', 'x.non-standard'], ['a']],
+      // Should contexts with explicit parents still respect the default logic?
+      // Not doing that would allow to deprecate the somewhat strange max-age 0
+      // check in favor of returning an empty list?
+      [['x', 'x.non-standard'], ['x']],
+      [['a.b.c', 'x.non-standard'], ['a.b.c', 'x.non-standard']],
+      // @todo Support this as well?
+      // [['a', 'non-standard'], ['a']],
+
+      // Contexts that return TRUE in isGlobal() are always optimized away.
+      [['a', 'x.global'], ['a']],
+      [['x.global'], []],
 
       // max-age 0 is treated as non-optimizable.
       [['a.b.no-optimize', 'a.b', 'a'], ['a.b.no-optimize', 'a']],
@@ -330,6 +359,90 @@ class NoOptimizeCacheContext implements CacheContextInterface {
   public function getCacheableMetadata() {
     $cacheable_metadata = new CacheableMetadata();
     return $cacheable_metadata->setCacheMaxAge(0);
+  }
+
+}
+
+/**
+ * Optimizable context class with a non-default parent.
+ */
+class NonStandardOptimizeCacheContext implements CacheContextInterface, CacheContextOptimizableInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getLabel() {
+    return 'Non-Standard';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getContext() {
+    return 'non_standard';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata($parameter = NULL) {
+    return new CacheableMetadata();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasVariations(): bool {
+    return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getParentContexts(): array {
+    return ['a.b'];
+  }
+
+}
+
+/**
+ * A global cache context that can always be optimized away.
+ */
+class GlobalOptimizeCacheContext implements CacheContextInterface, CacheContextOptimizableInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getLabel() {
+    return 'Non-Standard';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getContext() {
+    return 'non_standard';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata($parameter = NULL) {
+    return new CacheableMetadata();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasVariations(): bool {
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getParentContexts(): array {
+    return [];
   }
 
 }

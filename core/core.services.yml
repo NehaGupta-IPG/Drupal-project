@@ -207,6 +207,7 @@ services:
       - { name: cache.context}
   cache_context.timezone:
     class: Drupal\Core\Cache\Context\TimeZoneCacheContext
+    arguments: ['@config.factory']
     tags:
       - { name: cache.context}
 

@@ -3,6 +3,7 @@
 namespace Drupal\Core\Cache\Context;
 
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Config\ConfigFactoryInterface;
 
 /**
  * Defines the TimeZoneCacheContext service, for "per time zone" caching.
@@ -11,7 +12,24 @@ use Drupal\Core\Cache\CacheableMetadata;
  *
  * @see \Drupal\Core\Session\AccountProxy::setAccount()
  */
-class TimeZoneCacheContext implements CacheContextInterface {
+class TimeZoneCacheContext implements CacheContextInterface, CacheContextOptimizableInterface {
+
+  /**
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
+   * Constructor for the TimeZoneCacheContext object.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   *   The config factory.
+   */
+  public function __construct(ConfigFactoryInterface $configFactory) {
+    $this->configFactory = $configFactory;
+  }
 
   /**
    * {@inheritdoc}
@@ -33,7 +51,25 @@ class TimeZoneCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public function getCacheableMetadata() {
-    return new CacheableMetadata();
+    $cacheability_metadata = new CacheableMetadata();
+    $cacheability_metadata->addCacheableDependency($this->configFactory->get('system.date'));
+    return $cacheability_metadata;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasVariations(): bool {
+    // The timezone context can not have different values if the site does not
+    // use configurable timezones.
+    return (bool) $this->configFactory->get('system.date')->get('timezone.user.configurable');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getParentContexts(): array {
+    return [];
   }
 
 }

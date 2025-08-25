@@ -172,6 +172,22 @@ class CacheContextsManager {
         [$context_id, $parameter] = explode(':', $context_token);
       }
 
+      // Cache contexts can explicitly provide a list of parents or indicate
+      // that they are global.
+      // @todo Also support to optimize them away if a parent of those is
+      //   provided.
+      $service = $this->getService($context_id);
+      if ($service instanceof CacheContextOptimizableInterface) {
+        if (!$service->hasVariations()) {
+          continue;
+        }
+
+        if (array_intersect($context_tokens, $service->getParentContexts())) {
+          // If there is at least one parent context available, skip this one.
+          continue;
+        }
+      }
+
       // Context tokens without:
       // - a period means they don't have a parent
       // - a colon means they're not a specific value of a cache context
@@ -181,7 +197,7 @@ class CacheContextsManager {
       }
       // Check cacheability. If the context defines a max-age of 0, then it
       // can not be optimized away. Pass the parameter along if we have one.
-      elseif ($this->getService($context_id)->getCacheableMetadata($parameter)->getCacheMaxAge() === 0) {
+      elseif ($service->getCacheableMetadata($parameter)->getCacheMaxAge() === 0) {
         $optimized_content_tokens[] = $context_token;
       }
       // The context token has a period or a colon. Iterate over all ancestor
