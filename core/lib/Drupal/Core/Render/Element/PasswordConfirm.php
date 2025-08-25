@@ -66,9 +66,6 @@ class PasswordConfirm extends FormElementBase {
    * Expand a password_confirm field into two text boxes.
    */
   public static function processPasswordConfirm(&$element, FormStateInterface $form_state, &$complete_form) {
-    // Remove the type from the wrapper of the expanded elements.
-    unset($element['#type']);
-
     $element['pass1'] = [
       '#type' => 'password',
       '#title' => t('Password'),
