@@ -13,7 +13,8 @@
         "drupal/core": "self.version",
         "drupal/core-project-message": "self.version",
         "drupal/core-recipe-unpack": "self.version",
-        "drupal/core-vendor-hardening": "self.version"
+        "drupal/core-vendor-hardening": "self.version",
+        "stevebauman/unfinalize": "*"
     },
     "conflict": {
         "dealerdirect/phpcodesniffer-composer-installer": "1.1.0"
@@ -128,7 +129,11 @@
         ],
         "post-update-cmd": [
             "Drupal\\Composer\\Composer::generateMetapackages",
-            "Drupal\\Composer\\Composer::generateComponentPackages"
+            "Drupal\\Composer\\Composer::generateComponentPackages",
+            "@php vendor/bin/unfinalize run --annotate=final --properties=protected --methods=protected vendor core modules themes"
+        ],
+        "post-install-cmd": [
+            "@php vendor/bin/unfinalize run --annotate=final --properties=protected --methods=protected vendor core modules themes"
         ],
         "phpcs": "phpcs --standard=core/phpcs.xml.dist --parallel=\"$( (nproc || sysctl -n hw.logicalcpu || echo 4) 2>/dev/null)\" --",
         "phpcbf": "phpcbf --standard=core/phpcs.xml.dist --parallel=\"$( (nproc || sysctl -n hw.logicalcpu || echo 4) 2>/dev/null)\" --"

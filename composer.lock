@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7e45f46f86addf53ba6170d650e30fc2",
+    "content-hash": "593e00fffa01f1156aa876c7b1a2827c",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -2117,6 +2117,66 @@
                 }
             ],
             "time": "2024-07-03T04:53:05+00:00"
+        },
+        {
+            "name": "stevebauman/unfinalize",
+            "version": "v2.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stevebauman/unfinalize.git",
+                "reference": "acb6809a1392d0e40e6dfc40a4db003ffbfdae05"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stevebauman/unfinalize/zipball/acb6809a1392d0e40e6dfc40a4db003ffbfdae05",
+                "reference": "acb6809a1392d0e40e6dfc40a4db003ffbfdae05",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.16",
+                "laravel-zero/framework": "^10.0.2",
+                "laravel/pint": "^1.8",
+                "mockery/mockery": "^1.5.1",
+                "nunomaduro/termwind": "^1.15.1",
+                "pestphp/pest": "^2.5",
+                "spatie/ray": "^1.39"
+            },
+            "bin": [
+                "builds/unfinalize"
+            ],
+            "type": "project",
+            "autoload": {
+                "psr-4": {
+                    "App\\": "app/",
+                    "Database\\Seeders\\": "database/seeders/",
+                    "Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Steve Bauman",
+                    "email": "steven_bauman@outlook.com"
+                }
+            ],
+            "description": "Permanently remove final keywords from vendor packages.",
+            "keywords": [
+                "final",
+                "fixer",
+                "php-cs-fixer",
+                "unfinalize"
+            ],
+            "support": {
+                "issues": "https://github.com/stevebauman/unfinalize/issues",
+                "source": "https://github.com/stevebauman/unfinalize"
+            },
+            "time": "2024-10-02T14:02:32+00:00"
         },
         {
             "name": "symfony/console",
@@ -10205,8 +10265,8 @@
     },
     "prefer-stable": true,
     "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": [],
+    "platform": {},
+    "platform-dev": {},
     "platform-overrides": {
         "php": "8.3.0"
     },
