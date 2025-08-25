@@ -568,7 +568,20 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // trigger a user warning.
     if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::Voided) {
       $this->connectionTransactionState = ClientConnectionTransactionState::RollbackFailed;
-      trigger_error('Transaction::rollBack() failed because of a prior execution of a DDL statement.', E_USER_WARNING);
+      $message = 'Transaction::rollBack() failed because of a prior execution of a DDL statement.';
+      if ($this->connection->isEventEnabled(TransactionRollbackFailureEvent::class)) {
+        $this->connection->dispatchEvent(new TransactionRollbackFailureEvent(
+          $this->connection->getKey(),
+          $this->connection->getTarget(),
+          $id,
+          $name,
+          $this->getConnectionTransactionState(),
+          $this->stackItemsAsArray(),
+          get_class($this),
+          $message,
+        ));
+      }
+      trigger_error($message, E_USER_WARNING);
       return;
     }
 

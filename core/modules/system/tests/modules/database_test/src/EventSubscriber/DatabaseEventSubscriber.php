@@ -12,6 +12,7 @@ use Drupal\Core\Database\Event\TransactionBeginEvent;
 use Drupal\Core\Database\Event\TransactionCommitEvent;
 use Drupal\Core\Database\Event\TransactionReleaseSavepointEvent;
 use Drupal\Core\Database\Event\TransactionRollbackEvent;
+use Drupal\Core\Database\Event\TransactionRollbackFailureEvent;
 use Drupal\Core\Database\Event\TransactionRollbackToSavepointEvent;
 use Drupal\Core\Database\Event\TransactionSavepointEvent;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
@@ -54,16 +55,17 @@ class DatabaseEventSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents(): array {
     return [
-      StatementExecutionStartEvent::class => 'onStatementExecutionStart',
       StatementExecutionEndEvent::class => 'onStatementExecutionEnd',
       StatementExecutionFailureEvent::class => 'onStatementExecutionFailure',
-      TransactionBeginEvent::class => 'onTransactionBegin',
-      TransactionSavepointEvent::class => 'onTransactionSavepoint',
+      StatementExecutionStartEvent::class => 'onStatementExecutionStart',
       TransactionAutoCommitEvent::class => 'onTransactionAutoCommit',
+      TransactionBeginEvent::class => 'onTransactionBegin',
       TransactionCommitEvent::class => 'onTransactionCommit',
       TransactionReleaseSavepointEvent::class => 'onTransactionReleaseSavepoint',
       TransactionRollbackEvent::class => 'onTransactionRollback',
+      TransactionRollbackFailureEvent::class => 'onTransactionRollbackFailureEvent',
       TransactionRollbackToSavepointEvent::class => 'onTransactionRollbackToSavepoint',
+      TransactionSavepointEvent::class => 'onTransactionSavepoint',
     ];
   }
 
@@ -158,6 +160,16 @@ class DatabaseEventSubscriber implements EventSubscriberInterface {
    */
   public function onTransactionRollback(TransactionRollbackEvent $event): void {
     $this->keyValue->get('TransactionEventTest')->set('event_data', get_class($event) . ' ' . $event->key . ' ' . $event->target . ' ' . $event->id . '\\' . $event->name);
+  }
+
+  /**
+   * Subscribes to a TransactionRollbackFailureEvent.
+   *
+   * @param \Drupal\Core\Database\Event\TransactionRollbackFailureEvent $event
+   *   The transaction event.
+   */
+  public function onTransactionRollbackFailureEvent(TransactionRollbackFailureEvent $event): void {
+    $this->keyValue->get('TransactionEventTest')->set('event_data', get_class($event) . ' ' . $event->key . ' ' . $event->target . ' ' . $event->id . '\\' . $event->name . ' ' . $event->className . ' ' . $event->message);
   }
 
   /**

@@ -71,9 +71,9 @@ class TransactionEventTest extends DatabaseTestBase {
   }
 
   /**
-   * Tests DDL auto-commit.
+   * Tests DDL auto-commit - followed by implicit commit.
    */
-  public function testAutoCommitOnDataDefinitionLanguageStatement(): void {
+  public function testImplicitCommitAfterAutoCommitOnDataDefinitionLanguageStatement(): void {
     if ($this->connection->supportsTransactionalDDL()) {
       $this->markTestSkipped('This test is only relevant for databases that do not support transactional DDL.');
     }
@@ -94,6 +94,69 @@ class TransactionEventTest extends DatabaseTestBase {
     $this->assertMatchesRegularExpression("/^.*TransactionAutoCommitEvent default default .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
     unset($tx);
     $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction commit-type: AutomaticUponDDL$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+  }
+
+  /**
+   * Tests DDL auto-commit - followed by explict commit.
+   */
+  public function testExplicitCommitAfterAutoCommitOnDataDefinitionLanguageStatement(): void {
+    if ($this->connection->supportsTransactionalDDL()) {
+      $this->markTestSkipped('This test is only relevant for databases that do not support transactional DDL.');
+    }
+
+    $table = [
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+      ],
+      'primary key' => ['id'],
+    ];
+
+    $tx = $this->connection->startTransaction();
+    $this->connection->schema()->createTable('database_test_00', $table);
+    $this->assertMatchesRegularExpression("/^.*TransactionAutoCommitEvent default default .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+    $tx->commitOrRelease();
+    $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction commit-type: AutomaticUponDDL$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+  }
+
+  /**
+   * Tests DDL auto-commit - followed by rollback attempt.
+   */
+  public function testAttemptRollbackAfterAutoCommitOnDataDefinitionLanguageStatement(): void {
+    if ($this->connection->supportsTransactionalDDL()) {
+      $this->markTestSkipped('This test is only relevant for databases that do not support transactional DDL.');
+    }
+
+    $table = [
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+      ],
+      'primary key' => ['id'],
+    ];
+
+    $tx = $this->connection->startTransaction();
+    $this->connection->schema()->createTable('database_test_00', $table);
+    $this->assertMatchesRegularExpression("/^.*TransactionAutoCommitEvent default default .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+    set_error_handler(static function (int $errno, string $errstr): bool {
+      throw new \ErrorException($errstr);
+    });
+    try {
+      $tx->rollback();
+    }
+    catch (\ErrorException $e) {
+      $this->assertSame('Transaction::rollBack() failed because of a prior execution of a DDL statement.', $e->getMessage());
+    }
+    finally {
+      restore_error_handler();
+    }
+    $this->assertMatchesRegularExpression("/^.*TransactionRollbackFailureEvent default default .*\\\\drupal_transaction .* Transaction::rollBack\\(\\) failed because of a prior execution of a DDL statement\\.$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
   }
 
   /**
