@@ -31,6 +31,7 @@ class ElementsLabelsTest extends KernelTestBase {
 
   /**
    * Tests form elements.
+   *
    * @group legacy
    */
   public function testFormElements(): void {
