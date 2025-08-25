@@ -7,6 +7,7 @@ namespace Drupal\database_test\EventSubscriber;
 use Drupal\Core\Database\Event\StatementExecutionEndEvent;
 use Drupal\Core\Database\Event\StatementExecutionFailureEvent;
 use Drupal\Core\Database\Event\StatementExecutionStartEvent;
+use Drupal\Core\Database\Event\TransactionAutoCommitEvent;
 use Drupal\Core\Database\Event\TransactionBeginEvent;
 use Drupal\Core\Database\Event\TransactionCommitEvent;
 use Drupal\Core\Database\Event\TransactionReleaseSavepointEvent;
@@ -58,6 +59,7 @@ class DatabaseEventSubscriber implements EventSubscriberInterface {
       StatementExecutionFailureEvent::class => 'onStatementExecutionFailure',
       TransactionBeginEvent::class => 'onTransactionBegin',
       TransactionSavepointEvent::class => 'onTransactionSavepoint',
+      TransactionAutoCommitEvent::class => 'onTransactionAutoCommit',
       TransactionCommitEvent::class => 'onTransactionCommit',
       TransactionReleaseSavepointEvent::class => 'onTransactionReleaseSavepoint',
       TransactionRollbackEvent::class => 'onTransactionRollback',
@@ -116,6 +118,16 @@ class DatabaseEventSubscriber implements EventSubscriberInterface {
    */
   public function onTransactionSavepoint(TransactionSavepointEvent $event): void {
     $this->keyValue->get('TransactionEventTest')->set('event_data', get_class($event) . ' ' . $event->key . ' ' . $event->target . ' ' . $event->id . '\\' . $event->name . ' stack: ' . implode(' > ', $event->stackItems));
+  }
+
+  /**
+   * Subscribes to a TransactionAutoCommitEvent.
+   *
+   * @param \Drupal\Core\Database\Event\TransactionAutoCommitEvent $event
+   *   The transaction event.
+   */
+  public function onTransactionAutoCommit(TransactionAutoCommitEvent $event): void {
+    $this->keyValue->get('TransactionEventTest')->set('event_data', get_class($event) . ' ' . $event->key . ' ' . $event->target . ' ' . $event->id . '\\' . $event->name);
   }
 
   /**

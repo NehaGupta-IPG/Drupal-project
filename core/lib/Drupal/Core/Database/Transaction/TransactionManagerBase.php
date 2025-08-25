@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Database\Transaction;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Event\TransactionAutoCommitEvent;
 use Drupal\Core\Database\Event\TransactionBeginEvent;
 use Drupal\Core\Database\Event\TransactionCommitEvent;
 use Drupal\Core\Database\Event\TransactionCommitFailureEvent;
@@ -112,6 +113,14 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * state on the database server could be different.
    */
   private ClientConnectionTransactionState $connectionTransactionState;
+
+  /**
+   * Whether the root transaction was auto-committed.
+   *
+   * Normally FALSE, is set to TRUE when an autocommit occurred on the
+   * database engine.
+   */
+  private bool $isAutoCommitted = FALSE;
 
   /**
    * Whether to trigger warnings when unpiling a void transaction.
@@ -277,8 +286,6 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    *
    * @return string|null
    *   The current transaction id.
-   *
-   * @todo add method to TransactionManagerInterface in drupal:12.0.0.
    */
   public function currentTransactionId(): ?string {
     if (!$this->inTransaction()) {
@@ -292,8 +299,6 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    *
    * @return string|null
    *   The current transaction name.
-   *
-   * @todo add method to TransactionManagerInterface in drupal:12.0.0.
    */
   public function currentTransactionName(): ?string {
     if (!$this->inTransaction()) {
@@ -377,6 +382,20 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // statement, was executed that terminated the database transaction. So, we
     // can process the post transaction callbacks.
     if (!isset($this->stack()[$id]) && isset($this->voidedItems[$id]) && $this->rootId === $id) {
+      if ($this->isAutoCommitted) {
+        if ($this->connection->isEventEnabled(TransactionCommitEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionCommitEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->getConnectionTransactionState(),
+            $this->stackItemsAsArray(),
+            CommitType::AutomaticUponDDL,
+          ));
+        }
+        $this->isAutoCommitted = FALSE;
+      }
       $this->processPostTransactionCallbacks();
       $this->rootId = NULL;
       unset($this->voidedItems[$id]);
@@ -408,10 +427,25 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    */
   public function unpile(string $name, string $id): void {
     // If the transaction was voided, we cannot unpile. Skip but trigger a user
-    // warning if requested.
+    // warning if requested. If an autocommit happened, emit the
+    // TransactionCommitEvent.
     if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::Voided) {
       if ($this->triggerWarningWhenUnpilingOnVoidTransaction) {
         trigger_error('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', E_USER_WARNING);
+      }
+      if ($this->isAutoCommitted) {
+        if ($this->connection->isEventEnabled(TransactionCommitEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionCommitEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->getConnectionTransactionState(),
+            $this->stackItemsAsArray(),
+            CommitType::AutomaticUponDDL,
+          ));
+        }
+        $this->isAutoCommitted = FALSE;
       }
       return;
     }
@@ -828,32 +862,23 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   }
 
   /**
-   * Handles automatic commit occurred upon execution of a DDL statement.
-   *
-   * In some cases the active transaction is automatically committed by the
-   * database server when a DDL statement is executed during a transaction
-   * (for example, MySql). In such cases we need to trigger a
-   * TransactionCommitEvent and void the remaining items on the stack.
-   *
-   * This method should only be called internally by a database driver.
-   *
-   * @todo add method to TransactionManagerInterface in drupal:12.0.0.
+   * {@inheritdoc}
    */
   public function handleAutomaticCommitUponDDL(): void {
-    if ($this->connection->isEventEnabled(TransactionCommitEvent::class)) {
+    if ($this->connection->isEventEnabled(TransactionAutoCommitEvent::class)) {
       $i = array_key_first($this->stack);
       assert($this->stack[$i]->type === StackItemType::Root);
-      $this->connection->dispatchEvent(new TransactionCommitEvent(
+      $this->connection->dispatchEvent(new TransactionAutoCommitEvent(
         $this->connection->getKey(),
         $this->connection->getTarget(),
         $i,
         $this->stack[$i]->name,
         $this->getConnectionTransactionState(),
         $this->stackItemsAsArray(),
-        CommitType::AutomaticUponDDL,
       ));
     }
     $this->voidClientTransaction();
+    $this->isAutoCommitted = TRUE;
   }
 
 }

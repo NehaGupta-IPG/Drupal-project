@@ -20,6 +20,8 @@ enum TransactionEvent: string {
   case RollbackToSavepointFailure = TransactionRollbackToSavepointFailureEvent::class;
   case Savepoint = TransactionSavepointEvent::class;
 
+  case AutoCommit = TransactionAutoCommitEvent::class;
+
   /**
    * Returns an array with all transaction related event classes.
    *

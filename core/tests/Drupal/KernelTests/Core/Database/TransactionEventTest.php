@@ -73,7 +73,7 @@ class TransactionEventTest extends DatabaseTestBase {
   /**
    * Tests DDL auto-commit.
    */
-  public function testDDLAutoCommit(): void {
+  public function testAutoCommitOnDataDefinitionLanguageStatement(): void {
     if ($this->connection->supportsTransactionalDDL()) {
       $this->markTestSkipped('This test is only relevant for databases that do not support transactional DDL.');
     }
@@ -91,8 +91,9 @@ class TransactionEventTest extends DatabaseTestBase {
 
     $tx = $this->connection->startTransaction();
     $this->connection->schema()->createTable('database_test_00', $table);
-    $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction commit-type: AutomaticUponDDL$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
+    $this->assertMatchesRegularExpression("/^.*TransactionAutoCommitEvent default default .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
     unset($tx);
+    $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction commit-type: AutomaticUponDDL$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
   }
 
   /**

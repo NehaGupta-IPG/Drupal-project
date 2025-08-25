@@ -24,20 +24,16 @@ interface TransactionManagerInterface {
    *
    * @return string|null
    *   The current transaction id.
-   *
-   * @todo add method to TransactionManagerInterface in drupal:12.0.0.
    */
-  /* public function currentTransactionId(): ?string; */
+  public function currentTransactionId(): ?string;
 
   /**
    * Gets the current transaction name.
    *
    * @return string|null
    *   The current transaction name.
-   *
-   * @todo add method to TransactionManagerInterface in drupal:12.0.0.
    */
-  /* public function currentTransactionName(): ?string; */
+  public function currentTransactionName(): ?string;
 
   /**
    * Checks if a named Drupal transaction is active.
@@ -154,14 +150,15 @@ interface TransactionManagerInterface {
    *
    * In some cases the active transaction is automatically committed by the
    * database server when a DDL statement is executed during a transaction
-   * (for example, MySql). In such cases we need to trigger a
-   * TransactionCommitEvent and void the remaining items on the stack.
+   * (for example, MySql). In such cases we void the remaining items on the
+   * stack, and emit a TransactionAutoCommitEvent to notify that a db commit
+   * happened while the Drupal transaction was still active. Later, a normal
+   * TransactionCommitEvent is triggered when the Drupal transaction is
+   * finalized.
    *
    * This method should only be called internally by a database driver.
-   *
-   * @todo add method to TransactionManagerInterface in drupal:12.0.0.
    */
-  /* public function handleAutomaticCommitUponDDL(): void; */
+  public function handleAutomaticCommitUponDDL(): void;
 
   /**
    * Adds a root transaction end callback.
