@@ -282,29 +282,17 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   }
 
   /**
-   * Gets the current transaction id.
-   *
-   * @return string|null
-   *   The current transaction id.
+   * {@inheritdoc}
    */
   public function currentTransactionId(): ?string {
-    if (!$this->inTransaction()) {
-      return NULL;
-    }
-    return array_key_last($this->stack);
+    return $this->inTransaction() ? array_key_last($this->stack) : NULL;
   }
 
   /**
-   * Gets the current transaction name.
-   *
-   * @return string|null
-   *   The current transaction name.
+   * {@inheritdoc}
    */
   public function currentTransactionName(): ?string {
-    if (!$this->inTransaction()) {
-      return NULL;
-    }
-    return end($this->stack)->name;
+    return $this->inTransaction() ? end($this->stack)->name : NULL;
   }
 
   /**
