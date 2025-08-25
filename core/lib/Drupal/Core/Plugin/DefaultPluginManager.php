@@ -388,6 +388,9 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
     if ($this->alterHook) {
       $this->moduleHandler->alter($this->alterHook, $definitions);
     }
+    if (method_exists($this->getFactory(), 'alterDefinitions')) {
+      $this->getFactory()->alterDefinitions($definitions);
+    }
   }
 
   /**

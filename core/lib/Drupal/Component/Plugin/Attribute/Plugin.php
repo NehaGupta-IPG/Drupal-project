@@ -21,10 +21,13 @@ class Plugin extends AttributeBase {
    *   The plugin ID.
    * @param class-string|null $deriver
    *   (optional) The deriver class.
+   * @param bool $autowire
+   *   (optional) Whether the plugin should be autowired.
    */
   public function __construct(
     public readonly string $id,
     public readonly ?string $deriver = NULL,
+    public readonly bool $autowire = FALSE,
   ) {}
 
 }

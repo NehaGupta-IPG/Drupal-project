@@ -62,6 +62,7 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
       'discovery_test_1' => [
         'id' => 'discovery_test_1',
         'class' => 'com\example\PluginNamespace\AttributeDiscoveryTest1',
+        'autowire' => FALSE,
       ],
     ], $discovery->getDefinitions());
 
@@ -74,6 +75,7 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
     $this->assertEquals([
       'id' => 'discovery_test_1',
       'class' => 'com\example\PluginNamespace\AttributeDiscoveryTest1',
+      'autowire' => FALSE,
     ], unserialize($file_cache->get($file_path)['content']));
 
     // The plugins that extend a missing class, implement a missing interface,

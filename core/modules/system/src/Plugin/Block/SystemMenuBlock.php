@@ -9,11 +9,9 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Menu\MenuActiveTrailInterface;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\system\Form\SystemMenuOffCanvasForm;
 use Drupal\system\Plugin\Derivative\SystemMenuBlock as SystemMenuBlockDeriver;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a generic Menu block.
@@ -25,9 +23,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   deriver: SystemMenuBlockDeriver::class,
   forms: [
     'settings_tray' => SystemMenuOffCanvasForm::class,
-  ]
+  ],
+  autowire: TRUE,
 )]
-class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterface {
+class SystemMenuBlock extends BlockBase {
 
   /**
    * The menu link tree service.
@@ -61,19 +60,6 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->menuTree = $menu_tree;
     $this->menuActiveTrail = $menu_active_trail;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('menu.link_tree'),
-      $container->get('menu.active_trail')
-    );
   }
 
   /**

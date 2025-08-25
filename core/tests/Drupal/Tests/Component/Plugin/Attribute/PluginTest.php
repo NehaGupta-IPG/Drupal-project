@@ -27,6 +27,7 @@ class PluginTest extends TestCase {
       'id' => 'example',
       'class' => 'foo',
       'deriver' => 'test',
+      'autowire' => FALSE,
     ], $plugin->get());
   }
 

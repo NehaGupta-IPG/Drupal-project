@@ -49,6 +49,9 @@ class EntityTestHooks {
     }
     // Allow entity_test_rev tests to override the entity type definition.
     $entity_types['entity_test_rev'] = $state->get('entity_test_rev.entity_type', $entity_types['entity_test_rev']);
+    if ($entity_types['entity_test_rev'] === '') {
+      unset($entity_types['entity_test_rev']);
+    }
     $entity_types['entity_test_revpub'] = $state->get('entity_test_revpub.entity_type', $entity_types['entity_test_revpub']);
     // Enable the entity_test_new only when needed.
     if (!$state->get('entity_test_new')) {

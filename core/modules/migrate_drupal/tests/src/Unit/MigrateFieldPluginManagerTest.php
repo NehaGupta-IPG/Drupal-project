@@ -11,6 +11,7 @@ use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
 use Drupal\migrate_drupal\Annotation\MigrateField;
 use Drupal\migrate_drupal\Plugin\MigrateFieldPluginManager;
 use Drupal\Tests\UnitTestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Tests the MigrateFieldPluginManager class.
@@ -36,6 +37,7 @@ class MigrateFieldPluginManagerTest extends UnitTestCase {
     $discovery = $this->prophesize(AnnotatedClassDiscovery::class);
     $discovery->getDefinitions()->willReturn($this->pluginFixtureData());
     $manager = new MigrateFieldPluginManagerTestClass('field', new \ArrayObject(), $cache, $module_handler, MigrateField::class, $discovery->reveal());
+    \Drupal::setContainer($this->prophesize(ContainerInterface::class)->reveal());
     if (!$expected_plugin_id) {
       $this->expectException(PluginNotFoundException::class);
       $this->expectExceptionMessage(sprintf("Plugin ID '%s' was not found.", $field_type));

@@ -14,6 +14,7 @@ use Drupal\Core\Menu\ContextualLinkDefault;
 use Drupal\Core\Menu\ContextualLinkManager;
 use Drupal\Tests\UnitTestCase;
 use Prophecy\Argument;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -69,6 +70,8 @@ class ContextualLinkManagerTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
+
+    \Drupal::setContainer($this->prophesize(ContainerInterface::class)->reveal());
 
     $language_manager = $this->createMock(LanguageManagerInterface::class);
     $language_manager->expects($this->any())
