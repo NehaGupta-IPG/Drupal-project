@@ -97,7 +97,7 @@ class TransactionEventTest extends DatabaseTestBase {
   }
 
   /**
-   * Tests DDL auto-commit - followed by explict commit.
+   * Tests DDL auto-commit - followed by explicit commit.
    */
   public function testExplicitCommitAfterAutoCommitOnDataDefinitionLanguageStatement(): void {
     if ($this->connection->supportsTransactionalDDL()) {
