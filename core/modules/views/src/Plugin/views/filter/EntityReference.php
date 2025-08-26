@@ -312,28 +312,28 @@ class EntityReference extends ManyToOne {
   public function validateExtraOptionsForm($form, FormStateInterface $form_state): void {
     $options = $form_state->getValue('options');
     $sub_handler = $options['sub_handler'];
-    $subform = $form[static::SUBFORM_PREFIX . $sub_handler];
-    $subform_state = SubformState::createForSubform($subform, $form, $form_state);
+    $sub_handler_key = static::SUBFORM_PREFIX . $sub_handler;
+    $subform = $form[$sub_handler_key];
+    $subform_state = SubformState::createForSubform($subform, $form_state->getCompleteForm(), $form_state);
 
     // Copy handler_settings from options to settings to be compatible with
     // selection plugins.
-    $subform_options = $form_state->getValue([
-      'options',
-      static::SUBFORM_PREFIX . $sub_handler,
-    ]);
+    $subform_options = $options[$sub_handler_key];
     $subform_state->setValue([
       'settings',
+      'handler_settings',
     ], $subform_options);
     $this->getSelectionHandler($sub_handler)
       ->validateConfigurationForm($subform, $subform_state);
 
     // Store the sub handler options in sub_handler_settings.
-    $form_state->setValue(['options', 'sub_handler_settings'], $subform_options);
+    $form_state->setValue(['options', 'sub_handler_settings'], $subform_state->getValue(['settings', 'handler_settings']));
 
     // Remove options that are not from the selected sub_handler.
     foreach (array_keys($this->getSubHandlerOptions()) as $sub_handler_option) {
-      if (isset($options[static::SUBFORM_PREFIX . $sub_handler_option])) {
-        $form_state->unsetValue(['options', static::SUBFORM_PREFIX . $sub_handler_option]);
+      $option_key = static::SUBFORM_PREFIX . $sub_handler_option;
+      if (isset($options[$option_key])) {
+        $form_state->unsetValue(['options', $option_key]);
       }
     }
 
