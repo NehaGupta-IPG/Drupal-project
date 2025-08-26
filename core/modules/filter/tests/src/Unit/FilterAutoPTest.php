@@ -27,7 +27,7 @@ class FilterAutoPTest extends UnitTestCase {
     parent::setUp();
     $this->filter = new FilterAutoP([], 'filter_autop', ['provider' => 'test']);
     $path = __DIR__ . '/../../fixtures/autop';
-    require_once($path . '/drupal-10.filter-_filter_autop.php');
+    require_once $path . '/drupal-10.filter-_filter_autop.php';
   }
 
   /**
@@ -69,7 +69,7 @@ class FilterAutoPTest extends UnitTestCase {
       [
         file_get_contents($path . '/filter.autop-input-4.txt'),
         file_get_contents($path . '/filter.autop-output-4.txt'),
-      ]
+      ],
     ];
   }
 

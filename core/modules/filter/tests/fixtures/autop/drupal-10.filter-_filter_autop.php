@@ -5,17 +5,19 @@
  * Provides the global function `_filter_autop()` for testing purposes.
  */
 
-namespace  Drupal\filter\Plugin\Filter {
+namespace Drupal\filter\Plugin\Filter {
 
-  /**
-   * Overrides global function _filter_autop() if not exists.
-   *
-   * @see _filter_autop()
-   *
-   * @return string
-   *   The processed text.
-   */
   if (!function_exists('_filter_autop')) {
+
+    /**
+     * Overrides global function _filter_autop() if not exists.
+     *
+     * @param string $text
+     *   The text to process.
+     * @return string
+     *   The processed text.
+     * @see _filter_autop()
+     */
     function _filter_autop($text) {
       // All block level tags.
       $block = '(?:table|thead|tfoot|caption|col|colgroup|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|select|option|form|map|area|blockquote|address|math|input|p|h[1-6]|fieldset|legend|hr|article|aside|details|figcaption|figure|footer|header|hgroup|menu|nav|section|summary)';
@@ -112,5 +114,6 @@ namespace  Drupal\filter\Plugin\Filter {
       }
       return $output;
     }
+
   }
 }
