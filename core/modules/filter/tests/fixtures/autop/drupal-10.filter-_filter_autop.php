@@ -14,8 +14,10 @@ namespace Drupal\filter\Plugin\Filter {
      *
      * @param string $text
      *   The text to process.
+     *
      * @return string
      *   The processed text.
+     *
      * @see _filter_autop()
      */
     function _filter_autop($text) {
