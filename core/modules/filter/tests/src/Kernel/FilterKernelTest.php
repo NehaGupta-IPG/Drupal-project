@@ -491,7 +491,7 @@ class FilterKernelTest extends KernelTestBase {
       // Bug 3440307, double line breaks in <li> tags produced unmatched </p> tags.
       "<ul><li>aaa\nbbb</li><li>ccc\nddd\n\neee</li></ul>" => [
         "<ul>\n<li><p>aaa<br />\nbbb</p></li>\n<li><p>ccc<br />\nddd</p>\n<p>eee</p></li>\n</ul>" => TRUE,
-      ]
+      ],
     ];
     // cSpell:enable
     $this->assertFilteredString($filter, $tests);
