@@ -2,6 +2,7 @@
 
 namespace Drupal\language\Entity;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
@@ -149,12 +150,12 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
     // If this is an update (not a new language), check if the weight changed.
     // Language weight changes affect fallback order, so we need to invalidate
     // caches that depend on language fallback candidates.
-    if ($update) {
+    if ($update && !$this->isSyncing()) {
       $original = $storage->loadUnchanged($this->id());
       if ($original && $original->getWeight() !== $this->getWeight()) {
         // Invalidate caches that depend on language fallback order.
         // This includes entity translations, content negotiation, etc.
-        \Drupal::service('cache_tags.invalidator')->invalidateTags([
+        Cache::invalidateTags([
           'config:configurable_language_list',
           'language_fallback_candidates',
         ]);
