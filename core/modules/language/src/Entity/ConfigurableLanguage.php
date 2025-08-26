@@ -2,7 +2,6 @@
 
 namespace Drupal\language\Entity;
 
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
@@ -147,18 +146,19 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
       $language_manager->updateLockedLanguageWeights();
     }
 
-    // If this is an update (not a new language), check if the weight changed.
-    // Language weight changes affect fallback order, so we need to invalidate
-    // caches that depend on language fallback candidates.
+    // If this is an update (not a new language) and the weight changed,
+    // ensure the language manager cache is properly cleared for fallback order.
+    // The reset() call above should handle most cases, but we ensure additional
+    // cache invalidation for language fallback candidates when needed.
     if ($update && !$this->isSyncing()) {
       $original = $storage->loadUnchanged($this->id());
-      if ($original && $original->getWeight() !== $this->getWeight()) {
-        // Invalidate caches that depend on language fallback order.
-        // This includes entity translations, content negotiation, etc.
-        Cache::invalidateTags([
-          'config:configurable_language_list',
-          'language_fallback_candidates',
-        ]);
+      if ($original instanceof ConfigurableLanguageInterface) {
+        $original_weight = $original->getWeight();
+        $current_weight = $this->getWeight();
+        if ($original_weight !== $current_weight) {
+          // Additional reset to ensure fallback order is updated immediately.
+          $language_manager->reset();
+        }
       }
     }
 
