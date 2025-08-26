@@ -40,6 +40,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
     'taxonomy',
     'block',
     'views_ui',
+    'views_test_entity_reference',
   ];
 
   /**
@@ -380,6 +381,43 @@ class EntityReferenceAdminTest extends BrowserTestBase {
     $field_config = FieldConfig::load($field_id);
     $this->assertFalse($field_config->getSetting('handler_settings')['auto_create']);
     $this->assertFalse(isset($field_config->getSetting('handler_settings')['auto_create_bundle']));
+  }
+
+  /**
+   * Tests SelectionPluginBase::validateConfigurationForm() get/set values.
+   *
+   * Ensures SelectionPluginBase::validateConfigurationForm() can get and set
+   * form state values in the Field UI context.
+   */
+  public function testSelectionHandlerValidationErrorShown(): void {
+    // Create an entity reference field for testing.
+    $generated_field_name = $this->createEntityReferenceField('node', [$this->type]);
+
+    $field_path = 'node.' . $this->type . '.field_' . $generated_field_name;
+    $bundle_path = 'admin/structure/types/manage/' . $this->type;
+    $this->drupalGet($bundle_path . '/fields/' . $field_path);
+
+    // Switch the handler to the test plugin that fails validation when blank.
+    $this->submitForm(['settings[handler]' => 'entity_reference_test_validation_selection'], 'Change handler');
+    $this->submitForm([], 'Save settings');
+    $this->assertSession()->statusMessageContains('This setting is required.', MessengerInterface::TYPE_ERROR);
+
+    // Now fill in the required setting and confirm the form saves without
+    // error.
+    $this->submitForm([
+      'settings[handler_settings][test_required]' => 'set me',
+    ], 'Save settings');
+
+    // A successful save should show a status message and the field should be on
+    // the overview.
+    $this->assertSession()->pageTextNotContains('This setting is required.');
+    $this->assertSession()->statusMessageContains('Saved ' . $generated_field_name . ' configuration.', MessengerInterface::TYPE_STATUS);
+    $this->assertFieldExistsOnOverview($generated_field_name);
+
+    // Ensure the test_required value was updated.
+    $this->assertSession()->statusMessageContains('The test_required value was updated', MessengerInterface::TYPE_STATUS);
+    $this->drupalGet($bundle_path . '/fields/' . $field_path);
+    $this->assertSession()->fieldValueEquals('settings[handler_settings][test_required]', 'you have been set');
   }
 
   /**
