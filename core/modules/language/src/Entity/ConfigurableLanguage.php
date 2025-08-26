@@ -146,6 +146,21 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
       $language_manager->updateLockedLanguageWeights();
     }
 
+    // If this is an update (not a new language), check if the weight changed.
+    // Language weight changes affect fallback order, so we need to invalidate
+    // caches that depend on language fallback candidates.
+    if ($update) {
+      $original = $storage->loadUnchanged($this->id());
+      if ($original && $original->getWeight() !== $this->getWeight()) {
+        // Invalidate caches that depend on language fallback order.
+        // This includes entity translations, content negotiation, etc.
+        \Drupal::service('cache_tags.invalidator')->invalidateTags([
+          'config:configurable_language_list',
+          'language_fallback_candidates',
+        ]);
+      }
+    }
+
     // Update URL Prefixes for all languages after the
     // LanguageManagerInterface::getLanguages() cache is flushed.
     language_negotiation_url_prefixes_update();
