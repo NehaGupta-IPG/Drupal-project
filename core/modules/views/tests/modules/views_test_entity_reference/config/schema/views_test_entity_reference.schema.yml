@@ -1,0 +1,9 @@
+# Schema for the entity reference 'entity_reference_test_validation_selection'
+# selection handler settings.
+entity_reference_selection.entity_reference_test_validation_selection:
+  type: entity_reference_selection.default
+  label: 'Test Validation Selection Handler'
+  mapping:
+    test_required:
+      type: string
+      label: 'Test required setting'
