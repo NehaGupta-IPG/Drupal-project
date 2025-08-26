@@ -85,7 +85,7 @@ trait FunctionalTestSetupTrait {
     // - The temporary directory is set and created by install_base_system().
     // - The private file directory is created post install by
     //   FunctionalTestSetupTrait::initConfig().
-    // @see system_requirements()
+    // @see \Drupal\system\Install\SystemRequirements.
     // @see TestBase::prepareEnvironment()
     // @see install_base_system()
     // @see \Drupal\Core\Test\FunctionalTestSetupTrait::initConfig()
@@ -197,8 +197,8 @@ trait FunctionalTestSetupTrait {
   protected function writeSettings(array $settings) {
     include_once DRUPAL_ROOT . '/core/includes/install.inc';
     $filename = $this->siteDirectory . '/settings.php';
-    // system_requirements() removes write permissions from settings.php
-    // whenever it is invoked.
+    // The system runtime_requirements hook removes write permissions from
+    // settings.php whenever it is invoked.
     // Not using File API; a potential error must trigger a PHP warning.
     chmod($filename, 0666);
     SettingsEditor::rewrite($filename, $settings);
@@ -599,7 +599,7 @@ trait FunctionalTestSetupTrait {
     ];
 
     // If we only have one db driver available, we cannot set the driver.
-    if (count($this->getDatabaseTypes()) == 1) {
+    if (count(Database::getDriverList()->getInstallableList()) == 1) {
       unset($parameters['forms']['install_settings_form']['driver']);
     }
     return $parameters;
@@ -728,29 +728,6 @@ trait FunctionalTestSetupTrait {
     $callbacks = &drupal_register_shutdown_function();
     $this->originalShutdownCallbacks = $callbacks;
     $callbacks = [];
-  }
-
-  /**
-   * Returns all supported database driver installer objects.
-   *
-   * This wraps DatabaseDriverList::getInstallableList() for use without a
-   * current container.
-   *
-   * @return \Drupal\Core\Database\Install\Tasks[]
-   *   An array of available database driver installer objects.
-   */
-  protected function getDatabaseTypes() {
-    if (isset($this->originalContainer) && $this->originalContainer) {
-      \Drupal::setContainer($this->originalContainer);
-    }
-    $database_types = [];
-    foreach (Database::getDriverList()->getInstallableList() as $name => $driver) {
-      $database_types[$name] = $driver->getInstallTasks();
-    }
-    if (isset($this->originalContainer) && $this->originalContainer) {
-      \Drupal::unsetContainer();
-    }
-    return $database_types;
   }
 
 }

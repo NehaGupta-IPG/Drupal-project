@@ -85,12 +85,12 @@ abstract class StylePluginBase extends PluginBase {
   /**
    * Stores the rendered field values, keyed by the row index and field name.
    *
+   * @var array|null
+   *
    * @see \Drupal\views\Plugin\views\style\StylePluginBase::renderFields()
    * @see \Drupal\views\Plugin\views\style\StylePluginBase::getField()
-   *
-   * @var array|null
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $rendered_fields;
 
   /**
@@ -575,7 +575,7 @@ abstract class StylePluginBase extends PluginBase {
       $groupings = [['field' => $groupings, 'rendered' => $rendered]];
     }
 
-    // Make sure fields are rendered
+    // Make sure fields are rendered.
     $this->renderFields($this->view->result);
     $sets = [];
     if ($groupings) {
@@ -710,7 +710,7 @@ abstract class StylePluginBase extends PluginBase {
           // - HTML views are rendered inside a render context: then we want to
           //   use ::render(), so that attachments and cacheability are bubbled.
           // - non-HTML views are rendered outside a render context: then we
-          //   want to use ::renderInIsolation(), so that no bubbling happens
+          //   want to use ::renderInIsolation(), so that no bubbling happens.
           if ($renderer->hasRenderContext()) {
             $renderer->render($data);
           }
