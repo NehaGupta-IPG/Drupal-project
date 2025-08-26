@@ -7,14 +7,13 @@ namespace Drupal\Tests\views_ui\FunctionalJavascript;
 use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\views_ui\Traits\FilterEntityReferenceTrait;
-use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests views creation wizard.
  *
+ * @group views_ui
  * @see \Drupal\views\Plugin\views\filter\EntityReference
  */
-#[Group('views_ui')]
 class FilterEntityReferenceTest extends WebDriverTestBase {
 
   use FilterEntityReferenceTrait;
@@ -39,7 +38,7 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
    *
    * @var array
    */
-  public static $testViews = ['test_entity_reference'];
+  public static $testViews = ['views_test_entity_reference_view'];
 
   /**
    * {@inheritdoc}
@@ -92,7 +91,7 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
       ->isVisible());
     $this->assertTrue($page->findField('options[widget]')->isVisible());
 
-    // Ensure that disabled form elements from selection handler do not show up.
+    // Ensure that disabled form elements from selection handler do not show up
     // @see \Drupal\views\Plugin\views\filter\EntityReference method
     // buildExtraOptionsForm.
     $this->assertFalse($page->hasField('options[reference_default:node][target_bundles_update]'));
@@ -130,7 +129,7 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
 
     // Opening the settings form and change the handler to use an Entity
     // Reference view.
-    // @see views.view.test_entity_reference.yml
+    // @see views.view.views_test_entity_reference_view.yml
     $base_url = Url::fromRoute('entity.view.collection')->toString();
     $url = $base_url . '/nojs/handler-extra/content/page_1/filter/field_test_target_id';
     $extra_settings_selector = 'a[href="' . $url . '"]';
@@ -139,7 +138,7 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
     $element->click();
     $assert->waitForField('options[sub_handler]');
     $page->selectFieldOption('options[sub_handler]', 'views');
-    $page->selectFieldOption('options[reference_views][view][view_and_display]', 'test_entity_reference:entity_reference');
+    $page->selectFieldOption('options[reference_views][view][view_and_display]', 'views_test_entity_reference_view:entity_reference');
     $page->find('xpath', "//*[contains(text(), 'Apply')]")
       ->press();
     $assert->assertWaitOnAjaxRequest();
@@ -153,7 +152,7 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
     // Change to an autocomplete filter.
     // Opening the settings form and change the handler to use an Entity
     // Reference view.
-    // @see views.view.test_entity_reference.yml
+    // @see views.view.views_test_entity_reference_view.yml
     $page->find('css', $extra_settings_selector)
       ->click();
     $assert->waitForElementVisible('named', [
