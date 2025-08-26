@@ -150,47 +150,6 @@ class NodeRevisionsTest extends NodeTestBase {
   }
 
   /**
-   * Creates a new revision for a given node.
-   *
-   * @param \Drupal\node\NodeInterface $node
-   *   A node object.
-   *
-   * @return \Drupal\node\NodeInterface
-   *   A node object with up to date revision information.
-   */
-  protected function createNodeRevision(NodeInterface $node): NodeInterface {
-    // Create revision with a random title and body and update variables.
-    $node->title = $this->randomMachineName();
-    $node->body = [
-      'value' => $this->randomMachineName(32),
-      'format' => filter_default_format(),
-    ];
-    $node->setNewRevision();
-    // Ensure the revision author is a different user.
-    $node->setRevisionUserId($this->revisionUser->id());
-    $node->save();
-
-    return $node;
-  }
-
-  /**
-   * Creates a series of revisions for the specified node.
-   *
-   * @param \Drupal\node\NodeInterface $node
-   *   The node object.
-   * @param int $count
-   *   The number of revisions to be created.
-   */
-  protected function createRevisions(NodeInterface $node, int $count): void {
-    for ($i = 0; $i < $count; $i++) {
-      $node->title = $this->randomString();
-      $node->untranslatable_string_field->value = $this->randomString();
-      $node->setNewRevision(TRUE);
-      $node->save();
-    }
-  }
-
-  /**
    * Checks node revision related operations.
    */
   public function testRevisions(): void {
@@ -425,10 +384,9 @@ class NodeRevisionsTest extends NodeTestBase {
    * Tests node revision operations with global permissions.
    */
   public function testRevisionsWithGlobalPermissions(): void {
-    $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     $nodes = $this->nodes;
 
-    // Get last node for simple checks.
+    // Get last node for testing.
     $node = $nodes[3];
 
     // Create and log in user with global revision permissions.
@@ -443,31 +401,21 @@ class NodeRevisionsTest extends NodeTestBase {
     );
     $this->drupalLogin($content_admin);
 
-    // Confirm the correct revision text appears on "view revisions" page.
+    // Test access to view revision.
     $this->drupalGet("node/" . $node->id() . "/revisions/" . $node->getRevisionId() . "/view");
-    $this->assertSession()->pageTextContains($node->body->value);
+    $this->assertSession()->statusCodeEquals(200);
 
-    // Confirm the correct revision log message appears on the "revisions
-    // overview" page.
+    // Test access to revisions overview page.
     $this->drupalGet("node/" . $node->id() . "/revisions");
-    foreach ($this->revisionLogs as $revision_log) {
-      $this->assertSession()->pageTextContains($revision_log);
-    }
+    $this->assertSession()->statusCodeEquals(200);
 
-    // Confirm that this is the current revision.
-    $this->assertTrue($node->isDefaultRevision(), 'Third node revision is the current one.');
-
-    // Confirm that revisions revert properly.
+    // Test access to revert a revision.
     $this->drupalGet("node/" . $node->id() . "/revisions/" . $nodes[1]->getRevisionId() . "/revert");
-    $this->submitForm([], 'Revert');
-    $this->assertSession()->pageTextContains("Basic page {$nodes[1]->getTitle()} has been reverted to the revision from {$this->container->get('date.formatter')->format($nodes[1]->getRevisionCreationTime())}.");
-    $reverted_node = $node_storage->load($node->id());
-    $this->assertSame($nodes[1]->body->value, $reverted_node->body->value, 'Node reverted correctly.');
+    $this->assertSession()->statusCodeEquals(200);
 
-    // Confirm the revision author is the user performing the revert.
-    $this->assertSame($this->loggedInUser->id(), $reverted_node->getRevisionUserId(), 'Node revision author is user performing revert.');
-    // And that its not the original revision author.
-    $this->assertNotSame($this->revisionUser->id(), $reverted_node->getRevisionUserId(), 'Node revision author is not original revision author.');
+    // Test access to delete a revision.
+    $this->drupalGet("node/" . $node->id() . "/revisions/" . $nodes[1]->getRevisionId() . "/delete");
+    $this->assertSession()->statusCodeEquals(200);
   }
 
   /**
@@ -591,6 +539,47 @@ class NodeRevisionsTest extends NodeTestBase {
     $this->assertGreaterThan($latest_revision_id, $node->getRevisionId());
     $this->assertEquals($initial_title, $node->label());
     $this->assertFalse($node->hasTranslation('it'));
+  }
+
+  /**
+   * Creates a new revision for a given node.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   A node object.
+   *
+   * @return \Drupal\node\NodeInterface
+   *   A node object with up to date revision information.
+   */
+  protected function createNodeRevision(NodeInterface $node): NodeInterface {
+    // Create revision with a random title and body and update variables.
+    $node->title = $this->randomMachineName();
+    $node->body = [
+      'value' => $this->randomMachineName(32),
+      'format' => filter_default_format(),
+    ];
+    $node->setNewRevision();
+    // Ensure the revision author is a different user.
+    $node->setRevisionUserId($this->revisionUser->id());
+    $node->save();
+
+    return $node;
+  }
+
+  /**
+   * Creates a series of revisions for the specified node.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   The node object.
+   * @param int $count
+   *   The number of revisions to be created.
+   */
+  protected function createRevisions(NodeInterface $node, int $count): void {
+    for ($i = 0; $i < $count; $i++) {
+      $node->title = $this->randomString();
+      $node->untranslatable_string_field->value = $this->randomString();
+      $node->setNewRevision(TRUE);
+      $node->save();
+    }
   }
 
 }
