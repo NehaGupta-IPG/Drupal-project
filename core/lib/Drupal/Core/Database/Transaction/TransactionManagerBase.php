@@ -326,6 +326,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       // case of broken transactions.
       if ($this->rootId === NULL) {
         $this->rootId = $id;
+        $this->isAutoCommitted = FALSE;
       }
       if ($this->connection->isEventEnabled(TransactionBeginEvent::class)) {
         $this->connection->dispatchEvent(new TransactionBeginEvent(
