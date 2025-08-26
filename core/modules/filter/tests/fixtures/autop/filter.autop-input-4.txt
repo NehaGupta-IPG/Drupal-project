@@ -1,0 +1,5 @@
+<ul><li>First list item.</li>
+<li>Second list item contains
+a single line break.
+
+And then double line breaks.</li></ul>

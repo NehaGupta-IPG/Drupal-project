@@ -26,6 +26,8 @@ class FilterAutoPTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->filter = new FilterAutoP([], 'filter_autop', ['provider' => 'test']);
+    $path = __DIR__ . '/../../fixtures/autop';
+    require_once($path . '/drupal-10.filter-_filter_autop.php');
   }
 
   /**
@@ -40,7 +42,7 @@ class FilterAutoPTest extends UnitTestCase {
    */
   public function testProcess($html, $expected): void {
     $result = $this->filter->process($html, 'en');
-    $this->assertSame($expected, $result);
+    $this->assertSame($expected, $result->getProcessedText());
   }
 
   /**
@@ -50,22 +52,24 @@ class FilterAutoPTest extends UnitTestCase {
    *   An array of test data.
    */
   public static function providerFilterMarkup(): array {
+    $path = __DIR__ . '/../../fixtures/autop';
     return [
       [
-        'Single row.',
-        '<p>Single row.</p>'
+        file_get_contents($path . '/filter.autop-input-1.txt'),
+        file_get_contents($path . '/filter.autop-output-1.txt'),
       ],
       [
-        'First row of text.' . PHP_EOL . 'Second row of text.',
-        '<p>First row of text.<br />' . PHP_EOL . 'Second row of text.</p>'
+        file_get_contents($path . '/filter.autop-input-2.txt'),
+        file_get_contents($path . '/filter.autop-output-2.txt'),
       ],
       [
-        'First row of text.' . str_repeat(PHP_EOL, 2) . 'Second row of text.',
-        '<p>First row of text.</p>' . PHP_EOL . '<p>Second row of text.</p>'
+        file_get_contents($path . '/filter.autop-input-3.txt'),
+        file_get_contents($path . '/filter.autop-output-3.txt'),
       ],
       [
-        '<ul><li>First list item.</li>' . PHP_EOL . '<li>Second list item contains' . PHP_EOL . 'a single line break.' . str_repeat(PHP_EOL, 2) . 'And then double line breaks.</li></ul>',
-        '<ul><li>First list item.</li>' . PHP_EOL . '<li>Second list item contains<br />' . PHP_EOL . 'a single line break.' . PHP_EOL . '<p>And then double line breaks.</p></li></ul>'],
+        file_get_contents($path . '/filter.autop-input-4.txt'),
+        file_get_contents($path . '/filter.autop-output-4.txt'),
+      ]
     ];
   }
 
