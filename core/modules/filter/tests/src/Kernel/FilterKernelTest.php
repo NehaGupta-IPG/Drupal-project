@@ -488,6 +488,10 @@ class FilterKernelTest extends KernelTestBase {
       '<drupal-media data-caption=" " data-entity-type="media" data-entity-uuid="dbb16f97-cd11-4357-acde-cd09e19e312b"></drupal-media>' => [
         '<p><drupal-media data-caption=" " data-entity-type="media" data-entity-uuid="dbb16f97-cd11-4357-acde-cd09e19e312b"></drupal-media></p>' => FALSE,
       ],
+      // Bug 3440307, double line breaks in <li> tags produced unmatched </p> tags.
+      "<ul><li>aaa\nbbb</li><li>ccc\nddd\n\neee</li></ul>" => [
+        "<ul>\n<li><p>aaa<br />\nbbb</p></li>\n<li><p>ccc<br />\nddd</p>\n<p>eee</p></li>\n</ul>" => TRUE,
+      ]
     ];
     // cSpell:enable
     $this->assertFilteredString($filter, $tests);

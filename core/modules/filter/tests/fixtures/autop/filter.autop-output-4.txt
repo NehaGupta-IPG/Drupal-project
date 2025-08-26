@@ -1,6 +1,0 @@
-<ul>
-<li><p>First list item.</p></li>
-<li><p>Second list item contains<br />
-a single line break.</p>
-<p>And then double line breaks.</p></li>
-</ul>

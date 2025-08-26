@@ -1,2 +1,0 @@
-<p>First row of text.</p>
-<p>Second row of text.</p>
