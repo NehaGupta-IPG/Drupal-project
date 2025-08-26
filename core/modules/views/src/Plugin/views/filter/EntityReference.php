@@ -342,6 +342,11 @@ class EntityReference extends ManyToOne {
 
   /**
    * {@inheritdoc}
+   *
+   * This change is from https://www.drupal.org/project/drupal/issues/3542769
+   * and a temporary change to enable tests to pass.
+   *
+   * @todo Revert this change once Issue #3542769 is fixed.
    */
   public function submitExtraOptionsForm($form, FormStateInterface $form_state): void {
     $sub_handler = $form_state->getValue('options')['sub_handler'];
