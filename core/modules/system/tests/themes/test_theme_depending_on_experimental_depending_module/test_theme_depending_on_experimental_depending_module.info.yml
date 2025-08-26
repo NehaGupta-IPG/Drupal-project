@@ -1,0 +1,5 @@
+name: Test Theme Depending on Module that has Experimental dependency
+type: theme
+base theme: stark
+dependencies:
+  - experimental_module_dependency_test

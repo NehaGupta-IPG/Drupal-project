@@ -290,6 +290,14 @@ system.modules_list_non_stable_confirm:
   requirements:
     _permission: 'administer modules'
 
+system.extension_install_confirm:
+  path: '/admin/extension/install-confirm'
+  defaults:
+    _form: '\Drupal\system\Form\ExtensionConfirmForm'
+    _title: 'Confirm Install'
+  requirements:
+    _custom_access: '\Drupal\system\Form\ExtensionConfirmForm::access'
+
 system.theme_uninstall:
   path: '/admin/appearance/uninstall'
   defaults:

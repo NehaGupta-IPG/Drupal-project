@@ -10,7 +10,6 @@ use Drupal\Core\Link;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Template\Attribute;
-use Drupal\Core\Url;
 
 /**
  * Prepares variables for administrative content block templates.
@@ -337,16 +336,8 @@ function template_preprocess_system_themes_page(&$variables): void {
       elseif (!empty($theme->incompatible_module)) {
         $current_theme['incompatible'] = t('This theme requires the listed modules to operate correctly.');
       }
-      elseif (!empty($theme->module_dependencies_disabled)) {
-        if (!empty($theme->insufficient_module_permissions)) {
-          $current_theme['incompatible'] = t('This theme requires the listed modules to operate correctly. They must first be installed by a user with permissions to do so.');
-        }
-        else {
-          $modules_url = (string) Url::fromRoute('system.modules_list')->toString();
-          $current_theme['incompatible'] = t('This theme requires the listed modules to operate correctly. They must first be installed via the <a href=":modules_url">Extend page</a>.', [
-            ':modules_url' => $modules_url,
-          ]);
-        }
+      elseif (!empty($theme->module_dependencies_disabled) && !empty($theme->insufficient_module_permissions)) {
+        $current_theme['incompatible'] = t('This theme requires the listed modules to operate correctly. They must first be enabled by a user with permissions to do so.');
       }
 
       // Build operation links.

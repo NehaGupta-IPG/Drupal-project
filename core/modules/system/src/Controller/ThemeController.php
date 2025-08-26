@@ -7,10 +7,14 @@ use Drupal\Core\Config\PreExistingConfigException;
 use Drupal\Core\Config\UnmetDependenciesException;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Extension\MissingDependencyException;
+use Drupal\Core\Extension\ModuleExtensionList;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Extension\ThemeInstallerInterface;
-use Drupal\system\Form\ThemeExperimentalConfirmForm;
+use Drupal\system\Form\ExtensionFormTrait;
+use Drupal\system\Form\ExtensionConfirmForm;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -18,6 +22,8 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  * Controller for theme handling.
  */
 class ThemeController extends ControllerBase {
+
+  use ExtensionFormTrait;
 
   /**
    * The theme handler service.
@@ -41,6 +47,27 @@ class ThemeController extends ControllerBase {
   protected $themeInstaller;
 
   /**
+   * The module handler service.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
+   * The module installer.
+   *
+   * @var \Drupal\Core\Extension\ModuleInstallerInterface
+   */
+  protected $moduleInstaller;
+
+  /**
+   * The module extension list.
+   *
+   * @var \Drupal\Core\Extension\ModuleExtensionList
+   */
+  protected $moduleExtensionList;
+
+  /**
    * Constructs a new ThemeController.
    *
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
@@ -51,12 +78,33 @@ class ThemeController extends ControllerBase {
    *   The config factory.
    * @param \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer
    *   The theme installer.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
+   * @param \Drupal\Core\Extension\ModuleInstallerInterface $module_installer
+   *   The module installer.
+   * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
+   *   The module extension list.
    */
-  public function __construct(ThemeHandlerInterface $theme_handler, ThemeExtensionList $theme_list, ConfigFactoryInterface $config_factory, ThemeInstallerInterface $theme_installer) {
+  public function __construct(ThemeHandlerInterface $theme_handler, ThemeExtensionList $theme_list, ConfigFactoryInterface $config_factory, ThemeInstallerInterface $theme_installer, ?ModuleHandlerInterface $module_handler = NULL, ?ModuleInstallerInterface $module_installer = NULL, ?ModuleExtensionList $module_extension_list = NULL) {
     $this->themeHandler = $theme_handler;
     $this->themeList = $theme_list;
     $this->configFactory = $config_factory;
     $this->themeInstaller = $theme_installer;
+    if ($module_handler === NULL) {
+      @trigger_error('Calling ' . __NAMESPACE__ . '\SystemController::__construct without the module_handler argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3188195', E_USER_DEPRECATED);
+      $module_handler = \Drupal::service('module_handler');
+    }
+    $this->moduleHandler = $module_handler;
+    if ($module_installer === NULL) {
+      @trigger_error('Calling ' . __NAMESPACE__ . '\SystemController::__construct without the module_installer argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3188195', E_USER_DEPRECATED);
+      $module_installer = \Drupal::service('module_installer');
+    }
+    $this->moduleInstaller = $module_installer;
+    if ($module_extension_list === NULL) {
+      @trigger_error('Calling ' . __NAMESPACE__ . '\SystemController::__construct without the extension.list.module argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3188195', E_USER_DEPRECATED);
+      $module_extension_list = \Drupal::service('extension.list.module');
+    }
+    $this->moduleExtensionList = $module_extension_list;
   }
 
   /**
@@ -119,9 +167,8 @@ class ThemeController extends ControllerBase {
     $theme = $request->query->get('theme');
 
     if (isset($theme)) {
-      // Display confirmation form in case of experimental theme.
-      if ($this->willInstallExperimentalTheme($theme)) {
-        return $this->formBuilder()->getForm(ThemeExperimentalConfirmForm::class, $theme);
+      if ($confirmation_form = $this->checkConfirmationFormAndModules($request, $theme)) {
+        return $confirmation_form;
       }
 
       try {
@@ -200,16 +247,13 @@ class ThemeController extends ControllerBase {
     $theme = $request->query->get('theme');
 
     if (isset($theme)) {
-      // Get current list of themes.
-      $themes = $this->themeHandler->listInfo();
-      // Display confirmation form if an experimental theme is being installed.
-      if ($this->willInstallExperimentalTheme($theme)) {
-        return $this->formBuilder()->getForm(ThemeExperimentalConfirmForm::class, $theme, TRUE);
+      if ($confirmation_form = $this->checkConfirmationFormAndModules($request, $theme, TRUE)) {
+        return $confirmation_form;
       }
 
       // Check if the specified theme is one recognized by the system.
       // Or try to install the theme.
-      if (isset($themes[$theme]) || $this->themeInstaller->install([$theme])) {
+      if ($this->themeInstaller->install([$theme])) {
         $themes = $this->themeHandler->listInfo();
 
         // Set the default theme.
@@ -238,6 +282,32 @@ class ThemeController extends ControllerBase {
 
     }
     throw new AccessDeniedHttpException();
+  }
+
+  /**
+   * Checks if confirmation forms and module installation is needed.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   A request object possibly containing modules to be installed.
+   * @param string $theme
+   *   The theme being installed.
+   * @param bool|null $set_default
+   *   If the theme to install should be the default theme.
+   *
+   * @return array|null
+   *   A form array, when a confirmation form is deemed necessary.
+   */
+  protected function checkConfirmationFormAndModules(Request $request, $theme, $set_default = NULL) {
+    $modules_to_add = $request->query->get('modules');
+    $modules = !empty($modules_to_add) ? $this->buildModuleList($modules_to_add) : NULL;
+    $experimental_theme = $this->willInstallExperimentalTheme($theme);
+    if ($this->willInstallExperimentalTheme($theme) || !empty($modules['experimental']) || !empty($modules['dependencies'])) {
+      return $this->formBuilder()->getForm(ExtensionConfirmForm::class, 'system.themes_page', $modules, $theme, $set_default, $experimental_theme);
+    }
+
+    if (!empty($modules)) {
+      $this->installModules($modules);
+    }
   }
 
 }

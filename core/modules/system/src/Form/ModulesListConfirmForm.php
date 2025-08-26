@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Builds a confirmation form for enabling modules with dependencies.
  *
  * @internal
+ *
+ * @see https://www.drupal.org/node/3188194
  */
 class ModulesListConfirmForm extends ConfirmFormBase {
 
@@ -138,7 +140,7 @@ class ModulesListConfirmForm extends ConfirmFormBase {
    * @return \Drupal\Component\Render\MarkupInterface[]
    *   Array of markup for the list of messages on the form.
    *
-   * @see \Drupal\system\Form\ModulesListForm::buildModuleList()
+   * @see \Drupal\system\Form\ExtensionFormTrait::buildModuleList()
    */
   protected function buildMessageList() {
     $items = [];

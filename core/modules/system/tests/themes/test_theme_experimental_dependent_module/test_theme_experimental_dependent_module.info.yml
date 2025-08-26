@@ -1,0 +1,6 @@
+name: Test Experimental Theme With Indirect Module Dependency
+type: theme
+base theme: false
+experimental: true
+dependencies:
+  - experimental_module_dependency_test

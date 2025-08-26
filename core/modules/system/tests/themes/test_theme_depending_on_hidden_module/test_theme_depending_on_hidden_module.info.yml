@@ -1,0 +1,5 @@
+name: Test Theme Depending on Hidden Module
+type: theme
+base theme: false
+dependencies:
+  - hidden_module_test

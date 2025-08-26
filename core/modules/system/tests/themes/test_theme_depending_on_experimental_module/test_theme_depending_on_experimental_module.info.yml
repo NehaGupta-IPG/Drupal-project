@@ -1,0 +1,5 @@
+name: Test Theme Depending on Experimental Modules
+type: theme
+base theme: false
+dependencies:
+  - experimental_module_test

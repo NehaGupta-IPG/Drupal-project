@@ -1,0 +1,6 @@
+name: 'Hidden Module Test'
+type: module
+description: 'A blank hidden module for testing.'
+package: Testing
+version: VERSION
+hidden: true

@@ -52,7 +52,6 @@ class ThemeInstaller implements ThemeInstallerInterface {
 
     $theme_data = $this->themeExtensionList->reset()->getList();
     $installed_themes = $extension_config->get('theme') ?: [];
-    $installed_modules = $extension_config->get('module') ?: [];
 
     if ($install_dependencies) {
       $theme_list = array_combine($theme_list, $theme_list);
@@ -68,9 +67,37 @@ class ThemeInstaller implements ThemeInstallerInterface {
         return TRUE;
       }
 
-      $module_list = $this->moduleExtensionList->getList();
+      $extension_config = $this->configFactory->getEditable('core.extension');
       foreach ($theme_list as $theme => $value) {
         $module_dependencies = $theme_data[$theme]->module_dependencies;
+        if (!empty($module_dependencies)) {
+          $this->moduleExtensionList->reset();
+          // Using $this->moduleExtensionList does not consistently return an
+          // accurate/current list, even after calling
+          // $this->moduleExtensionList-reset().
+          $module_list = \Drupal::service('extension.list.module')->getList();
+          $installed_modules = array_filter($module_list, function ($module) {
+            return $module->status === 1;
+          });
+
+          // We can find the unmet module dependencies by finding the module
+          // machine names keys that are not in $installed_modules keys.
+          $unmet_module_dependencies = array_diff_key($module_dependencies, $installed_modules);
+
+          // Prevent themes with unmet module dependencies from being installed.
+          if (!empty($unmet_module_dependencies)) {
+            $unmet_module_dependencies_list = implode(', ', array_keys($unmet_module_dependencies));
+            throw new MissingDependencyException("Unable to install theme: '$theme' due to unmet module dependencies: '$unmet_module_dependencies_list'.");
+          }
+
+          foreach ($module_dependencies as $dependency => $dependency_object) {
+            if ($incompatible = $this->checkDependencyMessage($module_list, $dependency, $dependency_object)) {
+              $sanitized_message = Html::decodeEntities(strip_tags($incompatible));
+              throw new MissingDependencyException("Unable to install theme: $sanitized_message");
+            }
+          }
+        }
+
         // $theme_data[$theme]->requires contains both theme and module
         // dependencies keyed by the extension machine names.
         // $theme_data[$theme]->module_dependencies contains only the module
@@ -78,27 +105,6 @@ class ThemeInstaller implements ThemeInstallerInterface {
         // we can find the theme dependencies by finding array keys for
         // 'requires' that are not in $module_dependencies.
         $theme_dependencies = array_diff_key($theme_data[$theme]->requires, $module_dependencies);
-        // We can find the unmet module dependencies by finding the module
-        // machine names keys that are not in $installed_modules keys.
-        $unmet_module_dependencies = array_diff_key($module_dependencies, $installed_modules);
-
-        if ($theme_data[$theme]->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
-          // phpcs:ignore Drupal.Semantics.FunctionTriggerError
-          @trigger_error("The theme '$theme' is deprecated. See " . $theme_data[$theme]->info['lifecycle_link'], E_USER_DEPRECATED);
-        }
-
-        // Prevent themes with unmet module dependencies from being installed.
-        if (!empty($unmet_module_dependencies)) {
-          $unmet_module_dependencies_list = implode(', ', array_keys($unmet_module_dependencies));
-          throw new MissingDependencyException("Unable to install theme: '$theme' due to unmet module dependencies: '$unmet_module_dependencies_list'.");
-        }
-
-        foreach ($module_dependencies as $dependency => $dependency_object) {
-          if ($incompatible = $this->checkDependencyMessage($module_list, $dependency, $dependency_object)) {
-            $sanitized_message = Html::decodeEntities(strip_tags($incompatible));
-            throw new MissingDependencyException("Unable to install theme: $sanitized_message");
-          }
-        }
 
         // Add dependencies to the list of themes to install. The new themes
         // will be processed as the parent foreach loop continues.

@@ -30,6 +30,9 @@ class ThemeUiTest extends BrowserTestBase {
     'help' => 'Help',
     'test_module_required_by_theme' => 'Test Module Required by Theme',
     'test_another_module_required_by_theme' => 'Test Another Module Required by Theme',
+    'hidden_module_test' => 'Hidden Module Test',
+    'experimental_test' => 'Experimental Test',
+    'experimental_module_dependency_test' => 'Experimental Dependency Test',
   ];
 
   /**
@@ -77,21 +80,22 @@ class ThemeUiTest extends BrowserTestBase {
    *   The name of the theme being tested.
    * @param string[] $first_modules
    *   Machine names of first modules to install.
-   * @param string[] $second_modules
-   *   Machine names of second modules to install.
+   * @param string $module_to_install_with_theme
+   *   Name of module to be installed with theme.
    * @param string[] $required_by_messages
    *   Expected messages when attempting to uninstall $module_names.
    * @param string $base_theme_to_uninstall
    *   The name of the theme $theme_name has set as a base theme.
    * @param string[] $base_theme_module_names
    *   Machine names of the modules required by $base_theme_to_uninstall.
+   * @param string[] $all_dependent_modules
+   *   Machine names of every module the theme depends on.
    *
    * @dataProvider providerTestThemeInstallWithModuleDependencies
    */
-  public function testThemeInstallWithModuleDependencies($theme_name, array $first_modules, array $second_modules, array $required_by_messages, $base_theme_to_uninstall, array $base_theme_module_names): void {
+  public function testThemeInstallWithModuleDependencies($theme_name, array $first_modules, $module_to_install_with_theme, array $required_by_messages, $base_theme_to_uninstall, array $base_theme_module_names, array $all_dependent_modules): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
-    $all_dependent_modules = array_merge($first_modules, $second_modules);
     $this->drupalGet('admin/appearance');
     $assert_module_enabled_message = function ($enabled_modules) {
       $count = count($enabled_modules);
@@ -102,42 +106,36 @@ class ThemeUiTest extends BrowserTestBase {
     foreach ($all_dependent_modules as $module) {
       $expected_required_list_items[$module] = $this->testModules[$module] . " (disabled)";
     }
-    $this->assertUninstallableTheme($expected_required_list_items, $theme_name);
+    $this->assertModuleDependencies($expected_required_list_items, $theme_name);
 
-    // Enable the first group of dependee modules.
-    $first_module_form_post = [];
-    foreach ($first_modules as $module) {
-      $first_module_form_post["modules[$module][enable]"] = 1;
+    if (!empty($first_modules)) {
+      // Enable the first group of dependee modules.
+      $first_module_form_post = [];
+      foreach ($first_modules as $module) {
+        $first_module_form_post["modules[$module][enable]"] = 1;
+      }
+      $this->drupalGet('admin/modules');
+      $this->submitForm($first_module_form_post, 'Install');
+      $assert_module_enabled_message($first_modules);
+
+      $this->drupalGet('admin/appearance');
+
+      // Confirm the theme has remaining module dependencies
+      // The modules that have already been enabled will no longer be listed as
+      // disabled.
+      foreach ($first_modules as $module) {
+        $expected_required_list_items[$module] = $this->testModules[$module];
+      }
+      $this->assertModuleDependencies($expected_required_list_items, $theme_name);
     }
-    $this->drupalGet('admin/modules');
-    $this->submitForm($first_module_form_post, 'Install');
-    $assert_module_enabled_message($first_modules);
 
-    $this->drupalGet('admin/appearance');
-
-    // Confirm the theme is still uninstallable due to a remaining module
-    // dependency.
-    // The modules that have already been enabled will no longer be listed as
-    // disabled.
-    foreach ($first_modules as $module) {
-      $expected_required_list_items[$module] = $this->testModules[$module];
-    }
-    $this->assertUninstallableTheme($expected_required_list_items, $theme_name);
-
-    // Enable the second group of dependee modules.
-    $second_module_form_post = [];
-    foreach ($second_modules as $module) {
-      $second_module_form_post["modules[$module][enable]"] = 1;
-    }
-    $this->drupalGet('admin/modules');
-    $this->submitForm($second_module_form_post, 'Install');
-    $assert_module_enabled_message($second_modules);
-
-    // The theme should now be installable, so install it.
+    // Installing the theme should automatically enable the remaining module
+    // dependencies.
     $this->drupalGet('admin/appearance');
     $page->clickLink("Install $theme_name theme");
     $assert_session->addressEquals('admin/appearance');
     $assert_session->pageTextContains("The $theme_name theme has been installed");
+    $assert_session->pageTextContains("Module $module_to_install_with_theme has been enabled");
 
     // Confirm that the dependee modules can't be uninstalled because an enabled
     // theme depends on them.
@@ -217,7 +215,7 @@ class ThemeUiTest extends BrowserTestBase {
     // Data provider values with the following keys:
     // -'theme_name': The name of the theme being tested.
     // -'first_modules': Array of module machine names to enable first.
-    // -'second_modules': Array of module machine names to enable second.
+    // -'module_to_install_with_theme': Module to be installed with theme.
     // -'required_by_messages': Array for checking the messages explaining why a
     // module can't be uninstalled. The array key is the selector where the
     // message should appear, the array value is the expected message.
@@ -225,6 +223,8 @@ class ThemeUiTest extends BrowserTestBase {
     // uninstalled before modules it depends on can be uninstalled.
     // -'base_theme_module_names': Array of machine names of the modules
     // required by base_theme_to_uninstall.
+    // 'all_dependent_modules': Machine names of every module the theme
+    // depends on.
     return [
       'test theme with a module dependency and base theme with a different module dependency' => [
         'theme_name' => 'Test Theme with a Module Dependency and Base Theme with a Different Module Dependency',
@@ -232,9 +232,7 @@ class ThemeUiTest extends BrowserTestBase {
           'test_module_required_by_theme',
           'test_another_module_required_by_theme',
         ],
-        'second_modules' => [
-          'help',
-        ],
+        'module_to_install_with_theme' => 'Help',
         'required_by_messages' => [
           '[data-drupal-selector="edit-test-another-module-required-by-theme"] .item-list' => 'Required by the theme: Test Theme Depending on Modules',
           '[data-drupal-selector="edit-test-module-required-by-theme"] .item-list' => 'Required by the theme: Test Theme Depending on Modules',
@@ -245,30 +243,35 @@ class ThemeUiTest extends BrowserTestBase {
           'test_module_required_by_theme',
           'test_another_module_required_by_theme',
         ],
+        'all_dependent_modules' => [
+          'test_module_required_by_theme',
+          'test_another_module_required_by_theme',
+          'help',
+        ],
       ],
       'Test Theme Depending on Modules' => [
         'theme_name' => 'Test Theme Depending on Modules',
         'first_modules' => [
           'test_module_required_by_theme',
         ],
-        'second_modules' => [
-          'test_another_module_required_by_theme',
-        ],
+        'module_to_install_with_theme' => 'Test Another Module Required by Theme',
         'required_by_messages' => [
           '[data-drupal-selector="edit-test-another-module-required-by-theme"] .item-list' => 'Required by the theme: Test Theme Depending on Modules',
           '[data-drupal-selector="edit-test-module-required-by-theme"] .item-list' => 'Required by the theme: Test Theme Depending on Modules',
         ],
         'base_theme_to_uninstall' => '',
         'base_theme_module_names' => [],
+        'all_dependent_modules' => [
+          'test_module_required_by_theme',
+          'test_another_module_required_by_theme',
+        ],
       ],
       'test theme with a base theme depending on modules' => [
         'theme_name' => 'Test Theme with a Base Theme Depending on Modules',
         'first_modules' => [
           'test_module_required_by_theme',
         ],
-        'second_modules' => [
-          'test_another_module_required_by_theme',
-        ],
+        'module_to_install_with_theme' => 'Test Another Module Required by Theme',
         'required_by_messages' => [
           '[data-drupal-selector="edit-test-another-module-required-by-theme"] .item-list' => 'Required by the theme: Test Theme Depending on Modules',
           '[data-drupal-selector="edit-test-module-required-by-theme"] .item-list' => 'Required by the theme: Test Theme Depending on Modules',
@@ -278,6 +281,23 @@ class ThemeUiTest extends BrowserTestBase {
           'test_module_required_by_theme',
           'test_another_module_required_by_theme',
         ],
+        'all_dependent_modules' => [
+          'test_module_required_by_theme',
+          'test_another_module_required_by_theme',
+        ],
+      ],
+      'test theme depending on hidden module' => [
+        'theme_name' => 'Test Theme Depending on Hidden Module',
+        'first_modules' => [],
+        'module_to_install_with_theme' => 'Hidden Module Test',
+        'required_by_messages' => [
+          '[data-drupal-selector="edit-hidden-module-test"] .admin-requirements li' => 'Required by the theme: Test Theme Depending on Hidden Module',
+        ],
+        'base_theme_to_uninstall' => '',
+        'base_theme_module_names' => [],
+        'all_dependent_modules' => [
+          'hidden_module_test',
+        ],
       ],
     ];
   }
@@ -286,13 +306,13 @@ class ThemeUiTest extends BrowserTestBase {
    * Checks related to uninstallable themes due to module dependencies.
    *
    * @param string[] $expected_requires_list_items
-   *   The modules listed as being required to install the theme.
+   *   The modules listed as being required by the theme.
    * @param string $theme_name
    *   The name of the theme.
    *
    * @internal
    */
-  protected function assertUninstallableTheme(array $expected_requires_list_items, string $theme_name): void {
+  protected function assertModuleDependencies(array $expected_requires_list_items, string $theme_name): void {
     $theme_container = $this->getSession()->getPage()->find('css', "h3:contains(\"$theme_name\")")->getParent();
     $requires_list_items = $theme_container->findAll('css', '.theme-info__requires li');
     $this->assertSameSize($expected_requires_list_items, $requires_list_items);
@@ -300,11 +320,6 @@ class ThemeUiTest extends BrowserTestBase {
     foreach ($requires_list_items as $item) {
       $this->assertContains($item->getText(), $expected_requires_list_items);
     }
-
-    $incompatible = $theme_container->find('css', '.incompatible');
-    $expected_incompatible_text = 'This theme requires the listed modules to operate correctly. They must first be installed via the Extend page.';
-    $this->assertSame($expected_incompatible_text, $incompatible->getText());
-    $this->assertFalse($theme_container->hasLink('Install Test Theme Depending on Modules theme'));
   }
 
   /**
@@ -370,6 +385,133 @@ class ThemeUiTest extends BrowserTestBase {
     $this->writeInfoFile($file_path, $incompatible_info);
     $this->drupalGet('admin/appearance');
     $this->assertSession()->pageTextNotContains($incompatible_themes_message);
+  }
+
+  /**
+   * Tests installing themes that trigger a confirmation form.
+   *
+   * @param string $theme_name
+   *   The name of the theme being tested.
+   * @param string[] $dependent_modules
+   *   Machine names of modules theme depends on.
+   * @param string $question
+   *   The question presented by the confirmation form.
+   * @param string[] $messages
+   *   Messages appearing above the confirmation form.
+   * @param string[] $form_content
+   *   Information provided inside the confirmation form.
+   * @param string[] $after_install_messages
+   *   Messages appearing after theme is installed.
+   * @param bool $set_default
+   *   If the theme should be set as default.
+   *
+   * @dataProvider providerTestThemeInstallWithConfirmationForm
+   */
+  public function testThemeInstallWithConfirmationForm($theme_name, array $dependent_modules, $question, array $messages, array $form_content, array $after_install_messages, $set_default): void {
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+    $this->drupalGet('admin/appearance');
+
+    // All the modules should be listed as disabled.
+    foreach ($dependent_modules as $module) {
+      $expected_required_list_items[$module] = $this->testModules[$module] . " (disabled)";
+    }
+
+    $this->assertModuleDependencies($expected_required_list_items, $theme_name);
+
+    $install_link = $set_default ? "Install $theme_name as default theme" : "Install $theme_name theme";
+    $page->clickLink($install_link);
+
+    // The confirmation form should now be available.
+    $assert_session->pageTextContains('This action cannot be undone.');
+    $assert_session->responseContains($question);
+
+    foreach ($messages as $message) {
+      $assert_session->elementTextContains('css', '[role="contentinfo"]', $message);
+    }
+    foreach ($form_content as $item) {
+      $assert_session->elementTextContains('css', '[data-drupal-selector="edit-message"]', $item);
+    }
+
+    $page->pressButton('Continue');
+
+    $assert_session->addressEquals('admin/appearance');
+
+    foreach ($after_install_messages as $message) {
+      $assert_session->elementTextContains('css', '[aria-label="Status message"]', $message);
+    }
+
+    if ($set_default) {
+      $assert_session->elementTextContains('css', '[aria-label="Status message"]', "$theme_name is now the default theme.");
+    }
+    else {
+      $assert_session->elementTextContains('css', '[aria-label="Status message"]', "The $theme_name theme has been installed.");
+    }
+  }
+
+  /**
+   * Data provider for testThemeInstallWithConfirmationForm().
+   *
+   * @return array
+   *   An array of arrays. Details on the specific elements can be found in the
+   *   function body.
+   */
+  public static function providerTestThemeInstallWithConfirmationForm() {
+    // Data provider values with the following keys:
+    // -'theme_name': The name of the theme being tested.
+    // -'dependent_modules': Array of module machine names the theme depends on.
+    // -'question': Question posed in the confirmation form.
+    // -'messages': Information provided inside the confirmation form.
+    // -'form_content': Messages appearing above the confirmation form.
+    // -'after_install_messages': Messages appearing after theme is installed.
+    // -'set_default': If the enabled theme should be made default.
+    $scenarios = [
+      'depending on experimental module' => [
+        'theme_name' => 'Test Theme Depending on Experimental Modules',
+        'dependent_modules' => [
+          'experimental_test',
+        ],
+        'question' => '<h1>Are you sure you wish to enable experimental modules?</h1>',
+        'messages' => [
+          'Experimental modules are provided for testing purposes only. Use at your own risk.',
+        ],
+        'form_content' => [
+          'The following modules are experimental: Experimental Test',
+        ],
+        'after_install_messages' => [
+          'Module Experimental Test has been enabled.',
+        ],
+        'set_default' => FALSE,
+      ],
+      'experimental theme depending on module with experimental dependency' => [
+        'theme_name' => 'Test Experimental Theme With Indirect Module Dependency',
+        'dependent_modules' => [
+          'experimental_module_dependency_test',
+        ],
+        'question' => '<h1>Some required modules must be enabled. Are you sure you wish to enable experimental modules? Are you sure you wish to install an experimental theme?</h1>',
+        'messages' => [
+          'Experimental themes are provided for testing purposes only. Use at your own risk.',
+          'Experimental modules are provided for testing purposes only. Use at your own risk.',
+        ],
+        'form_content' => [
+          'The following themes are experimental: Test Experimental Theme With Indirect Module Dependency',
+          'You must enable the Experimental Test module to install Experimental Dependency Test.',
+          'The following modules are experimental: Experimental Test',
+        ],
+        'after_install_messages' => [
+          '2 modules have been enabled: Experimental Dependency Test, Experimental Test.',
+        ],
+        'set_default' => FALSE,
+      ],
+    ];
+
+    // Create a version of each scenario where the theme is set to default.
+    foreach ($scenarios as $key => $scenario) {
+      $scenarios["default_$key"] = $scenario;
+      $scenarios["default_$key"]['set_default'] = TRUE;
+    }
+
+    return $scenarios;
   }
 
 }
