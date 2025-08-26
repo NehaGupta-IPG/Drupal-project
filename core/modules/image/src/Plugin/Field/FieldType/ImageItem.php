@@ -88,7 +88,7 @@ class ImageItem extends FileItem {
       'title_field' => 0,
       'title_field_required' => 0,
       'max_resolution' => '',
-      'resize_policy' => NULL,
+      'resize_policy' => ImageResizePolicy::ResizeLargerImages->value,
       'min_resolution' => '',
       'default_image' => [
         'uuid' => NULL,
