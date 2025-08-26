@@ -5,8 +5,10 @@ namespace Drupal\file\Hook;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
+use Drupal\file\IconMimeTypes;
 
 /**
  * Hook implementations for file.
@@ -86,6 +88,13 @@ class FileHooks {
           'attributes' => [],
         ],
       ],
+      'file_mime_icon' => [
+        'initial preprocess' => static::class . ':preprocessFileMimeIcon',
+        'variables' => [
+          'mime' => NULL,
+          'attributes' => [],
+        ],
+      ],
       'file_managed_file' => [
         'render element' => 'element',
       ],
@@ -120,6 +129,33 @@ class FileHooks {
   #[Hook('file_predelete')]
   public function filePredelete(File $file): void {
     // @todo Remove references to a file that is in-use. See https://www.drupal.org/project/drupal/issues/1506314
+  }
+
+  /**
+   * Prepares variables for file mime icon templates.
+   *
+   * Default template: file-mime-icon.html.twig.
+   *
+   * @param array $variables
+   *   An associative array containing:
+   *   - mime: The file mime type.
+   *   - attributes: An associative array of attributes to be placed in a tag.
+   */
+  public function preprocessFileMimeIcon(array &$variables): void {
+    $mime_type = $variables['mime'];
+
+    // Classes to add to the file field for icons.
+    $classes = [
+      'file',
+      // Add a specific class for each and every mime type.
+      'file--mime-' . strtr($mime_type, ['/' => '-', '.' => '-']),
+      // Add a more general class for groups of well known MIME types.
+      'file--' . IconMimeTypes::getIconClass($mime_type),
+    ];
+
+    // Set file classes to the attributes array.
+    $variables['attributes'] = new Attribute($variables['attributes']);
+    $variables['attributes']->addClass($classes);
   }
 
 }

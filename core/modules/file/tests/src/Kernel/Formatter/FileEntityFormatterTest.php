@@ -151,7 +151,7 @@ class FileEntityFormatterTest extends KernelTestBase {
   }
 
   /**
-   * Tests the file_extension field formatter.
+   * Tests the file_mime field formatter.
    */
   public function testFormatterFileMime(): void {
     $entity_display = EntityViewDisplay::create([
@@ -162,8 +162,8 @@ class FileEntityFormatterTest extends KernelTestBase {
 
     foreach (array_values($this->files) as $file) {
       $build = $entity_display->build($file);
-      $this->assertEquals('image__file_icon', $build['filemime'][0]['#theme']);
-      $this->assertEquals(spl_object_hash($file), spl_object_hash($build['filemime'][0]['#file']));
+      $this->assertEquals('file_mime_icon', $build['filemime'][0]['#theme']);
+      $this->assertEquals($file->getMimeType(), $build['filemime'][0]['#mime']);
     }
   }
 
