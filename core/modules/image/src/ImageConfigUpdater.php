@@ -14,11 +14,15 @@ class ImageConfigUpdater {
 
   /**
    * Flag determining whether deprecations should be triggered.
+   *
+   * @var bool
    */
   protected bool $deprecationsEnabled = TRUE;
 
   /**
    * Stores which deprecations were triggered.
+   *
+   * @var array
    */
   protected array $triggeredDeprecations = [];
 
