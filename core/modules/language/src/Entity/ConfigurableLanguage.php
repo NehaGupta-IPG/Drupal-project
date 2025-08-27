@@ -146,22 +146,6 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
       $language_manager->updateLockedLanguageWeights();
     }
 
-    // If this is an update (not a new language) and the weight changed,
-    // ensure the language manager cache is properly cleared for fallback order.
-    // The reset() call above should handle most cases, but we ensure additional
-    // cache invalidation for language fallback candidates when needed.
-    if ($update && !$this->isSyncing()) {
-      $original = $storage->loadUnchanged($this->id());
-      if ($original instanceof ConfigurableLanguageInterface) {
-        $original_weight = $original->getWeight();
-        $current_weight = $this->getWeight();
-        if ($original_weight !== $current_weight) {
-          // Additional reset to ensure fallback order is updated immediately.
-          $language_manager->reset();
-        }
-      }
-    }
-
     // Update URL Prefixes for all languages after the
     // LanguageManagerInterface::getLanguages() cache is flushed.
     language_negotiation_url_prefixes_update();
