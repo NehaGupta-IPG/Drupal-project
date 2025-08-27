@@ -381,6 +381,164 @@ class EntityReferenceAdminTest extends BrowserTestBase {
   }
 
   /**
+   * Tests the save_referenced_entities field setting form element.
+   */
+  public function testSaveReferencedEntitiesFormElement(): void {
+    // Create a new entity reference field.
+    $field_name = $this->createEntityReferenceField('node', [$this->type]);
+    $field_id = 'node.' . $this->type . '.field_' . $field_name;
+    $field_path = 'admin/structure/types/manage/' . $this->type . '/fields/' . $field_id;
+
+    // Navigate to the field settings page.
+    $this->drupalGet($field_path);
+
+    // Test that the save_referenced_entities form element exists.
+    $this->assertSession()->fieldExists('settings[save_referenced_entities]');
+
+    // Test that all expected options are present.
+    $this->assertFieldSelectOptions('settings[save_referenced_entities]', [
+      'disabled',
+      'new_only',
+      'changed_only',
+      'always',
+    ]);
+
+    // Test that the correct option labels are displayed.
+    $this->assertSession()->optionExists('settings[save_referenced_entities]', 'disabled');
+    $select_element = $this->assertSession()->selectExists('settings[save_referenced_entities]');
+    $disabled_option = $select_element->find('xpath', '//option[@value="disabled"]');
+    $this->assertEquals('Do not save referenced entities automatically', $disabled_option->getText());
+
+    $new_only_option = $select_element->find('xpath', '//option[@value="new_only"]');
+    $this->assertEquals('Save only new referenced entities', $new_only_option->getText());
+
+    $changed_only_option = $select_element->find('xpath', '//option[@value="changed_only"]');
+    $this->assertEquals('Save only modified referenced entities', $changed_only_option->getText());
+
+    $always_option = $select_element->find('xpath', '//option[@value="always"]');
+    $this->assertEquals('Always save referenced entities', $always_option->getText());
+
+    // Test that the default value is 'new_only'.
+    $this->assertSession()->fieldValueEquals('settings[save_referenced_entities]', 'new_only');
+
+    // Get entity storage to test configuration persistence.
+    /** @var \Drupal\Core\Entity\EntityStorageInterface $field_config_storage */
+    $field_config_storage = \Drupal::entityTypeManager()->getStorage('field_config');
+
+    // Test saving different modes and verify persistence.
+    $test_modes = [
+      'disabled' => 'Never save',
+      'always' => 'Always save',
+      'changed_only' => 'Save changed only',
+      'new_only' => 'Save new only',
+    ];
+
+    foreach ($test_modes as $mode => $expected_summary) {
+      // Submit form with the specified mode.
+      $edit = [
+        'settings[save_referenced_entities]' => $mode,
+      ];
+      $this->drupalGet($field_path);
+      $this->submitForm($edit, 'Save settings');
+
+      // Verify configuration was saved to database using loadUnchanged.
+      $field_config = $field_config_storage->loadUnchanged($field_id);
+      $this->assertEquals($mode, $field_config->getSetting('save_referenced_entities'));
+
+      // Reload the form and verify the correct option is selected.
+      $this->drupalGet($field_path);
+      $this->assertSession()->fieldValueEquals('settings[save_referenced_entities]', $mode);
+
+      // Check that the field summary displays the correct save behavior.
+      $manage_fields_path = 'admin/structure/types/manage/' . $this->type . '/fields';
+      $this->drupalGet($manage_fields_path);
+      $this->assertSession()->pageTextContains('Referenced entity save behavior: ' . $expected_summary);
+    }
+  }
+
+  /**
+   * Tests save_referenced_entities setting with different target types.
+   */
+  public function testSaveReferencedEntitiesWithDifferentTargetTypes(): void {
+    // Test with taxonomy term target.
+    $vocabulary_name = $this->randomMachineName();
+    Vocabulary::create(['vid' => $vocabulary_name, 'name' => $vocabulary_name])->save();
+
+    $taxonomy_field_name = $this->createEntityReferenceField('taxonomy_term', [$vocabulary_name]);
+    $taxonomy_field_id = 'node.' . $this->type . '.field_' . $taxonomy_field_name;
+    $taxonomy_field_path = 'admin/structure/types/manage/' . $this->type . '/fields/' . $taxonomy_field_id;
+
+    $this->drupalGet($taxonomy_field_path);
+    $this->assertSession()->fieldExists('settings[save_referenced_entities]');
+    $this->assertSession()->fieldValueEquals('settings[save_referenced_entities]', 'new_only');
+
+    // Test saving 'always' mode.
+    $edit = ['settings[save_referenced_entities]' => 'always'];
+    $this->submitForm($edit, 'Save settings');
+
+    $field_config_storage = \Drupal::entityTypeManager()->getStorage('field_config');
+    $field_config = $field_config_storage->loadUnchanged($taxonomy_field_id);
+    $this->assertEquals('always', $field_config->getSetting('save_referenced_entities'));
+
+    // Test with user target.
+    $user_field_name = $this->createEntityReferenceField('user');
+    $user_field_id = 'node.' . $this->type . '.field_' . $user_field_name;
+    $user_field_path = 'admin/structure/types/manage/' . $this->type . '/fields/' . $user_field_id;
+
+    $this->drupalGet($user_field_path);
+    $this->assertSession()->fieldExists('settings[save_referenced_entities]');
+    $this->assertSession()->fieldValueEquals('settings[save_referenced_entities]', 'new_only');
+
+    // Test saving 'disabled' mode.
+    $edit = ['settings[save_referenced_entities]' => 'disabled'];
+    $this->submitForm($edit, 'Save settings');
+
+    $field_config = $field_config_storage->loadUnchanged($user_field_id);
+    $this->assertEquals('disabled', $field_config->getSetting('save_referenced_entities'));
+  }
+
+  /**
+   * Tests save_referenced_entities setting with handler changes.
+   */
+  public function testSaveReferencedEntitiesWithHandlerChanges(): void {
+    $field_name = $this->createEntityReferenceField('node', [$this->type]);
+    $field_id = 'node.' . $this->type . '.field_' . $field_name;
+    $field_path = 'admin/structure/types/manage/' . $this->type . '/fields/' . $field_id;
+
+    $this->drupalGet($field_path);
+
+    // Set save mode to 'always'.
+    $edit = ['settings[save_referenced_entities]' => 'always'];
+    $this->submitForm($edit, 'Save settings');
+
+    // Verify the setting persisted.
+    $field_config_storage = \Drupal::entityTypeManager()->getStorage('field_config');
+    $field_config = $field_config_storage->loadUnchanged($field_id);
+    $this->assertEquals('always', $field_config->getSetting('save_referenced_entities'));
+
+    // Change the handler to 'views' (if available).
+    $this->drupalGet($field_path);
+    if ($this->assertSession()->optionExists('settings[handler]', 'views')) {
+      $edit = ['settings[handler]' => 'views'];
+      $this->submitForm($edit, 'Change handler');
+
+      // Verify that the save_referenced_entities setting is preserved.
+      $this->assertSession()->fieldExists('settings[save_referenced_entities]');
+      $this->assertSession()->fieldValueEquals('settings[save_referenced_entities]', 'always');
+
+      // Change handler back to default.
+      $edit = ['settings[handler]' => 'default:node'];
+      $this->submitForm($edit, 'Change handler');
+
+      // Verify the save_referenced_entities setting is still preserved.
+      $this->assertSession()->fieldValueEquals('settings[save_referenced_entities]', 'always');
+
+      $field_config = $field_config_storage->loadUnchanged($field_id);
+      $this->assertEquals('always', $field_config->getSetting('save_referenced_entities'));
+    }
+  }
+
+  /**
    * Creates a new Entity Reference fields with a given target type.
    *
    * @param string $target_type
