@@ -31,6 +31,7 @@ class ManagedFileTest extends FileManagedUnitTestBase implements FormInterface {
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['managed_file'] = [
+      '#title' => 'managed_file',
       '#type' => 'managed_file',
     ];
     return $form;
@@ -48,12 +49,8 @@ class ManagedFileTest extends FileManagedUnitTestBase implements FormInterface {
 
   /**
    * Tests that managed file elements can be programmatically submitted.
-   *
-   * @group legacy
    */
   public function testManagedFileElement(): void {
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "managed_file" of #type "managed_file" from form "form_test_managed_file" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
-
     $form_state = new FormState();
     $values['managed_file'] = NULL;
     $form_state->setValues($values);
