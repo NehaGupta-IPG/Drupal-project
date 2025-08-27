@@ -7,6 +7,7 @@ namespace Drupal\Tests\Core\Config;
 use Drupal\Component\Uuid\Php;
 use Drupal\Core\Config\MemoryStorage;
 use Drupal\Core\Config\StorageComparer;
+use Drupal\Core\Config\StorageComparerInterface;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Tests\UnitTestCase;
 
@@ -105,6 +106,16 @@ class StorageComparerTest extends UnitTestCase {
 
     ];
     return $this->configData;
+  }
+
+  /**
+   * Tests deprecation message.
+   *
+   * @group legacy
+   */
+  public function testDeprecatedStorageComparerInterface() {
+    $this->expectDeprecation('The Drupal\Core\Config\StorageComparerInterface is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use "StorageComparer" instead. See https://www.drupal.org/node/3482267');
+    $storage_comparer_object = $this->createMock(StorageComparerInterface::class);
   }
 
   /**

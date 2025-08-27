@@ -2,8 +2,14 @@
 
 namespace Drupal\Core\Config;
 
+@trigger_error('The ' . __NAMESPACE__ . '\StorageComparerInterface is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use "StorageComparer" instead. See https://www.drupal.org/node/3482267', E_USER_DEPRECATED);
+
 /**
  * Defines an interface for comparison of configuration storage objects.
+ *
+ * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use "StorageComparer" instead.
+ *
+ * @see https://www.drupal.org/node/3482267
  */
 interface StorageComparerInterface {
 
