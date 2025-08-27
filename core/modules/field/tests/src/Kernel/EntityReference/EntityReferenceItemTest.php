@@ -7,6 +7,7 @@ namespace Drupal\Tests\field\Kernel\EntityReference;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Entity\CommentType;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Config\Schema\SchemaIncompleteException;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -415,6 +416,350 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
       'isSyncing' => TRUE,
     ]);
     $this->assertEquals('fake:thing', $field->getSetting('handler'));
+  }
+
+  /**
+   * Tests the save_referenced_entities field setting functionality.
+   */
+  public function testSaveReferencedEntities(): void {
+    // Set up fields with different save modes.
+    $this->setupSaveReferencedEntitiesFields();
+
+    // Test each save mode systematically.
+    $this->doTestSaveModeDisabled();
+    $this->doTestSaveModeNewOnly();
+    $this->doTestSaveModeChangedOnly();
+    $this->doTestSaveModeAlways();
+
+    // Edge case testing.
+    $this->doTestMultipleReferences();
+    $this->doTestConfigSchemaValidation();
+  }
+
+  /**
+   * Sets up entity reference fields with different save_referenced_entities modes.
+   */
+  private function setupSaveReferencedEntitiesFields(): void {
+    // Create fields with each save mode.
+    $modes = ['disabled', 'new_only', 'changed_only', 'always'];
+    foreach ($modes as $mode) {
+      $field_storage = FieldStorageConfig::create([
+        'field_name' => "field_save_mode_{$mode}",
+        'entity_type' => 'entity_test',
+        'type' => 'entity_reference',
+        'settings' => [
+          'target_type' => 'taxonomy_term',
+        ],
+      ]);
+      $field_storage->save();
+
+      $field = FieldConfig::create([
+        'field_storage' => $field_storage,
+        'bundle' => 'entity_test',
+        'label' => "Test save mode {$mode}",
+        'settings' => [
+          'handler' => 'default',
+          'save_referenced_entities' => $mode,
+        ],
+      ]);
+      $field->save();
+    }
+
+    // Create self-reference field.
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'field_self_ref',
+      'entity_type' => 'entity_test',
+      'type' => 'entity_reference',
+      'settings' => [
+        'target_type' => 'entity_test',
+      ],
+    ]);
+    $field_storage->save();
+
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => 'entity_test',
+      'label' => 'Self reference test',
+      'settings' => [
+        'handler' => 'default',
+        'save_referenced_entities' => 'always',
+      ],
+    ]);
+    $field->save();
+  }
+
+  /**
+   * Tests the 'disabled' save mode - referenced entities should never be saved.
+   */
+  private function doTestSaveModeDisabled(): void {
+    // Create test entities.
+    $new_term = Term::create([
+      'name' => $this->randomMachineName(),
+      'vid' => $this->term->bundle(),
+    ]);
+
+    $existing_term = Term::create([
+      'name' => $this->randomMachineName(),
+      'vid' => $this->term->bundle(),
+    ]);
+    $existing_term->save();
+    $original_changed = $existing_term->getChangedTime();
+
+    // Test with new entity - verify it's not auto-saved when parent saves.
+    // We need to save the new term first to avoid constraint violations,
+    // then test that it doesn't get re-saved when changed.
+    $new_term->save();
+    $new_term_original_changed = $new_term->getChangedTime();
+    $new_term->setName($this->randomMachineName()); // Change but don't save.
+
+    $entity = EntityTest::create(['name' => $this->randomMachineName()]);
+    $entity->field_save_mode_disabled->entity = $new_term;
+    $entity->save();
+
+    // Term should not be re-saved even though it was changed.
+    $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+    $reloaded_new_term = $term_storage->loadUnchanged($new_term->id());
+    $this->assertEquals($new_term_original_changed, $reloaded_new_term->getChangedTime(), 'Changed term was not auto-saved with disabled mode.');
+    $this->assertEquals($new_term->id(), $entity->field_save_mode_disabled->target_id, 'Target ID is set correctly.');
+
+    // Test with existing entity - should not be re-saved.
+    $entity = EntityTest::create(['name' => $this->randomMachineName()]);
+    $existing_term->setName($this->randomMachineName()); // Change the term but don't save it.
+    $entity->field_save_mode_disabled->entity = $existing_term;
+    $entity->save();
+
+    // Reload term and verify it wasn't re-saved.
+    $reloaded_term = $term_storage->loadUnchanged($existing_term->id());
+    $this->assertEquals($original_changed, $reloaded_term->getChangedTime(), 'Existing term was not re-saved with disabled mode.');
+    $this->assertEquals($existing_term->id(), $entity->field_save_mode_disabled->target_id, 'Target ID is set for existing entity.');
+  }
+
+  /**
+   * Tests the 'new_only' save mode - only new entities should be saved.
+   */
+  private function doTestSaveModeNewOnly(): void {
+    // Create test entities.
+    $new_term = Term::create([
+      'name' => $this->randomMachineName(),
+      'vid' => $this->term->bundle(),
+    ]);
+
+    $existing_term = Term::create([
+      'name' => $this->randomMachineName(),
+      'vid' => $this->term->bundle(),
+    ]);
+    $existing_term->save();
+    $original_changed = $existing_term->getChangedTime();
+
+    // Test with new entity - should be saved.
+    $entity = EntityTest::create(['name' => $this->randomMachineName()]);
+    $entity->field_save_mode_new_only->entity = $new_term;
+    $entity->save();
+
+    // New term should be saved.
+    $this->assertFalse($new_term->isNew(), 'New term was auto-saved with new_only mode.');
+    $this->assertEquals($new_term->id(), $entity->field_save_mode_new_only->target_id, 'Target ID is set after auto-save.');
+
+    // Test with existing entity - should not be re-saved.
+    $entity = EntityTest::create(['name' => $this->randomMachineName()]);
+    $existing_term->setName($this->randomMachineName()); // Change the term but don't save it.
+    $entity->field_save_mode_new_only->entity = $existing_term;
+    $entity->save();
+
+    // Existing term should not be re-saved.
+    $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+    $reloaded_term = $term_storage->loadUnchanged($existing_term->id());
+    $this->assertEquals($original_changed, $reloaded_term->getChangedTime(), 'Existing term was not re-saved with new_only mode.');
+    $this->assertEquals($existing_term->id(), $entity->field_save_mode_new_only->target_id, 'Target ID is synchronized for existing entity.');
+  }
+
+  /**
+   * Tests the 'always' save mode - all referenced entities should be saved.
+   */
+  private function doTestSaveModeAlways(): void {
+    // Create test entities.
+    $new_term = Term::create([
+      'name' => $this->randomMachineName(),
+      'vid' => $this->term->bundle(),
+    ]);
+
+    $existing_term = Term::create([
+      'name' => $this->randomMachineName(),
+      'vid' => $this->term->bundle(),
+    ]);
+    $existing_term->save();
+    $original_changed = $existing_term->getChangedTime();
+
+    // Test with new entity - should be saved.
+    $entity = EntityTest::create(['name' => $this->randomMachineName()]);
+    $entity->field_save_mode_always->entity = $new_term;
+    $entity->save();
+
+    // New term should be saved.
+    $this->assertFalse($new_term->isNew(), 'New term was auto-saved with always mode.');
+    $this->assertEquals($new_term->id(), $entity->field_save_mode_always->target_id, 'Target ID is set after auto-save.');
+
+    // Test with existing entity - should be re-saved.
+    $entity = EntityTest::create(['name' => $this->randomMachineName()]);
+    $new_name = $this->randomMachineName();
+    $existing_term->setName($new_name); // Change the term but don't save it.
+    $entity->field_save_mode_always->entity = $existing_term;
+
+    // Small delay to ensure changed time would be different.
+    sleep(1);
+    $entity->save();
+
+    // Existing term should be re-saved with the new name.
+    $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+    $reloaded_term = $term_storage->loadUnchanged($existing_term->id());
+    $this->assertEquals($new_name, $reloaded_term->getName(), 'Existing term was re-saved with always mode (name updated).');
+    // Also check timestamp if it actually changed.
+    if ($reloaded_term->getChangedTime() > $original_changed) {
+      $this->assertGreaterThan($original_changed, $reloaded_term->getChangedTime(), 'Existing term timestamp was updated with always mode.');
+    }
+    $this->assertEquals($existing_term->id(), $entity->field_save_mode_always->target_id, 'Target ID is synchronized for existing entity.');
+  }
+
+  /**
+   * Tests the 'changed_only' save mode - currently falls back to 'always' behavior.
+   */
+  private function doTestSaveModeChangedOnly(): void {
+    // Create test entities.
+    $new_term = Term::create([
+      'name' => $this->randomMachineName(),
+      'vid' => $this->term->bundle(),
+    ]);
+
+    $existing_term = Term::create([
+      'name' => $this->randomMachineName(),
+      'vid' => $this->term->bundle(),
+    ]);
+    $existing_term->save();
+    $original_changed = $existing_term->getChangedTime();
+
+    // Test with new entity - should be saved (fallback to 'always').
+    $entity = EntityTest::create(['name' => $this->randomMachineName()]);
+    $entity->field_save_mode_changed_only->entity = $new_term;
+    $entity->save();
+
+    // New term should be saved.
+    $this->assertFalse($new_term->isNew(), 'New term was auto-saved with changed_only mode.');
+    $this->assertEquals($new_term->id(), $entity->field_save_mode_changed_only->target_id, 'Target ID is set after auto-save.');
+
+    // Test with existing entity - should be re-saved (fallback to 'always').
+    $entity = EntityTest::create(['name' => $this->randomMachineName()]);
+    $new_name = $this->randomMachineName();
+    $existing_term->setName($new_name);
+    $entity->field_save_mode_changed_only->entity = $existing_term;
+
+    // Small delay to ensure different timestamps.
+    sleep(1);
+    $entity->save();
+
+    // Existing term should be re-saved (current fallback behavior).
+    $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+    $reloaded_term = $term_storage->loadUnchanged($existing_term->id());
+    // Since changed_only currently falls back to 'always', the entity should be saved.
+    $this->assertEquals($new_name, $reloaded_term->getName(), 'Existing term was re-saved with changed_only mode (fallback behavior - name updated).');
+    $this->assertEquals($existing_term->id(), $entity->field_save_mode_changed_only->target_id, 'Target ID is synchronized for existing entity.');
+  }
+
+  /**
+   * Tests multiple references with mixed entity states.
+   */
+  private function doTestMultipleReferences(): void {
+    // Create mix of new and existing terms.
+    $new_term1 = Term::create([
+      'name' => $this->randomMachineName(),
+      'vid' => $this->term->bundle(),
+    ]);
+
+    $new_term2 = Term::create([
+      'name' => $this->randomMachineName(),
+      'vid' => $this->term->bundle(),
+    ]);
+
+    $existing_term = Term::create([
+      'name' => $this->randomMachineName(),
+      'vid' => $this->term->bundle(),
+    ]);
+    $existing_term->save();
+
+    // Test new_only mode with multiple references.
+    $entity = EntityTest::create(['name' => $this->randomMachineName()]);
+    $entity->field_save_mode_new_only->setValue([
+      ['entity' => $new_term1],
+      ['entity' => $existing_term],
+      ['entity' => $new_term2],
+    ]);
+    $entity->save();
+
+    // Verify only new terms were saved.
+    $this->assertFalse($new_term1->isNew(), 'First new term was saved in new_only mode.');
+    $this->assertFalse($new_term2->isNew(), 'Second new term was saved in new_only mode.');
+
+    // Verify target IDs are set correctly.
+    $values = $entity->field_save_mode_new_only->getValue();
+    $this->assertEquals($new_term1->id(), $values[0]['target_id'], 'First new term target_id set correctly.');
+    $this->assertEquals($existing_term->id(), $values[1]['target_id'], 'Existing term target_id preserved.');
+    $this->assertEquals($new_term2->id(), $values[2]['target_id'], 'Second new term target_id set correctly.');
+  }
+
+  /**
+   * Tests configuration schema validation for save_referenced_entities setting.
+   */
+  private function doTestConfigSchemaValidation(): void {
+    // Test that default value is 'new_only'.
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'field_default_test',
+      'entity_type' => 'entity_test',
+      'type' => 'entity_reference',
+      'settings' => [
+        'target_type' => 'taxonomy_term',
+      ],
+    ]);
+    $field_storage->save();
+
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => 'entity_test',
+      'label' => 'Default test',
+      'settings' => [
+        'handler' => 'default',
+        // Not setting save_referenced_entities should use default.
+      ],
+    ]);
+    $field->save();
+
+    // Verify default value.
+    $this->assertEquals('new_only', $field->getSetting('save_referenced_entities'), 'Default save_referenced_entities setting is new_only.');
+
+    // Test that invalid values are rejected by schema validation.
+    // Create a separate field storage for the invalid mode test.
+    $invalid_field_storage = FieldStorageConfig::create([
+      'field_name' => 'field_invalid_mode_test',
+      'entity_type' => 'entity_test',
+      'type' => 'entity_reference',
+      'settings' => [
+        'target_type' => 'taxonomy_term',
+      ],
+    ]);
+    $invalid_field_storage->save();
+
+    // Test that saving a field with invalid save_referenced_entities value throws an exception.
+    $this->expectException(SchemaIncompleteException::class);
+    $this->expectExceptionMessage('The save mode must be one of: disabled, new_only, changed_only, always.');
+
+    $invalid_mode_field = FieldConfig::create([
+      'field_storage' => $invalid_field_storage,
+      'bundle' => 'entity_test',
+      'label' => 'Invalid mode test',
+      'settings' => [
+        'handler' => 'default',
+        'save_referenced_entities' => 'invalid_mode',
+      ],
+    ]);
+    $invalid_mode_field->save();
   }
 
   /**

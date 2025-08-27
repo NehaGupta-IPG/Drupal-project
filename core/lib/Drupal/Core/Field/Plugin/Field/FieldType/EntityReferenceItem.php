@@ -59,6 +59,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
     return [
       'handler' => 'default',
       'handler_settings' => [],
+      'save_referenced_entities' => 'new_only',
     ] + parent::defaultFieldSettings();
   }
 
@@ -133,20 +134,34 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
     $target_type = $field_definition->getFieldStorageDefinition()->getSetting('target_type');
     $handler_settings = $field_definition->getSetting('handler_settings');
 
-    if (!isset($handler_settings['target_bundles'])) {
-      return $summary;
+    // Add bundle information to summary.
+    if (isset($handler_settings['target_bundles'])) {
+      /** @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_bundle_information */
+      $entity_bundle_information = \Drupal::service('entity_type.bundle.info');
+      $bundle_info = $entity_bundle_information->getBundleInfo($target_type);
+      $bundles = array_map(fn($bundle) => $bundle_info[$bundle]['label'], $handler_settings['target_bundles']);
+      $bundle_label = \Drupal::entityTypeManager()->getDefinition($target_type)->getBundleLabel();
+
+      if (!empty($bundles)) {
+        $summary[] = new FormattableMarkup('@bundle: @entity_type', [
+          '@bundle' => $bundle_label ?: new TranslatableMarkup('Bundle'),
+          '@entity_type' => implode(', ', $bundles),
+        ]);
+      }
     }
 
-    /** @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_bundle_information */
-    $entity_bundle_information = \Drupal::service('entity_type.bundle.info');
-    $bundle_info = $entity_bundle_information->getBundleInfo($target_type);
-    $bundles = array_map(fn($bundle) => $bundle_info[$bundle]['label'], $handler_settings['target_bundles']);
-    $bundle_label = \Drupal::entityTypeManager()->getDefinition($target_type)->getBundleLabel();
-
-    if (!empty($bundles)) {
-      $summary[] = new FormattableMarkup('@bundle: @entity_type', [
-        '@bundle' => $bundle_label ?: new TranslatableMarkup('Bundle'),
-        '@entity_type' => implode(', ', $bundles),
+    // Add save mode information to summary.
+    $save_mode = $field_definition->getSetting('save_referenced_entities');
+    $save_mode_labels = [
+      'disabled' => new TranslatableMarkup('Never save'),
+      'new_only' => new TranslatableMarkup('Save new only'),
+      'changed_only' => new TranslatableMarkup('Save changed only'),
+      'always' => new TranslatableMarkup('Always save'),
+    ];
+    
+    if (isset($save_mode_labels[$save_mode])) {
+      $summary[] = new TranslatableMarkup('Referenced entity save behavior: @mode', [
+        '@mode' => $save_mode_labels[$save_mode],
       ]);
     }
 
@@ -314,17 +329,28 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
    * {@inheritdoc}
    */
   public function preSave() {
-    if ($this->hasNewEntity()) {
-      // Save the entity if it has not already been saved by some other code.
-      if ($this->entity->isNew()) {
+    if (!$this->isEmpty() && $this->entity instanceof EntityInterface) {
+      $save_mode = $this->getFieldDefinition()->getSetting('save_referenced_entities');
+      $is_new_entity = $this->hasNewEntity();
+
+      $do_save = match ($save_mode) {
+        'disabled' => FALSE,
+        'new_only' => $is_new_entity,
+        // @todo: Implement proper change detection, fall back to "always" for
+        //   now. See https://www.drupal.org/project/drupal/issues/xxx.
+        'changed_only' => TRUE,
+        'always' => TRUE,
+        default => $is_new_entity,
+      };
+
+      if ($do_save) {
         $this->entity->save();
       }
-      // Make sure the parent knows we are updating this property so it can
-      // react properly.
-      $this->target_id = $this->entity->id();
-    }
-    if (!$this->isEmpty() && $this->target_id === NULL) {
-      $this->target_id = $this->entity->id();
+
+      // Always synchronize "target_id" if the entity has a valid ID.
+      if ($this->entity?->id() !== NULL) {
+        $this->target_id = $this->entity->id();
+      }
     }
   }
 
@@ -502,6 +528,21 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
 
     $handler = \Drupal::service('plugin.manager.entity_reference_selection')->getSelectionHandler($field);
     $form['handler']['handler_settings'] += $handler->buildConfigurationForm([], $form_state);
+
+    // Add save mode configuration.
+    $form['save_referenced_entities'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Referenced entity save behavior'),
+      '#description' => $this->t('Configure when referenced entities should be automatically saved when the referencing entity is saved.'),
+      '#default_value' => $field->getSetting('save_referenced_entities'),
+      '#options' => [
+        'disabled' => $this->t('Do not save referenced entities automatically'),
+        'new_only' => $this->t('Save only new referenced entities'),
+        'changed_only' => $this->t('Save only modified referenced entities'),
+        'always' => $this->t('Always save referenced entities'),
+      ],
+      '#required' => TRUE,
+    ];
 
     return $form;
   }
