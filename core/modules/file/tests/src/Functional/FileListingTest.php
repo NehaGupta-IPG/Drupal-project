@@ -9,6 +9,8 @@ use Drupal\entity_test\EntityTestHelper;
 use Drupal\node\Entity\Node;
 use Drupal\file\Entity\File;
 use Drupal\entity_test\Entity\EntityTestConstraints;
+use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\user\Entity\Role;
 
 /**
@@ -253,6 +255,77 @@ class FileListingTest extends FileFieldTestBase {
     $this->assertSession()->pageTextContains($entity_name);
     $this->assertSession()->linkNotExists($entity_name, 'Linked entity name not added to file usage listing.');
     $this->assertSession()->linkExists($node->getTitle());
+  }
+
+  /**
+   * Tests file deletion with multi-language and domain prefix.
+   */
+  public function testFileDeleteWithMultipleDomain(): void {
+
+    // Enable language module.
+    \Drupal::service('module_installer')->install(['language']);
+
+    // Add the German language.
+    ConfigurableLanguage::createFromLangcode('de')->save();
+
+    // Log in with user with correct permissions and test listing.
+    $content_owner = $this->drupalCreateUser([
+      'access files overview',
+      'bypass node access',
+      'delete any file',
+      'administer languages',
+    ]);
+    $this->drupalLogin($content_owner);
+
+    // Enable browser and URL language detection.
+    $edit = [
+      'language_interface[enabled][language-url]' => TRUE,
+      'language_interface[weight][language-url]' => -10,
+    ];
+    $this->drupalGet('admin/config/regional/language/detection');
+    $this->submitForm($edit, 'Save settings');
+
+    // Change the domain for the German language.
+    $edit = [
+      'language_negotiation_url_part' => LanguageNegotiationUrl::CONFIG_DOMAIN,
+      'domain[en]' => \Drupal::request()->getHost(),
+      'domain[de]' => 'de.example.com',
+    ];
+    $this->drupalGet('admin/config/regional/language/detection/url');
+    $this->submitForm($edit, 'Save configuration');
+    $this->assertSession()->statusMessageContains('The configuration options have been saved', 'status');
+
+    // Create a node.
+    $node = $this->drupalCreateNode([
+      'type' => 'article',
+    ]);
+
+    // Add a file to the node.
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $file = $this->getTestFile('image');
+    $edit = [
+      'files[file_0]' => \Drupal::service('file_system')->realpath($file->getFileUri()),
+    ];
+    $this->submitForm($edit, 'Save');
+    $node = Node::load($node->id());
+
+    $this->drupalGet('admin/content/files');
+
+    $file = File::load($node->file->target_id);
+    $this->assertSession()->pageTextContains($file->getFilename());
+    $this->assertSession()->linkByHrefExists($file->createFileUrl());
+    $this->assertSession()->linkByHrefExists('admin/content/files/usage/' . $file->id());
+    $this->assertSession()->linkByHrefExists($file->toUrl('delete-form')->toString());
+
+    // Delete the file.
+    $this->clickLink('Delete');
+    $file_uri = $file->getFileUri();
+    $this->assertSession()->addressMatches('#file/1/delete$#');
+    $this->assertSession()->pageTextContains('Are you sure you want to delete the file image-test.png?');
+    $this->assertFileExists($file_uri);
+    $this->assertSession()->buttonExists('Delete')->press();
+    $this->assertSession()->pageTextContains('The file image-test.png has been deleted.');
+    $this->assertFileDoesNotExist($file_uri);
   }
 
   /**
