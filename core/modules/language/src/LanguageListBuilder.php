@@ -154,16 +154,9 @@ class LanguageListBuilder extends DraggableListBuilder {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    // Handle language weight changes with immediate cache invalidation.
-    foreach ($form_state->getValue($this->entitiesKey) as $id => $value) {
-      if (isset($this->entities[$id]) && $this->entities[$id]->getWeight() != $value['weight']) {
-        // Save entity with new weight.
-        $this->entities[$id]->setWeight($value['weight']);
-        $this->entities[$id]->save();
-        // Invalidate rendered cache to ensure language fallback takes effect.
-        Cache::invalidateTags(['rendered']);
-      }
-    }
+    parent::submitForm($form, $form_state);
+    // Invalidate custom language fallback cache tag.
+    Cache::invalidateTags(['language_fallback_order']);
 
     // Save the default language if changed.
     $new_id = $form_state->getValue('site_default_language');
