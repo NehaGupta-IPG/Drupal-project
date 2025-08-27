@@ -86,7 +86,8 @@ class PathItem extends FieldItemBase {
       elseif ($this->pid) {
         $path_alias = $path_alias_storage->load($this->pid);
 
-        if ($this->alias != $path_alias->getAlias()) {
+        if ($this->alias != $path_alias->getAlias() || $alias_langcode != $this->getLangcode()) {
+          $path_alias->set('langcode', $this->getLangcode());
           $path_alias->setAlias($this->alias);
           $path_alias->save();
         }
