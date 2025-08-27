@@ -6,7 +6,6 @@
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
-use Drupal\Core\Render\Element;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Hook\TaxonomyThemeHooks;
 
@@ -47,6 +46,7 @@ function template_preprocess_taxonomy_term(&$variables): void {
  * @param \Drupal\taxonomy\Entity\Term $term
  *   A taxonomy term entity.
  *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no
  * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no
  *   replacement, check the view mode instead during rendering.
  *
