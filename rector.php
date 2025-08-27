@@ -599,6 +599,17 @@ return RectorConfig::configure()
         # Core's Unit tests skipped.
         __DIR__ . '/core/tests/Drupal/Tests/Component',
         __DIR__ . '/core/tests/Drupal/Tests/Core/Config/TypeResolverTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Core/Lock/LockBackendAbstractTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Core/Asset/LibraryDiscoveryTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Core/Entity/Sql/SqlContentEntityStorageSchemaTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Core/Extension/ModuleHandlerTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Core/Form/ConfigTargetTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Core/StringTranslation/StringTranslationTraitTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Core/TypedData/RecursiveContextualValidatorTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Core/Database/ConnectionTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Core/Test/TestDatabaseTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Core/DrupalTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Core/Extension/Requirement/RequirementSeverityTest.php',
 
         __DIR__ . '/core/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php',
         __DIR__ . '/core/modules/ckeditor5/tests/src/FunctionalJavascript/SourceEditingEmptyElementTest.php',
