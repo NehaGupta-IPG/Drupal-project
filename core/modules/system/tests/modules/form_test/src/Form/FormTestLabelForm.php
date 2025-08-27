@@ -174,6 +174,11 @@ class FormTestLabelForm extends FormBase {
       if ($type === 'datetime') {
         $form['form_' . $type . '_title_no_xss']['#default_value'] = NULL;
       }
+      if ($type === 'password_confirm') {
+        // Override `none` value from PasswordConfirm so that expected
+        // title is displayed.
+        $form['form_' . $type . '_title_no_xss']['#title_display'] = 'before';
+      }
     }
 
     return $form;
