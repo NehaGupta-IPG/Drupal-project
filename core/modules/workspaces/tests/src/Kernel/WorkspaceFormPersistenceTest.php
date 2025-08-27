@@ -68,12 +68,8 @@ class WorkspaceFormPersistenceTest extends KernelTestBase {
 
   /**
    * Tests that the active workspace is persisted throughout a form's lifecycle.
-   *
-   * @group legacy
    */
   public function testFormPersistence(): void {
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "test" of #type "textfield" from form "active_workspace_test_form" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
-
     $form_arg = ActiveWorkspaceTestForm::class;
 
     $this->switchToWorkspace('ham');
