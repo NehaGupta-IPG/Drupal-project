@@ -32509,12 +32509,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/src/Functional/FileTransfer/TestFileTransfer.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$form_output in empty\\(\\) always exists and is not falsy\\.$#',
-	'identifier' => 'empty.variable',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Form/FormTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Form\\\\StubForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,

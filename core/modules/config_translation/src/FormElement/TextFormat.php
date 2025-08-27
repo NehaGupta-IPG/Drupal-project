@@ -26,6 +26,13 @@ class TextFormat extends FormElementBase {
   /**
    * {@inheritdoc}
    */
+  protected function isSafeConfig(mixed $config): bool {
+    return locale_string_is_safe($config['value']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getTranslationElement(LanguageInterface $translation_language, $source_config, $translation_config) {
     return [
       '#type' => 'text_format',

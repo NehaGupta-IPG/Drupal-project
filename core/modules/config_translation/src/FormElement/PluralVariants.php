@@ -66,6 +66,7 @@ class PluralVariants extends FormElementBase {
         '#title' => $i == 0 ? $this->t('Singular form') : $this->formatPlural($i, 'First plural form', '@count. plural form'),
         '#default_value' => $values[$i] ?? '',
         '#attributes' => ['lang' => $translation_language->getId()],
+        '#element_validate' => [[get_class($this), 'validateInput']],
       ];
     }
     return $element;

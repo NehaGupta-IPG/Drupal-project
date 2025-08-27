@@ -3,6 +3,7 @@
 namespace Drupal\config_translation\FormElement;
 
 use Drupal\Core\Config\Config;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TypedData\TypedDataInterface;
@@ -62,11 +63,46 @@ abstract class FormElementBase implements ElementInterface {
     // Therefore we make the 'source' and 'translation' keys the top-level
     // keys in $form_state['values'].
     $build['source'] = $this->getSourceElement($source_language, $source_config);
-    $build['translation'] = $this->getTranslationElement($translation_language, $source_config, $translation_config);
-
+    // If the source configuration contains unsafe markup, it cannot be
+    // translated because the translation cannot pass
+    // FormElementBase::validateInput().
+    if ($this->isSafeConfig($source_config)) {
+      $build['translation'] = $this->getTranslationElement($translation_language, $source_config, $translation_config);
+    }
+    else {
+      $build['translation'] = [
+        '#type' => 'item',
+        '#title' => $this->t('@label <span class="visually-hidden">(@source_language)</span>', [
+          '@label' => $this->definition['label'],
+          '@source_language' => $translation_language->getName(),
+        ]),
+        '#markup' => '<div class="messages messages--error">' . $this->t('This element cannot be translated because the source configuration contains unsafe HTML.') . '</div>',
+      ];
+    }
     $build['source']['#parents'] = array_merge(['source'], $parents);
     $build['translation']['#parents'] = array_merge(['translation'], $parents);
     return $build;
+  }
+
+  /**
+   * Determines whether or not the configuration does not contain.
+   *
+   * This is used to ensure the source configuration passes
+   * locale_string_is_safe().
+   *
+   * @param mixed $config
+   *   The configuration value of the element in the source language.
+   *
+   * @return bool
+   *   TRUE if the configuration is safe; FALSE otherwise.
+   *
+   * @see locale_string_is_safe()
+   */
+  protected function isSafeConfig(mixed $config): bool {
+    if (empty($config)) {
+      return TRUE;
+    }
+    return locale_string_is_safe($config);
   }
 
   /**
@@ -143,6 +179,12 @@ abstract class FormElementBase implements ElementInterface {
    * element is not available for translation of complex data, similar access
    * logic must be implemented manually.
    *
+   * Note that because configuration values might be output on the page the form
+   * element is also responsible for validating that the input does not contain
+   * malicious HTML input. FormElementBase::validateInput(), which uses
+   * locale_string_is_safe() for the validation, is provided for that purpose
+   * and is used for the default form element.
+   *
    * @param \Drupal\Core\Language\LanguageInterface $translation_language
    *   The language to display the translation form for.
    * @param mixed $source_config
@@ -155,6 +197,8 @@ abstract class FormElementBase implements ElementInterface {
    *
    * @see \Drupal\config_translation\FormElement\TextFormat
    * @see \Drupal\filter\Element\TextFormat::processFormat()
+   * @see \Drupal\config_translation\FormElement\FormElementBase::validateInput()
+   * @see locale_string_is_safe()
    */
   protected function getTranslationElement(LanguageInterface $translation_language, $source_config, $translation_config) {
     // Add basic properties that apply to all form elements.
@@ -167,7 +211,22 @@ abstract class FormElementBase implements ElementInterface {
       ]),
       '#default_value' => $translation_config,
       '#attributes' => ['lang' => $translation_language->getId()],
+      '#element_validate' => [[get_class($this), 'validateInput']],
     ];
+  }
+
+  /**
+   * Validates that the form element does not contain malicious HTML input.
+   *
+   * @param array $element
+   *   The form element to validate.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   */
+  public static function validateInput(array $element, FormStateInterface $form_state): void {
+    if (isset($element['#value']) && !locale_string_is_safe($element['#value'])) {
+      $form_state->setError($element, 'The submitted string contains disallowed HTML.');
+    }
   }
 
   /**
