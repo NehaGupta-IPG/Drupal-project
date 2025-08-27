@@ -33,7 +33,7 @@ class ReferenceAccessConstraintValidator extends ConstraintValidator {
         $referenced_entities = $existing_entity->{$value->getFieldDefinition()->getName()}->referencedEntities();
         // Check permission if we are not already referencing the entity.
         foreach ($referenced_entities as $ref) {
-          if (isset($referenced_entities[$ref->id()])) {
+          if ($ref->id() == $referenced_entity->id()) {
             $check_permission = FALSE;
             break;
           }
