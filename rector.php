@@ -610,6 +610,7 @@ return RectorConfig::configure()
         __DIR__ . '/core/tests/Drupal/Tests/Core/Test/TestDatabaseTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Core/DrupalTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Core/Extension/Requirement/RequirementSeverityTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Core/Utility/CallableResolverTest.php',
 
         __DIR__ . '/core/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php',
         __DIR__ . '/core/modules/ckeditor5/tests/src/FunctionalJavascript/SourceEditingEmptyElementTest.php',
