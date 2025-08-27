@@ -447,12 +447,8 @@ class FormTest extends BrowserTestBase {
 
   /**
    * Tests validation of #type 'select' elements.
-   *
-   * @group legacy
    */
   public function testSelect(): void {
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "unsorted" of #type "select" from form "form_test_select" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
-
     $form = \Drupal::formBuilder()->getForm('Drupal\form_test\Form\FormTestSelectForm');
     $this->drupalGet('form-test/select');
 
@@ -533,14 +529,8 @@ class FormTest extends BrowserTestBase {
 
   /**
    * Tests sorting and not sorting of options in a select element.
-   *
-   * @group legacy
    */
   public function testSelectSorting(): void {
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "sorted" of #type "select" from form "form_test_select" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "sorted_none" of #type "select" from form "form_test_select" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "sorted_none_no_start" of #type "select" from form "form_test_select" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
-
     $this->drupalGet('form-test/select');
 
     // Verify the order of the select options.

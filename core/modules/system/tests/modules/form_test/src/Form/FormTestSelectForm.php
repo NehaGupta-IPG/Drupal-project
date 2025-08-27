@@ -131,6 +131,7 @@ class FormTestSelectForm extends FormBase {
 
     // Add a select that should have its options left alone.
     $form['unsorted'] = [
+      '#title' => 'unsorted',
       '#type' => 'select',
       '#options' => $this->makeSortableOptions('uso'),
     ];
@@ -144,6 +145,7 @@ class FormTestSelectForm extends FormBase {
     $sortable_options['sso_xx_group']['#sort_start'] = 1;
     // Do not use a sort start on this one.
     $form['sorted'] = [
+      '#title' => 'sorted',
       '#type' => 'select',
       '#options' => $sortable_options,
       '#sort_options' => TRUE,
@@ -154,6 +156,7 @@ class FormTestSelectForm extends FormBase {
     $sortable_none_options = $this->makeSortableOptions('sno');
     $sortable_none_options['sno_zz_group']['#sort_options'] = TRUE;
     $form['sorted_none'] = [
+      '#title' => 'sorted_none',
       '#type' => 'select',
       '#options' => $sortable_none_options,
       '#sort_options' => TRUE,
@@ -166,6 +169,7 @@ class FormTestSelectForm extends FormBase {
     $sortable_none_no_start_options = $this->makeSortableOptions('snn');
     $sortable_none_no_start_options['snn_zz_group']['#sort_options'] = TRUE;
     $form['sorted_none_no_start'] = [
+      '#title' => 'sorted_none_no_start',
       '#type' => 'select',
       '#options' => $sortable_none_no_start_options,
       '#sort_options' => TRUE,
