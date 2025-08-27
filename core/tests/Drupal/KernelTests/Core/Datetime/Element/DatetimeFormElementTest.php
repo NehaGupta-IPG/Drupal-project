@@ -56,6 +56,7 @@ class DatetimeFormElementTest extends EntityKernelTestBase implements FormInterf
   public function buildForm(array $form, FormStateInterface $form_state): array {
     // Test datetime-local element.
     $form['datetime_local_picker'] = [
+      '#title' => 'datetime_local_picker',
       '#type' => 'datetime',
       '#date_date_element' => 'datetime-local',
       '#date_time_element' => 'none',
@@ -93,12 +94,8 @@ class DatetimeFormElementTest extends EntityKernelTestBase implements FormInterf
    * Checks we have no errors on form submit.
    *
    * @legacy-covers ::validateDatetime
-   *
-   * @group legacy
    */
   public function testNoErrorMetOnFormSubmit(): void {
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "datetime_local_picker" of #type "datetime" from form "datetime_form_element_test" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
-
     // No error expected when form elements have no value.
     $form_state = new FormState();
     $this->formBuilder->submitForm($this, $form_state);
