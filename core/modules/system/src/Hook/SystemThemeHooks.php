@@ -82,7 +82,9 @@ class SystemThemeHooks {
     $element = $variables['element'];
     $suggestions[] = 'field__' . $element['#field_type'];
     $suggestions[] = 'field__' . $element['#field_name'];
+    $suggestions['__DEPRECATED']['field__' . $element['#field_name']] = 'Theme suggestion field__' . $element['#field_name'] . ' is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/1367354';
     $suggestions[] = 'field__' . $element['#entity_type'] . '__' . $element['#bundle'];
+    $suggestions['__DEPRECATED']['field__' . $element['#entity_type'] . '__' . $element['#bundle']] = 'Theme suggestion field__' . $element['#entity_type'] . '__' . $element['#bundle'] . ' is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/1367354';
     $suggestions[] = 'field__' . $element['#entity_type'] . '__' . $element['#field_name'];
     $suggestions[] = 'field__' . $element['#entity_type'] . '__' . $element['#field_name'] . '__' . $element['#bundle'];
     return $suggestions;
