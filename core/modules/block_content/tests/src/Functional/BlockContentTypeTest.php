@@ -58,14 +58,26 @@ class BlockContentTypeTest extends BlockContentTestBase {
   }
 
   /**
-   * Tests the order of the block content types on the add page.
+   * Tests the block types on the block/add page.
    */
-  public function testBlockContentAddPageOrder(): void {
-    $this->createBlockContentType(['id' => 'bundle_1', 'label' => 'Bundle 1']);
-    $this->createBlockContentType(['id' => 'bundle_2', 'label' => 'Aaa Bundle 2']);
+  public function testBlockContentAddPage(): void {
+    $this->createBlockContentType([
+      'id' => 'bundle_1',
+      'label' => 'Bundle 1',
+      'description' => 'Bundle 1 description',
+    ]);
+    $this->createBlockContentType([
+      'id' => 'bundle_2',
+      'label' => 'Aaa Bundle 2',
+      'description' => 'Bundle 2 description',
+    ]);
     $this->drupalLogin($this->adminUser);
     $this->drupalGet('block/add');
+    // Ensure bundles are ordered by their label, not id.
     $this->assertSession()->pageTextMatches('/Aaa Bundle 2(.*)Bundle 1/');
+    // Block type descriptions should display.
+    $this->assertSession()->pageTextContains('Bundle 1 description');
+    $this->assertSession()->pageTextContains('Bundle 2 description');
   }
 
   /**
@@ -93,9 +105,6 @@ class BlockContentTypeTest extends BlockContentTestBase {
 
     $block_type = BlockContentType::load('foo');
     $this->assertInstanceOf(BlockContentType::class, $block_type);
-
-    $field_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('block_content', 'foo');
-    $this->assertTrue(isset($field_definitions['body']), 'Body field created when using the UI to create block content types.');
 
     // Check that the block type was created in site default language.
     $default_langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
@@ -224,8 +233,8 @@ class BlockContentTypeTest extends BlockContentTestBase {
 
       // For each installed theme, go to its block page and test the redirects.
       foreach ($themes as $theme) {
-        // Test that adding a block from the 'place blocks' form sends you to the
-        // block configure form.
+        // Test that adding a block from the 'place blocks' form sends you to
+        // the block configure form.
         $path = $theme == $default_theme ? 'admin/structure/block' : "admin/structure/block/list/$theme";
         $this->drupalGet($path);
         $this->clickLink('Place block');

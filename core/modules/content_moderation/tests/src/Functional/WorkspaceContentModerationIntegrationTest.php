@@ -33,7 +33,7 @@ class WorkspaceContentModerationIntegrationTest extends ModerationStateTestBase 
   protected function getAdministratorPermissions(): array {
     return array_merge($this->permissions, [
       'bypass node access',
-      'view any workspace',
+      'administer workspaces',
     ]);
   }
 
@@ -50,6 +50,7 @@ class WorkspaceContentModerationIntegrationTest extends ModerationStateTestBase 
     $this->createContentTypeFromUi('Article', 'article', TRUE);
 
     $this->setupWorkspaceSwitcherBlock();
+    $this->createWorkspaceThroughUi('Stage', 'stage');
   }
 
   /**
@@ -73,15 +74,19 @@ class WorkspaceContentModerationIntegrationTest extends ModerationStateTestBase 
 
     $first_article = $this->drupalGetNodeByTitle('First article - published', TRUE);
     $this->assertEquals('published', $first_article->moderation_state->value);
+    $this->assertTrue($first_article->isPublished());
 
     $second_article = $this->drupalGetNodeByTitle('Second article - draft', TRUE);
     $this->assertEquals('draft', $second_article->moderation_state->value);
+    $this->assertFalse($second_article->isPublished());
 
-    // Check that neither of them are visible in Live.
+    // Check that neither of them are published in Live.
     $this->switchToLive();
-    $this->drupalGet('<front>');
-    $this->assertSession()->pageTextNotContains('First article');
-    $this->assertSession()->pageTextNotContains('Second article');
+    $first_article = $this->drupalGetNodeByTitle('First article - published', TRUE);
+    $this->assertFalse($first_article->isPublished());
+
+    $second_article = $this->drupalGetNodeByTitle('Second article - draft', TRUE);
+    $this->assertFalse($second_article->isPublished());
 
     // Switch back to Stage.
     $this->switchToWorkspace($stage);

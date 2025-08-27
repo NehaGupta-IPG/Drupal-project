@@ -176,7 +176,7 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
     $original_uri = $file_system->copy($file->uri, $scheme . '://', FileExists::Rename);
     // Let the image_module_test module know about this file, so it can claim
     // ownership in hook_file_download().
-    \Drupal::state()->set('image.test_file_download', $original_uri);
+    \Drupal::keyValue('image')->set('test_file_download', $original_uri);
     $this->assertNotFalse($original_uri, 'Created the generated image file.');
 
     // Get the URL of a file that has not been generated and try to create it.
@@ -251,7 +251,7 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
 
       // Make sure that access is denied for existing style files if we do not
       // have access.
-      \Drupal::state()->delete('image.test_file_download');
+      \Drupal::keyValue('image')->delete('test_file_download');
       $this->drupalGet($generate_url);
       $this->assertSession()->statusCodeEquals(403);
 
@@ -301,7 +301,7 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
     $original_uri = $file_system->copy($file->uri, $scheme . '://', FileExists::Rename);
     // Let the image_module_test module know about this file, so it can claim
     // ownership in hook_file_download().
-    \Drupal::state()->set('image.test_file_download', $original_uri);
+    \Drupal::keyValue('image')->set('test_file_download', $original_uri);
 
     // Suppress the security token in the URL, then get the URL of a file that
     // has not been created and try to create it. Check that the security token
@@ -321,7 +321,7 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
     // Check that a security token is still required when generating a second
     // image derivative using the first one as a source.
     $nested_url = $this->style->buildUrl($generated_uri, $clean_url);
-    $matches_expected_url_format = (boolean) preg_match('/styles\/' . $this->style->id() . '\/' . $scheme . '\/styles\/' . $this->style->id() . '\/' . $scheme . '/', $nested_url);
+    $matches_expected_url_format = (bool) preg_match('/styles\/' . $this->style->id() . '\/' . $scheme . '\/styles\/' . $this->style->id() . '\/' . $scheme . '/', $nested_url);
     $this->assertTrue($matches_expected_url_format, "URL for a derivative of an image style matches expected format.");
     $nested_url_with_wrong_token = str_replace(IMAGE_DERIVATIVE_TOKEN . '=', 'wrong_parameter=', $nested_url);
     $this->drupalGet($nested_url_with_wrong_token);

@@ -12,6 +12,7 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -84,6 +85,7 @@ class CommentController extends ControllerBase {
    *   A comment entity.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   *   A redirect response to the comment's permalink after approval.
    */
   public function commentApprove(CommentInterface $comment) {
     $comment->setPublished();
@@ -251,6 +253,19 @@ class CommentController extends ControllerBase {
     $build['comment_form'] = $this->entityFormBuilder()->getForm($comment);
 
     return $build;
+  }
+
+  /**
+   * Title callback for the reply form.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity this comment belongs to.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   *   The reply form title.
+   */
+  public function replyFormTitle(EntityInterface $entity): TranslatableMarkup {
+    return $this->t('Add new comment to %label', ['%label' => $entity->label()]);
   }
 
   /**

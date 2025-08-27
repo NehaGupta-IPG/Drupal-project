@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
+use Drupal\jsonapi\JsonApiSpec;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Url;
+use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
 use Drupal\Tests\jsonapi\Traits\CommonCollectionFilterAccessTestPatternsTrait;
 
 /**
@@ -17,6 +19,7 @@ use Drupal\Tests\jsonapi\Traits\CommonCollectionFilterAccessTestPatternsTrait;
  */
 class BlockContentTest extends ResourceTestBase {
 
+  use BlockContentCreationTrait;
   use CommonCollectionFilterAccessTestPatternsTrait;
 
   /**
@@ -104,13 +107,11 @@ class BlockContentTest extends ResourceTestBase {
    */
   public function createEntity() {
     if (!BlockContentType::load('basic')) {
-      $block_content_type = BlockContentType::create([
+      $this->createBlockContentType([
         'id' => 'basic',
         'label' => 'basic',
         'revision' => TRUE,
-      ]);
-      $block_content_type->save();
-      block_content_add_body_field($block_content_type->id());
+      ], TRUE);
     }
 
     // Create a "Llama" content block.
@@ -140,10 +141,10 @@ class BlockContentTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
           ],
         ],
-        'version' => '1.0',
+        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
       ],
       'links' => [
         'self' => ['href' => $base_url->toString()],

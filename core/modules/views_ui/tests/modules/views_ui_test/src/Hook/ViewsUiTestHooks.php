@@ -17,8 +17,8 @@ class ViewsUiTestHooks {
    * Add a row count row to the live preview area.
    */
   #[Hook('views_preview_info_alter')]
-  public function viewsPreviewInfoAlter(&$rows, $view) {
-    $data = ['#markup' => t('Test row count')];
+  public function viewsPreviewInfoAlter(&$rows, $view): void {
+    $data = ['#markup' => 'Test row count'];
     $data['#attached']['library'][] = 'views_ui_test/views_ui_test.test';
     $rows['query'][] = [['data' => $data], count($view->result)];
   }

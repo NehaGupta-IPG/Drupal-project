@@ -27,6 +27,11 @@ class AccessDeniedTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * The test user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
   protected $adminUser;
 
   /**
@@ -51,6 +56,9 @@ class AccessDeniedTest extends BrowserTestBase {
     user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['access user profiles']);
   }
 
+  /**
+   * Tests access denied functionality.
+   */
   public function testAccessDenied(): void {
     $this->drupalGet('admin');
     $this->assertSession()->pageTextContains('Access denied');
@@ -107,7 +115,7 @@ class AccessDeniedTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(403);
     $this->assertSession()->pageTextContains('Username');
 
-    // Log back in, set the custom 403 page to /user/login and remove the block
+    // Log back in, set the custom 403 page to /user/login and remove the block.
     $this->drupalLogin($this->adminUser);
     $this->config('system.site')->set('page.403', '/user/login')->save();
     $block->disable()->save();

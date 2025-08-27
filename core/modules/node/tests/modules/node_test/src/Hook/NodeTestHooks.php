@@ -20,7 +20,7 @@ class NodeTestHooks {
    * Implements hook_ENTITY_TYPE_view() for node entities.
    */
   #[Hook('node_view')]
-  public function nodeView(array &$build, NodeInterface $node, EntityViewDisplayInterface $display, $view_mode) {
+  public function nodeView(array &$build, NodeInterface $node, EntityViewDisplayInterface $display, $view_mode): void {
     if ($node->isNew()) {
       return;
     }
@@ -28,24 +28,18 @@ class NodeTestHooks {
       // Add RSS elements and namespaces when building the RSS feed.
       $node->rss_elements[] = [
         'key' => 'testElement',
-        'value' => t('Value of testElement RSS element for node @nid.', [
-          '@nid' => $node->id(),
-        ]),
+        'value' => 'Value of testElement RSS element for node ' . $node->id() . '.',
       ];
       // Add content that should be displayed only in the RSS feed.
       $build['extra_feed_content'] = [
-        '#markup' => '<p>' . t('Extra data that should appear only in the RSS feed for node @nid.', [
-          '@nid' => $node->id(),
-        ]) . '</p>',
+        '#markup' => '<p>Extra data that should appear only in the RSS feed for node ' . $node->id() . '.</p>',
         '#weight' => 10,
       ];
     }
     if ($view_mode != 'rss') {
       // Add content that should NOT be displayed in the RSS feed.
       $build['extra_non_feed_content'] = [
-        '#markup' => '<p>' . t('Extra data that should appear everywhere except the RSS feed for node @nid.', [
-          '@nid' => $node->id(),
-        ]) . '</p>',
+        '#markup' => '<p>Extra data that should appear everywhere except the RSS feed for node ' . $node->id() . '.</p>',
       ];
     }
   }
@@ -54,7 +48,7 @@ class NodeTestHooks {
    * Implements hook_ENTITY_TYPE_build_defaults_alter() for node entities.
    */
   #[Hook('node_build_defaults_alter')]
-  public function nodeBuildDefaultsAlter(array &$build, NodeInterface &$node, $view_mode = 'full') {
+  public function nodeBuildDefaultsAlter(array &$build, NodeInterface &$node, $view_mode = 'full'): void {
     if ($view_mode == 'rss') {
       $node->rss_namespaces['xmlns:test'] = 'http://example.com/test-namespace';
     }
@@ -64,7 +58,7 @@ class NodeTestHooks {
    * Implements hook_node_grants().
    */
   #[Hook('node_grants')]
-  public function nodeGrants(AccountInterface $account, $operation) {
+  public function nodeGrants(AccountInterface $account, $operation): array {
     // Give everyone full grants so we don't break other node tests.
     // Our node access tests asserts three realms of access.
     // See testGrantAlter().
@@ -75,10 +69,10 @@ class NodeTestHooks {
    * Implements hook_node_access_records().
    */
   #[Hook('node_access_records')]
-  public function nodeAccessRecords(NodeInterface $node) {
+  public function nodeAccessRecords(NodeInterface $node): array {
     // Return nothing when testing for empty responses.
     if (!empty($node->disable_node_access)) {
-      return;
+      return [];
     }
     $grants = [];
     if ($node->getType() == 'article') {
@@ -108,10 +102,11 @@ class NodeTestHooks {
    * Implements hook_node_access_records_alter().
    */
   #[Hook('node_access_records_alter')]
-  public function nodeAccessRecordsAlter(&$grants, NodeInterface $node) {
+  public function nodeAccessRecordsAlter(&$grants, NodeInterface $node): void {
     if (!empty($grants)) {
       foreach ($grants as $key => $grant) {
-        // Alter grant from test_page_realm to test_alter_realm and modify the gid.
+        // Alter grant from test_page_realm to test_alter_realm and modify the
+        // gid.
         if ($grant['realm'] == 'test_page_realm' && $node->isPromoted()) {
           $grants[$key]['realm'] = 'test_alter_realm';
           $grants[$key]['gid'] = 2;
@@ -124,7 +119,7 @@ class NodeTestHooks {
    * Implements hook_node_grants_alter().
    */
   #[Hook('node_grants_alter')]
-  public function nodeGrantsAlter(&$grants, AccountInterface $account, $operation) {
+  public function nodeGrantsAlter(&$grants, AccountInterface $account, $operation): void {
     // Return an empty array of grants to prove that we can alter by reference.
     $grants = [];
   }
@@ -133,16 +128,16 @@ class NodeTestHooks {
    * Implements hook_ENTITY_TYPE_presave() for node entities.
    */
   #[Hook('node_presave')]
-  public function nodePresave(NodeInterface $node) {
+  public function nodePresave(NodeInterface $node): void {
     if ($node->getTitle() == 'testing_node_presave') {
-      // Sun, 19 Nov 1978 05:00:00 GMT
+      // Sun, 19 Nov 1978 05:00:00 GMT.
       $node->setCreatedTime(280299600);
       // Drupal 1.0 release.
       $node->changed = 979534800;
     }
     // Determine changes.
-    if (!empty($node->original) && $node->original->getTitle() == 'test_changes') {
-      if ($node->original->getTitle() != $node->getTitle()) {
+    if ($node->getOriginal()?->getTitle() == 'test_changes') {
+      if ($node->getOriginal()->getTitle() != $node->getTitle()) {
         $node->title->value .= '_presave';
       }
     }
@@ -152,10 +147,10 @@ class NodeTestHooks {
    * Implements hook_ENTITY_TYPE_update() for node entities.
    */
   #[Hook('node_update')]
-  public function nodeUpdate(NodeInterface $node) {
+  public function nodeUpdate(NodeInterface $node): void {
     // Determine changes on update.
-    if (!empty($node->original) && $node->original->getTitle() == 'test_changes') {
-      if ($node->original->getTitle() != $node->getTitle()) {
+    if ($node->getOriginal()?->getTitle() == 'test_changes') {
+      if ($node->getOriginal()->getTitle() != $node->getTitle()) {
         $node->title->value .= '_update';
       }
     }
@@ -165,7 +160,7 @@ class NodeTestHooks {
    * Implements hook_entity_view_mode_alter().
    */
   #[Hook('entity_view_mode_alter')]
-  public function entityViewModeAlter(&$view_mode, EntityInterface $entity) {
+  public function entityViewModeAlter(&$view_mode, EntityInterface $entity): void {
     // Only alter the view mode if we are on the test callback.
     $change_view_mode = \Drupal::state()->get('node_test_change_view_mode', '');
     if ($change_view_mode) {
@@ -181,7 +176,7 @@ class NodeTestHooks {
    * @see \Drupal\node\Tests\NodeSaveTest::testNodeSaveOnInsert()
    */
   #[Hook('node_insert')]
-  public function nodeInsert(NodeInterface $node) {
+  public function nodeInsert(NodeInterface $node): void {
     // Set the node title to the node ID and save.
     if ($node->getTitle() == 'new') {
       $node->setTitle('Node ' . $node->id());

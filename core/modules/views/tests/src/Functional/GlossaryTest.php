@@ -57,7 +57,7 @@ class GlossaryTest extends ViewTestBase {
       }
     }
 
-    // Execute glossary view
+    // Execute glossary view.
     $view = Views::getView('glossary');
     $view->setDisplay('attachment_1');
     $view->executeDisplay('attachment_1');
@@ -83,11 +83,10 @@ class GlossaryTest extends ViewTestBase {
         'url',
         'user.node_grants:view',
         'user.permissions',
-        'route',
       ],
       [
         'config:views.view.glossary',
-        // Listed for letter 'a'
+        // Listed for letter 'a'.
         'node:' . $nodes_by_char['a'][0]->id(), 'node:' . $nodes_by_char['a'][1]->id(), 'node:' . $nodes_by_char['a'][2]->id(),
         // Link for letter 'd'.
         'node:1',

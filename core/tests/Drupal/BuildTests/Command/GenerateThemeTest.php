@@ -8,6 +8,8 @@ use Drupal\BuildTests\QuickStart\QuickStartTestBase;
 use Drupal\Core\Command\GenerateTheme;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\sqlite\Driver\Database\sqlite\Install\Tasks;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Tester\Constraint\CommandIsSuccessful;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -15,12 +17,9 @@ use Symfony\Component\Process\Process;
 
 /**
  * Tests the generate-theme commands.
- *
- * @requires extension pdo_sqlite
- *
- * @group Command
- * @group #slow
  */
+#[Group('Command')]
+#[RequiresPhpExtension('pdo_sqlite')]
 class GenerateThemeTest extends QuickStartTestBase {
 
   /**
@@ -173,7 +172,7 @@ YAML
 
     // Confirm new .theme file.
     $dot_theme_file = $this->getWorkspaceDirectory() . '/themes/generated_from_another_theme/generated_from_another_theme.theme';
-    $this->assertStringContainsString('function generated_from_another_theme_preprocess_image_widget(array &$variables) {', file_get_contents($dot_theme_file));
+    $this->assertStringContainsString('function generated_from_another_theme_preprocess_image_widget(array &$variables): void {', file_get_contents($dot_theme_file));
   }
 
   /**

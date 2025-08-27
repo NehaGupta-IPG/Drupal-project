@@ -20,6 +20,7 @@ use Drupal\language\ContentLanguageSettingsInterface;
   label_singular: new TranslatableMarkup('content language setting'),
   label_plural: new TranslatableMarkup('content languages settings'),
   config_prefix: 'content_settings',
+  static_cache: TRUE,
   entity_keys: [
     'id' => 'id',
   ],
@@ -44,7 +45,8 @@ use Drupal\language\ContentLanguageSettingsInterface;
     'target_bundle',
     'default_langcode',
     'language_alterable',
-  ])]
+  ],
+  )]
 class ContentLanguageSettings extends ConfigEntityBase implements ContentLanguageSettingsInterface {
 
   /**

@@ -5,6 +5,7 @@
  */
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Theme\ThemePreprocess;
 use Drupal\field_ui\FieldUI;
 
 /**
@@ -17,17 +18,8 @@ use Drupal\field_ui\FieldUI;
  *   - elements: An associative array containing a Form API structure to be
  *     rendered as a table.
  */
-function template_preprocess_field_ui_table(&$variables) {
-  template_preprocess_table($variables);
-}
-
-/**
- * Implements hook_preprocess_HOOK().
- */
-function field_ui_preprocess_form_element__new_storage_type(&$variables) {
-  // Add support for a variant string so radios in the add field form can be
-  // programmatically distinguished.
-  $variables['variant'] = $variables['element']['#variant'] ?? NULL;
+function template_preprocess_field_ui_table(&$variables): void {
+  \Drupal::service(ThemePreprocess::class)->preprocessTable($variables);
 }
 
 /**
@@ -35,7 +27,7 @@ function field_ui_preprocess_form_element__new_storage_type(&$variables) {
  *
  * @see field_ui_form_alter()
  */
-function field_ui_form_manage_field_form_submit($form, FormStateInterface $form_state) {
+function field_ui_form_manage_field_form_submit($form, FormStateInterface $form_state): void {
   $provider = $form_state->getFormObject()->getEntity()->getEntityType()->getProvider();
   $id = $form_state->getFormObject()->getEntity()->id();
   if ($form_state->getTriggeringElement()['#parents'][0] === 'save_continue' && $route_info = FieldUI::getOverviewRouteInfo($provider, $id)) {

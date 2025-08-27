@@ -26,13 +26,9 @@ define('COMMENT_NEW_LIMIT', ((int) $_SERVER['REQUEST_TIME']) - 30 * 24 * 60 * 60
  * Entity URI callback.
  */
 function comment_uri(CommentInterface $comment) {
-  return new Url(
-    'entity.comment.canonical',
-    [
-      'comment' => $comment->id(),
-    ],
-    ['fragment' => 'comment-' . $comment->id()]
-  );
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\comment\Entity\Comment::permalink() instead. See https://www.drupal.org/node/3384294', E_USER_DEPRECATED);
+
+  return $comment->permalink();
 }
 
 /**
@@ -67,7 +63,7 @@ function _comment_entity_uses_integer_id($entity_type_id) {
  * @return array
  *   An array as expected by \Drupal\Core\Render\RendererInterface::render().
  */
-function comment_preview(CommentInterface $comment, FormStateInterface $form_state) {
+function comment_preview(CommentInterface $comment, FormStateInterface $form_state): array {
   $preview_build = [];
   $entity = $comment->getCommentedEntity();
 
@@ -111,15 +107,6 @@ function comment_preview(CommentInterface $comment, FormStateInterface $form_sta
 }
 
 /**
- * Implements hook_preprocess_HOOK() for block templates.
- */
-function comment_preprocess_block(&$variables) {
-  if ($variables['configuration']['provider'] == 'comment') {
-    $variables['attributes']['role'] = 'navigation';
-  }
-}
-
-/**
  * Prepares variables for comment templates.
  *
  * By default this function performs special preprocessing of some base fields
@@ -138,7 +125,7 @@ function comment_preprocess_block(&$variables) {
  *   - elements: An associative array containing the comment and entity objects.
  *     Array keys: #comment, #commented_entity.
  */
-function template_preprocess_comment(&$variables) {
+function template_preprocess_comment(&$variables): void {
   /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
   $date_formatter = \Drupal::service('date.formatter');
   /** @var \Drupal\comment\CommentInterface $comment */
@@ -168,7 +155,8 @@ function template_preprocess_comment(&$variables) {
     $variables['author_id'] = $comment->getOwnerId();
     $variables['new_indicator_timestamp'] = $comment->getChangedTime();
     $variables['created'] = $date_formatter->format($comment->getCreatedTime());
-    // Avoid calling DateFormatterInterface::format() twice on the same timestamp.
+    // Avoid calling DateFormatterInterface::format() twice on the same
+    // timestamp.
     if ($comment->getChangedTime() == $comment->getCreatedTime()) {
       $variables['changed'] = $variables['created'];
     }
@@ -263,33 +251,4 @@ function template_preprocess_comment(&$variables) {
   $variables['attributes']['data-comment-user-id'] = $comment->getOwnerId();
   // Add anchor for each comment.
   $variables['attributes']['id'] = 'comment-' . $comment->id();
-}
-
-/**
- * Prepares variables for comment field templates.
- *
- * Default template: field--comment.html.twig.
- *
- * @param array $variables
- *   An associative array containing:
- *   - element: An associative array containing render arrays for the list of
- *     comments, and the comment form. Array keys: comments, comment_form.
- *
- * @todo Rename to template_preprocess_field__comment() once
- *   https://www.drupal.org/node/939462 is resolved.
- */
-function comment_preprocess_field(&$variables) {
-  $element = $variables['element'];
-  if ($element['#field_type'] == 'comment') {
-    // Provide contextual information.
-    $variables['comment_display_mode'] = $element[0]['#comment_display_mode'];
-    $variables['comment_type'] = $element[0]['#comment_type'];
-
-    // Append additional attributes from the first field item.
-    $variables['attributes'] += $variables['items'][0]['attributes']->storage();
-
-    // Create separate variables for the comments and comment form.
-    $variables['comments'] = $element[0]['comments'];
-    $variables['comment_form'] = $element[0]['comment_form'];
-  }
 }

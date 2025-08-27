@@ -6,6 +6,7 @@ namespace Drupal\Tests\Core\DependencyInjection\Compiler;
 
 use Drupal\Core\DependencyInjection\Compiler\TaggedHandlersPass;
 use Drupal\Tests\UnitTestCase;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
@@ -307,6 +308,31 @@ class TaggedHandlersPassTest extends UnitTestCase {
   }
 
   /**
+   * Tests child handler with parent service.
+   *
+   * @covers ::process
+   */
+  public function testProcessChildDefinition(): void {
+    $container = $this->buildContainer();
+
+    $container
+      ->register('consumer_id', __NAMESPACE__ . '\ValidConsumer')
+      ->addTag('service_collector');
+    $container
+      ->register('root_handler', __NAMESPACE__ . '\ValidHandler');
+    $container->addDefinitions([
+      'parent_handler' => new ChildDefinition('root_handler'),
+      'child_handler' => (new ChildDefinition('parent_handler'))->addTag('consumer_id'),
+    ]);
+
+    $handler_pass = new TaggedHandlersPass();
+    $handler_pass->process($container);
+
+    $method_calls = $container->getDefinition('consumer_id')->getMethodCalls();
+    $this->assertCount(1, $method_calls);
+  }
+
+  /**
    * Tests consumer method with extra parameters.
    *
    * @covers ::process
@@ -430,8 +456,15 @@ class TaggedHandlersPassTest extends UnitTestCase {
 
 }
 
+/**
+ * Interface for test handlers.
+ */
 interface HandlerInterface {
 }
+
+/**
+ * Test class of a valid consumer.
+ */
 class ValidConsumer {
 
   public function addHandler(HandlerInterface $instance, $priority = 0) {
@@ -444,12 +477,20 @@ class ValidConsumer {
   }
 
 }
+
+/**
+ * Test class of an invalid consumer.
+ */
 class InvalidConsumer {
 
   public function addHandler($instance, $priority = 0) {
   }
 
 }
+
+/**
+ * Test class of a valid consumer with extra arguments.
+ */
 class ValidConsumerWithExtraArguments {
 
   public function addHandler(HandlerInterface $instance, $priority = 0, $extra1 = '', $extra2 = '') {
@@ -465,7 +506,15 @@ class ValidConsumerWithExtraArguments {
   }
 
 }
+
+/**
+ * Test handler class with interface implemented.
+ */
 class ValidHandler implements HandlerInterface {
 }
+
+/**
+ * Invalid test handler class.
+ */
 class InvalidHandler {
 }

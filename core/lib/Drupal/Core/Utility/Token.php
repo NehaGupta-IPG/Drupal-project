@@ -144,9 +144,9 @@ class Token {
    * @param array $data
    *   (optional) An array of keyed objects. For simple replacement scenarios
    *   'node', 'user', and others are common keys, with an accompanying node or
-   *   user object being the value. Some token types, like 'site', do not require
-   *   any explicit information from $data and can be replaced even if it is
-   *   empty.
+   *   user object being the value. Some token types, like 'site', do not
+   *   require any explicit information from $data and can be replaced even if
+   *   it is empty.
    * @param array $options
    *   (optional) A keyed array of settings and flags to control the token
    *   replacement process. Supported options are:
@@ -305,7 +305,8 @@ class Token {
 
     // Iterate through the matches, building an associative array containing
     // $tokens grouped by $types, pointing to the version of the token found in
-    // the source text. For example, $results['node']['title'] = '[node:title]';
+    // the source text. For example,
+    // "$results['node']['title'] = '[node:title]'".
     $results = [];
     for ($i = 0; $i < count($tokens); $i++) {
       $results[$types[$i]][$tokens[$i]] = $matches[0][$i];
@@ -390,8 +391,8 @@ class Token {
    * @param string $prefix
    *   A textual string to be matched at the beginning of the token.
    * @param string $delimiter
-   *   (optional) A string containing the character that separates the prefix from
-   *   the rest of the token. Defaults to ':'.
+   *   (optional) A string containing the character that separates the prefix
+   *   from the rest of the token. Defaults to ':'.
    *
    * @return array
    *   An associative array of discovered tokens, with the prefix and delimiter

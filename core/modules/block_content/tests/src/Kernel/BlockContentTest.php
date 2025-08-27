@@ -38,6 +38,19 @@ class BlockContentTest extends KernelTestBase {
   }
 
   /**
+   * Tests BlockContentType functionality.
+   */
+  public function testBlockContentType(): void {
+    $type = BlockContentType::create([
+      'id' => 'foo',
+      'label' => 'Foo',
+    ]);
+    $this->assertSame('', $type->getDescription());
+    $type->setDescription('Test description');
+    $this->assertSame('Test description', $type->getDescription());
+  }
+
+  /**
    * Tests the editing links for BlockContentBlock.
    */
   public function testOperationLinks(): void {
@@ -69,7 +82,7 @@ class BlockContentTest extends KernelTestBase {
     // The admin user does have the "administer block" permission.
     $this->assertEquals([
       'block-edit' => [
-        'title' => $this->t('Edit block'),
+        'title' => 'Edit block',
         'url' => $block_content->toUrl('edit-form')->setOptions([]),
         'weight' => 50,
       ],
