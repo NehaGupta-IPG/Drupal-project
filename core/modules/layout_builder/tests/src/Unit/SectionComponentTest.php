@@ -109,7 +109,7 @@ class SectionComponentTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getThirdPartySettings
+   * @legacy-covers ::getThirdPartySettings
    * @dataProvider providerTestGetThirdPartySettings
    */
   public function testGetThirdPartySettings($provider, $expected): void {
@@ -143,7 +143,7 @@ class SectionComponentTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getThirdPartySetting
+   * @legacy-covers ::getThirdPartySetting
    * @dataProvider providerTestGetThirdPartySetting
    */
   public function testGetThirdPartySetting($provider, $key, $expected, $default = FALSE): void {
@@ -192,7 +192,7 @@ class SectionComponentTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::setThirdPartySetting
+   * @legacy-covers ::setThirdPartySetting
    * @dataProvider providerTestSetThirdPartySetting
    */
   public function testSetThirdPartySetting($provider, $key, $value, $expected): void {
@@ -239,7 +239,7 @@ class SectionComponentTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::unsetThirdPartySetting
+   * @legacy-covers ::unsetThirdPartySetting
    * @dataProvider providerTestUnsetThirdPartySetting
    */
   public function testUnsetThirdPartySetting($provider, $key, $expected): void {
@@ -283,7 +283,7 @@ class SectionComponentTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getThirdPartyProviders
+   * @legacy-covers ::getThirdPartyProviders
    */
   public function testGetThirdPartyProviders(): void {
     $this->assertSame(['Tech', 'Llama'], $this->section->getComponent('some-uuid')->getThirdPartyProviders());
