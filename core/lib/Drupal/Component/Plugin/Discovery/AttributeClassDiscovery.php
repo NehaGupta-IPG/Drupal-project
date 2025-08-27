@@ -109,6 +109,9 @@ class AttributeClassDiscovery implements DiscoveryInterface {
               }
 
               $sub_path = $iterator->getSubIterator()->getSubPath();
+              if ($sub_path) {
+                trigger_error('Providing plugins in nested subdirectories within the plugin namespace is deprecated in drupal:11.3.0 and is removed in drupal:13.0.0. Plugins should be defined at the top level of the plugin namespace instead. See https://www.drupal.org/project/drupal/issues/3543371');
+              }
               $sub_path = $sub_path ? str_replace(DIRECTORY_SEPARATOR, '\\', $sub_path) . '\\' : '';
               $class = $namespace . '\\' . $sub_path . $fileinfo->getBasename('.php');
               // Plugins may rely on Attribute classes defined by modules that
