@@ -990,4 +990,43 @@ class EntityFieldTest extends EntityKernelTestBase {
     $storage->save($entity);
   }
 
+  /**
+   * Tests behavior when passing an invalid field name to $entity->get().
+   *
+   * @param bool|null $exception_on_invalid
+   *   Value to be passed to $exception_on_invalid parameter of get().
+   *
+   * @dataProvider providerEntityGetInvalidFieldName
+   *
+   * @group legacy
+   */
+  public function testEntityGetInvalidFieldName(?bool $exception_on_invalid): void {
+    $entity = $this->createTestEntity('entity_test');
+
+    if (is_null($exception_on_invalid) || $exception_on_invalid) {
+      $this->expectException(\InvalidArgumentException::class);
+      $this->expectExceptionMessage('Field field_does_not_exist is unknown.');
+    }
+
+    if (is_null($exception_on_invalid)) {
+      $this->expectDeprecation('Throwing an exception when calling Drupal\Core\Entity\ContentEntityBase::get on an invalid field name without the setting the second "$exception_on_invalid" parameter is deprecated in drupal:11.3.0 and will return NULL unless $exception_on_invalid is explicitly set to TRUE in drupal:13.0.0. See https://www.drupal.org/node/3522223');
+      $value = $entity->get('field_does_not_exist')?->value;
+    }
+    else {
+      $value = $entity->get('field_does_not_exist', $exception_on_invalid)?->value;
+    }
+    $this->assertNull($value);
+  }
+
+  /**
+   * Data provider for testEntityGetInvalidFieldName().
+   */
+  public static function providerEntityGetInvalidFieldName(): array {
+    return [
+      'default' => [NULL],
+      'pass true' => [TRUE],
+      'pass false' => [FALSE],
+    ];
+  }
+
 }

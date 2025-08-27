@@ -539,9 +539,9 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
       // Populated fields array.
       ['result', 'field_name', 'langcode', ['field_name' => ['langcode' => 'result']]],
       // Incomplete fields array.
-      ['getTranslatedField_result', 'field_name', 'langcode', ['field_name' => 'no_langcode']],
+      [NULL, 'field_name', 'langcode', ['field_name' => 'no_langcode']],
       // Empty fields array.
-      ['getTranslatedField_result', 'field_name', 'langcode', []],
+      [NULL, 'field_name', 'langcode', []],
     ];
   }
 

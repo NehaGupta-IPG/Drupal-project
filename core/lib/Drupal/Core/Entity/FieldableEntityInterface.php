@@ -141,14 +141,24 @@ interface FieldableEntityInterface extends EntityInterface {
    *
    * @param string $field_name
    *   The name of the field to get; e.g., 'title' or 'name'.
+   * phpcs:disable Drupal.Commenting
+   * @todo Uncomment new parameter and change default value to FALSE before
+   *   drupal:13.0.0.
+   * @see https://www.drupal.org/node/3522223s
    *
-   * @return \Drupal\Core\Field\FieldItemListInterface
-   *   The field item list, containing the field items.
+   * @param bool $exception_on_invalid
+   *   If TRUE, an exception will be thrown if an invalid field name is given.
+   *
+   * phpcs:enable
+   *
+   * @return \Drupal\Core\Field\FieldItemListInterface|null
+   *   The field item list, containing the field items. NULL if
+   *   $exception_on_invalid is FALSE and an invalid field name is given.
    *
    * @throws \InvalidArgumentException
-   *   If an invalid field name is given.
+   *   If $exception_on_invalid is TRUE and an invalid field name is given.
    */
-  public function get($field_name);
+  public function get(/* string */$field_name /* , bool $exception_on_invalid = TRUE */);
 
   /**
    * Sets a field value.
