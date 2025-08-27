@@ -207,6 +207,7 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
     ];
 
     $form['single_name_0'] = [
+      '#title' => 'single_name_0',
       '#type' => 'entity_autocomplete',
       '#target_type' => 'entity_test',
     ];
@@ -226,12 +227,8 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
 
   /**
    * Tests valid entries in the EntityAutocomplete Form API element.
-   *
-   * @group legacy
    */
   public function testValidEntityAutocompleteElement(): void {
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "single_name_0" of #type "entity_autocomplete" from form "test_entity_autocomplete" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
-
     $form_state = (new FormState())
       ->setValues([
         'single' => $this->getAutocompleteInput($this->referencedEntities[0]),
@@ -310,12 +307,8 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
 
   /**
    * Tests invalid entries in the EntityAutocomplete Form API element.
-   *
-   * @group legacy
    */
   public function testInvalidEntityAutocompleteElement(): void {
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "single_name_0" of #type "entity_autocomplete" from form "test_entity_autocomplete" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
-
     $form_builder = $this->container->get('form_builder');
 
     // Test 'single' with an entity label that doesn't exist.
@@ -364,12 +357,8 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
 
   /**
    * Tests that access is properly checked by the EntityAutocomplete element.
-   *
-   * @group legacy
    */
   public function testEntityAutocompleteAccess(): void {
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "single_name_0" of #type "entity_autocomplete" from form "test_entity_autocomplete" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
-
     $form_builder = $this->container->get('form_builder');
     $form = $form_builder->getForm($this);
 
@@ -397,12 +386,8 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
    * Tests ID input is handled correctly.
    *
    * E.g. This can happen with GET form parameters.
-   *
-   * @group legacy
    */
   public function testEntityAutocompleteIdInput(): void {
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "single_name_0" of #type "entity_autocomplete" from form "test_entity_autocomplete" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
-
     /** @var \Drupal\Core\Form\FormBuilderInterface $form_builder */
     $form_builder = $this->container->get('form_builder');
     // $form = $form_builder->getForm($this);
