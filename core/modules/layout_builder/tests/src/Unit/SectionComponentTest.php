@@ -109,6 +109,8 @@ class SectionComponentTest extends UnitTestCase {
   }
 
   /**
+   * Tests getThirdPartySettings.
+   *
    * @legacy-covers ::getThirdPartySettings
    * @dataProvider providerTestGetThirdPartySettings
    */
@@ -143,6 +145,8 @@ class SectionComponentTest extends UnitTestCase {
   }
 
   /**
+   * Tests getThirdPartySetting.
+   *
    * @legacy-covers ::getThirdPartySetting
    * @dataProvider providerTestGetThirdPartySetting
    */
@@ -192,6 +196,8 @@ class SectionComponentTest extends UnitTestCase {
   }
 
   /**
+   * Tests setThirdPartySetting.
+   *
    * @legacy-covers ::setThirdPartySetting
    * @dataProvider providerTestSetThirdPartySetting
    */
@@ -239,6 +245,8 @@ class SectionComponentTest extends UnitTestCase {
   }
 
   /**
+   * Tests unsetThirdPartySetting.
+   *
    * @legacy-covers ::unsetThirdPartySetting
    * @dataProvider providerTestUnsetThirdPartySetting
    */
@@ -283,6 +291,8 @@ class SectionComponentTest extends UnitTestCase {
   }
 
   /**
+   * Tests getThirdPartyProviders.
+   *
    * @legacy-covers ::getThirdPartyProviders
    */
   public function testGetThirdPartyProviders(): void {
