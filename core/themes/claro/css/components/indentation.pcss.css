@@ -15,7 +15,7 @@
   background: none !important;
   line-height: 0;
 
-  .tabledrag-cell-content & {
+  .tabledrag-cell & {
     /* Fixes Safari bug (16.1 at least) where table rows are overly large when
       using indentation (e.g. re-ordering menu items. */
     display: inline-flex;
