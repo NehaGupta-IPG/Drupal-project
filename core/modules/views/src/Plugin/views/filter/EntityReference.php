@@ -608,6 +608,9 @@ class EntityReference extends ManyToOne {
 
   /**
    * {@inheritdoc}
+   *
+   * Add in #45 https://www.drupal.org/project/drupal/issues/2429699#comment-11968489
+   * Hasn't been changed since then.
    */
   public function acceptExposedInput($input): bool {
     if (empty($this->options['exposed'])) {
@@ -661,8 +664,21 @@ class EntityReference extends ManyToOne {
 
     // Set the validated exposed input from the select list when not the all
     // value option.
-    if ($this->options['widget'] == static::WIDGET_SELECT && (isset($form[$identifier]) && $form[$identifier]['#type'] !== 'entity_autocomplete')) {
-      if ($form_state->getValue($identifier) != static::ALL_VALUE) {
+    // Given the widget type can dynamically change we need to check both the
+    // widget setting and the current form element type, to ensure it is a
+    // select list.
+    if ($this->options['expose']['use_operator']) {
+      // If the operator is exposed, then the element will be within a wrapper
+      // container.
+      // @see \Drupal\views\Plugin\views\filter\FilterPluginBase::buildExposedForm
+      $element_type = $form[$identifier . '_wrapper'][$identifier]['#type'] ?? NULL;
+    }
+    else {
+      $element_type = $form[$identifier]['#type'] ?? NULL;
+    }
+
+    if ($this->options['widget'] === static::WIDGET_SELECT && $element_type !== 'entity_autocomplete') {
+      if ($form_state->getValue($identifier) !== static::ALL_VALUE) {
         $this->validatedExposedInput = (array) $form_state->getValue($identifier);
       }
       return;
