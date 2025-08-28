@@ -608,9 +608,6 @@ class EntityReference extends ManyToOne {
 
   /**
    * {@inheritdoc}
-   *
-   * Add in #45 https://www.drupal.org/project/drupal/issues/2429699#comment-11968489
-   * Hasn't been changed since then.
    */
   public function acceptExposedInput($input): bool {
     if (empty($this->options['exposed'])) {
