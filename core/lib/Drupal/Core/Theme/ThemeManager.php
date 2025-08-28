@@ -227,6 +227,7 @@ class ThemeManager implements ThemeManagerInterface {
 
     $deprecated_suggestions = [];
     if (isset($suggestions['__DEPRECATED'])) {
+      /** @var array $deprecated_suggestions */
       $deprecated_suggestions = $suggestions['__DEPRECATED'];
       unset($suggestions['__DEPRECATED']);
     }
