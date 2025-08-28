@@ -30,12 +30,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @code
  * config:
  *   actions:
- *     core.entity_view_display.node.article.default:
+ *     core.entity_view_display.user.user.default:
  *       setComponentThirdPartySetting:
- *         component: field_image
- *         provider: mymodule
+ *         component: user_picture
+ *         provider: system
  *         settings:
- *           lazy: true
+ *           example_flag: true
  * @endcode
  *
  * @internal
