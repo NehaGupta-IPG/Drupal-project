@@ -1,8 +1,0 @@
-name: 'Hidden Widget Test'
-type: module
-description: 'Provides a custom entity type to test hidden widget behavior.'
-core_version_requirement: ^11
-package: Testing
-dependencies:
-  - drupal:field
-  - drupal:user

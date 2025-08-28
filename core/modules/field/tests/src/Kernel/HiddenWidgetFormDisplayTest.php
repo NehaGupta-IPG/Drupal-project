@@ -4,62 +4,58 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Kernel;
 
-use Drupal\KernelTests\KernelTestBase;
-use Drupal\field_hidden_widget_test\Entity\TestEntity;
 use Drupal\Core\Form\FormState;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 
 /**
- * Tests that 'hidden' widget type correctly skips rendering in form display.
+ * Tests that fields removed from the form display are not rendered.
  *
  * @group field
  */
-class HiddenWidgetFormDisplayTest extends KernelTestBase {
+class HiddenWidgetFormDisplayTest extends FieldKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
-    'user',
     'field',
     'field_ui',
-    'field_hidden_widget_test',
+    'entity_test',
   ];
 
   /**
-   * Tests hidden widget in form display.
+   * Tests hidden widget behavior by removing the field component.
    */
-  public function testHiddenWidgetNotRendered(): void {
-    // Install schema for test_entity.
-    $this->installEntitySchema('test_entity');
+  public function testHiddenWidgetFieldNotRendered(): void {
+    // Create a test field on entity_test entity type.
+    FieldStorageConfig::create([
+      'field_name' => 'test_field',
+      'entity_type' => 'entity_test',
+      'type' => 'string',
+    ])->save();
 
-    // Create a test entity.
-    $entity = TestEntity::create([
-      'name' => 'Test',
-    ]);
+    FieldConfig::create([
+      'field_name' => 'test_field',
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+      'label' => 'Test field',
+    ])->save();
 
-    // Create fresh runtime form display (DO NOT load + save).
-    $form_display = \Drupal::entityTypeManager()->getStorage('entity_form_display')
-      ->create([
-        'targetEntityType' => 'test_entity',
-        'bundle' => 'test_entity',
-        'mode' => 'default',
-        'status' => TRUE,
-      ]);
+    // Get a form display for entity_test and remove the test field component.
+    $form_display = $this->container->get('entity_display.repository')
+      ->getFormDisplay('entity_test', 'entity_test');
+    $form_display->removeComponent('test_field')->save();
 
-    // Set the 'test_field' widget to 'hidden'.
-    $form_display->setComponent('test_field', [
-      'type' => 'hidden',
-      'weight' => 5,
-    ]);
+    $entity = $this->container->get('entity_type.manager')
+      ->getStorage('entity_test')
+      ->create();
 
-    // Build the form display.
     $built_form = [];
     $form_state = new FormState();
     $form_display->buildForm($entity, $built_form, $form_state);
 
-    // Assert that the field is not present in the form.
-    $this->assertArrayNotHasKey('test_field', $built_form, 'Hidden widget field is not rendered in form.');
+    $this->assertArrayNotHasKey('test_field', $built_form);
   }
 
 }
