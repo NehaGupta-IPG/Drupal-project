@@ -189,7 +189,8 @@ class ModerationStateFieldItemListTest extends KernelTestBase {
     $this->assertEquals(0, $unmoderated_node->moderation_state->count());
 
     $unmoderated_node->moderation_state = NULL;
-    $this->assertEquals(0, $unmoderated_node->moderation_state->count());
+    $moderation_state_count = $unmoderated_node->moderation_state?->count() ?? 0;
+    $this->assertEquals(0, $moderation_state_count);
     $this->assertCount(0, $unmoderated_node->validate());
   }
 

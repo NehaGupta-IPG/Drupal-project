@@ -86,13 +86,13 @@ class FieldAccessTest extends KernelTestBase {
     $expected = AccessResult::forbidden()->addCacheableDependency($entity);
     $this->assertEquals($expected, $entity->field_test_text->access('view', $account, TRUE), 'Access to the field was denied.');
 
-    $entity->field_test_text = 'access alter value';
-    $this->assertFalse($entity->field_test_text->access('view', $account), 'Access to the field was denied.');
-    $this->assertEquals($expected, $entity->field_test_text->access('view', $account, TRUE), 'Access to the field was denied.');
+    $entity->set('field_test_text', 'access alter value');
+    $this->assertFalse($entity->get('field_test_text')->access('view', $account), 'Access to the field was denied.');
+    $this->assertEquals($expected, $entity->get('field_test_text')->access('view', $account, TRUE), 'Access to the field was denied.');
 
-    $entity->field_test_text = 'standard value';
-    $this->assertTrue($entity->field_test_text->access('view', $account), 'Access to the field was granted.');
-    $this->assertEquals(AccessResult::allowed(), $entity->field_test_text->access('view', $account, TRUE), 'Access to the field was granted.');
+    $entity->get('field_test_text')->value = 'standard value';
+    $this->assertTrue($entity->get('field_test_text')->access('view', $account), 'Access to the field was granted.');
+    $this->assertEquals(AccessResult::allowed(), $entity->get('field_test_text')->access('view', $account, TRUE), 'Access to the field was granted.');
   }
 
 }

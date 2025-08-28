@@ -3,6 +3,7 @@
 namespace Drupal\KernelTests\Core\Entity\EntityReferenceSelection;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\node\Entity\Node;
@@ -107,6 +108,7 @@ class EntityReferenceSelectionSortTest extends EntityKernelTestBase {
       ],
     ];
     $handler = $this->container->get('plugin.manager.entity_reference_selection')->getInstance($selection_options);
+    $this->assertInstanceOf(SelectionInterface::class, $handler);
 
     // Not only assert the result, but make sure the keys are sorted as
     // expected.
@@ -123,6 +125,7 @@ class EntityReferenceSelectionSortTest extends EntityKernelTestBase {
       'direction' => 'ASC',
     ];
     $handler = $this->container->get('plugin.manager.entity_reference_selection')->getInstance($selection_options);
+    $this->assertIsObject($handler);
     $result = $handler->getReferenceableEntities();
     $expected_result = [
       $nodes['published1']->id() => $node_labels['published1'],

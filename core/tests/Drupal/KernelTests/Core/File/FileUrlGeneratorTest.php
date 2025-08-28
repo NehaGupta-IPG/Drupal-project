@@ -123,9 +123,11 @@ class FileUrlGeneratorTest extends FileTestBase {
     \Drupal::state()->set('file_test.hook_file_url_alter', 'cdn');
     $uri = $this->createUri();
     $url = $this->fileUrlGenerator->generateAbsoluteString($uri);
-    $public_directory_path = \Drupal::service('stream_wrapper_manager')
-      ->getViaScheme('public')
-      ->getDirectoryPath();
+    $stream_wrapper = \Drupal::service('stream_wrapper_manager')->getViaScheme('public');
+    $this->assertInstanceOf(\Drupal\Core\StreamWrapper\StreamWrapperInterface::class, $stream_wrapper);
+
+    $public_directory_path = $stream_wrapper->getDirectoryPath();
+
     /** @var \Drupal\Core\File\FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
     $this->assertEquals(FILE_URL_TEST_CDN_2 . '/' . $public_directory_path . '/' . $file_system->basename($uri), $url, 'Correctly generated a CDN URL for a created file.');
@@ -165,9 +167,11 @@ class FileUrlGeneratorTest extends FileTestBase {
     // Managed file.
     $uri = $this->createUri();
     $url = $this->fileUrlGenerator->generateAbsoluteString($uri);
-    $public_directory_path = \Drupal::service('stream_wrapper_manager')
-      ->getViaScheme('public')
-      ->getDirectoryPath();
+    $stream_wrapper = \Drupal::service('stream_wrapper_manager')->getViaScheme('public');
+    $this->assertInstanceOf(\Drupal\Core\StreamWrapper\StreamWrapperInterface::class, $stream_wrapper);
+
+    $public_directory_path = $stream_wrapper->getDirectoryPath();
+
     $this->assertSame(base_path() . $public_directory_path . '/' . rawurlencode(\Drupal::service('file_system')
       ->basename($uri)), $this->fileUrlGenerator->transformRelative($url));
   }
@@ -203,9 +207,11 @@ class FileUrlGeneratorTest extends FileTestBase {
     $this->container->get('request_stack')->push($request);
     \Drupal::setContainer($this->container);
 
-    $public_directory_path = \Drupal::service('stream_wrapper_manager')
-      ->getViaScheme('public')
-      ->getDirectoryPath();
+    $stream_wrapper = \Drupal::service('stream_wrapper_manager')->getViaScheme('public');
+    $this->assertInstanceOf(\Drupal\Core\StreamWrapper\StreamWrapperInterface::class, $stream_wrapper);
+
+    $public_directory_path = $stream_wrapper->getDirectoryPath();
+
 
     $url = $this->fileUrlGenerator->generate('public://path/to/file.png');
     $this->assertEquals('base:/' . $public_directory_path . '/path/to/file.png', $url->getUri());

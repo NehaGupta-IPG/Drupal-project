@@ -35,8 +35,9 @@ function _update_cron_notify() {
       $default_langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
       $request_time = \Drupal::time()->getRequestTime();
       foreach ($notify_list as $target) {
-        if ($target_user = user_load_by_mail($target)) {
-          $target_langcode = $target_user->getPreferredLangcode();
+        $target_user = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties(['mail' => $target]);
+        if ($target_user && ($user = reset($target_user)) && $user->id()) {
+          $target_langcode = $user->getPreferredLangcode();
         }
         else {
           $target_langcode = $default_langcode;

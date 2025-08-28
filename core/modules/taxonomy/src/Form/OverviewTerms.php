@@ -286,7 +286,7 @@ class OverviewTerms extends FormBase {
     // Get the IDs of the terms edited on the current page which have pending
     // revisions.
     $edited_term_ids = array_map(function ($item) {
-      return $item->id();
+      return is_object($item) ? $item->id() : NULL;
     }, $current_page);
     $pending_term_ids = array_intersect($this->storageController->getTermIdsWithPendingRevisions(), $edited_term_ids);
     if ($pending_term_ids) {

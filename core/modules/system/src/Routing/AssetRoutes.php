@@ -3,6 +3,7 @@
 namespace Drupal\system\Routing;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
@@ -42,7 +43,13 @@ class AssetRoutes implements ContainerInjectionInterface {
     // Generate assets. If clean URLs are disabled image derivatives will always
     // be served through the routing system. If clean URLs are enabled and the
     // image derivative already exists, PHP will be bypassed.
-    $directory_path = $this->streamWrapperManager->getViaScheme('public')->getDirectoryPath();
+    $wrapper = $this->streamWrapperManager->getViaScheme('public');
+
+    if (!$wrapper instanceof StreamWrapperInterface) {
+      throw new \RuntimeException('Public stream wrapper not available.');
+    }
+
+    $directory_path = $wrapper->getDirectoryPath();
 
     $routes['system.css_asset'] = new Route(
       '/' . $directory_path . '/css/{file_name}',
@@ -52,7 +59,7 @@ class AssetRoutes implements ContainerInjectionInterface {
       [
         '_access' => 'TRUE',
       ]
-    );
+    );                                                                                  
     $routes['system.js_asset'] = new Route(
       '/' . $directory_path . '/js/{file_name}',
       [

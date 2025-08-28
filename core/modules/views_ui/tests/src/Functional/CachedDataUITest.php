@@ -36,13 +36,16 @@ class CachedDataUITest extends UITestBase {
     $this->drupalGet('admin/structure/views/nojs/display/test_view/default/title');
     $this->submitForm([], 'Apply');
     $this->assertSession()->pageTextContains('You have unsaved changes.');
-    $this->assertEquals($views_admin_user_uid, $temp_store->getMetadata('test_view')->getOwnerId(), 'View cache has been saved.');
+    $metadata = $temp_store->getMetadata('test_view');
+    $this->assertNotNull($metadata, 'Metadata should exist for test_view.');
+    $this->assertEquals($views_admin_user_uid, $metadata->getOwnerId(), 'View cache has been saved.');
 
-    $view_cache = $temp_store->get('test_view');
+    $view_cache = \Drupal\views\Entity\View::load('test_view');
+    $this->assertNotNull($view_cache, 'The test_view view entity should exist.');
     // The view should be enabled.
     $this->assertTrue($view_cache->status(), 'The view is enabled.');
     // The view should now be locked.
-    $this->assertEquals($views_admin_user_uid, $temp_store->getMetadata('test_view')->getOwnerId(), 'The view is locked.');
+    $this->assertEquals($views_admin_user_uid, $metadata->getOwnerId(), 'The view is locked.');
 
     // Cancel the view edit and make sure the cache is deleted.
     $this->submitForm([], 'Cancel');
@@ -80,5 +83,5 @@ class CachedDataUITest extends UITestBase {
     // No view tempstore data should be returned for this view after deletion.
     $this->assertNull($temp_store->getMetadata('test_view'), 'View tempstore data has been removed after deletion.');
   }
-
+  
 }

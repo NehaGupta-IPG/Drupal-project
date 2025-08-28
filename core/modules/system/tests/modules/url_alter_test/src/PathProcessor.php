@@ -15,7 +15,8 @@ class PathProcessor implements InboundPathProcessorInterface {
    */
   public function processInbound($path, Request $request) {
     if (preg_match('!^/user/([^/]+)(/.*)?!', $path, $matches)) {
-      if ($account = user_load_by_name($matches[1])) {
+      $account = user_load_by_name($matches[1]);
+      if ($account instanceof \Drupal\user\UserInterface) {
         $matches += [2 => ''];
         $path = '/user/' . $account->id() . $matches[2];
       }

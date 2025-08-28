@@ -313,29 +313,38 @@ class EntityFieldTest extends EntityKernelTestBase {
     $this->assertEquals(1, $entity->name[1]->getName(), new FormattableMarkup('%entity_type: The items names have been updated to their new delta.', ['%entity_type' => $entity_type]));
     $entity->name[1] = NULL;
     $this->assertCount(2, $entity->name, new FormattableMarkup('%entity_type: Assigning NULL does not reduce array count.', ['%entity_type' => $entity_type]));
-    $this->assertTrue($entity->name[1]->isEmpty(), new FormattableMarkup('%entity_type: Assigning NULL empties the item.', ['%entity_type' => $entity_type]));
+    
+    /** @var \Drupal\Core\Field\FieldItemListInterface $field */
+    $field = $entity->name;
+
+    $this->assertTrue($field[1]->isEmpty(), new FormattableMarkup('%entity_type: Assigning NULL empties the item.', ['%entity_type' => $entity_type]));
 
     // Test using isEmpty().
-    unset($entity->name[1]);
-    $this->assertFalse($entity->name[0]->isEmpty(), new FormattableMarkup('%entity_type: Name item is not empty.', ['%entity_type' => $entity_type]));
-    $entity->name->value = NULL;
-    $this->assertTrue($entity->name[0]->isEmpty(), new FormattableMarkup('%entity_type: Name item is empty.', ['%entity_type' => $entity_type]));
-    $this->assertTrue($entity->name->isEmpty(), new FormattableMarkup('%entity_type: Name field is empty.', ['%entity_type' => $entity_type]));
-    $this->assertCount(1, $entity->name, new FormattableMarkup('%entity_type: Empty item is considered when counting.', ['%entity_type' => $entity_type]));
-    $this->assertCount(1, iterator_to_array($entity->name->getIterator()), new FormattableMarkup('%entity_type: Count matches iterator count.', ['%entity_type' => $entity_type]));
-    $this->assertSame([0 => ['value' => NULL]], $entity->name->getValue(), new FormattableMarkup('%entity_type: Name field value contains a NULL value.', ['%entity_type' => $entity_type]));
+    unset($field[1]);
+    $this->assertFalse($field[0]->isEmpty(), new FormattableMarkup('%entity_type: Name item is not empty.', ['%entity_type' => $entity_type]));
+    $field->value = NULL;
+    $this->assertTrue($field[0]->isEmpty(), new FormattableMarkup('%entity_type: Name item is empty.', ['%entity_type' => $entity_type]));
+    $this->assertTrue($field->isEmpty(), new FormattableMarkup('%entity_type: Name field is empty.', ['%entity_type' => $entity_type]));
+    $this->assertCount(1, $field, new FormattableMarkup('%entity_type: Empty item is considered when counting.', ['%entity_type' => $entity_type]));
+    $this->assertCount(1, iterator_to_array($field->getIterator()), new FormattableMarkup('%entity_type: Count matches iterator count.', ['%entity_type' => $entity_type]));
+    $this->assertSame([0 => ['value' => NULL]], $field->getValue(), new FormattableMarkup('%entity_type: Name field value contains a NULL value.', ['%entity_type' => $entity_type]));
 
     // Test using filterEmptyItems().
-    $entity->name = [NULL, 'foo'];
-    $this->assertCount(2, $entity->name, new FormattableMarkup('%entity_type: List has 2 items.', ['%entity_type' => $entity_type]));
-    $entity->name->filterEmptyItems();
-    $this->assertCount(1, $entity->name, new FormattableMarkup('%entity_type: The empty item was removed.', ['%entity_type' => $entity_type]));
-    $this->assertEquals('foo', $entity->name[0]->value, new FormattableMarkup('%entity_type: The items were renumbered.', ['%entity_type' => $entity_type]));
-    $this->assertEquals(0, $entity->name[0]->getName(), new FormattableMarkup('%entity_type: The deltas were updated in the items.', ['%entity_type' => $entity_type]));
+    $field = [['value' => NULL], ['value' => 'foo']];
+    /** @var \Drupal\Core\Field\FieldItemListInterface $field */
+    $field = $entity->name;
+    $this->assertCount(2, $field, new FormattableMarkup('%entity_type: List has 2 items.', ['%entity_type' => $entity_type]));
+    $field->filterEmptyItems();
+    $this->assertCount(1, $field, new FormattableMarkup('%entity_type: The empty item was removed.', ['%entity_type' => $entity_type]));
+    $this->assertEquals('foo', $field[0]->value, new FormattableMarkup('%entity_type: The items were renumbered.', ['%entity_type' => $entity_type]));
+    $this->assertEquals(0, $field[0]->getName(), new FormattableMarkup('%entity_type: The deltas were updated in the items.', ['%entity_type' => $entity_type]));
 
     // Test get and set field values.
-    $entity->name = 'foo';
-    $this->assertEquals(['value' => 'foo'], $entity->name[0]->toArray(), new FormattableMarkup('%entity_type: Field value has been retrieved via toArray()', ['%entity_type' => $entity_type]));
+    $field = [['value' => 'foo']];
+
+    /** @var \Drupal\Core\Field\FieldItemListInterface $field */
+    $field = $entity->name;
+    $this->assertEquals(['value' => 'foo'], $field[0]->toArray(), new FormattableMarkup('%entity_type: Field value has been retrieved via toArray()', ['%entity_type' => $entity_type]));
 
     $values = $entity->toArray();
     $this->assertEquals([0 => ['value' => 'foo']], $values['name'], new FormattableMarkup('%entity_type: Field value has been retrieved via toArray() from an entity.', ['%entity_type' => $entity_type]));

@@ -68,6 +68,7 @@ class UserLanguageCreationTest extends BrowserTestBase {
     $this->submitForm($edit, 'Create new account');
 
     $user = user_load_by_name($username);
+    $this->assertInstanceOf(\Drupal\user\UserInterface::class, $user, 'User should be loaded successfully');
     $this->assertEquals($langcode, $user->getPreferredLangcode(), 'New user has correct preferred language set.');
     $this->assertEquals($langcode, $user->language()->getId(), 'New user has correct profile language set.');
 
@@ -87,6 +88,7 @@ class UserLanguageCreationTest extends BrowserTestBase {
     $this->submitForm($edit, 'Create new account');
 
     $user = user_load_by_name($username);
+    $this->assertInstanceOf(\Drupal\user\UserInterface::class, $user, 'User should be loaded successfully');
     $this->assertEquals($langcode, $user->getPreferredLangcode(), 'New user has correct preferred language set.');
     $this->assertEquals($langcode, $user->language()->getId(), 'New user has correct profile language set.');
 

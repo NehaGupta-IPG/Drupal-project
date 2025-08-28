@@ -161,12 +161,16 @@ class LinkItemTest extends FieldKernelTestBase {
     // Check that setting options to NULL does not trigger an error when
     // calling getUrl();
     $entity->field_test->options = NULL;
-    $this->assertInstanceOf(Url::class, $entity->field_test[0]->getUrl());
+    $link_item = $entity->field_test[0];
+    assert($link_item instanceof \Drupal\link\Plugin\Field\FieldType\LinkItem);
+    $this->assertInstanceOf(Url::class, $link_item->getUrl());
 
     // Check that setting LinkItem value NULL doesn't generate any error or
     // warning.
     $entity->field_test[0] = NULL;
-    $this->assertNull($entity->field_test[0]->getValue());
+    $link_item = $entity->field_test[0];
+    assert($link_item instanceof \Drupal\link\Plugin\Field\FieldType\LinkItem);
+    $this->assertNull($link_item->getValue());
 
     // Test the generateSampleValue() method for generic, external, and internal
     // link types.

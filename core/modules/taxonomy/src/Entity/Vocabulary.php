@@ -124,7 +124,8 @@ class Vocabulary extends ConfigEntityBundleBase implements VocabularyInterface {
     // Reset caches.
     $storage->resetCache(array_keys($entities));
 
-    if (reset($entities)->isSyncing()) {
+    $entity = reset($entities);
+    if ($entity && $entity->isSyncing()) {
       return;
     }
 

@@ -93,10 +93,24 @@ class StreamWrapperTest extends FileTestBase {
     $this->assertSame($stream_wrapper_manager::getTarget('data:'), '');
 
     // Test Drupal\Core\StreamWrapper\LocalStream::getDirectoryPath().
-    $this->assertEquals(PublicStream::basePath(), $stream_wrapper_manager->getViaScheme('public')->getDirectoryPath(), 'Expected default directory path was returned.');
+    $stream_wrapper = $stream_wrapper_manager->getViaScheme('public');
+    $this->assertInstanceOf(\Drupal\Core\StreamWrapper\StreamWrapperInterface::class, $stream_wrapper);
+
+    $this->assertEquals(
+      PublicStream::basePath(),
+      $stream_wrapper->getDirectoryPath(),
+      'Expected default directory path was returned.'
+    );
     $file_system = \Drupal::service('file_system');
     assert($file_system instanceof FileSystemInterface);
-    $this->assertEquals($file_system->getTempDirectory(), $stream_wrapper_manager->getViaScheme('temporary')->getDirectoryPath(), 'Expected temporary directory path was returned.');
+    $stream_wrapper = $stream_wrapper_manager->getViaScheme('temporary');
+    $this->assertInstanceOf(\Drupal\Core\StreamWrapper\StreamWrapperInterface::class, $stream_wrapper);
+
+    $this->assertEquals(
+      $file_system->getTempDirectory(),
+      $stream_wrapper->getDirectoryPath(),
+      'Expected temporary directory path was returned.'
+    );
 
     // Test FileUrlGeneratorInterface::generateString()
     // TemporaryStream::getExternalUrl() uses Url::fromRoute(), which needs

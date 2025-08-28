@@ -203,14 +203,16 @@ class FieldWebTest extends ViewTestBase {
    */
   protected function xpathContent($content, $xpath, array $arguments = []) {
     if ($elements = $this->parseContent($content)) {
-      $xpath = $this->assertSession()->buildXPathQuery($xpath, $arguments);
-      $result = $elements->xpath($xpath);
-      // Some combinations of PHP / libxml versions return an empty array
-      // instead of the documented FALSE. Forcefully convert any falsish values
-      // to an empty array to allow foreach(...) constructions.
-      return $result ? $result : [];
-    }
-    else {
+      if ($elements instanceof \SimpleXMLElement) {
+        $xpath = $this->assertSession()->buildXPathQuery($xpath, $arguments);
+        $result = $elements->xpath($xpath);
+        // Some combinations of PHP / libxml versions return an empty array
+        // instead of the documented FALSE. Forcefully convert any falsish values
+        // to an empty array to allow foreach(...) constructions.
+        return $result ?: [];
+      }
+      return [];
+    } else {
       return FALSE;
     }
   }
