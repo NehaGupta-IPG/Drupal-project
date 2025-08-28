@@ -16,7 +16,7 @@ class NodeLinksTest extends NodeTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['views'];
+  protected static $modules = ['views', 'node_test'];
 
   /**
    * {@inheritdoc}
@@ -46,6 +46,45 @@ class NodeLinksTest extends NodeTestBase {
     $this->drupalGet('node');
     $this->assertSession()->pageTextContains($node->getTitle());
     $this->assertSession()->linkNotExists('Read more');
+  }
+
+  /**
+   * Tests altering the entity type changes the route path.
+   */
+  public function testNodeRouteAlter(): void {
+    // Login with user with right permissions and test listing.
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer nodes',
+      'access content overview',
+      'edit any page content',
+      'administer nodes',
+      'bypass node access',
+    ]));
+    // Create a node with no usage.
+    $node = $this->createNode();
+    $this->drupalGet('admin/content');
+
+    // Verify default route path.
+    $this->assertSession()->linkByHrefExists('/node/' . $node->id());
+    $this->assertSession()->linkByHrefExists('/node/' . $node->id() . '/edit');
+    $this->assertSession()->linkByHrefExists('/node/' . $node->id() . '/delete');
+
+    // Trigger hook entity_type_alter node route change.
+    $this->container->get('state')->set('node_test_route_alter', TRUE);
+
+    // Clear the entity type manager cache so that
+    // the altered definition is picked up.
+    $this->container->get('entity_type.manager')->clearCachedDefinitions();
+    $this->container->get('router.builder')->rebuild();
+    $this->container->get('cache.render')->deleteAll();
+
+    $this->drupalGet('admin/content');
+
+    // Verify new route path.
+    $this->assertSession()->linkByHrefExists('/route_alter/' . $node->id());
+    $this->assertSession()->linkByHrefExists('/route_alter/' . $node->id() . '/edit');
+    $this->assertSession()->linkByHrefExists('/route_alter/' . $node->id() . '/delete');
+
   }
 
 }
