@@ -118,6 +118,10 @@ class FormTestLabelForm extends FormBase {
     ];
     // Textfield test for title set not to display.
     $form['form_textfield_test_title_no_show'] = [
+      // #title must not be empty, but should be completely omitted from
+      // the page.
+      '#title' => 'form_textfield_test_title_no_show',
+      '#title_display' => 'none',
       '#type' => 'textfield',
     ];
     // Checkboxes & radios with title as attribute.
