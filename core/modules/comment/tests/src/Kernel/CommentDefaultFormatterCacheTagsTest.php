@@ -63,7 +63,7 @@ class CommentDefaultFormatterCacheTagsTest extends EntityKernelTestBase {
 
     // Set up a field, so that the entity that'll be referenced bubbles up a
     // cache tag when rendering it entirely.
-    $this->addDefaultCommentField('entity_test', 'entity_test', 'field_comment');
+    $this->addDefaultCommentField('entity_test', 'entity_test');
   }
 
   /**
@@ -88,7 +88,7 @@ class CommentDefaultFormatterCacheTagsTest extends EntityKernelTestBase {
       'entity_test:' . $commented_entity->id(),
       'config:core.entity_form_display.comment.comment.default',
       'config:field.field.comment.comment.comment_body',
-      'config:field.field.entity_test.entity_test.field_comment',
+      'config:field.field.entity_test.entity_test.comment',
       'config:field.storage.comment.comment_body',
       'config:user.settings',
     ];
@@ -106,7 +106,7 @@ class CommentDefaultFormatterCacheTagsTest extends EntityKernelTestBase {
       ],
       'entity_id' => $commented_entity->id(),
       'entity_type' => 'entity_test',
-      'field_name' => 'field_comment',
+      'field_name' => 'comment',
       'comment_type' => 'comment',
       'status' => CommentInterface::PUBLISHED,
       'uid' => $user->id(),
@@ -136,7 +136,7 @@ class CommentDefaultFormatterCacheTagsTest extends EntityKernelTestBase {
       'user:' . $user->id(),
       'config:core.entity_form_display.comment.comment.default',
       'config:field.field.comment.comment.comment_body',
-      'config:field.field.entity_test.entity_test.field_  comment',
+      'config:field.field.entity_test.entity_test.comment',
       'config:field.storage.comment.comment_body',
       'config:user.settings',
     ];
@@ -158,7 +158,7 @@ class CommentDefaultFormatterCacheTagsTest extends EntityKernelTestBase {
 
     // The children (fields) of the entity render array are only built in case
     // of a cache miss.
-    $this->assertFalse(isset($build['entity']['field_comment']), 'Cache hit');
+    $this->assertFalse(isset($build['entity']['comment']), 'Cache hit');
   }
 
 }
