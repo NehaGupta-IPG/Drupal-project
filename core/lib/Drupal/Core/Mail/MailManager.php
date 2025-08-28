@@ -12,6 +12,8 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\MailTheme\MailTemplateId;
+use Drupal\Core\MailTheme\MailThemeManagerInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
@@ -78,8 +80,10 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
    *   The string translation service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
+   * @param \Drupal\Core\MailTheme\MailThemeManagerInterface $mailThemeManager
+   *   The mail theme manager.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory, TranslationInterface $string_translation, RendererInterface $renderer) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory, TranslationInterface $string_translation, RendererInterface $renderer, protected ?MailThemeManagerInterface $mailThemeManager = NULL) {
     parent::__construct('Plugin/Mail', $namespaces, $module_handler, MailInterface::class, Mail::class, 'Drupal\Core\Annotation\Mail');
     $this->alterInfo('mail_backend_info');
     $this->setCacheBackend($cache_backend, 'mail_backend_plugins');
@@ -87,6 +91,10 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
     $this->loggerFactory = $logger_factory;
     $this->stringTranslation = $string_translation;
     $this->renderer = $renderer;
+    if ($this->mailThemeManager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $mailThemeManager argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3486179', E_USER_DEPRECATED);
+      $this->mailThemeManager = \Drupal::service(MailThemeManagerInterface::class);
+    }
   }
 
   /**
@@ -177,8 +185,11 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
     // attachments. Therefore we perform mailing inside its own render context,
     // to ensure it doesn't leak into the render context for the HTTP response
     // to the current request.
-    return $this->renderer->executeInRenderContext(new RenderContext(), function () use ($module, $key, $to, $langcode, $params, $reply, $send) {
-      return $this->doMail($module, $key, $to, $langcode, $params, $reply, $send);
+    $templateId = new MailTemplateId($module, $key);
+    return $this->mailThemeManager->executeInMailTheme($templateId, function () use ($module, $key, $to, $langcode, $params, $reply, $send) {
+      return $this->renderer->executeInRenderContext(new RenderContext(), function () use ($module, $key, $to, $langcode, $params, $reply, $send) {
+        return $this->doMail($module, $key, $to, $langcode, $params, $reply, $send);
+      });
     });
   }
 

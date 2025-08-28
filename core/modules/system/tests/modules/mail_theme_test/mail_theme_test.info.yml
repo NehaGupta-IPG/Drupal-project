@@ -1,0 +1,5 @@
+name: 'Mail theme test'
+type: module
+description: 'Support module for mail theme system testing.'
+package: Testing
+version: VERSION

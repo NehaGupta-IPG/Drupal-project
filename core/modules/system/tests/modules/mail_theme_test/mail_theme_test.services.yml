@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autoconfigure: true
+    autowire: true
+  Drupal\mail_theme_test\MailTheme\CustomThemeNegotiator:
+    tags:
+      - { name: mail_theme_negotiator }

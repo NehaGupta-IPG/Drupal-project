@@ -1495,8 +1495,18 @@ services:
   Drupal\Core\Flood\FloodInterface: '@flood'
   plugin.manager.mail:
     class: Drupal\Core\Mail\MailManager
-    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@config.factory', '@logger.factory', '@string_translation', '@renderer']
+    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@config.factory', '@logger.factory', '@string_translation', '@renderer', '@Drupal\Core\MailTheme\MailThemeManagerInterface']
   Drupal\Core\Mail\MailManagerInterface: '@plugin.manager.mail'
+  Drupal\Core\MailTheme\MailThemeManagerInterface: 
+    class: 'Drupal\Core\MailTheme\MailThemeManager'
+    autowire: true
+  Drupal\Core\MailTheme\MailThemeNegotiatorInterface:
+    class: 'Drupal\Core\MailTheme\MailThemeNegotiator'
+    autowire: true
+  Drupal\Core\MailTheme\DefaultNegotiator:
+    autowire: true
+    tags:
+      - { name: mail_theme_negotiator, priority: -100 }
   plugin.manager.condition:
     class: Drupal\Core\Condition\ConditionManager
     parent: default_plugin_manager
