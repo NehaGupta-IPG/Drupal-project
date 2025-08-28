@@ -84,6 +84,17 @@ interface EntityTypeManagerInterface extends PluginManagerInterface, CachedDisco
   public function getRouteProviders($entity_type_id);
 
   /**
+   * Creates a new permission provider handler instance.
+   *
+   * @param string $entity_type_id
+   *   The entity type ID for this permission provider handler.
+   *
+   * @return \Drupal\Core\Entity\EntityPermissionProviderInterface
+   *   A permission provider handler instance.
+   */
+  public function getPermissionProvider($entity_type_id);
+
+  /**
    * Checks whether a certain entity type has a certain handler.
    *
    * @param string $entity_type_id

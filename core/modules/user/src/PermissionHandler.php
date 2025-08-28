@@ -3,9 +3,11 @@
 namespace Drupal\user;
 
 use Drupal\Core\Discovery\YamlDiscovery;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Utility\CallableResolver;
 
@@ -86,8 +88,10 @@ class PermissionHandler implements PermissionHandlerInterface {
    *   The callable resolver.
    * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
    *   The module extension list.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, TranslationInterface $string_translation, CallableResolver $callable_resolver, protected ModuleExtensionList $moduleExtensionList) {
+  public function __construct(ModuleHandlerInterface $module_handler, TranslationInterface $string_translation, CallableResolver $callable_resolver, protected ModuleExtensionList $moduleExtensionList, protected ?EntityTypeManagerInterface $entityTypeManager = NULL) {
     $this->callableResolver = $callable_resolver;
 
     // @todo It would be nice if you could pull all module directories from the
@@ -114,7 +118,7 @@ class PermissionHandler implements PermissionHandlerInterface {
    */
   public function getPermissions() {
     $all_permissions = $this->buildPermissionsYaml();
-
+    $all_permissions += $this->buildEntityTypePermissions();
     return $this->sortPermissions($all_permissions);
   }
 
@@ -197,6 +201,27 @@ class PermissionHandler implements PermissionHandlerInterface {
   }
 
   /**
+   * Builds all permissions provided by entity permission providers.
+   *
+   * @return array[]
+   *   The permissions.
+   *   Each permission is an array with the following keys:
+   *   - title: The title of the permission.
+   *   - description: The description of the permission, defaults to NULL.
+   *   - provider: The provider of the permission.
+   */
+  protected function buildEntityTypePermissions(): array {
+    $permissions = [];
+    /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+    foreach ($this->entityTypeManager->getDefinitions() as $entity_type) {
+      $permission_provider = $this->entityTypeManager->getPermissionProvider($entity_type->id());
+      $permissions = $permission_provider->buildPermissions();
+    }
+
+    return $permissions;
+  }
+
+  /**
    * Sorts the given permissions by provider name and title.
    *
    * @param array $all_permissions
@@ -215,7 +240,7 @@ class PermissionHandler implements PermissionHandlerInterface {
 
     uasort($all_permissions, function (array $permission_a, array $permission_b) use ($modules) {
       if ($modules[$permission_a['provider']] == $modules[$permission_b['provider']]) {
-        return $permission_a['title'] <=> $permission_b['title'];
+        return TranslatableMarkup::compare($permission_a['title'], $permission_b['title']);
       }
       else {
         return $modules[$permission_a['provider']] <=> $modules[$permission_b['provider']];

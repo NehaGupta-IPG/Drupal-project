@@ -5,14 +5,19 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Entity\Routing;
 
 use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
+use Drupal\Core\Entity\DefaultEntityPermissionProvider;
+use Drupal\Core\Entity\EditorialEntityPermissionProvider;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Entity\EntityPermissionProviderInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\UnitTestCase;
+use Drupal\user\EntityOwnerInterface;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Prophecy\Prophet;
@@ -50,8 +55,8 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-
     $this->entityTypeManager = $this->prophesize(EntityTypeManagerInterface::class);
+    $this->entityTypeManager->getPermissionProvider('the_entity_type_id')->willReturn($this->prophesize(EntityPermissionProviderInterface::class));
     $this->entityFieldManager = $this->prophesize(EntityFieldManagerInterface::class);
 
     $this->routeProvider = new TestDefaultHtmlRouteProvider($this->entityTypeManager->reveal(), $this->entityFieldManager->reveal());
@@ -262,6 +267,10 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
    */
   public function testGetCollectionRoute(?Route $expected, EntityTypeInterface $entity_type): void {
     $route = $this->routeProvider->getCollectionRoute($entity_type);
+    $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
+    $entity_type_manager->getPermissionProvider('the_entity_type_id')->willReturn(new DefaultEntityPermissionProvider($entity_type));
+    $route_provider = new TestDefaultHtmlRouteProvider($entity_type_manager->reveal(), $this->entityFieldManager->reveal());
+    $route = $route_provider->getCollectionRoute($entity_type);
     $this->assertEquals($expected, $route);
   }
 
@@ -346,6 +355,50 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
         '_permission' => 'administer the entity type+overview the entity type',
       ]);
     $data['collection_route_with_both_permission'] = [clone $route, $entity_type6->reveal()];
+    return $data;
+  }
+
+  /**
+   * @covers ::getCollectionRoute
+   * @dataProvider providerTestGetCollectionRouteOverviewPermission
+   */
+  public function testGetCollectionRouteOverviewPermission(EntityTypeInterface $entity_type, ?Route $expected = NULL): void {
+    $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
+    $entity_type_bundle_info = $this->prophesize(EntityTypeBundleInfoInterface::class);
+    $entity_type_manager->getPermissionProvider('the_entity_type_id')->willReturn(new EditorialEntityPermissionProvider($entity_type, $entity_type_bundle_info->reveal()));
+
+    $route_provider = new TestDefaultHtmlRouteProvider($entity_type_manager->reveal(), $this->entityFieldManager->reveal());
+
+    $route = $route_provider->getCollectionRoute($entity_type);
+    $this->assertEquals($expected, $route);
+  }
+
+  public static function providerTestGetCollectionRouteOverviewPermission(): array {
+    $data = [];
+    $entity_type = static::getEntityType();
+    $entity_type->hasLinkTemplate('collection')->willReturn(TRUE);
+    $entity_type->hasListBuilderClass()->willReturn(TRUE);
+    $entity_type->getAdminPermission()->willReturn('administer the entity type');
+    $entity_type->getPermissionGranularity()->willReturn('entity_type');
+    $entity_type->hasHandlerClass('permission_provider')->willReturn(TRUE);
+    $entity_type->id()->willReturn('the_entity_type_id');
+    $entity_type->getLabel()->willReturn('The entity type');
+    $entity_type->getCollectionLabel()->willReturn(new TranslatableMarkup('Test entities'));
+    $entity_type->getLinkTemplate('collection')->willReturn('/the/collection/link/template');
+    $entity_type->entityClassImplements(FieldableEntityInterface::class)->willReturn(FALSE);
+    $entity_type->entityClassImplements(EntityOwnerInterface::class)->willReturn(FALSE);
+    $route = (new Route('/the/collection/link/template'))
+      ->setDefaults([
+        '_entity_list' => 'the_entity_type_id',
+        '_title' => 'Test entities',
+        '_title_arguments' => [],
+        '_title_context' => '',
+      ])
+      ->setRequirements([
+        '_permission' => 'administer the_entity_type_id+access the_entity_type_id overview',
+      ]);
+    $data['collection_route'] = [clone $route, $entity_type->reveal()];
+
     return $data;
   }
 

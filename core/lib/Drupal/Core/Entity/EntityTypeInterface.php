@@ -355,6 +355,24 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
   public function setAccessClass($class);
 
   /**
+   * Gets the permission provider class.
+   *
+   * @return string
+   *   The class for this entity type's permission provider.
+   */
+  public function getPermissionProviderClass();
+
+  /**
+   * Sets the permission provider handler class.
+   *
+   * @param string $class
+   *   The class for this entity type's permission provider handler.
+   *
+   * @return $this
+   */
+  public function setPermissionProviderClass($class);
+
+  /**
    * Indicates if the entity type class implements the given interface.
    *
    * @param string $interface

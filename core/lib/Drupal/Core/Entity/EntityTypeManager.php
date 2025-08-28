@@ -195,6 +195,13 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
   /**
    * {@inheritdoc}
    */
+  public function getPermissionProvider($entity_type_id) {
+    return $this->getHandler($entity_type_id, 'permission_provider');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getListBuilder($entity_type_id) {
     return $this->getHandler($entity_type_id, 'list_builder');
   }

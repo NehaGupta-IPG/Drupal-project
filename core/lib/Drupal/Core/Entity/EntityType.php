@@ -346,6 +346,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
     ];
     $this->handlers += [
       'access' => 'Drupal\Core\Entity\EntityAccessControlHandler',
+      'permission_provider' => 'Drupal\Core\Entity\DefaultEntityPermissionProvider',
     ];
     if (isset($this->handlers['storage'])) {
       $this->checkStorageClass($this->handlers['storage']);
@@ -631,6 +632,21 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    */
   public function setAccessClass($class) {
     $this->handlers['access'] = $class;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPermissionProviderClass() {
+    return $this->getHandlerClass('permission_provider');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPermissionProviderClass($class) {
+    $this->handlers['permission_provider'] = $class;
     return $this;
   }
 
