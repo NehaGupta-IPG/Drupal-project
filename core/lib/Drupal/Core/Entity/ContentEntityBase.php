@@ -5,6 +5,7 @@ namespace Drupal\Core\Entity;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Entity\Plugin\DataType\EntityReference;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -605,7 +606,11 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    */
   public function get($field_name) {
     if (!isset($this->fields[$field_name][$this->activeLangcode])) {
-      return $this->getTranslatedField($field_name, $this->activeLangcode);
+      if (!($field = $this->getTranslatedField($field_name, $this->activeLangcode))) {
+        @trigger_error('Throwing an exception when calling ' . __METHOD__ . ' on an invalid field name is deprecated in drupal:11.3.0 and the method will return NULL on an invalid field name in drupal:12.0.0. See https://www.drupal.org/node/3522223', E_USER_DEPRECATED);
+        throw new \InvalidArgumentException("Field $field_name is unknown.");
+      }
+      return $field;
     }
     return $this->fields[$field_name][$this->activeLangcode];
   }
@@ -613,19 +618,18 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   /**
    * Gets a translated field.
    *
-   * @return \Drupal\Core\Field\FieldItemListInterface
-   *   The translated field.
+   * @return \Drupal\Core\Field\FieldItemListInterface|null
+   *   The translated field, or NULL if the field name is unknown.
    */
-  protected function getTranslatedField($name, $langcode) {
+  protected function getTranslatedField(string $name, string $langcode): ?FieldItemListInterface {
     if ($this->translations[$this->activeLangcode]['status'] == static::TRANSLATION_REMOVED) {
       throw new \InvalidArgumentException("The entity object refers to a removed translation ({$this->activeLangcode}) and cannot be manipulated.");
     }
     // Populate $this->fields to speed-up further look-ups and to keep track of
     // fields objects, possibly holding changes to field values.
     if (!isset($this->fields[$name][$langcode])) {
-      $definition = $this->getFieldDefinition($name);
-      if (!$definition) {
-        throw new \InvalidArgumentException("Field $name is unknown.");
+      if (!($definition = $this->getFieldDefinition($name))) {
+        return NULL;
       }
       // Non-translatable fields are always stored with
       // LanguageInterface::LANGCODE_DEFAULT as key.
@@ -666,6 +670,9 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     // Assign the value on the child and overrule notify such that we get
     // notified to handle changes afterwards. We can ignore notify as there is
     // no parent to notify anyway.
+    if (!$this->hasField($name)) {
+      throw new \InvalidArgumentException("Field $name is unknown.");
+    }
     $this->get($name)->setValue($value, TRUE);
     return $this;
   }
@@ -1087,18 +1094,9 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    *   builders) by reference. Clean that up.
    */
   public function &__get($name) {
-    // If this is an entity field, handle it accordingly. We first check whether
-    // a field object has been already created. If not, we create one.
-    if (isset($this->fields[$name][$this->activeLangcode])) {
-      return $this->fields[$name][$this->activeLangcode];
-    }
-    // Inline getFieldDefinition() to speed things up.
-    if (!isset($this->fieldDefinitions)) {
-      $this->getFieldDefinitions();
-    }
-    if (isset($this->fieldDefinitions[$name])) {
-      $return = $this->getTranslatedField($name, $this->activeLangcode);
-      return $return;
+    // If this is an entity field, handle it accordingly.
+    if (($field = $this->getTranslatedField($name, $this->activeLangcode))) {
+      return $field;
     }
     if ($name === 'original') {
       // A variable is required that this technically is a return-by-reference.
@@ -1119,24 +1117,13 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * Uses default language always.
    */
   public function __set($name, $value) {
-    // Inline getFieldDefinition() to speed things up.
-    if (!isset($this->fieldDefinitions)) {
-      $this->getFieldDefinitions();
-    }
     // Handle Field API fields.
-    if (isset($this->fieldDefinitions[$name])) {
+    if (($field = $this->getTranslatedField($name, $this->activeLangcode))) {
       // Support setting values via property objects.
       if ($value instanceof TypedDataInterface) {
         $value = $value->getValue();
       }
-      // If a FieldItemList object already exists, set its value.
-      if (isset($this->fields[$name][$this->activeLangcode])) {
-        $this->fields[$name][$this->activeLangcode]->setValue($value);
-      }
-      // If not, create one.
-      else {
-        $this->getTranslatedField($name, $this->activeLangcode)->setValue($value);
-      }
+      $field->setValue($value);
     }
     // The translations array is unset when cloning the entity object, we just
     // need to restore it.

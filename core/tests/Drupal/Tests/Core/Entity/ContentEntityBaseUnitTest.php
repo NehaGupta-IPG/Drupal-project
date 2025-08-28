@@ -16,6 +16,8 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Language\Language;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -539,16 +541,17 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
       // Populated fields array.
       ['result', 'field_name', 'langcode', ['field_name' => ['langcode' => 'result']]],
       // Incomplete fields array.
-      ['getTranslatedField_result', 'field_name', 'langcode', ['field_name' => 'no_langcode']],
+      [NULL, 'field_name', 'langcode', ['field_name' => 'no_langcode']],
       // Empty fields array.
-      ['getTranslatedField_result', 'field_name', 'langcode', []],
+      [NULL, 'field_name', 'langcode', []],
     ];
   }
 
   /**
    * @covers ::get
-   * @dataProvider providerGet
    */
+  #[DataProvider('providerGet')]
+  #[IgnoreDeprecations]
   public function testGet($expected, $field_name, $active_langcode, $fields): void {
     // Mock ContentEntityBase.
     $mock_base = $this->getMockBuilder(ContentEntityBaseMockableClass::class)
@@ -582,7 +585,16 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
     $ref_fields->setValue($mock_base, $fields);
 
     // Exercise get().
-    $this->assertEquals($expected, $mock_base->get($field_name));
+    if ($expected === NULL) {
+      $this->expectException(\InvalidArgumentException::class);
+      $this->expectExceptionMessage('Field field_name is unknown.');
+      $this->expectDeprecation('Throwing an exception when calling Drupal\Core\Entity\ContentEntityBase::get on an invalid field name is deprecated in drupal:11.3.0 and the method will return NULL on an invalid field name in drupal:12.0.0. See https://www.drupal.org/node/3522223');
+    }
+    $result = $mock_base->get($field_name);
+    if ($expected !== NULL) {
+      $this->assertEquals($expected, $result);
+    }
+
   }
 
   /**
