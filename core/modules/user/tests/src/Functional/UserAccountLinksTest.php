@@ -134,7 +134,7 @@ class UserAccountLinksTest extends BrowserTestBase {
    * Tests altering the entity type changes the route path.
    */
   public function testUserRouteAlter(): void {
-   // Create an admin user and log in.
+    // Create an admin user and log in.
     $this->drupalLogin($this->drupalCreateUser([
       'access administration pages',
       'administer users',
