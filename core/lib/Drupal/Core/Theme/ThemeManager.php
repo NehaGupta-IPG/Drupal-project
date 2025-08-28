@@ -236,10 +236,21 @@ class ThemeManager implements ThemeManagerInterface {
     // '#theme' => 'node', but a module can add 'node__article' as a suggestion
     // via hook_theme_suggestions_HOOK_alter(), enabling a theme to have
     // an alternate template file for article nodes.
-    foreach (array_reverse($suggestions) as $suggestion) {
+    foreach (array_reverse(array_keys($suggestions)) as $key) {
+      $suggestion = $suggestions[$key];
       if ($theme_registry->has($suggestion)) {
         $info = $theme_registry->get($suggestion);
         if (isset($deprecated_suggestions[$suggestion])) {
+
+          // If the suggestion is deprecated, but the next suggestion is
+          // identical to this one, ignore the deprecation and use the next.
+          // This happens for example with the common comment field and the
+          // deprecated field name and field type based suggestions.
+          if (isset($suggestions[$key - 1]) && $suggestions[$key - 1] === $suggestion) {
+            unset($suggestions[$key], $deprecated_suggestions[$suggestion]);
+            continue;
+          }
+
           @trigger_error($deprecated_suggestions[$suggestion], E_USER_DEPRECATED);
         }
         break;
