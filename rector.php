@@ -613,6 +613,12 @@ return RectorConfig::configure()
         __DIR__ . '/core/tests/Drupal/Tests/Core/Extension/Requirement/RequirementSeverityTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Core/Utility/CallableResolverTest.php',
 
+        # Modules' Kernel tests skipped.
+        __DIR__ . '/core/modules/editor/tests/src/Kernel/EditorValidationTest.php',
+        __DIR__ . '/core/modules/node/tests/src/Kernel/NodeTypeValidationTest.php',
+        __DIR__ . '/core/modules/ckeditor5/tests/src/Kernel/ConfigAction/AddItemToToolbarConfigActionTest.php',
+        __DIR__ . '/core/modules/system/tests/src/Kernel/Entity/MenuValidationTest.php',
+
         __DIR__ . '/core/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php',
         __DIR__ . '/core/modules/ckeditor5/tests/src/FunctionalJavascript/SourceEditingEmptyElementTest.php',
         '*/ProxyClass/*',
