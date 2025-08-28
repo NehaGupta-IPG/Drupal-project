@@ -70,13 +70,16 @@ class FormPreprocess {
    *   It is used where a visual label is not needed, such as a table of
    *   checkboxes where the row and column provide the context. The tooltip will
    *   include the title and required marker.
+   * - none: Omits the label or title attribute completely from the page.
+   *   This can be useful in cases such as the password_confirm element, which
+   *   creates children elements that have their own labels and required
+   *   markers, but the parent element should have neither. Use this carefully
+   *   because titles (names) on form elements are important for accessibility
+   *   and proper form validation error messages.
    *
-   * If the #title property is not set, then the label and any required marker
-   * will not be output, regardless of the #title_display or #required values.
-   * This can be useful in cases such as the password_confirm element, which
-   * creates children elements that have their own labels and required markers,
-   * but the parent element should have neither. Use this carefully because a
-   * field without an associated label can cause accessibility challenges.
+   * (deprecated) If the #title property is not set, then the label and any
+   * required marker will not be output, regardless of the #title_display or
+   * #required values.
    *
    * To associate the label with a different field, set the #label_for property
    * to the ID of the desired field.
@@ -86,6 +89,8 @@ class FormPreprocess {
    *   - element: An associative array containing the properties of the element.
    *     Properties used: #title, #title_display, #description, #id, #required,
    *     #children, #type, #name, #label_for.
+   *
+   * @see https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html
    */
   public function preprocessFormElement(array &$variables): void {
     $element = &$variables['element'];
@@ -121,6 +126,7 @@ class FormPreprocess {
     $variables['errors'] = NULL;
 
     // If #title is not set, we don't display any label.
+    // @todo Remove this after https://drupal.org/i/933004.
     if (!isset($element['#title'])) {
       $element['#title_display'] = 'none';
     }
