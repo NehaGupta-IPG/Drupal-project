@@ -16,7 +16,7 @@ class UserAccountLinksTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['menu_ui', 'block', 'test_page_test', 'user_hooks_test'];
+  protected static $modules = ['menu_ui', 'block', 'test_page_test', 'user_form_test'];
 
   /**
    * {@inheritdoc}
@@ -150,7 +150,7 @@ class UserAccountLinksTest extends BrowserTestBase {
     $this->assertSession()->linkByHrefExists('/user/' . $user->id() . '/cancel');
 
     // Trigger hook entity_type_alter user route change.
-    $this->container->get('state')->set('user_hooks_test_route_alter', TRUE);
+    $this->container->get('state')->set('user_form_test_route_alter', TRUE);
 
     // Clear the entity type manager cache so that
     // the altered definition is picked up.
