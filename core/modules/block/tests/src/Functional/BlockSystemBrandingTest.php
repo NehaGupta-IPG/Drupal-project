@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block\Functional;
 
+use Drupal\user\Entity\Role;
+
 /**
  * Tests branding block display.
  *
@@ -115,6 +117,28 @@ class BlockSystemBrandingTest extends BlockTestBase {
     $this->assertSession()->elementNotExists('xpath', $site_name_xpath);
     $this->assertSession()->elementTextNotContains('xpath', $site_slogan_xpath, 'Community carpentry');
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:system.site');
+
+    $authenticatedUser = $this->drupalCreateUser([
+      'administer blocks',
+      'access administration pages',
+    ]);
+
+    $this->drupalLogin($authenticatedUser);
+    $this->drupalGet('admin/structure/block/manage/site_branding');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextNotContains('Defined on the Appearance Settings or Theme Settings page.');
+    $this->assertSession()->pageTextNotContains('Defined on the Site Information page.');
+
+    $rids = $authenticatedUser->getRoles(TRUE);
+    $role = Role::load(array_shift($rids));
+    $role->grantPermission('administer themes')
+      ->grantPermission('administer site configuration')
+      ->save();
+
+    $this->drupalGet('admin/structure/block/manage/site_branding');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Defined on the Appearance Settings or Theme Settings page.');
+    $this->assertSession()->pageTextContains('Defined on the Site Information page.');
   }
 
 }
