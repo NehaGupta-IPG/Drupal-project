@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\navigation\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\PerformanceTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
 /**
  * Tests performance with the navigation toolbar enabled.
@@ -13,11 +15,10 @@ use Drupal\FunctionalJavascriptTests\PerformanceTestBase;
  *
  * @todo move this coverage to StandardPerformanceTest when Navigation is
  * enabled by default.
- *
- * @group Common
- * @group #slow
- * @requires extension apcu
  */
+#[Group('Common')]
+#[Group('#slow')]
+#[RequiresPhpExtension('apcu')]
 class PerformanceTest extends PerformanceTestBase {
 
   /**
@@ -73,16 +74,27 @@ class PerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 4,
-      'CacheGetCount' => 61,
+      'CacheGetCount' => 45,
+      'CacheGetCountByBin' => [
+        'config' => 10,
+        'data' => 4,
+        'discovery' => 9,
+        'bootstrap' => 6,
+        'dynamic_page_cache' => 1,
+        'render' => 14,
+        'menu' => 1,
+      ],
       'CacheSetCount' => 2,
+      'CacheSetCountByBin' => [
+        'dynamic_page_cache' => 2,
+      ],
       'CacheDeleteCount' => 0,
-      'CacheTagChecksumCount' => 3,
-      'CacheTagIsValidCount' => 31,
       'CacheTagInvalidationCount' => 0,
-      'ScriptCount' => 2,
-      'ScriptBytes' => 215500,
-      'StylesheetCount' => 1,
-      'StylesheetBytes' => 92000,
+      'CacheTagLookupQueryCount' => 13,
+      'ScriptCount' => 3,
+      'ScriptBytes' => 167569,
+      'StylesheetCount' => 2,
+      'StylesheetBytes' => 45450,
     ];
     $this->assertMetrics($expected, $performance_data);
 

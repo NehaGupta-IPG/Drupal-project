@@ -8,17 +8,18 @@ use Drupal\Component\Utility\Html;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
-use Drupal\views\ViewExecutable;
-use Drupal\views\Views;
 use Drupal\views\Entity\View;
 use Drupal\views\Plugin\views\filter\FilterPluginBase;
+use Drupal\views\ViewExecutable;
+use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests exposed forms functionality.
- *
- * @group views
- * @group #slow
  */
+#[Group('views')]
+#[Group('#slow')]
 class ExposedFormTest extends ViewTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -116,7 +117,7 @@ class ExposedFormTest extends ViewTestBase {
         'field' => 'type',
         'id' => 'type',
         'table' => 'node_field_data',
-        'plugin_id' => 'bundle',
+        'plugin_id' => 'in_operator',
         'entity_type' => 'node',
         'entity_field' => 'type',
         'expose' => [
@@ -209,10 +210,13 @@ class ExposedFormTest extends ViewTestBase {
     $this->assertSession()->fieldValueEquals('edit-type', 'article');
 
     // Test the reset works.
-    $this->drupalGet('test_exposed_form_buttons', ['query' => ['op' => 'Reset']]);
+    $this->submitForm([], 'Reset');
+    $this->assertSession()->addressEquals('test_exposed_form_buttons');
     $this->assertSession()->statusCodeEquals(200);
     // Test the type has been reset.
     $this->assertSession()->fieldValueEquals('edit-type', 'All');
+    // Test that the reset button didn't start a session.
+    $this->assertEquals(FALSE, (bool) $this->getSession()->getCookie($this->getSessionName()));
 
     // Test the button is hidden after reset.
     $this->assertSession()->fieldNotExists('edit-reset');
@@ -244,9 +248,8 @@ class ExposedFormTest extends ViewTestBase {
 
   /**
    * Tests the exposed block functionality.
-   *
-   * @dataProvider providerTestExposedBlock
    */
+  #[DataProvider('providerTestExposedBlock')]
   public function testExposedBlock($display): void {
     $view = Views::getView('test_exposed_block');
     $view->setDisplay($display);

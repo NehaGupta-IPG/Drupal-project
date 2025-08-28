@@ -7,15 +7,16 @@ namespace Drupal\Tests\package_manager\Functional;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\package_manager\FailureMarker;
 use Drupal\package_manager\PathLocator;
-use Drupal\package_manager\StageBase;
+use Drupal\package_manager\SandboxManagerBase;
 use Drupal\Tests\package_manager\Traits\AssertPreconditionsTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that Package Manager's requirements check for the failure marker.
  *
- * @group package_manager
  * @internal
  */
+#[Group('package_manager')]
 class FailureMarkerRequirementTest extends PackageManagerTestBase {
   use StringTranslationTrait;
 
@@ -44,14 +45,14 @@ class FailureMarkerRequirementTest extends PackageManagerTestBase {
 
     $failure_marker = $this->container->get(FailureMarker::class);
     $message = $this->t('Package Manager is here to wreck your day.');
-    $stage = new class() extends StageBase {
+    $stage = new class() extends SandboxManagerBase {
 
       public function __construct() {}
 
       /**
        * {@inheritdoc}
        */
-      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable, Drupal.Commenting.VariableComment.Missing
       protected string $type = 'test';
     };
     $failure_marker->write($stage, $message);

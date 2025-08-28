@@ -7,16 +7,16 @@ namespace Drupal\Tests\views\Unit\Plugin\views\query;
 use Drupal\Core\Database\Connection;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Plugin\views\query\SqliteDateSql;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore unixepoch
-
 /**
  * Tests the MySQL-specific date query handler.
- *
- * @coversDefaultClass \Drupal\views\Plugin\views\query\SqliteDateSql
- *
- * @group views
  */
+#[CoversClass(SqliteDateSql::class)]
+#[Group('views')]
 class SqliteDateSqlTest extends UnitTestCase {
 
   /**
@@ -37,7 +37,7 @@ class SqliteDateSqlTest extends UnitTestCase {
   /**
    * Tests the getDateField method.
    *
-   * @covers ::getDateField
+   * @legacy-covers ::getDateField
    */
   public function testGetDateField(): void {
     $date_sql = new SqliteDateSql($this->database);
@@ -52,10 +52,9 @@ class SqliteDateSqlTest extends UnitTestCase {
   /**
    * Tests date formatting replacement.
    *
-   * @covers ::getDateFormat
-   *
-   * @dataProvider providerTestGetDateFormat
+   * @legacy-covers ::getDateFormat
    */
+  #[DataProvider('providerTestGetDateFormat')]
   public function testGetDateFormat($field, $format, $expected): void {
     $date_sql = new SqliteDateSql($this->database);
 
@@ -67,17 +66,33 @@ class SqliteDateSqlTest extends UnitTestCase {
    */
   public static function providerTestGetDateFormat() {
     return [
-      ['foo.field', 'Y-y-M-m', "strftime('%Y-%Y-%m-%m', foo.field, 'unixepoch')"],
-      ['bar.field', 'n-F D d l', "strftime('%m-%m %d %d %d', bar.field, 'unixepoch')"],
-      ['baz.bar_field', 'j/W/H-h i s A', "strftime('%d/%W/%H-%H %M %S ', baz.bar_field, 'unixepoch')"],
-      ['foo.field', 'W', "CAST(((strftime('%j', date(strftime('%Y-%m-%d', foo.field, 'unixepoch'), '-3 days', 'weekday 4')) - 1) / 7 + 1) AS NUMERIC)"],
+      [
+        'foo.field',
+        'Y-y-M-m',
+        "strftime('%Y-%Y-%m-%m', foo.field, 'unixepoch')",
+      ],
+      [
+        'bar.field',
+        'n-F D d l',
+        "strftime('%m-%m %d %d %d', bar.field, 'unixepoch')",
+      ],
+      [
+        'baz.bar_field',
+        'j/W/H-h i s A',
+        "strftime('%d/%W/%H-%H %M %S ', baz.bar_field, 'unixepoch')",
+      ],
+      [
+        'foo.field',
+        'W',
+        "CAST(((strftime('%j', date(strftime('%Y-%m-%d', foo.field, 'unixepoch'), '-3 days', 'weekday 4')) - 1) / 7 + 1) AS NUMERIC)",
+      ],
     ];
   }
 
   /**
    * Tests timezone offset formatting.
    *
-   * @covers ::setFieldTimezoneOffset
+   * @legacy-covers ::setFieldTimezoneOffset
    */
   public function testSetFieldTimezoneOffset(): void {
     $date_sql = new SqliteDateSql($this->database);
@@ -90,7 +105,7 @@ class SqliteDateSqlTest extends UnitTestCase {
   /**
    * Tests setting the database offset.
    *
-   * @covers ::setTimezoneOffset
+   * @legacy-covers ::setTimezoneOffset
    */
   public function testSetTimezoneOffset(): void {
     $database = $this->prophesize(Connection::class);

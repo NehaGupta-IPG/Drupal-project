@@ -52,6 +52,43 @@ class FormBuilderTest extends FormTestBase {
   }
 
   /**
+   * Returns a test form array for use in form builder tests.
+   *
+   * @return array
+   *   The form array.
+   */
+  public static function buildTestFormStructure(): array {
+    $form['test'] = [
+      '#type' => 'textfield',
+      '#title' => 'Test',
+    ];
+    $form['options'] = [
+      '#type' => 'radios',
+      '#options' => [
+        'foo' => 'foo',
+        'bar' => 'bar',
+      ],
+    ];
+    $form['value'] = [
+      '#type' => 'value',
+      '#value' => 'bananas',
+    ];
+    $form['actions'] = [
+      '#type' => 'actions',
+    ];
+    $form['actions']['submit'] = [
+      '#type' => 'submit',
+      '#value' => 'Submit',
+    ];
+    $form['actions']['other_action'] = [
+      '#type' => 'submit',
+      '#name' => 'other_action',
+      '#value' => 'Other action',
+    ];
+    return $form;
+  }
+
+  /**
    * Tests the getFormId() method with a string based form ID.
    *
    * @covers ::getFormId
@@ -149,7 +186,7 @@ class FormBuilderTest extends FormTestBase {
    */
   public function testHandleFormStateResponse($class, $form_state_key): void {
     $form_id = 'test_form_id';
-    $expected_form = $form_id();
+    $expected_form = self::buildTestFormStructure();
 
     $response = $this->getMockBuilder($class)
       ->disableOriginalConstructor()
@@ -190,7 +227,7 @@ class FormBuilderTest extends FormTestBase {
    */
   public function testHandleRedirectWithResponse(): void {
     $form_id = 'test_form_id';
-    $expected_form = $form_id();
+    $expected_form = self::buildTestFormStructure();
 
     // Set up a response that will be used.
     $response = $this->getMockBuilder('Symfony\Component\HttpFoundation\Response')
@@ -239,7 +276,7 @@ class FormBuilderTest extends FormTestBase {
    */
   public function testGetFormWithObject(): void {
     $form_id = 'test_form_id';
-    $expected_form = $form_id();
+    $expected_form = self::buildTestFormStructure();
 
     $form_arg = $this->getMockForm($form_id, $expected_form);
 
@@ -293,7 +330,7 @@ class FormBuilderTest extends FormTestBase {
    */
   public function testBuildFormWithObject(): void {
     $form_id = 'test_form_id';
-    $expected_form = $form_id();
+    $expected_form = self::buildTestFormStructure();
 
     $form_arg = $this->getMockForm($form_id, $expected_form);
 
@@ -318,7 +355,7 @@ class FormBuilderTest extends FormTestBase {
    */
   public function testBuildFormWithTriggeringElement($element_value, $input_value): void {
     $form_id = 'test_form_id';
-    $expected_form = $form_id();
+    $expected_form = self::buildTestFormStructure();
 
     $expected_form['actions']['other_submit'] = [
       '#type' => 'submit',
@@ -356,7 +393,7 @@ class FormBuilderTest extends FormTestBase {
    */
   public function testRebuildForm(): void {
     $form_id = 'test_form_id';
-    $expected_form = $form_id();
+    $expected_form = self::buildTestFormStructure();
 
     // The form will be built four times.
     $form_arg = $this->createMock('Drupal\Core\Form\FormInterface');
@@ -396,7 +433,7 @@ class FormBuilderTest extends FormTestBase {
    */
   public function testRebuildFormOnGetRequest(): void {
     $form_id = 'test_form_id';
-    $expected_form = $form_id();
+    $expected_form = self::buildTestFormStructure();
 
     // The form will be built four times.
     $form_arg = $this->createMock('Drupal\Core\Form\FormInterface');
@@ -434,7 +471,7 @@ class FormBuilderTest extends FormTestBase {
    */
   public function testGetCache(): void {
     $form_id = 'test_form_id';
-    $expected_form = $form_id();
+    $expected_form = self::buildTestFormStructure();
     $expected_form['#token'] = FALSE;
 
     // FormBuilder::buildForm() will be called twice, but the form object will
@@ -477,7 +514,7 @@ class FormBuilderTest extends FormTestBase {
    */
   public function testUniqueHtmlId(): void {
     $form_id = 'test_form_id';
-    $expected_form = $form_id();
+    $expected_form = self::buildTestFormStructure();
     $expected_form['test']['#required'] = TRUE;
 
     // Mock a form object that will be built two times.
@@ -504,7 +541,7 @@ class FormBuilderTest extends FormTestBase {
   public function testUniqueElementHtmlId(): void {
     $form_id_1 = 'test_form_id';
     $form_id_2 = 'test_form_id_2';
-    $expected_form = $form_id_1();
+    $expected_form = self::buildTestFormStructure();
 
     // Mock 2 form objects that will be built once each.
     $form_arg_1 = $this->createMock('Drupal\Core\Form\FormInterface');
@@ -535,7 +572,7 @@ class FormBuilderTest extends FormTestBase {
     $form_id = 'test_form_id';
     $form_build_id = $this->randomMachineName();
 
-    $expected_form = $form_id();
+    $expected_form = self::buildTestFormStructure();
     $expected_form['#build_id'] = $form_build_id;
     $form_arg = $this->getMockForm($form_id, $expected_form);
     $form_arg->expects($this->once())
@@ -562,7 +599,7 @@ class FormBuilderTest extends FormTestBase {
     $form_id = 'test_form_id';
     $form_build_id = $this->randomMachineName();
 
-    $expected_form = $form_id();
+    $expected_form = self::buildTestFormStructure();
     $expected_form['#build_id'] = $form_build_id;
     $form_arg = $this->getMockForm($form_id, $expected_form);
 
@@ -678,6 +715,8 @@ class FormBuilderTest extends FormTestBase {
    * Data provider for testChildAccessInheritance.
    *
    * @return array
+   *   An array of test cases, each containing a form element structure and
+   *   its expected access results.
    */
   public static function providerTestChildAccessInheritance() {
     $data = [];
@@ -867,7 +906,7 @@ class FormBuilderTest extends FormTestBase {
     $property = new \ReflectionProperty(FormBuilder::class, 'currentUser');
     $property->setValue($this->formBuilder, $current_user->reveal());
 
-    $expected_form = $form_id();
+    $expected_form = self::buildTestFormStructure();
     $form_arg = $this->getMockForm($form_id, $expected_form);
 
     // Set up some request data so we can be sure it is removed when a token is
@@ -918,7 +957,7 @@ class FormBuilderTest extends FormTestBase {
     \Drupal::setContainer($this->container);
 
     $form_id = 'test_form_id';
-    $form = $form_id();
+    $form = self::buildTestFormStructure();
     $form['#method'] = $method;
 
     if (isset($token)) {
@@ -985,6 +1024,8 @@ class FormBuilderTest extends FormTestBase {
    * Data provider for testFormTokenCacheability.
    *
    * @return array
+   *   An array of test cases, each containing a form token, the authentication,
+   *   request method, and expected cacheability outcome.
    */
   public static function providerTestFormTokenCacheability() {
     return [
@@ -998,8 +1039,62 @@ class FormBuilderTest extends FormTestBase {
     ];
   }
 
+  /**
+   * Tests the detection of the triggering element.
+   */
+  public function testTriggeringElement(): void {
+    $form_arg = 'Drupal\Tests\Core\Form\TestForm';
+
+    // No triggering element.
+    $form_state = new FormState();
+    $this->formBuilder->buildForm($form_arg, $form_state);
+    $this->assertNull($form_state->getTriggeringElement());
+
+    // When no op is provided, default to the first button element.
+    $form_state = new FormState();
+    $form_state->setMethod('GET');
+    $form_state->setUserInput(['form_id' => 'test_form']);
+    $this->formBuilder->buildForm($form_arg, $form_state);
+    $triggeringElement = $form_state->getTriggeringElement();
+    $this->assertIsArray($triggeringElement);
+    $this->assertSame('op', $triggeringElement['#name']);
+    $this->assertSame('Submit', $triggeringElement['#value']);
+
+    // A single triggering element.
+    $form_state = new FormState();
+    $form_state->setMethod('GET');
+    $form_state->setUserInput(['form_id' => 'test_form', 'op' => 'Submit']);
+    $this->formBuilder->buildForm($form_arg, $form_state);
+    $triggeringElement = $form_state->getTriggeringElement();
+    $this->assertIsArray($triggeringElement);
+    $this->assertSame('op', $triggeringElement['#name']);
+
+    // A different triggering element.
+    $form_state = new FormState();
+    $form_state->setMethod('GET');
+    $form_state->setUserInput(['form_id' => 'test_form', 'other_action' => 'Other action']);
+    $this->formBuilder->buildForm($form_arg, $form_state);
+    $triggeringElement = $form_state->getTriggeringElement();
+    $this->assertIsArray($triggeringElement);
+    $this->assertSame('other_action', $triggeringElement['#name']);
+
+    // Two triggering elements.
+    $form_state = new FormState();
+    $form_state->setMethod('GET');
+    $form_state->setUserInput(['form_id' => 'test_form', 'op' => 'Submit', 'other_action' => 'Other action']);
+    $this->formBuilder->buildForm($form_arg, $form_state);
+
+    // Verify that only the first triggering element is respected.
+    $triggeringElement = $form_state->getTriggeringElement();
+    $this->assertIsArray($triggeringElement);
+    $this->assertSame('op', $triggeringElement['#name']);
+  }
+
 }
 
+/**
+ * Basic test form with interface implemented.
+ */
 class TestForm implements FormInterface {
 
   public function getFormId() {
@@ -1007,7 +1102,7 @@ class TestForm implements FormInterface {
   }
 
   public function buildForm(array $form, FormStateInterface $form_state) {
-    return test_form_id();
+    return FormBuilderTest::buildTestFormStructure();
   }
 
   public function validateForm(array &$form, FormStateInterface $form_state) {}
@@ -1015,6 +1110,10 @@ class TestForm implements FormInterface {
   public function submitForm(array &$form, FormStateInterface $form_state) {}
 
 }
+
+/**
+ * Basic test form with container injection interface implemented.
+ */
 class TestFormInjected extends TestForm implements ContainerInjectionInterface {
 
   public static function create(ContainerInterface $container) {
@@ -1023,7 +1122,9 @@ class TestFormInjected extends TestForm implements ContainerInjectionInterface {
 
 }
 
-
+/**
+ * Basic test form with predefined form set.
+ */
 class TestFormWithPredefinedForm extends TestForm {
 
   /**

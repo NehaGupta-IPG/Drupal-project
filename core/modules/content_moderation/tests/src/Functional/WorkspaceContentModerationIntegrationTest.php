@@ -6,13 +6,13 @@ namespace Drupal\Tests\content_moderation\Functional;
 
 use Drupal\Tests\workspaces\Functional\WorkspaceTestUtilities;
 use Drupal\workspaces\Entity\Workspace;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests Workspaces together with Content Moderation.
- *
- * @group content_moderation
- * @group workspaces
  */
+#[Group('content_moderation')]
+#[Group('workspaces')]
 class WorkspaceContentModerationIntegrationTest extends ModerationStateTestBase {
 
   use WorkspaceTestUtilities;
@@ -33,7 +33,7 @@ class WorkspaceContentModerationIntegrationTest extends ModerationStateTestBase 
   protected function getAdministratorPermissions(): array {
     return array_merge($this->permissions, [
       'bypass node access',
-      'view any workspace',
+      'administer workspaces',
     ]);
   }
 
@@ -50,6 +50,7 @@ class WorkspaceContentModerationIntegrationTest extends ModerationStateTestBase 
     $this->createContentTypeFromUi('Article', 'article', TRUE);
 
     $this->setupWorkspaceSwitcherBlock();
+    $this->createWorkspaceThroughUi('Stage', 'stage');
   }
 
   /**

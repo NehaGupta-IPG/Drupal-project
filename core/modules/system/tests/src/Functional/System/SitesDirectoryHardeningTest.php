@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\System;
 
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests Drupal permissions hardening of /sites subdirectories.
- *
- * @group system
  */
+#[Group('system')]
 class SitesDirectoryHardeningTest extends BrowserTestBase {
 
   /**
@@ -58,7 +59,7 @@ class SitesDirectoryHardeningTest extends BrowserTestBase {
 
     // Manually trigger the requirements check.
     $requirements = $this->checkSystemRequirements();
-    $this->assertEquals(REQUIREMENT_WARNING, $requirements['configuration_files']['severity'], 'Warning severity is properly set.');
+    $this->assertEquals(RequirementSeverity::Warning, $requirements['configuration_files']['severity'], 'Warning severity is properly set.');
     $this->assertEquals('Protection disabled', (string) $requirements['configuration_files']['value']);
     $description = strip_tags((string) \Drupal::service('renderer')->renderInIsolation($requirements['configuration_files']['description']));
     $this->assertStringContainsString('settings.php is not protected from modifications and poses a security risk.', $description);
@@ -91,8 +92,7 @@ class SitesDirectoryHardeningTest extends BrowserTestBase {
    *   An array of system requirements.
    */
   protected function checkSystemRequirements() {
-    \Drupal::moduleHandler()->loadInclude('system', 'install');
-    return system_requirements('runtime');
+    return \Drupal::moduleHandler()->invoke('system', 'runtime_requirements');
   }
 
   /**

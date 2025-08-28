@@ -17,6 +17,7 @@ interface ContentTranslationHandlerInterface {
    * Returns a set of field definitions to be used to store metadata items.
    *
    * @return \Drupal\Core\Field\FieldDefinitionInterface[]
+   *   The field definitions.
    */
   public function getFieldDefinitions();
 
@@ -27,9 +28,9 @@ interface ContentTranslationHandlerInterface {
    *   The entity whose translation has to be accessed.
    * @param string $op
    *   The operation to be performed on the translation. Possible values are:
-   *   - "create"
-   *   - "update"
-   *   - "delete"
+   *   - "create".
+   *   - "update".
+   *   - "delete".
    *
    * @return \Drupal\Core\Access\AccessResultInterface
    *   The access result.

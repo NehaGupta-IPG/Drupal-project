@@ -7,12 +7,12 @@ namespace Drupal\Tests\config\Functional;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests language overrides applied through the website.
- *
- * @group config
  */
+#[Group('config')]
 class ConfigLanguageOverrideWebTest extends BrowserTestBase {
 
   /**
@@ -28,13 +28,6 @@ class ConfigLanguageOverrideWebTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-  }
 
   /**
    * Tests translating the site name.

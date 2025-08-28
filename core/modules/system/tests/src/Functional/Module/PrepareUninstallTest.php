@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Module;
 
 use Drupal\node\Entity\NodeType;
-use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that modules which provide entity types can be uninstalled.
- *
- * @group Module
  */
+#[Group('Module')]
 class PrepareUninstallTest extends BrowserTestBase {
 
   use TaxonomyTestTrait;
@@ -60,7 +60,8 @@ class PrepareUninstallTest extends BrowserTestBase {
     // Create 10 nodes.
     for ($i = 1; $i <= 5; $i++) {
       $this->nodes[] = $this->drupalCreateNode(['type' => 'page']);
-      // These 5 articles are inaccessible to the admin user doing the uninstalling.
+      // These 5 articles are inaccessible to the admin user doing the
+      // uninstalling.
       $this->nodes[] = $this->drupalCreateNode(['type' => 'article', 'uid' => 0, 'private' => TRUE]);
     }
 
@@ -120,7 +121,8 @@ class PrepareUninstallTest extends BrowserTestBase {
 
     // Delete Node data.
     $this->drupalGet('admin/modules/uninstall/entity/node');
-    // Only the 5 pages should be listed as the 5 articles are initially inaccessible.
+    // Only the 5 pages should be listed as the 5 articles are initially
+    // inaccessible.
     foreach ($this->nodes as $node) {
       if ($node->bundle() === 'page') {
         $this->assertSession()->pageTextContains($node->label());

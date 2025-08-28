@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 
+use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
-use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\editor\Entity\Editor;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\filter\Entity\FilterFormat;
@@ -15,17 +15,21 @@ use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\media\Entity\Media;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 // cspell:ignore alternatif drupalelementstyle hurlant layercake tatou texte
 // cspell:ignore zartan
-
 /**
- * @coversDefaultClass \Drupal\ckeditor5\Plugin\CKEditor5Plugin\Media
- * @group ckeditor5
- * @group #slow
+ * Tests Drupal\ckeditor5\Plugin\CKEditor5Plugin\Media.
+ *
  * @internal
  */
+#[CoversClass(\Drupal\ckeditor5\Plugin\CKEditor5Plugin\Media::class)]
+#[Group('ckeditor5')]
+#[Group('#slow')]
 class MediaTest extends MediaTestBase {
 
   /**
@@ -99,6 +103,7 @@ class MediaTest extends MediaTestBase {
       'properties' => [
         'reversed' => FALSE,
         'startIndex' => FALSE,
+        'styles' => FALSE,
       ],
       'multiBlock' => TRUE,
     ];
@@ -332,7 +337,7 @@ class MediaTest extends MediaTestBase {
     $this->assertNotEmpty($assert_session->waitForElement('css', '.drupal-media figcaption.ck-editor__nested-editable'));
     $this->pressEditorButton('Link');
     $this->assertVisibleBalloon('.ck-link-form');
-    $link_input = $page->find('css', '.ck-balloon-panel .ck-link-form input[type=text]');
+    $link_input = $page->find('css', '.ck-balloon-panel .ck-link-form input[type=text][inputmode=url]');
     $link_input->setValue('https://example.com');
     $page->find('css', '.ck-balloon-panel .ck-link-form button[type=submit]')->click();
     $this->assertNotEmpty($assert_session->waitForElement('css', '.drupal-media figcaption > a'));
@@ -611,7 +616,8 @@ class MediaTest extends MediaTestBase {
     $this->assertEquals('center', $drupal_media_element->getAttribute('data-align'));
 
     $page->pressButton('Save');
-    // Check that the 'content has been updated' message status appears to confirm we left the editor.
+    // Check that the 'content has been updated' message status appears to
+    // confirm we left the editor.
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.messages.messages--status'));
     // Check that the class is correct in the front end.
     $assert_session->elementExists('css', 'figure.align-center');
@@ -743,7 +749,8 @@ class MediaTest extends MediaTestBase {
     $assert_session->elementNotExists('css', '.ck-widget.drupal-media.arbitrary-class');
     $page->pressButton('Save');
 
-    // Check that the 'content has been updated' message status appears to confirm we left the editor.
+    // Check that the 'content has been updated' message status appears to
+    // confirm we left the editor.
     $assert_session->waitForElementVisible('css', 'messages messages--status');
 
     // Ensure that the class is correct in the front end.
@@ -757,9 +764,8 @@ class MediaTest extends MediaTestBase {
    * Tests that view mode is reflected onto the CKEditor 5 Widget wrapper, that
    * the media style toolbar allows changing the view mode and that the changes
    * are reflected on the widget and downcast drupal-media tag.
-   *
-   * @dataProvider providerTestViewMode
    */
+  #[DataProvider('providerTestViewMode')]
   public function testViewMode(bool $with_alignment): void {
     EntityViewMode::create([
       'id' => 'media.view_mode_3',
@@ -878,7 +884,7 @@ class MediaTest extends MediaTestBase {
     // Test that setting the view mode back to the default removes the
     // `data-view-mode` attribute.
     $this->assertFalse($drupal_media_element->hasAttribute('data-view-mode'));
-    $assert_session->elementExists('css', 'article.media--view-mode-view-mode-1');
+    $this->assertNotEmpty($assert_session->waitForElement('css', 'article.media--view-mode-view-mode-1'));
 
     // Check that the toolbar status matches "no view mode".
     $dropdown_button = $page->find('css', 'button.ck-dropdown__button > span.ck-button__label');
@@ -911,7 +917,7 @@ class MediaTest extends MediaTestBase {
     $drupal_media_element = $editor_dom->getElementsByTagName('drupal-media')
       ->item(0);
     $this->assertFalse($drupal_media_element->hasAttribute('data-view-mode'));
-    $assert_session->waitForElement('css', 'article.media--view-mode-view-mode-1');
+    $this->assertNotEmpty($assert_session->waitForElement('css', 'article.media--view-mode-view-mode-1'));
 
     // Test that setting allowed_view_modes back to two items restores the
     // field.
@@ -947,7 +953,7 @@ class MediaTest extends MediaTestBase {
     $this->host->save();
     $this->getSession()->reload();
     $this->waitForEditor();
-    $assert_session->elementExists('css', 'article.media--view-mode-view-mode-1');
+    $this->assertNotEmpty($assert_session->waitForElement('css', 'article.media--view-mode-view-mode-1'));
 
     $this->assertEmpty($assert_session->waitForElementVisible('css', '.drupal-media figcaption'));
     $this->click('.ck-widget.drupal-media');
@@ -975,7 +981,7 @@ class MediaTest extends MediaTestBase {
     // Reload page to get new configuration.
     $this->getSession()->reload();
     $this->waitForEditor();
-    $assert_session->waitForElementVisible('css', 'article.media--view-mode-view-mode-1');
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', 'article.media--view-mode-view-mode-1'));
 
     // Test that having a default_view_mode that is not an allowed_view_mode
     // will still be added to the editor.

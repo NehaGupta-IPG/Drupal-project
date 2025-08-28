@@ -7,17 +7,18 @@ namespace Drupal\Tests\system\Functional\Routing;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Url;
 use Drupal\router_test\TestControllers;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\Routing\Alias;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use Drupal\Core\Url;
 
 /**
  * Functional class for the full integrated routing system.
- *
- * @group Routing
  */
+#[Group('Routing')]
 class RouterTest extends BrowserTestBase {
 
   /**
@@ -92,11 +93,13 @@ class RouterTest extends BrowserTestBase {
     $this->assertSession()->responseHeaderDoesNotExist('X-Drupal-Cache-Contexts');
     $this->assertSession()->responseHeaderDoesNotExist('X-Drupal-Cache-Tags');
     $this->assertSession()->responseHeaderDoesNotExist('X-Drupal-Cache-Max-Age');
-    // 5. controller result: CacheableResponse object, globally cacheable route access.
+    // 5. controller result: CacheableResponse object, globally cacheable route
+    // access.
     $this->drupalGet('router_test/test21');
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Contexts', '');
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', 'http_response');
-    // 6. controller result: CacheableResponse object, per-role cacheable route access.
+    // 6. controller result: CacheableResponse object, per-role cacheable route
+    // access.
     $this->drupalGet('router_test/test22');
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Contexts', 'user.roles');
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', 'http_response');
@@ -369,9 +372,8 @@ class RouterTest extends BrowserTestBase {
 
   /**
    * Tests route aliasing with deprecation.
-   *
-   * @group legacy
    */
+  #[IgnoreDeprecations]
   public function testRouteAliasWithDeprecation(): void {
     $request = \Drupal::request();
     $route_provider = \Drupal::service('router.route_provider');

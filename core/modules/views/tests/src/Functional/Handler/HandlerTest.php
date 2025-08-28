@@ -7,17 +7,16 @@ namespace Drupal\Tests\views\Functional\Handler;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Entity\View;
-use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\HandlerBase;
+use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore wõrd
-
 /**
  * Tests abstract handler definitions.
- *
- * @group views
  */
+#[Group('views')]
 class HandlerTest extends ViewTestBase {
 
   use CommentTestTrait;
@@ -80,7 +79,7 @@ class HandlerTest extends ViewTestBase {
     // Check defaults.
     $this->assertEquals((object) ['value' => [], 'operator' => NULL], HandlerBase::breakString(''));
 
-    // Test ors
+    // Test ors.
     $handler = HandlerBase::breakString('word1 word2+word');
     $this->assertEquals(['word1', 'word2', 'word'], $handler->value);
     $this->assertEquals('or', $handler->operator);
@@ -114,13 +113,13 @@ class HandlerTest extends ViewTestBase {
     $this->assertEquals(['wõrd1', 'wõrd2', 'wõrd'], $handler->value);
     $this->assertEquals('and', $handler->operator);
 
-    // Test a single word
+    // Test a single word.
     $handler = HandlerBase::breakString('word');
     $this->assertEquals(['word'], $handler->value);
     $this->assertEquals('and', $handler->operator);
 
     $s1 = $this->randomMachineName();
-    // Generate three random numbers which can be used below;
+    // Generate three random numbers which can be used below.
     $n1 = rand(0, 100);
     $n2 = rand(0, 100);
     $n3 = rand(0, 100);
@@ -168,7 +167,7 @@ class HandlerTest extends ViewTestBase {
     $this->assertEquals([(int) $s1, $n2, $n3], $handlerBase->value);
     $this->assertEquals('or', $handlerBase->operator);
 
-    // Generate three random decimals which can be used below;
+    // Generate three random decimals which can be used below.
     $d1 = rand(0, 10) / 10;
     $d2 = rand(0, 10) / 10;
     $d3 = rand(0, 10) / 10;
@@ -333,12 +332,6 @@ class HandlerTest extends ViewTestBase {
    * @see \Drupal\views\Plugin\views\HandlerBase::placeholder()
    */
   public function testPlaceholder(): void {
-    // Change the test view to use the test field plugin which has the
-    // additional get placeholder method.
-    $config = $this->config('views.view.test_view');
-    $config->set('display.default.display_options.fields.name.plugin_id', 'test_field');
-    $config->save();
-
     $view = Views::getView('test_view');
     $view->initHandlers();
     $view->initQuery();
@@ -348,7 +341,7 @@ class HandlerTest extends ViewTestBase {
     $field = $handler->field;
     $string = ':' . $table . '_' . $field;
 
-    // Make sure the placeholder variables contain the expected values.
+    // Make sure the placeholder variables are like expected.
     $this->assertEquals($string, $handler->getPlaceholder());
     $this->assertEquals($string . 1, $handler->getPlaceholder());
     $this->assertEquals($string . 2, $handler->getPlaceholder());
@@ -375,7 +368,7 @@ class HandlerTest extends ViewTestBase {
     $views_data = $this->viewsData();
     $views_data = $views_data['views_test_data'];
 
-    // Enable access only to the callback field and deny access for the callback and the arguments.
+    // Enable access to callback only field and deny for callback + arguments.
     $this->config('views_test_data.tests')->set('handler_access_callback', TRUE)->save();
     $this->config('views_test_data.tests')->set('handler_access_callback_argument', FALSE)->save();
     $view->initDisplay();
@@ -388,7 +381,7 @@ class HandlerTest extends ViewTestBase {
       }
     }
 
-    // Enable access to the callback and the argument handlers and deny access for the callback.
+    // Enable access to the callback + argument handlers and deny for callback.
     $this->config('views_test_data.tests')->set('handler_access_callback', FALSE)->save();
     $this->config('views_test_data.tests')->set('handler_access_callback_argument', TRUE)->save();
     $view->destroy();

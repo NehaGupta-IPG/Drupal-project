@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel\System;
 
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\KernelTests\KernelTestBase;
 
@@ -28,19 +29,19 @@ class RunTimeRequirementsTest extends KernelTestBase {
     // Enable the test module.
     \Drupal::service('module_installer')->install(['module_runtime_requirements']);
     $testRequirements = [
-      'title' => $this->t('RuntimeError'),
-      'value' => $this->t('None'),
-      'description' => $this->t('Runtime Error.'),
-      'severity' => REQUIREMENT_ERROR,
+      'title' => 'RuntimeError',
+      'value' => 'None',
+      'description' => 'Runtime Error.',
+      'severity' => RequirementSeverity::Error,
     ];
     $requirements = \Drupal::service('system.manager')->listRequirements()['test.runtime.error'];
     $this->assertEquals($testRequirements, $requirements);
 
     $testRequirementsAlter = [
-      'title' => $this->t('RuntimeWarning'),
-      'value' => $this->t('None'),
-      'description' => $this->t('Runtime Warning.'),
-      'severity' => REQUIREMENT_WARNING,
+      'title' => 'RuntimeWarning',
+      'value' => 'None',
+      'description' => 'Runtime Warning.',
+      'severity' => RequirementSeverity::Warning,
     ];
     $requirementsAlter = \Drupal::service('system.manager')->listRequirements()['test.runtime.error.alter'];
     $this->assertEquals($testRequirementsAlter, $requirementsAlter);

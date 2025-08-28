@@ -8,12 +8,12 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\file\Entity\File;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the display of file fields in node and views.
- *
- * @group file
  */
+#[Group('file')]
 class FileFieldDisplayTest extends FileFieldTestBase {
 
   use FieldUiTestTrait;
@@ -86,7 +86,8 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     $default_output = \Drupal::service('renderer')->renderRoot($file_link);
     $this->assertSession()->responseContains($default_output);
 
-    // Turn the "display" option off and check that the file is no longer displayed.
+    // Turn the "display" option off and check that the file is no longer
+    // displayed.
     $edit = [$field_name . '[0][display]' => FALSE];
     $this->drupalGet('node/' . $nid . '/edit');
     $this->submitForm($edit, 'Save');

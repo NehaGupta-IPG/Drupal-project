@@ -123,7 +123,7 @@ class ConfigImporter {
   protected $themeHandler;
 
   /**
-   * Flag set to import system.theme during processing theme install and uninstalls.
+   * Indicates if a system theme is in processing theme install and uninstalls.
    *
    * @var bool
    */
@@ -186,15 +186,16 @@ class ConfigImporter {
    * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
    *   The configuration manager.
    * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock backend to ensure multiple imports do not occur at the same time.
+   *   The lock backend to ensure multiple imports do not occur at the same
+   *   time.
    * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
    *   The typed configuration manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler
+   *   The module handler.
    * @param \Drupal\Core\Extension\ModuleInstallerInterface $module_installer
    *   The module installer.
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler
+   *   The theme handler.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
    * @param \Drupal\Core\Extension\ModuleExtensionList $extension_list_module
@@ -674,10 +675,17 @@ class ConfigImporter {
         $this->processConfiguration($operation['collection'], $operation['op'], $operation['name']);
       }
       if ($operation['collection'] == StorageInterface::DEFAULT_COLLECTION) {
-        $context['message'] = $this->t('Synchronizing configuration: @op @name.', ['@op' => $operation['op'], '@name' => $operation['name']]);
+        $context['message'] = $this->t('Synchronizing configuration: @op @name.', [
+          '@op' => $operation['op'],
+          '@name' => $operation['name'],
+        ]);
       }
       else {
-        $context['message'] = $this->t('Synchronizing configuration: @op @name in @collection.', ['@op' => $operation['op'], '@name' => $operation['name'], '@collection' => $operation['collection']]);
+        $context['message'] = $this->t('Synchronizing configuration: @op @name in @collection.', [
+          '@op' => $operation['op'],
+          '@name' => $operation['name'],
+          '@collection' => $operation['collection'],
+        ]);
       }
       $processed_count = 0;
       foreach ($this->storageComparer->getAllCollectionNames() as $collection) {
@@ -818,11 +826,19 @@ class ConfigImporter {
         $old_entity_type_id = $this->configManager->getEntityTypeIdByName($names['old_name']);
         $new_entity_type_id = $this->configManager->getEntityTypeIdByName($names['new_name']);
         if ($old_entity_type_id != $new_entity_type_id) {
-          $this->logError($this->t('Entity type mismatch on rename. @old_type not equal to @new_type for existing configuration @old_name and staged configuration @new_name.', ['@old_type' => $old_entity_type_id, '@new_type' => $new_entity_type_id, '@old_name' => $names['old_name'], '@new_name' => $names['new_name']]));
+          $this->logError($this->t('Entity type mismatch on rename. @old_type not equal to @new_type for existing configuration @old_name and staged configuration @new_name.', [
+            '@old_type' => $old_entity_type_id,
+            '@new_type' => $new_entity_type_id,
+            '@old_name' => $names['old_name'],
+            '@new_name' => $names['new_name'],
+          ]));
         }
         // Has to be a configuration entity.
         if (!$old_entity_type_id) {
-          $this->logError($this->t('Rename operation for simple configuration. Existing configuration @old_name and staged configuration @new_name.', ['@old_name' => $names['old_name'], '@new_name' => $names['new_name']]));
+          $this->logError($this->t('Rename operation for simple configuration. Existing configuration @old_name and staged configuration @new_name.', [
+            '@old_name' => $names['old_name'],
+            '@new_name' => $names['new_name'],
+          ]));
         }
       }
       $this->eventDispatcher->dispatch(new ConfigImporterEvent($this), ConfigEvents::IMPORT_VALIDATE);
@@ -863,7 +879,11 @@ class ConfigImporter {
       }
     }
     catch (\Exception $e) {
-      $this->logError($this->t('Unexpected error during import with operation @op for @name: @message', ['@op' => $op, '@name' => $name, '@message' => $e->getMessage()]));
+      $this->logError($this->t('Unexpected error during import with operation @op for @name: @message', [
+        '@op' => $op,
+        '@name' => $name,
+        '@message' => $e->getMessage(),
+      ]));
       // Error for that operation was logged, mark it as processed so that
       // the import can continue.
       $this->setProcessedConfiguration($collection, $op, $name);
@@ -1017,7 +1037,7 @@ class ConfigImporter {
     }
     else {
       $data = $this->storageComparer->getSourceStorage($collection)->read($name);
-      $config->setData($data ? $data : []);
+      $config->setData($data ?: []);
       $config->save();
     }
     $this->setProcessedConfiguration($collection, $op, $name);
