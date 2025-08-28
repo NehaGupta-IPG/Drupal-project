@@ -618,6 +618,8 @@ return RectorConfig::configure()
         __DIR__ . '/core/modules/node/tests/src/Kernel/NodeTypeValidationTest.php',
         __DIR__ . '/core/modules/ckeditor5/tests/src/Kernel/ConfigAction/AddItemToToolbarConfigActionTest.php',
         __DIR__ . '/core/modules/system/tests/src/Kernel/Entity/MenuValidationTest.php',
+        __DIR__ . '/core/modules/package_manager/tests/src/Kernel/ComposerInspectorTest.php',
+        __DIR__ . '/core/modules/file/tests/src/Kernel/FileItemValidationTest.php',
 
         __DIR__ . '/core/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php',
         __DIR__ . '/core/modules/ckeditor5/tests/src/FunctionalJavascript/SourceEditingEmptyElementTest.php',
