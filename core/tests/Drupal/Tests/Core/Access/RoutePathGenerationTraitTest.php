@@ -9,6 +9,7 @@ use Drupal\Core\Access\CsrfAccessCheck;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Access\RouteProcessorCsrf;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\SessionConfigurationInterface;
 use Drupal\Tests\UnitTestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\InputBag;
@@ -43,6 +44,11 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
   protected CsrfAccessCheck $accessCheck;
 
   /**
+   * The session configuration.
+   */
+  protected SessionConfigurationInterface $sessionConfiguration;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -58,9 +64,20 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
     $this->csrfToken->method('validate')->willReturnCallback(function ($token, $value) {
       return $token === hash('sha256', $value);
     });
+
+    // Create a new request mock that returns 'json' format.
+    $request = $this->createMock(Request::class);
+    $request->expects($this->once())
+      ->method('getRequestFormat')
+      ->willReturn('json');
     $this->requestStack = $this->createMock(RequestStack::class);
-    $this->processor = new RouteProcessorCsrf($this->csrfToken, $this->requestStack);
-    $this->accessCheck = new CsrfAccessCheck($this->csrfToken);
+    $this->requestStack->expects($this->once())
+      ->method('getCurrentRequest')
+      ->willReturn($request);
+
+    $this->sessionConfiguration = $this->createMock(SessionConfigurationInterface::class);
+    $this->processor = new RouteProcessorCsrf($this->csrfToken, $this->sessionConfiguration, $this->requestStack);
+    $this->accessCheck = new CsrfAccessCheck($this->csrfToken, $this->sessionConfiguration);
   }
 
   /**
@@ -75,7 +92,6 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
    * @dataProvider providerTestCsrfTokenCompleteLifeCycle
    */
   public function testCsrfTokenCompleteLifeCycle($params): void {
-
     // Mock a route.
     $route = $this->createMock(Route::class);
     $route
