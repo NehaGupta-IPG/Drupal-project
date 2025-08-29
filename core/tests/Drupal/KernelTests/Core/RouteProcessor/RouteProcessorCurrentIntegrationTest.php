@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\RouteProcessor;
 
 use Drupal\Core\Cache\Cache;
@@ -44,7 +46,7 @@ class RouteProcessorCurrentIntegrationTest extends KernelTestBase {
   /**
    * Tests the output process.
    */
-  public function testProcessOutbound() {
+  public function testProcessOutbound(): void {
     $expected_cacheability = (new BubbleableMetadata())
       ->addCacheContexts(['route'])
       ->setCacheMaxAge(Cache::PERMANENT);

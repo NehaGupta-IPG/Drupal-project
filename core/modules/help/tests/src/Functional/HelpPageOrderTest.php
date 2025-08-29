@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\help\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Verify the order of the help page.
- *
- * @group help
  */
+#[Group('help')]
 class HelpPageOrderTest extends BrowserTestBase {
 
   /**
@@ -51,7 +51,7 @@ class HelpPageOrderTest extends BrowserTestBase {
   /**
    * Tests the order of the help page.
    */
-  public function testHelp() {
+  public function testHelp(): void {
     $pos = 0;
     $this->drupalGet('admin/help');
     $page_text = $this->getTextContent();

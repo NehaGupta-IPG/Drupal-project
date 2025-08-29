@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Verifies that various taxonomy pages use the expected theme.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
 class ThemeTest extends TaxonomyTestBase {
 
   /**
@@ -42,7 +43,7 @@ class ThemeTest extends TaxonomyTestBase {
   /**
    * Tests the theme used when adding, viewing and editing taxonomy terms.
    */
-  public function testTaxonomyTermThemes() {
+  public function testTaxonomyTermThemes(): void {
     // Adding a term to a vocabulary is considered an administrative action and
     // should use the administrative theme.
     $vocabulary = $this->createVocabulary();

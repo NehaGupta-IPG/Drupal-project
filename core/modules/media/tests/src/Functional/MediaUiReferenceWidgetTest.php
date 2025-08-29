@@ -10,21 +10,20 @@ use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Ensures that media UI works correctly.
- *
- * @group media
- * @group #slow
  */
+#[Group('media')]
+#[Group('#slow')]
 class MediaUiReferenceWidgetTest extends MediaFunctionalTestBase {
 
   use FieldUiTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -112,10 +111,9 @@ class MediaUiReferenceWidgetTest extends MediaFunctionalTestBase {
    *
    * @see media_field_widget_entity_reference_autocomplete_form_alter()
    * @see media_field_widget_multiple_entity_reference_autocomplete_form_alter()
-   *
-   * @dataProvider providerTestMediaReferenceWidget
    */
-  public function testMediaReferenceWidget($cardinality, array $media_type_create_access, $list_access, $widget_id = 'entity_reference_autocomplete') {
+  #[DataProvider('providerTestMediaReferenceWidget')]
+  public function testMediaReferenceWidget($cardinality, array $media_type_create_access, $list_access, $widget_id = 'entity_reference_autocomplete'): void {
     $assert_session = $this->assertSession();
 
     // Create two content types.

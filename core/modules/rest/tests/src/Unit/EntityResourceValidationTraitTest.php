@@ -9,19 +9,24 @@ use Drupal\node\Entity\Node;
 use Drupal\rest\Plugin\rest\resource\EntityResourceValidationTrait;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
- * @group rest
- * @coversDefaultClass \Drupal\rest\Plugin\rest\resource\EntityResourceValidationTrait
+ * Tests Drupal\rest\Plugin\rest\resource\EntityResourceValidationTrait.
  */
+#[CoversClass(EntityResourceValidationTrait::class)]
+#[Group('rest')]
 class EntityResourceValidationTraitTest extends UnitTestCase {
 
   /**
-   * @covers ::validate
+   * Tests validate.
+   *
+   * @legacy-covers ::validate
    */
-  public function testValidate() {
+  public function testValidate(): void {
     $trait = new EntityResourceValidationTraitTestClass();
 
     $method = new \ReflectionMethod($trait, 'validate');
@@ -37,9 +42,11 @@ class EntityResourceValidationTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validate
+   * Tests failed validate.
+   *
+   * @legacy-covers ::validate
    */
-  public function testFailedValidate() {
+  public function testFailedValidate(): void {
     $violation1 = $this->prophesize(ConstraintViolationInterface::class);
     $violation1->getPropertyPath()->willReturn('property_path');
     $violation1->getMessage()->willReturn('message');
@@ -75,7 +82,6 @@ class EntityResourceValidationTraitTest extends UnitTestCase {
 /**
  * A test class to use to test EntityResourceValidationTrait.
  *
- * Using ->getMockForTrait is problematic, as this trait is marked internal.
  * Because the mock doesn't use the \Drupal namespace, the Symfony 4+ class
  * loader will throw a deprecation error.
  */

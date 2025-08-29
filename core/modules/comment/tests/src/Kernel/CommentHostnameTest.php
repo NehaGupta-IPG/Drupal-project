@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Kernel;
 
 use Drupal\comment\Entity\Comment;
@@ -28,7 +30,7 @@ class CommentHostnameTest extends KernelTestBase {
    *
    * @covers ::getDefaultHostname
    */
-  public function testGetDefaultHostname() {
+  public function testGetDefaultHostname(): void {
     // Create a fake request to be used for testing.
     $request = Request::create('/', 'GET', [], [], [], ['REMOTE_ADDR' => '203.0.113.1']);
     $request->setSession(new Session(new MockArraySessionStorage()));

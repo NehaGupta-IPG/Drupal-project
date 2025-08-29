@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
+use Drupal\comment\CommentInterface;
+use Drupal\comment\Entity\Comment;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\comment\CommentInterface;
 use Drupal\Core\Url;
-use Drupal\comment\Entity\Comment;
+use PHPUnit\Framework\Attributes\Group;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Tests the 'new' indicator posted on comments.
- *
- * @group comment
  */
+#[Group('comment')]
 class CommentNewIndicatorTest extends CommentTestBase {
 
   /**
@@ -40,7 +41,7 @@ class CommentNewIndicatorTest extends CommentTestBase {
    * @return \Psr\Http\Message\ResponseInterface
    *   The HTTP response.
    */
-  protected function renderNewCommentsNodeLinks(array $node_ids) {
+  protected function renderNewCommentsNodeLinks(array $node_ids): ResponseInterface {
     $client = $this->getHttpClient();
     $url = Url::fromRoute('comment.new_comments_node_links');
 
@@ -57,7 +58,7 @@ class CommentNewIndicatorTest extends CommentTestBase {
   /**
    * Tests new comment marker.
    */
-  public function testCommentNewCommentsIndicator() {
+  public function testCommentNewCommentsIndicator(): void {
     // Test if the right links are displayed when no comment is present for the
     // node.
     $this->drupalLogin($this->adminUser);

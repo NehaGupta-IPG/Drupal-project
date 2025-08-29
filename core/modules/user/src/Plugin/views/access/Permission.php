@@ -9,7 +9,9 @@ use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\PermissionHandlerInterface;
+use Drupal\views\Attribute\ViewsAccess;
 use Drupal\views\Plugin\views\access\AccessPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
@@ -18,13 +20,12 @@ use Symfony\Component\Routing\Route;
  * Access plugin that provides permission-based access control.
  *
  * @ingroup views_access_plugins
- *
- * @ViewsAccess(
- *   id = "perm",
- *   title = @Translation("Permission"),
- *   help = @Translation("Access will be granted to users with the specified permission string.")
- * )
  */
+#[ViewsAccess(
+  id: 'perm',
+  title: new TranslatableMarkup('Permission'),
+  help: new TranslatableMarkup('Access will be granted to users with the specified permission string.'),
+)]
 class Permission extends AccessPluginBase implements CacheableDependencyInterface {
   use DeprecatedServicePropertyTrait;
 
@@ -56,7 +57,7 @@ class Permission extends AccessPluginBase implements CacheableDependencyInterfac
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\user\PermissionHandlerInterface $permission_handler
@@ -101,15 +102,21 @@ class Permission extends AccessPluginBase implements CacheableDependencyInterfac
     $route->setRequirement('_permission', $this->options['perm']);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function summaryTitle() {
     $permissions = $this->permissionHandler->getPermissions();
     if (isset($permissions[$this->options['perm']])) {
       return $permissions[$this->options['perm']]['title'];
     }
-
+    // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
     return $this->t($this->options['perm']);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
     $options['perm'] = ['default' => 'access content'];
@@ -117,9 +124,12 @@ class Permission extends AccessPluginBase implements CacheableDependencyInterfac
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
-    // Get list of permissions
+    // Get list of permissions.
     $perms = [];
     $permissions = $this->permissionHandler->getPermissions();
     foreach ($permissions as $perm => $perm_item) {

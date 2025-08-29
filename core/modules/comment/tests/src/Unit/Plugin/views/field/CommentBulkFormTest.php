@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Unit\Plugin\views\field;
 
-use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\comment\Plugin\views\field\CommentBulkForm;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\ResettableStackedRouteMatchInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\comment\Plugin\views\field\CommentBulkForm
- * @group comment
+ * Tests Drupal\comment\Plugin\views\field\CommentBulkForm.
  */
+#[CoversClass(CommentBulkForm::class)]
+#[Group('comment')]
 class CommentBulkFormTest extends UnitTestCase {
 
   /**
@@ -29,7 +32,7 @@ class CommentBulkFormTest extends UnitTestCase {
   /**
    * Tests the constructor assignment of actions.
    */
-  public function testConstructor() {
+  public function testConstructor(): void {
     $actions = [];
 
     for ($i = 1; $i <= 2; $i++) {

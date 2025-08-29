@@ -6,12 +6,12 @@ namespace Drupal\Tests\system\Functional\Menu;
 
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Ensures that menu links don't cause XSS issues.
- *
- * @group Menu
  */
+#[Group('Menu')]
 class MenuLinkSecurityTest extends BrowserTestBase {
 
   /**
@@ -27,7 +27,7 @@ class MenuLinkSecurityTest extends BrowserTestBase {
   /**
    * Ensures that a menu link does not cause an XSS issue.
    */
-  public function testMenuLink() {
+  public function testMenuLink(): void {
     $menu_link_content = MenuLinkContent::create([
       'title' => '<script>alert("Wild animals")</script>',
       'menu_name' => 'tools',

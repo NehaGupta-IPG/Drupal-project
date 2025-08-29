@@ -32,6 +32,7 @@ class FileVideoFormatter extends FileMediaFormatterBase {
   public static function defaultSettings() {
     return [
       'muted' => FALSE,
+      'playsinline' => FALSE,
       'width' => 640,
       'height' => 480,
     ] + parent::defaultSettings();
@@ -47,6 +48,11 @@ class FileVideoFormatter extends FileMediaFormatterBase {
         '#type' => 'checkbox',
         '#default_value' => $this->getSetting('muted'),
       ],
+      'playsinline' => [
+        '#title' => $this->t('Plays Inline'),
+        '#type' => 'checkbox',
+        '#default_value' => $this->getSetting('playsinline'),
+      ],
       'width' => [
         '#type' => 'number',
         '#title' => $this->t('Width'),
@@ -54,7 +60,8 @@ class FileVideoFormatter extends FileMediaFormatterBase {
         '#size' => 5,
         '#maxlength' => 5,
         '#field_suffix' => $this->t('pixels'),
-        '#min' => 0,
+        // A width of zero pixels would make this video invisible.
+        '#min' => 1,
       ],
       'height' => [
         '#type' => 'number',
@@ -63,7 +70,8 @@ class FileVideoFormatter extends FileMediaFormatterBase {
         '#size' => 5,
         '#maxlength' => 5,
         '#field_suffix' => $this->t('pixels'),
-        '#min' => 0,
+        // A height of zero pixels would make this video invisible.
+        '#min' => 1,
       ],
     ];
   }
@@ -74,6 +82,7 @@ class FileVideoFormatter extends FileMediaFormatterBase {
   public function settingsSummary() {
     $summary = parent::settingsSummary();
     $summary[] = $this->t('Muted: %muted', ['%muted' => $this->getSetting('muted') ? $this->t('yes') : $this->t('no')]);
+    $summary[] = $this->t('Plays Inline: %playsinline', ['%playsinline' => $this->getSetting('playsinline') ? $this->t('yes') : $this->t('no')]);
 
     if ($width = $this->getSetting('width')) {
       $summary[] = $this->t('Width: %width pixels', [
@@ -94,7 +103,7 @@ class FileVideoFormatter extends FileMediaFormatterBase {
    * {@inheritdoc}
    */
   protected function prepareAttributes(array $additional_attributes = []) {
-    $attributes = parent::prepareAttributes(['muted']);
+    $attributes = parent::prepareAttributes(['muted', 'playsinline']);
     if (($width = $this->getSetting('width'))) {
       $attributes->setAttribute('width', $width);
     }

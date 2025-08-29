@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\FunctionalJavascript;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests the off-canvas dialog functionality.
- *
- * @group system
  */
+#[Group('system')]
 class OffCanvasTest extends OffCanvasTestBase {
 
   /**
@@ -34,10 +36,9 @@ class OffCanvasTest extends OffCanvasTestBase {
 
   /**
    * Tests that non-contextual links will work with the off-canvas dialog.
-   *
-   * @dataProvider themeDataProvider
    */
-  public function testOffCanvasLinks($theme) {
+  #[DataProvider('themeDataProvider')]
+  public function testOffCanvasLinks($theme): void {
     $this->enableTheme($theme);
     $this->drupalGet('/off-canvas-test-links');
 
@@ -95,7 +96,7 @@ class OffCanvasTest extends OffCanvasTestBase {
     $page->clickLink('Display more links!');
     $this->waitForOffCanvasToOpen();
     $web_assert->linkExists('Off_canvas link!');
-    // Click off-canvas link inside off-canvas dialog
+    // Click off-canvas link inside off-canvas dialog.
     $page->clickLink('Off_canvas link!');
     $this->waitForOffCanvasToOpen();
     $web_assert->elementTextContains('css', '.ui-dialog[aria-describedby="drupal-off-canvas"]', 'Thing 2 says hello');
@@ -108,7 +109,7 @@ class OffCanvasTest extends OffCanvasTestBase {
     $page->clickLink('Display more links!');
     $this->waitForOffCanvasToOpen();
     $web_assert->linkExists('Off_canvas link!');
-    // Click off-canvas link inside off-canvas dialog
+    // Click off-canvas link inside off-canvas dialog.
     $page->clickLink('Off_canvas link!');
     $this->waitForOffCanvasToOpen();
     $web_assert->elementTextContains('css', '.ui-dialog[aria-describedby="drupal-off-canvas"]', 'Thing 2 says hello');
@@ -117,7 +118,7 @@ class OffCanvasTest extends OffCanvasTestBase {
   /**
    * Tests the body displacement behaves differently at a narrow width.
    */
-  public function testNarrowWidth() {
+  public function testNarrowWidth(): void {
     $narrow_width_breakpoint = 768;
     $offset = 20;
     $height = 800;
@@ -125,7 +126,7 @@ class OffCanvasTest extends OffCanvasTestBase {
     $web_assert = $this->assertSession();
 
     // Test the same functionality on multiple themes.
-    foreach ($this->getTestThemes() as $theme) {
+    foreach (static::getTestThemes() as $theme) {
       $this->enableTheme($theme);
       // Testing at the wider width.
       $this->getSession()->resizeWindow($narrow_width_breakpoint + $offset, $height);
@@ -151,6 +152,8 @@ class OffCanvasTest extends OffCanvasTestBase {
   }
 
   /**
+   * Asserts that the off-canvas dialog opens and renders expected content.
+   *
    * @param int $link_index
    *   The index of the link to test.
    * @param string $position

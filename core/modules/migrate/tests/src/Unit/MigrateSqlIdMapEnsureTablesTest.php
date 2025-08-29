@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate\Unit;
 
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the SQL ID map plugin ensureTables() method.
- *
- * @group migrate
  */
+#[Group('migrate')]
 class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
 
   /**
@@ -25,7 +25,7 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
   /**
    * Tests the ensureTables method when the tables do not exist.
    */
-  public function testEnsureTablesNotExist() {
+  public function testEnsureTablesNotExist(): void {
     $fields['source_ids_hash'] = [
       'type' => 'varchar',
       'length' => 64,
@@ -128,7 +128,7 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
   /**
    * Tests the ensureTables method when the tables exist.
    */
-  public function testEnsureTablesExist() {
+  public function testEnsureTablesExist(): void {
     $schema = $this->prophesize('Drupal\Core\Database\Schema');
     $schema->tableExists('migrate_map_sql_idmap_test')->willReturn(TRUE);
     $schema->fieldExists('migrate_map_sql_idmap_test', 'rollback_action')->willReturn(FALSE);
@@ -166,7 +166,7 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
    *   ensureTables() which in turn calls this object and the expectations on
    *   it are the actual test and there are no additional asserts added.
    */
-  protected function runEnsureTablesTest($schema) {
+  protected function runEnsureTablesTest($schema): void {
     $database = $this->getMockBuilder('Drupal\Core\Database\Connection')
       ->disableOriginalConstructor()
       ->getMock();

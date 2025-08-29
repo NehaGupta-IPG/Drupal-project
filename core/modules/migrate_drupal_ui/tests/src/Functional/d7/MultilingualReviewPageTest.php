@@ -5,17 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate_drupal_ui\Functional\d7;
 
 use Drupal\Tests\migrate_drupal_ui\Functional\MultilingualReviewPageTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore Filefield Flexslider Multiupload Imagefield rulesets
-
 /**
  * Tests migrate upgrade review page for Drupal 7.
  *
  * Tests with translation modules enabled.
- *
- * @group migrate_drupal_7
- * @group migrate_drupal_ui
  */
+#[Group('migrate_drupal_7')]
+#[Group('migrate_drupal_ui')]
 class MultilingualReviewPageTest extends MultilingualReviewPageTestBase {
 
   /**
@@ -44,14 +43,14 @@ class MultilingualReviewPageTest extends MultilingualReviewPageTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getSourceBasePath() {
+  protected function getSourceBasePath(): string {
     return __DIR__ . '/files';
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getAvailablePaths() {
+  protected function getAvailablePaths(): array {
     return [
       'Block languages',
       'Blog',
@@ -138,7 +137,7 @@ class MultilingualReviewPageTest extends MultilingualReviewPageTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getMissingPaths() {
+  protected function getMissingPaths(): array {
     return [
       // Action is set not_finished in migrate_state_not_finished_test.
       'Aggregator',
@@ -166,7 +165,6 @@ class MultilingualReviewPageTest extends MultilingualReviewPageTestBase {
       'References',
       'References UUID',
       'Statistics',
-      // @todo Remove tracker in https://www.drupal.org/project/drupal/issues/3261452
       'Tracker',
       'Translation redirect',
       'Translation sets',

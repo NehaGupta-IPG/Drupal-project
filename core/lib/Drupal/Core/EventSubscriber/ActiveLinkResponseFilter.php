@@ -146,7 +146,7 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
     //    attribute.
     // 2. We are on the front page and a link has the special '<front>' value in
     //    its 'data-drupal-link-system-path' attribute.
-    while (strpos($html_markup, $search_key_current_path, $offset) !== FALSE || ($is_front && strpos($html_markup, $search_key_front, $offset) !== FALSE)) {
+    while (str_contains(substr($html_markup, $offset), $search_key_current_path) || ($is_front && str_contains(substr($html_markup, $offset), $search_key_front))) {
       $pos_current_path = strpos($html_markup, $search_key_current_path, $offset);
       // Only look for links with the special '<front>' system path if we are
       // actually on the front page.
@@ -183,7 +183,7 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
       }
 
       // Get the HTML: this will be the opening part of a single tag, e.g.:
-      // <a href="/" data-drupal-link-system-path="&lt;front&gt;">
+      // '<a href="/" data-drupal-link-system-path="&lt;front&gt;">'.
       $tag = substr($html_markup, $pos_tag_start ?? 0, $pos_tag_end - $pos_tag_start + 1);
 
       // Parse it into a DOMDocument so we can reliably read and modify

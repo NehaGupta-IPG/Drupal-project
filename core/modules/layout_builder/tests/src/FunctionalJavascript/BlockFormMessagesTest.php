@@ -7,12 +7,12 @@ namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that messages appear in the off-canvas dialog with configuring blocks.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
 class BlockFormMessagesTest extends WebDriverTestBase {
 
   use ContextualLinkClickTrait;
@@ -48,7 +48,7 @@ class BlockFormMessagesTest extends WebDriverTestBase {
   /**
    * Tests that validation messages are shown on the block form.
    */
-  public function testValidationMessage() {
+  public function testValidationMessage(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

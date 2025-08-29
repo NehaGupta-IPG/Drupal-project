@@ -6,6 +6,7 @@ use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
+use Drupal\user\UserAuthenticationInterface;
 use Drupal\user\UserAuthInterface;
 use Drupal\user\UserFloodControlInterface;
 use Drupal\user\UserInterface;
@@ -62,7 +63,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   /**
    * The user authentication.
    *
-   * @var \Drupal\user\UserAuthInterface
+   * @var \Drupal\user\UserAuthInterface|\Drupal\user\UserAuthenticationInterface
    */
   protected $userAuth;
 
@@ -103,7 +104,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    *   The user storage.
    * @param \Drupal\Core\Access\CsrfTokenGenerator $csrf_token
    *   The CSRF token generator.
-   * @param \Drupal\user\UserAuthInterface $user_auth
+   * @param \Drupal\user\UserAuthenticationInterface|\Drupal\user\UserAuthInterface $user_auth
    *   The user authentication.
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
    *   The route provider.
@@ -114,10 +115,13 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
    */
-  public function __construct(UserFloodControlInterface $user_flood_control, UserStorageInterface $user_storage, CsrfTokenGenerator $csrf_token, UserAuthInterface $user_auth, RouteProviderInterface $route_provider, Serializer $serializer, array $serializer_formats, LoggerInterface $logger) {
+  public function __construct(UserFloodControlInterface $user_flood_control, UserStorageInterface $user_storage, CsrfTokenGenerator $csrf_token, UserAuthenticationInterface|UserAuthInterface $user_auth, RouteProviderInterface $route_provider, Serializer $serializer, array $serializer_formats, LoggerInterface $logger) {
     $this->userFloodControl = $user_flood_control;
     $this->userStorage = $user_storage;
     $this->csrfToken = $csrf_token;
+    if (!$user_auth instanceof UserAuthenticationInterface) {
+      @trigger_error('The $user_auth parameter implementing UserAuthInterface is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. Implement UserAuthenticationInterface instead. See https://www.drupal.org/node/3411040');
+    }
     $this->userAuth = $user_auth;
     $this->serializer = $serializer;
     $this->serializerFormats = $serializer_formats;
@@ -178,15 +182,29 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
 
     $this->floodControl($request, $credentials['name']);
 
-    $accounts = $this->userStorage->loadByProperties(['name' => $credentials['name']]);
-    if (!empty($accounts)) {
-      /** @var \Drupal\user\UserInterface $account */
-      $account = reset($accounts);
+    $account = FALSE;
+
+    if ($this->userAuth instanceof UserAuthenticationInterface) {
+      $account = $this->userAuth->lookupAccount($credentials['name']);
+    }
+    else {
+      $accounts = $this->userStorage->loadByProperties(['name' => $credentials['name']]);
+      if ($accounts) {
+        $account = reset($accounts);
+      }
+    }
+
+    if ($account) {
       if ($account->isBlocked()) {
         throw new BadRequestHttpException('The user has not been activated or is blocked.');
       }
-
-      if ($this->userAuth->authenticateAccount($account, $credentials['pass'])) {
+      if ($this->userAuth instanceof UserAuthenticationInterface) {
+        $authenticated = $this->userAuth->authenticateAccount($account, $credentials['pass']) ? $account->id() : FALSE;
+      }
+      else {
+        $authenticated = $this->userAuth->authenticate($credentials['name'], $credentials['pass']);
+      }
+      if ($authenticated) {
         $this->userFloodControl->clear('user.http_login', $this->getLoginFloodIdentifier($request, $credentials['name']));
         $this->userLoginFinalize($account);
 
@@ -289,9 +307,13 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    *
    * @return bool
    *   TRUE if the user is blocked, otherwise FALSE.
+   *
+   * @deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There
+   * is no replacement.
+   * @see https://www.drupal.org/node/3425340
    */
   protected function userIsBlocked($name) {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3425340', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3425340', E_USER_DEPRECATED);
     return user_is_blocked($name);
   }
 

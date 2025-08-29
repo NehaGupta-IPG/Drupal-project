@@ -6,14 +6,17 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\Form\WorkspaceSafeFormTrait;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\WorkspaceDynamicSafeFormInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Routing\ResettableStackedRouteMatchInterface;
 use Drupal\Core\TypedData\TranslatableInterface;
+use Drupal\views\Attribute\ViewsField;
 use Drupal\views\Entity\Render\EntityTranslationRenderTrait;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\style\Table;
@@ -23,14 +26,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines an actions-based bulk operation form element.
- *
- * @ViewsField("bulk_form")
  */
-class BulkForm extends FieldPluginBase implements CacheableDependencyInterface {
+#[ViewsField("bulk_form")]
+class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, WorkspaceDynamicSafeFormInterface {
 
   use RedirectDestinationTrait;
   use UncacheableFieldHandlerTrait;
   use EntityTranslationRenderTrait;
+  use WorkspaceSafeFormTrait;
 
   /**
    * The entity type manager.
@@ -104,7 +107,7 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface {
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, MessengerInterface $messenger, EntityRepositoryInterface $entity_repository, ResettableStackedRouteMatchInterface $route_match = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, MessengerInterface $messenger, EntityRepositoryInterface $entity_repository, ResettableStackedRouteMatchInterface $route_match) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
@@ -112,10 +115,6 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface {
     $this->languageManager = $language_manager;
     $this->messenger = $messenger;
     $this->entityRepository = $entity_repository;
-    if (!$route_match) {
-      @trigger_error('Calling BulkForm::__construct() without the $route_match argument is deprecated in drupal:10.3.0 and the $route_match argument will be required in drupal:11.0.0. See https://www.drupal.org/node/3115868', E_USER_DEPRECATED);
-      $route_match = \Drupal::routeMatch();
-    }
     $this->routeMatch = $route_match;
   }
 
@@ -138,7 +137,7 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface {
   /**
    * {@inheritdoc}
    */
-  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
+  public function init(ViewExecutable $view, DisplayPluginBase $display, ?array &$options = NULL) {
     parent::init($view, $display, $options);
 
     $entity_type = $this->getEntityType();
@@ -329,7 +328,8 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface {
       // Replace the form submit button label.
       $form['actions']['submit']['#value'] = $this->t('Apply to selected items');
 
-      // Ensure a consistent container for filters/operations in the view header.
+      // Ensure a consistent container for filters/operations in the view
+      // header.
       $form['header'] = [
         '#type' => 'container',
         '#weight' => -100,
@@ -582,6 +582,14 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface {
     }
 
     return $entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isWorkspaceSafeForm(array $form, FormStateInterface $form_state): bool {
+    $entity_type = $this->entityTypeManager->getDefinition($this->getEntityTypeId());
+    return $this->isWorkspaceSafeEntityType($entity_type);
   }
 
 }

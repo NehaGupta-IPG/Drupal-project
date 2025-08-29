@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\block\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the block system with admin themes.
- *
- * @group block
  */
+#[Group('block')]
 class BlockAdminThemeTest extends BrowserTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'contextual'];
 
@@ -28,7 +26,7 @@ class BlockAdminThemeTest extends BrowserTestBase {
   /**
    * Check for the accessibility of the admin theme on the block admin page.
    */
-  public function testAdminTheme() {
+  public function testAdminTheme(): void {
     // Create administrative user.
     $admin_user = $this->drupalCreateUser([
       'administer blocks',
@@ -53,7 +51,7 @@ class BlockAdminThemeTest extends BrowserTestBase {
   /**
    * Ensure contextual links are disabled in Claro theme.
    */
-  public function testClaroAdminTheme() {
+  public function testClaroAdminTheme(): void {
     // Create administrative user.
     $admin_user = $this->drupalCreateUser([
       'access administration pages',

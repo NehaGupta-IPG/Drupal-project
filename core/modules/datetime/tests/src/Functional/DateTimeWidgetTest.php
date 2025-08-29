@@ -6,12 +6,12 @@ namespace Drupal\Tests\datetime\Functional;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests Datetime widgets functionality.
- *
- * @group datetime
  */
+#[Group('datetime')]
 class DateTimeWidgetTest extends DateTestBase {
 
   /**
@@ -29,14 +29,14 @@ class DateTimeWidgetTest extends DateTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getTestFieldType() {
+  protected function getTestFieldType(): string {
     return 'datetime';
   }
 
   /**
    * Test default value functionality.
    */
-  public function testDateOnlyDefaultValue() {
+  public function testDateOnlyDefaultValue(): void {
     // Create a test content type.
     $this->drupalCreateContentType(['type' => 'date_only_content']);
 

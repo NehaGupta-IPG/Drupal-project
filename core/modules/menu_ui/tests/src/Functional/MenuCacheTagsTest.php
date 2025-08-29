@@ -6,14 +6,14 @@ namespace Drupal\Tests\menu_ui\Functional;
 
 use Drupal\Core\Url;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
-use Drupal\Tests\system\Functional\Cache\PageCacheTagsTestBase;
 use Drupal\system\Entity\Menu;
+use Drupal\Tests\system\Functional\Cache\PageCacheTagsTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Menu and Menu Link entities' cache tags.
- *
- * @group menu_ui
  */
+#[Group('menu_ui')]
 class MenuCacheTagsTest extends PageCacheTagsTestBase {
 
   /**
@@ -32,7 +32,7 @@ class MenuCacheTagsTest extends PageCacheTagsTestBase {
    * Tests the following cache tags:
    * - "menu:<menu ID>"
    */
-  public function testMenuBlock() {
+  public function testMenuBlock(): void {
     $url = Url::fromRoute('test_page_test.test_page');
 
     // Create a Llama menu, add a link to it and place the corresponding block.

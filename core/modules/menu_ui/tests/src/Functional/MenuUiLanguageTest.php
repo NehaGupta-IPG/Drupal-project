@@ -8,23 +8,21 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\menu_ui\Traits\MenuUiTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests for menu_ui language settings.
  *
  * Create menu and menu links in non-English language, and edit language
  * settings.
- *
- * @group menu_ui
  */
+#[Group('menu_ui')]
 class MenuUiLanguageTest extends BrowserTestBase {
 
   use MenuUiTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',
@@ -60,7 +58,7 @@ class MenuUiLanguageTest extends BrowserTestBase {
   /**
    * Tests menu language settings and the defaults for menu link items.
    */
-  public function testMenuLanguage() {
+  public function testMenuLanguage(): void {
     // Create a test menu to test the various language-related settings.
     // Machine name has to be lowercase.
     $menu_name = $this->randomMachineName(16);

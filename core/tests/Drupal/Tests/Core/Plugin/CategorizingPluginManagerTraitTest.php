@@ -11,12 +11,16 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\CategorizingPluginManagerTrait;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\Core\Plugin\CategorizingPluginManagerTrait
- * @group Plugin
- * @runTestsInSeparateProcesses
+ * Tests Drupal\Core\Plugin\CategorizingPluginManagerTrait.
  */
+#[CoversClass(CategorizingPluginManagerTrait::class)]
+#[Group('Plugin')]
+#[RunTestsInSeparateProcesses]
 class CategorizingPluginManagerTraitTest extends UnitTestCase {
 
   /**
@@ -50,9 +54,11 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getCategories
+   * Tests get categories.
+   *
+   * @legacy-covers ::getCategories
    */
-  public function testGetCategories() {
+  public function testGetCategories(): void {
     $this->assertSame([
       'fruits',
       'vegetables',
@@ -60,17 +66,21 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getSortedDefinitions
+   * Tests get sorted definitions.
+   *
+   * @legacy-covers ::getSortedDefinitions
    */
-  public function testGetSortedDefinitions() {
+  public function testGetSortedDefinitions(): void {
     $sorted = $this->pluginManager->getSortedDefinitions();
     $this->assertSame(['apple', 'mango', 'cucumber'], array_keys($sorted));
   }
 
   /**
-   * @covers ::getGroupedDefinitions
+   * Tests get grouped definitions.
+   *
+   * @legacy-covers ::getGroupedDefinitions
    */
-  public function testGetGroupedDefinitions() {
+  public function testGetGroupedDefinitions(): void {
     $grouped = $this->pluginManager->getGroupedDefinitions();
     $this->assertSame(['fruits', 'vegetables'], array_keys($grouped));
     $this->assertSame(['apple', 'mango'], array_keys($grouped['fruits']));
@@ -78,9 +88,11 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::processDefinitionCategory
+   * Tests process definition category.
+   *
+   * @legacy-covers ::processDefinitionCategory
    */
-  public function testProcessDefinitionCategory() {
+  public function testProcessDefinitionCategory(): void {
     // Existing category.
     $definition = [
       'label' => 'some',
@@ -154,7 +166,7 @@ class CategorizingPluginManager extends DefaultPluginManager implements Categori
   /**
    * {@inheritdoc}
    */
-  public function processDefinition(&$definition, $plugin_id) {
+  public function processDefinition(&$definition, $plugin_id): void {
     parent::processDefinition($definition, $plugin_id);
     $this->processDefinitionCategory($definition);
   }

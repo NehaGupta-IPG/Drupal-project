@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\announcements_feed\FunctionalJavascript;
 
-use Drupal\Tests\system\FunctionalJavascript\OffCanvasTestBase;
 use Drupal\announce_feed_test\AnnounceTestHttpClientMiddleware;
+use Drupal\Tests\system\FunctionalJavascript\OffCanvasTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Test the access announcement permissions to get access announcement icon.
- *
- * @group announcements_feed
  */
+#[Group('announcements_feed')]
 class AccessAnnouncementTest extends OffCanvasTestBase {
 
   /**
@@ -40,7 +40,7 @@ class AccessAnnouncementTest extends OffCanvasTestBase {
   /**
    * Test of viewing announcements by a user with appropriate permission.
    */
-  public function testAnnounceFirstLogin() {
+  public function testAnnounceFirstLogin(): void {
     $this->drupalLogin(
       $this->drupalCreateUser(
         [
@@ -62,7 +62,7 @@ class AccessAnnouncementTest extends OffCanvasTestBase {
   /**
    * Testing announce icon without announce permission.
    */
-  public function testAnnounceWithoutPermission() {
+  public function testAnnounceWithoutPermission(): void {
     // User without "access announcements" permission.
     $account = $this->drupalCreateUser(
       [

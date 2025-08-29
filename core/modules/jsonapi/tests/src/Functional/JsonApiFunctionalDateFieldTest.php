@@ -9,12 +9,12 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\NodeInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * JSON:API integration test for the "Date" field.
- *
- * @group jsonapi
  */
+#[Group('jsonapi')]
 class JsonApiFunctionalDateFieldTest extends JsonApiFunctionalTestBase {
 
   /**
@@ -55,7 +55,7 @@ class JsonApiFunctionalDateFieldTest extends JsonApiFunctionalTestBase {
   /**
    * Tests the GET method.
    */
-  public function testRead() {
+  public function testRead(): void {
     /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
     $date_formatter = $this->container->get('date.formatter');
 

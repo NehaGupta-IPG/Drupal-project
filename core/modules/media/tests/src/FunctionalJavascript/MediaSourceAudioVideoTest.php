@@ -8,12 +8,12 @@ use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Audio and Video media sources.
- *
- * @group media
  */
+#[Group('media')]
 class MediaSourceAudioVideoTest extends MediaSourceTestBase {
 
   /**
@@ -24,7 +24,7 @@ class MediaSourceAudioVideoTest extends MediaSourceTestBase {
   /**
    * Check the Audio source functionality.
    */
-  public function testAudioTypeCreation() {
+  public function testAudioTypeCreation(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -73,7 +73,7 @@ class MediaSourceAudioVideoTest extends MediaSourceTestBase {
   /**
    * Check the Video source functionality.
    */
-  public function testVideoTypeCreation() {
+  public function testVideoTypeCreation(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

@@ -114,7 +114,7 @@ class ConfigTargetTest extends UnitTestCase {
    * @covers ::fromForm
    * @covers ::fromString
    */
-  public function testFromFormString() {
+  public function testFromFormString(): void {
     $form = [
       'group' => [
         '#type' => 'details',
@@ -136,7 +136,7 @@ class ConfigTargetTest extends UnitTestCase {
   /**
    * @covers ::fromForm
    */
-  public function testFromFormConfigTarget() {
+  public function testFromFormConfigTarget(): void {
     $form = [
       'test' => [
         '#type' => 'text',
@@ -158,7 +158,7 @@ class ConfigTargetTest extends UnitTestCase {
    * @covers ::fromForm
    * @dataProvider providerTestFromFormException
    */
-  public function testFromFormException(array $form, array $array_parents, string $exception_message) {
+  public function testFromFormException(array $form, array $array_parents, string $exception_message): void {
     $this->expectException(\LogicException::class);
     $this->expectExceptionMessage($exception_message);
     ConfigTarget::fromForm($array_parents, $form);
@@ -286,14 +286,14 @@ class ConfigTargetTest extends UnitTestCase {
     $config->set('something', FALSE)->shouldBeCalledTimes(1);
     $config_target->setValue($config->reveal(), 'No', $this->prophesize(FormStateInterface::class)->reveal());
 
-    // Test `ConfigTargetValue::NoMapping`: nothing should happen to the Config.
+    // Test `ToConfig::NoOp`: nothing should happen to the Config.
     $config = $this->prophesize(Config::class);
     $config->getName()->willReturn('foo.settings');
     $config->set('something', Argument::any())->shouldBeCalledTimes(0);
     $config->clear('something', Argument::any())->shouldBeCalledTimes(0);
     $config_target->setValue($config->reveal(), '<test:noop>', $this->prophesize(FormStateInterface::class)->reveal());
 
-    // Test `ConfigTargetValue::DeleteKey`: Config::clear() should be called.
+    // Test `ToConfig::DeleteKey`: Config::clear() should be called.
     $config = $this->prophesize(Config::class);
     $config->getName()->willReturn('foo.settings');
     $config->clear('something')->shouldBeCalledTimes(1);
@@ -357,7 +357,7 @@ class ConfigTargetTest extends UnitTestCase {
         'second',
       ],
       // In case of multiple targets, the return value must be an array with the
-      // keys matching
+      // keys matching.
       // @see ::testMultiTarget()
       fromConfig: fn (int $first, int $second): string => "$first|$second",
       toConfig: fn (): mixed => $toConfigReturnValue,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Extension;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -13,14 +15,14 @@ class ModuleExtensionListTest extends KernelTestBase {
   /**
    * @covers ::getList
    */
-  public function testGetList() {
+  public function testGetList(): void {
     \Drupal::configFactory()->getEditable('core.extension')
       ->set('module.testing', 1000)
       ->set('profile', 'testing')
       ->save();
 
     // The installation profile is provided by a container parameter.
-    // Saving the configuration doesn't automatically trigger invalidation
+    // Saving the configuration doesn't automatically trigger invalidation.
     $this->container->get('kernel')->rebuildContainer();
 
     /** @var \Drupal\Core\Extension\ModuleExtensionList $module_extension_list */

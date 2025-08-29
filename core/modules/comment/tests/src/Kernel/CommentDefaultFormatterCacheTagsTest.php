@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Kernel;
 
 use Drupal\comment\Tests\CommentTestTrait;
@@ -21,9 +23,7 @@ class CommentDefaultFormatterCacheTagsTest extends EntityKernelTestBase {
   use CommentTestTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test', 'comment'];
 
@@ -69,7 +69,7 @@ class CommentDefaultFormatterCacheTagsTest extends EntityKernelTestBase {
   /**
    * Tests the bubbling of cache tags.
    */
-  public function testCacheTags() {
+  public function testCacheTags(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
 

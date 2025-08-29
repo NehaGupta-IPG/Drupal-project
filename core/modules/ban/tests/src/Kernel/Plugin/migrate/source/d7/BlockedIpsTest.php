@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\ban\Kernel\Plugin\migrate\source\d7;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -9,6 +11,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  *
  * @covers \Drupal\ban\Plugin\migrate\source\d7\BlockedIps
  * @group ban
+ * @group legacy
  */
 class BlockedIpsTest extends MigrateSqlSourceTestBase {
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Render\Element;
 
 use Drupal\Core\Utility\TableSort;
@@ -18,7 +20,7 @@ class TableSortExtenderTest extends KernelTestBase {
   /**
    * Tests \Drupal\Core\Utility\TableSort::getContextFromRequest().
    */
-  public function testTableSortInit() {
+  public function testTableSortInit(): void {
 
     // Test simple table headers.
 

@@ -6,18 +6,17 @@ namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Component\Utility\Xss;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests theme suggestion alter hooks.
- *
- * @group Theme
  */
+#[Group('Theme')]
 class ThemeSuggestionsAlterTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['theme_test'];
 
@@ -37,7 +36,7 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
   /**
    * Tests that hooks to provide theme suggestions work.
    */
-  public function testTemplateSuggestions() {
+  public function testTemplateSuggestions(): void {
     $this->drupalGet('theme-test/suggestion-provided');
     $this->assertSession()->pageTextContains('Template for testing suggestions provided by the module declaring the theme hook.');
 
@@ -52,9 +51,34 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
   }
 
   /**
+   * Testing deprecated suggestions.
+   */
+  #[IgnoreDeprecations]
+  public function testDeprecatedTemplateSuggestions(): void {
+
+    $this->expectDeprecation('Theme suggestion theme_test_suggestion_provided__deprecated is deprecated in drupal:X.0.0 and is removed from drupal:Y.0.0. This is a test.');
+
+    \Drupal::service('theme_installer')->install(['test_deprecated_suggestion_theme']);
+
+    $this->config('system.theme')
+      ->set('default', 'test_deprecated_suggestion_theme')
+      ->save();
+
+    $parameters = $this->container->getParameter('twig.config');
+    $parameters['debug'] = TRUE;
+    $this->setContainerParameter('twig.config', $parameters);
+    $this->rebuildContainer();
+    $this->resetAll();
+
+    $this->drupalGet('theme-test/suggestion-provided');
+    $this->assertSession()->pageTextContains('Template overridden based on a deprecated theme suggestion.');
+    $this->assertSession()->responseContains('✅ theme-test-suggestion-provided--deprecated.html.twig (deprecated)');
+  }
+
+  /**
    * Tests hook_theme_suggestions_alter().
    */
-  public function testGeneralSuggestionsAlter() {
+  public function testGeneralSuggestionsAlter(): void {
     $this->drupalGet('theme-test/general-suggestion-alter');
     $this->assertSession()->pageTextContains('Original template for testing hook_theme_suggestions_alter().');
     $this->assertSession()->pageTextContains('Hooks: theme_test_theme none');
@@ -79,7 +103,7 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
   /**
    * Tests that theme suggestion alter hooks work for templates.
    */
-  public function testTemplateSuggestionsAlter() {
+  public function testTemplateSuggestionsAlter(): void {
     $this->drupalGet('theme-test/suggestion-alter');
     $this->assertSession()->pageTextContains('Original template for testing hook_theme_suggestions_HOOK_alter().');
 
@@ -101,7 +125,7 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
   /**
    * Tests that theme suggestion alter hooks work for specific theme calls.
    */
-  public function testSpecificSuggestionsAlter() {
+  public function testSpecificSuggestionsAlter(): void {
     // Test that the default template is rendered.
     $this->drupalGet('theme-test/specific-suggestion-alter');
     $this->assertSession()->pageTextContains('Template for testing specific theme calls.');
@@ -132,7 +156,7 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
    * Hook hook_theme_suggestions_alter() should fire before
    * hook_theme_suggestions_HOOK_alter() within an extension (module or theme).
    */
-  public function testExecutionOrder() {
+  public function testExecutionOrder(): void {
     // Install our test theme and module.
     $this->config('system.theme')
       ->set('default', 'test_theme')

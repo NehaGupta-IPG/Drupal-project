@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Kernel;
 
 use Drupal\Core\Datetime\Entity\DateFormat;
@@ -37,7 +39,7 @@ class CommentOrphanTest extends EntityKernelTestBase {
    *
    * @dataProvider providerTestOrphan
    */
-  public function testOrphan($property) {
+  public function testOrphan($property): void {
 
     DateFormat::create([
       'id' => 'fallback',
@@ -75,7 +77,7 @@ class CommentOrphanTest extends EntityKernelTestBase {
       'label' => 'Comment',
     ])->save();
 
-    // Make two comments
+    // Make two comments.
     $comment1 = $comment_storage->create([
       'field_name' => 'comment',
       'comment_body' => 'test',

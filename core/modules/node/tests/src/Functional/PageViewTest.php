@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\node\Entity\Node;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Create a node and test edit permissions.
- *
- * @group node
  */
+#[Group('node')]
 class PageViewTest extends NodeTestBase {
 
   /**
@@ -21,7 +21,7 @@ class PageViewTest extends NodeTestBase {
   /**
    * Tests editing a node by users with various access permissions.
    */
-  public function testPageView() {
+  public function testPageView(): void {
     // Create a node to view.
     $node = $this->drupalCreateNode();
     $this->assertNotEmpty(Node::load($node->id()), 'Node created.');

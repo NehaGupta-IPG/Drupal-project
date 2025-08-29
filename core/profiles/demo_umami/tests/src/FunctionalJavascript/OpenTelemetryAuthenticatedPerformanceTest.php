@@ -11,6 +11,7 @@ use Drupal\FunctionalJavascriptTests\PerformanceTestBase;
  *
  * @group OpenTelemetry
  * @group #slow
+ * @requires extension apcu
  */
 class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
 
@@ -19,6 +20,9 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
    */
   protected $profile = 'demo_umami';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
     $user = $this->drupalCreateUser();
@@ -38,24 +42,34 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
 
     $expected_queries = [
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
-      'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "8" AND "u"."default_langcode" = 1',
-      'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "8"',
-      'SELECT "config"."name" AS "name" FROM "config" "config" WHERE ("collection" = "") AND ("name" LIKE "language.entity.%" ESCAPE ' . "'\\\\'" . ') ORDER BY "collection" ASC, "name" ASC',
-      'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "system.maintenance_mode" ) AND "collection" = "state"',
-      'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "twig_extension_hash_prefix" ) AND "collection" = "state"',
-      'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "asset.css_js_query_string" ) AND "collection" = "state"',
-      'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "drupal.test_wait_terminate" ) AND "collection" = "state"',
-      'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "system.cron_last" ) AND "collection" = "state"',
+      'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "10" AND "u"."default_langcode" = 1',
+      'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "10"',
     ];
     $recorded_queries = $performance_data->getQueries();
     $this->assertSame($expected_queries, $recorded_queries);
-    $this->assertSame(9, $performance_data->getQueryCount());
-    $this->assertSame(45, $performance_data->getCacheGetCount());
-    $this->assertSame(0, $performance_data->getCacheSetCount());
-    $this->assertSame(0, $performance_data->getCacheDeleteCount());
-    $this->assertSame(0, $performance_data->getCacheTagChecksumCount());
-    $this->assertSame(13, $performance_data->getCacheTagIsValidCount());
-    $this->assertSame(0, $performance_data->getCacheTagInvalidationCount());
+
+    $expected = [
+      'QueryCount' => 3,
+      'CacheGetCount' => 42,
+      'CacheGetCountByBin' => [
+        'config' => 22,
+        'bootstrap' => 5,
+        'discovery' => 5,
+        'data' => 5,
+        'dynamic_page_cache' => 2,
+        'menu' => 1,
+        'render' => 2,
+      ],
+      'CacheSetCount' => 0,
+      'CacheDeleteCount' => 0,
+      'CacheTagInvalidationCount' => 0,
+      'CacheTagLookupQueryCount' => 5,
+      'ScriptCount' => 1,
+      'ScriptBytes' => 73031,
+      'StylesheetCount' => 2,
+      'StylesheetBytes' => 39163,
+    ];
+    $this->assertMetrics($expected, $performance_data);
   }
 
 }

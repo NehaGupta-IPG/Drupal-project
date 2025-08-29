@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Extension;
 
-// cspell:ignore skynet
-
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\InfoParser;
-use Drupal\Core\Extension\InfoParserDynamic;
 use Drupal\Core\Extension\InfoParserException;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+// cspell:ignore skynet
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests InfoParser class and exception.
@@ -19,11 +20,9 @@ use org\bovigo\vfs\vfsStream;
  * Files for this test are stored in core/modules/system/tests/fixtures and end
  * with .info.txt instead of info.yml in order not to be considered as real
  * extensions.
- *
- * @coversDefaultClass \Drupal\Core\Extension\InfoParser
- *
- * @group Extension
  */
+#[CoversClass(InfoParser::class)]
+#[Group('Extension')]
 class InfoParserUnitTest extends UnitTestCase {
 
   /**
@@ -45,9 +44,9 @@ class InfoParserUnitTest extends UnitTestCase {
   /**
    * Tests the functionality of the infoParser object.
    *
-   * @covers ::parse
+   * @legacy-covers ::parse
    */
-  public function testInfoParserNonExisting() {
+  public function testInfoParserNonExisting(): void {
     vfsStream::setup('modules');
     $this->expectException('\Drupal\Core\Extension\InfoParserException');
     $this->expectExceptionMessage('Unable to parse vfs://modules/does_not_exist.info.txt as it does not exist');
@@ -61,9 +60,8 @@ class InfoParserUnitTest extends UnitTestCase {
    *   The YAML to use to create the file to parse.
    * @param string $expected_exception_message
    *   The expected exception message.
-   *
-   * @dataProvider providerInfoException
    */
+  #[DataProvider('providerInfoException')]
   public function testInfoException($yaml, $expected_exception_message): void {
 
     vfsStream::setup('modules');
@@ -127,9 +125,9 @@ YML,
   /**
    * Tests that the correct exception is thrown for a broken info file.
    *
-   * @covers ::parse
+   * @legacy-covers ::parse
    */
-  public function testInfoParserBroken() {
+  public function testInfoParserBroken(): void {
     $broken_info = <<<BROKEN_INFO
 # info.yml for testing broken YAML parsing exception handling.
 name: File
@@ -157,9 +155,9 @@ BROKEN_INFO;
   /**
    * Tests that Testing package modules use a default core_version_requirement.
    *
-   * @covers ::parse
+   * @legacy-covers ::parse
    */
-  public function testTestingPackageMissingCoreVersionRequirement() {
+  public function testTestingPackageMissingCoreVersionRequirement(): void {
     $missing_core_version_requirement = <<<MISSING_CORE_VERSION_REQUIREMENT
 # info.yml for testing core_version_requirement.
 package: Testing
@@ -181,9 +179,9 @@ MISSING_CORE_VERSION_REQUIREMENT;
   /**
    * Tests common info file.
    *
-   * @covers ::parse
+   * @legacy-covers ::parse
    */
-  public function testInfoParserCommonInfo() {
+  public function testInfoParserCommonInfo(): void {
     $common = <<<COMMON
 core_version_requirement: '*'
 name: common_test
@@ -214,9 +212,9 @@ COMMON;
   /**
    * Tests common info file.
    *
-   * @covers ::parse
+   * @legacy-covers ::parse
    */
-  public function testInfoParserCoreInfo() {
+  public function testInfoParserCoreInfo(): void {
     $common = <<<CORE
 name: core_test
 type: module
@@ -239,11 +237,12 @@ CORE;
   }
 
   /**
-   * @covers ::parse
+   * Tests core incompatibility.
    *
-   * @dataProvider providerCoreIncompatibility
+   * @legacy-covers ::parse
    */
-  public function testCoreIncompatibility($test_case, $constraint, $expected) {
+  #[DataProvider('providerCoreIncompatibility')]
+  public function testCoreIncompatibility($test_case, $constraint, $expected): void {
     $core_incompatibility = <<<CORE_INCOMPATIBILITY
 core_version_requirement: $constraint
 name: common_test
@@ -304,7 +303,7 @@ CORE_INCOMPATIBILITY;
   /**
    * Tests a profile info file.
    */
-  public function testProfile() {
+  public function testProfile(): void {
     $profile = <<<PROFILE_TEST
 core_version_requirement: '*'
 name: The Perfect Profile
@@ -325,9 +324,9 @@ PROFILE_TEST;
   /**
    * Tests the exception for an unparsable 'core_version_requirement' value.
    *
-   * @covers ::parse
+   * @legacy-covers ::parse
    */
-  public function testUnparsableCoreVersionRequirement() {
+  public function testUnparsableCoreVersionRequirement(): void {
     $unparsable_core_version_requirement = <<<UNPARSABLE_CORE_VERSION_REQUIREMENT
 # info.yml for testing invalid core_version_requirement value.
 name: Not this module
@@ -352,11 +351,10 @@ UNPARSABLE_CORE_VERSION_REQUIREMENT;
   /**
    * Tests an info file with valid lifecycle values.
    *
-   * @covers ::parse
-   *
-   * @dataProvider providerValidLifecycle
+   * @legacy-covers ::parse
    */
-  public function testValidLifecycle($lifecycle, $expected) {
+  #[DataProvider('providerValidLifecycle')]
+  public function testValidLifecycle($lifecycle, $expected): void {
     $info = <<<INFO
 package: Core
 core_version_requirement: '*'
@@ -412,11 +410,10 @@ INFO;
   /**
    * Tests an info file with invalid lifecycle values.
    *
-   * @covers ::parse
-   *
-   * @dataProvider providerInvalidLifecycle
+   * @legacy-covers ::parse
    */
-  public function testInvalidLifecycle($lifecycle, $exception_message) {
+  #[DataProvider('providerInvalidLifecycle')]
+  public function testInvalidLifecycle($lifecycle, $exception_message): void {
     $info = <<<INFO
 package: Core
 core_version_requirement: '*'
@@ -461,11 +458,10 @@ INFO;
   /**
    * Tests an info file's lifecycle_link values.
    *
-   * @covers ::parse
-   *
-   * @dataProvider providerLifecycleLink
+   * @legacy-covers ::parse
    */
-  public function testLifecycleLink($lifecycle, $lifecycle_link = NULL, $exception_message = NULL) {
+  #[DataProvider('providerLifecycleLink')]
+  public function testLifecycleLink($lifecycle, $lifecycle_link = NULL, $exception_message = NULL): void {
     $info = <<<INFO
 package: Core
 core_version_requirement: '*'
@@ -536,14 +532,6 @@ INFO;
         "Extension Module for That (%s) has a 'lifecycle_link' entry that is not a valid URL.",
       ],
     ];
-  }
-
-  /**
-   * @group legacy
-   */
-  public function testDeprecation(): void {
-    $this->expectDeprecation('Calling InfoParserDynamic::__construct() without the $app_root argument is deprecated in drupal:10.1.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3293709');
-    new InfoParserDynamic();
   }
 
 }

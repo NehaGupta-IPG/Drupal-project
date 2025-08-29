@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Core\Url;
+use Drupal\jsonapi\JsonApiSpec;
 use Drupal\search\Entity\SearchPage;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore hinode
-
 /**
  * JSON:API integration test for the "SearchPage" config entity type.
- *
- * @group jsonapi
- * @group #slow
  */
+#[Group('jsonapi')]
 class SearchPageTest extends ConfigEntityResourceTestBase {
 
   /**
@@ -47,7 +46,7 @@ class SearchPageTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     switch ($method) {
       case 'GET':
         $this->grantPermissionsToTestedRole(['access content']);
@@ -78,16 +77,16 @@ class SearchPageTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedDocument() {
+  protected function getExpectedDocument(): array {
     $self_url = Url::fromUri('base:/jsonapi/search_page/search_page/' . $this->entity->uuid())->setAbsolute()->toString(TRUE)->getGeneratedUrl();
     return [
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
           ],
         ],
-        'version' => '1.0',
+        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
       ],
       'links' => [
         'self' => ['href' => $self_url],
@@ -122,7 +121,7 @@ class SearchPageTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getPostDocument() {
+  protected function getPostDocument(): array {
     // @todo Update in https://www.drupal.org/node/2300677.
     return [];
   }

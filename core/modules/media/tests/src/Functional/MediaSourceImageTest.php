@@ -8,12 +8,12 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\file\Entity\File;
 use Drupal\media\Entity\Media;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the image media source.
- *
- * @group media
  */
+#[Group('media')]
 class MediaSourceImageTest extends MediaFunctionalTestBase {
 
   use TestFileCreationTrait;
@@ -26,7 +26,7 @@ class MediaSourceImageTest extends MediaFunctionalTestBase {
   /**
    * Test that non-main properties do not trigger source field value change.
    */
-  public function testOnlyMainPropertiesTriggerSourceFieldChanged() {
+  public function testOnlyMainPropertiesTriggerSourceFieldChanged(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

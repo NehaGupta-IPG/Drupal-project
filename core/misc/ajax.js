@@ -1,3 +1,5 @@
+/* cspell:ignore xmlhttprequest */
+
 /**
  * @file
  * Provides Ajax page updating via jQuery $.ajax.
@@ -456,7 +458,7 @@
 
     // If there isn't a form, jQuery.ajax() will be used instead, allowing us to
     // bind Ajax to links as well.
-    if (this.element && this.element.form) {
+    if (this.element?.form) {
       /**
        * @type {jQuery}
        */
@@ -554,7 +556,7 @@
         // Sanity check for browser support (object expected).
         // When using iFrame uploads, responses must be returned as a string.
         if (typeof response === 'string') {
-          response = $.parseJSON(response);
+          response = JSON.parse(response);
         }
 
         // Prior to invoking the response's commands, verify that they can be
@@ -1232,7 +1234,7 @@
    * @param {object} response
    *   The response from the Ajax request.
    *
-   * @deprecated in drupal:8.6.0 and is removed from drupal:10.0.0.
+   * @deprecated in drupal:8.6.0 and is removed from drupal:12.0.0.
    *   Use data with desired wrapper.
    *
    * @see https://www.drupal.org/node/2940704
@@ -1263,7 +1265,7 @@
    * @param {jQuery} $elements
    *   Response elements after parsing.
    *
-   * @deprecated in drupal:8.6.0 and is removed from drupal:10.0.0.
+   * @deprecated in drupal:8.6.0 and is removed from drupal:12.0.0.
    *   Use data with desired wrapper.
    *
    * @see https://www.drupal.org/node/2940704
@@ -1333,7 +1335,22 @@
       const settings = response.settings || ajax.settings || drupalSettings;
 
       // Parse response.data into an element collection.
-      let $newContent = $($.parseHTML(response.data, document, true));
+      const parseHTML = (htmlString) => {
+        const fragment = document.createDocumentFragment();
+        // Create a temporary template element.
+        const template = fragment.appendChild(
+          document.createElement('template'),
+        );
+
+        // Set the innerHTML of the template to the provided HTML string.
+        template.innerHTML = htmlString;
+
+        // Return the contents of the temporary template.
+        return template.content.childNodes;
+      };
+
+      let $newContent = $(parseHTML(response.data));
+
       // For backward compatibility, in some cases a wrapper will be added. This
       // behavior will be removed before Drupal 9.0.0. If different behavior is
       // needed, the theme functions can be overridden.
@@ -1377,17 +1394,18 @@
         $newContent[effect.showEffect](effect.showSpeed);
       }
 
-      // Attach all JavaScript behaviors to the new content, if it was
-      // successfully added to the page, this if statement allows
-      // `#ajax['wrapper']` to be optional.
-      if ($newContent.parents('html').length) {
-        // Attach behaviors to all element nodes.
-        $newContent.each((index, element) => {
-          if (element.nodeType === Node.ELEMENT_NODE) {
-            Drupal.attachBehaviors(element, settings);
-          }
-        });
-      }
+      // Attach behaviors to all element nodes.
+      $newContent.each((index, element) => {
+        if (
+          element.nodeType === Node.ELEMENT_NODE &&
+          // Attach all JavaScript behaviors to the new content, if it was
+          // successfully added to the page, this condition allows
+          // `#ajax['wrapper']` to be optional.
+          document.documentElement.contains(element)
+        ) {
+          Drupal.attachBehaviors(element, settings);
+        }
+      });
     },
 
     /**
@@ -1422,7 +1440,7 @@
      *   The JSON response object from the Ajax request.
      * @param {string} response.selector
      *   A jQuery selector string.
-     * @param {boolean} [response.asterisk]
+     * @param {string} [response.asterisk]
      *   An optional CSS selector. If specified, an asterisk will be
      *   appended to the HTML inside the provided selector.
      * @param {number} [status]
@@ -1511,7 +1529,7 @@
      *   The XMLHttpRequest status.
      */
     css(ajax, response, status) {
-      // eslint-disable-next-line jquery/no-css
+      // eslint-disable-next-line no-jquery/no-css
       $(response.selector).css(response.argument);
     },
 
@@ -1706,16 +1724,18 @@
      */
     add_css(ajax, response, status) {
       const allUniqueBundleIds = response.data.map(function (style) {
-        const uniqueBundleId = style.href + ajax.instanceIndex;
+        const uniqueBundleId = style.href;
         // Force file to load as a CSS stylesheet using 'css!' flag.
-        loadjs(`css!${style.href}`, uniqueBundleId, {
-          before(path, styleEl) {
-            // This allows all attributes to be added, like media.
-            Object.keys(style).forEach((attributeKey) => {
-              styleEl.setAttribute(attributeKey, style[attributeKey]);
-            });
-          },
-        });
+        if (!loadjs.isDefined(uniqueBundleId)) {
+          loadjs(`css!${style.href}`, uniqueBundleId, {
+            before(path, styleEl) {
+              // This allows all attributes to be added, like media.
+              Object.keys(style).forEach((attributeKey) => {
+                styleEl.setAttribute(attributeKey, style[attributeKey]);
+              });
+            },
+          });
+        }
         return uniqueBundleId;
       });
       // Returns the promise so that the next AJAX command waits on the
@@ -1781,32 +1801,31 @@
       const parentEl = document.querySelector(response.selector || 'body');
       const settings = ajax.settings || drupalSettings;
       const allUniqueBundleIds = response.data.map((script) => {
-        // loadjs requires a unique ID, and an AJAX instance's `instanceIndex`
-        // is guaranteed to be unique.
-        // @see Drupal.behaviors.AJAX.detach
-        const uniqueBundleId = script.src + ajax.instanceIndex;
-        loadjs(script.src, uniqueBundleId, {
-          // The default loadjs behavior is to load script with async, in Drupal
-          // we need to explicitly tell scripts to load async, this is set in
-          // the before callback below if necessary.
-          async: false,
-          before(path, scriptEl) {
-            // This allows all attributes to be added, like defer, async and
-            // crossorigin.
-            Object.keys(script).forEach((attributeKey) => {
-              scriptEl.setAttribute(attributeKey, script[attributeKey]);
-            });
+        const uniqueBundleId = script.src;
+        if (!loadjs.isDefined(uniqueBundleId)) {
+          loadjs(script.src, uniqueBundleId, {
+            // The default loadjs behavior is to load script with async, in Drupal
+            // we need to explicitly tell scripts to load async, this is set in
+            // the before callback below if necessary.
+            async: false,
+            before(path, scriptEl) {
+              // This allows all attributes to be added, like defer, async and
+              // crossorigin.
+              Object.keys(script).forEach((attributeKey) => {
+                scriptEl.setAttribute(attributeKey, script[attributeKey]);
+              });
 
-            // By default, loadjs appends the script to the head. When scripts
-            // are loaded via AJAX, their location has no impact on
-            // functionality. But, since non-AJAX loaded scripts can choose
-            // their parent element, we provide that option here for the sake of
-            // consistency.
-            parentEl.appendChild(scriptEl);
-            // Return false to bypass loadjs' default DOM insertion mechanism.
-            return false;
-          },
-        });
+              // By default, loadjs appends the script to the head. When scripts
+              // are loaded via AJAX, their location has no impact on
+              // functionality. But, since non-AJAX loaded scripts can choose
+              // their parent element, we provide that option here for the sake of
+              // consistency.
+              parentEl.appendChild(scriptEl);
+              // Return false to bypass loadjs' default DOM insertion mechanism.
+              return false;
+            },
+          });
+        }
         return uniqueBundleId;
       });
       // Returns the promise so that the next AJAX command waits on the
@@ -1843,19 +1862,7 @@
      *   Selector to use.
      */
     scrollTop(ajax, response) {
-      const offset = $(response.selector).offset();
-      // We can't guarantee that the scrollable object should be
-      // the body, as the element could be embedded in something
-      // more complex such as a modal popup. Recurse up the DOM
-      // and scroll the first element that has a non-zero top.
-      let scrollTarget = response.selector;
-      while ($(scrollTarget).scrollTop() === 0 && $(scrollTarget).parent()) {
-        scrollTarget = $(scrollTarget).parent();
-      }
-      // Only scroll upward.
-      if (offset.top - 10 < $(scrollTarget).scrollTop()) {
-        $(scrollTarget).animate({ scrollTop: offset.top - 10 }, 500);
-      }
+      document.querySelector(response.selector)?.scrollIntoView();
     },
   };
 
@@ -1875,7 +1882,7 @@
       xhr.getResponseHeader('X-Drupal-Ajax-Token') === '1' &&
       // The isInProgress() function might not be defined if the Ajax request
       // was initiated without Drupal.ajax() or new Drupal.Ajax().
-      settings.isInProgress &&
+      typeof settings.isInProgress === 'function' &&
       // Until this is false, the Ajax request isn't completely done (the
       // response's commands might still be running).
       settings.isInProgress()

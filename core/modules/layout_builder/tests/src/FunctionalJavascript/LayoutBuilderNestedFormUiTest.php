@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests placing blocks containing forms in theLayout Builder UI.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
 class LayoutBuilderNestedFormUiTest extends WebDriverTestBase {
 
   /**
@@ -67,7 +67,7 @@ class LayoutBuilderNestedFormUiTest extends WebDriverTestBase {
   /**
    * Tests blocks containing forms can be successfully saved editing defaults.
    */
-  public function testAddingFormBlocksToDefaults() {
+  public function testAddingFormBlocksToDefaults(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'configure any layout',
       'administer node display',
@@ -101,7 +101,7 @@ class LayoutBuilderNestedFormUiTest extends WebDriverTestBase {
   /**
    * Tests blocks containing forms can be successfully saved editing overrides.
    */
-  public function testAddingFormBlocksToOverrides() {
+  public function testAddingFormBlocksToOverrides(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'configure any layout',
       'administer node display',
@@ -134,7 +134,7 @@ class LayoutBuilderNestedFormUiTest extends WebDriverTestBase {
    * @param string $expected_save_message
    *   The message that should be displayed after successful layout save.
    */
-  protected function addFormBlock($label, $path, $expected_save_message) {
+  protected function addFormBlock($label, $path, $expected_save_message): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

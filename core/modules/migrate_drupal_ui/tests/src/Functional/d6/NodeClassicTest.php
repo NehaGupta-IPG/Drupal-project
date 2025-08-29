@@ -7,15 +7,15 @@ namespace Drupal\Tests\migrate_drupal_ui\Functional\d6;
 use Drupal\migrate_drupal\NodeMigrateType;
 use Drupal\Tests\migrate_drupal\Traits\NodeMigrateTypeTestTrait;
 use Drupal\Tests\migrate_drupal_ui\Functional\MigrateUpgradeExecuteTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the classic node migration runs.
  *
  * The classic node migration will run and not the complete node migration
  * when there is a pre-existing classic node migrate map table.
- *
- * @group migrate_drupal_ui
  */
+#[Group('migrate_drupal_ui')]
 class NodeClassicTest extends MigrateUpgradeExecuteTestBase {
 
   use NodeMigrateTypeTestTrait;
@@ -42,42 +42,42 @@ class NodeClassicTest extends MigrateUpgradeExecuteTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getSourceBasePath() {
+  protected function getSourceBasePath(): string {
     return __DIR__ . '/files';
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getEntityCounts() {
+  protected function getEntityCounts(): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getEntityCountsIncremental() {
+  protected function getEntityCountsIncremental(): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getAvailablePaths() {
+  protected function getAvailablePaths(): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getMissingPaths() {
+  protected function getMissingPaths(): array {
     return [];
   }
 
   /**
    * Tests node classic migration via the UI.
    */
-  public function testNodeClassicUpgrade() {
+  public function testNodeClassicUpgrade(): void {
     // Add a node classic migrate table to d8.
     $this->makeNodeMigrateMapTable(NodeMigrateType::NODE_MIGRATE_TYPE_CLASSIC, '6');
 

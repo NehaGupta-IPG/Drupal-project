@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate_drupal_ui\Functional;
 
-use Drupal\views\Entity\View;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\views\Entity\View;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests for the MigrateController class.
- *
- * @group migrate_drupal_ui
  */
+#[Group('migrate_drupal_ui')]
 class MigrateControllerTest extends BrowserTestBase {
 
   /**
@@ -34,8 +34,9 @@ class MigrateControllerTest extends BrowserTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    // Log in as user 1. Migrations in the UI can only be performed as user 1.
-    $this->drupalLogin($this->rootUser);
+    // Log in as a user with access to view the migration report.
+    $account = $this->drupalCreateUser(['access site reports', 'administer views']);
+    $this->drupalLogin($account);
 
     // Create a migrate message for testing purposes.
     \Drupal::logger('migrate_drupal_ui')->notice('A test message');
@@ -45,7 +46,7 @@ class MigrateControllerTest extends BrowserTestBase {
   /**
    * Tests the upgrade report with the view enabled, disabled and uninstalled.
    */
-  public function testUpgradeReport() {
+  public function testUpgradeReport(): void {
     $session = $this->assertSession();
 
     $this->assertTrue(View::load('watchdog')->status(), 'Watchdog view is enabled');

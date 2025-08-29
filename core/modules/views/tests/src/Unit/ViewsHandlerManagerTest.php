@@ -6,22 +6,26 @@ namespace Drupal\Tests\views\Unit;
 
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Plugin\ViewsHandlerManager;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the ViewsHandlerManager class.
- *
- * @group views
- *
- * @coversDefaultClass \Drupal\views\Plugin\ViewsHandlerManager
  */
+#[CoversClass(ViewsHandlerManager::class)]
+#[Group('views')]
 class ViewsHandlerManagerTest extends UnitTestCase {
 
   /**
+   * The views handler manager.
+   *
    * @var \Drupal\views\Plugin\ViewsHandlerManager
    */
   protected $handlerManager;
 
   /**
+   * The module handler service.
+   *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $moduleHandler;
@@ -56,7 +60,7 @@ class ViewsHandlerManagerTest extends UnitTestCase {
   /**
    * Setups of the plugin factory.
    */
-  protected function setupMockedFactory() {
+  protected function setupMockedFactory(): void {
     $this->factory = $this->createMock('Drupal\Component\Plugin\Factory\FactoryInterface');
 
     $reflection = new \ReflectionClass($this->handlerManager);
@@ -67,10 +71,10 @@ class ViewsHandlerManagerTest extends UnitTestCase {
   /**
    * Tests that hook_views_plugins_TYPE_alter() is invoked for a handler type.
    *
-   * @covers ::__construct
-   * @covers ::getDefinitions
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getDefinitions
    */
-  public function testAlterHookInvocation() {
+  public function testAlterHookInvocation(): void {
     $this->moduleHandler->expects($this->once())
       ->method('alter')
       ->with('views_plugins_test', []);
@@ -81,7 +85,7 @@ class ViewsHandlerManagerTest extends UnitTestCase {
   /**
    * Tests getHandler() and its base information propagation.
    */
-  public function testGetHandlerBaseInformationPropagation() {
+  public function testGetHandlerBaseInformationPropagation(): void {
     $this->setupMockedFactory();
 
     $item = [];
@@ -124,7 +128,7 @@ class ViewsHandlerManagerTest extends UnitTestCase {
   /**
    * Tests getHandler() with an override.
    */
-  public function testGetHandlerOverride() {
+  public function testGetHandlerOverride(): void {
     $this->setupMockedFactory();
 
     $item = [];
@@ -152,7 +156,7 @@ class ViewsHandlerManagerTest extends UnitTestCase {
   /**
    * Tests getHandler() without an override.
    */
-  public function testGetHandlerNoOverride() {
+  public function testGetHandlerNoOverride(): void {
     $this->setupMockedFactory();
 
     $item = [];

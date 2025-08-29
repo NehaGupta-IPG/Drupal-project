@@ -7,13 +7,13 @@ namespace Drupal\Tests\taxonomy\Functional;
 use Drupal\Core\Url;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\workflows\Entity\Workflow;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests taxonomy terms with Content Moderation.
- *
- * @group content_moderation
- * @group taxonomy
  */
+#[Group('content_moderation')]
+#[Group('taxonomy')]
 class TaxonomyTermContentModerationTest extends TaxonomyTestBase {
 
   use ContentModerationTestTrait;
@@ -190,10 +190,9 @@ class TaxonomyTermContentModerationTest extends TaxonomyTestBase {
     $assert_session->pageTextContains($default_term_name);
     $assert_session->pageTextContains($default_term_description);
 
-    // Check the revision log message field does not appear on the term edit
-    // page.
+    // Check the revision log message field appears on the term edit page.
     $this->drupalGet($term->toUrl('edit-form'));
-    $assert_session->fieldNotExists('revision_log_message[0][value]');
+    $assert_session->fieldExists('revision_log_message[0][value]');
 
     $pending_term_name = 'term - pending revision';
     $pending_term_description = 'The pending revision of a term.';

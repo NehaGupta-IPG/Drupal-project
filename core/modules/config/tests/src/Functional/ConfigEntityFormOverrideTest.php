@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\config\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that config overrides do not bleed through in entity forms and lists.
- *
- * @group config
  */
+#[Group('config')]
 class ConfigEntityFormOverrideTest extends BrowserTestBase {
 
   /**
@@ -26,7 +26,7 @@ class ConfigEntityFormOverrideTest extends BrowserTestBase {
   /**
    * Tests that overrides do not affect forms or listing screens.
    */
-  public function testFormsWithOverrides() {
+  public function testFormsWithOverrides(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'administer site configuration',
     ]));

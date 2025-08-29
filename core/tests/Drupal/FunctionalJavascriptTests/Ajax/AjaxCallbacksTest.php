@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests\Ajax;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests Ajax callbacks on FAPI elements.
- *
- * @group Ajax
  */
+#[Group('Ajax')]
 class AjaxCallbacksTest extends WebDriverTestBase {
 
   /**
@@ -26,7 +26,7 @@ class AjaxCallbacksTest extends WebDriverTestBase {
   /**
    * Tests if Ajax callback works on date element.
    */
-  public function testDateAjaxCallback() {
+  public function testDateAjaxCallback(): void {
 
     // Test Ajax callback when date changes.
     $this->drupalGet('ajax_forms_test_ajax_element_form');
@@ -38,7 +38,7 @@ class AjaxCallbacksTest extends WebDriverTestBase {
   /**
    * Tests if Ajax callback works on datetime element.
    */
-  public function testDateTimeAjaxCallback() {
+  public function testDateTimeAjaxCallback(): void {
 
     // Test Ajax callback when datetime changes.
     $this->drupalGet('ajax_forms_test_ajax_element_form');

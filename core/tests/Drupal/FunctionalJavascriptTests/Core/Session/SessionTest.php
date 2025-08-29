@@ -6,12 +6,12 @@ namespace Drupal\FunctionalJavascriptTests\Core\Session;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that sessions don't expire.
- *
- * @group session
  */
+#[Group('session')]
 class SessionTest extends WebDriverTestBase {
 
   /**
@@ -50,7 +50,7 @@ class SessionTest extends WebDriverTestBase {
    * performed by the Mink browser. The SIMPLETEST_USER_AGENT cookie must always
    * be valid.
    */
-  public function testSessionExpiration() {
+  public function testSessionExpiration(): void {
     // Visit the front page and click the link back to the front page a large
     // number of times.
     $this->drupalGet('<front>');

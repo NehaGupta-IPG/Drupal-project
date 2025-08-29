@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
@@ -21,9 +23,7 @@ use Drupal\Core\Entity\Entity\EntityViewMode;
 class FieldRenderedEntityTest extends ViewsKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test', 'field'];
 
@@ -44,7 +44,7 @@ class FieldRenderedEntityTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpFixtures() {
+  protected function setUpFixtures(): void {
     $this->installEntitySchema('user');
     $this->installEntitySchema('entity_test');
     $this->installConfig(['entity_test']);
@@ -111,7 +111,7 @@ class FieldRenderedEntityTest extends ViewsKernelTestBase {
   /**
    * Tests the default rendered entity output.
    */
-  public function testRenderedEntityWithoutAndWithField() {
+  public function testRenderedEntityWithoutAndWithField(): void {
     // First test without test_field displayed.
     \Drupal::currentUser()->setAccount($this->user);
 
@@ -165,7 +165,7 @@ class FieldRenderedEntityTest extends ViewsKernelTestBase {
    * Ensures that the expected cacheability metadata is applied.
    *
    * @param array $build
-   *   The render array
+   *   The render array.
    *
    * @internal
    */

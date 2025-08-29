@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Functional\Views;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests the taxonomy term with depth argument.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
 class TaxonomyTermArgumentDepthTest extends TaxonomyTestBase {
 
   /**
@@ -63,7 +64,7 @@ class TaxonomyTermArgumentDepthTest extends TaxonomyTestBase {
   /**
    * Tests title escaping.
    */
-  public function testTermWithDepthArgumentTitleEscaping() {
+  public function testTermWithDepthArgumentTitleEscaping(): void {
     $this->drupalGet('test_argument_taxonomy_index_tid_depth/' . $this->terms[0]->id());
     $this->assertSession()->assertEscaped($this->terms[0]->label());
   }

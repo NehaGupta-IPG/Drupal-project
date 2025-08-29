@@ -6,22 +6,18 @@ namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the form API URL element.
- *
- * @group Form
  */
+#[Group('Form')]
 class UrlTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['form_test'];
-
-  protected $profile = 'testing';
 
   /**
    * {@inheritdoc}
@@ -31,7 +27,7 @@ class UrlTest extends BrowserTestBase {
   /**
    * Tests that #type 'url' fields are properly validated and trimmed.
    */
-  public function testFormUrl() {
+  public function testFormUrl(): void {
     $edit = [];
     $edit['url'] = 'http://';
     $edit['url_required'] = ' ';

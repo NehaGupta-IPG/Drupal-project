@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\menu_link_content\Kernel;
 
 use Drupal\Core\Menu\MenuTreeParameters;
@@ -47,7 +49,7 @@ class PathAliasMenuLinkContentTest extends KernelTestBase {
   /**
    * Tests the path aliasing changing.
    */
-  public function testPathAliasChange() {
+  public function testPathAliasChange(): void {
     $path_alias = $this->createPathAlias('/test-page', '/my-blog');
     $menu_link_content = MenuLinkContent::create([
       'title' => 'Menu title',

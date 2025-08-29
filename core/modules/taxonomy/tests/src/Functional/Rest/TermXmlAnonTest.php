@@ -6,11 +6,12 @@ namespace Drupal\Tests\taxonomy\Functional\Rest;
 
 use Drupal\Tests\rest\Functional\AnonResourceTestTrait;
 use Drupal\Tests\rest\Functional\EntityResource\XmlEntityNormalizationQuirksTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @group rest
- * @group #slow
+ * Tests Term Xml Anon.
  */
+#[Group('rest')]
 class TermXmlAnonTest extends TermResourceTestBase {
 
   use AnonResourceTestTrait;
@@ -30,13 +31,5 @@ class TermXmlAnonTest extends TermResourceTestBase {
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testPatchPath() {
-    // Deserialization of the XML format is not supported.
-    $this->markTestSkipped();
-  }
 
 }

@@ -10,12 +10,14 @@ use Drupal\file\Entity\File;
 use Drupal\media\Entity\Media;
 use Drupal\Tests\media\Functional\MediaFunctionalTestBase;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @covers \Drupal\media\Plugin\Field\FieldFormatter\MediaThumbnailFormatter
+ * Tests Media Thumbnail Formatter.
  *
- * @group media
+ * @legacy-covers \Drupal\media\Plugin\Field\FieldFormatter\MediaThumbnailFormatter
  */
+#[Group('media')]
 class MediaThumbnailFormatterTest extends MediaFunctionalTestBase {
 
   use TestFileCreationTrait;
@@ -28,11 +30,8 @@ class MediaThumbnailFormatterTest extends MediaFunctionalTestBase {
   /**
    * Tests the media thumbnail field formatter.
    */
-  public function testRender() {
+  public function testRender(): void {
     $this->drupalLogin($this->adminUser);
-
-    /** @var \Drupal\node\NodeStorage $node_storage */
-    $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
 
     // Create an image media type for testing the formatter.
     $this->createMediaType('image', ['id' => 'image']);
@@ -102,7 +101,6 @@ class MediaThumbnailFormatterTest extends MediaFunctionalTestBase {
 
     // Change the image thumbnail to point into the content node.
     $this->changeMediaReferenceFieldLinkType('content');
-    $node_storage->resetCache([$nid]);
     $this->drupalGet('node/' . $nid);
 
     // Validate image being loaded with the content on the link.

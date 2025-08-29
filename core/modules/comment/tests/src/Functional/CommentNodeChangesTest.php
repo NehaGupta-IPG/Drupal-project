@@ -7,12 +7,12 @@ namespace Drupal\Tests\comment\Functional;
 use Drupal\comment\Entity\Comment;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that comments behave correctly when the node is changed.
- *
- * @group comment
  */
+#[Group('comment')]
 class CommentNodeChangesTest extends CommentTestBase {
 
   /**
@@ -23,7 +23,7 @@ class CommentNodeChangesTest extends CommentTestBase {
   /**
    * Tests that comments are deleted with the node.
    */
-  public function testNodeDeletion() {
+  public function testNodeDeletion(): void {
     $this->drupalLogin($this->webUser);
     $comment = $this->postComment($this->node, $this->randomMachineName(), $this->randomMachineName());
     $this->assertInstanceOf(Comment::class, $comment);

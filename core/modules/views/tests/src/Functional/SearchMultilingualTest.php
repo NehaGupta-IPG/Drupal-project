@@ -7,21 +7,19 @@ namespace Drupal\Tests\views\Functional;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\language\Traits\LanguageTestTrait;
 use Drupal\Tests\Traits\Core\CronRunTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests search integration filters with multilingual nodes.
- *
- * @group views
  */
+#[Group('views')]
 class SearchMultilingualTest extends ViewTestBase {
 
   use CronRunTrait;
   use LanguageTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node',
@@ -45,7 +43,7 @@ class SearchMultilingualTest extends ViewTestBase {
   /**
    * Tests search with multilingual nodes.
    */
-  public function testMultilingualSearchFilter() {
+  public function testMultilingualSearchFilter(): void {
     // Add Spanish language programmatically.
     static::createLanguageFromLangcode('es');
 

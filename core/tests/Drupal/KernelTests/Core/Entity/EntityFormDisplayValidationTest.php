@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
@@ -37,6 +39,8 @@ class EntityFormDisplayValidationTest extends ConfigEntityValidationTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installEntitySchema('node');
+    $this->installEntitySchema('user');
     $this->installConfig('node');
     $this->createContentType(['type' => 'one']);
     $this->createContentType(['type' => 'two']);
@@ -111,6 +115,7 @@ class EntityFormDisplayValidationTest extends ConfigEntityValidationTestBase {
    */
   public function testImmutableProperties(array $valid_values = []): void {
     parent::testImmutableProperties([
+      'id' => 'entity_test_with_bundle.two.default',
       'targetEntityType' => 'entity_test_with_bundle',
       'bundle' => 'two',
     ]);

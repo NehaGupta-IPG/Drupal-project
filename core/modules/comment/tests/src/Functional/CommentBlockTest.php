@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests comment block functionality.
- *
- * @group comment
  */
+#[Group('comment')]
 class CommentBlockTest extends CommentTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'views'];
 
@@ -45,7 +43,7 @@ class CommentBlockTest extends CommentTestBase {
   /**
    * Tests the recent comments block.
    */
-  public function testRecentCommentBlock() {
+  public function testRecentCommentBlock(): void {
     $this->drupalLogin($this->adminUser);
     $this->drupalPlaceBlock('views_block:comments_recent-block_1');
 

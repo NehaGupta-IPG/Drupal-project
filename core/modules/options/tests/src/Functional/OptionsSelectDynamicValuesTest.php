@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\options\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests an options select with a dynamic allowed values function.
- *
- * @group options
  */
+#[Group('options')]
 class OptionsSelectDynamicValuesTest extends OptionsDynamicValuesTestBase {
 
   /**
@@ -19,7 +20,7 @@ class OptionsSelectDynamicValuesTest extends OptionsDynamicValuesTestBase {
   /**
    * Tests the 'options_select' widget (single select).
    */
-  public function testSelectListDynamic() {
+  public function testSelectListDynamic(): void {
     // Create an entity.
     $this->entity->save();
 

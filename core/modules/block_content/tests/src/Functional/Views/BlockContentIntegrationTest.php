@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block_content\Functional\Views;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests the block_content integration into views.
- *
- * @group block_content
  */
+#[Group('block_content')]
 class BlockContentIntegrationTest extends BlockContentTestBase {
 
   /**
@@ -26,7 +27,7 @@ class BlockContentIntegrationTest extends BlockContentTestBase {
   /**
    * Tests basic block_content view with a block_content_type argument.
    */
-  public function testBlockContentViewTypeArgument() {
+  public function testBlockContentViewTypeArgument(): void {
     // Create two content types with three block_contents each.
     $types = [];
     $all_ids = [];

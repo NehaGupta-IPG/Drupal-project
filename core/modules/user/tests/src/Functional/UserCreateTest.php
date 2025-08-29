@@ -8,12 +8,12 @@ use Drupal\Core\Test\AssertMailTrait;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the create user administration page.
- *
- * @group user
  */
+#[Group('user')]
 class UserCreateTest extends BrowserTestBase {
 
   use AssertMailTrait {
@@ -21,9 +21,7 @@ class UserCreateTest extends BrowserTestBase {
   }
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['image'];
 
@@ -35,7 +33,7 @@ class UserCreateTest extends BrowserTestBase {
   /**
    * Tests user creation and display from the administration interface.
    */
-  public function testUserAdd() {
+  public function testUserAdd(): void {
     $user = $this->drupalCreateUser(['administer users']);
     $this->drupalLogin($user);
 

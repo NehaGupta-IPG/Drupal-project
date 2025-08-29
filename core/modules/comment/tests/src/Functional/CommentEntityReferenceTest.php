@@ -6,12 +6,12 @@ namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\Entity\Comment;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that comments behave correctly when added as entity references.
- *
- * @group comment
  */
+#[Group('comment')]
 class CommentEntityReferenceTest extends CommentTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -83,7 +83,7 @@ class CommentEntityReferenceTest extends CommentTestBase {
   /**
    * Tests that comments are correctly saved as entity references.
    */
-  public function testCommentAsEntityReference() {
+  public function testCommentAsEntityReference(): void {
     // Load the node and save it.
     $edit = [
       'entity_reference_comment' => $this->comment->id(),
@@ -100,7 +100,7 @@ class CommentEntityReferenceTest extends CommentTestBase {
   /**
    * Tests that comments of unpublished are not shown.
    */
-  public function testCommentOfUnpublishedNodeBypassAccess() {
+  public function testCommentOfUnpublishedNodeBypassAccess(): void {
     // Unpublish the node that has the comment.
     $this->node->setUnpublished()->save();
 

@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Functional;
 
+use Drupal\file\Entity\File;
 use Drupal\node\Entity\Node;
 use Drupal\user\RoleInterface;
-use Drupal\file\Entity\File;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Confirm that file field submissions work correctly for anonymous visitors.
- *
- * @group file
  */
+#[Group('file')]
 class FileFieldAnonymousSubmissionTest extends FileFieldTestBase {
 
   /**
@@ -35,7 +35,7 @@ class FileFieldAnonymousSubmissionTest extends FileFieldTestBase {
   /**
    * Tests the basic node submission for an anonymous visitor.
    */
-  public function testAnonymousNode() {
+  public function testAnonymousNode(): void {
     $type = 'Article';
     $title = 'test page';
 
@@ -64,7 +64,7 @@ class FileFieldAnonymousSubmissionTest extends FileFieldTestBase {
   /**
    * Tests file submission for an anonymous visitor.
    */
-  public function testAnonymousNodeWithFile() {
+  public function testAnonymousNodeWithFile(): void {
     $type = 'Article';
     $title = 'Test page';
     $this->createFileField('field_image', 'node', 'article', [], ['file_extensions' => 'txt png']);
@@ -100,7 +100,7 @@ class FileFieldAnonymousSubmissionTest extends FileFieldTestBase {
   /**
    * Tests file submission for an anonymous visitor with a missing node title.
    */
-  public function testAnonymousNodeWithFileWithoutTitle() {
+  public function testAnonymousNodeWithFileWithoutTitle(): void {
     $this->drupalLogout();
     $this->doTestNodeWithFileWithoutTitle();
   }
@@ -108,7 +108,7 @@ class FileFieldAnonymousSubmissionTest extends FileFieldTestBase {
   /**
    * Tests file submission for an authenticated user with a missing node title.
    */
-  public function testAuthenticatedNodeWithFileWithoutTitle() {
+  public function testAuthenticatedNodeWithFileWithoutTitle(): void {
     $admin_user = $this->drupalCreateUser([
       'bypass node access',
       'access content overview',
@@ -121,7 +121,7 @@ class FileFieldAnonymousSubmissionTest extends FileFieldTestBase {
   /**
    * Helper method to test file submissions with missing node titles.
    */
-  protected function doTestNodeWithFileWithoutTitle() {
+  protected function doTestNodeWithFileWithoutTitle(): void {
     $type = 'Article';
     $title = 'Test page';
     $this->createFileField('field_image', 'node', 'article', [], ['file_extensions' => 'txt png']);

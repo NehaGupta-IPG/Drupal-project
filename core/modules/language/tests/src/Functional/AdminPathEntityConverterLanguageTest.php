@@ -6,14 +6,17 @@ namespace Drupal\Tests\language\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Test administration path based conversion of entities.
- *
- * @group language
  */
+#[Group('language')]
 class AdminPathEntityConverterLanguageTest extends BrowserTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['language', 'language_test'];
 
   /**
@@ -37,7 +40,7 @@ class AdminPathEntityConverterLanguageTest extends BrowserTestBase {
   /**
    * Tests the translated and untranslated config entities are loaded properly.
    */
-  public function testConfigUsingCurrentLanguage() {
+  public function testConfigUsingCurrentLanguage(): void {
     \Drupal::languageManager()
       ->getLanguageConfigOverride('es', 'language.entity.es')
       ->set('label', 'Español')

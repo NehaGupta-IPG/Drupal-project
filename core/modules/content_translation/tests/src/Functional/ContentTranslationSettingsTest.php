@@ -12,23 +12,22 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the content translation settings UI.
  *
- * @covers \Drupal\language\Form\ContentLanguageSettingsForm
- * @covers ::_content_translation_form_language_content_settings_form_alter
- * @group content_translation
+ * @legacy-covers \Drupal\language\Form\ContentLanguageSettingsForm
+ * @legacy-covers ::_content_translation_form_language_content_settings_form_alter
  */
+#[Group('content_translation')]
 class ContentTranslationSettingsTest extends BrowserTestBase {
 
   use CommentTestTrait;
   use FieldUiTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',
@@ -74,7 +73,7 @@ class ContentTranslationSettingsTest extends BrowserTestBase {
   /**
    * Tests that the settings UI works as expected.
    */
-  public function testSettingsUI() {
+  public function testSettingsUI(): void {
     // Check for the content_translation_menu_links_discovered_alter() changes.
     $this->drupalGet('admin/config');
     $this->assertSession()->linkExists('Content language and translation');
@@ -245,7 +244,7 @@ class ContentTranslationSettingsTest extends BrowserTestBase {
   /**
    * Tests the language settings checkbox on account settings page.
    */
-  public function testAccountLanguageSettingsUI() {
+  public function testAccountLanguageSettingsUI(): void {
     // Make sure the checkbox is available and not checked by default.
     $this->drupalGet('admin/config/people/accounts');
     $this->assertSession()->fieldExists('language[content_translation]');
@@ -291,7 +290,7 @@ class ContentTranslationSettingsTest extends BrowserTestBase {
   /**
    * Tests that field setting depends on bundle translatability.
    */
-  public function testFieldTranslatableSettingsUI() {
+  public function testFieldTranslatableSettingsUI(): void {
     // At least one field needs to be translatable to enable article for
     // translation. Create an extra field to be used for this purpose. We use
     // the UI to test our form alterations.
@@ -325,7 +324,7 @@ class ContentTranslationSettingsTest extends BrowserTestBase {
   /**
    * Tests the translatable settings checkbox for untranslatable entities.
    */
-  public function testNonTranslatableTranslationSettingsUI() {
+  public function testNonTranslatableTranslationSettingsUI(): void {
     $this->drupalGet('admin/config/regional/content-language');
     $this->assertSession()->fieldNotExists('settings[entity_test][entity_test][translatable]');
   }

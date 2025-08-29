@@ -16,13 +16,17 @@ use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @coversDefaultClass \Drupal\Core\Entity\EntityTypeBundleInfo
- * @group Entity
+ * Tests Drupal\Core\Entity\EntityTypeBundleInfo.
  */
+#[CoversClass(EntityTypeBundleInfo::class)]
+#[Group('Entity')]
 class EntityTypeBundleInfoTest extends UnitTestCase {
 
   /**
@@ -112,7 +116,7 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
    * @param \Drupal\Core\Entity\EntityTypeInterface[]|\Prophecy\Prophecy\ProphecyInterface[] $definitions
    *   (optional) An array of entity type definitions.
    */
-  protected function setUpEntityTypeDefinitions($definitions = []) {
+  protected function setUpEntityTypeDefinitions($definitions = []): void {
     foreach ($definitions as $key => $entity_type) {
       // \Drupal\Core\Entity\EntityTypeInterface::getLinkTemplates() is called
       // by \Drupal\Core\Entity\EntityTypeManager::processDefinition() so it
@@ -143,9 +147,9 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
   /**
    * Tests the clearCachedBundles() method.
    *
-   * @covers ::clearCachedBundles
+   * @legacy-covers ::clearCachedBundles
    */
-  public function testClearCachedBundles() {
+  public function testClearCachedBundles(): void {
     $this->setUpEntityTypeDefinitions();
 
     $this->typedDataManager->clearCachedDefinitions()->shouldBeCalled();
@@ -158,11 +162,10 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
   /**
    * Tests the getBundleInfo() method.
    *
-   * @covers ::getBundleInfo
-   *
-   * @dataProvider providerTestGetBundleInfo
+   * @legacy-covers ::getBundleInfo
    */
-  public function testGetBundleInfo($entity_type_id, $expected) {
+  #[DataProvider('providerTestGetBundleInfo')]
+  public function testGetBundleInfo($entity_type_id, $expected): void {
     $this->moduleHandler->invokeAll('entity_bundle_info')->willReturn([]);
     $this->moduleHandler->alter('entity_bundle_info', Argument::type('array'))->willReturn(NULL);
 
@@ -210,9 +213,9 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
   /**
    * Tests the getAllBundleInfo() method.
    *
-   * @covers ::getAllBundleInfo
+   * @legacy-covers ::getAllBundleInfo
    */
-  public function testGetAllBundleInfo() {
+  public function testGetAllBundleInfo(): void {
     $this->moduleHandler->invokeAll('entity_bundle_info')->willReturn([]);
     $this->moduleHandler->alter('entity_bundle_info', Argument::type('array'))->willReturn(NULL);
 
@@ -268,9 +271,11 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getAllBundleInfo
+   * Tests get all bundle info with entity bundle info.
+   *
+   * @legacy-covers ::getAllBundleInfo
    */
-  public function testGetAllBundleInfoWithEntityBundleInfo() {
+  public function testGetAllBundleInfoWithEntityBundleInfo(): void {
     // Ensure that EntityTypeBundleInfo::getAllBundleInfo() does not add
     // additional bundles if hook_entity_bundle_info() defines some and the
     // entity_type does not define a bundle entity type.

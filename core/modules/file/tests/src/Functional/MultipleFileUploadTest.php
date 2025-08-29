@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\file\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests multiple file upload.
- *
- * @group file
  */
+#[Group('file')]
 class MultipleFileUploadTest extends BrowserTestBase {
 
   /**
@@ -36,7 +36,7 @@ class MultipleFileUploadTest extends BrowserTestBase {
   /**
    * Tests multiple file field with all file extensions.
    */
-  public function testMultipleFileFieldWithAllFileExtensions() {
+  public function testMultipleFileFieldWithAllFileExtensions(): void {
     $theme = 'test_theme_settings';
     \Drupal::service('theme_installer')->install([$theme]);
     $this->drupalGet("admin/appearance/settings/$theme");
@@ -49,7 +49,7 @@ class MultipleFileUploadTest extends BrowserTestBase {
       $edit["files[multi_file][$i]"] = $file_path;
     }
 
-    // @todo: Replace after https://www.drupal.org/project/drupal/issues/2917885
+    // @todo Replace after https://www.drupal.org/project/drupal/issues/2917885
     $this->drupalGet("admin/appearance/settings/$theme");
     $submit_xpath = $this->assertSession()->buttonExists('Save configuration')->getXpath();
     $client = $this->getSession()->getDriver()->getClient();

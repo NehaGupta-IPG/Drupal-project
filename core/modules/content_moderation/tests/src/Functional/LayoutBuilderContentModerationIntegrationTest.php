@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_moderation\Functional;
 
-use Drupal\block_content\Entity\BlockContentType;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests Content Moderation's integration with Layout Builder.
- *
- * @group content_moderation
- * @group layout_builder
  */
+#[Group('content_moderation')]
+#[Group('layout_builder')]
 class LayoutBuilderContentModerationIntegrationTest extends BrowserTestBase {
 
+  use BlockContentCreationTrait;
   use ContentModerationTestTrait;
 
   /**
@@ -49,12 +50,11 @@ class LayoutBuilderContentModerationIntegrationTest extends BrowserTestBase {
     $this->createContentType(['type' => 'bundle_with_section_field']);
 
     // Add a new block content bundle to the editorial workflow.
-    BlockContentType::create([
+    $this->createBlockContentType([
       'id' => 'basic',
       'label' => 'Basic',
       'revision' => 1,
-    ])->save();
-    block_content_add_body_field('basic');
+    ], TRUE);
 
     // Enable layout overrides.
     LayoutBuilderEntityViewDisplay::load('node.bundle_with_section_field.default')
@@ -96,7 +96,7 @@ class LayoutBuilderContentModerationIntegrationTest extends BrowserTestBase {
   /**
    * Tests that Layout changes are respected by Content Moderation.
    */
-  public function testLayoutModeration() {
+  public function testLayoutModeration(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -169,7 +169,7 @@ class LayoutBuilderContentModerationIntegrationTest extends BrowserTestBase {
   /**
    * Test placing inline blocks that belong to a moderated content block bundle.
    */
-  public function testModeratedInlineBlockBundles() {
+  public function testModeratedInlineBlockBundles(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 

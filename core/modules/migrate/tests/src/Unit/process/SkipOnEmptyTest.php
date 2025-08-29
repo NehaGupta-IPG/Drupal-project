@@ -6,19 +6,22 @@ namespace Drupal\Tests\migrate\Unit\process;
 
 use Drupal\migrate\MigrateSkipRowException;
 use Drupal\migrate\Plugin\migrate\process\SkipOnEmpty;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the skip on empty process plugin.
- *
- * @group migrate
- * @coversDefaultClass \Drupal\migrate\Plugin\migrate\process\SkipOnEmpty
  */
+#[CoversClass(SkipOnEmpty::class)]
+#[Group('migrate')]
 class SkipOnEmptyTest extends MigrateProcessTestCase {
 
   /**
-   * @covers ::process
+   * Tests process skips on empty.
+   *
+   * @legacy-covers ::process
    */
-  public function testProcessSkipsOnEmpty() {
+  public function testProcessSkipsOnEmpty(): void {
     $configuration['method'] = 'process';
     $plugin = new SkipOnEmpty($configuration, 'skip_on_empty', []);
     $this->assertFalse($plugin->isPipelineStopped());
@@ -27,9 +30,11 @@ class SkipOnEmptyTest extends MigrateProcessTestCase {
   }
 
   /**
-   * @covers ::process
+   * Tests process bypasses on non empty.
+   *
+   * @legacy-covers ::process
    */
-  public function testProcessBypassesOnNonEmpty() {
+  public function testProcessBypassesOnNonEmpty(): void {
     $configuration['method'] = 'process';
     $plugin = new SkipOnEmpty($configuration, 'skip_on_empty', []);
     $value = $plugin
@@ -39,9 +44,11 @@ class SkipOnEmptyTest extends MigrateProcessTestCase {
   }
 
   /**
-   * @covers ::row
+   * Tests row skips on empty.
+   *
+   * @legacy-covers ::row
    */
-  public function testRowSkipsOnEmpty() {
+  public function testRowSkipsOnEmpty(): void {
     $configuration['method'] = 'row';
     $this->expectException(MigrateSkipRowException::class);
     (new SkipOnEmpty($configuration, 'skip_on_empty', []))
@@ -49,9 +56,11 @@ class SkipOnEmptyTest extends MigrateProcessTestCase {
   }
 
   /**
-   * @covers ::row
+   * Tests row bypasses on non empty.
+   *
+   * @legacy-covers ::row
    */
-  public function testRowBypassesOnNonEmpty() {
+  public function testRowBypassesOnNonEmpty(): void {
     $configuration['method'] = 'row';
     $value = (new SkipOnEmpty($configuration, 'skip_on_empty', []))
       ->transform(' ', $this->migrateExecutable, $this->row, 'destination_property');
@@ -61,9 +70,9 @@ class SkipOnEmptyTest extends MigrateProcessTestCase {
   /**
    * Tests that a skip row exception without a message is raised.
    *
-   * @covers ::row
+   * @legacy-covers ::row
    */
-  public function testRowSkipWithoutMessage() {
+  public function testRowSkipWithoutMessage(): void {
     $configuration = [
       'method' => 'row',
     ];
@@ -75,9 +84,9 @@ class SkipOnEmptyTest extends MigrateProcessTestCase {
   /**
    * Tests that a skip row exception with a message is raised.
    *
-   * @covers ::row
+   * @legacy-covers ::row
    */
-  public function testRowSkipWithMessage() {
+  public function testRowSkipWithMessage(): void {
     $configuration = [
       'method' => 'row',
       'message' => 'The value is empty',
@@ -89,9 +98,9 @@ class SkipOnEmptyTest extends MigrateProcessTestCase {
   }
 
   /**
-   * Tests repeated execution of a process plugin can reset the pipeline stoppage correctly.
+   * Tests repeated execution of a process plugin resets the pipeline stoppage.
    */
-  public function testMultipleTransforms() {
+  public function testMultipleTransforms(): void {
     $configuration['method'] = 'process';
     $plugin = new SkipOnEmpty($configuration, 'skip_on_empty', []);
 

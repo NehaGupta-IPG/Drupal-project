@@ -6,13 +6,14 @@ namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the UI of row plugins.
  *
- * @group views_ui
  * @see \Drupal\views_test_data\Plugin\views\row\RowTest.
  */
+#[Group('views_ui')]
 class RowUITest extends UITestBase {
 
   /**
@@ -30,7 +31,7 @@ class RowUITest extends UITestBase {
   /**
    * Tests changing the row plugin and changing some options of a row.
    */
-  public function testRowUI() {
+  public function testRowUI(): void {
     $view_name = 'test_view';
     $view_edit_url = "admin/structure/views/view/$view_name/edit";
 

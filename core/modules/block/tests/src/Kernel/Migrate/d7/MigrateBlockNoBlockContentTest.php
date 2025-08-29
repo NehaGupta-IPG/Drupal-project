@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Kernel\Migrate\d7;
 
 use Drupal\block\Entity\Block;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use Drupal\block\Hook\BlockHooks;
 
 /**
  * Tests the migration of blocks without Block Content installed.
@@ -50,7 +53,8 @@ class MigrateBlockNoBlockContentTest extends MigrateDrupal7TestBase {
       'd7_user_role',
       'd7_block',
     ]);
-    block_rebuild();
+    $blockRebuild = new BlockHooks();
+    $blockRebuild->rebuild();
   }
 
   /**

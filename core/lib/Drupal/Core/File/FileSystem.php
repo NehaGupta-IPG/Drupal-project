@@ -287,8 +287,12 @@ class FileSystem implements FileSystemInterface {
   /**
    * {@inheritdoc}
    */
-  public function copy($source, $destination, $replace = self::EXISTS_RENAME) {
-    $this->prepareDestination($source, $destination, $replace);
+  public function copy($source, $destination, /* FileExists */$fileExists = FileExists::Rename) {
+    if (!$fileExists instanceof FileExists) {
+      // @phpstan-ignore staticMethod.deprecated
+      $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
+    }
+    $this->prepareDestination($source, $destination, $fileExists);
 
     if (!@copy($source, $destination)) {
       // If the copy failed and realpaths exist, retry the operation using them
@@ -310,6 +314,13 @@ class FileSystem implements FileSystemInterface {
    * {@inheritdoc}
    */
   public function delete($path) {
+    if (is_link($path)) {
+      // See https://bugs.php.net/52176.
+      if (!($this->unlink($path) || '\\' !== \DIRECTORY_SEPARATOR || $this->rmdir($path)) && file_exists($path)) {
+        throw new FileException("Failed to unlink symlink '$path'.");
+      }
+      return TRUE;
+    }
     if (is_file($path)) {
       if (!$this->unlink($path)) {
         throw new FileException("Failed to unlink file '$path'.");
@@ -335,16 +346,22 @@ class FileSystem implements FileSystemInterface {
   /**
    * {@inheritdoc}
    */
-  public function deleteRecursive($path, callable $callback = NULL) {
+  public function deleteRecursive($path, ?callable $callback = NULL) {
+    // Ensure paths are local paths when a recursive delete is started.
+    if ($this->streamWrapperManager->isValidUri($path)) {
+      $path = $this->realpath($path);
+    }
+
     if ($callback) {
       call_user_func($callback, $path);
     }
 
-    if (!file_exists($path)) {
+    // Allow broken links to be removed.
+    if (!file_exists($path) && !is_link($path)) {
       return TRUE;
     }
 
-    if (is_dir($path)) {
+    if (is_dir($path) && !is_link($path)) {
       $dir = dir($path);
       while (($entry = $dir->read()) !== FALSE) {
         if ($entry == '.' || $entry == '..') {
@@ -364,8 +381,12 @@ class FileSystem implements FileSystemInterface {
   /**
    * {@inheritdoc}
    */
-  public function move($source, $destination, $replace = self::EXISTS_RENAME) {
-    $this->prepareDestination($source, $destination, $replace);
+  public function move($source, $destination, /* FileExists */$fileExists = FileExists::Rename) {
+    if (!$fileExists instanceof FileExists) {
+      // @phpstan-ignore staticMethod.deprecated
+      $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
+    }
+    $this->prepareDestination($source, $destination, $fileExists);
 
     // Ensure compatibility with Windows.
     // @see \Drupal\Core\File\FileSystemInterface::unlink().
@@ -412,17 +433,20 @@ class FileSystem implements FileSystemInterface {
    *   A URI containing the destination that $source should be moved/copied to.
    *   The URI may be a bare filepath (without a scheme) and in that case the
    *   default scheme (file://) will be used.
-   * @param int $replace
-   *   Replace behavior when the destination file already exists:
-   *   - FileSystemInterface::EXISTS_REPLACE - Replace the existing file.
-   *   - FileSystemInterface::EXISTS_RENAME - Append _{incrementing number}
-   *     until the filename is unique.
-   *   - FileSystemInterface::EXISTS_ERROR - Do nothing and return FALSE.
+   * @param \Drupal\Core\File\FileExists|int $fileExists
+   *   Replace behavior when the destination file already exists.
+   *
+   * @throws \TypeError
+   *   Thrown when the $fileExists parameter is not an enum or legacy int.
    *
    * @see \Drupal\Core\File\FileSystemInterface::copy()
    * @see \Drupal\Core\File\FileSystemInterface::move()
    */
-  protected function prepareDestination($source, &$destination, $replace) {
+  protected function prepareDestination($source, &$destination, /* FileExists */$fileExists) {
+    if (!$fileExists instanceof FileExists) {
+      // @phpstan-ignore staticMethod.deprecated
+      $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
+    }
     $original_source = $source;
 
     if (!file_exists($source)) {
@@ -448,7 +472,7 @@ class FileSystem implements FileSystemInterface {
     }
 
     // Determine whether we can perform this operation based on overwrite rules.
-    $destination = $this->getDestinationFilename($destination, $replace);
+    $destination = $this->getDestinationFilename($destination, $fileExists);
     if ($destination === FALSE) {
       throw new FileExistsException("File '$original_source' could not be copied because a file by that name already exists in the destination directory ('$destination').");
     }
@@ -464,7 +488,11 @@ class FileSystem implements FileSystemInterface {
   /**
    * {@inheritdoc}
    */
-  public function saveData($data, $destination, $replace = self::EXISTS_RENAME) {
+  public function saveData($data, $destination, /* FileExists */$fileExists = FileExists::Rename) {
+    if (!$fileExists instanceof FileExists) {
+      // @phpstan-ignore staticMethod.deprecated
+      $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
+    }
     // Write the data to a temporary file.
     $temp_name = $this->tempnam('temporary://', 'file');
     if (file_put_contents($temp_name, $data) === FALSE) {
@@ -472,7 +500,7 @@ class FileSystem implements FileSystemInterface {
     }
 
     // Move the file to its final destination.
-    return $this->move($temp_name, $destination, $replace);
+    return $this->move($temp_name, $destination, $fileExists);
   }
 
   /**
@@ -514,23 +542,27 @@ class FileSystem implements FileSystemInterface {
   /**
    * {@inheritdoc}
    */
-  public function getDestinationFilename($destination, $replace) {
+  public function getDestinationFilename($destination, /* FileExists */$fileExists) {
+    if (!$fileExists instanceof FileExists) {
+      // @phpstan-ignore staticMethod.deprecated
+      $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
+    }
     $basename = $this->basename($destination);
     if (!Unicode::validateUtf8($basename)) {
       throw new FileException(sprintf("Invalid filename '%s'", $basename));
     }
     if (file_exists($destination)) {
-      switch ($replace) {
-        case FileSystemInterface::EXISTS_REPLACE:
+      switch ($fileExists) {
+        case FileExists::Replace:
           // Do nothing here, we want to overwrite the existing file.
           break;
 
-        case FileSystemInterface::EXISTS_RENAME:
+        case FileExists::Rename:
           $directory = $this->dirname($destination);
           $destination = $this->createFilename($basename, $directory);
           break;
 
-        case FileSystemInterface::EXISTS_ERROR:
+        case FileExists::Error:
           // Error reporting handled by calling function.
           return FALSE;
       }

@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the SystemConfigFormTestBase class.
- *
- * @group Form
  */
+#[Group('Form')]
 class SystemConfigFormTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['form_test'];
 
@@ -28,7 +26,7 @@ class SystemConfigFormTest extends BrowserTestBase {
   /**
    * Tests the SystemConfigFormTestBase class.
    */
-  public function testSystemConfigForm() {
+  public function testSystemConfigForm(): void {
     $this->drupalGet('form-test/system-config-form');
     // Verify the primary action submit button is found.
     $this->assertSession()->elementExists('xpath', "//div[@id = 'edit-actions']/input[contains(@class, 'button--primary')]");

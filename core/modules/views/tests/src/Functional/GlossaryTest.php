@@ -9,21 +9,19 @@ use Drupal\Core\Url;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\views\Tests\AssertViewsCacheTagsTrait;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests glossary functionality of views.
- *
- * @group views
  */
+#[Group('views')]
 class GlossaryTest extends ViewTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
   use AssertViewsCacheTagsTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node'];
 
@@ -35,7 +33,7 @@ class GlossaryTest extends ViewTestBase {
   /**
    * Tests the default glossary view.
    */
-  public function testGlossaryView() {
+  public function testGlossaryView(): void {
     // Create a content type and add some nodes, with a non-random title.
     $type = $this->drupalCreateContentType();
     $nodes_per_char = [
@@ -59,7 +57,7 @@ class GlossaryTest extends ViewTestBase {
       }
     }
 
-    // Execute glossary view
+    // Execute glossary view.
     $view = Views::getView('glossary');
     $view->setDisplay('attachment_1');
     $view->executeDisplay('attachment_1');
@@ -85,11 +83,10 @@ class GlossaryTest extends ViewTestBase {
         'url',
         'user.node_grants:view',
         'user.permissions',
-        'route',
       ],
       [
         'config:views.view.glossary',
-        // Listed for letter 'a'
+        // Listed for letter 'a'.
         'node:' . $nodes_by_char['a'][0]->id(), 'node:' . $nodes_by_char['a'][1]->id(), 'node:' . $nodes_by_char['a'][2]->id(),
         // Link for letter 'd'.
         'node:1',
@@ -121,7 +118,7 @@ class GlossaryTest extends ViewTestBase {
       // Get the summary link for a certain character. Filter by label and href
       // to ensure that both of them are correct.
       $result = $this->assertSession()->elementExists('xpath', "//a[contains(@href, '{$href}') and normalize-space(text())='{$label}']/..");
-      // The rendered output looks like "<a href=''>X</a> | (count)" so let's
+      // The rendered output looks like "<a href="">X</a> | (count)" so let's
       // figure out the int.
       $result_count = explode(' ', trim(str_replace(['|', '(', ')'], '', $result->getText())))[1];
       $this->assertEquals($count, $result_count, 'The expected number got rendered.');

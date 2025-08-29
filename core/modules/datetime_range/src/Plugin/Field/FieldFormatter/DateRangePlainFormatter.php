@@ -30,9 +30,7 @@ class DateRangePlainFormatter extends DateTimePlainFormatter {
    * {@inheritdoc}
    */
   public static function defaultSettings() {
-    return [
-      'separator' => '-',
-    ] + parent::defaultSettings();
+    return static::dateTimeRangeDefaultSettings() + parent::defaultSettings();
   }
 
   /**
@@ -50,11 +48,7 @@ class DateRangePlainFormatter extends DateTimePlainFormatter {
         $end_date = $item->end_date;
 
         if ($start_date->getTimestamp() !== $end_date->getTimestamp()) {
-          $elements[$delta] = [
-            'start_date' => $this->buildDate($start_date),
-            'separator' => ['#plain_text' => ' ' . $separator . ' '],
-            'end_date' => $this->buildDate($end_date),
-          ];
+          $elements[$delta] = $this->renderStartEnd($start_date, $separator, $end_date);
         }
         else {
           $elements[$delta] = $this->buildDate($start_date);
@@ -62,7 +56,8 @@ class DateRangePlainFormatter extends DateTimePlainFormatter {
           if (!empty($item->_attributes)) {
             $elements[$delta]['#attributes'] += $item->_attributes;
             // Unset field item attributes since they have been included in the
-            // formatter output and should not be rendered in the field template.
+            // formatter output and should not be rendered in the field
+            // template.
             unset($item->_attributes);
           }
         }
@@ -77,14 +72,7 @@ class DateRangePlainFormatter extends DateTimePlainFormatter {
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
-
-    $form['separator'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Date separator'),
-      '#description' => $this->t('The string to separate the start and end dates'),
-      '#default_value' => $this->getSetting('separator'),
-    ];
-
+    $form = $this->dateTimeRangeSettingsForm($form);
     return $form;
   }
 
@@ -92,13 +80,7 @@ class DateRangePlainFormatter extends DateTimePlainFormatter {
    * {@inheritdoc}
    */
   public function settingsSummary() {
-    $summary = parent::settingsSummary();
-
-    if ($separator = $this->getSetting('separator')) {
-      $summary[] = $this->t('Separator: %separator', ['%separator' => $separator]);
-    }
-
-    return $summary;
+    return array_merge(parent::settingsSummary(), $this->dateTimeRangeSettingsSummary());
   }
 
 }

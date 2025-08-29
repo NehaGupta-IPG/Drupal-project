@@ -6,19 +6,19 @@ namespace Drupal\Tests\taxonomy\Functional\Views;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
-use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\taxonomy\Entity\Term;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests taxonomy field filters with translations.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
 class TaxonomyFieldFilterTest extends ViewTestBase {
 
   /**
@@ -114,7 +114,7 @@ class TaxonomyFieldFilterTest extends ViewTestBase {
   /**
    * Tests description and term name filters.
    */
-  public function testFilters() {
+  public function testFilters(): void {
     // Test the name filter page, which filters for name contains 'Comida'.
     // Should show just the Spanish translation, once.
     $this->assertPageCounts('test-name-filter', ['es' => 1, 'fr' => 0, 'en' => 0], 'Comida name filter');

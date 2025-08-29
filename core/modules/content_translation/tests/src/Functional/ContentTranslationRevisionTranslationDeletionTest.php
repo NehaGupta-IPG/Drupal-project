@@ -6,12 +6,12 @@ namespace Drupal\Tests\content_translation\Functional;
 
 use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that revision translation deletion is handled correctly.
- *
- * @group content_translation
  */
+#[Group('content_translation')]
 class ContentTranslationRevisionTranslationDeletionTest extends ContentTranslationPendingRevisionTestBase {
 
   /**
@@ -31,7 +31,7 @@ class ContentTranslationRevisionTranslationDeletionTest extends ContentTranslati
   /**
    * Tests that translation overview handles pending revisions correctly.
    */
-  public function testOverview() {
+  public function testOverview(): void {
     $index = 1;
     $accounts = [
       $this->rootUser,
@@ -50,7 +50,7 @@ class ContentTranslationRevisionTranslationDeletionTest extends ContentTranslati
    * @param int $index
    *   The test run index.
    */
-  public function doTestOverview($index) {
+  public function doTestOverview($index): void {
     $this->drupalLogin($this->currentAccount);
 
     // Create a test node.

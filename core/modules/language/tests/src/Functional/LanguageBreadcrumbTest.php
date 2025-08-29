@@ -7,20 +7,18 @@ namespace Drupal\Tests\language\Functional;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests breadcrumbs functionality.
- *
- * @group Menu
  */
+#[Group('Menu')]
 class LanguageBreadcrumbTest extends BrowserTestBase {
 
   use AssertBreadcrumbTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language', 'block', 'filter'];
 
@@ -42,7 +40,7 @@ class LanguageBreadcrumbTest extends BrowserTestBase {
   /**
    * Tests breadcrumbs with URL prefixes.
    */
-  public function testBreadCrumbs() {
+  public function testBreadCrumbs(): void {
     // /user/login is the default frontpage which only works for an anonymous
     // user. Access the frontpage in different languages, ensure that no
     // breadcrumb is displayed.

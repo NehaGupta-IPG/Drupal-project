@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\taxonomy\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests content translation for vocabularies.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
 class VocabularyTranslationTest extends TaxonomyTestBase {
 
   /**
@@ -56,7 +56,7 @@ class VocabularyTranslationTest extends TaxonomyTestBase {
   /**
    * Tests language settings for vocabularies.
    */
-  public function testVocabularyLanguage() {
+  public function testVocabularyLanguage(): void {
     $this->drupalGet('admin/structure/taxonomy/add');
 
     // Check that the field to enable content translation is available.

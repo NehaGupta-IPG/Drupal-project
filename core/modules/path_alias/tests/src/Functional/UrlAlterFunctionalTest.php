@@ -8,20 +8,18 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests altering the inbound path and the outbound path.
- *
- * @group path_alias
  */
+#[Group('path_alias')]
 class UrlAlterFunctionalTest extends BrowserTestBase {
 
   use PathAliasTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['path', 'url_alter_test'];
 
@@ -33,7 +31,7 @@ class UrlAlterFunctionalTest extends BrowserTestBase {
   /**
    * Tests that URL altering works and that it occurs in the correct order.
    */
-  public function testUrlAlter() {
+  public function testUrlAlter(): void {
     // Ensure that the path_alias table exists after Drupal installation.
     $this->assertTrue(Database::getConnection()->schema()->tableExists('path_alias'), 'The path_alias table exists after Drupal installation.');
 

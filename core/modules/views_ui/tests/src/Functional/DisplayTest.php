@@ -7,13 +7,13 @@ namespace Drupal\Tests\views_ui\Functional;
 use Drupal\Component\Utility\Unicode;
 use Drupal\views\Entity\View;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the display UI.
- *
- * @group views_ui
- * @group #slow
  */
+#[Group('views_ui')]
+#[Group('#slow')]
 class DisplayTest extends UITestBase {
 
   /**
@@ -24,9 +24,7 @@ class DisplayTest extends UITestBase {
   public static $testViews = ['test_display'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['contextual'];
 
@@ -38,8 +36,8 @@ class DisplayTest extends UITestBase {
   /**
    * Tests adding a display.
    */
-  public function testAddDisplay() {
-    $view = $this->randomView();
+  public function testAddDisplay(): void {
+    $this->randomView();
     $this->assertSession()->elementNotExists('xpath', '//li[@data-drupal-selector="edit-displays-top-tabs-block-1"]');
     $this->assertSession()->elementNotExists('xpath', '//li[@data-drupal-selector="edit-displays-top-tabs-block-2"]');
     $this->assertSession()->pageTextMatchesCount(0, '/Block name:/');
@@ -53,7 +51,7 @@ class DisplayTest extends UITestBase {
   /**
    * Tests reordering of displays.
    */
-  public function testReorderDisplay() {
+  public function testReorderDisplay(): void {
     $view = [
       'block[create]' => TRUE,
     ];
@@ -88,7 +86,7 @@ class DisplayTest extends UITestBase {
   /**
    * Tests disabling of a display.
    */
-  public function testDisableDisplay() {
+  public function testDisableDisplay(): void {
     $view = $this->randomView();
     $path_prefix = 'admin/structure/views/view/' . $view['id'] . '/edit';
 
@@ -115,7 +113,7 @@ class DisplayTest extends UITestBase {
   /**
    * Tests views_ui_views_plugins_display_alter is altering plugin definitions.
    */
-  public function testDisplayPluginsAlter() {
+  public function testDisplayPluginsAlter(): void {
     $definitions = Views::pluginManager('display')->getDefinitions();
 
     $expected = [
@@ -132,7 +130,7 @@ class DisplayTest extends UITestBase {
   /**
    * Tests display areas.
    */
-  public function testDisplayAreas() {
+  public function testDisplayAreas(): void {
     // Show the advanced column.
     $this->config('views.settings')->set('ui.show.advanced_column', TRUE)->save();
 
@@ -158,12 +156,12 @@ class DisplayTest extends UITestBase {
   /**
    * Tests the link-display setting.
    */
-  public function testLinkDisplay() {
+  public function testLinkDisplay(): void {
     // Test setting the link display in the UI form.
     $path = 'admin/structure/views/view/test_display/edit/block_1';
     $link_display_path = 'admin/structure/views/nojs/display/test_display/block_1/link_display';
 
-    // Test the link text displays 'None' and not 'Block 1'
+    // Test the link text displays 'None' and not 'Block 1'.
     $this->drupalGet($path);
     $this->assertSession()->elementTextEquals('xpath', "//a[contains(@href, '{$link_display_path}')]", 'None');
 
@@ -189,7 +187,7 @@ class DisplayTest extends UITestBase {
 
     $this->assertSession()->linkExists('Custom URL', 0, 'The link option has custom URL as summary.');
 
-    // Test the default link_url value for new display
+    // Test the default link_url value for new display.
     $this->submitForm([], 'Add Block');
     $this->assertSession()->addressEquals('admin/structure/views/view/test_display/edit/block_2');
     $this->clickLink('Custom URL');
@@ -199,7 +197,7 @@ class DisplayTest extends UITestBase {
   /**
    * Tests that the view status is correctly reflected on the edit form.
    */
-  public function testViewStatus() {
+  public function testViewStatus(): void {
     $view = $this->randomView();
     $id = $view['id'];
 
@@ -218,7 +216,7 @@ class DisplayTest extends UITestBase {
   /**
    * Ensures that no XSS is possible for buttons.
    */
-  public function testDisplayTitleInButtonsXss() {
+  public function testDisplayTitleInButtonsXss(): void {
     $xss_markup = '"><script>alert(123)</script>';
     $view = $this->randomView();
     $view = View::load($view['id']);
@@ -247,7 +245,7 @@ class DisplayTest extends UITestBase {
   /**
    * Tests the action links on the edit display UI.
    */
-  public function testActionLinks() {
+  public function testActionLinks(): void {
     // Change the display title of a display so it contains characters that will
     // be escaped when rendered.
     $display_title = "'<test>'";
@@ -279,7 +277,7 @@ class DisplayTest extends UITestBase {
   /**
    * Tests that the override option is hidden when it's not needed.
    */
-  public function testHideDisplayOverride() {
+  public function testHideDisplayOverride(): void {
     // Test that the override option appears with two displays.
     $this->drupalGet('admin/structure/views/nojs/handler/test_display/page_1/field/title');
     $this->assertSession()->pageTextContains('All displays');

@@ -6,15 +6,15 @@ namespace Drupal\Tests\migrate_drupal_ui\Functional\d6;
 
 use Drupal\node\Entity\Node;
 use Drupal\Tests\migrate_drupal_ui\Functional\MigrateUpgradeExecuteTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests Drupal 6 upgrade using the migrate UI.
  *
  * The test method is provided by the MigrateUpgradeTestBase class.
- *
- * @group migrate_drupal_ui
- * @group #slow
  */
+#[Group('migrate_drupal_ui')]
+#[Group('#slow')]
 class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
 
   /**
@@ -54,25 +54,26 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
 
     $this->loadFixture($this->getModulePath('migrate_drupal') . '/tests/fixtures/drupal6.php');
 
-    // Enable saving the logs and set the post migration admin user name.
-    $this->outputLogs = TRUE;
-    $this->migratedAdminUserName = 'root';
     $this->expectedLoggedErrors = 39;
+    // If saving the logs, then set the admin user.
+    if ($this->outputLogs) {
+      $this->migratedAdminUserName = 'admin';
+    }
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getSourceBasePath() {
+  protected function getSourceBasePath(): string {
     return __DIR__ . '/files';
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getEntityCounts() {
+  protected function getEntityCounts(): array {
     return [
-      'block' => 37,
+      'block' => 36,
       'block_content' => 2,
       'block_content_type' => 1,
       'comment' => 8,
@@ -96,7 +97,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       'search_page' => 3,
       'shortcut' => 2,
       'shortcut_set' => 1,
-      'action' => 33,
+      'action' => 30,
       'menu' => 8,
       'path_alias' => 8,
       'taxonomy_term' => 15,
@@ -132,7 +133,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getAvailablePaths() {
+  protected function getAvailablePaths(): array {
     return [
       'Block',
       'Block translation',
@@ -185,7 +186,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getMissingPaths() {
+  protected function getMissingPaths(): array {
     return [
       'Aggregator',
       'Book',
@@ -197,7 +198,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
   /**
    * Executes all steps of migrations upgrade.
    */
-  public function testUpgradeAndIncremental() {
+  public function testUpgradeAndIncremental(): void {
     // Perform upgrade followed by an incremental upgrade.
     $this->doUpgradeAndIncremental();
 
@@ -207,6 +208,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
     $this->assertFollowUpMigrationResults();
     $this->assertEntityRevisionsCount('node', 26);
     $this->assertEmailsSent();
+    $this->assertLogError();
   }
 
   /**

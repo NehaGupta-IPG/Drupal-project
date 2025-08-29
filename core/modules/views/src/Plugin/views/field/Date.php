@@ -6,6 +6,7 @@ use Drupal\Core\Datetime\TimeZoneFormHelper;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\views\Attribute\ViewsField;
 use Drupal\views\ResultRow;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
@@ -14,9 +15,8 @@ use Drupal\Core\Datetime\DateFormatterInterface;
  * A handler to provide proper displays for dates.
  *
  * @ingroup views_field_handlers
- *
- * @ViewsField("date")
  */
+#[ViewsField("date")]
 class Date extends FieldPluginBase {
 
   /**
@@ -46,7 +46,7 @@ class Date extends FieldPluginBase {
    *   The date formatter service.
    * @param \Drupal\Core\Entity\EntityStorageInterface $date_format_storage
    *   The date format storage.
-   * @param \Drupal\Component\Datetime\TimeInterface|null $time
+   * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    */
   public function __construct(
@@ -55,16 +55,12 @@ class Date extends FieldPluginBase {
     $plugin_definition,
     DateFormatterInterface $date_formatter,
     EntityStorageInterface $date_format_storage,
-    protected ?TimeInterface $time = NULL,
+    protected TimeInterface $time,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->dateFormatter = $date_formatter;
     $this->dateFormatStorage = $date_format_storage;
-    if (!$time) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $time argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/3395991', E_USER_DEPRECATED);
-      $this->time = \Drupal::service('datetime.time');
-    }
   }
 
   /**
@@ -125,7 +121,8 @@ class Date extends FieldPluginBase {
       '#description' => $this->t('If "Custom", see <a href="https://www.php.net/manual/datetime.format.php#refsect1-datetime.format-parameters" target="_blank">the PHP docs</a> for date formats. Otherwise, enter the number of different time units to display, which defaults to 2.'),
       '#default_value' => $this->options['custom_date_format'] ?? '',
     ];
-    // Setup #states for all possible date_formats on the custom_date_format form element.
+    // Setup #states for all possible date_formats on the custom_date_format
+    // form element.
     foreach (['custom', 'raw time ago', 'time ago', 'raw time hence', 'time hence', 'raw time span', 'time span', 'raw time span', 'inverse time span', 'time span'] as $custom_date_possible) {
       $form['custom_date_format']['#states']['visible'][] = [
         ':input[name="options[date_format]"]' => ['value' => $custom_date_possible],

@@ -10,12 +10,12 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests file upload scenario's with Inline Form Errors.
- *
- * @group inline_form_errors
  */
+#[Group('inline_form_errors')]
 class FormErrorHandlerFileUploadTest extends BrowserTestBase {
 
   /**
@@ -91,7 +91,7 @@ class FormErrorHandlerFileUploadTest extends BrowserTestBase {
   /**
    * Tests that the required field error is displayed as inline error message.
    */
-  public function testFileUploadErrors() {
+  public function testFileUploadErrors(): void {
     $this->drupalGet('node/add/page');
     $edit = [
       'edit-title-0-value' => $this->randomString(),

@@ -6,18 +6,16 @@ namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests form redirection functionality.
- *
- * @group Form
  */
+#[Group('Form')]
 class RedirectTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['form_test', 'block'];
 
@@ -29,7 +27,7 @@ class RedirectTest extends BrowserTestBase {
   /**
    * Tests form redirection.
    */
-  public function testRedirect() {
+  public function testRedirect(): void {
     $path = 'form-test/redirect';
     $options = ['query' => ['foo' => 'bar']];
     $options['absolute'] = TRUE;
@@ -113,7 +111,7 @@ class RedirectTest extends BrowserTestBase {
   /**
    * Tests form redirection from 404/403 pages with the Block form.
    */
-  public function testRedirectFromErrorPages() {
+  public function testRedirectFromErrorPages(): void {
     // Make sure the block containing the redirect form is placed.
     $this->drupalPlaceBlock('redirect_form_block');
 

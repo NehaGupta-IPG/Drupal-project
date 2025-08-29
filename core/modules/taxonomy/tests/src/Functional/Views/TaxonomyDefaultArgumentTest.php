@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Functional\Views;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests the representative node relationship for terms.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
 class TaxonomyDefaultArgumentTest extends TaxonomyTestBase {
 
   /**
@@ -26,7 +27,7 @@ class TaxonomyDefaultArgumentTest extends TaxonomyTestBase {
   /**
    * Tests escaping of page title when the taxonomy plugin provides it.
    */
-  public function testTermTitleEscaping() {
+  public function testTermTitleEscaping(): void {
     $this->term1->setName('<em>Markup</em>')->save();
     $this->drupalGet('taxonomy_default_argument_test/' . $this->term1->id());
     $this->assertSession()->assertEscaped($this->term1->label());

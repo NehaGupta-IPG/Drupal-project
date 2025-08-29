@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\language\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that the language list is not empty when language is installed.
- *
- * @group language
  */
+#[Group('language')]
 class LanguageListModuleInstallTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language_test'];
 
@@ -28,7 +26,7 @@ class LanguageListModuleInstallTest extends BrowserTestBase {
   /**
    * Tests enabling Language.
    */
-  public function testModuleInstallLanguageList() {
+  public function testModuleInstallLanguageList(): void {
     // Since LanguageManager::getLanguages() uses static caches we need to do
     // this by enabling the module using the UI.
     $admin_user = $this->drupalCreateUser([

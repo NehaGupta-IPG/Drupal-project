@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\media\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests media Install / Uninstall logic.
- *
- * @group media
  */
+#[Group('media')]
 class MediaInstallTest extends BrowserTestBase {
 
   /**
@@ -34,7 +34,7 @@ class MediaInstallTest extends BrowserTestBase {
   /**
    * Tests reinstalling after being uninstalled.
    */
-  public function testReinstallAfterUninstall() {
+  public function testReinstallAfterUninstall(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 

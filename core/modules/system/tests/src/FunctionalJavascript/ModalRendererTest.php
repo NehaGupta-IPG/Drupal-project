@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that dialog links use different renderer services.
- *
- * @group system
  */
+#[Group('system')]
 class ModalRendererTest extends WebDriverTestBase {
 
   /**
@@ -26,7 +26,7 @@ class ModalRendererTest extends WebDriverTestBase {
   /**
    * Tests that links respect 'data-dialog-renderer' attribute.
    */
-  public function testModalRenderer() {
+  public function testModalRenderer(): void {
     $session_assert = $this->assertSession();
     $this->drupalGet('/dialog_renderer-test-links');
     $this->clickLink('Normal Modal!');
@@ -103,7 +103,7 @@ class ModalRendererTest extends WebDriverTestBase {
   /**
    * Confirm focus management of a dialog openers in a dropbutton.
    */
-  public function testOpenerInDropbutton() {
+  public function testOpenerInDropbutton(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

@@ -9,19 +9,24 @@ use Drupal\Core\EventSubscriber\RedirectResponseSubscriber;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\FormSubmitter;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\UnroutedUrlAssemblerInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @coversDefaultClass \Drupal\Core\Form\FormSubmitter
- * @group Form
+ * Tests Drupal\Core\Form\FormSubmitter.
  */
+#[CoversClass(FormSubmitter::class)]
+#[Group('Form')]
 class FormSubmitterTest extends UnitTestCase {
 
   /**
@@ -54,9 +59,11 @@ class FormSubmitterTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::doSubmitForm
+   * Tests handle form submission not submitted.
+   *
+   * @legacy-covers ::doSubmitForm
    */
-  public function testHandleFormSubmissionNotSubmitted() {
+  public function testHandleFormSubmissionNotSubmitted(): void {
     $form_submitter = $this->getFormSubmitter();
     $form = [];
     $form_state = new FormState();
@@ -67,9 +74,11 @@ class FormSubmitterTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::doSubmitForm
+   * Tests handle form submission no redirect.
+   *
+   * @legacy-covers ::doSubmitForm
    */
-  public function testHandleFormSubmissionNoRedirect() {
+  public function testHandleFormSubmissionNoRedirect(): void {
     $form_submitter = $this->getFormSubmitter();
     $form = [];
     $form_state = (new FormState())
@@ -82,11 +91,12 @@ class FormSubmitterTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::doSubmitForm
+   * Tests handle form submission with responses.
    *
-   * @dataProvider providerTestHandleFormSubmissionWithResponses
+   * @legacy-covers ::doSubmitForm
    */
-  public function testHandleFormSubmissionWithResponses($class, $form_state_key) {
+  #[DataProvider('providerTestHandleFormSubmissionWithResponses')]
+  public function testHandleFormSubmissionWithResponses($class, $form_state_key): void {
     $response = $this->getMockBuilder($class)
       ->disableOriginalConstructor()
       ->getMock();
@@ -115,9 +125,9 @@ class FormSubmitterTest extends UnitTestCase {
   /**
    * Tests the redirectForm() method when the redirect is NULL.
    *
-   * @covers ::redirectForm
+   * @legacy-covers ::redirectForm
    */
-  public function testRedirectWithNull() {
+  public function testRedirectWithNull(): void {
     $form_submitter = $this->getFormSubmitter();
 
     $form_state = $this->createMock('Drupal\Core\Form\FormStateInterface');
@@ -139,11 +149,10 @@ class FormSubmitterTest extends UnitTestCase {
   /**
    * Tests redirectForm() when a redirect is a Url object.
    *
-   * @covers ::redirectForm
-   *
-   * @dataProvider providerTestRedirectWithUrl
+   * @legacy-covers ::redirectForm
    */
-  public function testRedirectWithUrl(Url $redirect_value, $result, $status = 303) {
+  #[DataProvider('providerTestRedirectWithUrl')]
+  public function testRedirectWithUrl(Url $redirect_value, $result, $status = 303): void {
     $container = new ContainerBuilder();
     $container->set('url_generator', $this->urlGenerator);
     \Drupal::setContainer($container);
@@ -188,9 +197,9 @@ class FormSubmitterTest extends UnitTestCase {
   /**
    * Tests the redirectForm() method with a response object.
    *
-   * @covers ::redirectForm
+   * @legacy-covers ::redirectForm
    */
-  public function testRedirectWithResponseObject() {
+  public function testRedirectWithResponseObject(): void {
     $form_submitter = $this->getFormSubmitter();
     $redirect = new RedirectResponse('/example');
     $form_state = $this->createMock('Drupal\Core\Form\FormStateInterface');
@@ -206,9 +215,9 @@ class FormSubmitterTest extends UnitTestCase {
   /**
    * Tests the redirectForm() method when no redirect is expected.
    *
-   * @covers ::redirectForm
+   * @legacy-covers ::redirectForm
    */
-  public function testRedirectWithoutResult() {
+  public function testRedirectWithoutResult(): void {
     $form_submitter = $this->getFormSubmitter();
     $this->urlGenerator->expects($this->never())
       ->method('generateFromRoute');
@@ -227,9 +236,11 @@ class FormSubmitterTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::executeSubmitHandlers
+   * Tests execute submit handlers.
+   *
+   * @legacy-covers ::executeSubmitHandlers
    */
-  public function testExecuteSubmitHandlers() {
+  public function testExecuteSubmitHandlers(): void {
     $form_submitter = $this->getFormSubmitter();
     $mock = $this->prophesize(MockFormBase::class);
     $mock
@@ -262,6 +273,7 @@ class FormSubmitterTest extends UnitTestCase {
 
   /**
    * @return \Drupal\Core\Form\FormSubmitterInterface
+   *   A mocked instance of FormSubmitter.
    */
   protected function getFormSubmitter() {
     $request_stack = new RequestStack();

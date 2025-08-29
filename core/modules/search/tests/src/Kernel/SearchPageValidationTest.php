@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\search\Kernel;
 
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
@@ -28,6 +30,7 @@ class SearchPageValidationTest extends ConfigEntityValidationTestBase {
     $this->entity = SearchPage::create([
       'id' => 'test',
       'label' => 'Test',
+      'path' => 'test',
       'plugin' => 'user_search',
     ]);
     $this->entity->save();

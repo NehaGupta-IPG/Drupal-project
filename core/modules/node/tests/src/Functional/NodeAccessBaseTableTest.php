@@ -9,20 +9,20 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests behavior of the node access subsystem if the base table is not node.
- *
- * @group node
  */
+#[Group('node')]
 class NodeAccessBaseTableTest extends NodeTestBase {
 
   use EntityReferenceFieldCreationTrait;
+  use NodeAccessTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node_access_test',
@@ -59,6 +59,8 @@ class NodeAccessBaseTableTest extends NodeTestBase {
 
   /**
    * A web user.
+   *
+   * @var \Drupal\user\Entity\User|false
    */
   protected $webUser;
 
@@ -102,7 +104,7 @@ class NodeAccessBaseTableTest extends NodeTestBase {
       ])
       ->save();
 
-    node_access_test_add_field(NodeType::load('article'));
+    $this->addPrivateField(NodeType::load('article'));
 
     node_access_rebuild();
     \Drupal::state()->set('node_access_test.private', TRUE);
@@ -122,11 +124,11 @@ class NodeAccessBaseTableTest extends NodeTestBase {
    * - Test that user 4 can view all content created above.
    * - Test that user 4 can view all content on taxonomy listing.
    */
-  public function testNodeAccessBasic() {
+  public function testNodeAccessBasic(): void {
     $num_simple_users = 2;
     $simple_users = [];
 
-    // Nodes keyed by uid and nid: $nodes[$uid][$nid] = $is_private;
+    // Nodes keyed by uid and nid: "$nodes[$uid][$nid] = $is_private".
     $this->nodesByUser = [];
     // Titles keyed by nid.
     $titles = [];

@@ -10,11 +10,15 @@ use Drupal\views\Plugin\views\field\Counter;
 use Drupal\views\ResultRow;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\ViewExecutable;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\views\Plugin\views\field\Counter
- * @group views
+ * Tests Drupal\views\Plugin\views\field\Counter.
  */
+#[CoversClass(Counter::class)]
+#[Group('views')]
 class CounterTest extends UnitTestCase {
 
   /**
@@ -73,7 +77,10 @@ class CounterTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
     $route_provider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
-    $this->view = new ViewExecutable($storage, $user, $views_data, $route_provider);
+    $display_plugin_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->view = new ViewExecutable($storage, $user, $views_data, $route_provider, $display_plugin_manager);
 
     $this->display = $this->getMockBuilder('Drupal\views\Plugin\views\display\DisplayPluginBase')
       ->disableOriginalConstructor()
@@ -110,10 +117,9 @@ class CounterTest extends UnitTestCase {
 
   /**
    * Tests a simple counter field.
-   *
-   * @dataProvider providerRowIndexes
    */
-  public function testSimpleCounter($i) {
+  #[DataProvider('providerRowIndexes')]
+  public function testSimpleCounter($i): void {
     $counter_handler = new Counter([], 'counter', $this->definition);
     $options = [];
     $counter_handler->init($this->view, $this->display, $options);
@@ -132,10 +138,9 @@ class CounterTest extends UnitTestCase {
    *
    * @param int $i
    *   The row index to test.
-   *
-   * @dataProvider providerRowIndexes
    */
-  public function testCounterRandomStart($i) {
+  #[DataProvider('providerRowIndexes')]
+  public function testCounterRandomStart($i): void {
     // Setup a counter field with a random start.
     $rand_start = rand(5, 10);
     $counter_handler = new Counter([], 'counter', $this->definition);
@@ -158,10 +163,9 @@ class CounterTest extends UnitTestCase {
    *
    * @param int $i
    *   The row index to test.
-   *
-   * @dataProvider providerRowIndexes
    */
-  public function testCounterRandomPagerOffset($i) {
+  #[DataProvider('providerRowIndexes')]
+  public function testCounterRandomPagerOffset($i): void {
     // Setup a counter field with a pager with a random offset.
     $offset = 3;
     $this->pager->setOffset($offset);
@@ -187,10 +191,9 @@ class CounterTest extends UnitTestCase {
    *
    * @param int $i
    *   The row index to test.
-   *
-   * @dataProvider providerRowIndexes
    */
-  public function testCounterSecondPage($i) {
+  #[DataProvider('providerRowIndexes')]
+  public function testCounterSecondPage($i): void {
     $offset = 3;
     // Setup a pager on the second page.
     $this->pager->setOffset($offset);

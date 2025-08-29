@@ -6,12 +6,12 @@ namespace Drupal\Tests\image\Functional;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests image style deletion using the UI.
- *
- * @group image
  */
+#[Group('image')]
 class ImageStyleDeleteTest extends ImageFieldTestBase {
 
   /**
@@ -26,13 +26,13 @@ class ImageStyleDeleteTest extends ImageFieldTestBase {
     parent::setUp();
     // Create an image field 'foo' having the image style 'medium' as widget
     // preview and as formatter.
-    $this->createImageField('foo', 'page', [], [], ['preview_image_style' => 'medium'], ['image_style' => 'medium']);
+    $this->createImageField('foo', 'node', 'page', [], [], ['preview_image_style' => 'medium'], ['image_style' => 'medium']);
   }
 
   /**
    * Tests image style deletion.
    */
-  public function testDelete() {
+  public function testDelete(): void {
     $this->drupalGet('admin/config/media/image-styles/manage/medium/delete');
     // Checks that the 'replacement' select element is displayed.
     $this->assertSession()->fieldExists('replacement');

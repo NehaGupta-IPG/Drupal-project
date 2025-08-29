@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block_content\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Create a block and test block access by attempting to view the block.
- *
- * @group block_content
  */
+#[Group('block_content')]
 class BlockContentPageViewTest extends BlockContentTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block_content_test'];
 
@@ -26,7 +25,7 @@ class BlockContentPageViewTest extends BlockContentTestBase {
   /**
    * Checks block edit and fallback functionality.
    */
-  public function testPageEdit() {
+  public function testPageEdit(): void {
     $this->drupalLogin($this->adminUser);
     $block = $this->createBlockContent();
 
