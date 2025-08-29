@@ -9,12 +9,12 @@ use Drupal\shortcut\Entity\Shortcut;
 use Drupal\shortcut\Entity\ShortcutSet;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\system\Functional\Cache\PageCacheTagsTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests for \Drupal\navigation\Plugin\Block\NavigationShortcutsBlock.
- *
- * @group navigation
  */
+#[Group('navigation')]
 class NavigationShortcutsBlockTest extends PageCacheTagsTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -116,13 +116,13 @@ class NavigationShortcutsBlockTest extends PageCacheTagsTestBase {
     $this->drupalLogin($site_configuration_user1);
     $this->verifyDynamicPageCache($test_page_url, 'MISS');
     $this->verifyDynamicPageCache($test_page_url, 'HIT');
-    $this->assertCacheContexts(['user', 'url.query_args:_wrapper_format', 'session']);
+    $this->assertCacheContexts(['user', 'url.query_args:_wrapper_format', 'session', 'route']);
     $this->assertSession()->pageTextContains('Shortcuts');
     $this->assertSession()->linkExists('Cron');
 
     $this->drupalLogin($site_configuration_user2);
     $this->verifyDynamicPageCache($test_page_url, 'HIT');
-    $this->assertCacheContexts(['user', 'url.query_args:_wrapper_format', 'session']);
+    $this->assertCacheContexts(['user', 'url.query_args:_wrapper_format', 'session', 'route']);
     $this->assertSession()->pageTextContains('Shortcuts');
     $this->assertSession()->linkExists('Cron');
 

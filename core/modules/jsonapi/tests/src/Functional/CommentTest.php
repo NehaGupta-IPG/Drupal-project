@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
-use Drupal\entity_test\EntityTestHelper;
-use Drupal\jsonapi\JsonApiSpec;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Entity\CommentType;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
@@ -16,15 +14,17 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\entity_test\EntityTestHelper;
+use Drupal\jsonapi\JsonApiSpec;
 use Drupal\Tests\jsonapi\Traits\CommonCollectionFilterAccessTestPatternsTrait;
 use Drupal\user\Entity\User;
 use GuzzleHttp\RequestOptions;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * JSON:API integration test for the "Comment" content entity type.
- *
- * @group jsonapi
  */
+#[Group('jsonapi')]
 class CommentTest extends ResourceTestBase {
 
   use CommentTestTrait;
@@ -362,8 +362,8 @@ class CommentTest extends ResourceTestBase {
     $doc = $this->getDocumentFromResponse($response);
     $this->assertCount(1, $doc['data']);
     // Mark the commented entity as inaccessible.
-    \Drupal::state()->set('jsonapi__entity_test_filter_access_blacklist', [$this->entity->getCommentedEntityId()]);
-    Cache::invalidateTags(['state:jsonapi__entity_test_filter_access_blacklist']);
+    \Drupal::state()->set('jsonapi__entity_test_filter_access_deny_list', [$this->entity->getCommentedEntityId()]);
+    Cache::invalidateTags(['state:jsonapi__entity_test_filter_access_deny_list']);
     // ?filter[spotlight.LABEL]: 0 results.
     $response = $this->request('GET', $collection_filter_url, $request_options);
     $doc = $this->getDocumentFromResponse($response);
@@ -376,7 +376,7 @@ class CommentTest extends ResourceTestBase {
   protected static function getExpectedCollectionCacheability(AccountInterface $account, array $collection, ?array $sparse_fieldset = NULL, $filtered = FALSE) {
     $cacheability = parent::getExpectedCollectionCacheability($account, $collection, $sparse_fieldset, $filtered);
     if ($filtered) {
-      $cacheability->addCacheTags(['state:jsonapi__entity_test_filter_access_blacklist']);
+      $cacheability->addCacheTags(['state:jsonapi__entity_test_filter_access_deny_list']);
     }
     return $cacheability;
   }

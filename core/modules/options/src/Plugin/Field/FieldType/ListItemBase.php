@@ -83,7 +83,9 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    * {@inheritdoc}
    */
   public function isEmpty() {
-    return empty($this->value) && (string) $this->value !== '0';
+    $value = $this->get('value')->getValue();
+
+    return empty($value) && (string) $value !== '0';
   }
 
   /**
@@ -349,13 +351,17 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
   public static function validateAllowedValues($element, FormStateInterface $form_state) {
     $items = array_filter(array_map(function ($item) use ($element) {
       $current_element = $element['table'][$item];
-      if ($current_element['item']['key']['#value'] !== NULL && $current_element['item']['label']['#value']) {
-        return $current_element['item']['key']['#value'] . '|' . $current_element['item']['label']['#value'];
-      }
-      elseif ($current_element['item']['key']['#value']) {
+      $key_has_input = isset($current_element['item']['key']['#value']) && $current_element['item']['key']['#value'] !== '';
+      $label_has_input = isset($current_element['item']['label']['#value']) && $current_element['item']['label']['#value'] !== '';
+      if ($key_has_input) {
+        if ($label_has_input) {
+          return $current_element['item']['key']['#value'] . '|' . $current_element['item']['label']['#value'];
+        }
+
         return $current_element['item']['key']['#value'];
       }
-      elseif ($current_element['item']['label']['#value']) {
+
+      if ($label_has_input) {
         return $current_element['item']['label']['#value'];
       }
 

@@ -7,6 +7,7 @@ namespace Drupal\Tests\node\Functional;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Ensures that node types translation work correctly.
@@ -14,9 +15,8 @@ use Drupal\Tests\BrowserTestBase;
  * Note that the child site is installed in French; therefore, when making
  * assertions on translated text it is important to provide a langcode. This
  * ensures the asserts pass regardless of the Drupal version.
- *
- * @group node
  */
+#[Group('node')]
 class NodeTypeTranslationTest extends BrowserTestBase {
 
   use StringTranslationTrait;
@@ -173,15 +173,14 @@ class NodeTypeTranslationTest extends BrowserTestBase {
 
     // Add an email field.
     $this->drupalGet("admin/structure/types/manage/{$type}/fields/add-field");
-    $this->submitForm([
-      'new_storage_type' => 'email',
-    ], 'Continue');
+    $this->clickLink('Email');
+    $this->submitForm([], 'Continue');
     $this->submitForm([
       'label' => 'Email',
       'field_name' => 'email',
     ], 'Continue');
     $this->submitForm([], 'Update settings');
-    $this->submitForm([], 'Save settings');
+    $this->submitForm([], 'Save');
 
     $type = $this->randomMachineName(16);
     $name = $this->randomString();

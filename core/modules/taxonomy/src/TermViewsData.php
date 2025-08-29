@@ -4,8 +4,6 @@ namespace Drupal\taxonomy;
 
 use Drupal\views\EntityViewsData;
 
-// cspell:ignore fulldate
-
 /**
  * Provides the views data for the taxonomy entity type.
  */
@@ -141,12 +139,12 @@ class TermViewsData extends EntityViewsData {
 
     $data['taxonomy_index']['table']['join'] = [
       'taxonomy_term_field_data' => [
-        // Links directly to taxonomy_term_field_data via tid
+        // Links directly to taxonomy_term_field_data via tid.
         'left_field' => 'tid',
         'field' => 'tid',
       ],
       'node_field_data' => [
-        // Links directly to node via nid
+        // Links directly to node via nid.
         'left_field' => 'nid',
         'field' => 'nid',
       ],

@@ -10,15 +10,15 @@ use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
-use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Ensure that account cancellation methods work as expected.
- *
- * @group user
  */
+#[Group('user')]
 class UserCancelTest extends BrowserTestBase {
 
   use CommentTestTrait;
@@ -279,7 +279,7 @@ class UserCancelTest extends BrowserTestBase {
   public function testUserBlockUnpublishNodeAccess(): void {
     \Drupal::service('module_installer')->install(['node_access_test', 'user_form_test']);
 
-    // Setup node access
+    // Setup node access.
     node_access_rebuild();
     $this->addPrivateField(NodeType::load('page'));
     \Drupal::state()->set('node_access_test.private', TRUE);
@@ -394,6 +394,8 @@ class UserCancelTest extends BrowserTestBase {
 
   /**
    * Delete account and anonymize all content using a batch process.
+   *
+   * @see \Drupal\node\NodeBulkUpdate::process()
    */
   public function testUserAnonymizeBatch(): void {
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
@@ -406,8 +408,7 @@ class UserCancelTest extends BrowserTestBase {
     // Load a real user object.
     $account = $user_storage->load($account->id());
 
-    // Create 11 nodes in order to trigger batch processing in
-    // node_mass_update().
+    // Create 11 nodes in order to trigger batch processing.
     $nodes = [];
     for ($i = 0; $i < 11; $i++) {
       $node = $this->drupalCreateNode(['uid' => $account->id()]);
@@ -514,27 +515,40 @@ class UserCancelTest extends BrowserTestBase {
   }
 
   /**
-   * Create an administrative user and delete another user.
+   * Create an administrative user and delete other users.
    */
   public function testUserCancelByAdmin(): void {
     $this->config('user.settings')->set('cancel_method', 'user_cancel_reassign')->save();
-
-    // Create a regular user.
-    $account = $this->drupalCreateUser([]);
 
     // Create administrative user.
     $admin_user = $this->drupalCreateUser(['administer users']);
     $this->drupalLogin($admin_user);
 
+    // Test deletion of a user account without email confirmation.
+    $account1 = $this->drupalCreateUser([]);
+
     // Delete regular user.
-    $this->drupalGet('user/' . $account->id() . '/cancel');
-    $this->assertSession()->pageTextContains("Are you sure you want to cancel the account {$account->getAccountName()}?");
+    $this->drupalGet('user/' . $account1->id() . '/cancel');
+    $this->assertSession()->pageTextContains("Are you sure you want to cancel the account {$account1->getAccountName()}?");
     $this->assertSession()->pageTextContains('Cancellation method');
 
     // Confirm deletion.
     $this->submitForm([], 'Confirm');
-    $this->assertSession()->pageTextContains("Account {$account->getAccountName()} has been deleted.");
-    $this->assertNull(User::load($account->id()), 'User is not found in the database.');
+    $this->assertSession()->pageTextContains("Account {$account1->getAccountName()} has been deleted.");
+    $this->assertNull(User::load($account1->id()), 'User is not found in the database.');
+
+    // Test deletion of a user account with email confirmation.
+    $account2 = $this->drupalCreateUser([]);
+
+    // Delete regular user.
+    $this->drupalGet('user/' . $account2->id() . '/cancel');
+    $this->assertSession()->pageTextContains("Are you sure you want to cancel the account {$account2->getAccountName()}?");
+    $this->assertSession()->pageTextContains('Cancellation method');
+
+    // Confirm deletion.
+    $this->submitForm(['edit-user-cancel-confirm' => 1], 'Confirm');
+    $this->assertSession()->pageTextContains("A confirmation request to cancel the account {$account2->getAccountName()} has been sent to the user's email address.");
+    $this->assertNotNull(User::load($account2->id()), 'User is found in the database.');
   }
 
   /**

@@ -13,15 +13,18 @@ use Drupal\Core\TypedData\Type\DateTimeInterface;
 use Drupal\serialization\Normalizer\DateTimeNormalizer;
 use Drupal\Tests\serialization\Traits\JsonSchemaTestTrait;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Unit test coverage for @DataTypes implementing DateTimeInterface.
  *
- * @group serialization
- * @coversDefaultClass \Drupal\serialization\Normalizer\DateTimeNormalizer
  * @see \Drupal\Core\TypedData\Type\DateTimeInterface
  */
+#[CoversClass(DateTimeNormalizer::class)]
+#[Group('serialization')]
 class DateTimeNormalizerTest extends UnitTestCase {
 
   use JsonSchemaTestTrait;
@@ -58,7 +61,9 @@ class DateTimeNormalizerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::supportsNormalization
+   * Tests supports normalization.
+   *
+   * @legacy-covers ::supportsNormalization
    */
   public function testSupportsNormalization(): void {
     $this->assertTrue($this->normalizer->supportsNormalization($this->data->reveal()));
@@ -71,14 +76,18 @@ class DateTimeNormalizerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::supportsDenormalization
+   * Tests supports denormalization.
+   *
+   * @legacy-covers ::supportsDenormalization
    */
   public function testSupportsDenormalization(): void {
     $this->assertTrue($this->normalizer->supportsDenormalization($this->data->reveal(), DateTimeInterface::class));
   }
 
   /**
-   * @covers ::normalize
+   * Tests normalize.
+   *
+   * @legacy-covers ::normalize
    */
   public function testNormalize(): void {
     $random_rfc_3339_string = $this->randomMachineName();
@@ -97,7 +106,9 @@ class DateTimeNormalizerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::normalize
+   * Tests normalize when null.
+   *
+   * @legacy-covers ::normalize
    */
   public function testNormalizeWhenNull(): void {
     $this->data->getDateTime()
@@ -110,9 +121,9 @@ class DateTimeNormalizerTest extends UnitTestCase {
   /**
    * Tests the denormalize function with good data.
    *
-   * @covers ::denormalize
-   * @dataProvider providerTestDenormalizeValidFormats
+   * @legacy-covers ::denormalize
    */
+  #[DataProvider('providerTestDenormalizeValidFormats')]
   public function testDenormalizeValidFormats($normalized, $expected): void {
     $denormalized = $this->normalizer->denormalize($normalized, DateTimeInterface::class, NULL, []);
     $this->assertSame(0, $denormalized->getTimestamp() - $expected->getTimestamp());
@@ -142,9 +153,9 @@ class DateTimeNormalizerTest extends UnitTestCase {
   /**
    * Tests the denormalize function with a user supplied format.
    *
-   * @covers ::denormalize
-   * @dataProvider providerTestDenormalizeUserFormats
+   * @legacy-covers ::denormalize
    */
+  #[DataProvider('providerTestDenormalizeUserFormats')]
   public function testDenormalizeUserFormats($normalized, $format, $expected): void {
     $denormalized = $this->normalizer->denormalize($normalized, DateTimeInterface::class, NULL, ['datetime_allowed_formats' => [$format]]);
     $this->assertSame(0, $denormalized->getTimestamp() - $expected->getTimestamp());
@@ -160,9 +171,21 @@ class DateTimeNormalizerTest extends UnitTestCase {
   public static function providerTestDenormalizeUserFormats() {
     $data = [];
 
-    $data['Y/m/d H:i:s P'] = ['2016/11/06 09:02:00 +00:00', 'Y/m/d H:i:s P', new \DateTimeImmutable('2016-11-06T09:02:00+00:00')];
-    $data['H:i:s Y/m/d P'] = ['09:02:00 2016/11/06  +01:00', 'H:i:s Y/m/d P', new \DateTimeImmutable('2016-11-06T09:02:00+01:00')];
-    $data['Y/m/d H:i:s'] = ['09:02:00 2016/11/06', 'H:i:s Y/m/d', new \DateTimeImmutable('2016-11-06T09:02:00+11:00')];
+    $data['Y/m/d H:i:s P'] = [
+      '2016/11/06 09:02:00 +00:00',
+      'Y/m/d H:i:s P',
+      new \DateTimeImmutable('2016-11-06T09:02:00+00:00'),
+    ];
+    $data['H:i:s Y/m/d P'] = [
+      '09:02:00 2016/11/06  +01:00',
+      'H:i:s Y/m/d P',
+      new \DateTimeImmutable('2016-11-06T09:02:00+01:00'),
+    ];
+    $data['Y/m/d H:i:s'] = [
+      '09:02:00 2016/11/06',
+      'H:i:s Y/m/d',
+      new \DateTimeImmutable('2016-11-06T09:02:00+11:00'),
+    ];
 
     return $data;
   }
@@ -170,7 +193,7 @@ class DateTimeNormalizerTest extends UnitTestCase {
   /**
    * Tests the denormalize function with bad data.
    *
-   * @covers ::denormalize
+   * @legacy-covers ::denormalize
    */
   public function testDenormalizeException(): void {
     $this->expectException(UnexpectedValueException::class);
@@ -220,6 +243,9 @@ class DateTimeNormalizerTest extends UnitTestCase {
  */
 class DateTimeNormalizerTestDrupalDateTime extends DrupalDateTime {
 
+  /**
+   * Sets the timezone.
+   */
   public function setTimezone(\DateTimeZone $timezone) {
     parent::setTimezone($timezone);
   }

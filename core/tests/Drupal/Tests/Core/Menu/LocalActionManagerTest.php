@@ -162,7 +162,16 @@ class LocalActionManagerTest extends UnitTestCase {
       ->willReturn($plugin_definitions);
     $map = [];
     foreach ($plugin_definitions as $plugin_id => $plugin_definition) {
-      $plugin = $this->createMock('Drupal\Core\Menu\LocalActionInterface');
+      $plugin = $this->createMock('Drupal\Core\Menu\LocalActionDefault');
+      $plugin->expects($this->any())
+        ->method('getCacheContexts')
+        ->willReturn([]);
+      $plugin->expects($this->any())
+        ->method('getCacheTags')
+        ->willReturn([]);
+      $plugin->expects($this->any())
+        ->method('getCacheMaxAge')
+        ->willReturn(0);
       $plugin->expects($this->any())
         ->method('getRouteName')
         ->willReturn($plugin_definition['route_name']);
@@ -194,6 +203,8 @@ class LocalActionManagerTest extends UnitTestCase {
   }
 
   public static function getActionsForRouteProvider() {
+    $originalContainer = \Drupal::hasContainer() ? \Drupal::getContainer() : NULL;
+
     $cache_contexts_manager = (new Prophet())->prophesize(CacheContextsManager::class);
     $cache_contexts_manager->assertValidTokens(Argument::any())
       ->willReturn(TRUE);
@@ -374,6 +385,11 @@ class LocalActionManagerTest extends UnitTestCase {
         ],
       ],
     ];
+
+    // Restore the original container if needed.
+    if ($originalContainer) {
+      \Drupal::setContainer($originalContainer);
+    }
 
     return $data;
   }

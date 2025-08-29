@@ -67,7 +67,11 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
       if ($plugin instanceof MainContentBlockPluginInterface || $plugin instanceof TitleBlockPluginInterface) {
         // Immediately build a #pre_render-able block, since this block cannot
         // be built lazily.
-        $build[$entity_id] += static::buildPreRenderableBlock($entity, $this->moduleHandler());
+        $cacheableMetadata = CacheableMetadata::createFromRenderArray($build[$entity_id]);
+        $preRenderableBlock = static::buildPreRenderableBlock($entity, $this->moduleHandler());
+        $cacheableMetadata->addCacheableDependency(CacheableMetadata::createFromRenderArray($preRenderableBlock));
+        $build[$entity_id] += $preRenderableBlock;
+        $cacheableMetadata->applyTo($build[$entity_id]);
       }
       else {
         // Assign a #lazy_builder callback, which will generate a #pre_render-
@@ -75,6 +79,13 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
         $build[$entity_id] += [
           '#lazy_builder' => [static::class . '::lazyBuilder', [$entity_id, $view_mode, $langcode]],
         ];
+        // Only add create_placeholder if it's explicitly set to TRUE, so it can
+        // be set to TRUE by automatic placeholdering conditions if it's absent.
+        if ($plugin->createPlaceholder()) {
+          $build[$entity_id] += [
+            '#create_placeholder' => TRUE,
+          ];
+        }
       }
     }
 

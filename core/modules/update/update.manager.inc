@@ -7,7 +7,6 @@
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\Exception\InvalidStreamWrapperException;
 use Drupal\Core\File\FileExists;
-use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Psr\Http\Client\ClientExceptionInterface;
 
 /**
@@ -24,8 +23,9 @@ use Psr\Http\Client\ClientExceptionInterface;
  *   workflow, or FALSE if we've hit a fatal configuration and must halt the
  *   workflow.
  */
-#[StopProceduralHookScan]
 function _update_manager_check_backends(&$form, $operation) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+
   // If file transfers will be performed locally, we do not need to display any
   // warnings or notices to the user and should automatically continue the
   // workflow, since we won't be using a FileTransfer backend that requires
@@ -92,6 +92,8 @@ function _update_manager_check_backends(&$form, $operation) {
  * @throws Exception
  */
 function update_manager_archive_extract($file, $directory) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+
   /** @var \Drupal\Core\Archiver\ArchiverInterface $archiver */
   $archiver = \Drupal::service('plugin.manager.archiver')->getInstance([
     'filepath' => $file,
@@ -141,7 +143,9 @@ function update_manager_archive_extract($file, $directory) {
  *   are no errors, it will be an empty array.
  */
 function update_manager_archive_verify($project, $archive_file, $directory) {
-  return \Drupal::moduleHandler()->invokeAll('verify_update_archive', [$project, $archive_file, $directory]);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+
+  return \Drupal::moduleHandler()->invokeAllDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'verify_update_archive', [$project, $archive_file, $directory]);
 }
 
 /**
@@ -156,6 +160,8 @@ function update_manager_archive_verify($project, $archive_file, $directory) {
  *   Path to local file, or FALSE if it could not be retrieved.
  */
 function update_manager_file_get($url) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+
   $parsed_url = parse_url($url);
   $remote_schemes = ['http', 'https', 'ftp', 'ftps', 'smb', 'nfs'];
   if (!isset($parsed_url['scheme']) || !in_array($parsed_url['scheme'], $remote_schemes)) {
@@ -164,9 +170,11 @@ function update_manager_file_get($url) {
   }
 
   // Check the cache and download the file if needed.
+  // @phpstan-ignore function.deprecated
   $cache_directory = _update_manager_cache_directory();
   $local = $cache_directory . '/' . \Drupal::service('file_system')->basename($parsed_url['path']);
 
+  // @phpstan-ignore function.deprecated
   if (!file_exists($local) || update_delete_file_if_stale($local)) {
     try {
       $data = (string) \Drupal::httpClient()->get($url)->getBody();
@@ -203,7 +211,9 @@ function update_manager_file_get($url) {
  *
  * @see update_manager_download_page()
  */
-function update_manager_batch_project_get($project, $url, &$context) {
+function update_manager_batch_project_get($project, $url, &$context): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+
   // This is here to show the user that we are in the process of downloading.
   if (!isset($context['sandbox']['started'])) {
     $context['sandbox']['started'] = TRUE;
@@ -219,6 +229,7 @@ function update_manager_batch_project_get($project, $url, &$context) {
   }
 
   // Extract it.
+  // @phpstan-ignore function.deprecated
   $extract_directory = _update_manager_extract_directory();
   try {
     update_manager_archive_extract($local_cache, $extract_directory);
@@ -264,6 +275,8 @@ function update_manager_batch_project_get($project, $url, &$context) {
  * @see install_check_requirements()
  */
 function update_manager_local_transfers_allowed() {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+
   $file_system = \Drupal::service('file_system');
   // Compare the owner of a webserver-created temporary file to the owner of
   // the configuration directory to determine if local transfers will be

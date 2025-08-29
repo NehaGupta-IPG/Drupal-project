@@ -222,6 +222,7 @@ hmac
 hookname
 hrefs
 htmlcorrector
+htmx
 httpheader
 httponly
 icann
@@ -384,6 +385,9 @@ prepopulation
 prerendered
 presave
 preuninstall
+prewarmable
+prewarmer
+prewarmers
 prophesize
 protossl
 pseudotag
@@ -423,6 +427,8 @@ rowspans
 rtsp
 ruleset
 sameorigin
+sandboxed
+sandboxing
 savepoints
 sayre
 schemaapi
@@ -510,6 +516,7 @@ tablesorts
 tabset
 tabwidth
 tbachert
+tenderwolf
 testbot
 testlogger
 textareas
@@ -573,6 +580,7 @@ userinfo
 versionable
 vfsstream
 viewports
+warmable
 wcag
 webcal
 webflo
