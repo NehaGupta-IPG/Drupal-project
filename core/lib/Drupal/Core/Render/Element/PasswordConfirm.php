@@ -32,10 +32,6 @@ class PasswordConfirm extends FormElementBase {
    */
   public function getInfo() {
     return [
-      // Empty `#title` is deprecated, but the title for the container must be
-      // completely absent from the page.
-      '#title' => 'Password confirm container',
-      '#title_display' => 'none',
       '#input' => TRUE,
       '#markup' => '',
       '#process' => [
