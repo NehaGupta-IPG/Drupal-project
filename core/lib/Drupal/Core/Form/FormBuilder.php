@@ -1084,6 +1084,9 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       'value',
       'item',
       'datelist',
+      // password_confirm widgets expand the element into two text boxes
+      // that have their own #title properties.
+      'password_confirm',
     ];
     if (isset($element['#type']) && !in_array($element['#type'], $types_to_skip) && !empty($element['#input']) && empty($element['#attributes']['aria-labelledby'])) {
       $title_key = in_array($element['#type'], ['button', 'submit']) ? '#value' : '#title';
