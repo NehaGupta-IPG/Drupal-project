@@ -72,7 +72,7 @@ class Textarea extends FormElementBase {
       $value = is_scalar($input) ? (string) $input : '';
       // Normalize all newline strings. This allows filters to only deal with
       // one possibility.
-      return $element['#normalize_newlines'] === TRUE ? str_replace(["\r\n", "\r"], "\n", $value) : $value;
+      return $element['#normalize_newlines'] ? str_replace(["\r\n", "\r"], "\n", $value) : $value;
     }
     return NULL;
   }
