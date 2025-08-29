@@ -16,7 +16,7 @@ input:
     form:
       '#type': email
       '#title': 'Feedback form email address'
-    default:
+    default_value:
       source: config
       config: ['system.site', 'mail']
 config:

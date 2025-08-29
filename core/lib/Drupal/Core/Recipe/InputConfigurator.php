@@ -32,6 +32,8 @@ final class InputConfigurator {
   private array $values = [];
 
   /**
+   * Constructs a new InputConfigurator object.
+   *
    * @param array<string, array<string, mixed>> $definitions
    *   The recipe's input definitions, keyed by name. This is an array of arrays
    *   where each sub-array has, at minimum:
@@ -189,7 +191,7 @@ final class InputConfigurator {
    *   The default value.
    */
   private function getDefaultValue(DataDefinition $definition): mixed {
-    $settings = $definition->getSetting('default');
+    $settings = $definition->getSetting('default_value');
 
     if ($settings['source'] === 'config') {
       [$name, $key] = $settings['config'];

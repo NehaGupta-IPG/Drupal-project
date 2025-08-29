@@ -17,7 +17,7 @@ input:
     form:
       '#type': textfield
       '#title': "Site owner's name"
-    default:
+    default_value:
       source: value
       value: 'Dries Buytaert'
   break_stuff:
@@ -26,13 +26,13 @@ input:
     form:
       '#type': checkbox
       '#title': 'Allow mischief'
-    default:
+    default_value:
       source: value
       value: false
   node_type:
     data_type: string
     description: 'The ID of a node type to create'
-    default:
+    default_value:
       source: value
       value: 'test'
 config:

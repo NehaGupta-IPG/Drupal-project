@@ -10,6 +10,8 @@ use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
+ * Tests recipe.yml validation against expected violations.
+ *
  * @group Recipe
  * @group #slow
  */
@@ -354,7 +356,7 @@ name: Bad input definitions
 input:
   - data_type: string
     description: A valid enough input, but in an indexed array.
-    default:
+    default_value:
       source: value
       value: Here be dragons
 YAML,
@@ -368,7 +370,7 @@ name: Bad input definitions
 input:
   foo:
     description: What's my data type?
-    default:
+    default_value:
       source: value
       value: Here be dragons
 YAML,
@@ -383,7 +385,7 @@ input:
   foo:
     data_type: string
     description: 3.141
-    default:
+    default_value:
       source: value
       value: Here be dragons
 YAML,
@@ -398,7 +400,7 @@ input:
   foo:
     data_type: string
     description: ''
-    default:
+    default_value:
       source: value
       value: Here be dragons
 YAML,
@@ -415,7 +417,7 @@ input:
     description: 'Constraints need to be associative'
     constraints:
       - Type: string
-    default:
+    default_value:
       source: value
       value: Here be dragons
 YAML,
@@ -432,7 +434,7 @@ input:
     description: 'Bad data type'
     prompt:
       method: ask
-    default:
+    default_value:
       source: value
       value: Here be dragons
 YAML,
@@ -447,7 +449,7 @@ input:
   foo:
     data_type: list
     description: 'Non-primitive data type'
-    default:
+    default_value:
       source: value
       value: [Yeah, No]
 YAML,
@@ -465,7 +467,7 @@ input:
     data_type: string
     description: 'Prompt info must be an array'
     prompt: ask
-    default:
+    default_value:
       source: value
       value: Here be dragons
 YAML,
@@ -482,7 +484,7 @@ input:
     description: 'Bad prompt type'
     prompt:
       method: whoops
-    default:
+    default_value:
       source: value
       value: Here be dragons
 YAML,
@@ -500,7 +502,7 @@ input:
     prompt:
       method: ask
       arguments: [1, 2]
-    default:
+    default_value:
       source: value
       value: Here be dragons
 YAML,
@@ -516,7 +518,7 @@ input:
     data_type: string
     description: 'Form element must be array'
     form: true
-    default:
+    default_value:
       source: value
       value: Here be dragons
 YAML,
@@ -532,7 +534,7 @@ input:
     data_type: string
     description: 'Form element must be associative'
     form: [text]
-    default:
+    default_value:
       source: value
       value: Here be dragons
 YAML,
@@ -548,7 +550,7 @@ input:
     data_type: string
     description: 'Form elements cannot be empty'
     form: []
-    default:
+    default_value:
       source: value
       value: Here be dragons
 YAML,
@@ -567,7 +569,7 @@ input:
       '#type': textfield
       child:
         '#type': select
-    default:
+    default_value:
       source: value
       value: Here be dragons
 YAML,
@@ -584,7 +586,7 @@ input:
     description: 'This has a valid form element'
     form:
       '#type': textfield
-    default:
+    default_value:
       source: value
       value: Here be dragons
 YAML,
@@ -601,7 +603,7 @@ input:
       method: ask
 YAML,
       [
-        '[input][foo][default]' => ['This field is missing.'],
+        '[input][foo][default_value]' => ['This field is missing.'],
       ],
     ];
     yield 'default value from config is not defined' => [
@@ -613,11 +615,11 @@ input:
     description: 'Bad default definition'
     prompt:
       method: ask
-    default:
+    default_value:
       source: config
 YAML,
       [
-        '[input][foo][default]' => ["The 'config' key is required."],
+        '[input][foo][default_value]' => ["The 'config' key is required."],
       ],
     ];
     yield 'default value from config is not an array' => [
@@ -629,12 +631,12 @@ input:
     description: 'Bad default definition'
     prompt:
       method: ask
-    default:
+    default_value:
       source: config
       config: 'system.site:mail'
 YAML,
       [
-        '[input][foo][default][config]' => ['This value should be of type list.'],
+        '[input][foo][default_value][config]' => ['This value should be of type list.'],
       ],
     ];
     yield 'default value from config has too few values' => [
@@ -646,12 +648,12 @@ input:
     description: 'Bad default definition'
     prompt:
       method: ask
-    default:
+    default_value:
       source: config
       config: ['system.site:mail']
 YAML,
       [
-        '[input][foo][default][config]' => ['This collection should contain exactly 2 elements.'],
+        '[input][foo][default_value][config]' => ['This collection should contain exactly 2 elements.'],
       ],
     ];
     yield 'default value from config is an associative array' => [
@@ -663,14 +665,14 @@ input:
     description: 'Bad default definition'
     prompt:
       method: ask
-    default:
+    default_value:
       source: config
       config:
         name: system.site
         key: mail
 YAML,
       [
-        '[input][foo][default][config]' => ['This value should be of type list.'],
+        '[input][foo][default_value][config]' => ['This value should be of type list.'],
       ],
     ];
     yield 'default value from config has non-string values' => [
@@ -682,12 +684,12 @@ input:
     description: 'Bad default definition'
     prompt:
       method: ask
-    default:
+    default_value:
       source: config
       config: ['system.site', 39]
 YAML,
       [
-        '[input][foo][default][config][1]' => ['This value should be of type string.'],
+        '[input][foo][default_value][config][1]' => ['This value should be of type string.'],
       ],
     ];
     yield 'default value from config has empty strings' => [
@@ -699,12 +701,12 @@ input:
     description: 'Bad default definition'
     prompt:
       method: ask
-    default:
+    default_value:
       source: config
       config: ['', 'mail']
 YAML,
       [
-        '[input][foo][default][config][0]' => ['This value should not be blank.'],
+        '[input][foo][default_value][config][0]' => ['This value should not be blank.'],
       ],
     ];
     yield 'valid default value from config' => [
@@ -716,7 +718,7 @@ input:
     description: 'Good default definition'
     prompt:
       method: ask
-    default:
+    default_value:
       source: config
       config: ['system.site', 'mail']
 YAML,
@@ -768,12 +770,12 @@ input:
   bad_news:
     data_type: string
     description: 'Bad default definition'
-    default:
+    default_value:
       source: env
       env: -40
 YAML,
       [
-        '[input][bad_news][default][env]' => ['This value should be of type string.'],
+        '[input][bad_news][default_value][env]' => ['This value should be of type string.'],
       ],
     ];
     yield 'input env variable name is empty' => [
@@ -783,12 +785,12 @@ input:
   bad_news:
     data_type: string
     description: 'Bad default definition'
-    default:
+    default_value:
       source: env
       env: ''
 YAML,
       [
-        '[input][bad_news][default][env]' => ['This value should not be blank.'],
+        '[input][bad_news][default_value][env]' => ['This value should not be blank.'],
       ],
     ];
   }
