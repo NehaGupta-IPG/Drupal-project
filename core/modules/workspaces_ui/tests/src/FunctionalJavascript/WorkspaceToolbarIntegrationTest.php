@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\workspaces_ui\FunctionalJavascript;
 
 use Drupal\Tests\system\FunctionalJavascript\OffCanvasTestBase;
+use Drupal\workspaces\Entity\Workspace;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests workspace settings stray integration.
- *
- * @group workspaces_ui
  */
+#[Group('workspaces')]
+#[Group('workspaces_ui')]
 class WorkspaceToolbarIntegrationTest extends OffCanvasTestBase {
 
   /**
@@ -34,6 +36,7 @@ class WorkspaceToolbarIntegrationTest extends OffCanvasTestBase {
       'access administration pages',
     ]);
     $this->drupalLogin($admin_user);
+    Workspace::create(['id' => 'stage', 'label' => 'Stage'])->save();
   }
 
   /**

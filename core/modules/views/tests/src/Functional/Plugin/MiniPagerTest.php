@@ -6,13 +6,14 @@ namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the mini pager plugin.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\pager\Mini
  */
+#[Group('views')]
 class MiniPagerTest extends ViewTestBase {
 
   /**
@@ -84,7 +85,7 @@ class MiniPagerTest extends ViewTestBase {
     $this->assertSession()->pageTextContains($this->nodes[18]->label());
     $this->assertSession()->pageTextContains($this->nodes[19]->label());
 
-    // Test @total value in result summary
+    // Test @total value in result summary.
     $view = Views::getView('test_mini_pager');
     $view->setDisplay('page_4');
     $this->executeView($view);

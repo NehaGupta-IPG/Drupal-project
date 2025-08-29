@@ -115,13 +115,14 @@ class MenuUiHooks {
       return $entity->access('update', NULL, TRUE)->andIf($entity->access('delete', NULL, TRUE));
     }
     else {
-      // If the node has no corresponding menu link, users needs to permission to create one.
+      // If the node has no corresponding menu link, users needs to permission
+      // to create one.
       return $this->entityTypeManager->getAccessControlHandler('menu_link_content')->createAccess(NULL, NULL, [], TRUE);
     }
   }
 
   /**
-   * Implements hook_form_BASE_FORM_ID_alter() for \Drupal\node\NodeForm.
+   * Implements hook_form_BASE_FORM_ID_alter() for \Drupal\node\Form\NodeForm.
    *
    * Adds menu item fields to the node form.
    *
@@ -231,7 +232,7 @@ class MenuUiHooks {
   }
 
   /**
-   * Implements hook_form_FORM_ID_alter() for \Drupal\node\NodeTypeForm.
+   * Implements hook_form_FORM_ID_alter() for \Drupal\node\Form\NodeTypeForm.
    *
    * Adds menu options to the node type form.
    *
@@ -289,6 +290,38 @@ class MenuUiHooks {
     $options_cacheability->applyTo($form['menu']['menu_parent']);
     $form['#validate'][] = 'menu_ui_form_node_type_form_validate';
     $form['#entity_builders'][] = 'menu_ui_form_node_type_form_builder';
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_delete().
+   */
+  #[Hook('menu_delete')]
+  public function menuDelete(EntityInterface $entity): void {
+    if (!$this->entityTypeManager->hasDefinition('node_type')) {
+      return;
+    }
+
+    // Remove the menu from content type third party settings.
+    $menu_id = $entity->id();
+    $parent_prefix = $menu_id . ':';
+    $storage = $this->entityTypeManager->getStorage('node_type');
+    foreach ($storage->loadMultiple() as $content_type) {
+      $third_party_settings = $original_third_party_settings = $content_type->getThirdPartySettings('menu_ui');
+      if (isset($third_party_settings['available_menus']) && in_array($menu_id, $third_party_settings['available_menus'])) {
+        $key = array_search($menu_id, $third_party_settings['available_menus']);
+        if ($key !== FALSE) {
+          unset($third_party_settings['available_menus'][$key]);
+        }
+        $content_type->setThirdPartySetting('menu_ui', 'available_menus', $third_party_settings['available_menus']);
+      }
+      if (isset($third_party_settings['parent']) && substr($third_party_settings['parent'], 0, strlen($parent_prefix)) == $parent_prefix) {
+        $third_party_settings['parent'] = '';
+        $content_type->setThirdPartySetting('menu_ui', 'parent', $third_party_settings['parent']);
+      }
+      if ($third_party_settings != $original_third_party_settings) {
+        $content_type->save();
+      }
+    }
   }
 
   /**
