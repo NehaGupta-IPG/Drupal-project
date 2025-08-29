@@ -39,10 +39,6 @@
   htmx.on('htmx:configRequest', ({ detail }) => {
     const url = new URL(detail.path, document.location.href);
     if (Drupal.url.isLocal(url.toString())) {
-      // This will make Drupal return a simplified HTML page.
-      // @see \Drupal\Core\Render\MainContent\HtmxRenderer
-      url.searchParams.set('_wrapper_format', 'drupal_htmx');
-      detail.path = url.toString();
       // Allow Drupal to return new JavaScript and CSS files to load without
       // returning the ones already loaded.
       // @see \Drupal\Core\StackMiddleWare\AjaxPageState
@@ -68,11 +64,6 @@
     // We need to parse the response to find all the assets to load.
     // htmx cleans up too many things to be able to rely on their dom fragment.
     let responseHTML = Document.parseHTMLUnsafe(detail.serverResponse);
-
-    // Remove all noscript tags to avoid loading fallback JS and CSS assets.
-    responseHTML
-      .querySelectorAll('noscript')
-      .forEach((element) => element.remove());
 
     // Update drupalSettings
     // Use direct child elements to harden against XSS exploits when CSP is on.
@@ -106,7 +97,7 @@
     });
 
     // The response is the whole page without the assets we handle with loadjs.
-    detail.serverResponse = responseHTML.querySelector('template')?.innerHTML;
+    detail.serverResponse = responseHTML.documentElement.outerHTML;
 
     // Helps with memory management.
     responseHTML = null;
