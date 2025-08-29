@@ -571,9 +571,9 @@ return RectorConfig::configure()
         __DIR__ . '/vendor/palantirnet/drupal-rector/config/drupal-phpunit-bootstrap-file.php',
     ])
     ->withPaths([
-        __DIR__ . '/core/**/tests/src/Build',
-        __DIR__ . '/core/**/tests/src/Functional',
-        __DIR__ . '/core/**/tests/src/FunctionalJavascript',
+        __DIR__ . '/core/*/**/tests/src/Build',
+        __DIR__ . '/core/*/**/tests/src/Functional',
+        __DIR__ . '/core/*/**/tests/src/FunctionalJavascript',
 #        __DIR__ . '/core/modules/**/tests/src/Kernel',
 #        __DIR__ . '/core/modules/**/tests/src/Unit',
 #        __DIR__ . '/core/tests/Drupal/Tests/Component',
