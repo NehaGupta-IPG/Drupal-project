@@ -95,7 +95,7 @@ class ConfirmFormHelperTest extends UnitTestCase {
    * @covers ::buildCancelLink
    * @dataProvider providerTestCancelLinkDestination
    */
-  public function testCancelLinkDestination($destination): void {
+  public function testCancelLinkDestination($destination, $base_path): void {
     $query = ['destination' => $destination];
     $form = $this->createMock('Drupal\Core\Form\ConfirmFormInterface');
 
@@ -110,7 +110,12 @@ class ConfirmFormHelperTest extends UnitTestCase {
       ->with('baz')
       ->willReturn($url);
 
-    $link = ConfirmFormHelper::buildCancelLink($form, new Request($query));
+    $server['SCRIPT_FILENAME'] = "/some/docroot{$base_path}/index.php";
+    $server['SCRIPT_NAME'] = "{$base_path}/index.php";
+    $server['REQUEST_URI'] = "{$base_path}/some/confirmation";
+    $request = new Request($query, [], [], [], [], $server);
+
+    $link = ConfirmFormHelper::buildCancelLink($form, $request);
     $this->assertSame($url, $link['#url']);
     $this->assertSame(['contexts' => ['url.query_args:destination']], $link['#cache']);
   }
@@ -120,8 +125,10 @@ class ConfirmFormHelperTest extends UnitTestCase {
    */
   public static function providerTestCancelLinkDestination() {
     $data = [];
-    $data[] = ['baz'];
-    $data[] = ['/baz'];
+    $data[] = ['baz', ''];
+    $data[] = ['/baz', ''];
+    $data[] = ['baz', '/base/path'];
+    $data[] = ['/base/path/baz', '/base/path'];
     return $data;
   }
 
