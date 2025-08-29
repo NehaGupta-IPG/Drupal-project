@@ -7,6 +7,7 @@ use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\ContentEntityStorageInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\TypedData\EntityDataDefinition;
@@ -42,6 +43,15 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\AllowedValuesConstraint;
   list_class: EntityReferenceFieldItemList::class,
 )]
 class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProviderInterface, PreconfiguredFieldUiOptionsInterface {
+
+  /**
+   * Tracks entities currently being saved to prevent infinite recursion.
+   *
+   * @var array
+   *   An associative array where keys are "entity_type_id:uuid" strings
+   *   and values are TRUE for entities currently being saved.
+   */
+  protected static $savedEntities = [];
 
   /**
    * {@inheritdoc}
@@ -158,7 +168,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
       'changed_only' => new TranslatableMarkup('Save changed only'),
       'always' => new TranslatableMarkup('Always save'),
     ];
-    
+
     if (isset($save_mode_labels[$save_mode])) {
       $summary[] = new TranslatableMarkup('Referenced entity save behavior: @mode', [
         '@mode' => $save_mode_labels[$save_mode],
@@ -329,27 +339,53 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
    * {@inheritdoc}
    */
   public function preSave() {
-    if (!$this->isEmpty() && $this->entity instanceof EntityInterface) {
+    $referenced_entity = $this->entity ?? NULL;
+    if (!$this->isEmpty() && $referenced_entity instanceof EntityInterface) {
+      $parent_entity = $this->getEntity();
       $save_mode = $this->getFieldDefinition()->getSetting('save_referenced_entities');
-      $is_new_entity = $this->hasNewEntity();
+      $has_new_entity = $this->hasNewEntity();
 
       $do_save = match ($save_mode) {
         'disabled' => FALSE,
-        'new_only' => $is_new_entity,
+        'new_only' => $has_new_entity,
         // @todo: Implement proper change detection, fall back to "always" for
         //   now. See https://www.drupal.org/project/drupal/issues/xxx.
         'changed_only' => TRUE,
         'always' => TRUE,
-        default => $is_new_entity,
+        default => $has_new_entity,
       };
 
-      if ($do_save) {
-        $this->entity->save();
+      // Prevent infinite recursion by tracking entities currently being saved.
+      $parent_key = $parent_entity->getEntityTypeId() . ':' . $parent_entity->uuid();
+      $referenced_key = $referenced_entity->getEntityTypeId() . ':' . $referenced_entity->uuid();
+
+      try {
+        static::$savedEntities[$parent_key] = TRUE;
+
+        if ($do_save) {
+          if (empty(static::$savedEntities[$referenced_key])) {
+            static::$savedEntities[$referenced_key] = TRUE;
+            $referenced_entity->save();
+          }
+          elseif ($parent_entity->isNew() || $referenced_entity->isNew()) {
+            // Circular reference detected involving at least one new entity:
+            // this is forbidden because new entities cannot have stable
+            // references to themselves or be part of cycles.
+            throw new EntityStorageException('Invalid circular reference detected: a new entity cannot reference itself, not even indirectly.');
+          }
+          // If parent entity already exists, circular references are allowed
+          // since both entities have stable IDs and the reference is valid.
+        }
+      }
+      finally {
+        // Always clean up tracking entries to prevent memory leaks and
+        // ensure proper state for subsequent operations.
+        unset(static::$savedEntities[$parent_key]);
+        unset(static::$savedEntities[$referenced_key]);
       }
 
-      // Always synchronize "target_id" if the entity has a valid ID.
-      if ($this->entity?->id() !== NULL) {
-        $this->target_id = $this->entity->id();
+      if ($this->target_id === NULL) {
+        $this->target_id = $referenced_entity->id();
       }
     }
   }

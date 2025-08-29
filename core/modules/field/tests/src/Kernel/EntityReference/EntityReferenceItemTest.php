@@ -8,6 +8,7 @@ use Drupal\comment\Entity\Comment;
 use Drupal\comment\Entity\CommentType;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Config\Schema\SchemaIncompleteException;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -432,6 +433,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $this->doTestSaveModeAlways();
 
     // Edge case testing.
+    $this->doTestCircularReference();
     $this->doTestMultipleReferences();
     $this->doTestConfigSchemaValidation();
   }
@@ -662,6 +664,377 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     // Since changed_only currently falls back to 'always', the entity should be saved.
     $this->assertEquals($new_name, $reloaded_term->getName(), 'Existing term was re-saved with changed_only mode (fallback behavior - name updated).');
     $this->assertEquals($existing_term->id(), $entity->field_save_mode_changed_only->target_id, 'Target ID is synchronized for existing entity.');
+  }
+
+  /**
+   * Tests self-reference scenarios to ensure no infinite recursion.
+   */
+  private function doTestCircularReference(): void {
+    // Test entity referencing itself during creation.
+    $expectedExceptionMessage = 'Invalid circular reference detected: a new entity cannot reference itself, not even indirectly.';
+    $entity = EntityTest::create(['name' => $this->randomMachineName()]);
+    $entity->field_self_ref->entity = $entity;
+    try {
+      $entity->save();
+      $this->fail();
+    }
+    catch (EntityStorageException $e) {
+      $this->assertSame($expectedExceptionMessage, $e->getMessage());
+    }
+
+    // Test entity referencing itself after creation.
+    $entity = EntityTest::create(['name' => $this->randomMachineName()]);
+    $entity->save();
+    $entity->field_self_ref->entity = $entity;
+    $entity->save();
+
+    // Verify the entity saved successfully and target_id is set.
+    $this->assertFalse($entity->isNew(), 'Self-referencing entity saved successfully.');
+    $this->assertEquals($entity->id(), $entity->field_self_ref->target_id, 'Self-reference target_id is correctly set.');
+
+    // Test existing entity adding self-reference.
+    $entity2 = EntityTest::create(['name' => $this->randomMachineName()]);
+    $entity2->save();
+    $entity2->field_self_ref->target_id = $entity2->id();
+    $entity2->save();
+
+    // Verify self-reference works with existing entity.
+    $this->assertEquals($entity2->id(), $entity2->field_self_ref->target_id, 'Existing entity self-reference works correctly.');
+
+    // Test circular reference chain.
+    $entityA = EntityTest::create(['name' => $this->randomMachineName()]);
+    $entityB = EntityTest::create(['name' => $this->randomMachineName()]);
+
+    $entityA->field_self_ref->entity = $entityB;
+    $entityB->field_self_ref->entity = $entityA;
+
+    try {
+      $entityA->save();
+      $this->fail();
+    }
+    catch (EntityStorageException $e) {
+      $this->assertSame($expectedExceptionMessage, $e->getMessage());
+    }
+
+    try {
+      $entityB->save();
+      $this->fail();
+    }
+    catch (EntityStorageException $e) {
+      $this->assertSame($expectedExceptionMessage, $e->getMessage());
+    }
+
+    // Clear the circular references so we can save the entities individually first.
+    // This tests the scenario where entities are saved separately and then
+    // circular references are established between existing entities.
+    unset(
+      $entityA->field_self_ref->entity,
+      $entityB->field_self_ref->entity,
+    );
+
+    $entityA->save();
+    $entityB->save();
+
+    $entityA->field_self_ref->entity = $entityB;
+    $entityB->field_self_ref->entity = $entityA;
+
+    $entityA->save();
+    $entityB->save();
+
+    $this->assertEquals($entityB->id(), $entityA->field_self_ref->target_id, 'Circular reference A->B works.');
+    $this->assertEquals($entityA->id(), $entityB->field_self_ref->target_id, 'Circular reference B->A works.');
+
+    // Advanced test scenarios.
+    $this->doTestAdvancedCircularReferences();
+  }
+
+  /**
+   * Tests advanced circular reference scenarios with multi-level chains.
+   */
+  private function doTestAdvancedCircularReferences(): void {
+    $expectedExceptionMessage = 'Invalid circular reference detected: a new entity cannot reference itself, not even indirectly.';
+
+    // Test 1: Three-level circular chain (A->B->C->A) with all new entities.
+    $this->doTestThreeLevelCircularChain($expectedExceptionMessage);
+
+    // Test 2: Four-level circular chain with mixed entity states.
+    $this->doTestMixedStateCircularChain($expectedExceptionMessage);
+
+    // Test 3: Partial chain building with incremental saves.
+    $this->doTestPartialChainBuilding();
+
+    // Test 4: Multiple reference fields cross-referencing.
+    $this->doTestMultipleFieldCrossReference();
+
+    // Test 5: Deep nesting scenarios.
+    $this->doTestDeepNestingScenarios();
+  }
+
+  /**
+   * Tests three-level circular chain (A->B->C->A) scenarios.
+   */
+  private function doTestThreeLevelCircularChain(string $expectedExceptionMessage): void {
+    // Create three new entities in a circular chain.
+    $entityA = EntityTest::create(['name' => 'Chain A - ' . $this->randomMachineName()]);
+    $entityB = EntityTest::create(['name' => 'Chain B - ' . $this->randomMachineName()]);
+    $entityC = EntityTest::create(['name' => 'Chain C - ' . $this->randomMachineName()]);
+
+    // Set up circular references: A->B->C->A.
+    $entityA->field_self_ref->entity = $entityB;
+    $entityB->field_self_ref->entity = $entityC;
+    $entityC->field_self_ref->entity = $entityA;
+
+    // Try to save entity A - should fail due to circular reference.
+    try {
+      $entityA->save();
+      $this->fail('Expected EntityStorageException for three-level circular chain.');
+    }
+    catch (EntityStorageException $e) {
+      $this->assertSame($expectedExceptionMessage, $e->getMessage(), 'Three-level circular chain properly detected.');
+    }
+
+    // Now test the same chain but with existing entities.
+    // Clear references and save entities individually.
+    unset($entityA->field_self_ref->entity, $entityB->field_self_ref->entity, $entityC->field_self_ref->entity);
+    
+    $entityA->save();
+    $entityB->save();
+    $entityC->save();
+
+    // Now establish the circular chain with existing entities.
+    $entityA->field_self_ref->entity = $entityB;
+    $entityB->field_self_ref->entity = $entityC;
+    $entityC->field_self_ref->entity = $entityA;
+
+    // Should work fine with existing entities.
+    $entityA->save();
+    $entityB->save();
+    $entityC->save();
+
+    // Verify the chain is correctly established.
+    $this->assertEquals($entityB->id(), $entityA->field_self_ref->target_id, 'A->B reference set correctly.');
+    $this->assertEquals($entityC->id(), $entityB->field_self_ref->target_id, 'B->C reference set correctly.');
+    $this->assertEquals($entityA->id(), $entityC->field_self_ref->target_id, 'C->A reference set correctly.');
+  }
+
+  /**
+   * Tests four-level circular chain with mixed new/existing entity states.
+   */
+  private function doTestMixedStateCircularChain(string $expectedExceptionMessage): void {
+    // Create two existing entities.
+    $existingA = EntityTest::create(['name' => 'Existing A - ' . $this->randomMachineName()]);
+    $existingB = EntityTest::create(['name' => 'Existing B - ' . $this->randomMachineName()]);
+    $existingA->save();
+    $existingB->save();
+
+    // Create two new entities.
+    $newC = EntityTest::create(['name' => 'New C - ' . $this->randomMachineName()]);
+    $newD = EntityTest::create(['name' => 'New D - ' . $this->randomMachineName()]);
+
+    // Set up mixed chain: ExistingA -> NewC -> ExistingB -> NewD -> ExistingA.
+    $existingA->field_self_ref->entity = $newC;
+    $newC->field_self_ref->entity = $existingB;
+    $existingB->field_self_ref->entity = $newD;
+    $newD->field_self_ref->entity = $existingA;
+
+    // Try to save one of the new entities - should fail due to circular reference.
+    try {
+      $newC->save();
+      $this->fail('Expected EntityStorageException for mixed state circular chain.');
+    }
+    catch (EntityStorageException $e) {
+      $this->assertSame($expectedExceptionMessage, $e->getMessage(), 'Mixed state circular chain properly detected.');
+    }
+
+    // Test scenario where we build the chain incrementally.
+    // Reset entities to clean state by clearing all field values.
+    $existingA = EntityTest::load($existingA->id());
+    $existingB = EntityTest::load($existingB->id());
+    $newC = EntityTest::create(['name' => 'New C Clean - ' . $this->randomMachineName()]);
+    $newD = EntityTest::create(['name' => 'New D Clean - ' . $this->randomMachineName()]);
+
+    // Build partial chain step by step to avoid circular references.
+    
+    // Step 1: ExistingA -> NewC (linear, no circular reference).
+    $existingA->field_self_ref->entity = $newC;
+    $existingA->save(); // Should work - saves newC as well.
+    $this->assertFalse($newC->isNew(), 'NewC was saved when referenced by existing entity.');
+
+    // Step 2: NewC -> ExistingB (still linear).
+    $newC->field_self_ref->entity = $existingB;
+    $newC->save(); // Should work.
+    
+    // Step 3: ExistingB -> NewD (still linear).
+    $existingB->field_self_ref->entity = $newD;
+    $existingB->save(); // Should work - saves newD as well.
+    $this->assertFalse($newD->isNew(), 'NewD was saved when referenced by existing entity.');
+
+    // Step 4: Complete the circle NewD -> ExistingA (all entities exist now).
+    $newD->field_self_ref->entity = $existingA;
+    $newD->save(); // Should work since no new entities are involved.
+
+    // Reload entities to get fresh data.
+    $existingA = EntityTest::load($existingA->id());
+    $existingB = EntityTest::load($existingB->id());
+    $newC = EntityTest::load($newC->id());
+    $newD = EntityTest::load($newD->id());
+
+    // Verify the complete chain.
+    $this->assertEquals($newC->id(), $existingA->field_self_ref->target_id, 'ExistingA -> NewC reference is correct.');
+    $this->assertEquals($existingB->id(), $newC->field_self_ref->target_id, 'NewC -> ExistingB reference is correct.');
+    $this->assertEquals($newD->id(), $existingB->field_self_ref->target_id, 'ExistingB -> NewD reference is correct.');
+    $this->assertEquals($existingA->id(), $newD->field_self_ref->target_id, 'NewD -> ExistingA reference is correct.');
+  }
+
+  /**
+   * Tests partial chain building with incremental saves.
+   */
+  private function doTestPartialChainBuilding(): void {
+    // Create entities for building a chain incrementally.
+    $root = EntityTest::create(['name' => 'Root - ' . $this->randomMachineName()]);
+    $child1 = EntityTest::create(['name' => 'Child1 - ' . $this->randomMachineName()]);
+    $child2 = EntityTest::create(['name' => 'Child2 - ' . $this->randomMachineName()]);
+    $child3 = EntityTest::create(['name' => 'Child3 - ' . $this->randomMachineName()]);
+
+    // Build chain step by step: Root -> Child1 -> Child2 -> Child3.
+    $root->field_self_ref->entity = $child1;
+    $root->save();
+    $this->assertFalse($child1->isNew(), 'Child1 saved via root reference.');
+
+    $child1->field_self_ref->entity = $child2;
+    $child1->save();
+    $this->assertFalse($child2->isNew(), 'Child2 saved via child1 reference.');
+
+    $child2->field_self_ref->entity = $child3;
+    $child2->save();
+    $this->assertFalse($child3->isNew(), 'Child3 saved via child2 reference.');
+
+    // Verify chain integrity.
+    $this->assertEquals($child1->id(), $root->field_self_ref->target_id);
+    $this->assertEquals($child2->id(), $child1->field_self_ref->target_id);
+    $this->assertEquals($child3->id(), $child2->field_self_ref->target_id);
+
+    // Test breaking and rebuilding part of the chain.
+    $newChild2 = EntityTest::create(['name' => 'NewChild2 - ' . $this->randomMachineName()]);
+    $child1->field_self_ref->entity = $newChild2;
+    $newChild2->field_self_ref->entity = $child3; // Skip the old child2.
+    
+    $child1->save(); // This should save newChild2 and update the chain.
+    $this->assertFalse($newChild2->isNew(), 'NewChild2 saved when inserted in chain.');
+    $this->assertEquals($newChild2->id(), $child1->field_self_ref->target_id);
+    $this->assertEquals($child3->id(), $newChild2->field_self_ref->target_id);
+  }
+
+  /**
+   * Tests multiple reference fields cross-referencing.
+   */
+  private function doTestMultipleFieldCrossReference(): void {
+    // Create a second self-reference field for cross-referencing tests.
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'field_self_ref_2',
+      'entity_type' => 'entity_test',
+      'type' => 'entity_reference',
+      'settings' => [
+        'target_type' => 'entity_test',
+      ],
+    ]);
+    $field_storage->save();
+
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => 'entity_test',
+      'label' => 'Second self reference test',
+      'settings' => [
+        'handler' => 'default',
+        'save_referenced_entities' => 'always',
+      ],
+    ]);
+    $field->save();
+
+    // Create entities that reference each other via different fields.
+    $entityX = EntityTest::create(['name' => 'EntityX - ' . $this->randomMachineName()]);
+    $entityY = EntityTest::create(['name' => 'EntityY - ' . $this->randomMachineName()]);
+
+    // Cross-reference: X.field1 -> Y, Y.field2 -> X.
+    $entityX->field_self_ref->entity = $entityY;
+    $entityY->field_self_ref_2->entity = $entityX;
+
+    // This should fail because of circular reference involving new entities.
+    $expectedExceptionMessage = 'Invalid circular reference detected: a new entity cannot reference itself, not even indirectly.';
+    try {
+      $entityX->save();
+      $this->fail('Expected EntityStorageException for cross-field circular reference.');
+    }
+    catch (EntityStorageException $e) {
+      $this->assertSame($expectedExceptionMessage, $e->getMessage(), 'Cross-field circular reference properly detected.');
+    }
+
+    // Clear references and save entities first.
+    unset($entityX->field_self_ref->entity, $entityY->field_self_ref_2->entity);
+    $entityX->save();
+    $entityY->save();
+
+    // Now establish cross-references with existing entities.
+    $entityX->field_self_ref->entity = $entityY;
+    $entityY->field_self_ref_2->entity = $entityX;
+    
+    $entityX->save();
+    $entityY->save();
+
+    // Verify cross-references work with existing entities.
+    $this->assertEquals($entityY->id(), $entityX->field_self_ref->target_id);
+    $this->assertEquals($entityX->id(), $entityY->field_self_ref_2->target_id);
+  }
+
+  /**
+   * Tests deep nesting scenarios and performance limits.
+   */
+  private function doTestDeepNestingScenarios(): void {
+    // Test reasonable depth chain (should work fine).
+    $entities = [];
+    $depth = 10;
+    
+    // Create a linear chain of entities.
+    for ($i = 0; $i < $depth; $i++) {
+      $entities[$i] = EntityTest::create(['name' => "Chain{$i} - " . $this->randomMachineName()]);
+      
+      if ($i > 0) {
+        // Each entity references the previous one.
+        $entities[$i]->field_self_ref->entity = $entities[$i - 1];
+      }
+    }
+
+    // Save the last entity - should trigger cascade saves.
+    $entities[$depth - 1]->save();
+
+    // Verify all entities in the chain were saved.
+    foreach ($entities as $i => $entity) {
+      $this->assertFalse($entity->isNew(), "Entity {$i} in deep chain was saved.");
+      
+      if ($i > 0) {
+        $this->assertEquals($entities[$i - 1]->id(), $entity->field_self_ref->target_id, "Chain link {$i} is correct.");
+      }
+    }
+
+    // Test error recovery: Create a scenario where part of a chain fails.
+    $validEntity = EntityTest::create(['name' => 'Valid - ' . $this->randomMachineName()]);
+    // Create an entity that will cause a constraint violation.
+    $invalidEntity = EntityTest::create([
+      'name' => 'Invalid - ' . $this->randomMachineName(),
+    ]);
+    // Make the invalid entity reference itself - this should cause circular reference detection.
+    $invalidEntity->field_self_ref->entity = $invalidEntity;
+    
+    $validEntity->field_self_ref->entity = $invalidEntity;
+    
+    try {
+      $validEntity->save();
+      $this->fail('Expected EntityStorageException for circular reference in chain.');
+    }
+    catch (EntityStorageException $e) {
+      // Expected - save should fail due to circular reference.
+      $this->assertStringContainsString('circular reference', strtolower($e->getMessage()), 'Save failed due to circular reference as expected.');
+    }
   }
 
   /**
