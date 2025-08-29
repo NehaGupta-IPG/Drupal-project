@@ -96,7 +96,7 @@ final class HtmxTestAttachmentsController extends ControllerBase {
       $options = [
         'query' => [
           MainContentViewSubscriber::WRAPPER_FORMAT => 'drupal_htmx',
-        ]
+        ],
       ];
     }
     $url = Url::fromRoute('test_htmx.attachments.replace', [], $options);
