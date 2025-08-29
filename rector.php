@@ -573,10 +573,10 @@ return RectorConfig::configure()
     ->withPaths([
 #        __DIR__ . '/core/modules/**/tests/src/Build',
 #        __DIR__ . '/core/modules/**/tests/src/Functional',
-        __DIR__ . '/core/modules/**/tests/src/Kernel',
-#        __DIR__ . '/core/modules/**/tests/src/Unit',
+#        __DIR__ . '/core/modules/**/tests/src/Kernel',
+        __DIR__ . '/core/modules/**/tests/src/Unit',
 #        __DIR__ . '/core/tests/Drupal/Tests/Component',
-#        __DIR__ . '/core/tests/Drupal/Tests',
+        __DIR__ . '/core/tests/Drupal/Tests',
 #        __DIR__ . '/core/tests/Drupal/KernelTests',
 #        __DIR__ . '/core/tests/Drupal/FunctionalTests',
 #        __DIR__ . '/core/tests/Drupal/FunctionalJavascriptTests',
@@ -587,7 +587,7 @@ return RectorConfig::configure()
         __DIR__ . '/core/tests/Drupal/Tests/Component/Annotation/Doctrine/Fixtures',
 
         # Modules' Unit tests skipped.
-        __DIR__ . '/core/modules/package_manager/tests/src/Unit/InstalledPackagesListTest.php',
+/*        __DIR__ . '/core/modules/package_manager/tests/src/Unit/InstalledPackagesListTest.php',
         __DIR__ . '/core/modules/mysql/tests/src/Unit/InstallTasksTest.php',
         __DIR__ . '/core/modules/views/tests/src/Unit/Plugin/Block/ViewsBlockTest.php',
         __DIR__ . '/core/modules/comment/tests/src/Unit/CommentLinkBuilderTest.php',
@@ -612,7 +612,7 @@ return RectorConfig::configure()
         __DIR__ . '/core/tests/Drupal/Tests/Core/DrupalTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Core/Extension/Requirement/RequirementSeverityTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Core/Utility/CallableResolverTest.php',
-
+*/
         # Modules' Kernel tests skipped.
         __DIR__ . '/core/modules/editor/tests/src/Kernel/EditorValidationTest.php',
         __DIR__ . '/core/modules/node/tests/src/Kernel/NodeTypeValidationTest.php',
