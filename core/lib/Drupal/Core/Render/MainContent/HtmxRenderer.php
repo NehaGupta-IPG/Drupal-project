@@ -15,15 +15,22 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Main content renderer for HTMX requests.
  *
+ * This renderer is invoked in two circumstances:
+ * - The HTMX request adds the `_wrapper_format` query parameter with value
+ *   `drupal_htmx`.
+ * - The route has the option `_htmx_route` set to TRUE.
+ *
  * Attachments in HTML responses are handled by
  * \Drupal\Core\Render\AttachmentsResponseProcessorInterface and
  * \Drupal\Core\Render\HtmlResponseAttachmentsProcessor.
  *
+ * @see \Drupal\Core\EventSubscriber\MainContentViewSubscriber
  * @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
  * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface
  * @see \Drupal\Core\Render\BareHtmlPageRenderer
  * @see \Drupal\Core\Render\HtmlResponse
  * @see \Drupal\Core\Render\HtmlResponseAttachmentsProcessor
+ * @see \Drupal\Core\EventSubscriber\MainContentViewSubscriber
  */
 class HtmxRenderer implements MainContentRendererInterface {
 
@@ -57,7 +64,7 @@ class HtmxRenderer implements MainContentRendererInterface {
 <js-placeholder token="{{ placeholder_token }}">
 <js-bottom-placeholder token="{{ placeholder_token }}">
 </head>
-<body><template>{{ content }}</template></body>
+<body>{{ content }}</body>
 </html>
 HTMX_RESPONSE,
       '#context' => [
