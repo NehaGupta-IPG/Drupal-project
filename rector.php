@@ -571,48 +571,23 @@ return RectorConfig::configure()
         __DIR__ . '/vendor/palantirnet/drupal-rector/config/drupal-phpunit-bootstrap-file.php',
     ])
     ->withPaths([
-#        __DIR__ . '/core/modules/**/tests/src/Build',
-#        __DIR__ . '/core/modules/**/tests/src/Functional',
+        __DIR__ . '/core/**/tests/src/Build',
+        __DIR__ . '/core/**/tests/src/Functional',
+        __DIR__ . '/core/**/tests/src/FunctionalJavascript',
 #        __DIR__ . '/core/modules/**/tests/src/Kernel',
-        __DIR__ . '/core/modules/**/tests/src/Unit',
+#        __DIR__ . '/core/modules/**/tests/src/Unit',
 #        __DIR__ . '/core/tests/Drupal/Tests/Component',
-        __DIR__ . '/core/tests/Drupal/Tests',
+#        __DIR__ . '/core/tests/Drupal/Tests',
 #        __DIR__ . '/core/tests/Drupal/KernelTests',
-#        __DIR__ . '/core/tests/Drupal/FunctionalTests',
-#        __DIR__ . '/core/tests/Drupal/FunctionalJavascriptTests',
+        __DIR__ . '/core/tests/Drupal/BuildTests',
+        __DIR__ . '/core/tests/Drupal/FunctionalTests',
+        __DIR__ . '/core/tests/Drupal/FunctionalJavascriptTests',
 #        __DIR__ . '/core',
 #        __DIR__ . '/composer',
     ])
     ->withSkip([
         __DIR__ . '/core/tests/Drupal/Tests/Component/Annotation/Doctrine/Fixtures',
 
-        # Modules' Unit tests skipped.
-        __DIR__ . '/core/modules/package_manager/tests/src/Unit/InstalledPackagesListTest.php',
-/*        __DIR__ . '/core/modules/mysql/tests/src/Unit/InstallTasksTest.php',
-        __DIR__ . '/core/modules/views/tests/src/Unit/Plugin/Block/ViewsBlockTest.php',
-        __DIR__ . '/core/modules/comment/tests/src/Unit/CommentLinkBuilderTest.php',
-        __DIR__ . '/core/modules/language/tests/src/Unit/LanguageNegotiationUrlTest.php',
-        __DIR__ . '/core/modules/migrate_drupal/tests/src/Unit/source/d6/Drupal6SqlBaseTest.php',
-        __DIR__ . '/core/modules/views/tests/src/Unit/Plugin/field/FieldPluginBaseTest.php',
-        __DIR__ . '/core/modules/views/tests/src/Unit/Routing/ViewPageControllerTest.php',
-        __DIR__ . '/core/modules/migrate/tests/src/Unit/Exception/MigrateSkipProcessExceptionTest.php',
-
-        # Core's Unit tests skipped.
-        __DIR__ . '/core/tests/Drupal/Tests/Component',*/
-        __DIR__ . '/core/tests/Drupal/Tests/Core/Config/TypeResolverTest.php',
-/*        __DIR__ . '/core/tests/Drupal/Tests/Core/Lock/LockBackendAbstractTest.php',
-        __DIR__ . '/core/tests/Drupal/Tests/Core/Asset/LibraryDiscoveryTest.php',
-        __DIR__ . '/core/tests/Drupal/Tests/Core/Entity/Sql/SqlContentEntityStorageSchemaTest.php',
-        __DIR__ . '/core/tests/Drupal/Tests/Core/Extension/ModuleHandlerTest.php',
-        __DIR__ . '/core/tests/Drupal/Tests/Core/Form/ConfigTargetTest.php',
-        __DIR__ . '/core/tests/Drupal/Tests/Core/StringTranslation/StringTranslationTraitTest.php',
-        __DIR__ . '/core/tests/Drupal/Tests/Core/TypedData/RecursiveContextualValidatorTest.php',
-        __DIR__ . '/core/tests/Drupal/Tests/Core/Database/ConnectionTest.php',
-        __DIR__ . '/core/tests/Drupal/Tests/Core/Test/TestDatabaseTest.php',
-        __DIR__ . '/core/tests/Drupal/Tests/Core/DrupalTest.php',
-        __DIR__ . '/core/tests/Drupal/Tests/Core/Extension/Requirement/RequirementSeverityTest.php',
-        __DIR__ . '/core/tests/Drupal/Tests/Core/Utility/CallableResolverTest.php',
-*/
         # Modules' Kernel tests skipped.
         __DIR__ . '/core/modules/editor/tests/src/Kernel/EditorValidationTest.php',
         __DIR__ . '/core/modules/node/tests/src/Kernel/NodeTypeValidationTest.php',
@@ -621,8 +596,6 @@ return RectorConfig::configure()
         __DIR__ . '/core/modules/package_manager/tests/src/Kernel/ComposerInspectorTest.php',
         __DIR__ . '/core/modules/file/tests/src/Kernel/FileItemValidationTest.php',
 
-        __DIR__ . '/core/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php',
-        __DIR__ . '/core/modules/ckeditor5/tests/src/FunctionalJavascript/SourceEditingEmptyElementTest.php',
         '*/ProxyClass/*',
         '*.api.php',
     ])
