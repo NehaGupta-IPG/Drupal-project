@@ -587,8 +587,8 @@ return RectorConfig::configure()
         __DIR__ . '/core/tests/Drupal/Tests/Component/Annotation/Doctrine/Fixtures',
 
         # Modules' Unit tests skipped.
-/*        __DIR__ . '/core/modules/package_manager/tests/src/Unit/InstalledPackagesListTest.php',
-        __DIR__ . '/core/modules/mysql/tests/src/Unit/InstallTasksTest.php',
+        __DIR__ . '/core/modules/package_manager/tests/src/Unit/InstalledPackagesListTest.php',
+/*        __DIR__ . '/core/modules/mysql/tests/src/Unit/InstallTasksTest.php',
         __DIR__ . '/core/modules/views/tests/src/Unit/Plugin/Block/ViewsBlockTest.php',
         __DIR__ . '/core/modules/comment/tests/src/Unit/CommentLinkBuilderTest.php',
         __DIR__ . '/core/modules/language/tests/src/Unit/LanguageNegotiationUrlTest.php',
@@ -598,9 +598,9 @@ return RectorConfig::configure()
         __DIR__ . '/core/modules/migrate/tests/src/Unit/Exception/MigrateSkipProcessExceptionTest.php',
 
         # Core's Unit tests skipped.
-        __DIR__ . '/core/tests/Drupal/Tests/Component',
+        __DIR__ . '/core/tests/Drupal/Tests/Component',*/
         __DIR__ . '/core/tests/Drupal/Tests/Core/Config/TypeResolverTest.php',
-        __DIR__ . '/core/tests/Drupal/Tests/Core/Lock/LockBackendAbstractTest.php',
+/*        __DIR__ . '/core/tests/Drupal/Tests/Core/Lock/LockBackendAbstractTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Core/Asset/LibraryDiscoveryTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Core/Entity/Sql/SqlContentEntityStorageSchemaTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Core/Extension/ModuleHandlerTest.php',
