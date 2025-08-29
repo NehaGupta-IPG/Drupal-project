@@ -88,7 +88,7 @@ final class SettingsEditor {
                 // This is the current index in parent.
                 $index = $variable_names[$value];
                 // This will be necessary for descending into the array.
-                $current = &$parent[$index];
+                $current = (array) $parent[$index];
                 $state = 'candidate_left';
               }
               break;
@@ -118,7 +118,7 @@ final class SettingsEditor {
                 if (isset($current[$index])) {
                   // If the new settings has this index, descend into it.
                   $parent = &$current;
-                  $current = &$parent[$index];
+                  $current = (array) $parent[$index];
                   $state = 'candidate_left';
                 }
                 else {
@@ -134,7 +134,7 @@ final class SettingsEditor {
 
             case 'candidate_right':
               if (self::isSimple($type, $value)) {
-                $value = self::exportSingleSettingToPhp($current);
+                $value = self::exportSingleSettingToPhp((object) $current);
                 // Unsetting $current would not affect $settings at all.
                 unset($parent[$index]);
                 // Skip the semicolon because self::dumpOne() added one.
