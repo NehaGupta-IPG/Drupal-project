@@ -196,8 +196,8 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
     ];
     $tree = $this->menuTree->transform($tree, $manipulators);
     $build = $this->menuTree->build($tree);
-    if (!empty($build['#menu_name'])) {
-      $build['#attributes']['id'] = Html::getUniqueId('block-' . $build['#menu_name']);
+    if (!empty($menu_name)) {
+      $build['#attributes']['id'] = Html::getUniqueId('block-' . $menu_name);
     }
     return $build;
   }
