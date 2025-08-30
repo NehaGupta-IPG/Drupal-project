@@ -527,6 +527,10 @@ function olivero_preprocess_comment(&$variables): void {
  * Implements hook_preprocess_HOOK() for field--comment.html.twig.
  */
 function olivero_preprocess_field__comment(&$variables): void {
+  if ($variables['field_type'] !== 'comment') {
+    return;
+  }
+
   // Add a comment_count.
   $variables['comment_count'] = count(array_filter($variables['comments'], 'is_numeric', ARRAY_FILTER_USE_KEY));
 
