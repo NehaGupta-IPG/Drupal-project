@@ -3,7 +3,6 @@
 namespace Drupal\comment;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\views\EntityViewsData;
 
 /**
@@ -310,8 +309,9 @@ class CommentViewsData extends EntityViewsData {
     ];
 
     // Provide last_updated for comment_entity_statistics table.
-    // The handler will determine whether to use GREATEST() with entity changed time
-    // or just the comment timestamp based on whether the entity implements EntityChangedInterface.
+    // The handler will determine whether to use GREATEST() with entity changed
+    // time or just the comment timestamp based on whether the entity implements
+    // EntityChangedInterface.
     $data['comment_entity_statistics']['last_updated'] = [
       'title' => $this->t('Updated/commented date'),
       'help' => $this->t('The most recent of last comment posted or entity updated time. For entities without a changed field, this is just the last comment timestamp.'),

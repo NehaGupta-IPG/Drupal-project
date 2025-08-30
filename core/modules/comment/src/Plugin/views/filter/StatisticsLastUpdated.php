@@ -51,13 +51,14 @@ class StatisticsLastUpdated extends Date {
 
     if ($entity_type->entityClassImplements(EntityChangedInterface::class) && isset($base_fields['changed'])) {
       // Entity implements EntityChangedInterface and has a 'changed' field.
-      // Use GREATEST function to filter by the newer of entity changed time and last comment time.
+      // Use GREATEST() to filter on the newer of entity 'changed' and the last
+      // comment timestamp.
       $entity_data_table = $this->query->ensureTable($entity_type->getDataTable(), $this->relationship);
       $field = 'GREATEST(' . $entity_data_table . '.changed, ' . $this->tableAlias . '.last_comment_timestamp)';
     }
     else {
-      // Entity doesn't implement EntityChangedInterface or doesn't have a 'changed' field.
-      // Just filter by the last comment timestamp.
+      // Entity does not implement EntityChangedInterface or lacks a 'changed'
+      // field. Filter on the last comment timestamp only.
       $field = $this->tableAlias . '.last_comment_timestamp';
     }
 
