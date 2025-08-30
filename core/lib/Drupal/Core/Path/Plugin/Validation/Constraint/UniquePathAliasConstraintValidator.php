@@ -92,7 +92,7 @@ class UniquePathAliasConstraintValidator extends ConstraintValidator implements 
    *   The path alias to check.
    *
    * @return string|null
-   *   The view name if the alias is used by a view page display, NULL otherwise.
+   *   The view name if alias is used by a view page display, NULL otherwise.
    */
   protected function validatePathViews(string $alias): ?string {
     if ($alias[0] === '/') {

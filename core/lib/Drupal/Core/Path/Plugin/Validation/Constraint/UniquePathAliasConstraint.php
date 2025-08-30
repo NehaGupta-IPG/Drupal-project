@@ -36,5 +36,4 @@ class UniquePathAliasConstraint extends SymfonyConstraint {
    */
   public $viewsMessage = 'This alias %alias is already in use by the view %view.';
 
-
 }
