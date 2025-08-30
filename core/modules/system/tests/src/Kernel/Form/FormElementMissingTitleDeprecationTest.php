@@ -7,12 +7,13 @@ namespace Drupal\Tests\system\Kernel\Form;
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the the deprecation message for empty #title property.
- *
- * @group Form
  */
+#[Group('form')]
+#[Group('legacy')]
 class FormElementMissingTitleDeprecationTest extends KernelTestBase implements FormInterface {
 
   /**
@@ -50,8 +51,6 @@ class FormElementMissingTitleDeprecationTest extends KernelTestBase implements F
 
   /**
    * Ensures that missing #title property triggers deprecation message.
-   *
-   * @group legacy
    */
   public function testDeprecationMessage(): void {
     $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "missing_title" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
