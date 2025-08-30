@@ -3,3 +3,6 @@ type: module
 description: 'Utilities for path testing'
 package: Testing
 version: VERSION
+dependencies:
+  - node
+  - views

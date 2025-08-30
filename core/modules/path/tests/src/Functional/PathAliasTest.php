@@ -8,6 +8,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
 use Drupal\Tests\WaitTerminateTestTrait;
+use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
@@ -21,7 +22,7 @@ class PathAliasTest extends PathTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['path'];
+  protected static $modules = ['path', 'views', 'path_test_misc', 'node'];
 
   /**
    * {@inheritdoc}
@@ -453,6 +454,22 @@ class PathAliasTest extends PathTestBase {
     $this->assertSession()->linkExists('URL alias');
     // The link should be to the ID of the URL alias field.
     $this->assertSession()->linkByHrefExists('#edit-path-0-alias');
+  }
+
+  /**
+   * Tests that duplicate aliases when an alias is used by a view.
+   */
+  public function testDuplicateNodeViewsAlias(): void {
+    $views = View::load('test_views_alias');
+    $this->assertNotEmpty($views);
+
+    // Create one node with a random alias.
+    $node_one = $this->drupalCreateNode();
+    $edit = [];
+    $edit['path[0][alias]'] = '/test-views-alias';
+    $this->drupalGet('node/' . $node_one->id() . '/edit');
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->statusMessageContains("This alias {$edit['path[0][alias]']} is already in use by the view test_views_alias.", 'error');
   }
 
 }
