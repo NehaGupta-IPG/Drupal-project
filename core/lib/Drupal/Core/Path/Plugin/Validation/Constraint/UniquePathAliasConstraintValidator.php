@@ -4,6 +4,7 @@ namespace Drupal\Core\Path\Plugin\Validation\Constraint;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -21,13 +22,23 @@ class UniquePathAliasConstraintValidator extends ConstraintValidator implements 
   protected $entityTypeManager;
 
   /**
+   * The module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
    * Creates a new UniquePathAliasConstraintValidator instance.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *  The module handler.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler) {
     $this->entityTypeManager = $entity_type_manager;
+    $this->moduleHandler = $module_handler;
   }
 
   /**
@@ -35,7 +46,8 @@ class UniquePathAliasConstraintValidator extends ConstraintValidator implements 
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('module_handler')
     );
   }
 
@@ -77,7 +89,7 @@ class UniquePathAliasConstraintValidator extends ConstraintValidator implements 
         ])->addViolation();
       }
     }
-    elseif ($viewName = $this->validatePathViews($alias)) {
+    elseif ($this->moduleHandler->moduleExists('views') && $viewName = $this->validatePathViews($alias)) {
       $this->context->buildViolation($constraint->viewsMessage, [
         '%alias' => $alias,
         '%view' => $viewName,
