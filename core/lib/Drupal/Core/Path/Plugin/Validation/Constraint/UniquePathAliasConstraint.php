@@ -29,4 +29,12 @@ class UniquePathAliasConstraint extends SymfonyConstraint {
    */
   public $differentCapitalizationMessage = 'The alias %alias could not be added because it is already in use in this language with different capitalization: %stored_alias.';
 
+  /**
+   * Violation message when the path alias is used by a view.
+   *
+   * @var string
+   */
+  public $viewsMessage = 'This alias %alias is already in use by the view %view.';
+
+
 }

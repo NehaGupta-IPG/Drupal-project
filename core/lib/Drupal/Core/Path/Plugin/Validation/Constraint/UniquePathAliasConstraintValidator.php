@@ -77,6 +77,39 @@ class UniquePathAliasConstraintValidator extends ConstraintValidator implements 
         ])->addViolation();
       }
     }
+    elseif ($viewName = $this->validatePathViews($alias)) {
+      $this->context->buildViolation($constraint->viewsMessage, [
+        '%alias' => $alias,
+        '%view' => $viewName,
+      ])->addViolation();
+    }
+  }
+
+  /**
+   * Check if the alias is used by any view page display.
+   *
+   * @param string $alias
+   *   The path alias to check.
+   *
+   * @return string|null
+   *   The view name if the alias is used by a view page display, NULL otherwise.
+   */
+  protected function validatePathViews(string $alias): ?string {
+    if ($alias[0] === '/') {
+      $alias = substr($alias, 1);
+    }
+    $views = $this->entityTypeManager
+      ->getStorage('view')
+      ->loadMultiple();
+    foreach ($views as $view) {
+      if (array_find(
+        $view->get('display'),
+        fn($display) => $display['display_plugin'] === 'page' && $display["display_options"]["path"] === $alias)
+      ) {
+        return $view->label();
+      }
+    }
+    return NULL;
   }
 
 }
