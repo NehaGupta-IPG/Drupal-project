@@ -4,5 +4,5 @@ description: 'Utilities for path testing'
 package: Testing
 version: VERSION
 dependencies:
-  - node
-  - views
+  - drupal:node
+  - drupal:views
