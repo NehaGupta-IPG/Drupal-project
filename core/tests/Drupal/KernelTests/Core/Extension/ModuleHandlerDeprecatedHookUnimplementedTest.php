@@ -6,6 +6,8 @@ namespace Drupal\KernelTests\Core\Extension;
 
 use Drupal\Core\Extension\ModuleHandler;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Hook\Attribute\HookAttributeInterface;
+use Drupal\deprecation_hook_attribute_test\Hook\DeprecationHookAttributeTestHooks;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -31,6 +33,24 @@ class ModuleHandlerDeprecatedHookUnimplementedTest extends KernelTestBase {
     $module_handler->invokeAll($unimplemented_hook_name);
     $data = [];
     $module_handler->alter($unimplemented_hook_name, $data);
+  }
+
+  /**
+   * Ensures the deprecated attributes exist.
+   */
+  public function testDeprecationExists(): void {
+    $reflectionClass = new \ReflectionClass(DeprecationHookAttributeTestHooks::class);
+    $attributes = $reflectionClass->getAttributes(HookAttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF);
+    $expected = [
+      'deprecated_hook',
+      'deprecated_alter',
+      'unimplemented_hook_name',
+    ];
+    $parsedAttributes = [];
+    foreach ($attributes as $attribute) {
+      $parsedAttributes[] = $attribute->getArguments()[0];
+    }
+    $this->assertEquals($expected, $parsedAttributes);
   }
 
 }
