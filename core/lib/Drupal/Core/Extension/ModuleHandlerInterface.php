@@ -293,6 +293,11 @@ interface ModuleHandlerInterface {
    *
    * @see \Drupal\Core\Extension\ModuleHandlerInterface::invoke()
    * @see https://www.drupal.org/core/deprecation#how-hook
+   *
+   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use the #[DeprecatedHook]
+   * attribute instead.
+   *
+   * @see https://www.drupal.org/node/3544006
    */
   public function invokeDeprecated($description, $module, $hook, array $args = []);
 
@@ -320,6 +325,11 @@ interface ModuleHandlerInterface {
    *
    * @see \Drupal\Core\Extension\ModuleHandlerInterface::invokeAll()
    * @see https://www.drupal.org/core/deprecation#how-hook
+   *
+   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use the #[DeprecatedHook]
+   * attribute instead.
+   *
+   * @see https://www.drupal.org/node/3544006
    */
   public function invokeAllDeprecated($description, $hook, array $args = []);
 
@@ -407,6 +417,11 @@ interface ModuleHandlerInterface {
    *
    * @see \Drupal\Core\Extension\ModuleHandlerInterface::alter()
    * @see https://www.drupal.org/core/deprecation#how-hook
+   *
+   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use the #[DeprecatedHook]
+   * attribute instead.
+   *
+   * @see https://www.drupal.org/node/3544006
    */
   public function alterDeprecated($description, $type, &$data, &$context1 = NULL, &$context2 = NULL);
 
