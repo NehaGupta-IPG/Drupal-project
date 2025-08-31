@@ -24,6 +24,8 @@ class DeprecatedHook implements HookAttributeInterface {
    *   The version the hook was deprecated in.
    * @param string $version_removed
    *   The version the hook will be removed.
+   * @param string $message
+   *   The message for the deprecation.
    * @param string $change_record
    *   The change record for this deprecation.
    */
@@ -32,6 +34,7 @@ class DeprecatedHook implements HookAttributeInterface {
     public readonly string $provider,
     public readonly string $version_deprecated,
     public readonly string $version_removed,
+    public readonly string $message,
     public readonly string $change_record,
   ) {}
 

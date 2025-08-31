@@ -8,6 +8,7 @@ use Drupal\Component\Annotation\Doctrine\StaticReflectionParser;
 use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Extension\ProceduralCall;
+use Drupal\Core\Hook\Attribute\DeprecatedHook;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\HookAttributeInterface;
 use Drupal\Core\Hook\Attribute\LegacyHook;
@@ -68,6 +69,13 @@ class HookCollectorPass implements CompilerPassInterface {
    * @var array<string, list<string>>
    */
   protected array $removeHookIdentifiers = [];
+
+  /**
+   * Hooks to deprecate.
+   *
+   * @var array<string, array>
+   */
+  protected array $deprecatedHooks = [];
 
   /**
    * A map of include files by function name.
@@ -211,6 +219,15 @@ class HookCollectorPass implements CompilerPassInterface {
         unset($implementationsByHook[$hook]);
       }
     }
+
+    foreach ($this->deprecatedHooks as $deprecated_hook => $deprecation) {
+      if ($deprecated_identifiers = $implementationsByHook[$deprecated_hook] ?? FALSE) {
+        $deprecated_identifiers = implode(', ', array_keys($deprecated_identifiers));
+        $message = "$deprecated_hook implementations $deprecated_identifiers are deprecated in $deprecation[provider]:$deprecation[version_deprecated] and removed in $deprecation[provider]:$deprecation[version_removed]. $deprecation[message] See $deprecation[change_record]";
+        @trigger_error($message, E_USER_DEPRECATED);
+      }
+    }
+
     return $implementationsByHook;
   }
 
@@ -438,6 +455,15 @@ class HookCollectorPass implements CompilerPassInterface {
             }
             elseif ($attribute instanceof RemoveHook) {
               $this->removeHookIdentifiers[$attribute->hook][] = $attribute->class . '::' . $attribute->method;
+            }
+            elseif ($attribute instanceof DeprecatedHook) {
+              $this->deprecatedHooks[$attribute->hook] = [
+                'provider' => $attribute->provider,
+                'version_deprecated' => $attribute->version_deprecated,
+                'version_removed' => $attribute->version_removed,
+                'message' => $attribute->message,
+                'change_record' => $attribute->change_record,
+              ];
             }
           }
         }

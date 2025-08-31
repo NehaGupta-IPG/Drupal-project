@@ -18,11 +18,7 @@ use PHPUnit\Framework\Attributes\Group;
 class ModuleHandlerDeprecatedHookUnimplementedTest extends KernelTestBase {
 
   /**
-   * Tests unimplemented hooks.
-   *
-   * @legacy-covers ::alterDeprecated
-   * @legacy-covers ::invokeAllDeprecated
-   * @legacy-covers ::invokeDeprecated
+   * Ensures deprecations are not triggered if no implementations are detected.
    */
   public function testUnimplementedHooks(): void {
     $unimplemented_hook_name = 'unimplemented_hook_name';
@@ -31,10 +27,10 @@ class ModuleHandlerDeprecatedHookUnimplementedTest extends KernelTestBase {
     $module_handler = $this->container->get('module_handler');
     $this->assertInstanceOf(ModuleHandlerInterface::class, $module_handler);
 
-    $module_handler->invokeDeprecated('Use something else.', 'deprecation_test', $unimplemented_hook_name);
-    $module_handler->invokeAllDeprecated('Use something else.', $unimplemented_hook_name);
+    $module_handler->invoke('deprecation_test', $unimplemented_hook_name);
+    $module_handler->invokeAll($unimplemented_hook_name);
     $data = [];
-    $module_handler->alterDeprecated('Alter something else.', $unimplemented_hook_name, $data);
+    $module_handler->alter($unimplemented_hook_name, $data);
   }
 
 }

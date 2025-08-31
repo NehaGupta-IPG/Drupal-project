@@ -27,28 +27,24 @@ class ModuleHandlerDeprecatedHookTest extends KernelTestBase {
   ];
 
   /**
-   * Tests invoke deprecated.
-   *
-   * @legacy-covers ::invokeDeprecated
+   * Ensures invoke triggers deprecations for deprecated hooks.
    */
   public function testInvokeDeprecated(): void {
-    $this->expectDeprecation('The deprecated hook hook_deprecated_hook() is implemented in these modules: deprecation_test, deprecation_hook_attribute_test. Use something else.');
+    $this->expectDeprecation('deprecated_hook implementations Drupal\Core\Extension\ProceduralCall::deprecation_test_deprecated_hook, Drupal\deprecation_hook_attribute_test\Hook\DeprecationHookAttributeTestHooks::deprecatedHook are deprecated in deprecation_test:x.x.x and removed in deprecation_test:y.y.y. Use something else. See change record');
     /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */
     $module_handler = $this->container->get('module_handler');
     $arg = 'an_arg';
     $this->assertEquals(
       $arg,
-      $module_handler->invokeDeprecated('Use something else.', 'deprecation_test', 'deprecated_hook', [$arg])
+      $module_handler->invoke('deprecation_test', 'deprecated_hook', [$arg])
     );
   }
 
   /**
-   * Tests invoke all deprecated.
-   *
-   * @legacy-covers ::invokeAllDeprecated
+   * Ensures invokeAll triggers deprecations for deprecated hooks.
    */
   public function testInvokeAllDeprecated(): void {
-    $this->expectDeprecation('The deprecated hook hook_deprecated_hook() is implemented in these modules: deprecation_test, deprecation_hook_attribute_test. Use something else.');
+    $this->expectDeprecation('deprecated_hook implementations Drupal\Core\Extension\ProceduralCall::deprecation_test_deprecated_hook, Drupal\deprecation_hook_attribute_test\Hook\DeprecationHookAttributeTestHooks::deprecatedHook are deprecated in deprecation_test:x.x.x and removed in deprecation_test:y.y.y. Use something else. See change record');
     /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */
     $module_handler = $this->container->get('module_handler');
     $arg = 'an_arg';
@@ -57,23 +53,21 @@ class ModuleHandlerDeprecatedHookTest extends KernelTestBase {
         $arg,
         $arg,
       ],
-      $module_handler->invokeAllDeprecated('Use something else.', 'deprecated_hook', [$arg])
+      $module_handler->invokeAll('deprecated_hook', [$arg])
     );
   }
 
   /**
-   * Tests alter deprecated.
-   *
-   * @legacy-covers ::alterDeprecated
+   * Ensures alter triggers deprecations for deprecated hooks.
    */
   public function testAlterDeprecated(): void {
-    $this->expectDeprecation('The deprecated alter hook hook_deprecated_alter_alter() is implemented in these locations: deprecation_test_deprecated_alter_alter, Drupal\deprecation_hook_attribute_test\Hook\DeprecationHookAttributeTestHooks::deprecatedAlterAlterFirst. Alter something else.');
+    $this->expectDeprecation('deprecated_hook implementations Drupal\Core\Extension\ProceduralCall::deprecation_test_deprecated_hook, Drupal\deprecation_hook_attribute_test\Hook\DeprecationHookAttributeTestHooks::deprecatedHook are deprecated in deprecation_test:x.x.x and removed in deprecation_test:y.y.y. Use something else. See change record');
     /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */
     $module_handler = $this->container->get('module_handler');
     $data = [];
     $context1 = 'test1';
     $context2 = 'test2';
-    $module_handler->alterDeprecated('Alter something else.', 'deprecated_alter', $data, $context1, $context2);
+    $module_handler->alter('deprecated_alter', $data, $context1, $context2);
     $this->assertEquals([$context1, $context2], $data);
   }
 
