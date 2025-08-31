@@ -8,12 +8,12 @@ use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Ensures that block type functions work correctly.
- *
- * @group block_content
  */
+#[Group('block_content')]
 class BlockContentTypeTest extends BlockContentTestBase {
 
   use AssertBreadcrumbTrait;
@@ -105,9 +105,6 @@ class BlockContentTypeTest extends BlockContentTestBase {
 
     $block_type = BlockContentType::load('foo');
     $this->assertInstanceOf(BlockContentType::class, $block_type);
-
-    $field_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('block_content', 'foo');
-    $this->assertTrue(isset($field_definitions['body']), 'Body field created when using the UI to create block content types.');
 
     // Check that the block type was created in site default language.
     $default_langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();

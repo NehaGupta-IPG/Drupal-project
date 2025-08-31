@@ -788,7 +788,7 @@ function hook_install_tasks_alter(&$tasks, $install_state) {
 // phpcs:enable
 function hook_update_N(&$sandbox) {
   // For non-batch updates, the signature can simply be:
-  // function hook_update_N() {
+  // "function hook_update_N() {".
 
   // Example function body for adding a field to a database table, which does
   // not require a batch operation:
@@ -861,6 +861,12 @@ function hook_update_N(&$sandbox) {
  *
  * Drupal also ensures to not execute the same hook_post_update_NAME() function
  * twice.
+ *
+ * Post update hooks are not executed at module install time. During install
+ * they are skipped and added to an internal "already executed" list in the
+ * key_value database table, making them appear as if they have been executed
+ * properly. For tasks that need to run at module installation time, use
+ * hook_install() instead.
  *
  * @section sec_bulk Batch updates
  * If running your update all at once could possibly cause PHP to time out, use
@@ -1140,7 +1146,7 @@ function hook_updater_info_alter(&$updaters) {
 function hook_requirements($phase): array {
   $requirements = [];
 
-  // Report Drupal version
+  // Report Drupal version.
   if ($phase == 'runtime') {
     $requirements['drupal'] = [
       'title' => t('Drupal'),
@@ -1149,7 +1155,7 @@ function hook_requirements($phase): array {
     ];
   }
 
-  // Test PHP version
+  // Test PHP version.
   $requirements['php'] = [
     'title' => t('PHP'),
     'value' => ($phase == 'runtime') ? Link::fromTextAndUrl(phpversion(), Url::fromRoute('system.php'))->toString() : phpversion(),
@@ -1159,7 +1165,7 @@ function hook_requirements($phase): array {
     $requirements['php']['severity'] = RequirementSeverity::Error;
   }
 
-  // Report cron status
+  // Report cron status.
   if ($phase == 'runtime') {
     $cron_last = \Drupal::state()->get('system.cron_last');
 
@@ -1234,14 +1240,14 @@ function hook_requirements_alter(array &$requirements): void {
 function hook_runtime_requirements(): array {
   $requirements = [];
 
-  // Report Drupal version
+  // Report Drupal version.
   $requirements['drupal'] = [
     'title' => t('Drupal'),
     'value' => \Drupal::VERSION,
     'severity' => RequirementSeverity::Info,
   ];
 
-  // Test PHP version
+  // Test PHP version.
   $requirements['php'] = [
     'title' => t('PHP'),
     'value' => Link::fromTextAndUrl(phpversion(), Url::fromRoute('system.php'))->toString(),
@@ -1251,7 +1257,7 @@ function hook_runtime_requirements(): array {
     $requirements['php']['severity'] = RequirementSeverity::Error;
   }
 
-  // Report cron status
+  // Report cron status.
   $cron_last = \Drupal::state()->get('system.cron_last');
   $requirements['cron']['title'] = t('Cron maintenance tasks');
   if (is_numeric($cron_last)) {
@@ -1311,7 +1317,7 @@ function hook_runtime_requirements_alter(array &$requirements): void {
 function hook_update_requirements() {
   $requirements = [];
 
-  // Test PHP version
+  // Test PHP version.
   $requirements['php'] = [
     'title' => t('PHP'),
     'value' => phpversion(),

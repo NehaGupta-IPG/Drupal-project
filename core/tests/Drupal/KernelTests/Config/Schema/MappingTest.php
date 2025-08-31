@@ -100,7 +100,6 @@ class MappingTest extends KernelTestBase {
           // Avoid showing "Powered by Drupal" on 404 responses.
           'visibility' => [
             'I_CAN_CHOOSE_THIS' => [
-              // This is what determines the
               'id' => 'response_status',
               'negate' => FALSE,
               'status_codes' => [
@@ -138,9 +137,6 @@ class MappingTest extends KernelTestBase {
         $this->installEntitySchema('user');
         $this->installEntitySchema('node');
         $this->assertNull(FieldConfig::load('node.config_mapping_test.comment_config_mapping_test'));
-        // \Drupal\node\Entity\NodeType::$preview_mode uses DRUPAL_OPTIONAL,
-        // which is defined in system.module.
-        require_once 'core/modules/system/system.module';
         $this->installConfig(['config_mapping_test']);
         $this->assertNotNull(FieldConfig::load('node.config_mapping_test.comment_config_mapping_test'));
         break;
@@ -219,7 +215,7 @@ class MappingTest extends KernelTestBase {
     // Special case: deprecated  is needed for deprecated config schema:
     // - deprecated keys are treated as optional
     // - if a deprecated property path is itself a mapping, then the keys inside
-    //   are not optional
+    //   are not optional.
     yield 'No dynamic type: config_schema_deprecated_test.settings' => [
       'config_schema_deprecated_test.settings',
       NULL,
