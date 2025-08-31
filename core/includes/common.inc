@@ -500,8 +500,8 @@ function drupal_get_updaters() {
 
   $updaters = &drupal_static(__FUNCTION__);
   if (!isset($updaters)) {
-    $updaters = \Drupal::moduleHandler()->invokeAllDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'updater_info');
-    \Drupal::moduleHandler()->alterDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'updater_info', $updaters);
+    $updaters = \Drupal::moduleHandler()->invokeAll('updater_info');
+    \Drupal::moduleHandler()->alter('updater_info', $updaters);
     uasort($updaters, [SortArray::class, 'sortByWeightElement']);
   }
   return $updaters;
@@ -522,8 +522,8 @@ function drupal_get_filetransfer_info() {
 
   $info = &drupal_static(__FUNCTION__);
   if (!isset($info)) {
-    $info = \Drupal::moduleHandler()->invokeAllDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'filetransfer_info');
-    \Drupal::moduleHandler()->alterDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'filetransfer_info', $info);
+    $info = \Drupal::moduleHandler()->invokeAll('filetransfer_info');
+    \Drupal::moduleHandler()->alter('filetransfer_info', $info);
     uasort($info, [SortArray::class, 'sortByWeightElement']);
   }
   return $info;

@@ -3,6 +3,7 @@
 namespace Drupal\update\Hook;
 
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
+use Drupal\Core\Hook\Attribute\DeprecatedHook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\update\UpdateManagerInterface;
 use Drupal\Core\Url;
@@ -12,6 +13,10 @@ use Drupal\Core\Hook\Attribute\Hook;
 /**
  * Hook implementations for update.
  */
+#[DeprecatedHook('updater_info', 'drupal', '11.2.0', '12.0.0', 'There is no replacement. Use composer to manage the code for your site.', 'https://www.drupal.org/node/3512364')]
+#[DeprecatedHook('updater_info_alter', 'drupal', '11.2.0', '12.0.0', 'There is no replacement. Use composer to manage the code for your site.', 'https://www.drupal.org/node/3512364')]
+#[DeprecatedHook('filetransfer_info', 'drupal', '11.2.0', '12.0.0', 'There is no replacement. Use composer to manage the code for your site.', 'https://www.drupal.org/node/3512364')]
+#[DeprecatedHook('filetransfer_info_alter', 'drupal', '11.2.0', '12.0.0', 'There is no replacement. Use composer to manage the code for your site.', 'https://www.drupal.org/node/3512364')]
 class UpdateHooks {
 
   use StringTranslationTrait;
