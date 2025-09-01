@@ -62,7 +62,6 @@ class ListFilter extends Search {
         'plural' => $this->t('@count items are available in the modified list.'),
         'all' => $this->t('All available items are listed.'),
       ],
-      '#library' => 'core/drupal.list-filter',
     ];
   }
 
