@@ -105,28 +105,28 @@ class LinkSeparateFormatterDisplayTest extends FieldKernelTestBase {
 <a href="#net">#net</a>
 </div>',
       3 => '<div>
-<a href="?a%5B0%5D=1&amp;a%5B1%5D=2">?a%5B0%5D=1&amp;a%5B1%5D=2</a>
+<a href="?a%5B0%5D=1&amp;a%5B1%5D=2">?a[0]=1&amp;a[1]=2</a>
 </div>',
       4 => '<div>
-<a href="?b%5B0%5D=1&amp;b%5B1%5D=2">?b%5B0%5D=1&amp;b%5B1%5D=2</a>
+<a href="?b%5B0%5D=1&amp;b%5B1%5D=2">?b[0]=1&amp;b[1]=2</a>
 </div>',
       16 => '<div>
-<a href="?b%5B0%5D=9&amp;b%5B1%5D=8">?b%5B0%5D=9&amp;b%5B1%5D=8</a>
+<a href="?b%5B0%5D=9&amp;b%5B1%5D=8">?b[0]=9&amp;b[1]=8</a>
 </div>',
       5 => '<div>
-<a href="?c%5B0%5D=1&amp;c%5B1%5D=2&amp;d=3">?c%5B0%5D=1&amp;c%5B1%5D=2&amp;d=3</a>
+<a href="?c%5B0%5D=1&amp;c%5B1%5D=2&amp;d=3">?c[0]=1&amp;c[1]=2&amp;d=3</a>
 </div>',
       6 => '<div>
-<a href="?e%5Bf%5D%5Bg%5D=h">?e%5Bf%5D%5Bg%5D=h</a>
+<a href="?e%5Bf%5D%5Bg%5D=h">?e[f][g]=h</a>
 </div>',
       7 => '<div>
-<a href="?i%5Bj%5Bk%5D=l">?i%5Bj%5Bk%5D=l</a>
+<a href="?i%5Bj%5Bk%5D=l">?i[j[k]=l</a>
 </div>',
       8 => '<div>
 <a href="?x=2">?x=2</a>
 </div>',
       9 => '<div>
-<a href="?z%5B0%5D=2">?z%5B0%5D=2</a>
+<a href="?z%5B0%5D=2">?z[0]=2</a>
 </div>',
       10 => '<div>
 <a href=""></a>
@@ -171,28 +171,28 @@ class LinkSeparateFormatterDisplayTest extends FieldKernelTestBase {
 <a href="#net">#net</a>
 </div>',
         3 => '<div>
-<a href="?a%5B0%5D=1&amp;a%5B1%5D=2">?a%5B…</a>
+<a href="?a%5B0%5D=1&amp;a%5B1%5D=2">?a[0]…</a>
 </div>',
         4 => '<div>
-<a href="?b%5B0%5D=1&amp;b%5B1%5D=2">?b%5B…</a>
+<a href="?b%5B0%5D=1&amp;b%5B1%5D=2">?b[0]…</a>
 </div>',
         16 => '<div>
-<a href="?b%5B0%5D=9&amp;b%5B1%5D=8">?b%5B…</a>
+<a href="?b%5B0%5D=9&amp;b%5B1%5D=8">?b[0]…</a>
 </div>',
         5 => '<div>
-<a href="?c%5B0%5D=1&amp;c%5B1%5D=2&amp;d=3">?c%5B…</a>
+<a href="?c%5B0%5D=1&amp;c%5B1%5D=2&amp;d=3">?c[0]…</a>
 </div>',
         6 => '<div>
-<a href="?e%5Bf%5D%5Bg%5D=h">?e%5B…</a>
+<a href="?e%5Bf%5D%5Bg%5D=h">?e[f]…</a>
 </div>',
         7 => '<div>
-<a href="?i%5Bj%5Bk%5D=l">?i%5B…</a>
+<a href="?i%5Bj%5Bk%5D=l">?i[j[…</a>
 </div>',
         8 => '<div>
 <a href="?x=2">?x=2</a>
 </div>',
         9 => '<div>
-<a href="?z%5B0%5D=2">?z%5B…</a>
+<a href="?z%5B0%5D=2">?z[0]…</a>
 </div>',
         10 => '<div>
 <a href=""></a>
@@ -232,28 +232,28 @@ class LinkSeparateFormatterDisplayTest extends FieldKernelTestBase {
 <a href="#net" rel="nofollow">#net</a>
 </div>',
         3 => '<div>
-<a href="?a%5B0%5D=1&amp;a%5B1%5D=2" rel="nofollow">?a%5B0%5D=1&amp;a%5B1%5D=2</a>
+<a href="?a%5B0%5D=1&amp;a%5B1%5D=2" rel="nofollow">?a[0]=1&amp;a[1]=2</a>
 </div>',
         4 => '<div>
-<a href="?b%5B0%5D=1&amp;b%5B1%5D=2" rel="nofollow">?b%5B0%5D=1&amp;b%5B1%5D=2</a>
+<a href="?b%5B0%5D=1&amp;b%5B1%5D=2" rel="nofollow">?b[0]=1&amp;b[1]=2</a>
 </div>',
         16 => '<div>
-<a href="?b%5B0%5D=9&amp;b%5B1%5D=8" rel="nofollow">?b%5B0%5D=9&amp;b%5B1%5D=8</a>
+<a href="?b%5B0%5D=9&amp;b%5B1%5D=8" rel="nofollow">?b[0]=9&amp;b[1]=8</a>
 </div>',
         5 => '<div>
-<a href="?c%5B0%5D=1&amp;c%5B1%5D=2&amp;d=3" rel="nofollow">?c%5B0%5D=1&amp;c%5B1%5D=2&amp;d=3</a>
+<a href="?c%5B0%5D=1&amp;c%5B1%5D=2&amp;d=3" rel="nofollow">?c[0]=1&amp;c[1]=2&amp;d=3</a>
 </div>',
         6 => '<div>
-<a href="?e%5Bf%5D%5Bg%5D=h" rel="nofollow">?e%5Bf%5D%5Bg%5D=h</a>
+<a href="?e%5Bf%5D%5Bg%5D=h" rel="nofollow">?e[f][g]=h</a>
 </div>',
         7 => '<div>
-<a href="?i%5Bj%5Bk%5D=l" rel="nofollow">?i%5Bj%5Bk%5D=l</a>
+<a href="?i%5Bj%5Bk%5D=l" rel="nofollow">?i[j[k]=l</a>
 </div>',
         8 => '<div>
 <a href="?x=2" rel="nofollow">?x=2</a>
 </div>',
         9 => '<div>
-<a href="?z%5B0%5D=2" rel="nofollow">?z%5B0%5D=2</a>
+<a href="?z%5B0%5D=2" rel="nofollow">?z[0]=2</a>
 </div>',
         10 => '<div>
 <a href="" rel="nofollow"></a>
@@ -292,28 +292,28 @@ class LinkSeparateFormatterDisplayTest extends FieldKernelTestBase {
 <a href="#net" target="_blank">#net</a>
 </div>',
         3 => '<div>
-<a href="?a%5B0%5D=1&amp;a%5B1%5D=2" target="_blank">?a%5B0%5D=1&amp;a%5B1%5D=2</a>
+<a href="?a%5B0%5D=1&amp;a%5B1%5D=2" target="_blank">?a[0]=1&amp;a[1]=2</a>
 </div>',
         4 => '<div>
-<a href="?b%5B0%5D=1&amp;b%5B1%5D=2" target="_blank">?b%5B0%5D=1&amp;b%5B1%5D=2</a>
+<a href="?b%5B0%5D=1&amp;b%5B1%5D=2" target="_blank">?b[0]=1&amp;b[1]=2</a>
 </div>',
         16 => '<div>
-<a href="?b%5B0%5D=9&amp;b%5B1%5D=8" target="_blank">?b%5B0%5D=9&amp;b%5B1%5D=8</a>
+<a href="?b%5B0%5D=9&amp;b%5B1%5D=8" target="_blank">?b[0]=9&amp;b[1]=8</a>
 </div>',
         5 => '<div>
-<a href="?c%5B0%5D=1&amp;c%5B1%5D=2&amp;d=3" target="_blank">?c%5B0%5D=1&amp;c%5B1%5D=2&amp;d=3</a>
+<a href="?c%5B0%5D=1&amp;c%5B1%5D=2&amp;d=3" target="_blank">?c[0]=1&amp;c[1]=2&amp;d=3</a>
 </div>',
         6 => '<div>
-<a href="?e%5Bf%5D%5Bg%5D=h" target="_blank">?e%5Bf%5D%5Bg%5D=h</a>
+<a href="?e%5Bf%5D%5Bg%5D=h" target="_blank">?e[f][g]=h</a>
 </div>',
         7 => '<div>
-<a href="?i%5Bj%5Bk%5D=l" target="_blank">?i%5Bj%5Bk%5D=l</a>
+<a href="?i%5Bj%5Bk%5D=l" target="_blank">?i[j[k]=l</a>
 </div>',
         8 => '<div>
 <a href="?x=2" target="_blank">?x=2</a>
 </div>',
         9 => '<div>
-<a href="?z%5B0%5D=2" target="_blank">?z%5B0%5D=2</a>
+<a href="?z%5B0%5D=2" target="_blank">?z[0]=2</a>
 </div>',
         10 => '<div>
 <a href="" target="_blank"></a>
