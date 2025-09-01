@@ -93,9 +93,9 @@
       return {
         minLength: 2,
         searchStart: false,
-        singular: null,
-        plural: null,
-        full: Drupal.t('All available items are listed.'),
+        announceSingular: null,
+        announcePlural: null,
+        announceFull: Drupal.t('All available items are listed.'),
         containerSelector: null,
         itemsSelector: null,
         targetsSelector: null,
