@@ -32,8 +32,79 @@ class FormElementMissingTitleDeprecationTest extends KernelTestBase implements F
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $form['missing_title'] = [
+    // #title is completely missing.
+    // Should cause deprecation message.
+    $form['textfield_missing_title'] = [
       '#type' => 'textfield',
+    ];
+    // #title is the empty string ('').
+    // Should cause deprecation message.
+    $form['textfield_title_is_empty_string'] = [
+      '#title' => '',
+      '#type' => 'textfield',
+    ];
+    // #title is one or more spaces (' ').
+    // Should cause deprecation message.
+    $form['textfield_title_is_space'] = [
+      '#title' => ' ',
+      '#type' => 'textfield',
+    ];
+    // #title is FALSE.
+    // Should cause deprecation message.
+    $form['textfield_title_is_false'] = [
+      '#title' => FALSE,
+      '#type' => 'textfield',
+    ];
+    // #title is completely missing. #input is NULL.
+    // Should not cause deprecation message.
+    $form['textfield_missing_title_null_input'] = [
+      '#type' => 'textfield',
+      '#input' => NULL,
+    ];
+
+    // Buttons.
+    foreach (['button', 'submit'] as $type) {
+      // Missing #value.
+      // Should cause deprecation message.
+      $form["{$type}_missing_value"] = [
+        '#type' => $type,
+        '#title' => "{$type}_missing_value",
+      ];
+      // Missing #title.
+      // Should not cause deprecation message.
+      $form["{$type}_missing_title"] = [
+        '#type' => $type,
+        '#value' => "{$type}_missing_title",
+      ];
+    }
+
+    // Skipped types.
+    // Should not cause deprecation message.
+    $types_to_skip = [
+      'field_ui_table',
+      'table',
+      'tableselect',
+      'hidden',
+      'token',
+      'value',
+      'item',
+      'datelist',
+      'password_confirm',
+    ];
+
+    foreach ($types_to_skip as $type) {
+      $form["{$type}_missing_title"] = [
+        '#type' => $type,
+      ];
+    }
+
+    // #title is completely missing. aria-labelledby attribute is set.
+    // Should not cause deprecation message.
+    $form['textfield_missing_title_with_aria_labelledby'] = [
+      '#type' => 'textfield',
+      '#attributes' => [
+        'aria-labelledby' => 'aria labelledby',
+      ],
     ];
 
     return $form;
@@ -53,13 +124,47 @@ class FormElementMissingTitleDeprecationTest extends KernelTestBase implements F
    * Ensures that missing #title property triggers deprecation message.
    */
   public function testDeprecationMessage(): void {
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "missing_title" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    // ::expectDeprecation only checks the existence of the expected messages.
+    // It doesn't rule out unexpected / unwanted messages. Therefore, we check
+    // for an exact match to rule out unexpected cases.
+    // See ExpectDeprecationTrait::tearDownErrorHandler.
+    $expected = [
+      [
+        E_USER_DEPRECATED,
+        'Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "textfield_missing_title" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004',
+      ],
+      [
+        E_USER_DEPRECATED,
+        'Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "textfield_title_is_empty_string" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004',
+      ],
+      [
+        E_USER_DEPRECATED,
+        'Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "textfield_title_is_space" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004',
+      ],
+      [
+        E_USER_DEPRECATED,
+        'Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "textfield_title_is_false" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004',
+      ],
+      [
+        E_USER_DEPRECATED,
+        'Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "button_missing_value" of #type "button" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004',
+      ],
+      [
+        E_USER_DEPRECATED,
+        'Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "submit_missing_value" of #type "submit" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004',
+      ],
+    ];
 
-    /** @var \Drupal\Core\Form\FormBuilder $form_builder */
-    $form_builder = $this->container->get('form_builder');
-    $form = $form_builder->getForm($this);
-    $this->assertTrue(isset($form['missing_title']) && !isset($form['missing_title']['#title']));
-    $this->render($form);
+    $actual = [];
+    set_error_handler(function (int $errno, string $errstr) use (&$actual): void {
+      $actual[] = [$errno, $errstr];
+    });
+
+    $this->container->get('form_builder')->getForm($this);
+
+    restore_error_handler();
+
+    $this->assertEquals($expected, $actual);
   }
 
 }
