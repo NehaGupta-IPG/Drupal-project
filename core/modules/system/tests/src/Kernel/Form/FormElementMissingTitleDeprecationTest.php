@@ -98,6 +98,15 @@ class FormElementMissingTitleDeprecationTest extends KernelTestBase implements F
       ];
     }
 
+    // #title is completely missing. aria-label attribute is set.
+    // Should not cause deprecation message.
+    $form['textfield_missing_title_with_aria_label'] = [
+      '#type' => 'textfield',
+      '#attributes' => [
+        'aria-label' => 'aria label',
+      ],
+    ];
+
     // #title is completely missing. aria-labelledby attribute is set.
     // Should not cause deprecation message.
     $form['textfield_missing_title_with_aria_labelledby'] = [
