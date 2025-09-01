@@ -41,7 +41,7 @@
   --summary-accordion-line-height: var(--space-l);
 }
 
-.claro-details {
+.claro-details:not(.hidden, [hidden]) {
   display: block;
   margin-top: var(--space-m);
   margin-bottom: var(--space-m);
@@ -59,7 +59,7 @@
    */
 }
 
-td .claro-details {
+td .claro-details:not(.hidden, [hidden]) {
   width: min-content;
   min-width: 100%;
 }
