@@ -95,7 +95,7 @@
         searchStart: false,
         singular: null,
         plural: null,
-        full: null,
+        full: Drupal.t('All available items are listed.'),
         containerSelector: null,
         itemsSelector: null,
         targetsSelector: null,
@@ -111,41 +111,11 @@
     /**
      * Constructs a ListFilter instance.
      *
-     * @param {object} [settings={}]
-     *   Configuration settings and method overrides.
-     *   @param {HTMLElement} [settings.input]
-     *     The input element to bind events to.
-     *   @param {string} [settings.containerSelector]
-     *     Selector for the container(s) (table, list, etc.) to filter.
-     *   @param {string} [settings.itemsSelector]
-     *     Selector for the items/rows to filter.
-     *   @param {string} [settings.targetsSelector]
-     *     (Optional) Selector for sub-elements to search within each item.
-     *   @param {string} [settings.singular]
-     *     (Optional) Singular label for ARIA/live region.
-     *   @param {string} [settings.plural]
-     *     (Optional) Plural label for ARIA/live region.
-     *   @param {string} [settings.full]
-     *     (Optional) Label for "all items listed".
-     *   @param {number} [settings.minLength]
-     *     (Optional) Minimum query length to trigger filtering.
-     *   @param {boolean} [settings.searchStart]
-     *     (Optional) If true, only match from start of words.
-     *   @param {function} [settings.hideElement]
-     *     (Optional) Custom function to hide an element.
-     *   @param {function} [settings.showElement]
-     *     (Optional) Custom function to show an element.
-     *   @param {function} [settings.normalizeString]
-     *     (Optional) Custom function to normalize strings for searching.
-     *   @param {function} [settings.searchMethod]
-     *     (Optional) Custom function to determine if an item matches the query.
-     *   @param {function} [settings.announce]
-     *     (Optional) Custom function for accessibility announcements.
-     *   @param {function} [settings.filterItemsBuilder]
-     *     (Optional) Custom function to build filterable items.
+     * @param {HTMLInputElement} input
      */
-    constructor(settings = {}) {
-      this.input = settings.input;
+    constructor(input) {
+      this.input = input;
+      const settings = input.dataset?.listFilter ? JSON.parse(input.dataset.listFilter) : {};
       const merged = {
         ...ListFilter.DEFAULT_SETTINGS,
         ...settings,
@@ -169,9 +139,9 @@
       this.containerSelector = consolidateSettings.containerSelector;
       this.itemsSelector = consolidateSettings.itemsSelector;
       this.targetsSelector = consolidateSettings.targetsSelector;
-      this.singular = consolidateSettings.singular;
-      this.plural = consolidateSettings.plural;
-      this.full = consolidateSettings.full;
+      this.announceSingular = consolidateSettings.announceSingular;
+      this.announcePlural = consolidateSettings.announcePlural;
+      this.announceFull = consolidateSettings.announceFull;
       this.minLength = consolidateSettings.minLength;
       this.searchStart = consolidateSettings.searchStart;
       this.hideElement =
@@ -214,7 +184,7 @@
         Drupal.debounce((event) => {
           containers.forEach((container) => {
             container.dispatchEvent(
-              new CustomEvent(ListFilter.FILTER_EVENT, { detail: { event } }),
+              new CustomEvent(ListFilter.FILTER_EVENT, { detail: { query: event.target.value } }),
             );
           });
         }, 200),
@@ -241,7 +211,7 @@
      *   The label elements.
      */
     filterTableList(event, allItems, labels) {
-      const query = this.normalizeString(event.detail.event.target.value);
+      const query = this.normalizeString(event.detail.query);
       const toShow = [];
       const toHide = [];
       const visibleGroups = {};
@@ -270,7 +240,7 @@
             }
             ListFilter._labelCollapse(label, false);
           });
-          this.announce(toShow.length, this.singular, this.plural);
+          this.announce(toShow.length, this.announceSingular, this.announcePlural);
         });
       } else {
         allItems.forEach((item) => {
@@ -279,9 +249,7 @@
         requestAnimationFrame(() => {
           toShow.forEach((node) => this.showElement(node));
           labels.forEach((label) => this.showElement(label));
-          Drupal.announce(
-            this.full ?? Drupal.t('All available items are listed.'),
-          );
+          Drupal.announce(this.announceFull);
           labels.forEach((label) => {
             ListFilter._labelCollapse(label, true);
           });

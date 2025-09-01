@@ -20,10 +20,6 @@ views_ui.admin:
 views_ui.listing:
   version: VERSION
   dependencies:
-    - core/jquery
-    - core/drupal
-    - core/drupal.list-filter
-    - core/once
     - views_ui/admin.styling
 
 admin.styling:

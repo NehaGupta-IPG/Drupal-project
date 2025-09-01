@@ -3,3 +3,4 @@ list_filter_test:
     js/list-filter-library-override.js: {}
   dependencies:
     - core/drupal
+    - core/once

@@ -43,8 +43,7 @@
  *     );
  *   });
  */
-
-(function (Drupal, debounce, once, ListFilter) {
+(function ({ ListFilter, debounce, ...Drupal }, once) {
   /**
    * Behavior to attach the list filter to elements.
    *
@@ -54,38 +53,24 @@
     attach(context) {
       once(
         'drupal-list-filter',
-        '.table-filter-text[data-auto-activate="true"]',
+        '.table-filter-text',
         context,
       ).forEach((input) => {
         input.addEventListener(
           'focus',
           () => {
-            // Pass only the valid dataset attributes to the filter class.
-            const defaultSettings = ListFilter.DEFAULT_SETTINGS;
-            const validKeys = Object.keys(defaultSettings);
-            const sanitizedDataset = Object.fromEntries(
-              Object.entries(input.dataset).filter(([key]) =>
-                validKeys.includes(key),
-              ),
-            );
-
-            // Consolidate the settings for the list filter.
-            const settings = {
-              input,
-              ...sanitizedDataset,
-              searchStart: input.dataset.searchStart === 'true',
-              minLength:
-                parseInt(input.dataset.minLength, 10) ||
-                defaultSettings.minLength,
-            };
-
             // Activate the list filter.
-            const filter = new ListFilter(settings);
+            const filter = new ListFilter(input);
             filter.filter();
           },
           { once: true },
         );
       });
     },
+    detach(context, settings, trigger) {
+      if (trigger === 'unload') {
+        once.remove('drupal-list-filter', '.table-filter-text');
+      }
+    },
   };
-})(Drupal, Drupal.debounce, once, Drupal.ListFilter);
+})(Drupal, once);

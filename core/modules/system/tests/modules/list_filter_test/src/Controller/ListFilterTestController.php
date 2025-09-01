@@ -37,7 +37,6 @@ class ListFilterTestController extends ControllerBase {
 
     if ($test_case === 'override_library') {
       $build['#attached']['library'][] = 'list_filter_test/list_filter_test';
-      $build['filter']['#auto_activate'] = TRUE;
       $build['filter']['#suffix'] = "<span class='js-filter-count hidden'></span>";
     }
     return $build;
@@ -241,7 +240,6 @@ class ListFilterTestController extends ControllerBase {
       '#list_text' => '.name, .ingredients, .instructions, .category, .is_alcoholic',
       '#minimum_filter_length' => 1,
       '#search_start_of_words' => FALSE,
-      '#auto_activate' => TRUE,
       '#attributes' => [
         'class' => ['filter-input'],
       ],
@@ -266,10 +264,6 @@ class ListFilterTestController extends ControllerBase {
 
       case 'search_start_of_words':
         $filterElement['#search_start_of_words'] = TRUE;
-        break;
-
-      case 'auto_activate_false':
-        $filterElement['#auto_activate'] = FALSE;
         break;
 
       default:

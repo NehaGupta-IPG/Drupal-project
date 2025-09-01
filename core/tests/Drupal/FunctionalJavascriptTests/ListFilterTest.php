@@ -31,23 +31,6 @@ class ListFilterTest extends WebDriverTestBase {
   }
 
   /**
-   * Tests the ListFilter with auto_activate set to FALSE.
-   */
-  public function testAutoActivateFalse(): void {
-    $this->drupalGet('/list-filter/auto_activate_false');
-    $this->getSession()
-      ->getPage()
-      ->find('css', '.filter-input')
-      ->setValue('Mojito');
-    $this->waitSearchFiltered();
-    $this->assertEquals(
-      $this->countVisibleRows(),
-      $this->countTotalRows(),
-      'All rows should be visible when auto_activate is set to FALSE.'
-    );
-  }
-
-  /**
    * Tests the ListFilter with an overridden library.
    */
   public function testListFilterOverride(): void {

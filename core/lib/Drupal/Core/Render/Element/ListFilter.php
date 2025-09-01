@@ -11,10 +11,6 @@ use Drupal\Core\Render\Attribute\RenderElement;
  * Provides a search element for filtering a list with JavaScript.
  *
  * - #input: TRUE
- * - #auto_activate: (optional) Whether the filter functionality should be
- *   automatically activated via the drupalFilterByText behavior; it can be set
- *   to FALSE, in which case the implementation needs to provide its own
- *   integration with `Drupal.listFilter`. Defaults to TRUE.
  * - #size: (optional) The size of the input field. Defaults to 60.
  * - #maxlength: (optional) The maximum length of the input field. Defaults to
  *   128.
@@ -33,7 +29,6 @@ use Drupal\Core\Render\Attribute\RenderElement;
  * - #search_start_of_words: (optional) Whether the entered filter text will
  *   search anywhere within words, or only from the start of words. For example,
  *   if TRUE, typing 'ke' will not filter the word 'cake'. Defaults to FALSE.
- * - #library: (optional) Override library to attach.
  * - #announce: (optional) An array of strings to use for accessibility ARIA
  *   announcements when the number of visible items is changed. The keys are:
  *   - singular: Message to announce when only one item is visible.
@@ -47,15 +42,13 @@ class ListFilter extends Search {
   /**
    * {@inheritdoc}
    */
-  public function getInfo() {
-    $class = static::class;
+  public function getInfo(): array {
     return [
       '#input' => TRUE,
-      '#auto_activate' => TRUE,
       '#size' => 60,
       '#maxlength' => 128,
       '#pre_render' => [
-        [$class, 'preRenderListFilterSearch'],
+        [static::class, 'preRenderListFilterSearch'],
       ],
       '#theme' => 'input__search',
       '#theme_wrappers' => ['form_element'],
@@ -84,30 +77,26 @@ class ListFilter extends Search {
    * @return array
    *   The $element with prepared variables ready for input.html.twig.
    */
-  public static function preRenderListFilterSearch($element) {
+  public static function preRenderListFilterSearch(array $element): array {
     $element['#attributes']['type'] = 'search';
     Element::setAttributes($element, ['id', 'name', 'value', 'size', 'maxlength', 'placeholder']);
     static::setAttributes($element, ['form-search']);
     $element['#attributes']['class'][] = 'table-filter-text';
-    $element['#attributes']['data-auto-activate'] = $element['#auto_activate'] ? 'true' : 'false';
-    $element['#attributes']['data-container-selector'] = $element['#list_container_selector'];
-    $element['#attributes']['data-items-selector'] = $element['#list_item'];
 
+    $listFilterAttrs = [];
+    $listFilterAttrs['containerSelector'] = $element['#list_container_selector'];
+    $listFilterAttrs['itemsSelector'] = $element['#list_item'];
     if ($element['#list_text']) {
-      $element['#attributes']['data-targets-selector'] = $element['#list_text'];
+      $listFilterAttrs['targetsSelector'] = $element['#list_text'];
     }
+    $listFilterAttrs['minLength'] = $element['#minimum_filter_length'];
+    $listFilterAttrs['searchStart'] = (bool) $element['#search_start_of_words'];
+    $listFilterAttrs['announceSingular'] = $element['#announce']['singular'] ?? t('1 item is available in the modified list.');
+    $listFilterAttrs['announcePlural'] = $element['#announce']['plural'] ?? t('@count items are available in the modified list.');
+    $listFilterAttrs['announceFull'] = $element['#announce']['all'] ?? t('All available items are listed.');
 
-    $element['#attributes']['data-min-length'] = $element['#minimum_filter_length'];
-    $element['#attributes']['data-search-start'] = $element['#search_start_of_words'] ? 'true' : 'false';
-
-    if ($element['#library']) {
-      $element['#attached']['library'][] = $element['#library'];
-    }
-
-    $element['#attributes']['data-singular'] = $element['#announce']['singular'] ?? t('1 item is available in the modified list.');
-    $element['#attributes']['data-plural'] = $element['#announce']['plural'] ?? t('@count items are available in the modified list.');
-    $element['#attributes']['data-full'] = $element['#announce']['all'] ?? t('All available items are listed.');
-
+    $element['#attributes']['data-list-filter'] = json_encode($listFilterAttrs);
+    $element['#attached']['library'][] = 'core/drupal.list-filter';
     return $element;
   }
 

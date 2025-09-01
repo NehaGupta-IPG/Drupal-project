@@ -2,13 +2,13 @@
  * @file
  * test_filter_library behaviors.
  */
-(function (Drupal) {
+(function (Drupal, once) {
   Drupal.behaviors.listFilterOverride = {
     attach(context) {
       const result = document.querySelector('.js-filter-count');
       once(
         'list-filter-override',
-        '.table-filter-text[data-auto-activate="true"]',
+        '.table-filter-text',
         context,
       ).forEach((input) => {
         input.addEventListener('listFilter:searchingFinished', (e) => {
@@ -18,4 +18,4 @@
       });
     },
   };
-})(Drupal);
+})(Drupal, once);
