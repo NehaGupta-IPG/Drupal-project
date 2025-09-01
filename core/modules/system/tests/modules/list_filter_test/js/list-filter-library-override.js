@@ -6,16 +6,14 @@
   Drupal.behaviors.listFilterOverride = {
     attach(context) {
       const result = document.querySelector('.js-filter-count');
-      once(
-        'list-filter-override',
-        '.table-filter-text',
-        context,
-      ).forEach((input) => {
-        input.addEventListener('listFilter:searchingFinished', (e) => {
-          result.classList.remove('hidden');
-          result.innerText = `Results found: ${e.detail.matched.length}`;
-        });
-      });
+      once('list-filter-override', '.table-filter-text', context).forEach(
+        (input) => {
+          input.addEventListener('listFilter:searchingFinished', (e) => {
+            result.classList.remove('hidden');
+            result.innerText = `Results found: ${e.detail.matched.length}`;
+          });
+        },
+      );
     },
   };
 })(Drupal, once);

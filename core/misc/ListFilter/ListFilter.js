@@ -115,7 +115,9 @@
      */
     constructor(input) {
       this.input = input;
-      const settings = input.dataset?.listFilter ? JSON.parse(input.dataset.listFilter) : {};
+      const settings = input.dataset?.listFilter
+        ? JSON.parse(input.dataset.listFilter)
+        : {};
       const merged = {
         ...ListFilter.DEFAULT_SETTINGS,
         ...settings,
@@ -184,7 +186,9 @@
         Drupal.debounce((event) => {
           containers.forEach((container) => {
             container.dispatchEvent(
-              new CustomEvent(ListFilter.FILTER_EVENT, { detail: { query: event.target.value } }),
+              new CustomEvent(ListFilter.FILTER_EVENT, {
+                detail: { query: event.target.value },
+              }),
             );
           });
         }, 200),
@@ -240,7 +244,11 @@
             }
             ListFilter._labelCollapse(label, false);
           });
-          this.announce(toShow.length, this.announceSingular, this.announcePlural);
+          this.announce(
+            toShow.length,
+            this.announceSingular,
+            this.announcePlural,
+          );
         });
       } else {
         allItems.forEach((item) => {

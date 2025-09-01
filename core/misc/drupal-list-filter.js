@@ -51,21 +51,19 @@
    */
   Drupal.behaviors.drupalListFilter = {
     attach(context) {
-      once(
-        'drupal-list-filter',
-        '.table-filter-text',
-        context,
-      ).forEach((input) => {
-        input.addEventListener(
-          'focus',
-          () => {
-            // Activate the list filter.
-            const filter = new ListFilter(input);
-            filter.filter();
-          },
-          { once: true },
-        );
-      });
+      once('drupal-list-filter', '.table-filter-text', context).forEach(
+        (input) => {
+          input.addEventListener(
+            'focus',
+            () => {
+              // Activate the list filter.
+              const filter = new ListFilter(input);
+              filter.filter();
+            },
+            { once: true },
+          );
+        },
+      );
     },
     detach(context, settings, trigger) {
       if (trigger === 'unload') {
