@@ -54,6 +54,16 @@
       </div>
     </div>
     <div class="system-status-general-info__item card">
+      <span class="system-status-general-info__item-icon system-status-general-info__item-icon--https"></span>
+      <div class="system-status-general-info__item-details">
+        <h3 class="system-status-general-info__item-title">{{ 'Request info'|t }}</h3>
+        <h4 class="system-status-general-info__sub-item-title">{{ 'Hostname and protocol'|t }}</h4>
+        {{ request_info_url.value }}
+        <h4 class="system-status-general-info__sub-item-title">{{ 'Client IP'|t }}</h4>
+        {{ request_info_remote_ip.value }}
+      </div>
+    </div>
+    <div class="system-status-general-info__item card">
       <span class="system-status-general-info__item-icon system-status-general-info__item-icon--clock"></span>
       <div class="system-status-general-info__item-details">
         <h3 class="system-status-general-info__item-title">{{ 'Last Cron Run'|t }}</h3>

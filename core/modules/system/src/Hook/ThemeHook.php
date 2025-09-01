@@ -81,6 +81,8 @@ class ThemeHook {
           'database_system_version' => [],
           'php' => [],
           'php_memory_limit' => [],
+          'request_info_url' => [],
+          'request_info_remote_ip' => [],
           'webserver' => [],
         ],
       ],

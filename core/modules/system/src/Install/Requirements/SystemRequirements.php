@@ -28,6 +28,7 @@ use Drupal\Core\Utility\Error;
 use Drupal\Core\Utility\PhpRequirements;
 use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 
 /**
  * Install time requirements for the system module.
@@ -1610,6 +1611,157 @@ class SystemRequirements implements InstallRequirementsInterface {
           'severity' => RequirementSeverity::Warning,
         ];
       }
+    }
+
+    // Check HTTPS and reverse proxies.
+    if ($phase === 'runtime') {
+      // Check HTTPS.
+      $request_object = \Drupal::request();
+      if ($request_object->isSecure()) {
+        $requirements['https'] = [
+          'title' => t('HTTPS'),
+          'value' => t('This website is providing HTTP Secure connections.'),
+          'severity' => RequirementSeverity::OK,
+        ];
+      }
+      else {
+        $requirements['https'] = [
+          'title' => t('HTTPS'),
+          'value' => t(
+            'This website does not provide HTTP secure connections (HTTPS), be aware that all traffic is transmitted in plain text. It is strongly advised to add https support to your webserver, See the <a href=":link">Enabling HTTP Secure (HTTPS)</a> page for more information.',
+            [
+              ':link' => 'https://www.drupal.org/docs/administering-a-drupal-site/security-in-drupal/enabling-http-secure-https',
+            ]
+          ),
+          'severity' => RequirementSeverity::Warning,
+        ];
+      }
+
+      // Reverse proxies.
+      $is_reverse_proxy_enabled = Settings::get('reverse_proxy', FALSE);
+      $raw_remote_address = $request_object->server->get("REMOTE_ADDR") ?? 'No IP detected!';
+      $client_ip = $request_object->getClientIp();
+      $scheme = $request_object->getScheme();
+      $host = $request_object->getHost();
+      $port = $request_object->getPort();
+      $trusted_proxies = $request_object->getTrustedProxies();
+      $is_from_trusted_proxies = $request_object->isFromTrustedProxy();
+
+      // Information deducted from request.
+      $requirements['request_info_url'] = [
+        'title' => t('Detected scheme, host & port'),
+        'value' => $scheme . '://' . $host . ':' . $port,
+      ];
+      $requirements['request_info_remote_ip'] = [
+        'title' => t('Detected remote client IP'),
+        'value' => $client_ip,
+      ];
+
+      $request_info[] = t(
+        'Current detected scheme, host and port are <code>@scheme://@host:@port</code>.',
+        [
+          '@scheme' => $scheme,
+          '@host' => $host,
+          '@port' => $port,
+        ]
+      );
+
+      $request_info[] = t(
+        'Current detected remote address is <code>@client_ip</code>, the raw value (<code>REMOTE_ADDR</code>) is <code>@raw_remote_address</code>.',
+        [
+          '@client_ip' => $client_ip,
+          '@raw_remote_address' => $raw_remote_address,
+        ]
+      );
+
+      $reverse_proxy_trusted_headers = [
+        'forwarded',
+        'x-forwarded-for',
+        'x-forwarded-host',
+        'x-forwarded-proto',
+        'x-forwarded-port',
+        'x-forwarded-prefix',
+      ];
+
+      $x_forwarded_for = $request_object->headers->get('x-forwarded-for') ?? '';
+      $forwarded_for = '';
+      $forwarded_header_exist = FALSE;
+      foreach ($reverse_proxy_trusted_headers as $header) {
+        if ($value = $request_object->headers->get($header)) {
+          $request_info[] = t('Header <code>@header_name: @value</code>', ['@header_name' => $header, '@value' => $value]);
+          $forwarded_header_exist = TRUE;
+          if ($header == 'forwarded') {
+            $parts = HeaderUtils::split($value, ',;=');
+            foreach ($parts as $subParts) {
+              $forwarded_for .= HeaderUtils::combine($subParts)['for'] . ',';
+            }
+          }
+        }
+      }
+
+      if (!$forwarded_header_exist) {
+        $request_info[] = t('No x-forwarded headers detected.');
+      }
+
+      if ($is_reverse_proxy_enabled) {
+
+        $trusted_proxies_text = $trusted_proxies ? implode(', ', $trusted_proxies) : t('missing value');
+        $request_info[] = t(
+          'Trusted proxies list declared in <code>settings.php</code>: <code>"@trusted_proxies"</code>. It should match all the IPs but the leftmost in <code>@header + REMOTE_ADDR: "@suggested_value"</code>.',
+          [
+            '@trusted_proxies' => $trusted_proxies_text,
+            '@header' => $forwarded_for != '' ? 'forwarded:for' : 'x-forwarded-for',
+            '@suggested_value' => ($forwarded_for != '' ? trim($forwarded_for, ',') : $x_forwarded_for) . ' + ' . $raw_remote_address,
+          ]
+          );
+        if ($is_from_trusted_proxies) {
+          $requirements['reverse_proxies'] = [
+            'value' => t('Reverse proxy is enabled and correctly set.'),
+            'severity' => RequirementSeverity::OK,
+          ];
+        }
+        else {
+          $requirements['reverse_proxies'] = [
+            'value' => t(
+              'Reverse proxy is enabled but does not seem to be correctly set: the current detected scheme, host, port and remote address could false or forged. See "Trusted proxies list line" below and <a href=":link"  target="_blank">Drupal proxy documentation</a>.',
+              [
+                ':link' => 'https://www.drupal.org/docs/getting-started/installing-drupal/using-a-load-balancer-or-reverse-proxy',
+              ]
+            ),
+            'severity' => RequirementSeverity::Warning,
+          ];
+        }
+      }
+      elseif ($forwarded_header_exist) {
+        $requirements['reverse_proxies'] = [
+          'value' => t(
+            'Reverse proxy is not enabled but forwarded headers are detected, you certainly have to enable reverse proxy in <code>settings.php</code>. See <a href=":link"  target="_blank">Drupal proxy documentation</a>.',
+            [
+              ':link' => 'https://www.drupal.org/docs/getting-started/installing-drupal/using-a-load-balancer-or-reverse-proxy',
+            ]
+          ),
+          'severity' => RequirementSeverity::Warning,
+        ];
+      }
+      else {
+        $requirements['reverse_proxies'] = [
+          'value' => t('Reverse proxy is not enabled.'),
+          'severity' => RequirementSeverity::OK,
+        ];
+      }
+
+      $requirements['reverse_proxies']['title'] = t('Reverse proxies');
+      $requirements['reverse_proxies']['description'] = [
+        '#type' => 'inline_template',
+        '#template' => '{{ headers_info_title }} {{ headers_info }}',
+        '#context' => [
+          'headers_info_title' => 'Request summary:',
+          'headers_info' => [
+            '#theme' => 'item_list',
+            '#items' => $request_info,
+          ],
+        ],
+      ];
     }
 
     return $requirements;
