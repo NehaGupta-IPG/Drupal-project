@@ -44,7 +44,7 @@
 %.*::getOperations\(\) will require a new "\Drupal\Core\Cache\CacheableMetadata|null \$cacheability" argument in the next major version of its interface%
 %updater_info implementations Drupal\\system\\Hook\\SystemHooks::updaterInfo are deprecated in drupal:11\.2\.0 and removed in drupal:12\.0\.0\. There is no replacement\. Use composer to manage the code for your site\. See https://www\.drupal\.org/node/3512364%
 %filetransfer_info implementations Drupal\\system\\Hook\\SystemHooks::filetransferInfo are deprecated in drupal:11\.2\.0 and removed in drupal:12\.0\.0\. There is no replacement\. Use composer to manage the code for your site\. See https://www\.drupal\.org/node/3512364%
-%verify_update_archive implementations Drupal\update\Hook\UpdateHooks::verifyUpdateArchive are deprecated in drupal:11\.2\.0 and removed in drupal:12\.0\.0\. There is no replacement\. Use composer to manage the code for your site\. See https://www\.drupal\.org/node/3512364%
+%verify_update_archive implementations Drupal\\update\\Hook\\UpdateHooks::verifyUpdateArchive are deprecated in drupal:11\.2\.0 and removed in drupal:12\.0\.0\. There is no replacement\. Use composer to manage the code for your site\. See https://www\.drupal\.org/node/3512364%
 
 # Symfony 7.3.
 %Since symfony/validator 7.3: Passing an array of options to configure the "[^"]+" constraint is deprecated, use named arguments instead.%
