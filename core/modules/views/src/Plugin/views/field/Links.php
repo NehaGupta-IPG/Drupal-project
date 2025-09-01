@@ -109,6 +109,13 @@ abstract class Links extends FieldPluginBase {
       $tokens = $this->getRenderTokens([]);
       $path = strip_tags(Html::decodeEntities($this->viewsTokenReplace($path, $tokens)));
 
+      // When given an absolute path, we should strip the initial forward slash
+      // so the internal URI generation doesn't think the first part of the path
+      // is the host.
+      if (strpos($path, '/') === 0) {
+        $path = substr($path, 1);
+      }
+
       $links[$field] = [
         'url' => $path ? UrlObject::fromUri('internal:/' . $path) : $url,
         'title' => $title,
