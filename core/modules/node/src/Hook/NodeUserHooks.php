@@ -6,14 +6,14 @@ namespace Drupal\node\Hook;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\node\NodeBulkUpdate;
 use Drupal\node\NodeStorageInterface;
 use Drupal\user\UserInterface;
 
 /**
  * Hook implementations for the node module.
  */
-class NodeHooks {
+class NodeUserHooks {
 
   /**
    * The Node Storage.
@@ -22,17 +22,9 @@ class NodeHooks {
    */
   protected NodeStorageInterface $nodeStorage;
 
-  /**
-   * NodeHooks constructor.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   The module handler.
-   */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
-    protected ModuleHandlerInterface $moduleHandler,
+    protected NodeBulkUpdate $nodeBulkUpdate,
   ) {
     $this->nodeStorage = $entityTypeManager->getStorage('node');
   }
@@ -49,7 +41,7 @@ class NodeHooks {
         ->accessCheck(FALSE)
         ->condition('uid', $account->id())
         ->execute();
-      $this->moduleHandler->invoke('node', 'mass_update', [$nids, ['status' => 0], NULL, TRUE]);
+      $this->nodeBulkUpdate->process($nids, ['status' => 0], NULL, TRUE);
     }
   }
 
@@ -62,17 +54,8 @@ class NodeHooks {
   public function userCancelReassign($edit, UserInterface $account, $method): void {
     if ($method === 'user_cancel_reassign') {
       $vids = $this->nodeStorage->userRevisionIds($account);
-      $this->moduleHandler->invoke('node', 'mass_update', [$vids, ['uid' => 0, 'revision_uid' => 0], NULL, TRUE, TRUE]);
+      $this->nodeBulkUpdate->process($vids, ['uid' => 0, 'revision_uid' => 0], NULL, TRUE, TRUE);
     }
-  }
-
-  /**
-   * Implements hook_block_alter().
-   */
-  #[Hook('block_alter')]
-  public function blockAlter(&$definitions): void {
-    // Hide the deprecated Syndicate block from the UI.
-    $definitions['node_syndicate_block']['_block_ui_hidden'] = TRUE;
   }
 
 }
