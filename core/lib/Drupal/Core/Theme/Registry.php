@@ -9,6 +9,7 @@ use Drupal\Core\DestructableInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Update\UpdateKernel;
 use Drupal\Core\Utility\ThemeRegistry;
@@ -210,10 +211,12 @@ class Registry implements DestructableInterface {
    *   The kernel.
    * @param string $theme_name
    *   (optional) The name of the theme for which to construct the registry.
+   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
+   *   The file system service.
    * @param array<string, true> $preprocess_for_suggestions
    *   (optional) Grouped preprocess functions from modules.
    */
-  public function __construct($root, CacheBackendInterface $cache, LockBackendInterface $lock, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, ThemeInitializationInterface $theme_initialization, CacheBackendInterface $runtime_cache, ModuleExtensionList $module_list, protected HttpKernelInterface $kernel, $theme_name = NULL, array $preprocess_for_suggestions = []) {
+  public function __construct($root, CacheBackendInterface $cache, LockBackendInterface $lock, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, ThemeInitializationInterface $theme_initialization, CacheBackendInterface $runtime_cache, ModuleExtensionList $module_list, protected HttpKernelInterface $kernel, $theme_name = NULL, protected ?FileSystemInterface $fileSystem = NULL, array $preprocess_for_suggestions = []) {
     $this->root = $root;
     $this->cache = $cache;
     $this->lock = $lock;
@@ -224,6 +227,10 @@ class Registry implements DestructableInterface {
     $this->moduleList = $module_list;
     $this->themeName = $theme_name;
     $this->preprocessForSuggestions = $preprocess_for_suggestions;
+    if (!$fileSystem instanceof FileSystemInterface) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $fileSystem argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3490392', E_USER_DEPRECATED);
+      $this->fileSystem = \Drupal::service('file_system');
+    }
   }
 
   /**
