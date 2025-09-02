@@ -73,7 +73,7 @@ class BlockFilterTest extends WebDriverTestBase {
     $blocks = $page->findAll('css', '.js-layout-builder-categories li a');
     $categories = $page->findAll('css', '.js-layout-builder-category');
 
-    $filter = $assert_session->elementExists('css', '.table-filter-text');
+    $filter = $assert_session->elementExists('css', '[data-list-filter]');
 
     // Set announce to ensure it is not cleared.
     $init_message = 'init message';

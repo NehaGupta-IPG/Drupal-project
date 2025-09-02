@@ -163,7 +163,7 @@
     /**
      * Initializes filtering on the specified input and container(s).
      */
-    filter() {
+    initialize() {
       const containers = document.querySelectorAll(this.containerSelector);
       containers.forEach((container) => {
         const filterItems = this.filterItemsBuilder(
@@ -181,26 +181,25 @@
         });
       });
 
-      this.input.addEventListener(
-        'input',
-        Drupal.debounce((event) => {
-          containers.forEach((container) => {
-            container.dispatchEvent(
-              new CustomEvent(ListFilter.FILTER_EVENT, {
-                detail: { query: event.target.value },
-              }),
-            );
-          });
-        }, 200),
-      );
+      this._inputHandler = Drupal.debounce((event) => {
+        containers.forEach((container) => {
+          container.dispatchEvent(
+            new CustomEvent(ListFilter.FILTER_EVENT, {
+              detail: { query: event.target.value },
+            }),
+          );
+        });
+      }, 200);
 
-      this.input.addEventListener('keydown', (event) => {
+      this._keyDownHandler = (event) => {
         if (event.key === 'Enter') {
           event.preventDefault();
           event.stopPropagation();
         }
-      });
+      };
 
+      this.input.addEventListener('input', this._inputHandler);
+      this.input.addEventListener('keydown', this._keyDownHandler);
       return this;
     }
 
@@ -382,6 +381,15 @@
         label.open = false;
         delete label.dataset.openedByFilter;
       }
+    }
+
+    /**
+     * Destroys the ListFilter instance by removing event listeners.
+     */
+    destroy() {
+      this.input.removeEventListener('keydown', this._keyDownHandler);
+      this.input.removeEventListener('input', this._inputHandler);
+      this.input = null;
     }
   }
 

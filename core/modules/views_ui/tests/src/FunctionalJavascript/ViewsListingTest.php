@@ -65,7 +65,7 @@ class ViewsListingTest extends WebDriverTestBase {
     $this->assertCount($disabled_views_count, $disabled_rows);
 
     // Filter on the string 'people'. This should only show the people view.
-    $search_input = $page->find('css', '.table-filter-text');
+    $search_input = $page->find('css', '[data-list-filter]');
     $search_input->setValue('people');
 
     sleep(1);

@@ -6,7 +6,7 @@
   Drupal.behaviors.listFilterOverride = {
     attach(context) {
       const result = document.querySelector('.js-filter-count');
-      once('list-filter-override', '.table-filter-text', context).forEach(
+      once('list-filter-override', '[data-list-filter]', context).forEach(
         (input) => {
           input.addEventListener('listFilter:searchingFinished', (e) => {
             result.classList.remove('hidden');

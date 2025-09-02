@@ -603,7 +603,7 @@ drupal.entity-form:
 drupal.list-filter-class:
   version: VERSION
   js:
-    misc/ListFilter/ListFilter.js: {}
+    misc/list-filter/list-filter.js: {}
   dependencies:
     - core/drupal
     - core/drupal.announce
@@ -613,7 +613,7 @@ drupal.list-filter-class:
 drupal.list-filter:
   version: VERSION
   js:
-    misc/drupal-list-filter.js: {}
+    misc/list-filter/drupal-list-filter.js: {}
   dependencies:
     - core/drupal
     - core/once

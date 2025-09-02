@@ -184,7 +184,7 @@ class UserPermissionsForm extends FormBase {
           'restrict access' => FALSE,
           'warning' => !empty($perm_item['restrict access']) ? $this->t('Warning: Give to trusted roles only; this permission has security implications.') : '',
         ];
-        $form['permissions'][$perm]['#attributes'] = ['data-filter-parent-group' => 'module-' . $provider];
+        $form['permissions'][$perm]['#attributes']['data-filter-parent-group'] = 'module-' . $provider;
         $form['permissions'][$perm]['description'] = [
           '#type' => 'inline_template',
           '#template' => '<div class="permission"><span class="title table-filter-text-source">{{ title }}</span>{% if description or warning %}<div class="description">{% if warning %}<em class="permission-warning">{{ warning }}</em> {% endif %}{{ description }}</div>{% endif %}</div>',
