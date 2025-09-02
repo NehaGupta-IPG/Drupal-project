@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\KernelTests\KernelTestBase;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Ensures the setComponentThirdPartySetting action works via recipes.
@@ -60,6 +61,11 @@ config:
 YAML;
 
     $recipe = $this->createRecipe($contents);
+    // Disable strict schema checking for this test, since the provider used
+    // for third-party settings in this example does not declare a schema.
+    $schema_checker = $this->container->get('testing.config_schema_checker');
+    $this->container->get(EventDispatcherInterface::class)
+      ->removeSubscriber($schema_checker);
     RecipeRunner::processRecipe($recipe);
 
     $display = $this->container->get(EntityDisplayRepositoryInterface::class)
