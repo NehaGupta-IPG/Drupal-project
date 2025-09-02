@@ -8,7 +8,6 @@ use Drupal\Core\Config\Action\Attribute\ConfigAction;
 use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionPluginInterface;
 use Drupal\Core\Config\ConfigManagerInterface;
-use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\Display\EntityDisplayInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Component\Utility\NestedArray;
@@ -57,8 +56,10 @@ final class SetComponentThirdPartySetting implements ConfigActionPluginInterface
   /**
    * Constructs a SetComponentThirdPartySetting object.
    *
-   * @param ConfigManagerInterface $configManager
+   * @param \Drupal\Core\Config\ConfigManagerInterface $configManager
    *   The config manager.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   The module handler.
    */
   public function __construct(
     private readonly ConfigManagerInterface $configManager,
