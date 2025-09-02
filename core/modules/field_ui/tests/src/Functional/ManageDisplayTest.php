@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field_ui\Functional;
 
+use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ExpectationException;
 use Drupal\Core\Entity\Entity\EntityFormMode;
-use Drupal\Core\Url;
-use Behat\Mink\Element\NodeElement;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Url;
 use Drupal\node\Entity\NodeType;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Field UI "Manage display" and "Manage form display" screens.
- *
- * @group field_ui
  */
+#[Group('field_ui')]
 class ManageDisplayTest extends BrowserTestBase {
 
   use FieldUiTestTrait;
@@ -407,7 +407,7 @@ class ManageDisplayTest extends BrowserTestBase {
       $options[] = $option->getValue();
     }
 
-    // Loops trough all the option groups
+    // Loops trough all the option groups.
     foreach ($element->optgroup as $optgroup) {
       $options = array_merge($this->getAllOptionsList($optgroup), $options);
     }

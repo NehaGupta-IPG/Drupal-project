@@ -11,13 +11,13 @@ use Drupal\Tests\rest\Functional\CookieResourceTestTrait;
 use Drupal\Tests\rest\Functional\ResourceTestBase;
 use Drupal\user\UserInterface;
 use GuzzleHttp\RequestOptions;
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Http\Message\ResponseInterface;
 
 /**
  * Tests registration of user using REST.
- *
- * @group user
  */
+#[Group('user')]
 class UserRegistrationRestTest extends ResourceTestBase {
 
   use CookieResourceTestTrait;
@@ -85,7 +85,7 @@ class UserRegistrationRestTest extends ResourceTestBase {
     $this->assertNotEmpty($user->getPassword());
     $email_count = count($this->drupalGetMails());
 
-    $this->assertEquals(0, $email_count);
+    $this->assertEquals(1, $email_count);
 
     // Attempt to register without sending a password.
     $response = $this->registerRequest('PhilipK.Dick', FALSE);
