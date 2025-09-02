@@ -31,7 +31,14 @@ class AliasManager implements AliasManagerInterface {
    *
    * @var array
    */
-  protected $lookupMap = [];
+  protected $lookupPathMap = [];
+
+  /**
+   * Holds the map of alias lookups per language.
+   *
+   * @var array
+   */
+  protected $lookupAliasMap = [];
 
   /**
    * Holds an array of aliases for which no path was found.
@@ -62,7 +69,7 @@ class AliasManager implements AliasManagerInterface {
    *
    * @var array
    */
-  protected $preloadedPathLookups = FALSE;
+  protected $preloadedLookups = FALSE;
 
   public function __construct(
     protected AliasRepositoryInterface $pathAliasRepository,
@@ -94,11 +101,18 @@ class AliasManager implements AliasManagerInterface {
     if ($this->cacheNeedsWriting && !empty($this->cacheKey)) {
       // Start with the preloaded path lookups, so that cached entries for other
       // languages will not be lost.
-      $path_lookups = $this->preloadedPathLookups ?: [];
-      foreach ($this->lookupMap as $langcode => $lookups) {
-        $path_lookups[$langcode] = array_keys($lookups);
+      $path_lookups = $this->preloadedLookups ?: [];
+      foreach ($this->lookupAliasMap as $langcode => $lookups) {
+        $path_lookups[$langcode]['path'] = array_keys($lookups);
         if (!empty($this->noAlias[$langcode])) {
-          $path_lookups[$langcode] = array_merge($path_lookups[$langcode], array_keys($this->noAlias[$langcode]));
+          $path_lookups[$langcode]['path'] = array_merge($path_lookups[$langcode]['path'], array_keys($this->noAlias[$langcode]));
+        }
+      }
+
+      foreach ($this->lookupPathMap as $langcode => $lookups) {
+        $path_lookups[$langcode]['alias'] = array_keys($lookups);
+        if (!empty($this->noPath[$langcode])) {
+          $path_lookups[$langcode]['alias'] = array_merge($path_lookups[$langcode]['alias'], array_keys($this->noPath[$langcode]));
         }
       }
 
@@ -123,17 +137,25 @@ class AliasManager implements AliasManagerInterface {
     }
 
     // Look for the alias within the cached map.
-    if (isset($this->lookupMap[$langcode]) && ($path = array_search($alias, $this->lookupMap[$langcode]))) {
+    if (isset($this->lookupPathMap[$langcode][$alias])) {
+      return $this->lookupPathMap[$langcode][$alias];
+    }
+
+    // Look for the alias within the cached path map.
+    if (isset($this->lookupAliasMap[$langcode]) && ($path = array_search($alias, $this->lookupAliasMap[$langcode]))) {
       return $path;
     }
 
+    // The path was not found in cache. Cache must be updated.
+    $this->cacheNeedsWriting = TRUE;
+
     // Look for path in storage.
     if ($path_alias = $this->pathAliasRepository->lookupByAlias($alias, $langcode)) {
-      $this->lookupMap[$langcode][$path_alias['path']] = $alias;
+      $this->lookupPathMap[$langcode][$alias] = $path_alias['path'];
       return $path_alias['path'];
     }
 
-    // We can't record anything into $this->lookupMap because we didn't find any
+    // We can't record anything into $this->lookupPathMap because we didn't find any
     // paths for this alias. Thus cache to $this->noPath.
     $this->noPath[$langcode][$alias] = TRUE;
 
@@ -164,15 +186,16 @@ class AliasManager implements AliasManagerInterface {
     // paths for the page from cache.
     if (empty($this->langcodePreloaded[$langcode])) {
       $this->langcodePreloaded[$langcode] = TRUE;
-      $this->lookupMap[$langcode] = [];
+      $this->lookupPathMap[$langcode] = [];
+      $this->lookupAliasMap[$langcode] = [];
 
       // Load the cached paths that should be used for preloading. This only
       // happens if a cache key has been set.
-      if ($this->preloadedPathLookups === FALSE) {
-        $this->preloadedPathLookups = [];
+      if ($this->preloadedLookups === FALSE) {
+        $this->preloadedLookups = [];
         if ($this->cacheKey) {
           if ($cached = $this->cache->get($this->cacheKey)) {
-            $this->preloadedPathLookups = $cached->data;
+            $this->preloadedLookups = $cached->data;
           }
           else {
             $this->cacheNeedsWriting = TRUE;
@@ -181,10 +204,17 @@ class AliasManager implements AliasManagerInterface {
       }
 
       // Load paths from cache.
-      if (!empty($this->preloadedPathLookups[$langcode])) {
-        $this->lookupMap[$langcode] = $this->pathAliasRepository->preloadPathAlias($this->preloadedPathLookups[$langcode], $langcode);
+      if (!empty($this->preloadedLookups[$langcode]['path'])) {
+        $this->lookupAliasMap[$langcode] = $this->pathAliasRepository->preloadAliases($this->preloadedLookups[$langcode]['path'], $langcode);
         // Keep a record of paths with no alias to avoid querying twice.
-        $this->noAlias[$langcode] = array_flip(array_diff($this->preloadedPathLookups[$langcode], array_keys($this->lookupMap[$langcode])));
+        $this->noAlias[$langcode] = array_flip(array_diff($this->preloadedLookups[$langcode]['path'], array_keys($this->lookupAliasMap[$langcode])));
+      }
+
+      // Load paths from cache.
+      if (!empty($this->preloadedLookups[$langcode]['alias'])) {
+        $this->lookupPathMap[$langcode] = $this->pathAliasRepository->preloadPaths($this->preloadedLookups[$langcode]['alias'], $langcode);
+        // Keep a record of paths with no alias to avoid querying twice.
+        $this->noPath[$langcode] = array_flip(array_diff($this->preloadedLookups[$langcode]['alias'], array_keys($this->lookupPathMap[$langcode])));
       }
     }
 
@@ -194,19 +224,23 @@ class AliasManager implements AliasManagerInterface {
     }
 
     // If the alias has already been loaded, return it from static cache.
-    if (isset($this->lookupMap[$langcode][$path])) {
-      return $this->lookupMap[$langcode][$path];
+    if (isset($this->lookupAliasMap[$langcode][$path])) {
+      return $this->lookupAliasMap[$langcode][$path];
     }
+
+    // The path was not found in cache. Cache must be updated.
+    $this->cacheNeedsWriting = TRUE;
 
     // Try to load alias from storage.
     if ($path_alias = $this->pathAliasRepository->lookupBySystemPath($path, $langcode)) {
-      $this->lookupMap[$langcode][$path] = $path_alias['alias'];
+      $this->lookupAliasMap[$langcode][$path] = $path_alias['alias'];
       return $path_alias['alias'];
     }
 
-    // We can't record anything into $this->lookupMap because we didn't find any
+    // We can't record anything into $this->lookupAliasMap because we didn't find any
     // aliases for this path. Thus cache to $this->noAlias.
     $this->noAlias[$langcode][$path] = TRUE;
+
     return $path;
   }
 
@@ -219,17 +253,24 @@ class AliasManager implements AliasManagerInterface {
     // alias being loaded correctly, only less efficiently.
 
     if ($source) {
-      foreach (array_keys($this->lookupMap) as $lang) {
-        unset($this->lookupMap[$lang][$source]);
+      foreach (array_keys($this->lookupAliasMap) as $langcode) {
+        unset($this->lookupAliasMap[$langcode][$source]);
+      }
+
+      foreach (array_keys($this->lookupPathMap) as $langcode) {
+        if ($alias = array_search($source, $this->lookupPathMap[$langcode])) {
+          unset($this->lookupPathMap[$langcode][$alias]);
+        }
       }
     }
     else {
-      $this->lookupMap = [];
+      $this->lookupPathMap = [];
+      $this->lookupAliasMap = [];
     }
     $this->noPath = [];
     $this->noAlias = [];
     $this->langcodePreloaded = [];
-    $this->preloadedPathLookups = [];
+    $this->preloadedLookups = [];
     $this->pathAliasPrefixListRebuild($source);
   }
 

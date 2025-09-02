@@ -18,7 +18,7 @@ namespace Drupal\path_alias;
 interface AliasRepositoryInterface {
 
   /**
-   * Pre-loads path alias information for a given list of system paths.
+   * Pre-loads alias information for a given list of system paths.
    *
    * @param array $preloaded
    *   System paths that need preloading of aliases.
@@ -29,7 +29,21 @@ interface AliasRepositoryInterface {
    * @return string[]
    *   System paths (keys) to alias (values) mapping.
    */
-  public function preloadPathAlias($preloaded, $langcode);
+  public function preloadAliases($preloaded, $langcode);
+
+  /**
+   * Pre-loads path information for a given list of aliases.
+   *
+   * @param array $preloaded
+   *   Aliases that need preloading of system paths.
+   * @param string $langcode
+   *   Language code to search the path with. If there's no path defined for
+   *   that language it will search paths without language.
+   *
+   * @return string[]
+   *   Aliases (keys) to system paths (values) mapping.
+   */
+  public function preloadPaths($preloaded, $langcode);
 
   /**
    * Searches a path alias for a given Drupal system path.

@@ -42,9 +42,9 @@ class AliasTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::preloadPathAlias
+   * @covers ::preloadAliases
    */
-  public function testPreloadPathAlias(): void {
+  public function testPreloadAliases(): void {
     $path_alias_repository = $this->container->get('path_alias.repository');
 
     // Every interesting language combination:
@@ -74,32 +74,32 @@ class AliasTest extends KernelTestBase {
         '/en-und/src' => '/en-und/und',
         '/en-xx-lolspeak-und/src' => '/en-xx-lolspeak-und/und',
       ],
-      $path_alias_repository->preloadPathAlias([], LanguageInterface::LANGCODE_NOT_SPECIFIED)
+      $path_alias_repository->preloadAliases([], LanguageInterface::LANGCODE_NOT_SPECIFIED)
     );
     // Ask for nonexistent source.
     $this->assertEquals(
       [],
-      $path_alias_repository->preloadPathAlias(['/nonexistent'], LanguageInterface::LANGCODE_NOT_SPECIFIED));
+      $path_alias_repository->preloadAliases(['/nonexistent'], LanguageInterface::LANGCODE_NOT_SPECIFIED));
     // Ask for each saved source, individually.
     $this->assertEquals(
       ['/und/src' => '/und/alias'],
-      $path_alias_repository->preloadPathAlias(['/und/src'], LanguageInterface::LANGCODE_NOT_SPECIFIED)
+      $path_alias_repository->preloadAliases(['/und/src'], LanguageInterface::LANGCODE_NOT_SPECIFIED)
     );
     $this->assertEquals(
       [],
-      $path_alias_repository->preloadPathAlias(['/en/src'], LanguageInterface::LANGCODE_NOT_SPECIFIED)
+      $path_alias_repository->preloadAliases(['/en/src'], LanguageInterface::LANGCODE_NOT_SPECIFIED)
     );
     $this->assertEquals(
       ['/en-und/src' => '/en-und/und'],
-      $path_alias_repository->preloadPathAlias(['/en-und/src'], LanguageInterface::LANGCODE_NOT_SPECIFIED)
+      $path_alias_repository->preloadAliases(['/en-und/src'], LanguageInterface::LANGCODE_NOT_SPECIFIED)
     );
     $this->assertEquals(
       [],
-      $path_alias_repository->preloadPathAlias(['/en-xx-lolspeak/src'], LanguageInterface::LANGCODE_NOT_SPECIFIED)
+      $path_alias_repository->preloadAliases(['/en-xx-lolspeak/src'], LanguageInterface::LANGCODE_NOT_SPECIFIED)
     );
     $this->assertEquals(
       ['/en-xx-lolspeak-und/src' => '/en-xx-lolspeak-und/und'],
-      $path_alias_repository->preloadPathAlias(['/en-xx-lolspeak-und/src'], LanguageInterface::LANGCODE_NOT_SPECIFIED)
+      $path_alias_repository->preloadAliases(['/en-xx-lolspeak-und/src'], LanguageInterface::LANGCODE_NOT_SPECIFIED)
     );
     // Ask for multiple sources, all that are known.
     $this->assertEquals(
@@ -108,7 +108,7 @@ class AliasTest extends KernelTestBase {
         '/en-und/src' => '/en-und/und',
         '/en-xx-lolspeak-und/src' => '/en-xx-lolspeak-und/und',
       ],
-      $path_alias_repository->preloadPathAlias(
+      $path_alias_repository->preloadAliases(
         [
           '/nonexistent',
           '/und/src',
@@ -126,7 +126,7 @@ class AliasTest extends KernelTestBase {
         '/und/src' => '/und/alias',
         '/en-xx-lolspeak-und/src' => '/en-xx-lolspeak-und/und',
       ],
-      $path_alias_repository->preloadPathAlias(
+      $path_alias_repository->preloadAliases(
         [
           '/und/src',
           '/en-xx-lolspeak/src',
@@ -146,32 +146,32 @@ class AliasTest extends KernelTestBase {
         '/en-xx-lolspeak/src' => '/en-xx-lolspeak/en-dup',
         '/en-xx-lolspeak-und/src' => '/en-xx-lolspeak-und/en',
       ],
-      $path_alias_repository->preloadPathAlias([], 'en')
+      $path_alias_repository->preloadAliases([], 'en')
     );
     // Ask for nonexistent source.
     $this->assertEquals(
       [],
-      $path_alias_repository->preloadPathAlias(['/nonexistent'], 'en'));
+      $path_alias_repository->preloadAliases(['/nonexistent'], 'en'));
     // Ask for each saved source, individually.
     $this->assertEquals(
       ['/und/src' => '/und/alias'],
-      $path_alias_repository->preloadPathAlias(['/und/src'], 'en')
+      $path_alias_repository->preloadAliases(['/und/src'], 'en')
     );
     $this->assertEquals(
       ['/en/src' => '/en/alias'],
-      $path_alias_repository->preloadPathAlias(['/en/src'], 'en')
+      $path_alias_repository->preloadAliases(['/en/src'], 'en')
     );
     $this->assertEquals(
       ['/en-und/src' => '/en-und/en'],
-      $path_alias_repository->preloadPathAlias(['/en-und/src'], 'en')
+      $path_alias_repository->preloadAliases(['/en-und/src'], 'en')
     );
     $this->assertEquals(
       ['/en-xx-lolspeak/src' => '/en-xx-lolspeak/en-dup'],
-      $path_alias_repository->preloadPathAlias(['/en-xx-lolspeak/src'], 'en')
+      $path_alias_repository->preloadAliases(['/en-xx-lolspeak/src'], 'en')
     );
     $this->assertEquals(
       ['/en-xx-lolspeak-und/src' => '/en-xx-lolspeak-und/en'],
-      $path_alias_repository->preloadPathAlias(['/en-xx-lolspeak-und/src'], 'en')
+      $path_alias_repository->preloadAliases(['/en-xx-lolspeak-und/src'], 'en')
     );
     // Ask for multiple sources, all that are known.
     $this->assertEquals(
@@ -182,7 +182,7 @@ class AliasTest extends KernelTestBase {
         '/en-xx-lolspeak/src' => '/en-xx-lolspeak/en-dup',
         '/en-xx-lolspeak-und/src' => '/en-xx-lolspeak-und/en',
       ],
-      $path_alias_repository->preloadPathAlias(
+      $path_alias_repository->preloadAliases(
         [
           '/nonexistent',
           '/und/src',
@@ -201,7 +201,7 @@ class AliasTest extends KernelTestBase {
         '/en-xx-lolspeak/src' => '/en-xx-lolspeak/en-dup',
         '/en-xx-lolspeak-und/src' => '/en-xx-lolspeak-und/en',
       ],
-      $path_alias_repository->preloadPathAlias(
+      $path_alias_repository->preloadAliases(
         [
           '/und/src',
           '/en-xx-lolspeak/src',
@@ -220,32 +220,32 @@ class AliasTest extends KernelTestBase {
         '/en-xx-lolspeak/src' => '/en-xx-lolspeak/xx-lolspeak',
         '/en-xx-lolspeak-und/src' => '/en-xx-lolspeak-und/xx-lolspeak',
       ],
-      $path_alias_repository->preloadPathAlias([], 'xx-lolspeak')
+      $path_alias_repository->preloadAliases([], 'xx-lolspeak')
     );
     // Ask for nonexistent source.
     $this->assertEquals(
       [],
-      $path_alias_repository->preloadPathAlias(['/nonexistent'], 'xx-lolspeak'));
+      $path_alias_repository->preloadAliases(['/nonexistent'], 'xx-lolspeak'));
     // Ask for each saved source, individually.
     $this->assertEquals(
       ['/und/src' => '/und/alias'],
-      $path_alias_repository->preloadPathAlias(['/und/src'], 'xx-lolspeak')
+      $path_alias_repository->preloadAliases(['/und/src'], 'xx-lolspeak')
     );
     $this->assertEquals(
       [],
-      $path_alias_repository->preloadPathAlias(['/en/src'], 'xx-lolspeak')
+      $path_alias_repository->preloadAliases(['/en/src'], 'xx-lolspeak')
     );
     $this->assertEquals(
       ['/en-und/src' => '/en-und/und'],
-      $path_alias_repository->preloadPathAlias(['/en-und/src'], 'xx-lolspeak')
+      $path_alias_repository->preloadAliases(['/en-und/src'], 'xx-lolspeak')
     );
     $this->assertEquals(
       ['/en-xx-lolspeak/src' => '/en-xx-lolspeak/xx-lolspeak'],
-      $path_alias_repository->preloadPathAlias(['/en-xx-lolspeak/src'], 'xx-lolspeak')
+      $path_alias_repository->preloadAliases(['/en-xx-lolspeak/src'], 'xx-lolspeak')
     );
     $this->assertEquals(
       ['/en-xx-lolspeak-und/src' => '/en-xx-lolspeak-und/xx-lolspeak'],
-      $path_alias_repository->preloadPathAlias(['/en-xx-lolspeak-und/src'], 'xx-lolspeak')
+      $path_alias_repository->preloadAliases(['/en-xx-lolspeak-und/src'], 'xx-lolspeak')
     );
     // Ask for multiple sources, all that are known.
     $this->assertEquals(
@@ -255,7 +255,7 @@ class AliasTest extends KernelTestBase {
         '/en-xx-lolspeak/src' => '/en-xx-lolspeak/xx-lolspeak',
         '/en-xx-lolspeak-und/src' => '/en-xx-lolspeak-und/xx-lolspeak',
       ],
-      $path_alias_repository->preloadPathAlias(
+      $path_alias_repository->preloadAliases(
         [
           '/nonexistent',
           '/und/src',
@@ -274,7 +274,7 @@ class AliasTest extends KernelTestBase {
         '/en-xx-lolspeak/src' => '/en-xx-lolspeak/xx-lolspeak',
         '/en-xx-lolspeak-und/src' => '/en-xx-lolspeak-und/xx-lolspeak',
       ],
-      $path_alias_repository->preloadPathAlias(
+      $path_alias_repository->preloadAliases(
         [
           '/und/src',
           '/en-xx-lolspeak/src',

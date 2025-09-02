@@ -32,7 +32,7 @@ class AliasRepository implements AliasRepositoryInterface {
   /**
    * {@inheritdoc}
    */
-  public function preloadPathAlias($preloaded, $langcode) {
+  public function preloadAliases($preloaded, $langcode) {
     $select = $this->getBaseQuery()
       ->fields('base_table', ['path', 'alias']);
 
@@ -58,6 +58,40 @@ class AliasRepository implements AliasRepositoryInterface {
     $aliases = [];
     foreach (array_reverse($results) as $result) {
       $aliases[$result['path']] = $result['alias'];
+    }
+
+    return $aliases;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preloadPaths($preloaded, $langcode) {
+    $select = $this->getBaseQuery()
+      ->fields('base_table', ['path', 'alias']);
+
+    if (!empty($preloaded)) {
+      $conditions = $this->connection->condition('OR');
+      foreach ($preloaded as $preloaded_item) {
+        $conditions->condition('base_table.alias', $this->connection->escapeLike($preloaded_item), 'LIKE');
+      }
+      $select->condition($conditions);
+    }
+
+    $this->addLanguageFallback($select, $langcode);
+
+    $select->orderBy('base_table.id', 'DESC');
+
+    // We want the most recently created alias for each source, however that
+    // will be at the start of the result-set, so fetch everything and reverse
+    // it. Note that it would not be sufficient to reverse the ordering of the
+    // 'base_table.id' column, as that would not guarantee other conditions
+    // added to the query, such as those in ::addLanguageFallback, would be
+    // reversed.
+    $results = $select->execute()->fetchAll(\PDO::FETCH_ASSOC);
+    $aliases = [];
+    foreach (array_reverse($results) as $result) {
+      $aliases[$result['alias']] = $result['path'];
     }
 
     return $aliases;
