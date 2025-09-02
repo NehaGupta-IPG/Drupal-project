@@ -20,8 +20,8 @@ class UniquePathAliasConstraintValidator extends ConstraintValidator implements 
    *   The entity type manager.
    */
   public function __construct(
-    protected readonly EntityTypeManagerInterface $entityTypeManager
-  ) { }
+    protected readonly EntityTypeManagerInterface $entityTypeManager,
+  ) {}
 
   /**
    * {@inheritdoc}
