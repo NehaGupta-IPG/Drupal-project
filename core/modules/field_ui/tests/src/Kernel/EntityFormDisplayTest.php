@@ -9,6 +9,8 @@ use Drupal\Core\Entity\Entity\EntityFormMode;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Core\Form\FormState;
+use Drupal\Component\Serialization\PhpSerialize;
 
 /**
  * Tests the entity display configuration entities.
@@ -37,6 +39,7 @@ class EntityFormDisplayTest extends KernelTestBase {
     parent::setUp();
     $this->installEntitySchema('action');
     $this->installConfig('user');
+    $this->installEntitySchema('user');
     $this->installEntitySchema('entity_test');
   }
 
@@ -303,9 +306,49 @@ class EntityFormDisplayTest extends KernelTestBase {
     // Remove the langcode.
     $form_display->removeComponent('langcode');
 
-    $unserialized = unserialize(serialize($form_display));
+    $unserialized = PhpSerialize::decode(PhpSerialize::encode($form_display));
     // Verify that components are retained upon unserialization.
     $this->assertEquals($form_display->getComponents(), $unserialized->getComponents());
+  }
+
+  /**
+   * Tests that fields removed from the form display are not rendered.
+   */
+  public function testHiddenWidgetNotRendered(): void {
+    // Create a string field on entity_test.
+    $field_name = 'test_hidden';
+    FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'type' => 'string',
+    ])->save();
+
+    FieldConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+      'label' => 'Hidden test field',
+    ])->save();
+
+    // Create a form display and then remove the field component.
+    $form_display = EntityFormDisplay::create([
+      'targetEntityType' => 'entity_test',
+      'bundle' => 'entity_test',
+      'mode' => 'default',
+    ]);
+    $form_display->setComponent($field_name)->save();
+    $form_display->removeComponent($field_name)->save();
+
+    // Create a new entity and build the form.
+    $entity = \Drupal::entityTypeManager()
+      ->getStorage('entity_test')
+      ->create();
+
+    $form_state = new FormState();
+    $built_form = [];
+    $form_display->buildForm($entity, $built_form, $form_state);
+
+    $this->assertArrayNotHasKey($field_name, $built_form);
   }
 
 }
