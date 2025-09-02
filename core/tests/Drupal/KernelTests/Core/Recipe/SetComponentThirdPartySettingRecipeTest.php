@@ -52,9 +52,8 @@ YAML;
       ->getViewDisplay('user', 'user', 'default');
     $component = $display->getComponent('user_picture');
     $this->assertIsArray($component);
-    $this->assertSame(true, $component['third_party_settings']['system']['example_flag']);
+    $this->assertSame(TRUE, $component['third_party_settings']['system']['example_flag']);
     $this->assertSame('initial', $component['third_party_settings']['system']['nested']['level_one']['key']);
   }
+
 }
-
-
