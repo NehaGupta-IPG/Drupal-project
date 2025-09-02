@@ -27,6 +27,20 @@ class SetComponentThirdPartySettingRecipeTest extends KernelTestBase {
   ];
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    // Ensure the user entity and its default displays exist before applying
+    // the recipe action targeting the user default view display.
+    $this->installEntitySchema('user');
+    $this->installConfig(['user']);
+    $this->container->get(EntityDisplayRepositoryInterface::class)
+      ->getViewDisplay('user', 'user', 'default')
+      ->save();
+  }
+
+  /**
    * Tests applying third-party settings to a user display component via recipe.
    */
   public function testApplyRecipe(): void {
