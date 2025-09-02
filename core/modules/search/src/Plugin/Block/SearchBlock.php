@@ -32,7 +32,7 @@ class SearchBlock extends BlockBase implements ContainerFactoryPluginInterface {
     }
     if ($searchPageRepository instanceof SearchPageRepositoryInterface) {
       @trigger_error('Passing a SearchPageRepositoryInterface object as the search page repository argument in ' . __METHOD__ . 'is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. Pass a closure instead. See https://www.drupal.org/node/0000000', E_USER_DEPRECATED);
-      $this->formBuilder = static fn(): SearchPageRepositoryInterface => \Drupal::service('search.search_page_repository');
+      $this->searchPageRepository = static fn(): SearchPageRepositoryInterface => \Drupal::service('search.search_page_repository');
     }
   }
 
@@ -41,8 +41,8 @@ class SearchBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static($configuration, $plugin_id, $plugin_definition,
-      static fn(): FormBuilderInterface => $container->get('form_builder'),
-      static fn(): SearchPageRepositoryInterface => $container->get('search.search_page_repository')
+      fn(): FormBuilderInterface => $container->get('form_builder'),
+      fn(): SearchPageRepositoryInterface => $container->get('search.search_page_repository')
     );
   }
 
