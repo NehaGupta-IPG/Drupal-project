@@ -158,12 +158,14 @@
       this.filterItemsBuilder =
         consolidateSettings.filterItemsBuilder ||
         ListFilter._filterItemsBuilderImpl;
+
+      this._initialize();
     }
 
     /**
      * Initializes filtering on the specified input and container(s).
      */
-    initialize() {
+    _initialize() {
       const containers = document.querySelectorAll(this.containerSelector);
       containers.forEach((container) => {
         const filterItems = this.filterItemsBuilder(
@@ -394,5 +396,6 @@
   }
 
   // Expose the class to Drupal namespace
+  ListFilter.instances = [];
   Drupal.ListFilter = ListFilter;
 })(Drupal, window.slugify);

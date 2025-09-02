@@ -45,12 +45,6 @@
  */
 (function ({ ListFilter, debounce, ...Drupal }, once) {
   /**
-   * Stores ListFilter instances to be able to destroy them later.
-   * @type {*[]}
-   */
-  let listFilterInstances = [];
-
-  /**
    * Behavior to attach the list filter to elements.
    *
    * @namespace Drupal.behaviors.drupalListFilter
@@ -63,9 +57,7 @@
             'focus',
             () => {
               // Activate the list filter.
-              const filter = new ListFilter(input);
-              filter.initialize();
-              listFilterInstances.push(filter);
+              ListFilter.instances.push(new ListFilter(input));
             },
             { once: true },
           );
@@ -74,9 +66,9 @@
     },
     detach(context, settings, trigger) {
       if (trigger === 'unload') {
-        once.remove('drupal-list-filter', '.table-filter-text');
-        listFilterInstances.forEach((instance) => instance.destroy());
-        listFilterInstances = [];
+        once.remove('drupal-list-filter', '.table-filter-text', context);
+        ListFilter.instances.forEach((instance) => instance.destroy());
+        ListFilter.instances = [];
       }
     },
   };
