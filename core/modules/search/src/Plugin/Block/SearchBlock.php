@@ -24,38 +24,16 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 )]
 class SearchBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
-  /**
-   * The form builder.
-   *
-   * @var \Drupal\Core\Form\FormBuilderInterface
-   */
-  protected $formBuilder;
-
-  /**
-   * The search page repository.
-   *
-   * @var \Drupal\search\SearchPageRepositoryInterface
-   */
-  protected $searchPageRepository;
-
-  /**
-   * Constructs a new SearchLocalTask.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
-   *   The form builder.
-   * @param \Drupal\search\SearchPageRepositoryInterface $search_page_repository
-   *   The search page repository.
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, FormBuilderInterface $form_builder, SearchPageRepositoryInterface $search_page_repository) {
+  public function __construct(array $configuration, string $plugin_id, array|object $plugin_definition, protected \Closure|FormBuilderInterface $formBuilder, protected \Closure|SearchPageRepositoryInterface $searchPageRepository) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->formBuilder = $form_builder;
-    $this->searchPageRepository = $search_page_repository;
+    if ($formBuilder instanceof FormBuilderInterface) {
+      @trigger_error('Passing a FormBuilderInterface object as the form builder argument in ' . __METHOD__ . 'is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. Pass a closure instead. See https://www.drupal.org/node/0000000', E_USER_DEPRECATED);
+      $this->formBuilder = static fn(): FormBuilderInterface => \Drupal::service('form_builder');
+    }
+    if ($searchPageRepository instanceof SearchPageRepositoryInterface) {
+      @trigger_error('Passing a SearchPageRepositoryInterface object as the search page repository argument in ' . __METHOD__ . 'is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. Pass a closure instead. See https://www.drupal.org/node/0000000', E_USER_DEPRECATED);
+      $this->formBuilder = static fn(): SearchPageRepositoryInterface => \Drupal::service('search.search_page_repository');
+    }
   }
 
   /**
@@ -63,8 +41,8 @@ class SearchBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static($configuration, $plugin_id, $plugin_definition,
-      $container->get('form_builder'),
-      $container->get('search.search_page_repository')
+      static fn(): FormBuilderInterface => $container->get('form_builder'),
+      static fn(): SearchPageRepositoryInterface => $container->get('search.search_page_repository')
     );
   }
 
@@ -80,7 +58,7 @@ class SearchBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public function build() {
     $page = $this->configuration['page_id'] ?? NULL;
-    return $this->formBuilder->getForm(SearchBlockForm::class, $page);
+    return ($this->formBuilder)()->getForm(SearchBlockForm::class, $page);
   }
 
   /**
@@ -99,8 +77,9 @@ class SearchBlock extends BlockBase implements ContainerFactoryPluginInterface {
     // The configuration for this block is which search page to connect the
     // form to. Options are all configured/active search pages.
     $options = [];
-    $active_search_pages = $this->searchPageRepository->getActiveSearchPages();
-    foreach ($this->searchPageRepository->sortSearchPages($active_search_pages) as $entity_id => $entity) {
+    $searchRepository = ($this->searchPageRepository)();
+    $active_search_pages = $searchRepository->getActiveSearchPages();
+    foreach ($searchRepository->sortSearchPages($active_search_pages) as $entity_id => $entity) {
       $options[$entity_id] = $entity->label();
     }
 
