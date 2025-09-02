@@ -1,7 +1,6 @@
 name: views_test_ajax_subscriber
 type: module
 description: Tests views ajax responses.
-core: 8.x
 package: Testing
 dependencies:
   - drupal:views
