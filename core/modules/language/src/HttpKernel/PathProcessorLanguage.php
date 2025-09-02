@@ -69,16 +69,17 @@ class PathProcessorLanguage implements InboundPathProcessorInterface, OutboundPa
    *   The configurable language manager.
    * @param \Drupal\language\LanguageNegotiatorInterface $negotiator
    *   The language negotiator.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current active user.
-   * @param \Drupal\language\EventSubscriber\ConfigSubscriber $config_subscriber
+   * @param \Drupal\language\EventSubscriber\ConfigSubscriber|\Drupal\Core\Session\AccountInterface $config_subscriber
    *   The language configuration event subscriber.
    */
-  public function __construct(ConfigFactoryInterface $config, ConfigurableLanguageManagerInterface $language_manager, LanguageNegotiatorInterface $negotiator, AccountInterface $current_user, ConfigSubscriber $config_subscriber) {
+  public function __construct(ConfigFactoryInterface $config, ConfigurableLanguageManagerInterface $language_manager, LanguageNegotiatorInterface $negotiator, ConfigSubscriber|AccountInterface $config_subscriber) {
     $this->config = $config;
     $this->languageManager = $language_manager;
     $this->negotiator = $negotiator;
-    $this->negotiator->setCurrentUser($current_user);
+    if ($config_subscriber instanceof AccountInterface) {
+      @trigger_error('Calling ' . __CLASS__ . ' constructor with the $current_user argument is deprecated in drupal:11.4.0 and it will be removed in drupal:12.0.0. See https://www.drupal.org/node/3544400', E_USER_DEPRECATED);
+      $config_subscriber = \Drupal::service('language.config_subscriber');
+    }
     $this->configSubscriber = $config_subscriber;
   }
 

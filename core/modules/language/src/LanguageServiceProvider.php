@@ -25,8 +25,7 @@ class LanguageServiceProvider extends ServiceProviderBase {
         ->addTag('event_subscriber')
         ->addArgument(new Reference('language_manager'))
         ->addArgument(new Reference('language_negotiator'))
-        ->addArgument(new Reference('string_translation'))
-        ->addArgument(new Reference('current_user'));
+        ->addArgument(new Reference('string_translation'));
 
       $container->register('path_processor_language', 'Drupal\language\HttpKernel\PathProcessorLanguage')
         ->addTag('path_processor_inbound', ['priority' => 300])
@@ -34,7 +33,6 @@ class LanguageServiceProvider extends ServiceProviderBase {
         ->addArgument(new Reference('config.factory'))
         ->addArgument(new Reference('language_manager'))
         ->addArgument(new Reference('language_negotiator'))
-        ->addArgument(new Reference('current_user'))
         ->addArgument(new Reference('language.config_subscriber'))
         ->addMethodCall('initConfigSubscriber');
     }

@@ -35,6 +35,7 @@ class PathNoCanonicalLinkTest extends KernelTestBase {
 
     $this->installEntitySchema('entity_test');
     $this->installEntitySchema('entity_test_mul');
+    $this->installConfig(['language']);
 
     // Adding german language.
     ConfigurableLanguage::createFromLangcode('de')->save();

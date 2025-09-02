@@ -17,6 +17,17 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class LanguageDependencyInjectionTest extends LanguageTestBase {
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    // Disable the default URL-based language negotiation so the interface
+    // language always matches the default language.
+    $this->config('language.types')->set('negotiation.language_interface.enabled', [])->save();
+  }
+
+  /**
    * Tests dependency injected languages against a new Language object.
    *
    * @see \Drupal\Core\Language\LanguageInterface
