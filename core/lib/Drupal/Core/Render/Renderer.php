@@ -11,6 +11,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Form\FormHelper;
+use Drupal\Core\Htmx\HtmxHelper;
 use Drupal\Core\Render\Element\RenderCallbackInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
@@ -464,6 +465,11 @@ class Renderer implements RendererInterface {
     // Add any JavaScript state information associated with the element.
     if (!empty($elements['#states'])) {
       FormHelper::processStates($elements);
+    }
+
+    // Add any JavaScript state information associated with the element.
+    if (!empty($elements['#htmx'])) {
+      HtmxHelper::processHtmx($elements);
     }
 
     // Get the children of the element, sorted by weight.
