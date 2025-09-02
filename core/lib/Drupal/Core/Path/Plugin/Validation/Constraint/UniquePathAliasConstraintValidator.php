@@ -4,7 +4,6 @@ namespace Drupal\Core\Path\Plugin\Validation\Constraint;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -15,31 +14,14 @@ use Symfony\Component\Validator\ConstraintValidator;
 class UniquePathAliasConstraintValidator extends ConstraintValidator implements ContainerInjectionInterface {
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * Creates a new UniquePathAliasConstraintValidator instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler) {
-    $this->entityTypeManager = $entity_type_manager;
-    $this->moduleHandler = $module_handler;
-  }
+  public function __construct(
+    protected readonly EntityTypeManagerInterface $entityTypeManager
+  ) { }
 
   /**
    * {@inheritdoc}
@@ -47,7 +29,6 @@ class UniquePathAliasConstraintValidator extends ConstraintValidator implements 
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity_type.manager'),
-      $container->get('module_handler')
     );
   }
 
@@ -89,7 +70,7 @@ class UniquePathAliasConstraintValidator extends ConstraintValidator implements 
         ])->addViolation();
       }
     }
-    elseif ($this->moduleHandler->moduleExists('views') && $viewName = $this->validatePathViews($alias)) {
+    elseif ($viewName = $this->validatePathViews($alias)) {
       $this->context->buildViolation($constraint->viewsMessage, [
         '%alias' => $alias,
         '%view' => $viewName,
@@ -107,13 +88,13 @@ class UniquePathAliasConstraintValidator extends ConstraintValidator implements 
    *   The view name if alias is used by a view page display, NULL otherwise.
    */
   protected function validatePathViews(string $alias): ?string {
+    if (!$this->entityTypeManager->hasDefinition('view')) {
+      return NULL;
+    }
     if ($alias[0] === '/') {
       $alias = substr($alias, 1);
     }
-    $views = $this->entityTypeManager
-      ->getStorage('view')
-      ->loadMultiple();
-    foreach ($views as $view) {
+    foreach ($this->entityTypeManager->getStorage('view')->loadMultiple() as $view) {
       if (array_find(
         $view->get('display'),
         fn($display) => $display['display_plugin'] === 'page' && $display["display_options"]["path"] === $alias)
