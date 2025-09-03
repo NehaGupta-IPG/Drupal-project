@@ -166,28 +166,35 @@
      * Initializes filtering on the specified input and container(s).
      */
     _initialize() {
-      const containers = document.querySelectorAll(this.containerSelector);
-      containers.forEach((container) => {
-        const filterItems = this.filterItemsBuilder(
-          container,
-          this.itemsSelector,
-          this.targetsSelector,
-          this.normalizeString,
+      this._boundFilterTableList = this._filterTableList.bind(this);
+      this.containers = Array.from(
+        document.querySelectorAll(this.containerSelector),
+      ).map((container) => {
+        container.addEventListener(
+          ListFilter.FILTER_EVENT,
+          this._boundFilterTableList,
         );
-
-        const labels = container.querySelectorAll('[data-filter-group-name]');
-
-        // Bind the input event to the container.
-        container.addEventListener(ListFilter.FILTER_EVENT, (event) => {
-          this.filterTableList(event, filterItems, labels);
-        });
+        return {
+          container,
+          filterItems: this.filterItemsBuilder(
+            container,
+            this.itemsSelector,
+            this.targetsSelector,
+            this.normalizeString,
+          ),
+          labels: container.querySelectorAll('[data-filter-group-name]'),
+        };
       });
 
       this._inputHandler = Drupal.debounce((event) => {
-        containers.forEach((container) => {
-          container.dispatchEvent(
+        this.containers.forEach((c) => {
+          c.container.dispatchEvent(
             new CustomEvent(ListFilter.FILTER_EVENT, {
-              detail: { query: event.target.value },
+              detail: {
+                query: event.target.value,
+                allItems: c.filterItems,
+                labels: c.labels,
+              },
             }),
           );
         });
@@ -210,13 +217,10 @@
      *
      * @param {Event} event
      *   The input event.
-     * @param {Array} allItems
-     *   The original filter items.
-     * @param {NodeList} labels
-     *   The label elements.
      */
-    filterTableList(event, allItems, labels) {
-      const query = this.normalizeString(event.detail.query);
+    _filterTableList(event) {
+      const { allItems, labels, query: queryParam } = event.detail;
+      const query = this.normalizeString(queryParam);
       const toShow = [];
       const toHide = [];
       const visibleGroups = {};
@@ -267,13 +271,14 @@
 
       // Dispatch a custom event to signal that searching has finished.
       requestAnimationFrame(() => {
-        const event = new CustomEvent(ListFilter.SEARCH_FINISHED_EVENT, {
-          detail: {
-            matched: toShow,
-            unmatched: toHide,
-          },
-        });
-        this.input.dispatchEvent(event);
+        this.input.dispatchEvent(
+          new CustomEvent(ListFilter.SEARCH_FINISHED_EVENT, {
+            detail: {
+              matched: toShow,
+              unmatched: toHide,
+            },
+          }),
+        );
       });
     }
 
@@ -391,7 +396,13 @@
     destroy() {
       this.input.removeEventListener('keydown', this._keyDownHandler);
       this.input.removeEventListener('input', this._inputHandler);
-      this.input = null;
+      this.containers.forEach((c) => {
+        c.container.removeEventListener(
+          ListFilter.FILTER_EVENT,
+          this._boundFilterTableList,
+        );
+      });
+      this.containers = [];
     }
   }
 
