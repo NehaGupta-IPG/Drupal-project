@@ -7,7 +7,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\Attribute\DataType;
 use Drupal\Core\TypedData\PrimitiveBase;
 use Drupal\Core\TypedData\Type\FloatInterface;
-use \Drupal\Core\Config\UnsupportedDataTypeConfigException;
+use Drupal\Core\Config\UnsupportedDataTypeConfigException;
 
 /**
  * The float data type.
@@ -28,7 +28,7 @@ class FloatData extends PrimitiveBase implements FloatInterface {
   public function getCastedValue() {
     $min = constant('PHP_FLOAT_MIN');
     $max = constant('PHP_FLOAT_MAX');
-    if( $this->value < $min || $this->value > $max) {
+    if ($this->value < $min || $this->value > $max) {
       throw new UnsupportedDataTypeConfigException("The value is out of the range of a PHP float ($min to $max).");
     }
     return (float) $this->value;
