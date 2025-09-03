@@ -79,14 +79,41 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
    * {@inheritdoc}
    */
   public function getEditable($name) {
-    return $this->doGet($name, FALSE);
+    $config = $this->doGet($name, FALSE);
+    if ($config->isNew()) {
+      @trigger_error('Getting non-existent configuration is deprecated in drupal:11.3.0 and will trigger a \Drupal\Core\Config\ConfigException from drupal:13.0.0. Call ConfigFactoryInterface::create() instead. See https://www.drupal.org/node/3544577', E_USER_DEPRECATED);
+    }
+    return $config;
   }
 
   /**
    * {@inheritdoc}
    */
   public function get($name) {
-    return $this->doGet($name);
+    $config = $this->doGet($name);
+    if ($config->isNew()) {
+      @trigger_error('Getting non-existent configuration is deprecated in drupal:11.3.0 and will trigger a \Drupal\Core\Config\ConfigException from drupal:13.0.0. Call ConfigFactoryInterface::create() instead. See https://www.drupal.org/node/3544577', E_USER_DEPRECATED);
+    }
+    return $config;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function create(string $name): Config {
+    $config = $this->doGet($name, FALSE);
+    if (!$config->isNew()) {
+      throw new ConfigException("Configuration $name cannot be created as it already exists.");
+    }
+    return $config;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function exists(string $name): bool {
+    // @todo check $this->cache first.
+    return $this->storage->exists($name);
   }
 
   /**
