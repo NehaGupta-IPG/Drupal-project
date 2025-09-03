@@ -6,29 +6,20 @@ namespace Drupal\Tests\package_manager\Functional;
 
 use Drupal\package_manager\ComposerInspector;
 use PhpTuf\ComposerStager\API\Finder\Service\ExecutableFinderInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that Package Manager shows the Composer version on the status report.
  *
- * @group package_manager
  * @internal
  */
+#[Group('package_manager')]
 class ComposerRequirementTest extends PackageManagerTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = ['package_manager'];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $configSchemaCheckerExclusions = [
-    // We test what happens when the configured path to Composer is invalid,
-    // so we need to be able to skip schema-based validation, which would
-    // normally confirm that the configured path to Composer is executable.
-    'package_manager.settings',
-  ];
 
   /**
    * Tests that Composer version and path are listed on the status report.
