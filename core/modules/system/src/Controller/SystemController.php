@@ -351,31 +351,17 @@ class SystemController extends ControllerBase {
         }
       }
 
-      // Add notes to default theme, administration theme and non-stable themes.
+      // Add notes if theme of core, if theme is sub theme or if it's
+      // experimental theme.
       $theme->notes = [];
-      if ($theme->is_default) {
-        $theme->notes[] = $this->t('default theme');
+      if (!empty($theme->origin) && $theme->origin == 'core') {
+        $theme->notes['core'] = $this->t('Core');
       }
-      if ($theme->is_admin) {
-        $theme->notes[] = $this->t('administration theme');
+      if (!empty($theme->info['base theme'])) {
+        $theme->notes['sub_theme'] = $this->t('Sub theme');
       }
-      $lifecycle = $theme->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER];
-      if (!empty($theme->info[ExtensionLifecycle::LIFECYCLE_LINK_IDENTIFIER])) {
-        $theme->notes[] = Link::fromTextAndUrl($this->t('@lifecycle', ['@lifecycle' => ucfirst($lifecycle)]),
-          Url::fromUri($theme->info[ExtensionLifecycle::LIFECYCLE_LINK_IDENTIFIER], [
-            'attributes' =>
-              [
-                'class' => 'theme-link--non-stable',
-                'aria-label' => $this->t('View information on the @lifecycle status of the theme @theme', [
-                  '@lifecycle' => ucfirst($lifecycle),
-                  '@theme' => $theme->info['name'],
-                ]),
-              ],
-          ])
-        )->toString();
-      }
-      if ($theme->isExperimental() && empty($theme->info[ExtensionLifecycle::LIFECYCLE_LINK_IDENTIFIER])) {
-        $theme->notes[] = $this->t('experimental theme');
+      if (property_exists($theme, 'is_experimental') && $theme->is_experimental) {
+        $theme->notes['experimental'] = $this->t('Experimental');
       }
 
       // Sort installed and uninstalled themes into their own groups.

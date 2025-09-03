@@ -46,11 +46,60 @@
  * Card image.
  */
 .card__image {
+  position: relative;
   overflow: hidden;
   border-radius: var(--card-image-border-radius-size) var(--card-image-border-radius-size) 0 0;
-  line-height: 0;
 }
 
+.card__image img {
+  width: 100%;
+  vertical-align: top;
+}
+
+/**
+ * Card notes.
+ */
+.card__notes {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: calc(100% - var(--space-m));
+}
+
+[dir="rtl"] .card__notes {
+  right: auto;
+  left: 0;
+}
+
+.card__note {
+  margin-right: var(--space-m);
+  margin-bottom: var(--space-m);
+  padding: 0.3125rem 1rem;
+  color: var(--color-white);
+  border-radius: 1.0625rem;
+  font-weight: 700;
+}
+
+[dir="rtl"] .card__note {
+  margin-right: 0;
+  margin-left: var(--space-m);
+}
+
+.card__note--type-core {
+  background-color: var(--color-lightninggreen);
+}
+
+.card__note--type-sub-theme {
+  background-color: var(--color-mango-tango);
+}
+
+.card__note--type-experimental {
+  background-color: var(--color-maximumred);
+ }
 @media screen and (min-width: 36.75rem) {
   .card--horizontal .card__image {
     flex-basis: 35%;

@@ -15,12 +15,13 @@
  *     - description: Description of the theme.
  *     - name: Theme name.
  *     - version: The theme's version number.
+ *     - requires: Base theme of the theme if such exist.
  *     - is_default: Boolean indicating whether the theme is the default theme
  *       or not.
  *     - is_admin: Boolean indicating whether the theme is the admin theme or
  *       not.
  *     - notes: Identifies what context this theme is being used in, e.g.,
- *       default theme, admin theme.
+ *       core, sub_theme or experimental.
  *     - incompatible: Text describing any compatibility issues.
  *     - module_dependencies: A list of modules that this theme requires.
  *     - operations: A list of operation links, e.g., Settings, Enable, Disable,
@@ -79,15 +80,19 @@
             {% if theme.screenshot %}
               <div class="card__image">
                 {{ theme.screenshot }}
+                {# {% if theme.notes %}
+                  <div class="card__notes">
+                    {% for note_type, note_value in theme.notes %}
+                      <div class="card__note card__note--type-{{ note_type|replace({'_': '-'}) }}">{{ note_value }}</div>
+                    {% endfor %}
+                  </div>
+                {% endif %} #}
               </div>
             {% endif %}
             <div class="card__content-wrapper">
               <div class="card__content">
                 <h3{{ create_attribute({'id': theme.title_id}).addClass(theme_title_classes) }} id={{ theme.title_id }}>
-                  {{- theme.name }} {{ theme.version -}}
-                  {% if theme.notes %}
-                    ({{ theme.notes|safe_join(', ') }})
-                  {%- endif -%}
+                  {{- theme.name -}}
                 </h3>
 
                 {% if theme.description and theme.description_id %}
@@ -95,8 +100,21 @@
                     {{ theme.description }}
                   </div>
                 {%- endif -%}
-              </div>
 
+                {% if theme.version %}
+                  <div{{ create_attribute().addClass(theme_description_classes, 'card__other-info', 'clearfix') }}>
+                    <div class="card__other-info-label">{{ 'Version'|t }}</div>
+                    <div class="card__other-info-value">{{ theme.version }}</div>
+                  </div>
+                {% endif %}
+
+                {% if theme.requires %}
+                  <div{{ create_attribute().addClass(theme_description_classes, 'card__other-info', 'clearfix') }}>
+                    <div class="card__other-info-label">{{ 'Requires'|t }}</div>
+                    <div class="card__other-info-value">{{ theme.requires }}</div>
+                  </div>
+                {% endif %}
+              </div>
               <div class="card__footer">
                 {% if theme.module_dependencies %}
                   <div class="theme-info__requires">
@@ -107,7 +125,7 @@
                 {% if theme.incompatible %}
                   <small class="incompatible">{{ theme.incompatible }}</small>
                 {% else %}
-                    {{ theme.operations }}
+                  {{ theme.operations }}
                 {% endif %}
               </div>
             </div>

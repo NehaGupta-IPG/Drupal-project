@@ -304,6 +304,7 @@ function template_preprocess_system_themes_page(&$variables): void {
       $current_theme['attributes'] = new Attribute();
       $current_theme['name'] = $theme->info['name'];
       $current_theme['version'] = $theme->info['version'] ?? '';
+      $current_theme['requires'] = !empty($theme->info['base theme']) ? $theme->base_themes[$theme->info['base theme']] : '';
       $current_theme['notes'] = $theme->notes;
       $current_theme['is_default'] = $theme->is_default;
       $current_theme['is_admin'] = $theme->is_admin;
