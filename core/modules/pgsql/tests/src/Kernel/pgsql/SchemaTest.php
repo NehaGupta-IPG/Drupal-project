@@ -443,6 +443,18 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     $this->assertTrue($this->schema->tableExists($table_name));
   }
 
+  /**
+   * Provides the definitions for database index creation with GIN/GIST indexes.
+   *
+   * This method returns an array containing configuration details for both GIN
+   * and GIST index types. Each definition includes field specifications, index
+   * configurations, and primary key information, tailored for database indexing
+   * scenarios that benefit from either GIN or GIST characteristics.
+   *
+   * @return array
+   *   The array defining GIN and GIST index configurations.
+   *   Including fields, indexes, and primary keys.
+   */
   public static function ginGistIndexDefinitionProvider(): array {
     return [
       'gin' => [
