@@ -41,6 +41,7 @@ class LegacyDiscoveryDecorator implements DiscoveryInterface {
 
     $legacy_plugin_definitions = $this->legacy->getDefinitions();
     foreach ($legacy_plugin_definitions as $plugin_id => $legacy_plugin_definition) {
+      // phpcs:ignore Drupal.Semantics.FunctionTriggerError.TriggerErrorTextLayoutRelaxed
       @trigger_error(sprintf($this->deprecationMessage, $plugin_id), E_USER_DEPRECATED);
     }
 
