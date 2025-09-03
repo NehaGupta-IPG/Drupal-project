@@ -83,12 +83,6 @@ class MainContentViewSubscriber implements EventSubscriberInterface {
     if (is_array($result) && ($request->query->has(static::WRAPPER_FORMAT) || $request->getRequestFormat() == 'html')) {
       $wrapper = $request->query->get(static::WRAPPER_FORMAT, 'html');
 
-      // Also use the HTMX renderer on dedicated routes.
-      $htmxRoute = $this->routeMatch->getRouteObject()->getOption('_htmx_route') ?? FALSE;
-      if ($htmxRoute) {
-        $wrapper = 'drupal_htmx';
-      }
-
       // Fall back to HTML if the requested wrapper envelope is not available.
       $wrapper = isset($this->mainContentRenderers[$wrapper]) ? $wrapper : 'html';
 
