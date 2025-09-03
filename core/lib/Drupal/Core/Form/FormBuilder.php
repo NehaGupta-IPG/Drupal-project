@@ -302,11 +302,6 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       }
     }
 
-    // If this form is an AJAX request, disable all form redirects.
-    if ($ajax_form_request = $request->query->has(static::AJAX_FORM_REQUEST)) {
-      $form_state->disableRedirect();
-    }
-
     // Now that we have a constructed form, process it. This is where:
     // - Element #process functions get called to further refine $form.
     // - User input, if any, gets incorporated in the #value property of the
@@ -323,6 +318,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // In case the post request exceeds the configured allowed size
     // (post_max_size), the post request is potentially broken. Add some
     // protection against that and at the same time have a nice error message.
+    $ajax_form_request = $request->query->has(static::AJAX_FORM_REQUEST);
     if ($ajax_form_request && !$request->get('form_id')) {
       throw new BrokenPostRequestException($this->getFileUploadMaxSize());
     }
