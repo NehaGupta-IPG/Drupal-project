@@ -277,6 +277,8 @@ class ConfigEntityStorageTest extends UnitTestCase {
       ->willReturn($immutable_config_object->reveal());
     $this->configFactory->create('the_provider.the_config_prefix.foo')
       ->willReturn($config_object->reveal());
+    $this->configFactory->exists('the_provider.the_config_prefix.foo')
+      ->willReturn(FALSE);
 
     $this->moduleHandler->invokeAll('test_entity_type_presave', [$entity])
       ->shouldBeCalled();
@@ -332,9 +334,8 @@ class ConfigEntityStorageTest extends UnitTestCase {
       ->willReturn([])
       ->shouldBeCalledTimes(2);
     $this->configFactory
-      ->get('the_provider.the_config_prefix.foo')
-      ->willReturn($immutable_config_object->reveal())
-      ->shouldBeCalledTimes(1);
+      ->exists('the_provider.the_config_prefix.foo')
+      ->willReturn(TRUE);
     $this->configFactory
       ->getEditable('the_provider.the_config_prefix.foo')
       ->willReturn($config_object->reveal())
@@ -385,14 +386,17 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $this->cacheTagsInvalidator->invalidateTags([$this->entityTypeId . '_list'])
       ->shouldBeCalled();
 
-    $this->configFactory->get('the_provider.the_config_prefix.foo')
-      ->willReturn($immutable_config_object->reveal());
+    $this->configFactory->exists('the_provider.the_config_prefix.foo')
+      ->willReturn(TRUE)
+      ->shouldBeCalled();
     $this->configFactory->loadMultiple(['the_provider.the_config_prefix.foo'])
-      ->willReturn([]);
+      ->willReturn([])
+      ->shouldBeCalled();
     $this->configFactory->rename('the_provider.the_config_prefix.foo', 'the_provider.the_config_prefix.bar')
       ->shouldBeCalled();
     $this->configFactory->getEditable('the_provider.the_config_prefix.bar')
-      ->willReturn($config_object->reveal());
+      ->willReturn($config_object->reveal())
+      ->shouldBeCalled();
 
     // Performing a rename does not change the original ID until saving.
     $this->assertSame('foo', $entity->getOriginalId());
@@ -437,6 +441,8 @@ class ConfigEntityStorageTest extends UnitTestCase {
 
     $this->configFactory->get('the_provider.the_config_prefix.foo')
       ->willReturn($config_object->reveal());
+    $this->configFactory->exists('the_provider.the_config_prefix.foo')
+      ->willReturn(TRUE);
 
     $entity = $this->getMockEntity(['id' => 'foo']);
     $entity->enforceIsNew();
@@ -460,6 +466,8 @@ class ConfigEntityStorageTest extends UnitTestCase {
 
     $this->configFactory->get('the_provider.the_config_prefix.foo')
       ->willReturn($config_object->reveal());
+    $this->configFactory->exists('the_provider.the_config_prefix.foo')
+      ->willReturn(FALSE);
 
     $this->entityQuery->condition('uuid', NULL)->willReturn($this->entityQuery);
     $this->entityQuery->execute()->willReturn(['baz']);
@@ -496,8 +504,8 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $this->cacheTagsInvalidator->invalidateTags([$this->entityTypeId . '_list'])
       ->shouldBeCalled();
 
-    $this->configFactory->get('the_provider.the_config_prefix.baz')
-      ->willReturn($immutable_config_object->reveal())
+    $this->configFactory->exists('the_provider.the_config_prefix.baz')
+      ->willReturn(FALSE)
       ->shouldBeCalled();
     $this->configFactory->rename('the_provider.the_config_prefix.baz', 'the_provider.the_config_prefix.foo')
       ->shouldBeCalled();
@@ -537,6 +545,8 @@ class ConfigEntityStorageTest extends UnitTestCase {
       ->willReturn([$config_object->reveal()]);
     $this->configFactory->get('the_provider.the_config_prefix.foo')
       ->willReturn($config_object->reveal());
+    $this->configFactory->exists('the_provider.the_config_prefix.foo')
+      ->willReturn(TRUE);
     $this->configFactory->rename(Argument::cetera())->shouldNotBeCalled();
 
     $this->entityQuery->condition('uuid', 'baz')->willReturn($this->entityQuery);
