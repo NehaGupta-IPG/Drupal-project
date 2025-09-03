@@ -227,8 +227,10 @@ function theme_get_setting($setting_name, $theme = NULL) {
 
       // Retrieve configured theme-specific settings, if any.
       try {
-        if ($theme_settings = \Drupal::config($theme . '.settings')->get()) {
-          $cache[$theme]->merge($theme_settings);
+        if (\Drupal::configFactory()->exists($theme . '.settings')) {
+          if ($theme_settings = \Drupal::config($theme . '.settings')->get()) {
+            $cache[$theme]->merge($theme_settings);
+          }
         }
       }
       catch (StorageException) {

@@ -4,6 +4,7 @@ namespace Drupal\system\SecurityAdvisories;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ProfileExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
@@ -30,7 +31,7 @@ final class SecurityAdvisoriesFetcher {
   /**
    * The 'system.advisories' configuration.
    *
-   * @var \Drupal\Core\Config\ImmutableConfig
+   * @var \Drupal\Core\Config\ImmutableConfig|null
    */
   protected $config;
 
@@ -90,7 +91,7 @@ final class SecurityAdvisoriesFetcher {
    *   The settings instance.
    */
   public function __construct(ConfigFactoryInterface $config_factory, KeyValueExpirableFactoryInterface $key_value_factory, ClientInterface $client, ModuleExtensionList $module_list, ThemeExtensionList $theme_list, ProfileExtensionList $profile_list, LoggerInterface $logger, Settings $settings) {
-    $this->config = $config_factory->get('system.advisories');
+    $this->config = $config_factory->exists('system.advisories') ? $config_factory->get('system.advisories') : NULL;
     $this->keyValueExpirable = $key_value_factory->get('system');
     $this->httpClient = $client;
     $this->extensionLists['module'] = $module_list;
@@ -129,7 +130,7 @@ final class SecurityAdvisoriesFetcher {
         return NULL;
       }
       $response = $this->doRequest($timeout);
-      $interval_seconds = $this->config->get('interval_hours') * 60 * 60;
+      $interval_seconds = ($this->config?->get('interval_hours') ?? 6) * 60 * 60;
       $json_payload = Json::decode($response);
       if (is_array($json_payload)) {
         // Only store and use the response if it could be successfully

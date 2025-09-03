@@ -297,8 +297,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
    */
   protected function has($id, EntityInterface $entity) {
     $prefix = $this->getPrefix();
-    $config = $this->configFactory->get($prefix . $id);
-    return !$config->isNew();
+    return $this->configFactory->exists($prefix . $id);
   }
 
   /**
