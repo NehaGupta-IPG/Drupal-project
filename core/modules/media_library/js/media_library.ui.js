@@ -213,6 +213,19 @@
             if (displayAnnouncement) {
               Drupal.announce(displayAnnouncement);
             }
+
+            // Restore selection state after AJAX request.
+            const currentSelection = Drupal.MediaLibrary.currentSelection;
+            if (currentSelection && currentSelection.length > 0) {
+              setTimeout(() => {
+                currentSelection.forEach((value) => {
+                  const $checkbox = $(`input[type="checkbox"][value="${value}"]`);
+                  if ($checkbox.length && !$checkbox.prop('checked')) {
+                    $checkbox.prop('checked', true).trigger('change');
+                  }
+                });
+              }, 100);
+            }
           };
         }
 
@@ -393,6 +406,65 @@
         $buttonPane.append(Drupal.theme('mediaLibrarySelectionCount'));
         updateSelectionCount(settings.media_library.selection_remaining);
       });
+    },
+  };
+
+  /**
+   * Preserve media library selection across AJAX pagination requests.
+   *
+   * @type {Drupal~behavior}
+   *
+   * @prop {Drupal~behaviorAttach} attach
+   *   Attaches behavior to preserve selection during pagination.
+   */
+  Drupal.behaviors.MediaLibraryPreserveSelection = {
+    attach(context) {
+      // Hook into all AJAX responses for media library.
+      if (!window.mediaLibraryAjaxFixed) {
+        window.mediaLibraryAjaxFixed = true;
+
+        // Store original AJAX success handler.
+        const originalProcessAjaxData = Drupal.Ajax.prototype.success;
+
+        Drupal.Ajax.prototype.success = function(response, status) {
+          // Store selection before AJAX.
+          const beforeSelection = Drupal.MediaLibrary ? Drupal.MediaLibrary.currentSelection.slice() : [];
+          const beforeHiddenValue = document.querySelector('#media-library-modal-selection') ? 
+            document.querySelector('#media-library-modal-selection').value : '';
+
+          // Call original success handler.
+          const result = originalProcessAjaxData.call(this, response, status);
+
+          // Check if this affects media library.
+          const isMediaLibraryAjax = response.some && response.some(r => 
+            (r.selector && (r.selector.includes('media-library-view') || r.selector.includes('media_library'))) ||
+            (r.method === 'replaceWith' && r.data && r.data.includes('js-media-library'))
+          );
+
+          if (isMediaLibraryAjax || (this.element && this.element.closest('.js-media-library-view'))) {
+            // Restore selections after a delay to ensure DOM is updated.
+            setTimeout(() => {
+              if (beforeSelection.length > 0) {
+                beforeSelection.forEach((value) => {
+                  const checkbox = document.querySelector(`input[type="checkbox"][value="${value}"]`);
+                  if (checkbox && !checkbox.checked) {
+                    checkbox.checked = true;
+                    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                  }
+                });
+
+                // Also restore hidden field if it got cleared.
+                const hiddenField = document.querySelector('#media-library-modal-selection');
+                if (hiddenField && !hiddenField.value && beforeHiddenValue) {
+                  hiddenField.value = beforeHiddenValue;
+                }
+              }
+            }, 300);
+          }
+
+          return result;
+        };
+      }
     },
   };
 
