@@ -173,7 +173,7 @@ class EntityFieldManagerTest extends UnitTestCase {
     $language = new Language(['id' => 'en']);
     $this->languageManager = $this->prophesize(LanguageManagerInterface::class);
     $this->languageManager->getCurrentLanguage()->willReturn($language);
-    $this->languageManager->getLanguages()->willReturn(['en' => (object) ['id' => 'en']]);
+    $this->languageManager->getConfigOverrideLanguage()->willReturn($language);
 
     $this->keyValueFactory = $this->prophesize(KeyValueFactoryInterface::class);
 
@@ -249,6 +249,9 @@ class EntityFieldManagerTest extends UnitTestCase {
     $bundle_field_definition = $this->prophesize()
       ->willImplement(FieldDefinitionInterface::class)
       ->willImplement(FieldStorageDefinitionInterface::class);
+
+    $language = new Language(['id' => 'en']);
+    $this->languageManager->setConfigOverrideLanguage($language)->shouldBeCalled();
 
     // Define bundle fields to be stored on the default Entity class.
     $bundle_fields = [
@@ -477,6 +480,9 @@ class EntityFieldManagerTest extends UnitTestCase {
       ],
     ])->shouldBeCalledTimes(2);
 
+    $language = new Language(['id' => 'en']);
+    $this->languageManager->setConfigOverrideLanguage($language)->shouldBeCalled();
+
     $this->assertSame($expected, $this->entityFieldManager->getFieldDefinitions('test_entity_type', 'test_bundle'));
     $this->entityFieldManager->testClearEntityFieldInfo();
     $this->assertSame($expected, $this->entityFieldManager->getFieldDefinitions('test_entity_type', 'test_bundle'));
@@ -584,6 +590,9 @@ class EntityFieldManagerTest extends UnitTestCase {
           $module,
         );
       });
+
+    $language = new Language(['id' => 'en']);
+    $this->languageManager->setConfigOverrideLanguage($language)->shouldBeCalled();
 
     $this->entityFieldManager->getFieldDefinitions('test_entity_type', 'test_bundle');
   }

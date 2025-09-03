@@ -425,6 +425,11 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
     // overrides of base fields.
     $bundle_field_definitions = $class::bundleFieldDefinitions($entity_type, $bundle, $base_field_definitions);
 
+    // Make sure base field overrides and also configurable fields are loaded in
+    // the correct language.
+    $overrideLanguage = $this->languageManager->getConfigOverrideLanguage();
+    $this->languageManager->setConfigOverrideLanguage($this->languageManager->getCurrentLanguage());
+
     if (!isset($this->baseFieldOverrides)) {
       $this->baseFieldOverrides = [];
       $base_field_overrides = $this->entityTypeManager->getStorage('base_field_override')->loadMultiple();
@@ -468,6 +473,9 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
         }
       }
     );
+
+    // Revert to the previous config override language.
+    $this->languageManager->setConfigOverrideLanguage($overrideLanguage);
 
     // Automatically set the field name, target entity type and bundle
     // for non-configurable fields.
