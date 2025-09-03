@@ -717,7 +717,7 @@
   $document.on('state:required', (e) => {
     if (e.trigger) {
       const $target = $(e.target);
-      const $label = $(
+      let $label = $(
         e.target
           .closest(
             '.js-form-item:not(.form-no-label), .js-form-wrapper:not(.form-no-label)',
@@ -732,6 +732,16 @@
             ].join(', '),
           ),
       );
+      // If hidden, add the required marker to the multiple value label if
+      // available.
+      if ($label.hasClass('visually-hidden')) {
+        const $multipleLabel = $(e.target)
+          .closest('table')
+          .find('.form-item__label--multiple-value-form');
+        if ($multipleLabel) {
+          $label = $multipleLabel;
+        }
+      }
       if (e.value) {
         $target.attr({ required: 'required' });
         // Avoids duplicate required markers on initialization.
