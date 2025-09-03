@@ -275,7 +275,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
 
     $this->configFactory->get('the_provider.the_config_prefix.foo')
       ->willReturn($immutable_config_object->reveal());
-    $this->configFactory->getEditable('the_provider.the_config_prefix.foo')
+    $this->configFactory->create('the_provider.the_config_prefix.foo')
       ->willReturn($config_object->reveal());
 
     $this->moduleHandler->invokeAll('test_entity_type_presave', [$entity])
@@ -501,7 +501,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
       ->shouldBeCalled();
     $this->configFactory->rename('the_provider.the_config_prefix.baz', 'the_provider.the_config_prefix.foo')
       ->shouldBeCalled();
-    $this->configFactory->getEditable('the_provider.the_config_prefix.foo')
+    $this->configFactory->create('the_provider.the_config_prefix.foo')
       ->willReturn($config_object->reveal())
       ->shouldBeCalled();
 
