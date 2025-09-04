@@ -2,7 +2,9 @@
 
 namespace Drupal\Core\File\MimeType;
 
+use Drupal\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
+use Symfony\Component\Mime\Mime\MimeTypes;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 
 /**
