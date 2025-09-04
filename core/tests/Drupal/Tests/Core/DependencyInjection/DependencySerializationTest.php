@@ -79,8 +79,8 @@ class DependencySerializationTest extends UnitTestCase {
     catch (\Throwable $throwable) {
     }
     finally {
-      $this->assertNotNull($throwable);
       $this->assertInstanceOf(\Exception::class, $throwable);
+      $this->assertSame("Serialization of 'Closure' is not allowed", $throwable->getMessage());
     }
   }
 
