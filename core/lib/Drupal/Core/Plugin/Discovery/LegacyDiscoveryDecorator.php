@@ -51,7 +51,7 @@ class LegacyDiscoveryDecorator implements DiscoveryInterface {
   /**
    * Passes through all unknown calls onto the decorated object.
    */
-  public function __call($method, $args) {
+  public function __call($method, $args): mixed {
     return call_user_func_array([$this->decorated, $method], $args);
   }
 
