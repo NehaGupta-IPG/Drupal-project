@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\mailer_experiment\Functional;
+namespace Drupal\Tests\mailer_symfony\Functional;
 
 use Drupal\Core\Test\MailerCaptureTrait;
 use Drupal\Tests\BrowserTestBase;
@@ -18,7 +18,7 @@ use Symfony\Component\Mime\Email;
  * The mailer_capture module installs a mailer transport which intercepts any
  * email sent during a test.
  */
-#[Group('mailer_experiment')]
+#[Group('mailer_symfony')]
 #[RunTestsInSeparateProcesses]
 class MailerCaptureTest extends BrowserTestBase {
 
@@ -32,7 +32,7 @@ class MailerCaptureTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['mailer_experiment', 'mailer_capture', 'mailer_capture_test'];
+  protected static $modules = ['mailer_symfony', 'mailer_capture', 'mailer_capture_test'];
 
   /**
    * Tests collecting mail sent in the test runner.
