@@ -72,7 +72,9 @@ trait DependencySerializationTrait {
         elseif (($value instanceof \Closure) &&
                 ($reflection_closure = new \ReflectionFunction($value)) &&
                 ($reflection_closure->getNumberOfParameters() === 0) &&
-                ($service_id = $reverse_container->getId(($value)()))) {
+                ($closure_return = ($value)()) &&
+                (is_object($closure_return)) &&
+                ($service_id = $reverse_container->getId($closure_return))) {
           // If a class member is a closure that returns a service object, only
           // store its ID so it can be used to create a new closure that returns
           // the service object on unserialization.
