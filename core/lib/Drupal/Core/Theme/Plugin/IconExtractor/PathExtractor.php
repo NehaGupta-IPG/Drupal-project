@@ -36,6 +36,8 @@ class PathExtractor extends IconExtractorWithFinder {
       return [];
     }
 
+    ksort($files);
+
     $icons = [];
     foreach ($files as $file) {
       $id = IconDefinition::createIconId($this->configuration['id'], $file['icon_id']);
