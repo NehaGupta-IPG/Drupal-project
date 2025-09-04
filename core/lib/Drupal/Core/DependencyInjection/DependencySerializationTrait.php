@@ -20,6 +20,17 @@ trait DependencySerializationTrait {
   protected $_serviceIds = [];
 
   /**
+   * An array of service IDs keyed by property name used for serialization.
+   *
+   * This tracks the services that are returned by class properties which are
+   * closures.
+   *
+   * @var array
+   */
+  // phpcs:ignore Drupal.Classes.PropertyDeclaration, Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  protected $_serviceClosureIds = [];
+
+  /**
    * An array of entity type IDs keyed by the property name of their storages.
    *
    * @var array
@@ -58,6 +69,13 @@ trait DependencySerializationTrait {
           $this->_serviceIds[$key] = $service_id;
           unset($vars[$key]);
         }
+        elseif (($value instanceof \Closure) &&
+                ($reflection_closure = new \ReflectionFunction($value)) &&
+                ($reflection_closure->getNumberOfParameters() === 0) &&
+                ($service_id = $reverse_container->getId(($value)()))) {
+          $this->_serviceClosureIds[$key] = $service_id;
+          unset($vars[$key]);
+        }
       }
     }
     catch (ContainerNotInitializedException) {
@@ -80,6 +98,11 @@ trait DependencySerializationTrait {
       $this->$key = $container->get($service_id);
     }
     $this->_serviceIds = [];
+
+    foreach ($this->_serviceClosureIds as $key => $service_closure_id) {
+      $this->$key = static fn() => $container->get($service_closure_id);
+    }
+    $this->_serviceClosureIds = [];
 
     if ($this->_entityStorages) {
       /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
