@@ -83,7 +83,8 @@ class Formula extends ArgumentPluginBase implements ArgumentInterface {
       $field = $this->getFormula();
     }
 
-    // If grouping, check to see if the aggregation method needs to modify the field.
+    // If grouping, check to see if the aggregation method needs to modify
+    // the field.
     if ($this->view->display_handler->useGroupBy()) {
       $this->view->initQuery();
       if ($this->query) {

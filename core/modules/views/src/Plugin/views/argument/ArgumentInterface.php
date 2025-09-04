@@ -9,8 +9,6 @@ interface ArgumentInterface {
 
   /**
    * Returns the formula for this argument.
-   *
-   * @return string
    */
   public function getFormula(): string;
 
