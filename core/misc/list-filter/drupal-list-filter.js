@@ -67,9 +67,9 @@
     detach(context, settings, trigger) {
       if (trigger === 'unload') {
         once
-          .remove('drupal-list-filter', '.table-filter-text', context)
+          .remove('drupal-list-filter', '[data-list-filter]', context)
           .forEach((input) => {
-            ListFilter.instances.get(input).destroy();
+            ListFilter.instances.get(input)?.destroy();
           });
       }
     },
