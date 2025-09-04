@@ -186,18 +186,22 @@
         };
       });
 
+      this._dispatchFilterEventByContainer = (c, search) => {
+        c.container.dispatchEvent(
+          new CustomEvent(ListFilter.FILTER_EVENT, {
+            detail: {
+              query: search,
+              allItems: c.filterItems,
+              labels: c.labels,
+            },
+          }),
+        );
+      };
+
       this._inputHandler = Drupal.debounce((event) => {
-        this.containers.forEach((c) => {
-          c.container.dispatchEvent(
-            new CustomEvent(ListFilter.FILTER_EVENT, {
-              detail: {
-                query: event.target.value,
-                allItems: c.filterItems,
-                labels: c.labels,
-              },
-            }),
-          );
-        });
+        this.containers.forEach((c) =>
+          this._dispatchFilterEventByContainer(c, event.target.value),
+        );
       }, 200);
 
       this._keyDownHandler = (event) => {
@@ -209,7 +213,6 @@
 
       this.input.addEventListener('input', this._inputHandler);
       this.input.addEventListener('keydown', this._keyDownHandler);
-      return this;
     }
 
     /**
@@ -391,9 +394,21 @@
     }
 
     /**
+     * Resets the filter input and shows all items.
+     */
+    reset() {
+      this.input.value = '';
+      this.containers.forEach((c) =>
+        this._dispatchFilterEventByContainer(c, ''),
+      );
+    }
+
+    /**
      * Destroys the ListFilter instance by removing event listeners.
      */
     destroy() {
+      this.reset();
+      ListFilter.instances.delete(this.input);
       this.input.removeEventListener('keydown', this._keyDownHandler);
       this.input.removeEventListener('input', this._inputHandler);
       this.containers.forEach((c) => {
@@ -402,11 +417,11 @@
           this._boundFilterTableList,
         );
       });
-      this.containers = [];
+      this.containers = null;
     }
   }
 
+  ListFilter.instances = new WeakMap();
   // Expose the class to Drupal namespace
-  ListFilter.instances = [];
   Drupal.ListFilter = ListFilter;
 })(Drupal, window.slugify);

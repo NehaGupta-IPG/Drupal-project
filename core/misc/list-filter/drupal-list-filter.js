@@ -57,7 +57,7 @@
             'focus',
             () => {
               // Activate the list filter.
-              ListFilter.instances.push(new ListFilter(input));
+              ListFilter.instances.set(input, new ListFilter(input));
             },
             { once: true },
           );
@@ -66,9 +66,11 @@
     },
     detach(context, settings, trigger) {
       if (trigger === 'unload') {
-        once.remove('drupal-list-filter', '.table-filter-text', context);
-        ListFilter.instances.forEach((instance) => instance.destroy());
-        ListFilter.instances = [];
+        once
+          .remove('drupal-list-filter', '.table-filter-text', context)
+          .forEach((input) => {
+            ListFilter.instances.get(input).destroy();
+          });
       }
     },
   };
