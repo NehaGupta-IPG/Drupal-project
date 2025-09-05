@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\olivero\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the update path for Olivero.
  */
+#[Group('update')]
 class OliveroPostUpdateTest extends UpdatePathTestBase {
 
   /**
