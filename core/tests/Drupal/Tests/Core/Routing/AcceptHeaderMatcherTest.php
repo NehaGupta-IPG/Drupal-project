@@ -6,14 +6,15 @@ namespace Drupal\Tests\Core\Routing;
 
 use Drupal\accept_header_routing_test\Routing\AcceptHeaderMatcher;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
 /**
  * Confirm that the mime types partial matcher is functioning properly.
- *
- * @group Routing
  */
+#[Group('Routing')]
 class AcceptHeaderMatcherTest extends UnitTestCase {
 
   /**
@@ -67,10 +68,9 @@ class AcceptHeaderMatcherTest extends UnitTestCase {
    *   The route name that should survive the filter and be ranked first.
    * @param string $excluded_route
    *   The route name that should be filtered out during matching.
-   *
-   * @dataProvider acceptFilterProvider
    */
-  public function testAcceptFiltering($accept_header, $format, $included_route, $excluded_route) {
+  #[DataProvider('acceptFilterProvider')]
+  public function testAcceptFiltering($accept_header, $format, $included_route, $excluded_route): void {
     $collection = $this->fixtures->sampleRouteCollection();
 
     $request = Request::create('path/two', 'GET');
@@ -89,7 +89,7 @@ class AcceptHeaderMatcherTest extends UnitTestCase {
   /**
    * Confirms that the AcceptHeaderMatcher throws an exception for no-route.
    */
-  public function testNoRouteFound() {
+  public function testNoRouteFound(): void {
     // Remove the sample routes that would match any method.
     $routes = $this->fixtures->sampleRouteCollection();
     $routes->remove('route_a');

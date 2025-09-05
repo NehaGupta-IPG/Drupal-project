@@ -6,17 +6,21 @@ namespace Drupal\Tests\Core\ParamConverter;
 
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\Entity\EntityRepositoryInterface;
-use Drupal\Core\Entity\RevisionableStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\RevisionableStorageInterface;
 use Drupal\Core\ParamConverter\EntityRevisionParamConverter;
 use Drupal\Core\ParamConverter\ParamNotConvertedException;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Routing\Route;
 
 /**
- * @coversDefaultClass \Drupal\Core\ParamConverter\EntityRevisionParamConverter
- * @group entity
+ * Tests Drupal\Core\ParamConverter\EntityRevisionParamConverter.
  */
+#[CoversClass(EntityRevisionParamConverter::class)]
+#[Group('entity')]
 class EntityRevisionParamConverterTest extends UnitTestCase {
 
   /**
@@ -49,17 +53,21 @@ class EntityRevisionParamConverterTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::applies
+   * Tests non applying route.
+   *
+   * @legacy-covers ::applies
    */
-  public function testNonApplyingRoute() {
+  public function testNonApplyingRoute(): void {
     $route = new Route('/test');
     $this->assertFalse($this->converter->applies([], 'test_revision', $route));
   }
 
   /**
-   * @covers ::applies
+   * Tests applying route.
+   *
+   * @legacy-covers ::applies
    */
-  public function testApplyingRoute() {
+  public function testApplyingRoute(): void {
     $route = $this->getTestRoute();
     $this->assertTrue($this->converter->applies($route->getOption('parameters')['test_revision'], 'test_revision', $route));
   }
@@ -67,11 +75,10 @@ class EntityRevisionParamConverterTest extends UnitTestCase {
   /**
    * Tests the convert() method.
    *
-   * @dataProvider providerTestConvert
-   *
-   * @covers ::convert
+   * @legacy-covers ::convert
    */
-  public function testConvert($value, array $definition, array $defaults, $expected_result) {
+  #[DataProvider('providerTestConvert')]
+  public function testConvert($value, array $definition, array $defaults, $expected_result): void {
     $storage = $this->prophesize(RevisionableStorageInterface::class);
     $storage->loadRevision('valid_id')->willReturn((object) ['revision_id' => 'valid_id']);
     $storage->loadRevision('invalid_id')->willReturn(NULL);
@@ -103,9 +110,9 @@ class EntityRevisionParamConverterTest extends UnitTestCase {
   /**
    * Tests the convert() method with an invalid entity type ID.
    *
-   * @covers ::convert
+   * @legacy-covers ::convert
    */
-  public function testConvertWithInvalidEntityType() {
+  public function testConvertWithInvalidEntityType(): void {
     $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
     $entity_type_manager->getStorage('invalid_entity_type_id')->willThrow(new InvalidPluginDefinitionException('invalid_entity_type_id'));
     $entity_repository = $this->prophesize(EntityRepositoryInterface::class);
@@ -118,9 +125,9 @@ class EntityRevisionParamConverterTest extends UnitTestCase {
   /**
    * Tests the convert() method with an invalid dynamic entity type ID.
    *
-   * @covers ::convert
+   * @legacy-covers ::convert
    */
-  public function testConvertWithInvalidType() {
+  public function testConvertWithInvalidType(): void {
     $this->expectException(ParamNotConvertedException::class);
     $this->expectExceptionMessage('The type definition "entity_revision_{entity_type_id}" is invalid. The expected format is "entity_revision:<entity_type_id>".');
     $this->converter->convert('valid_id', ['type' => 'entity_revision_{entity_type_id}'], 'foo', ['foo' => 'valid_id']);
@@ -129,9 +136,9 @@ class EntityRevisionParamConverterTest extends UnitTestCase {
   /**
    * Tests the convert() method with an invalid dynamic entity type ID.
    *
-   * @covers ::convert
+   * @legacy-covers ::convert
    */
-  public function testConvertWithInvalidDynamicEntityType() {
+  public function testConvertWithInvalidDynamicEntityType(): void {
     $this->expectException(ParamNotConvertedException::class);
     $this->expectExceptionMessage('The "foo" parameter was not converted because the "invalid_entity_type_id" parameter is missing.');
     $this->converter->convert('valid_id', ['type' => 'entity_revision:{invalid_entity_type_id}'], 'foo', ['foo' => 'valid_id']);

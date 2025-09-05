@@ -7,12 +7,12 @@ namespace Drupal\Tests\file\FunctionalJavascript;
 use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests ajax upload to managed files.
- *
- * @group file
  */
+#[Group('file')]
 class AjaxFileManagedMultipleTest extends WebDriverTestBase {
 
   use TestFileCreationTrait {
@@ -32,7 +32,7 @@ class AjaxFileManagedMultipleTest extends WebDriverTestBase {
   /**
    * Tests if managed file form element works well with multiple files upload.
    */
-  public function testMultipleFilesUpload() {
+  public function testMultipleFilesUpload(): void {
     $file_system = \Drupal::service('file_system');
     $file_storage = \Drupal::entityTypeManager()->getStorage('file');
     $page = $this->getSession()->getPage();

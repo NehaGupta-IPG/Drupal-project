@@ -6,19 +6,20 @@ namespace Drupal\Tests\ckeditor5\Functional;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\File\FileExists;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Test image upload access.
  *
- * @group ckeditor5
  * @internal
  */
+#[Group('ckeditor5')]
 class ImageUploadAccessTest extends ImageUploadTest {
 
   /**
    * Test access to the CKEditor 5 image upload controller.
    */
-  public function testCkeditor5ImageUploadRoute() {
+  public function testCkeditor5ImageUploadRoute(): void {
     $this->createBasicFormat();
     $url = $this->getUploadUrl();
     $test_image = file_get_contents(current($this->getTestFiles('image'))->uri);

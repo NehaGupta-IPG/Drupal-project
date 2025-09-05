@@ -7,18 +7,16 @@ namespace Drupal\Tests\language\Functional;
 use Drupal\Core\Config\ConfigCollectionEvents;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Ensures the language config overrides can be synchronized.
- *
- * @group language
  */
+#[Group('language')]
 class LanguageConfigOverrideImportTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',
@@ -35,7 +33,7 @@ class LanguageConfigOverrideImportTest extends BrowserTestBase {
   /**
    * Tests that language can be enabled and overrides are created during a sync.
    */
-  public function testConfigOverrideImport() {
+  public function testConfigOverrideImport(): void {
     ConfigurableLanguage::createFromLangcode('fr')->save();
     /** @var \Drupal\Core\Config\StorageInterface $sync */
     $sync = \Drupal::service('config.storage.sync');
@@ -72,7 +70,7 @@ class LanguageConfigOverrideImportTest extends BrowserTestBase {
   /**
    * Tests that configuration events are not fired during a sync of overrides.
    */
-  public function testConfigOverrideImportEvents() {
+  public function testConfigOverrideImportEvents(): void {
     // Enable the config_events_test module so we can record events occurring.
     \Drupal::service('module_installer')->install(['config_events_test']);
     $this->rebuildContainer();

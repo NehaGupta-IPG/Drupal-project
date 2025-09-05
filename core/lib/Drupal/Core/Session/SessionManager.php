@@ -6,6 +6,7 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 
 /**
@@ -17,8 +18,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
  * storing and retrieving session data has been extracted from it in Symfony 2.1
  * but the class name was not changed.
  *
- * @todo
- *   In fact the NativeSessionStorage class already implements all of the
+ * @todo In fact the NativeSessionStorage class already implements all of the
  *   functionality required by a typical Symfony application. Normally it is not
  *   necessary to subclass it at all. In order to reach the point where Drupal
  *   can use the Symfony session management unmodified, the code implemented
@@ -39,10 +39,10 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
   /**
    * The write safe session handler.
    *
-   * @todo: This reference should be removed once all database queries
-   *   are removed from the session manager class.
-   *
    * @var \Drupal\Core\Session\WriteSafeSessionHandlerInterface
+   *
+   * @todo This reference should be removed once all database queries
+   *   are removed from the session manager class.
    */
   protected $writeSafeHandler;
 
@@ -163,6 +163,16 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
       parent::save();
     }
 
+    $allowedKeys = array_map(
+      fn (SessionBagInterface $bag) => $bag->getStorageKey(),
+      $this->bags
+    );
+    $allowedKeys[] = $this->getMetadataBag()->getStorageKey();
+    $deprecatedKeys = array_diff(array_keys($_SESSION), $allowedKeys);
+    if (count($deprecatedKeys) > 0) {
+      @trigger_error(sprintf('Storing values directly in $_SESSION is deprecated in drupal:11.2.0 and will become unsupported in drupal:12.0.0. Use $request->getSession()->set() instead. Affected keys: %s. See https://www.drupal.org/node/3518527', implode(", ", $deprecatedKeys)), E_USER_DEPRECATED);
+    }
+
     $this->startedLazy = FALSE;
   }
 
@@ -250,6 +260,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
    * Command line clients do not support cookies nor sessions.
    *
    * @return bool
+   *   TRUE if the current PHP process runs on CLI, otherwise FALSE>
    */
   protected function isCli() {
     return PHP_SAPI === 'cli';

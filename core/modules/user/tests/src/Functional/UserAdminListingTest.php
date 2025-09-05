@@ -6,13 +6,14 @@ namespace Drupal\Tests\user\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the user admin listing if views is not enabled.
  *
- * @group user
  * @see user_admin_account()
  */
+#[Group('user')]
 class UserAdminListingTest extends BrowserTestBase {
 
   /**
@@ -23,7 +24,7 @@ class UserAdminListingTest extends BrowserTestBase {
   /**
    * Tests the listing.
    */
-  public function testUserListing() {
+  public function testUserListing(): void {
     // Ensure the anonymous user cannot access the admin listing.
     $this->drupalGet('admin/people');
     $this->assertSession()->statusCodeEquals(403);

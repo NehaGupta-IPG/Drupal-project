@@ -12,12 +12,12 @@ use Drupal\filter\Entity\FilterFormat;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\node\Entity\NodeType;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the inline errors fragment link to a CKEditor5-enabled textarea.
- *
- * @group ckeditor5
  */
+#[Group('ckeditor5')]
 class FormErrorHandlerCKEditor5Test extends WebDriverTestBase {
 
   /**
@@ -87,7 +87,7 @@ class FormErrorHandlerCKEditor5Test extends WebDriverTestBase {
   /**
    * Tests if the fragment link to a textarea works with CKEditor 5 enabled.
    */
-  public function testFragmentLink() {
+  public function testFragmentLink(): void {
     $session = $this->getSession();
     $web_assert = $this->assertSession();
     $ckeditor_class = '.ck-editor';
@@ -118,7 +118,8 @@ class FormErrorHandlerCKEditor5Test extends WebDriverTestBase {
     $errors_link->click();
 
     // Check that the CKEditor5-enabled body field is visible in the viewport.
-    // The hash change adds an ID to the CKEditor 5 instance so check its visibility using the ID now.
+    // The hash change adds an ID to the CKEditor 5 instance so check its
+    // visibility using the ID now.
     $web_assert->assertVisibleInViewport('css', $ckeditor_id, 'topLeft', 'CKEditor5-enabled body field is visible.');
   }
 

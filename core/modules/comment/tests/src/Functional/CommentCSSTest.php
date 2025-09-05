@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\comment\CommentInterface;
-use Drupal\user\RoleInterface;
 use Drupal\comment\Entity\Comment;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\Traits\Core\GeneratePermutationsTrait;
+use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests CSS classes on comments.
- *
- * @group comment
  */
+#[Group('comment')]
 class CommentCSSTest extends CommentTestBase {
 
   use GeneratePermutationsTrait;
@@ -42,7 +42,7 @@ class CommentCSSTest extends CommentTestBase {
   /**
    * Tests CSS classes on comments.
    */
-  public function testCommentClasses() {
+  public function testCommentClasses(): void {
     // Create all permutations for comments, users, and nodes.
     $parameters = [
       'node_uid' => [0, $this->webUser->id()],

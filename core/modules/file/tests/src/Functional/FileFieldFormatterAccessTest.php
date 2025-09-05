@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests file formatter access.
- * @group file
  */
+#[Group('file')]
 class FileFieldFormatterAccessTest extends FileFieldTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'file', 'field_ui', 'file_test'];
 
@@ -25,7 +25,7 @@ class FileFieldFormatterAccessTest extends FileFieldTestBase {
   /**
    * Tests the custom access handler is invoked.
    */
-  public function testFileAccessHandler() {
+  public function testFileAccessHandler(): void {
     $type_name = 'article';
     $field_name = $this->randomMachineName();
     $this->createFileField($field_name, 'node', $type_name);

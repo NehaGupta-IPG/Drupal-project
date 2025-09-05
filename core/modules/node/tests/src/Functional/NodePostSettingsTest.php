@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests the node setting for displaying author and date information.
- *
- * @group node
  */
+#[Group('node')]
 class NodePostSettingsTest extends NodeTestBase {
 
   /**
@@ -33,7 +34,7 @@ class NodePostSettingsTest extends NodeTestBase {
   /**
    * Confirms "Basic page" content type and post information is on a new node.
    */
-  public function testPagePostInfo() {
+  public function testPagePostInfo(): void {
 
     // Set "Basic page" content type to display post information.
     $edit = [];

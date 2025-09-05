@@ -15,14 +15,14 @@ class ThemeExtensionListTest extends KernelTestBase {
   /**
    * @covers ::getList
    */
-  public function testGetList() {
+  public function testGetList(): void {
     \Drupal::configFactory()->getEditable('core.extension')
       ->set('module.testing', 1000)
       ->set('theme.test_theme', 0)
       ->save();
 
     // The installation profile is provided by a container parameter.
-    // Saving the configuration doesn't automatically trigger invalidation
+    // Saving the configuration doesn't automatically trigger invalidation.
     $this->container->get('kernel')->rebuildContainer();
 
     /** @var \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list */
@@ -35,7 +35,7 @@ class ThemeExtensionListTest extends KernelTestBase {
   /**
    * Tests that themes have an empty default version set.
    */
-  public function testThemeWithoutVersion() {
+  public function testThemeWithoutVersion(): void {
     $theme = \Drupal::service('extension.list.theme')->get('test_theme_settings_features');
     $this->assertNull($theme->info['version']);
   }

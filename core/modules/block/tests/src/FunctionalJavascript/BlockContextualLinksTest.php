@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\block\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the contextual links added while rendering the block.
- *
- * @group block
  */
+#[Group('block')]
 class BlockContextualLinksTest extends WebDriverTestBase {
 
   /**
@@ -50,7 +50,7 @@ class BlockContextualLinksTest extends WebDriverTestBase {
   /**
    * Test that remove/configure contextual links are present in the block.
    */
-  public function testBlockContextualRemoveLinks() {
+  public function testBlockContextualRemoveLinks(): void {
     $this->drupalGet('<front>');
     $contextual_id = "[data-contextual-id^='block:block=$this->blockId:langcode=en']";
     $this->assertSession()->waitForElement('css', "$contextual_id .contextual-links");

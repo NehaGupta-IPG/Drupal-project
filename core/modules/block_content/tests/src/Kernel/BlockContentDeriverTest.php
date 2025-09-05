@@ -63,12 +63,12 @@ class BlockContentDeriverTest extends KernelTestBase {
   /**
    * Tests that only reusable blocks are derived.
    */
-  public function testReusableBlocksOnlyAreDerived() {
+  public function testReusableBlocksOnlyAreDerived(): void {
     // Create a block content type.
     $block_content_type = BlockContentType::create([
       'id' => 'spiffy',
-      'label' => 'Mucho spiffy',
-      'description' => "Provides a block type that increases your site's spiffiness by up to 11%",
+      'label' => 'Very spiffy',
+      'description' => "Provides a block type that increases your site's spiffy rating by up to 11%",
     ]);
     $block_content_type->save();
     // And a block content entity.

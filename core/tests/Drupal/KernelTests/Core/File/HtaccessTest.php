@@ -46,7 +46,7 @@ class HtaccessTest extends KernelTestBase {
   /**
    * @covers ::write
    */
-  public function testHtaccessSave() {
+  public function testHtaccessSave(): void {
     // Prepare test directories.
     $private = Settings::get('file_public_path') . '/test/private';
     $stream = 'public://test/stream';
@@ -89,6 +89,15 @@ class HtaccessTest extends KernelTestBase {
     $this->assertFilePermissions($stream . '/.htaccess', 0444);
 
     $this->assertTrue($this->htaccessWriter->write($stream));
+  }
+
+  /**
+   * @covers ::write
+   */
+  public function testHtaccessSaveDisabled(): void {
+    $this->setSetting('auto_create_htaccess', FALSE);
+    $this->assertTrue($this->htaccessWriter->write($this->public, FALSE));
+    $this->assertFileDoesNotExist($this->public . '/.htaccess');
   }
 
   /**

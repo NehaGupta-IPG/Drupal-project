@@ -19,9 +19,7 @@ use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 class RowEntityTest extends ViewsKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'entity_test',
@@ -50,7 +48,7 @@ class RowEntityTest extends ViewsKernelTestBase {
   /**
    * Tests the entity row handler.
    */
-  public function testEntityRow() {
+  public function testEntityRow(): void {
     $user = User::create([
       'name' => 'test user',
     ]);

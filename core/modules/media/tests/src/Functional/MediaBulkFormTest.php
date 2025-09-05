@@ -6,12 +6,12 @@ namespace Drupal\Tests\media\Functional;
 
 use Drupal\media\Entity\Media;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests a media bulk form.
- *
- * @group media
  */
+#[Group('media')]
 class MediaBulkFormTest extends MediaFunctionalTestBase {
 
   /**
@@ -62,7 +62,7 @@ class MediaBulkFormTest extends MediaFunctionalTestBase {
   /**
    * Tests the media bulk form.
    */
-  public function testBulkForm() {
+  public function testBulkForm(): void {
     $session = $this->getSession();
     $page = $session->getPage();
     $assert_session = $this->assertSession();

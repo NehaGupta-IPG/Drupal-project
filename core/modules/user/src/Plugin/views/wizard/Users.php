@@ -7,7 +7,7 @@ use Drupal\views\Attribute\ViewsWizard;
 use Drupal\views\Plugin\views\wizard\WizardPluginBase;
 
 /**
- * @todo: replace numbers with constants.
+ * @todo Replace numbers with constants.
  */
 
 /**
@@ -29,6 +29,8 @@ class Users extends WizardPluginBase {
 
   /**
    * Set default values for the filters.
+   *
+   * @var string[]
    */
   protected $filters = [
     'status' => [

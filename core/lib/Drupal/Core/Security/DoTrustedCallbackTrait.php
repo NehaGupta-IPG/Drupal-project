@@ -31,7 +31,7 @@ trait DoTrustedCallbackTrait {
    *   magic method __invoke() are not supported.
    * @param array $args
    *   The arguments to pass the callback.
-   * @param $message
+   * @param string $message
    *   The error message if the callback is not trusted. If the message contains
    *   "%s" it will be replaced in with the resolved callback.
    * @param string $error_type
@@ -103,7 +103,7 @@ trait DoTrustedCallbackTrait {
       }
     }
 
-    // @TODO Allow named arguments in https://www.drupal.org/node/3174150
+    // @todo Allow named arguments in https://www.drupal.org/node/3174150
     return call_user_func_array($callback, array_values($args));
   }
 

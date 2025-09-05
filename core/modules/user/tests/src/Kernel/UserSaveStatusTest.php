@@ -15,9 +15,7 @@ use Drupal\user\Entity\User;
 class UserSaveStatusTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'user', 'field'];
 
@@ -32,7 +30,7 @@ class UserSaveStatusTest extends KernelTestBase {
   /**
    * Tests SAVED_NEW and SAVED_UPDATED statuses for user entity type.
    */
-  public function testUserSaveStatus() {
+  public function testUserSaveStatus(): void {
     // Create a new user.
     $values = [
       'uid' => 1,

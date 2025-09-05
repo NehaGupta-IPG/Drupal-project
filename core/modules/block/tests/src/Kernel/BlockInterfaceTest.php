@@ -17,6 +17,9 @@ use Drupal\KernelTests\KernelTestBase;
  */
 class BlockInterfaceTest extends KernelTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['system', 'block', 'block_test', 'user'];
 
   /**
@@ -33,7 +36,7 @@ class BlockInterfaceTest extends KernelTestBase {
    * subsequent method calls are just attempting to cause a failure if a
    * dependency outside of the plugin configuration is required.
    */
-  public function testBlockInterface() {
+  public function testBlockInterface(): void {
     $manager = $this->container->get('plugin.manager.block');
     $configuration = [
       'label' => 'Custom Display Message',

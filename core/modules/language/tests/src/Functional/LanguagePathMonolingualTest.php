@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\language\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Confirm that paths are not changed on monolingual non-English sites.
- *
- * @group language
  */
+#[Group('language')]
 class LanguagePathMonolingualTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'language', 'path'];
 
@@ -75,7 +73,7 @@ class LanguagePathMonolingualTest extends BrowserTestBase {
   /**
    * Verifies that links do not have language prefixes in them.
    */
-  public function testPageLinks() {
+  public function testPageLinks(): void {
     // Navigate to 'admin/config' path.
     $this->drupalGet('admin/config');
 

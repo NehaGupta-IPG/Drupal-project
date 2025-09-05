@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the JavaScript functionality of the module uninstall filter.
- *
- * @group system
  */
+#[Group('system')]
 class ModuleUninstallFilterTest extends WebDriverTestBase {
 
   /**
@@ -38,7 +38,7 @@ class ModuleUninstallFilterTest extends WebDriverTestBase {
   /**
    * Tests that correct module count is returned when list filtered.
    */
-  public function testModuleUninstallFilter() {
+  public function testModuleUninstallFilter(): void {
 
     // Find the module filter field.
     $this->drupalGet('admin/modules/uninstall');
@@ -89,6 +89,7 @@ class ModuleUninstallFilterTest extends WebDriverTestBase {
    *   An array of node elements.
    *
    * @return \Behat\Mink\Element\NodeElement[]
+   *   An array of node elements that are visible.
    */
   protected function filterVisibleElements($elements) {
     $elements = array_filter($elements, function ($element) {

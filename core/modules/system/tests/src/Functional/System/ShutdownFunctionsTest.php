@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Functional tests shutdown functions.
- *
- * @group system
  */
+#[Group('system')]
 class ShutdownFunctionsTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system_test'];
 
@@ -39,7 +37,7 @@ class ShutdownFunctionsTest extends BrowserTestBase {
   /**
    * Tests shutdown functions.
    */
-  public function testShutdownFunctions() {
+  public function testShutdownFunctions(): void {
     $arg1 = $this->randomMachineName();
     $arg2 = $this->randomMachineName();
     $this->drupalGet('system-test/shutdown-functions/' . $arg1 . '/' . $arg2);

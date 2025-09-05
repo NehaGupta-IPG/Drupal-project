@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\node\Entity\NodeType;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests node access rebuild functions with multiple node access modules.
- *
- * @group node
  */
+#[Group('node')]
 class NodeAccessRebuildNodeGrantsTest extends NodeTestBase {
+
+  use NodeAccessTrait;
 
   /**
    * {@inheritdoc}
@@ -52,10 +55,10 @@ class NodeAccessRebuildNodeGrantsTest extends NodeTestBase {
   /**
    * Tests rebuilding the node access permissions table with content.
    */
-  public function testNodeAccessRebuildNodeGrants() {
+  public function testNodeAccessRebuildNodeGrants(): void {
     \Drupal::service('module_installer')->install(['node_access_test']);
     \Drupal::state()->set('node_access_test.private', TRUE);
-    node_access_test_add_field(NodeType::load('page'));
+    $this->addPrivateField(NodeType::load('page'));
     $this->resetAll();
 
     // Create 30 nodes so that _node_access_rebuild_batch_operation() has to run
@@ -84,6 +87,7 @@ class NodeAccessRebuildNodeGrantsTest extends NodeTestBase {
     $this->clickLink('Rebuild permissions');
     $this->submitForm([], 'Rebuild permissions');
     $this->assertSession()->pageTextContains('The content access permissions have been rebuilt.');
+    \Drupal::service('node.view_all_nodes_memory_cache')->deleteAll();
 
     // Test if the rebuild by user that cannot bypass node access and does not
     // have access to the nodes has been successful.
@@ -108,7 +112,7 @@ class NodeAccessRebuildNodeGrantsTest extends NodeTestBase {
   /**
    * Tests rebuilding the node access permissions table with no content.
    */
-  public function testNodeAccessRebuildNoAccessModules() {
+  public function testNodeAccessRebuildNoAccessModules(): void {
     // Default realm access is present.
     $this->assertEquals(1, \Drupal::service('node.grant_storage')->count(), 'There is an all realm access record');
 

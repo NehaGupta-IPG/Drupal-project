@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\path\Functional;
 
 use Drupal\media\Entity\MediaType;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the path media form UI.
- *
- * @group path
  */
+#[Group('path')]
 class PathMediaFormTest extends PathTestBase {
 
   /**
@@ -37,7 +37,7 @@ class PathMediaFormTest extends PathTestBase {
   /**
    * Tests the media form UI.
    */
-  public function testMediaForm() {
+  public function testMediaForm(): void {
     $assert_session = $this->assertSession();
 
     // Create media type.

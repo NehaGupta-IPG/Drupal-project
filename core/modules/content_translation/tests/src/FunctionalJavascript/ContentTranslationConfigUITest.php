@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\content_translation\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that the content translation configuration javascript does't fail.
- *
- * @group content_translation
  */
+#[Group('content_translation')]
 class ContentTranslationConfigUITest extends WebDriverTestBase {
 
   /**
@@ -33,7 +33,7 @@ class ContentTranslationConfigUITest extends WebDriverTestBase {
   /**
    * Tests that the content translation configuration javascript does't fail.
    */
-  public function testContentTranslationConfigUI() {
+  public function testContentTranslationConfigUI(): void {
     $content_translation_manager = $this->container->get('content_translation.manager');
     $content_translation_manager->setEnabled('node', 'article', TRUE);
     $this->rebuildContainer();

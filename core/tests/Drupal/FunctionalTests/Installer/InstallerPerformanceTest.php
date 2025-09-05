@@ -7,12 +7,12 @@ namespace Drupal\FunctionalTests\Installer;
 use Drupal\Core\Routing\RoutingEvents;
 use Drupal\Core\Test\PerformanceTestRecorder;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the interactive installer.
- *
- * @group Installer
  */
+#[Group('Installer')]
 class InstallerPerformanceTest extends BrowserTestBase {
 
   /**
@@ -28,7 +28,7 @@ class InstallerPerformanceTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function prepareSettings() {
+  protected function prepareSettings(): void {
     parent::prepareSettings();
     PerformanceTestRecorder::registerService($this->siteDirectory . '/services.yml', FALSE);
   }
@@ -36,7 +36,7 @@ class InstallerPerformanceTest extends BrowserTestBase {
   /**
    * Ensures that the user page is available after installation.
    */
-  public function testInstaller() {
+  public function testInstaller(): void {
     // Ensures that router is not rebuilt unnecessarily during the install.
     // Currently it is built once during the install in install_finished().
     $this->assertSame(1, \Drupal::service('core.performance.test.recorder')->getCount('event', RoutingEvents::FINISHED));

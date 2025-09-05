@@ -5,15 +5,19 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\FileCache;
 
 use Drupal\Component\FileCache\FileCache;
-use Drupal\Component\FileCache\NullFileCache;
 use Drupal\Component\FileCache\FileCacheFactory;
+use Drupal\Component\FileCache\NullFileCache;
 use Drupal\Component\Utility\Random;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \Drupal\Component\FileCache\FileCacheFactory
- * @group FileCache
+ * Tests Drupal\Component\FileCache\FileCacheFactory.
  */
+#[CoversClass(FileCacheFactory::class)]
+#[Group('FileCache')]
 class FileCacheFactoryTest extends TestCase {
 
   /**
@@ -36,9 +40,9 @@ class FileCacheFactoryTest extends TestCase {
   }
 
   /**
-   * @covers ::get
+   * @legacy-covers ::get
    */
-  public function testGet() {
+  public function testGet(): void {
     $file_cache = FileCacheFactory::get('test_foo_settings', []);
 
     // Ensure the right backend and configuration is used.
@@ -57,9 +61,9 @@ class FileCacheFactoryTest extends TestCase {
   }
 
   /**
-   * @covers ::get
+   * @legacy-covers ::get
    */
-  public function testGetNoPrefix() {
+  public function testGetNoPrefix(): void {
     FileCacheFactory::setPrefix(NULL);
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage('Required prefix configuration is missing');
@@ -67,9 +71,9 @@ class FileCacheFactoryTest extends TestCase {
   }
 
   /**
-   * @covers ::get
+   * @legacy-covers ::get
    */
-  public function testGetDisabledFileCache() {
+  public function testGetDisabledFileCache(): void {
     // Ensure the returned FileCache is an instance of FileCache::class.
     $file_cache = FileCacheFactory::get('test_foo_settings', []);
     $this->assertInstanceOf(FileCache::class, $file_cache);
@@ -84,11 +88,10 @@ class FileCacheFactoryTest extends TestCase {
   }
 
   /**
-   * @covers ::get
-   *
-   * @dataProvider configurationDataProvider
+   * @legacy-covers ::get
    */
-  public function testGetConfigurationOverrides($configuration, $arguments, $class) {
+  #[DataProvider('configurationDataProvider')]
+  public function testGetConfigurationOverrides($configuration, $arguments, $class): void {
     FileCacheFactory::setConfiguration($configuration);
 
     $file_cache = FileCacheFactory::get('test_foo_settings', $arguments);
@@ -154,10 +157,10 @@ class FileCacheFactoryTest extends TestCase {
   }
 
   /**
-   * @covers ::getConfiguration
-   * @covers ::setConfiguration
+   * @legacy-covers ::getConfiguration
+   * @legacy-covers ::setConfiguration
    */
-  public function testGetSetConfiguration() {
+  public function testGetSetConfiguration(): void {
     $configuration = FileCacheFactory::getConfiguration();
     $configuration['test_foo_bar'] = ['bar' => 'llama'];
     FileCacheFactory::setConfiguration($configuration);
@@ -166,10 +169,10 @@ class FileCacheFactoryTest extends TestCase {
   }
 
   /**
-   * @covers ::getPrefix
-   * @covers ::setPrefix
+   * @legacy-covers ::getPrefix
+   * @legacy-covers ::setPrefix
    */
-  public function testGetSetPrefix() {
+  public function testGetSetPrefix(): void {
     // Random generator.
     $random = new Random();
 
@@ -180,4 +183,7 @@ class FileCacheFactoryTest extends TestCase {
 
 }
 
+/**
+ * Class to help test the file cache class.
+ */
 class CustomFileCache extends FileCache {}

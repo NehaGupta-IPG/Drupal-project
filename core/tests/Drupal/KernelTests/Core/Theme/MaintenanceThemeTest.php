@@ -16,7 +16,7 @@ class MaintenanceThemeTest extends KernelTestBase {
   /**
    * Tests that the maintenance theme initializes the theme and its base themes.
    */
-  public function testMaintenanceTheme() {
+  public function testMaintenanceTheme(): void {
     $this->setSetting('maintenance_theme', 'test_subtheme');
     // Get the maintenance theme loaded.
     drupal_maintenance_theme();
@@ -29,7 +29,7 @@ class MaintenanceThemeTest extends KernelTestBase {
 
     $base_themes = $active_theme->getBaseThemeExtensions();
     $base_theme_names = array_keys($base_themes);
-    $this->assertSame(['test_basetheme'], $base_theme_names);
+    $this->assertSame(['test_base_theme'], $base_theme_names);
   }
 
 }

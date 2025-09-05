@@ -63,7 +63,10 @@ class ActionsTest extends KernelTestBase implements FormInterface {
   public function submitForm(array &$form, FormStateInterface $form_state) {
   }
 
-  public function testDropbuttonWithBubbleableMetadata() {
+  /**
+   * Tests a drop button with Bubbleable metadata.
+   */
+  public function testDropbuttonWithBubbleableMetadata(): void {
     $result = \Drupal::formBuilder()->getForm($this);
     \Drupal::service('renderer')->renderRoot($result);
     $this->assertEquals(['system/base', 'core/drupal.dropbutton'], $result['#attached']['library']);

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Libraries;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the loading of many weighted assets.
- *
- * @group libraries
  */
+#[Group('libraries')]
 class ManyAssetsLoadOrderTest extends BrowserTestBase {
 
   /**
@@ -28,7 +28,7 @@ class ManyAssetsLoadOrderTest extends BrowserTestBase {
    *
    * Confirms the load order reflects the configured weights for each asset.
    */
-  public function testLoadOrder() {
+  public function testLoadOrder(): void {
     $this->drupalGet('many_assets_test');
 
     $js = $this->getSession()->getPage()->findAll('css', 'script[data-weight]');

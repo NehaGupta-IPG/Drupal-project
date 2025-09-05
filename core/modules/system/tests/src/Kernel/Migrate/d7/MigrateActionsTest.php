@@ -14,6 +14,9 @@ use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
  */
 class MigrateActionsTest extends MigrateDrupal7TestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['comment', 'node'];
 
   /**
@@ -27,7 +30,7 @@ class MigrateActionsTest extends MigrateDrupal7TestBase {
   /**
    * Tests Drupal 7 action migration to Drupal 8.
    */
-  public function testActions() {
+  public function testActions(): void {
     // Test default actions.
     $this->assertEntity('node_publish_action', 'Publish content', 'node', []);
     $this->assertEntity('node_make_sticky_action', 'Make content sticky', 'node', []);

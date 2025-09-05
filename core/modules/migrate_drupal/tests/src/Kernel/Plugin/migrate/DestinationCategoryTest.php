@@ -46,7 +46,7 @@ class DestinationCategoryTest extends MigrateDrupalTestBase {
   /**
    * Tests that all D6 migrations are tagged as either Configuration or Content.
    */
-  public function testD6Categories() {
+  public function testD6Categories(): void {
     $migrations = $this->drupal6Migrations();
     $this->assertArrayHasKey('d6_node:page', $migrations);
     $this->assertCategories($migrations);
@@ -55,7 +55,7 @@ class DestinationCategoryTest extends MigrateDrupalTestBase {
   /**
    * Tests that all D7 migrations are tagged as either Configuration or Content.
    */
-  public function testD7Categories() {
+  public function testD7Categories(): void {
     $migrations = $this->drupal7Migrations();
     $this->assertArrayHasKey('d7_node:page', $migrations);
     $this->assertCategories($migrations);
@@ -98,7 +98,7 @@ class DestinationCategoryTest extends MigrateDrupalTestBase {
    * @return array
    *   The configuration class names.
    */
-  protected function getConfigurationClasses() {
+  protected function getConfigurationClasses(): array {
     return [
       Config::class,
       EntityConfigBase::class,
@@ -117,9 +117,10 @@ class DestinationCategoryTest extends MigrateDrupalTestBase {
    * @return array
    *   The content class names.
    */
-  protected function getContentClasses() {
+  protected function getContentClasses(): array {
     return [
       EntityContentBase::class,
+      // @todo Remove BlockedIp in https://www.drupal.org/project/drupal/issues/3488827
       BlockedIp::class,
       UserData::class,
     ];

@@ -13,12 +13,12 @@ use Drupal\search\Entity\SearchPage;
 use Drupal\search\SearchIndexInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\CronRunTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Indexes content and tests ranking factors.
- *
- * @group search
  */
+#[Group('search')]
 class SearchRankingTest extends BrowserTestBase {
 
   use CommentTestTrait;
@@ -61,7 +61,10 @@ class SearchRankingTest extends BrowserTestBase {
     ]));
   }
 
-  public function testRankings() {
+  /**
+   * Tests the impact of different ranking factors on search results.
+   */
+  public function testRankings(): void {
     // Add a comment field.
     $this->addDefaultCommentField('node', 'page');
 
@@ -211,7 +214,7 @@ class SearchRankingTest extends BrowserTestBase {
   /**
    * Tests rankings of HTML tags.
    */
-  public function testHTMLRankings() {
+  public function testHTMLRankings(): void {
     $full_html_format = FilterFormat::create([
       'format' => 'full_html',
       'name' => 'Full HTML',

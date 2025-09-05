@@ -6,12 +6,12 @@ namespace Drupal\Tests\views\FunctionalJavascript\Plugin\views\Handler;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the contextual filter handler UI.
- *
- * @group views
  */
+#[Group('views')]
 class ContextualFilterTest extends WebDriverTestBase {
 
   /**
@@ -59,7 +59,7 @@ class ContextualFilterTest extends WebDriverTestBase {
   /**
    * Tests adding a contextual filter handler through the UI.
    */
-  public function testAddContextualFilterUI() {
+  public function testAddContextualFilterUI(): void {
     $this->drupalGet('/admin/structure/views/view/test_field_body');
 
     $web_assert = $this->assertSession();

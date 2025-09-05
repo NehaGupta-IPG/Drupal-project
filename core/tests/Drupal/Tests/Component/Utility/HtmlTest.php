@@ -8,17 +8,17 @@ use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Render\MarkupTrait;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Random;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 // cspell:ignore répét répété
-
 /**
  * Tests \Drupal\Component\Utility\Html.
- *
- * @group Common
- *
- * @coversDefaultClass \Drupal\Component\Utility\Html
  */
+#[CoversClass(Html::class)]
+#[Group('Common')]
 class HtmlTest extends TestCase {
 
   /**
@@ -42,11 +42,10 @@ class HtmlTest extends TestCase {
    *   (optional) An array of string replacements to use on the identifier. If
    *   NULL, no filter will be passed and a default will be used.
    *
-   * @dataProvider providerTestCleanCssIdentifier
-   *
-   * @covers ::cleanCssIdentifier
+   * @legacy-covers ::cleanCssIdentifier
    */
-  public function testCleanCssIdentifier($expected, $source, $filter = NULL) {
+  #[DataProvider('providerTestCleanCssIdentifier')]
+  public function testCleanCssIdentifier($expected, $source, $filter = NULL): void {
     if ($filter !== NULL) {
       $this->assertSame($expected, Html::cleanCssIdentifier($source, $filter));
     }
@@ -65,13 +64,17 @@ class HtmlTest extends TestCase {
     $id1 = 'abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ-0123456789';
     $id2 = '¡¢£¤¥';
     $id3 = 'css__identifier__with__double__underscores';
+    $id4 = "\x80\x81";
     return [
       // Verify that no valid ASCII characters are stripped from the identifier.
       [$id1, $id1, []],
-      // Verify that valid UTF-8 characters are not stripped from the identifier.
+      // Verify that valid UTF-8 characters are not stripped from the
+      // identifier.
       [$id2, $id2, []],
       // Verify that double underscores are not stripped from the identifier.
       [$id3, $id3],
+      // Confirm that NULL identifier does not trigger PHP 8.1 deprecation message.
+      ['', $id4],
       // Verify that invalid characters (including non-breaking space) are
       // stripped from the identifier.
       ['invalid_identifier', 'invalid_ !"#$%&\'()*+,./:;<=>?@[\\]^`{|}~ identifier', []],
@@ -90,9 +93,9 @@ class HtmlTest extends TestCase {
   /**
    * Tests that Html::getClass() cleans the class name properly.
    *
-   * @covers ::getClass
+   * @legacy-covers ::getClass
    */
-  public function testHtmlClass() {
+  public function testHtmlClass(): void {
     // Verify Drupal coding standards are enforced.
     $this->assertSame('class-name--ü', Html::getClass('CLASS NAME_[Ü]'), 'Enforce Drupal coding standards.');
 
@@ -112,11 +115,10 @@ class HtmlTest extends TestCase {
    * @param bool $reset
    *   (optional) If TRUE, reset the list of seen IDs. Defaults to FALSE.
    *
-   * @dataProvider providerTestHtmlGetUniqueId
-   *
-   * @covers ::getUniqueId
+   * @legacy-covers ::getUniqueId
    */
-  public function testHtmlGetUniqueId($expected, $source, $reset = FALSE) {
+  #[DataProvider('providerTestHtmlGetUniqueId')]
+  public function testHtmlGetUniqueId($expected, $source, $reset = FALSE): void {
     if ($reset) {
       Html::resetSeenIds();
     }
@@ -155,11 +157,10 @@ class HtmlTest extends TestCase {
    * @param string $source
    *   The string being transformed to an ID.
    *
-   * @dataProvider providerTestHtmlGetUniqueIdWithAjaxIds
-   *
-   * @covers ::getUniqueId
+   * @legacy-covers ::getUniqueId
    */
-  public function testHtmlGetUniqueIdWithAjaxIds($expected, $source) {
+  #[DataProvider('providerTestHtmlGetUniqueIdWithAjaxIds')]
+  public function testHtmlGetUniqueIdWithAjaxIds($expected, $source): void {
     Html::setIsAjax(TRUE);
     $id = Html::getUniqueId($source);
 
@@ -199,11 +200,10 @@ class HtmlTest extends TestCase {
    * @param string $source
    *   The string being transformed to an ID.
    *
-   * @dataProvider providerTestHtmlGetId
-   *
-   * @covers ::getId
+   * @legacy-covers ::getId
    */
-  public function testHtmlGetId($expected, $source) {
+  #[DataProvider('providerTestHtmlGetId')]
+  public function testHtmlGetId($expected, $source): void {
     Html::setIsAjax(FALSE);
     $this->assertSame($expected, Html::getId($source));
   }
@@ -234,10 +234,10 @@ class HtmlTest extends TestCase {
   /**
    * Tests Html::decodeEntities().
    *
-   * @dataProvider providerDecodeEntities
-   * @covers ::decodeEntities
+   * @legacy-covers ::decodeEntities
    */
-  public function testDecodeEntities($text, $expected) {
+  #[DataProvider('providerDecodeEntities')]
+  public function testDecodeEntities($text, $expected): void {
     $this->assertEquals($expected, Html::decodeEntities($text));
   }
 
@@ -275,10 +275,10 @@ class HtmlTest extends TestCase {
   /**
    * Tests Html::escape().
    *
-   * @dataProvider providerEscape
-   * @covers ::escape
+   * @legacy-covers ::escape
    */
-  public function testEscape($expected, $text) {
+  #[DataProvider('providerEscape')]
+  public function testEscape($expected, $text): void {
     $this->assertEquals($expected, Html::escape($text));
   }
 
@@ -309,10 +309,10 @@ class HtmlTest extends TestCase {
   /**
    * Tests relationship between escaping and decoding HTML entities.
    *
-   * @covers ::decodeEntities
-   * @covers ::escape
+   * @legacy-covers ::decodeEntities
+   * @legacy-covers ::escape
    */
-  public function testDecodeEntitiesAndEscape() {
+  public function testDecodeEntitiesAndEscape(): void {
     $string = "<em>répét&eacute;</em>";
     $escaped = Html::escape($string);
     $this->assertSame('&lt;em&gt;répét&amp;eacute;&lt;/em&gt;', $escaped);
@@ -327,30 +327,31 @@ class HtmlTest extends TestCase {
   /**
    * Tests Html::serialize().
    *
-   * Resolves an issue by where an empty DOMDocument object sent to serialization would
-   * cause errors in getElementsByTagName() in the serialization function.
+   * Resolves an issue by where an empty DOMDocument object sent to
+   * serialization would cause errors in getElementsByTagName() in the
+   * serialization function.
    *
-   * @covers ::serialize
+   * @legacy-covers ::serialize
    */
-  public function testSerialize() {
+  public function testSerialize(): void {
     $document = new \DOMDocument();
     $result = Html::serialize($document);
     $this->assertSame('', $result);
   }
 
   /**
-   * @covers ::transformRootRelativeUrlsToAbsolute
-   * @dataProvider providerTestTransformRootRelativeUrlsToAbsolute
+   * @legacy-covers ::transformRootRelativeUrlsToAbsolute
    */
-  public function testTransformRootRelativeUrlsToAbsolute($html, $scheme_and_host, $expected_html) {
+  #[DataProvider('providerTestTransformRootRelativeUrlsToAbsolute')]
+  public function testTransformRootRelativeUrlsToAbsolute($html, $scheme_and_host, $expected_html): void {
     $this->assertSame($expected_html ?: $html, Html::transformRootRelativeUrlsToAbsolute($html, $scheme_and_host));
   }
 
   /**
-   * @covers ::transformRootRelativeUrlsToAbsolute
-   * @dataProvider providerTestTransformRootRelativeUrlsToAbsoluteAssertion
+   * @legacy-covers ::transformRootRelativeUrlsToAbsolute
    */
-  public function testTransformRootRelativeUrlsToAbsoluteAssertion($scheme_and_host) {
+  #[DataProvider('providerTestTransformRootRelativeUrlsToAbsoluteAssertion')]
+  public function testTransformRootRelativeUrlsToAbsoluteAssertion($scheme_and_host): void {
     $this->expectException(\AssertionError::class);
     Html::transformRootRelativeUrlsToAbsolute('', $scheme_and_host);
   }

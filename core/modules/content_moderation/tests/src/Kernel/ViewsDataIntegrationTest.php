@@ -59,7 +59,7 @@ class ViewsDataIntegrationTest extends ViewsKernelTestBase {
   /**
    * Tests the content moderation state views field.
    */
-  public function testContentModerationStateField() {
+  public function testContentModerationStateField(): void {
     $node = Node::create([
       'type' => 'page',
       'title' => 'Test title',
@@ -76,7 +76,13 @@ class ViewsDataIntegrationTest extends ViewsKernelTestBase {
         'moderation_state' => 'published',
       ],
     ];
-    $this->assertIdenticalResultset($view, $expected_result, ['title' => 'title', 'moderation_state' => 'moderation_state']);
+    $this->assertIdenticalResultset(
+      $view,
+      $expected_result,
+      [
+        'title' => 'title',
+        'moderation_state' => 'moderation_state',
+      ]);
   }
 
 }

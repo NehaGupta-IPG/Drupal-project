@@ -322,10 +322,8 @@
       // Additional styles that need to be explicity added in addition to the
       // prefixed versions of existing css in `existingCss`.
       const addedCss = [
-        `${prefix} .ck.ck-content {display:block;min-height:5rem;}`,
         `${prefix} .ck.ck-content * {display:revert;background:revert;color:initial;padding:revert;}`,
         `${prefix} .ck.ck-content li {display:list-item}`,
-        `${prefix} .ck.ck-content ol li {list-style-type: decimal}`,
       ];
 
       const prefixedCss = [...addedCss].join('\n');
@@ -623,6 +621,30 @@
 
       // Store the save callback to be executed when this dialog is closed.
       Drupal.ckeditor5.saveCallback = saveCallback;
+    },
+  };
+
+  Drupal.behaviors.editorStyleFix = {
+    attach(context) {
+      // CKEditor's DLL injects a style tag that overrides native list
+      // type styling. The following find the style(s) causing the problem
+      // and removes them.
+      // @todo remove this entire behavior when this issue is fixed
+      //  https://github.com/ckeditor/ckeditor5/issues/14613
+      [...document.styleSheets]
+        .filter((sheet) => sheet.ownerNode.hasAttribute('data-cke'))
+        .forEach((sheet) => {
+          [...sheet.cssRules].forEach((rule, ruleIndex) => {
+            if (
+              rule?.selectorText &&
+              (rule.selectorText.includes(' ol') ||
+                rule.selectorText.includes(' ul')) &&
+              !rule.selectorText.includes('type')
+            ) {
+              sheet.cssRules[ruleIndex].style['list-style-type'] = null;
+            }
+          });
+        });
     },
   };
 

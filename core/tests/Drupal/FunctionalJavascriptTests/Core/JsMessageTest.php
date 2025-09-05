@@ -6,12 +6,12 @@ namespace Drupal\FunctionalJavascriptTests\Core;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\js_message_test\Controller\JSMessageTestController;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests core/drupal.message library.
- *
- * @group Javascript
  */
+#[Group('Javascript')]
 class JsMessageTest extends WebDriverTestBase {
 
   /**
@@ -40,7 +40,7 @@ class JsMessageTest extends WebDriverTestBase {
   /**
    * Tests click on links to show messages and remove messages.
    */
-  public function testAddRemoveMessages() {
+  public function testAddRemoveMessages(): void {
     $web_assert = $this->assertSession();
     $this->drupalGet('js_message_test_link');
 

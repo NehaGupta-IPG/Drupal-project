@@ -8,12 +8,12 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the view access control handler for moderation state entities.
- *
- * @group content_moderation
  */
+#[Group('content_moderation')]
 class ModerationStateAccessTest extends BrowserTestBase {
 
   use ContentModerationTestTrait;
@@ -53,7 +53,7 @@ class ModerationStateAccessTest extends BrowserTestBase {
   /**
    * Tests the view operation access handler with the view permission.
    */
-  public function testViewShowsCorrectStates() {
+  public function testViewShowsCorrectStates(): void {
     $permissions = [
       'access content',
       'view all revisions',

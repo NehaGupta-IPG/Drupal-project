@@ -15,6 +15,9 @@ use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
  */
 class MigrateCustomBlockTest extends MigrateDrupal7TestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = [
     'block_content',
     'filter',
@@ -40,7 +43,7 @@ class MigrateCustomBlockTest extends MigrateDrupal7TestBase {
   /**
    * Tests migration of content blocks from Drupal 7 to Drupal 8.
    */
-  public function testCustomBlockMigration() {
+  public function testCustomBlockMigration(): void {
     $block = BlockContent::load(1);
     $this->assertInstanceOf(BlockContentInterface::class, $block);
     /** @var \Drupal\block_content\BlockContentInterface $block */

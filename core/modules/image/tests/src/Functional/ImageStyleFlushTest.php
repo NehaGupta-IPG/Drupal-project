@@ -6,12 +6,12 @@ namespace Drupal\Tests\image\Functional;
 
 use Drupal\image\Entity\ImageStyle;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests flushing of image styles.
- *
- * @group image
  */
+#[Group('image')]
 class ImageStyleFlushTest extends ImageFieldTestBase {
 
   use TestFileCreationTrait {
@@ -58,7 +58,7 @@ class ImageStyleFlushTest extends ImageFieldTestBase {
   /**
    * General test to flush a style.
    */
-  public function testFlush() {
+  public function testFlush(): void {
 
     // Setup a style to be created and effects to add to it.
     $style_name = $this->randomMachineName(10);

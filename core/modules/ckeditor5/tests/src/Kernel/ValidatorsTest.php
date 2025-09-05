@@ -24,7 +24,6 @@ use Symfony\Component\Yaml\Yaml;
  * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\FundamentalCompatibilityConstraintValidator
  * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\CKEditor5MediaAndFilterSettingsInSyncConstraintValidator
  * @group ckeditor5
- * @group #slow
  */
 class ValidatorsTest extends KernelTestBase {
 
@@ -49,6 +48,7 @@ class ValidatorsTest extends KernelTestBase {
     'filter_test',
     'media',
     'media_library',
+    'user',
     'views',
   ];
 
@@ -72,7 +72,7 @@ class ValidatorsTest extends KernelTestBase {
    *   All expected violations for the given CKEditor 5 settings, with property
    *   path as keys and message as values.
    */
-  public function test(array $ckeditor5_settings, array $expected_violations) {
+  public function test(array $ckeditor5_settings, array $expected_violations): void {
     // The data provider is unable to access services, so the test scenario of
     // testing with CKEditor 5's default settings is partially provided here.
     if ($ckeditor5_settings === ['__DEFAULT__']) {
@@ -98,7 +98,6 @@ class ValidatorsTest extends KernelTestBase {
     );
     $violations = $typed_config->validate();
 
-    $actual_violations = self::violationsToArray($violations);
     $this->assertSame($expected_violations, self::violationsToArray($violations));
 
     if (empty($expected_violations)) {
@@ -137,6 +136,7 @@ class ValidatorsTest extends KernelTestBase {
             'properties' => [
               'reversed' => FALSE,
               'startIndex' => FALSE,
+              'styles' => TRUE,
             ],
             'multiBlock' => TRUE,
           ],
@@ -584,7 +584,7 @@ class ValidatorsTest extends KernelTestBase {
       ],
       'expected_violations' => [],
     ];
-    $data['INVALID: SourceEditing plugin configuration: <ol start type> must not be allowed because List can generate <ol reversed start>'] = [
+    $data['INVALID: SourceEditing plugin configuration: <ol start type> must not be allowed because List can generate <ol reversed start type>'] = [
       'ckeditor5_settings' => [
         'toolbar' => [
           'items' => [
@@ -597,6 +597,7 @@ class ValidatorsTest extends KernelTestBase {
             'properties' => [
               'reversed' => TRUE,
               'startIndex' => TRUE,
+              'styles' => FALSE,
             ],
             'multiBlock' => TRUE,
           ],
@@ -608,10 +609,13 @@ class ValidatorsTest extends KernelTestBase {
         ],
       ],
       'expected_violations' => [
-        'settings.plugins.ckeditor5_sourceEditing.allowed_tags.0' => 'The following attribute(s) are already supported by enabled plugins and should not be added to the Source Editing "Manually editable HTML tags" field: <em class="placeholder">List (&lt;ol start&gt;)</em>.',
+        'settings.plugins.ckeditor5_sourceEditing.allowed_tags.0' => [
+          'The following attribute(s) are already supported by enabled plugins and should not be added to the Source Editing "Manually editable HTML tags" field: <em class="placeholder">List (&lt;ol start&gt;)</em>.',
+          'The following attribute(s) can optionally be supported by enabled plugins and should not be added to the Source Editing "Manually editable HTML tags" field: <em class="placeholder">List (&lt;ol type&gt;)</em>.',
+        ],
       ],
     ];
-    $data['INVALID: SourceEditing plugin configuration: <ol start type> must not be allowed because List can generate <ol start>'] = [
+    $data['INVALID: SourceEditing plugin configuration: <ol start type> must not be allowed because List can generate <ol start type>'] = [
       'ckeditor5_settings' => [
         'toolbar' => [
           'items' => [
@@ -624,6 +628,7 @@ class ValidatorsTest extends KernelTestBase {
             'properties' => [
               'reversed' => FALSE,
               'startIndex' => FALSE,
+              'styles' => FALSE,
             ],
             'multiBlock' => TRUE,
           ],
@@ -635,7 +640,7 @@ class ValidatorsTest extends KernelTestBase {
         ],
       ],
       'expected_violations' => [
-        'settings.plugins.ckeditor5_sourceEditing.allowed_tags.0' => 'The following attribute(s) can optionally be supported by enabled plugins and should not be added to the Source Editing "Manually editable HTML tags" field: <em class="placeholder">List (&lt;ol start&gt;)</em>.',
+        'settings.plugins.ckeditor5_sourceEditing.allowed_tags.0' => 'The following attribute(s) can optionally be supported by enabled plugins and should not be added to the Source Editing "Manually editable HTML tags" field: <em class="placeholder">List (&lt;ol start type&gt;)</em>.',
       ],
     ];
 
@@ -655,7 +660,7 @@ class ValidatorsTest extends KernelTestBase {
    * @param array $expected_violations
    *   All expected violations for the pair.
    */
-  public function testPair(array $ckeditor5_settings, array $editor_image_upload_settings, array $filters, array $expected_violations) {
+  public function testPair(array $ckeditor5_settings, array $editor_image_upload_settings, array $filters, array $expected_violations): void {
     $text_editor = Editor::create([
       'format' => 'dummy',
       'editor' => 'ckeditor5',
@@ -967,7 +972,7 @@ class ValidatorsTest extends KernelTestBase {
           'status' => TRUE,
           'weight' => 0,
           'settings' => [
-            'allowed_html' => "<a href hreflang> <em> <strong> <cite> <blockquote cite> <code> <ul type> <ol start type='1 A I'> <li> <dl> <dt> <dd> <h2 id='jump-*'> <h3 id> <h4 id> <h5 id> <h6 id>" . "<p> <br>",
+            'allowed_html' => "<a href hreflang> <em> <strong> <cite> <blockquote cite> <code> <ul type> <ol start type='1 A I'> <li> <dl> <dt> <dd> <h2 id='jump-*'> <h3 id> <h4 id> <h5 id> <h6 id> <p> <br>",
             'filter_html_help' => TRUE,
             'filter_html_nofollow' => TRUE,
           ],

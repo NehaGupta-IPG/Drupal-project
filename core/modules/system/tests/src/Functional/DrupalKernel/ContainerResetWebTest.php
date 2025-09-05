@@ -6,14 +6,13 @@ namespace Drupal\Tests\system\Functional\DrupalKernel;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore contenedor fuera reiniciado Después
-
 /**
  * Ensures that the container rebuild works as expected.
- *
- * @group DrupalKernel
  */
+#[Group('DrupalKernel')]
 class ContainerResetWebTest extends BrowserTestBase {
 
   /**
@@ -26,6 +25,9 @@ class ContainerResetWebTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
     ConfigurableLanguage::createFromLangcode('es')->save();
@@ -49,7 +51,7 @@ class ContainerResetWebTest extends BrowserTestBase {
   /**
    * Sets a different deployment identifier.
    */
-  public function testContainerRebuild() {
+  public function testContainerRebuild(): void {
     $this->drupalLogin($this->drupalCreateUser());
 
     $this->drupalGet('container_rebuild_test/container_reset');

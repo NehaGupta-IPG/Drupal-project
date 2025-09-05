@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\entity_test\EntityTestHelper;
+
 /**
  * @coversDefaultClass \Drupal\Core\Entity\EntityBundleListener
  *
@@ -20,14 +22,14 @@ class EntityBundleListenerTest extends EntityKernelTestBase {
    *
    * @covers ::onBundleCreate
    */
-  public function testOnBundleCreate() {
+  public function testOnBundleCreate(): void {
     $field_map = $this->container->get('entity_field.manager')->getFieldMap();
     $expected = [
       'entity_test' => 'entity_test',
     ];
     $this->assertEquals($expected, $field_map['entity_test']['id']['bundles']);
 
-    entity_test_create_bundle('custom');
+    EntityTestHelper::createBundle('custom');
     $field_map = $this->container->get('entity_field.manager')->getFieldMap();
     $expected = [
       'entity_test' => 'entity_test',

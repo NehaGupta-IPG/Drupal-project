@@ -18,12 +18,12 @@ class EntityContextTypedDataTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['entity_test'];
+  protected static $modules = ['entity_test', 'user'];
 
   /**
    * Tests that entity contexts wrapping a config entity can be validated.
    */
-  public function testValidateConfigEntityContext() {
+  public function testValidateConfigEntityContext(): void {
     $display = EntityViewDisplay::create([
       'targetEntityType' => 'entity_test',
       'bundle' => 'entity_test',

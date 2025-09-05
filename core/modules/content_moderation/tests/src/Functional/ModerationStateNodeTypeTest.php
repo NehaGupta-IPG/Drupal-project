@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_moderation\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests moderation state node type integration.
- *
- * @group content_moderation
- * @group #slow
  */
+#[Group('content_moderation')]
 class ModerationStateNodeTypeTest extends ModerationStateTestBase {
 
   /**
@@ -20,10 +20,10 @@ class ModerationStateNodeTypeTest extends ModerationStateTestBase {
   /**
    * A node type without moderation state disabled.
    *
-   * @covers \Drupal\content_moderation\EntityTypeInfo::formAlter
-   * @covers \Drupal\content_moderation\Entity\Handler\NodeModerationHandler::enforceRevisionsBundleFormAlter
+   * @legacy-covers \Drupal\content_moderation\EntityTypeInfo::formAlter
+   * @legacy-covers \Drupal\content_moderation\Entity\Handler\NodeModerationHandler::enforceRevisionsBundleFormAlter
    */
-  public function testNotModerated() {
+  public function testNotModerated(): void {
     $this->drupalLogin($this->adminUser);
     $this->createContentTypeFromUi('Not moderated', 'not_moderated');
     $this->assertSession()->pageTextContains('The content type Not moderated has been added.');
@@ -39,10 +39,10 @@ class ModerationStateNodeTypeTest extends ModerationStateTestBase {
   /**
    * Tests enabling moderation on an existing node-type, with content.
    *
-   * @covers \Drupal\content_moderation\EntityTypeInfo::formAlter
-   * @covers \Drupal\content_moderation\Entity\Handler\NodeModerationHandler::enforceRevisionsBundleFormAlter
+   * @legacy-covers \Drupal\content_moderation\EntityTypeInfo::formAlter
+   * @legacy-covers \Drupal\content_moderation\Entity\Handler\NodeModerationHandler::enforceRevisionsBundleFormAlter
    */
-  public function testEnablingOnExistingContent() {
+  public function testEnablingOnExistingContent(): void {
     $editor_permissions = [
       'administer workflows',
       'access administration pages',
@@ -106,9 +106,11 @@ class ModerationStateNodeTypeTest extends ModerationStateTestBase {
   }
 
   /**
-   * @covers \Drupal\content_moderation\Entity\Handler\NodeModerationHandler::enforceRevisionsBundleFormAlter
+   * Tests enforce revisions entity form alter.
+   *
+   * @legacy-covers \Drupal\content_moderation\Entity\Handler\NodeModerationHandler::enforceRevisionsBundleFormAlter
    */
-  public function testEnforceRevisionsEntityFormAlter() {
+  public function testEnforceRevisionsEntityFormAlter(): void {
     $this->drupalLogin($this->adminUser);
     $this->createContentTypeFromUi('Moderated', 'moderated');
 

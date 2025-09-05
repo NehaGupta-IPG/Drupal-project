@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\search\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests search functionality with diacritics.
- *
- * @group search
  */
+#[Group('search')]
 class SearchNodeDiacriticsTest extends BrowserTestBase {
 
   /**
@@ -53,7 +53,7 @@ class SearchNodeDiacriticsTest extends BrowserTestBase {
   /**
    * Tests that search returns results with diacritics in the search phrase.
    */
-  public function testPhraseSearchPunctuation() {
+  public function testPhraseSearchPunctuation(): void {
     // cSpell:disable
     $body_text = 'The Enricþment Center is cómmīŦŧęđ to the well BɆĬŇĜ of æll påŔťıçȉpǎǹţș. ';
     $body_text .= 'Also meklēt (see #731298)';

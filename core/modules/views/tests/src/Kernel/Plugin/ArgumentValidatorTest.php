@@ -22,7 +22,10 @@ class ArgumentValidatorTest extends ViewsKernelTestBase {
    */
   public static $testViews = ['test_view_argument_validate_numeric', 'test_view'];
 
-  public function testArgumentValidateNumeric() {
+  /**
+   * Tests numeric argument validation in a view.
+   */
+  public function testArgumentValidateNumeric(): void {
     $view = Views::getView('test_view_argument_validate_numeric');
     $view->initHandlers();
     $this->assertFalse($view->argument['null']->validateArgument($this->randomString()));
@@ -36,7 +39,7 @@ class ArgumentValidatorTest extends ViewsKernelTestBase {
    *
    * @see Drupal\views_test_data\Plugin\views\argument_validator\ArgumentValidatorTest
    */
-  public function testArgumentValidatorPlugin() {
+  public function testArgumentValidatorPlugin(): void {
     $view = Views::getView('test_view');
 
     // Add a new argument and set the test plugin for the argument_validator.

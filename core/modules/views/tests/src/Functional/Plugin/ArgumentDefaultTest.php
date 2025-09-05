@@ -10,13 +10,13 @@ use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
 use Drupal\views_test_data\Plugin\views\argument_default\ArgumentDefaultTest as ArgumentDefaultTestPlugin;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests pluggable argument_default for views.
- *
- * @group views
  */
+#[Group('views')]
 class ArgumentDefaultTest extends ViewTestBase {
 
   /**
@@ -39,9 +39,7 @@ class ArgumentDefaultTest extends ViewTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'views_ui', 'block'];
 
@@ -59,7 +57,7 @@ class ArgumentDefaultTest extends ViewTestBase {
    *
    * @see \Drupal\views_test_data\Plugin\views\argument_default\ArgumentDefaultTest
    */
-  public function testArgumentDefaultPlugin() {
+  public function testArgumentDefaultPlugin(): void {
     $view = Views::getView('test_view');
 
     // Add a new argument and set the test plugin for the argument_default.
@@ -96,7 +94,7 @@ class ArgumentDefaultTest extends ViewTestBase {
   /**
    * Tests the use of a default argument plugin that provides no options.
    */
-  public function testArgumentDefaultNoOptions() {
+  public function testArgumentDefaultNoOptions(): void {
     $admin_user = $this->drupalCreateUser([
       'administer views',
       'administer site configuration',
@@ -118,7 +116,7 @@ class ArgumentDefaultTest extends ViewTestBase {
   /**
    * Tests fixed default argument.
    */
-  public function testArgumentDefaultFixed() {
+  public function testArgumentDefaultFixed(): void {
     $random = $this->randomMachineName();
     $view = Views::getView('test_argument_default_fixed');
     $view->setDisplay();
@@ -129,7 +127,7 @@ class ArgumentDefaultTest extends ViewTestBase {
 
     $this->assertEquals($random, $view->argument['null']->getDefaultArgument(), 'Fixed argument should be used by default.');
 
-    // Make sure that a normal argument provided is used
+    // Make sure that a normal argument provided is used.
     $random_string = $this->randomMachineName();
     $view->executeDisplay('default', [$random_string]);
 
@@ -137,14 +135,9 @@ class ArgumentDefaultTest extends ViewTestBase {
   }
 
   /**
-   * @todo Test php default argument.
-   */
-  // function testArgumentDefaultPhp() {}
-
-  /**
    * Tests node default argument.
    */
-  public function testArgumentDefaultNode() {
+  public function testArgumentDefaultNode(): void {
     // Create a user that has permission to place a view block.
     $permissions = [
       'administer views',
@@ -183,7 +176,7 @@ class ArgumentDefaultTest extends ViewTestBase {
   /**
    * Tests the query parameter default argument.
    */
-  public function testArgumentDefaultQueryParameter() {
+  public function testArgumentDefaultQueryParameter(): void {
     $view = Views::getView('test_argument_default_query_param');
 
     $request = Request::create(Url::fromUri('internal:/whatever', ['absolute' => TRUE])->toString());
@@ -203,7 +196,7 @@ class ArgumentDefaultTest extends ViewTestBase {
   /**
    * Tests the more line generation if a default argument is provided.
    */
-  public function testArgumentDefaultUrlGeneration() {
+  public function testArgumentDefaultUrlGeneration(): void {
     // Create a user that has permission to place a view block.
     $permissions = [
       'administer views',

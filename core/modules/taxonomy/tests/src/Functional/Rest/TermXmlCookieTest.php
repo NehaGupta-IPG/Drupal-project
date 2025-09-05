@@ -6,11 +6,12 @@ namespace Drupal\Tests\taxonomy\Functional\Rest;
 
 use Drupal\Tests\rest\Functional\CookieResourceTestTrait;
 use Drupal\Tests\rest\Functional\EntityResource\XmlEntityNormalizationQuirksTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @group rest
- * @group #slow
+ * Tests Term Xml Cookie.
  */
+#[Group('rest')]
 class TermXmlCookieTest extends TermResourceTestBase {
 
   use CookieResourceTestTrait;
@@ -35,13 +36,5 @@ class TermXmlCookieTest extends TermResourceTestBase {
    * {@inheritdoc}
    */
   protected static $auth = 'cookie';
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testPatchPath() {
-    // Deserialization of the XML format is not supported.
-    $this->markTestSkipped();
-  }
 
 }

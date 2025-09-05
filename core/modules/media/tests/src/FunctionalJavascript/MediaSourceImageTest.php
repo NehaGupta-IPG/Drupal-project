@@ -12,12 +12,12 @@ use Drupal\media\Entity\MediaType;
 use Drupal\media\Plugin\media\Source\Image;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the image media source.
- *
- * @group media
  */
+#[Group('media')]
 class MediaSourceImageTest extends MediaSourceTestBase {
 
   /**
@@ -28,7 +28,7 @@ class MediaSourceImageTest extends MediaSourceTestBase {
   /**
    * Tests the image media source.
    */
-  public function testMediaImageSource() {
+  public function testMediaImageSource(): void {
     $media_type_id = 'test_media_image_type';
     $source_field_id = 'field_media_image';
     $provided_fields = [
@@ -79,7 +79,7 @@ class MediaSourceImageTest extends MediaSourceTestBase {
     $image_element = $field->find('css', 'img');
     /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
     $file_url_generator = \Drupal::service('file_url_generator');
-    $expected_image_src = $file_url_generator->generateString(\Drupal::token()->replace('public://styles/large/public/[date:custom:Y]-[date:custom:m]/example_1.jpeg'));
+    $expected_image_src = $file_url_generator->generate(\Drupal::token()->replace('public://styles/large/public/[date:custom:Y]-[date:custom:m]/example_1.jpeg'))->toString();
     $this->assertStringContainsString($expected_image_src, $image_element->getAttribute('src'));
     $assert_session->elementNotExists('css', 'a', $field);
 

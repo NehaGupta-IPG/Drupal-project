@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests\Components;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the correct rendering of components.
- *
- * @group sdc
  */
+#[Group('sdc')]
 class ComponentRenderTest extends WebDriverTestBase {
 
   /**
@@ -29,7 +29,7 @@ class ComponentRenderTest extends WebDriverTestBase {
    * This also covers all the path translations necessary to produce the correct
    * path to the assets.
    */
-  public function testCssLibraryAttachesCorrectly() {
+  public function testCssLibraryAttachesCorrectly(): void {
     $build = [
       '#type' => 'inline_template',
       '#template' => "{{ include('sdc_theme_test:lib-overrides') }}",
@@ -47,7 +47,7 @@ class ComponentRenderTest extends WebDriverTestBase {
    * This also covers all the path translations necessary to produce the correct
    * path to the assets.
    */
-  public function testJsLibraryAttachesCorrectly() {
+  public function testJsLibraryAttachesCorrectly(): void {
     $build = [
       '#type' => 'inline_template',
       '#template' => "{{ include('sdc_test:my-button', {

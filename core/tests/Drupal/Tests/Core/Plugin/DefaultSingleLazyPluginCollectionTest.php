@@ -4,21 +4,23 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Plugin;
 
-use Drupal\Component\Plugin\ConfigurableInterface;
-use Drupal\Component\Plugin\PluginBase;
+use Drupal\Core\Plugin\ConfigurablePluginBase;
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
 
 /**
- * @coversDefaultClass \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection
- * @group Plugin
+ * Tests Drupal\Core\Plugin\DefaultSingleLazyPluginCollection.
  */
+#[CoversClass(DefaultSingleLazyPluginCollection::class)]
+#[Group('Plugin')]
 class DefaultSingleLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected function setupPluginCollection(InvocationOrder $create_count = NULL) {
+  protected function setupPluginCollection(?InvocationOrder $create_count = NULL): void {
     $definitions = $this->getPluginDefinitions();
     $this->pluginInstances['apple'] = new ConfigurablePlugin(['id' => 'apple', 'key' => 'value'], 'apple', $definitions['apple']);
     $this->pluginInstances['banana'] = new ConfigurablePlugin(['id' => 'banana', 'key' => 'other_value'], 'banana', $definitions['banana']);
@@ -36,7 +38,7 @@ class DefaultSingleLazyPluginCollectionTest extends LazyPluginCollectionTestBase
   /**
    * Tests the get() method.
    */
-  public function testGet() {
+  public function testGet(): void {
     $this->setupPluginCollection($this->once());
     $apple = $this->pluginInstances['apple'];
 
@@ -44,11 +46,13 @@ class DefaultSingleLazyPluginCollectionTest extends LazyPluginCollectionTestBase
   }
 
   /**
-   * @covers ::addInstanceId
-   * @covers ::getConfiguration
-   * @covers ::setConfiguration
+   * Tests add instance id.
+   *
+   * @legacy-covers ::addInstanceId
+   * @legacy-covers ::getConfiguration
+   * @legacy-covers ::setConfiguration
    */
-  public function testAddInstanceId() {
+  public function testAddInstanceId(): void {
     $this->setupPluginCollection($this->any());
 
     $this->assertEquals(['id' => 'apple', 'key' => 'value'], $this->defaultPluginCollection->get('apple')->getConfiguration());
@@ -62,9 +66,11 @@ class DefaultSingleLazyPluginCollectionTest extends LazyPluginCollectionTestBase
   }
 
   /**
-   * @covers ::getInstanceIds
+   * Tests get instance ids.
+   *
+   * @legacy-covers ::getInstanceIds
    */
-  public function testGetInstanceIds() {
+  public function testGetInstanceIds(): void {
     $this->setupPluginCollection($this->any());
     $this->assertEquals(['apple' => 'apple'], $this->defaultPluginCollection->getInstanceIds());
 
@@ -73,9 +79,11 @@ class DefaultSingleLazyPluginCollectionTest extends LazyPluginCollectionTestBase
   }
 
   /**
-   * @covers ::setConfiguration
+   * Tests configurable set configuration.
+   *
+   * @legacy-covers ::setConfiguration
    */
-  public function testConfigurableSetConfiguration() {
+  public function testConfigurableSetConfiguration(): void {
     $this->setupPluginCollection($this->any());
 
     $this->defaultPluginCollection->setConfiguration(['apple' => ['value' => 'pineapple', 'id' => 'apple']]);
@@ -95,24 +103,8 @@ class DefaultSingleLazyPluginCollectionTest extends LazyPluginCollectionTestBase
 
 }
 
-class ConfigurablePlugin extends PluginBase implements ConfigurableInterface {
-
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
-
-    $this->configuration = $configuration + $this->defaultConfiguration();
-  }
-
-  public function defaultConfiguration() {
-    return [];
-  }
-
-  public function getConfiguration() {
-    return $this->configuration;
-  }
-
-  public function setConfiguration(array $configuration) {
-    $this->configuration = $configuration;
-  }
-
+/**
+ * Stub configurable plugin class for testing.
+ */
+class ConfigurablePlugin extends ConfigurablePluginBase {
 }

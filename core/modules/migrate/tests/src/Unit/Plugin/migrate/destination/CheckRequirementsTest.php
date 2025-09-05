@@ -7,22 +7,22 @@ namespace Drupal\Tests\migrate\Unit\Plugin\migrate\destination;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Tests\UnitTestCase;
 use Drupal\migrate\Exception\RequirementsException;
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\destination\Config;
+use Drupal\migrate\Plugin\MigrationInterface;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests check requirements exception on DestinationBase.
- *
- * @group migrate
  */
+#[Group('migrate')]
 class CheckRequirementsTest extends UnitTestCase {
 
   /**
    * Tests the check requirements exception message.
    */
-  public function testException() {
+  public function testException(): void {
     $destination = new Config(
       ['config_name' => 'test'],
       'test',

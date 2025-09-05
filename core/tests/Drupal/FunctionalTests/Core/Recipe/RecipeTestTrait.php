@@ -52,20 +52,50 @@ trait RecipeTestTrait {
    * @param int $expected_exit_code
    *   The expected exit code of the `drupal recipe` process. Defaults to 0,
    *   which indicates that no error occurred.
+   * @param string[] $options
+   *   (optional) Additional options to pass to the `drupal recipe` command.
+   * @param string $command
+   *   (optional) The name of the command to run. Defaults to `recipe`.
    *
    * @return \Symfony\Component\Process\Process
    *   The `drupal recipe` command process, after having run.
    */
-  protected function applyRecipe(string $path, int $expected_exit_code = 0): Process {
-    assert($this instanceof BrowserTestBase);
-    $this->assertDirectoryExists($path);
-
-    $arguments = [
-      (new PhpExecutableFinder())->find(),
-      'core/scripts/drupal',
-      'recipe',
+  protected function applyRecipe(string $path, int $expected_exit_code = 0, array $options = [], string $command = 'recipe'): Process {
+    $process = $this->runDrupalCommand([
+      $command,
+      // Never apply recipes interactively.
+      '--no-interaction',
+      ...$options,
       $path,
-    ];
+    ]);
+    $this->assertSame($expected_exit_code, $process->getExitCode(), sprintf("Process exit code mismatch.\nExpected: %d\nActual: %d\n\nSTDOUT:\n%s\n\nSTDERR:\n%s", $expected_exit_code, $process->getExitCode(), $process->getOutput(), $process->getErrorOutput()));
+    // Applying a recipe:
+    // - creates new checkpoints, hence the "state" service in the test runner
+    //   is outdated
+    // - may install modules, which would cause the entire container in the test
+    //   runner to be outdated.
+    // Hence the entire environment must be rebuilt for assertions to target the
+    // actual post-recipe-application result.
+    // @see \Drupal\Core\Config\Checkpoint\LinearHistory::__construct()
+    assert($this instanceof BrowserTestBase);
+    $this->rebuildAll();
+    return $process;
+  }
+
+  /**
+   * Runs the `core/scripts/drupal` script with the given arguments.
+   *
+   * @param string[] $arguments
+   *   The arguments and options to pass to the script.
+   *
+   * @return \Symfony\Component\Process\Process
+   *   The started process.
+   */
+  protected function runDrupalCommand(array $arguments): Process {
+    assert($this instanceof BrowserTestBase);
+
+    array_unshift($arguments, (new PhpExecutableFinder())->find(), 'core/scripts/drupal');
+
     $process = (new Process($arguments))
       ->setWorkingDirectory($this->getDrupalRoot())
       ->setEnv([
@@ -78,17 +108,25 @@ trait RecipeTestTrait {
       ->setTimeout(500);
 
     $process->run();
-    $this->assertSame($expected_exit_code, $process->getExitCode(), $process->getErrorOutput());
-    // Applying a recipe:
-    // - creates new checkpoints, hence the "state" service in the test runner
-    //   is outdated
-    // - may install modules, which would cause the entire container in the test
-    //   runner to be outdated.
-    // Hence the entire environment must be rebuilt for assertions to target the
-    // actual post-recipe-application result.
-    // @see \Drupal\Core\Config\Checkpoint\LinearHistory::__construct()
-    $this->rebuildAll();
     return $process;
+  }
+
+  /**
+   * Alters an existing recipe.
+   *
+   * @param string $path
+   *   The recipe directory path.
+   * @param callable $alter
+   *   A function that will receive the decoded contents of recipe.yml as an
+   *   array. This should returned a modified array to be written to recipe.yml.
+   */
+  protected function alterRecipe(string $path, callable $alter): void {
+    $file = $path . '/recipe.yml';
+    $this->assertFileExists($file);
+    $contents = file_get_contents($file);
+    $contents = Yaml::decode($contents);
+    $contents = $alter($contents);
+    file_put_contents($file, Yaml::encode($contents));
   }
 
 }

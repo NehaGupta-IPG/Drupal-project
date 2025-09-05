@@ -7,14 +7,14 @@ namespace Drupal\Tests\system\Functional\UpdateSystem;
 use Drupal\Core\Database\Database;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\UpdatePathTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests handling of existing initial keys during updates.
  *
  * @see https://www.drupal.org/project/drupal/issues/2925550
- *
- * @group Update
  */
+#[Group('Update')]
 class EntityUpdateInitialTest extends BrowserTestBase {
   use UpdatePathTestTrait;
 
@@ -58,7 +58,7 @@ class EntityUpdateInitialTest extends BrowserTestBase {
   /**
    * Tests that a pre-existing initial key in the field schema is not a change.
    */
-  public function testInitialIsIgnored() {
+  public function testInitialIsIgnored(): void {
     $this->runUpdates();
   }
 

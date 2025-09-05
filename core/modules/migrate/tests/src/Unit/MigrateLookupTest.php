@@ -11,22 +11,23 @@ use Drupal\migrate\Plugin\MigrateDestinationInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\MigrationPluginManagerInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Provides unit testing for the migration lookup service.
- *
- * @group migrate
- *
- * @coversDefaultClass \Drupal\migrate\MigrateLookup
  */
+#[CoversClass(MigrateLookup::class)]
+#[Group('migrate')]
 class MigrateLookupTest extends MigrateTestCase {
 
   /**
    * Tests the lookup function.
    *
-   * @covers ::lookup
+   * @legacy-covers ::lookup
    */
-  public function testLookup() {
+  public function testLookup(): void {
     $source_ids = ['id' => '1'];
 
     $destination_ids = [[2]];
@@ -51,10 +52,9 @@ class MigrateLookupTest extends MigrateTestCase {
 
   /**
    * Tests message logged when a single migration is not found.
-   *
-   * @dataProvider providerExceptionOnMigrationNotFound
    */
-  public function testExceptionOnMigrationNotFound($migrations, $message) {
+  #[DataProvider('providerExceptionOnMigrationNotFound')]
+  public function testExceptionOnMigrationNotFound($migrations, $message): void {
     $migration_plugin_manager = $this->prophesize(MigrationPluginManagerInterface::class);
     $migration_plugin_manager->createInstances($migrations)->willReturn([]);
     $this->expectException(PluginNotFoundException::class);
@@ -81,10 +81,9 @@ class MigrateLookupTest extends MigrateTestCase {
 
   /**
    * Tests message logged when multiple migrations are not found.
-   *
-   * @dataProvider providerExceptionOnMultipleMigrationsNotFound
    */
-  public function testExceptionOnMultipleMigrationsNotFound($migrations, $message) {
+  #[DataProvider('providerExceptionOnMultipleMigrationsNotFound')]
+  public function testExceptionOnMultipleMigrationsNotFound($migrations, $message): void {
     $migration_plugin_manager = $this->prophesize(MigrationPluginManagerInterface::class);
     $migration_plugin_manager->createInstances($migrations)->willReturn([]);
     $this->expectException(PluginException::class);

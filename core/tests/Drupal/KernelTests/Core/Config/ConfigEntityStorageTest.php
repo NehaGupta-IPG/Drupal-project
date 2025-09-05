@@ -15,16 +15,14 @@ use Drupal\KernelTests\KernelTestBase;
 class ConfigEntityStorageTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['config_test'];
 
   /**
    * Tests creating configuration entities with changed UUIDs.
    */
-  public function testUUIDConflict() {
+  public function testUUIDConflict(): void {
     $entity_type = 'config_test';
     $id = 'test_1';
     // Load the original configuration entity.
@@ -43,7 +41,7 @@ class ConfigEntityStorageTest extends KernelTestBase {
       $entity->save();
       $this->fail('Exception thrown when attempting to save a configuration entity with a UUID that does not match the existing UUID.');
     }
-    catch (ConfigDuplicateUUIDException $e) {
+    catch (ConfigDuplicateUUIDException) {
       // Expected exception; just continue testing.
     }
 
@@ -57,7 +55,7 @@ class ConfigEntityStorageTest extends KernelTestBase {
    *
    * @covers \Drupal\Core\Config\Entity\ConfigEntityStorage::hasData
    */
-  public function testHasData() {
+  public function testHasData(): void {
     $storage = \Drupal::entityTypeManager()->getStorage('config_test');
     $this->assertFalse($storage->hasData());
 

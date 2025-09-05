@@ -19,9 +19,8 @@ class UserMigrationClassTest extends MigrateDrupal7TestBase {
    * Ensures profile fields are merged into the d7_profile_values migration's
    * process pipeline.
    */
-  public function testClass() {
+  public function testClass(): void {
     $migration = $this->getMigration('d7_user');
-    /** @var \Drupal\migrate\Plugin\MigrationInterface[] $migrations */
     $this->assertSame('d7_user', $migration->id());
     $process = $migration->getProcess();
     $this->assertSame('field_file', $process['field_file'][0]['source']);

@@ -6,20 +6,21 @@ namespace Drupal\Tests\system\Functional\Render;
 
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Functional test verifying that messages set in placeholders always appear.
- *
- * @group Render
  */
+#[Group('Render')]
 class PlaceholderMessageTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  protected static $modules = ['render_placeholder_message_test'];
+  protected static $modules = [
+    'render_placeholder_message_test',
+    'big_pipe_messages_test',
+  ];
 
   /**
    * {@inheritdoc}
@@ -29,7 +30,7 @@ class PlaceholderMessageTest extends BrowserTestBase {
   /**
    * Tests rendering of message placeholder.
    */
-  public function testMessagePlaceholder() {
+  public function testMessagePlaceholder(): void {
     $messages_markup = '<div role="contentinfo" aria-label="Status message"';
 
     $test_routes = [

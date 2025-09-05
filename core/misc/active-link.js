@@ -23,11 +23,11 @@
       // Start by finding all potentially active links.
       const path = drupalSettings.path;
       const queryString = JSON.stringify(path.currentQuery);
-      const querySelector = path.currentQuery
-        ? `[data-drupal-link-query='${queryString}']`
+      const querySelector = queryString
+        ? `[data-drupal-link-query="${CSS.escape(queryString)}"]`
         : ':not([data-drupal-link-query])';
       const originalSelectors = [
-        `[data-drupal-link-system-path="${path.currentPath}"]`,
+        `[data-drupal-link-system-path="${CSS.escape(path.currentPath)}"]`,
       ];
       let selectors;
 
@@ -50,24 +50,19 @@
       // Add query string selector for pagers, exposed filters.
       selectors = selectors.map((current) => current + querySelector);
 
-      // Query the DOM.
-      const activeLinks = context.querySelectorAll(selectors.join(','));
-      const il = activeLinks.length;
-      for (let i = 0; i < il; i++) {
-        activeLinks[i].classList.add('is-active');
-        activeLinks[i].setAttribute('aria-current', 'page');
-      }
+      context.querySelectorAll(selectors.join(',')).forEach((activeLink) => {
+        activeLink.classList.add('is-active');
+        activeLink.setAttribute('aria-current', 'page');
+      });
     },
     detach(context, settings, trigger) {
       if (trigger === 'unload') {
-        const activeLinks = context.querySelectorAll(
-          '[data-drupal-link-system-path].is-active',
-        );
-        const il = activeLinks.length;
-        for (let i = 0; i < il; i++) {
-          activeLinks[i].classList.remove('is-active');
-          activeLinks[i].removeAttribute('aria-current');
-        }
+        context
+          .querySelectorAll('[data-drupal-link-system-path].is-active')
+          .forEach((activeLink) => {
+            activeLink.classList.remove('is-active');
+            activeLink.removeAttribute('aria-current');
+          });
       }
     },
   };

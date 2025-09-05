@@ -31,6 +31,7 @@ class MediaLibraryWidgetTest extends KernelTestBase {
     'media',
     'media_library',
     'field',
+    'file',
     'filter',
     'image',
     'system',
@@ -98,7 +99,7 @@ class MediaLibraryWidgetTest extends KernelTestBase {
   /**
    * Test the media library widget access.
    */
-  public function testWidgetAccess() {
+  public function testWidgetAccess(): void {
     $entity = EntityTest::create([
       'name' => 'sample entity',
     ]);
@@ -110,7 +111,7 @@ class MediaLibraryWidgetTest extends KernelTestBase {
   /**
    * Test the media library widget access with a revisionable entity type.
    */
-  public function testRevisionableWidgetAccess() {
+  public function testRevisionableWidgetAccess(): void {
     $allowed_revision = EntityTestRev::create([
       'name' => 'allowed_access',
     ]);

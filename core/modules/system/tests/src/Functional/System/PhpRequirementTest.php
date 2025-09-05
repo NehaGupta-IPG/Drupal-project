@@ -7,12 +7,12 @@ namespace Drupal\Tests\system\Functional\System;
 use Drupal\Core\Utility\PhpRequirements;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\RequirementsPageTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the output of PHP requirements on the status report.
- *
- * @group system
  */
+#[Group('system')]
 class PhpRequirementTest extends BrowserTestBase {
 
   use RequirementsPageTrait;
@@ -49,7 +49,7 @@ class PhpRequirementTest extends BrowserTestBase {
   /**
    * Tests status report messages regarding the PHP version.
    */
-  public function testStatusPage() {
+  public function testStatusPage(): void {
     $minimum_php_version = PhpRequirements::getMinimumSupportedPhp();
     // Go to Administration.
     $this->drupalGet('admin/reports/status');

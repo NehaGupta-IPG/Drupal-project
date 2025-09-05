@@ -21,9 +21,7 @@ class EntitySchemaTest extends EntityKernelTestBase {
   use EntityDefinitionTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test_update'];
 
@@ -61,7 +59,7 @@ class EntitySchemaTest extends EntityKernelTestBase {
   /**
    * Tests the custom bundle field creation and deletion.
    */
-  public function testCustomFieldCreateDelete() {
+  public function testCustomFieldCreateDelete(): void {
     // Install the module which adds the field.
     $this->installModule('entity_schema_test');
     $storage_definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('entity_test_update');
@@ -92,7 +90,7 @@ class EntitySchemaTest extends EntityKernelTestBase {
    * @param bool $alter
    *   Whether the original definition should be altered or not.
    */
-  protected function updateEntityType($alter) {
+  protected function updateEntityType($alter): void {
     $this->state->set('entity_schema_update', $alter);
     $updated_entity_type = $this->getUpdatedEntityTypeDefinition($alter, $alter);
     $updated_field_storage_definitions = $this->getUpdatedFieldStorageDefinitions($alter, $alter);
@@ -102,7 +100,7 @@ class EntitySchemaTest extends EntityKernelTestBase {
   /**
    * Tests that entity schema responds to changes in the entity type definition.
    */
-  public function testEntitySchemaUpdate() {
+  public function testEntitySchemaUpdate(): void {
     $this->installModule('entity_schema_test');
     $storage_definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('entity_test_update');
     \Drupal::service('field_storage_definition.listener')->onFieldStorageDefinitionCreate($storage_definitions['custom_base_field']);
@@ -147,7 +145,7 @@ class EntitySchemaTest extends EntityKernelTestBase {
    *
    * @dataProvider providerTestPrimaryKeyUpdate
    */
-  public function testPrimaryKeyUpdate($entity_type_id, $field_name) {
+  public function testPrimaryKeyUpdate($entity_type_id, $field_name): void {
     // EntityKernelTestBase::setUp() already installs the schema for the
     // 'entity_test' entity type.
     if ($entity_type_id !== 'entity_test') {
@@ -296,7 +294,7 @@ class EntitySchemaTest extends EntityKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function refreshServices() {
+  protected function refreshServices(): void {
     parent::refreshServices();
     $this->database = $this->container->get('database');
   }
@@ -304,7 +302,7 @@ class EntitySchemaTest extends EntityKernelTestBase {
   /**
    * Tests that modifying the UUID field for a translatable entity works.
    */
-  public function testModifyingTranslatableColumnSchema() {
+  public function testModifyingTranslatableColumnSchema(): void {
     $this->installModule('entity_schema_test');
     $this->updateEntityType(TRUE);
     $fields = ['revision_log', 'uuid'];
@@ -321,7 +319,7 @@ class EntitySchemaTest extends EntityKernelTestBase {
   /**
    * Tests fields from an uninstalled module are removed from the schema.
    */
-  public function testCleanUpStorageDefinition() {
+  public function testCleanUpStorageDefinition(): void {
     // Find all the entity types provided by the entity_test module and install
     // the schema for them.
     $entity_type_ids = [];
@@ -376,7 +374,7 @@ class EntitySchemaTest extends EntityKernelTestBase {
   /**
    * Tests the installed storage schema for identifier fields.
    */
-  public function testIdentifierSchema() {
+  public function testIdentifierSchema(): void {
     $this->installEntitySchema('entity_test_rev');
 
     $key_value_store = \Drupal::keyValue('entity.storage_schema.sql');

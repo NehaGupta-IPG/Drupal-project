@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\file\Functional;
 
 use Drupal\file\Entity\File;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Ensure that files added to nodes appear correctly in RSS feeds.
- *
- * @group file
  */
+#[Group('file')]
 class FileFieldRSSContentTest extends FileFieldTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'views'];
 
@@ -28,7 +26,7 @@ class FileFieldRSSContentTest extends FileFieldTestBase {
   /**
    * Tests RSS enclosure formatter display for RSS feeds.
    */
-  public function testFileFieldRSSContent() {
+  public function testFileFieldRSSContent(): void {
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     $field_name = $this->randomMachineName();
     $type_name = 'article';
@@ -59,7 +57,6 @@ class FileFieldRSSContentTest extends FileFieldTestBase {
     $nid = $this->uploadNodeFile($test_file, $field_name, $node->id());
 
     // Get the uploaded file from the node.
-    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
     $node_file = File::load($node->{$field_name}->target_id);
 

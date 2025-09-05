@@ -6,12 +6,12 @@ namespace Drupal\Tests\mysql\Functional;
 
 use Drupal\Core\Database\Database;
 use Drupal\FunctionalTests\Installer\InstallerTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the isolation_level setting with no database settings.
- *
- * @group Installer
  */
+#[Group('Installer')]
 class InstallerIsolationLevelNoDatabaseSettingsTest extends InstallerTestBase {
 
   /**
@@ -22,7 +22,7 @@ class InstallerIsolationLevelNoDatabaseSettingsTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function prepareEnvironment() {
+  protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
 
     // The isolation_level option is only available for MySQL.
@@ -35,7 +35,7 @@ class InstallerIsolationLevelNoDatabaseSettingsTest extends InstallerTestBase {
   /**
    * Verifies that the isolation_level was added to the database settings.
    */
-  public function testInstaller() {
+  public function testInstaller(): void {
     $contents = file_get_contents($this->container->getParameter('app.root') . '/' . $this->siteDirectory . '/settings.php');
 
     // Test that isolation_level was set to "READ COMMITTED".

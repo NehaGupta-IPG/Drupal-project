@@ -28,6 +28,7 @@ class ConfigActionValidationTest extends KernelTestBase {
     'node',
     'shortcut',
     'system',
+    'user',
   ];
 
   /**
@@ -77,7 +78,7 @@ name: Config actions making bad decisions
 config:
   actions:
     $config_name:
-      simple_config_update:
+      setProperties:
         $label_key: ''
 YAML;
 
@@ -118,7 +119,7 @@ name: Config actions making bad decisions
 config:
   actions:
     random.config:
-      simple_config_update:
+      simpleConfigUpdate:
         label: ''
 YAML;
 

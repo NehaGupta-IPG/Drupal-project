@@ -6,24 +6,23 @@ namespace Drupal\Tests\config_translation\Functional;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Language\Language;
+use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
 
-// cspell:ignore tuvan
-
+// cspell:ignore testcontent tuvan
 /**
  * Translate settings and entities to various languages.
- *
- * @group config_translation
- * @group #slow
  */
+#[Group('config_translation')]
 class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
 
   /**
    * Tests the contact form translation.
    */
-  public function testContactConfigEntityTranslation() {
+  public function testContactConfigEntityTranslation(): void {
     $this->drupalLogin($this->adminUser);
 
     $this->drupalGet('admin/structure/contact');
@@ -161,7 +160,7 @@ class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
   /**
    * Tests the views translation interface.
    */
-  public function testViewsTranslationUI() {
+  public function testViewsTranslationUI(): void {
     $this->drupalLogin($this->adminUser);
 
     $description = 'All content promoted to the front page.';
@@ -207,7 +206,7 @@ class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
   /**
    * Tests the translation of field and field storage configuration.
    */
-  public function testFieldConfigTranslation() {
+  public function testFieldConfigTranslation(): void {
     // Add a test field which has a translatable field setting and a
     // translatable field storage setting.
     $field_name = $this->randomMachineName();
@@ -222,7 +221,7 @@ class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
     $field_storage->save();
 
     $bundle = $this->randomMachineName();
-    entity_test_create_bundle($bundle);
+    EntityTestHelper::createBundle($bundle);
     $field = FieldConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'entity_test',
@@ -247,7 +246,7 @@ class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
   /**
    * Tests the translation of a boolean field settings.
    */
-  public function testBooleanFieldConfigTranslation() {
+  public function testBooleanFieldConfigTranslation(): void {
     // Add a test boolean field.
     $field_name = $this->randomMachineName();
     FieldStorageConfig::create([
@@ -257,7 +256,7 @@ class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
     ])->save();
 
     $bundle = $this->randomMachineName();
-    entity_test_create_bundle($bundle);
+    EntityTestHelper::createBundle($bundle);
     $field = FieldConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'entity_test',
@@ -277,7 +276,7 @@ class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
 
     // Checks the text of details summary element that surrounds the translation
     // options.
-    $this->assertSession()->responseContains(Html::escape(strip_tags($on_label)) . ' Boolean settings');
+    $this->assertSession()->responseContains(Html::escape($on_label) . ' Boolean settings');
 
     // Checks that the correct on and off labels appear on the form.
     $this->assertSession()->assertEscaped($on_label);
@@ -287,7 +286,7 @@ class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
   /**
    * Tests text_format translation.
    */
-  public function testTextFormatTranslation() {
+  public function testTextFormatTranslation(): void {
     $this->drupalLogin($this->adminUser);
     /** @var \Drupal\Core\Config\ConfigFactoryInterface $config_factory */
     $config_factory = $this->container->get('config.factory');
@@ -383,7 +382,7 @@ class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
   /**
    * Tests field translation for node fields.
    */
-  public function testNodeFieldTranslation() {
+  public function testNodeFieldTranslation(): void {
     NodeType::create(['type' => 'article', 'name' => 'Article'])->save();
 
     $field_name = 'translatable_field';
@@ -392,9 +391,8 @@ class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
       'entity_type' => 'node',
       'type' => 'text',
     ]);
-
-    $field_storage->setSetting('translatable_storage_setting', 'translatable_storage_setting');
     $field_storage->save();
+
     $field = FieldConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'node',
@@ -415,14 +413,14 @@ class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
     $this->assertSession()->pageTextContains('Successfully saved French translation.');
 
     // Check that the translations are saved.
-    $this->clickLink('Add');
+    $this->clickLink('Edit');
     $this->assertSession()->responseContains('FR label');
   }
 
   /**
    * Test translation save confirmation message.
    */
-  public function testMenuTranslationWithoutChange() {
+  public function testMenuTranslationWithoutChange(): void {
     $this->drupalLogin($this->adminUser);
     $this->drupalGet('admin/structure/menu/manage/main/translate/tyv/add');
     $this->submitForm([], 'Save translation');

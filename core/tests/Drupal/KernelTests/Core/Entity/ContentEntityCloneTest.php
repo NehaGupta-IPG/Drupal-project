@@ -36,7 +36,7 @@ class ContentEntityCloneTest extends EntityKernelTestBase {
   /**
    * Tests if entity references on fields are still correct after cloning.
    */
-  public function testFieldEntityReferenceAfterClone() {
+  public function testFieldEntityReferenceAfterClone(): void {
     $user = $this->createUser();
 
     // Create a test entity.
@@ -76,7 +76,7 @@ class ContentEntityCloneTest extends EntityKernelTestBase {
   /**
    * Tests that the flag for enforcing a new entity is not shared.
    */
-  public function testEnforceIsNewOnClonedEntityTranslation() {
+  public function testEnforceIsNewOnClonedEntityTranslation(): void {
     // Create a test entity.
     $entity = EntityTestMul::create([
       'name' => $this->randomString(),
@@ -103,7 +103,7 @@ class ContentEntityCloneTest extends EntityKernelTestBase {
   /**
    * Tests if the entity fields are properly cloned.
    */
-  public function testClonedEntityFields() {
+  public function testClonedEntityFields(): void {
     $user = $this->createUser();
 
     // Create a test entity.
@@ -148,7 +148,7 @@ class ContentEntityCloneTest extends EntityKernelTestBase {
   /**
    * Tests that the flag for enforcing a new revision is not shared.
    */
-  public function testNewRevisionOnCloneEntityTranslation() {
+  public function testNewRevisionOnCloneEntityTranslation(): void {
     // Create a test entity.
     $entity = EntityTestMulRev::create([
       'name' => $this->randomString(),
@@ -180,7 +180,7 @@ class ContentEntityCloneTest extends EntityKernelTestBase {
   /**
    * Tests modifications on entity keys of a cloned entity object.
    */
-  public function testEntityKeysModifications() {
+  public function testEntityKeysModifications(): void {
     // Create a test entity with a translation, which will internally trigger
     // entity cloning for the new translation and create references for some of
     // the entity properties.
@@ -220,7 +220,7 @@ class ContentEntityCloneTest extends EntityKernelTestBase {
   /**
    * Tests the field values after serializing an entity and its clone.
    */
-  public function testFieldValuesAfterSerialize() {
+  public function testFieldValuesAfterSerialize(): void {
     // Create a test entity with a translation, which will internally trigger
     // entity cloning for the new translation and create references for some of
     // the entity properties.
@@ -252,7 +252,7 @@ class ContentEntityCloneTest extends EntityKernelTestBase {
   /**
    * Tests changing the default revision flag.
    */
-  public function testDefaultRevision() {
+  public function testDefaultRevision(): void {
     // Create a test entity with a translation, which will internally trigger
     // entity cloning for the new translation and create references for some of
     // the entity properties.
@@ -279,7 +279,7 @@ class ContentEntityCloneTest extends EntityKernelTestBase {
   /**
    * Tests references of entity properties after entity cloning.
    */
-  public function testEntityPropertiesModifications() {
+  public function testEntityPropertiesModifications(): void {
     // Create a test entity with a translation, which will internally trigger
     // entity cloning for the new translation and create references for some of
     // the entity properties.
@@ -299,6 +299,11 @@ class ContentEntityCloneTest extends EntityKernelTestBase {
     $translation_unique_properties = ['activeLangcode', 'translationInitialize', 'fieldDefinitions', 'languages', 'langcodeKey', 'defaultLangcode', 'defaultLangcodeKey', 'revisionTranslationAffectedKey', 'validated', 'validationRequired', 'entityTypeId', 'typedData', 'cacheContexts', 'cacheTags', 'cacheMaxAge', '_serviceIds', '_entityStorages', 'enforceDefaultTranslation'];
 
     foreach ($properties as $property) {
+      // The original property is typed and can not be set to a string.
+      if ($property->getName() === 'originalEntity') {
+        continue;
+      }
+
       $property_name = $property->getName();
 
       // Modify each entity property on the clone and assert that the change is

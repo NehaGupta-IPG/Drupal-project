@@ -43,6 +43,9 @@ class IndexTidDepth extends ArgumentPluginBase implements ContainerFactoryPlugin
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
 
@@ -53,6 +56,9 @@ class IndexTidDepth extends ArgumentPluginBase implements ContainerFactoryPlugin
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     $form['depth'] = [
       '#type' => 'weight',
@@ -89,6 +95,9 @@ class IndexTidDepth extends ArgumentPluginBase implements ContainerFactoryPlugin
     return $actions;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function query($group_by = FALSE) {
     $this->ensureMyTable();
 
@@ -106,12 +115,15 @@ class IndexTidDepth extends ArgumentPluginBase implements ContainerFactoryPlugin
     $this->addSubQueryJoin($tids);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function title() {
     $term = $this->entityRepository->getCanonical('taxonomy_term', $this->argument);
     if (!empty($term)) {
       return $term->label();
     }
-    // @todo review text
+    // @todo Review text.
     return $this->t('No name');
   }
 

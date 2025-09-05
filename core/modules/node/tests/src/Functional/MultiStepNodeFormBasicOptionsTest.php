@@ -6,12 +6,12 @@ namespace Drupal\Tests\node\Functional;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the persistence of basic options through multiple steps.
- *
- * @group node
  */
+#[Group('node')]
 class MultiStepNodeFormBasicOptionsTest extends NodeTestBase {
 
   /**
@@ -29,7 +29,7 @@ class MultiStepNodeFormBasicOptionsTest extends NodeTestBase {
   /**
    * Tests changing the default values of basic options to ensure they persist.
    */
-  public function testMultiStepNodeFormBasicOptions() {
+  public function testMultiStepNodeFormBasicOptions(): void {
     // Prepare a user to create the node.
     $web_user = $this->drupalCreateUser([
       'administer nodes',
@@ -57,6 +57,12 @@ class MultiStepNodeFormBasicOptionsTest extends NodeTestBase {
       ->getFormDisplay('node', 'page')
       ->setComponent($this->fieldName, [
         'type' => 'text_textfield',
+      ])
+      ->setComponent('promote', [
+        'type' => 'boolean_checkbox',
+      ])
+      ->setComponent('sticky', [
+        'type' => 'boolean_checkbox',
       ])
       ->save();
 

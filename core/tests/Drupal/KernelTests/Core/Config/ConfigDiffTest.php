@@ -14,16 +14,14 @@ use Drupal\KernelTests\KernelTestBase;
 class ConfigDiffTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['config_test', 'system'];
 
   /**
    * Tests calculating the difference between two sets of configuration.
    */
-  public function testDiff() {
+  public function testDiff(): void {
     $active = $this->container->get('config.storage');
     $sync = $this->container->get('config.storage.sync');
     $config_name = 'config_test.system';
@@ -50,7 +48,7 @@ class ConfigDiffTest extends KernelTestBase {
       [$change_key . ': ' . $original_data[$change_key]],
       [$change_key . ': ' . $change_data]);
 
-    // Reset data back to original, and remove a key
+    // Reset data back to original, and remove a key.
     $sync_data = $original_data;
     unset($sync_data[$remove_key]);
     $sync->write($config_name, $sync_data);
@@ -64,7 +62,7 @@ class ConfigDiffTest extends KernelTestBase {
       FALSE
     );
 
-    // Reset data back to original and add a key
+    // Reset data back to original and add a key.
     $sync_data = $original_data;
     $sync_data[$add_key] = $add_data;
     $sync->write($config_name, $sync_data);
@@ -110,7 +108,7 @@ class ConfigDiffTest extends KernelTestBase {
   /**
    * Tests calculating the difference between two sets of config collections.
    */
-  public function testCollectionDiff() {
+  public function testCollectionDiff(): void {
     /** @var \Drupal\Core\Config\StorageInterface $active */
     $active = $this->container->get('config.storage');
     /** @var \Drupal\Core\Config\StorageInterface $sync */

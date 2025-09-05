@@ -6,12 +6,12 @@ namespace Drupal\Tests\system\Functional\Common;
 
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Verifies that bubbleable metadata of early rendering is not lost.
- *
- * @group Common
  */
+#[Group('Common')]
 class EarlyRenderingControllerTest extends BrowserTestBase {
 
   /**
@@ -27,7 +27,7 @@ class EarlyRenderingControllerTest extends BrowserTestBase {
   /**
    * Tests theme preprocess functions being able to attach assets.
    */
-  public function testEarlyRendering() {
+  public function testEarlyRendering(): void {
     // Render array: non-early & early.
     $this->drupalGet(Url::fromRoute('early_rendering_controller_test.render_array'));
     $this->assertSession()->statusCodeEquals(200);

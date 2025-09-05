@@ -261,7 +261,7 @@ class EntityController implements ContainerInjectionInterface {
    * @return string|null
    *   The title for the entity view page, if an entity was found.
    */
-  public function title(RouteMatchInterface $route_match, EntityInterface $_entity = NULL) {
+  public function title(RouteMatchInterface $route_match, ?EntityInterface $_entity = NULL) {
     if ($entity = $this->doGetEntity($route_match, $_entity)) {
       return $entity->label();
     }
@@ -278,7 +278,7 @@ class EntityController implements ContainerInjectionInterface {
    * @return string|null
    *   The title for the entity edit page, if an entity was found.
    */
-  public function editTitle(RouteMatchInterface $route_match, EntityInterface $_entity = NULL) {
+  public function editTitle(RouteMatchInterface $route_match, ?EntityInterface $_entity = NULL) {
     if ($entity = $this->doGetEntity($route_match, $_entity)) {
       return $this->t('Edit %label', ['%label' => $entity->label()]);
     }
@@ -296,10 +296,9 @@ class EntityController implements ContainerInjectionInterface {
    * @return string
    *   The title for the entity delete page.
    */
-  public function deleteTitle(RouteMatchInterface $route_match, EntityInterface $_entity = NULL) {
-    if ($entity = $this->doGetEntity($route_match, $_entity)) {
-      return $this->t('Delete %label', ['%label' => $entity->label()]);
-    }
+  public function deleteTitle(RouteMatchInterface $route_match, ?EntityInterface $_entity = NULL) {
+    $entity = $this->doGetEntity($route_match, $_entity);
+    return $entity ? $this->t('Delete %label', ['%label' => $entity->label()]) : '';
   }
 
   /**
@@ -315,7 +314,7 @@ class EntityController implements ContainerInjectionInterface {
    *   The entity, if it is passed in directly or if the first parameter of the
    *   active route is an entity; otherwise, NULL.
    */
-  protected function doGetEntity(RouteMatchInterface $route_match, EntityInterface $_entity = NULL) {
+  protected function doGetEntity(RouteMatchInterface $route_match, ?EntityInterface $_entity = NULL) {
     if ($_entity) {
       $entity = $_entity;
     }
@@ -336,13 +335,16 @@ class EntityController implements ContainerInjectionInterface {
   /**
    * Expands the bundle information with descriptions, if known.
    *
+   * Also sorts the bundles before adding the bundle descriptions. Sorting is
+   * being done here to avoid having to load bundle entities multiple times.
+   *
    * @param array $bundles
    *   An array of bundle information.
    * @param \Drupal\Core\Entity\EntityTypeInterface $bundle_entity_type
    *   The bundle entity type definition.
    *
    * @return array
-   *   The expanded array of bundle information.
+   *   An array of sorted bundle information including bundle descriptions.
    */
   protected function loadBundleDescriptions(array $bundles, EntityTypeInterface $bundle_entity_type) {
     if (!$bundle_entity_type->entityClassImplements(EntityDescriptionInterface::class)) {
@@ -352,6 +354,10 @@ class EntityController implements ContainerInjectionInterface {
     $storage = $this->entityTypeManager->getStorage($bundle_entity_type->id());
     /** @var \Drupal\Core\Entity\EntityDescriptionInterface[] $bundle_entities */
     $bundle_entities = $storage->loadMultiple($bundle_names);
+
+    uasort($bundle_entities, [$bundle_entity_type->getClass(), 'sort']);
+    $bundles = array_replace($bundle_entities, $bundles);
+
     foreach ($bundles as $bundle_name => &$bundle_info) {
       if (isset($bundle_entities[$bundle_name])) {
         $bundle_info['description'] = $bundle_entities[$bundle_name]->getDescription();

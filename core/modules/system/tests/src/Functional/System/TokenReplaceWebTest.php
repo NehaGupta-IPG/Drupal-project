@@ -7,12 +7,12 @@ namespace Drupal\Tests\system\Functional\System;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the token system integration.
- *
- * @group system
  */
+#[Group('system')]
 class TokenReplaceWebTest extends BrowserTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -30,7 +30,7 @@ class TokenReplaceWebTest extends BrowserTestBase {
   /**
    * Tests a token replacement on an actual website.
    */
-  public function testTokens() {
+  public function testTokens(): void {
     $node = $this->drupalCreateNode();
     $account = $this->drupalCreateUser();
     $this->drupalLogin($account);

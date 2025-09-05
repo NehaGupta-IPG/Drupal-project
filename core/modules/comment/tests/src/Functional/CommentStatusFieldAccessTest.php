@@ -7,12 +7,12 @@ namespace Drupal\Tests\comment\Functional;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests comment status field access.
- *
- * @group comment
  */
+#[Group('comment')]
 class CommentStatusFieldAccessTest extends BrowserTestBase {
 
   use CommentTestTrait;
@@ -85,7 +85,7 @@ class CommentStatusFieldAccessTest extends BrowserTestBase {
   /**
    * Tests comment status field access.
    */
-  public function testCommentStatusFieldAccessStatus() {
+  public function testCommentStatusFieldAccessStatus(): void {
     $this->drupalLogin($this->nodeAuthor);
     $this->drupalGet('node/add/article');
     $assert = $this->assertSession();

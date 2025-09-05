@@ -23,7 +23,7 @@ class BasicTest extends ViewsKernelTestBase {
   /**
    * Tests a trivial result set.
    */
-  public function testSimpleResultSet() {
+  public function testSimpleResultSet(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 
@@ -41,7 +41,7 @@ class BasicTest extends ViewsKernelTestBase {
   /**
    * Tests filtering of the result set.
    */
-  public function testSimpleFiltering() {
+  public function testSimpleFiltering(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 
@@ -100,8 +100,8 @@ class BasicTest extends ViewsKernelTestBase {
   /**
    * Tests simple argument.
    */
-  public function testSimpleArgument() {
-    // Execute with a view
+  public function testSimpleArgument(): void {
+    // Execute with a view.
     $view = Views::getView('test_simple_argument');
     $view->setArguments([27]);
     $this->executeView($view);

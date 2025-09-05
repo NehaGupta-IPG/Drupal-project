@@ -22,7 +22,7 @@ class BlockContentDeletionTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'block_content', 'system', 'user'];
+  protected static $modules = ['block', 'block_content', 'field', 'system', 'text', 'user'];
 
   /**
    * {@inheritdoc}
@@ -31,18 +31,19 @@ class BlockContentDeletionTest extends KernelTestBase {
     parent::setUp();
     $this->installEntitySchema('user');
     $this->installEntitySchema('block_content');
+    $this->installConfig(['block_content']);
     $this->container->get('theme_installer')->install(['stark']);
   }
 
   /**
    * Tests deleting a block_content updates the discovered block plugin.
    */
-  public function testDeletingBlockContentShouldClearPluginCache() {
+  public function testDeletingBlockContentShouldClearPluginCache(): void {
     // Create a block content type.
     $block_content_type = BlockContentType::create([
       'id' => 'spiffy',
-      'label' => 'Mucho spiffy',
-      'description' => "Provides a block type that increases your site's spiffiness by upto 11%",
+      'label' => 'Very spiffy',
+      'description' => "Provides a block type that increases your site's spiffy rating by upto 11%",
     ]);
     $block_content_type->save();
     // And a block content entity.

@@ -4,27 +4,24 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional;
 
+use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\node\Entity\NodeType;
-use Drupal\Core\Url;
-use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Ensures that node type functions work correctly.
- *
- * @group node
- * @group #slow
  */
+#[Group('node')]
 class NodeTypeTest extends NodeTestBase {
 
   use AssertBreadcrumbTrait;
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field_ui', 'block'];
 
@@ -34,28 +31,9 @@ class NodeTypeTest extends NodeTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Ensures that node type functions (node_type_get_*) work correctly.
-   *
-   * Load available node types and validate the returned data.
-   */
-  public function testNodeTypeGetFunctions() {
-    $node_types = NodeType::loadMultiple();
-    $node_names = node_type_get_names();
-
-    $this->assertTrue(isset($node_types['article']), 'Node type article is available.');
-    $this->assertTrue(isset($node_types['page']), 'Node type basic page is available.');
-
-    $this->assertEquals($node_names['article'], $node_types['article']->label(), 'Correct node type base has been returned.');
-
-    $article = NodeType::load('article');
-    $this->assertEquals($node_types['article'], $article, 'Correct node type has been returned.');
-    $this->assertEquals($node_types['article']->label(), $article->label(), 'Correct node type name has been returned.');
-  }
-
-  /**
    * Tests creating a content type programmatically and via a form.
    */
-  public function testNodeTypeCreation() {
+  public function testNodeTypeCreation(): void {
     // Create a content type programmatically.
     $type = $this->drupalCreateContentType();
 
@@ -106,7 +84,7 @@ class NodeTypeTest extends NodeTestBase {
   /**
    * Tests editing a node type using the UI.
    */
-  public function testNodeTypeEditing() {
+  public function testNodeTypeEditing(): void {
     $assert = $this->assertSession();
     $this->drupalPlaceBlock('system_breadcrumb_block');
     $web_user = $this->drupalCreateUser([
@@ -150,7 +128,7 @@ class NodeTypeTest extends NodeTestBase {
     $assert->pageTextContains('Foo');
     $assert->pageTextContains('Body');
 
-    // Change the name through the API
+    // Change the name through the API.
     /** @var \Drupal\node\NodeTypeInterface $node_type */
     $node_type = NodeType::load('page');
     $node_type->set('name', 'NewBar');
@@ -181,7 +159,7 @@ class NodeTypeTest extends NodeTestBase {
   /**
    * Tests deleting a content type that still has content.
    */
-  public function testNodeTypeDeletion() {
+  public function testNodeTypeDeletion(): void {
     $this->drupalPlaceBlock('page_title_block');
     // Create a content type programmatically.
     $type = $this->drupalCreateContentType();
@@ -234,7 +212,7 @@ class NodeTypeTest extends NodeTestBase {
   /**
    * Tests operations from Field UI and User modules for content types.
    */
-  public function testNodeTypeOperations() {
+  public function testNodeTypeOperations(): void {
     // Create an admin user who can only manage node fields.
     $admin_user_1 = $this->drupalCreateUser([
       'administer content types',
@@ -266,7 +244,7 @@ class NodeTypeTest extends NodeTestBase {
   /**
    * Tests for when there are no content types defined.
    */
-  public function testNodeTypeNoContentType() {
+  public function testNodeTypeNoContentType(): void {
     /** @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info */
     $bundle_info = \Drupal::service('entity_type.bundle.info');
     $this->assertCount(2, $bundle_info->getBundleInfo('node'), 'The bundle information service has 2 bundles for the Node entity type.');
@@ -280,7 +258,7 @@ class NodeTypeTest extends NodeTestBase {
     $this->drupalGet('admin/structure/types/manage/page/delete');
     $this->submitForm([], 'Delete');
 
-    // Navigate to content type administration screen
+    // Navigate to content type administration screen.
     $this->drupalGet('admin/structure/types');
     $this->assertSession()->pageTextContains("No content types available. Add content type.");
     $this->assertSession()->linkExists("Add content type");

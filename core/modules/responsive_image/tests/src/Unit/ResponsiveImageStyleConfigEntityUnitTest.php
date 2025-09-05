@@ -9,11 +9,14 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeRepositoryInterface;
 use Drupal\responsive_image\Entity\ResponsiveImageStyle;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\responsive_image\Entity\ResponsiveImageStyle
- * @group block
+ * Tests Drupal\responsive_image\Entity\ResponsiveImageStyle.
  */
+#[CoversClass(ResponsiveImageStyle::class)]
+#[Group('block')]
 class ResponsiveImageStyleConfigEntityUnitTest extends UnitTestCase {
 
   /**
@@ -63,9 +66,11 @@ class ResponsiveImageStyleConfigEntityUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::calculateDependencies
+   * Tests calculate dependencies.
+   *
+   * @legacy-covers ::calculateDependencies
    */
-  public function testCalculateDependencies() {
+  public function testCalculateDependencies(): void {
     // Set up image style loading mock.
     $styles = [];
     foreach (['fallback', 'small', 'medium', 'large'] as $style) {
@@ -95,7 +100,10 @@ class ResponsiveImageStyleConfigEntityUnitTest extends UnitTestCase {
     $entity = new ResponsiveImageStyle(['breakpoint_group' => 'test_group']);
     $entity->setBreakpointGroup('test_group');
     $entity->setFallbackImageStyle('fallback');
-    $entity->addImageStyleMapping('test_breakpoint', '1x', ['image_mapping_type' => 'image_style', 'image_mapping' => 'small']);
+    $entity->addImageStyleMapping('test_breakpoint', '1x', [
+      'image_mapping_type' => 'image_style',
+      'image_mapping' => 'small',
+    ]);
     $entity->addImageStyleMapping('test_breakpoint', '2x', [
       'image_mapping_type' => 'sizes',
       'image_mapping' => [
@@ -121,10 +129,12 @@ class ResponsiveImageStyleConfigEntityUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::addImageStyleMapping
-   * @covers ::hasImageStyleMappings
+   * Tests has image style mappings.
+   *
+   * @legacy-covers ::addImageStyleMapping
+   * @legacy-covers ::hasImageStyleMappings
    */
-  public function testHasImageStyleMappings() {
+  public function testHasImageStyleMappings(): void {
     $entity = new ResponsiveImageStyle([]);
     $this->assertFalse($entity->hasImageStyleMappings());
     $entity->addImageStyleMapping('test_breakpoint', '1x', [
@@ -172,10 +182,12 @@ class ResponsiveImageStyleConfigEntityUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::addImageStyleMapping
-   * @covers ::getImageStyleMapping
+   * Tests get image style mapping.
+   *
+   * @legacy-covers ::addImageStyleMapping
+   * @legacy-covers ::getImageStyleMapping
    */
-  public function testGetImageStyleMapping() {
+  public function testGetImageStyleMapping(): void {
     $entity = new ResponsiveImageStyle(['']);
     $entity->addImageStyleMapping('test_breakpoint', '1x', [
       'image_mapping_type' => 'image_style',
@@ -192,10 +204,12 @@ class ResponsiveImageStyleConfigEntityUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::addImageStyleMapping
-   * @covers ::getKeyedImageStyleMappings
+   * Tests get keyed image style mappings.
+   *
+   * @legacy-covers ::addImageStyleMapping
+   * @legacy-covers ::getKeyedImageStyleMappings
    */
-  public function testGetKeyedImageStyleMappings() {
+  public function testGetKeyedImageStyleMappings(): void {
     $entity = new ResponsiveImageStyle(['']);
     $entity->addImageStyleMapping('test_breakpoint', '1x', [
       'image_mapping_type' => 'image_style',
@@ -284,10 +298,12 @@ class ResponsiveImageStyleConfigEntityUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::addImageStyleMapping
-   * @covers ::getImageStyleMappings
+   * Tests get image style mappings.
+   *
+   * @legacy-covers ::addImageStyleMapping
+   * @legacy-covers ::getImageStyleMappings
    */
-  public function testGetImageStyleMappings() {
+  public function testGetImageStyleMappings(): void {
     $entity = new ResponsiveImageStyle(['']);
     $entity->addImageStyleMapping('test_breakpoint', '1x', [
       'image_mapping_type' => 'image_style',
@@ -336,10 +352,12 @@ class ResponsiveImageStyleConfigEntityUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::addImageStyleMapping
-   * @covers ::removeImageStyleMappings
+   * Tests remove image style mappings.
+   *
+   * @legacy-covers ::addImageStyleMapping
+   * @legacy-covers ::removeImageStyleMappings
    */
-  public function testRemoveImageStyleMappings() {
+  public function testRemoveImageStyleMappings(): void {
     $entity = new ResponsiveImageStyle(['']);
     $entity->addImageStyleMapping('test_breakpoint', '1x', [
       'image_mapping_type' => 'image_style',
@@ -367,10 +385,12 @@ class ResponsiveImageStyleConfigEntityUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::setBreakpointGroup
-   * @covers ::getBreakpointGroup
+   * Tests set breakpoint group.
+   *
+   * @legacy-covers ::setBreakpointGroup
+   * @legacy-covers ::getBreakpointGroup
    */
-  public function testSetBreakpointGroup() {
+  public function testSetBreakpointGroup(): void {
     $entity = new ResponsiveImageStyle(['breakpoint_group' => 'test_group']);
     $entity->addImageStyleMapping('test_breakpoint', '1x', [
       'image_mapping_type' => 'image_style',

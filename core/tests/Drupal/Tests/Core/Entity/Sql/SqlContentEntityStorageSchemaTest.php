@@ -12,11 +12,15 @@ use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Entity\Sql\DefaultTableMapping;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema
- * @group Entity
+ * Tests Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema.
  */
+#[CoversClass(SqlContentEntityStorageSchema::class)]
+#[Group('Entity')]
 class SqlContentEntityStorageSchemaTest extends UnitTestCase {
 
   /**
@@ -106,18 +110,18 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
   /**
    * Tests the schema for non-revisionable, non-translatable entities.
    *
-   * @covers ::__construct
-   * @covers ::getEntitySchemaTables
-   * @covers ::initializeBaseTable
-   * @covers ::addTableDefaults
-   * @covers ::getEntityIndexName
-   * @covers ::getFieldIndexes
-   * @covers ::getFieldUniqueKeys
-   * @covers ::getFieldForeignKeys
-   * @covers ::getFieldSchemaData
-   * @covers ::processIdentifierSchema
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getEntitySchemaTables
+   * @legacy-covers ::initializeBaseTable
+   * @legacy-covers ::addTableDefaults
+   * @legacy-covers ::getEntityIndexName
+   * @legacy-covers ::getFieldIndexes
+   * @legacy-covers ::getFieldUniqueKeys
+   * @legacy-covers ::getFieldForeignKeys
+   * @legacy-covers ::getFieldSchemaData
+   * @legacy-covers ::processIdentifierSchema
    */
-  public function testGetSchemaBase() {
+  public function testGetSchemaBase(): void {
     $this->entityType = new ContentEntityType([
       'id' => 'entity_test',
       'entity_keys' => ['id' => 'id'],
@@ -402,15 +406,15 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
   /**
    * Tests the schema for revisionable, non-translatable entities.
    *
-   * @covers ::__construct
-   * @covers ::getEntitySchemaTables
-   * @covers ::initializeBaseTable
-   * @covers ::initializeRevisionTable
-   * @covers ::addTableDefaults
-   * @covers ::getEntityIndexName
-   * @covers ::processIdentifierSchema
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getEntitySchemaTables
+   * @legacy-covers ::initializeBaseTable
+   * @legacy-covers ::initializeRevisionTable
+   * @legacy-covers ::addTableDefaults
+   * @legacy-covers ::getEntityIndexName
+   * @legacy-covers ::processIdentifierSchema
    */
-  public function testGetSchemaRevisionable() {
+  public function testGetSchemaRevisionable(): void {
     $this->entityType = $this->getMockBuilder('Drupal\Core\Entity\ContentEntityType')
       ->setConstructorArgs([
         [
@@ -507,14 +511,14 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
   /**
    * Tests the schema for non-revisionable, translatable entities.
    *
-   * @covers ::__construct
-   * @covers ::getEntitySchemaTables
-   * @covers ::initializeDataTable
-   * @covers ::addTableDefaults
-   * @covers ::getEntityIndexName
-   * @covers ::processDataTable
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getEntitySchemaTables
+   * @legacy-covers ::initializeDataTable
+   * @legacy-covers ::addTableDefaults
+   * @legacy-covers ::getEntityIndexName
+   * @legacy-covers ::processDataTable
    */
-  public function testGetSchemaTranslatable() {
+  public function testGetSchemaTranslatable(): void {
     $this->entityType = new ContentEntityType([
       'id' => 'entity_test',
       'entity_keys' => [
@@ -618,15 +622,15 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
   /**
    * Tests the schema for revisionable, translatable entities.
    *
-   * @covers ::__construct
-   * @covers ::getEntitySchemaTables
-   * @covers ::initializeDataTable
-   * @covers ::addTableDefaults
-   * @covers ::getEntityIndexName
-   * @covers ::initializeRevisionDataTable
-   * @covers ::processRevisionDataTable
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getEntitySchemaTables
+   * @legacy-covers ::initializeDataTable
+   * @legacy-covers ::addTableDefaults
+   * @legacy-covers ::getEntityIndexName
+   * @legacy-covers ::initializeRevisionDataTable
+   * @legacy-covers ::processRevisionDataTable
    */
-  public function testGetSchemaRevisionableTranslatable() {
+  public function testGetSchemaRevisionableTranslatable(): void {
     $this->entityType = $this->getMockBuilder('Drupal\Core\Entity\ContentEntityType')
       ->setConstructorArgs([
         [
@@ -834,11 +838,11 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
   /**
    * Tests the schema for a field dedicated table.
    *
-   * @covers ::onFieldStorageDefinitionCreate
-   * @covers ::getDedicatedTableSchema
-   * @covers ::createDedicatedTableSchema
+   * @legacy-covers ::onFieldStorageDefinitionCreate
+   * @legacy-covers ::getDedicatedTableSchema
+   * @legacy-covers ::createDedicatedTableSchema
    */
-  public function testDedicatedTableSchema() {
+  public function testDedicatedTableSchema(): void {
     $entity_type_id = 'entity_test';
     $this->entityType = new ContentEntityType([
       'id' => 'entity_test',
@@ -1011,11 +1015,11 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
   /**
    * Tests the schema for a field dedicated table for an entity with a string identifier.
    *
-   * @covers ::onFieldStorageDefinitionCreate
-   * @covers ::getDedicatedTableSchema
-   * @covers ::createDedicatedTableSchema
+   * @legacy-covers ::onFieldStorageDefinitionCreate
+   * @legacy-covers ::getDedicatedTableSchema
+   * @legacy-covers ::createDedicatedTableSchema
    */
-  public function testDedicatedTableSchemaForEntityWithStringIdentifier() {
+  public function testDedicatedTableSchemaForEntityWithStringIdentifier(): void {
     $entity_type_id = 'entity_test';
     $this->entityType = new ContentEntityType([
       'id' => 'entity_test',
@@ -1180,10 +1184,11 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::requiresEntityDataMigration
+   * Tests requires entity data migration.
    *
-   * @dataProvider providerTestRequiresEntityDataMigration
+   * @legacy-covers ::requiresEntityDataMigration
    */
+  #[DataProvider('providerTestRequiresEntityDataMigration')]
   public function testRequiresEntityDataMigration(string $storage_class, bool|null $original_storage_has_data, bool $shared_table_structure_changed, bool $migration_required): void {
     $this->entityType = new ContentEntityType([
       'id' => 'entity_test',
@@ -1252,10 +1257,11 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::requiresEntityStorageSchemaChanges
+   * Tests requires entity storage schema changes.
    *
-   * @dataProvider providerTestRequiresEntityStorageSchemaChanges
+   * @legacy-covers ::requiresEntityStorageSchemaChanges
    */
+  #[DataProvider('providerTestRequiresEntityStorageSchemaChanges')]
   public function testRequiresEntityStorageSchemaChanges(bool $requires_change, bool $change_schema, bool $change_shared_table, ?string $method = NULL): void {
     $original = $this->createMock(ContentEntityTypeInterface::class);
     $original->expects($this->any())
@@ -1337,7 +1343,7 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
    *   (optional) An associative array describing the expected entity schema to
    *   be created. Defaults to expecting nothing.
    */
-  protected function setUpStorageSchema(array $expected = []) {
+  protected function setUpStorageSchema(array $expected = []): void {
     $this->entityTypeManager
       ->getDefinition($this->entityType->id())
       ->willReturn($this->entityType);
@@ -1419,7 +1425,7 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
    *   The schema array of the field definition, as returned from
    *   FieldStorageDefinitionInterface::getSchema().
    */
-  public function setUpStorageDefinition($field_name, array $schema) {
+  public function setUpStorageDefinition($field_name, array $schema): void {
     $this->storageDefinitions[$field_name] = $this->createMock('Drupal\Tests\Core\Field\TestBaseFieldDefinitionInterface');
     $this->storageDefinitions[$field_name]->expects($this->any())
       ->method('isBaseField')
@@ -1451,9 +1457,11 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
   }
 
   /**
-   * ::onEntityTypeUpdate.
+   * Tests on entity type update with new index.
+   *
+   * @legacy-covers \Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema::onEntityTypeUpdate()
    */
-  public function testonEntityTypeUpdateWithNewIndex() {
+  public function testonEntityTypeUpdateWithNewIndex(): void {
     $this->entityType = $original_entity_type = new ContentEntityType([
       'id' => 'entity_test',
       'entity_keys' => ['id' => 'id'],
@@ -1551,10 +1559,10 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
    * @param array $schema
    *   The schema for the table column.
    *
-   * @dataProvider providerSchemaCastValue
-   * @covers ::castValue
+   * @legacy-covers ::castValue
    */
-  public function testCastValue($expected, $value, array $schema) {
+  #[DataProvider('providerSchemaCastValue')]
+  public function testCastValue($expected, $value, array $schema): void {
     $this->assertSame($expected, SqlContentEntityStorageSchema::castValue($schema, $value));
   }
 

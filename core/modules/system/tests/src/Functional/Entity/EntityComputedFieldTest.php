@@ -8,18 +8,16 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\State\StateInterface;
 use Drupal\entity_test\Entity\EntityTestComputedField;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that entities with computed fields work correctly.
- *
- * @group Entity
  */
+#[Group('Entity')]
 class EntityComputedFieldTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test'];
 
@@ -35,6 +33,9 @@ class EntityComputedFieldTest extends BrowserTestBase {
    */
   protected StateInterface $state;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -44,7 +45,7 @@ class EntityComputedFieldTest extends BrowserTestBase {
   /**
    * Tests that formatters bubble the cacheable metadata of computed fields.
    */
-  public function testFormatterComputedFieldCacheableMetadata() {
+  public function testFormatterComputedFieldCacheableMetadata(): void {
     $this->drupalLogin($this->drupalCreateUser(['administer entity_test content']));
 
     $entity = EntityTestComputedField::create([

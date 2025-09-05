@@ -6,6 +6,8 @@ namespace Drupal\Tests\pgsql\Kernel\pgsql;
 
 use Drupal\KernelTests\Core\Database\TemporaryQueryTestBase;
 
+// cspell:ignore relname relpersistence
+
 /**
  * Tests the temporary query functionality.
  *
@@ -16,7 +18,7 @@ class TemporaryQueryTest extends TemporaryQueryTestBase {
   /**
    * Confirms that temporary tables work.
    */
-  public function testTemporaryQuery() {
+  public function testTemporaryQuery(): void {
     parent::testTemporaryQuery();
 
     $connection = $this->getConnection();

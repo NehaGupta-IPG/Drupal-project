@@ -8,20 +8,21 @@ use Drupal\Core\Session\CalculatedPermissions;
 use Drupal\Core\Session\CalculatedPermissionsInterface;
 use Drupal\Core\Session\CalculatedPermissionsItem;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the CalculatedPermissions value object.
  *
- * @covers \Drupal\Core\Session\CalculatedPermissions
- * @covers \Drupal\Core\Session\CalculatedPermissionsTrait
- * @group Session
+ * @legacy-covers \Drupal\Core\Session\CalculatedPermissions
+ * @legacy-covers \Drupal\Core\Session\CalculatedPermissionsTrait
  */
+#[Group('Session')]
 class CalculatedPermissionsTest extends UnitTestCase {
 
   /**
    * Tests that the object values were set in the constructor.
    */
-  public function testConstructor() {
+  public function testConstructor(): void {
     $item_a = new CalculatedPermissionsItem(['baz'], FALSE, 'scope_a', 'foo');
     $item_b = new CalculatedPermissionsItem(['bob', 'charlie'], FALSE, 'scope_b', 1);
 

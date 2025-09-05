@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests User related helper methods of BrowserTestBase.
- *
- * @group browsertestbase
  */
+#[Group('browsertestbase')]
 class UserHelpersTest extends BrowserTestBase {
 
   /**
@@ -21,7 +21,7 @@ class UserHelpersTest extends BrowserTestBase {
   /**
    * Tests BrowserTestBase::drupalUserIsLoggedIn().
    */
-  public function testDrupalUserIsLoggedIn() {
+  public function testDrupalUserIsLoggedIn(): void {
     $first_user = $this->drupalCreateUser();
     $second_user = $this->drupalCreateUser();
 

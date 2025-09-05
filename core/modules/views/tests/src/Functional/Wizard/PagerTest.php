@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Functional\Wizard;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests the ability of the views wizard to create views without a pager.
- *
- * @group views
  */
+#[Group('views')]
 class PagerTest extends WizardTestBase {
 
   /**
@@ -19,7 +20,7 @@ class PagerTest extends WizardTestBase {
   /**
    * Tests the pager option.
    */
-  public function testPager() {
+  public function testPager(): void {
     // Create nodes, each with a different creation time so that we have
     // conditions that are meaningful for the use of a pager.
     $this->drupalCreateContentType(['type' => 'page']);
@@ -51,7 +52,7 @@ class PagerTest extends WizardTestBase {
    * @param bool $pager
    *   A boolean for whether the View created should use a pager.
    */
-  protected function createViewAtPath($path, $pager = TRUE) {
+  protected function createViewAtPath($path, $pager = TRUE): void {
     $view = [];
     $view['label'] = $this->randomMachineName(16);
     $view['id'] = $this->randomMachineName(16);

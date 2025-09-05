@@ -14,6 +14,9 @@ use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Routing\UrlGenerator;
 use Drupal\path_alias\PathProcessor\AliasPathProcessor;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -22,10 +25,9 @@ use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Confirm that the UrlGenerator is functioning properly.
- *
- * @coversDefaultClass \Drupal\Core\Routing\UrlGenerator
- * @group Routing
  */
+#[CoversClass(UrlGenerator::class)]
+#[Group('Routing')]
 class UrlGeneratorTest extends UnitTestCase {
 
   /**
@@ -186,6 +188,7 @@ class UrlGeneratorTest extends UnitTestCase {
    * to return an actual alias.
    *
    * @return string
+   *   The alias for the given path, or the path itself if no alias is defined.
    */
   public function aliasManagerCallback() {
     $args = func_get_args();
@@ -207,7 +210,7 @@ class UrlGeneratorTest extends UnitTestCase {
   /**
    * Confirms that generated routes will have aliased paths.
    */
-  public function testAliasGeneration() {
+  public function testAliasGeneration(): void {
     $url = $this->generator->generate('test_1');
     $this->assertEquals('/hello/world', $url);
     // No cacheability to test; UrlGenerator::generate() doesn't support
@@ -227,7 +230,7 @@ class UrlGeneratorTest extends UnitTestCase {
   /**
    * Confirms that generated routes will have aliased paths using interface constants.
    */
-  public function testAliasGenerationUsingInterfaceConstants() {
+  public function testAliasGenerationUsingInterfaceConstants(): void {
     $url = $this->generator->generate('test_1', [], UrlGenerator::ABSOLUTE_PATH);
     $this->assertEquals('/hello/world', $url);
     // No cacheability to test; UrlGenerator::generate() doesn't support
@@ -245,9 +248,11 @@ class UrlGeneratorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::generateFromRoute
+   * Tests url generation with disabled path processing.
+   *
+   * @legacy-covers ::generateFromRoute
    */
-  public function testUrlGenerationWithDisabledPathProcessing() {
+  public function testUrlGenerationWithDisabledPathProcessing(): void {
     $path_processor = $this->prophesize(OutboundPathProcessorInterface::class);
     $path_processor->processOutbound(Argument::cetera())->shouldNotBeCalled();
 
@@ -259,9 +264,11 @@ class UrlGeneratorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::generateFromRoute
+   * Tests url generation with disabled path processing by route.
+   *
+   * @legacy-covers ::generateFromRoute
    */
-  public function testUrlGenerationWithDisabledPathProcessingByRoute() {
+  public function testUrlGenerationWithDisabledPathProcessingByRoute(): void {
     $path_processor = $this->prophesize(OutboundPathProcessorInterface::class);
     $path_processor->processOutbound(Argument::cetera())->shouldNotBeCalled();
 
@@ -276,9 +283,11 @@ class UrlGeneratorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::generateFromRoute
+   * Tests url generation with disabled path processing by route and opted in path processing.
+   *
+   * @legacy-covers ::generateFromRoute
    */
-  public function testUrlGenerationWithDisabledPathProcessingByRouteAndOptedInPathProcessing() {
+  public function testUrlGenerationWithDisabledPathProcessingByRouteAndOptedInPathProcessing(): void {
     $path_processor = $this->prophesize(OutboundPathProcessorInterface::class);
     $path_processor->processOutbound('/test/one', Argument::cetera())->willReturn('/hello/world')->shouldBeCalled();
 
@@ -295,7 +304,7 @@ class UrlGeneratorTest extends UnitTestCase {
   /**
    * Tests URL generation in a subdirectory.
    */
-  public function testGetPathFromRouteWithSubdirectory() {
+  public function testGetPathFromRouteWithSubdirectory(): void {
     $this->routeProcessorManager->expects($this->once())
       ->method('processOutbound');
 
@@ -306,7 +315,7 @@ class UrlGeneratorTest extends UnitTestCase {
   /**
    * Confirms that generated routes will have aliased paths.
    */
-  public function testAliasGenerationWithParameters() {
+  public function testAliasGenerationWithParameters(): void {
     $url = $this->generator->generate('test_2', ['Lassie' => '5']);
     $this->assertEquals('/goodbye/cruel/world', $url);
     // No cacheability to test; UrlGenerator::generate() doesn't support
@@ -336,10 +345,9 @@ class UrlGeneratorTest extends UnitTestCase {
 
   /**
    * Confirms that generated routes will have aliased paths with options.
-   *
-   * @dataProvider providerTestAliasGenerationWithOptions
    */
-  public function testAliasGenerationWithOptions($route_name, $route_parameters, $options, $expected) {
+  #[DataProvider('providerTestAliasGenerationWithOptions')]
+  public function testAliasGenerationWithOptions($route_name, $route_parameters, $options, $expected): void {
     $this->assertGenerateFromRoute($route_name, $route_parameters, $options, $expected, (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
   }
 
@@ -388,7 +396,7 @@ class UrlGeneratorTest extends UnitTestCase {
   /**
    * Tests URL generation from route with trailing start and end slashes.
    */
-  public function testGetPathFromRouteTrailing() {
+  public function testGetPathFromRouteTrailing(): void {
     $this->routeProcessorManager->expects($this->once())
       ->method('processOutbound');
 
@@ -399,7 +407,7 @@ class UrlGeneratorTest extends UnitTestCase {
   /**
    * Confirms that absolute URLs work with generated routes.
    */
-  public function testAbsoluteURLGeneration() {
+  public function testAbsoluteURLGeneration(): void {
     $url = $this->generator->generate('test_1', [], TRUE);
     $this->assertEquals('http://localhost/hello/world', $url);
     // No cacheability to test; UrlGenerator::generate() doesn't support
@@ -417,7 +425,7 @@ class UrlGeneratorTest extends UnitTestCase {
   /**
    * Confirms that absolute URLs work with generated routes using interface constants.
    */
-  public function testAbsoluteURLGenerationUsingInterfaceConstants() {
+  public function testAbsoluteURLGenerationUsingInterfaceConstants(): void {
     $url = $this->generator->generate('test_1', [], UrlGenerator::ABSOLUTE_URL);
     $this->assertEquals('http://localhost/hello/world', $url);
     // No cacheability to test; UrlGenerator::generate() doesn't support
@@ -435,7 +443,7 @@ class UrlGeneratorTest extends UnitTestCase {
   /**
    * Confirms that explicitly setting the base_url works with generated routes.
    */
-  public function testBaseURLGeneration() {
+  public function testBaseURLGeneration(): void {
     $options = ['base_url' => 'http://www.example.com:8888'];
     $this->assertGenerateFromRoute('test_1', [], $options, 'http://www.example.com:8888/hello/world', (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
 
@@ -457,7 +465,7 @@ class UrlGeneratorTest extends UnitTestCase {
   /**
    * Tests the 'scheme' route requirement during URL generation.
    */
-  public function testUrlGenerationWithHttpsRequirement() {
+  public function testUrlGenerationWithHttpsRequirement(): void {
     $url = $this->generator->generate('test_4', [], TRUE);
     $this->assertEquals('https://localhost/test/four', $url);
     // No cacheability to test; UrlGenerator::generate() doesn't support
@@ -479,11 +487,10 @@ class UrlGeneratorTest extends UnitTestCase {
    * @param string $expected_url
    *   The expected relative URL.
    *
-   * @covers ::generateFromRoute
-   *
-   * @dataProvider providerTestNoPath
+   * @legacy-covers ::generateFromRoute
    */
-  public function testNoPath($options, $expected_url) {
+  #[DataProvider('providerTestNoPath')]
+  public function testNoPath($options, $expected_url): void {
     $url = $this->generator->generateFromRoute('<none>', [], $options);
     $this->assertEquals($expected_url, $url);
   }
@@ -509,13 +516,15 @@ class UrlGeneratorTest extends UnitTestCase {
   }
 
   /**
-   * @covers \Drupal\Core\Routing\UrlGenerator::generateFromRoute
+   * Tests generate with path processor changing options.
+   *
+   * @legacy-covers \Drupal\Core\Routing\UrlGenerator::generateFromRoute
    */
-  public function testGenerateWithPathProcessorChangingOptions() {
+  public function testGenerateWithPathProcessorChangingOptions(): void {
     $path_processor = $this->createMock(OutboundPathProcessorInterface::CLASS);
     $path_processor->expects($this->atLeastOnce())
       ->method('processOutbound')
-      ->willReturnCallback(function ($path, &$options = [], Request $request = NULL, BubbleableMetadata $bubbleable_metadata = NULL) {
+      ->willReturnCallback(function ($path, &$options = [], ?Request $request = NULL, ?BubbleableMetadata $bubbleable_metadata = NULL) {
         $options['query'] = ['zoo' => 5];
         $options['fragment'] = 'foo';
         return $path;

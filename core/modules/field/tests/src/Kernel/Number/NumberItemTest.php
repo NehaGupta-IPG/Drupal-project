@@ -17,14 +17,11 @@ use Drupal\field\Entity\FieldStorageConfig;
  * Tests the new entity API for the number field type.
  *
  * @group field
- * @group #slow
  */
 class NumberItemTest extends FieldKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [];
 
@@ -52,7 +49,7 @@ class NumberItemTest extends FieldKernelTestBase {
   /**
    * Tests using entity fields of the number field type.
    */
-  public function testNumberItem() {
+  public function testNumberItem(): void {
     // Verify entity creation.
     $entity = EntityTest::create();
     $integer = rand(0, 10);
@@ -131,8 +128,6 @@ class NumberItemTest extends FieldKernelTestBase {
   /**
    * Tests constraints on numeric item fields.
    *
-   * @dataProvider dataNumberFieldSettingsProvider
-   *
    * @param string $type
    *   The field type.
    * @param int|float $min
@@ -147,8 +142,10 @@ class NumberItemTest extends FieldKernelTestBase {
    *   The expected constraint violation message.
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
+   *
+   * @dataProvider dataNumberFieldSettingsProvider
    */
-  public function testConstraints($type, $min, $max, $value, $expect_constraints, $expected_constraint_message = '') {
+  public function testConstraints($type, $min, $max, $value, $expect_constraints, $expected_constraint_message = ''): void {
     $field = FieldConfig::loadByName('entity_test', 'entity_test', 'field_' . $type);
     $field->setSetting('min', $min);
     $field->setSetting('max', $max);

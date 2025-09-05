@@ -6,14 +6,17 @@ namespace Drupal\Tests\system\Functional\Common;
 
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Confirm that the link generator works correctly.
- *
- * @group Common
  */
+#[Group('Common')]
 class UrlTest extends BrowserTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['common_test'];
 
   /**
@@ -24,7 +27,7 @@ class UrlTest extends BrowserTestBase {
   /**
    * Tests the active class in links.
    */
-  public function testActiveLinkAttributes() {
+  public function testActiveLinkAttributes(): void {
     $options_no_query = [];
     $options_query = [
       'query' => [

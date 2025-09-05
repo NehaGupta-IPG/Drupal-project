@@ -17,16 +17,21 @@ use Drupal\Core\Layout\LayoutDefinition;
 use Drupal\Core\Layout\LayoutInterface;
 use Drupal\Core\Layout\LayoutPluginManager;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Prophecy\Argument;
 
 // cspell:ignore lorem, ipsum, consectetur, adipiscing
-
 /**
- * @coversDefaultClass \Drupal\Core\Layout\LayoutPluginManager
- * @group Layout
+ * Tests Drupal\Core\Layout\LayoutPluginManager.
  */
+#[CoversClass(LayoutPluginManager::class)]
+#[Group('Layout')]
+#[IgnoreDeprecations]
 class LayoutPluginManagerTest extends UnitTestCase {
 
   /**
@@ -42,6 +47,13 @@ class LayoutPluginManagerTest extends UnitTestCase {
    * @var \Drupal\Core\Extension\ThemeHandlerInterface
    */
   protected $themeHandler;
+
+  /**
+   * The theme manager.
+   *
+   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   */
+  protected $themeManager;
 
   /**
    * Cache backend instance.
@@ -67,6 +79,8 @@ class LayoutPluginManagerTest extends UnitTestCase {
 
     $container = new ContainerBuilder();
     $container->set('string_translation', $this->getStringTranslationStub());
+    $this->themeManager = $this->prophesize(ThemeManagerInterface::class);
+    $container->set('theme.manager', $this->themeManager->reveal());
     \Drupal::setContainer($container);
 
     $this->moduleHandler = $this->prophesize(ModuleHandlerInterface::class);
@@ -98,13 +112,17 @@ class LayoutPluginManagerTest extends UnitTestCase {
     $class_loader->addPsr4("Drupal\\Core\\", vfsStream::url("root/core/lib/Drupal/Core"));
     $class_loader->register(TRUE);
     $this->layoutPluginManager = new LayoutPluginManager($namespaces, $this->cacheBackend->reveal(), $this->moduleHandler->reveal(), $this->themeHandler->reveal());
+
+    $this->expectDeprecation('Using @Layout annotation for plugin with ID plugin_provided_by_annotation_layout is deprecated and is removed from drupal:13.0.0. Use a Drupal\Core\Layout\Attribute\Layout attribute instead. See https://www.drupal.org/node/3395575');
   }
 
   /**
-   * @covers ::getDefinitions
-   * @covers ::providerExists
+   * Tests get definitions.
+   *
+   * @legacy-covers ::getDefinitions
+   * @legacy-covers ::providerExists
    */
-  public function testGetDefinitions() {
+  public function testGetDefinitions(): void {
     $expected = [
       'module_a_provided_layout',
       'theme_a_provided_layout',
@@ -118,10 +136,12 @@ class LayoutPluginManagerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getDefinition
-   * @covers ::processDefinition
+   * Tests get definition.
+   *
+   * @legacy-covers ::getDefinition
+   * @legacy-covers ::processDefinition
    */
-  public function testGetDefinition() {
+  public function testGetDefinition(): void {
     $layout_definition = $this->layoutPluginManager->getDefinition('theme_a_provided_layout');
     $this->assertSame('theme_a_provided_layout', $layout_definition->id());
     $this->assertSame('2 column layout', (string) $layout_definition->getLabel());
@@ -241,9 +261,11 @@ class LayoutPluginManagerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::processDefinition
+   * Tests process definition.
+   *
+   * @legacy-covers ::processDefinition
    */
-  public function testProcessDefinition() {
+  public function testProcessDefinition(): void {
     $this->moduleHandler->alter('layout', Argument::type('array'))->shouldNotBeCalled();
     $this->expectException(InvalidPluginDefinitionException::class);
     $this->expectExceptionMessage('The "module_a_derived_layout:array_based" layout definition must extend ' . LayoutDefinition::class);
@@ -263,9 +285,11 @@ EOS;
   }
 
   /**
-   * @covers ::getThemeImplementations
+   * Tests get theme implementations.
+   *
+   * @legacy-covers ::getThemeImplementations
    */
-  public function testGetThemeImplementations() {
+  public function testGetThemeImplementations(): void {
     $core_path = '/core/lib/Drupal/Core';
     $expected = [
       'layout' => [
@@ -295,9 +319,11 @@ EOS;
   }
 
   /**
-   * @covers ::getCategories
+   * Tests get categories.
+   *
+   * @legacy-covers ::getCategories
    */
-  public function testGetCategories() {
+  public function testGetCategories(): void {
     $expected = [
       'Columns: 1',
       'Columns: 2',
@@ -307,9 +333,11 @@ EOS;
   }
 
   /**
-   * @covers ::getSortedDefinitions
+   * Tests get sorted definitions.
+   *
+   * @legacy-covers ::getSortedDefinitions
    */
-  public function testGetSortedDefinitions() {
+  public function testGetSortedDefinitions(): void {
     // Sorted by category first, then label.
     $expected = [
       'module_a_provided_layout',
@@ -324,9 +352,11 @@ EOS;
   }
 
   /**
-   * @covers ::getGroupedDefinitions
+   * Tests get grouped definitions.
+   *
+   * @legacy-covers ::getGroupedDefinitions
    */
-  public function testGetGroupedDefinitions() {
+  public function testGetGroupedDefinitions(): void {
     $category_expected = [
       'Columns: 1' => [
         'module_a_provided_layout',
@@ -348,9 +378,31 @@ EOS;
   }
 
   /**
+   * Test that modules and themes can alter the list of layouts.
+   *
+   * @legacy-covers ::getLayoutOptions
+   */
+  public function testGetLayoutOptions(): void {
+    $this->moduleHandler->alter(
+      ['plugin_filter_layout', 'plugin_filter_layout__layout'],
+      Argument::type('array'),
+      [],
+      'layout',
+    )->shouldBeCalled();
+    $this->themeManager->alter(
+      ['plugin_filter_layout', 'plugin_filter_layout__layout'],
+      Argument::type('array'),
+      [],
+      'layout',
+    )->shouldBeCalled();
+
+    $this->layoutPluginManager->getLayoutOptions();
+  }
+
+  /**
    * Sets up the filesystem with YAML files and annotated plugins.
    */
-  protected function setUpFilesystem() {
+  protected function setUpFilesystem(): void {
     $module_a_provided_layout = <<<'EOS'
 module_a_provided_layout:
   label: 1 column layout

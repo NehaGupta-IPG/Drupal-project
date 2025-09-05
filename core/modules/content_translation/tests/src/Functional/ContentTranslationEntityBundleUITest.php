@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\content_translation\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the content translation behaviors on entity bundle UI.
- *
- * @group content_translation
  */
+#[Group('content_translation')]
 class ContentTranslationEntityBundleUITest extends BrowserTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = [
     'language',
     'content_translation',
@@ -43,7 +46,7 @@ class ContentTranslationEntityBundleUITest extends BrowserTestBase {
   /**
    * Tests content types default translation behavior.
    */
-  public function testContentTypeUI() {
+  public function testContentTypeUI(): void {
     // Create first content type.
     $this->drupalCreateContentType(['type' => 'article']);
     // Enable content translation.

@@ -5,20 +5,23 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate\Unit\destination;
 
 use Drupal\Core\Config\TypedConfigManagerInterface;
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\destination\Config;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\migrate\Plugin\migrate\destination\Config
- * @group migrate
+ * Tests Drupal\migrate\Plugin\migrate\destination\Config.
  */
+#[CoversClass(Config::class)]
+#[Group('migrate')]
 class ConfigTest extends UnitTestCase {
 
   /**
    * Tests the import method.
    */
-  public function testImport() {
+  public function testImport(): void {
     $source = [
       'test' => 'x',
     ];
@@ -65,7 +68,7 @@ class ConfigTest extends UnitTestCase {
   /**
    * Tests the import method.
    */
-  public function testLanguageImport() {
+  public function testLanguageImport(): void {
     $source = [
       'langcode' => 'mi',
     ];

@@ -6,13 +6,13 @@ namespace Drupal\Tests\image\Functional;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests validation functions such as min/max dimensions.
- *
- * @group image
- * @group #slow
  */
+#[Group('image')]
 class ImageFieldValidateTest extends ImageFieldTestBase {
 
   use TestFileCreationTrait {
@@ -28,7 +28,7 @@ class ImageFieldValidateTest extends ImageFieldTestBase {
   /**
    * Tests image validity.
    */
-  public function testValid() {
+  public function testValid(): void {
     $file_system = $this->container->get('file_system');
     $image_files = $this->drupalGetTestFiles('image');
 
@@ -90,7 +90,7 @@ class ImageFieldValidateTest extends ImageFieldTestBase {
   /**
    * Tests min/max dimensions settings.
    */
-  public function testResolution() {
+  public function testResolution(): void {
     $field_names = [
       0 => $this->randomMachineName(),
       1 => $this->randomMachineName(),
@@ -165,7 +165,7 @@ class ImageFieldValidateTest extends ImageFieldTestBase {
   /**
    * Tests that required alt/title fields gets validated right.
    */
-  public function testRequiredAttributes() {
+  public function testRequiredAttributes(): void {
     $field_name = $this->randomMachineName();
     $field_settings = [
       'alt_field' => 1,
@@ -219,10 +219,9 @@ class ImageFieldValidateTest extends ImageFieldTestBase {
    *
    * This is tested first with edit access to the image field allowed, and then
    * with it forbidden.
-   *
-   * @dataProvider providerTestEmpty
    */
-  public function testEmpty($field_name, $required, $cardinality, $form_element_name, $expected_page_text_when_edit_access_allowed, $expected_page_text_when_edit_access_forbidden) {
+  #[DataProvider('providerTestEmpty')]
+  public function testEmpty($field_name, $required, $cardinality, $form_element_name, $expected_page_text_when_edit_access_allowed, $expected_page_text_when_edit_access_forbidden): void {
     $this->createImageField($field_name, 'node', 'article', ['cardinality' => $cardinality], ['required' => $required]);
 
     // Test with field edit access allowed.
@@ -273,8 +272,9 @@ class ImageFieldValidateTest extends ImageFieldTestBase {
    *   The maximum width and height setting.
    *
    * @return array
+   *   List of field settings.
    */
-  protected function getFieldSettings($min_resolution, $max_resolution) {
+  protected function getFieldSettings($min_resolution, $max_resolution): array {
     return [
       'max_resolution' => $max_resolution['width'] . 'x' . $max_resolution['height'],
       'min_resolution' => $min_resolution['width'] . 'x' . $min_resolution['height'],

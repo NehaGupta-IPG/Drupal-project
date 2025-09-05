@@ -15,6 +15,9 @@ use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
  */
 class MigrateBlockContentTypeTest extends MigrateDrupal7TestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['block', 'block_content', 'filter', 'text'];
 
   /**
@@ -30,7 +33,7 @@ class MigrateBlockContentTypeTest extends MigrateDrupal7TestBase {
   /**
    * Tests the block content type migration.
    */
-  public function testBlockContentTypeMigration() {
+  public function testBlockContentTypeMigration(): void {
     /** @var \Drupal\block_content\BlockContentTypeInterface $entity */
     $entity = BlockContentType::load('basic');
     $this->assertInstanceOf(BlockContentTypeInterface::class, $entity);

@@ -8,15 +8,19 @@ use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\Theme\AjaxBasePageNegotiator;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @coversDefaultClass \Drupal\Core\Theme\AjaxBasePageNegotiator
- * @group Theme
+ * Tests Drupal\Core\Theme\AjaxBasePageNegotiator.
  */
+#[CoversClass(AjaxBasePageNegotiator::class)]
+#[Group('Theme')]
 class AjaxBasePageNegotiatorTest extends UnitTestCase {
 
   /**
@@ -53,10 +57,12 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::applies
-   * @dataProvider providerTestApplies
+   * Tests applies.
+   *
+   * @legacy-covers ::applies
    */
-  public function testApplies($request_data, $expected) {
+  #[DataProvider('providerTestApplies')]
+  public function testApplies($request_data, $expected): void {
     $request = new Request();
     foreach ($request_data as $key => $data) {
       $request->query->set($key, $data);
@@ -78,9 +84,11 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::determineActiveTheme
+   * Tests determine active theme valid token.
+   *
+   * @legacy-covers ::determineActiveTheme
    */
-  public function testDetermineActiveThemeValidToken() {
+  public function testDetermineActiveThemeValidToken(): void {
     $theme = 'claro';
     $theme_token = 'valid_theme_token';
 
@@ -96,9 +104,11 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::determineActiveTheme
+   * Tests determine active theme invalid token.
+   *
+   * @legacy-covers ::determineActiveTheme
    */
-  public function testDetermineActiveThemeInvalidToken() {
+  public function testDetermineActiveThemeInvalidToken(): void {
     $theme = 'claro';
     $theme_token = 'invalid_theme_token';
     $request = new Request();
@@ -114,9 +124,11 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::determineActiveTheme
+   * Tests determine active theme default theme.
+   *
+   * @legacy-covers ::determineActiveTheme
    */
-  public function testDetermineActiveThemeDefaultTheme() {
+  public function testDetermineActiveThemeDefaultTheme(): void {
     $theme = 'stark';
     // When the theme is the system default, an empty string is provided as the
     // theme token. See system_js_settings_alter().

@@ -13,6 +13,9 @@ use Drupal\filter\FilterPluginCollection;
 use Drupal\filter\Plugin\FilterInterface;
 use Drupal\KernelTests\KernelTestBase;
 
+// cspell:ignore outro
+// cspell:ignore toolongdomainexampledomainexampledomainexampledomainexampledomain
+
 /**
  * Tests Filter module filters individually.
  *
@@ -21,9 +24,7 @@ use Drupal\KernelTests\KernelTestBase;
 class FilterKernelTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'filter'];
 
@@ -47,7 +48,7 @@ class FilterKernelTest extends KernelTestBase {
   /**
    * Tests the align filter.
    */
-  public function testAlignFilter() {
+  public function testAlignFilter(): void {
     $filter = $this->filters['filter_align'];
 
     $test = function ($input) use ($filter) {
@@ -102,7 +103,7 @@ class FilterKernelTest extends KernelTestBase {
   /**
    * Tests the caption filter.
    */
-  public function testCaptionFilter() {
+  public function testCaptionFilter(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
     $filter = $this->filters['filter_caption'];
@@ -330,7 +331,7 @@ class FilterKernelTest extends KernelTestBase {
   /**
    * Tests the combination of the align and caption filters.
    */
-  public function testAlignAndCaptionFilters() {
+  public function testAlignAndCaptionFilters(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
     $align_filter = $this->filters['filter_align'];
@@ -405,7 +406,7 @@ class FilterKernelTest extends KernelTestBase {
   /**
    * Tests the line break filter.
    */
-  public function testLineBreakFilter() {
+  public function testLineBreakFilter(): void {
     // Get FilterAutoP object.
     $filter = $this->filters['filter_autop'];
 
@@ -548,7 +549,7 @@ class FilterKernelTest extends KernelTestBase {
    * @todo Class, id, name and xmlns should be added to the list of forbidden
    *   attributes, or, better yet, use an allowed attribute list.
    */
-  public function testHtmlFilter() {
+  public function testHtmlFilter(): void {
     // Get FilterHtml object.
     $filter = $this->filters['filter_html'];
     $filter->setConfiguration([
@@ -648,7 +649,7 @@ class FilterKernelTest extends KernelTestBase {
   /**
    * Tests the spam deterrent.
    */
-  public function testNoFollowFilter() {
+  public function testNoFollowFilter(): void {
     // Get FilterHtml object.
     $filter = $this->filters['filter_html'];
     $filter->setConfiguration([
@@ -681,7 +682,7 @@ class FilterKernelTest extends KernelTestBase {
   /**
    * Tests the HTML escaping filter.
    */
-  public function testHtmlEscapeFilter() {
+  public function testHtmlEscapeFilter(): void {
     // Get FilterHtmlEscape object.
     $filter = $this->filters['filter_html_escape'];
 
@@ -698,7 +699,7 @@ class FilterKernelTest extends KernelTestBase {
   /**
    * Tests the URL filter.
    */
-  public function testUrlFilter() {
+  public function testUrlFilter(): void {
     // Get FilterUrl object.
     $filter = $this->filters['filter_url'];
     $filter->setConfiguration([
@@ -732,15 +733,15 @@ class FilterKernelTest extends KernelTestBase {
         '<a href="mailto:' . $email_with_plus_sign . '">' . $email_with_plus_sign . '</a>' => TRUE,
       ],
       // URI parts and special characters.
-      'http://trailingslash.com/ or www.trailingslash.com/
+      'http://trailing-slash.com/ or www.trailing-slash.com/
       http://host.com/some/path?query=foo&bar[baz]=beer#fragment or www.host.com/some/path?query=foo&bar[baz]=beer#fragment
       http://twitter.com/#!/example/status/22376963142324226
       http://example.com/@user/
       ftp://user:pass@ftp.example.com/~home/dir1
       sftp://user@nonstandardport:222/dir
       ssh://192.168.0.100/srv/git/drupal.git' => [
-        '<a href="http://trailingslash.com/">http://trailingslash.com/</a>' => TRUE,
-        '<a href="http://www.trailingslash.com/">www.trailingslash.com/</a>' => TRUE,
+        '<a href="http://trailing-slash.com/">http://trailing-slash.com/</a>' => TRUE,
+        '<a href="http://www.trailing-slash.com/">www.trailing-slash.com/</a>' => TRUE,
         '<a href="http://host.com/some/path?query=foo&amp;bar[baz]=beer#fragment">http://host.com/some/path?query=foo&amp;bar[baz]=beer#fragment</a>' => TRUE,
         '<a href="http://www.host.com/some/path?query=foo&amp;bar[baz]=beer#fragment">www.host.com/some/path?query=foo&amp;bar[baz]=beer#fragment</a>' => TRUE,
         '<a href="http://twitter.com/#!/example/status/22376963142324226">http://twitter.com/#!/example/status/22376963142324226</a>' => TRUE,
@@ -902,11 +903,11 @@ class FilterKernelTest extends KernelTestBase {
       '<script>
       <!--
         // @see www.example.com
-        var exampleurl = "http://example.net";
+        var example_url = "http://example.net";
       -->
       <!--//--><![CDATA[//><!--
         // @see www.example.com
-        var exampleurl = "http://example.net";
+        var example_url = "http://example.net";
       //--><!]]>
       </script>' => [
         'href="http://www.example.com"' => FALSE,
@@ -978,12 +979,12 @@ class FilterKernelTest extends KernelTestBase {
    *   strings and whose values are Booleans indicating whether the output is
    *   expected or not. For example:
    *   @code
-   *   $tests = array(
-   *     'Input string' => array(
+   *   $tests = [
+   *     'Input string' => [
    *       '<p>Input string</p>' => TRUE,
    *       'Input string<br' => FALSE,
-   *     ),
-   *   );
+   *     ],
+   *   ];
    *   @endcode
    *
    * @internal
@@ -1028,7 +1029,7 @@ class FilterKernelTest extends KernelTestBase {
    * - Mix of absolute and partial URLs, and email addresses in one content.
    * - Input that exceeds PCRE backtracking limit.
    */
-  public function testUrlFilterContent() {
+  public function testUrlFilterContent(): void {
     // Get FilterUrl object.
     $filter = $this->filters['filter_url'];
     $filter->setConfiguration([
@@ -1067,7 +1068,7 @@ class FilterKernelTest extends KernelTestBase {
    *
    * @todo This test could really use some validity checking function.
    */
-  public function testHtmlCorrectorFilter() {
+  public function testHtmlCorrectorFilter(): void {
     // Tag closing.
     $f = Html::normalize('<p>text');
     $this->assertEquals('<p>text</p>', $f, 'HTML corrector -- tag closing at the end of input.');

@@ -6,18 +6,16 @@ namespace Drupal\Tests\system\Functional;
 
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests protecting routes by requiring CSRF token in the request header.
- *
- * @group system
  */
+#[Group('system')]
 class CsrfRequestHeaderTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'csrf_test'];
 
@@ -31,7 +29,7 @@ class CsrfRequestHeaderTest extends BrowserTestBase {
    *
    * This checks one route that uses _csrf_request_header_token.
    */
-  public function testRouteAccess() {
+  public function testRouteAccess(): void {
     $client = $this->getHttpClient();
     $csrf_token_path = 'session/token';
     // Test using the current path.

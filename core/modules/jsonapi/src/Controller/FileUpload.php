@@ -17,7 +17,7 @@ use Drupal\Core\Lock\LockAcquiringException;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\file\Upload\ContentDispositionFilenameParser;
-use Drupal\file\Upload\FileUploadHandler;
+use Drupal\file\Upload\FileUploadHandlerInterface;
 use Drupal\file\Upload\FileUploadLocationTrait;
 use Drupal\file\Upload\FileUploadResult;
 use Drupal\file\Upload\InputStreamFileWriterInterface;
@@ -63,7 +63,7 @@ class FileUpload {
   public function __construct(
     protected AccountInterface $currentUser,
     protected EntityFieldManagerInterface $fieldManager,
-    protected FileUploadHandler $fileUploadHandler,
+    protected FileUploadHandlerInterface $fileUploadHandler,
     protected HttpKernelInterface $httpKernel,
     protected InputStreamFileWriterInterface $inputStreamFileWriter,
     protected FileSystemInterface $fileSystem,
@@ -204,7 +204,7 @@ class FileUpload {
     catch (FileExistsException $e) {
       throw new HttpException(500, $e->getMessage(), $e);
     }
-    catch (FileException $e) {
+    catch (FileException) {
       throw new HttpException(500, 'Temporary file could not be moved to file location');
     }
 
@@ -234,7 +234,7 @@ class FileUpload {
    * @return \Drupal\Core\Access\AccessResultInterface
    *   The file upload access result.
    */
-  public static function checkFileUploadAccess(AccountInterface $account, FieldDefinitionInterface $field_definition, EntityInterface $entity = NULL) {
+  public static function checkFileUploadAccess(AccountInterface $account, FieldDefinitionInterface $field_definition, ?EntityInterface $entity = NULL) {
     assert(is_null($entity) ||
       $field_definition->getTargetEntityTypeId() === $entity->getEntityTypeId() &&
       // Base fields do not have target bundles.
@@ -260,7 +260,7 @@ class FileUpload {
    * @param \Drupal\Core\Entity\FieldableEntityInterface|null $entity
    *   The entity, if one exists, for which the file is to be uploaded.
    */
-  protected static function ensureFileUploadAccess(AccountInterface $account, FieldDefinitionInterface $field_definition, FieldableEntityInterface $entity = NULL) {
+  protected static function ensureFileUploadAccess(AccountInterface $account, FieldDefinitionInterface $field_definition, ?FieldableEntityInterface $entity = NULL) {
     $access_result = $entity
       ? static::checkFileUploadAccess($account, $field_definition, $entity)
       : static::checkFileUploadAccess($account, $field_definition);

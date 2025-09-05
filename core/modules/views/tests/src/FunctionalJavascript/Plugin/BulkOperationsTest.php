@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\FunctionalJavascript\Plugin;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the bulk operations.
- *
- * @group views
  */
+#[Group('views')]
 class BulkOperationsTest extends WebDriverTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'views'];
 
@@ -40,7 +38,10 @@ class BulkOperationsTest extends WebDriverTestBase {
     $this->drupalLogin($this->createUser(['bypass node access', 'administer nodes', 'access content overview']));
   }
 
-  public function testBulkOperations() {
+  /**
+   * Tests views bulk operations.
+   */
+  public function testBulkOperations(): void {
     $node_1 = $this->drupalCreateNode([
       'type' => 'page',
       'title' => 'The first node',

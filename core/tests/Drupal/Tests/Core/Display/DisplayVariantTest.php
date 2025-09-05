@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Display;
 
+use Drupal\Core\Display\VariantBase;
 use Drupal\Core\Form\FormState;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Display\VariantBase
- * @group Display
+ * Tests Drupal\Core\Display\VariantBase.
  */
+#[CoversClass(VariantBase::class)]
+#[Group('Display')]
 class DisplayVariantTest extends UnitTestCase {
 
   /**
@@ -34,9 +39,9 @@ class DisplayVariantTest extends UnitTestCase {
   /**
    * Tests the label() method.
    *
-   * @covers ::label
+   * @legacy-covers ::label
    */
-  public function testLabel() {
+  public function testLabel(): void {
     $display_variant = $this->setUpDisplayVariant(['label' => 'foo']);
     $this->assertSame('foo', $display_variant->label());
   }
@@ -44,9 +49,9 @@ class DisplayVariantTest extends UnitTestCase {
   /**
    * Tests the label() method using a default value.
    *
-   * @covers ::label
+   * @legacy-covers ::label
    */
-  public function testLabelDefault() {
+  public function testLabelDefault(): void {
     $display_variant = $this->setUpDisplayVariant();
     $this->assertSame('', $display_variant->label());
   }
@@ -54,9 +59,9 @@ class DisplayVariantTest extends UnitTestCase {
   /**
    * Tests the getWeight() method.
    *
-   * @covers ::getWeight
+   * @legacy-covers ::getWeight
    */
-  public function testGetWeight() {
+  public function testGetWeight(): void {
     $display_variant = $this->setUpDisplayVariant(['weight' => 5]);
     $this->assertSame(5, $display_variant->getWeight());
   }
@@ -64,9 +69,9 @@ class DisplayVariantTest extends UnitTestCase {
   /**
    * Tests the getWeight() method using a default value.
    *
-   * @covers ::getWeight
+   * @legacy-covers ::getWeight
    */
-  public function testGetWeightDefault() {
+  public function testGetWeightDefault(): void {
     $display_variant = $this->setUpDisplayVariant();
     $this->assertSame(0, $display_variant->getWeight());
   }
@@ -74,11 +79,10 @@ class DisplayVariantTest extends UnitTestCase {
   /**
    * Tests the getConfiguration() method.
    *
-   * @covers ::getConfiguration
-   *
-   * @dataProvider providerTestGetConfiguration
+   * @legacy-covers ::getConfiguration
    */
-  public function testGetConfiguration($configuration, $expected) {
+  #[DataProvider('providerTestGetConfiguration')]
+  public function testGetConfiguration($configuration, $expected): void {
     $display_variant = $this->setUpDisplayVariant($configuration);
 
     $this->assertSame($expected, $display_variant->getConfiguration());
@@ -122,9 +126,9 @@ class DisplayVariantTest extends UnitTestCase {
   /**
    * Tests the access() method.
    *
-   * @covers ::access
+   * @legacy-covers ::access
    */
-  public function testAccess() {
+  public function testAccess(): void {
     $display_variant = $this->setUpDisplayVariant();
     $this->assertTrue($display_variant->access());
   }
@@ -132,9 +136,9 @@ class DisplayVariantTest extends UnitTestCase {
   /**
    * Tests the submitConfigurationForm() method.
    *
-   * @covers ::submitConfigurationForm
+   * @legacy-covers ::submitConfigurationForm
    */
-  public function testSubmitConfigurationForm() {
+  public function testSubmitConfigurationForm(): void {
     $display_variant = $this->setUpDisplayVariant();
     $this->assertSame('', $display_variant->label());
 

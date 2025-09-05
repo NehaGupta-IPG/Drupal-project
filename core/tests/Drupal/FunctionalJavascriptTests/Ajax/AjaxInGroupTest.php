@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests\Ajax;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that form elements in groups work correctly with AJAX.
- *
- * @group Ajax
  */
+#[Group('Ajax')]
 class AjaxInGroupTest extends WebDriverTestBase {
 
   /**
@@ -35,7 +35,7 @@ class AjaxInGroupTest extends WebDriverTestBase {
   /**
    * Submits forms with select and checkbox elements via Ajax.
    */
-  public function testSimpleAjaxFormValue() {
+  public function testSimpleAjaxFormValue(): void {
     $this->drupalGet('/ajax_forms_test_get_form');
 
     $assert_session = $this->assertSession();

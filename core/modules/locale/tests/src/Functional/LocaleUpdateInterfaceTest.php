@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Core\Url;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests for the user interface of project interface translations.
- *
- * @group locale
  */
+#[Group('locale')]
 class LocaleUpdateInterfaceTest extends LocaleUpdateBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['locale_test_translate'];
 
@@ -46,7 +44,7 @@ class LocaleUpdateInterfaceTest extends LocaleUpdateBase {
    * Testing the Available updates summary on the side wide status page and the
    * Available translation updates page.
    */
-  public function testInterface() {
+  public function testInterface(): void {
     // No language added.
     // Check status page and Available translation updates page.
     $this->drupalGet('admin/reports/status');

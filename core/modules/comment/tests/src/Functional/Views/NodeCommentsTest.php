@@ -4,19 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional\Views;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests comments on nodes.
- *
- * @group comment
  */
+#[Group('comment')]
 class NodeCommentsTest extends CommentTestBase {
-
-  /**
-   * Modules to install.
-   *
-   * @var array
-   */
-  protected static $modules = ['history'];
 
   /**
    * {@inheritdoc}
@@ -28,22 +22,12 @@ class NodeCommentsTest extends CommentTestBase {
    *
    * @var array
    */
-  public static $testViews = ['test_new_comments', 'test_comment_count'];
-
-  /**
-   * Tests the new comments field plugin.
-   */
-  public function testNewComments() {
-    $this->drupalGet('test-new-comments');
-    $this->assertSession()->statusCodeEquals(200);
-    $new_comments = $this->cssSelect(".views-field-new-comments a:contains('1')");
-    $this->assertCount(1, $new_comments, 'Found the number of new comments for a certain node.');
-  }
+  public static $testViews = ['test_comment_count'];
 
   /**
    * Test the comment count field.
    */
-  public function testCommentCount() {
+  public function testCommentCount(): void {
     $this->drupalGet('test-comment-count');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertCount(2, $this->cssSelect('.views-row'));

@@ -6,6 +6,7 @@ namespace Drupal\Tests\contact\Functional;
 
 use Drupal\contact\Entity\Message;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests storing contact messages.
@@ -14,15 +15,12 @@ use Drupal\user\RoleInterface;
  * this test. This is by design to ensure that regular contact.module functions
  * continue to work when a storage handler other than ContentEntityNullStorage
  * is enabled for contact Message entities.
- *
- * @group contact
  */
+#[Group('contact')]
 class ContactStorageTest extends ContactSitewideTest {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -41,7 +39,7 @@ class ContactStorageTest extends ContactSitewideTest {
   /**
    * Tests configuration options and the site-wide contact form.
    */
-  public function testContactStorage() {
+  public function testContactStorage(): void {
     // Create and log in administrative user.
     $admin_user = $this->drupalCreateUser([
       'access site-wide contact form',

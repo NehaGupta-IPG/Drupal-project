@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests lazy loading for images.
- *
- * @group Theme
  */
+#[Group('Theme')]
 class ImageLoadingAttributeTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['image_lazy_load_test'];
 
@@ -28,7 +26,7 @@ class ImageLoadingAttributeTest extends BrowserTestBase {
   /**
    * Tests that loading attribute is enabled for images.
    */
-  public function testImageLoadingAttribute() {
+  public function testImageLoadingAttribute(): void {
     $assert = $this->assertSession();
 
     // Get page under test.
