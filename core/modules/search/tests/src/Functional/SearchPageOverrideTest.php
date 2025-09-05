@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Tests\search\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests if the result page can be overridden.
  *
  * Verifies that a plugin can override the buildResults() method to
  * control what the search results page looks like.
- *
- * @group search
  */
+#[Group('search')]
 class SearchPageOverrideTest extends BrowserTestBase {
 
   /**
@@ -47,6 +47,9 @@ class SearchPageOverrideTest extends BrowserTestBase {
     $this->drupalLogin($this->searchUser);
   }
 
+  /**
+   * Tests that the search results page can be overridden by a custom plugin.
+   */
   public function testSearchPageHook(): void {
     $keys = 'bike shed ' . $this->randomMachineName();
     $this->drupalGet("search/dummy_path", ['query' => ['keys' => $keys]]);

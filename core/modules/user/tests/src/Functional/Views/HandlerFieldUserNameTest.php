@@ -6,13 +6,14 @@ namespace Drupal\Tests\user\Functional\Views;
 
 use Drupal\Core\Render\RenderContext;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the handler of the user: name field.
  *
- * @group user
  * @see views_handler_field_user_name
  */
+#[Group('user')]
 class HandlerFieldUserNameTest extends UserTestBase {
 
   /**
@@ -27,6 +28,9 @@ class HandlerFieldUserNameTest extends UserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * Tests the rendering of the user name field in Views.
+   */
   public function testUserName(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');

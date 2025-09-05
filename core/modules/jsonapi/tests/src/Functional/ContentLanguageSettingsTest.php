@@ -7,15 +7,15 @@ namespace Drupal\Tests\jsonapi\Functional;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\jsonapi\JsonApiSpec;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * JSON:API integration test for "ContentLanguageSettings" config entity type.
- *
- * @group jsonapi
- * @group #slow
  */
+#[Group('jsonapi')]
 class ContentLanguageSettingsTest extends ConfigEntityResourceTestBase {
 
   /**
@@ -48,7 +48,7 @@ class ContentLanguageSettingsTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer languages']);
   }
 
@@ -82,10 +82,10 @@ class ContentLanguageSettingsTest extends ConfigEntityResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
           ],
         ],
-        'version' => '1.0',
+        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
       ],
       'links' => [
         'self' => ['href' => $self_url],

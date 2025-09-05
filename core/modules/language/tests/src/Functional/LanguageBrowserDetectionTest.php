@@ -6,14 +6,17 @@ namespace Drupal\Tests\language\Functional;
 
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests browser language detection.
- *
- * @group language
  */
+#[Group('language')]
 class LanguageBrowserDetectionTest extends BrowserTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['language'];
 
   /**

@@ -6,20 +6,18 @@ namespace Drupal\Tests\views\Functional;
 
 use Drupal\Core\Url;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests glossary functionality of taxonomy views.
- *
- * @group views
  */
+#[Group('views')]
 class TaxonomyGlossaryTest extends ViewTestBase {
 
   use TaxonomyTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['taxonomy'];
 

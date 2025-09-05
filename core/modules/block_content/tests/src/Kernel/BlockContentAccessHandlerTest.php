@@ -23,7 +23,6 @@ use Drupal\user\Entity\User;
  * @coversDefaultClass \Drupal\block_content\BlockContentAccessControlHandler
  *
  * @group block_content
- * @group #slow
  */
 class BlockContentAccessHandlerTest extends KernelTestBase {
 
@@ -126,7 +125,7 @@ class BlockContentAccessHandlerTest extends KernelTestBase {
    *   assert parent will not be called.
    * @param string $expected_access
    *   The expected access for the user and block content. Valid values are
-   *   class names of classes implementing AccessResultInterface
+   *   class names of classes implementing AccessResultInterface.
    * @param string|null $expected_access_message
    *   The expected access message.
    *

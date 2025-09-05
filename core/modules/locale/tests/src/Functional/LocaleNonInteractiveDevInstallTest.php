@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\locale\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests installing in a different language with a dev version string.
- *
- * @group locale
  */
+#[Group('locale')]
 class LocaleNonInteractiveDevInstallTest extends LocaleNonInteractiveInstallTest {
 
   /**
@@ -19,7 +20,7 @@ class LocaleNonInteractiveDevInstallTest extends LocaleNonInteractiveInstallTest
   /**
    * {@inheritdoc}
    */
-  protected function getVersionStringToTest() {
+  protected function getVersionStringToTest(): string {
     include_once $this->root . '/core/includes/install.core.inc';
     $version = _install_get_version_info(\Drupal::VERSION);
     return $version['major'] . '.' . $version['minor'] . '.x';

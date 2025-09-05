@@ -6,18 +6,16 @@ namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\views\Entity\View;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the views list.
- *
- * @group views_ui
  */
+#[Group('views_ui')]
 class ViewsListTest extends UITestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'views_ui'];
 

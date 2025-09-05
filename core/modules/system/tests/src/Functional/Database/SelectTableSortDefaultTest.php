@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\Database;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests the tablesort query extender.
- *
- * @group Database
  */
+#[Group('Database')]
 class SelectTableSortDefaultTest extends DatabaseTestBase {
 
   /**
@@ -28,7 +29,7 @@ class SelectTableSortDefaultTest extends DatabaseTestBase {
       ['field' => 'Task ID', 'sort' => 'asc', 'first' => 'eat', 'last' => 'perform at superbowl'],
       ['field' => 'Task', 'sort' => 'asc', 'first' => 'code', 'last' => 'sleep'],
       ['field' => 'Task', 'sort' => 'desc', 'first' => 'sleep', 'last' => 'code'],
-      // More elements here
+      // More elements here.
 
     ];
 
@@ -47,7 +48,7 @@ class SelectTableSortDefaultTest extends DatabaseTestBase {
   /**
    * Confirms precedence of tablesorts headers.
    *
-   * If a tablesort's orderByHeader is called before another orderBy, then its
+   * If a tablesort orderByHeader is called before another orderBy, then its
    * header happens first.
    */
   public function testTableSortQueryFirst(): void {
@@ -56,7 +57,7 @@ class SelectTableSortDefaultTest extends DatabaseTestBase {
       ['field' => 'Task ID', 'sort' => 'asc', 'first' => 'eat', 'last' => 'perform at superbowl'],
       ['field' => 'Task', 'sort' => 'asc', 'first' => 'code', 'last' => 'sleep'],
       ['field' => 'Task', 'sort' => 'desc', 'first' => 'sleep', 'last' => 'code'],
-      // More elements here
+      // More elements here.
 
     ];
 

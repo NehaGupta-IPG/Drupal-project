@@ -8,20 +8,19 @@ use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use Drupal\twig_theme_test\TwigThemeTestUtils;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests Twig-specific theme functionality.
- *
- * @group Theme
  */
+#[Group('Theme')]
 class EngineTwigTest extends BrowserTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['theme_test', 'twig_theme_test'];
 
@@ -46,7 +45,7 @@ class EngineTwigTest extends BrowserTestBase {
       ->set('default', 'test_theme')
       ->save();
     $this->drupalGet('twig-theme-test/php-variables');
-    foreach (_test_theme_twig_php_values() as $type => $value) {
+    foreach (TwigThemeTestUtils::phpValues() as $type => $value) {
       $this->assertSession()->responseContains('<li>' . $type . ': ' . $value['expected'] . '</li>');
     }
   }
@@ -140,7 +139,7 @@ class EngineTwigTest extends BrowserTestBase {
     $this->drupalGet('/twig-theme-test/file-url');
     /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
     $file_url_generator = \Drupal::service('file_url_generator');
-    $filepath = $file_url_generator->generateString('core/modules/system/tests/modules/twig_theme_test/twig_theme_test.js');
+    $filepath = $file_url_generator->generateString('core/modules/system/tests/modules/twig_theme_test/js/twig_theme_test.js');
     $this->assertSession()->responseContains('<div>file_url: ' . $filepath . '</div>');
   }
 

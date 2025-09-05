@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\toolbar\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that the toolbar icon class remains for translated menu items.
- *
- * @group toolbar
  */
+#[Group('toolbar')]
 class ToolbarMenuTranslationTest extends BrowserTestBase {
 
   /**
@@ -21,9 +21,7 @@ class ToolbarMenuTranslationTest extends BrowserTestBase {
   protected $adminUser;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'toolbar',

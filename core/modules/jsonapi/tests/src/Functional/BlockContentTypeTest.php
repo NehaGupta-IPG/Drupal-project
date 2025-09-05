@@ -6,13 +6,13 @@ namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Core\Url;
+use Drupal\jsonapi\JsonApiSpec;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * JSON:API integration test for the "BlockContentType" config entity type.
- *
- * @group jsonapi
- * @group #slow
  */
+#[Group('jsonapi')]
 class BlockContentTypeTest extends ConfigEntityResourceTestBase {
 
   /**
@@ -45,7 +45,7 @@ class BlockContentTypeTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer block types']);
   }
 
@@ -74,10 +74,10 @@ class BlockContentTypeTest extends ConfigEntityResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
           ],
         ],
-        'version' => '1.0',
+        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
       ],
       'links' => [
         'self' => ['href' => $self_url],

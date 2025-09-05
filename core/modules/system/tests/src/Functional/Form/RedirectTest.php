@@ -6,18 +6,16 @@ namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests form redirection functionality.
- *
- * @group Form
  */
+#[Group('Form')]
 class RedirectTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['form_test', 'block'];
 

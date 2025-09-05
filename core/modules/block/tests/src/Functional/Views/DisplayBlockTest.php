@@ -7,29 +7,28 @@ namespace Drupal\Tests\block\Functional\Views;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Drupal\Tests\block\Functional\AssertBlockAppearsTrait;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Entity\View;
 use Drupal\views\Views;
-use Drupal\Core\Template\Attribute;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the block display plugin.
  *
- * @group block
  * @see \Drupal\views\Plugin\views\display\Block
  */
+#[Group('block')]
 class DisplayBlockTest extends ViewTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
   use AssertBlockAppearsTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node',
@@ -221,8 +220,8 @@ class DisplayBlockTest extends ViewTestBase {
       $this->drupalGet('admin/structure/block/add/views_block:test_view_block-block_1/' . $default_theme);
       $this->submitForm($edit, 'Save block');
       $block = $storage->load($default_theme . '_views_block__test_view_block_block_1_' . $i);
-      // This will only return a result if our new block has been created with the
-      // expected machine name.
+      // This will only return a result if our new block has been created with
+      // the expected machine name.
       $this->assertNotEmpty($block, 'The expected block was loaded.');
     }
 
@@ -269,11 +268,12 @@ class DisplayBlockTest extends ViewTestBase {
       'views_label' => 'Custom title',
       'region' => 'sidebar_first',
     ]);
-    $block_title_xpath = $this->assertSession()->buildXPathQuery('//aside[contains(@class, "layout-sidebar-first")]//div[@id = :id]/h2', [
+    $block_xpath = $this->assertSession()->buildXPathQuery('//aside[contains(@class, "layout-sidebar-first")]//div[@id = :id]', [
       ':id' => 'block-' . $block->id(),
     ]);
     $this->drupalGet('');
-    $this->assertSession()->elementTextEquals('xpath', $block_title_xpath, 'Custom title');
+    $this->assertSession()->elementTextEquals('xpath', "{$block_xpath}/h2", 'Custom title');
+    $this->assertSession()->elementTextEquals('xpath', "{$block_xpath}//footer", 'Custom title');
 
     // Don't override the title anymore.
     $plugin = $block->getPlugin();
@@ -281,14 +281,15 @@ class DisplayBlockTest extends ViewTestBase {
     $block->save();
 
     $this->drupalGet('');
-    $this->assertSession()->elementTextEquals('xpath', $block_title_xpath, 'test_view_block');
+    $this->assertSession()->elementTextEquals('xpath', "{$block_xpath}/h2", 'test_view_block');
+    $this->assertSession()->elementTextEquals('xpath', "{$block_xpath}//footer", 'test_view_block');
 
     // Hide the title.
     $block->getPlugin()->setConfigurationValue('label_display', FALSE);
     $block->save();
 
     $this->drupalGet('');
-    $this->assertSession()->elementNotExists('xpath', $block_title_xpath);
+    $this->assertSession()->elementNotExists('xpath', "{$block_xpath}/h2");
 
     $this->assertCacheTags(array_merge($block->getCacheTags(), ['block_view', 'config:block_list', 'config:system.site', 'config:views.view.test_view_block', 'http_response', 'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form', 'rendered']));
   }

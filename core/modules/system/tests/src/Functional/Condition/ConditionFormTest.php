@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Functional\Condition;
 
 use Drupal\node\Entity\Node;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that condition plugins basic form handling is working.
@@ -13,11 +14,13 @@ use Drupal\Tests\BrowserTestBase;
  * Checks condition forms and submission and gives a very cursory check to make
  * sure the configuration that was submitted actually causes the condition to
  * validate correctly.
- *
- * @group Condition
  */
+#[Group('Condition')]
 class ConditionFormTest extends BrowserTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['node', 'condition_test'];
 
   /**

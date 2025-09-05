@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\config\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests config overrides do not appear on forms that extend ConfigFormBase.
  *
- * @group config
  * @see \Drupal\Core\Form\ConfigFormBase
  */
+#[Group('config')]
 class ConfigFormOverrideTest extends BrowserTestBase {
 
   /**
@@ -20,9 +21,7 @@ class ConfigFormOverrideTest extends BrowserTestBase {
   private const OVERRIDE_TEXT = 'These values are overridden. Changes on this form will be saved, but overrides will take precedence. See configuration overrides documentation for more information.';
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['update', 'config_override_message_test'];
 

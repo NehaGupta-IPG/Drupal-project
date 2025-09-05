@@ -6,18 +6,16 @@ namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Tests\BrowserTestBase;
 use Drupal\twig_extension_test\TwigExtension\TestExtension;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests Twig extensions.
- *
- * @group Theme
  */
+#[Group('Theme')]
 class TwigExtensionTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['theme_test', 'twig_extension_test', 'twig_theme_test'];
 
@@ -126,6 +124,19 @@ class TwigExtensionTest extends BrowserTestBase {
     $this->assertStringContainsString('💩', $dumps[2]->getText());
     $this->assertStringContainsString('☄️', $dumps[3]->getText());
 
+  }
+
+  /**
+   * Test if Drupal html strategy is done and the fallback to Twig itself works.
+   */
+  public function testRenderStrategies(): void {
+    /** @var \Drupal\Core\Template\TwigExtension $extension */
+    $extension = \Drupal::service('twig.extension');
+    /** @var \Drupal\Core\Template\TwigEnvironment $twig */
+    $twig = \Drupal::service('twig');
+
+    $this->assertSame('test&amp;', $extension->escapeFilter($twig, 'test&'), 'TwigExtension::escapeFilter() renders escaped & when strategy is html (default).');
+    $this->assertSame('test\u0026', $extension->escapeFilter($twig, 'test&', 'js'), 'TwigExtension::escapeFilter() renders escaped & when strategy is js.');
   }
 
 }

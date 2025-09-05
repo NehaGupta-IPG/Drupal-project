@@ -7,12 +7,12 @@ namespace Drupal\FunctionalTests\Installer;
 use Drupal\Core\Routing\RoutingEvents;
 use Drupal\Core\Test\PerformanceTestRecorder;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the interactive installer.
- *
- * @group Installer
  */
+#[Group('Installer')]
 class InstallerPerformanceTest extends BrowserTestBase {
 
   /**
@@ -28,7 +28,7 @@ class InstallerPerformanceTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function prepareSettings() {
+  protected function prepareSettings(): void {
     parent::prepareSettings();
     PerformanceTestRecorder::registerService($this->siteDirectory . '/services.yml', FALSE);
   }

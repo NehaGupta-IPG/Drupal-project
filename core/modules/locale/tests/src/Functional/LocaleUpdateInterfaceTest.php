@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Core\Url;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests for the user interface of project interface translations.
- *
- * @group locale
  */
+#[Group('locale')]
 class LocaleUpdateInterfaceTest extends LocaleUpdateBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['locale_test_translate'];
 

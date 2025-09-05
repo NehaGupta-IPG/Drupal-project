@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\comment\CommentInterface;
-use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\comment\Entity\Comment;
+use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests access controlled node views have the right amount of comment pages.
- *
- * @group node
  */
+#[Group('node')]
 class NodeAccessPagerTest extends BrowserTestBase {
 
   use CommentTestTrait;
@@ -27,9 +27,7 @@ class NodeAccessPagerTest extends BrowserTestBase {
   protected User $webUser;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'node_access_test', 'comment'];
 
