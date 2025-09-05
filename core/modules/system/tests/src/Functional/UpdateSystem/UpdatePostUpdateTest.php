@@ -69,7 +69,7 @@ class UpdatePostUpdateTest extends BrowserTestBase {
   protected function doSelectionTest(): void {
     // Ensure that normal and post_update updates are merged together on the
     // selection page.
-    $this->assertSession()->responseContains('<ul><li>8001 - Normal update_N() function.</li><li>First update.</li><li>Second update.</li><li>Test0 update.</li><li>Test1 update.</li><li>Testing batch processing in post updates update.</li></ul>');
+    $this->assertSession()->responseContains('<ul><li>8001 - Normal update_N() function.</li><li>First update.</li><li>Second update.</li><li>Test0 update.</li><li>Test1 update.</li><li>Testing batch processing in post updates update.</li><li>Last update.</li></ul>');
   }
 
   /**
@@ -88,6 +88,8 @@ class UpdatePostUpdateTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Test0 update');
     $this->assertSession()->responseContains('<h3>Update test_batch</h3>');
     $this->assertSession()->pageTextContains('Test post update batches');
+    $this->assertSession()->responseContains('<h3>Update last</h3>');
+    $this->assertSession()->pageTextContains('Last update');
 
     // Test state value set by each post update.
     $updates = [
@@ -98,6 +100,7 @@ class UpdatePostUpdateTest extends BrowserTestBase {
       'update_test_postupdate_post_update_test_batch-1',
       'update_test_postupdate_post_update_test_batch-2',
       'update_test_postupdate_post_update_test_batch-3',
+      'update_test_postupdate_post_update_last',
     ];
     $this->assertSame($updates, \Drupal::state()->get('post_update_test_execution', []));
 
@@ -110,6 +113,7 @@ class UpdatePostUpdateTest extends BrowserTestBase {
       'update_test_postupdate_post_update_test1',
       'update_test_postupdate_post_update_test0',
       'update_test_postupdate_post_update_test_batch',
+      'update_test_postupdate_post_update_last',
     ];
     foreach ($expected_updates as $expected_update) {
       $this->assertEquals(1, $existing_updates[$expected_update], "$expected_update exists in 'existing_updates' key and only appears once.");

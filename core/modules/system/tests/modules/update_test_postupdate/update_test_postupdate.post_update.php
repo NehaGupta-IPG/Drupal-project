@@ -32,6 +32,17 @@ function update_test_postupdate_post_update_second(): string {
 }
 
 /**
+ * Last update.
+ */
+function update_test_postupdate_post_update_last(&$sandbox = NULL) {
+  $execution = \Drupal::state()->get('post_update_test_execution', []);
+  $execution[] = __FUNCTION__;
+  \Drupal::state()->set('post_update_test_execution', $execution);
+
+  return 'Last update';
+}
+
+/**
  * Test1 update.
  */
 function update_test_postupdate_post_update_test1(): string {
@@ -82,4 +93,17 @@ function update_test_postupdate_removed_post_updates(): array {
     'update_test_postupdate_post_update_pub' => '3.0.0',
     'update_test_postupdate_post_update_baz' => '3.0.0',
   ];
+}
+
+/**
+ * Implements hook_post_updates_alter().
+ */
+function update_test_postupdate_post_updates_alter(&$updates) {
+  foreach ($updates as $key => $update) {
+    if ($update == 'update_test_postupdate_post_update_last') {
+      unset($updates[$key]);
+      break;
+    }
+  }
+  $updates[] = 'update_test_postupdate_post_update_last';
 }
