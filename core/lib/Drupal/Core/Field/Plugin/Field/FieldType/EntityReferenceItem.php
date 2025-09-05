@@ -13,6 +13,7 @@ use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\TypedData\EntityDataDefinition;
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\EntityReferenceFieldItemList;
+use Drupal\Core\Field\FieldConfigInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldException;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -343,26 +344,22 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
     if (!$this->isEmpty() && $referenced_entity instanceof EntityInterface) {
       $parent_entity = $this->getEntity();
       $save_mode = $this->getFieldDefinition()->getSetting('save_referenced_entities');
-      $has_new_entity = $this->hasNewEntity();
 
+      // To preserve BC, default to saving only new entities.
       $do_save = match ($save_mode) {
         'disabled' => FALSE,
-        'new_only' => $has_new_entity,
-        // @todo: Implement proper change detection, fall back to "always" for
-        //   now. See https://www.drupal.org/project/drupal/issues/xxx.
-        'changed_only' => TRUE,
+        'changed_only' => $this->hasChangedEntity(),
         'always' => TRUE,
-        default => $has_new_entity,
+        default => $this->hasNewEntity(),
       };
 
-      // Prevent infinite recursion by tracking entities currently being saved.
-      $parent_key = $parent_entity->getEntityTypeId() . ':' . $parent_entity->uuid();
-      $referenced_key = $referenced_entity->getEntityTypeId() . ':' . $referenced_entity->uuid();
+      if ($do_save) {
+        // Prevent infinite recursion by tracking entities currently being saved.
+        $parent_key = $parent_entity->getEntityTypeId() . ':' . $parent_entity->uuid();
+        $referenced_key = $referenced_entity->getEntityTypeId() . ':' . $referenced_entity->uuid();
 
-      try {
-        static::$savedEntities[$parent_key] = TRUE;
-
-        if ($do_save) {
+        try {
+          static::$savedEntities[$parent_key] = TRUE;
           if (empty(static::$savedEntities[$referenced_key])) {
             static::$savedEntities[$referenced_key] = TRUE;
             $referenced_entity->save();
@@ -376,12 +373,12 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
           // If parent entity already exists, circular references are allowed
           // since both entities have stable IDs and the reference is valid.
         }
-      }
-      finally {
-        // Always clean up tracking entries to prevent memory leaks and
-        // ensure proper state for subsequent operations.
-        unset(static::$savedEntities[$parent_key]);
-        unset(static::$savedEntities[$referenced_key]);
+        finally {
+          // Always clean up tracking entries to prevent memory leaks and
+          // ensure proper state for subsequent operations.
+          unset(static::$savedEntities[$parent_key]);
+          unset(static::$savedEntities[$referenced_key]);
+        }
       }
 
       if ($this->target_id === NULL) {
@@ -503,6 +500,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
    */
   public function fieldSettingsForm(array $form, FormStateInterface $form_state) {
     $field = $form_state->getFormObject()->getEntity();
+    assert($field instanceof FieldConfigInterface);
 
     // Get all selection plugins for this entity type.
     $selection_plugins = \Drupal::service('plugin.manager.entity_reference_selection')->getSelectionGroups($this->getSetting('target_type'));
@@ -526,6 +524,25 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
       '#element_validate' => [[static::class, 'fieldSettingsFormValidate']],
 
     ];
+
+    // Add save mode configuration.
+    $key = 'save_referenced_entities';
+    $default_value = $field->getSetting($key) ?? static::defaultFieldSettings()[$key];
+    $entity_type = \Drupal::entityTypeManager()->getDefinition($field->getTargetEntityTypeId());
+    $form[$key] = [
+      '#type' => 'select',
+      '#title' => $this->t('Referenced item save behavior'),
+      '#description' => $this->t('Configure whether referenced items should be automatically saved, when the referencing %entity_type item is saved.', ['%entity_type' => $entity_type->getLabel()]),
+      '#default_value' => $default_value,
+      '#options' => [
+        'disabled' => $this->t('Do not save referenced items automatically'),
+        'new_only' => $this->t('Save only new referenced items'),
+        'changed_only' => $this->t('Save only modified referenced items'),
+        'always' => $this->t('Always save referenced items'),
+      ],
+      '#required' => TRUE,
+    ];
+
     $form['handler'] = [
       '#type' => 'details',
       '#title' => $this->t('Reference type'),
@@ -565,21 +582,6 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
     $handler = \Drupal::service('plugin.manager.entity_reference_selection')->getSelectionHandler($field);
     $form['handler']['handler_settings'] += $handler->buildConfigurationForm([], $form_state);
 
-    // Add save mode configuration.
-    $form['save_referenced_entities'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Referenced entity save behavior'),
-      '#description' => $this->t('Configure when referenced entities should be automatically saved when the referencing entity is saved.'),
-      '#default_value' => $field->getSetting('save_referenced_entities'),
-      '#options' => [
-        'disabled' => $this->t('Do not save referenced entities automatically'),
-        'new_only' => $this->t('Save only new referenced entities'),
-        'changed_only' => $this->t('Save only modified referenced entities'),
-        'always' => $this->t('Always save referenced entities'),
-      ],
-      '#required' => TRUE,
-    ];
-
     return $form;
   }
 
@@ -609,6 +611,18 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
    */
   public function hasNewEntity() {
     return !$this->isEmpty() && $this->target_id === NULL && $this->entity->isNew();
+  }
+
+  /**
+   * Determines whether the item holds a changed entity.
+   *
+   * @return bool
+   *   TRUE if the item holds a changed entity.
+   */
+  protected function hasChangedEntity(): bool {
+    // @todo: Implement proper change detection, fall back to "always" for
+    //   now. See https://www.drupal.org/project/drupal/issues/xxx.
+    return !$this->isEmpty();
   }
 
   /**
