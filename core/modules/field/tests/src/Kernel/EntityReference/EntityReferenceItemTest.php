@@ -489,6 +489,31 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
       ],
     ]);
     $field->save();
+
+    // Create field for entity_test -> entity_test references (for changed_only test).
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'field_save_mode_changed_et',
+      'entity_type' => 'entity_test',
+      'type' => 'entity_reference',
+      'settings' => [
+        'target_type' => 'entity_test',
+      ],
+    ]);
+    $field_storage->save();
+
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => 'entity_test',
+      'label' => 'Test save mode changed_only for entity_test',
+      'settings' => [
+        'handler' => 'default',
+        'save_referenced_entities' => 'changed_only',
+      ],
+    ]);
+    $field->save();
+
+    // Clear field definition cache to ensure new fields are recognized.
+    \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
   }
 
   /**
@@ -715,39 +740,17 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $non_changed_entity = EntityTest::create(['name' => $this->randomMachineName()]);
     $non_changed_entity->save();
 
-    // Create field for entity_test references.
-    $field_storage = FieldStorageConfig::create([
-      'field_name' => 'field_save_mode_changed_only_entity_test',
-      'entity_type' => 'entity_test',
-      'type' => 'entity_reference',
-      'settings' => [
-        'target_type' => 'entity_test',
-      ],
-    ]);
-    $field_storage->save();
-
-    $field = FieldConfig::create([
-      'field_storage' => $field_storage,
-      'bundle' => 'entity_test',
-      'label' => 'Test save mode changed_only for entity_test',
-      'settings' => [
-        'handler' => 'default',
-        'save_referenced_entities' => 'changed_only',
-      ],
-    ]);
-    $field->save();
-
     $entity = EntityTest::create(['name' => $this->randomMachineName()]);
     $non_changed_entity->set('name', $this->randomMachineName());
     // Change but don't save.
-    $entity->field_save_mode_changed_only_entity_test->entity = $non_changed_entity;
+    $entity->field_save_mode_changed_et->entity = $non_changed_entity;
     $entity->save();
 
     // Non-EntityChangedInterface entity should be saved (fallback behavior).
     $entity_test_storage = \Drupal::entityTypeManager()->getStorage('entity_test');
     $reloaded_entity = $entity_test_storage->loadUnchanged($non_changed_entity->id());
     $this->assertEquals($non_changed_entity->get('name')->value, $reloaded_entity->get('name')->value, 'Non-EntityChangedInterface entity was saved with changed_only mode (fallback behavior).');
-    $this->assertEquals($non_changed_entity->id(), $entity->field_save_mode_changed_only_entity_test->target_id, 'Target ID is synchronized for non-EntityChangedInterface entity.');
+    $this->assertEquals($non_changed_entity->id(), $entity->field_save_mode_changed_et->target_id, 'Target ID is synchronized for non-EntityChangedInterface entity.');
   }
 
   /**
