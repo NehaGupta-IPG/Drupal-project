@@ -64,8 +64,8 @@ class AnnotatedClassDiscovery implements DiscoveryInterface {
    *   (optional) An array of namespace that may contain plugin implementations.
    *   Defaults to an empty array.
    * @param string $plugin_definition_annotation_name
-   *   (optional) The name of the annotation that contains the plugin definition.
-   *   Defaults to 'Drupal\Component\Annotation\Plugin'.
+   *   (optional) The name of the annotation that contains the plugin
+   *   definition. Defaults to 'Drupal\Component\Annotation\Plugin'.
    * @param string[] $annotation_namespaces
    *   (optional) Additional namespaces to be scanned for annotation classes.
    */
@@ -123,7 +123,8 @@ class AnnotatedClassDiscovery implements DiscoveryInterface {
             if ($fileinfo->getExtension() == 'php') {
               if ($cached = $this->fileCache->get($fileinfo->getPathName())) {
                 if (isset($cached['id'])) {
-                  // Explicitly unserialize this to create a new object instance.
+                  // Explicitly unserialize this to create a new object
+                  // instance.
                   $definitions[$cached['id']] = unserialize($cached['content']);
                 }
                 continue;

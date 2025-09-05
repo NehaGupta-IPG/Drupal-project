@@ -8,12 +8,12 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\file\Entity\File;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests file token replacement.
- *
- * @group file
  */
+#[Group('file')]
 class FileTokenReplaceTest extends FileFieldTestBase {
 
   /**
@@ -46,7 +46,6 @@ class FileTokenReplaceTest extends FileFieldTestBase {
     $nid = $this->uploadNodeFile($test_file, $field_name, $type_name);
 
     // Load the node and the file.
-    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
     $file = File::load($node->{$field_name}->target_id);
 

@@ -8,12 +8,12 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
 use Drupal\Tests\WaitTerminateTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests modifying path aliases from the UI.
- *
- * @group path
  */
+#[Group('path')]
 class PathAliasTest extends PathTestBase {
 
   use WaitTerminateTestTrait;
@@ -154,7 +154,7 @@ class PathAliasTest extends PathTestBase {
 
     // Set alias to second test node.
     $edit['path[0][value]'] = '/node/' . $node2->id();
-    // Leave $edit['alias'] the same
+    // Leave "$edit['alias']" the same.
     $this->drupalGet('admin/config/search/path/add');
     $this->submitForm($edit, 'Save');
 

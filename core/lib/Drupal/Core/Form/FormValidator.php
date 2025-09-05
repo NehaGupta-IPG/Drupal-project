@@ -142,8 +142,9 @@ class FormValidator implements FormValidatorInterface {
    *   The unique string identifying the form.
    */
   protected function handleErrorsWithLimitedValidation(&$form, FormStateInterface &$form_state, $form_id) {
-    // If validation errors are limited then remove any non validated form values,
-    // so that only values that passed validation are left for submit callbacks.
+    // If validation errors are limited then remove any non validated form
+    // values, so that only values that passed validation are left for submit
+    // callbacks.
     $triggering_element = $form_state->getTriggeringElement();
     if (isset($triggering_element['#limit_validation_errors']) && $triggering_element['#limit_validation_errors'] !== FALSE) {
       $values = [];
@@ -330,7 +331,11 @@ class FormValidator implements FormValidatorInterface {
   protected function performRequiredValidation(&$elements, FormStateInterface &$form_state) {
     // Verify that the value is not longer than #maxlength.
     if (isset($elements['#maxlength']) && mb_strlen($elements['#value']) > $elements['#maxlength']) {
-      $form_state->setError($elements, $this->t('@name cannot be longer than %max characters but is currently %length characters long.', ['@name' => empty($elements['#title']) ? $elements['#parents'][0] : $elements['#title'], '%max' => $elements['#maxlength'], '%length' => mb_strlen($elements['#value'])]));
+      $form_state->setError($elements, $this->t('@name cannot be longer than %max characters but is currently %length characters long.', [
+        '@name' => empty($elements['#title']) ? $elements['#parents'][0] : $elements['#title'],
+        '%max' => $elements['#maxlength'],
+        '%length' => mb_strlen($elements['#value']),
+      ]));
     }
 
     if (isset($elements['#options']) && isset($elements['#value'])) {

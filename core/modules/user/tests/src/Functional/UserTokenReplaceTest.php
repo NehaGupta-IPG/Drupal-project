@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Functional;
 
-use Drupal\Core\Url;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the replacement of user tokens.
- *
- * @group user
  */
+#[Group('user')]
 class UserTokenReplaceTest extends BrowserTestBase {
 
   /**
@@ -51,8 +51,8 @@ class UserTokenReplaceTest extends BrowserTestBase {
       'language' => $language_interface,
     ];
 
-    \Drupal::state()->set('user_hooks_test_user_format_name_alter', TRUE);
-    \Drupal::state()->set('user_hooks_test_user_format_name_alter_safe', TRUE);
+    \Drupal::keyValue('user_hooks_test')->set('user_format_name_alter', TRUE);
+    \Drupal::keyValue('user_hooks_test')->set('user_format_name_alter_safe', TRUE);
 
     // Create two users and log them in one after another.
     $user1 = $this->drupalCreateUser([]);
@@ -173,8 +173,7 @@ class UserTokenReplaceTest extends BrowserTestBase {
     }
 
     // Generate user display name tokens when safe markup is returned.
-    // @see user_hooks_test_user_format_name_alter()
-    \Drupal::state()->set('user_hooks_test_user_format_name_alter_safe', TRUE);
+    \Drupal::keyValue('user_hooks_test')->set('user_format_name_alter_safe', TRUE);
     $input = '[user:display-name] [current-user:display-name]';
     $expected = "<em>{$user1->id()}</em> <em>{$user2->id()}</em>";
     $output = $token_service->replace($input, ['user' => $user1]);

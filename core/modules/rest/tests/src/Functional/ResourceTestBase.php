@@ -231,14 +231,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * (Should be called before sending a well-formed request.)
    *
-   * @see \GuzzleHttp\ClientInterface::request()
-   *
    * @param string $method
    *   HTTP method.
    * @param \Drupal\Core\Url $url
    *   URL to request.
    * @param array $request_options
    *   Request options to apply.
+   *
+   * @see \GuzzleHttp\ClientInterface::request()
    */
   abstract protected function assertNormalizationEdgeCases($method, Url $url, array $request_options);
 
@@ -247,14 +247,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * (Should be called before sending a well-formed request.)
    *
-   * @see \GuzzleHttp\ClientInterface::request()
-   *
    * @param string $method
    *   HTTP method.
    * @param \Drupal\Core\Url $url
    *   URL to request.
    * @param array $request_options
    *   Request options to apply.
+   *
+   * @see \GuzzleHttp\ClientInterface::request()
    */
   abstract protected function assertAuthenticationEdgeCases($method, Url $url, array $request_options);
 
@@ -358,7 +358,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       // sets it to 'text/html' by default. We also cannot detect the presence
       // of Apache either here in the CLI. For now having this documented here
       // is all we can do.
-      // $this->assertFalse($response->hasHeader('Content-Type'));
+      // "$this->assertFalse($response->hasHeader('Content-Type'));".
       $this->assertSame('', (string) $response->getBody());
     }
     else {

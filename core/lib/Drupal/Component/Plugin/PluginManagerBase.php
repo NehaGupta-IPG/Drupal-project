@@ -27,7 +27,7 @@ abstract class PluginManagerBase implements PluginManagerInterface {
   protected $factory;
 
   /**
-   * The object that returns the preconfigured plugin instance appropriate for a particular runtime condition.
+   * The preconfigured plugin instance for a particular runtime condition.
    *
    * @var \Drupal\Component\Plugin\Mapper\MapperInterface|null
    */
@@ -120,13 +120,13 @@ abstract class PluginManagerBase implements PluginManagerInterface {
    * @param array $configuration
    *   An array of configuration relevant to the plugin instance.
    *
+   * phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
    * @return string
    *   The id of an existing plugin to use when the plugin does not exist.
    *
    * @throws \BadMethodCallException
    *   If the method is not implemented in the concrete plugin manager class.
    */
-  // phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
   protected function getFallbackPluginId($plugin_id, array $configuration = []) {
     throw new \BadMethodCallException(static::class . '::getFallbackPluginId() not implemented.');
   }
