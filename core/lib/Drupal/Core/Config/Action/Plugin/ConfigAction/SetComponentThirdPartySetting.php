@@ -117,7 +117,7 @@ final class SetComponentThirdPartySetting implements ConfigActionPluginInterface
       }
       // Deep-merge while preserving existing values on conflicts.
       // Existing takes precedence to avoid overwriting.
-      $component_config['third_party_settings'][$provider] = NestedArray::mergeDeep($settings, $existing);
+      $component_config['third_party_settings'][$provider] = array_merge($existing, $settings);
     }
     else {
       // Scalar setting gets stored under a generic key 'value'.
