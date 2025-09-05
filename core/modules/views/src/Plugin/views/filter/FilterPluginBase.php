@@ -1026,12 +1026,13 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
       }
       elseif (!empty($this->options['group_info']['remember'])) {
         $user_input = $form_state->getUserInput();
-        if (isset($user_input[$value]) && isset($user_input[$value . '_group'])) {
-          $user_input[$value] = $user_input[$value . '_group'];
-          $form_state->setUserInput($user_input);
-        }
-        elseif (is_array($user_input[$value] ?? NULL)) {
-          $user_input[$value] = $this->group_info;
+        if (isset($user_input[$value])) {
+          if (isset($user_input[$value . '_group'])) {
+            $user_input[$value] = $user_input[$value . '_group'];
+          }
+          elseif (is_array($user_input[$value])) {
+            $user_input[$value] = $this->group_info;
+          }
           $form_state->setUserInput($user_input);
         }
       }
