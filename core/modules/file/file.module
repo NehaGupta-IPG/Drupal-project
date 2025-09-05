@@ -5,6 +5,8 @@
  */
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldFilteredMarkup;
@@ -674,18 +676,48 @@ function template_preprocess_file_upload_help(&$variables): void {
  * @ingroup file
  */
 function file_get_file_references(FileInterface $file, ?FieldDefinitionInterface $field = NULL, $age = EntityStorageInterface::FIELD_LOAD_REVISION, $field_type = 'file') {
-  $references = &drupal_static(__FUNCTION__, []);
+  /** @var \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache */
+  $memory_cache = \Drupal::service('cache.file_memory');
   $field_columns = &drupal_static(__FUNCTION__ . ':field_columns', []);
 
+  $list_tags_cache = $memory_cache->get('list_cache_tags');
+  if ($list_tags_cache === FALSE) {
+    $list_tags = [];
+    // @todo Gracefully get a list of entity types with file fields.
+    // We can not get via \Drupal::service('entity_field.manager')
+    // ->getFieldMapByFieldType('file') as there are additional types (e.g image
+    // and potentially other contrib) that can be in use that will trigger file
+    // usage counts.
+    // Idea - this could be a more long lived cache that can filter through
+    // all field definitions to check the schema for a foreign key reference to
+    // the file_managed table similar to how
+    // file_field_find_file_reference_column currently works. We could them use
+    // the bundles on the field storage to get bundle specific list tags.
+    foreach (\Drupal::entityTypeManager()->getDefinitions() as $entity_type) {
+      if ($entity_type instanceof ContentEntityTypeInterface) {
+        $list_tags = Cache::mergeTags($list_tags, $entity_type->getListCacheTags());
+      }
+    }
+    $memory_cache->set('list_cache_tags', $list_tags);
+  }
+  else {
+    $list_tags = $list_tags_cache->data;
+  }
+
+  $cid = $file->id() . ':' . $age;
+  $reference_cache = $memory_cache->get($cid);
+
   // Fill the static cache, disregard $field and $field_type for now.
-  if (!isset($references[$file->id()][$age])) {
-    $references[$file->id()][$age] = [];
+  if ($reference_cache === FALSE) {
+    $references = [];
+    $tags = $list_tags;
     $usage_list = \Drupal::service('file.usage')->listUsage($file);
     $file_usage_list = $usage_list['file'] ?? [];
     foreach ($file_usage_list as $entity_type_id => $entity_ids) {
       $entities = \Drupal::entityTypeManager()
         ->getStorage($entity_type_id)->loadMultiple(array_keys($entity_ids));
       foreach ($entities as $entity) {
+        $tags = Cache::mergeTags($tags, $entity->getCacheTags());
         $bundle = $entity->bundle();
         // We need to find file fields for this entity type and bundle.
         if (!isset($file_fields[$entity_type_id][$bundle])) {
@@ -713,7 +745,7 @@ function file_get_file_references(FileInterface $file, ?FieldDefinitionInterface
           foreach ($entity->getTranslationLanguages() as $langcode => $language) {
             foreach ($entity->getTranslation($langcode)->get($field_name) as $item) {
               if ($file->id() == $item->{$field_column}) {
-                $references[$file->id()][$age][$field_name][$entity_type_id][$entity->id()] = $entity;
+                $references[$field_name][$entity_type_id][$entity->id()] = $entity;
                 break;
               }
             }
@@ -721,23 +753,26 @@ function file_get_file_references(FileInterface $file, ?FieldDefinitionInterface
         }
       }
     }
+    $memory_cache->set($cid, $references, Cache::PERMANENT, $tags);
   }
-  $return = $references[$file->id()][$age];
+  else {
+    $references = $reference_cache->data;
+  }
   // Filter the static cache down to the requested entries. The usual static
   // cache is very small so this will be very fast.
   $entity_field_manager = \Drupal::service('entity_field.manager');
   if ($field || $field_type) {
-    foreach ($return as $field_name => $data) {
+    foreach ($references as $field_name => $data) {
       foreach (array_keys($data) as $entity_type_id) {
         $field_storage_definitions = $entity_field_manager->getFieldStorageDefinitions($entity_type_id);
         $current_field = $field_storage_definitions[$field_name];
         if (($field_type && $current_field->getType() != $field_type) || ($field && $field->uuid() != $current_field->uuid())) {
-          unset($return[$field_name][$entity_type_id]);
+          unset($references[$field_name][$entity_type_id]);
         }
       }
     }
   }
-  return $return;
+  return $references;
 }
 
 /**
