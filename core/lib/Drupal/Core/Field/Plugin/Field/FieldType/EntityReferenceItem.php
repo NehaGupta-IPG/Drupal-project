@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\ContentEntityStorageInterface;
+use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -370,8 +371,9 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
             // references to themselves or be part of cycles.
             throw new EntityStorageException('Invalid circular reference detected: a new entity cannot reference itself, not even indirectly.');
           }
-          // If parent entity already exists, circular references are allowed
-          // since both entities have stable IDs and the reference is valid.
+          // If the parent entity already exists, circular references are
+          // allowed since both entities have stable IDs and the reference is
+          // valid.
         }
         finally {
           // Always clean up tracking entries to prevent memory leaks and
@@ -620,9 +622,29 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
    *   TRUE if the item holds a changed entity.
    */
   protected function hasChangedEntity(): bool {
-    // @todo: Implement proper change detection, fall back to "always" for
-    //   now. See https://www.drupal.org/project/drupal/issues/xxx.
-    return !$this->isEmpty();
+    if ($this->isEmpty()) {
+      return FALSE;
+    }
+
+    // @todo: Implement proper change detection, for now fall back to always
+    //   save, if change status cannot be determined.
+    //   See https://www.drupal.org/project/drupal/issues/2862574.
+    $referenced_entity = $this->entity;
+    if ($referenced_entity instanceof EntityChangedInterface) {
+      if ($referenced_entity->isNew()) {
+        return TRUE;
+      }
+
+      $original = $referenced_entity->getOriginal();
+      if ($original instanceof EntityChangedInterface) {
+        return $original->getChangedTimeAcrossTranslations() < $referenced_entity->getChangedTimeAcrossTranslations();
+      }
+      else {
+        return $referenced_entity->getChangedTimeAcrossTranslations() >= \Drupal::time()->getRequestTime();
+      }
+    }
+
+    return TRUE;
   }
 
   /**
