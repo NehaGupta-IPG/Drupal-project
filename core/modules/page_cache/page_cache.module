@@ -12,8 +12,11 @@ use Drupal\Core\Url;
  * Form submission handler for system_site_maintenance_mode().
  */
 function page_cache_settings_submit(array $form, FormStateInterface $form_state): void {
-  \Drupal::messenger()->deleteByType(MessengerInterface::TYPE_STATUS);
-  \Drupal::messenger()->addMessage(t('The site is now in maintenance mode. The maintenance mode message will not show on already cached pages. To clear the cache, visit the <a href=":performance-page-url" title="performance settings page">Performance page</a>.', [
-    ':performance-page-url' => Url::fromRoute('system.performance_settings')->toString(),
-  ]));
+  $is_maintenance_mode = \Drupal::state()->get('system.maintenance_mode');
+  if ($is_maintenance_mode) {
+    \Drupal::messenger()->deleteByType(MessengerInterface::TYPE_STATUS);
+    \Drupal::messenger()->addMessage(t('The site is now in maintenance mode. The maintenance mode message will not show on already cached pages. To clear the cache, visit the <a href=":performance-page-url" title="performance settings page">Performance page</a>.', [
+      ':performance-page-url' => Url::fromRoute('system.performance_settings')->toString(),
+    ]));
+  }
 }
