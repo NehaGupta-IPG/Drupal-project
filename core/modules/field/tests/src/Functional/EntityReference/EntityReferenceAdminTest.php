@@ -407,16 +407,16 @@ class EntityReferenceAdminTest extends BrowserTestBase {
     $this->assertSession()->optionExists('settings[save_referenced_entities]', 'disabled');
     $select_element = $this->assertSession()->selectExists('settings[save_referenced_entities]');
     $disabled_option = $select_element->find('xpath', '//option[@value="disabled"]');
-    $this->assertEquals('Do not save referenced entities automatically', $disabled_option->getText());
+    $this->assertEquals('Do not save referenced items automatically', $disabled_option->getText());
 
     $new_only_option = $select_element->find('xpath', '//option[@value="new_only"]');
-    $this->assertEquals('Save only new referenced entities', $new_only_option->getText());
+    $this->assertEquals('Save only new referenced items', $new_only_option->getText());
 
     $changed_only_option = $select_element->find('xpath', '//option[@value="changed_only"]');
-    $this->assertEquals('Save only modified referenced entities', $changed_only_option->getText());
+    $this->assertEquals('Save only modified referenced items', $changed_only_option->getText());
 
     $always_option = $select_element->find('xpath', '//option[@value="always"]');
-    $this->assertEquals('Always save referenced entities', $always_option->getText());
+    $this->assertEquals('Always save referenced items', $always_option->getText());
 
     // Test that the default value is 'new_only'.
     $this->assertSession()->fieldValueEquals('settings[save_referenced_entities]', 'new_only');
