@@ -2,12 +2,11 @@
 
 namespace Drupal\system\Form;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\State\StateInterface;
+use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Url;
 use Drupal\user\PermissionHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -20,33 +19,46 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class SiteMaintenanceModeForm extends ConfigFormBase {
 
   /**
+   * The state keyvalue collection.
+   *
+   * @var \Drupal\Core\State\StateInterface
+   */
+  protected $state;
+
+  /**
+   * The permission handler.
+   *
+   * @var \Drupal\user\PermissionHandlerInterface
+   */
+  protected $permissionHandler;
+
+  /**
    * Constructs a new SiteMaintenanceModeForm.
    *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The factory for configuration objects.
    * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
    *   The typed config manager.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state keyvalue collection to use.
-   * @param \Drupal\user\PermissionHandlerInterface $permissionHandler
+   * @param \Drupal\user\PermissionHandlerInterface $permission_handler
    *   The permission handler.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   The module handler service.
    */
-  public function __construct(
-    protected TypedConfigManagerInterface $typedConfigManager,
-    protected readonly StateInterface $state,
-    protected readonly PermissionHandlerInterface $permissionHandler,
-    protected readonly ModuleHandlerInterface $moduleHandler,
-  ) {}
+  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, StateInterface $state, PermissionHandlerInterface $permission_handler) {
+    parent::__construct($config_factory, $typedConfigManager);
+    $this->state = $state;
+    $this->permissionHandler = $permission_handler;
+  }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     return new static(
+      $container->get('config.factory'),
       $container->get('config.typed'),
       $container->get('state'),
-      $container->get('user.permissions'),
-      $container->get('module_handler'),
+      $container->get('user.permissions')
     );
   }
 
@@ -91,12 +103,6 @@ class SiteMaintenanceModeForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->state->set('system.maintenance_mode', $form_state->getValue('maintenance_mode'));
     parent::submitForm($form, $form_state);
-
-    if ($form_state->getValue('maintenance_mode') && $this->moduleHandler->moduleExists('page_cache')) {
-      // Remove parent message.
-      $this->messenger()->deleteByType(MessengerInterface::TYPE_STATUS);
-      $this->messenger()->addMessage($this->t('The site is now in maintenance mode. The maintenance mode message will not show on already cached pages. To clear the cache, visit the <a href=":performance-page-url" title="performance settings page">Performance page</a>.', [':performance-page-url' => Url::fromRoute('system.performance_settings')->toString()]));
-    }
   }
 
 }
