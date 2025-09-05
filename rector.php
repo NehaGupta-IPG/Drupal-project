@@ -588,6 +588,12 @@ return RectorConfig::configure()
     ->withSkip([
         __DIR__ . '/core/tests/Drupal/Tests/Component/Annotation/Doctrine/Fixtures',
 
+        # Core's Kernel tests skipped.
+        __DIR__ . '/core/tests/Drupal/KernelTests/Core/Recipe/EntityMethodConfigActionsTest.php',
+        __DIR__ . '/core/tests/Drupal/KernelTests/Core/Ajax/CommandsTest.php',
+        __DIR__ . '/core/tests/Drupal/KernelTests/Core/TypedData/ValidKeysConstraintValidatorTest.php',
+        __DIR__ . '/core/tests/Drupal/KernelTests/Core/Config/ConfigExistsConstraintValidatorTest.php',
+
         # Modules' Kernel tests skipped.
         __DIR__ . '/core/modules/editor/tests/src/Kernel/EditorValidationTest.php',
         __DIR__ . '/core/modules/node/tests/src/Kernel/NodeTypeValidationTest.php',
