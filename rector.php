@@ -593,6 +593,7 @@ return RectorConfig::configure()
         __DIR__ . '/core/tests/Drupal/KernelTests/Core/Ajax/CommandsTest.php',
         __DIR__ . '/core/tests/Drupal/KernelTests/Core/TypedData/ValidKeysConstraintValidatorTest.php',
         __DIR__ . '/core/tests/Drupal/KernelTests/Core/Config/ConfigExistsConstraintValidatorTest.php',
+        __DIR__ . '/core/tests/Drupal/KernelTests/Core/Theme/FrontMatterTest.php',
 
         # Modules' Kernel tests skipped.
         __DIR__ . '/core/modules/editor/tests/src/Kernel/EditorValidationTest.php',
