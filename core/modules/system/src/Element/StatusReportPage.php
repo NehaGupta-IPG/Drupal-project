@@ -80,18 +80,21 @@ class StatusReportPage extends RenderElementBase {
     $counters = [
       'error' => [
         'amount' => 0,
-        'text' => t('Error'),
-        'text_plural' => t('Errors'),
+        'text' => 'Error',
+        'text_plural' => 'Errors',
+        'options' => [],
       ],
       'warning' => [
         'amount' => 0,
-        'text' => t('Warning'),
-        'text_plural' => t('Warnings'),
+        'text' => 'Warning',
+        'text_plural' => 'Warnings',
+        'options' => [],
       ],
       'checked' => [
         'amount' => 0,
-        'text' => t('Checked', [], ['context' => 'Examined']),
-        'text_plural' => t('Checked', [], ['context' => 'Examined']),
+        'text' => 'Checked',
+        'text_plural' => 'Checked',
+        'options' => ['context' => 'Examined'],
       ],
     ];
 
@@ -115,7 +118,7 @@ class StatusReportPage extends RenderElementBase {
         continue;
       }
 
-      $text = new PluralTranslatableMarkup($counter['amount'], $counter['text'], $counter['text_plural']);
+      $text = new PluralTranslatableMarkup($counter['amount'], $counter['text'], $counter['text_plural'], [], $counter['options']);
 
       $element['#counters'][$key] = [
         '#theme' => 'status_report_counter',
