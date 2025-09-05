@@ -631,17 +631,16 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
     //   See https://www.drupal.org/project/drupal/issues/2862574.
     $referenced_entity = $this->entity;
     if ($referenced_entity instanceof EntityChangedInterface) {
+      // New entities should always be considered changed.
       if ($referenced_entity->isNew()) {
         return TRUE;
       }
-
+      // If the original entity is not available, save entities changed in the
+      // current request.
       $original = $referenced_entity->getOriginal();
-      if ($original instanceof EntityChangedInterface) {
-        return $original->getChangedTimeAcrossTranslations() < $referenced_entity->getChangedTimeAcrossTranslations();
-      }
-      else {
-        return $referenced_entity->getChangedTimeAcrossTranslations() >= \Drupal::time()->getRequestTime();
-      }
+      $original_changed_time = $original?->getChangedTimeAcrossTranslations() ?? \Drupal::time()->getRequestTime() - 1;
+      $changed_time = $referenced_entity->getChangedTimeAcrossTranslations();
+      return $original_changed_time < $changed_time;
     }
 
     return TRUE;

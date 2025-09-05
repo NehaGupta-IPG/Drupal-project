@@ -627,6 +627,10 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
    * Tests the 'changed_only' save mode with basic change detection.
    */
   private function doTestSaveModeChangedOnly(): void {
+    $test_time = new TestTime(\Drupal::requestStack());
+    \Drupal::getContainer()->set('datetime.time', $test_time);
+    $request_time = $test_time->getRequestTime();
+
     // Test 1: New EntityChangedInterface entities should always be saved.
     $new_term = Term::create([
       'name' => $this->randomMachineName(),
@@ -650,13 +654,13 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     ]);
     $existing_term->save();
     $original_changed = $existing_term->getChangedTime();
+    $existing_term->setOriginal(clone $existing_term);
 
-    // Test 2a: Unchanged existing entity - should NOT be saved.
+    // Test 2a: Unchanged existing entity with original - should NOT be saved,
+    // despite the request time.
     $entity = EntityTest::create(['name' => $this->randomMachineName()]);
     $entity->field_save_mode_changed_only->entity = $existing_term;
-
-    // Small delay to ensure request time is after entity's changed time.
-    sleep(1);
+    $test_time->requestTime = $request_time - 1;
     $entity->save();
 
     // Existing unchanged term should NOT be re-saved.
@@ -665,14 +669,15 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $this->assertEquals($original_changed, $reloaded_term->getChangedTime(), 'Unchanged existing term was not re-saved with changed_only mode.');
     $this->assertEquals($existing_term->id(), $entity->field_save_mode_changed_only->target_id, 'Target ID is synchronized for unchanged existing entity.');
 
-    // Test 2b: Changed existing entity - should be saved.
+    // Test 2b: Changed existing entity with original - should be saved despite
+    // the request time.
     $entity = EntityTest::create(['name' => $this->randomMachineName()]);
     $new_name = $this->randomMachineName();
-    $existing_term->setName($new_name); // Change but don't save yet.
+    // Change but don't save yet.
+    $existing_term->setName($new_name);
+    $test_time->requestTime = $request_time + 1;
+    $existing_term->setChangedTime($request_time + 1);
     $entity->field_save_mode_changed_only->entity = $existing_term;
-
-    // Small delay to ensure different timestamps.
-    sleep(1);
     $entity->save();
 
     // Changed existing term should be re-saved.
@@ -688,24 +693,25 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     ]);
     $term_without_original->save();
 
-    // Manually clear the original to simulate an entity loaded without original tracking.
-    $term_without_original->original = NULL;
+    // Manually clear the original to simulate an entity loaded without original
+    // tracking.
+    $term_without_original->setOriginal(NULL);
 
     $entity = EntityTest::create(['name' => $this->randomMachineName()]);
     $entity->field_save_mode_changed_only->entity = $term_without_original;
     $original_changed = $term_without_original->getChangedTime();
-
-    // Small delay to ensure request time comparison.
-    sleep(1);
+    $test_time->requestTime = $request_time + 3;
     $entity->save();
 
-    // Entity without original should be saved (fallback to request time comparison).
+    // Entity without original should be saved (fall back to request time
+    // comparison).
     $reloaded_term = $term_storage->loadUnchanged($term_without_original->id());
     $this->assertGreaterThanOrEqual($original_changed, $reloaded_term->getChangedTime(), 'Entity without original was saved with changed_only mode (fallback behavior).');
     $this->assertEquals($term_without_original->id(), $entity->field_save_mode_changed_only->target_id, 'Target ID is synchronized for entity without original.');
 
-    // Test 4: Non-EntityChangedInterface entity - should be saved (fallback behavior).
-    // Create an entity test that doesn't implement EntityChangedInterface.
+    // Test 4: Non-EntityChangedInterface entity - should be saved (fallback
+    // behavior). Create an entity test that doesn't implement
+    // EntityChangedInterface.
     $non_changed_entity = EntityTest::create(['name' => $this->randomMachineName()]);
     $non_changed_entity->save();
 
@@ -732,13 +738,14 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $field->save();
 
     $entity = EntityTest::create(['name' => $this->randomMachineName()]);
-    $non_changed_entity->set('name', $this->randomMachineName()); // Change but don't save.
+    $non_changed_entity->set('name', $this->randomMachineName());
+    // Change but don't save.
     $entity->field_save_mode_changed_only_entity_test->entity = $non_changed_entity;
     $entity->save();
 
     // Non-EntityChangedInterface entity should be saved (fallback behavior).
-    $entity_storage = \Drupal::entityTypeManager()->getStorage('entity_test');
-    $reloaded_entity = $entity_storage->loadUnchanged($non_changed_entity->id());
+    $entity_test_storage = \Drupal::entityTypeManager()->getStorage('entity_test');
+    $reloaded_entity = $entity_test_storage->loadUnchanged($non_changed_entity->id());
     $this->assertEquals($non_changed_entity->get('name')->value, $reloaded_entity->get('name')->value, 'Non-EntityChangedInterface entity was saved with changed_only mode (fallback behavior).');
     $this->assertEquals($non_changed_entity->id(), $entity->field_save_mode_changed_only_entity_test->target_id, 'Target ID is synchronized for non-EntityChangedInterface entity.');
   }
@@ -1399,6 +1406,17 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $file->setPermanent();
     $errors = $entity->validate();
     $this->assertCount(0, $errors);
+  }
+
+}
+
+
+final class TestTime extends Time {
+
+  public ?int $requestTime;
+
+  public function getRequestTime() {
+    return $this->requestTime ?? parent::getRequestTime();
   }
 
 }
