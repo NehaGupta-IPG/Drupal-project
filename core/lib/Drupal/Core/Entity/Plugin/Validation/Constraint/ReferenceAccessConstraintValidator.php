@@ -30,10 +30,10 @@ class ReferenceAccessConstraintValidator extends ConstraintValidator {
       $check_permission = TRUE;
       if (!$entity->isNew()) {
         $existing_entity = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId())->loadUnchanged($entity->id());
-        $referenced_entities = $existing_entity->{$value->getFieldDefinition()->getName()}->referencedEntities();
+        $existing_referenced_entities = $existing_entity->{$value->getFieldDefinition()->getName()}->referencedEntities();
         // Check permission if we are not already referencing the entity.
-        foreach ($referenced_entities as $ref) {
-          if (isset($referenced_entities[$ref->id()])) {
+        foreach ($existing_referenced_entities as $ref) {
+          if ($ref->id() == $id) {
             $check_permission = FALSE;
             break;
           }
