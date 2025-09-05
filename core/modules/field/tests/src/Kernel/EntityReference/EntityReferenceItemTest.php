@@ -6,6 +6,7 @@ namespace Drupal\Tests\field\Kernel\EntityReference;
 
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Entity\CommentType;
+use Drupal\Component\Datetime\Time;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Config\Schema\SchemaIncompleteException;
 use Drupal\Core\Entity\EntityStorageException;
@@ -623,15 +624,26 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
   }
 
   /**
-   * Tests the 'changed_only' save mode - currently falls back to 'always' behavior.
+   * Tests the 'changed_only' save mode with basic change detection.
    */
   private function doTestSaveModeChangedOnly(): void {
-    // Create test entities.
+    // Test 1: New EntityChangedInterface entities should always be saved.
     $new_term = Term::create([
       'name' => $this->randomMachineName(),
       'vid' => $this->term->bundle(),
     ]);
 
+    $entity = EntityTest::create(['name' => $this->randomMachineName()]);
+    $entity->field_save_mode_changed_only->entity = $new_term;
+    $entity->save();
+
+    // New term should be saved (EntityChangedInterface entities that are new
+    // are considered changed).
+    $this->assertFalse($new_term->isNew(), 'New term was auto-saved with changed_only mode.');
+    $this->assertEquals($new_term->id(), $entity->field_save_mode_changed_only->target_id, 'Target ID is set after auto-save.');
+
+    // Test 2: Existing EntityChangedInterface entities - test actual change
+    // detection.
     $existing_term = Term::create([
       'name' => $this->randomMachineName(),
       'vid' => $this->term->bundle(),
@@ -639,31 +651,96 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $existing_term->save();
     $original_changed = $existing_term->getChangedTime();
 
-    // Test with new entity - should be saved (fallback to 'always').
+    // Test 2a: Unchanged existing entity - should NOT be saved.
     $entity = EntityTest::create(['name' => $this->randomMachineName()]);
-    $entity->field_save_mode_changed_only->entity = $new_term;
+    $entity->field_save_mode_changed_only->entity = $existing_term;
+
+    // Small delay to ensure request time is after entity's changed time.
+    sleep(1);
     $entity->save();
 
-    // New term should be saved.
-    $this->assertFalse($new_term->isNew(), 'New term was auto-saved with changed_only mode.');
-    $this->assertEquals($new_term->id(), $entity->field_save_mode_changed_only->target_id, 'Target ID is set after auto-save.');
+    // Existing unchanged term should NOT be re-saved.
+    $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+    $reloaded_term = $term_storage->loadUnchanged($existing_term->id());
+    $this->assertEquals($original_changed, $reloaded_term->getChangedTime(), 'Unchanged existing term was not re-saved with changed_only mode.');
+    $this->assertEquals($existing_term->id(), $entity->field_save_mode_changed_only->target_id, 'Target ID is synchronized for unchanged existing entity.');
 
-    // Test with existing entity - should be re-saved (fallback to 'always').
+    // Test 2b: Changed existing entity - should be saved.
     $entity = EntityTest::create(['name' => $this->randomMachineName()]);
     $new_name = $this->randomMachineName();
-    $existing_term->setName($new_name);
+    $existing_term->setName($new_name); // Change but don't save yet.
     $entity->field_save_mode_changed_only->entity = $existing_term;
 
     // Small delay to ensure different timestamps.
     sleep(1);
     $entity->save();
 
-    // Existing term should be re-saved (current fallback behavior).
-    $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+    // Changed existing term should be re-saved.
     $reloaded_term = $term_storage->loadUnchanged($existing_term->id());
-    // Since changed_only currently falls back to 'always', the entity should be saved.
-    $this->assertEquals($new_name, $reloaded_term->getName(), 'Existing term was re-saved with changed_only mode (fallback behavior - name updated).');
-    $this->assertEquals($existing_term->id(), $entity->field_save_mode_changed_only->target_id, 'Target ID is synchronized for existing entity.');
+    $this->assertEquals($new_name, $reloaded_term->getName(), 'Changed existing term was re-saved with changed_only mode (name updated).');
+    $this->assertGreaterThan($original_changed, $reloaded_term->getChangedTime(), 'Changed existing term timestamp was updated with changed_only mode.');
+    $this->assertEquals($existing_term->id(), $entity->field_save_mode_changed_only->target_id, 'Target ID is synchronized for changed existing entity.');
+
+    // Test 3: Entity without original - should be saved (fallback behavior).
+    $term_without_original = Term::create([
+      'name' => $this->randomMachineName(),
+      'vid' => $this->term->bundle(),
+    ]);
+    $term_without_original->save();
+
+    // Manually clear the original to simulate an entity loaded without original tracking.
+    $term_without_original->original = NULL;
+
+    $entity = EntityTest::create(['name' => $this->randomMachineName()]);
+    $entity->field_save_mode_changed_only->entity = $term_without_original;
+    $original_changed = $term_without_original->getChangedTime();
+
+    // Small delay to ensure request time comparison.
+    sleep(1);
+    $entity->save();
+
+    // Entity without original should be saved (fallback to request time comparison).
+    $reloaded_term = $term_storage->loadUnchanged($term_without_original->id());
+    $this->assertGreaterThanOrEqual($original_changed, $reloaded_term->getChangedTime(), 'Entity without original was saved with changed_only mode (fallback behavior).');
+    $this->assertEquals($term_without_original->id(), $entity->field_save_mode_changed_only->target_id, 'Target ID is synchronized for entity without original.');
+
+    // Test 4: Non-EntityChangedInterface entity - should be saved (fallback behavior).
+    // Create an entity test that doesn't implement EntityChangedInterface.
+    $non_changed_entity = EntityTest::create(['name' => $this->randomMachineName()]);
+    $non_changed_entity->save();
+
+    // Create field for entity_test references.
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'field_save_mode_changed_only_entity_test',
+      'entity_type' => 'entity_test',
+      'type' => 'entity_reference',
+      'settings' => [
+        'target_type' => 'entity_test',
+      ],
+    ]);
+    $field_storage->save();
+
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => 'entity_test',
+      'label' => 'Test save mode changed_only for entity_test',
+      'settings' => [
+        'handler' => 'default',
+        'save_referenced_entities' => 'changed_only',
+      ],
+    ]);
+    $field->save();
+
+    $entity = EntityTest::create(['name' => $this->randomMachineName()]);
+    $non_changed_entity->set('name', $this->randomMachineName()); // Change but don't save.
+    $entity->field_save_mode_changed_only_entity_test->entity = $non_changed_entity;
+    $entity->save();
+
+    // Non-EntityChangedInterface entity should be saved (fallback behavior).
+    $entity_storage = \Drupal::entityTypeManager()->getStorage('entity_test');
+    $reloaded_entity = $entity_storage->loadUnchanged($non_changed_entity->id());
+    $this->assertEquals($non_changed_entity->get('name')->value, $reloaded_entity->get('name')->value, 'Non-EntityChangedInterface entity was saved with changed_only mode (fallback behavior).');
+    $this->assertEquals($non_changed_entity->id(), $entity->field_save_mode_changed_only_entity_test->target_id, 'Target ID is synchronized for non-EntityChangedInterface entity.');
   }
 
   /**
@@ -796,7 +873,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     // Now test the same chain but with existing entities.
     // Clear references and save entities individually.
     unset($entityA->field_self_ref->entity, $entityB->field_self_ref->entity, $entityC->field_self_ref->entity);
-    
+
     $entityA->save();
     $entityB->save();
     $entityC->save();
@@ -854,7 +931,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $newD = EntityTest::create(['name' => 'New D Clean - ' . $this->randomMachineName()]);
 
     // Build partial chain step by step to avoid circular references.
-    
+
     // Step 1: ExistingA -> NewC (linear, no circular reference).
     $existingA->field_self_ref->entity = $newC;
     $existingA->save(); // Should work - saves newC as well.
@@ -863,7 +940,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     // Step 2: NewC -> ExistingB (still linear).
     $newC->field_self_ref->entity = $existingB;
     $newC->save(); // Should work.
-    
+
     // Step 3: ExistingB -> NewD (still linear).
     $existingB->field_self_ref->entity = $newD;
     $existingB->save(); // Should work - saves newD as well.
@@ -918,7 +995,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $newChild2 = EntityTest::create(['name' => 'NewChild2 - ' . $this->randomMachineName()]);
     $child1->field_self_ref->entity = $newChild2;
     $newChild2->field_self_ref->entity = $child3; // Skip the old child2.
-    
+
     $child1->save(); // This should save newChild2 and update the chain.
     $this->assertFalse($newChild2->isNew(), 'NewChild2 saved when inserted in chain.');
     $this->assertEquals($newChild2->id(), $child1->field_self_ref->target_id);
@@ -977,7 +1054,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     // Now establish cross-references with existing entities.
     $entityX->field_self_ref->entity = $entityY;
     $entityY->field_self_ref_2->entity = $entityX;
-    
+
     $entityX->save();
     $entityY->save();
 
@@ -993,11 +1070,11 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     // Test reasonable depth chain (should work fine).
     $entities = [];
     $depth = 10;
-    
+
     // Create a linear chain of entities.
     for ($i = 0; $i < $depth; $i++) {
       $entities[$i] = EntityTest::create(['name' => "Chain{$i} - " . $this->randomMachineName()]);
-      
+
       if ($i > 0) {
         // Each entity references the previous one.
         $entities[$i]->field_self_ref->entity = $entities[$i - 1];
@@ -1010,7 +1087,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     // Verify all entities in the chain were saved.
     foreach ($entities as $i => $entity) {
       $this->assertFalse($entity->isNew(), "Entity {$i} in deep chain was saved.");
-      
+
       if ($i > 0) {
         $this->assertEquals($entities[$i - 1]->id(), $entity->field_self_ref->target_id, "Chain link {$i} is correct.");
       }
@@ -1024,9 +1101,9 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     ]);
     // Make the invalid entity reference itself - this should cause circular reference detection.
     $invalidEntity->field_self_ref->entity = $invalidEntity;
-    
+
     $validEntity->field_self_ref->entity = $invalidEntity;
-    
+
     try {
       $validEntity->save();
       $this->fail('Expected EntityStorageException for circular reference in chain.');
