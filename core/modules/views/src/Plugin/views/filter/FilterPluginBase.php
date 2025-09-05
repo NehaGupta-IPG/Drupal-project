@@ -1530,16 +1530,18 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
 
         // Value can be optional, For example for 'empty' and 'not empty'
         // filters.
-        if (isset($selected_group_options['value']) && $selected_group_options['value'] !== '') {
-          $input[$this->options['group_info']['identifier']] = $selected_group_options['value'];
-          $input[$this->options['expose']['identifier']] = $selected_group_options['value'];
-          $this->group_info = $selected_group;
-        }
-        elseif (isset($selected_group_options['string']) && $selected_group_options['string'] !== '') {
-          $input[$this->options['expose']['identifier']] = $selected_group_options['string'];
-          $this->group_info = $selected_group;
-        }
-        else {
+        $handleGroupOption = function (string $key) use (&$input, &$selected_group_options, &$selected_group) {
+          if (isset($selected_group_options[$key]) && $selected_group_options[$key] !== '') {
+            $input[$this->options['expose']['identifier']] = $selected_group_options[$key];
+            if ($key === 'value') {
+              $input[$this->options['group_info']['identifier']] = $selected_group_options[$key];
+            }
+            $this->group_info = $selected_group;
+            return TRUE;
+          }
+          return FALSE;
+        };
+        if (!$handleGroupOption('value') && !$handleGroupOption('string')) {
           $this->group_info = $input[$this->options['group_info']['identifier']];
         }
 
