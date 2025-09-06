@@ -17,7 +17,7 @@ use Drupal\update\UpdateFetcherInterface;
 use Drupal\update\UpdateManagerInterface;
 
 /**
- * Theme hooks for update module.
+ * Theme hooks for the update module.
  */
 class UpdateThemeHooks {
 
@@ -75,6 +75,59 @@ class UpdateThemeHooks {
         ],
       ],
     ];
+  }
+
+  /**
+   * Implements hook_page_top().
+   */
+  #[Hook('page_top')]
+  public function pageTop(): void {
+    /** @var \Drupal\Core\Routing\AdminContext $admin_context */
+    $admin_context = \Drupal::service('router.admin_context');
+    $route_match = \Drupal::routeMatch();
+    if ($admin_context->isAdminRoute($route_match->getRouteObject()) && \Drupal::currentUser()->hasPermission('view update notifications')) {
+      $route_name = \Drupal::routeMatch()->getRouteName();
+      switch ($route_name) {
+        // These pages don't need additional nagging.
+        case 'update.status':
+        case 'update.settings':
+        case 'system.status':
+        case 'system.theme_install':
+        case 'system.batch_page.html':
+          return;
+
+          // If we are on the appearance or modules list, display a detailed
+          // report
+          // of the update status.
+        case 'system.themes_page':
+        case 'system.modules_list':
+          $verbose = TRUE;
+          break;
+      }
+      $status = \Drupal::moduleHandler()->invoke('update', 'runtime_requirements');
+      foreach (['core', 'contrib'] as $report_type) {
+        $type = 'update_' . $report_type;
+        // hook_requirements() supports render arrays therefore we need to
+        // render them before using
+        // \Drupal\Core\Messenger\MessengerInterface::addStatus().
+        if (isset($status[$type]['description']) && is_array($status[$type]['description'])) {
+          $status[$type]['description'] = \Drupal::service('renderer')->renderInIsolation($status[$type]['description']);
+        }
+        if (!empty($verbose)) {
+          if (isset($status[$type]['severity'])) {
+            if ($status[$type]['severity'] === RequirementSeverity::Error) {
+              \Drupal::messenger()->addError($status[$type]['description']);
+            } elseif ($status[$type]['severity'] === RequirementSeverity::Warning) {
+              \Drupal::messenger()->addWarning($status[$type]['description']);
+            }
+          }
+        } else {
+          if (isset($status[$type]) && isset($status[$type]['reason']) && $status[$type]['reason'] === UpdateManagerInterface::NOT_SECURE) {
+            \Drupal::messenger()->addError($status[$type]['description']);
+          }
+        }
+      }
+    }
   }
 
   /**
