@@ -1,0 +1,8 @@
+{%
+  set classes = [
+    status ? 'status-enabled' : 'status-disabled'
+  ]
+%}
+<div{{ attributes.addClass(classes).setAttribute('lang', langcode) }}>
+  <p>{{ text }}</p>
+</div>

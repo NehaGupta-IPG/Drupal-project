@@ -1,0 +1,28 @@
+mailer_email_test.default:
+  label: 'Default email'
+  key: 'default'
+
+mailer_email_test.minimal:
+  label: 'Email without parameters'
+  key: 'minimal'
+  class: 'Drupal\mailer_email_test\MinimalTestEmail'
+
+mailer_email_test.scalars:
+  label: 'Email with scalars'
+  key: 'scalars'
+  class: 'Drupal\mailer_email_test\ScalarsTestEmail'
+
+mailer_email_test.entity:
+  label: 'Email with entity parameter'
+  key: 'entity'
+  class: 'Drupal\mailer_email_test\EntityTestEmail'
+
+mailer_email_test.generic:
+  label: 'Email with generic plugin'
+  key: 'generic'
+  class: 'Drupal\mailer_email_test\GenericTestEmail'
+
+mailer_email_test.html:
+  label: 'Email with html output'
+  key: 'html'
+  class: 'Drupal\mailer_email_test\HtmlTestEmail'
