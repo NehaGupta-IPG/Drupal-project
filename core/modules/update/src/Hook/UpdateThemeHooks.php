@@ -94,9 +94,9 @@ class UpdateThemeHooks {
         case 'system.batch_page.html':
           return;
 
-          // If we are on the appearance or modules list, display a detailed
-          // report
-          // of the update status.
+        // If we are on the appearance or modules list, display a detailed
+        // report
+        // of the update status.
         case 'system.themes_page':
         case 'system.modules_list':
           $verbose = TRUE;
@@ -115,11 +115,13 @@ class UpdateThemeHooks {
           if (isset($status[$type]['severity'])) {
             if ($status[$type]['severity'] === RequirementSeverity::Error) {
               \Drupal::messenger()->addError($status[$type]['description']);
-            } elseif ($status[$type]['severity'] === RequirementSeverity::Warning) {
+            }
+            elseif ($status[$type]['severity'] === RequirementSeverity::Warning) {
               \Drupal::messenger()->addWarning($status[$type]['description']);
             }
           }
-        } else {
+        }
+        else {
           if (isset($status[$type]) && isset($status[$type]['reason']) && $status[$type]['reason'] === UpdateManagerInterface::NOT_SECURE) {
             \Drupal::messenger()->addError($status[$type]['description']);
           }
