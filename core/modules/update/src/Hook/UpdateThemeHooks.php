@@ -29,9 +29,7 @@ class UpdateThemeHooks {
     protected ModuleHandlerInterface $moduleHandler,
     protected AccountInterface $currentUser,
     protected RedirectDestinationInterface $redirectDestination,
-  ) {
-
-  }
+  ) {}
 
   /**
    * Implements hook_theme().
