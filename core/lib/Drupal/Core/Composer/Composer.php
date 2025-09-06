@@ -37,6 +37,11 @@ class Composer {
     if (!isset($autoload['classmap'])) {
       $autoload['classmap'] = [];
     }
+
+    // Add autoload directories for parent database driver modules.
+    $autoload['psr-4']['Drupal\\mysql\\'] = 'core/modules/mysql/src';
+    $autoload['psr-4']['Drupal\\pgsql\\'] = 'core/modules/pgsql/src';
+
     // Check for packages used prior to the default classloader being able to
     // use APCu and optimize them if they're present.
     // @see \Drupal\Core\DrupalKernel::boot()
