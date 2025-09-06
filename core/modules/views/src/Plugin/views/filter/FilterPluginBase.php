@@ -1302,8 +1302,6 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
         // JavaScript. However, missing titles are planned to be deprecated by
         // https://drupal.org/i/933004, and the checkboxes are currently
         // visible in Claro and Gin.
-        // #title_display can be changed to 'none' if / when they are
-        // actually hidden.
         'remove' => [
           '#title' => $this->t('Remove'),
           '#title_display' => 'invisible',
