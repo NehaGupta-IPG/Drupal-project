@@ -2,8 +2,11 @@
 
 namespace Drupal\update\Hook;
 
+use Drupal\Core\Extension\InfoParserInterface;
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\StringTranslation\TranslationInterface;
 
 /**
  * Deprecated hook implementations for the update module.
@@ -11,6 +14,12 @@ use Drupal\Core\Hook\Attribute\Hook;
 class UpdateDeprecatedHooks {
 
   use StringTranslationTrait;
+
+  public function __construct(
+    protected readonly FileSystemInterface $fileSystem,
+    protected readonly InfoParserInterface $infoParser,
+    protected readonly TranslationInterface $translation,
+  ) {}
 
   /**
    * Implements hook_verify_update_archive().
@@ -43,12 +52,10 @@ class UpdateDeprecatedHooks {
     // functionality).
     $compatible_project = FALSE;
     $incompatible = [];
-    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
-    $file_system = \Drupal::service('file_system');
-    $files = $file_system->scanDirectory("{$directory}/{$project}", '/.*\.info.yml$/', ['key' => 'name', 'min_depth' => 0]);
+    $files = $this->fileSystem->scanDirectory("{$directory}/{$project}", '/.*\.info.yml$/', ['key' => 'name', 'min_depth' => 0]);
     foreach ($files as $file) {
       // Get the .info.yml file for the module or theme this file belongs to.
-      $info = \Drupal::service('info_parser')->parse($file->uri);
+      $info = $this->infoParser->parse($file->uri);
       // If the module or theme is incompatible with Drupal core, set an error.
       if ($info['core_incompatible']) {
         $incompatible[] = !empty($info['name']) ? $info['name'] : $this->t('Unknown');
@@ -59,12 +66,12 @@ class UpdateDeprecatedHooks {
       }
     }
     if (empty($files)) {
-      $errors[] = $this->t('%archive_file does not contain any .info.yml files.', ['%archive_file' => $file_system->basename($archive_file)]);
+      $errors[] = $this->t('%archive_file does not contain any .info.yml files.', ['%archive_file' => $this->fileSystem->basename($archive_file)]);
     }
     elseif (!$compatible_project) {
-      $errors[] = \Drupal::translation()->formatPlural(count($incompatible), '%archive_file contains a version of %names that is not compatible with Drupal @version.', '%archive_file contains versions of modules or themes that are not compatible with Drupal @version: %names', [
+      $errors[] = $this->translation->formatPlural(count($incompatible), '%archive_file contains a version of %names that is not compatible with Drupal @version.', '%archive_file contains versions of modules or themes that are not compatible with Drupal @version: %names', [
         '@version' => \Drupal::VERSION,
-        '%archive_file' => $file_system->basename($archive_file),
+        '%archive_file' => $this->fileSystem->basename($archive_file),
         '%names' => implode(', ', $incompatible),
       ]);
     }
