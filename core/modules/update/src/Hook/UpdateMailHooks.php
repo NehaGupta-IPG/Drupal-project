@@ -2,9 +2,11 @@
 
 namespace Drupal\update\Hook;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Language\LanguageManagerInterface;
 
 /**
  * Mail hook implementations for the update module.
@@ -12,6 +14,11 @@ use Drupal\Core\Hook\Attribute\Hook;
 class UpdateMailHooks {
 
   use StringTranslationTrait;
+
+  public function __construct(
+    protected readonly LanguageManagerInterface $languageManager,
+    protected readonly ConfigFactoryInterface $configFactory,
+  ) {}
 
   /**
    * Implements hook_mail().
@@ -26,14 +33,14 @@ class UpdateMailHooks {
   #[Hook('mail')]
   public function mail($key, &$message, $params): void {
     $langcode = $message['langcode'];
-    $language = \Drupal::languageManager()->getLanguage($langcode);
-    $message['subject'] .= $this->t('New release(s) available for @site_name', ['@site_name' => \Drupal::config('system.site')->get('name')], ['langcode' => $langcode]);
+    $language = $this->languageManager->getLanguage($langcode);
+    $message['subject'] .= $this->t('New release(s) available for @site_name', ['@site_name' => $this->configFactory->get('system.site')->get('name')], ['langcode' => $langcode]);
     foreach ($params as $msg_type => $msg_reason) {
       $message['body'][] = _update_message_text($msg_type, $msg_reason, $langcode);
     }
     $message['body'][] = $this->t('See the available updates page for more information:', [], ['langcode' => $langcode]) . "\n" . Url::fromRoute('update.status', [], ['absolute' => TRUE, 'language' => $language])->toString();
     $settings_url = Url::fromRoute('update.settings', [], ['absolute' => TRUE])->toString();
-    if (\Drupal::config('update.settings')->get('notification.threshold') == 'all') {
+    if ($this->configFactory->get('update.settings')->get('notification.threshold') == 'all') {
       $message['body'][] = $this->t('Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, @url.', ['@url' => $settings_url]);
     }
     else {
