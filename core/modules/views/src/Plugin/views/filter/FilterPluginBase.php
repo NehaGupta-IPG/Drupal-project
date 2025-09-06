@@ -1241,7 +1241,8 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
       // Force the operator form to be a select box. Some handlers uses
       // radios and they occupy a lot of space in a table row.
       $row['operator']['#type'] = 'select';
-      $row['operator']['#title'] = '';
+      // Label should be present but visually-hidden.
+      $row['operator']['#title_display'] = 'invisible';
       $this->valueForm($row, $form_state);
 
       // Fix the dependencies to update value forms when operators changes. This
@@ -1257,7 +1258,8 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
           if (!empty($row['value'][$child]['#states']['visible'])) {
             foreach ($row['value'][$child]['#states']['visible'] as $state) {
               if (isset($state[':input[name="options[group_info][group_items][' . $item_id . '][operator]"]'])) {
-                $row['value'][$child]['#title'] = '';
+                // Label should be present but visually-hidden.
+                $row['value'][$child]['#title_display'] = 'invisible';
 
                 // Exit this loop and process the next child element.
                 break;
@@ -1296,9 +1298,15 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
         ],
         'operator' => $row['operator'],
         'value' => $row['value'],
-        // No title is given here, since this input is never displayed. It is
-        // only triggered by JavaScript.
+        // These checkboxes should be hidden and only triggered by JavaScript.
+        // JavaScript. However, missing titles are planned to be deprecated by
+        // https://drupal.org/i/933004, and the checkboxes are currently
+        // visible in Claro and Gin.
+        // #title_display can be changed to 'none' if / when they are
+        // actually hidden.
         'remove' => [
+          '#title' => $this->t('Remove'),
+          '#title_display' => 'invisible',
           '#type' => 'checkbox',
           '#id' => 'views-removed-' . $item_id,
           '#attributes' => ['class' => ['views-remove-checkbox']],
