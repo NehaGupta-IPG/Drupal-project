@@ -14,7 +14,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\update\UpdateManagerInterface;
 
 /**
- * Theme hooks for the update module.
+ * Page top hook for the update module.
  */
 class UpdatePageTopHooks {
 
