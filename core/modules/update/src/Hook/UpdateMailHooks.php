@@ -26,7 +26,7 @@ class UpdateMailHooks {
    * Constructs the email notification message when the site is out of date.
    *
    * @see \Drupal\Core\Mail\MailManagerInterface::mail()
-   * @see _update_cron_notify()
+   * @see \Drupal\update\Hook\UpdateCronHooks::notify()
    * @see _update_message_text()
    * @see \Drupal\update\UpdateManagerInterface
    */
