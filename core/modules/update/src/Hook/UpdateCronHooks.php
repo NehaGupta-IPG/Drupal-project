@@ -59,8 +59,8 @@ class UpdateCronHooks {
    * Performs any notifications that should be done once cron fetches new data.
    *
    * This method checks the status of the site using the new data and, depending
-   * on the configuration of the site, notifies administrators via email if there
-   * are new releases or missing security updates.
+   * on the configuration of the site, notifies administrators via email if
+   * there are new releases or missing security updates.
    *
    * @see update_requirements()
    */
@@ -86,7 +86,8 @@ class UpdateCronHooks {
         foreach ($notify_list as $target) {
           if ($target_user = user_load_by_mail($target)) {
             $target_langcode = $target_user->getPreferredLangcode();
-          } else {
+          }
+          else {
             $target_langcode = $default_langcode;
           }
           $message = $this->mailManager->mail('update', 'status_notify', $target, $target_langcode, $params);
