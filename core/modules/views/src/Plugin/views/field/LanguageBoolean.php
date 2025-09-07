@@ -2,15 +2,9 @@
 
 namespace Drupal\views\Plugin\views\field;
 
-use Drupal\Component\Utility\Xss as UtilityXss;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\views\Attribute\ViewsField;
-use Drupal\views\Render\ViewsRenderPipelineMarkup;
-use Drupal\views\ResultRow;
-use Drupal\views\ViewExecutable;
-use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
