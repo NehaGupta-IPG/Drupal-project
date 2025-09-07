@@ -137,7 +137,7 @@ class UpdateMailTest extends UnitTestCase {
     \Drupal::setContainer($this->container);
 
     // Generate the email message.
-    $updateMail = new UpdateMailHooks();
+    $updateMail = new UpdateMailHooks($this->languageManager, $this->configFactory);
     $updateMail->mail($key, $message, $params);
 
     // Confirm the subject.
