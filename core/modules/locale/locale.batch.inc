@@ -7,7 +7,6 @@
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\Exception\InvalidStreamWrapperException;
 use Drupal\Core\File\FileExists;
-use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Drupal\Core\Url;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
@@ -37,7 +36,6 @@ require_once __DIR__ . '/locale.translation.inc';
  * @param array|\ArrayAccess $context
  *   The batch context.
  */
-#[StopProceduralHookScan]
 function locale_translation_batch_version_check(string $project, string $langcode, array|\ArrayAccess &$context): void {
   $locale_project = \Drupal::service('locale.project')->get($project);
 
@@ -173,8 +171,8 @@ function locale_translation_batch_status_finished($success, $results): void {
  * Downloads a remote gettext file into the translations directory. When
  * successfully the translation status is updated.
  *
- * @param object $project
- *   Source object of the translatable project.
+ * @param string $project
+ *   The name of the project to import translations.
  * @param string $langcode
  *   Language code.
  * @param array $context
@@ -204,8 +202,8 @@ function locale_translation_batch_fetch_download($project, $langcode, &$context)
  * Imports a gettext file from the translation directory. When successfully the
  * translation status is updated.
  *
- * @param object $project
- *   Source object of the translatable project.
+ * @param string $project
+ *   The name of the project to import translations.
  * @param string $langcode
  *   Language code.
  * @param array $options
@@ -242,6 +240,15 @@ function locale_translation_batch_fetch_import($project, $langcode, $options, &$
             locale_translation_status_save($project, $langcode, LOCALE_TRANSLATION_CURRENT, $source->files[LOCALE_TRANSLATION_LOCAL]);
           }
         }
+      }
+      elseif ($source->type == LOCALE_TRANSLATION_CURRENT) {
+        /*
+         * This can happen if the locale_translation_batch_fetch_import
+         * batch was interrupted
+         * and the translation was imported by another batch.
+         */
+        $context['message'] = t('Ignoring already imported translation for %project.', ['%project' => $source->project]);
+        $context['finished'] = 1;
       }
     }
   }

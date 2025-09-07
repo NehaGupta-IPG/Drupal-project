@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Hook;
 
+use Drupal\block\BlockInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\views\ViewsConfigUpdater;
 use Drupal\views\ViewEntityInterface;
@@ -95,7 +96,7 @@ class ViewsHooks {
     \Drupal::moduleHandler()->loadInclude('views', 'inc', 'views.theme');
     // Some quasi clever array merging here.
     $base = ['file' => 'views.theme.inc'];
-    // Our extra version of pager
+    // Our extra version of pager.
     $hooks['views_mini_pager'] = $base + [
       'variables' => [
         'tags' => [],
@@ -150,7 +151,7 @@ class ViewsHooks {
         'parameters' => [],
       ],
     ];
-    // Default view themes
+    // Default view themes.
     $hooks['views_view_field'] = $base + ['variables' => ['view' => NULL, 'field' => NULL, 'row' => NULL]];
     $hooks['views_view_grouping'] = $base + [
       'variables' => [
@@ -231,8 +232,10 @@ class ViewsHooks {
     $node = $variables['elements']['#node'];
     if (!empty($node->view) && $node->view->storage->id()) {
       $suggestions[] = 'node__view__' . $node->view->storage->id();
+      $suggestions['__DEPRECATED']['node__view__' . $node->view->storage->id()] = 'Theme suggestion node__view__' . $node->view->storage->id() . ' is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3541462';
       if (!empty($node->view->current_display)) {
         $suggestions[] = 'node__view__' . $node->view->storage->id() . '__' . $node->view->current_display;
+        $suggestions['__DEPRECATED']['node__view__' . $node->view->storage->id() . '__' . $node->view->current_display] = 'Theme suggestion node__view__' . $node->view->storage->id() . '__' . $node->view->current_display . ' is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3541462';
       }
     }
   }
@@ -245,8 +248,10 @@ class ViewsHooks {
     $comment = $variables['elements']['#comment'];
     if (!empty($comment->view) && $comment->view->storage->id()) {
       $suggestions[] = 'comment__view__' . $comment->view->storage->id();
+      $suggestions['__DEPRECATED']['comment__view__' . $comment->view->storage->id()] = 'Theme suggestion comment__view__' . $comment->view->storage->id() . ' is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3541462';
       if (!empty($comment->view->current_display)) {
         $suggestions[] = 'comment__view__' . $comment->view->storage->id() . '__' . $comment->view->current_display;
+        $suggestions['__DEPRECATED']['comment__view__' . $comment->view->storage->id() . '__' . $comment->view->current_display] = 'Theme suggestion comment__view__' . $comment->view->storage->id() . '__' . $comment->view->current_display . ' is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3541462';
       }
     }
   }
@@ -374,8 +379,23 @@ class ViewsHooks {
   #[Hook('view_presave')]
   public function viewPresave(ViewEntityInterface $view): void {
     /** @var \Drupal\views\ViewsConfigUpdater $config_updater */
-    $config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+    $config_updater = \Drupal::service(ViewsConfigUpdater::class);
     $config_updater->updateAll($view);
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_presave() for blocks.
+   */
+  #[Hook('block_presave')]
+  public function blockPresave(BlockInterface $block): void {
+    if (str_starts_with($block->getPluginId(), 'views_block:')) {
+      $settings = $block->get('settings');
+      if (isset($settings['items_per_page']) && $settings['items_per_page'] === 'none') {
+        @trigger_error('Saving a views block with "none" items per page is deprecated in drupal:11.2.0 and removed in drupal:12.0.0. To use the items per page defined by the view, use NULL. See https://www.drupal.org/node/3522240', E_USER_DEPRECATED);
+        $settings['items_per_page'] = NULL;
+        $block->set('settings', $settings);
+      }
+    }
   }
 
 }

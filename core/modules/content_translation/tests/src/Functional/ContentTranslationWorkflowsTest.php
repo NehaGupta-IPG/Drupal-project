@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_translation\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTestMulRevPub;
@@ -12,12 +11,12 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the content translation workflows for the test entity.
- *
- * @group content_translation
  */
+#[Group('content_translation')]
 class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -249,10 +248,10 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
 
       foreach ($ops as $op => $label) {
         if ($op != $current_op) {
-          $this->assertSession()->linkNotExists($label, new FormattableMarkup('No %op link found.', ['%op' => $label]));
+          $this->assertSession()->linkNotExists($label);
         }
         else {
-          $this->assertSession()->linkExists($label, 0, new FormattableMarkup('%op link found.', ['%op' => $label]));
+          $this->assertSession()->linkExists($label, 0);
         }
       }
     }

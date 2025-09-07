@@ -17,7 +17,7 @@ class SimpleConfigValidationTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system'];
+  protected static $modules = ['config_test', 'system'];
 
   /**
    * {@inheritdoc}
@@ -27,6 +27,9 @@ class SimpleConfigValidationTest extends KernelTestBase {
     $this->installConfig('system');
   }
 
+  /**
+   * Tests the validation of the default configuration hash.
+   */
   public function testDefaultConfigHashValidation(): void {
     $config = $this->config('system.site');
     $this->assertFalse($config->isNew());
@@ -112,6 +115,12 @@ class SimpleConfigValidationTest extends KernelTestBase {
       '🤓',
       NULL,
     ];
+    $data['plural label'] = [
+      'config_test.with_plural_label',
+      'label',
+      "\x03",
+      NULL,
+    ];
 
     return $data;
   }
@@ -132,6 +141,7 @@ class SimpleConfigValidationTest extends KernelTestBase {
    */
   public function testSpecialCharacters(string $config_name, string $property, string $character, ?string $expected_error_message): void {
     $config = $this->config($config_name)
+      ->set('langcode', 'en')
       ->set($property, "This has a special character: $character");
 
     $violations = $this->container->get('config.typed')

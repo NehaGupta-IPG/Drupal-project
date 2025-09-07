@@ -10,13 +10,14 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\content_translation\ContentTranslationManager;
 use Drupal\content_translation\BundleTranslationSettingsInterface;
 use Drupal\language\ContentLanguageSettingsInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Order\Order;
+use Drupal\workflows\Entity\Workflow;
 
 /**
  * Hook implementations for content_translation.
@@ -139,7 +140,7 @@ class ContentTranslationHooks {
    *
    * @see \Drupal\Core\Entity\Annotation\EntityType
    */
-  #[Hook('entity_type_alter')]
+  #[Hook('entity_type_alter', order: Order::Last)]
   public function entityTypeAlter(array &$entity_types) : void {
     // Provide defaults for translation info.
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
@@ -221,7 +222,7 @@ class ContentTranslationHooks {
   /**
    * Implements hook_entity_bundle_info_alter().
    */
-  #[Hook('entity_bundle_info_alter')]
+  #[Hook('entity_bundle_info_alter', order: Order::First)]
   public function entityBundleInfoAlter(&$bundles): void {
     /** @var \Drupal\content_translation\ContentTranslationManagerInterface $content_translation_manager */
     $content_translation_manager = \Drupal::service('content_translation.manager');
@@ -230,11 +231,27 @@ class ContentTranslationHooks {
         $bundle_info['translatable'] = $content_translation_manager->isEnabled($entity_type_id, $bundle);
         if ($bundle_info['translatable'] && $content_translation_manager instanceof BundleTranslationSettingsInterface) {
           $settings = $content_translation_manager->getBundleTranslationSettings($entity_type_id, $bundle);
-          // If pending revision support is enabled for this bundle, we need to
-          // hide untranslatable field widgets, otherwise changes in pending
-          // revisions might be overridden by changes in later default
-          // revisions.
-          $bundle_info['untranslatable_fields.default_translation_affected'] = !empty($settings['untranslatable_fields_hide']) || ContentTranslationManager::isPendingRevisionSupportEnabled($entity_type_id, $bundle);
+          $bundle_info['untranslatable_fields.default_translation_affected'] = !empty($settings['untranslatable_fields_hide']);
+        }
+      }
+    }
+
+    // Always hide untranslatable field widgets if pending revision support is
+    // enabled otherwise changes in pending
+    // revisions might be overridden by changes in later default revisions.
+    // This can't use
+    // Drupal\content_translation\ContentTranslationManager::isPendingRevisionSupportEnabled()
+    // since that depends on entity bundle information to be completely built.
+    if (\Drupal::moduleHandler()->moduleExists('content_moderation')) {
+      foreach (Workflow::loadMultipleByType('content_moderation') as $workflow) {
+        /** @var \Drupal\content_moderation\Plugin\WorkflowType\ContentModeration $plugin */
+        $plugin = $workflow->getTypePlugin();
+        foreach ($plugin->getEntityTypes() as $entity_type_id) {
+          foreach ($plugin->getBundlesForEntityType($entity_type_id) as $bundle_id) {
+            if (isset($bundles[$entity_type_id][$bundle_id])) {
+              $bundles[$entity_type_id][$bundle_id]['untranslatable_fields.default_translation_affected'] = TRUE;
+            }
+          }
         }
       }
     }

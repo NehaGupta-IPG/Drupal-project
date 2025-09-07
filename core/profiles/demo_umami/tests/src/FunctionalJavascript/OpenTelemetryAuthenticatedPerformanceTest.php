@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Tests\demo_umami\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\PerformanceTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
 /**
  * Tests demo_umami profile performance.
- *
- * @group OpenTelemetry
- * @group #slow
- * @requires extension apcu
  */
+#[Group('OpenTelemetry')]
+#[Group('#slow')]
+#[RequiresPhpExtension('apcu')]
 class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
 
   /**
@@ -55,18 +56,19 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
         'config' => 22,
         'bootstrap' => 5,
         'discovery' => 5,
-        'data' => 6,
+        'data' => 5,
         'dynamic_page_cache' => 2,
+        'menu' => 1,
         'render' => 2,
       ],
       'CacheSetCount' => 0,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 4,
-      'ScriptCount' => 2,
-      'ScriptBytes' => 123850,
+      'CacheTagLookupQueryCount' => 5,
+      'ScriptCount' => 1,
+      'ScriptBytes' => 73031,
       'StylesheetCount' => 2,
-      'StylesheetBytes' => 42500,
+      'StylesheetBytes' => 39163,
     ];
     $this->assertMetrics($expected, $performance_data);
   }

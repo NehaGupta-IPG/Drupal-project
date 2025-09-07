@@ -5,22 +5,21 @@ declare(strict_types=1);
 namespace Drupal\Tests\page_cache\Functional;
 
 use Drupal\Component\Datetime\DateTimePlus;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
-use Drupal\Core\Cache\Cache;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore curlopt returntransfer
-
 /**
  * Enables the page cache and tests it with various HTTP requests.
- *
- * @group page_cache
- * @group #slow
  */
+#[Group('page_cache')]
+#[Group('#slow')]
 class PageCacheTest extends BrowserTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -626,7 +625,6 @@ class PageCacheTest extends BrowserTestBase {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
     curl_setopt($ch, CURLOPT_USERAGENT, drupal_generate_test_ua($this->databasePrefix));
     $output = curl_exec($ch);
-    curl_close($ch);
 
     $headers = [];
     foreach (explode("\n", $output) as $header) {

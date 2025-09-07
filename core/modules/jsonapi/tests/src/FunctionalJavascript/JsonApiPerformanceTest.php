@@ -6,14 +6,15 @@ namespace Drupal\Tests\jsonapi\FunctionalJavascript;
 
 use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\PerformanceTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
 /**
  * Tests performance for JSON:API routes.
- *
- * @group Common
- * @group #slow
- * @requires extension apcu
  */
+#[Group('Common')]
+#[Group('#slow')]
+#[RequiresPhpExtension('apcu')]
 class JsonApiPerformanceTest extends PerformanceTestBase {
 
   /**
@@ -65,7 +66,7 @@ class JsonApiPerformanceTest extends PerformanceTestBase {
       'SELECT "revision".* FROM "node_field_revision" "revision" WHERE ("revision"."nid" IN (1)) AND ("revision"."vid" IN ("1")) ORDER BY "revision"."nid" ASC',
       'SELECT "t".* FROM "node__body" "t" WHERE ("entity_id" IN (1)) AND ("deleted" = 0) AND ("langcode" IN ("en", "und", "zxx")) ORDER BY "delta" ASC',
       'SELECT 1 AS "expression" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/jsonapi%" ESCAPE ' . "'\\\\'" . ') LIMIT 1 OFFSET 0',
-      'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node_revision" "base_table" LEFT OUTER JOIN "node_revision" "base_table_2" ON "base_table"."nid" = "base_table_2"."nid" AND "base_table"."vid" < "base_table_2"."vid" INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE ("base_table_2"."nid" IS NULL) AND ("node_field_data"."nid" = "1")',
+      'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node_revision" "base_table" INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE ("base_table"."vid" IN (SELECT MAX(base_table.vid) AS "expression" FROM "node_revision" "base_table" GROUP BY "base_table"."nid")) AND ("node_field_data"."nid" = "1")',
       'SELECT "name", "route" FROM "router" WHERE "name" IN ( "jsonapi.node--article.node_type.relationship.get" )',
       'SELECT "name", "route" FROM "router" WHERE "name" IN ( "jsonapi.node--article.node_type.related" )',
       'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node" "base_table" INNER JOIN "node" "node" ON "node"."nid" = "base_table"."nid" INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE ("node"."uuid" IN ("677f9911-f002-4639-9891-5c39e8b00d9d")) AND ("node_field_data"."default_langcode" IN (1))',
@@ -87,7 +88,7 @@ class JsonApiPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 26,
-      'CacheGetCount' => 44,
+      'CacheGetCount' => 42,
       'CacheGetCountByBin' => [
         'config' => 8,
         'data' => 8,
@@ -95,8 +96,8 @@ class JsonApiPerformanceTest extends PerformanceTestBase {
         'discovery' => 13,
         'entity' => 2,
         'default' => 4,
-        'dynamic_page_cache' => 2,
-        'jsonapi_normalizations' => 2,
+        'dynamic_page_cache' => 1,
+        'jsonapi_normalizations' => 1,
       ],
       'CacheSetCount' => 16,
       'CacheSetCountByBin' => [
@@ -192,7 +193,7 @@ class JsonApiPerformanceTest extends PerformanceTestBase {
       'SELECT "revision"."vid" AS "vid", "revision"."langcode" AS "langcode", "revision"."revision_uid" AS "revision_uid", "revision"."revision_timestamp" AS "revision_timestamp", "revision"."revision_log" AS "revision_log", "revision"."revision_default" AS "revision_default", "base"."nid" AS "nid", "base"."type" AS "type", "base"."uuid" AS "uuid", CASE "base"."vid" WHEN "revision"."vid" THEN 1 ELSE 0 END AS "isDefaultRevision" FROM "node" "base" INNER JOIN "node_revision" "revision" ON "revision"."vid" = "base"."vid" WHERE "base"."nid" IN (1)',
       'SELECT "revision".* FROM "node_field_revision" "revision" WHERE ("revision"."nid" IN (1)) AND ("revision"."vid" IN ("1")) ORDER BY "revision"."nid" ASC',
       'SELECT "t".* FROM "node__body" "t" WHERE ("entity_id" IN (1)) AND ("deleted" = 0) AND ("langcode" IN ("en", "und", "zxx")) ORDER BY "delta" ASC',
-      'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node_revision" "base_table" LEFT OUTER JOIN "node_revision" "base_table_2" ON "base_table"."nid" = "base_table_2"."nid" AND "base_table"."vid" < "base_table_2"."vid" INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE ("base_table_2"."nid" IS NULL) AND ("node_field_data"."nid" = "1")',
+      'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node_revision" "base_table" INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE ("base_table"."vid" IN (SELECT MAX(base_table.vid) AS "expression" FROM "node_revision" "base_table" GROUP BY "base_table"."nid")) AND ("node_field_data"."nid" = "1")',
       'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node" "base_table" INNER JOIN "node" "node" ON "node"."nid" = "base_table"."nid" INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE ("node"."uuid" IN ("677f9911-f002-4639-9891-5c39e8b00d9d")) AND ("node_field_data"."default_langcode" IN (1))',
       'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node" "base_table" INNER JOIN "node" "node" ON "node"."nid" = "base_table"."nid" INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE ("node"."uuid" IN ("677f9911-f002-4639-9891-5c39e8b00d9d")) AND ("node_field_data"."default_langcode" IN (1))',
       'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node" "base_table" INNER JOIN "node" "node" ON "node"."nid" = "base_table"."nid" INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE ("node"."uuid" IN ("677f9911-f002-4639-9891-5c39e8b00d9d")) AND ("node_field_data"."default_langcode" IN (1))',
@@ -206,7 +207,7 @@ class JsonApiPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 15,
-      'CacheGetCount' => 47,
+      'CacheGetCount' => 43,
       'CacheGetCountByBin' => [
         'config' => 8,
         'data' => 8,
@@ -214,8 +215,8 @@ class JsonApiPerformanceTest extends PerformanceTestBase {
         'entity' => 2,
         'default' => 4,
         'bootstrap' => 4,
-        'dynamic_page_cache' => 4,
-        'jsonapi_normalizations' => 4,
+        'dynamic_page_cache' => 2,
+        'jsonapi_normalizations' => 2,
       ],
       'CacheSetCount' => 3,
       'CacheDeleteCount' => 0,

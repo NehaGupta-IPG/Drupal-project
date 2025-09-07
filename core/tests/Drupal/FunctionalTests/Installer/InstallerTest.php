@@ -5,17 +5,16 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Extension\ModuleUninstallValidatorException;
 use Drupal\Core\Routing\RoutingEvents;
 use Drupal\Core\Test\PerformanceTestRecorder;
-use Drupal\Core\Extension\ModuleUninstallValidatorException;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore drupalmysqldriverdatabasemysql drupalpgsqldriverdatabasepgsql
-
 /**
  * Tests the interactive installer.
- *
- * @group Installer
  */
+#[Group('Installer')]
 class InstallerTest extends InstallerTestBase {
 
   /**
@@ -136,8 +135,8 @@ class InstallerTest extends InstallerTestBase {
     $module_handler = \Drupal::service('module_handler');
     $module_extension_list = \Drupal::service('extension.list.module');
 
-    // Ensure the update module is not installed.
-    $this->assertFalse($module_handler->moduleExists('update'), 'The Update module is not installed.');
+    // Ensure the Update Status module is not installed.
+    $this->assertFalse($module_handler->moduleExists('update'), 'The Update Status module should not be installed.');
 
     // Assert that the module that is providing the database driver has been
     // installed.

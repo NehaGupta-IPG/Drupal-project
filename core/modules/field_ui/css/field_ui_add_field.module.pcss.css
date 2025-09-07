@@ -9,7 +9,7 @@
   --input-fg-color: var(--color-gray);
   --color-blue: #003ecc;
   --color-red: #dc2323;
-  --details-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --details-box-shadow: 0 2px 4px rgb(0, 0, 0, 0.1);
 }
 
 .field-ui-new-storage-wrapper {
@@ -45,7 +45,7 @@
   padding-inline-end: 0.75rem;
   text-decoration: none;
   color: unset;
-  border: 1px solid #dedfe4;
+  border: 1px solid #919297;
   gap: 0.75rem;
   border-radius: 4px;
   &:hover {
