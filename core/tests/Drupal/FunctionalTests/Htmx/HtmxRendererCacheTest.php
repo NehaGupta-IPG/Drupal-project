@@ -5,7 +5,10 @@ namespace Drupal\FunctionalTests\Htmx;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Tests\BrowserTestBase;
 
-class HtmxRendererResourceTest extends BrowserTestBase {
+/**
+ * Tests the cache headers set HtmxRenderer responses.
+ */
+class HtmxRendererCacheTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
@@ -28,7 +31,7 @@ class HtmxRendererResourceTest extends BrowserTestBase {
     ]);
   }
 
-  public function testCacheResources() {
+  public function testCacheResources():void {
     $options = [
       'query' => [
         MainContentViewSubscriber::WRAPPER_FORMAT => 'drupal_htmx',
