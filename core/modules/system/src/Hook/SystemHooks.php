@@ -11,14 +11,8 @@ use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Extension\Extension;
-use Drupal\Component\Gettext\PoItem;
-use Drupal\Core\Language\LanguageInterface;
-use Drupal\Core\Routing\StackedRouteMatchInterface;
-use Drupal\Core\Asset\AttachedAssetsInterface;
-use Drupal\Core\Field\FieldPurger;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 
 /**
@@ -190,105 +184,6 @@ class SystemHooks {
       $backends['ssh'] = ['title' => $this->t('SSH'), 'class' => 'Drupal\Core\FileTransfer\SSH', 'weight' => 20];
     }
     return $backends;
-  }
-
-  /**
-   * Implements hook_js_settings_build().
-   *
-   * Sets values for the core/drupal.ajax library, which just depends on the
-   * active theme but no other request-dependent values.
-   */
-  #[Hook('js_settings_build')]
-  public function jsSettingsBuild(&$settings, AttachedAssetsInterface $assets): void {
-    // Generate the values for the core/drupal.ajax library.
-    // We need to send ajaxPageState settings for core/drupal.ajax if:
-    // - ajaxPageState is being loaded in this Response, in which case it will
-    //   already exist at $settings['ajaxPageState'] (because the
-    //   core/drupal.ajax library definition specifies a placeholder
-    //   'ajaxPageState' setting).
-    // - core/drupal.ajax already has been loaded and hence this is an AJAX
-    //   Response in which we must send the list of extra asset libraries that
-    //   are being added in this AJAX Response.
-    /** @var \Drupal\Core\Asset\LibraryDependencyResolver $library_dependency_resolver */
-    $library_dependency_resolver = \Drupal::service('library.dependency_resolver');
-    if (isset($settings['ajaxPageState']) || in_array('core/drupal.ajax', $library_dependency_resolver->getLibrariesWithDependencies($assets->getAlreadyLoadedLibraries()))) {
-      // Provide the page with information about the theme that's used, so that
-      // a later AJAX request can be rendered using the same theme.
-      // @see \Drupal\Core\Theme\AjaxBasePageNegotiator
-      $theme_key = \Drupal::theme()->getActiveTheme()->getName();
-      $settings['ajaxPageState']['theme'] = $theme_key;
-    }
-  }
-
-  /**
-   * Implements hook_js_settings_alter().
-   *
-   * Sets values which depend on the current request, like core/drupalSettings
-   * as well as theme_token ajax state.
-   */
-  #[Hook('js_settings_alter')]
-  public function jsSettingsAlter(&$settings, AttachedAssetsInterface $assets): void {
-    // As this is being output in the final response always use the main
-    // request.
-    $request = \Drupal::requestStack()->getMainRequest();
-    $current_query = $request->query->all();
-    // Let output path processors set a prefix.
-    /** @var \Drupal\Core\PathProcessor\OutboundPathProcessorInterface $path_processor */
-    $path_processor = \Drupal::service('path_processor_manager');
-    $options = ['prefix' => ''];
-    $path_processor->processOutbound('/', $options);
-    $pathPrefix = $options['prefix'];
-    $route_match = \Drupal::routeMatch();
-    if ($route_match instanceof StackedRouteMatchInterface) {
-      $route_match = $route_match->getMasterRouteMatch();
-    }
-    $current_path = $route_match->getRouteName() ? Url::fromRouteMatch($route_match)->getInternalPath() : '';
-    $current_path_is_admin = \Drupal::service('router.admin_context')->isAdminRoute($route_match->getRouteObject());
-    $path_settings = [
-      'baseUrl' => $request->getBaseUrl() . '/',
-      'pathPrefix' => $pathPrefix,
-      'currentPath' => $current_path,
-      'currentPathIsAdmin' => $current_path_is_admin,
-      'isFront' => \Drupal::service('path.matcher')->isFrontPage(),
-      'currentLanguage' => \Drupal::languageManager()->getCurrentLanguage(LanguageInterface::TYPE_URL)->getId(),
-    ];
-    if (!empty($current_query)) {
-      ksort($current_query);
-      $path_settings['currentQuery'] = (object) $current_query;
-    }
-    // Only set core/drupalSettings values that haven't been set already.
-    foreach ($path_settings as $key => $value) {
-      if (!isset($settings['path'][$key])) {
-        $settings['path'][$key] = $value;
-      }
-    }
-    if (!isset($settings['pluralDelimiter'])) {
-      $settings['pluralDelimiter'] = PoItem::DELIMITER;
-    }
-    // Add the theme token to ajaxPageState, ensuring the database is available
-    // before doing so. Also add the loaded libraries to ajaxPageState.
-    /** @var \Drupal\Core\Asset\LibraryDependencyResolver $library_dependency_resolver */
-    $library_dependency_resolver = \Drupal::service('library.dependency_resolver');
-    $loaded_libraries = [];
-    if (!isset($settings['ajaxPageState'])) {
-      $loaded_libraries = $library_dependency_resolver->getLibrariesWithDependencies($assets->getAlreadyLoadedLibraries());
-    }
-    if (isset($settings['ajaxPageState']) || in_array('core/drupal.ajax', $loaded_libraries) || in_array('core/drupal.htmx', $loaded_libraries)) {
-      if (!defined('MAINTENANCE_MODE')) {
-        // The theme token is only validated when the theme requested is not the
-        // default, so don't generate it unless necessary.
-        // @see \Drupal\Core\Theme\AjaxBasePageNegotiator::determineActiveTheme()
-        $active_theme_key = \Drupal::theme()->getActiveTheme()->getName();
-        if ($active_theme_key !== \Drupal::service('theme_handler')->getDefault()) {
-          $settings['ajaxPageState']['theme_token'] = \Drupal::csrfToken()->get($active_theme_key);
-        }
-      }
-      // Provide the page with information about the individual asset libraries
-      // used, information not otherwise available when aggregation is enabled.
-      $minimal_libraries = $library_dependency_resolver->getMinimalRepresentativeSubset(array_unique(array_merge($assets->getLibraries(), $assets->getAlreadyLoadedLibraries())));
-      sort($minimal_libraries);
-      $settings['ajaxPageState']['libraries'] = implode(',', $minimal_libraries);
-    }
   }
 
   /**
