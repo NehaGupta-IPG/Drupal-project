@@ -15,10 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Main content renderer for HTMX requests.
  *
- * This renderer is invoked in two circumstances:
+ * This renderer is invoked when circumstances:
  * - The HTMX request adds the `_wrapper_format` query parameter with value
  *   `drupal_htmx`.
- * - The route has the option `_htmx_route` set to TRUE.
  *
  * Attachments in HTML responses are handled by
  * \Drupal\Core\Render\AttachmentsResponseProcessorInterface and
