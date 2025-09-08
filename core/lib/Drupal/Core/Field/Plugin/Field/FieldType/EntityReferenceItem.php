@@ -379,9 +379,9 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
           // themselves or be part of cycles.
           throw new EntityStorageException('Invalid circular reference detected: a new entity cannot reference itself, not even indirectly.');
         }
-        // If the parent entity already exists, circular references are allowed
-        // since both entities have stable IDs and the reference is
-        // valid.
+        // If both the parent and the referenced entity already exist, circular
+        // references are allowed since both entities have stable IDs, so the
+        // reference is valid.
       }
       finally {
         // Always clean up tracking entries to prevent memory leaks and ensure
@@ -391,7 +391,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
       }
     }
 
-    if ($this->target_id === NULL) {
+    if (!$this->isEmpty() && $this->target_id === NULL) {
       $this->target_id = $this->entity->id();
     }
   }
