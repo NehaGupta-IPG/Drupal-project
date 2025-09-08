@@ -66,7 +66,7 @@ field.value.file:
   label: 'Default value'
 
 base_file_field_field_settings:
-  type: mapping
+  type: field.field_settings.entity_reference
   mapping:
     handler:
       type: string
