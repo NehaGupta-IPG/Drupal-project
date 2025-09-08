@@ -8,7 +8,7 @@ use Drupal\Component\Serialization\PhpSerialize;
 use Drupal\Core\Database\Database;
 use Drupal\Core\KeyValueStore\DatabaseStorageExpirable;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\system\Hook\SystemHooks;
+use Drupal\system\Hook\SystemCronHooks;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -48,7 +48,15 @@ class GarbageCollectionTest extends KernelTestBase {
 
     // Perform a new set operation and then trigger garbage collection.
     $store->setWithExpire('autumn', 'winter', rand(500, 1000000));
-    $systemCron = new SystemHooks();
+    $systemCron = new SystemCronHooks(
+      \Drupal::service('flood'),
+      \Drupal::service('keyvalue.expirable.database'),
+      \Drupal::service('plugin.manager.queue_worker'),
+      \Drupal::service('queue'),
+      \Drupal::service('file.htaccess_writer'),
+      \Drupal::service('config.factory'),
+      \Drupal::service('system.sa_fetcher'),
+    );
     $systemCron->cron();
 
     // Query the database and confirm that the stale records were deleted.

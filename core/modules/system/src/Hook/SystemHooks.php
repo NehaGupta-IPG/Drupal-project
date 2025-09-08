@@ -10,9 +10,6 @@ use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Component\Render\PlainTextOutput;
-use Drupal\Core\Queue\QueueGarbageCollectionInterface;
-use Drupal\Core\KeyValueStore\KeyValueDatabaseExpirableFactory;
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Extension\Extension;
 use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\Language\LanguageInterface;
@@ -269,50 +266,6 @@ class SystemHooks {
       $info['regions_hidden'][] = 'page_top';
       $info['regions_hidden'][] = 'page_bottom';
     }
-  }
-
-  /**
-   * Implements hook_cron().
-   *
-   * Remove older rows from flood, batch cache and expirable keyvalue tables.
-   * Also ensure files directories have .htaccess files.
-   */
-  #[Hook('cron')]
-  public function cron(): void {
-    // Clean up the flood.
-    \Drupal::flood()->garbageCollection();
-    foreach (Cache::getBins() as $cache_backend) {
-      $cache_backend->garbageCollection();
-    }
-    // Clean up the expirable key value database store.
-    if (\Drupal::service('keyvalue.expirable.database') instanceof KeyValueDatabaseExpirableFactory) {
-      \Drupal::service('keyvalue.expirable.database')->garbageCollection();
-    }
-    // Clean up any garbage in the queue service.
-    $queue_worker_manager = \Drupal::service('plugin.manager.queue_worker');
-    $queue_factory = \Drupal::service('queue');
-    foreach (array_keys($queue_worker_manager->getDefinitions()) as $queue_name) {
-      $queue = $queue_factory->get($queue_name);
-      if ($queue instanceof QueueGarbageCollectionInterface) {
-        $queue->garbageCollection();
-      }
-    }
-    // Ensure that all of Drupal's standard directories (e.g., the public files
-    // directory and config directory) have appropriate .htaccess files.
-    \Drupal::service('file.htaccess_writer')->ensure();
-    if (\Drupal::config('system.advisories')->get('enabled')) {
-      // Fetch the security advisories so that they will be pre-fetched during
-      // systemAdvisoriesRequirements() and system_page_top().
-      /** @var \Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher $fetcher */
-      $fetcher = \Drupal::service('system.sa_fetcher');
-      $fetcher->getSecurityAdvisories();
-    }
-
-    // Do a pass of purging on deleted entity field data, if any exists.
-    if (!$config_purge_batch_size = \Drupal::config('field.field_settings')->get('purge_batch_size')) {
-      $config_purge_batch_size = Settings::get('field_purge_batch_size', 50);
-    }
-    \Drupal::service(FieldPurger::class)->purgeBatch($config_purge_batch_size);
   }
 
   /**
