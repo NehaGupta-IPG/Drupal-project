@@ -548,7 +548,8 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     // then test that it doesn't get re-saved when changed.
     $new_term->save();
     $new_term_original_changed = $new_term->getChangedTime();
-    $new_term->setName($this->randomMachineName()); // Change but don't save.
+    // Change but don't save.
+    $new_term->setName($this->randomMachineName());
 
     $entity = EntityTest::create(['name' => $this->randomMachineName()]);
     $entity->field_save_mode_disabled->entity = $new_term;
@@ -562,7 +563,8 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
 
     // Test with existing entity - should not be re-saved.
     $entity = EntityTest::create(['name' => $this->randomMachineName()]);
-    $existing_term->setName($this->randomMachineName()); // Change the term but don't save it.
+    // Change the term but don't save it.
+    $existing_term->setName($this->randomMachineName());
     $entity->field_save_mode_disabled->entity = $existing_term;
     $entity->save();
 
@@ -600,7 +602,8 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
 
     // Test with existing entity - should not be re-saved.
     $entity = EntityTest::create(['name' => $this->randomMachineName()]);
-    $existing_term->setName($this->randomMachineName()); // Change the term but don't save it.
+    // Change the term but don't save it.
+    $existing_term->setName($this->randomMachineName());
     $entity->field_save_mode_new_only->entity = $existing_term;
     $entity->save();
 
@@ -969,24 +972,27 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $newD = EntityTest::create(['name' => 'New D Clean - ' . $this->randomMachineName()]);
 
     // Build partial chain step by step to avoid circular references.
-
     // Step 1: ExistingA -> NewC (linear, no circular reference).
     $existingA->field_self_ref->entity = $newC;
-    $existingA->save(); // Should work - saves newC as well.
+    // Should work - saves newC as well.
+    $existingA->save();
     $this->assertFalse($newC->isNew(), 'NewC was saved when referenced by existing entity.');
 
     // Step 2: NewC -> ExistingB (still linear).
     $newC->field_self_ref->entity = $existingB;
-    $newC->save(); // Should work.
+    // Should work.
+    $newC->save();
 
     // Step 3: ExistingB -> NewD (still linear).
     $existingB->field_self_ref->entity = $newD;
-    $existingB->save(); // Should work - saves newD as well.
+    // Should work - saves newD as well.
+    $existingB->save();
     $this->assertFalse($newD->isNew(), 'NewD was saved when referenced by existing entity.');
 
     // Step 4: Complete the circle NewD -> ExistingA (all entities exist now).
     $newD->field_self_ref->entity = $existingA;
-    $newD->save(); // Should work since no new entities are involved.
+    // Should work since no new entities are involved.
+    $newD->save();
 
     // Reload entities to get fresh data.
     $existingA = EntityTest::load($existingA->id());
@@ -1032,9 +1038,11 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     // Test breaking and rebuilding part of the chain.
     $newChild2 = EntityTest::create(['name' => 'NewChild2 - ' . $this->randomMachineName()]);
     $child1->field_self_ref->entity = $newChild2;
-    $newChild2->field_self_ref->entity = $child3; // Skip the old child2.
+    // Skip the old child2.
+    $newChild2->field_self_ref->entity = $child3;
 
-    $child1->save(); // This should save newChild2 and update the chain.
+    // This should save newChild2 and update the chain.
+    $child1->save();
     $this->assertFalse($newChild2->isNew(), 'NewChild2 saved when inserted in chain.');
     $this->assertEquals($newChild2->id(), $child1->field_self_ref->target_id);
     $this->assertEquals($child3->id(), $newChild2->field_self_ref->target_id);
@@ -1441,11 +1449,19 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
 
 }
 
-
+/**
+ * Test helper class to control time for change detection tests.
+ */
 final class TestTime extends Time {
 
+  /**
+   * Override request time for testing purposes.
+   */
   public ?int $requestTime;
 
+  /**
+   * Returns the request time, or a custom time if set.
+   */
   public function getRequestTime() {
     return $this->requestTime ?? parent::getRequestTime();
   }

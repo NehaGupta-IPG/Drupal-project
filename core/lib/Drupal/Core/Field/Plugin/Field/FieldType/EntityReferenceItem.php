@@ -355,7 +355,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
       };
 
       if ($do_save) {
-        // Prevent infinite recursion by tracking entities currently being saved.
+        // Prevent infinite recursion by tracking entities being saved.
         $parent_key = $parent_entity->getEntityTypeId() . ':' . $parent_entity->uuid();
         $referenced_key = $referenced_entity->getEntityTypeId() . ':' . $referenced_entity->uuid();
 
@@ -534,10 +534,12 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
     $form[$key] = [
       '#type' => 'select',
       '#title' => $this->t('Referenced item save behavior'),
-      '#description' => $this->t('Configure whether referenced items should be automatically saved, when the referencing %entity_type item is saved.', ['%entity_type' => $entity_type->getLabel()]),
+      '#description' => $this->t('Configure whether referenced items should be automatically saved, when the referencing %entity_type item is saved.', [
+        '%entity_type' => $entity_type->getLabel(),
+      ]),
       '#default_value' => $default_value,
       '#options' => [
-        'disabled' => $this->t('Do not save referenced items automatically'),
+        'disabled' => $this->t('Never save referenced items automatically'),
         'new_only' => $this->t('Save only new referenced items'),
         'changed_only' => $this->t('Save only modified referenced items'),
         'always' => $this->t('Always save referenced items'),
@@ -626,7 +628,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
       return FALSE;
     }
 
-    // @todo: Implement proper change detection, for now fall back to always
+    // @todo Implement proper change detection, for now fall back to always
     //   save, if change status cannot be determined.
     //   See https://www.drupal.org/project/drupal/issues/2862574.
     $referenced_entity = $this->entity;
