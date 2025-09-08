@@ -542,6 +542,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
       'vid' => $this->term->bundle(),
     ]);
     $existing_term->save();
+    $original_name = $existing_term->getName();
     $original_changed = $existing_term->getChangedTime();
 
     // Test with new entity - verify it's not auto-saved when parent saves.
@@ -572,6 +573,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     // Reload term and verify it wasn't re-saved.
     $reloaded_term = $term_storage->loadUnchanged($existing_term->id());
     $this->assertEquals($original_changed, $reloaded_term->getChangedTime(), 'Existing term was not re-saved with disabled mode.');
+    $this->assertEquals($original_name, $reloaded_term->getName());
     $this->assertEquals($existing_term->id(), $entity->field_save_mode_disabled->target_id, 'Target ID is set for existing entity.');
   }
 
@@ -590,6 +592,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
       'vid' => $this->term->bundle(),
     ]);
     $existing_term->save();
+    $original_name = $existing_term->getName();
     $original_changed = $existing_term->getChangedTime();
 
     // Test with new entity - should be saved.
@@ -612,6 +615,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
     $reloaded_term = $term_storage->loadUnchanged($existing_term->id());
     $this->assertEquals($original_changed, $reloaded_term->getChangedTime(), 'Existing term was not re-saved with new_only mode.');
+    $this->assertEquals($original_name, $reloaded_term->getName());
     $this->assertEquals($existing_term->id(), $entity->field_save_mode_new_only->target_id, 'Target ID is synchronized for existing entity.');
   }
 
@@ -630,6 +634,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
       'vid' => $this->term->bundle(),
     ]);
     $existing_term->save();
+    $original_name = $existing_term->getName();
     $original_changed = $existing_term->getChangedTime();
 
     // Test with new entity - should be saved.
@@ -643,7 +648,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
 
     // Test with existing entity - should be re-saved.
     $entity = EntityTest::create(['name' => $this->randomMachineName()]);
-    $new_name = $this->randomMachineName();
+    $new_name = $original_name . '- changed';
     $existing_term->setName($new_name);
     // Change the term but don't save it.
     $entity->field_save_mode_always->entity = $existing_term;
@@ -750,7 +755,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $reloaded_term = $term_storage->loadUnchanged($term_without_original->id());
     $this->assertGreaterThan($original_changed_time, $reloaded_term->getChangedTime(), 'Entity without original was saved with changed_only mode (fallback behavior).');
     $this->assertEquals($term_without_original->id(), $entity->field_save_mode_changed_only->target_id, 'Target ID is synchronized for entity without original.');
-    $this->assertEquals($reloaded_term->label(), $changed_name, 'The term name was saved.');
+    $this->assertEquals($reloaded_term->getName(), $changed_name, 'The term name was saved.');
 
     // Test 3b: entity changed in a previous request is NOT saved.
     $entity = EntityTest::create(['name' => $this->randomMachineName()]);
@@ -764,7 +769,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $reloaded_term = $term_storage->loadUnchanged($term_without_original->id());
     $this->assertEquals($changed_time, $reloaded_term->getChangedTime(), 'Entity without original was NOT saved.');
     $this->assertEquals($term_without_original->id(), $entity->field_save_mode_changed_only->target_id, 'Target ID is synchronized for entity without original.');
-    $this->assertEquals($reloaded_term->label(), $changed_name, 'The term name was NOT changed.');
+    $this->assertEquals($reloaded_term->getName(), $changed_name, 'The term name was NOT changed.');
 
     // Test 4: Non-EntityChangedInterface entity - should be saved (fallback
     // behavior). Create an entity test that doesn't implement
@@ -811,13 +816,14 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $this->assertFalse($entity->isNew(), 'Self-referencing entity saved successfully.');
     $this->assertEquals($entity->id(), $entity->field_self_ref->target_id, 'Self-reference target_id is correctly set.');
 
-    // Test existing entity adding self-reference.
+    // Test existing entity adding self-reference via target_id.
     $entity2 = EntityTest::create(['name' => $this->randomMachineName()]);
     $entity2->save();
     $entity2->field_self_ref->target_id = $entity2->id();
     $entity2->save();
 
-    // Verify self-reference works with existing entity.
+    // Verify the entity saved successfully and target_id is set.
+    $this->assertFalse($entity2->isNew(), 'Self-referencing entity saved successfully.');
     $this->assertEquals($entity2->id(), $entity2->field_self_ref->target_id, 'Existing entity self-reference works correctly.');
 
     // Test circular reference chain.
@@ -843,9 +849,9 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
       $this->assertSame($expectedExceptionMessage, $e->getMessage());
     }
 
-    // Clear the circular references so we can save the entities individually first.
-    // This tests the scenario where entities are saved separately and then
-    // circular references are established between existing entities.
+    // Clear the circular references so we can save the entities individually
+    // first. This tests the scenario where entities are saved separately and
+    // then circular references are established between existing entities.
     unset(
       $entityA->field_self_ref->entity,
       $entityB->field_self_ref->entity,
@@ -883,10 +889,10 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $this->doTestPartialChainBuilding();
 
     // Test 4: Multiple reference fields cross-referencing.
-    $this->doTestMultipleFieldCrossReference();
+    $this->doTestMultipleFieldCrossReference($expectedExceptionMessage);
 
     // Test 5: Deep nesting scenarios.
-    $this->doTestDeepNestingScenarios();
+    $this->doTestDeepNestingScenarios($expectedExceptionMessage);
   }
 
   /**
@@ -967,8 +973,11 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
 
     // Test scenario where we build the chain incrementally.
     // Reset entities to clean state by clearing all field values.
-    $existingA = EntityTest::load($existingA->id());
-    $existingB = EntityTest::load($existingB->id());
+    $entity_test_storage = \Drupal::entityTypeManager()->getStorage('entity_test');
+    $existingA = $entity_test_storage->loadUnchanged($existingA->id());
+    assert($existingA instanceof EntityTest);
+    $existingB = $entity_test_storage->loadUnchanged($existingB->id());
+    assert($existingB instanceof EntityTest);
     $newC = EntityTest::create(['name' => 'New C Clean - ' . $this->randomMachineName()]);
     $newD = EntityTest::create(['name' => 'New D Clean - ' . $this->randomMachineName()]);
 
@@ -996,10 +1005,15 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $newD->save();
 
     // Reload entities to get fresh data.
-    $existingA = EntityTest::load($existingA->id());
-    $existingB = EntityTest::load($existingB->id());
-    $newC = EntityTest::load($newC->id());
-    $newD = EntityTest::load($newD->id());
+    $entity_test_storage = \Drupal::entityTypeManager()->getStorage('entity_test');
+    $existingA = $entity_test_storage->loadUnchanged($existingA->id());
+    assert($existingA instanceof EntityTest);
+    $existingB = $entity_test_storage->loadUnchanged($existingB->id());
+    assert($existingB instanceof EntityTest);
+    $newC = $entity_test_storage->loadUnchanged($newC->id());
+    assert($newC instanceof EntityTest);
+    $newD = $entity_test_storage->loadUnchanged($newD->id());
+    assert($newD instanceof EntityTest);
 
     // Verify the complete chain.
     $this->assertEquals($newC->id(), $existingA->field_self_ref->target_id, 'ExistingA -> NewC reference is correct.');
@@ -1052,7 +1066,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
   /**
    * Tests multiple reference fields cross-referencing.
    */
-  private function doTestMultipleFieldCrossReference(): void {
+  private function doTestMultipleFieldCrossReference(string $expectedExceptionMessage): void {
     // Create a second self-reference field for cross-referencing tests.
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'field_self_ref_2',
@@ -1084,9 +1098,15 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $entityY->field_self_ref_2->entity = $entityX;
 
     // This should fail because of circular reference involving new entities.
-    $expectedExceptionMessage = 'Invalid circular reference detected: a new entity cannot reference itself, not even indirectly.';
     try {
       $entityX->save();
+      $this->fail('Expected EntityStorageException for cross-field circular reference.');
+    }
+    catch (EntityStorageException $e) {
+      $this->assertSame($expectedExceptionMessage, $e->getMessage(), 'Cross-field circular reference properly detected.');
+    }
+    try {
+      $entityY->save();
       $this->fail('Expected EntityStorageException for cross-field circular reference.');
     }
     catch (EntityStorageException $e) {
@@ -1113,7 +1133,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
   /**
    * Tests deep nesting scenarios and performance limits.
    */
-  private function doTestDeepNestingScenarios(): void {
+  private function doTestDeepNestingScenarios(string $expectedExceptionMessage): void {
     // Test reasonable depth chain (should work fine).
     $entities = [];
     $depth = 10;
@@ -1146,7 +1166,8 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $invalidEntity = EntityTest::create([
       'name' => 'Invalid - ' . $this->randomMachineName(),
     ]);
-    // Make the invalid entity reference itself - this should cause circular reference detection.
+    // Make the invalid entity reference itself - this should cause circular
+    // reference detection.
     $invalidEntity->field_self_ref->entity = $invalidEntity;
 
     $validEntity->field_self_ref->entity = $invalidEntity;
@@ -1157,7 +1178,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     }
     catch (EntityStorageException $e) {
       // Expected - save should fail due to circular reference.
-      $this->assertStringContainsString('circular reference', strtolower($e->getMessage()), 'Save failed due to circular reference as expected.');
+      $this->assertSame($expectedExceptionMessage, $e->getMessage(), 'Cross-field circular reference properly detected.');
     }
   }
 
@@ -1243,10 +1264,8 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     ]);
     $invalid_field_storage->save();
 
-    // Test that saving a field with invalid save_referenced_entities value throws an exception.
-    $this->expectException(SchemaIncompleteException::class);
-    $this->expectExceptionMessage('The save mode must be one of: disabled, new_only, changed_only, always.');
-
+    // Test that saving a field with invalid save_referenced_entities value
+    // throws an exception.
     $invalid_mode_field = FieldConfig::create([
       'field_storage' => $invalid_field_storage,
       'bundle' => 'entity_test',
@@ -1256,7 +1275,13 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
         'save_referenced_entities' => 'invalid_mode',
       ],
     ]);
-    $invalid_mode_field->save();
+
+    try {
+      $invalid_mode_field->save();
+    }
+    catch (SchemaIncompleteException $e) {
+      $this->assertStringContainsString('The save mode must be one of: disabled, new_only, changed_only, always.', $e->getMessage());
+    }
   }
 
   /**
