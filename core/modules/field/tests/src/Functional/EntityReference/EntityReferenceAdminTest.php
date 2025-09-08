@@ -407,7 +407,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
     $this->assertSession()->optionExists('settings[save_referenced_entities]', 'disabled');
     $select_element = $this->assertSession()->selectExists('settings[save_referenced_entities]');
     $disabled_option = $select_element->find('xpath', '//option[@value="disabled"]');
-    $this->assertEquals('Do not save referenced items automatically', $disabled_option->getText());
+    $this->assertEquals('Never save referenced items automatically', $disabled_option->getText());
 
     $new_only_option = $select_element->find('xpath', '//option[@value="new_only"]');
     $this->assertEquals('Save only new referenced items', $new_only_option->getText());

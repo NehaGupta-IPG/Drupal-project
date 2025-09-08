@@ -342,51 +342,57 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
    * {@inheritdoc}
    */
   public function preSave() {
-    $referenced_entity = $this->entity ?? NULL;
-    if (!$this->isEmpty() && $referenced_entity instanceof EntityInterface) {
-      $parent_entity = $this->getEntity();
-      $save_mode = $this->getFieldDefinition()->getSetting('save_referenced_entities');
+    if ($this->isEmpty()) {
+      return;
+    }
 
-      // To preserve BC, default to saving only new entities.
-      $do_save = match ($save_mode) {
-        'disabled' => FALSE,
-        'changed_only' => $this->hasChangedEntity(),
-        'always' => TRUE,
-        default => $this->hasNewEntity(),
-      };
+    $parent_entity = $this->getEntity();
+    $save_mode = $this->getFieldDefinition()->getSetting('save_referenced_entities');
 
-      if ($do_save) {
-        // Prevent infinite recursion by tracking entities being saved.
-        $parent_key = $parent_entity->getEntityTypeId() . ':' . $parent_entity->uuid();
-        $referenced_key = $referenced_entity->getEntityTypeId() . ':' . $referenced_entity->uuid();
+    // To preserve BC, default to saving only new entities.
+    $do_save = match ($save_mode) {
+      'disabled' => FALSE,
+      'changed_only' => $this->hasChangedEntity(),
+      'always' => TRUE,
+      default => $this->hasNewEntity(),
+    };
 
-        try {
-          static::$savedEntities[$parent_key] = TRUE;
-          if (empty(static::$savedEntities[$referenced_key])) {
-            static::$savedEntities[$referenced_key] = TRUE;
-            $referenced_entity->save();
-          }
-          elseif ($parent_entity->isNew() || $referenced_entity->isNew()) {
-            // Circular reference detected involving at least one new entity:
-            // this is forbidden because new entities cannot have stable
-            // references to themselves or be part of cycles.
-            throw new EntityStorageException('Invalid circular reference detected: a new entity cannot reference itself, not even indirectly.');
-          }
-          // If the parent entity already exists, circular references are
-          // allowed since both entities have stable IDs and the reference is
-          // valid.
-        }
-        finally {
-          // Always clean up tracking entries to prevent memory leaks and
-          // ensure proper state for subsequent operations.
-          unset(static::$savedEntities[$parent_key]);
-          unset(static::$savedEntities[$referenced_key]);
-        }
+    if ($do_save) {
+      $referenced_entity = $this->entity ?? NULL;
+      if (!($referenced_entity instanceof EntityInterface)) {
+        return;
       }
 
-      if ($this->target_id === NULL) {
-        $this->target_id = $referenced_entity->id();
+      // Prevent infinite recursion by tracking entities being saved.
+      $parent_key = $parent_entity->getEntityTypeId() . ':' . $parent_entity->uuid();
+      $referenced_key = $referenced_entity->getEntityTypeId() . ':' . $referenced_entity->uuid();
+
+      try {
+        static::$savedEntities[$parent_key] = TRUE;
+        if (empty(static::$savedEntities[$referenced_key])) {
+          static::$savedEntities[$referenced_key] = TRUE;
+          $referenced_entity->save();
+        }
+        elseif ($parent_entity->isNew() || $referenced_entity->isNew()) {
+          // Circular reference detected involving at least one new entity: this
+          // is forbidden because new entities cannot have stable references to
+          // themselves or be part of cycles.
+          throw new EntityStorageException('Invalid circular reference detected: a new entity cannot reference itself, not even indirectly.');
+        }
+        // If the parent entity already exists, circular references are allowed
+        // since both entities have stable IDs and the reference is
+        // valid.
       }
+      finally {
+        // Always clean up tracking entries to prevent memory leaks and ensure
+        // proper state for subsequent operations.
+        unset(static::$savedEntities[$parent_key]);
+        unset(static::$savedEntities[$referenced_key]);
+      }
+    }
+
+    if ($this->target_id === NULL) {
+      $this->target_id = $this->entity->id();
     }
   }
 
@@ -632,7 +638,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
     // @todo Implement proper change detection, for now fall back to always
     //   save, if change status cannot be determined.
     //   See https://www.drupal.org/project/drupal/issues/2862574.
-    $referenced_entity = $this->entity;
+    $referenced_entity = $this->entity ?? NULL;
     if ($referenced_entity instanceof EntityChangedInterface) {
       // New entities should always be considered changed.
       if ($referenced_entity->isNew()) {
