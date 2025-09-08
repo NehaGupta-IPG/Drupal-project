@@ -4,6 +4,10 @@ namespace Drupal\system\Hook;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\system\DateFormatListBuilder;
+use Drupal\system\Form\DateFormatAddForm;
+use Drupal\system\Form\DateFormatDeleteForm;
+use Drupal\system\Form\DateFormatEditForm;
 
 /**
  * Entity hook implementations for system.
@@ -17,10 +21,10 @@ class SystemEntityHooks {
   public function entityTypeBuild(array &$entity_types): void {
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
     $entity_types['date_format']
-      ->setFormClass('add', 'Drupal\system\Form\DateFormatAddForm')
-      ->setFormClass('edit', 'Drupal\system\Form\DateFormatEditForm')
-      ->setFormClass('delete', 'Drupal\system\Form\DateFormatDeleteForm')
-      ->setListBuilderClass('Drupal\system\DateFormatListBuilder')
+      ->setFormClass('add', DateFormatAddForm::class)
+      ->setFormClass('edit', DateFormatEditForm::class)
+      ->setFormClass('delete', DateFormatDeleteForm::class)
+      ->setListBuilderClass(DateFormatListBuilder::class)
       ->setLinkTemplate('edit-form', '/admin/config/regional/date-time/formats/manage/{date_format}')
       ->setLinkTemplate('delete-form', '/admin/config/regional/date-time/formats/manage/{date_format}/delete')
       ->setLinkTemplate('collection', '/admin/config/regional/date-time/formats');
