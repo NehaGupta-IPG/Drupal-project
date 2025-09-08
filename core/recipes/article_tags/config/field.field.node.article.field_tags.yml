@@ -23,4 +23,5 @@ settings:
     sort:
       field: _none
     auto_create: true
+  save_referenced_entities: 'new_only'
 field_type: entity_reference

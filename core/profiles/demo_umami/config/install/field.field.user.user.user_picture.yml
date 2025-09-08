@@ -26,6 +26,7 @@ settings:
   min_resolution: ''
   alt_field: false
   alt_field_required: false
+  save_referenced_entities: 'new_only'
   title_field: false
   title_field_required: false
   default_image:
