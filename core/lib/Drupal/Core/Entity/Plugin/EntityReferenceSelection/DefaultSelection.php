@@ -384,13 +384,11 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
    *   The form element being validated.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state object.
-   * @param array $form
-   *   The complete form structure.
    */
-  public static function validateAutoCreateConsistency($element, FormStateInterface $form_state, $form) {
+  public static function validateAutoCreateConsistency(array $element, FormStateInterface $form_state): void {
     $auto_create = $form_state->getValue(['settings', 'handler_settings', 'auto_create']);
     $save_mode = $form_state->getValue(['settings', 'save_referenced_entities']);
-    
+
     if ($auto_create && $save_mode === 'disabled') {
       $form_state->setError($element, t('Auto-creation cannot be enabled when referenced entities are not being saved automatically. Either disable auto-creation or change the save behavior setting to enable automatic saving.'));
     }

@@ -500,7 +500,8 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     ]);
     $field->save();
 
-    // Create field for entity_test -> entity_test references (for changed_only test).
+    // Create field for entity_test -> entity_test references (for changed_only
+    // test).
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'field_save_mode_changed_et',
       'entity_type' => 'entity_test',

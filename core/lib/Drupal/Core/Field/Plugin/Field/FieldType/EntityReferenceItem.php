@@ -9,6 +9,7 @@ use Drupal\Core\Entity\ContentEntityStorageInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\TypedData\EntityDataDefinition;
@@ -49,11 +50,11 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
   /**
    * Tracks entities currently being saved to prevent infinite recursion.
    *
-   * @var array
-   *   An associative array where keys are "entity_type_id:uuid" strings
-   *   and values are TRUE for entities currently being saved.
+   * @var bool[]
+   *   An associative array where keys are "entity_type_id:uuid" strings and
+   *   values are TRUE for entities currently being saved.
    */
-  protected static $savedEntities = [];
+  protected static array $savedEntities = [];
 
   /**
    * {@inheritdoc}
@@ -149,7 +150,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
     // Add bundle information to summary.
     if (isset($handler_settings['target_bundles'])) {
       /** @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_bundle_information */
-      $entity_bundle_information = \Drupal::service('entity_type.bundle.info');
+      $entity_bundle_information = \Drupal::service(EntityTypeBundleInfoInterface::class);
       $bundle_info = $entity_bundle_information->getBundleInfo($target_type);
       $bundles = array_map(fn($bundle) => $bundle_info[$bundle]['label'], $handler_settings['target_bundles']);
       $bundle_label = \Drupal::entityTypeManager()->getDefinition($target_type)->getBundleLabel();
