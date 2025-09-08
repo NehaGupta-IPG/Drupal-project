@@ -6,11 +6,9 @@ use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\StreamWrapper\LocalStream;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Link;
-use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Component\Render\PlainTextOutput;
-use Drupal\Core\Extension\Extension;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -187,20 +185,6 @@ class SystemHooks {
   }
 
   /**
-   * Implements hook_system_info_alter().
-   */
-  #[Hook('system_info_alter')]
-  public function systemInfoAlter(&$info, Extension $file, $type): void {
-    // Remove page-top and page-bottom from the blocks UI since they are
-    // reserved for
-    // modules to populate from outside the blocks system.
-    if ($type == 'theme') {
-      $info['regions_hidden'][] = 'page_top';
-      $info['regions_hidden'][] = 'page_bottom';
-    }
-  }
-
-  /**
    * Implements hook_mail().
    */
   #[Hook('mail')]
@@ -268,6 +252,32 @@ class SystemHooks {
         $entity_type->setRevisionMetadataKey('workspace', NULL);
         $entity_definition_update_manager->updateEntityType($entity_type);
       }
+    }
+  }
+
+  /**
+   * Implements hook_library_info_alter().
+   */
+  #[Hook('library_info_alter')]
+  public function libraryInfoAlter(&$libraries, $extension): void {
+    // If Claro is the admin theme but not the active theme, grant Claro the
+    // ability to override the toolbar library with its own assets.
+    if ($extension === 'toolbar' && _system_is_claro_admin_and_not_active()) {
+      require_once DRUPAL_ROOT . '/core/themes/claro/claro.theme';
+      claro_system_module_invoked_library_info_alter($libraries, $extension);
+    }
+  }
+
+  /**
+   * Implements hook_theme_registry_alter().
+   */
+  #[Hook('theme_registry_alter')]
+  public function themeRegistryAlter(array &$theme_registry): void {
+    // If Claro is the admin theme but not the active theme, use Claro's toolbar
+    // templates.
+    if (_system_is_claro_admin_and_not_active()) {
+      require_once DRUPAL_ROOT . '/core/themes/claro/claro.theme';
+      claro_system_module_invoked_theme_registry_alter($theme_registry);
     }
   }
 
