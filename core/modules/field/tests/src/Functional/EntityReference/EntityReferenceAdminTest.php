@@ -569,7 +569,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
   }
 
   /**
-   * Tests server-side validation prevents conflicting auto-create and save settings.
+   * Checks that validation prevents conflicting auto-create and save settings.
    */
   public function testServerSideValidationAutoCreateSaveConflict(): void {
     // Create a taxonomy vocabulary for testing.
@@ -602,20 +602,22 @@ class EntityReferenceAdminTest extends BrowserTestBase {
       'settings[handler_settings][target_bundles][tags]' => TRUE,
       'settings[handler_settings][auto_create]' => TRUE,
     ];
-    
+
     // Submit the form with conflicting settings.
     $this->submitForm($edit, 'Save settings');
 
     // Verify that a validation error appears.
     $this->assertSession()->pageTextContains('Auto-creation cannot be enabled when referenced entities are not being saved automatically');
-    
-    // Verify that the form was not saved (we should still be on the settings page).
+
+    // Verify that the form was not saved (we should still be on the settings
+    // page).
     $this->assertSession()->addressEquals($field_path);
-    
+
     // Verify the field configuration was not changed.
     $field_config_storage = \Drupal::entityTypeManager()->getStorage('field_config');
     $field_config = $field_config_storage->loadUnchanged($field_id);
-    // The save_referenced_entities should still have its default value since validation failed.
+    // The save_referenced_entities should still have its default value since
+    // validation failed.
     $this->assertNotEquals('disabled', $field_config->getSetting('save_referenced_entities'));
 
     // Test that non-conflicting settings work correctly.
@@ -624,14 +626,14 @@ class EntityReferenceAdminTest extends BrowserTestBase {
       'settings[handler_settings][target_bundles][tags]' => TRUE,
       'settings[handler_settings][auto_create]' => TRUE,
     ];
-    
+
     // Submit with non-conflicting settings.
     $this->submitForm($edit, 'Save settings');
-    
+
     // Verify no validation error and successful save.
     $this->assertSession()->pageTextNotContains('Auto-creation cannot be enabled when referenced entities are not being saved automatically');
     $this->assertSession()->statusMessageContains('Saved', MessengerInterface::TYPE_STATUS);
-    
+
     // Verify the configuration was actually saved.
     $field_config = $field_config_storage->loadUnchanged($field_id);
     $this->assertEquals('new_only', $field_config->getSetting('save_referenced_entities'));
