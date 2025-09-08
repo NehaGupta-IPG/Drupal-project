@@ -37,4 +37,5 @@ settings:
     title: ''
     width: null
     height: null
+  save_referenced_entities: 'new_only'
 field_type: image
