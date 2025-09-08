@@ -7,29 +7,20 @@ namespace Drupal\node\Hook;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\node\NodeBulkUpdate;
-use Drupal\node\NodeStorageInterface;
 use Drupal\user\UserInterface;
 
 /**
  * Hook implementations for the node module.
  */
-class NodeHooks {
-
-  /**
-   * The Node Storage.
-   *
-   * @var \Drupal\node\NodeStorageInterface
-   */
-  protected NodeStorageInterface $nodeStorage;
+class NodeUserHooks {
 
   /**
    * NodeHooks constructor.
    */
   public function __construct(
-    EntityTypeManagerInterface $entityTypeManager,
+    protected EntityTypeManagerInterface $entityTypeManager,
     protected NodeBulkUpdate $nodeBulkUpdate,
   ) {
-    $this->nodeStorage = $entityTypeManager->getStorage('node');
   }
 
   /**
@@ -40,7 +31,7 @@ class NodeHooks {
   #[Hook('user_cancel')]
   public function userCancelBlockUnpublish($edit, UserInterface $account, $method): void {
     if ($method === 'user_cancel_block_unpublish') {
-      $nids = $this->nodeStorage->getQuery()
+      $nids = $this->entityTypeManager->getStorage('node')->getQuery()
         ->accessCheck(FALSE)
         ->condition('uid', $account->id())
         ->execute();
@@ -56,18 +47,13 @@ class NodeHooks {
   #[Hook('user_cancel')]
   public function userCancelReassign($edit, UserInterface $account, $method): void {
     if ($method === 'user_cancel_reassign') {
-      $vids = $this->nodeStorage->userRevisionIds($account);
+      $query = $this->entityTypeManager->getStorage('node')->getQuery()
+        ->allRevisions()
+        ->accessCheck(FALSE)
+        ->condition('uid', $account->id());
+      $vids = array_keys($query->execute());
       $this->nodeBulkUpdate->process($vids, ['uid' => 0, 'revision_uid' => 0], NULL, TRUE, TRUE);
     }
-  }
-
-  /**
-   * Implements hook_block_alter().
-   */
-  #[Hook('block_alter')]
-  public function blockAlter(&$definitions): void {
-    // Hide the deprecated Syndicate block from the UI.
-    $definitions['node_syndicate_block']['_block_ui_hidden'] = TRUE;
   }
 
 }

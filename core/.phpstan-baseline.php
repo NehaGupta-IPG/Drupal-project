@@ -12608,42 +12608,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/comment/src/Plugin/views/field/LastTimestamp.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\comment\\\\Plugin\\\\views\\\\field\\\\NodeNewComments\\:\\:buildOptionsForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/src/Plugin/views/field/NodeNewComments.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\comment\\\\Plugin\\\\views\\\\field\\\\NodeNewComments\\:\\:init\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/src/Plugin/views/field/NodeNewComments.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\comment\\\\Plugin\\\\views\\\\field\\\\NodeNewComments\\:\\:preRender\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/src/Plugin/views/field/NodeNewComments.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\comment\\\\Plugin\\\\views\\\\field\\\\NodeNewComments\\:\\:query\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/src/Plugin/views/field/NodeNewComments.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\comment\\\\Plugin\\\\views\\\\field\\\\NodeNewComments\\:\\:render\\(\\) should return Drupal\\\\Component\\\\Render\\\\MarkupInterface\\|string but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/src/Plugin/views/field/NodeNewComments.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\comment\\\\Plugin\\\\views\\\\field\\\\NodeNewComments\\:\\:usesGroupBy\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/src/Plugin/views/field/NodeNewComments.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\comment\\\\Plugin\\\\views\\\\field\\\\StatisticsLastCommentName\\:\\:query\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -17730,6 +17694,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/history/src/Plugin/views/field/HistoryUserTimestamp.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\history\\\\Plugin\\\\views\\\\field\\\\NodeNewComments\\:\\:render\\(\\) should return Drupal\\\\Component\\\\Render\\\\MarkupInterface\\|string but return statement is missing\\.$#',
+	'identifier' => 'return.missing',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/history/src/Plugin/views/field/NodeNewComments.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\history\\\\Plugin\\\\views\\\\filter\\\\HistoryUserTimestamp\\:\\:adminSummary\\(\\) has no return type specified\\.$#',
@@ -47791,6 +47761,14 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Asset/LibraryDiscoveryParserTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Access to constant on deprecated class Drupal\\\\Core\\\\Asset\\\\LibraryDiscovery\\:
+in drupal\\:11\\.1\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use
+\\\\Drupal\\\\Core\\\\Asset\\\\LibraryDiscoveryCollector instead\\.$#',
+	'identifier' => 'classConstant.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Asset/LibraryDiscoveryTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Authentication\\\\AuthenticationManagerTest\\:\\:providerTestDefaultFilter\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -48474,12 +48452,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/Routing/DefaultHtmlRouteProviderTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^@covers value \\\\Drupal\\\\Core\\\\Entity\\\\Sql\\\\SqlContentEntityStorageSchema\\:\\:onEntityTypeUpdate\\(\\) references an invalid method\\.$#',
-	'identifier' => 'phpunit.coversMethod',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/Sql/SqlContentEntityStorageSchemaTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Entity\\\\Sql\\\\SqlContentEntityStorageSchemaTest\\:\\:providerSchemaCastValue\\(\\) has no return type specified\\.$#',
