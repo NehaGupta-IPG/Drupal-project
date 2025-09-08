@@ -9,12 +9,13 @@ use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionComponent;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the rendering of a layout section field.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
 class LayoutSectionTest extends BrowserTestBase {
 
   /**
@@ -168,9 +169,8 @@ class LayoutSectionTest extends BrowserTestBase {
 
   /**
    * Tests layout_section formatter output.
-   *
-   * @dataProvider providerTestLayoutSectionFormatter
    */
+  #[DataProvider('providerTestLayoutSectionFormatter')]
   public function testLayoutSectionFormatter($layout_data, $expected_selector, $expected_content, $expected_cache_contexts, $expected_cache_tags, $expected_dynamic_cache): void {
     $node = $this->createSectionNode($layout_data);
 
@@ -197,7 +197,7 @@ class LayoutSectionTest extends BrowserTestBase {
     ]);
 
     // Restrict access to the block.
-    $this->container->get('state')->set('test_block_access', FALSE);
+    $this->container->get('keyvalue')->get('block_test')->set('access', FALSE);
 
     $this->drupalGet($node->toUrl('canonical'));
     $this->assertLayoutSection('.layout--onecol', NULL, '', '', 'UNCACHEABLE (poor cacheability)');
@@ -205,7 +205,7 @@ class LayoutSectionTest extends BrowserTestBase {
     $this->assertSession()->pageTextNotContains('Hello test world');
 
     // Grant access to the block, and ensure it was rendered.
-    $this->container->get('state')->set('test_block_access', TRUE);
+    $this->container->get('keyvalue')->get('block_test')->set('access', TRUE);
     $this->drupalGet($node->toUrl('canonical'));
     $this->assertLayoutSection('.layout--onecol', 'Hello test world', '', '', 'UNCACHEABLE (poor cacheability)');
   }

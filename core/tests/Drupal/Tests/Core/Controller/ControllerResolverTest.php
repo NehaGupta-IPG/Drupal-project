@@ -10,15 +10,19 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @coversDefaultClass \Drupal\Core\Controller\ControllerResolver
- * @group Controller
+ * Tests Drupal\Core\Controller\ControllerResolver.
  */
+#[CoversClass(ControllerResolver::class)]
+#[Group('Controller')]
 class ControllerResolverTest extends UnitTestCase {
 
   /**
@@ -49,9 +53,8 @@ class ControllerResolverTest extends UnitTestCase {
 
   /**
    * Tests createController().
-   *
-   * @dataProvider providerTestCreateController
    */
+  #[DataProvider('providerTestCreateController')]
   public function testCreateController($controller, $class, $output): void {
     $this->container->set('some_service', new MockController());
     $result = $this->controllerResolver->getControllerFromDefinition($controller);
@@ -90,9 +93,8 @@ class ControllerResolverTest extends UnitTestCase {
 
   /**
    * Tests getController().
-   *
-   * @dataProvider providerTestGetController
    */
+  #[DataProvider('providerTestGetController')]
   public function testGetController($attributes, $class, $output = NULL): void {
     $request = new Request([], [], $attributes);
     $result = $this->controllerResolver->getController($request);
@@ -122,9 +124,8 @@ class ControllerResolverTest extends UnitTestCase {
 
   /**
    * Tests getControllerFromDefinition().
-   *
-   * @dataProvider providerTestGetControllerFromDefinition
    */
+  #[DataProvider('providerTestGetControllerFromDefinition')]
   public function testGetControllerFromDefinition($definition, $output): void {
     $this->container->set('invoke_service', new MockInvokeController());
     $controller = $this->controllerResolver->getControllerFromDefinition($definition);
@@ -181,6 +182,9 @@ class ControllerResolverTest extends UnitTestCase {
 
 }
 
+/**
+ * Mock for the controller.
+ */
 class MockController {
 
   public function getResult() {
@@ -192,6 +196,10 @@ class MockController {
   }
 
 }
+
+/**
+ * Mock for the PSR-7 controller.
+ */
 class MockControllerPsr7 {
 
   public function getResult() {
@@ -204,7 +212,16 @@ class MockControllerPsr7 {
 
 }
 
+/**
+ * Mock for the injected service.
+ */
 class MockContainerInjection implements ContainerInjectionInterface {
+
+  /**
+   * The test value saved during construction.
+   *
+   * @var string
+   */
   protected $result;
 
   public function __construct($result) {
@@ -221,6 +238,9 @@ class MockContainerInjection implements ContainerInjectionInterface {
 
 }
 
+/**
+ * Test class used for testing the Controller resolver class.
+ */
 class MockInvokeController {
 
   public function __invoke() {

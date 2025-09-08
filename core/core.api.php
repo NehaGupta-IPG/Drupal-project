@@ -1251,7 +1251,8 @@
  *   https://www.drupal.org/docs/theming-drupal
  * - Modules: Modules add to or alter the behavior and functionality of Drupal,
  *   by using one or more of the methods listed below. For more information
- *   about creating modules, see https://www.drupal.org/docs/creating-custom-modules
+ *   about creating modules, see
+ *   https://www.drupal.org/docs/creating-custom-modules
  * - Installation profiles: Installation profiles can be used to
  *   create distributions, which are complete specific-purpose packages of
  *   Drupal including additional modules, themes, and data. For more
@@ -1605,6 +1606,14 @@
  * modules that they interact with. Your modules can also define their own
  * hooks, in order to let other modules interact with them.
  *
+ * Hook implementations will execute in the following order.
+ * order.
+ * - Module weight.
+ * - Alphabetical by module name.
+ * - This order can be modified by using the order parameter on the #[Hook]
+ *   attribute, using the #[ReorderHook] attribute, or implementing the legacy
+ *   hook_module_implements_alter.
+ *
  * @section implementing Implementing a hook
  *
  * There are two ways to implement a hook:
@@ -1632,13 +1641,13 @@
  * - On a method, use the attribute with the hook name:
  *   @code
  *   #[Hook('user_cancel')]
- *   public method userCancel(...)
+ *   public function userCancel(...) {}
  *   @endcode
  * - On a class, specify the method name as well as the hook name:
  *   @code
  *   #[Hook('user_cancel', method: 'userCancel')]
  *   class Hooks {
- *     method userCancel(...) {}
+ *     public function userCancel(...) {}
  *   }
  *   @endcode
  * - On a class with an __invoke method, which is taken to be the hook
@@ -1646,7 +1655,7 @@
  *   @code
  *   #[Hook('user_cancel')]
  *   class Hooks {
- *     method __invoke(...) {}
+ *     public function __invoke(...) {}
  *   }
  *   @endcode
  *
@@ -1656,6 +1665,7 @@
  * Legacy meta hooks:
  * - hook_hook_info()
  * - hook_module_implements_alter()
+ * @see \Drupal\Core\Hook\Attribute\LegacyModuleImplementsAlter
  *
  * Install hooks:
  * - hook_install()
@@ -1667,8 +1677,7 @@
  * - hook_update_last_removed()
  * - hook_update_N()
  *
- * Theme hooks:
- * - hook_preprocess_HOOK()
+ * Hooks implemented by themes must remain procedural.
  *
  * @subsection procedural-hooks Procedural hook implementation
  *
@@ -1708,6 +1717,90 @@
  * @see \Drupal\Core\Hook\Attribute\Hook
  * @see \Drupal::moduleHandler()
  *
+ * @section ordering_hooks Ordering hook implementations
+ *
+ * The order in which hook implementations are executed can be modified. A hook
+ * can be placed first or last in the order of execution. It can also be placed
+ * before or after the execution of another module's implementation of the same
+ * hook. When changing the order of execution in relation to a specific module
+ * either the module name or the class and method can be used.
+ *
+ * Use the order argument of the Hook attribute to order the execution of
+ * hooks.
+ *
+ * Example of executing 'entity_type_alter' of my_module first:
+ * @code
+ * #[Hook('entity_type_alter', order: Order::First)]
+ * @endcode
+ *
+ * Example of executing 'entity_type_alter' of my_module last:
+ * @code
+ * #[Hook('entity_type_alter', order: Order::Last)]
+ * @endcode
+ *
+ * Example of executing 'entity_type_alter' before the execution of the
+ * implementation in the foo module:
+ * @code
+ * #[Hook('entity_type_alter', order: new OrderBefore(['foo']))]
+ * @endcode
+ *
+ * Example of executing 'entity_type_alter' after the execution of the
+ * implementation in the foo module:
+ * @code
+ * #[Hook('entity_type_alter', order: new OrderAfter(['foo']))]
+ * @endcode
+ *
+ * Example of executing 'entity_type_alter' before two methods. One in the Foo
+ * class and one in the Bar class.
+ * @code
+ * #[Hook('entity_type_alter',
+ *   order: new OrderBefore(
+ *     classesAndMethods: [
+ *       [Foo::class, 'someMethod'],
+ *       [Bar::class, 'someOtherMethod'],
+ *     ]
+ *   )
+ * )]
+ * @endcode
+ *
+ * @see \Drupal\Core\Hook\Attribute\Hook
+ * @see \Drupal\Core\Hook\Order\Order
+ * @see \Drupal\Core\Hook\Order\OrderBefore
+ * @see \Drupal\Core\Hook\Order\OrderAfter
+ *
+ * @section ordering_other_module_hooks Ordering other module hook implementations
+ *
+ * The order in which hooks implemented in other modules are executed can be
+ * reordered. The reordering of the targeted hook is done relative to other
+ * implementations. The reordering process executes after the ordering defined
+ * in the Hook attribute.
+ *
+ * Example of reordering the execution of the 'entity_presave' hook so that
+ * Content Moderation module hook executes before the Workspaces module hook.
+ * @code
+ * #[ReorderHook('entity_presave',
+ *   class: ContentModerationHooks::class,
+ *   method: 'entityPresave',
+ *   order: new OrderBefore(['workspaces'])
+ * )]
+ * @endcode
+ *
+ * @see \Drupal\Core\Hook\Attribute\ReorderHook
+ *
+ * @section removing_hooks Removing hook implementations
+ *
+ * The execution of a hooks implemented by other modules can be skipped. This
+ * is done by removing the targeted hook, use the RemoveHook attribute.
+ *
+ * Example of removing the 'help' hook of the Layout Builder module.
+ * @code
+ * #[RemoveHook('help',
+ *   class: LayoutBuilderHooks::class,
+ *   method: 'help'
+ * )]
+ * @endcode
+ *
+ * @see \Drupal\Core\Hook\Attribute\RemoveHook
  * @}
  */
 
@@ -2052,7 +2145,7 @@ function hook_queue_info_alter(&$queues) {
 }
 
 /**
- * Alter the information provided in \Drupal\Core\Condition\ConditionManager::getDefinitions().
+ * Alter the information provided in ConditionManager::getDefinitions().
  *
  * @param array $definitions
  *   The array of condition definitions.
@@ -2078,7 +2171,7 @@ function hook_condition_info_alter(array &$definitions) {
  * this hook. All core modules use MailManagerInterface->mail() for messaging,
  * it is best practice but not mandatory in contributed modules.
  *
- * @param $message
+ * @param array $message
  *   An array containing the message data. Keys in this array include:
  *   - 'id':
  *     The MailManagerInterface->mail() id of the message. Look at module source
@@ -2130,9 +2223,9 @@ function hook_mail_alter(&$message) {
  * unlike hook_mail_alter(), is only called on the $module argument to
  * MailManagerInterface->mail(), not all modules.
  *
- * @param $key
+ * @param string $key
  *   An identifier of the mail.
- * @param $message
+ * @param array $message
  *   An array to be filled in. Elements in this array include:
  *   - id: An ID to identify the mail sent. Look at module source code or
  *     MailManagerInterface->mail() for possible id values.
@@ -2153,7 +2246,7 @@ function hook_mail_alter(&$message) {
  *   - headers: Associative array containing mail headers, such as From,
  *     Sender, MIME-Version, Content-Type, etc.
  *     MailManagerInterface->mail() pre-fills several headers in this array.
- * @param $params
+ * @param array $params
  *   An array of parameters supplied by the caller of
  *   MailManagerInterface->mail().
  *
@@ -2186,7 +2279,7 @@ function hook_mail($key, &$message, $params): void {
     $variables += [
       '%uid' => $node->getOwnerId(),
       '%url' => $node->toUrl('canonical', ['absolute' => TRUE])->toString(),
-      '%node_type' => node_get_type_label($node),
+      '%node_type' => $node->getBundleEntity()->label(),
       '%title' => $node->getTitle(),
       '%teaser' => $node->teaser,
       '%body' => $node->body,
@@ -2214,7 +2307,7 @@ function hook_mail_backend_info_alter(&$info) {
 /**
  * Alter the default country list.
  *
- * @param $countries
+ * @param string[][] $countries
  *   The associative array of countries keyed by two-letter country code.
  *
  * @see \Drupal\Core\Locale\CountryManager::getList()
@@ -2339,7 +2432,7 @@ function hook_config_import_steps_alter(&$sync_steps, \Drupal\Core\Config\Config
  *
  * For adding new data types use configuration schema YAML files instead.
  *
- * @param $definitions
+ * @param array $definitions
  *   Associative array of configuration type definitions keyed by schema type
  *   names. The elements are themselves array with information about the type.
  *
@@ -2613,11 +2706,11 @@ function hook_validation_constraint_alter(array &$definitions) {
  * Making the expensive service lazy means that the class is only dependent on
  * the proxy service, and not on all the dependencies of the lazy service.
  *
- * To define a service as lazy, add @code lazy: true @endcode to the service
- * definition, and use the @code core/scripts/generate-proxy.sh @endcode script
- * to generate the proxy class.
+ * To define a service as lazy, add "lazy: true" to the service definition, and
+ * use the "core/scripts/generate-proxy-class.php" script to generate the proxy
+ * class.
  *
- * @see core/scripts/generate-proxy.sh
+ * @see core/scripts/generate-proxy-class.php
  */
 
 /**

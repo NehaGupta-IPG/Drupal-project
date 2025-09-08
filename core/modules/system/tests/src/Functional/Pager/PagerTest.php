@@ -7,12 +7,12 @@ namespace Drupal\Tests\system\Functional\Pager;
 use Behat\Mink\Element\NodeElement;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests pager functionality.
- *
- * @group Pager
  */
+#[Group('Pager')]
 class PagerTest extends BrowserTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -33,8 +33,6 @@ class PagerTest extends BrowserTestBase {
    * @var \Drupal\user\UserInterface
    */
   protected $adminUser;
-
-  protected $profile = 'testing';
 
   /**
    * {@inheritdoc}
@@ -181,14 +179,14 @@ class PagerTest extends BrowserTestBase {
 
     // We loop through the page with the test data query parameters, and check
     // that the active page for each pager element has the expected page
-    // (1-indexed) and resulting query parameter
+    // (1-indexed) and resulting query parameter.
     foreach ($test_data as $data) {
       $input_query = str_replace(' ', '%20', $data['input_query']);
       $this->drupalGet($this->getAbsoluteUrl(parse_url($this->getUrl())['path'] . $input_query), ['external' => TRUE]);
       foreach ([0, 1, 4] as $pager_element) {
         $active_page = $this->cssSelect("div.test-pager-{$pager_element} ul.pager__items li.is-active:contains('{$data['expected_page'][$pager_element]}')");
         $destination = str_replace('%2C', ',', $active_page[0]->find('css', 'a')->getAttribute('href'));
-        $this->assertEquals($data['expected_query'], $destination);
+        $this->assertStringEndsWith($data['expected_query'], $destination);
       }
     }
   }

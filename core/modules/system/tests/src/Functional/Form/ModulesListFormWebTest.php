@@ -6,12 +6,12 @@ namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Tests\BrowserTestBase;
 use Drupal\TestTools\Extension\InfoWriterTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests \Drupal\system\Form\ModulesListForm.
- *
- * @group Form
  */
+#[Group('Form')]
 class ModulesListFormWebTest extends BrowserTestBase {
   use InfoWriterTrait;
 
@@ -95,7 +95,7 @@ class ModulesListFormWebTest extends BrowserTestBase {
    * Tests the module form with a module with an invalid info.yml file.
    */
   public function testModulesListFormWithInvalidInfoFile(): void {
-    $path = \Drupal::getContainer()->getParameter('site.path') . "/modules/broken";
+    $path = $this->root . '/' . \Drupal::getContainer()->getParameter('site.path') . "/modules/broken";
     mkdir($path, 0777, TRUE);
     $file_path = "$path/broken.info.yml";
 

@@ -6,15 +6,15 @@ namespace Drupal\Tests\path\Functional;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
+use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
 use Drupal\user\Entity\User;
 use Drupal\user\Plugin\LanguageNegotiation\LanguageNegotiationUser;
-use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Confirm that paths work with translated nodes.
- *
- * @group path
  */
+#[Group('path')]
 class PathLanguageTest extends PathTestBase {
 
   use ContentTranslationTestTrait;
@@ -116,7 +116,6 @@ class PathLanguageTest extends PathTestBase {
     $languages = $this->container->get('language_manager')->getLanguages();
 
     // Ensure the node was created.
-    $node_storage->resetCache([$english_node->id()]);
     $english_node = $node_storage->load($english_node->id());
     $english_node_french_translation = $english_node->getTranslation('fr');
     $this->assertTrue($english_node->hasTranslation('fr'), 'Node found in database.');

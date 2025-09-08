@@ -6,12 +6,12 @@ namespace Drupal\Tests\block_content\Functional;
 
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the block content translation UI.
- *
- * @group block_content
  */
+#[Group('block_content')]
 class BlockContentTranslationUITest extends ContentTranslationUITestBase {
 
   /**
@@ -140,7 +140,6 @@ class BlockContentTranslationUITest extends ContentTranslationUITestBase {
   protected function doTestTranslationEdit(): void {
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($this->entityTypeId);
-    $storage->resetCache([$this->entityId]);
     $entity = $storage->load($this->entityId);
     $languages = $this->container->get('language_manager')->getLanguages();
 

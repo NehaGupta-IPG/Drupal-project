@@ -54,7 +54,7 @@ class BlockViewBuilderTest extends KernelTestBase {
       ->get('entity_type.manager')
       ->getStorage('block');
 
-    \Drupal::state()->set('block_test.content', 'Llamas &gt; unicorns!');
+    \Drupal::keyValue('block_test')->set('content', 'Llamas &gt; unicorns!');
 
     // Create a block with only required values.
     $this->block = $this->controller->create([
@@ -70,10 +70,31 @@ class BlockViewBuilderTest extends KernelTestBase {
   }
 
   /**
+   * Tests rendering a block plugin that returns an empty array.
+   */
+  public function testEmptyRender(): void {
+    \Drupal::keyValue('block_test')->set('content', '');
+
+    $entity = $this->controller->create([
+      'id' => 'test_block1',
+      'theme' => 'stark',
+      'plugin' => 'test_empty',
+    ]);
+    $entity->save();
+
+    // Test the rendering of a block.
+    $entity = Block::load('test_block1');
+    $builder = \Drupal::entityTypeManager()->getViewBuilder('block');
+    $output = $builder->view($entity, 'block');
+    $expected_output = '';
+    $this->assertSame($expected_output, (string) $this->renderer->renderRoot($output));
+  }
+
+  /**
    * Tests the rendering of blocks.
    */
   public function testBasicRendering(): void {
-    \Drupal::state()->set('block_test.content', '');
+    \Drupal::keyValue('block_test')->set('content', '');
 
     $entity = $this->controller->create([
       'id' => 'test_block1',
@@ -136,10 +157,34 @@ class BlockViewBuilderTest extends KernelTestBase {
       'plugin' => 'test_cache',
     ]);
     $this->block->save();
-    \Drupal::state()->set('block_test.content', NULL);
+    \Drupal::keyValue('block_test')->set('content', NULL);
 
     // Verify cache handling for an empty block.
     $this->verifyRenderCacheHandling();
+  }
+
+  /**
+   * Tests title block render cache handling.
+   *
+   * @see \Drupal\block_test\Hook\BlockTestHooks::blockViewPageTitleBlockAlter()
+   */
+  public function testBlockViewBuilderCacheTitleBlock(): void {
+    // Create title block.
+    $this->block = $this->controller->create([
+      'id' => 'test_block_title',
+      'theme' => 'stark',
+      'plugin' => 'page_title_block',
+    ]);
+    $this->block->save();
+
+    $entity = Block::load('test_block_title');
+    $builder = \Drupal::entityTypeManager()->getViewBuilder('block');
+    $output = $builder->view($entity, 'block');
+
+    $this->assertSame(
+      ['block_view', 'config:block.block.test_block_title', 'custom_cache_tag'],
+      $output['#cache']['tags']
+    );
   }
 
   /**
@@ -203,7 +248,7 @@ class BlockViewBuilderTest extends KernelTestBase {
     $this->assertSame('Llamas > unicorns!', trim((string) $this->cssSelect('[foo=bar]')[0]));
     \Drupal::state()->set('block_test_view_alter_suffix', FALSE);
 
-    \Drupal::state()->set('block_test.content', NULL);
+    \Drupal::keyValue('block_test')->set('content', NULL);
     Cache::invalidateTags($this->block->getCacheTagsToInvalidate());
 
     // Advanced: cached block, but an alter hook adds a #pre_render callback to
@@ -303,17 +348,17 @@ class BlockViewBuilderTest extends KernelTestBase {
 
     $required_cache_contexts = ['languages:' . LanguageInterface::TYPE_INTERFACE, 'theme', 'user.permissions'];
 
-    // Check that the expected cacheability metadata is present in:
-    // - the built render array;
+    // Check that the expected cacheability metadata is present in the built
+    // render array.
     $build = $this->getBlockRenderArray();
     $this->assertSame($expected_keys, $build['#cache']['keys']);
     $this->assertEqualsCanonicalizing($expected_contexts, $build['#cache']['contexts']);
     $this->assertEqualsCanonicalizing($expected_tags, $build['#cache']['tags']);
     $this->assertSame($expected_max_age, $build['#cache']['max-age']);
     $this->assertFalse(isset($build['#create_placeholder']));
-    // - the rendered render array;
+    // And also in the rendered render array.
     $this->renderer->renderRoot($build);
-    // - the render cache item.
+    // And also in the render cache item.
     $final_cache_contexts = Cache::mergeContexts($expected_contexts, $required_cache_contexts);
     $cache_item = $cache_bin->get($expected_keys, CacheableMetadata::createFromRenderArray($build));
     $this->assertNotEmpty($cache_item, 'The block render element has been cached with the expected cache keys.');

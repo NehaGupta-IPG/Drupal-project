@@ -6,12 +6,12 @@ namespace Drupal\Tests\taxonomy\Functional;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the taxonomy RSS display.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
 class RssTest extends TaxonomyTestBase {
 
   /**
@@ -59,7 +59,7 @@ class RssTest extends TaxonomyTestBase {
       ],
       'auto_create' => TRUE,
     ];
-    $this->createEntityReferenceField('node', 'article', $this->fieldName, NULL, 'taxonomy_term', 'default', $handler_settings, FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+    $this->createEntityReferenceField('node', 'article', $this->fieldName, '', 'taxonomy_term', 'default', $handler_settings, FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
 
     /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
     $display_repository = \Drupal::service('entity_display.repository');
@@ -101,6 +101,7 @@ class RssTest extends TaxonomyTestBase {
     $node = $this->drupalCreateNode([
       'type' => 'article',
       $this->fieldName => $term1->id(),
+      'promote' => TRUE,
     ]);
 
     // Check that the term is displayed when the RSS feed is viewed.

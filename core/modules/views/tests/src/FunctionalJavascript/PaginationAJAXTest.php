@@ -8,12 +8,12 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the click sorting AJAX functionality of Views exposed forms.
- *
- * @group views
  */
+#[Group('views')]
 class PaginationAJAXTest extends WebDriverTestBase {
 
   use ContentTypeCreationTrait;
@@ -30,11 +30,17 @@ class PaginationAJAXTest extends WebDriverTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * @var array
    * Test Views to enable.
+   *
+   * @var array
    */
   public static $testViews = ['test_content_ajax'];
 
+  /**
+   * The test user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
   protected $user;
 
   /**
@@ -252,6 +258,24 @@ class PaginationAJAXTest extends WebDriverTestBase {
       $this->assertNotContains($script->getAttribute('src'), $script_src);
       $script_src[] = $script->getAttribute('src');
     }
+  }
+
+  /**
+   * Tests when a user navigates directly using a page number parameter.
+   */
+  public function testPaginationAjaxWithTitleFilter(): void {
+    // Visit the page url /test-content-ajax-filter?page=3.
+    $this->drupalGet('test-content-ajax-filter', ['query' => ['page' => 3]]);
+    $session_assert = $this->assertSession();
+    $page = $this->getSession()->getPage();
+
+    // Filter by title using the exposed form.
+    $session_assert->elementExists('css', 'input[name="title"]')->setValue('Node 11 content');
+    $session_assert->elementExists('css', 'input[value="Filter"]')->click();
+    $session_assert->assertWaitOnAjaxRequest();
+
+    $rows = $page->findAll('css', 'tbody tr');
+    $this->assertStringContainsString('Node 11 content', $rows[0]->getHtml());
   }
 
 }

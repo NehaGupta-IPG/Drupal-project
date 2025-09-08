@@ -13,12 +13,12 @@ use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Tests\AssertViewsCacheTagsTrait;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the default frontpage provided by views.
- *
- * @group node
  */
+#[Group('node')]
 class FrontPageTest extends ViewTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -62,7 +62,8 @@ class FrontPageTest extends ViewTestBase {
 
     $view = Views::getView('frontpage');
 
-    // Tests \Drupal\node\Plugin\views\row\RssPluginBase::calculateDependencies().
+    // Tests
+    // \Drupal\node\Plugin\views\row\RssPluginBase::calculateDependencies().
     $expected = [
       'config' => [
         'core.entity_view_mode.node.rss',
@@ -277,6 +278,7 @@ class FrontPageTest extends ViewTestBase {
         'created' => $i,
         'title' => $this->randomMachineName(8),
         'nid' => $i + 1,
+        'promote' => TRUE,
       ]);
       $node->enforceIsNew(TRUE);
       $node->save();
