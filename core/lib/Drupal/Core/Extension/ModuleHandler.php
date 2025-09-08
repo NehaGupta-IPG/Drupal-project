@@ -19,16 +19,16 @@ class ModuleHandler implements ModuleHandlerInterface {
   /**
    * List of loaded files.
    *
-   * @var array
+   * @var array<string, true>
    *   An associative array whose keys are file paths of loaded files, relative
    *   to the application's root directory.
    */
   protected $loadedFiles;
 
   /**
-   * List of installed modules.
+   * Installed modules, as extension objects keyed by module name.
    *
-   * @var \Drupal\Core\Extension\Extension[]
+   * @var array<string, \Drupal\Core\Extension\Extension>
    */
   protected $moduleList;
 
@@ -40,9 +40,9 @@ class ModuleHandler implements ModuleHandlerInterface {
   protected $loaded = FALSE;
 
   /**
-   * List of events which implement an alter hook keyed by hook name(s).
+   * Lists of callbacks which implement an alter hook, keyed by hook name(s).
    *
-   * @var array
+   * @var array<string, list<callable>>
    */
   protected array $alterEventListeners = [];
 
@@ -56,7 +56,11 @@ class ModuleHandler implements ModuleHandlerInterface {
   /**
    * A list of module include file keys.
    *
-   * @var array
+   * The array keys are generated from the arguments to ->loadInclude().
+   * Each value is either the path of a file that was successfully included, or
+   * FALSE if the given file did not exist.
+   *
+   * @var array<string, string|false>
    */
   protected $includeFileKeys = [];
 
@@ -290,6 +294,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function loadAllIncludes($type, $name = NULL) {
+    @trigger_error("ModuleHandler::loadAllIncludes() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3536432", E_USER_DEPRECATED);
     foreach ($this->moduleList as $module => $filename) {
       $this->loadInclude($module, $type, $name);
     }
@@ -624,12 +629,12 @@ class ModuleHandler implements ModuleHandlerInterface {
   /**
    * Reorder modules for alters.
    *
-   * @param array $modules
-   *   A list of modules.
+   * @param list<string> $modules
+   *   A list of module names.
    * @param string $hook
    *   The hook being worked on, for example form_alter.
    *
-   * @return array
+   * @return list<string>
    *   The list, potentially reordered and changed by
    *   hook_module_implements_alter().
    */

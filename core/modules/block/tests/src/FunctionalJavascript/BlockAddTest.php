@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\block\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the JS functionality in the block add form.
- *
- * @group block
  */
+#[Group('block')]
 class BlockAddTest extends WebDriverTestBase {
 
   /**
@@ -52,7 +52,7 @@ class BlockAddTest extends WebDriverTestBase {
     $assert_session->elementTextContains('css', '.vertical-tabs__menu-item-title', 'Response status');
     $assert_session->elementTextNotContains('css', '.vertical-tabs__menu-item-title', $summary_text);
 
-    // Search for the "Pages" tab link and click it
+    // Search for the "Pages" tab link and click it.
     $this->getSession()->getPage()->find('css', 'a[href="#edit-visibility-request-path"]')->click();
     // Check that the corresponding form section is open and visible.
     $form_section = $this->getSession()->getPage()->find('css', '#edit-visibility-request-path');

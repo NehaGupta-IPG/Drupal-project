@@ -10,8 +10,20 @@ if (PHP_SAPI !== 'cli') {
   return;
 }
 
+$args = $_SERVER['argv'];
+
+if (!isset($args[1])) {
+  echo "PHPStan baseline file path not specified.\n";
+  exit(2);
+}
 $ignoreErrors = [];
-require __DIR__ . '/../../core/.phpstan-baseline.php';
+require $args[1];
+
+if (!isset($args[2])) {
+  echo "Report output file path not specified.\n";
+  exit(2);
+}
+$outputFilePath = $args[2];
 
 $outputFilePath = __DIR__ . "/../../";
 if ($artifactsDirectory = getenv('_ARTIFACTS_DIR')) {

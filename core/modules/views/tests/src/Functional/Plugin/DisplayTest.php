@@ -8,12 +8,12 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
 use Drupal\views_test_data\Plugin\views\display\DisplayTest as DisplayTestPlugin;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the basic display plugin.
- *
- * @group views
  */
+#[Group('views')]
 class DisplayTest extends ViewTestBase {
 
   /**
@@ -392,7 +392,7 @@ class DisplayTest extends ViewTestBase {
 
     // Remove the relationship used by other handlers.
     $view->removeHandler('default', 'relationship', 'uid');
-    // Validate display
+    // Validate display.
     $errors = $view->validate();
     // Check that the error messages are shown.
     $this->assertCount(2, $errors['default'], 'Error messages found for required relationship');
