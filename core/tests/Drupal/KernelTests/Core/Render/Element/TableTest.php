@@ -304,4 +304,28 @@ class TableTest extends KernelTestBase {
     $this->assertRaw('Update my favorite fruit is <strong>bananas</strong>');
   }
 
+  /**
+   * Tests that #type 'hidden' or 'value' elements do not create empty <td>s.
+   */
+  public function testHiddenAndValueElementsSkipped(): void {
+    $table = [
+      '#type' => 'table',
+      '#header' => ['Visible', 'Hidden/Value'],
+      '#rows' => [
+        [
+          'visible' => ['#markup' => 'I am visible'],
+          'hidden_value' => ['#type' => 'value', '#value' => 42],
+        ],
+      ],
+    ];
+
+    $this->render($table);
+
+    // Assert the visible cell exists.
+    $this->assertRaw('I am visible');
+
+    // Assert that the hidden/value cell exists but has class "visually-hidden".
+    $this->assertRaw('class="visually-hidden"');
+  }
+
 }
