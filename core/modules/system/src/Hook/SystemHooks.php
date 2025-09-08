@@ -197,15 +197,6 @@ class SystemHooks {
   }
 
   /**
-   * Implements hook_entity_type_build().
-   */
-  #[Hook('entity_type_build')]
-  public function entityTypeBuild(array &$entity_types): void {
-    /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
-    $entity_types['date_format']->setFormClass('add', 'Drupal\system\Form\DateFormatAddForm')->setFormClass('edit', 'Drupal\system\Form\DateFormatEditForm')->setFormClass('delete', 'Drupal\system\Form\DateFormatDeleteForm')->setListBuilderClass('Drupal\system\DateFormatListBuilder')->setLinkTemplate('edit-form', '/admin/config/regional/date-time/formats/manage/{date_format}')->setLinkTemplate('delete-form', '/admin/config/regional/date-time/formats/manage/{date_format}/delete')->setLinkTemplate('collection', '/admin/config/regional/date-time/formats');
-  }
-
-  /**
    * Implements hook_block_view_BASE_BLOCK_ID_alter().
    */
   #[Hook('block_view_system_main_block_alter')]
