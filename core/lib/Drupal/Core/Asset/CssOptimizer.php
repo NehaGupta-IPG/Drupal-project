@@ -43,7 +43,7 @@ class CssOptimizer implements AssetOptimizerInterface {
       throw new \Exception('Only file CSS assets can be optimized. Path: ' . $css_asset['data']);
     }
     if (!$css_asset['preprocess']) {
-      throw new \Exception('Only file CSS assets with preprocessing enabled can be optimized. ' . $css_asset['data']);
+      throw new \Exception('Only file CSS assets with preprocessing enabled can be optimized. Path: ' . $css_asset['data']);
     }
 
     return $this->processFile($css_asset);
