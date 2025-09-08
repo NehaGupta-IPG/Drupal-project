@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Htmx;
 
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
