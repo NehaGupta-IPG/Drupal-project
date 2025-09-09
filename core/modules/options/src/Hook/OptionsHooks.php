@@ -3,6 +3,7 @@
 namespace Drupal\options\Hook;
 
 use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\Core\Url;
@@ -53,6 +54,14 @@ class OptionsHooks {
   }
 
   /**
+   * Implements hook_element_info_alter().
+   */
+  #[Hook('element_info_alter')]
+  public function elementInfoAlter(&$type): void {
+    array_unshift($type['select']['#process'], [__CLASS__, 'processSelect']);
+  }
+
+  /**
    * Implements hook_ENTITY_TYPE_update() for 'field_storage_config'.
    */
   #[Hook('field_storage_config_update')]
@@ -82,6 +91,32 @@ class OptionsHooks {
         throw new FieldStorageDefinitionUpdateForbiddenException("A list field '{$field_storage->getName()}' with existing data cannot have its keys changed.");
       }
     }
+  }
+
+  /**
+   * Processes a select list form element.
+   *
+   * This process callback maps the '_none' special value to an #empty_option
+   * and #empty_value of a Select.
+   *
+   * @param array $element
+   *   The form element to process.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   * @param array $complete_form
+   *   The complete form structure.
+   *
+   * @return array
+   *   The processed element.
+   */
+  public static function processSelect(&$element, FormStateInterface $form_state, &$complete_form) {
+    if (isset($element['#options']['_none']) && $element['#multiple'] === FALSE) {
+      $element['#empty_value'] = '';
+      $element['#empty_option'] = $element['#options']['_none'];
+      unset($element['#options']['_none']);
+    }
+
+    return $element;
   }
 
 }

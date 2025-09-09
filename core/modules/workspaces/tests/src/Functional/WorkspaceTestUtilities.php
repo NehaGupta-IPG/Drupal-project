@@ -61,12 +61,12 @@ trait WorkspaceTestUtilities {
    * @param string|null $id
    *   The ID of the workspace to create.
    * @param string $parent
-   *   (optional) The ID of the parent workspace. Defaults to ''.
+   *   (optional) The ID of the parent workspace. Defaults to '_none'.
    *
    * @return \Drupal\workspaces\WorkspaceInterface
    *   The workspace that was just created.
    */
-  protected function createAndActivateWorkspaceThroughUi(?string $label = NULL, ?string $id = NULL, string $parent = ''): WorkspaceInterface {
+  protected function createAndActivateWorkspaceThroughUi(?string $label = NULL, ?string $id = NULL, string $parent = '_none'): WorkspaceInterface {
     $id ??= $this->randomMachineName();
     $label ??= $this->randomString();
 
@@ -94,12 +94,12 @@ trait WorkspaceTestUtilities {
    * @param string|null $id
    *   The ID of the workspace to create.
    * @param string $parent
-   *   (optional) The ID of the parent workspace. Defaults to ''.
+   *   (optional) The ID of the parent workspace. Defaults to '_none'.
    *
    * @return \Drupal\workspaces\WorkspaceInterface
    *   The workspace that was just created.
    */
-  protected function createWorkspaceThroughUi(?string $label = NULL, ?string $id = NULL, string $parent = '') {
+  protected function createWorkspaceThroughUi(?string $label = NULL, ?string $id = NULL, string $parent = '_none') {
     $id ??= $this->randomMachineName();
     $label ??= $this->randomString();
 

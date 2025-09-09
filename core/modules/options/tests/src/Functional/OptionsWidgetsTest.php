@@ -166,7 +166,7 @@ class OptionsWidgetsTest extends FieldTestBase {
     $this->assertSession()->checkboxNotChecked('edit-card-1-2');
 
     // Unselect option.
-    $edit = ['card_1' => ''];
+    $edit = ['card_1' => '_none'];
     $this->submitForm($edit, 'Save');
     $this->assertFieldValues($entity_init, 'card_1', []);
 
@@ -480,13 +480,13 @@ class OptionsWidgetsTest extends FieldTestBase {
 
     // Check that the 'none' option has no effect if actual options are selected
     // as well.
-    $edit = ['card_2[]' => ['' => '', 0 => 0]];
+    $edit = ['card_2[]' => ['_none' => '_none', 0 => 0]];
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     $this->submitForm($edit, 'Save');
     $this->assertFieldValues($entity_init, 'card_2', [0]);
 
     // Check that selecting the 'none' option empties the field.
-    $edit = ['card_2[]' => ['' => '']];
+    $edit = ['card_2[]' => ['_none' => '_none']];
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     $this->submitForm($edit, 'Save');
     $this->assertFieldValues($entity_init, 'card_2', []);
@@ -530,7 +530,7 @@ class OptionsWidgetsTest extends FieldTestBase {
     $this->assertFalse($this->assertSession()->optionExists('card_2', 2)->isSelected());
 
     // Submit form: Unselect the option.
-    $edit = ['card_2[]' => ['' => '']];
+    $edit = ['card_2[]' => ['_none' => '_none']];
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     $this->submitForm($edit, 'Save');
     $this->assertFieldValues($entity_init, 'card_2', []);
@@ -611,9 +611,13 @@ class OptionsWidgetsTest extends FieldTestBase {
     ]);
     $entity->save();
 
-    // Display form: check that empty '' option is present and has label.
+    // Display form: check that _none options are present and has label.
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
-    $this->assertNotEmpty($this->xpath('//div[@id=:id]//input[@value=:value]', [':id' => 'edit-card-1', ':value' => '']), 'A test radio button has a "None" choice.');
+    // Verify that a test radio button has a "None" choice.
+    $this->assertSession()->elementExists('xpath', '//div[@id="edit-card-1"]//input[@value="_none"]');
+    // Verify that a test radio button has a "N/A" choice..
+    $this->assertSession()->elementExists('xpath', '//div[@id="edit-card-1"]//label[@for="edit-card-1-none"]');
+    $this->assertSession()->elementTextEquals('xpath', '//div[@id="edit-card-1"]//label[@for="edit-card-1-none"]', "N/A");
 
     // Change it to the select widget.
     $display_repository->getFormDisplay('entity_test', 'entity_test')
