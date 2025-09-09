@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the language formatter update.
@@ -13,9 +14,8 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
  * hardcoded values.
  *
  * @see language_post_update_language_component_plain_text()
- *
- * @group Update
  */
+#[Group('Update')]
 class NodeLanguageFormatterUpdateTest extends UpdatePathTestBase {
 
   /**
