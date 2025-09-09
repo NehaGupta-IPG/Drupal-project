@@ -97,7 +97,9 @@ class UniquePathAliasConstraintValidator extends ConstraintValidator implements 
     foreach ($this->entityTypeManager->getStorage('view')->loadMultiple() as $view) {
       if (array_find(
         $view->get('display'),
-        fn($display) => $display['display_plugin'] === 'page' && $display["display_options"]["path"] === $alias)
+        fn($display) => $display['display_plugin'] === 'page'
+        && isset($display['display_options']['path'])
+        && $display["display_options"]["path"] === $alias)
       ) {
         return $view->label();
       }
