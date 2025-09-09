@@ -5,11 +5,16 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Htmx;
 
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
+use Drupal\Core\Render\MainContent\HtmxRenderer;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the cache headers set HtmxRenderer responses.
  */
+#[CoversClass(HtmxRenderer::class)]
+#[Group('Htmx')]
 class HtmxRendererCacheTest extends BrowserTestBase {
 
   /**
