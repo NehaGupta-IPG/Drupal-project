@@ -435,7 +435,7 @@ class ImageItem extends FileItem {
       'title' => $random->sentences(4),
       'width' => $width,
       'height' => $height,
-      'display' => (int) $settings['display_default'],
+      'display' => isset($settings['display_default']) ? (int) $settings['display_default'] : 1,
     ];
     return $values;
   }
