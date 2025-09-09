@@ -26,7 +26,7 @@ final class FormTestRadiosRequiredForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
-    $form['radios-example-0'] = [
+    $form['radios-required'] = [
       '#type' => 'radios',
       '#title' => 'Radios required',
       '#options' => [
@@ -36,7 +36,7 @@ final class FormTestRadiosRequiredForm extends FormBase {
       ],
       '#required' => TRUE,
     ];
-    $form['radios-example-1'] = [
+    $form['radios-required-with-default'] = [
       '#type' => 'radios',
       '#title' => 'Radios required with default value',
       '#options' => [
@@ -47,7 +47,7 @@ final class FormTestRadiosRequiredForm extends FormBase {
       '#required' => TRUE,
       '#default_value' => 1,
     ];
-    $form['radios-example-2'] = [
+    $form['radios-not-required'] = [
       '#type' => 'radios',
       '#title' => 'Radios not required',
       '#options' => [
