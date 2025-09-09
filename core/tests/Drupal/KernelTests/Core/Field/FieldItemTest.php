@@ -4,20 +4,24 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Field;
 
+use Drupal\Core\Field\FieldItemBase;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
-use PHPUnit\Framework\Attributes\Group;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 
 /**
  * Test field item methods.
+ *
+ * @group Field
  */
-#[Group('Field')]
 class FieldItemTest extends EntityKernelTestBase {
 
   /**
+   * The name of the test field.
+   *
    * @var string
    */
   protected $fieldName;
@@ -65,16 +69,9 @@ class FieldItemTest extends EntityKernelTestBase {
       $this->fieldName => $this->randomString(),
     ]);
 
-    // Save a new entity and verify that the initial field value is overwritten
-    // with a value containing the entity id, which implies a resave. Check that
-    // the entity data structure and the stored values match.
     $this->assertSavedFieldItemValue($entity, "field_test:{$this->fieldName}:1:1");
-
-    // Update the entity and verify that the field value is overwritten on
-    // presave if it is not resaved.
     $this->assertSavedFieldItemValue($entity, 'overwritten');
 
-    // Flag the field value as needing to be resaved and verify it actually is.
     $entity->field_test_item->value = $entity->{$this->fieldName}->value = 'resave';
     $this->assertSavedFieldItemValue($entity, "field_test:{$this->fieldName}:1:3");
   }
@@ -110,6 +107,75 @@ class FieldItemTest extends EntityKernelTestBase {
     $label = 'Foo bar';
     $data_definition->setLabel($label);
     $this->assertEquals($label, $data_definition->getLabel());
+  }
+
+  /**
+   * Tests the new property definition methods.
+   */
+  public function testPropertyDefinitions(): void {
+    $entity = EntityTestMulRev::create([
+      'name' => 'test entity',
+      $this->fieldName => 'test value',
+    ]);
+    $field_item = $entity->{$this->fieldName}[0];
+
+    // getPropertyDefinitions() proxies to the data definition.
+    $definitions = $field_item->getPropertyDefinitions();
+    $this->assertIsArray($definitions);
+    $this->assertArrayHasKey('value', $definitions);
+
+    // getPropertyDefinition($name) returns a single definition.
+    $value_definition = $field_item->getPropertyDefinition('value');
+    $this->assertNotNull($value_definition);
+
+    // Instead of getName(), assert the data type (Drupal 11 compatible).
+    $this->assertEquals('string', $value_definition->getDataType());
+  }
+
+  /**
+   * Tests nullsafe operators in getEntity() and getLangcode.
+   *
+   * @note cspell:ignore nullsafe Nullsafe
+   */
+  public function testNullsafeGetEntityAndLangcode(): void {
+    $definition = \Drupal::typedDataManager()->createDataDefinition('field_item:string');
+
+    $field_item = new class($definition) extends FieldItemBase {
+
+      /**
+       * {@inheritdoc}
+       *
+       * Defines the properties of the field item.
+       *
+       * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $field_definition
+       *   The field storage definition for which to define properties.
+       *
+       * @return array
+       *   An array of property definitions for this field item.
+       */
+      public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition): array {
+        return [];
+      }
+
+      /**
+       * {@inheritdoc}
+       *
+       * Provides the database schema for the field storage of this field item.
+       *
+       * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $field_definition
+       *   The field storage definition for which to generate the schema.
+       *
+       * @return array
+       *   An array representing the database schema for this field item.
+       */
+      public static function schema(FieldStorageDefinitionInterface $field_definition): array {
+        return [];
+      }
+
+    };
+
+    $this->assertNull($field_item->getEntity());
+    $this->assertNull($field_item->getLangcode());
   }
 
 }
