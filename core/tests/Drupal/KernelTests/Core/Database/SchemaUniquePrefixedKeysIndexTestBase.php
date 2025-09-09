@@ -11,7 +11,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 /**
  * Tests adding UNIQUE keys to tables.
  *
- * @todo in drupal:11.0.0, do not drop this test but rather test full length
+ * @todo in drupal:13.0.0, do not drop this test but rather test full length
  *   columns.
  */
 #[Group('Database')]
