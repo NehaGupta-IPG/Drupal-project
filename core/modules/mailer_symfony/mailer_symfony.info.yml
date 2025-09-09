@@ -1,4 +1,4 @@
-name: Mailer
+name: Experimental Mailer
 type: module
 description: 'Provides an experimental API to build and deliver email messages.'
 package: Core (Experimental)
