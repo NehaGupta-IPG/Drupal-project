@@ -155,7 +155,7 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
     if (!$this->preSaveMultilingual && !$update && $language_manager instanceof ConfigurableLanguageManagerInterface) {
       $language_manager::rebuildServices();
     }
-    if (!$update) {
+    if (!$update && !\Drupal::isConfigSyncing()) {
       // Install any available language configuration overrides for the
       // language.
       \Drupal::service('language.config_factory_override')->installLanguageOverrides($this->id());
