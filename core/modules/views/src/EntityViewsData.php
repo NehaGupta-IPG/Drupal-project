@@ -68,10 +68,10 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
   protected $entityFieldManager;
 
   /**
-  * The entity bundle info.
-  *
-  * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
-  */
+   * The entity bundle info.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   */
   protected $entityTypeBundleInfo;
 
   /**
@@ -89,15 +89,21 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
    *   The translation manager.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface|null $entityTypeBundleInfo
+   *   The entity type bundle info.
    */
-  public function __construct(EntityTypeInterface $entity_type, SqlEntityStorageInterface $storage_controller, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, TranslationInterface $translation_manager, EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
+  public function __construct(EntityTypeInterface $entity_type, SqlEntityStorageInterface $storage_controller, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, TranslationInterface $translation_manager, EntityFieldManagerInterface $entity_field_manager, ?EntityTypeBundleInfoInterface $entityTypeBundleInfo = NULL) {
     $this->entityType = $entity_type;
     $this->entityTypeManager = $entity_type_manager;
     $this->storage = $storage_controller;
     $this->moduleHandler = $module_handler;
     $this->setStringTranslation($translation_manager);
     $this->entityFieldManager = $entity_field_manager;
-    $this->entityTypeBundleInfo = $entity_type_bundle_info;
+    if ($entityTypeBundleInfo === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $entityTypeBundleInfo argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/2898635', E_USER_DEPRECATED);
+      $entityTypeBundleInfo = \Drupal::service('entity_type.bundle.info');
+    }
+    $this->entityTypeBundleInfo = $entityTypeBundleInfo;
   }
 
   /**
