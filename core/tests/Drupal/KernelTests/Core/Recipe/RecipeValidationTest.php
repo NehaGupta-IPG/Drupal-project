@@ -8,13 +8,18 @@ use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeFileException;
 use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests recipe.yml validation against expected violations.
  *
  * @group Recipe
  * @group #slow
+ * Tests Recipe Validation.
  */
+#[Group('Recipe')]
+#[Group('#slow')]
 class RecipeValidationTest extends KernelTestBase {
 
   /**
@@ -807,9 +812,8 @@ YAML,
    * @param string|null $recipe_name
    *   (optional) The name of the directory containing `recipe.yml`, or NULL to
    *   randomly generate one.
-   *
-   * @dataProvider providerRecipeValidation
    */
+  #[DataProvider('providerRecipeValidation')]
   public function testRecipeValidation(string $recipe, ?array $expected_violations, ?string $recipe_name = NULL): void {
     $dir = 'public://' . ($recipe_name ?? uniqid());
     mkdir($dir);
