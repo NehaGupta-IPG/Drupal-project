@@ -41,11 +41,10 @@ class Radios extends FormElementBase {
   /**
    * {@inheritdoc}
    *
-   * Overwrite setAttributes to remove unnecessary attributes from the
-   * fieldset for radio groups. These are applied to the child radio
-   * elements instead.
    */
   public static function setAttributes(&$element, $class = []): void {
+    // Remove unnecessary attributes from the fieldset for radio groups. These
+    // are applied to the child radio elements instead.
     if (!empty($class)) {
       if (!isset($element['#attributes']['class'])) {
         $element['#attributes']['class'] = [];
