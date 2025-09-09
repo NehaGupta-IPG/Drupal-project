@@ -13,6 +13,7 @@ use Drupal\Core\Database\Transaction\StackItemType;
 use Drupal\Core\Database\Transaction\TransactionManagerBase;
 use Drupal\Core\Database\TransactionNameNonUniqueException;
 use Drupal\Core\Database\TransactionOutOfOrderException;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 // cspell:ignore Tinky Winky Dipsy
@@ -41,9 +42,8 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
  * and mysqli (MySql) clients do not have a solution to check if a transaction
  * is active, and mysqli does not fail when rolling back and no transaction
  * active.
- *
- * @group Database
  */
+#[Group('Database')]
 class TransactionTest extends DatabaseTestBase {
 
   /**
