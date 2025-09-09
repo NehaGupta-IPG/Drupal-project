@@ -90,8 +90,8 @@ abstract class OptionsWidgetBase extends WidgetBase {
    *   The form state.
    */
   public static function validateElement(array $element, FormStateInterface $form_state) {
-    $empty_option = $element['#empty_option'] ?? '_none';
-    if ($element['#required'] && !empty($empty_option) && $element['#value'] === $empty_option) {
+    $empty_value = $element['#empty_value'] ?? '_none';
+    if ($element['#required'] && !empty($empty_value) && $element['#value'] === $empty_value) {
       if (isset($element['#required_error'])) {
         $form_state->setError($element, $element['#required_error']);
       }
@@ -114,7 +114,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
 
     // Filter out the empty option. Use a strict comparison, because
     // 0 == 'any string'.
-    $index = array_search($empty_option, $values, TRUE);
+    $index = array_search($empty_value, $values, TRUE);
     if ($index !== FALSE) {
       unset($values[$index]);
     }
