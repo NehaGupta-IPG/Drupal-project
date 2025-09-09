@@ -124,6 +124,26 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
   public function &getUnion();
 
   /**
+   * Returns a reference to the Common Table Expressions (CTEs) for this query.
+   *
+   * This includes all CTEs added via with(), recursive or not.
+   *
+   * Because this method returns by reference, alter hooks may edit the CTEs
+   * array directly to make their changes. If just adding CTEs, however, the
+   * use of the with() method is preferred.
+   *
+   * Note that this method must be called by reference as well:
+   *
+   * @code
+   * $ctes =& $query->getCTEs();
+   * @endcode
+   *
+   * @return array
+   *   A reference to the CTE array structure.
+   */
+  public function &getCTEs();
+
+  /**
    * Escapes characters that work as wildcard characters in a LIKE pattern.
    *
    * @param string $string
@@ -456,6 +476,21 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
    *   The called object.
    */
   public function union(SelectInterface $query, $type = '');
+
+  /**
+   * Adds a Common Table Expression (CTE) to the query.
+   *
+   * @param string $name
+   *   The name of the CTE.
+   * @param \Drupal\Core\Database\Query\SelectInterface $query
+   *   The Select query object representing the CTE.
+   * @param bool $recursive
+   *   (optional) Set to TRUE if this is a recursive CTE. Defaults to FALSE.
+   *
+   * @return $this
+   *   The called object.
+   */
+  public function with(string $name, SelectInterface $query, $recursive = FALSE);
 
   /**
    * Groups the result set by the specified field.

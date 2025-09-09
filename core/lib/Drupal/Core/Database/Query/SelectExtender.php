@@ -277,6 +277,13 @@ class SelectExtender implements SelectInterface {
   /**
    * {@inheritdoc}
    */
+  public function &getCTEs() {
+    return $this->query->getCTEs();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function escapeLike($string) {
     return $this->query->escapeLike($string);
   }
@@ -416,6 +423,14 @@ class SelectExtender implements SelectInterface {
    */
   public function union(SelectInterface $query, $type = '') {
     $this->query->union($query, $type);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function with(string $name, SelectInterface $query, $recursive = FALSE) {
+    $this->query->with($name, $query, $recursive);
     return $this;
   }
 
