@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\DatabaseException;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests adding UNIQUE keys to tables.
  *
- * @group Database
- * @group legacy
- *
  * @todo in drupal:11.0.0, do not drop this test but rather test full length
  *   columns.
  */
+#[Group('Database')]
+#[IgnoreDeprecations]
 abstract class SchemaUniquePrefixedKeysIndexTestBase extends DriverSpecificDatabaseTestBase {
 
   /**
