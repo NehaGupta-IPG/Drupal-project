@@ -7,6 +7,6 @@ version: VERSION
 core_version_requirement: '*'
 hidden: true
 install:
-  - core:language
+  - drupal:language
   - entity_test_install
   - testing_config_overrides_module

@@ -3,10 +3,11 @@ type: profile
 description: 'Build a custom site without pre-configured functionality. Suitable for advanced users.'
 version: VERSION
 install:
-  - core:node
-  - core:block
-  - core:dblog
-  - core:page_cache
-  - core:dynamic_page_cache
+  - drupal:node
+  - drupal:block
+  - drupal:dblog
+  - drupal:page_cache
+  - drupal:dynamic_page_cache
 themes:
-  - core:stark
+  - drupal:stark
+

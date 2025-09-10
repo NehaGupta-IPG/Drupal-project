@@ -8,4 +8,4 @@ themes:
   - testing_theme_required_blocks
   - testing_theme_without_blocks
 install:
-  - core:block
+  - drupal:block

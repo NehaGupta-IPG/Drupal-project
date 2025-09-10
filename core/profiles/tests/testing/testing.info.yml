@@ -6,5 +6,5 @@ hidden: true
 install:
   # Enable page_cache and dynamic_page_cache in testing, to ensure that as many
   # tests as possible run with them enabled.
-  - core:page_cache
-  - core:dynamic_page_cache
+  - drupal:page_cache
+  - drupal:dynamic_page_cache
