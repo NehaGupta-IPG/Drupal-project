@@ -43,7 +43,7 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\AllowedValuesConstraint;
   default_formatter: "entity_reference_label",
   list_class: EntityReferenceFieldItemList::class,
 )]
-class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProviderInterface, PreconfiguredFieldUiOptionsInterface {
+class EntityReferenceItem extends EntityReferenceItemBase implements SavableEntityReferenceItemInterface, OptionsProviderInterface, PreconfiguredFieldUiOptionsInterface {
 
   /**
    * Tracks entities currently being saved to prevent infinite recursion.
@@ -53,6 +53,14 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
    *   values are TRUE for entities currently being saved.
    */
   protected static array $savedEntities = [];
+
+  /**
+   * Whether the referenced entity should be saved, when the parent entity is
+   * saved.
+   *
+   * @var bool
+   */
+  protected ?bool $needsEntitySave;
 
   /**
    * {@inheritdoc}
@@ -322,6 +330,16 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
   }
 
   /**
+   * Sets whether the referenced entity should be saved with the parent entity.
+   *
+   * @param bool $needsEntitySave
+   *   The flag value.
+   */
+  public function setNeedsEntitySave(bool $needsEntitySave): void {
+    $this->needsEntitySave = $needsEntitySave;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function preSave() {
@@ -329,24 +347,17 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
       return;
     }
 
-    $parent_entity = $this->getEntity();
-    $save_mode = $this->getFieldDefinition()->getSetting('save_referenced_entities');
-
     // To preserve BC, default to saving only new entities.
-    $do_save = match ($save_mode) {
-      'disabled' => FALSE,
-      'changed_only' => $this->hasChangedEntity(),
-      'always' => TRUE,
-      default => $this->hasNewEntity(),
-    };
+    $do_save = $this->needsEntitySave ?? $this->hasNewEntity();
 
     if ($do_save) {
       $referenced_entity = $this->entity ?? NULL;
-      if (!($referenced_entity instanceof EntityInterface)) {
+      if (!$referenced_entity instanceof EntityInterface) {
         return;
       }
 
       // Prevent infinite recursion by tracking entities being saved.
+      $parent_entity = $this->getEntity();
       $parent_key = $parent_entity->getEntityTypeId() . ':' . $parent_entity->uuid();
       $referenced_key = $referenced_entity->getEntityTypeId() . ':' . $referenced_entity->uuid();
 
@@ -377,6 +388,10 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
     if (!$this->isEmpty() && $this->target_id === NULL) {
       $this->target_id = $this->entity->id();
     }
+
+    // Reset the entity save status: this will need to be populated again
+    // before the next save.
+    $this->needsEntitySave = NULL;
   }
 
   /**
@@ -572,26 +587,16 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
   }
 
   /**
-   * Determines whether the item holds an unsaved entity.
-   *
-   * This is notably used for "autocreate" widgets, and more generally to
-   * support referencing freshly created entities (they will get saved
-   * automatically as the hosting entity gets saved).
-   *
-   * @return bool
-   *   TRUE if the item holds an unsaved entity.
+   * {@inheritdoc}
    */
   public function hasNewEntity() {
     return !$this->isEmpty() && $this->target_id === NULL && $this->entity->isNew();
   }
 
   /**
-   * Determines whether the item holds a changed entity.
-   *
-   * @return bool
-   *   TRUE if the item holds a changed entity.
+   * {@inheritdoc}
    */
-  protected function hasChangedEntity(): bool {
+  public function hasChangedEntity(): bool {
     if ($this->isEmpty()) {
       return FALSE;
     }
