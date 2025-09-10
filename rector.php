@@ -603,6 +603,7 @@ return RectorConfig::configure()
 #        __DIR__ . '/core/modules/package_manager/tests/src/Kernel/ComposerInspectorTest.php',
 #        __DIR__ . '/core/modules/file/tests/src/Kernel/FileItemValidationTest.php',
 
+        __DIR__ . '/vendor',
         '*/ProxyClass/*',
         '*.api.php',
     ])
