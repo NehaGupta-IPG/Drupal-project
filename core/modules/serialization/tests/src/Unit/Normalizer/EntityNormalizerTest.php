@@ -14,6 +14,7 @@ use Drupal\Tests\Core\Entity\ContentEntityBaseMockableClass;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use Prophecy\Argument;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
@@ -114,6 +115,22 @@ class EntityNormalizerTest extends UnitTestCase {
   public function testDenormalizeWithNoEntityType(): void {
     $this->expectException(UnexpectedValueException::class);
     $this->entityNormalizer->denormalize([], ContentEntityBaseMockableClass::class);
+  }
+
+  /**
+   * Tests denormalize() when entity type ID cannot be determined.
+   *
+   * @legacy-covers ::denormalize
+   */
+  public function testDenormalizeThrowsWhenEntityTypeIdCannotBeDetermined(): void {
+    $this->expectException(UnexpectedValueException::class);
+    $this->expectExceptionMessage('The entity type ID could not be determined.');
+    $this->entityNormalizer->denormalize(
+      ['invalid' => 'data'],
+      ContentEntityBaseMockableClass::class,
+      NULL,
+      []
+    );
   }
 
   /**
@@ -221,12 +238,30 @@ class EntityNormalizerTest extends UnitTestCase {
     // Setup expectations for the serializer. This will be called for each field
     // item.
     $serializer = $this->prophesize('Symfony\Component\Serializer\Serializer');
-    $serializer->denormalize('value_1', get_class($key_1), NULL, ['target_instance' => $key_1, 'entity_type' => 'test'])
-      ->willReturn(NULL)
-      ->shouldBeCalled();
-    $serializer->denormalize('value_2', get_class($key_2), NULL, ['target_instance' => $key_2, 'entity_type' => 'test'])
-      ->willReturn(NULL)
-      ->shouldBeCalled();
+
+    $serializer->denormalize(
+      'value_1',
+      get_class($key_1),
+      NULL,
+      Argument::that(function ($context) use ($key_1) {
+        return isset($context['entity_type'])
+          && $context['entity_type'] === 'test'
+          && isset($context['target_instance'])
+          && $context['target_instance'] === $key_1;
+      })
+    )->willReturn(NULL)->shouldBeCalled();
+
+    $serializer->denormalize(
+      'value_2',
+      get_class($key_2),
+      NULL,
+      Argument::that(function ($context) use ($key_2) {
+        return isset($context['entity_type'])
+          && $context['entity_type'] === 'test'
+          && isset($context['target_instance'])
+          && $context['target_instance'] === $key_2;
+      })
+    )->willReturn(NULL)->shouldBeCalled();
 
     $this->entityNormalizer->setSerializer($serializer->reveal());
 
@@ -371,12 +406,28 @@ class EntityNormalizerTest extends UnitTestCase {
     // Setup expectations for the serializer. This will be called for each field
     // item.
     $serializer = $this->prophesize('Symfony\Component\Serializer\Serializer');
-    $serializer->denormalize('value_1', get_class($key_1), NULL, ['target_instance' => $key_1, 'entity_type' => 'test'])
-      ->willReturn(NULL)
-      ->shouldBeCalled();
-    $serializer->denormalize('value_2', get_class($key_2), NULL, ['target_instance' => $key_2, 'entity_type' => 'test'])
-      ->willReturn(NULL)
-      ->shouldBeCalled();
+
+    $serializer->denormalize(
+        'value_1',
+        get_class($key_1),
+        NULL,
+        Argument::that(function ($context) use ($key_1, $test_data) {
+            return $context['entity_type'] === 'test'
+                && $context['target_instance'] === $key_1
+                && $context['request_data'] === $test_data;
+        })
+    )->willReturn(NULL)->shouldBeCalled();
+
+    $serializer->denormalize(
+        'value_2',
+        get_class($key_2),
+        NULL,
+        Argument::that(function ($context) use ($key_2, $test_data) {
+            return $context['entity_type'] === 'test'
+                && $context['target_instance'] === $key_2
+                && $context['request_data'] === $test_data;
+        })
+    )->willReturn(NULL)->shouldBeCalled();
 
     $this->entityNormalizer->setSerializer($serializer->reveal());
 
