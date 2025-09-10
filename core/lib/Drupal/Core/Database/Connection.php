@@ -683,9 +683,6 @@ abstract class Connection {
    * @param array $args
    *   The arguments for the query.
    *
-   * @return bool
-   *   TRUE if the query was modified, FALSE otherwise.
-   *
    * @throws \InvalidArgumentException
    *   This exception is thrown when:
    *   - A placeholder that ends in [] is supplied, and the supplied value is
