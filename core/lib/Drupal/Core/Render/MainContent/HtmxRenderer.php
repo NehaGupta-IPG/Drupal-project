@@ -56,10 +56,12 @@ class HtmxRenderer implements MainContentRendererInterface {
     $token = Crypt::randomBytesBase64(55);
     $html = [
       '#type' => 'inline_template',
+      // Add a noindex meta tag to make sure this response will not be indexed.
       '#template' => <<<HTMX_RESPONSE
 <!doctype html>
 <html>
 <head>
+<meta name="robots" content="noindex">
 <title>{{ title }}</title>
 <css-placeholder token="{{ placeholder_token }}">
 <js-placeholder token="{{ placeholder_token }}">
@@ -118,6 +120,8 @@ HTMX_RESPONSE,
 
     $response = new HtmlResponse($content, 200, [
       'Content-Type' => 'text/html; charset=UTF-8',
+      // Make sure bots do not show this response in search results.
+      'X-Robots-Tag' => 'noindex',
     ]);
 
     return $response;
