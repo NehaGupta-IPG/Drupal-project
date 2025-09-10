@@ -8,11 +8,14 @@ use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\Plugin\DataType\FloatData;
 use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Config\UnsupportedDataTypeConfigException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\TypedData\Validation\RecursiveContextualValidator
- * @group TypedData
+ * Tests Drupal\Core\TypedData\Plugin\DataType\FloatData.
  */
+#[CoversClass(FloatData::class)]
+#[Group('TypedData')]
 class FloatDataTest extends UnitTestCase {
 
   /**
