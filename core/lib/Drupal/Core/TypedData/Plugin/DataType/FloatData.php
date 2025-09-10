@@ -28,7 +28,7 @@ class FloatData extends PrimitiveBase implements FloatInterface {
   public function getCastedValue() {
     $min = constant('PHP_FLOAT_MIN');
     $max = constant('PHP_FLOAT_MAX');
-    if ($this->value < -$max || 
+    if ($this->value < -$max ||
         $this->value > -$min && $this->value < $min ||
         $this->value > $max
     ) {
