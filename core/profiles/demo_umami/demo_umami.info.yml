@@ -46,6 +46,6 @@ install:
   - drupal:content_translation
   - drupal:announcements_feed
 themes:
-  - drupal:claro
+  - claro
   - umami
 keep_english: true

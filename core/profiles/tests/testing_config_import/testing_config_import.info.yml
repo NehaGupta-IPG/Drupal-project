@@ -7,4 +7,4 @@ install:
   - drupal:syslog
   - testing_config_import_module
 themes:
-  - drupal:stark
+  - stark

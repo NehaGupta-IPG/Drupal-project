@@ -14,5 +14,5 @@ install:
   - drupal:taxonomy
   - nightwatch_theme_install_utility
 themes:
-  - drupal:claro
-  - drupal:olivero
+  - claro
+  - olivero

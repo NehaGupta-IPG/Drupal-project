@@ -9,4 +9,4 @@ install:
   - drupal:page_cache
   - drupal:dynamic_page_cache
 themes:
-  - drupal:stark
+  - stark

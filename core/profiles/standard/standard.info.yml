@@ -36,5 +36,5 @@ install:
   - drupal:automated_cron
   - drupal:announcements_feed
 themes:
-  - drupal:olivero
-  - drupal:claro
+  - olivero
+  - claro
