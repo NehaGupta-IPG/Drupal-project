@@ -583,7 +583,7 @@ return RectorConfig::configure()
 #        __DIR__ . '/core/tests/Drupal/FunctionalTests',
 #        __DIR__ . '/core/tests/Drupal/FunctionalJavascriptTests',
 #        __DIR__ . '/core',
-        __DIR__ . '/*/**/*Test.php',
+        __DIR__,
     ])
     ->withSkip([
         __DIR__ . '/core/tests/Drupal/Tests/Component/Annotation/Doctrine/Fixtures',
