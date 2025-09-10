@@ -16,4 +16,3 @@ install:
 themes:
   - drupal:claro
   - drupal:olivero
-
