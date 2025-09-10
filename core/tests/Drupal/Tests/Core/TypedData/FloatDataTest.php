@@ -45,3 +45,4 @@ class FloatDataTest extends UnitTestCase {
   }
 
 }
+
