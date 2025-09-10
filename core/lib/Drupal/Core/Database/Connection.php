@@ -690,9 +690,7 @@ abstract class Connection {
    *   - A placeholder that does not end in [] is supplied, and the supplied
    *     value is an array.
    */
-  protected function expandArguments(&$query, &$args) {
-    $modified = FALSE;
-
+  protected function expandArguments(&$query, &$args): void {
     // If the placeholder indicated the value to use is an array,  we need to
     // expand it out into a comma-delimited set of placeholders.
     foreach ($args as $key => $data) {
@@ -728,11 +726,8 @@ abstract class Connection {
       // Update the args array with the new placeholders.
       unset($args[$key]);
       $args += $new_keys;
-
-      $modified = TRUE;
     }
 
-    return $modified;
   }
 
   /**
