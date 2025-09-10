@@ -23,5 +23,4 @@ settings:
   file_extensions: 'mp3 wav aac'
   max_filesize: ''
   description_field: false
-  save_referenced_entities: 'new_only'
 field_type: file

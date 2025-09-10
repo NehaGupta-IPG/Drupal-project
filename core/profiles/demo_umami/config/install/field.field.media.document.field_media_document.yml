@@ -26,5 +26,4 @@ settings:
   file_extensions: 'txt rtf doc docx ppt pptx xls xlsx pdf odf odg odp ods odt fodt fods fodp fodg key numbers pages'
   max_filesize: ''
   description_field: false
-  save_referenced_entities: 'new_only'
 field_type: file

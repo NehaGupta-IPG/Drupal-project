@@ -90,7 +90,6 @@ class MigrateFieldInstanceTest extends MigrateDrupal6TestBase {
       'uri_scheme' => 'public',
       'handler' => 'default:file',
       'handler_settings' => [],
-      'save_referenced_entities' => 'new_only',
     ];
     $field_settings = $field->getSettings();
     ksort($expected);

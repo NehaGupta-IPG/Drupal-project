@@ -9,13 +9,11 @@ use Drupal\Core\Entity\ContentEntityStorageInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
-use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\TypedData\EntityDataDefinition;
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\EntityReferenceFieldItemList;
-use Drupal\Core\Field\FieldConfigInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldException;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -72,7 +70,6 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
     return [
       'handler' => 'default',
       'handler_settings' => [],
-      'save_referenced_entities' => 'new_only',
     ] + parent::defaultFieldSettings();
   }
 
@@ -147,10 +144,12 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
     $target_type = $field_definition->getFieldStorageDefinition()->getSetting('target_type');
     $handler_settings = $field_definition->getSetting('handler_settings');
 
-    // Add bundle information to summary.
-    if (isset($handler_settings['target_bundles'])) {
+    if (!isset($handler_settings['target_bundles'])) {
+      return $summary;
+    }
+
       /** @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_bundle_information */
-      $entity_bundle_information = \Drupal::service(EntityTypeBundleInfoInterface::class);
+    $entity_bundle_information = \Drupal::service('entity_type.bundle.info');
       $bundle_info = $entity_bundle_information->getBundleInfo($target_type);
       $bundles = array_map(fn($bundle) => $bundle_info[$bundle]['label'], $handler_settings['target_bundles']);
       $bundle_label = \Drupal::entityTypeManager()->getDefinition($target_type)->getBundleLabel();
@@ -161,22 +160,6 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
           '@entity_type' => implode(', ', $bundles),
         ]);
       }
-    }
-
-    // Add save mode information to summary.
-    $save_mode = $field_definition->getSetting('save_referenced_entities');
-    $save_mode_labels = [
-      'disabled' => new TranslatableMarkup('Never save'),
-      'new_only' => new TranslatableMarkup('Save new only'),
-      'changed_only' => new TranslatableMarkup('Save changed only'),
-      'always' => new TranslatableMarkup('Always save'),
-    ];
-
-    if (isset($save_mode_labels[$save_mode])) {
-      $summary[] = new TranslatableMarkup('Referenced entity save behavior: @mode', [
-        '@mode' => $save_mode_labels[$save_mode],
-      ]);
-    }
 
     return $summary;
   }
@@ -509,7 +492,6 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
    */
   public function fieldSettingsForm(array $form, FormStateInterface $form_state) {
     $field = $form_state->getFormObject()->getEntity();
-    assert($field instanceof FieldConfigInterface);
 
     // Get all selection plugins for this entity type.
     $selection_plugins = \Drupal::service('plugin.manager.entity_reference_selection')->getSelectionGroups($this->getSetting('target_type'));
@@ -533,27 +515,6 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
       '#element_validate' => [[static::class, 'fieldSettingsFormValidate']],
 
     ];
-
-    // Add save mode configuration.
-    $key = 'save_referenced_entities';
-    $default_value = $field->getSetting($key) ?? static::defaultFieldSettings()[$key];
-    $entity_type = \Drupal::entityTypeManager()->getDefinition($field->getTargetEntityTypeId());
-    $form[$key] = [
-      '#type' => 'select',
-      '#title' => $this->t('Referenced item save behavior'),
-      '#description' => $this->t('Configure whether referenced items should be automatically saved, when the referencing %entity_type item is saved.', [
-        '%entity_type' => $entity_type->getLabel(),
-      ]),
-      '#default_value' => $default_value,
-      '#options' => [
-        'disabled' => $this->t('Never save referenced items automatically'),
-        'new_only' => $this->t('Save only new referenced items'),
-        'changed_only' => $this->t('Save only modified referenced items'),
-        'always' => $this->t('Always save referenced items'),
-      ],
-      '#required' => TRUE,
-    ];
-
     $form['handler'] = [
       '#type' => 'details',
       '#title' => $this->t('Reference type'),

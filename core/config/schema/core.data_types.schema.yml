@@ -783,17 +783,6 @@ field.field_settings.entity_reference:
     handler_settings:
       type: entity_reference_selection.[%parent.handler]
       label: 'Entity reference selection plugin settings'
-    save_referenced_entities:
-      type: string
-      label: 'When to save referenced entities'
-      constraints:
-        Choice:
-          choices:
-            - 'disabled'
-            - 'new_only'
-            - 'always'
-            - 'changed_only'
-          message: 'The save mode must be one of: disabled, new_only, changed_only, always.'
 
 field.value.entity_reference:
   type: mapping

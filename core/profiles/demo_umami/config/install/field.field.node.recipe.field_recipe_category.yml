@@ -25,5 +25,4 @@ settings:
       direction: asc
     auto_create: false
     auto_create_bundle: ''
-  save_referenced_entities: 'new_only'
 field_type: entity_reference
