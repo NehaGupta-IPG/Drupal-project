@@ -21,7 +21,6 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\layout_builder\LayoutEntityHelperTrait;
 use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\layout_builder\Section;
-use Drupal\layout_builder\SectionComponent;
 use Drupal\layout_builder\SectionListTrait;
 use Drupal\layout_builder\SectionStorage\SupportAwareSectionStorageManagerInterface;
 
