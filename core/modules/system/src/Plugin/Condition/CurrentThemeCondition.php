@@ -123,6 +123,13 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
   protected function currentThemeAllowed() {
     $this->execute();
     $configuredThemes = $this->configuration['themes'];
+
+    // Handle deprecated 'theme' configuration option.
+    if (empty($configuredThemes) && !empty($this->configuration['theme'])) {
+      @trigger_error('The "theme" configuration key is deprecated in drupal:11.2.5 and will be removed in drupal:12.0.0. Use "themes" instead. See https://www.drupal.org/node/3523553', E_USER_DEPRECATED);
+      $configuredThemes = [$this->configuration['theme']];
+    }
+
     // If no themes are configured, the condition always evaluates to TRUE.
     if (empty($configuredThemes)) {
       return TRUE;

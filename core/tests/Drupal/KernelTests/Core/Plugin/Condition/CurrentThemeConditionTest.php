@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Plugin\Condition;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests the CurrentThemeCondition plugin.
@@ -23,6 +24,7 @@ class CurrentThemeConditionTest extends KernelTestBase {
   /**
    * Tests the current theme condition.
    */
+  #[IgnoreDeprecations]
   public function testCurrentTheme(): void {
     \Drupal::service('theme_installer')->install(['test_theme', 'test_base_theme', 'test_subtheme']);
 
@@ -45,10 +47,19 @@ class CurrentThemeConditionTest extends KernelTestBase {
     /** @var \Drupal\Core\Condition\ConditionInterface $condition_any_negated */
     $condition_any_negated = $manager->createInstance('current_theme');
     $condition_any_negated->setConfiguration(['themes' => [], 'negate' => TRUE]);
+    // Check whether the deprecated config works as expected
+    /** @var \Drupal\Core\Condition\ConditionInterface $condition_deprecated_config */
+    $condition_deprecated_config = $manager->createInstance('current_theme');
+    $condition_deprecated_config->setConfiguration(['theme' => 'test_theme']);
 
     // The expected theme has not been set up yet.
     $this->assertFalse($condition->execute());
     $this->assertTrue($condition_negated->execute());
+
+    // Check whether the deprecated config functions as expected, but throws a
+    // deprecation notice:
+    $this->assertFalse($condition_deprecated_config->execute());
+    $this->expectDeprecation('The "theme" configuration key is deprecated in drupal:11.2.5 and will be removed in drupal:12.0.0. Use "themes" instead. See https://www.drupal.org/node/3523553');
 
     // Set the expected theme to be used.
     $this->config('system.theme')->set('default', 'test_theme')->save();
@@ -60,6 +71,7 @@ class CurrentThemeConditionTest extends KernelTestBase {
     $this->assertEquals('The current theme is not one of the enabled themes.', $condition_multiple_negated->summary());
     $this->assertEquals('The current theme is one of the enabled themes.', $condition_any->summary());
     $this->assertEquals('The current theme is not one of the enabled themes.', $condition_any_negated->summary());
+    $this->assertEquals('The current theme is one of the enabled themes.', $condition_deprecated_config->summary());
 
     $this->assertTrue($condition->execute());
     $this->assertFalse($condition_negated->execute());
@@ -67,6 +79,11 @@ class CurrentThemeConditionTest extends KernelTestBase {
     // The multiple condition should also apply:
     $this->assertTrue($condition_multiple->execute());
     $this->assertFalse($condition_multiple_negated->execute());
+
+    // Check whether the deprecated config functions as expected, but throws a
+    // deprecation notice:
+    $this->assertTrue($condition_deprecated_config->execute());
+    $this->expectDeprecation('The "theme" configuration key is deprecated in drupal:11.2.5 and will be removed in drupal:12.0.0. Use "themes" instead. See https://www.drupal.org/node/3523553');
 
     // Also when setting the other expected theme:
     $this->config('system.theme')->set('default', 'test_subtheme')->save();
