@@ -447,32 +447,9 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
     if (!$this->isLayoutBuilderEnabled()) {
       return $this;
     }
-
-    // Retrieve the updated options after the parent:: call.
-    $options = $this->content[$name];
-    // Provide backwards compatibility by converting to a section component.
-    $field_definition = $this->getFieldDefinition($name);
-    $extra_fields = $this->entityFieldManager->getExtraFields($this->getTargetEntityTypeId(), $this->getTargetBundle());
-    $is_view_configurable_non_extra_field = $field_definition && $field_definition->isDisplayConfigurable('view') && isset($options['type']);
-    if ($is_view_configurable_non_extra_field || isset($extra_fields['display'][$name])) {
-      $configuration = [
-        'label_display' => '0',
-        'context_mapping' => ['entity' => 'layout_builder.entity'],
-      ];
-      if ($is_view_configurable_non_extra_field) {
-        $configuration['id'] = 'field_block:' . $this->getTargetEntityTypeId() . ':' . $this->getTargetBundle() . ':' . $name;
-        $keys = array_flip(['type', 'label', 'settings', 'third_party_settings']);
-        $configuration['formatter'] = array_intersect_key($options, $keys);
-      }
-      else {
-        $configuration['id'] = 'extra_field_block:' . $this->getTargetEntityTypeId() . ':' . $this->getTargetBundle() . ':' . $name;
-      }
-
-      $section = $this->getDefaultSection();
-      $region = $options['region'] ?? $section->getDefaultRegion();
-      $new_component = (new SectionComponent(\Drupal::service('uuid')->generate(), $region, $configuration));
-      $section->appendComponent($new_component);
-    }
+    // Always add a new section if one doesn't exist, so when enabling layout
+    // builder the layout has at least 1 section to add blocks to.
+    $this->getDefaultSection();
     return $this;
   }
 
