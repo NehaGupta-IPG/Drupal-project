@@ -7,6 +7,7 @@ namespace Drupal\Core\Htmx;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
+use Drupal\Core\Form\FormState;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeBoolean;
 use Drupal\Core\Template\AttributeHelper;
@@ -209,8 +210,24 @@ class Htmx {
    */
   protected function buildRequestAttribute(string $method, ?Url $url = NULL, bool $full_page = FALSE): static {
     if (is_null($url)) {
-      $query = \Drupal::request()->query->all();
       $request_url = Url::fromRoute('<current>');
+      $query = \Drupal::request()->query->all();
+      // Clean up values that could cause a conflict when several unrelated
+      // forms are on the same page.
+      $exclude_keys = [
+        // @see FormState::$cleanValueKeys.
+        'form_id',
+        'form_token',
+        'form_build_id',
+        'op',
+        // Managed on the frontend by htmx-assets.js.
+        'ajax_page_state',
+        // Do not inherit return format from a previous request.
+        MainContentViewSubscriber::WRAPPER_FORMAT,
+      ];
+      foreach ($exclude_keys as $key) {
+        unset($query[$key]);
+      }
     }
     else {
       // The Htmx helper should not modify the original URL object.
