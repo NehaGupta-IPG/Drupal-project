@@ -65,3 +65,13 @@ entity.block_content.collection:
     _entity_list: 'block_content'
   requirements:
     _permission: 'access block library+administer block content'
+
+block_content.add_missing:
+  path: '/block/add/{block_content_type}/{uuid}'
+  defaults:
+    _controller: '\Drupal\block_content\Controller\BlockContentController::addMissing'
+    _title_callback: 'Drupal\block_content\Controller\BlockContentController::getAddFormTitle'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer blocks'

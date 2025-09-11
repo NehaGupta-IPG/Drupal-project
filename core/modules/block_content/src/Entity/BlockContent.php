@@ -10,6 +10,7 @@ use Drupal\block_content\BlockContentTranslationHandler;
 use Drupal\block_content\BlockContentViewBuilder;
 use Drupal\block_content\BlockContentViewsData;
 use Drupal\block_content\Form\BlockContentDeleteForm;
+use Drupal\block_content\MissingBlockContentEntitySubscriber;
 use Drupal\Core\Access\RefinableDependentAccessTrait;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\Entity\Routing\RevisionHtmlRouteProvider;
@@ -141,6 +142,12 @@ class BlockContent extends EditorialContentEntityBase implements BlockContentInt
    */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
+    /** @var \Drupal\block_content\MissingBlockContentEntitySubscriber $missing_block_content_entity_subscriber */
+    $missing_block_content_entity_subscriber = \Drupal::service(MissingBlockContentEntitySubscriber::class);
+    $uuid = $this->uuid();
+    if (!$missing_block_content_entity_subscriber->isMissing($uuid)) {
+      $missing_block_content_entity_subscriber->remove($uuid);
+    }
     if ($this->isReusable() || $this->getOriginal()?->isReusable()) {
       static::invalidateBlockPluginCache();
     }

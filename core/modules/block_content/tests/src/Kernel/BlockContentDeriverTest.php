@@ -6,6 +6,7 @@ namespace Drupal\Tests\block_content\Kernel;
 
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
+use Drupal\block_content\MissingBlockContentEntitySubscriber;
 use Drupal\block_content\Plugin\Derivative\BlockContent as DerivativeBlockContent;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\KernelTests\KernelTestBase;
@@ -57,7 +58,7 @@ class BlockContentDeriverTest extends KernelTestBase {
     $this->installEntitySchema('block_content');
 
     $this->blockContentStorage = \Drupal::entityTypeManager()->getStorage('block_content');
-    $this->blockContentDerivative = new DerivativeBlockContent($this->blockContentStorage);
+    $this->blockContentDerivative = new DerivativeBlockContent($this->blockContentStorage, \Drupal::service(MissingBlockContentEntitySubscriber::class));
   }
 
   /**

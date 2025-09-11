@@ -5,7 +5,9 @@ namespace Drupal\block_content\Controller;
 use Drupal\block_content\BlockContentTypeInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
+use Drupal\Core\Http\Exception\CacheableAccessDeniedHttpException;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,6 +39,13 @@ class BlockContentController extends ControllerBase {
   protected $themeHandler;
 
   /**
+   * The entity repository.
+   *
+   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   */
+  protected $entityRepository;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
@@ -44,7 +53,8 @@ class BlockContentController extends ControllerBase {
     return new static(
       $entity_type_manager->getStorage('block_content'),
       $entity_type_manager->getStorage('block_content_type'),
-      $container->get('theme_handler')
+      $container->get('theme_handler'),
+      $container->get('entity.repository')
     );
   }
 
@@ -57,11 +67,14 @@ class BlockContentController extends ControllerBase {
    *   The block type storage.
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
+   *   The entity repository.
    */
-  public function __construct(EntityStorageInterface $block_content_storage, EntityStorageInterface $block_content_type_storage, ThemeHandlerInterface $theme_handler) {
+  public function __construct(EntityStorageInterface $block_content_storage, EntityStorageInterface $block_content_type_storage, ThemeHandlerInterface $theme_handler, EntityRepositoryInterface $entityRepository) {
     $this->blockContentStorage = $block_content_storage;
     $this->blockContentTypeStorage = $block_content_type_storage;
     $this->themeHandler = $theme_handler;
+    $this->entityRepository = $entityRepository;
   }
 
   /**
@@ -138,6 +151,32 @@ class BlockContentController extends ControllerBase {
    */
   public function getAddFormTitle(BlockContentTypeInterface $block_content_type) {
     return $this->t('Add %type content block', ['%type' => $block_content_type->label()]);
+  }
+
+  /**
+   * Creates a missing block and presents the edit form.
+   *
+   * @param \Drupal\block_content\BlockContentTypeInterface $block_content_type
+   *   The bundle of the missing entity.
+   * @param string $uuid
+   *   The UUID of the missing entity.
+   *
+   * @return array
+   *   Form if applicable, or access denied if the block already exists.
+   *
+   * @throws \Drupal\Core\Http\Exception\CacheableAccessDeniedHttpException
+   *   When a block with the given UUID already exists.
+   */
+  public function addMissing(BlockContentTypeInterface $block_content_type, string $uuid): array {
+    if ($this->entityRepository->loadEntityByUuid('block_content', $uuid)) {
+      // Cannot create this entity, it already exists.
+      throw new CacheableAccessDeniedHttpException($block_content_type);
+    }
+    $block_content = $this->blockContentStorage->create([
+      'type' => $block_content_type->id(),
+      'uuid' => $uuid,
+    ]);
+    return $this->entityFormBuilder()->getForm($block_content);
   }
 
 }

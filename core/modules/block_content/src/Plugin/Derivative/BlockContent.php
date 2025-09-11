@@ -2,9 +2,11 @@
 
 namespace Drupal\block_content\Plugin\Derivative;
 
+use Drupal\block_content\MissingBlockContentEntitySubscriber;
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -13,29 +15,20 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class BlockContent extends DeriverBase implements ContainerDeriverInterface {
 
   /**
-   * The content block storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $blockContentStorage;
-
-  /**
    * Constructs a BlockContent object.
-   *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $block_content_storage
-   *   The content block storage.
    */
-  public function __construct(EntityStorageInterface $block_content_storage) {
-    $this->blockContentStorage = $block_content_storage;
-  }
+  public function __construct(
+    protected readonly EntityStorageInterface $blockContentStorage,
+    protected readonly MissingBlockContentEntitySubscriber $missingBlockContentEntitySubscriber,
+  ) {}
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $base_plugin_id) {
-    $entity_type_manager = $container->get('entity_type.manager');
     return new static(
-      $entity_type_manager->getStorage('block_content')
+      $container->get('entity_type.manager')->getStorage('block_content'),
+      $container->get(MissingBlockContentEntitySubscriber::class),
     );
   }
 
@@ -53,6 +46,18 @@ class BlockContent extends DeriverBase implements ContainerDeriverInterface {
       $this->derivatives[$block_content->uuid()]['config_dependencies']['content'] = [
         $block_content->getConfigDependencyName(),
       ];
+    }
+    // Missing items that were found during config import.
+    // @see \Drupal\block_content\EventSubscriber\MissingBlockContentEntitySubscriber::onMissingContent
+    // @see \Drupal\block_content\Plugin\Block\BlockContentBlock::build
+    foreach ($this->missingBlockContentEntitySubscriber->getMissing() as $uuid => $details) {
+      if (!isset($this->derivatives[$uuid])) {
+        $this->derivatives[$uuid] = $base_plugin_definition;
+        $this->derivatives[$uuid]['admin_label'] = new TranslatableMarkup('Missing block content');
+        $this->derivatives[$uuid]['config_dependencies']['content'] = [
+          sprintf('block_content:%s:%s', $details['bundle'], $uuid),
+        ];
+      }
     }
     return parent::getDerivativeDefinitions($base_plugin_definition);
   }
