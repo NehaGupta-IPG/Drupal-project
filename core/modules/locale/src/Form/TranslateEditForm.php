@@ -4,7 +4,9 @@ namespace Drupal\locale\Form;
 
 use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Url;
 use Drupal\locale\SourceString;
 
 /**
@@ -34,10 +36,13 @@ class TranslateEditForm extends TranslateFormBase {
     $language_name = isset($langcode) ? $languages[$langcode]->getName() : "- None -";
 
     $form['#attached']['library'][] = 'locale/drupal.locale.admin';
-    $form['#attached']['library'][] = 'core/drupal.htmx';
-    $form['#attributes']['data-hx-post'] = '';
-    $form['#attributes']['data-hx-swap'] = 'outerHTML';
-    $form['#attributes']['data-hx-select'] = '#locale-translate-edit-form';
+
+    (new Htmx())
+      // @todo remove once https://www.drupal.org/project/drupal/issues/3546105 is in.
+      ->post(Url::fromRoute('<current>', [], ['query' => \Drupal::request()->query->all()]))
+      ->swap('outerHTML')
+      ->select('#locale-translate-edit-form')
+      ->applyTo($form);
 
     $form['langcode'] = [
       '#type' => 'value',
