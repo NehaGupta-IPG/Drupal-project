@@ -15,6 +15,7 @@ use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionComponent;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -112,8 +113,8 @@ class SectionComponentTest extends UnitTestCase {
    * Tests getThirdPartySettings.
    *
    * @legacy-covers ::getThirdPartySettings
-   * @dataProvider providerTestGetThirdPartySettings
    */
+  #[DataProvider('providerTestGetThirdPartySettings')]
   public function testGetThirdPartySettings($provider, $expected): void {
     $this->assertSame($expected, $this->section->getComponent('some-uuid')->getThirdPartySettings($provider));
   }
@@ -148,8 +149,8 @@ class SectionComponentTest extends UnitTestCase {
    * Tests getThirdPartySetting.
    *
    * @legacy-covers ::getThirdPartySetting
-   * @dataProvider providerTestGetThirdPartySetting
    */
+  #[DataProvider('providerTestGetThirdPartySetting')]
   public function testGetThirdPartySetting($provider, $key, $expected, $default = FALSE): void {
     if ($default) {
       $this->assertSame($expected, $this->section->getComponent('some-uuid')->getThirdPartySetting($provider, $key, $default));
@@ -199,8 +200,8 @@ class SectionComponentTest extends UnitTestCase {
    * Tests setThirdPartySetting.
    *
    * @legacy-covers ::setThirdPartySetting
-   * @dataProvider providerTestSetThirdPartySetting
    */
+  #[DataProvider('providerTestSetThirdPartySetting')]
   public function testSetThirdPartySetting($provider, $key, $value, $expected): void {
     $this->section->getComponent('some-uuid')->setThirdPartySetting($provider, $key, $value);
     $this->assertSame($expected, $this->section->getComponent('some-uuid')->getThirdPartySettings($provider));
@@ -248,8 +249,8 @@ class SectionComponentTest extends UnitTestCase {
    * Tests unsetThirdPartySetting.
    *
    * @legacy-covers ::unsetThirdPartySetting
-   * @dataProvider providerTestUnsetThirdPartySetting
    */
+  #[DataProvider('providerTestUnsetThirdPartySetting')]
   public function testUnsetThirdPartySetting($provider, $key, $expected): void {
     $this->section->getComponent('some-uuid')->unsetThirdPartySetting($provider, $key);
     $this->assertSame($expected, $this->section->getComponent('some-uuid')->getThirdPartySettings($provider));
