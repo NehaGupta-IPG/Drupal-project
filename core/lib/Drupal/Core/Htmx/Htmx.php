@@ -207,15 +207,19 @@ class Htmx {
    */
   protected function buildRequestAttribute(string $method, ?Url $url = NULL, bool $full_page = FALSE): static {
     if (is_null($url)) {
-      $value = Url::fromRoute('<current>', ['query' => \Drupal::request()->query->all()]);
+      $query = \Drupal::request()->query->all();
+      $request_url = Url::fromRoute('<current>');
     }
     else {
-      $value = $this->urlValue($url);
+      // The Htmx helper should not modify the original URL object.
+      $request_url = clone $url;
+      $query = $request_url->getOption('query');
     }
     if (!$full_page) {
-      $url->setOption(MainContentViewSubscriber::WRAPPER_FORMAT, 'drupal_htmx');
+      $query[MainContentViewSubscriber::WRAPPER_FORMAT] = 'drupal_htmx';
     }
-    $this->createStringAttribute($method, $value);
+    $request_url->setOption('query', $query);
+    $this->createStringAttribute($method, $this->urlValue($request_url));
     return $this;
   }
 
