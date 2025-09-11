@@ -7,7 +7,6 @@ namespace Drupal\Core\Htmx;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
-use Drupal\Core\Form\FormState;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeBoolean;
 use Drupal\Core\Template\AttributeHelper;
