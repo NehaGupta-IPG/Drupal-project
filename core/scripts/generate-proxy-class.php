@@ -16,6 +16,7 @@
 use Drupal\Core\Command\GenerateProxyClassApplication;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\ProxyBuilder\ProxyBuilder;
+use Drupal\Core\Runtime\DrupalRuntime;
 use Drupal\Core\Site\Settings;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -23,12 +24,18 @@ if (PHP_SAPI !== 'cli') {
   return;
 }
 
-// Bootstrap.
-$autoloader = require __DIR__ . '/../../autoload.php';
-$request = Request::createFromGlobals();
-Settings::initialize(dirname(__DIR__, 2), DrupalKernel::findSitePath($request), $autoloader);
-DrupalKernel::createFromRequest($request, $autoloader, 'prod')->boot();
+// @todo Replace once https://github.com/symfony/symfony/issues/60249 is fixed.
+$_ENV['APP_RUNTIME'] ??= DrupalRuntime::class;
+require_once __DIR__ . '/../../autoload_runtime.php';
 
-// Run the database dump command.
-$application = new GenerateProxyClassApplication(new ProxyBuilder());
-$application->run();
+return static function () {
+  // Bootstrap.
+  // @todo Move from front-controller into runtime on request.
+  $autoloader = require __DIR__ . '/../../autoload.php';
+  $request = Request::createFromGlobals();
+  Settings::initialize(dirname(__DIR__, 2), DrupalKernel::findSitePath($request), $autoloader);
+  DrupalKernel::createFromRequest($request, $autoloader, 'prod')->boot();
+
+  // Run the database dump command.
+  return new GenerateProxyClassApplication(new ProxyBuilder());
+};
