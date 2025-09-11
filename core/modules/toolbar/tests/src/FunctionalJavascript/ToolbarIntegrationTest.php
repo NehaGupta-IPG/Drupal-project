@@ -120,9 +120,9 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
     $page = $this->getSession()->getPage();
 
     // Grab three tabs.
-    $admin_tab  = $page->find('css', '#toolbar-item-administration');
+    $admin_tab = $page->find('css', '#toolbar-item-administration');
     $user_tab = $page->find('css', '#toolbar-item-user');
-    $shortcuts_tab  = $page->find('css', '#toolbar-item-shortcuts');
+    $shortcuts_tab = $page->find('css', '#toolbar-item-shortcuts');
 
     $this->assertNotNull($admin_tab, 'Administration tab present.');
     $this->assertNotNull($user_tab, 'User tab present.');
