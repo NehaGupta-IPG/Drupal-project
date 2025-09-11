@@ -87,18 +87,25 @@ class MigrationPluginManager extends BaseMigrationPluginManager {
   public function processDefinition(&$definition, $plugin_id) {
     parent::processDefinition($definition, $plugin_id);
 
-    $source_id = $definition['source']['plugin'];
-    $source_definition = $this->sourceManager->getDefinition($source_id);
-    // If the source plugin uses annotations, then the 'provider' key is the
-    // array of providers. If the source plugin uses attributes, then combine
-    // the singular string provider with the providers for the plugin
-    // dependencies.
-    if (is_array($source_definition['provider'])) {
-      $providers = $source_definition['provider'];
-    }
-    else {
-      $providers = $source_definition['dependencies']['provider'] ?? [];
-      $providers[] = $source_definition['provider'];
+    // Some migration plugins may have source plugin definitions added via
+    // migration_plugins_alter implementations. We can't check the providers or
+    // for usage of source_module on those.
+    $source_definition = NULL;
+    $providers = [];
+    if (isset($definition['source']['plugin'])) {
+      $source_id = $definition['source']['plugin'];
+      $source_definition = $this->sourceManager->getDefinition($source_id);
+      // If the source plugin uses annotations, then the 'provider' key is the
+      // array of providers. If the source plugin uses attributes, then combine
+      // the singular string provider with the providers for the plugin
+      // dependencies.
+      if (is_array($source_definition['provider'])) {
+        $providers = $source_definition['provider'];
+      }
+      else {
+        $providers = $source_definition['dependencies']['provider'] ?? [];
+        $providers[] = $source_definition['provider'];
+      }
     }
 
     // Check if the migration has any of the tags that trigger source_module
