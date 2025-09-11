@@ -91,6 +91,7 @@ class MigrationPluginManager extends BaseMigrationPluginManager {
     // migration_plugins_alter implementations. We can't check the providers or
     // for usage of source_module on those.
     $source_definition = NULL;
+    $source_id = NULL;
     $providers = [];
     if (isset($definition['source']['plugin'])) {
       $source_id = $definition['source']['plugin'];
