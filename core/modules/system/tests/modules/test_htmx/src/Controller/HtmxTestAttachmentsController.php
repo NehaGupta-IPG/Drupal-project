@@ -92,15 +92,7 @@ final class HtmxTestAttachmentsController extends ControllerBase {
    *   The render array.
    */
   public static function generateHtmxButton(string $swap = '', bool $useWrapperFormat = FALSE): array {
-    $options = [];
-    if ($useWrapperFormat) {
-      $options = [
-        'query' => [
-          MainContentViewSubscriber::WRAPPER_FORMAT => 'drupal_htmx',
-        ],
-      ];
-    }
-    $url = Url::fromRoute('test_htmx.attachments.replace', [], $options);
+    $url = Url::fromRoute('test_htmx.attachments.replace');
     $build['replace'] = [
       '#type' => 'html_tag',
       '#tag' => 'button',
@@ -111,7 +103,7 @@ final class HtmxTestAttachmentsController extends ControllerBase {
       '#value' => 'Click this',
     ];
     $replace_htmx = (new Htmx())
-      ->get($url)
+      ->get($url, full_page: !$useWrapperFormat)
       ->select('div.ajax-content')
       ->target('[data-drupal-htmx-target]');
     if ($swap !== '') {

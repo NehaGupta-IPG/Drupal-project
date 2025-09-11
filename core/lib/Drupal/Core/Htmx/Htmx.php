@@ -6,6 +6,7 @@ namespace Drupal\Core\Htmx;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeBoolean;
 use Drupal\Core\Template\AttributeHelper;
@@ -204,12 +205,15 @@ class Htmx {
    * @return static
    *   returns self so that attribute methods may be chained.
    */
-  protected function buildRequestAttribute(string $method, ?Url $url = NULL): static {
+  protected function buildRequestAttribute(string $method, ?Url $url = NULL, bool $full_page = FALSE): static {
     if (is_null($url)) {
-      $value = '';
+      $value = Url::fromRoute('<current>', ['query' => \Drupal::request()->query->all()]);
     }
     else {
       $value = $this->urlValue($url);
+    }
+    if (!$full_page) {
+      $url->setOption(MainContentViewSubscriber::WRAPPER_FORMAT, 'drupal_htmx');
     }
     $this->createStringAttribute($method, $value);
     return $this;
@@ -519,14 +523,16 @@ class Htmx {
    *
    * @param \Drupal\Core\Url|null $url
    *   The URL for the GET request. If NULL the current page is used.
+   * @param bool $full_page
+   *   Toggle to use the full HTML response of just the necessary html part.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
    *
    * @see https://htmx.org/attributes/hx-get/
    */
-  public function get(?Url $url = NULL): static {
-    return $this->buildRequestAttribute('hx-get', $url);
+  public function get(?Url $url = NULL, bool $full_page = FALSE): static {
+    return $this->buildRequestAttribute('hx-get', $url, $full_page);
   }
 
   /**
@@ -539,14 +545,16 @@ class Htmx {
    *
    * @param \Drupal\Core\Url|null $url
    *   The URL for the POST request. If NULL the current page is used.
+   * @param bool $full_page
+   *   Toggle to use the full HTML response of just the necessary html part.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
    *
    * @see https://htmx.org/attributes/hx-post/
    */
-  public function post(?Url $url = NULL): static {
-    return $this->buildRequestAttribute('hx-post', $url);
+  public function post(?Url $url = NULL, bool $full_page = FALSE): static {
+    return $this->buildRequestAttribute('hx-post', $url, $full_page);
   }
 
   /**
@@ -559,34 +567,38 @@ class Htmx {
    *
    * @param \Drupal\Core\Url|null $url
    *   The URL for the PUT request. If NULL the current page is used.
+   * @param bool $full_page
+   *   Toggle to use the full HTML response of just the necessary html part.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
    *
    * @see https://htmx.org/attributes/hx-put/
    */
-  public function put(?Url $url = NULL): static {
-    return $this->buildRequestAttribute('hx-put', $url);
+  public function put(?Url $url = NULL, bool $full_page = FALSE): static {
+    return $this->buildRequestAttribute('hx-put', $url, $full_page);
   }
 
   /**
    * Creates a `data-hx-patch` attribute.
    *
-   * This attribute instructs HTMX to issue a PATCH request
+   * This attribute instructs HTMX to issue a PATCH request.
    *
    *  This request method also accepts no parameters, which issues a patch
    *  request to the current url. If parameters are used, both are required.
    *
    * @param \Drupal\Core\Url|null $url
    *   Collects the cacheable metadata from the URL generation.
+   * @param bool $full_page
+   *   Toggle to use the full HTML response of just the necessary html part.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
    *
    * @see https://htmx.org/attributes/hx-patch/
    */
-  public function patch(?Url $url = NULL): static {
-    return $this->buildRequestAttribute('hx-patch', $url);
+  public function patch(?Url $url = NULL, bool $full_page = FALSE): static {
+    return $this->buildRequestAttribute('hx-patch', $url, $full_page);
   }
 
   /**
@@ -600,14 +612,16 @@ class Htmx {
    *
    * @param \Drupal\Core\Url|null $url
    *   The URL for the DELETE request. If NULL the current page is used.
+   * @param bool $full_page
+   *   Toggle to use the full HTML response of just the necessary html part.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
    *
    * @see https://htmx.org/attributes/hx-delete/
    */
-  public function delete(?Url $url = NULL): static {
-    return $this->buildRequestAttribute('hx-delete', $url);
+  public function delete(?Url $url = NULL, bool $full_page = FALSE): static {
+    return $this->buildRequestAttribute('hx-delete', $url, $full_page);
   }
 
   /**
@@ -999,7 +1013,7 @@ class Htmx {
    * data from being saved to the localStorage cache when htmx takes a snapshot
    * of the page state. This attribute is effective when set on any element in
    * the current document, or any html fragment loaded into the current document
-   * by htmx
+   * by htmx.
    *
    * @return static
    *   Returns this object to allow chaining methods.
