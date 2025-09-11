@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\test_htmx\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Url;
 

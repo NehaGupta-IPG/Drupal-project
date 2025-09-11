@@ -201,6 +201,8 @@ class Htmx {
    *   The request method.
    * @param \Drupal\Core\Url|null $url
    *   The URL for the request.
+   * @param bool $full_page
+   *   Toggle to use the full HTML response of just the necessary html part.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
