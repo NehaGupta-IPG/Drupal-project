@@ -209,8 +209,9 @@ class Htmx {
    */
   protected function buildRequestAttribute(string $method, ?Url $url = NULL, bool $full_page = FALSE): static {
     if (is_null($url)) {
-      $request_url = Url::fromRoute('<current>');
-      $query = \Drupal::request()->query->all();
+      $current_request = \Drupal::request();
+      $request_url = Url::createFromRequest($current_request);
+      $query = $current_request->query->all();
       // Clean up values that could cause a conflict when several unrelated
       // forms are on the same page.
       $exclude_keys = [
