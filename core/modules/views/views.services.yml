@@ -97,6 +97,9 @@ services:
     arguments: ['@database']
     tags:
       - { name: backend_overridable }
+  views.reserved_path_checker:
+    class: Drupal\views\ReservedPathChecker
+    arguments: ['@file_system', '%app.root%']
   pgsql.views.date_sql:
     class: Drupal\views\Plugin\views\query\PostgresqlDateSql
     arguments: ['@database']
