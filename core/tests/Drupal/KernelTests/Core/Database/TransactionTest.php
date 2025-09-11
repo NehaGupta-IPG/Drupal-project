@@ -1288,4 +1288,35 @@ class TransactionTest extends DatabaseTestBase {
     $this->assertTrue(TRUE);
   }
 
+  /**
+   * Tests post-transaction callback can have a transaction.
+   */
+  public function testRootTransactionEndCallbackWithTransaction(): void {
+    $this->assertFalse($this->connection->inTransaction());
+    $transaction = $this->connection->startTransaction();
+    $this->connection->transactionManager()->addPostTransactionCallback([$this, 'rootTransactionCallbackWithTransaction']);
+    $this->insertRow('row');
+    $this->assertNull($this->postTransactionCallbackAction);
+    $this->assertRowAbsent('rtcCommit');
+    $transaction->commitOrRelease();
+    $this->assertFalse($this->connection->inTransaction());
+    // @todo This test only passes when the transaction is unset. Something odd
+    //   is going on. AHA - root transaction callbacks are only called on purge
+    //   which is happening in \Drupal\Core\Database\Transaction::__destruct().
+    //   This is not correct.
+    unset($transaction);
+    $this->assertSame('rtcCommit', $this->postTransactionCallbackAction);
+    $this->assertRowPresent('row');
+    $this->assertRowPresent('rtcCommit');
+  }
+
+  /**
+   * A post-transaction callback with a transaction for testing purposes.
+   */
+  public function rootTransactionCallbackWithTransaction(bool $success): void {
+    $transaction = $this->connection->startTransaction();
+    $this->rootTransactionCallback($success);
+    $transaction->commitOrRelease();
+  }
+
 }

@@ -805,25 +805,6 @@ abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseT
   }
 
   /**
-   * Tests post-transaction callback can have a transaction.
-   */
-  public function testRootTransactionEndCallbackWithTransaction(): void {
-    $transaction = $this->connection->startTransaction();
-    $transaction2 = $this->connection->startTransaction();
-    $this->connection->transactionManager()->addPostTransactionCallback([$this, 'rootTransactionCallbackWithTransaction']);
-    $this->insertRow('row');
-    $this->assertNull($this->postTransactionCallbackAction);
-    $this->assertRowAbsent('rtcCommit');
-    unset($transaction2);
-    $this->assertNull($this->postTransactionCallbackAction);
-    $this->assertRowAbsent('rtcCommit');
-    unset($transaction);
-    $this->assertSame('rtcCommit', $this->postTransactionCallbackAction);
-    $this->assertRowPresent('row');
-    $this->assertRowPresent('rtcCommit');
-  }
-
-  /**
    * Tests post-transaction callback executes after transaction rollback.
    */
   public function testRootTransactionEndCallbackCalledAfterRollbackAndDestruction(): void {
@@ -990,15 +971,6 @@ abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseT
   public function rootTransactionCallback(bool $success): void {
     $this->postTransactionCallbackAction = $success ? 'rtcCommit' : 'rtcRollback';
     $this->insertRow($this->postTransactionCallbackAction);
-  }
-
-  /**
-   * A post-transaction callback with a transaction for testing purposes.
-   */
-  public function rootTransactionCallbackWithTransaction(bool $success): void {
-    $transaction = $this->connection->startTransaction();
-    $this->rootTransactionCallback($success);
-    unset($transaction);
   }
 
   /**
