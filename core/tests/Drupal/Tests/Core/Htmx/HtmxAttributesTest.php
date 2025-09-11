@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Htmx;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\GeneratedUrl;
 use Drupal\Core\Htmx\Htmx;
+use Drupal\Core\Routing\UrlGenerator;
+use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Url;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Test all attribute-related Htmx public methods.
@@ -37,6 +42,7 @@ class HtmxAttributesTest extends UnitTestCase {
     $this->htmx = new Htmx();
     $generated = new GeneratedUrl();
     $generated->setGeneratedUrl('https://www.example.test/common-test/destination');
+
     $this->url = $this->getMockBuilder(Url::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['toString'])
@@ -44,6 +50,31 @@ class HtmxAttributesTest extends UnitTestCase {
     $this->url->expects($this->any())
       ->method('toString')
       ->willReturn($generated);
+
+    $this->requestStack = new RequestStack();
+    $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+    $this->urlGenerator->expects($this->any())
+      ->method('generateFromRoute')
+      ->with($this->url)
+      ->willReturn($generated);
+
+    $current = $this->getMockBuilder(Url::class)
+      ->disableOriginalConstructor()
+      ->onlyMethods(['toString'])
+      ->getMock();
+
+    $this->urlGenerator->expects($this->any())
+      ->method('generateFromRoute')
+      ->with($current)
+      ->willReturn((new GeneratedUrl())->setGeneratedUrl('/test'));
+
+    $this->container = new ContainerBuilder();
+    $this->container->set('request_stack', $this->requestStack);
+    $this->container->set('url_generator', $this->urlGenerator);
+    \Drupal::setContainer($this->container);
+
+    $this->request = Request::create('/test');
+    $this->requestStack->push($this->request);
   }
 
   protected function apply(): array {
