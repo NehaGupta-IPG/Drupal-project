@@ -17,6 +17,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Prophecy\Argument;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -305,11 +306,10 @@ class SectionComponentTest extends UnitTestCase {
   /**
    * Tests that deprecation notices are triggered.
    *
-   * @group legacy
-   *
    * @todo Remove below test when the drupal:12.x branch is opened.
    * @see https://www.drupal.org/project/drupal/issues/3160644
    */
+  #[IgnoreDeprecations]
   public function testDeprecationNotices(): void {
     $this->expectDeprecation('Setting random section component properties is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Component properties should be set via dedicated setters. See https://www.drupal.org/node/3100177');
     $this->expectDeprecation('Getting additional properties is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Additional component properties should be gotten via ::getThirdPartySetting(). See https://www.drupal.org/node/3100177');
