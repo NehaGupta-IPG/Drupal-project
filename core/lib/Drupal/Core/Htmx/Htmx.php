@@ -228,16 +228,20 @@ class Htmx {
       foreach ($exclude_keys as $key) {
         unset($query[$key]);
       }
+      $request_url->setOption('query', $query);
     }
     else {
       // The Htmx helper should not modify the original URL object.
       $request_url = clone $url;
-      $query = $request_url->getOption('query');
     }
     if (!$full_page) {
-      $query[MainContentViewSubscriber::WRAPPER_FORMAT] = 'drupal_htmx';
+      $options = [
+        'query' => [
+          MainContentViewSubscriber::WRAPPER_FORMAT => 'drupal_htmx',
+        ],
+      ];
+      $request_url->mergeOptions($options);
     }
-    $request_url->setOption('query', $query);
     $this->createStringAttribute($method, $this->urlValue($request_url));
     return $this;
   }
