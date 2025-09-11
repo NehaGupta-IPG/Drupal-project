@@ -7,13 +7,16 @@ namespace Drupal\Tests\Core\Htmx;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\GeneratedUrl;
 use Drupal\Core\Htmx\Htmx;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Routing\UrlGenerator;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Url;
+use Drupal\Tests\Core\Routing\TestRouterInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -52,29 +55,53 @@ class HtmxAttributesTest extends UnitTestCase {
       ->willReturn($generated);
 
     $this->requestStack = new RequestStack();
+
     $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
     $this->urlGenerator->expects($this->any())
       ->method('generateFromRoute')
       ->with($this->url)
       ->willReturn($generated);
 
-    $current = $this->getMockBuilder(Url::class)
+
+    $current = new GeneratedUrl();
+    $current->setGeneratedUrl('/test');
+    $this->current_url = $this->getMockBuilder(Url::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['toString'])
       ->getMock();
+    $this->current_url->expects($this->any())
+      ->method('toString')
+      ->willReturn($current);
 
     $this->urlGenerator->expects($this->any())
       ->method('generateFromRoute')
-      ->with($current)
-      ->willReturn((new GeneratedUrl())->setGeneratedUrl('/test'));
+      ->with($this->current_url)
+      ->willReturn($current);
+
+    $this->router = $this->createMock(TestRouterInterface::class);
 
     $this->container = new ContainerBuilder();
     $this->container->set('request_stack', $this->requestStack);
     $this->container->set('url_generator', $this->urlGenerator);
+    $this->container->set('router.no_access_checks', $this->router);
     \Drupal::setContainer($this->container);
 
     $this->request = Request::create('/test');
     $this->requestStack->push($this->request);
+
+    $this->router->expects($this->any())
+      ->method('matchRequest')
+      ->willReturnCallback(function (Request $request) {
+        [$route_name, $vars] = match($request->getPathInfo()) {
+          '/test' => ['test', []],
+        };
+        return [
+          RouteObjectInterface::ROUTE_NAME => $route_name,
+          '_raw_variables' => new InputBag($vars),
+        ];
+      });
+
+
   }
 
   protected function apply(): array {
