@@ -61,8 +61,8 @@ class FilemimeFormatter extends BaseFieldFileFormatterBase {
     $value = $item->value;
     if ($this->getSetting('filemime_image') && $value) {
       $file_icon = [
-        '#theme' => 'image__file_icon',
-        '#file' => $item->getEntity(),
+        '#theme' => 'file_mime_icon',
+        '#mime' => $value,
       ];
       return $file_icon;
     }

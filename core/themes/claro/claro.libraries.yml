@@ -9,6 +9,7 @@ global-styling:
     component:
       css/classy/components/container-inline.css: {}
       css/classy/components/exposed-filters.css: {}
+      css/classy/components/file.css: {}
       css/classy/components/field.css: {}
       css/classy/components/icons.css: {}
       css/classy/components/inline-form.css: {}
