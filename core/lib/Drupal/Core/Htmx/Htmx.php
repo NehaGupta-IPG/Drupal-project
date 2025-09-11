@@ -203,7 +203,7 @@ class Htmx {
    * @param \Drupal\Core\Url|null $url
    *   The URL for the request.
    * @param bool $full_page
-   *   Toggle to use the full HTML response of just the necessary html part.
+   *   Toggle to use the full HTML response or just the main content.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
@@ -547,7 +547,7 @@ class Htmx {
    * @param \Drupal\Core\Url|null $url
    *   The URL for the GET request. If NULL the current page is used.
    * @param bool $full_page
-   *   Toggle to use the full HTML response of just the necessary html part.
+   *   Toggle to use the full HTML response or just the main content.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
@@ -569,7 +569,7 @@ class Htmx {
    * @param \Drupal\Core\Url|null $url
    *   The URL for the POST request. If NULL the current page is used.
    * @param bool $full_page
-   *   Toggle to use the full HTML response of just the necessary html part.
+   *   Toggle to use the full HTML response or just the main content.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
@@ -591,7 +591,7 @@ class Htmx {
    * @param \Drupal\Core\Url|null $url
    *   The URL for the PUT request. If NULL the current page is used.
    * @param bool $full_page
-   *   Toggle to use the full HTML response of just the necessary html part.
+   *   Toggle to use the full HTML response or just the main content.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
@@ -613,7 +613,7 @@ class Htmx {
    * @param \Drupal\Core\Url|null $url
    *   Collects the cacheable metadata from the URL generation.
    * @param bool $full_page
-   *   Toggle to use the full HTML response of just the necessary html part.
+   *   Toggle to use the full HTML response or just the main content.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
@@ -636,7 +636,7 @@ class Htmx {
    * @param \Drupal\Core\Url|null $url
    *   The URL for the DELETE request. If NULL the current page is used.
    * @param bool $full_page
-   *   Toggle to use the full HTML response of just the necessary html part.
+   *   Toggle to use the full HTML response or just the main content.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
