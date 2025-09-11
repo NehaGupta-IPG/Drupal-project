@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\test_htmx\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Url;
 
@@ -91,7 +92,15 @@ final class HtmxTestAttachmentsController extends ControllerBase {
    *   The render array.
    */
   public static function generateHtmxButton(string $swap = '', bool $useWrapperFormat = FALSE): array {
-    $url = Url::fromRoute('test_htmx.attachments.replace');
+    $options = [];
+    if ($useWrapperFormat) {
+      $options = [
+        'query' => [
+          MainContentViewSubscriber::WRAPPER_FORMAT => 'drupal_htmx',
+        ],
+      ];
+    }
+    $url = Url::fromRoute('test_htmx.attachments.replace', [], $options);
     $build['replace'] = [
       '#type' => 'html_tag',
       '#tag' => 'button',
