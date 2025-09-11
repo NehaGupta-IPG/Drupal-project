@@ -8,7 +8,7 @@ use Drupal\Core\File\FileSystemInterface;
  * Provides discovery of top-level directories in the Drupal web root.
  */
 class ReservedPathChecker {
-  
+
   /**
    * The file system service.
    *
@@ -23,7 +23,6 @@ class ReservedPathChecker {
    */
   protected $appRoot;
 
-
   /**
    * Constructs a ReservedPathChecker object.
    *
@@ -34,7 +33,7 @@ class ReservedPathChecker {
    */
   public function __construct(FileSystemInterface $file_system, $app_root) {
     $this->fileSystem = $file_system;
-    $this->appRoot = $app_root;  
+    $this->appRoot = $app_root;
   }
 
   /**
@@ -44,8 +43,8 @@ class ReservedPathChecker {
    *   Lowercased directory names present at the docroot root.
    */
   public function listReservedFirstSegments(): array {
-    static $cache = null;
-    if ($cache !== null) {
+    static $cache = NULL;
+    if ($cache !== NULL) {
       return $cache;
     }
 
