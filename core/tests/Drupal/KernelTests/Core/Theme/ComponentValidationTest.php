@@ -39,6 +39,7 @@ class ComponentValidationTest extends KernelTestBase {
           'author' => NULL,
           'time' => 'January 1, 2038',
         ],
+        'classes' => NULL,
       ],
     ];
     $this->container->get(RendererInterface::class)->renderRoot($build);

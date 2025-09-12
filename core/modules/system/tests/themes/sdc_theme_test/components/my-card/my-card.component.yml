@@ -34,6 +34,11 @@ props:
           description: A date and time.
       required:
         - time
+    classes:
+      type: array
+      title: Optional extra CSS classes.
+      items:
+        type: string
 slots:
   card_body:
     title: Body
