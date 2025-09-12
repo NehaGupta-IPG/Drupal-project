@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests node module updates.
- *
- * @group node
- * @group legacy
  */
+#[Group('node')]
+#[IgnoreDeprecations]
+#[CoversFunction('node_post_update_plural_variants')]
 class NodeUpdateTest extends UpdatePathTestBase {
 
   /**
@@ -22,7 +25,7 @@ class NodeUpdateTest extends UpdatePathTestBase {
   }
 
   /**
-   * @covers \node_post_update_plural_variants
+   * Tests node_post_update_plural_variants().
    */
   public function testPostUpdatePluralVariants(): void {
     $properties = ['label_singular', 'label_plural', 'label_count'];
