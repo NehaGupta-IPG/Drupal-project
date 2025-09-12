@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\mysql\Unit;
 
-use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Schema;
+use Drupal\mysql\Driver\Database\mysql\Connection;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\mysql\RequirementsTrait;
 use Drupal\Tests\UnitTestCase;
@@ -51,12 +50,37 @@ class RequirementsTraitTest extends UnitTestCase {
     $this->schema = $this->createMock(Schema::class);
 
     // Create an anonymous class that uses the trait for testing.
-    $this->requirementsTraitObject = new class {
+    $this->requirementsTraitObject = new class() {
       use RequirementsTrait;
 
+      /**
+       * Mock translation function.
+       *
+       * Mimics Drupal's t() function for testing purposes.
+       */
       public function t($string, array $args = [], array $options = []): string {
+        // Handle Drupal's placeholder replacements.
+        foreach ($args as $key => $value) {
+          switch ($key[0]) {
+            case '@':
+              // Plain text replacement.
+              $args[$key] = (string) $value;
+              break;
+
+            case '%':
+              // Emphasized replacement.
+              $args[$key] = '<em>' . (string) $value . '</em>';
+              break;
+
+            case ':':
+              // URL replacement.
+              $args[$key] = (string) $value;
+              break;
+          }
+        }
         return strtr($string, $args);
       }
+
     };
   }
 
@@ -87,7 +111,7 @@ class RequirementsTraitTest extends UnitTestCase {
 
     $this->connection->expects($this->once())
       ->method('isMariaDb')
-      ->willReturn(false);
+      ->willReturn(FALSE);
 
     // Set up query expectations.
     $this->connection->expects($this->exactly(4))
@@ -123,8 +147,9 @@ class RequirementsTraitTest extends UnitTestCase {
     // The test should pass with only the table being checked for primary key,
     // while the view is excluded. Since the table has no primary key, it should
     // be listed in the error message.
-    $this->assertStringContainsString('test_table', $requirements['mysql_transaction_level']['description']);
-    $this->assertStringNotContainsString('test_view', $requirements['mysql_transaction_level']['description']);
+    $description = (string) $requirements['mysql_transaction_level']['description'];
+    $this->assertStringContainsString('test_table', $description);
+    $this->assertStringNotContainsString('test_view', $description);
   }
 
   /**
@@ -154,7 +179,7 @@ class RequirementsTraitTest extends UnitTestCase {
 
     $this->connection->expects($this->once())
       ->method('isMariaDb')
-      ->willReturn(false);
+      ->willReturn(FALSE);
 
     $this->connection->expects($this->exactly(3))
       ->method('query')
@@ -182,8 +207,9 @@ class RequirementsTraitTest extends UnitTestCase {
 
     $requirements = $this->requirementsTraitObject->getRuntimeRequirements($this->connection);
 
-    $this->assertStringContainsString('table_without_primary_key', $requirements['mysql_transaction_level']['description']);
-    $this->assertStringContainsString('do not have a primary key', $requirements['mysql_transaction_level']['description']);
+    $description = (string) $requirements['mysql_transaction_level']['description'];
+    $this->assertStringContainsString('table_without_primary_key', $description);
+    $this->assertStringContainsString('do not have a primary key', $description);
   }
 
 }
