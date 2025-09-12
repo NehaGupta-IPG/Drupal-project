@@ -35,6 +35,10 @@ class ComponentValidationTest extends KernelTestBase {
       '#props' => [
         'header' => 'This is clearly a header.',
         'slogan' => NULL,
+        'author_and_time' => [
+          'author' => NULL,
+          'time' => 'January 1, 2038',
+        ],
       ],
     ];
     $this->container->get(RendererInterface::class)->renderRoot($build);

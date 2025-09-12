@@ -21,6 +21,19 @@ props:
       type: string
       title: Slogan
       description: A pithy and clever, but optional, slogan.
+    author_and_time:
+      type: object
+      properties:
+        author:
+          type: string
+          title: Author
+          description: A person's name, optional.
+        time:
+          type: string
+          title: Time
+          description: A date and time.
+      required:
+        - time
 slots:
   card_body:
     title: Body
