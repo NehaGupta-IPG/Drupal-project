@@ -21,6 +21,7 @@ class EntityTypeBundleInfoPluralLabelTest extends KernelTestBase {
   protected static $modules = [
     'entity_bundle_test',
     'entity_test',
+    'user',
   ];
 
   /**
