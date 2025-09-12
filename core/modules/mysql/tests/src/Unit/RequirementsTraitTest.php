@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\mysql\Unit;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Database\Schema;
 use Drupal\mysql\Driver\Database\mysql\Connection;
 use Drupal\Core\Database\StatementInterface;
@@ -68,14 +69,14 @@ class RequirementsTraitTest extends UnitTestCase {
        * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
        *   The translation service.
        */
-      public function setStringTranslation($translation) {
+      public function setStringTranslation($translation): void {
         $this->stringTranslation = $translation;
       }
 
       /**
        * {@inheritdoc}
        */
-      protected function t($string, array $args = [], array $options = []) {
+      protected function t($string, array $args = [], array $options = []): TranslatableMarkup {
         return $this->stringTranslation->translate($string, $args, $options);
       }
 
