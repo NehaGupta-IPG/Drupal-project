@@ -97,6 +97,7 @@ function views_post_update_block_items_per_page(?array &$sandbox = NULL): void {
   if (!\Drupal::moduleHandler()->moduleExists('block')) {
     return;
   }
+  \Drupal::classResolver(ViewsConfigUpdater::class)->setDeprecationsEnabled(FALSE);
   \Drupal::classResolver(ConfigEntityUpdater::class)
     ->update($sandbox, 'block', function (BlockInterface $block): bool {
       if (str_starts_with($block->getPluginId(), 'views_block:')) {
