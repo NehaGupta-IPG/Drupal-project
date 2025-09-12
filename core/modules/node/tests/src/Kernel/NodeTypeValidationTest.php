@@ -30,6 +30,9 @@ class NodeTypeValidationTest extends ConfigEntityValidationTestBase {
   protected static array $propertiesWithOptionalValues = [
     'description',
     'help',
+    'label_singular',
+    'label_plural',
+    'label_count',
   ];
 
   /**
