@@ -177,6 +177,19 @@ class ComponentValidator {
       // If there are no properties in the schema there is nothing to validate.
       return TRUE;
     }
+
+    // Add null type to all non-required properties.
+    $required_props = $schema['required'] ?? [];
+    $optional_props = array_diff(array_keys($schema['properties']), $required_props);
+    foreach ($optional_props as $prop_id) {
+      $prop = &$schema['properties'][$prop_id];
+
+      if (!is_array($prop['type'])) {
+        $prop['type'] = [$prop['type']];
+      }
+      $prop['type'][] = 'null';
+    }
+
     $prop_names = array_keys($schema['properties']);
     $props_raw = array_intersect_key($context, array_flip($prop_names));
     // Validator::arrayToObjectRecursive stringifies the props using the JSON
