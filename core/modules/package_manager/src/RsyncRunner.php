@@ -30,7 +30,7 @@ final class RsyncRunner implements RsyncProcessRunnerInterface, LoggerAwareInter
   ) {}
 
   /**
-   * [@inheritdoc
+   * {@inheritdoc}
    */
   public function run(array $command, ?PathInterface $cwd = NULL, array $env = [], ?OutputCallbackInterface $callback = NULL, int $timeout = ProcessInterface::DEFAULT_TIMEOUT): void {
     try {
