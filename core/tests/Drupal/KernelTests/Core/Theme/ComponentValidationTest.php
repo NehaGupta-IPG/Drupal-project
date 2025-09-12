@@ -33,6 +33,7 @@ class ComponentValidationTest extends KernelTestBase {
       '#type' => 'component',
       '#component' => 'sdc_theme_test:my-card',
       '#props' => [
+        'header' => 'This is clearly a header.',
         'slogan' => NULL,
       ],
     ];
