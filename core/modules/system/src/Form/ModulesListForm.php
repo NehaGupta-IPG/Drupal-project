@@ -329,7 +329,7 @@ class ModulesListForm extends FormBase {
     // Disable the checkbox for required modules.
     if (!empty($module->info['required'])) {
       // Used when displaying modules that are required by the installation
-      // profile
+      // profile.
       $row['enable']['#disabled'] = TRUE;
       $row['#required_by'][] = $distribution . (!empty($module->info['explanation']) ? ' (' . $module->info['explanation'] . ')' : '');
     }
@@ -375,8 +375,6 @@ class ModulesListForm extends FormBase {
     // If this module requires other modules, add them to the array.
     /** @var \Drupal\Core\Extension\Dependency $dependency_object */
     foreach ($module->requires as $dependency => $dependency_object) {
-      // @todo Add logic for not displaying hidden modules in
-      //   https://drupal.org/node/3117829.
       if ($incompatible = $this->checkDependencyMessage($modules, $dependency, $dependency_object)) {
         $row['#requires'][$dependency] = $incompatible;
         $row['enable']['#disabled'] = TRUE;
