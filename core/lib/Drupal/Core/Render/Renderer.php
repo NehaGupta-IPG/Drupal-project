@@ -775,9 +775,8 @@ class Renderer implements RendererInterface {
           // still not finished, then start to allow code higher up the stack to
           // get on with something else.
           if ($iterations) {
-            $fiber = \Fiber::getCurrent();
-            if ($fiber !== NULL) {
-              $fiber->suspend();
+            if (\Fiber::getCurrent()) {
+              \Fiber::suspend();
             }
           }
           continue;
