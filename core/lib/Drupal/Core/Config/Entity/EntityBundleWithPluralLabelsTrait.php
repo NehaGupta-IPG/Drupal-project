@@ -26,6 +26,8 @@ trait EntityBundleWithPluralLabelsTrait {
   /**
    * A list of definite singular/plural count label variants.
    *
+   * @var string[]|null
+   *
    * Unlimited definite singular/plural count labels can be defined in order to
    * cover various contexts where they are used. The array keys are strings or
    * integers, identifying the count label variant. For instance, a site might
@@ -49,8 +51,6 @@ trait EntityBundleWithPluralLabelsTrait {
    * @endcode
    * Each value is a definite singular/plural count label with the plural
    * variants separated by ETX (PoItem::DELIMITER).
-   *
-   * @var string[]|null
    *
    * @see \Drupal\Component\Gettext\PoItem::DELIMITER
    */
