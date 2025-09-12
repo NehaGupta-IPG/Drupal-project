@@ -8,3 +8,7 @@ help: null
 new_revision: true
 preview_mode: 1
 display_submitted: false
+label_singular: page
+label_plural: pages
+label_count:
+  - "1 page\x03@count pages"
