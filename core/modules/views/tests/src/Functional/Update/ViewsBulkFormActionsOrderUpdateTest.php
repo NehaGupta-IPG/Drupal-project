@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests views_post_update_bulk_form_action_order().
- *
- * @group views
- * @group legacy
  */
+#[Group('Update')]
+#[CoversFunction('views_post_update_bulk_form_action_order')]
+#[IgnoreDeprecations]
 class ViewsBulkFormActionsOrderUpdateTest extends UpdatePathTestBase {
 
   /**
@@ -24,7 +27,7 @@ class ViewsBulkFormActionsOrderUpdateTest extends UpdatePathTestBase {
   }
 
   /**
-   * @covers  \views_post_update_bulk_form_action_order
+   * Tests views_post_update_bulk_form_action_order().
    */
   public function testBulkFormActionsOrderPostUpdate(): void {
     $config_factory = \Drupal::configFactory();
