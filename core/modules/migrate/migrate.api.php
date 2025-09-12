@@ -184,6 +184,38 @@ function hook_migrate_MIGRATION_ID_prepare_row(Row $row, MigrateSourceInterface 
 }
 
 /**
+ * Alters the information provided in \Drupal\migrate\Annotation\MigrateDestination.
+ *
+ * @param array $destination_plugins
+ *   The array of Migrate destination plugin definitions, keyed by plugin ID.
+ */
+function hook_migrate_destination_info_alter(array &$destination_plugins) {}
+
+/**
+ * Alters the information provided in \Drupal\migrate\Annotation\MigrateSource.
+ *
+ * @param array $source_plugins
+ *   The array of Migrate source plugin definitions, keyed by plugin ID.
+ */
+function hook_migrate_source_info_alter(array &$source_plugins) {}
+
+/**
+ * Alters the information provided in \Drupal\migrate\Annotation\MigrateProcessPlugin.
+ *
+ * @param array $process_plugins
+ *   The array of Migrate process plugin definitions, keyed by plugin ID.
+ */
+function hook_migrate_process_plugin_info_alter(array &$process_plugins) {}
+
+/**
+ * Allows altering the information of plugins implemented \Drupal\migrate\Plugin\MigrateIdMapInterface
+ *
+ * @param array $id_map_plugins
+ *   The array of Migrate ID map plugin definitions, keyed by plugin ID.
+ */
+function hook_migrate_id_map_info_alter(array &$id_map_plugins) {}
+
+/**
  * Allows altering the list of discovered migration plugins.
  *
  * Modules are able to alter specific migrations structures or even remove or
