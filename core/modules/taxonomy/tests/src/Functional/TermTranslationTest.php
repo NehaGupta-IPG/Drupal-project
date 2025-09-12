@@ -6,12 +6,12 @@ namespace Drupal\Tests\taxonomy\Functional;
 
 use Drupal\Core\Url;
 use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests for proper breadcrumb translation.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
 class TermTranslationTest extends TaxonomyTestBase {
 
   use AssertBreadcrumbTrait;
@@ -122,7 +122,7 @@ class TermTranslationTest extends TaxonomyTestBase {
   /**
    * Setup translated terms in a hierarchy.
    */
-  protected function setUpTerms() {
+  protected function setUpTerms(): void {
     $parent_vid = 0;
     foreach ($this->termTranslationMap as $name => $translation) {
 

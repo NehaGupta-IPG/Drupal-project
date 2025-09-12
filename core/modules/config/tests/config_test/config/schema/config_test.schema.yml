@@ -241,6 +241,13 @@ config_test.foo:
     label:
       type: label
       label: 'Label'
+    # Note that config_object should never be used on a non-root key.
+    broken_langcode_required:
+      type: config_object
+      required: false
+      mapping:
+        foo:
+          type: string
 
 config_test.bar:
   type: config_test.foo
@@ -301,3 +308,9 @@ config_test.validation:
       type: string
       constraints:
         UriHost: ~
+
+config_test.with_plural_label:
+  type: config_object
+  mapping:
+    label:
+      type: plural_label

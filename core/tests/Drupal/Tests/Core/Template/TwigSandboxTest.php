@@ -5,21 +5,22 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Template;
 
 use Drupal\Core\Template\Attribute;
-use Drupal\Core\Template\TwigSandboxPolicy;
 use Drupal\Core\Template\Loader\StringLoader;
+use Drupal\Core\Template\TwigSandboxPolicy;
 use Drupal\Tests\Core\Entity\ContentEntityBaseMockableClass;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Twig\Environment;
 use Twig\Extension\SandboxExtension;
 use Twig\Sandbox\SecurityError;
 
 /**
  * Tests the twig sandbox policy.
- *
- * @group Template
- *
- * @coversDefaultClass \Drupal\Core\Template\TwigSandboxPolicy
  */
+#[CoversClass(TwigSandboxPolicy::class)]
+#[Group('Template')]
 class TwigSandboxTest extends UnitTestCase {
 
   /**
@@ -44,9 +45,8 @@ class TwigSandboxTest extends UnitTestCase {
 
   /**
    * Tests that dangerous methods cannot be called in entity objects.
-   *
-   * @dataProvider getTwigEntityDangerousMethods
    */
+  #[DataProvider('getTwigEntityDangerousMethods')]
   public function testEntityDangerousMethods($template): void {
     $entity = $this->createMock('Drupal\Core\Entity\EntityInterface');
     $this->expectException(SecurityError::class);
@@ -57,6 +57,7 @@ class TwigSandboxTest extends UnitTestCase {
    * Data provider for ::testEntityDangerousMethods.
    *
    * @return array
+   *   An array of dangerous methods.
    */
   public static function getTwigEntityDangerousMethods() {
     return [
@@ -105,8 +106,8 @@ class TwigSandboxTest extends UnitTestCase {
   /**
    * Tests that valid methods can be called from within Twig templates.
    *
-   * Currently the following methods are whitelisted: id, label, bundle, and
-   * get.
+   * Currently the following methods are in the allowed list: id, label, bundle,
+   * and get.
    */
   public function testEntitySafeMethods(): void {
     $entity = $this->getMockBuilder(ContentEntityBaseMockableClass::class)
@@ -157,4 +158,7 @@ class TwigSandboxTest extends UnitTestCase {
 
 }
 
+/**
+ * Test class for HTML attributes collector, sanitizer, and renderer.
+ */
 class TestAttribute extends Attribute {}

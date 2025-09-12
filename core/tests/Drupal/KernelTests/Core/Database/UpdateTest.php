@@ -6,12 +6,12 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the update query builder.
- *
- * @group Database
  */
+#[Group('Database')]
 class UpdateTest extends DatabaseTestBase {
 
   /**
@@ -170,6 +170,32 @@ class UpdateTest extends DatabaseTestBase {
       ->fields(['id' => 2])
       ->condition('id', 1)
       ->execute();
+  }
+
+  /**
+   * Tests the Update::__toString() method.
+   */
+  public function testToString(): void {
+    // Prepare query for testing.
+    $query = $this->connection->update('test')
+      ->fields(['a' => 27, 'b' => 42])
+      ->condition('c', [1, 2], 'IN');
+
+    // Confirm placeholders are present.
+    $query_string = (string) $query;
+    $this->assertStringContainsString(':db_update_placeholder_0', $query_string);
+    $this->assertStringContainsString(':db_update_placeholder_1', $query_string);
+    $this->assertStringContainsString(':db_condition_placeholder_0', $query_string);
+    $this->assertStringContainsString(':db_condition_placeholder_1', $query_string);
+
+    // Test arguments.
+    $expected = [
+      ':db_update_placeholder_0' => 27,
+      ':db_update_placeholder_1' => 42,
+      ':db_condition_placeholder_0' => 1,
+      ':db_condition_placeholder_1' => 2,
+    ];
+    $this->assertEquals($expected, $query->arguments());
   }
 
 }

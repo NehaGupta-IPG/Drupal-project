@@ -4,24 +4,28 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 
+use Drupal\ckeditor5\Plugin\CKEditor5Plugin\Media;
+use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
-use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
-use Symfony\Component\Validator\ConstraintViolation;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
- * @coversDefaultClass \Drupal\ckeditor5\Plugin\CKEditor5Plugin\Media
- * @group ckeditor5
- * @group #slow
+ * Tests Drupal\ckeditor5\Plugin\CKEditor5Plugin\Media.
+ *
  * @internal
  */
+#[CoversClass(Media::class)]
+#[Group('ckeditor5')]
 class MediaLinkabilityTest extends MediaTestBase {
 
   /**
    * Ensures arbitrary attributes can be added on links wrapping media via GHS.
-   *
-   * @dataProvider providerLinkability
    */
+  #[DataProvider('providerLinkability')]
   public function testLinkedMediaArbitraryHtml(bool $unrestricted): void {
     $assert_session = $this->assertSession();
 
@@ -33,9 +37,9 @@ class MediaLinkabilityTest extends MediaTestBase {
         ->setFilterConfig('filter_html', ['status' => FALSE]);
     }
     else {
-      // Allow the data-foo attribute in <a> via GHS. Also, add support for div's
-      // with data-foo attribute to ensure that linked drupal-media elements can
-      // be wrapped with <div>.
+      // Allow the data-foo attribute in <a> via GHS. Also, add support for
+      // div's with data-foo attribute to ensure that linked drupal-media
+      // elements can be wrapped with <div>.
       $settings['plugins']['ckeditor5_sourceEditing']['allowed_tags'] = ['<a data-foo>', '<div data-bar>'];
       $editor->setSettings($settings);
       $filter_format->setFilterConfig('filter_html', [
@@ -48,7 +52,7 @@ class MediaLinkabilityTest extends MediaTestBase {
     $editor->save();
     $filter_format->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolation $v) {
+      function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -85,9 +89,8 @@ class MediaLinkabilityTest extends MediaTestBase {
    * "dataDowncast" results. These are CKEditor 5 concepts.
    *
    * @see https://ckeditor.com/docs/ckeditor5/latest/framework/guides/architecture/editing-engine.html#conversion
-   *
-   * @dataProvider providerLinkability
    */
+  #[DataProvider('providerLinkability')]
   public function testLinkability(bool $unrestricted): void {
     // Disable filter_html.
     if ($unrestricted) {
@@ -135,10 +138,10 @@ class MediaLinkabilityTest extends MediaTestBase {
     $link_media_button->press();
     // Assert structure of link form balloon.
     $balloon = $this->assertVisibleBalloon('.ck-link-form');
-    $url_input = $balloon->find('css', '.ck-labeled-field-view__input-wrapper .ck-input-text');
-    // Fill in link form balloon's <input> and hit "Save".
+    $url_input = $balloon->find('css', '.ck-labeled-field-view__input-wrapper .ck-input-text[inputmode=url]');
+    // Fill in link form balloon's <input> and hit "Insert".
     $url_input->setValue('http://linking-embedded-media.com');
-    $balloon->pressButton('Save');
+    $balloon->pressButton('Insert');
 
     // Assert the "editingDowncast" HTML after making changes. Assert the link
     // exists, then assert the link exists. Then assert the expected DOM
@@ -221,6 +224,12 @@ class MediaLinkabilityTest extends MediaTestBase {
     $this->assertEmpty($xpath->query('//a'));
   }
 
+  /**
+   * Returns data for multiple tests.
+   *
+   * Provides data for testLinkability(), testLinkManualDecorator() and
+   * testLinkedMediaArbitraryHtml().
+   */
   public static function providerLinkability(): array {
     return [
       'restricted' => [FALSE],
@@ -230,9 +239,8 @@ class MediaLinkabilityTest extends MediaTestBase {
 
   /**
    * Ensure that manual link decorators work with linkable media.
-   *
-   * @dataProvider providerLinkability
    */
+  #[DataProvider('providerLinkability')]
   public function testLinkManualDecorator(bool $unrestricted): void {
     \Drupal::service('module_installer')->install(['ckeditor5_manual_decorator_test']);
     $this->resetAll();
@@ -267,13 +275,15 @@ class MediaLinkabilityTest extends MediaTestBase {
     $this->getBalloonButton('Link media')->click();
 
     $balloon = $this->assertVisibleBalloon('.ck-link-form');
-    $url_input = $balloon->find('css', '.ck-labeled-field-view__input-wrapper .ck-input-text');
+    $url_input = $balloon->find('css', '.ck-labeled-field-view__input-wrapper .ck-input-text[inputmode=url]');
     $url_input->setValue('http://linking-embedded-media.com');
+    $balloon->pressButton('Insert');
+    $this->getBalloonButton('Link properties')->click();
     $this->getBalloonButton($decorator)->click();
-    $balloon->pressButton('Save');
+    $this->getBalloonButton('Back')->click();
 
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.drupal-media a'));
-    $this->assertVisibleBalloon('.ck-link-actions');
+    $this->assertVisibleBalloon('.ck-link-toolbar');
 
     $xpath = new \DOMXPath($this->getEditorDataAsDom());
     $this->assertNotEmpty($xpath->query("//a[@href='http://linking-embedded-media.com']$decorator_attributes"));
@@ -291,7 +301,7 @@ class MediaLinkabilityTest extends MediaTestBase {
     $drupalmedia->click();
     $this->assertVisibleBalloon('.ck-toolbar[aria-label="Drupal Media toolbar"]');
     $this->getBalloonButton('Link media')->click();
-    $this->assertVisibleBalloon('.ck-link-actions');
+    $this->assertVisibleBalloon('.ck-link-toolbar');
     $this->getBalloonButton('Unlink')->click();
 
     $this->assertTrue($assert_session->waitForElementRemoved('css', '.drupal-media a'));

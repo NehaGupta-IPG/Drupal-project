@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Installer;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Testing installing from config without system.site.
- *
- * @group Installer
  */
-class InstallerExistingConfigNoSystemSiteTest extends InstallerExistingConfigTestBase {
+#[Group('Installer')]
+class InstallerExistingConfigNoSystemSiteTest extends InstallerConfigDirectoryTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected function prepareEnvironment() {
+  protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
     // File API functions are not available yet.
     unlink($this->siteDirectory . '/profiles/' . $this->profile . '/config/sync/system.site.yml');
@@ -23,7 +24,7 @@ class InstallerExistingConfigNoSystemSiteTest extends InstallerExistingConfigTes
   /**
    * {@inheritdoc}
    */
-  public function setUpSite() {
+  public function setUpSite(): void {
     // There are errors. Therefore, there is nothing to do here.
   }
 
@@ -44,8 +45,8 @@ class InstallerExistingConfigNoSystemSiteTest extends InstallerExistingConfigTes
   /**
    * {@inheritdoc}
    */
-  protected function getConfigTarball() {
-    return __DIR__ . '/../../../fixtures/config_install/testing_config_install.tar.gz';
+  protected function getConfigLocation(): string {
+    return __DIR__ . '/../../../fixtures/config_install/testing_config_install';
   }
 
 }

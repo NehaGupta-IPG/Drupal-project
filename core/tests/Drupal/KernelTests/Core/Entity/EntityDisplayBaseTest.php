@@ -6,15 +6,19 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\comment\Entity\CommentType;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\Core\Entity\EntityDisplayBase;
+use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Entity\EntityDisplayBase
- *
- * @group Entity
+ * Tests Drupal\Core\Entity\EntityDisplayBase.
  */
+#[CoversClass(EntityDisplayBase::class)]
+#[Group('Entity')]
 class EntityDisplayBaseTest extends KernelTestBase {
 
   /**
@@ -41,7 +45,9 @@ class EntityDisplayBaseTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::preSave
+   * Tests pre save.
+   *
+   * @legacy-covers ::preSave
    */
   public function testPreSave(): void {
     $entity_display = EntityViewDisplay::create([
@@ -78,7 +84,9 @@ class EntityDisplayBaseTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::onDependencyRemoval
+   * Tests on dependency removal.
+   *
+   * @legacy-covers ::onDependencyRemoval
    */
   public function testOnDependencyRemoval(): void {
     // Create a comment field for entity_test.
@@ -168,6 +176,24 @@ class EntityDisplayBaseTest extends KernelTestBase {
       'entity_test',
     ];
     $this->assertSame($expected_dependencies, $entity_display->getDependencies());
+  }
+
+  /**
+   * Tests that changing the entity ID updates related properties.
+   */
+  public function testChangeId(): void {
+    /** @var \Drupal\Core\Entity\Display\EntityDisplayInterface $display */
+    $display = $this->container->get(EntityDisplayRepositoryInterface::class)
+      ->getViewDisplay('entity_test', 'entity_test');
+    $this->assertSame('entity_test.entity_test.default', $display->id());
+    $display->set('id', 'node.page.rss');
+    $this->assertSame('node', $display->getTargetEntityTypeId());
+    $this->assertSame('page', $display->getTargetBundle());
+    $this->assertSame('rss', $display->getMode());
+
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage("'a.b' is not a valid entity display ID.");
+    $display->set('id', 'a.b');
   }
 
 }

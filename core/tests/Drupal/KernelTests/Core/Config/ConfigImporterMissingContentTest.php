@@ -7,8 +7,6 @@ namespace Drupal\KernelTests\Core\Config;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Block\Plugin\Block\Broken;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\StorageComparer;
@@ -17,13 +15,13 @@ use Drupal\Core\Logger\RfcLoggerTrait;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Log\LoggerInterface;
 
 /**
  * Tests importing configuration which has missing content dependencies.
- *
- * @group config
  */
+#[Group('config')]
 class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerInterface {
   use BlockCreationTrait;
   use RfcLoggerTrait;
@@ -43,9 +41,7 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
   protected $configImporter;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
@@ -58,7 +54,7 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
     $container->register('logger.ConfigImporterMissingContentTest', __CLASS__)->addTag('logger');
     $container->set('logger.ConfigImporterMissingContentTest', $this);
@@ -147,9 +143,12 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
     $this->enableModules([
       'block',
       'block_content',
+      'field',
+      'text',
     ]);
     $this->container->get('theme_installer')->install(['stark']);
     $this->installEntitySchema('block_content');
+    $this->installConfig(['block_content']);
     // Create a block content type.
     $block_content_type = BlockContentType::create([
       'id' => 'test',
@@ -194,7 +193,8 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
    * {@inheritdoc}
    */
   public function log($level, $message, array $context = []): void {
-    $this->logMessages[] = PlainTextOutput::renderFromHtml(new FormattableMarkup($message, $context));
+    $message_placeholders = \Drupal::service('logger.log_message_parser')->parseMessagePlaceholders($message, $context);
+    $this->logMessages[] = empty($message_placeholders) ? $message : strtr($message, $message_placeholders);
   }
 
 }

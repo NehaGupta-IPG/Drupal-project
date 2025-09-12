@@ -5,20 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Menu;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests breadcrumbs functionality.
- *
- * @group Menu
  */
+#[Group('Menu')]
 class BreadcrumbFrontCacheContextsTest extends BrowserTestBase {
 
   use AssertBreadcrumbTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',

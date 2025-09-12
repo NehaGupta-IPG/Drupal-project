@@ -8,12 +8,12 @@ use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests detection of triggering_element for programmed form submissions.
- *
- * @group Form
  */
+#[Group('Form')]
 class TriggeringElementProgrammedTest extends KernelTestBase implements FormInterface {
 
   /**
@@ -54,7 +54,7 @@ class TriggeringElementProgrammedTest extends KernelTestBase implements FormInte
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     // Verify that the only submit button was recognized as triggering_element.
     $this->assertEquals($form['actions']['submit']['#array_parents'], $form_state->getTriggeringElement()['#array_parents']);
   }

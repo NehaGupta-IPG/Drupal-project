@@ -10,13 +10,12 @@ use Drupal\media\Entity\Media;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Basic access tests for Media.
- *
- * @group media
- * @group #slow
  */
+#[Group('media')]
 class MediaAccessTest extends MediaFunctionalTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -221,6 +220,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     $mediaOverviewRole = $this->createRole(['access content overview', 'access media overview']);
     $this->nonAdminUser->addRole($mediaOverviewRole)->save();
 
+    $this->grantPermissions($role, ['access user profiles']);
     $this->drupalGet('admin/content');
     $assert_session->linkByHrefExists('/admin/content/media');
     $this->clickLink('Media');

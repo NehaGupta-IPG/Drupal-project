@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\language\Functional;
 
+use Drupal\block\Entity\Block;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Language\Language;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\language\LanguageNegotiatorInterface;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationBrowser;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationSelected;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationSession;
@@ -15,11 +19,8 @@ use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Plugin\LanguageNegotiation\LanguageNegotiationUser;
 use Drupal\user\Plugin\LanguageNegotiation\LanguageNegotiationUserAdmin;
-use Drupal\Core\Language\Language;
-use Drupal\Core\Language\LanguageInterface;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
-use Drupal\language\LanguageNegotiatorInterface;
-use Drupal\block\Entity\Block;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
@@ -40,9 +41,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  * - admin/config: Tests the UI using the precedence rules.
  * - zh-hans/admin/config: Tests the UI in Chinese.
  * - blah-blah/admin/config: Tests the 404 page.
- *
- * @group language
  */
+#[Group('language')]
 class LanguageUILanguageNegotiationTest extends BrowserTestBase {
 
   /**
@@ -62,7 +62,7 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
   protected $adminUser;
 
   /**
-   * Modules to enable.
+   * Modules to install.
    *
    * We marginally use interface translation functionality here, so need to use
    * the locale module instead of language only, but the 90% of the test is
@@ -126,10 +126,10 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
     $file->save();
 
     // Setup the site languages by installing two languages.
-    // Set the default language in order for the translated string to be registered
-    // into database when seen by t(). Without doing this, our target string
-    // is for some reason not found when doing translate search. This might
-    // be some bug.
+    // Set the default language in order for the translated string to be
+    // registered into database when seen by t(). Without doing this, our target
+    // string is for some reason not found when doing translate search. This
+    // might be some bug.
     $default_language = \Drupal::languageManager()->getDefaultLanguage();
     ConfigurableLanguage::createFromLangcode($langcode_browser_fallback)->save();
     $this->config('system.site')->set('default_langcode', $langcode_browser_fallback)->save();
@@ -414,7 +414,10 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
     }
   }
 
-  protected function doRunTest($test) {
+  /**
+   * Runs common tests for the language user interface.
+   */
+  protected function doRunTest($test): void {
     $test += ['path_options' => []];
     if (!empty($test['language_negotiation'])) {
       $method_weights = array_flip($test['language_negotiation']);

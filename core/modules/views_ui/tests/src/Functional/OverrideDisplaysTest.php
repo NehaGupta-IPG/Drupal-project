@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views_ui\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests that displays can be correctly overridden via the user interface.
- *
- * @group views_ui
- * @group #slow
  */
+#[Group('views_ui')]
 class OverrideDisplaysTest extends UITestBase {
 
   /**

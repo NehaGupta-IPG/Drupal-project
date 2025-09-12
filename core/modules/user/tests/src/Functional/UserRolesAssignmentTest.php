@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\user\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that users can be assigned and unassigned roles.
- *
- * @group user
  */
+#[Group('user')]
 class UserRolesAssignmentTest extends BrowserTestBase {
 
   /**
@@ -94,7 +94,7 @@ class UserRolesAssignmentTest extends BrowserTestBase {
    *   (optional) Whether to assert that $rid exists (TRUE) or not (FALSE).
    *   Defaults to TRUE.
    */
-  private function userLoadAndCheckRoleAssigned($account, $rid, $is_assigned = TRUE) {
+  private function userLoadAndCheckRoleAssigned($account, $rid, $is_assigned = TRUE): void {
     $user_storage = $this->container->get('entity_type.manager')->getStorage('user');
     $user_storage->resetCache([$account->id()]);
     $account = $user_storage->load($account->id());

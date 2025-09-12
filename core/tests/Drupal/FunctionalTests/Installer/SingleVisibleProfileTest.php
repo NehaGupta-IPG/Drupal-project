@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Core\Serialization\Yaml;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests distribution profile support.
- *
- * @group Installer
  */
+#[Group('Installer')]
 class SingleVisibleProfileTest extends InstallerTestBase {
 
   /**
@@ -30,7 +30,7 @@ class SingleVisibleProfileTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function prepareEnvironment() {
+  protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
     $profiles = ['standard', 'demo_umami'];
     foreach ($profiles as $profile) {
@@ -50,7 +50,7 @@ class SingleVisibleProfileTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpProfile() {
+  protected function setUpProfile(): void {
     // This step is skipped, because there is only one visible profile.
   }
 

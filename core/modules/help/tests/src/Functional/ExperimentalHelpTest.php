@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\help\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Verifies help for experimental modules.
- *
- * @group help
  */
+#[Group('help')]
 class ExperimentalHelpTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
+   * Modules to install.
    *
    * The experimental_module_test module implements hook_help() and is in the
    * Core (Experimental) package.

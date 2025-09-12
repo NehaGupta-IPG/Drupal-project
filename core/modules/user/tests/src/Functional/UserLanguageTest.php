@@ -6,18 +6,16 @@ namespace Drupal\Tests\user\Functional;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Functional tests for a user's ability to change their default language.
- *
- * @group user
  */
+#[Group('user')]
 class UserLanguageTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['user', 'language'];
 

@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\user\Functional\Views;
 
 use Drupal\Tests\views\Functional\ViewTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the permission field handler ui.
  *
- * @group user
  * @see \Drupal\user\Plugin\views\filter\Permissions
  */
+#[Group('user')]
 class FilterPermissionUiTest extends ViewTestBase {
 
   /**
@@ -22,9 +23,7 @@ class FilterPermissionUiTest extends ViewTestBase {
   public static $testViews = ['test_filter_permission'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['user', 'user_test_views', 'views_ui'];
 

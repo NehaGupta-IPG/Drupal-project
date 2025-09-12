@@ -6,13 +6,14 @@ namespace Drupal\Tests\user\Functional\Views;
 
 use Drupal\Component\Utility\Html;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the handler of the user: role field.
  *
- * @group user
  * @see views_handler_field_user_name
  */
+#[Group('user')]
 class HandlerFieldRoleTest extends UserTestBase {
 
   /**
@@ -27,6 +28,9 @@ class HandlerFieldRoleTest extends UserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * Tests the rendering of user roles in a Views field handler.
+   */
   public function testRole(): void {
     // Create a couple of roles for the view.
     $role_name_a = 'a' . $this->randomMachineName(8);

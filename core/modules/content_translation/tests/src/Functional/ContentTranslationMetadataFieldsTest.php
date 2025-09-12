@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_translation\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests the Content Translation metadata fields handling.
- *
- * @group content_translation
  */
+#[Group('content_translation')]
 class ContentTranslationMetadataFieldsTest extends ContentTranslationTestBase {
 
   /**
@@ -26,9 +27,7 @@ class ContentTranslationMetadataFieldsTest extends ContentTranslationTestBase {
   protected $bundle = 'article';
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language', 'content_translation', 'node'];
 
@@ -40,7 +39,7 @@ class ContentTranslationMetadataFieldsTest extends ContentTranslationTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setupBundle() {
+  protected function setupBundle(): void {
     parent::setupBundle();
     $this->createContentType(['type' => $this->bundle]);
   }

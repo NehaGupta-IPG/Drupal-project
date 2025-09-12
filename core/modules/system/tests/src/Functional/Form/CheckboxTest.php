@@ -5,20 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the form API checkbox element.
  *
  * Various combinations of #default_value and #return_value are used.
- *
- * @group Form
  */
+#[Group('Form')]
 class CheckboxTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['form_test'];
 
@@ -27,6 +25,9 @@ class CheckboxTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * Tests various checkbox configurations in the form API.
+   */
   public function testFormCheckbox(): void {
     // Ensure that the checked state is determined and rendered correctly for
     // tricky combinations of default and return values.

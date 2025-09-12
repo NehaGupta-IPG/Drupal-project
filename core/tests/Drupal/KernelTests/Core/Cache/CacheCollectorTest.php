@@ -8,19 +8,20 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Core\Cache\CacheCollectorHelper;
 use Drupal\TestTools\Random;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Tests DatabaseBackend cache tag implementation.
- *
- * @group Cache
  */
+#[Group('Cache')]
 class CacheCollectorTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
     // Change container to database cache backends.
     $container
@@ -36,9 +37,8 @@ class CacheCollectorTest extends KernelTestBase {
 
   /**
    * Tests setting and invalidating.
-   *
-   * @dataProvider providerTestInvalidCharacters
    */
+  #[DataProvider('providerTestInvalidCharacters')]
   public function testCacheCollector($cid, $key, $value): void {
     $collector = new CacheCollectorHelper($cid, $this->container->get('cache.default'), $this->container->get('lock'));
     $this->assertNull($collector->get($key));

@@ -6,18 +6,16 @@ namespace Drupal\KernelTests\Core\Menu;
 
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests integration of static menu links.
- *
- * @group Menu
  */
+#[Group('Menu')]
 class MenuLinkDefaultIntegrationTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'menu_test',

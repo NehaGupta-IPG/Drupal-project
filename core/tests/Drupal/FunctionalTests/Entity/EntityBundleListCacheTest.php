@@ -9,20 +9,18 @@ use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\entity_test\Entity\EntityTestWithBundle;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that bundle tags are invalidated when entities change.
- *
- * @group Entity
  */
+#[Group('Entity')]
 class EntityBundleListCacheTest extends BrowserTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['cache_test', 'entity_test'];
 

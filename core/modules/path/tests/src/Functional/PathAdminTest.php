@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\path\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests the Path admin UI.
- *
- * @group path
  */
+#[Group('path')]
 class PathAdminTest extends PathTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['path'];
 

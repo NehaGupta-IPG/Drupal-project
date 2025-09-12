@@ -10,14 +10,14 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the entity reference display plugin.
  *
- * @group views
- *
  * @see \Drupal\views\Plugin\views\display\EntityReference
  */
+#[Group('views')]
 class DisplayEntityReferenceTest extends ViewTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -30,9 +30,7 @@ class DisplayEntityReferenceTest extends ViewTestBase {
   public static $testViews = ['test_display_entity_reference'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test', 'field', 'views_ui'];
 
@@ -95,7 +93,7 @@ class DisplayEntityReferenceTest extends ViewTestBase {
 
     // Add an entity reference field to reference the same base table.
     $this->entityRefFieldName = 'field_test_entity_ref_entity_ref';
-    $this->createEntityReferenceField('entity_test', 'entity_test', $this->entityRefFieldName, NULL, 'entity_test');
+    $this->createEntityReferenceField('entity_test', 'entity_test', $this->entityRefFieldName, '', 'entity_test');
 
     // Create some entities to search. Add a common string to the name and
     // the text field in two entities so we can test that we can search in both.

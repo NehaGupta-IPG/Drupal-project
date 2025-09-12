@@ -7,14 +7,14 @@ namespace Drupal\KernelTests\Core\Routing;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Tests the exception handling for various cases.
- *
- * @group Routing
  */
+#[Group('Routing')]
 class ExceptionHandlingTest extends KernelTestBase {
 
   /**
@@ -132,7 +132,7 @@ class ExceptionHandlingTest extends KernelTestBase {
 
     // Test with 404 path pointing to a route that uses '_form'.
     $response = $this->doTest404Route('/router_test/test26');
-    $this->assertStringContainsString('<form class="system-logging-settings"', $response->getContent());
+    $this->assertStringContainsString('<form class="router-test-form"', $response->getContent());
 
     // Test with 404 path pointing to a route that uses '_entity_form'.
     $response = $this->doTest404Route('/router_test/test27');
@@ -146,6 +146,7 @@ class ExceptionHandlingTest extends KernelTestBase {
    *   The path to test.
    *
    * @return \Drupal\Core\Render\HtmlResponse
+   *   The generated 404 response.
    *
    * @see \Drupal\system\Tests\Routing\ExceptionHandlingTest::testExceptionResponseGeneratedForOriginalRequest()
    */

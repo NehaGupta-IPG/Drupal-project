@@ -6,12 +6,12 @@ namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Tests\views\Functional\ViewTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the menu links created in views.
- *
- * @group views
  */
+#[Group('views')]
 class MenuLinkTest extends ViewTestBase {
 
   /**
@@ -22,9 +22,7 @@ class MenuLinkTest extends ViewTestBase {
   public static $testViews = ['test_menu_link'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'views',

@@ -20,14 +20,13 @@ class EntityTypeInfoTest extends KernelTestBase {
   use ContentModerationTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'content_moderation',
     'workflows',
     'entity_test',
+    'user',
   ];
 
   /**
@@ -144,7 +143,7 @@ class EntityTypeInfoTest extends KernelTestBase {
   /**
    * Add moderation to an entity type and bundle.
    */
-  protected function enableModeration($entity_type_id, $bundle) {
+  protected function enableModeration($entity_type_id, $bundle): void {
     $workflow = $this->createEditorialWorkflow();
     $workflow->getTypePlugin()->addEntityTypeAndBundle($entity_type_id, $bundle);
     $workflow->save();
