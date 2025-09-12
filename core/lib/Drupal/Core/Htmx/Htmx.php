@@ -214,20 +214,19 @@ class Htmx {
       $query = $current_request->query->all();
       // Clean up values that could cause a conflict when several unrelated
       // forms are on the same page.
-      $exclude_keys = [
-        // @see FormState::$cleanValueKeys.
-        'form_id',
-        'form_token',
-        'form_build_id',
-        'op',
-        // Managed on the frontend by htmx-assets.js.
-        'ajax_page_state',
-        // Do not inherit return format from a previous request.
-        MainContentViewSubscriber::WRAPPER_FORMAT,
-      ];
-      foreach ($exclude_keys as $key) {
-        unset($query[$key]);
-      }
+      $query = array_filter($query, function ($key) {
+        return match ($key) {
+          'form_id' => FALSE,
+          'form_token' => FALSE,
+          'form_build_id' => FALSE,
+          'op' => FALSE,
+          // Managed on the frontend by htmx-assets.js.
+          'ajax_page_state' => FALSE,
+          // Do not inherit return format from a previous request.
+          MainContentViewSubscriber::WRAPPER_FORMAT => FALSE,
+          default => TRUE,
+        };
+      }, ARRAY_FILTER_USE_KEY);
       $request_url->setOption('query', $query);
     }
     else {
