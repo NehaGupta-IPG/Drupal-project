@@ -534,4 +534,12 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     return new TransactionManager($this);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function setIdleTimeout(int $timeout): void {
+    // SQLite has no concept of idle timeout since it's not a separate server.
+    // So, don't do anything (the parent method throws an exception).
+  }
+
 }

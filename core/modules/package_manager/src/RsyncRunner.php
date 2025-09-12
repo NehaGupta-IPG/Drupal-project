@@ -36,10 +36,6 @@ final class RsyncRunner implements RsyncProcessRunnerInterface, LoggerAwareInter
     try {
       $this->database->setIdleTimeout($timeout + 5);
     }
-    catch (\BadMethodCallException) {
-      // If the database driver doesn't support setting the idle timeout, this
-      // exception will be thrown and there's nothing else we need to do.
-    }
     catch (\Throwable $e) {
       // If we weren't able to set the idle timeout for whatever reason, bravely
       // continue anyway and hope for the best, but do log the problem for
