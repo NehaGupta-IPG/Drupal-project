@@ -49,39 +49,38 @@ class RequirementsTraitTest extends UnitTestCase {
     $this->connection = $this->createMock(Connection::class);
     $this->schema = $this->createMock(Schema::class);
 
+    $translation = $this->getStringTranslationStub();
+
     // Create an anonymous class that uses the trait for testing.
     $this->requirementsTraitObject = new class() {
       use RequirementsTrait;
 
       /**
-       * Mock translation function.
+       * The string translation service.
        *
-       * Mimics Drupal's t() function for testing purposes.
+       * @var \Drupal\Core\StringTranslation\TranslationInterface
        */
-      public function t($string, array $args = [], array $options = []): string {
-        // Handle Drupal's placeholder replacements.
-        foreach ($args as $key => $value) {
-          switch ($key[0]) {
-            case '@':
-              // Plain text replacement.
-              $args[$key] = (string) $value;
-              break;
+      private $stringTranslation;
 
-            case '%':
-              // Emphasized replacement.
-              $args[$key] = '<em>' . (string) $value . '</em>';
-              break;
+      /**
+       * Sets the string translation service.
+       *
+       * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
+       *   The translation service.
+       */
+      public function setStringTranslation($translation) {
+        $this->stringTranslation = $translation;
+      }
 
-            case ':':
-              // URL replacement.
-              $args[$key] = (string) $value;
-              break;
-          }
-        }
-        return strtr($string, $args);
+      /**
+       * {@inheritdoc}
+       */
+      protected function t($string, array $args = [], array $options = []) {
+        return $this->stringTranslation->translate($string, $args, $options);
       }
 
     };
+    $this->requirementsTraitObject->setStringTranslation($translation);
   }
 
   /**
