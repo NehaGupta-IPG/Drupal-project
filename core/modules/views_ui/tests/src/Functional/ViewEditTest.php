@@ -7,12 +7,12 @@ namespace Drupal\Tests\views_ui\Functional;
 use Drupal\Core\Database\Database;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\views\Entity\View;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests some general functionality of editing views, like deleting a view.
- *
- * @group views_ui
  */
+#[Group('views_ui')]
 class ViewEditTest extends UITestBase {
 
   /**
@@ -85,7 +85,7 @@ class ViewEditTest extends UITestBase {
     $machine_name_edit_url = 'admin/structure/views/nojs/display/test_view/test_1/display_id';
     $error_text = 'Display machine name must contain only lowercase letters, numbers, or underscores.';
 
-    // Test that potential invalid display ID requests are detected
+    // Test that potential invalid display ID requests are detected.
     $this->drupalGet('admin/structure/views/ajax/handler/test_view/fake_display_name/filter/title');
     $arguments = [
       '@display_id' => 'fake_display_name',

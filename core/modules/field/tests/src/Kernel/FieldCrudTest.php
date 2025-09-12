@@ -65,7 +65,7 @@ class FieldCrudTest extends FieldKernelTestBase {
   // - a full fledged $field structure, check that all the values are there
   // - a minimal $field structure, check all default values are set
   // defer actual $field comparison to a helper function, used for the two cases above,
-  // and for testUpdateField
+  // and for testUpdateField.
 
   /**
    * Tests the creation of a field.
@@ -313,7 +313,7 @@ class FieldCrudTest extends FieldKernelTestBase {
     $this->assertCount(0, $fields, 'A deleted field is marked for deletion.');
 
     // Try to load the field normally and make sure it does not show up.
-    $field = FieldConfig::load('entity_test.' . '.' . $this->fieldDefinition['bundle'] . '.' . $this->fieldDefinition['field_name']);
+    $field = FieldConfig::load('entity_test.' . $this->fieldDefinition['bundle'] . '.' . $this->fieldDefinition['field_name']);
     $this->assertTrue(empty($field), 'Field was deleted');
 
     // Make sure the other field is not deleted.

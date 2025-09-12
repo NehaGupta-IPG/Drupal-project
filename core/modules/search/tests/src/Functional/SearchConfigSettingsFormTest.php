@@ -8,12 +8,12 @@ use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\search\Entity\SearchPage;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Verify the search config settings form.
- *
- * @group search
  */
+#[Group('search')]
 class SearchConfigSettingsFormTest extends BrowserTestBase {
 
   /**
@@ -146,7 +146,7 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
     $this->drupalGet('admin/config/search/pages');
     $this->clickLink('Edit', 1);
 
-    // Ensure that the default setting was picked up from the default config
+    // Ensure that the default setting was picked up from the default config.
     $this->assertTrue($this->assertSession()->optionExists('edit-extra-type-settings-boost', 'bi')->isSelected());
 
     // Change extra type setting and also modify a common search setting.

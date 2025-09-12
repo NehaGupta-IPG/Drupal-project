@@ -6,13 +6,14 @@ namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\CommentInterface;
 use Drupal\comment\CommentManagerInterface;
+use Drupal\comment\CommentPreviewMode;
 use Drupal\comment\Entity\Comment;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests comment statistics on nodes.
- *
- * @group comment
  */
+#[Group('comment')]
 class CommentStatisticsTest extends CommentTestBase {
 
   /**
@@ -56,7 +57,7 @@ class CommentStatisticsTest extends CommentTestBase {
   public function testCommentNodeCommentStatistics(): void {
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     // Set comments to have subject and preview disabled.
-    $this->setCommentPreview(DRUPAL_DISABLED);
+    $this->setCommentPreview(CommentPreviewMode::Disabled);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(FALSE);
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');

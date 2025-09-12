@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\media\Functional\FieldWidget;
 
 use Drupal\field\Entity\FieldConfig;
+use Drupal\media\Plugin\Field\FieldWidget\OEmbedWidget;
 use Drupal\Tests\media\Functional\MediaFunctionalTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @covers \Drupal\media\Plugin\Field\FieldWidget\OEmbedWidget
- *
- * @group media
+ * Tests OEmbed Field Widget.
  */
+#[Group('media')]
+#[CoversClass(OEmbedWidget::class)]
 class OEmbedFieldWidgetTest extends MediaFunctionalTestBase {
 
   /**

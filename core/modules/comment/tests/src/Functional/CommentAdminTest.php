@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\CommentInterface;
+use Drupal\comment\Entity\Comment;
 use Drupal\Component\Utility\Html;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\user\RoleInterface;
-use Drupal\comment\Entity\Comment;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests comment approval functionality.
- *
- * @group comment
  */
+#[Group('comment')]
 class CommentAdminTest extends CommentTestBase {
 
   /**
@@ -45,7 +45,7 @@ class CommentAdminTest extends CommentTestBase {
     // Ensure that doesn't require contact info.
     $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
 
-    // Test that the comments page loads correctly when there are no comments
+    // Test that the comments page loads correctly when there are no comments.
     $this->drupalGet('admin/content/comment');
     $this->assertSession()->pageTextContains('No comments available.');
 
