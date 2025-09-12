@@ -7,12 +7,14 @@ namespace Drupal\entity_test\Entity;
 use Drupal\Core\Config\Entity\EntityBundleWithPluralLabelsInterface;
 use Drupal\Core\Config\Entity\EntityBundleWithPluralLabelsTrait;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Defines the Test entity bundle with plural labels configuration entity.
  */
 #[ConfigEntityType(
   id: 'entity_test_bundle_plural_labels',
+  label: new TranslatableMarkup('Test entity bundle with plural labels'),
   config_prefix: 'entity_test_bundle_plural_labels',
   entity_keys: [
     'id' => 'id',
