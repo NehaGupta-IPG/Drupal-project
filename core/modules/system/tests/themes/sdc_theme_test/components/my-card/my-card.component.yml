@@ -17,6 +17,10 @@ props:
       description: The card header
       examples:
         - I am a header!
+    slogan:
+      type: string
+      title: Slogan
+      description: A pithy and clever, but optional, slogan.
 slots:
   card_body:
     title: Body
