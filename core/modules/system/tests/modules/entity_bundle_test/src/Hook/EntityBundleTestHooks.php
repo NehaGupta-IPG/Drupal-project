@@ -5,17 +5,20 @@ declare(strict_types=1);
 namespace Drupal\entity_bundle_test\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Module hook implementations.
  */
 class EntityBundleTestHooks {
 
+  use StringTranslationTrait;
+
   /**
    * Implements hook_entity_type_alter().
    */
   #[Hook('entity_type_alter')]
-  function setBundleEntityType(array &$entity_types): void {
+  public function setBundleEntityType(array &$entity_types): void {
     // Use 'entity_test_bundle_plural_labels' as bundle entity for
     // 'entity_test_with_bundle' in order to test bundle plural labels.
     // @see \Drupal\KernelTests\Core\Entity\EntityTypeBundleInfoPluralLabelTest
@@ -26,13 +29,13 @@ class EntityBundleTestHooks {
    * Implements hook_entity_bundle_info().
    */
   #[Hook('entity_bundle_info')]
-  function bundleInfo(): array {
+  public function bundleInfo(): array {
     return [
       'entity_test' => [
         'artist' => [
-          'label' => t('Artist'),
-          'label_singular' => t('artist'),
-          'label_plural' => t('artists'),
+          'label' => $this->t('Artist'),
+          'label_singular' => $this->t('artist'),
+          'label_plural' => $this->t('artists'),
           'label_count' => [
             "1 artist\x03@count artists",
             'search results' => "1 artist was awarded\x03@count artists were awarded",
@@ -46,7 +49,7 @@ class EntityBundleTestHooks {
    * Implements hook_entity_bundle_info_alter().
    */
   #[Hook('entity_bundle_info_alter')]
-  function alterBundleInfo(array &$bundles): void {
+  public function alterBundleInfo(array &$bundles): void {
     // Allow the test to trigger altering.
     // @see \Drupal\KernelTests\Core\Entity\EntityTypeBundleInfoPluralLabelTest
     if (\Drupal::state()->get('entity_bundle_test.allow_alter', FALSE)) {
