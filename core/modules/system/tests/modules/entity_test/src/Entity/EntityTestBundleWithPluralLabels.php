@@ -25,7 +25,7 @@ use Drupal\Core\Entity\Attribute\ConfigEntityType;
     'label_singular',
     'label_plural',
     'label_count',
- ]
+ ],
 )]
 class EntityTestBundleWithPluralLabels extends EntityTestBundle implements EntityBundleWithPluralLabelsInterface {
 
