@@ -8,7 +8,6 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\views\Plugin\views\field\BulkForm;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a BC layer for modules providing old configurations.
