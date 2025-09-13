@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 /**
  * Tests systems for plugin deprecation.
  *
- * @covers Drupal\Core\Plugin\Discovery\LegacyDiscoveryDecorator.
+ * @covers \Drupal\Core\Plugin\Discovery\LegacyDiscoveryDecorator.
  * @group Plugin
  */
 #[IgnoreDeprecations]
@@ -26,7 +26,7 @@ class DeprecatedDiscoveryTest extends KernelTestBase {
   /**
    * Tests deprecation of plugin subdir.
    *
-   * @covers Drupal\Core\Plugin\LegacySubdirPluginManagerTrait.
+   * @covers \Drupal\Core\Plugin\LegacySubdirPluginManagerTrait.
    */
   public function testDeprecatedSubdir(): void {
     $plugin_manager = $this->container->get('plugin.manager.deprecation_plugin_test_subdir_deprecation');
