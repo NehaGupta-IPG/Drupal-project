@@ -306,6 +306,23 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       '#title' => $this->t("Create referenced entities if they don't already exist"),
       '#default_value' => $configuration['auto_create'],
       '#weight' => -2,
+      '#states' => [
+        'disabled' => [
+          ':input[name="settings[save_referenced_entities]"]' => ['value' => 'disabled'],
+        ],
+      ],
+      '#element_validate' => [[static::class, 'validateAutoCreateConsistency']],
+    ];
+
+    $form['auto_create_help'] = [
+      '#type' => 'container',
+      '#markup' => '<div class="messages messages--warning">' . $this->t('Auto-creation is disabled because referenced items are not going to be saved automatically. Change the save behavior setting to enable auto-creation.') . '</div>',
+      '#weight' => -1,
+      '#states' => [
+        'visible' => [
+          ':input[name="settings[save_referenced_entities]"]' => ['value' => 'disabled'],
+        ],
+      ],
     ];
 
     if ($entity_type->hasKey('bundle')) {
@@ -355,6 +372,26 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
   public static function elementValidateFilter(&$element, FormStateInterface $form_state) {
     $element['#value'] = array_filter($element['#value']);
     $form_state->setValueForElement($element, $element['#value']);
+  }
+
+  /**
+   * Form element validation handler for auto_create setting consistency.
+   *
+   * Validates that auto_create is not enabled when save_referenced_entities
+   * is set to 'disabled', which would create entities that are never saved.
+   *
+   * @param array $element
+   *   The form element being validated.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state object.
+   */
+  public static function validateAutoCreateConsistency(array $element, FormStateInterface $form_state): void {
+    $auto_create = $form_state->getValue(['settings', 'handler_settings', 'auto_create']);
+    $save_mode = $form_state->getValue(['settings', 'save_referenced_entities']);
+
+    if ($auto_create && $save_mode === 'disabled') {
+      $form_state->setError($element, t('Auto-creation cannot be enabled when referenced entities are not being saved automatically. Either disable auto-creation or change the save behavior setting to enable automatic saving.'));
+    }
   }
 
   /**

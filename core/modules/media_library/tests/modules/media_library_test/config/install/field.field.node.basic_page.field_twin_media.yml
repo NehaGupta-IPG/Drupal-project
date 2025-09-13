@@ -28,4 +28,5 @@ settings:
       field: _none
     auto_create: false
     auto_create_bundle: file
+  save_referenced_entities: 'new_only'
 field_type: entity_reference
