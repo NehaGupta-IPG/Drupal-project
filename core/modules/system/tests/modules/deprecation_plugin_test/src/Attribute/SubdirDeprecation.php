@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\deprecation_plugin_test\Attribute;
 
 use Drupal\Component\Plugin\Attribute\Plugin;
