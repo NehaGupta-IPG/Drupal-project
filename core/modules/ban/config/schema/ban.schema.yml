@@ -1,4 +1,4 @@
-ban.ban_allowed_ip.*:
+ban.allowed.*:
   type: config_entity
   label: 'Allowed IPs'
   mapping:
