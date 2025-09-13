@@ -9,6 +9,10 @@ use Drupal\Component\Plugin\Discovery\DiscoveryTrait;
 
 /**
  * Discovery decorator which includes a secondary discovery for legacy.
+ *
+ * Any plugins which are found by the legacy discovery will cause a deprecation
+ * error. If a plugin is found by both discoveries, the main discovery copy
+ * takes precedence (but an error will still be triggered).
  */
 class LegacyDiscoveryDecorator implements DiscoveryInterface {
 
