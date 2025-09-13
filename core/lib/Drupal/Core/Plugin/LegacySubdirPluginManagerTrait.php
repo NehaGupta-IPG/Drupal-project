@@ -11,22 +11,33 @@ use Drupal\Core\Plugin\Discovery\LegacyDiscoveryDecorator;
  *
  * Plugin managers can use this trait to deprecate a plugin subdir. A plugin
  * manager must do the following:
- * - Set the new plugin subdir as $this->subdir.
+ * - Set the new plugin subdir as $this->subdir as normal.
  * - Set the deprecated plugin subdir as $this->legacySubdir.
- * - Set the deprecation message as $this->deprecationMessage, with a '%s' for
- *   the plugin ID.
+ * - Set the deprecation version as $this->deprecationVersion.
+ * - Set the removal version as $this->removedVersion.
+ * - Set the change record URL as $this->changeRecordUrl.
  */
 trait LegacySubdirPluginManagerTrait {
 
   /**
-   * The subdirectory which is being deprecated for the plugin type.
+   * The plugin subdirectory which is being deprecated for the plugin type.
    */
   protected string $legacySubdir;
 
   /**
-   * The message for a deprecation error, with '%s' for the plugin ID.
+   * The version in which the deprecation was introduced.
    */
-  protected string $deprecationMessage;
+  protected string $deprecationVersion;
+
+  /**
+   * The version in which the backwards-compatibility handling will be removed.
+   */
+  protected string $removedVersion;
+
+  /**
+   * The URL for the change record.
+   */
+  protected string $changeRecordUrl;
 
   /**
    * Overrides \Drupal\Component\Plugin\PluginManagerBase::getDiscovery().
@@ -34,7 +45,8 @@ trait LegacySubdirPluginManagerTrait {
   protected function getDiscovery() {
     if (!$this->discovery) {
       $main_discovery = parent::getDiscovery();
-      // Undo the setting of the discovery, so we can call the method again.
+      // Undo the setting of the discovery, so calling getDiscovery() again
+      // creates another discover object.
       $this->discovery = NULL;
 
       // Get legacy discovery.
@@ -52,7 +64,11 @@ trait LegacySubdirPluginManagerTrait {
       $this->discovery = new LegacyDiscoveryDecorator(
         $main_discovery,
         $legacy_discovery,
-        $this->deprecationMessage,
+        "in subdirectory {$this->legacySubdir}",
+        "The plugin class should be moved to {$this->subdir} and its namespace adjusted accordingly.",
+        $this->deprecationVersion,
+        $this->removedVersion,
+        $this->changeRecordUrl,
       );
     }
 
