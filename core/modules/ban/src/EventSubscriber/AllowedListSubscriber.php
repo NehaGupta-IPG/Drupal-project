@@ -44,6 +44,7 @@ final class AllowedListSubscriber implements EventSubscriberInterface {
     $ids = $this->entityTypeManager
       ->getStorage('ban_allowed_ip')
       ->getQuery()
+      ->accessCheck(FALSE)
       ->condition('allowedIp', $ip)
       ->execute();
 

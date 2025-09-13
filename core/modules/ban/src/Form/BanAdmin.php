@@ -101,6 +101,7 @@ final class BanAdmin extends FormBase {
     $ids = $this->entityTypeManager
       ->getStorage('ban_allowed_ip')
       ->getQuery()
+      ->accessCheck(FALSE)
       ->condition('allowedIp', $ip)
       ->execute();
 

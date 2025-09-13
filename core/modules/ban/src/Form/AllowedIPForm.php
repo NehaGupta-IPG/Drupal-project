@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\ban\Form;
 
 use Drupal\Core\Entity\EntityForm;
@@ -10,18 +12,17 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Form handler for the Allowed IP add and edit forms.
  */
-class AllowedIPForm extends EntityForm {
-
-  protected EntityTypeManagerInterface $entityTypeManager;
+final class AllowedIPForm extends EntityForm {
 
   public function __construct(EntityTypeManagerInterface $entityTypeManager) {
+    // Parent has a protected $entityTypeManager.
     $this->entityTypeManager = $entityTypeManager;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): self {
     return new static(
       $container->get('entity_type.manager')
     );
@@ -30,7 +31,7 @@ class AllowedIPForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function form(array $form, FormStateInterface $form_state) {
+  public function form(array $form, FormStateInterface $form_state): array {
     $form = parent::form($form, $form_state);
 
     /** @var \Drupal\ban\AllowedIPInterface $ip */
@@ -49,8 +50,9 @@ class AllowedIPForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    $ip = $form_state->getValue('allowedIp');
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
+    $ip = (string) $form_state->getValue('allowedIp');
+
     if ($this->exists($ip)) {
       $form_state->setErrorByName('allowedIp', $this->t('The IP is already on the allowed list.'));
     }
@@ -62,11 +64,11 @@ class AllowedIPForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function save(array $form, FormStateInterface $form_state) {
+  public function save(array $form, FormStateInterface $form_state): int {
     /** @var \Drupal\ban\AllowedIPInterface $ip */
     $ip = $this->entity;
     // Use the IP value as the entity ID to ensure uniqueness.
-    $ip->set('id', $ip->getAllowedIp());
+    $ip->set('id', strtr($ip->getAllowedIp(), ['.' => '_', ':' => '_']));
     $status = $ip->save();
 
     if ($status === SAVED_NEW) {
@@ -77,15 +79,20 @@ class AllowedIPForm extends EntityForm {
     }
 
     $form_state->setRedirect('entity.ban_allowed_ip.collection');
+    return $status;
   }
 
   /**
    * Checks whether an Allowed IP configuration entity exists.
    */
   protected function exists(string $ip): bool {
-    $ids = $this->entityTypeManager->getStorage('ban_allowed_ip')->getQuery()
+    $ids = $this->entityTypeManager
+      ->getStorage('ban_allowed_ip')
+      ->getQuery()
+      ->accessCheck(FALSE)
       ->condition('allowedIp', $ip)
       ->execute();
+
     return (bool) $ids;
   }
 

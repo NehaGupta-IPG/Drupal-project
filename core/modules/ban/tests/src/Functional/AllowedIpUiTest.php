@@ -24,6 +24,13 @@ final class AllowedIpUiTest extends BrowserTestBase {
   ];
 
   /**
+   * Use a minimal core theme for functional tests.
+   *
+   * @var string
+   */
+  protected $defaultTheme = 'stark';
+
+  /**
    * Admin user with needed permissions.
    *
    * @var \Drupal\user\UserInterface
