@@ -281,6 +281,21 @@ function template_preprocess_vertical_tabs(&$variables): void {
 }
 
 /**
+ * Prepares variables for button templates.
+ *
+ * Default template: button.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - element: An associative array containing the properties of the element.
+ *     Properties used: #attributes.
+ */
+function template_preprocess_button(&$variables): void {
+  $element = $variables['element'];
+  $variables['children'] = $element['#children'];
+}
+
+/**
  * Prepares variables for input templates.
  *
  * Default template: input.html.twig.

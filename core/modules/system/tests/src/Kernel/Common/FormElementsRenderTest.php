@@ -27,10 +27,16 @@ class FormElementsRenderTest extends KernelTestBase {
   public function testDrupalRenderFormElements(): void {
     // Define a series of form elements.
     $element = [
-      '#type' => 'button',
+      '#type' => 'submit',
       '#value' => $this->randomMachineName(),
     ];
     $this->assertRenderedElement($element, '//input[@type=:type]', [':type' => 'submit']);
+
+    $element = [
+      '#type' => 'button',
+      '#value' => $this->randomMachineName(),
+    ];
+    $this->assertRenderedElement($element, '//button[@type=:type]', [':type' => 'submit']);
 
     $element = [
       '#type' => 'textfield',
