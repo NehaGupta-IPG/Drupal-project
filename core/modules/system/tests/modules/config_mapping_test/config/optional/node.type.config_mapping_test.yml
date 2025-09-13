@@ -11,3 +11,6 @@ help: null
 new_revision: false
 preview_mode: 1
 display_submitted: true
+label_singular: null
+label_plural: null
+label_count: null
