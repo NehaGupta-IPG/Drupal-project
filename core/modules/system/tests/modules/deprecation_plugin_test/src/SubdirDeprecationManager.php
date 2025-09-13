@@ -40,6 +40,8 @@ class SubdirDeprecationManager extends DefaultPluginManager {
       SubdirDeprecation::class,
     );
 
+    $this->setCacheBackend($cache_backend, 'deprecated_subdir_plugins');
+
     // Set up deprecation.
     $this->legacySubdir = 'Plugin/SubdirDeprecationLegacy';
     $this->deprecationVersion = 'example:12.4.0';
