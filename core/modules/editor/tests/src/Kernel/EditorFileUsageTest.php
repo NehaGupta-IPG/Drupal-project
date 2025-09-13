@@ -6,6 +6,7 @@ namespace Drupal\Tests\editor\Kernel;
 
 use Drupal\editor\Entity\Editor;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\file\Entity\File;
 use Drupal\field\Entity\FieldConfig;
@@ -26,7 +27,7 @@ class EditorFileUsageTest extends EntityKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['editor', 'editor_test', 'node', 'file'];
+  protected static $modules = ['editor', 'editor_test', 'node', 'file', 'language'];
 
   /**
    * {@inheritdoc}
@@ -76,6 +77,11 @@ class EditorFileUsageTest extends EntityKernelTestBase {
       'bundle' => 'page',
       'label' => 'Description',
     ])->save();
+
+    // Create a second language to test translations.
+    ConfigurableLanguage::createFromLangcode('es')
+      ->save();
+
   }
 
   /**
@@ -290,6 +296,52 @@ class EditorFileUsageTest extends EntityKernelTestBase {
     foreach ($image_entities as $key => $image_entity) {
       $this->assertSame([], $file_usage->listUsage($image_entity), 'The image ' . $image_paths[$key] . ' has zero usages again.');
     }
+
+  }
+
+  /**
+   * Tests the configurable text editor manager.
+   */
+  public function testUsagesOnlyInTranslations(): void {
+    $image_path = 'core/misc/druplicon.png';
+
+    $image_entity = File::create();
+    $image_entity->setFileUri($image_path);
+    $image_entity->setFilename(\Drupal::service('file_system')->basename($image_entity->getFileUri()));
+    $image_entity->save();
+
+    $file_usage = $this->container->get('file.usage');
+    $this->assertSame([], $file_usage->listUsage($image_entity), 'The image ' . $image_entity->getFileUri() . ' has zero usages.');
+
+    $body_value = '<p>Hello, world!</p>';
+    $body_value .= '<img src="awesome-llama-0.jpg" data-entity-type="file" data-entity-uuid="' . $image_entity->uuid() . '" />';
+
+    $body = [
+      'value' => $body_value,
+      'format' => 'filtered_html',
+    ];
+
+    // Test editor_entity_insert(): increment with usages only in translations.
+    $node = Node::create([
+      'type' => 'page',
+      'title' => 'test',
+      'body' => '',
+      'uid' => 1,
+    ]);
+    $node->save();
+    $this->assertSame([], $file_usage->listUsage($image_entity), 'The image ' . $image_entity->getFileUri() . ' has zero usages.');
+
+    $translation = $node->addTranslation('es', [
+      'title' => 'translation test',
+      'body' => $body,
+    ]);
+    $translation->save();
+    $this->assertSame(['editor' => ['node' => [1 => '1']]], $file_usage->listUsage($image_entity), 'The image ' . $image_entity->getFileUri() . ' has 1 usage.');
+
+    // Test editor_entity_delete(): decrement translation usages when deleting the original translation.
+    $node->delete();
+    $this->assertSame([], $file_usage->listUsage($image_entity), 'The image ' . $image_entity->getFileUri() . ' has zero usages again.');
+
   }
 
 }
