@@ -291,8 +291,8 @@ function template_preprocess_vertical_tabs(&$variables): void {
  *     Properties used: #attributes.
  */
 function template_preprocess_button(&$variables): void {
-  $element = $variables['element'];
-  $variables['children'] = $element['#children'];
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(FormPreprocess::class)->preprocessButton($variables);
 }
 
 /**

@@ -221,6 +221,10 @@ class ThemeCommonElements {
         'render element' => 'element',
         'initial preprocess' => FormPreprocess::class . ':preprocessInput',
       ],
+      'button' => [
+        'render element' => 'element',
+        'initial preprocess' => FormPreprocess::class . ':preprocessButton',
+      ],
       'select' => [
         'render element' => 'element',
         'initial preprocess' => FormPreprocess::class . ':preprocessSelect',
