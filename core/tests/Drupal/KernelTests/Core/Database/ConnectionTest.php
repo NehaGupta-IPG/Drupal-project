@@ -184,4 +184,17 @@ class ConnectionTest extends DatabaseTestBase {
     $this->assertTrue($this->connection->hasJson());
   }
 
+  /**
+   * Test that the method ::hasClientConnection() returns expected results.
+   */
+  public function testHasClientConnection():void {
+    $connection = Database::getConnection('default', 'default');
+    $this->assertTrue($connection->hasClientConnection());
+
+    Database::closeConnection('default', 'default');
+    $connection->__destruct();
+
+    $this->assertFalse($connection->hasClientConnection());
+  }
+
 }
