@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\ban\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
@@ -35,12 +37,20 @@ use Drupal\ban\AllowedIPInterface;
  *   }
  * )
  */
-class AllowedIP extends ConfigEntityBase implements AllowedIPInterface {
+final class AllowedIP extends ConfigEntityBase implements AllowedIPInterface {
 
-  /** @var string */
+  /**
+   * The config entity ID.
+   *
+   * @var string
+   */
   public $id;
 
-  /** @var string */
+  /**
+   * The allowed IP address.
+   *
+   * @var string
+   */
   public $allowedIp = '';
 
   public function getAllowedIp(): string {

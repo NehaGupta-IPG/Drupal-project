@@ -14,7 +14,7 @@ class BanEvent extends Event {
   public string $ip;
   public bool $isBanned;
 
-  public function __construct(string $ip, bool $isBanned = true) {
+  public function __construct(string $ip, bool $isBanned = TRUE) {
     $this->ip = $ip;
     $this->isBanned = $isBanned;
   }

@@ -31,7 +31,7 @@ class AllowedListSubscriber implements EventSubscriberInterface {
    */
   public function checkAllowedList(BanEvent $event): void {
     if ($this->isAllowed($event->ip)) {
-      $event->isBanned = false;
+      $event->isBanned = FALSE;
     }
   }
 

@@ -6,8 +6,9 @@ namespace Drupal\Tests\ban\Unit;
 
 use Drupal\ban\Event\BanEvent;
 use Drupal\ban\EventSubscriber\AllowedListSubscriber;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -21,15 +22,19 @@ final class AllowedListSubscriberTest extends UnitTestCase {
   public function testIpOnAllowedListSetsIsBannedFalse(): void {
     $ip = '203.0.113.5';
 
+    $query = $this->createMock(QueryInterface::class);
+    $query->expects($this->once())
+      ->method('condition')
+      ->with('allowedIp', $ip)
+      ->willReturnSelf();
+    $query->expects($this->once())
+      ->method('execute')
+      ->willReturn(['id_' . $ip]);
+
     $storage = $this->createMock(EntityStorageInterface::class);
     $storage->expects($this->once())
       ->method('getQuery')
-      ->willReturn(new class($ip) {
-        private string $ip;
-        public function __construct(string $ip) { $this->ip = $ip; }
-        public function condition($field, $value) { return $this; }
-        public function execute() { return ['id_' . $this->ip]; }
-      });
+      ->willReturn($query);
 
     $etm = $this->createMock(EntityTypeManagerInterface::class);
     $etm->expects($this->once())
@@ -48,13 +53,19 @@ final class AllowedListSubscriberTest extends UnitTestCase {
   public function testIpNotOnAllowedListKeepsIsBannedTrue(): void {
     $ip = '203.0.113.6';
 
+    $query = $this->createMock(QueryInterface::class);
+    $query->expects($this->once())
+      ->method('condition')
+      ->with('allowedIp', $ip)
+      ->willReturnSelf();
+    $query->expects($this->once())
+      ->method('execute')
+      ->willReturn([]);
+
     $storage = $this->createMock(EntityStorageInterface::class);
     $storage->expects($this->once())
       ->method('getQuery')
-      ->willReturn(new class {
-        public function condition($field, $value) { return $this; }
-        public function execute() { return []; }
-      });
+      ->willReturn($query);
 
     $etm = $this->createMock(EntityTypeManagerInterface::class);
     $etm->expects($this->once())
