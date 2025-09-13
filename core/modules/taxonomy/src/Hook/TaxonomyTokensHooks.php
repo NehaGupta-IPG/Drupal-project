@@ -98,9 +98,13 @@ class TaxonomyTokensHooks {
       $langcode = LanguageInterface::LANGCODE_DEFAULT;
     }
     $replacements = [];
+
+    $langcode = $options['langcode'] ?? NULL;
+
     if ($type == 'term' && !empty($data['term'])) {
+      /** @var \Drupal\taxonomy\TermInterface $term */
       $term = $data['term'];
-      $term = \Drupal::service('entity.repository')->getTranslationFromContext($term, $options['langcode'] ?? NULL);
+      $term = \Drupal::service('entity.repository')->getTranslationFromContext($term, $langcode, ['operation' => 'term_tokens']);
       foreach ($tokens as $name => $original) {
         switch ($name) {
           case 'tid':
@@ -116,9 +120,7 @@ class TaxonomyTokensHooks {
             break;
 
           case 'description':
-            // "processed" returns a \Drupal\Component\Render\MarkupInterface
-            // via check_markup().
-            $replacements[$original] = $term->description->processed;
+            $replacements[$original] = $term->getDescription();
             break;
 
           case 'url':
@@ -134,6 +136,7 @@ class TaxonomyTokensHooks {
             break;
 
           case 'vocabulary':
+            /** @var \Drupal\taxonomy\VocabularyInterface $vocabulary */
             $vocabulary = Vocabulary::load($term->bundle());
             $bubbleable_metadata->addCacheableDependency($vocabulary);
             $replacements[$original] = $vocabulary->label();
@@ -142,7 +145,7 @@ class TaxonomyTokensHooks {
           case 'parent':
             $taxonomy_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
             if ($parents = $taxonomy_storage->loadParents($term->id())) {
-              $parent = array_pop($parents);
+              $parent = \Drupal::service('entity.repository')->getTranslationFromContext(array_pop($parents), $langcode, ['operation' => 'term_tokens']);
               $bubbleable_metadata->addCacheableDependency($parent);
               $replacements[$original] = $parent->getName();
             }
@@ -171,6 +174,11 @@ class TaxonomyTokensHooks {
       }
     }
     elseif ($type == 'vocabulary' && !empty($data['vocabulary'])) {
+      /** @var \Drupal\taxonomy\VocabularyInterface $vocabulary */
+      $language_manager = \Drupal::languageManager();
+      $language = $language_manager->getLanguage($langcode);
+      $original_language = $language_manager->getConfigOverrideLanguage();
+      $language_manager->setConfigOverrideLanguage($language);
       $vocabulary = $data['vocabulary'];
       foreach ($tokens as $name => $original) {
         switch ($name) {
@@ -198,6 +206,7 @@ class TaxonomyTokensHooks {
             break;
         }
       }
+      $language_manager->setConfigOverrideLanguage($original_language);
     }
     return $replacements;
   }

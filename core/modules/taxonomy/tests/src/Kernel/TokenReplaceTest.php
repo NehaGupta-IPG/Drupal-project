@@ -11,6 +11,7 @@ use Drupal\node\Entity\NodeType;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
+use Drupal\Tests\Traits\Core\AssertTokenReplacementTrait;
 
 /**
  * Tests taxonomy token replacement.
@@ -19,6 +20,7 @@ use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
  */
 class TokenReplaceTest extends KernelTestBase {
 
+  use AssertTokenReplacementTrait;
   use EntityReferenceFieldCreationTrait;
   use NodeCreationTrait;
   use TaxonomyTestTrait;
@@ -69,7 +71,7 @@ class TokenReplaceTest extends KernelTestBase {
     ]);
     $type->save();
 
-    $this->vocabulary = $this->createVocabulary();
+    $this->vocabulary = $this->createVocabulary(['name' => 'V1 <strong>"&lt;name&gt;"</strong>']);
     $this->fieldName = 'taxonomy_' . $this->vocabulary->id();
 
     $handler_settings = [
@@ -98,13 +100,15 @@ class TokenReplaceTest extends KernelTestBase {
    * Creates some terms and a node, then tests the tokens generated from them.
    */
   public function testTaxonomyTokenReplacement(): void {
-    $token_service = \Drupal::token();
     $language_interface = \Drupal::languageManager()->getCurrentLanguage();
 
-    // Create two taxonomy terms.
-    $term1 = $this->createTerm($this->vocabulary);
+    // Create two taxonomy terms with unsafe names.
+    $term1 = $this->createTerm($this->vocabulary, [
+      'name' => 'T1 <script>"&lt;name&gt;"</script>',
+    ]);
     // Set $term1 as parent of $term2.
     $term2 = $this->createTerm($this->vocabulary, [
+      'name' => 'T2 <strong>"&lt;name&gt;"</strong>',
       'parent' => $term1->id(),
     ]);
 
@@ -119,15 +123,20 @@ class TokenReplaceTest extends KernelTestBase {
     $tests['[term:tid]'] = $term1->id();
     $tests['[term:uuid]'] = $term1->uuid();
     $tests['[term:name]'] = $term1->getName();
-    $tests['[term:description]'] = $term1->description->processed;
+    $tests['[term:description]'] = $term1->getDescription();
     $tests['[term:url]'] = $term1->toUrl('canonical', ['absolute' => TRUE])->toString();
     $tests['[term:node-count]'] = 0;
+    $tests['[term:parent]'] = '[term:parent]';
     $tests['[term:parent:name]'] = '[term:parent:name]';
+    $tests['[term:parent:url]'] = '[term:parent:url]';
     /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
     $date_formatter = $this->container->get('date.formatter');
     $tests['[term:changed:since]'] = $date_formatter->formatTimeDiffSince($term1->getChangedTime(), ['langcode' => $language_interface->getId()]);
     $tests['[term:vocabulary:name]'] = $this->vocabulary->label();
     $tests['[term:vocabulary]'] = $this->vocabulary->label();
+
+    // Test to make sure that we generated something for each token.
+    $this->assertFalse(in_array(0, array_map('strlen', $tests)), 'No empty tokens generated.');
 
     $base_bubbleable_metadata = BubbleableMetadata::createFromObject($term1);
 
@@ -138,41 +147,71 @@ class TokenReplaceTest extends KernelTestBase {
     $metadata_tests['[term:description]'] = $base_bubbleable_metadata;
     $metadata_tests['[term:url]'] = $base_bubbleable_metadata;
     $metadata_tests['[term:node-count]'] = $base_bubbleable_metadata;
+    $metadata_tests['[term:parent]'] = $base_bubbleable_metadata;
     $metadata_tests['[term:parent:name]'] = $base_bubbleable_metadata;
+    $metadata_tests['[term:parent:url]'] = $base_bubbleable_metadata;
     $bubbleable_metadata = clone $base_bubbleable_metadata;
     $metadata_tests['[term:vocabulary:name]'] = $bubbleable_metadata->addCacheTags($this->vocabulary->getCacheTags());
     $metadata_tests['[term:vocabulary]'] = $bubbleable_metadata->addCacheTags($this->vocabulary->getCacheTags());
     $bubbleable_metadata = clone $base_bubbleable_metadata;
     $metadata_tests['[term:changed:since]'] = $bubbleable_metadata->setCacheMaxAge(0);
 
-    foreach ($tests as $input => $expected) {
-      $bubbleable_metadata = new BubbleableMetadata();
-      $output = $token_service->replace($input, ['term' => $term1], ['langcode' => $language_interface->getId()], $bubbleable_metadata);
-      $this->assertSame((string) $expected, (string) $output, "Failed test case: {$input}");
-      $this->assertEquals($metadata_tests[$input], $bubbleable_metadata);
-    }
+    $data = ['term' => $term1];
+    $options = ['langcode' => $language_interface->getId()];
+    $msg = 'Taxonomy term 1 token %token replaced with %output which is equal to %expected';
+    $this->assertTokenReplacementAndCheckMetadata($tests, $data, $options, $msg, $metadata_tests);
 
     // Generate and test sanitized tokens for term2.
     $tests = [];
     $tests['[term:tid]'] = $term2->id();
     $tests['[term:uuid]'] = $term2->uuid();
     $tests['[term:name]'] = $term2->getName();
-    $tests['[term:description]'] = $term2->description->processed;
+    $tests['[term:description]'] = $term2->getDescription();
     $tests['[term:url]'] = $term2->toUrl('canonical', ['absolute' => TRUE])->toString();
     $tests['[term:node-count]'] = 1;
+    $tests['[term:vocabulary]'] = $this->vocabulary->label();
+    $tests['[term:parent]'] = $term1->getName();
+    $tests['[term:parent:tid]'] = $term1->id();
     $tests['[term:parent:name]'] = $term1->getName();
+    $tests['[term:parent:description]'] = $term1->getDescription();
     $tests['[term:parent:url]'] = $term1->toUrl('canonical', ['absolute' => TRUE])->toString();
+    $tests['[term:parent:node-count]'] = 0;
     $tests['[term:parent:parent:name]'] = '[term:parent:parent:name]';
     $tests['[term:changed:since]'] = $date_formatter->formatTimeDiffSince($term2->getChangedTime(), ['langcode' => $language_interface->getId()]);
     $tests['[term:vocabulary:name]'] = $this->vocabulary->label();
+    $tests['[term:parent:vocabulary]'] = $this->vocabulary->label();
+    $tests['[term:parent:vocabulary:name]'] = $this->vocabulary->label();
 
     // Test to make sure that we generated something for each token.
     $this->assertNotContains(0, array_map('strlen', $tests), 'No empty tokens generated.');
 
-    foreach ($tests as $input => $expected) {
-      $output = $token_service->replace($input, ['term' => $term2], ['langcode' => $language_interface->getId()]);
-      $this->assertSame((string) $expected, (string) $output, "Failed test case: {$input}");
-    }
+    $base_bubbleable_metadata = BubbleableMetadata::createFromObject($term2);
+    $metadata_tests = [];
+    $metadata_tests['[term:tid]'] = $base_bubbleable_metadata;
+    $metadata_tests['[term:name]'] = $base_bubbleable_metadata;
+    $metadata_tests['[term:description]'] = $base_bubbleable_metadata;
+    $metadata_tests['[term:url]'] = $base_bubbleable_metadata;
+    $metadata_tests['[term:node-count]'] = $base_bubbleable_metadata;
+    $bubbleable_metadata = clone $base_bubbleable_metadata;
+    $bubbleable_metadata = $bubbleable_metadata->addCacheTags($this->vocabulary->getCacheTags());
+    $metadata_tests['[term:vocabulary]'] = $bubbleable_metadata;
+    $metadata_tests['[term:vocabulary:name]'] = $bubbleable_metadata;
+    $base_bubbleable_metadata = BubbleableMetadata::createFromObject($term1)->addCacheTags($term2->getCacheTags());
+    $metadata_tests['[term:parent]'] = $base_bubbleable_metadata;
+    $metadata_tests['[term:parent:tid]'] = $base_bubbleable_metadata;
+    $metadata_tests['[term:parent:name]'] = $base_bubbleable_metadata;
+    $metadata_tests['[term:parent:description]'] = $base_bubbleable_metadata;
+    $metadata_tests['[term:parent:url]'] = $base_bubbleable_metadata;
+    $metadata_tests['[term:parent:node-count]'] = $base_bubbleable_metadata;
+    $metadata_tests['[term:parent:parent:name]'] = $base_bubbleable_metadata;
+    $bubbleable_metadata = clone $base_bubbleable_metadata;
+    $bubbleable_metadata = $bubbleable_metadata->addCacheTags($this->vocabulary->getCacheTags());
+    $metadata_tests['[term:parent:vocabulary:name]'] = $bubbleable_metadata;
+    $metadata_tests['[term:parent:vocabulary]'] = $bubbleable_metadata;
+
+    $data = ['term' => $term2];
+    $msg = 'Taxonomy term 2 token %token replaced with %output which is equal to %expected';
+    $this->assertTokenReplacementAndCheckMetadata($tests, $data, $options, $msg, $metadata_tests);
 
     // Generate and test sanitized tokens.
     $tests = [];
@@ -185,10 +224,18 @@ class TokenReplaceTest extends KernelTestBase {
     // Test to make sure that we generated something for each token.
     $this->assertNotContains(0, array_map('strlen', $tests), 'No empty tokens generated.');
 
-    foreach ($tests as $input => $expected) {
-      $output = $token_service->replace($input, ['vocabulary' => $this->vocabulary], ['langcode' => $language_interface->getId()]);
-      $this->assertSame((string) $expected, (string) $output, "Failed test case: {$input}");
-    }
+    $base_bubbleable_metadata = BubbleableMetadata::createFromObject($this->vocabulary);
+
+    $metadata_tests = [];
+    $metadata_tests['[vocabulary:vid]'] = $base_bubbleable_metadata;
+    $metadata_tests['[vocabulary:name]'] = $base_bubbleable_metadata;
+    $metadata_tests['[vocabulary:description]'] = $base_bubbleable_metadata;
+    $metadata_tests['[vocabulary:node-count]'] = $base_bubbleable_metadata;
+    $metadata_tests['[vocabulary:term-count]'] = $base_bubbleable_metadata;
+
+    $data = ['vocabulary' => $this->vocabulary];
+    $msg = 'Taxonomy vocabulary token %token replaced with %output which is equal to %expected';
+    $this->assertTokenReplacementAndCheckMetadata($tests, $data, $options, $msg, $metadata_tests);
   }
 
 }

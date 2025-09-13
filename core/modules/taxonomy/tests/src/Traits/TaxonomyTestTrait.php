@@ -22,7 +22,9 @@ trait TaxonomyTestTrait {
    *   (optional) Default values for the Vocabulary::create() method.
    *
    * @return \Drupal\taxonomy\VocabularyInterface
-   *   A vocabulary used for testing.
+   *   The new taxonomy vocabulary object.
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   protected function createVocabulary(array $values = []) {
     $values += [

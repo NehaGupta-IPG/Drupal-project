@@ -5,7 +5,6 @@ namespace Drupal\node\Hook;
 use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\user\Entity\User;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Hook\Attribute\Hook;
 
@@ -83,12 +82,12 @@ class NodeTokensHooks {
       $langcode = $options['langcode'];
     }
     else {
-      $langcode = LanguageInterface::LANGCODE_DEFAULT;
+      $langcode = NULL;
     }
     $replacements = [];
     if ($type == 'node' && !empty($data['node'])) {
       /** @var \Drupal\node\NodeInterface $node */
-      $node = $data['node'];
+      $node = \Drupal::service('entity.repository')->getTranslationFromContext($data['node'], $langcode, ['operation' => 'node_tokens']);
       foreach ($tokens as $name => $original) {
         switch ($name) {
           // Simple key values on the node.
@@ -119,8 +118,7 @@ class NodeTokensHooks {
 
           case 'body':
           case 'summary':
-            $translation = \Drupal::service('entity.repository')->getTranslationFromContext($node, $langcode, ['operation' => 'node_tokens']);
-            if ($translation->hasField('body') && ($items = $translation->get('body')) && !$items->isEmpty()) {
+            if ($node->hasField('body') && ($items = $node->get('body')) && !$items->isEmpty()) {
               $item = $items[0];
               // If the summary was requested and is not empty, use it.
               if ($name == 'summary' && !empty($item->summary)) {
@@ -174,15 +172,13 @@ class NodeTokensHooks {
             break;
 
           case 'created':
-            $date_format = DateFormat::load('medium');
-            $bubbleable_metadata->addCacheableDependency($date_format);
-            $replacements[$original] = \Drupal::service('date.formatter')->format($node->getCreatedTime(), 'medium', '', NULL, $langcode);
-            break;
-
           case 'changed':
+            /** @var \Drupal\Core\Datetime\Entity\DateFormat $date_format */
             $date_format = DateFormat::load('medium');
+            $date_raw = ($name === 'created' ? $node->getCreatedTime() : $node->getChangedTime());
+            $date_formatted = \Drupal::service('date.formatter')->format($date_raw, $date_format->id(), '', NULL, $langcode);
             $bubbleable_metadata->addCacheableDependency($date_format);
-            $replacements[$original] = \Drupal::service('date.formatter')->format($node->getChangedTime(), 'medium', '', NULL, $langcode);
+            $replacements[$original] = $date_formatted;
             break;
         }
       }
