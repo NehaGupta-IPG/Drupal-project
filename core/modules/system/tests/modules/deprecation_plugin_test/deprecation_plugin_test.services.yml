@@ -1,0 +1,4 @@
+services:
+  plugin.manager.deprecation_plugin_test_subdir_deprecation:
+    class: Drupal\deprecation_plugin_test\SubdirDeprecationManager
+    parent: default_plugin_manager
