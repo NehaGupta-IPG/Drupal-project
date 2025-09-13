@@ -1,132 +1,124 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\ban\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\ban\BanIpManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Displays banned IP addresses.
+ * Displays banned IP addresses and allows banning/unbanning.
  *
  * @internal
  */
-class BanAdmin extends FormBase {
+final class BanAdmin extends FormBase {
 
   /**
+   * The ban IP manager.
+   *
    * @var \Drupal\ban\BanIpManagerInterface
    */
-  protected $ipManager;
+  protected BanIpManagerInterface $ipManager;
+
+  /**
+   * Entity type manager (used to check the allowed list).
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * Constructs a new BanAdmin object.
-   *
-   * @param \Drupal\ban\BanIpManagerInterface $ip_manager
-   *   The ban IP manager.
    */
-  public function __construct(BanIpManagerInterface $ip_manager) {
+  public function __construct(BanIpManagerInterface $ip_manager, EntityTypeManagerInterface $entity_type_manager) {
     $this->ipManager = $ip_manager;
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): self {
     return new static(
-      $container->get('ban.ip_manager')
+      $container->get('ban.ip_manager'),
+      $container->get('entity_type.manager')
     );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
-    return 'ban_ip_form';
+  public function getFormId(): string {
+    return 'ban_admin';
   }
 
   /**
    * {@inheritdoc}
-   *
-   * @param array $form
-   *   A nested array form elements comprising the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   * @param string $default_ip
-   *   (optional) IP address to be passed on to
-   *   \Drupal::formBuilder()->getForm() for use as the default value of the IP
-   *   address form field.
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $default_ip = '') {
-    $rows = [];
-    $header = [$this->t('banned IP addresses'), $this->t('Operations')];
-    $result = $this->ipManager->findAll();
-    foreach ($result as $ip) {
-      $row = [];
-      $row[] = $ip->ip;
-      $links = [];
-      $links['delete'] = [
-        'title' => $this->t('Delete'),
-        'url' => Url::fromRoute('ban.delete', ['ban_id' => $ip->iid]),
-      ];
-      $row[] = [
-        'data' => [
-          '#type' => 'operations',
-          '#links' => $links,
-        ],
-      ];
-      $rows[] = $row;
-    }
-
+  public function buildForm(array $form, FormStateInterface $form_state, string $default_ip = ''): array {
+    // Existing core UI (simplified to essentials).
     $form['ip'] = [
-      '#title' => $this->t('IP address'),
       '#type' => 'textfield',
-      '#size' => 48,
-      '#maxlength' => 40,
+      '#title' => $this->t('IP address'),
       '#default_value' => $default_ip,
-      '#description' => $this->t('Enter a valid IP address.'),
+      '#required' => TRUE,
     ];
-    $form['actions'] = ['#type' => 'actions'];
-    $form['actions']['submit'] = [
+
+    $form['ban_ip'] = [
       '#type' => 'submit',
       '#value' => $this->t('Add'),
     ];
 
-    $form['ban_ip_banning_table'] = [
-      '#type' => 'table',
-      '#header' => $header,
-      '#rows' => $rows,
-      '#empty' => $this->t('No blocked IP addresses available.'),
-      '#weight' => 120,
-    ];
+    // Link to unban routes is kept by core listing; not changed here.
+
     return $form;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    $ip = trim($form_state->getValue('ip'));
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
+    $ip = (string) $form_state->getValue('ip');
+
+    // Core-style validation: non-empty, valid format.
+    if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+      $form_state->setErrorByName('ip', $this->t('Enter a valid IP address.'));
+      return;
+    }
+
+    // Already banned?
     if ($this->ipManager->isBanned($ip)) {
       $form_state->setErrorByName('ip', $this->t('This IP address is already banned.'));
+      return;
     }
-    elseif ($ip == $this->getRequest()->getClientIP()) {
-      $form_state->setErrorByName('ip', $this->t('You may not ban your own IP address.'));
-    }
-    elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_RES_RANGE) == FALSE) {
-      $form_state->setErrorByName('ip', $this->t('Enter a valid IP address.'));
+
+    // NEW: Block banning if the IP is on the allowed list (config entity).
+    $ids = $this->entityTypeManager
+      ->getStorage('ban_allowed_ip')
+      ->getQuery()
+      ->condition('allowedIp', $ip)
+      ->execute();
+
+    if (!empty($ids)) {
+      $form_state->setErrorByName('ip', $this->t('This IP address is allowed and cannot be banned.'));
+      return;
     }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-    $ip = trim($form_state->getValue('ip'));
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
+    $ip = (string) $form_state->getValue('ip');
     $this->ipManager->banIp($ip);
+
     $this->messenger()->addStatus($this->t('The IP address %ip has been banned.', ['%ip' => $ip]));
-    $form_state->setRedirect('ban.admin_page');
+    $form_state->setRedirectUrl(Url::fromRoute('ban.admin_page'));
   }
 
 }
