@@ -47,11 +47,4 @@ class SubdirDeprecationManager extends DefaultPluginManager {
     $this->changeRecordUrl = 'http://example.com/change-record/subdir-deprecation';
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function getType() {
-    return 'subdir_deprecation';
-  }
-
 }
