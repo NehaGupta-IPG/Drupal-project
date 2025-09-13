@@ -184,36 +184,102 @@ function hook_migrate_MIGRATION_ID_prepare_row(Row $row, MigrateSourceInterface 
 }
 
 /**
- * Alters the information provided in \Drupal\migrate\Annotation\MigrateDestination.
+ * Allows altering the information of plugins implementing X.
  *
- * @param array $destination_plugins
+ * @param array $plugin_definitions
+ *   The array of Migrate X definitions, keyed by plugin ID.
+ *
+ * @ingroup migration
+ *
+ * @todo Does this hook really exist? It's referenced in the MigratePluginManager::__construct()
+ *   documentation for $type parameter, but I'm not able to invoke it. Documentation also
+ *   mentions 'entity_field' but that one is probably hook_migrate_field_info_alter().
+ */
+function hook_migrate_row_info_alter(array &$plugin_definitions) {
+
+}
+
+/**
+ * Allows altering the information of plugins implementing X.
+ *
+ * @param array $plugin_definitions
+ *   The array of Migrate X definitions, keyed by plugin ID.
+ *
+ * @ingroup migration
+ */
+function hook_migrate_field_info_alter(array &$plugin_definitions) {
+
+}
+
+/**
+ * Allows altering the information of discovered destination plugins.
+ *
+ * For example...
+ *
+ * @param array[] $plugin_definitions
  *   The array of Migrate destination plugin definitions, keyed by plugin ID.
+ *
+ * @see \Drupal\migrate\Annotation\MigrateDestination
+ * @see \Drupal\migrate\Attribute\MigrateDestination
+ *
+ * @ingroup migration
  */
-function hook_migrate_destination_info_alter(array &$destination_plugins) {}
+function hook_migrate_destination_info_alter(array &$plugin_definitions) {
+
+}
 
 /**
- * Alters the information provided in \Drupal\migrate\Annotation\MigrateSource.
+ * Allows altering the information of discovered source plugins.
  *
- * @param array $source_plugins
+ * For example, this implementation changes the class of the content_entity:node
+ * source plugin to a custom implementation.
+ *
+ * @param array[] $plugin_definitions
  *   The array of Migrate source plugin definitions, keyed by plugin ID.
+ *
+ * @see \Drupal\migrate\Annotation\MigrateSource
+ * @see \Drupal\migrate\Attribute\MigrateSource
+ *
+ * @ingroup migration
  */
-function hook_migrate_source_info_alter(array &$source_plugins) {}
+function hook_migrate_source_info_alter(array &$plugin_definitions) {
+  if ($plugin_definitions['content_entity:node']) {
+    $plugin_definitions['content_entity:node']['class'] = 'Drupal\my_module\Plugin\migrate\source\MyNode';
+  }
+}
 
 /**
- * Alters the information provided in \Drupal\migrate\Annotation\MigrateProcessPlugin.
+ * Allows altering the information of discovered process plugins.
  *
- * @param array $process_plugins
+ * For example...
+ *
+ * @param array[] $plugin_definitions
  *   The array of Migrate process plugin definitions, keyed by plugin ID.
+ *
+ * @see \Drupal\migrate\Annotation\MigrateProcessPlugin
+ * @see \Drupal\migrate\Attribute\MigrateProcess
+ *
+ * @ingroup migration
  */
-function hook_migrate_process_plugin_info_alter(array &$process_plugins) {}
+function hook_migrate_process_info_alter(array &$plugin_definitions) {
+
+}
 
 /**
- * Allows altering the information of plugins implemented \Drupal\migrate\Plugin\MigrateIdMapInterface
+ * Allows altering the information of discovered id_map plugins.
  *
- * @param array $id_map_plugins
+ * For example...
+ *
+ * @param array[] $plugin_definitions
  *   The array of Migrate ID map plugin definitions, keyed by plugin ID.
+ *
+ * @see \Drupal\migrate\Plugin\MigrateIdMapInterface
+ *
+ * @ingroup migration
  */
-function hook_migrate_id_map_info_alter(array &$id_map_plugins) {}
+function hook_migrate_id_map_info_alter(array &$plugin_definitions) {
+
+}
 
 /**
  * Allows altering the list of discovered migration plugins.
