@@ -223,6 +223,21 @@ class FormPreprocess {
   }
 
   /**
+   * Prepares variables for button templates.
+   *
+   * Default template: button.html.twig.
+   *
+   * @param array $variables
+   *   An associative array containing:
+   *   - element: An associative array containing the properties of the element.
+   *     Properties used: #attributes.
+   */
+  public function preprocessButton(array &$variables): void {
+    $element = $variables['element'];
+    $variables['children'] = $element['#children'];
+  }
+
+  /**
    * Prepares variables for textarea templates.
    *
    * Default template: textarea.html.twig.
