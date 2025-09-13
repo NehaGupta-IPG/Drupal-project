@@ -497,7 +497,7 @@
             "dist": {
                 "type": "path",
                 "url": "core",
-                "reference": "a2da2f7675f7e843097188deb4e4218c4173de28"
+                "reference": "b2c939f4e44139e133cf07bd8d1a3003e3fd28fa"
             },
             "require": {
                 "asm89/stack-cors": "^2.3",
@@ -505,6 +505,7 @@
                 "composer/semver": "^3.3",
                 "doctrine/annotations": "^2.0",
                 "doctrine/lexer": "^2 || ^3",
+                "drupal/core-composer-scaffold": "self.version",
                 "egulias/email-validator": "^3.2.1|^4.0",
                 "ext-date": "*",
                 "ext-dom": "*",
@@ -657,6 +658,48 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Drupal is an open source content management platform powering millions of websites and applications.",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "drupal/core-composer-scaffold",
+            "version": "11.x-dev",
+            "dist": {
+                "type": "path",
+                "url": "composer/Plugin/Scaffold",
+                "reference": "ede8fa67a9abaf6fb3ee327a1aed2e97a1d113cb"
+            },
+            "require": {
+                "composer-plugin-api": "^2",
+                "php": ">=7.3.0"
+            },
+            "conflict": {
+                "drupal-composer/drupal-scaffold": "*"
+            },
+            "require-dev": {
+                "composer/composer": "^1.8@stable"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Drupal\\Composer\\Plugin\\Scaffold\\Plugin",
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Drupal\\Composer\\Plugin\\Scaffold\\": ""
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "A flexible Composer project scaffold builder.",
+            "homepage": "https://www.drupal.org/project/drupal",
+            "keywords": [
+                "drupal"
+            ],
             "transport-options": {
                 "relative": true
             }
