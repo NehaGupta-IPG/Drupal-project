@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\ban\EventSubscriber;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -9,7 +11,7 @@ use Drupal\ban\Event\BanEvent;
 /**
  * Vetoes bans for IPs present on the allowed list.
  */
-class AllowedListSubscriber implements EventSubscriberInterface {
+final class AllowedListSubscriber implements EventSubscriberInterface {
 
   protected EntityTypeManagerInterface $entityTypeManager;
 
@@ -39,10 +41,12 @@ class AllowedListSubscriber implements EventSubscriberInterface {
    * Checks whether an Allowed IP config entity exists for $ip.
    */
   protected function isAllowed(string $ip): bool {
-    $ids = $this->entityTypeManager->getStorage('ban_allowed_ip')
+    $ids = $this->entityTypeManager
+      ->getStorage('ban_allowed_ip')
       ->getQuery()
       ->condition('allowedIp', $ip)
       ->execute();
+
     return (bool) $ids;
   }
 

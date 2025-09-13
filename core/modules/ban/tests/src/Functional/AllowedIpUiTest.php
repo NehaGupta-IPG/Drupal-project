@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\ban\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use Drupal\user\UserInterface;
 
 /**
  * Functional tests for Allowed IP administration UI.
@@ -27,7 +28,7 @@ final class AllowedIpUiTest extends BrowserTestBase {
    *
    * @var \Drupal\user\UserInterface
    */
-  protected $adminUser;
+  protected UserInterface $adminUser;
 
   /**
    * {@inheritdoc}
@@ -51,8 +52,6 @@ final class AllowedIpUiTest extends BrowserTestBase {
     $this->assertSession()->addressEquals('/admin/config/people/ban-allowed/add');
 
     $ip = '203.0.113.99';
-
-    // Fill the canonical field name used by the form.
     $this->submitForm(['allowedIp' => $ip], 'Save');
 
     $this->assertSession()->statusCodeEquals(200);

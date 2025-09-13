@@ -6,8 +6,8 @@ namespace Drupal\Tests\ban\Unit;
 
 use Drupal\ban\Event\BanEvent;
 use Drupal\ban\EventSubscriber\AllowedListSubscriber;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Tests\UnitTestCase;
 
@@ -47,7 +47,7 @@ final class AllowedListSubscriberTest extends UnitTestCase {
     $event = new BanEvent($ip, TRUE);
     $subscriber->checkAllowedList($event);
 
-    $this->assertFalse($event->isBanned, 'Allowed IP should be vetoed.');
+    $this->assertFalse($event->isBanned);
   }
 
   public function testIpNotOnAllowedListKeepsIsBannedTrue(): void {
@@ -78,7 +78,7 @@ final class AllowedListSubscriberTest extends UnitTestCase {
     $event = new BanEvent($ip, TRUE);
     $subscriber->checkAllowedList($event);
 
-    $this->assertTrue($event->isBanned, 'Non-allowed IP remains bannable.');
+    $this->assertTrue($event->isBanned);
   }
 
 }
