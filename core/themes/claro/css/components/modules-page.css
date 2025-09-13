@@ -16,22 +16,22 @@
   --modules-page-system-modules-tr-bg-color: #f3f4ee;
 }
 
-.system-modules fieldset {
+.extension fieldset {
   border: 0;
   border-top: 1px solid var(--modules-page-system-modules-fieldset-color);
 }
 
-.system-modules .fieldset-wrapper {
+.extension .fieldset-wrapper {
   padding: 0;
 }
 
-.system-modules table,
+.extension table,
 .locale-translation-status-form table {
   border: 0;
 }
 
-.system-modules tr.even,
-.system-modules tr.odd,
+.extension tr.even,
+.extension tr.odd,
 .locale-translation-status-form tr.even,
 .locale-translation-status-form tr.odd {
   border: 0;
@@ -39,18 +39,18 @@
   background: var(--modules-page-system-modules-tr-bg-color);
 }
 
-.system-modules tr td:last-child,
+.extension tr td:last-child,
 .locale-translation-status-form tr td:last-child {
   border: 0;
 }
 
-.system-modules table th,
+.extension table th,
 .locale-translation-status-form table th {
   border: 0;
   border-bottom: 10px solid var(--modules-page-system-modules-tr-border-color);
 }
 
-.system-modules .sticky-header th,
+.extension .sticky-header th,
 .locale-translation-status-form .sticky-header th {
   border: 0;
 }

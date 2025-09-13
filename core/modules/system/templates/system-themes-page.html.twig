@@ -57,17 +57,30 @@
           {% endif %}
           <div class="theme-info">
             <h3 class="theme-info__header">
-              {{- theme.name }} {{ theme.version -}}
+              {{- theme.name -}}
               {% if theme.notes %}
                 ({{ theme.notes|safe_join(', ') }})
               {%- endif -%}
             </h3>
-            <div class="theme-info__description">{{ theme.description }}</div>
-            {% if theme.module_dependencies %}
-              <div class="theme-info__requires">
-                {{ 'Requires: @module_dependencies'|t({'@module_dependencies': theme.module_dependencies|render}) }}
+            <details class="js-form-wrapper form-wrapper theme-list__theme-details claro-details" id="{{ theme.machine_name }}-description">
+              <summary aria-controls="{{ theme.machine_name }}-description" role="button" aria-expanded="false" class="claro-details__summary theme-list__theme-summary"><span class="text theme-info__description">{{ theme.description }}</span></summary>
+              <div class="claro-details__wrapper theme-details__wrapper">
+                <div class="theme-details__description">
+                  <div class="theme-details__requirements">
+                  <div class="theme-details__requirement">{{ 'Machine name: @module-machine-name'|t({'@module-machine-name': theme.machine_name}) }}</div>
+                  {% if theme.version %}
+                    <div class="theme-details__requirement">{{ 'Version: @module-version'|t({'@module-version': theme.version}) }}</div>
+                  {% endif %}
+                  {% if theme.requires %}
+                    <div class="theme-details__requirement">{{ 'Requires: @module-list'|t({'@module-list': theme.requires|safe_join(', ')}) }}</div>
+                  {% endif %}
+                  {% if theme.required_by %}
+                    <div class="theme-details__requirement">{{ 'Required by: @module-list'|t({'@module-list': theme.required_by|safe_join(', ')}) }}</div>
+                  {% endif %}
+                  </div>
+                </div>
               </div>
-            {% endif %}
+            </details>
             {# Display operation links if the theme is compatible. #}
             {% if theme.incompatible %}
               <div class="incompatible">{{ theme.incompatible }}</div>

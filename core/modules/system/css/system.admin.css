@@ -76,82 +76,91 @@ small .admin-link::after {
 /**
  * Modules page.
  */
-.system-modules thead > tr {
+.extension thead > tr {
   border: 0;
 }
-.system-modules div.incompatible {
+.extension div.incompatible {
   font-weight: bold;
 }
-.system-modules td.checkbox {
+.extension td.checkbox {
   width: 4%;
   min-width: 25px;
 }
-.system-modules td.module {
+.extension td.module {
   width: 25%;
 }
-.system-modules td {
+.extension td {
   vertical-align: top;
 }
-.system-modules label,
+.extension label,
 .system-modules-uninstall label {
   color: #1d1d1d;
   font-size: 1.15em;
 }
-.system-modules details {
+.extension details {
   color: #5c5c5b;
   line-height: 20px;
 }
-.system-modules details[open] {
+.extension details[open] {
   overflow: visible;
   height: auto;
   white-space: normal;
 }
-.system-modules details[open] summary .text {
+.extension details[open] summary .text {
   text-transform: none;
   -webkit-hyphens: auto;
   hyphens: auto;
 }
-.system-modules td details a {
+.extension details a {
   color: #5c5c5b;
   border: 0;
 }
-.system-modules td details {
+.extension details {
   margin: 0;
   border: 0;
 }
-.system-modules td details summary {
+.extension details > summary {
+  overflow: hidden; /* truncates descriptions if too long */
   padding: 0;
   cursor: default;
+  white-space: nowrap;
   text-transform: none;
+  text-overflow: ellipsis;
   font-weight: normal;
 }
-.system-modules td {
+
+.extension details[open] > summary {
+  overflow: visible;
+  white-space: normal;
+}
+
+.extension td {
   padding-left: 0; /* LTR */
 }
-[dir="rtl"] .system-modules td {
+[dir="rtl"] .extension td {
   padding-right: 0;
   padding-left: 12px;
 }
 
 @media screen and (max-width: 40em) {
-  .system-modules td.name {
+  .extension td.name {
     width: 20%;
   }
-  .system-modules td.description {
+  .extension td.description {
     width: 40%;
   }
 }
-.system-modules .requirements {
+.extension .requirements {
   max-width: 490px;
   padding: 5px 0;
 }
-.system-modules .links {
+.extension .links {
   overflow: hidden; /* prevents collapse */
 }
-.system-modules .checkbox {
+.extension .checkbox {
   margin: 0 5px;
 }
-.system-modules .checkbox .form-item {
+.extension .checkbox .form-item {
   margin-bottom: 0;
 }
 .admin-requirements,
@@ -307,6 +316,12 @@ small .admin-link::after {
   body:not(.toolbar-vertical) .system-themes-list-installed .system-themes-list__header {
     margin-top: 0;
   }
+  body:not(.toolbar-vertical) .system-themes-list-installed .theme-info {
+    margin-left: 320px;
+  }
+  [dir="rtl"] body:not(.toolbar-vertical) .system-themes-list-installed .theme-info {
+    margin-right: 320px;
+  }
   body:not(.toolbar-vertical) .system-themes-list-uninstalled .theme-selector {
     float: left; /* LTR */
     box-sizing: border-box;
@@ -340,6 +355,12 @@ small .admin-link::after {
   .toolbar-vertical .system-themes-list-installed .theme-info__header {
     margin-top: 0;
   }
+  .toolbar-vertical .system-themes-list-installed .theme-info {
+    margin-left: 320px;
+  }
+  [dir="rtl"] .toolbar-vertical .system-themes-list-installed .theme-info {
+    margin-right: 320px;
+  }
   .toolbar-vertical .system-themes-list-uninstalled .theme-selector {
     float: left; /* LTR */
     box-sizing: border-box;
@@ -353,9 +374,6 @@ small .admin-link::after {
   .toolbar-vertical .system-themes-list-uninstalled .theme-info {
     min-height: 170px;
   }
-}
-.system-themes-list-installed .theme-info {
-  max-width: 940px;
 }
 
 .theme-selector .incompatible {

@@ -261,6 +261,18 @@ function template_preprocess_system_themes_page(&$variables): void {
   $groups = [];
   $theme_groups = $variables['theme_groups'];
   $variables['attributes']['id'] = 'system-themes-page';
+  $variables['attributes']['class'] = [
+    'extension',
+    'extension--theme',
+  ];
+
+  // Build a list of theme names for all known themes.
+  $theme_infos = [];
+  foreach ($variables['theme_group_titles'] as $state => $title) {
+    foreach ($theme_groups[$state] as $theme) {
+      $theme_infos[$theme->getName()] = $theme->info['name'];
+    }
+  }
 
   foreach ($variables['theme_group_titles'] as $state => $title) {
     if (!count($theme_groups[$state])) {
@@ -297,13 +309,30 @@ function template_preprocess_system_themes_page(&$variables): void {
         ];
       }
 
+      $version = $theme->info['version'] ?? '';
+
+      $requires = [];
+      foreach (array_keys($theme->requires) as $key) {
+        $requires[$key] = $theme_infos[$key] ?? $key;
+      }
+
+      $required_by = [];
+      foreach (array_keys($theme->required_by) as $key) {
+        $required_by[$key] = $theme_infos[$key] ?? $key;
+      }
+
+      $current_theme['machine_name'] = $theme->getName();
+      $current_theme['version'] = $version;
+      $current_theme['requires'] = $requires;
+      $current_theme['required_by'] = $required_by;
+
       // Localize the theme description.
       // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
       $current_theme['description'] = Markup::create(Xss::filterAdmin(t($theme->info['description'])));
 
       $current_theme['attributes'] = new Attribute();
       $current_theme['name'] = $theme->info['name'];
-      $current_theme['version'] = $theme->info['version'] ?? '';
+      $current_theme['version'] = $version;
       $current_theme['notes'] = $theme->notes;
       $current_theme['is_default'] = $theme->is_default;
       $current_theme['is_admin'] = $theme->is_admin;

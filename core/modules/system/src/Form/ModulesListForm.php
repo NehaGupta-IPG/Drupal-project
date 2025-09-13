@@ -228,6 +228,11 @@ class ModulesListForm extends FormBase {
     // Lastly, sort all packages by title.
     uasort($form['modules'], ['\Drupal\Component\Utility\SortArray', 'sortByTitleProperty']);
 
+    $form['#attributes']['class'] = [
+      'extension',
+      'extension--module',
+    ];
+
     $form['#attached']['library'][] = 'core/drupal.tableresponsive';
     $form['#attached']['library'][] = 'system/drupal.system.modules';
     $form['actions'] = ['#type' => 'actions'];
