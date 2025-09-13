@@ -271,7 +271,7 @@ class FileSystem implements FileSystemInterface {
     if ($this->streamWrapperManager->isValidScheme($scheme)) {
       $wrapper = $this->streamWrapperManager->getViaScheme($scheme);
 
-      if ($filename = tempnam($wrapper->getDirectoryPath(), $prefix)) {
+      if ($filename = tempnam($wrapper->realpath(), $prefix)) {
         return $scheme . '://' . static::basename($filename);
       }
       else {
