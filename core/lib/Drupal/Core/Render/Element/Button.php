@@ -75,7 +75,9 @@ class Button extends FormElementBase {
   }
 
   /**
-   * Prepares a #type 'button' render element for input.html.twig or button.html.twig.
+   * Prepares a #type 'button' render element.
+   *
+   * Prepared for input.html.twig or button.html.twig.
    *
    * @param array $element
    *   An associative array containing the properties of the element.
@@ -85,7 +87,8 @@ class Button extends FormElementBase {
    *   'primary', 'danger'.
    *
    * @return array
-   *   The $element with prepared variables ready for input.html.twig or button.html.twig.
+   *   The $element with prepared variables ready for input.html.twig or
+   *   button.html.twig.
    */
   public static function preRenderButton($element) {
     if ($element['#submit_button']) {
