@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\ban\Kernel;
 
 use Drupal\ban\BanIpManagerInterface;
-use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\KernelTests\KernelTestBase;
 
