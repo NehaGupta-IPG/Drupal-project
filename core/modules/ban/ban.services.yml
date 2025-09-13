@@ -12,3 +12,8 @@ services:
       # Ensure to come before page caching, so you don't serve cached pages to
       # banned users.
       - { name: http_middleware, priority: 250 }
+  ban.allowed_list_subscriber:
+    class: Drupal\ban\EventSubscriber\AllowedListSubscriber
+    arguments: [ '@entity_type.manager' ]
+    tags:
+      - { name: event_subscriber }

@@ -14,3 +14,35 @@ ban.delete:
     _title: 'Delete IP address'
   requirements:
     _permission: 'ban IP addresses'
+
+entity.ban_allowed_ip.collection:
+  path: '/admin/config/people/ban-allowed'
+  defaults:
+    _entity_list: 'ban_allowed_ip'
+    _title: 'Allowed IP configuration'
+  requirements:
+    _permission: 'administer site configuration'
+
+entity.ban_allowed_ip.add_form:
+  path: '/admin/config/people/ban-allowed/add'
+  defaults:
+    _entity_form: 'ban_allowed_ip.add'
+    _title: 'Add Allowed IP'
+  requirements:
+    _permission: 'administer site configuration'
+
+entity.ban_allowed_ip.edit_form:
+  path: '/admin/config/people/ban-allowed/{ban_allowed_ip}'
+  defaults:
+    _entity_form: 'ban_allowed_ip.edit'
+    _title: 'Edit Allowed IP'
+  requirements:
+    _permission: 'administer site configuration'
+
+entity.ban_allowed_ip.delete_form:
+  path: '/admin/config/people/ban-allowed/{ban_allowed_ip}/delete'
+  defaults:
+    _entity_form: 'ban_allowed_ip.delete'
+    _title: 'Delete Allowed IP'
+  requirements:
+    _permission: 'administer site configuration'

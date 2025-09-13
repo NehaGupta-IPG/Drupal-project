@@ -1,0 +1,5 @@
+ban.allowed.add_form:
+  route_name: 'entity.ban_allowed_ip.add_form'
+  title: 'Add Allowed IP'
+  appears_on:
+    - entity.ban_allowed_ip.collection
