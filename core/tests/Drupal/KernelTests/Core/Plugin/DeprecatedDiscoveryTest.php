@@ -34,7 +34,7 @@ class DeprecatedDiscoveryTest extends KernelTestBase {
     $this->expectDeprecation("Plugin discovery of plugin 'old_plugin' in subdirectory Plugin/SubdirDeprecationLegacy is deprecated in example:12.4.0 and is removed in example:13.0.0. The plugin class should be moved to Plugin/SubdirDeprecationNew and its namespace adjusted accordingly. See http://example.com/change-record/subdir-deprecation.");
     $definitions = $plugin_manager->getDefinitions();
 
-    // Plugins are discovered in both the old and new subdirs.
+    // Plugins are discovered in both the old and new subdirectories.
     $this->assertArrayHasKey('old_plugin', $definitions);
     $this->assertArrayHasKey('new_plugin', $definitions);
   }
