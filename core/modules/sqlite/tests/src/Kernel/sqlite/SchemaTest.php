@@ -14,6 +14,35 @@ use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
 class SchemaTest extends DriverSpecificSchemaTestBase {
 
   /**
+   * Sets up the database schema for testing.
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    $this->createTestTable();
+  }
+
+  /**
+   * Creates a test table with a VARCHAR length constraint.
+   */
+  protected function createTestTable(): void {
+    $schema = $this->schema->createTable('test_table', [
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+        ],
+        'name' => [
+          'type' => 'varchar',
+          // Should enforce a max length of 10 characters.
+          'length' => 10,
+          'not null' => TRUE,
+        ],
+      ],
+      'primary key' => ['id'],
+    ]);
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function checkSchemaComment(string|false $description, string $table, ?string $column = NULL): void {
@@ -44,6 +73,64 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     ];
     $this->schema->createTable('test_timestamp', $table_specification);
     $this->assertTrue($this->schema->tableExists('test_timestamp'));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function testTableInsertWithLengthConstraint(): void {
+    // Valid insert (should pass).
+    $this->schema->insert('test_table')
+      ->fields(['name'])
+      ->values(['short'])
+      ->execute();
+    $this->assertEquals(1, $this->schema->select('test_table')->countQuery()->execute()->fetchField());
+
+    // Invalid insert (should fail).
+    try {
+      $this->schema->insert('test_table')
+        ->fields(['name'])
+        ->values(['this_is_too_long'])
+        ->execute();
+      $this->fail('Expected an exception for exceeding length constraint.');
+    }
+    catch (\Exception $e) {
+      $this->assertStringContainsString('CHECK constraint failed', $e->getMessage());
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function testTableUpdateWithLengthConstraint(): void {
+    // Insert a valid row.
+    $id = $this->schema->insert('test_table')
+      ->fields(['name'])
+      ->values(['validname'])
+      ->execute();
+
+    // Valid update (should pass).
+    $this->schema->update('test_table')
+      ->fields(['name' => 'newvalue'])
+      ->condition('id', $id)
+      ->execute();
+    $this->assertEquals('newvalue', $this->schema->select('test_table')
+      ->fields('test_table', ['name'])
+      ->condition('id', $id)
+      ->execute()
+      ->fetchField());
+
+    // Invalid update (should fail).
+    try {
+      $this->schema->update('test_table')
+        ->fields(['name' => 'this_is_too_long'])
+        ->condition('id', $id)
+        ->execute();
+      $this->fail('Expected an exception for exceeding length constraint.');
+    }
+    catch (\Exception $e) {
+      $this->assertStringContainsString('CHECK constraint failed', $e->getMessage());
+    }
   }
 
   /**

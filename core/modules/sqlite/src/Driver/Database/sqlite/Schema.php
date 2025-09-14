@@ -172,7 +172,7 @@ class Schema extends DatabaseSchema {
 
       if (in_array($spec['sqlite_type'], ['VARCHAR', 'TEXT'])) {
         if (isset($spec['length'])) {
-          $sql .= '(' . $spec['length'] . ')';
+          $sql .= '(' . $spec['length'] . ') CHECK (length(' . $name . ') <= ' . $spec['length'] . ')';
         }
 
         if (isset($spec['binary']) && $spec['binary'] === FALSE) {
