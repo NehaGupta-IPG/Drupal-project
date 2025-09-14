@@ -240,8 +240,7 @@ class FormTestSelectForm extends FormBase {
   }
 
   /**
-   * Ajax callback to add child select #options depending on parent's
-   * value.
+   * Ajax callback to add child select #options depending on parent's value.
    */
   public function ajaxCallback($form, FormStateInterface $form_state): array {
     $options = [
