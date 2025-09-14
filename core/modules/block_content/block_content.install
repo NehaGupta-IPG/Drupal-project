@@ -4,6 +4,7 @@
  * @file
  * Install, update and uninstall functions for the block_content module.
  */
+ use Drupal\language\Entity\ContentLanguageSettings;
 
 /**
  * Implements hook_update_last_removed().
@@ -16,6 +17,10 @@ function block_content_update_last_removed(): int {
  * Implements_hook_update_N().
  */
 function block_content_update_11100() : void {
+  if (!\Drupal::moduleHandler()->moduleExists('content_translation')) {
+    return;
+  }
+  
   $permission = 'translate block_content';
   $roles = \Drupal::service('entity_type.manager')
     ->getStorage('user_role')
@@ -26,8 +31,12 @@ function block_content_update_11100() : void {
   foreach ($roles as $role_id => $role) {
     if ($role->hasPermission($permission)) {
       $role->revokePermission($permission);
-      foreach ($bundles as $bundle => $bundle_info) {
-        $role->grantPermission('translate ' . $bundle . ' block_content');
+      foreach ($bundles as $bundle_name => $bundle_info) {
+        $settings = ContentLanguageSettings::loadByEntityTypeBundle('block_content', $bundle_name);
+        $is_translatable = $settings->getThirdPartySetting('content_translation', 'enabled');
+        if ($is_translatable) {
+          $role->grantPermission('translate ' . $bundle_name . ' block_content');
+        }
       }
       $role->save();
     }
