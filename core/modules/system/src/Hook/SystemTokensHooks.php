@@ -80,7 +80,7 @@ class SystemTokensHooks {
     ];
     $date['custom'] = [
       'name' => $this->t("Custom format"),
-      'description' => $this->t('The current date in a custom format. See <a href="https://www.php.net/manual/datetime.format.php#refsect1-datetime.format-parameters">the PHP documentation</a> for details.'),
+      'description' => $this->t('The current date in a custom format. See <a href="https://www.php.net/manual/datetime.format.php#refsect1-datetime.format-parameters" target="_blank">the PHP documentation</a> for details.'),
     ];
     $date['since'] = [
       'name' => $this->t("Time-since"),
