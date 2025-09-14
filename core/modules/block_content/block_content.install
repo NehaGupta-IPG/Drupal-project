@@ -15,21 +15,21 @@ function block_content_update_last_removed(): int {
 /**
  * Implements_hook_update_N().
  */
-function block_content_update_11100() {
+function block_content_update_11100() : void {
   $permission = 'translate block_content';
-    $roles = \Drupal::service('entity_type.manager')
-      ->getStorage('user_role')
-      ->loadMultiple();
+  $roles = \Drupal::service('entity_type.manager')
+    ->getStorage('user_role')
+    ->loadMultiple();
 
-    $matched = [];
-    $bundles = $this->entityTypeBundleInfo->getBundleInfo('block_content');
-    foreach ($roles as $role_id => $role) {
-      if ($role->hasPermission($permission)) {
-        $role->revokePermission($permission);
-        foreach ($bundles as $bundle => $bundle_info) {
-          $role->grantPermission('translate ' . $bundle . ' block_content');
-        }
-        $role->save();
+  $matched = [];
+  $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo('block_content');
+  foreach ($roles as $role_id => $role) {
+    if ($role->hasPermission($permission)) {
+      $role->revokePermission($permission);
+      foreach ($bundles as $bundle => $bundle_info) {
+        $role->grantPermission('translate ' . $bundle . ' block_content');
       }
+      $role->save();
     }
+  }
 }
