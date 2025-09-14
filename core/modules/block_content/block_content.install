@@ -11,3 +11,25 @@
 function block_content_update_last_removed(): int {
   return 10300;
 }
+
+/**
+ * Implements_hook_update_N().
+ */
+function block_content_update_11100() {
+  $permission = 'translate block_content';
+    $roles = \Drupal::service('entity_type.manager')
+      ->getStorage('user_role')
+      ->loadMultiple();
+
+    $matched = [];
+    $bundles = $this->entityTypeBundleInfo->getBundleInfo('block_content');
+    foreach ($roles as $role_id => $role) {
+      if ($role->hasPermission($permission)) {
+        $role->revokePermission($permission);
+        foreach ($bundles as $bundle => $bundle_info) {
+          $role->grantPermission('translate ' . $bundle . ' block_content');
+        }
+        $role->save();
+      }
+    }
+}
