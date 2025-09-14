@@ -109,6 +109,14 @@ final class ConsoleInputCollector implements InputCollectorInterface {
       $arguments['question'] = is_string($arguments['question']) ? (string) $this->t($arguments['question']) : (string) $arguments['question'];
     }
 
+    // Translate choices (if any)
+    if (!empty($arguments['choices']) && is_array($arguments['choices'])) {
+      foreach ($arguments['choices'] as $k => $choice) {
+        // @phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
+        $arguments['choices'][$k] = is_string($choice) ? (string) $this->t($choice) : (string) $arguments['question'];
+      }
+    }
+
     // We don't support using Symfony Console's inline validation; instead,
     // input definitions should define constraints.
     unset($arguments['validator']);
