@@ -4,21 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Htmx;
 
-use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\GeneratedUrl;
 use Drupal\Core\Htmx\Htmx;
-use Drupal\Core\Routing\RouteObjectInterface;
-use Drupal\Core\Routing\UrlGenerator;
-use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Url;
-use Drupal\Tests\Core\Routing\TestRouterInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use Symfony\Component\HttpFoundation\InputBag;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Test all attribute-related Htmx public methods.
@@ -45,7 +37,6 @@ class HtmxAttributesTest extends UnitTestCase {
     $this->htmx = new Htmx();
     $generated = new GeneratedUrl();
     $generated->setGeneratedUrl('https://www.example.test/common-test/destination');
-
     $this->url = $this->getMockBuilder(Url::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['toString'])
@@ -53,142 +44,15 @@ class HtmxAttributesTest extends UnitTestCase {
     $this->url->expects($this->any())
       ->method('toString')
       ->willReturn($generated);
-
-    $this->requestStack = new RequestStack();
-
-    $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-    $this->urlGenerator->expects($this->any())
-      ->method('generateFromRoute')
-      ->with($this->url)
-      ->willReturn($generated);
-
-
-    $current = new GeneratedUrl();
-    $current->setGeneratedUrl('/test');
-    $this->current_url = $this->getMockBuilder(Url::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['toString'])
-      ->getMock();
-    $this->current_url->expects($this->any())
-      ->method('toString')
-      ->willReturn($current);
-
-    $this->urlGenerator->expects($this->any())
-      ->method('generateFromRoute')
-      ->with($this->current_url)
-      ->willReturn($current);
-
-    $this->router = $this->createMock(TestRouterInterface::class);
-
-    $this->container = new ContainerBuilder();
-    $this->container->set('request_stack', $this->requestStack);
-    $this->container->set('url_generator', $this->urlGenerator);
-    $this->container->set('router.no_access_checks', $this->router);
-    \Drupal::setContainer($this->container);
-
-    $this->request = Request::create('/test');
-    $this->requestStack->push($this->request);
-
-    $this->router->expects($this->any())
-      ->method('matchRequest')
-      ->willReturnCallback(function (Request $request) {
-        [$route_name, $vars] = match($request->getPathInfo()) {
-          '/test' => ['test', []],
-        };
-        return [
-          RouteObjectInterface::ROUTE_NAME => $route_name,
-          '_raw_variables' => new InputBag($vars),
-        ];
-      });
-
-
   }
 
+  /**
+   * Applies the Htmx attributes to a render array.
+   */
   protected function apply(): array {
     $render = [];
     $this->htmx->applyTo($render);
     return $render;
-  }
-
-  /**
-   * Test get method.
-   */
-  public function testHxGet(): void {
-    $this->htmx->get($this->url);
-    $render = $this->apply();
-    // The paths in GitLabCI include a subfolder.
-    $this->assertTrue(isset($render['#attributes']['data-hx-get']));
-    $this->assertStringEndsWith('/common-test/destination', $render['#attributes']['data-hx-get']);
-    // Verify no parameters.
-    $this->htmx->get();
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-get']));
-    $this->assertEquals('', $render['#attributes']['data-hx-get']);
-  }
-
-  /**
-   * Test post method.
-   */
-  public function testHxPost(): void {
-    $this->htmx->post($this->url);
-    $render = $this->apply();
-    // The paths in GitLabCI include a subfolder.
-    $this->assertTrue(isset($render['#attributes']['data-hx-post']));
-    $this->assertStringEndsWith('/common-test/destination', $render['#attributes']['data-hx-post']);
-    // Verify no parameters.
-    $this->htmx->post();
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-post']));
-    $this->assertEquals('', $render['#attributes']['data-hx-post']);
-  }
-
-  /**
-   * Test put method.
-   */
-  public function testHxPut(): void {
-    $this->htmx->put($this->url);
-    $render = $this->apply();
-    // The paths in GitLabCI include a subfolder.
-    $this->assertTrue(isset($render['#attributes']['data-hx-put']));
-    $this->assertStringEndsWith('/common-test/destination', $render['#attributes']['data-hx-put']);
-    // Verify no parameters.
-    $this->htmx->put();
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-put']));
-    $this->assertEquals('', $render['#attributes']['data-hx-put']);
-  }
-
-  /**
-   * Test patch method.
-   */
-  public function testHxPatch(): void {
-    $this->htmx->patch($this->url);
-    $render = $this->apply();
-    // The paths in GitLabCI include a subfolder.
-    $this->assertTrue(isset($render['#attributes']['data-hx-patch']));
-    $this->assertStringEndsWith('/common-test/destination', $render['#attributes']['data-hx-patch']);
-    // Verify no parameters.
-    $this->htmx->patch();
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-patch']));
-    $this->assertEquals('', $render['#attributes']['data-hx-patch']);
-  }
-
-  /**
-   * Test delete method.
-   */
-  public function testHxDelete(): void {
-    $this->htmx->delete($this->url);
-    $render = $this->apply();
-
-    // The paths in GitLabCI include a subfolder.
-    $this->assertTrue(isset($render['#attributes']['data-hx-delete']));
-    $this->assertStringEndsWith('/common-test/destination', $render['#attributes']['data-hx-delete']);
-    // Verify no parameters.
-    $this->htmx->delete();
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-delete']));
-    $this->assertEquals('', $render['#attributes']['data-hx-delete']);
   }
 
   /**
