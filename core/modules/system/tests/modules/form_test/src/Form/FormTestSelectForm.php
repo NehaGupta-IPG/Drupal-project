@@ -171,6 +171,25 @@ class FormTestSelectForm extends FormBase {
       '#empty_value' => 'snn_empty',
     ];
 
+    $form['ajax_parent_select'] = [
+      '#title' => $this->t('Parent select with Ajax callback'),
+      '#type' => 'select',
+      '#options' => ['one' => 'One', 'two' => 'Two'],
+      '#default_value' => 'one',
+      '#ajax' => [
+        'callback' => '::ajaxCallback',
+        'wrapper' => 'child-wrapper',
+      ],
+    ];
+    $form['ajax_child_select'] = [
+      '#title' => $this->t('Child select'),
+      '#type' => 'select',
+      '#options' => ['three' => 'Three'],
+      '#empty_option' => $this->t('- Select -'),
+      '#prefix' => '<div id="child-wrapper">',
+      '#suffix' => '</div>',
+    ];
+
     $form['submit'] = ['#type' => 'submit', '#value' => 'Submit'];
     return $form;
   }
@@ -218,6 +237,18 @@ class FormTestSelectForm extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $form_state->setResponse(new JsonResponse($form_state->getValues()));
+  }
+
+  /**
+   * Ajax callback to add child select #options depending on parent's value.
+   */
+  public function ajaxCallback($form, FormStateInterface $form_state) {
+    $options = [
+      'one' => ['three' => 'Three'],
+      'two' => ['four' => 'Four'],
+    ];
+    $form['ajax_child_select']['#options'] = $options[$form_state->getValue('ajax_parent_select')];
+    return $form['ajax_child_select'];
   }
 
 }

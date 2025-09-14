@@ -133,30 +133,8 @@ class Select extends FormElementBase {
       $element['#attributes']['multiple'] = 'multiple';
       $element['#attributes']['name'] = $element['#name'] . '[]';
     }
-    // A non-#multiple select needs special handling to prevent user agents from
-    // preselecting the first option without intention. #multiple select lists
-    // do not get an empty option, as it would not make sense, user
-    // interface-wise.
-    else {
-      // If the element is set to #required through #states, override the
-      // element's #required setting.
-      $required = isset($element['#states']['required']) ? TRUE : $element['#required'];
-      // If the element is required and there is no #default_value, then add an
-      // empty option that will fail validation, so that the user is required to
-      // make a choice. Also, if there's a value for #empty_value or
-      // #empty_option, then add an option that represents emptiness.
-      if (($required && !isset($element['#default_value'])) || isset($element['#empty_value']) || isset($element['#empty_option'])) {
-        $element += [
-          '#empty_value' => '',
-          '#empty_option' => $required ? t('- Select -') : t('- None -'),
-        ];
-        // The empty option is prepended to #options and purposively not merged
-        // to prevent another option in #options mistakenly using the same value
-        // as #empty_value.
-        $empty_option = [$element['#empty_value'] => $element['#empty_option']];
-        $element['#options'] = $empty_option + $element['#options'];
-      }
-    }
+
+    static::insertEmptyOption($element);
     // Provide the correct default value for #sort_start.
     $element['#sort_start'] = $element['#sort_start'] ??
       (isset($element['#empty_value']) ? 1 : 0);
@@ -196,11 +174,49 @@ class Select extends FormElementBase {
 
   /**
    * Prepares a select render element.
+   *
+   * @param array $element
+   *   An associative array containing the attributes of the element.
    */
   public static function preRenderSelect($element) {
     Element::setAttributes($element, ['id', 'name', 'size']);
     static::setAttributes($element, ['form-select']);
+    static::insertEmptyOption($element);
     return $element;
+  }
+
+  /**
+   * Inserts empty option.
+   *
+   * @param array $element
+   *   An associative array containing the attributes of the element.
+   *   Properties used: #multiple, #states, #required, #default_value, #empty_value,
+   *   #empty_option and #options.
+   */
+  protected static function insertEmptyOption(&$element) {
+    // A non-#multiple select needs special handling to prevent user agents from
+    // preselecting the first option without intention. #multiple select lists do
+    // not get an empty option, as it would not make sense, user interface-wise.
+    if (!$element['#multiple']) {
+      // If the element is set to #required through #states, override the
+      // element's #required setting.
+      $required = isset($element['#states']['required']) ? TRUE : $element['#required'];
+      // If the element is required and there is no #default_value, then add an
+      // empty option that will fail validation, so that the user is required to
+      // make a choice. Also, if there's a value for #empty_value or
+      // #empty_option, then add an option that represents emptiness.
+      if (($required && !isset($element['#default_value'])) || isset($element['#empty_value']) || isset($element['#empty_option'])) {
+        $element = [
+          '#empty_value' => '',
+          '#empty_option' => $required ? t('- Select -') : t('- None -'),
+        ];
+        // The empty option is prepended to #options and purposively not merged
+        // to prevent another option in #options mistakenly using the same value
+        // as #empty_value.
+        $empty_option = [$element['#empty_value'] => $element['#empty_option']];
+        $element['#options'] = $empty_option + $element['#options'];
+      }
+    }
   }
 
 }

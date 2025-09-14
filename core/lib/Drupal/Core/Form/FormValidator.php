@@ -376,7 +376,10 @@ class FormValidator implements FormValidatorInterface {
         $elements['#value'] = NULL;
         $form_state->setValueForElement($elements, NULL);
       }
-      elseif (!isset($options[$elements['#value']])) {
+      // Verify if the submitted value is a default option in form
+      // or a changed one by the user in HTML. If the value isn't an
+      // default option set an error.
+      elseif ($elements['#value'] !== '' && !isset($options[$elements['#value']])) {
         $message_arguments['%choice'] = $elements['#value'];
         $form_state->setError($elements, $this->t('The submitted value %choice in the %name element is not allowed.', $message_arguments));
         $this->logger->error('The submitted value %choice in the %name element is not allowed.', $message_arguments);
