@@ -230,4 +230,14 @@ abstract class MenuLinkBase extends PluginBase implements MenuLinkInterface {
     return [];
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function isPromoted() {
+    if (!isset($this->pluginDefinition['promoted'])) {
+      $this->pluginDefinition['promoted'] = FALSE;
+    }
+    return $this->pluginDefinition['promoted'];
+  }
+
 }

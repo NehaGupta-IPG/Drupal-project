@@ -3,6 +3,7 @@ entity.node_type.collection:
   parent: system.admin_structure
   description: 'Create and manage fields, forms, and display settings for your content.'
   route_name: entity.node_type.collection
+  promoted: 1
 node.add_page:
   title: 'Add content'
   route_name: node.add_page

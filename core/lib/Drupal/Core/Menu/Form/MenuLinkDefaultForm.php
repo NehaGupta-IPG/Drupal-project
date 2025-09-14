@@ -135,6 +135,13 @@ class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionIn
       '#default_value' => $this->menuLink->isExpanded(),
     ];
 
+    $form['promoted'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Show as promoted'),
+      '#description' => $this->t('If selected, menu handlers may use this information to show this link more prominently.'),
+      '#default_value' => $this->menuLink->isPromoted(),
+    ];
+
     $menu_parent = $this->menuLink->getMenuName() . ':' . $this->menuLink->getParent();
     $form['menu_parent'] = $this->menuParentSelector->parentSelectElement($menu_parent, $this->menuLink->getPluginId());
     $form['menu_parent']['#title'] = $this->t('Parent link');
@@ -166,6 +173,7 @@ class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionIn
     $new_definition['enabled'] = $form_state->getValue('enabled') ? 1 : 0;
     $new_definition['weight'] = (int) $form_state->getValue('weight');
     $new_definition['expanded'] = $form_state->getValue('expanded') ? 1 : 0;
+    $new_definition['promoted'] = $form_state->getValue('promoted') ? 1 : 0;
     [$menu_name, $parent] = explode(':', $form_state->getValue('menu_parent'), 2);
     if (!empty($menu_name)) {
       $new_definition['menu_name'] = $menu_name;

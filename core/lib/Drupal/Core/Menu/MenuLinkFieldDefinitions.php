@@ -45,6 +45,7 @@ trait MenuLinkFieldDefinitions {
     'form_class' => 'Drupal\Core\Menu\Form\MenuLinkDefaultForm',
     // The plugin ID. Set by the plugin system based on the top-level YAML key.
     'id' => '',
+    'promoted' => 1,
   ];
 
 }

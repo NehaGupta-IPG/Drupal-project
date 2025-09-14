@@ -3,6 +3,7 @@ entity.media_type.collection:
   parent: system.admin_structure
   description: 'Manage media types.'
   route_name: entity.media_type.collection
+  promoted: 1
 
 media.settings:
   title: 'Media settings'

@@ -28,7 +28,13 @@ use Drupal\Core\Url;
 function template_preprocess_admin_block_content(&$variables): void {
   if (!empty($variables['content'])) {
     $variables['compact'] = system_admin_compact_mode();
+    $previous_promoted = FALSE;
     foreach ($variables['content'] as $key => $item) {
+      if ($previous_promoted && empty($item['promoted'])) {
+        // This is the first non-promoted item from the list. Add a flag to
+        // indicate that.
+        $variables['content'][$key]['first_non_promoted'] = TRUE;
+      }
       $variables['content'][$key]['link'] = Link::fromTextAndUrl($item['title'], $item['url'])->toString();
       if (!$variables['compact'] && !empty($item['description'])) {
         $variables['content'][$key]['description'] = ['#markup' => $item['description']];
@@ -36,6 +42,7 @@ function template_preprocess_admin_block_content(&$variables): void {
       else {
         $variables['content'][$key]['description'] = FALSE;
       }
+      $previous_promoted = !empty($item['promoted']);
     }
   }
 }

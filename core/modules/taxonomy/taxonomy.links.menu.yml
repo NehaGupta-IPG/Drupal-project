@@ -3,3 +3,4 @@ entity.taxonomy_vocabulary.collection:
   parent: system.admin_structure
   description: 'Manage tagging, categorization, and classification of your content.'
   route_name: entity.taxonomy_vocabulary.collection
+  promoted: 1

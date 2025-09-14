@@ -131,6 +131,7 @@ class StaticMenuLinkOverrides implements StaticMenuLinkOverridesInterface {
       'weight' => 0,
       'expanded' => FALSE,
       'enabled' => FALSE,
+      'promoted' => FALSE,
     ];
     // Filter the overrides to only those that are expected.
     $definition = array_intersect_key($definition, $expected);
@@ -143,6 +144,7 @@ class StaticMenuLinkOverrides implements StaticMenuLinkOverridesInterface {
       $definition['weight'] = (int) $definition['weight'];
       $definition['expanded'] = (bool) $definition['expanded'];
       $definition['enabled'] = (bool) $definition['enabled'];
+      $definition['promoted'] = (bool) $definition['promoted'];
 
       $id = static::encodeId($id);
       $all_overrides = $this->getConfig()->get('definitions');

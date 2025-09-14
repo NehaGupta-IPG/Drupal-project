@@ -20,6 +20,7 @@ class MenuLinkDefault extends MenuLinkBase implements ContainerFactoryPluginInte
     'weight' => 1,
     'expanded' => 1,
     'enabled' => 1,
+    'promoted' => 1,
   ];
 
   /**

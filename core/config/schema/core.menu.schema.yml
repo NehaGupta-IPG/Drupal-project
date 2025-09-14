@@ -41,3 +41,6 @@ core.menu.static_menu_link_overrides:
           enabled:
             type: boolean
             label: 'Enabled'
+          promoted:
+            type: boolean
+            label: 'Promoted'

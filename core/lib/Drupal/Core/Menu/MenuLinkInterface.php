@@ -77,6 +77,14 @@ interface MenuLinkInterface extends PluginInspectionInterface, DerivativeInspect
   public function isExpanded();
 
   /**
+   * Returns whether the child menu links should always been shown.
+   *
+   * @return bool
+   *   TRUE for Promoted, FALSE otherwise.
+   */
+  public function isPromoted();
+
+  /**
    * Returns whether this link can be reset.
    *
    * In general, only links that store overrides using the

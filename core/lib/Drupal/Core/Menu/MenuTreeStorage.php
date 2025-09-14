@@ -382,6 +382,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     // Cast Booleans to int, if needed.
     $fields['enabled'] = (int) $fields['enabled'];
     $fields['expanded'] = (int) $fields['expanded'];
+    $fields['promoted'] = (int) $fields['promoted'];
     return $fields;
   }
 
@@ -1288,6 +1289,13 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
         ],
         'expanded' => [
           'description' => 'Flag for whether this link should be rendered as expanded in menus - expanded links always have their child links displayed, instead of only when the link is in the active trail (1 = expanded, 0 = not expanded)',
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+          'size' => 'small',
+        ],
+        'promoted' => [
+          'description' => 'Flag for whether this link should be rendered as promoted in menus (1 = promoted, 0 = not promoted)',
           'type' => 'int',
           'not null' => TRUE,
           'default' => 0,

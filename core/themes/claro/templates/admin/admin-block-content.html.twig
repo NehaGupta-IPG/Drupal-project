@@ -26,7 +26,8 @@
   <dl{{ attributes.addClass('admin-list') }}>
     {% for item in content %}
       <div{{ create_attribute({class: item_classes}) }}>
-        <dt class="admin-item__title">{{ item.link }}</dt>
+      {% set item_class = [ item.promoted ? 'menu-link-promoted', item.first_non_promoted ? 'first-non-promoted' ]|join(' ') %}
+      <dt class="list-group__lin {{ item_class }}">{{ item.link }}</dt>
         {% if item.description %}
           <dd class="admin-item__description">{{ item.description }}</dd>
         {% endif %}

@@ -30,6 +30,7 @@ class MenuLinkDefaultTest extends UnitTestCase {
       'menu_name' => 'admin',
       'parent' => '',
       'weight' => 10,
+      'promoted' => 1,
     ];
     $expected_plugin_definition = $plugin_definition;
     $expected_plugin_definition['weight'] = -10;
@@ -56,6 +57,7 @@ class MenuLinkDefaultTest extends UnitTestCase {
       'menu_name' => 'admin',
       'parent' => '',
       'weight' => 10,
+      'promoted' => 1,
     ];
     $expected_plugin_definition = $plugin_definition;
     $expected_plugin_definition['weight'] = -10;

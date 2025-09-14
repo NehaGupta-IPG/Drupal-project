@@ -218,6 +218,31 @@ class DefaultMenuLinkTreeManipulators {
   }
 
   /**
+   * Separate the links into promoted vs non-promoted ones.
+   *
+   * Will only affect the first-level of the tree.
+   *
+   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
+   *   The menu link tree to manipulate.
+   *
+   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
+   *   The manipulated menu link tree.
+   */
+  public function bubbleUpPromotedItems(array $tree) {
+    $promoted = [];
+    $regular = [];
+    foreach ($tree as $key => $v) {
+      if ($v->link->isPromoted()) {
+        $promoted['1' . $key] = $tree[$key];
+      }
+      else {
+        $regular[$key] = $tree[$key];
+      }
+    }
+    return $promoted + $regular;
+  }
+
+  /**
    * Flattens the tree to a single level.
    *
    * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
