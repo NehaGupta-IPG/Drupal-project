@@ -248,7 +248,12 @@ abstract class Connection {
   /**
    * Indicates if the connection object is currently available.
    *
+   * We expect:
+   * - TRUE when there is a connection available.
+   * - FALSE when the connection object has been destructed.
+   *
    * @return bool
+   *   Indicates if the connection object is currently available.
    */
   public function hasClientConnection(): bool {
     return $this->connection !== NULL;

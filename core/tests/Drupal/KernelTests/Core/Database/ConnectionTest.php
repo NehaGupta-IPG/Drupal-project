@@ -185,9 +185,7 @@ class ConnectionTest extends DatabaseTestBase {
   }
 
   /**
-   * Test that the method ::hasClientConnection() returns
-   * - TRUE when there is a connection
-   * - FALSE when the connection object has been destructed
+   * Test that the method ::hasClientConnection() returns expected results.
    */
   public function testHasClientConnection():void {
     $connection = Database::getConnection('default', 'default');
