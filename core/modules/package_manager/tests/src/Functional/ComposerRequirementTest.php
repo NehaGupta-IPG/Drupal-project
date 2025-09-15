@@ -5,37 +5,46 @@ declare(strict_types=1);
 namespace Drupal\Tests\package_manager\Functional;
 
 use Drupal\package_manager\ComposerInspector;
-use Drupal\package_manager_test_validation\TestExecutableFinder;
 use PhpTuf\ComposerStager\API\Finder\Service\ExecutableFinderInterface;
-use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that Package Manager shows the Composer version on the status report.
  *
+ * @group package_manager
  * @internal
  */
-#[Group('package_manager')]
 class ComposerRequirementTest extends PackageManagerTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = [
-    'package_manager',
-    'package_manager_test_validation',
+  protected static $modules = ['package_manager'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $configSchemaCheckerExclusions = [
+    // We test what happens when the configured path to Composer is invalid,
+    // so we need to be able to skip schema-based validation, which would
+    // normally confirm that the configured path to Composer is executable.
+    'package_manager.settings',
   ];
 
   /**
    * Tests that Composer version and path are listed on the status report.
    */
   public function testComposerInfoShown(): void {
+    $config = $this->config('package_manager.settings');
+
     // Ensure we can locate the Composer executable.
     /** @var \PhpTuf\ComposerStager\API\Finder\Service\ExecutableFinderInterface $executable_finder */
     $executable_finder = $this->container->get(ExecutableFinderInterface::class);
     $composer_path = $executable_finder->find('composer');
     $composer_version = $this->container->get(ComposerInspector::class)->getVersion();
 
-    // Ensure the status report shows Composer's version and path.
+    // With a valid path to Composer, ensure the status report shows its version
+    // number and path.
+    $config->set('executables.composer', $composer_path)->save();
     $account = $this->drupalCreateUser(['administer site configuration']);
     $this->drupalLogin($account);
     $this->drupalGet('/admin/reports/status');
@@ -43,12 +52,15 @@ class ComposerRequirementTest extends PackageManagerTestBase {
     $assert_session->pageTextContains('Composer version');
     $assert_session->responseContains("$composer_version (<code>$composer_path</code>)");
 
-    // If the Composer can't be found, we should see the error message that gets
-    // throw by the executable finder.
-    TestExecutableFinder::throwFor('composer');
+    // If the path to Composer is invalid, we should see the error message
+    // that gets raised when we try to get its version.
+    $config->set('executables.composer', '/path/to/composer')->save();
     $this->getSession()->reload();
     $assert_session->statusCodeEquals(200);
-    $assert_session->pageTextContains('Composer was not found. The error message was: composer is not a thing');
+    $assert_session->pageTextContains('Composer was not found. The error message was: ');
+    // Check for the part of the command string that is constant (the path to
+    // the PHP interpreter will vary).
+    $assert_session->pageTextContains("/php' '/path/to/composer' '--format=json'\" failed.");
   }
 
 }

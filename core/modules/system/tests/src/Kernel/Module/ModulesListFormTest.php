@@ -2,31 +2,25 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\system\Kernel\Module;
-
-use Drupal\Core\Form\FormState;
-use Drupal\KernelTests\KernelTestBase;
-use Drupal\system\Form\ModulesListForm;
-use PHPUnit\Framework\Attributes\Group;
+namespace Drupal\Tests\system\Functional\Module;
 
 /**
- * Tests the modules list form.
+ * Tests module version dependencies.
+ *
+ * @group Module
+ * @group #slow
  */
-#[Group('Module')]
-class ModulesListFormTest extends KernelTestBase {
+class VersionTest extends ModuleTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = [
-    'system_test',
-    'user',
-  ];
+  protected $defaultTheme = 'stark';
 
   /**
-   * Test module checkboxes for various version dependencies.
+   * Tests version dependencies.
    */
-  public function testModuleVersionDependencies(): void {
+  public function testModuleVersions(): void {
     $dependencies = [
       // Alternating between being compatible and incompatible with
       // 8.x-2.4-beta3.
@@ -59,16 +53,15 @@ class ModulesListFormTest extends KernelTestBase {
       // Testing extra version. Incompatible.
       'common_test (>2.4-rc0)',
     ];
-    foreach ($dependencies as $i => $dependency) {
-      \Drupal::state()->set('system_test.dependency', $dependency);
-      $form_object = ModulesListForm::create($this->container);
-      $form = $form_object->buildForm([], new FormState());
-      $disabled = $form['modules']['Testing']['module_test']['enable']['#disabled'];
-      if ($i % 2 === 0) {
-        $this->assertFalse($disabled);
+    \Drupal::state()->set('system_test.dependencies', $dependencies);
+    $n = count($dependencies);
+    for ($i = 0; $i < $n; $i++) {
+      $this->drupalGet('admin/modules');
+      if ($i % 2 == 0) {
+        $this->assertSession()->fieldEnabled('edit-modules-module-test-enable');
       }
       else {
-        $this->assertTrue($disabled);
+        $this->assertSession()->fieldDisabled('edit-modules-module-test-enable');
       }
     }
   }

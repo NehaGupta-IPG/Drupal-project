@@ -6,8 +6,6 @@ namespace Drupal\KernelTests\Core\Asset;
 
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\KernelTests\KernelTestBase;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests that the asset files for all core libraries exist.
@@ -15,9 +13,10 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
  * This test also changes the active theme to each core theme to verify
  * the libraries after theme-level libraries-override and libraries-extend are
  * applied.
+ *
+ * @group Asset
+ * @group #slow
  */
-#[Group('Asset')]
-#[Group('#slow')]
 class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
 
   /**
@@ -164,8 +163,9 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
 
   /**
    * Ensures that module and theme library files exist for a deprecated modules.
+   *
+   * @group legacy
    */
-  #[IgnoreDeprecations]
   public function testCoreLibraryCompletenessDeprecated(): void {
     // Find and install deprecated modules to test.
     $all_modules = $this->container->get('extension.list.module')->getList();

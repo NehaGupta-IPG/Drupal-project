@@ -12,7 +12,6 @@ use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Installer\InstallerKernel;
 
 /**
  * Hook implementations for block.
@@ -149,7 +148,7 @@ class BlockHooks {
   /**
    * Implements hook_modules_installed().
    *
-   * @see BlockHooks::themesInstalled()
+   * @see block_themes_installed()
    */
   #[Hook('modules_installed')]
   public function modulesInstalled($modules, bool $is_syncing): void {
@@ -158,46 +157,13 @@ class BlockHooks {
       return;
     }
 
-    // BlockHooks::themesInstalled() does not call block_theme_initialize()
-    // during site installation because block configuration can be optional or
-    // provided by the profile. Now, when the profile is installed, this
-    // configuration exists, call block_theme_initialize() for all installed
-    // themes.
+    // block_themes_installed() does not call block_theme_initialize() during
+    // site installation because block configuration can be optional or provided
+    // by the profile. Now, when the profile is installed, this configuration
+    // exists, call block_theme_initialize() for all installed themes.
     $profile = \Drupal::installProfile();
     if (in_array($profile, $modules, TRUE)) {
       foreach (\Drupal::service('theme_handler')->listInfo() as $theme => $data) {
-        block_theme_initialize($theme);
-      }
-    }
-  }
-
-  /**
-   * Implements hook_themes_installed().
-   *
-   * Initializes blocks for installed themes.
-   *
-   * @param string[] $theme_list
-   *   An array of theme names.
-   *
-   * @see BlockHooks::modulesInstalled()
-   */
-  #[Hook('themes_installed')]
-  public function themesInstalled($theme_list): void {
-    // Do not create blocks during config sync.
-    if (\Drupal::service('config.installer')->isSyncing()) {
-      return;
-    }
-    // Disable this functionality prior to install profile installation because
-    // block configuration is often optional or provided by the install profile
-    // itself. block_theme_initialize() will be called when the install profile
-    // is installed.
-    if (InstallerKernel::installationAttempted() && \Drupal::config('core.extension')->get('module.' . \Drupal::installProfile()) === NULL) {
-      return;
-    }
-
-    foreach ($theme_list as $theme) {
-      // Don't initialize themes that are not displayed in the UI.
-      if (\Drupal::service('theme_handler')->hasUi($theme)) {
         block_theme_initialize($theme);
       }
     }

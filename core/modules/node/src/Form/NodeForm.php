@@ -10,8 +10,6 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
-use Drupal\Core\Utility\Error;
-use Drupal\node\NodePreviewMode;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -126,7 +124,7 @@ class NodeForm extends ContentEntityForm {
 
     if ($this->operation == 'edit') {
       $form['#title'] = $this->t('<em>Edit @type</em> @title', [
-        '@type' => $node->getBundleEntity()->label(),
+        '@type' => node_get_type_label($node),
         '@title' => $node->label(),
       ]);
     }
@@ -165,7 +163,7 @@ class NodeForm extends ContentEntityForm {
     $form['meta']['author'] = [
       '#type' => 'item',
       '#title' => $this->t('Author'),
-      '#markup' => $node->getOwner()?->getDisplayName(),
+      '#markup' => $node->getOwner()?->getAccountName(),
       '#wrapper_attributes' => ['class' => ['entity-meta__author']],
     ];
 
@@ -228,13 +226,13 @@ class NodeForm extends ContentEntityForm {
   protected function actions(array $form, FormStateInterface $form_state) {
     $element = parent::actions($form, $form_state);
     $node = $this->entity;
-    $preview_mode = $node->type->entity->getPreviewMode(FALSE);
+    $preview_mode = $node->type->entity->getPreviewMode();
 
-    $element['submit']['#access'] = $preview_mode != NodePreviewMode::Required || $form_state->get('has_been_previewed');
+    $element['submit']['#access'] = $preview_mode != DRUPAL_REQUIRED || $form_state->get('has_been_previewed');
 
     $element['preview'] = [
       '#type' => 'submit',
-      '#access' => $preview_mode != NodePreviewMode::Disabled && ($node->access('create') || $node->access('update')),
+      '#access' => $preview_mode != DRUPAL_DISABLED && ($node->access('create') || $node->access('update')),
       '#value' => $this->t('Preview'),
       '#weight' => 20,
       '#submit' => ['::submitForm', '::preview'],
@@ -280,22 +278,21 @@ class NodeForm extends ContentEntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $node = $this->entity;
     $insert = $node->isNew();
+    $node->save();
+    $node_link = $node->toLink($this->t('View'))->toString();
+    $context = ['@type' => $node->getType(), '%title' => $node->label(), 'link' => $node_link];
+    $t_args = ['@type' => node_get_type_label($node), '%title' => $node->access('view') ? $node->toLink()->toString() : $node->label()];
 
-    try {
-      $node->save();
-      $node_link = $node->toLink($this->t('View'))->toString();
-      $context = ['@type' => $node->getType(), '%title' => $node->label(), 'link' => $node_link];
-      $t_args = ['@type' => $node->getBundleEntity()->label(), '%title' => $node->access('view') ? $node->toLink()->toString() : $node->label()];
+    if ($insert) {
+      $this->logger('content')->info('@type: added %title.', $context);
+      $this->messenger()->addStatus($this->t('@type %title has been created.', $t_args));
+    }
+    else {
+      $this->logger('content')->info('@type: updated %title.', $context);
+      $this->messenger()->addStatus($this->t('@type %title has been updated.', $t_args));
+    }
 
-      if ($insert) {
-        $this->logger('content')->info('@type: added %title.', $context);
-        $this->messenger()->addStatus($this->t('@type %title has been created.', $t_args));
-      }
-      else {
-        $this->logger('content')->info('@type: updated %title.', $context);
-        $this->messenger()->addStatus($this->t('@type %title has been updated.', $t_args));
-      }
-
+    if ($node->id()) {
       $form_state->setValue('nid', $node->id());
       $form_state->set('nid', $node->id());
       if ($node->access('view')) {
@@ -313,15 +310,10 @@ class NodeForm extends ContentEntityForm {
       $store = $this->tempStoreFactory->get('node_preview');
       $store->delete($node->uuid());
     }
-    catch (\Exception $e) {
+    else {
       // In the unlikely case something went wrong on save, the node will be
-      // rebuilt and node form redisplayed.
-      $this->messenger()->addError($this->t('The content could not be saved. Contact the site administrator if the problem persists.'));
-      // It's likely that this exception is an EntityStorageException in which
-      // case we won't have the actual backtrace available. Attempt to get the
-      // previous exception if available to include the backtrace.
-      $e = $e->getPrevious() ?: $e;
-      \Drupal::logger('node')->error('%type saving node form: @message in %function (line %line of %file) @backtrace_string.', Error::decodeException($e));
+      // rebuilt and node form redisplayed the same way as in preview.
+      $this->messenger()->addError($this->t('The post could not be saved.'));
       $form_state->setRebuild();
     }
   }

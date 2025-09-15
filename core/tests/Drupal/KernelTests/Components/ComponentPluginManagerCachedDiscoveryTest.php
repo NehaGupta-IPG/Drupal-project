@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Components;
 
-use PHPUnit\Framework\Attributes\Group;
-
 /**
  * Tests discovery of components in a theme being installed or uninstalled.
+ *
+ * @group sdc
  */
-#[Group('sdc')]
 class ComponentPluginManagerCachedDiscoveryTest extends ComponentKernelTestBase {
 
   /**

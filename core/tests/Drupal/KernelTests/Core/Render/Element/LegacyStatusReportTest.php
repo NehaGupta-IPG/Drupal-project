@@ -6,14 +6,13 @@ namespace Drupal\KernelTests\Core\Render\Element;
 
 use Drupal\Core\Render\Element\StatusReport;
 use Drupal\KernelTests\KernelTestBase;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests the status report element legacy methods.
+ *
+ * @group Render
+ * @group legacy
  */
-#[Group('Render')]
-#[IgnoreDeprecations]
 class LegacyStatusReportTest extends KernelTestBase {
 
   /**

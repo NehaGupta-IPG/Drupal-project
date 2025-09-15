@@ -10,15 +10,12 @@ use Drupal\Core\Access\RefinableDependentAccessInterface;
 use Drupal\Core\Access\RefinableDependentAccessTrait;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 
 /**
- * Tests Drupal\Core\Access\RefinableDependentAccessTrait.
+ * @coversDefaultClass  \Drupal\Core\Access\RefinableDependentAccessTrait
+ *
+ * @group Access
  */
-#[CoversClass(RefinableDependentAccessTrait::class)]
-#[Group('Access')]
 class DependentAccessTest extends UnitTestCase {
   use AccessibleTestingTrait;
 
@@ -49,9 +46,10 @@ class DependentAccessTest extends UnitTestCase {
   /**
    * Tests that the previous dependency is replaced when using set.
    *
-   * @legacy-covers ::setAccessDependency
+   * @covers ::setAccessDependency
+   *
+   * @dataProvider providerTestSetFirst
    */
-  #[DataProvider('providerTestSetFirst')]
   public function testSetAccessDependency($use_set_first): void {
     $testRefinable = new RefinableDependentAccessTraitTestClass();
 
@@ -76,8 +74,9 @@ class DependentAccessTest extends UnitTestCase {
 
   /**
    * Tests merging a new dependency with existing non-group access dependency.
+   *
+   * @dataProvider providerTestSetFirst
    */
-  #[DataProvider('providerTestSetFirst')]
   public function testMergeNonGroup($use_set_first): void {
     $testRefinable = new RefinableDependentAccessTraitTestClass();
     if ($use_set_first) {
@@ -107,8 +106,9 @@ class DependentAccessTest extends UnitTestCase {
 
   /**
    * Tests merging a new dependency with an existing access group dependency.
+   *
+   * @dataProvider providerTestSetFirst
    */
-  #[DataProvider('providerTestSetFirst')]
   public function testMergeGroup($use_set_first): void {
     $andGroup = new AccessGroupAnd();
     $andGroup->addDependency($this->forbidden);

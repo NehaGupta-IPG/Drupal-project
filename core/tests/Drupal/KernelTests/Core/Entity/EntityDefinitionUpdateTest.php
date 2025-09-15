@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
-use Drupal\Core\Entity\EntityDefinitionUpdateManager;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests EntityDefinitionUpdateManager functionality.
+ *
+ * @coversDefaultClass \Drupal\Core\Entity\EntityDefinitionUpdateManager
+ *
+ * @group Entity
  */
-#[CoversClass(EntityDefinitionUpdateManager::class)]
-#[Group('Entity')]
 class EntityDefinitionUpdateTest extends EntityKernelTestBase {
 
   use EntityDefinitionTestTrait;
@@ -77,7 +76,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
   /**
    * Tests installing an additional base field while installing an entity type.
    *
-   * @legacy-covers ::installFieldableEntityType
+   * @covers ::installFieldableEntityType
    */
   public function testInstallAdditionalBaseFieldDuringFieldableEntityTypeInstallation(): void {
     $entity_type = clone $this->entityTypeManager->getDefinition('entity_test_update');
@@ -97,9 +96,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
   }
 
   /**
-   * Tests get entity types.
-   *
-   * @legacy-covers ::getEntityTypes
+   * @covers ::getEntityTypes
    */
   public function testGetEntityTypes(): void {
     $entity_type_definitions = $this->entityDefinitionUpdateManager->getEntityTypes();

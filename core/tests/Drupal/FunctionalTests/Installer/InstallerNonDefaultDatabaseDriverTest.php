@@ -111,4 +111,22 @@ class InstallerNonDefaultDatabaseDriverTest extends InstallerTestBase {
     return $databases;
   }
 
+  /**
+   * Returns the databases setup from the SUT's settings.php.
+   *
+   * @return array<string,mixed>
+   *   The value of the $databases variable.
+   */
+  protected function getInstalledDatabaseSettings(): array {
+    // The $app_root and $site_path variables are required by the settings.php
+    // file to be parsed correctly. The $databases variable is set in the
+    // included file, we need to inform PHPStan about that since PHPStan itself
+    // is unable to determine it.
+    $app_root = $this->container->getParameter('app.root');
+    $site_path = $this->siteDirectory;
+    include $app_root . '/' . $site_path . '/settings.php';
+    assert(isset($databases));
+    return $databases;
+  }
+
 }

@@ -70,16 +70,16 @@
   background: var(--dropbutton--active-bg-color);
 }
 
-:is(.dropbutton-toggle button):focus {
+.dropbutton-toggle button:focus {
   outline: solid 2px var(--dropbutton--outline-color);
   outline-offset: -2px;
 }
 
-:is(.dropbutton-toggle button):dir(rtl) {
+.dropbutton-toggle button:dir(rtl) {
   border-radius: var(--dropbutton--border-radius) 0 0 var(--dropbutton--border-radius);
 }
 
-:is(.dropbutton-toggle button)::before {
+.dropbutton-toggle button::before {
   display: block;
   width: var(--sp0-5);
   height: var(--sp0-5);
@@ -89,7 +89,7 @@
   border-bottom: solid 2px var(--dropbutton--outline-color);
 }
 
-:is(.dropbutton-wrapper.open :is(.dropbutton-toggle button))::before {
+.dropbutton-wrapper.open :is(.dropbutton-toggle button)::before {
   transform: translateY(25%) rotate(225deg);
 }
 
@@ -118,27 +118,27 @@
   font-weight: 600;
 }
 
-:is(.dropbutton-action a):hover {
+.dropbutton-action a:hover {
   color: inherit;
 }
 
-:is(.dropbutton-action a):focus {
+.dropbutton-action a:focus {
   outline: solid 2px var(--dropbutton--outline-color);
   outline-offset: -1px; /* Overlap parent container by 1px. */
 }
 
 /* Special rules if there is only one action. */
 
-:is(.dropbutton-single .dropbutton-action):first-child {
+.dropbutton-single .dropbutton-action:first-child {
   border-right: solid 1px transparent; /* LTR */
   border-radius: var(--dropbutton--border-radius);
 }
 
-:is(.dropbutton-single .dropbutton-action):first-child:dir(rtl) {
+.dropbutton-single .dropbutton-action:first-child:dir(rtl) {
   border: solid 1px transparent;
 }
 
-:is(.dropbutton-single .dropbutton-action) a {
+.dropbutton-single .dropbutton-action a {
   justify-content: center;
 }
 

@@ -9,24 +9,18 @@ include_once \DRUPAL_ROOT . '/core/includes/install.inc';
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
- * Tests Drupal\Core\Extension\Requirement\RequirementSeverity.
+ * @coversDefaultClass \Drupal\Core\Extension\Requirement\RequirementSeverity
+ *
+ * @group Extension
  */
-#[CoversClass(RequirementSeverity::class)]
-#[Group('Extension')]
 class RequirementSeverityTest extends UnitTestCase {
 
   /**
-   * Tests convert legacy severities.
-   *
-   * @legacy-covers ::convertLegacyIntSeveritiesToEnums
+   * @covers ::convertLegacyIntSeveritiesToEnums
+   * @group legacy
    */
-  #[IgnoreDeprecations]
   public function testConvertLegacySeverities(): void {
     $requirements['foo'] = [
       'title' => new TranslatableMarkup('Foo'),
@@ -51,11 +45,9 @@ class RequirementSeverityTest extends UnitTestCase {
   }
 
   /**
-   * Tests get max severity.
-   *
-   * @legacy-covers ::maxSeverityFromRequirements
+   * @covers ::maxSeverityFromRequirements
+   * @dataProvider requirementProvider
    */
-  #[DataProvider('requirementProvider')]
   public function testGetMaxSeverity(array $requirements, RequirementSeverity $expectedSeverity): void {
     $severity = RequirementSeverity::maxSeverityFromRequirements($requirements);
     $this->assertEquals($expectedSeverity, $severity);

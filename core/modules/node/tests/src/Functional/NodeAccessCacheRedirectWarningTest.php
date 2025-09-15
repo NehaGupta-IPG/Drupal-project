@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional;
 
-use PHPUnit\Framework\Attributes\Group;
-
 /**
  * Tests the node access grants cache context service.
+ *
+ * @group node
+ * @group Cache
  */
-#[Group('node')]
-#[Group('Cache')]
 class NodeAccessCacheRedirectWarningTest extends NodeTestBase {
 
   /**
@@ -35,7 +34,7 @@ class NodeAccessCacheRedirectWarningTest extends NodeTestBase {
   /**
    * Ensures that node access checks don't cause cache redirect warnings.
    *
-   * @legacy-covers \Drupal\node\NodeAccessControlHandler
+   * @covers \Drupal\node\NodeAccessControlHandler
    */
   public function testNodeAccessCacheRedirectWarning(): void {
     $this->drupalPlaceBlock('local_tasks_block');

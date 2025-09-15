@@ -4,22 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Entity;
 
-use Drupal\Core\Entity\Form\RevisionRevertForm;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\entity_test\Entity\EntityTestRevPub;
 use Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog;
 use Drupal\Tests\BrowserTestBase;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests reverting a revision with revision revert form.
+ *
+ * @group Entity
+ * @group #slow
+ * @coversDefaultClass \Drupal\Core\Entity\Form\RevisionRevertForm
  */
-#[CoversClass(RevisionRevertForm::class)]
-#[Group('Entity')]
-#[Group('#slow')]
 class RevisionRevertFormTest extends BrowserTestBase {
 
   /**
@@ -110,7 +107,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
   /**
    * Test cannot revert latest default revision.
    *
-   * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
+   * @covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
   protected function testAccessRevertLatestDefault(): void {
     /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
@@ -129,7 +126,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
   /**
    * Ensures that forward revisions can be reverted.
    *
-   * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
+   * @covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
   protected function testAccessRevertLatestForwardRevision(): void {
     /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
@@ -153,7 +150,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
   /**
    * Test can revert non-latest revision.
    *
-   * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
+   * @covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
   protected function testAccessRevertNonLatest(): void {
     /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
@@ -191,9 +188,9 @@ class RevisionRevertFormTest extends BrowserTestBase {
    * @param string $expectedDestination
    *   Expected destination after deletion.
    *
-   * @legacy-covers ::submitForm
+   * @covers ::submitForm
+   * @dataProvider providerSubmitForm
    */
-  #[DataProvider('providerSubmitForm')]
   public function testSubmitForm(array $permissions, string $entityTypeId, string $entityLabel, array $expectedLog, string $expectedMessage, string $expectedDestination): void {
     if (count($permissions) > 0) {
       $this->drupalLogin($this->createUser($permissions));
@@ -305,7 +302,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
   /**
    * Tests the revert process.
    *
-   * @legacy-covers ::prepareRevision
+   * @covers ::prepareRevision
    */
   protected function testPrepareRevision(): void {
     $user = $this->createUser();

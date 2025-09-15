@@ -8,12 +8,12 @@ use Drupal\Core\Access\AccessGroupAnd;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests accessible groups.
+ *
+ * @group Access
  */
-#[Group('Access')]
 class AccessGroupAndTest extends UnitTestCase {
 
   use AccessibleTestingTrait;
@@ -27,9 +27,7 @@ class AccessGroupAndTest extends UnitTestCase {
   }
 
   /**
-   * Tests groups.
-   *
-   * @legacy-covers \Drupal\Core\Access\AccessGroupAnd
+   * @covers \Drupal\Core\Access\AccessGroupAnd
    */
   public function testGroups(): void {
     $allowedAccessible = $this->createAccessibleDouble(AccessResult::allowed());
