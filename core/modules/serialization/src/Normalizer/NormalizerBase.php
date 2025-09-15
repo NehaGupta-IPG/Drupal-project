@@ -38,6 +38,7 @@ abstract class NormalizerBase implements SerializerAwareInterface, CacheableNorm
 
   /**
    * Implements \Symfony\Component\Serializer\Normalizer\DenormalizerInterface::supportsDenormalization()
+   * Checks whether the given data type can be denormalized.
    *
    * This class doesn't implement DenormalizerInterface, but most of its child
    * classes do. Therefore, this method is implemented at this level to reduce
@@ -51,11 +52,21 @@ abstract class NormalizerBase implements SerializerAwareInterface, CacheableNorm
 
     $supported = array_keys($this->getSupportedTypes($format));
 
-    $subclass_check = function ($name) use ($type) {
-      return (class_exists($name) || interface_exists($name)) && is_subclass_of($type, $name, TRUE);
-    };
+    if (
+      // Object types should be checked.
+      is_object($type) ||
+      // There's also possible to pass a fully qualified class name (FQCN)
+      // as an argument. We'll perceive a string as an object type if it
+      // contains backslashes, which are indicators of the PHP namespace,
+      // or if the "class_exists()" explicitly returns "TRUE".
+      (is_string($type) && (strpos($type, '\\') !== FALSE || class_exists($type)))
+    ) {
+      return (bool) array_filter($supported, function ($name) use ($type) {
+        return (class_exists($name) || interface_exists($name)) && is_a($type, $name, TRUE);
+      });
+    }
 
-    return in_array($type, $supported) || array_filter($supported, $subclass_check);
+    return in_array($type, $supported, TRUE);
   }
 
   /**
