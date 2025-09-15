@@ -4,4 +4,4 @@ dependencies: {  }
 id: html_week
 label: 'HTML Week'
 locked: true
-pattern: Y-\WW
+pattern: o-\WW
