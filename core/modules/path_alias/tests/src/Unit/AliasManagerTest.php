@@ -551,6 +551,16 @@ class AliasManagerTest extends UnitTestCase {
   }
 
   /**
+   * Tests getAliasByPath invalid argument exception for an invalid path.
+   *
+   * @covers ::getAliasByPath
+   */
+  public function testInvalidArgumentException() {
+    $this->expectException(\InvalidArgumentException::class);
+    $this->aliasManager->getAliasByPath('');
+  }
+
+  /**
    * Sets up the current language.
    *
    * @return \Drupal\Core\Language\LanguageInterface
