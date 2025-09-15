@@ -274,6 +274,36 @@ class UrlConversionTest extends UnitTestCase {
         ],
         FALSE,
       ],
+      'MySQL with unix_socket parameter' => [
+        'mysql://test_user:test_pass@test_host:3306/test_database?unix_socket=%2Ftmp%2Fmysql.sock',
+        [
+          'driver' => 'mysql',
+          'username' => 'test_user',
+          'password' => 'test_pass',
+          'host' => 'test_host',
+          'database' => 'test_database',
+          'port' => 3306,
+          'unix_socket' => '/tmp/mysql.sock',
+          'namespace' => 'Drupal\mysql\Driver\Database\mysql',
+          'autoload' => 'core/modules/mysql/src/Driver/Database/mysql/',
+        ],
+        FALSE,
+      ],
+      'MySQL with unix_socket and module parameters' => [
+        'mysql://test_user:test_pass@test_host:3306/test_database?unix_socket=%2Fvar%2Flib%2Fmysql%2Fmysql.sock&module=mysql',
+        [
+          'driver' => 'mysql',
+          'username' => 'test_user',
+          'password' => 'test_pass',
+          'host' => 'test_host',
+          'database' => 'test_database',
+          'port' => 3306,
+          'unix_socket' => '/var/lib/mysql/mysql.sock',
+          'namespace' => 'Drupal\mysql\Driver\Database\mysql',
+          'autoload' => 'core/modules/mysql/src/Driver/Database/mysql/',
+        ],
+        FALSE,
+      ],
     ];
   }
 
@@ -456,6 +486,27 @@ class UrlConversionTest extends UnitTestCase {
     ];
     $expected_url9 = 'DriverTestMysql://test_user:test_pass@test_host:3306/test_database?module=driver_test';
 
+    $info10 = [
+      'database' => 'test_database',
+      'username' => 'test_user',
+      'password' => 'test_pass',
+      'host' => 'test_host',
+      'port' => '3306',
+      'driver' => 'mysql',
+      'unix_socket' => '/tmp/mysql.sock',
+    ];
+    $expected_url10 = 'mysql://test_user:test_pass@test_host:3306/test_database?module=mysql&unix_socket=%2Ftmp%2Fmysql.sock';
+
+    $info11 = [
+      'database' => 'test_database',
+      'username' => 'test_user',
+      'host' => 'test_host',
+      'driver' => 'mysql',
+      'unix_socket' => '/var/lib/mysql/mysql.sock',
+      'prefix' => 'test_prefix_',
+    ];
+    $expected_url11 = 'mysql://test_user@test_host/test_database?module=mysql&unix_socket=%2Fvar%2Flib%2Fmysql%2Fmysql.sock#test_prefix_';
+
     return [
       [$info1, $expected_url1],
       [$info2, $expected_url2],
@@ -466,6 +517,8 @@ class UrlConversionTest extends UnitTestCase {
       [$info7, $expected_url7],
       [$info8, $expected_url8],
       [$info9, $expected_url9],
+      [$info10, $expected_url10],
+      [$info11, $expected_url11],
     ];
   }
 

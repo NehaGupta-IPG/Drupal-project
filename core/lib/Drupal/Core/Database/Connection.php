@@ -1372,11 +1372,14 @@ abstract class Connection {
       $database['prefix'] = $url_components['fragment'];
     }
 
-    // Add query parameters to the database connection options.
+    // Extract unix_socket parameter from the URL query string.
+    // This is the only query parameter that should be passed through to the
+    // connection options, as it's a legitimate connection-level setting.
     if (!empty($url_components['query'])) {
       parse_str($url_components['query'], $query_params);
-      // Merge query parameters into the database options array.
-      $database = array_merge($database, $query_params);
+      if (isset($query_params['unix_socket'])) {
+        $database['unix_socket'] = $query_params['unix_socket'];
+      }
     }
 
     return $database;
