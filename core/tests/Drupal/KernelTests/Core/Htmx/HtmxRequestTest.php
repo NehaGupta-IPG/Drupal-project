@@ -9,6 +9,7 @@ use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -64,158 +65,49 @@ class HtmxRequestTest extends KernelTestBase {
   }
 
   /**
-   * Test get method.
+   * Test all 5 request verb methods.
    */
-  public function testHxGet(): void {
-    $this->htmx->get($this->url);
+  #[DataProvider('htmxRequestProvider')]
+  public function testHxRequest(string $method): void {
+    $attribute = "data-hx-$method";
+    $this->htmx->$method($this->url);
     $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-get']));
+    $this->assertTrue(isset($render['#attributes'][$attribute]));
     $expected = '/htmx-test-attachments/page?' . MainContentViewSubscriber::WRAPPER_FORMAT . '=drupal_htmx';
     // The paths in GitLabCI include a subfolder.
-    $this->assertStringEndsWith($expected, $render['#attributes']['data-hx-get']);
+    $this->assertStringEndsWith($expected, $render['#attributes'][$attribute]);
     // Verify no wrapper format.
-    $this->htmx->get($this->url, TRUE);
+    $this->htmx->$method($this->url, TRUE);
     $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-get']));
-    $this->assertStringEndsWith('/htmx-test-attachments/page', $render['#attributes']['data-hx-get']);
+    $this->assertTrue(isset($render['#attributes'][$attribute]));
+    $this->assertStringEndsWith('/htmx-test-attachments/page', $render['#attributes'][$attribute]);
     // Verify no parameters.
     $url = Url::fromRoute('test_htmx.attachments.replace');
     $request = Request::create($url->toString());
     $this->httpKernel->handle($request);
-    $this->htmx->get();
+    $this->htmx->$method();
     $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-get']));
+    $this->assertTrue(isset($render['#attributes'][$attribute]));
     $expected = '/htmx-test-attachments/replace?' . MainContentViewSubscriber::WRAPPER_FORMAT . '=drupal_htmx';
-    $this->assertStringEndsWith($expected, $render['#attributes']['data-hx-get']);
+    $this->assertStringEndsWith($expected, $render['#attributes'][$attribute]);
     // Verify no parameters with no wrapper format.
-    $this->htmx->get(NULL, TRUE);
+    $this->htmx->$method(NULL, TRUE);
     $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-get']));
-    $this->assertStringEndsWith('/htmx-test-attachments/replace', $render['#attributes']['data-hx-get']);
+    $this->assertTrue(isset($render['#attributes'][$attribute]));
+    $this->assertStringEndsWith('/htmx-test-attachments/replace', $render['#attributes'][$attribute]);
   }
 
   /**
-   * Test post method.
+   * Data provider for testHxRequest.
    */
-  public function testHxPost(): void {
-    $this->htmx->post($this->url);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-post']));
-    $expected = '/htmx-test-attachments/page?' . MainContentViewSubscriber::WRAPPER_FORMAT . '=drupal_htmx';
-    // The paths in GitLabCI include a subfolder.
-    $this->assertStringEndsWith($expected, $render['#attributes']['data-hx-post']);
-    // Verify no wrapper format.
-    $this->htmx->post($this->url, TRUE);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-post']));
-    $this->assertStringEndsWith('/htmx-test-attachments/page', $render['#attributes']['data-hx-post']);
-    // Verify no parameters.
-    $url = Url::fromRoute('test_htmx.attachments.replace');
-    $request = Request::create($url->toString());
-    $this->httpKernel->handle($request);
-    $this->htmx->post();
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-post']));
-    $expected = '/htmx-test-attachments/replace?' . MainContentViewSubscriber::WRAPPER_FORMAT . '=drupal_htmx';
-    $this->assertStringEndsWith($expected, $render['#attributes']['data-hx-post']);
-    // Verify no parameters with no wrapper format.
-    $this->htmx->post(NULL, TRUE);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-post']));
-    $this->assertStringEndsWith('/htmx-test-attachments/replace', $render['#attributes']['data-hx-post']);
-  }
-
-  /**
-   * Test put method.
-   */
-  public function testHxPut(): void {
-    $this->htmx->put($this->url);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-put']));
-    $expected = '/htmx-test-attachments/page?' . MainContentViewSubscriber::WRAPPER_FORMAT . '=drupal_htmx';
-    // The paths in GitLabCI include a subfolder.
-    $this->assertStringEndsWith($expected, $render['#attributes']['data-hx-put']);
-    // Verify no wrapper format.
-    $this->htmx->put($this->url, TRUE);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-put']));
-    $this->assertStringEndsWith('/htmx-test-attachments/page', $render['#attributes']['data-hx-put']);
-    // Verify no parameters.
-    $url = Url::fromRoute('test_htmx.attachments.replace');
-    $request = Request::create($url->toString());
-    $this->httpKernel->handle($request);
-    $this->htmx->put();
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-put']));
-    $expected = '/htmx-test-attachments/replace?' . MainContentViewSubscriber::WRAPPER_FORMAT . '=drupal_htmx';
-    $this->assertStringEndsWith($expected, $render['#attributes']['data-hx-put']);
-    // Verify no parameters with no wrapper format.
-    $this->htmx->put(NULL, TRUE);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-put']));
-    $this->assertStringEndsWith('/htmx-test-attachments/replace', $render['#attributes']['data-hx-put']);
-  }
-
-  /**
-   * Test patch method.
-   */
-  public function testHxPatch(): void {
-    $this->htmx->patch($this->url);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-patch']));
-    $expected = '/htmx-test-attachments/page?' . MainContentViewSubscriber::WRAPPER_FORMAT . '=drupal_htmx';
-    // The paths in GitLabCI include a subfolder.
-    $this->assertStringEndsWith($expected, $render['#attributes']['data-hx-patch']);
-    // Verify no wrapper format.
-    $this->htmx->patch($this->url, TRUE);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-patch']));
-    $this->assertStringEndsWith('/htmx-test-attachments/page', $render['#attributes']['data-hx-patch']);
-    // Verify no parameters.
-    $url = Url::fromRoute('test_htmx.attachments.replace');
-    $request = Request::create($url->toString());
-    $this->httpKernel->handle($request);
-    $this->htmx->patch();
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-patch']));
-    $expected = '/htmx-test-attachments/replace?' . MainContentViewSubscriber::WRAPPER_FORMAT . '=drupal_htmx';
-    $this->assertStringEndsWith($expected, $render['#attributes']['data-hx-patch']);
-    // Verify no parameters with no wrapper format.
-    $this->htmx->patch(NULL, TRUE);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-patch']));
-    $this->assertStringEndsWith('/htmx-test-attachments/replace', $render['#attributes']['data-hx-patch']);
-  }
-
-  /**
-   * Test delete method.
-   */
-  public function testHxDelete(): void {
-    $this->htmx->delete($this->url);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-delete']));
-    $expected = '/htmx-test-attachments/page?' . MainContentViewSubscriber::WRAPPER_FORMAT . '=drupal_htmx';
-    // The paths in GitLabCI include a subfolder.
-    $this->assertStringEndsWith($expected, $render['#attributes']['data-hx-delete']);
-    // Verify no wrapper format.
-    $this->htmx->delete($this->url, TRUE);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-delete']));
-    $this->assertStringEndsWith('/htmx-test-attachments/page', $render['#attributes']['data-hx-delete']);
-    // Verify no parameters.
-    $url = Url::fromRoute('test_htmx.attachments.replace');
-    $request = Request::create($url->toString());
-    $this->httpKernel->handle($request);
-    $this->htmx->delete();
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-delete']));
-    $expected = '/htmx-test-attachments/replace?' . MainContentViewSubscriber::WRAPPER_FORMAT . '=drupal_htmx';
-    $this->assertStringEndsWith($expected, $render['#attributes']['data-hx-delete']);
-    // Verify no parameters with no wrapper format.
-    $this->htmx->delete(NULL, TRUE);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-delete']));
-    $this->assertStringEndsWith('/htmx-test-attachments/replace', $render['#attributes']['data-hx-delete']);
+  public static function htmxRequestProvider(): array {
+    return [
+      ['get'],
+      ['post'],
+      ['put'],
+      ['patch'],
+      ['delete'],
+    ];
   }
 
 }
