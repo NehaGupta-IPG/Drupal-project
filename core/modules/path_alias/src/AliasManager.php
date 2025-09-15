@@ -144,7 +144,7 @@ class AliasManager implements AliasManagerInterface {
    * {@inheritdoc}
    */
   public function getAliasByPath($path, $langcode = NULL) {
-    if (!str_starts_with($path, '/')) {
+    if (empty($path) || !str_starts_with($path, '/')) {
       throw new \InvalidArgumentException(sprintf('Source path %s has to start with a slash.', $path));
     }
     // If no language is explicitly specified we default to the current URL
