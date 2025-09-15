@@ -20,7 +20,6 @@ Product managers
 - Dries Buytaert 'dries' https://www.drupal.org/u/dries
 - Gábor Hojtsy 'Gábor Hojtsy' https://www.drupal.org/u/gábor-hojtsy
 - Lauri Timmanee 'lauriii' https://www.drupal.org/u/lauriii
-- Roy Scholten 'yoroy' https://www.drupal.org/u/yoroy
 
 User Experience (UX) managers
 - Cristina Chumillas 'ckrina' https://www.drupal.org/u/ckrina
@@ -76,7 +75,8 @@ Ajax
 - Tim Plunkett 'tim.plunkett' https://www.drupal.org/u/tim.plunkett
 
 Asset Library API
-- ?
+- Pierre Dureau 'pdureau' https://www.drupal.org/u/pdureau
+- Florent Torregrosa 'grimreaper' https://www.drupal.org/u/grimreaper
 
 Authentication and Authorization
 - ?
@@ -216,7 +216,6 @@ Field API
 - Andrei Mateescu 'amateescu' https://www.drupal.org/u/amateescu
 
 Field UI
-- Yves Chedemois 'yched' https://www.drupal.org/u/yched
 - Andrei Mateescu 'amateescu' https://www.drupal.org/u/amateescu
 
 File
@@ -242,7 +241,7 @@ Image
 - ?
 
 Inline Form Errors
-- Daniël Smidt 'dmsmidt' https://www.drupal.org/u/dmsmidt
+- ?
 
 Installer
 - ?
@@ -270,7 +269,6 @@ Layout Builder
 
 Link Field
 - David Cameron 'dcam' https://www.drupal.org/u/dcam
-- Weber Macedo 'Mac_Weber' https://www.drupal.org/u/mac_weber
 
 Lock
 - ?
@@ -322,7 +320,6 @@ Node Access
 
 Olivero
 - Mike Herchel 'mherchel' https://www.drupal.org/u/mherchel
-- Putra Bonaccorsi 'proeung' https://www.drupal.org/u/proeung
 - Jen Witkowski 'jwitkowski79' https://www.drupal.org/u/jwitkowski79
 - Konstantin Shupenko 'kostyashupenko' https://www.drupal.org/u/kostyashupenko
 - Andy Blum 'andy-blum' https://www.drupal.org/u/andy-blum
@@ -367,7 +364,6 @@ REST
 Responsive Image
 - Peter Droogmans 'attiks' https://www.drupal.org/u/attiks
 - Heather Brooke Drummond 'RainbowArray' https://www.drupal.org/u/rainbowarray
-- Jelle Sebreghts 'Jelle_S' https://www.drupal.org/u/jelle_s
 
 Routing
 - Tim Plunkett 'tim.plunkett' https://www.drupal.org/u/tim.plunkett
@@ -377,10 +373,9 @@ Search
 
 Serialization
 - Brad Jones 'bradjones1' https://www.drupal.org/u/bradjones1
-- Damian Lee 'damiankloip' https://www.drupal.org/u/damiankloip
 
 Settings Tray
-- Ted Bowman 'tedbow' https://www.drupal.org/u/tedbow
+- ?
 
 Shortcut
 - Jibran Ijaz 'jibran' https://www.drupal.org/u/jibran
@@ -432,7 +427,6 @@ Umami demo
 - Mark Conroy 'markconroy' https://www.drupal.org/u/markconroy
 - Gareth Goodwin 'smaz' https://www.drupal.org/u/smaz
 - Keith Jay 'kjay' https://www.drupal.org/u/kjay
-- Ofer Shaal 'shaal' https://www.drupal.org/u/shaal
 - Ivan Berdinsky 'finnsky' https://www.drupal.org/u/finnsky
 
 Update Status
@@ -445,7 +439,6 @@ User
 
 Views
 - Tim Plunkett 'tim.plunkett' https://www.drupal.org/u/tim.plunkett
-- Damian Lee 'damiankloip' https://www.drupal.org/u/damiankloip
 - Jess Myrbo 'xjm' https://www.drupal.org/u/xjm
 - Len Swaneveld 'Lendude' https://www.drupal.org/u/lendude
 
