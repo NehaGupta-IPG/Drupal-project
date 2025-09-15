@@ -72,7 +72,6 @@ class FormElementsRenderTest extends KernelTestBase {
         0 => $this->randomMachineName(),
         1 => $this->randomMachineName(),
       ],
-      '#required' => FALSE,
     ];
     $this->assertRenderedElement($element, '//select');
 

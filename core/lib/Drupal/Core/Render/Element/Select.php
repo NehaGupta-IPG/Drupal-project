@@ -193,7 +193,7 @@ class Select extends FormElementBase {
    *   Properties used: #multiple, #states, #required, #default_value,
    *   #empty_value, #empty_option and #options.
    */
-  protected static function insertEmptyOption(&$element): void {
+  public static function insertEmptyOption(&$element): void {
     // A non-#multiple select needs special handling to prevent user agents
     // from preselecting the first option without intention. #multiple select
     // lists do not get an empty option, as it would not make sense, user
