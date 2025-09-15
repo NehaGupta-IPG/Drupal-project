@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Plugin;
 
+use Drupal\Core\Plugin\Discovery\LegacyDiscoveryDecorator;
+use Drupal\Core\Plugin\LegacySubdirPluginManagerTrait;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests systems for plugin deprecation.
- *
- * @covers \Drupal\Core\Plugin\Discovery\LegacyDiscoveryDecorator.
- * @group Plugin
  */
+#[CoversClass(LegacyDiscoveryDecorator::class)]
+#[Group('Plugin')]
 #[IgnoreDeprecations]
 class DeprecatedDiscoveryTest extends KernelTestBase {
 
@@ -25,9 +28,8 @@ class DeprecatedDiscoveryTest extends KernelTestBase {
 
   /**
    * Tests deprecation of plugin subdir.
-   *
-   * @covers \Drupal\Core\Plugin\LegacySubdirPluginManagerTrait.
    */
+  #[CoversClass(LegacySubdirPluginManagerTrait::class)]
   public function testDeprecatedSubdir(): void {
     $plugin_manager = $this->container->get('plugin.manager.deprecation_plugin_test_subdir_deprecation');
 
