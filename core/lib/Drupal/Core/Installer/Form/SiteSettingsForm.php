@@ -162,6 +162,12 @@ class SiteSettingsForm extends FormBase {
     $database['driver'] = $driver;
     $database = array_merge($database, $this->databaseDriverList->get($driver)->getAutoloadInfo());
 
+    // Preserve unix_socket parameter from existing connection info if present.
+    $existing_connection = Database::getConnectionInfo('default');
+    if (isset($existing_connection['default']['unix_socket'])) {
+      $database['unix_socket'] = $existing_connection['default']['unix_socket'];
+    }
+
     $form_state->set('database', $database);
 
     foreach ($this->getDatabaseErrors($database, $form_state->getValue('settings_file')) as $name => $message) {
