@@ -76,7 +76,8 @@ class Tasks extends InstallTasks {
    */
   protected function connect() {
     try {
-      // Check for unix_socket in SIMPLETEST_DB environment variable during testing.
+      // Check for unix_socket in SIMPLETEST_DB environment variable
+      // during tests.
       $db_url = getenv('SIMPLETEST_DB');
       if ($db_url && strpos($db_url, 'unix_socket=') !== FALSE) {
         $connection_info = Database::getConnectionInfo('default');
