@@ -4,6 +4,7 @@ namespace Drupal\system\Form;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Form\ConfigFormBase;
@@ -19,20 +20,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class SiteMaintenanceModeForm extends ConfigFormBase {
 
   /**
-   * The state keyvalue collection.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
-   * The permission handler.
-   *
-   * @var \Drupal\user\PermissionHandlerInterface
-   */
-  protected $permissionHandler;
-
-  /**
    * Constructs a new SiteMaintenanceModeForm.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -41,13 +28,19 @@ class SiteMaintenanceModeForm extends ConfigFormBase {
    *   The typed config manager.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state keyvalue collection to use.
-   * @param \Drupal\user\PermissionHandlerInterface $permission_handler
+   * @param \Drupal\user\PermissionHandlerInterface $permissionHandler
    *   The permission handler.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   The module handler.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, StateInterface $state, PermissionHandlerInterface $permission_handler) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typedConfigManager,
+    protected StateInterface $state,
+    protected PermissionHandlerInterface $permissionHandler,
+    protected ModuleHandlerInterface $moduleHandler,
+  ) {
     parent::__construct($config_factory, $typedConfigManager);
-    $this->state = $state;
-    $this->permissionHandler = $permission_handler;
   }
 
   /**
@@ -58,7 +51,8 @@ class SiteMaintenanceModeForm extends ConfigFormBase {
       $container->get('config.factory'),
       $container->get('config.typed'),
       $container->get('state'),
-      $container->get('user.permissions')
+      $container->get('user.permissions'),
+      $container->get('module_handler'),
     );
   }
 
@@ -93,6 +87,10 @@ class SiteMaintenanceModeForm extends ConfigFormBase {
       '#title' => $this->t('Message to display when in maintenance mode'),
       '#config_target' => 'system.maintenance:message',
     ];
+
+    if ($this->moduleHandler->moduleExists('page_cache')) {
+      $form['maintenance_mode_message']['#description'] = $this->t('The message will not show on already cached pages without clearing the page cache.');
+    }
 
     return parent::buildForm($form, $form_state);
   }

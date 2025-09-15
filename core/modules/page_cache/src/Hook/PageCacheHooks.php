@@ -2,7 +2,6 @@
 
 namespace Drupal\page_cache\Hook;
 
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -44,15 +43,6 @@ class PageCacheHooks {
         return $output;
     }
     return NULL;
-  }
-
-  /**
-   * Implements hook_form_FORM_ID_alter() for system_site_maintenance_mode().
-   */
-  #[Hook('form_system_site_maintenance_mode_alter')]
-  public function formSystemSiteMaintenanceModeAlter(&$form, FormStateInterface $form_state) : void {
-    // Add submit callback.
-    $form['#submit'][] = 'page_cache_settings_submit';
   }
 
 }
