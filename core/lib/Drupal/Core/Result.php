@@ -88,9 +88,8 @@ final class Result {
    * @template T
    */
   public static function ok($value): self {
-    // The indirect assignment and @-var annotation are needed until
-    // https://github.com/phpstan/phpstan/issues/6732
-    // See https://github.com/phpstan/phpstan/discussions/10667.
+    // @todo Remove intermediary variable once PHPStan understand the return
+    //   type, see https://www.drupal.org/i/3546778.
     /** @var \Drupal\Core\Result<T, never> $ok */
     $ok = new self(TRUE, $value);
     return $ok;
@@ -108,9 +107,8 @@ final class Result {
    * @template T
    */
   public static function error($value): self {
-    // The indirect assignment and @-var annotation are needed until
-    // https://github.com/phpstan/phpstan/issues/6732
-    // See https://github.com/phpstan/phpstan/discussions/10667.
+    // @todo Remove intermediary variable once PHPStan understand the return
+    //   type, see https://www.drupal.org/i/3546778.
     /** @var \Drupal\Core\Result<never, T> $error */
     $error = new self(FALSE, $value);
     return $error;
