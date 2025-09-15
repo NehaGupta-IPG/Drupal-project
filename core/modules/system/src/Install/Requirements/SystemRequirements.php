@@ -561,24 +561,26 @@ class SystemRequirements implements InstallRequirementsInterface {
       }
     }
 
-    if ($phase === 'runtime' || $phase === 'update') {
-      $database_supports_json = Database::getConnection()->hasJson();
+    if (in_array($phase, ['runtime', 'update'], TRUE) && !Database::getConnection()->hasJson()) {
 
-      // Show the JSON support status on the status report, but only show the
-      // warning in the update runtime if no JSON support is available.
-      if (!$database_supports_json || $phase !== 'update') {
-        $requirements['database_support_json'] = [
-          'title' => t('Database support for JSON'),
-          'severity' => RequirementSeverity::OK,
-          'value' => t('Available'),
-          'description' => t('Drupal requires databases that support JSON storage.'),
-        ];
-      }
+      // Show JSON is not supported in both the runtime (status report) and
+      // update phases.
+      $requirements['database_support_json'] = [
+        'title' => t('Database support for JSON'),
+        'severity' => RequirementSeverity::Error,
+        'value' => t('Not available'),
+        'description' => t('Drupal requires databases that support JSON storage.'),
+      ];
+    }
+    elseif ($phase === 'runtime') {
 
-      if (!$database_supports_json) {
-        $requirements['database_support_json']['value'] = t('Not available');
-        $requirements['database_support_json']['severity'] = RequirementSeverity::Error;
-      }
+      // Show JSON is supported in the runtime (status report) phase only.
+      $requirements['database_support_json'] = [
+        'title' => t('Database support for JSON'),
+        'severity' => RequirementSeverity::OK,
+        'value' => t('Available'),
+        'description' => t('Drupal requires databases that support JSON storage.'),
+      ];
     }
 
     // Test PHP memory_limit
