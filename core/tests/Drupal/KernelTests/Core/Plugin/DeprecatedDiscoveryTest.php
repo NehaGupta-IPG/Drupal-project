@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
  * Tests systems for plugin deprecation.
  */
 #[CoversClass(LegacyDiscoveryDecorator::class)]
+#[CoversTrait(LegacySubdirPluginManagerTrait::class)]
 #[Group('Plugin')]
 #[IgnoreDeprecations]
 class DeprecatedDiscoveryTest extends KernelTestBase {
@@ -30,7 +31,6 @@ class DeprecatedDiscoveryTest extends KernelTestBase {
   /**
    * Tests deprecation of plugin subdir.
    */
-  #[CoversTrait(LegacySubdirPluginManagerTrait::class)]
   public function testDeprecatedSubdir(): void {
     $plugin_manager = $this->container->get('plugin.manager.deprecation_plugin_test_subdir_deprecation');
 
