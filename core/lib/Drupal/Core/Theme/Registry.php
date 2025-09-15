@@ -747,7 +747,7 @@ class Registry implements DestructableInterface {
     // @see https://www.drupal.org/node/2457295
     if (isset($cache[$source_hook_name]) && (!isset($cache[$source_hook_name]['incomplete preprocess functions']) || !isset($cache[$destination_hook_name]['incomplete preprocess functions']))) {
       $cache[$destination_hook_name] = $parent_hook + $cache[$source_hook_name];
-      if (isset($parent_hook['preprocess functions'])) {
+      if (isset($parent_hook['preprocess functions']) && isset($cache[$source_hook_name]['preprocess functions'])) {
         $diff = array_diff($parent_hook['preprocess functions'], $cache[$source_hook_name]['preprocess functions'] ?? []);
         $cache[$destination_hook_name]['preprocess functions'] = array_merge($cache[$source_hook_name]['preprocess functions'] ?? [], $diff);
       }
