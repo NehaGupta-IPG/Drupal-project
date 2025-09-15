@@ -100,13 +100,13 @@
     this.settings = settings;
 
     // Add the ajax to exposed forms.
-    this.$exposedForm = $(
+    this.$exposed_form = $(
       `form#views-exposed-form-${settings.view_name.replace(
         /_/g,
         '-',
       )}-${settings.view_display_id.replace(/_/g, '-')}`,
     );
-    once('exposed-form', this.$exposedForm).forEach(
+    once('exposed-form', this.$exposed_form).forEach(
       this.attachExposedFormAjax.bind(this),
     );
 
@@ -144,7 +144,7 @@
     // break during the form reset phase if using AJAX.
     $(
       'input[type=submit], button[type=submit], input[type=image]',
-      this.$exposedForm,
+      this.$exposed_form,
     )
       .not('[data-drupal-selector=edit-reset]')
       .each(function (index) {
@@ -155,7 +155,7 @@
 
         selfSettings.url = that.removeExposedFiltersQueryParameters(
           selfSettings.url,
-          that.$exposedForm,
+          that.$exposed_form,
         );
         that.exposedFormAjax[index] = Drupal.ajax(selfSettings);
       });
@@ -242,7 +242,7 @@
     });
     selfSettings.url = this.removeExposedFiltersQueryParameters(
       selfSettings.url,
-      this.$exposedForm,
+      this.$exposed_form,
     );
     this.pagerAjax = Drupal.ajax(selfSettings);
   };
