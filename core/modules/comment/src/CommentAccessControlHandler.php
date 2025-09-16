@@ -174,10 +174,14 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function buildCreateAccessCid(array $context, ?string $entity_bundle): string {
+    $commented_entity_id = isset($context['commented_entity']) ? $context['commented_entity']->id() : '0';
+    unset($context['commented_entity']);
+
     $cid = parent::buildCreateAccessCid($context, $entity_bundle);
+    $cid ??= "create:$entity_bundle:";
+
     // Vary the static access cache depending on the commented/host entity.
-    $cid .= ':' . (isset($context['commented_entity']) ? $context['commented_entity']->id() : '0');
-    return $cid;
+    return $cid . $commented_entity_id;
   }
 
 }
