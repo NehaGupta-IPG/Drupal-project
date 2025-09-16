@@ -826,7 +826,7 @@ trait FunctionalTestSetupTrait {
   /**
    * Dumps database structure and contents of test site.
    */
-  protected function dumpDatabase() {
+  protected function dumpDatabase(): void {
     $connection_info = Database::getConnectionInfo('default');
 
     $user = $connection_info['default']['username'];
