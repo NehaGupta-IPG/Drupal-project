@@ -429,11 +429,11 @@ class Block extends DisplayPluginBase {
    * request. This is possible only when all following calls pass along the
    * 'block_config_key' query param and it  matches the key generated here.
    *
-   * @see \Drupal\views\Plugin\views\display\Block::preview()
-   * @see \Drupal\views\Plugin\views\display\Block::getConfigurationFromHashedKey()
-   *
    * @param \Drupal\views\Plugin\Block\ViewsBlock $block
    *   The block plugin for views displays.
+   *
+   * @see \Drupal\views\Plugin\views\display\Block::preview()
+   * @see \Drupal\views\Plugin\views\display\Block::getConfigurationFromHashedKey()
    */
   public function preBlockBuild(ViewsBlock $block) {
     $config = $block->getConfiguration();
@@ -541,7 +541,7 @@ class Block extends DisplayPluginBase {
         return $block_instance;
       }
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       return NULL;
     }
     return NULL;
