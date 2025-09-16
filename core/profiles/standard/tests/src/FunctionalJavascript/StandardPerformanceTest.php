@@ -230,9 +230,9 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $recorded_queries = $performance_data->getQueries();
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
-      'QueryCount' => 10,
-      'CacheGetCount' => 69,
-      'CacheSetCount' => 16,
+      'QueryCount' => 8,
+      'CacheGetCount' => 67,
+      'CacheSetCount' => 14,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 13,
