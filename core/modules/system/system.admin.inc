@@ -228,6 +228,7 @@ function template_preprocess_system_modules_uninstall(&$variables): void {
   foreach (Element::children($form['modules']) as $key) {
     $module = $form['modules'][$key];
     $module['module_name'] = $module['#module_name'];
+    $module['machine_name'] = $key;
     $module['checkbox'] = $form['uninstall'][$key];
     $module['checkbox_id'] = $form['uninstall'][$key]['#id'];
 
