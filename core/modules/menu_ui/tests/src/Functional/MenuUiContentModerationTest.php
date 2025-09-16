@@ -193,6 +193,120 @@ class MenuUiContentModerationTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains("Page {$node->label()} has been updated.");
     $this->assertSession()->linkExists('Second test menu link');
+
+    // Create a node.
+    $node = $this->drupalCreateNode();
+
+    // Publish the node with no changes.
+    $edit = [
+      'moderation_state[0][state]' => 'published',
+      'menu[enabled]' => 1,
+      'menu[title]' => 'Third test menu link',
+    ];
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains("Page {$node->label()} has been updated.");
+    $this->assertSession()->linkExists('Third test menu link');
+
+    // Change a menu link and save and create a new non-default (draft) revision
+    // and ensure it's not immediately published.
+    $edit = [
+      'menu[enabled]' => 1,
+      'menu[title]' => 'Third test menu link updated',
+      'moderation_state[0][state]' => 'draft',
+    ];
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains("Page {$node->label()} has been updated.");
+
+    // Publish the revision via the latest-version tab.
+    $edit = [
+      'new_state' => 'published',
+    ];
+    $this->submitForm($edit, 'Apply');
+    $this->assertSession()->pageTextContains("The moderation state has been updated.");
+    $this->assertSession()->linkExists('Third test menu link updated');
+  }
+
+  /**
+   * Tests that moderation behaviour is consistent between widget and node form.
+   */
+  public function testMenuUiWithModerationStateWidget() {
+    $editor = $this->drupalCreateUser([
+      'administer nodes',
+      'administer menu',
+      'create page content',
+      'edit any page content',
+      'use editorial transition create_new_draft',
+      'use editorial transition publish',
+      'view latest version',
+      'view any unpublished content',
+    ]);
+    $this->drupalLogin($editor);
+
+    // Create a node.
+    $node = $this->drupalCreateNode();
+
+    // Publish the node with a menu link.
+    $edit = [
+      'moderation_state[0][state]' => 'published',
+      'menu[enabled]' => 1,
+      'menu[title]' => 'Test menu link',
+    ];
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains("Page {$node->label()} has been updated.");
+    $this->assertSession()->linkExists('Test menu link');
+
+    // Change a menu link and save and create a new non-default (draft) revision
+    // and ensure it's not immediately published.
+    $edit = [
+      'menu[title]' => 'Test menu link updated',
+      'moderation_state[0][state]' => 'draft',
+    ];
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains("Page {$node->label()} has been updated.");
+
+    // Publish the revision via the node edit form.
+    $edit = ['moderation_state[0][state]' => 'published'];
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains("Page {$node->label()} has been updated.");
+    $this->assertSession()->linkExists('Test menu link updated');
+
+    // Repeat the above steps but publish the revision via the widget.
+    // Create a node.
+    $node = $this->drupalCreateNode();
+
+    // Publish the node with a menu link.
+    $edit = [
+      'moderation_state[0][state]' => 'published',
+      'menu[enabled]' => 1,
+      'menu[title]' => 'Second test menu link',
+    ];
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains("Page {$node->label()} has been updated.");
+    $this->assertSession()->linkExists('Second test menu link');
+
+    // Change a menu link and save and create a new non-default (draft) revision
+    // and ensure it's not immediately published.
+    $edit = [
+      'menu[title]' => 'Second test menu link updated',
+      'moderation_state[0][state]' => 'draft',
+    ];
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains("Page {$node->label()} has been updated.");
+
+    // Publish the revision via the latest-version tab.
+    $edit = [
+      'new_state' => 'published',
+    ];
+    $this->submitForm($edit, 'Apply');
+    $this->assertSession()->pageTextContains("The moderation state has been updated.");
+    $this->assertSession()->linkExists('Second test menu link updated');
   }
 
   /**
