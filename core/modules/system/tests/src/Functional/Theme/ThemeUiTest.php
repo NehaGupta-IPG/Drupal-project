@@ -302,7 +302,7 @@ class ThemeUiTest extends BrowserTestBase {
     }
 
     $incompatible = $theme_container->find('css', '.incompatible');
-    $expected_incompatible_text = 'This theme requires the listed modules to operate correctly. They must first be installed via the Extend page.';
+    $expected_incompatible_text = 'This theme requires the listed modules to operate correctly. They must first be installed via the Extensions page.';
     $this->assertSame($expected_incompatible_text, $incompatible->getText());
     $this->assertFalse($theme_container->hasLink('Install Test Theme Depending on Modules theme'));
   }

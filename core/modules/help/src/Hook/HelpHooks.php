@@ -29,7 +29,7 @@ class HelpHooks {
           ':admin' => Url::fromRoute('system.admin')->toString(),
           ':config' => Url::fromRoute('system.admin_config')->toString(),
         ]) . '</li>';
-        $output .= '<li>' . $this->t('<strong>Enable additional functionality</strong> Next, visit the <a href=":modules">Extend page</a> and install modules that suit your specific needs. You can find additional modules at the <a href=":download_modules">Drupal.org modules page</a>.', [
+        $output .= '<li>' . $this->t('<strong>Enable additional functionality</strong> Next, visit the <a href=":modules">Extensions page</a> and install modules that suit your specific needs. You can find additional modules at the <a href=":download_modules">Drupal.org modules page</a>.', [
           ':modules' => Url::fromRoute('system.modules_list')->toString(),
           ':download_modules' => 'https://www.drupal.org/project/modules',
         ]) . '</li>';

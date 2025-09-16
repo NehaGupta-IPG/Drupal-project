@@ -40,11 +40,11 @@ class EditorHooks {
         $output .= '<h2>' . $this->t('Uses') . '</h2>';
         $output .= '<dl>';
         $output .= '<dt>' . $this->t('Installing text editors') . '</dt>';
-        $output .= '<dd>' . $this->t('The Text Editor module provides a framework for managing editors. To use it, you also need to install a text editor. This can either be the core <a href=":ckeditor5">CKEditor5 module</a>, which can be installed on the <a href=":extend">Extend page</a>, or a contributed module for any other text editor. When installing a contributed text editor module, be sure to check the installation instructions, because you will most likely need to download an external library as well as the Drupal module.', [
+        $output .= '<dd>' . $this->t('The Text Editor module provides a framework for managing editors. To use it, you also need to install a text editor. This can either be the core <a href=":ckeditor5">CKEditor5 module</a>, which can be installed on the <a href=":extensions">Extensions page</a>, or a contributed module for any other text editor. When installing a contributed text editor module, be sure to check the installation instructions, because you will most likely need to download an external library as well as the Drupal module.', [
           ':ckeditor5' => \Drupal::moduleHandler()->moduleExists('ckeditor5') ? Url::fromRoute('help.page', [
             'name' => 'ckeditor5',
           ])->toString() : '#',
-          ':extend' => Url::fromRoute('system.modules_list')->toString(),
+          ':extensions' => Url::fromRoute('system.modules_list')->toString(),
         ]) . '</dd>';
         $output .= '<dt>' . $this->t('Enabling a text editor for a text format') . '</dt>';
         $output .= '<dd>' . $this->t('On the <a href=":formats">Text formats and editors page</a> you can see which text editor is associated with each text format. You can change this by clicking on the <em>Configure</em> link, and then choosing a text editor or <em>none</em> from the <em>Text editor</em> drop-down list. The text editor will then be displayed with any text field for which this text format is chosen.', [':formats' => Url::fromRoute('filter.admin_overview')->toString()]) . '</dd>';

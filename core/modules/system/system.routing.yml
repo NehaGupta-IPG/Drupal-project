@@ -268,7 +268,7 @@ entity.date_format.delete_form:
 system.modules_list:
   path: '/admin/modules'
   defaults:
-    _title: 'Extend'
+    _title: 'Extensions'
     _title_context: 'With components'
     _form: '\Drupal\system\Form\ModulesListForm'
   requirements:
