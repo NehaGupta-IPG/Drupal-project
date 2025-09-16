@@ -402,7 +402,7 @@ class ViewsHooks {
    * Implements hook_ENTITY_TYPE_update().
    */
   #[Hook('view_update')]
-  public function viewUpdate(EntityInterface $entity) {
+  public function viewUpdate(EntityInterface $entity): void {
     // Clear the views block config cache.
     $views_block_config_store = \Drupal::keyValue('views_block_overrides');
     if ($views_block_config_store->has($entity->id())) {
@@ -414,7 +414,7 @@ class ViewsHooks {
    * Implements hook_ENTITY_TYPE_update().
    */
   #[Hook('view_delete')]
-  public function viewDelete(EntityInterface $entity) {
+  public function viewDelete(EntityInterface $entity): void {
     $this->viewUpdate($entity);
   }
 
@@ -422,7 +422,7 @@ class ViewsHooks {
    * Implements hook_ENTITY_TYPE_update().
    */
   #[Hook('block_update')]
-  public function blockUpdate(EntityInterface $entity) {
+  public function blockUpdate(EntityInterface $entity): void {
     // Clear the views block config cache.
     $plugin_id = $entity->getPluginId();
     if (str_starts_with($plugin_id, 'views_block:')) {
@@ -442,7 +442,7 @@ class ViewsHooks {
    * Implements hook_ENTITY_TYPE_delete().
    */
   #[Hook('block_delete')]
-  public function blockDelete(EntityInterface $entity) {
+  public function blockDelete(EntityInterface $entity): void {
     $this->blockUpdate($entity);
   }
 

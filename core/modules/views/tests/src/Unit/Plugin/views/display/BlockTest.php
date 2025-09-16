@@ -62,10 +62,10 @@ class BlockTest extends UnitTestCase {
       ->willReturn(TRUE);
     $this->executable->expects($this->any())
       ->method('id')
-      ->will($this->returnValue('foo'));
+      ->willReturn('foo');
     $this->executable->expects($this->any())
       ->method('getRequest')
-      ->will($this->returnValue(new Request()));
+      ->willReturn(new Request());
 
     $key_value = $this->getMockBuilder('Drupal\Core\KeyValueStore\DatabaseStorage')
       ->disableOriginalConstructor()
@@ -73,13 +73,13 @@ class BlockTest extends UnitTestCase {
       ->getMock();
     $key_value->expects($this->any())
       ->method('has')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
     $key_value->expects($this->any())
       ->method('set')
-      ->will($this->returnValue(NULL));
+      ->willReturn(NULL);
     $key_value->expects($this->any())
       ->method('getMultiple')
-      ->will($this->returnValue(NULL));
+      ->willReturn(NULL);
 
     $key_value_factory = $this->getMockBuilder('Drupal\Core\KeyValueStore\KeyValueDatabaseFactory')
       ->disableOriginalConstructor()
@@ -87,7 +87,7 @@ class BlockTest extends UnitTestCase {
       ->getMock();
     $key_value_factory->expects($this->any())
       ->method('get')
-      ->will($this->returnValue($key_value));
+      ->willReturn($key_value);
     $args = [
       [],
       'views_block',
@@ -112,7 +112,7 @@ class BlockTest extends UnitTestCase {
       ->getMock();
     $this->blockDisplay->expects($this->any())
       ->method('calculateConfigurationHash')
-      ->will($this->returnValue('foobar'));
+      ->willReturn('foobar');
 
     $this->blockDisplay->view = $this->executable;
 

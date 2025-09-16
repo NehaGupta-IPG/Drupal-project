@@ -2500,7 +2500,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   /**
    * {@inheritdoc}
    */
-  public function preparePreview() {
+  public function preparePreview(): void {
   }
 
   /**

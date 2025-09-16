@@ -512,7 +512,7 @@ interface DisplayPluginInterface {
   /**
    * Prepares the display for preview prior to preExecute().
    */
-  public function preparePreview();
+  public function preparePreview(): void;
 
   /**
    * Renders the display for the purposes of a live preview.

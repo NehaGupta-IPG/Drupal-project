@@ -480,7 +480,7 @@ class Block extends DisplayPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function preparePreview() {
+  public function preparePreview(): void {
     // In AJAX requests, we have to figure out the block config ourselves and
     // prepare the view using that.
     if ($block_instance = $this->getBlockFromAjaxRequest()) {
