@@ -6,13 +6,14 @@ namespace Drupal\Tests\comment\Functional\Update;
 
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests Comment module update paths.
- *
- * @group comment
- * @group legacy
  */
+#[Group('comment')]
+#[IgnoreDeprecations]
 class CommentUpdateTest extends UpdatePathTestBase {
 
   /**
