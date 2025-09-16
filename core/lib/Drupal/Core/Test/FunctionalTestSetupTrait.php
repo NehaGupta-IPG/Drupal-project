@@ -74,7 +74,7 @@ trait FunctionalTestSetupTrait {
    *
    * @var string
    */
-  protected $dumpFile;
+  protected string $dumpFile;
 
   /**
    * Prepares site settings and services before installation.
