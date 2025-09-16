@@ -141,3 +141,6 @@ filter_settings.media_embed:
       sequence:
         type: string
         label: 'Media type'
+    disable_filtering:
+      type: boolean
+      label: 'Allow disabled view modes to be selected in the editor'
