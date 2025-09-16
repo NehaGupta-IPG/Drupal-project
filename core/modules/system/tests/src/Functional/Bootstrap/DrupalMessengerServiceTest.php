@@ -7,18 +7,16 @@ namespace Drupal\Tests\system\Functional\Bootstrap;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Messenger service.
- *
- * @group Bootstrap
  */
+#[Group('Bootstrap')]
 class DrupalMessengerServiceTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system_test'];
 

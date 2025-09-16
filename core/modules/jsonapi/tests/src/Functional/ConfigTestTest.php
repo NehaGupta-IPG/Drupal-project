@@ -6,13 +6,13 @@ namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\config_test\Entity\ConfigTest;
 use Drupal\Core\Url;
+use Drupal\jsonapi\JsonApiSpec;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * JSON:API integration test for the "ConfigTest" config entity type.
- *
- * @group jsonapi
- * @group #slow
  */
+#[Group('jsonapi')]
 class ConfigTestTest extends ConfigEntityResourceTestBase {
 
   /**
@@ -45,7 +45,7 @@ class ConfigTestTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['view config_test']);
   }
 
@@ -84,10 +84,10 @@ class ConfigTestTest extends ConfigEntityResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
           ],
         ],
-        'version' => '1.0',
+        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
       ],
       'links' => [
         'self' => ['href' => $self_url],

@@ -8,12 +8,12 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Queue\DatabaseQueue;
 use Drupal\Core\Queue\Memory;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Queues and unqueues a set of items to check the basic queue functionality.
- *
- * @group Queue
  */
+#[Group('Queue')]
 class QueueTest extends KernelTestBase {
 
   /**
@@ -50,7 +50,7 @@ class QueueTest extends KernelTestBase {
    * @param \Drupal\Core\Queue\QueueInterface $queue2
    *   An instantiated queue object.
    */
-  protected function runQueueTest($queue1, $queue2) {
+  protected function runQueueTest($queue1, $queue2): void {
     // Create four items.
     $data = [];
     for ($i = 0; $i < 4; $i++) {

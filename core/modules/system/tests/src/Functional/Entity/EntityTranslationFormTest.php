@@ -9,18 +9,16 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests entity translation form.
- *
- * @group Entity
  */
+#[Group('Entity')]
 class EntityTranslationFormTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test', 'language', 'node'];
 
@@ -29,6 +27,11 @@ class EntityTranslationFormTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * The test language codes.
+   *
+   * @var string[]
+   */
   protected $langcodes;
 
   /**

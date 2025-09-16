@@ -6,18 +6,16 @@ namespace Drupal\Tests\block\Functional;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests blocks are being rendered in order by weight.
- *
- * @group block
  */
+#[Group('block')]
 class BlockRenderOrderTest extends BrowserTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'block'];
 

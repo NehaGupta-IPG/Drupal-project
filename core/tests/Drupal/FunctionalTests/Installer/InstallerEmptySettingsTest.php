@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Installer;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests the installer with empty settings file.
- *
- * @group Installer
  */
+#[Group('Installer')]
 class InstallerEmptySettingsTest extends InstallerTestBase {
 
   /**
@@ -19,7 +20,7 @@ class InstallerEmptySettingsTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function prepareEnvironment() {
+  protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
     // Create an empty settings.php file.
     $path = $this->root . DIRECTORY_SEPARATOR . $this->siteDirectory;

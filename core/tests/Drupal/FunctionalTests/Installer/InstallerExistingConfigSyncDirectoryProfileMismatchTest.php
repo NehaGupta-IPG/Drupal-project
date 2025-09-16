@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Installer;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Verifies that installing from existing configuration works.
- *
- * @group Installer
  */
+#[Group('Installer')]
 class InstallerExistingConfigSyncDirectoryProfileMismatchTest extends InstallerConfigDirectoryTestBase {
 
   /**
@@ -29,20 +30,20 @@ class InstallerExistingConfigSyncDirectoryProfileMismatchTest extends InstallerC
   /**
    * {@inheritdoc}
    */
-  protected function getConfigLocation() {
+  protected function getConfigLocation(): string {
     return __DIR__ . '/../../../fixtures/config_install/multilingual';
   }
 
   /**
    * Installer step: Configure settings.
    */
-  protected function setUpSettings() {
+  protected function setUpSettings(): void {
     // Cause a profile mismatch by hacking the URL.
     $this->drupalGet(str_replace($this->profile, 'minimal', $this->getUrl()));
     parent::setUpSettings();
   }
 
-  protected function setUpSite() {
+  protected function setUpSite(): void {
     // This step will not occur because there is an error.
   }
 

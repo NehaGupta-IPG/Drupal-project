@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Component\Serialization\Yaml;
+use PHPUnit\Framework\Attributes\Group;
 
 // cSpell:ignore Anónimo Aplicar
-
 /**
  * Verifies that installing from existing configuration works.
- *
- * @group Installer
  */
+#[Group('Installer')]
 class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerConfigDirectoryTestBase {
 
   /**
@@ -43,14 +42,14 @@ class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerConf
   /**
    * {@inheritdoc}
    */
-  protected function getConfigLocation() {
+  protected function getConfigLocation(): string {
     return __DIR__ . '/../../../fixtures/config_install/multilingual';
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function prepareEnvironment() {
+  protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
     // Place custom local translations in the translations directory and fix up
     // configuration.
@@ -195,7 +194,7 @@ PO;
    * @return string
    *   Contents for the test .po file.
    */
-  protected function getPo($langcode) {
+  protected function getPo($langcode): string {
     return <<<PO
 msgid ""
 msgstr ""

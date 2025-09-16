@@ -6,12 +6,12 @@ namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\UpdatePathTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests low-level theme functions.
- *
- * @group Theme
  */
+#[Group('Theme')]
 class ThemeUpdateTest extends BrowserTestBase {
   use UpdatePathTestTrait;
 
@@ -47,7 +47,7 @@ class ThemeUpdateTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function doSelectionTest() {
+  protected function doSelectionTest(): void {
     // Ensure that the theme's post update appears as expected.
     $this->assertSession()->responseContains('test_theme_depending_on_modules theme');
     $this->assertSession()->responseContains('Install a dependent module.');

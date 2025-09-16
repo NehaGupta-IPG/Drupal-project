@@ -5,21 +5,19 @@ declare(strict_types=1);
 namespace Drupal\Tests\filter\Functional;
 
 use Drupal\filter\Entity\FilterFormat;
-use Drupal\Tests\BrowserTestBase;
 use Drupal\filter\Plugin\FilterInterface;
+use Drupal\Tests\BrowserTestBase;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests HTML filtering with missing or skipped filters or text formats.
- *
- * @group filter
  */
+#[Group('filter')]
 class FilterSecurityTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'filter_test'];
 

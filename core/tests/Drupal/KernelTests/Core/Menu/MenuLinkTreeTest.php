@@ -11,14 +11,14 @@ use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Session\UserSession;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Core\Menu\MenuLinkMock;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the menu link tree.
  *
- * @group Menu
- *
  * @see \Drupal\Core\Menu\MenuLinkTree
  */
+#[Group('Menu')]
 class MenuLinkTreeTest extends KernelTestBase {
 
   /**
@@ -36,9 +36,7 @@ class MenuLinkTreeTest extends KernelTestBase {
   protected $menuLinkManager;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',

@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
-use Drupal\Core\Entity\EntityViewBuilder;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityViewBuilder;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the entity view builder.
- *
- * @group Entity
  */
+#[Group('Entity')]
 class EntityViewBuilderTest extends EntityKernelTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -348,7 +349,7 @@ class EntityViewBuilderTest extends EntityKernelTestBase {
    * @return \Drupal\Core\Entity\EntityInterface
    *   The created entity.
    */
-  protected function createTestEntity($entity_type) {
+  protected function createTestEntity($entity_type): EntityInterface {
     $data = [
       'bundle' => $entity_type,
       'name' => $this->randomMachineName(),

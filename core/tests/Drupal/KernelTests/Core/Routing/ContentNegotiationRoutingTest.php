@@ -6,14 +6,14 @@ namespace Drupal\KernelTests\Core\Routing;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Tests content negotiation routing variations.
- *
- * @group ContentNegotiation
  */
+#[Group('ContentNegotiation')]
 class ContentNegotiationRoutingTest extends KernelTestBase {
 
   use PathAliasTestTrait;
@@ -21,7 +21,7 @@ class ContentNegotiationRoutingTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['content_negotiation_test', 'path_alias'];
+  protected static $modules = ['content_negotiation_test', 'path_alias', 'system'];
 
   /**
    * {@inheritdoc}

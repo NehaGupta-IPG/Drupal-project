@@ -6,14 +6,17 @@ namespace Drupal\Tests\system\Functional\Common;
 
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Confirm that the link generator works correctly.
- *
- * @group Common
  */
+#[Group('Common')]
 class UrlTest extends BrowserTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['common_test'];
 
   /**

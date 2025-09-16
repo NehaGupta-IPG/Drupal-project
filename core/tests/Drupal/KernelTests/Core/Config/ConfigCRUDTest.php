@@ -11,12 +11,12 @@ use Drupal\Core\Config\ConfigValueException;
 use Drupal\Core\Config\DatabaseStorage;
 use Drupal\Core\Config\UnsupportedDataTypeConfigException;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests CRUD operations on configuration objects.
- *
- * @group config
  */
+#[Group('config')]
 class ConfigCRUDTest extends KernelTestBase {
 
   /**
@@ -29,9 +29,7 @@ class ConfigCRUDTest extends KernelTestBase {
   protected $strictConfigSchema = FALSE;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system'];
 

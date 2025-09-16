@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\File;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests the unmanaged file delete recursive function.
- *
- * @group File
  */
+#[Group('File')]
 class RemoteFileDeleteRecursiveTest extends FileDeleteRecursiveTest {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['file_test'];
 

@@ -6,22 +6,20 @@ namespace Drupal\Tests\node\Functional;
 
 use Drupal\Core\Url;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the node access automatic cacheability bubbling logic.
- *
- * @group node
- * @group Cache
- * @group cacheability_safeguards
  */
+#[Group('node')]
+#[Group('Cache')]
+#[Group('cacheability_safeguards')]
 class NodeAccessCacheabilityTest extends NodeTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node_access_test',

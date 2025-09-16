@@ -11,6 +11,7 @@ use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the timezone handling of datetime and datelist element types.
@@ -18,9 +19,8 @@ use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
  * A range of different permutations of #default_value and #date_timezone
  * for an element are setup in a single form by the buildForm() method, and
  * tested in various ways for both element types.
- *
- * @group Form
  */
+#[Group('Form')]
 class TimezoneTest extends EntityKernelTestBase implements FormInterface {
 
   /**
@@ -342,7 +342,7 @@ class TimezoneTest extends EntityKernelTestBase implements FormInterface {
 
     // Check the #date_timezone property on each processed test element.
     $wrongTimezones = [];
-    foreach ($form_state->getCompleteForm() as $elementName => $element) {
+    foreach ($form_state->getCompleteForm() as $element) {
       if (isset($element['#type']) && $element['#type'] === $this->elementType) {
         // Check the correct timezone is set on the value object.
         $actualTimezone = array_search($element['#date_timezone'], $this->timezones, TRUE);

@@ -92,7 +92,7 @@ trait FunctionalTestSetupTrait {
     // - The temporary directory is set and created by install_base_system().
     // - The private file directory is created post install by
     //   FunctionalTestSetupTrait::initConfig().
-    // @see system_requirements()
+    // @see \Drupal\system\Install\SystemRequirements.
     // @see TestBase::prepareEnvironment()
     // @see install_base_system()
     // @see \Drupal\Core\Test\FunctionalTestSetupTrait::initConfig()
@@ -174,6 +174,17 @@ trait FunctionalTestSetupTrait {
         'tags' => [['name' => 'event_subscriber']],
       ];
     }
+    // Register test middleware.
+    $services['services']['testing.http_client.middleware'] = [
+      'class' => 'Drupal\Core\Test\HttpClientMiddleware\TestHttpClientMiddleware',
+      'tags' => [['name' => 'http_client_middleware']],
+    ];
+    $services['services']['testing.http_middleware.wait_terminate_middleware'] = [
+      'class' => 'Drupal\Core\Test\StackMiddleware\TestWaitTerminateMiddleware',
+      'arguments' => ['@lock', '%drupal.test_wait_terminate%'],
+      'tags' => [['name' => 'http_middleware', 'priority' => -1024]],
+    ];
+    $services['parameters']['drupal.test_wait_terminate'] = FALSE;
     file_put_contents($directory . '/services.yml', $yaml->dump($services));
     // Since Drupal is bootstrapped already, install_begin_request() will not
     // bootstrap again. Hence, we have to reload the newly written custom
@@ -193,8 +204,8 @@ trait FunctionalTestSetupTrait {
   protected function writeSettings(array $settings) {
     include_once DRUPAL_ROOT . '/core/includes/install.inc';
     $filename = $this->siteDirectory . '/settings.php';
-    // system_requirements() removes write permissions from settings.php
-    // whenever it is invoked.
+    // The system runtime_requirements hook removes write permissions from
+    // settings.php whenever it is invoked.
     // Not using File API; a potential error must trigger a PHP warning.
     chmod($filename, 0666);
     SettingsEditor::rewrite($filename, $settings);
@@ -205,7 +216,7 @@ trait FunctionalTestSetupTrait {
    *
    * @param string $name
    *   The name of the parameter.
-   * @param string $value
+   * @param string|array|bool $value
    *   The value of the parameter.
    */
   protected function setContainerParameter($name, $value) {
@@ -578,7 +589,7 @@ trait FunctionalTestSetupTrait {
           'site_name' => 'Drupal',
           'site_mail' => 'simpletest@example.com',
           'account' => [
-            'name' => $this->rootUser->name,
+            'name' => $this->rootUser->getAccountName(),
             'mail' => $this->rootUser->getEmail(),
             'pass' => [
               'pass1' => $this->rootUser->pass_raw ?? $this->rootUser->passRaw,
@@ -595,7 +606,7 @@ trait FunctionalTestSetupTrait {
     ];
 
     // If we only have one db driver available, we cannot set the driver.
-    if (count($this->getDatabaseTypes()) == 1) {
+    if (count(Database::getDriverList()->getInstallableList()) == 1) {
       unset($parameters['forms']['install_settings_form']['driver']);
     }
     return $parameters;
@@ -605,7 +616,8 @@ trait FunctionalTestSetupTrait {
    * Sets up the base URL based upon the environment variable.
    *
    * @throws \Exception
-   *   Thrown when no SIMPLETEST_BASE_URL environment variable is provided or uses an invalid scheme.
+   *   Thrown when no SIMPLETEST_BASE_URL environment variable is provided or
+   *   uses an invalid scheme.
    */
   protected function setupBaseUrl() {
     global $base_url;
@@ -678,7 +690,6 @@ trait FunctionalTestSetupTrait {
     $this->publicFilesDirectory = $this->siteDirectory . '/files';
     $this->privateFilesDirectory = $this->siteDirectory . '/private';
     $this->tempFilesDirectory = $this->siteDirectory . '/temp';
-    $this->translationFilesDirectory = $this->siteDirectory . '/translations';
 
     // Ensure the configImporter is refreshed for each test.
     $this->configImporter = NULL;

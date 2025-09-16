@@ -9,21 +9,19 @@ use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Session\UserSession;
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests FormBuilder caching.
  *
- * @covers \Drupal\Core\Form\FormBuilder::getCache
- * @covers \Drupal\Core\Form\FormBuilder::setCache
- *
- * @group Form
+ * @legacy-covers \Drupal\Core\Form\FormBuilder::getCache
+ * @legacy-covers \Drupal\Core\Form\FormBuilder::setCache
  */
+#[Group('Form')]
 class FormCacheTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'user'];
 

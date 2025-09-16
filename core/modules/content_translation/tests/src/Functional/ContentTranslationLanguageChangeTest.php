@@ -8,12 +8,12 @@ use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
 use Drupal\Tests\image\Kernel\ImageFieldCreationTrait;
 use Drupal\Tests\node\Functional\NodeTestBase;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the content translation language that is set.
- *
- * @group content_translation
  */
+#[Group('content_translation')]
 class ContentTranslationLanguageChangeTest extends NodeTestBase {
 
   use ContentTranslationTestTrait;
@@ -23,9 +23,7 @@ class ContentTranslationLanguageChangeTest extends NodeTestBase {
   }
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',

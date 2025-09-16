@@ -11,6 +11,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Template\TwigEnvironment;
 use Drupal\Core\Template\TwigPhpStorageCache;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\Definition;
 use Twig\Error\LoaderError;
 
@@ -18,14 +19,12 @@ use Twig\Error\LoaderError;
  * Tests the twig environment.
  *
  * @see \Drupal\Core\Template\TwigEnvironment
- * @group Twig
  */
+#[Group('Twig')]
 class TwigEnvironmentTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system'];
 
@@ -185,7 +184,7 @@ class TwigEnvironmentTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
 
     $definition = new Definition('Twig\Loader\FilesystemLoader', [[sys_get_temp_dir()]]);

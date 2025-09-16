@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\workspaces\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests concurrent edits in different workspaces.
- *
- * @group workspaces
  */
+#[Group('workspaces')]
 class WorkspaceConcurrentEditingTest extends BrowserTestBase {
 
   use WorkspaceTestUtilities;
@@ -18,7 +18,7 @@ class WorkspaceConcurrentEditingTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'node', 'workspaces'];
+  protected static $modules = ['block', 'node', 'workspaces', 'workspaces_ui'];
 
   /**
    * {@inheritdoc}

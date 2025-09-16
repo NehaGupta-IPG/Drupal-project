@@ -6,18 +6,16 @@ namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests for Twig debug markup.
- *
- * @group Theme
  */
+#[Group('Theme')]
 class TwigDebugMarkupTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['theme_test', 'node'];
 

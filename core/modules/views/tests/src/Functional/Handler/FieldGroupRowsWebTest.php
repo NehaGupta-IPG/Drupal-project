@@ -8,12 +8,12 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\views\Functional\ViewTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the "Display all values in the same row" setting.
- *
- * @group views
  */
+#[Group('views')]
 class FieldGroupRowsWebTest extends ViewTestBase {
 
   /**
@@ -24,9 +24,7 @@ class FieldGroupRowsWebTest extends ViewTestBase {
   public static $testViews = ['test_group_rows', 'test_ungroup_rows'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node'];
 

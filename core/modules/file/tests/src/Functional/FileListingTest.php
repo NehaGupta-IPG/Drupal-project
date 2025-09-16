@@ -4,23 +4,22 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Functional;
 
-use Drupal\node\Entity\Node;
-use Drupal\file\Entity\File;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\entity_test\Entity\EntityTestConstraints;
+use Drupal\entity_test\EntityTestHelper;
+use Drupal\file\Entity\File;
+use Drupal\node\Entity\Node;
 use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests file listing page functionality.
- *
- * @group file
- * @group #slow
  */
+#[Group('file')]
 class FileListingTest extends FileFieldTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['views', 'file', 'image', 'entity_test'];
 
@@ -65,7 +64,7 @@ class FileListingTest extends FileFieldTestBase {
    * @return int
    *   Total usage count.
    */
-  protected function sumUsages($usage) {
+  protected function sumUsages($usage): int {
     $count = 0;
     foreach ($usage as $module) {
       foreach ($module as $entity_type) {
@@ -217,7 +216,7 @@ class FileListingTest extends FileFieldTestBase {
 
     // Create a bundle and attach a File field to the bundle.
     $bundle = $this->randomMachineName();
-    entity_test_create_bundle($bundle, NULL, 'entity_test_constraints');
+    EntityTestHelper::createBundle($bundle, NULL, 'entity_test_constraints');
     $this->createFileField('field_test_file', 'entity_test_constraints', $bundle, [], ['file_extensions' => 'txt png']);
 
     // Create file to attach to entity.
@@ -262,7 +261,7 @@ class FileListingTest extends FileFieldTestBase {
    * @return \Drupal\Core\Entity\EntityInterface
    *   A file entity.
    */
-  protected function createFile() {
+  protected function createFile(): EntityInterface {
     // Create a new file entity.
     $file = File::create([
       'uid' => 1,

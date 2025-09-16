@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
+use Drupal\jsonapi\Form\JsonApiSettingsForm;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @covers \Drupal\jsonapi\Form\JsonApiSettingsForm
- * @group jsonapi
+ * Tests Settings Form.
  */
+#[Group('jsonapi')]
+#[CoversClass(JsonApiSettingsForm::class)]
 class SettingsFormTest extends BrowserTestBase {
 
   /**

@@ -6,12 +6,12 @@ namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the UI of storage properties of views.
- *
- * @group views_ui
  */
+#[Group('views_ui')]
 class StorageTest extends UITestBase {
 
   /**
@@ -27,9 +27,7 @@ class StorageTest extends UITestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['views_ui', 'language'];
 

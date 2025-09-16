@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_translation\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests the test content translation UI with the test entity.
- *
- * @group content_translation
  */
+#[Group('content_translation')]
+#[Group('#slow')]
 class ContentTestTranslationUITest extends ContentTranslationUITestBase {
 
   /**
@@ -28,9 +30,7 @@ class ContentTestTranslationUITest extends ContentTranslationUITestBase {
   ];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',
