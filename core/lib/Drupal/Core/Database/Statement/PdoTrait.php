@@ -25,6 +25,7 @@ trait PdoTrait {
       FetchAs::Column => \PDO::FETCH_COLUMN,
       FetchAs::List => \PDO::FETCH_NUM,
       FetchAs::Object => \PDO::FETCH_OBJ,
+      FetchAs::Group => \PDO::FETCH_GROUP,
     };
   }
 
@@ -44,6 +45,7 @@ trait PdoTrait {
       \PDO::FETCH_COLUMN => FetchAs::Column,
       \PDO::FETCH_NUM => FetchAs::List,
       \PDO::FETCH_OBJ => FetchAs::Object,
+      \PDO::FETCH_GROUP => FetchAs::Group,
       default => throw new \RuntimeException('Fetch mode ' . ($this->fetchModeLiterals[$mode] ?? $mode) . ' is not supported. Use supported modes only.'),
     };
   }
