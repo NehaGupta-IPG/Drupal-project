@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Unit\Plugin\views\display;
 
 use Drupal\Tests\UnitTestCase;
+use Drupal\views\Plugin\views\display\Block;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @coversDefaultClass \Drupal\views\Plugin\views\display\Block
- * @group block
+ * Tests Drupal\views\Plugin\views\display\Block.
  */
+#[CoversClass(Block::class)]
+#[Group('block')]
 class BlockTest extends UnitTestCase {
 
   /**
@@ -119,11 +124,11 @@ class BlockTest extends UnitTestCase {
   /**
    * Tests the build method with no overriding.
    *
-   * @testWith [null]
-   *           ["none"]
-   *           [0]
    * @todo Delete the last two cases in https://www.drupal.org/project/drupal/issues/3521221. The last one is `intval('none')`.
    */
+  #[TestWith([NULL])]
+  #[TestWith(["none"])]
+  #[TestWith([0])]
   public function testBuildNoOverride($items_per_page_setting): void {
     $this->executable->expects($this->never())
       ->method('setItemsPerPage');
@@ -137,10 +142,9 @@ class BlockTest extends UnitTestCase {
 
   /**
    * Tests the build method with overriding items per page.
-   *
-   * @testWith [5, 5]
-   *           ["5", 5]
    */
+  #[TestWith([5, 5])]
+  #[TestWith(["5", 5])]
   public function testBuildOverride(mixed $input, int $expected): void {
     $this->executable->expects($this->once())
       ->method('setItemsPerPage')

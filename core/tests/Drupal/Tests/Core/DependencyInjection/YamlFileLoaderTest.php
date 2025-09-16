@@ -9,14 +9,18 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\YamlFileLoader;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * @coversDefaultClass \Drupal\Core\DependencyInjection\YamlFileLoader
- * @group DependencyInjection
+ * Tests Drupal\Core\DependencyInjection\YamlFileLoader.
  */
+#[CoversClass(YamlFileLoader::class)]
+#[Group('DependencyInjection')]
 class YamlFileLoaderTest extends UnitTestCase {
 
   /**
@@ -44,6 +48,9 @@ services:
   example_service_closure:
     class: \Drupal\Core\ExampleClass
     arguments: [!service_closure '@example_service_1']
+  example_service_closure_shorthand:
+    class: \Drupal\Core\ExampleClass
+    arguments: ['@>example_service_1']
 YAML;
 
     vfsStream::setup('drupal', NULL, [
@@ -75,11 +82,18 @@ YAML;
     $ref = $service_closure->getValues()[0];
     $this->assertInstanceOf(Reference::class, $ref);
     $this->assertEquals('example_service_1', $ref);
+
+    $service_closure = $builder->getDefinition('example_service_closure_shorthand')->getArgument(0);
+    $this->assertInstanceOf(ServiceClosureArgument::class, $service_closure);
+    $ref = $service_closure->getValues()[0];
+    $this->assertInstanceOf(Reference::class, $ref);
+    $this->assertEquals('example_service_1', $ref);
   }
 
   /**
-   * @dataProvider providerTestExceptions
-   */
+ * Tests exceptions.
+ */
+  #[DataProvider('providerTestExceptions')]
   public function testExceptions($yml, $message): void {
     vfsStream::setup('drupal', NULL, [
       'modules' => [
