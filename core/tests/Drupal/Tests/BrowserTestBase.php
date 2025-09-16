@@ -568,7 +568,7 @@ abstract class BrowserTestBase extends TestCase {
   /**
    * Installs Drupal using installation profile.
    */
-  protected function installDrupalFromProfile() {
+  protected function installDrupalFromProfile(): void {
     $this->initUserSession();
     $this->prepareSettings();
     $this->doInstall();
