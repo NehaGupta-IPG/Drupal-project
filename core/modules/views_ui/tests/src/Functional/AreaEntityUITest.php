@@ -7,13 +7,14 @@ namespace Drupal\Tests\views_ui\Functional;
 use Drupal\block\Entity\Block;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\views\Entity\View;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the entity area UI test.
  *
  * @see \Drupal\views\Plugin\views\area\Entity
- * @group views_ui
  */
+#[Group('views_ui')]
 class AreaEntityUITest extends UITestBase {
 
   /**
@@ -26,6 +27,9 @@ class AreaEntityUITest extends UITestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * Tests the Views user interface.
+   */
   public function testUI(): void {
     // Set up a block and an entity_test entity.
     $block = Block::create(['id' => 'test_id', 'plugin' => 'system_main_block', 'theme' => 'stark']);

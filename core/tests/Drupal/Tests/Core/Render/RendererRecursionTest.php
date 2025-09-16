@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Render;
 
+use Drupal\Core\Render\Renderer;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+
 /**
- * @coversDefaultClass \Drupal\Core\Render\Renderer
- * @group Render
+ * Tests Drupal\Core\Render\Renderer.
  */
+#[CoversClass(Renderer::class)]
+#[Group('Render')]
 class RendererRecursionTest extends RendererTestBase {
 
   protected function setUpRenderRecursionComplexElements(): array {
@@ -27,11 +32,11 @@ class RendererRecursionTest extends RendererTestBase {
   }
 
   /**
-   * ::renderRoot() may not be called inside of another ::renderRoot() call.
+   * Tests that renderRoot() may not be called recursively.
    *
-   * @covers ::renderRoot
-   * @covers ::render
-   * @covers ::doRender
+   * @legacy-covers ::renderRoot
+   * @legacy-covers ::render
+   * @legacy-covers ::doRender
    */
   public function testRenderRecursionWithNestedRenderRoot(): void {
     [$parent_markup, $complex_child_template] = $this->setUpRenderRecursionComplexElements();
@@ -56,14 +61,14 @@ class RendererRecursionTest extends RendererTestBase {
   }
 
   /**
-   * ::render() may be called from anywhere.
+   * Tests that render() may be called from anywhere.
    *
    * Including from inside of another ::renderRoot() call. Bubbling must be
    * performed.
    *
-   * @covers ::renderRoot
-   * @covers ::render
-   * @covers ::doRender
+   * @legacy-covers ::renderRoot
+   * @legacy-covers ::render
+   * @legacy-covers ::doRender
    */
   public function testRenderRecursionWithNestedRender(): void {
     [$parent_markup, $complex_child_template] = $this->setUpRenderRecursionComplexElements();
@@ -92,12 +97,10 @@ class RendererRecursionTest extends RendererTestBase {
   }
 
   /**
-   * ::renderInIsolation() may be called from anywhere.
+   * Tests that renderRoot() can be called from anywhere including recursively.
    *
-   * Including from inside of another ::renderRoot() call.
-   *
-   * @covers ::renderRoot
-   * @covers ::renderInIsolation
+   * @legacy-covers ::renderRoot
+   * @legacy-covers ::renderInIsolation
    */
   public function testRenderRecursionWithNestedRenderInIsolation(): void {
     [$parent_markup, $complex_child_template] = $this->setUpRenderRecursionComplexElements();

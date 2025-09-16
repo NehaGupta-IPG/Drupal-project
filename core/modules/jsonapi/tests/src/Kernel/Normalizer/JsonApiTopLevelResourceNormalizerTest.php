@@ -802,7 +802,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
    * @param \Drupal\Core\Cache\CacheableMetadata $expected_metadata
    *   The expected cacheable metadata.
    *
-   * @dataProvider testCacheableMetadataProvider
+   * @dataProvider cacheableMetadataProvider
    */
   public function testCacheableMetadata(CacheableMetadata $expected_metadata): void {
     $resource_type = $this->container->get('jsonapi.resource_type.repository')->get('node', 'article');
@@ -824,7 +824,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
   /**
    * Provides test cases for asserting cacheable metadata behavior.
    */
-  public static function testCacheableMetadataProvider(): array {
+  public static function cacheableMetadataProvider(): array {
     $cacheable_metadata = function ($metadata) {
       return CacheableMetadata::createFromRenderArray(['#cache' => $metadata]);
     };
@@ -909,6 +909,9 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
     $this->assertSame([], $validator->getErrors(), 'Validation errors on object ' . print_r($normalized, TRUE) . ' with schema ' . print_r($schema, TRUE));
   }
 
+  /**
+   * Tests the serialization of a top-level JSON:API document with a single resource.
+   */
   public function testTopLevelResourceWithSingleResource(): void {
     [, $resource_object] = $this->getTestContentEntityResource();
     $serializer = $this->container->get('jsonapi.serializer');

@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore basefield
-
 /**
  * Tests Field SQL Storage .
  *
  * Field_sql_storage.module implements the default back-end storage plugin
  * for the Field Storage API.
- *
- * @group Entity
  */
+#[Group('Entity')]
 class FieldSqlStorageTest extends EntityKernelTestBase {
 
   /**
@@ -201,7 +201,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
 
     $connection = Database::getConnection();
     // Read the tables and check the correct values have been stored.
-    $rows = $connection->select($this->table, 't')->fields('t')->execute()->fetchAllAssoc('delta', \PDO::FETCH_ASSOC);
+    $rows = $connection->select($this->table, 't')->fields('t')->execute()->fetchAllAssoc('delta', FetchAs::Associative);
     $this->assertCount($this->fieldCardinality, $rows);
     foreach ($rows as $delta => $row) {
       $expected = [
@@ -225,7 +225,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
     $values_count = count($values);
     $entity->{$this->fieldName} = $values;
     $entity->save();
-    $rows = $connection->select($this->table, 't')->fields('t')->execute()->fetchAllAssoc('delta', \PDO::FETCH_ASSOC);
+    $rows = $connection->select($this->table, 't')->fields('t')->execute()->fetchAllAssoc('delta', FetchAs::Associative);
     $this->assertCount($values_count, $rows);
     foreach ($rows as $delta => $row) {
       $expected = [
@@ -253,7 +253,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
 
     // Check that data for both revisions are in the revision table.
     foreach ($revision_values as $revision_id => $values) {
-      $rows = $connection->select($this->revisionTable, 't')->fields('t')->condition('revision_id', $revision_id)->execute()->fetchAllAssoc('delta', \PDO::FETCH_ASSOC);
+      $rows = $connection->select($this->revisionTable, 't')->fields('t')->condition('revision_id', $revision_id)->execute()->fetchAllAssoc('delta', FetchAs::Associative);
       $this->assertCount(min(count($values), $this->fieldCardinality), $rows);
       foreach ($rows as $delta => $row) {
         $expected = [
@@ -272,7 +272,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
     // Test emptying the field.
     $entity->{$this->fieldName} = NULL;
     $entity->save();
-    $rows = $connection->select($this->table, 't')->fields('t')->execute()->fetchAllAssoc('delta', \PDO::FETCH_ASSOC);
+    $rows = $connection->select($this->table, 't')->fields('t')->execute()->fetchAllAssoc('delta', FetchAs::Associative);
     $this->assertCount(0, $rows);
   }
 
@@ -502,7 +502,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
     $expected = 'short_entity_type_revision__short_field_name';
     $this->assertEquals($expected, $this->tableMapping->getDedicatedRevisionTableName($field_storage));
 
-    // Short entity type, long field name
+    // Short entity type, long field name.
     $entity_type = 'short_entity_type';
     $field_name = 'long_field_name_abcdefghijklmnopqrstuvwxyz';
     $field_storage = FieldStorageConfig::create([
@@ -515,7 +515,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
     $expected = 'short_entity_type_r__' . substr(hash('sha256', $field_storage->uuid()), 0, 10);
     $this->assertEquals($expected, $this->tableMapping->getDedicatedRevisionTableName($field_storage));
 
-    // Long entity type, short field name
+    // Long entity type, short field name.
     $entity_type = 'long_entity_type_all_forty_three_characters';
     $field_name = 'short_field_name';
     $field_storage = FieldStorageConfig::create([

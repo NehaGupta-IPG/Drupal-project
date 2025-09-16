@@ -7,12 +7,12 @@ namespace Drupal\Tests\field\Functional;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the default value callback.
- *
- * @group field
  */
+#[Group('field')]
 class FieldDefaultValueCallbackTest extends BrowserTestBase {
 
   /**
@@ -54,6 +54,9 @@ class FieldDefaultValueCallbackTest extends BrowserTestBase {
 
   }
 
+  /**
+   * Tests the default value callback functionality for fields.
+   */
   public function testDefaultValueCallbackForm(): void {
     // Create a field and storage for checking.
     FieldStorageConfig::create([

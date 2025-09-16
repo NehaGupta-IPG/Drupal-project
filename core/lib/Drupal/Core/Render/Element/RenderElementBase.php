@@ -38,7 +38,10 @@ use Drupal\Core\Url;
  *
  * Here is the list of the properties used during the rendering of all render
  * elements:
- * - #access: (bool) Whether the element is accessible or not. When FALSE,
+ * - #access: (bool or AccessResultInterface)
+ *   Whether the element is accessible or not.
+ *   When the value is FALSE (if boolean)
+ *   or the isAllowed() method returns FALSE (if AccessResultInterface),
  *   the element is not rendered and user-submitted values are not taken
  *   into consideration.
  * - #access_callback: A callable or function name to call to check access.
@@ -142,7 +145,6 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
     if (!empty($element['#required'])) {
       $element['#attributes']['class'][] = 'required';
       $element['#attributes']['required'] = 'required';
-      $element['#attributes']['aria-required'] = 'true';
     }
     if (isset($element['#parents']) && isset($element['#errors']) && !empty($element['#validated'])) {
       $element['#attributes']['class'][] = 'error';
@@ -241,16 +243,16 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
    * @param array $element
    *   An associative array containing the properties of the element.
    *   Properties used:
-   *   - #ajax['event']
-   *   - #ajax['prevent']
-   *   - #ajax['url']
-   *   - #ajax['httpMethod']
-   *   - #ajax['callback']
-   *   - #ajax['options']
-   *   - #ajax['wrapper']
-   *   - #ajax['parameters']
-   *   - #ajax['effect']
-   *   - #ajax['accepts']
+   *   - "#ajax['event']".
+   *   - "#ajax['prevent']".
+   *   - "#ajax['url']".
+   *   - "#ajax['httpMethod']".
+   *   - "#ajax['callback']".
+   *   - "#ajax['options']".
+   *   - "#ajax['wrapper']".
+   *   - "#ajax['parameters']".
+   *   - "#ajax['effect']".
+   *   - "#ajax['accepts']".
    *
    * @return array
    *   The processed element with the necessary JavaScript attached to it.

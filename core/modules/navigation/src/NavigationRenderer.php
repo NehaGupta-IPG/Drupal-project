@@ -134,7 +134,7 @@ final class NavigationRenderer {
     $asset_url = $module_path . '/assets/fonts/inter-var.woff2';
 
     $defaults = [
-      'settings' => ['hide_logo' => $logo_provider === self::LOGO_PROVIDER_HIDE],
+      '#settings' => ['hide_logo' => $logo_provider === self::LOGO_PROVIDER_HIDE],
       '#attached' => [
         'html_head_link' => [
           [
@@ -157,10 +157,10 @@ final class NavigationRenderer {
       if (!empty($logo_path) && is_file($logo_path)) {
         $logo_managed_url = $this->fileUrlGenerator->generateAbsoluteString($logo_path);
         $image = $this->imageFactory->get($logo_path);
-        $build[0]['settings']['logo_path'] = $logo_managed_url;
+        $build[0]['#settings']['logo_path'] = $logo_managed_url;
         if ($image->isValid()) {
-          $build[0]['settings']['logo_width'] = $image->getWidth();
-          $build[0]['settings']['logo_height'] = $image->getHeight();
+          $build[0]['#settings']['logo_width'] = $image->getWidth();
+          $build[0]['#settings']['logo_height'] = $image->getHeight();
         }
       }
     }
@@ -204,10 +204,6 @@ final class NavigationRenderer {
    * @see hook_page_top()
    */
   public function buildTopBar(array &$page_top): void {
-    if (!$this->moduleHandler->moduleExists('navigation_top_bar')) {
-      return;
-    }
-
     $page_top['top_bar'] = [
       '#type' => 'top_bar',
       '#access' => $this->currentUser->hasPermission('access navigation'),
@@ -236,7 +232,7 @@ final class NavigationRenderer {
     if ($block->getPluginId() !== 'local_tasks_block') {
       return;
     }
-    if ($this->hasLocalTasks() && $this->moduleHandler->moduleExists('navigation_top_bar')) {
+    if ($this->hasLocalTasks()) {
       $build['#access'] = FALSE;
     }
   }

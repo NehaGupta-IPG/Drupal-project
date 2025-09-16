@@ -7,8 +7,6 @@ namespace Drupal\KernelTests\Core\Config;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Block\Plugin\Block\Broken;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\StorageComparer;
@@ -17,13 +15,13 @@ use Drupal\Core\Logger\RfcLoggerTrait;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Log\LoggerInterface;
 
 /**
  * Tests importing configuration which has missing content dependencies.
- *
- * @group config
  */
+#[Group('config')]
 class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerInterface {
   use BlockCreationTrait;
   use RfcLoggerTrait;
@@ -195,7 +193,8 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
    * {@inheritdoc}
    */
   public function log($level, $message, array $context = []): void {
-    $this->logMessages[] = PlainTextOutput::renderFromHtml(new FormattableMarkup($message, $context));
+    $message_placeholders = \Drupal::service('logger.log_message_parser')->parseMessagePlaceholders($message, $context);
+    $this->logMessages[] = empty($message_placeholders) ? $message : strtr($message, $message_placeholders);
   }
 
 }

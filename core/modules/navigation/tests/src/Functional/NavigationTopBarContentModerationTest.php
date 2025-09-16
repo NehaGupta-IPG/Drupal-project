@@ -6,12 +6,12 @@ namespace Drupal\Tests\navigation\Functional;
 
 use Drupal\node\NodeInterface;
 use Drupal\Tests\content_moderation\Functional\ModerationStateTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the top bar behavior along with content moderation.
- *
- * @group navigation
  */
+#[Group('navigation')]
 class NavigationTopBarContentModerationTest extends ModerationStateTestBase {
 
   /**
@@ -25,7 +25,7 @@ class NavigationTopBarContentModerationTest extends ModerationStateTestBase {
   protected static $modules = [
     'content_moderation',
     'node',
-    'navigation_top_bar',
+    'navigation',
   ];
 
   /**
@@ -69,11 +69,13 @@ class NavigationTopBarContentModerationTest extends ModerationStateTestBase {
 
     $this->drupalGet($this->node->toUrl());
     $this->assertSession()->elementContains('xpath', '//*[@id="top-bar-page-actions"]/ul', 'Latest version');
+    $this->assertSession()->elementContains('css', '.toolbar-badge--success', 'Published (Draft available)');
 
     // Confirm that Edit option is featured  in Latest version page.
     $this->clickLink('Latest version');
     $this->assertSession()->elementNotContains('xpath', '//*[@id="top-bar-page-actions"]/ul', 'Edit');
-    $this->assertSession()->elementTextEquals('xpath', "//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/a[contains(@class, 'toolbar-button--icon--thin-pencil')]", "Edit");
+    $this->assertSession()->elementContains('css', '.toolbar-badge--info', 'Draft');
+    $this->assertSession()->elementTextEquals('xpath', "//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/a[contains(@class, 'toolbar-button--icon--pencil')]", "Edit");
   }
 
 }

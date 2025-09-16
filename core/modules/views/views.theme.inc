@@ -159,7 +159,7 @@ function template_preprocess_views_view_fields(&$variables): void {
         $object->wrapper_attributes = new Attribute($attributes);
       }
 
-      // Set up field label
+      // Set up field label.
       $object->label = $view->field[$id]->label();
 
       // Set up field label wrapper and its attributes.
@@ -253,15 +253,12 @@ function template_preprocess_views_view_summary(&$variables): void {
     $url_options['query'] = $view->exposed_raw_input;
   }
 
+  $currentPath = \Drupal::service('path.current')->getPath();
   $active_urls = [
     // Force system path.
-    Url::fromRoute('<current>', [], ['alias' => TRUE])->toString(),
-    // Force system path.
-    Url::fromRouteMatch(\Drupal::routeMatch())->setOption('alias', TRUE)->toString(),
+    Url::fromUserInput($currentPath, ['alias' => TRUE])->toString(),
     // Could be an alias.
-    Url::fromRoute('<current>')->toString(),
-    // Could be an alias.
-    Url::fromRouteMatch(\Drupal::routeMatch())->toString(),
+    Url::fromUserInput($currentPath)->toString(),
   ];
   $active_urls = array_combine($active_urls, $active_urls);
 
@@ -303,7 +300,7 @@ function template_preprocess_views_view_summary(&$variables): void {
         $url->setRouteParameters($parameters);
       }
       catch (Exception) {
-        // If the given route doesn't exist, default to <front>
+        // If the given route doesn't exist, default to "<front>".
         $url = Url::fromRoute('<front>');
       }
     }
@@ -342,11 +339,12 @@ function template_preprocess_views_view_summary_unformatted(&$variables): void {
   }
 
   $count = 0;
+  $currentPath = \Drupal::service('path.current')->getPath();
   $active_urls = [
     // Force system path.
-    Url::fromRoute('<current>', [], ['alias' => TRUE])->toString(),
+    Url::fromUserInput($currentPath, ['alias' => TRUE])->toString(),
     // Could be an alias.
-    Url::fromRoute('<current>')->toString(),
+    Url::fromUserInput($currentPath)->toString(),
   ];
   $active_urls = array_combine($active_urls, $active_urls);
 
@@ -389,7 +387,7 @@ function template_preprocess_views_view_summary_unformatted(&$variables): void {
         $url->setRouteParameters($parameters);
       }
       catch (Exception) {
-        // If the given route doesn't exist, default to <front>
+        // If the given route doesn't exist, default to <front>.
         $url = Url::fromRoute('<front>');
       }
     }
@@ -691,6 +689,12 @@ function template_preprocess_views_view_table(&$variables): void {
     // This is needed to target tables constructed by this function.
     $variables['responsive'] = TRUE;
   }
+
+  // Fetch classes from handler options.
+  if ($handler->options['class']) {
+    $class = explode(' ', $handler->options['class']);
+    $variables['attributes']['class'] = array_map('\Drupal\Component\Utility\Html::cleanCssIdentifier', $class);
+  }
 }
 
 /**
@@ -865,12 +869,20 @@ function template_preprocess_views_view_list(&$variables): void {
   $handler = $variables['view']->style_plugin;
 
   // Fetch classes from handler options.
+  $variables['list']['attributes'] = new Attribute();
   if ($handler->options['class']) {
     $class = explode(' ', $handler->options['class']);
     $class = array_map('\Drupal\Component\Utility\Html::cleanCssIdentifier', $class);
 
     // Initialize a new attribute class for $class.
-    $variables['list']['attributes'] = new Attribute(['class' => $class]);
+    $variables['list']['attributes']->addClass($class);
+  }
+
+  $type = $handler->options['type'];
+
+  if ($type === 'ol') {
+    $pager = $variables['view']->getPager();
+    $variables['list']['attributes']['start'] = $variables['view']->getCurrentPage() * $pager->options['items_per_page'] + 1;
   }
 
   // Fetch wrapper classes from handler options.
@@ -879,7 +891,7 @@ function template_preprocess_views_view_list(&$variables): void {
     $variables['attributes']['class'] = array_map('\Drupal\Component\Utility\Html::cleanCssIdentifier', $wrapper_class);
   }
 
-  $variables['list']['type'] = $handler->options['type'];
+  $variables['list']['type'] = $type;
 
   template_preprocess_views_view_unformatted($variables);
 }

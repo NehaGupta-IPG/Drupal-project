@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore fichiers
-
 /**
  * Tests that translated strings in views UI don't override original strings.
- *
- * @group views_ui
  */
+#[Group('views_ui')]
 class TranslatedViewTest extends UITestBase {
 
   /**
@@ -71,6 +70,9 @@ class TranslatedViewTest extends UITestBase {
     $this->rebuildContainer();
   }
 
+  /**
+   * Tests view translation.
+   */
   public function testTranslatedStrings(): void {
     $translation_url = 'admin/structure/views/view/files/translate/fr/add';
     $edit_url = 'admin/structure/views/view/files';

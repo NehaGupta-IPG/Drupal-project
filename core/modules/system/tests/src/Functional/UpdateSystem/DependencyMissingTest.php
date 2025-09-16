@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\UpdateSystem;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that missing update dependencies are correctly flagged.
- *
- * @group Update
  */
+#[Group('Update')]
 class DependencyMissingTest extends BrowserTestBase {
 
   /**
@@ -33,6 +33,9 @@ class DependencyMissingTest extends BrowserTestBase {
     require_once $this->root . '/core/includes/update.inc';
   }
 
+  /**
+   * Tests updating with a missing dependency.
+   */
   public function testMissingUpdate(): void {
     $starting_updates = [
       'update_test_2' => 8001,

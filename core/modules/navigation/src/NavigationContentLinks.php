@@ -36,7 +36,7 @@ final class NavigationContentLinks implements ContainerInjectionInterface {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('router.route_provider'),
       $container->get('entity_type.manager')
@@ -92,36 +92,6 @@ final class NavigationContentLinks implements ContainerInjectionInterface {
       'parent' => 'navigation.create',
       'weight' => 100,
     ], $links);
-  }
-
-  /**
-   * Remove the admin/content link, and any direct children.
-   *
-   * @param array $links
-   *   The array of links being altered.
-   */
-  public function removeAdminContentLink(array &$links): void {
-    unset($links['system.admin_content']);
-
-    // Also remove any links that have set admin/content as their parent link.
-    // They are unsupported by the Navigation module.
-    foreach ($links as $link_name => $link) {
-      if (isset($link['parent']) && $link['parent'] === 'system.admin_content') {
-        // @todo Do we need to make this recursive, and unset children of these
-        // links too?
-        unset($links[$link_name]);
-      }
-    }
-  }
-
-  /**
-   * Remove the help link as render it outside any menu.
-   *
-   * @param array $links
-   *   The array of links being altered.
-   */
-  public function removeHelpLink(array &$links): void {
-    unset($links['help.main']);
   }
 
   /**

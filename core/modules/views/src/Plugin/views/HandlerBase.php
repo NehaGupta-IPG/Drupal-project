@@ -331,7 +331,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
   }
 
   /**
-   * Provides the handler some groupby.
+   * Provides the handler some group by.
    */
   public function usesGroupBy() {
     return TRUE;
@@ -398,8 +398,16 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    *
    * @param array $option
    *   An array of options.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+   *   This method is no longer used by Drupal core. There is no
+   *   replacement.
+   *
+   * @see https://www.drupal.org/node/3486781
    */
-  public function defineExtraOptions(&$option) {}
+  public function defineExtraOptions(&$option) {
+    @trigger_error('defineExtraOptions() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. This method is no longer in use and should not be called. See https://www.drupal.org/node/3486781', E_USER_DEPRECATED);
+  }
 
   /**
    * Provide a form for setting options.
@@ -695,7 +703,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    */
   public function getJoin() {
     // Get the join from this table that links back to the base table.
-    // Determine the primary table to seek
+    // Determine the primary table to seek.
     if (empty($this->query->relationships[$this->relationship])) {
       $base_table = $this->view->storage->get('base_table');
     }
@@ -870,7 +878,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    */
   public function displayExposedForm($form, FormStateInterface $form_state) {
     $item = &$this->options;
-    // Flip
+    // Flip.
     $item['exposed'] = empty($item['exposed']);
 
     // If necessary, set new defaults:
@@ -950,7 +958,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
 
     $form_state->get('rerender', TRUE);
     $form_state->setRebuild();
-    // Write to cache
+    // Write to cache.
     $view->cacheSet();
   }
 
@@ -958,7 +966,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    * Calculates options stored on the handler.
    *
    * @param array $options
-   *   The options stored in the handler
+   *   The options stored in the handler.
    * @param array $form_state_options
    *   The newly submitted form state options.
    *

@@ -4,7 +4,6 @@ namespace Drupal\user\Hook;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\user\Entity\Role;
 use Drupal\filter\FilterFormatInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\system\Entity\Action;
@@ -267,7 +266,7 @@ class UserHooks {
     $mail_config = \Drupal::config('user.mail');
     $token_options = ['langcode' => $langcode, 'callback' => 'user_mail_tokens', 'clear' => TRUE];
     $message['subject'] .= PlainTextOutput::renderFromHtml($token_service->replace($mail_config->get($key . '.subject'), $variables, $token_options));
-    $message['body'][] = $token_service->replace($mail_config->get($key . '.body'), $variables, $token_options);
+    $message['body'][] = $token_service->replacePlain($mail_config->get($key . '.body'), $variables, $token_options);
     $language_manager->setConfigOverrideLanguage($original_language);
   }
 
@@ -487,8 +486,12 @@ class UserHooks {
   public function filterFormatDisable(FilterFormatInterface $filter_format): void {
     // Remove the permission from any roles.
     $permission = $filter_format->getPermissionName();
+
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $role_storage */
+    $role_storage = \Drupal::entityTypeManager()->getStorage('user_role');
+
     /** @var \Drupal\user\Entity\Role $role */
-    foreach (Role::loadMultiple() as $role) {
+    foreach ($role_storage->loadMultipleOverrideFree() as $role) {
       if ($role->hasPermission($permission)) {
         $role->revokePermission($permission)->save();
       }

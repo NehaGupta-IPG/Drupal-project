@@ -17,15 +17,15 @@ use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\FullyValidatableConstraint;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore kthxbai
-
 /**
  * Base class for testing validation of config entities.
- *
- * @group config
- * @group Validation
  */
+#[Group('config')]
+#[Group('Validation')]
 abstract class ConfigEntityValidationTestBase extends KernelTestBase {
 
   /**
@@ -151,9 +151,8 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
    *   A machine name to test.
    * @param bool $is_expected_to_be_valid
    *   Whether this machine name is expected to be considered valid.
-   *
-   * @dataProvider providerInvalidMachineNameCharacters
    */
+  #[DataProvider('providerInvalidMachineNameCharacters')]
   public function testInvalidMachineNameCharacters(string $machine_name, bool $is_expected_to_be_valid): void {
     $constraints = $this->getMachineNameConstraints();
 
@@ -182,7 +181,7 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
   /**
    * Tests that the entity ID's length is validated if it is a machine name.
    */
-  public function testMachineNameLength(): void {
+  public function testMachineNameLength(string $prefix = ''): void {
     $constraints = $this->getMachineNameConstraints();
 
     $max_length = $constraints['Length']['max'];
@@ -195,7 +194,7 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
       // Config entity IDs are immutable by default.
       '' => "The '$id_key' property cannot be changed.",
     ];
-    $this->entity->set($id_key, $this->randomMachineName($max_length + 2));
+    $this->entity->set($id_key, $prefix . $this->randomMachineName($max_length + 2));
     $this->assertValidationErrors($expected_errors);
   }
 
@@ -260,7 +259,7 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
         ],
         [
           'dependencies.module.0' => [
-            'This value is not valid.',
+            'This value is not a valid extension name.',
             "Module 'invalid-module-name' is not installed.",
           ],
         ],
@@ -290,7 +289,7 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
         ],
         [
           'dependencies.theme.0' => [
-            'This value is not valid.',
+            'This value is not a valid extension name.',
             "Theme 'invalid-theme-name' is not installed.",
           ],
         ],
@@ -315,9 +314,8 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
    *   The expected validation error messages. Keys are property paths, values
    *   are the expected messages: a string if a single message is expected, an
    *   array of strings if multiple are expected.
-   *
-   * @dataProvider providerConfigDependenciesValidation
    */
+  #[DataProvider('providerConfigDependenciesValidation')]
   public function testConfigDependenciesValidation(array $dependencies, array $expected_messages): void {
     // Add the dependencies we were given to the dependencies that may already
     // exist in the entity.

@@ -1,3 +1,6 @@
+parameters:
+  navigation.skip_procedural_hook_scan: true
+
 services:
   _defaults:
     autoconfigure: true
@@ -28,6 +31,7 @@ services:
         '@router.route_provider',
         '@menu.active_trail',
         '@callable_resolver',
+        '@module_handler',
       ]
 
   navigation.entity_route_helper:
@@ -44,3 +48,6 @@ services:
     class: Drupal\navigation\TopBarItemManager
     parent: default_plugin_manager
   Drupal\navigation\TopBarItemManagerInterface: '@plugin.manager.top_bar_item'
+
+  Drupal\navigation\Menu\NavigationMenuLinkTreeManipulators:
+    autowire: true

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\entity_test\Hook;
 
 use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
@@ -135,7 +136,8 @@ class EntityTestHooks {
     $bundles = [];
     $entity_types = \Drupal::entityTypeManager()->getDefinitions();
     foreach ($entity_types as $entity_type_id => $entity_type) {
-      if ($entity_type->getProvider() == 'entity_test' && !in_array($entity_type_id, ['entity_test_with_bundle', 'entity_test_mul_with_bundle'], TRUE)) {
+      if ($entity_type->getProvider() == 'entity_test'
+        && !in_array($entity_type_id, ['entity_test_with_bundle', 'entity_test_mul_with_bundle'], TRUE)) {
         $bundles[$entity_type_id] = \Drupal::state()->get($entity_type_id . '.bundles', [$entity_type_id => ['label' => 'Entity Test Bundle']]);
       }
     }
@@ -386,10 +388,32 @@ class EntityTestHooks {
   }
 
   /**
+   * Implements hook_entity_operation().
+   */
+  #[Hook('entity_operation')]
+  public function entityOperation(EntityInterface $entity, CacheableMetadata $cacheability): array {
+    if (!$entity instanceof EntityTest) {
+      return [];
+    }
+    $cacheability->addCacheTags(['entity_test_operation_tag_test']);
+    $operations['entity_test_custom_operation'] = [
+      'title' => 'Custom Home',
+      'weight' => 20,
+      'url' => Url::fromRoute('<front>'),
+    ];
+    return $operations;
+  }
+
+  /**
    * Implements hook_entity_operation_alter().
    */
   #[Hook('entity_operation_alter')]
-  public function entityOperationAlter(array &$operations, EntityInterface $entity): void {
+  public function entityOperationAlter(array &$operations, EntityInterface $entity, CacheableMetadata $cacheability): void {
+    if ($entity instanceof EntityTest) {
+      $cacheability->addCacheTags(['entity_test_operation_alter_tag_test']);
+      return;
+    }
+
     $valid_entity_type_ids = ['user_role', 'block'];
     if (in_array($entity->getEntityTypeId(), $valid_entity_type_ids)) {
       if (\Drupal::service('router.route_provider')->getRouteByName("entity.{$entity->getEntityTypeId()}.test_operation")) {

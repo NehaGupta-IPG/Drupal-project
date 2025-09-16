@@ -8,15 +8,14 @@ use Drupal\Component\Utility\Html;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore displaymessage scriptalertxsssubjectscript
 // cspell:ignore testcontextawareblock
-
 /**
  * Tests that the block configuration UI exists and stores data correctly.
- *
- * @group block
  */
+#[Group('block')]
 class BlockUiTest extends BrowserTestBase {
 
   /**
@@ -335,19 +334,17 @@ class BlockUiTest extends BrowserTestBase {
     // block placement indicator. Click the first 'Place block' link to bring up
     // the list of blocks to place in the first available region.
     $this->clickLink('Place block');
-    // Select the first available block, which is the 'test_xss_title' plugin,
-    // with a default machine name 'scriptalertxsssubjectscript' that is used
+    // Select the first available block, which is the 'test_block_instantiation'
+    // plugin, with a default machine name 'stark-displaymessage' that is used
     // for the 'block-placement' querystring parameter.
     $this->clickLink('Place block');
     $this->submitForm([], 'Save block');
-    $this->assertSession()->addressEquals('admin/structure/block/list/stark?block-placement=stark-scriptalertxsssubjectscript');
+    $this->assertSession()->addressEquals('admin/structure/block/list/stark?block-placement=stark-displaymessage');
 
     // Removing a block will remove the block placement indicator.
     $this->clickLink('Remove');
     $this->submitForm([], 'Remove');
-    // @todo https://www.drupal.org/project/drupal/issues/2980527 this should be
-    //   'admin/structure/block/list/stark' but there is a bug.
-    $this->assertSession()->addressEquals('admin/structure/block');
+    $this->assertSession()->addressEquals('admin/structure/block/list/stark');
   }
 
   /**

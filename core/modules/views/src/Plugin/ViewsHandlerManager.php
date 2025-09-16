@@ -7,6 +7,8 @@ use Drupal\Component\Plugin\FallbackPluginManagerInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\Core\Plugin\PreWarmablePluginManagerTrait;
+use Drupal\Core\PreWarm\PreWarmableInterface;
 use Drupal\views\Plugin\views\HandlerBase;
 use Drupal\views\Plugin\views\join\JoinPluginInterface;
 use Drupal\views\Plugin\views\ViewsHandlerInterface;
@@ -16,7 +18,9 @@ use Symfony\Component\DependencyInjection\Container;
 /**
  * Plugin type manager for all views handlers.
  */
-class ViewsHandlerManager extends DefaultPluginManager implements FallbackPluginManagerInterface {
+class ViewsHandlerManager extends DefaultPluginManager implements FallbackPluginManagerInterface, PreWarmableInterface {
+
+  use PreWarmablePluginManagerTrait;
 
   /**
    * The views data cache.
@@ -41,7 +45,7 @@ class ViewsHandlerManager extends DefaultPluginManager implements FallbackPlugin
    *   The plugin type, for example filter.
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
-   *   keyed by the corresponding namespace to look for plugin implementations,
+   *   keyed by the corresponding namespace to look for plugin implementations.
    * @param \Drupal\views\ViewsData $views_data
    *   The views data cache.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
@@ -107,7 +111,6 @@ class ViewsHandlerManager extends DefaultPluginManager implements FallbackPlugin
         }
       }
 
-      // First priority is to use the override.
       // When aggregation is enabled, particular plugins need to be
       // replaced in order to override the query with a query that
       // can run the aggregate counts, sums, or averages for example.
@@ -115,24 +118,13 @@ class ViewsHandlerManager extends DefaultPluginManager implements FallbackPlugin
       // for example which aggressively overrides any filter used
       // by a number of mathematical-type queries regardless of the
       // original filter.
-      if ($override_plugin_id) {
-        $handler = $this->createInstance($override_plugin_id, $definition);
-        if (!method_exists($handler, 'broken') || !$handler->broken()) {
-          return $handler;
-        }
+      $plugin_id = $override_plugin_id ?: $definition['id'];
+      // Try to use the overridden handler.
+      $handler = $this->createInstance($plugin_id, $definition);
+      if ($override_plugin_id && method_exists($handler, 'broken') && $handler->broken()) {
+        $handler = $this->createInstance($definition['id'], $definition);
       }
-
-      // Then try the configuration provided for the handler.
-      if (isset($item['plugin_id'])) {
-        $handler = $this->createInstance($item['plugin_id'], $definition);
-        if (!method_exists($handler, 'broken') || !$handler->broken()) {
-          return $handler;
-        }
-      }
-
-      // Finally, fall back to the default configuration suggested
-      // by the view data.
-      return $this->createInstance($definition['id'], $definition);
+      return $handler;
     }
 
     // Finally, use the 'broken' handler.

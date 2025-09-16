@@ -4,24 +4,23 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Entity\EntityDefinitionUpdateManager;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Site\Settings;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests EntityDefinitionUpdateManager's fieldable entity update functionality.
- *
- * @coversDefaultClass \Drupal\Core\Entity\EntityDefinitionUpdateManager
- *
- * @group Entity
  */
+#[CoversClass(EntityDefinitionUpdateManager::class)]
+#[Group('Entity')]
 class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
 
   use EntityDefinitionTestTrait;
-  use StringTranslationTrait;
 
   /**
    * The entity definition update manager.
@@ -109,8 +108,8 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
     // updated, so add it to the entity type that is being tested in order to
     // provide test coverage for this special case.
     $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel($this->t('Changed'))
-      ->setDescription($this->t('The time that the content block was last edited.'))
+      ->setLabel('Changed')
+      ->setDescription('The time that the content block was last edited.')
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE);
     $this->state->set('entity_test_update.additional_base_field_definitions', $fields);

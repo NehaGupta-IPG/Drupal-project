@@ -193,9 +193,10 @@ class UrlHelper {
     // appears in front of the '?' query argument delimiter.
     $scheme_delimiter_position = strpos($url, '://');
     $query_delimiter_position = strpos($url, '?');
-    if ($scheme_delimiter_position !== FALSE && ($query_delimiter_position === FALSE || $scheme_delimiter_position < $query_delimiter_position)) {
+    $fragment_delimiter_position = strpos($url, '#');
+    if ($scheme_delimiter_position !== FALSE && ($query_delimiter_position === FALSE || $scheme_delimiter_position < $query_delimiter_position) && ($fragment_delimiter_position === FALSE || $scheme_delimiter_position < $fragment_delimiter_position)) {
       // Split off the fragment, if any.
-      if (str_contains($url, '#')) {
+      if ($fragment_delimiter_position !== FALSE) {
         [$url, $options['fragment']] = explode('#', $url, 2);
       }
 
@@ -216,7 +217,7 @@ class UrlHelper {
     else {
       // parse_url() does not support relative URLs, so make it absolute. For
       // instance, the relative URL "foo/bar:1" isn't properly parsed.
-      $parts = parse_url('http://example.com/' . $url);
+      $parts = parse_url('https://example.com/' . $url);
       // Strip the leading slash that was just added.
       $options['path'] = substr($parts['path'], 1);
       if (isset($parts['query'])) {
@@ -248,13 +249,13 @@ class UrlHelper {
   /**
    * Determines whether a path is external to Drupal.
    *
-   * An example of an external path is http://example.com. If a path cannot be
+   * An example of an external path is https://example.com. If a path cannot be
    * assessed by Drupal's menu handler, then we must treat it as potentially
    * insecure.
    *
    * @param string $path
    *   The internal path or external URL being linked to, such as "node/34" or
-   *   "http://example.com/foo".
+   *   "https://example.com/foo".
    *
    * @return bool
    *   TRUE or FALSE, where TRUE indicates an external path.
@@ -283,9 +284,9 @@ class UrlHelper {
    * Determines if an external URL points to this installation.
    *
    * @param string $url
-   *   A string containing an external URL, such as "http://example.com/foo".
+   *   A string containing an external URL, such as "https://example.com/foo".
    * @param string $base_url
-   *   The base URL string to check against, such as "http://example.com/"
+   *   The base URL string to check against, such as "https://example.com/".
    *
    * @return bool
    *   TRUE if the URL has the same domain and base path.

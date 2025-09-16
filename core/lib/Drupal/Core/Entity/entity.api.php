@@ -686,9 +686,9 @@ use Drupal\node\Entity\NodeType;
  *   The entity to check access to.
  * @param string $operation
  *   The operation that is to be performed on $entity. Usually one of:
- *   - "view"
- *   - "update"
- *   - "delete"
+ *   - "view".
+ *   - "update".
+ *   - "delete".
  * @param \Drupal\Core\Session\AccountInterface $account
  *   The account trying to access the entity.
  *
@@ -727,7 +727,7 @@ function hook_entity_access(\Drupal\Core\Entity\EntityInterface $entity, $operat
  *   The operation that is to be performed on $entity. Usually one of:
  *   - "view"
  *   - "update"
- *   - "delete"
+ *   - "delete".
  * @param \Drupal\Core\Session\AccountInterface $account
  *   The account trying to access the entity.
  *
@@ -2130,6 +2130,9 @@ function hook_entity_field_storage_info_alter(&$fields, \Drupal\Core\Entity\Enti
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity on which the linked operations will be performed.
+ * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
+ *   The cacheable metadata to add to if your operations vary by or depend on
+ *   something.
  *
  * @return array
  *   An operations array as returned by
@@ -2137,7 +2140,7 @@ function hook_entity_field_storage_info_alter(&$fields, \Drupal\Core\Entity\Enti
  *
  * @see \Drupal\Core\Entity\EntityListBuilderInterface::getOperations()
  */
-function hook_entity_operation(\Drupal\Core\Entity\EntityInterface $entity): array {
+function hook_entity_operation(\Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Cache\CacheableMetadata $cacheability): array {
   $operations = [];
   $operations['translate'] = [
     'title' => t('Translate'),
@@ -2156,8 +2159,11 @@ function hook_entity_operation(\Drupal\Core\Entity\EntityInterface $entity): arr
  *   \Drupal\Core\Entity\EntityListBuilderInterface::getOperations().
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity on which the linked operations will be performed.
+ * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
+ *   The cacheable metadata to add to if your operations vary by or depend on
+ *   something.
  */
-function hook_entity_operation_alter(array &$operations, \Drupal\Core\Entity\EntityInterface $entity) {
+function hook_entity_operation_alter(array &$operations, \Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Cache\CacheableMetadata $cacheability) {
   // Alter the title and weight.
   $operations['translate']['title'] = t('Translate @entity_type', [
     '@entity_type' => $entity->getEntityTypeId(),
@@ -2226,7 +2232,7 @@ function hook_entity_field_access_alter(array &$grants, array $context) {
     // take out node module's part in the access handling of this field. We also
     // don't want to switch node module's grant to
     // AccessResultInterface::isAllowed() , because the grants of other modules
-    // should still decide on their own if this field is accessible or not
+    // should still decide on their own if this field is accessible or not.
     $grants['node'] = AccessResult::neutral()->inheritCacheability($grants['node']);
   }
 }
@@ -2394,6 +2400,22 @@ function hook_entity_query_tag__TAG_alter(\Drupal\Core\Entity\Query\QueryInterfa
  */
 function hook_entity_query_tag__ENTITY_TYPE__TAG_alter(\Drupal\Core\Entity\Query\QueryInterface $query): void {
   $query->condition('id', '1', '<>');
+}
+
+/**
+ * Modify the list of available entity reference plugins.
+ *
+ * This hook may be used to modify plugin properties after they have been
+ * specified by other modules.
+ *
+ * @param array $plugins
+ *   An array of all the existing plugin definitions, passed by reference.
+ *
+ * @see \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManager
+ */
+function hook_entity_reference_selection_alter(array &$plugins): void {
+  // Remove a plugin.
+  unset($plugins['broken']);
 }
 
 /**

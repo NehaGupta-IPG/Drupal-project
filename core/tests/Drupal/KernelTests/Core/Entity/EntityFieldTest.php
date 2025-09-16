@@ -26,12 +26,12 @@ use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Entity Field API.
- *
- * @group Entity
  */
+#[Group('Entity')]
 class EntityFieldTest extends EntityKernelTestBase {
 
   /**
@@ -254,7 +254,7 @@ class EntityFieldTest extends EntityKernelTestBase {
     // Test emptying a field by assigning an empty value, NULL and an empty
     // array behave the same.
     foreach ([NULL, [], 'unset'] as $empty) {
-      // Make sure a value is present
+      // Make sure a value is present.
       $entity->name->value = 'a value';
       $this->assertTrue(isset($entity->name->value), "$entity_type: Name is set.");
       // Now, empty the field.
