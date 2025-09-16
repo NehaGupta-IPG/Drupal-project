@@ -114,8 +114,6 @@ final class SetComponentThirdPartySetting implements ConfigActionPluginInterface
       if (!is_array($existing)) {
         $existing = [];
       }
-      // Deep-merge while preserving existing values on conflicts.
-      // Existing takes precedence to avoid overwriting.
       $component_config['third_party_settings'][$provider] = array_merge($existing, $settings);
     }
     else {
