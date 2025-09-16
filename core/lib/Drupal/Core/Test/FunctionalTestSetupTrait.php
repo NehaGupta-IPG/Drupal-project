@@ -852,7 +852,7 @@ trait FunctionalTestSetupTrait {
   /**
    * Restores database structure and contents of test site.
    */
-  protected function restoreDatabase() {
+  protected function restoreDatabase(): void {
     $connection_info = Database::getConnectionInfo('default');
 
     $user = $connection_info['default']['username'];
