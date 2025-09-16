@@ -13,12 +13,12 @@ use Drupal\hook_collector_hook_attribute\AnotherServiceWithHook;
 use Drupal\hook_collector_hook_attribute\Hook\HookRegisteredService;
 use Drupal\hook_collector_hook_attribute\ServiceWithHook;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Test hook implementations in declared services.
- *
- * @group Hook
  */
+#[Group('Hook')]
 class HookCollectorRegisteredServicesPassTest extends KernelTestBase {
 
   /**
