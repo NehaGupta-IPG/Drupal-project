@@ -763,7 +763,7 @@ trait FunctionalTestSetupTrait {
   /**
    * Installs Drupal using SQL dump.
    */
-  protected function installDrupalFromDump() {
+  protected function installDrupalFromDump(): void {
 
     $this->restoreDatabase();
 
