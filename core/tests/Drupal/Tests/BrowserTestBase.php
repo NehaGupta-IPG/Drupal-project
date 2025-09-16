@@ -545,7 +545,7 @@ abstract class BrowserTestBase extends TestCase {
   /**
    * Determines a proper file name for SQL dump.
    */
-  protected function initDumpFile() {
+  protected function initDumpFile(): void {
     $class = get_class($this);
     $modules = [];
     while ($class) {
