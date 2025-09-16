@@ -372,7 +372,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   public function setIdleTimeout(int $timeout): void {
     // Since the timeout needs to be an integer, we cannot use a parameterized
     // query here. The argument is guaranteed to have been coerced to an int.
-    // @todo Use SQL CAST instead?
     $this->query("SET SESSION wait_timeout = $timeout");
   }
 
