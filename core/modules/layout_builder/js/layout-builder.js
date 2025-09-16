@@ -454,7 +454,7 @@
   $(window).on('drupalContextualLinkAdded', (event, data) => {
     const element = data.$el;
     const contextualId = element.attr('data-contextual-id');
-    if (contextualId && !contextualId.startsWith('layout_builder_block:')) {
+    if (contextualId && !contextualId.startsWith('layout_builder_block') && !contextualId.startsWith('layout_builder_inline_block')) {
       element.remove();
     }
   });

@@ -23,6 +23,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\block_content\BlockContentInterface;
+use Drupal\layout_builder\Form\BlockContentInlineBlockTranslateForm;
 
 /**
  * Defines the content block entity class.
@@ -62,6 +63,7 @@ use Drupal\block_content\BlockContentInterface;
       'default' => BlockContentForm::class,
       'revision-delete' => RevisionDeleteForm::class,
       'revision-revert' => RevisionRevertForm::class,
+      'layout_builder_translate' => BlockContentInlineBlockTranslateForm::class,
     ],
     'route_provider' => [
       'html' => BlockContentRouteProvider::class,
