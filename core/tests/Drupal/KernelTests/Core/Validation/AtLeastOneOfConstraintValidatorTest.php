@@ -6,15 +6,16 @@ namespace Drupal\KernelTests\Core\Validation;
 
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests AtLeastOneOf validation constraint with both valid and invalid values.
  *
- * @covers \Drupal\Core\Validation\Plugin\Validation\Constraint\AtLeastOneOfConstraint
- * @covers \Drupal\Core\Validation\Plugin\Validation\Constraint\AtLeastOneOfConstraintValidator
- *
- * @group Validation
+ * @legacy-covers \Drupal\Core\Validation\Plugin\Validation\Constraint\AtLeastOneOfConstraint
+ * @legacy-covers \Drupal\Core\Validation\Plugin\Validation\Constraint\AtLeastOneOfConstraintValidator
  */
+#[Group('Validation')]
 class AtLeastOneOfConstraintValidatorTest extends KernelTestBase {
 
   /**
@@ -22,23 +23,22 @@ class AtLeastOneOfConstraintValidatorTest extends KernelTestBase {
    *
    * @var \Drupal\Core\TypedData\TypedDataManager
    */
-  protected $typedData;
+  protected $typedDataManager;
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->typedData = $this->container->get('typed_data_manager');
+    $this->typedDataManager = $this->container->get('typed_data_manager');
   }
 
   /**
    * Tests the AllowedValues validation constraint validator.
    *
    * For testing we define an integer with a set of allowed values.
-   *
-   * @dataProvider dataProvider
    */
+  #[DataProvider('dataProvider')]
   public function testValidation($type, $value, $at_least_one_of_constraints, $expectedViolations, $extra_constraints = []): void {
     // Create a definition that specifies some AllowedValues.
     $definition = DataDefinition::create($type);
@@ -54,7 +54,7 @@ class AtLeastOneOfConstraintValidatorTest extends KernelTestBase {
     ]);
 
     // Test the validation.
-    $typed_data = $this->typedData->create($definition, $value);
+    $typed_data = $this->typedDataManager->create($definition, $value);
     $violations = $typed_data->validate();
 
     $violationMessages = [];

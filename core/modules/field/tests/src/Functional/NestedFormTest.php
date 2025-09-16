@@ -7,12 +7,12 @@ namespace Drupal\Tests\field\Functional;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests field elements in nested forms.
- *
- * @group field
  */
+#[Group('field')]
 class NestedFormTest extends FieldTestBase {
 
   /**
@@ -83,7 +83,7 @@ class NestedFormTest extends FieldTestBase {
     /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
     $display_repository = \Drupal::service('entity_display.repository');
 
-    // Add two fields on the 'entity_test'
+    // Add two fields on the 'entity_test'.
     FieldStorageConfig::create($this->fieldStorageSingle)->save();
     FieldStorageConfig::create($this->fieldStorageUnlimited)->save();
     $this->field['field_name'] = 'field_single';
