@@ -160,7 +160,7 @@ function menu_ui_get_menu_link_defaults(NodeInterface $node) {
  *
  * @see menu_ui_form_content_moderation_entity_moderation_form_alter()
  */
-function menu_ui_form_content_moderation_entity_moderation_form_submit(&$form, FormStateInterface $form_state) {
+function menu_ui_form_content_moderation_entity_moderation_form_submit(&$form, FormStateInterface $form_state): void {
   /** @var \Drupal\node\NodeInterface $node */
   $node = $form_state->get('entity');
   /** @var \Drupal\node\NodeStorageInterface $nodeStorage */

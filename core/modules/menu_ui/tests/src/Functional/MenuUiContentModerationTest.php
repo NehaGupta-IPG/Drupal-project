@@ -229,9 +229,9 @@ class MenuUiContentModerationTest extends BrowserTestBase {
   }
 
   /**
-   * Tests that moderation behaviour is consistent between widget and node form.
+   * Tests that moderation behavior is consistent between widget and node form.
    */
-  public function testMenuUiWithModerationStateWidget() {
+  public function testMenuUiWithModerationStateWidget(): void {
     $editor = $this->drupalCreateUser([
       'administer nodes',
       'administer menu',
