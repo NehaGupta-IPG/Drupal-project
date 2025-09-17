@@ -8,6 +8,7 @@ use Drupal\Core\Url;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 use Drupal\Tests\layout_builder\Functional\TranslationTestTrait;
 
+// cspell:ignore blocknodebundle fieldbody
 /**
  * Tests that block settings can be translated.
  *
