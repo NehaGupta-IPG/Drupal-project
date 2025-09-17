@@ -167,11 +167,15 @@ $databases = [];
  * Advanced users can add or override initial commands to execute when
  * connecting to the database server, as well as PDO connection settings. For
  * example, to enable MySQL SELECT queries to exceed the max_join_size system
- * variable, and to reduce the database connection timeout to 5 seconds:
+ * variable, and configure MariaDB to interpret GROUP BY clauses the same way
+ * that MySQL does, and to reduce the database connection timeout to 5 seconds:
  * @code
  * $databases['default']['default'] = [
  *   'init_commands' => [
  *     'big_selects' => 'SET SQL_BIG_SELECTS=1',
+ *   ],
+ *   'sql_mode_options' => [
+ *     'ONLY_FULL_GROUP_BY' => TRUE,
  *   ],
  *   'pdo' => [
  *     PDO::ATTR_TIMEOUT => 5,
@@ -188,6 +192,9 @@ $databases = [];
  * - \Drupal\mysql\Driver\Database\mysql\Connection::__construct()
  * - \Drupal\pgsql\Driver\Database\pgsql\Connection::__construct()
  * - \Drupal\sqlite\Driver\Database\sqlite\Connection::__construct()
+ *
+ * More information on SQL Modes (mysql driver only) can be found in
+ * \Drupal\mysql\Driver\Database\mysql\SqlMode.
  *
  * Sample Database configuration format for PostgreSQL (pgsql):
  * @code
