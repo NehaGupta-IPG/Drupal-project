@@ -8,5 +8,5 @@ core_version_requirement: '*'
 hidden: true
 install:
   - drupal:language
-  - entity_test_install
-  - testing_config_overrides_module
+  - drupal:entity_test_install
+  - drupal:testing_config_overrides_module
