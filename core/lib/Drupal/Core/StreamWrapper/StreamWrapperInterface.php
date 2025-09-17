@@ -160,7 +160,7 @@ interface StreamWrapperInterface extends PhpStreamWrapperInterface {
    * wrappers. We provide this as a default so that individual wrappers may
    * implement their own solutions.
    *
-   * @return string
+   * @return string|false
    *   Returns a string with absolute pathname on success (implemented
    *   by core wrappers), or FALSE on failure or if the registered
    *   wrapper does not provide an implementation.
@@ -174,7 +174,7 @@ interface StreamWrapperInterface extends PhpStreamWrapperInterface {
    * \Drupal\Core\File\FileSystemInterface::dirname(), which wraps around the
    * normal PHP dirname() function, which does not support stream wrappers.
    *
-   * @param string $uri
+   * @param string|false $uri
    *   An optional URI.
    *
    * @return string
