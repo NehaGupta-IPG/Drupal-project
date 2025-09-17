@@ -180,11 +180,14 @@ trait PdoTrait {
    * @param list<mixed>|null $constructorArguments
    *   If $mode is FetchAs::ClassObject, the arguments to pass to the
    *   constructor.
+   * @param \Drupal\Core\Database\Statement\FetchAs|null $additionalMode
+   *   Optional. Specifies additional fetch preferences that can be combined
+   *     with the primary fetch mode using the bitwise OR operator (|).
    *
    * @return array<array<scalar|null>|object|scalar|null>
    *   An array of results.
    */
-  protected function clientFetchAll(?FetchAs $mode = NULL, int|string|null $columnOrClass = NULL, array|null $constructorArguments = NULL): array {
+  protected function clientFetchAll(?FetchAs $mode = NULL, int|string|null $columnOrClass = NULL, array|null $constructorArguments = NULL, FetchAs|null $additionalMode = NULL): array {
     return match ($mode) {
       FetchAs::Column => $this->getClientStatement()->fetchAll(
         \PDO::FETCH_COLUMN,
@@ -196,7 +199,7 @@ trait PdoTrait {
         $constructorArguments ?? $this->fetchOptions['constructor_args'],
       ),
       default => $this->getClientStatement()->fetchAll(
-        $this->fetchAsToPdo($mode ?? $this->fetchMode),
+        $this->fetchAsToPdo($mode) | ($additionalMode ? $this->fetchAsToPdo($additionalMode) : 0),
       ),
     };
   }

@@ -320,7 +320,7 @@ abstract class StatementBase implements \Iterator, StatementInterface {
   /**
    * {@inheritdoc}
    */
-  public function fetchAll($mode = NULL, $columnIndex = NULL, $constructorArguments = NULL) {
+  public function fetchAll($mode = NULL, $columnIndex = NULL, $constructorArguments = NULL, $additionalFetchMethod = NULL) {
     if (is_int($mode)) {
       @trigger_error("Passing the \$mode argument as an integer to fetchAll() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
       $mode = $this->pdoToFetchAs($mode);
@@ -334,6 +334,9 @@ abstract class StatementBase implements \Iterator, StatementInterface {
     }
     if (isset($constructorArguments)) {
       $this->fetchOptions['constructor_args'] = $constructorArguments;
+    }
+    if (isset($additionalFetchMethod)) {
+      $this->fetchOptions['additional_mode'] = $additionalFetchMethod;
     }
 
     $return = $this->result->fetchAll($fetchMode, $this->fetchOptions);
