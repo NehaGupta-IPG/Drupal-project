@@ -12,6 +12,9 @@ use Drupal\Core\TypedData\DataDefinition;
 
 /**
  * Defines the 'test_object_field' entity field item.
+ *
+ * @todo Remove this (and its related test) in Drupal 12.
+ * @see https://www.drupal.org/node/3484452
  */
 #[FieldType(
   id: "test_object_field",

@@ -2,6 +2,7 @@
 
 namespace Drupal\layout_builder\Plugin\Field\FieldType;
 
+use Drupal\Core\Entity\FieldItemStorageMapperInterface;
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
@@ -27,7 +28,7 @@ use Drupal\layout_builder\Section;
   list_class: LayoutSectionItemList::class,
   cardinality: FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED
 )]
-class LayoutSectionItem extends FieldItemBase {
+class LayoutSectionItem extends FieldItemBase implements FieldItemStorageMapperInterface {
 
   /**
    * {@inheritdoc}
@@ -91,6 +92,27 @@ class LayoutSectionItem extends FieldItemBase {
    */
   public function isEmpty() {
     return empty($this->section);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function mapColumnsOnLoad(array $columns): array {
+    // @todo Remove the array check/BC layer in Drupal 12.
+    // @see https://www.drupal.org/project/drupal/issues/3484469
+    if (!empty($columns['section']) && is_array($columns['section'])) {
+      $columns['section'] = Section::fromArray($columns['section']);
+    }
+    return $columns;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function mapColumnsOnSave(array $properties): array {
+    assert($properties['section'] instanceof Section);
+    $properties['section'] = $properties['section']->toArray();
+    return $properties;
   }
 
 }

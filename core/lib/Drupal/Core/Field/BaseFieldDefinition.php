@@ -4,6 +4,8 @@ namespace Drupal\Core\Field;
 
 use Drupal\Core\Cache\UnchangingCacheableDependencyTrait;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Entity\Sql\StorageMapperDelegatorTrait;
+use Drupal\Core\Entity\Sql\StorageMapperInterface;
 use Drupal\Core\Field\Entity\BaseFieldOverride;
 use Drupal\Core\Field\TypedData\FieldItemDataDefinition;
 use Drupal\Core\TypedData\ListDataDefinition;
@@ -12,10 +14,11 @@ use Drupal\Core\TypedData\OptionsProviderInterface;
 /**
  * A class for defining entity fields.
  */
-class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionInterface, FieldStorageDefinitionInterface, RequiredFieldStorageDefinitionInterface {
+class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionInterface, FieldStorageDefinitionInterface, RequiredFieldStorageDefinitionInterface, StorageMapperInterface {
 
   use UnchangingCacheableDependencyTrait;
   use FieldInputValueNormalizerTrait;
+  use StorageMapperDelegatorTrait;
 
   /**
    * The field type.
@@ -834,6 +837,13 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
   public function isInternal() {
     // All fields are not internal unless explicitly set.
     return !empty($this->definition['internal']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getFieldItemClass(): string {
+    return $this->getItemDefinition()->getClass();
   }
 
 }

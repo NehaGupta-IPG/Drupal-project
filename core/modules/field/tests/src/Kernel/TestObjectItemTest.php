@@ -11,7 +11,11 @@ use Drupal\field\Entity\FieldStorageConfig;
 /**
  * Tests the serialization of an object.
  *
+ * @todo Remove this test in Drupal 12.
+ * @see https://www.drupal.org/node/3484452
+ *
  * @group field
+ * @group legacy
  */
 class TestObjectItemTest extends FieldKernelTestBase {
 
@@ -47,6 +51,7 @@ class TestObjectItemTest extends FieldKernelTestBase {
     $object->foo = 'bar';
     $entity = EntityTest::create();
     $entity->field_test->value = $object;
+    $this->expectDeprecation('Unserializing PHP objects from storage is deprecated in drupal:11.2.0 and forbidden in drupal:12.0.0. Consider using JSON or plain PHP array serialized data and hydrating the target object in code. See https://www.drupal.org/node/3484452');
     $entity->save();
 
     // Verify that the entity has been created properly.

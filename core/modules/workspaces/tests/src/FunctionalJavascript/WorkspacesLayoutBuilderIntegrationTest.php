@@ -136,6 +136,15 @@ class WorkspacesLayoutBuilderIntegrationTest extends InlineBlockTestBase {
     $this->drupalGet('/node/1/layout');
     $assert_session->pageTextContains('The content is being edited in the Stage workspace. As a result, your changes cannot be saved.');
 
+    // Layout Builder adds a field to store section overrides in
+    // \Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay::addSectionField
+    // whose definition is not reliably available throughout this test, since
+    // static caches in the web server context may become out of sync with
+    // this scope. We must explicitly clear the cache, here. This was not
+    // necessary until https://www.drupal.org/node/3377624 which requires
+    // correct field item column schema data when loading from the database.
+    $this->container->get('entity_type.manager')->clearCachedDefinitions();
+
     $stage->publish();
     $this->drupalGet('node/1');
     $assert_session->pageTextNotContains('The DEFAULT block body');
