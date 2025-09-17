@@ -100,6 +100,7 @@ services:
   views.reserved_path_checker:
     class: Drupal\views\ReservedPathChecker
     arguments: ['@file_system', '%app.root%']
+  Drupal\views\ReservedPathChecker: '@views.reserved_path_checker'
   pgsql.views.date_sql:
     class: Drupal\views\Plugin\views\query\PostgresqlDateSql
     arguments: ['@database']
