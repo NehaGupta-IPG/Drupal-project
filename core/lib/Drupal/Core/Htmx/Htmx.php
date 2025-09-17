@@ -200,7 +200,8 @@ class Htmx {
    * @param string $method
    *   The request method.
    * @param \Drupal\Core\Url|null $url
-   *   The URL for the request.
+   *   The URL for the request. If NULL is passed it will use the current URL
+   *   without any query parameter.
    * @param bool $full_page
    *   Toggle to use the full HTML response or just the main content.
    *
@@ -209,25 +210,7 @@ class Htmx {
    */
   protected function buildRequestAttribute(string $method, ?Url $url = NULL, bool $full_page = FALSE): static {
     if (is_null($url)) {
-      $current_request = \Drupal::request();
-      $request_url = Url::createFromRequest($current_request);
-      $query = $current_request->query->all();
-      // Clean up values that could cause a conflict when several unrelated
-      // forms are on the same page.
-      $query = array_filter($query, function ($key) {
-        return match ($key) {
-          'form_id' => FALSE,
-          'form_token' => FALSE,
-          'form_build_id' => FALSE,
-          'op' => FALSE,
-          // Managed on the frontend by htmx-assets.js.
-          'ajax_page_state' => FALSE,
-          // Do not inherit return format from a previous request.
-          MainContentViewSubscriber::WRAPPER_FORMAT => FALSE,
-          default => TRUE,
-        };
-      }, ARRAY_FILTER_USE_KEY);
-      $request_url->setOption('query', $query);
+      $request_url = Url::fromRoute('<none>');
     }
     else {
       // The Htmx helper should not modify the original URL object.
@@ -548,7 +531,8 @@ class Htmx {
    * request to the current url. If parameters are used, both are required.
    *
    * @param \Drupal\Core\Url|null $url
-   *   The URL for the GET request. If NULL the current page is used.
+   *   The URL for the GET request. If NULL the current page is used without the
+   *   query parameters.
    * @param bool $full_page
    *   Toggle to use the full HTML response or just the main content.
    *
@@ -570,7 +554,8 @@ class Htmx {
    *  request to the current url. If parameters are used, both are required.
    *
    * @param \Drupal\Core\Url|null $url
-   *   The URL for the POST request. If NULL the current page is used.
+   *   The URL for the GET request. If NULL the current page is used without the
+   *   query parameters.
    * @param bool $full_page
    *   Toggle to use the full HTML response or just the main content.
    *
@@ -592,7 +577,8 @@ class Htmx {
    *  request to the current url. If parameters are used, both are required.
    *
    * @param \Drupal\Core\Url|null $url
-   *   The URL for the PUT request. If NULL the current page is used.
+   *   The URL for the GET request. If NULL the current page is used without the
+   *   query parameters.
    * @param bool $full_page
    *   Toggle to use the full HTML response or just the main content.
    *
@@ -614,7 +600,8 @@ class Htmx {
    *  request to the current url. If parameters are used, both are required.
    *
    * @param \Drupal\Core\Url|null $url
-   *   Collects the cacheable metadata from the URL generation.
+   *   The URL for the GET request. If NULL the current page is used without the
+   *   query parameters.
    * @param bool $full_page
    *   Toggle to use the full HTML response or just the main content.
    *
@@ -637,7 +624,8 @@ class Htmx {
    *  request to the current url. If parameters are used, both are required.
    *
    * @param \Drupal\Core\Url|null $url
-   *   The URL for the DELETE request. If NULL the current page is used.
+   *   The URL for the GET request. If NULL the current page is used without the
+   *   query parameters.
    * @param bool $full_page
    *   Toggle to use the full HTML response or just the main content.
    *
