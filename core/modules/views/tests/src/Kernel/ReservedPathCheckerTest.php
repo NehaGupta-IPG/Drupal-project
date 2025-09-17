@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel;
 
 /**
@@ -18,7 +20,7 @@ class ReservedPathCheckerTest extends ViewsKernelTestBase {
   ];
 
   /**
-   * Tests listReservedFirstSegments
+   * Tests listReservedFirstSegments.
    */
   public function testListReservedFirstSegments(): void {
     /** @var \Drupal\views\ReservedPathChecker $service */
@@ -40,7 +42,7 @@ class ReservedPathCheckerTest extends ViewsKernelTestBase {
   }
 
   /**
-   * Tests firstSegmentFromPath
+   * Tests firstSegmentFromPath.
    */
   public function testFirstSegmentFromPath(): void {
     /** @var \Drupal\views\ReservedPathChecker $service */
@@ -58,7 +60,7 @@ class ReservedPathCheckerTest extends ViewsKernelTestBase {
   }
 
   /**
-   * Tests isReservedFirstSegment
+   * Tests isReservedFirstSegment.
    */
   public function testIsReservedFirstSegment(): void {
     /** @var \Drupal\views\ReservedPathChecker $service */
