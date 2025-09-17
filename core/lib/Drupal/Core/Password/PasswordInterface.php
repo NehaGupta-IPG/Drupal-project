@@ -18,7 +18,7 @@ interface PasswordInterface {
    * @param string $password
    *   A plain-text password.
    *
-   * @return string
+   * @return string|false
    *   A string containing the hashed password, or FALSE on failure.
    */
   public function hash(#[\SensitiveParameter] $password);
