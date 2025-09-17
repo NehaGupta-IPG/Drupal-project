@@ -16,9 +16,9 @@ interface MultipleProviderAnnotationInterface extends AnnotationInterface {
   /**
    * Gets the name of the provider of the annotated class.
    *
-   * @return string
+   * @return string|false
    *   The provider of the annotation. If there are multiple providers the first
-   *   is returned.
+   *   is returned. If no providers are available FALSE is returned.
    */
   public function getProvider();
 
