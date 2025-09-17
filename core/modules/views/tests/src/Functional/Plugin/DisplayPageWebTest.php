@@ -145,13 +145,13 @@ class DisplayPageWebTest extends ViewTestBase {
     $this->assertPagePath('0');
     $this->assertPagePath('9999');
     $this->assertPagePath('☺');
+
     // Reserved paths should trigger a validation error.
-    $this->assertReservedPagePath('core');
-    $this->assertReservedPagePath('libraries');
-    $this->assertReservedPagePath('modules');
-    $this->assertReservedPagePath('profiles');
-    $this->assertReservedPagePath('sites');
-    $this->assertReservedPagePath('themes');
+    /** @var \Drupal\views\ReservedPathChecker $checker */
+    $checker = $this->container->get('views.reserved_path_checker');
+    foreach ($checker->listReservedFirstSegments() as $segment) {
+      $this->assertReservedPagePath($segment);
+    }
   }
 
   /**
