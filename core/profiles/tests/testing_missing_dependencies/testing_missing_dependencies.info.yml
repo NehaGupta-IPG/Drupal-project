@@ -6,7 +6,7 @@ hidden: true
 install:
   - drupal:block
   - drupal:node
-  - fictional
-  - missing_module1
-  - missing_module2
+  - drupal:fictional
+  - drupal:missing_module1
+  - drupal:missing_module2
 keep_english: true
