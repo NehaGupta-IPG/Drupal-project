@@ -1709,7 +1709,8 @@ class ViewExecutable {
    *
    * @return array|null|false
    *   A renderable array containing the view output, NULL if the display ID
-   *   of the view to be executed doesn't exist, or FALSE if the display could not be set.
+   *   of the view to be executed doesn't exist, or FALSE if the display could
+   *   not be set.
    */
   public function preview($display_id = NULL, $args = []) {
     if (empty($this->current_display) || ((!empty($display_id)) && $this->current_display != $display_id)) {
