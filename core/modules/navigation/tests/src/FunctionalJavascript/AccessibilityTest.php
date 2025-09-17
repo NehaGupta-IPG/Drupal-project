@@ -7,13 +7,14 @@ namespace Drupal\Tests\navigation\FunctionalJavascript;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\AxeCoreTestTrait;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Performs accessibility tests for the navigation module.
- *
- * @group navigation
- * @group accessibility
  */
+#[Group('navigation')]
+#[Group('accessibility')]
 class AccessibilityTest extends WebDriverTestBase {
 
   use AxeCoreTestTrait;
@@ -53,9 +54,8 @@ class AccessibilityTest extends WebDriverTestBase {
    *   The path to be tested.
    * @param ?array $options
    *   (optional) Associative array of Axe options.
-   *
-   * @dataProvider providerTestNavigationModule
    */
+  #[DataProvider('providerTestNavigationModule')]
   public function testNavigationModule(string $uri, ?array $options = NULL): void {
     $this->drupalGet($uri);
     $this->executeAxe($options);

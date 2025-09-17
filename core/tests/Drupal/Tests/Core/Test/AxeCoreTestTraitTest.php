@@ -7,13 +7,15 @@ namespace Drupal\Tests\Core\Test;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\AxeCoreTestTrait;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests AxeCoreTestTrait.
  *
  * @coversDefaultClass \Drupal\Tests\AxeCoreTestTrait
- * @group Testing
  */
+#[Group('Testing')]
 class AxeCoreTestTraitTest extends WebDriverTestBase {
 
   use AxeCoreTestTrait;
@@ -59,9 +61,8 @@ TEXT
 
   /**
    * Tests various `axe.run()` option combinations.
-   *
-   * @dataProvider providerAxeCoreTestTraitWithOptions
    */
+  #[DataProvider('providerAxeCoreTestTraitWithOptions')]
   public function testAxeCoreTestTraitWithRuleOptions(array $axe_options, string $expected_message): void {
     $this->drupalGet('accessibility-test');
 

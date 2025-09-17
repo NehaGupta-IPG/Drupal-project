@@ -6,13 +6,14 @@ namespace Drupal\Tests\olivero\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\AxeCoreTestTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Run a basic axe-core test on some pages.
- *
- * @group olivero
- * @group accessibility
  */
+#[Group('olivero')]
+#[Group('accessibility')]
 class AccessibilityTest extends WebDriverTestBase {
 
   use AxeCoreTestTrait;
@@ -34,9 +35,8 @@ class AccessibilityTest extends WebDriverTestBase {
    *   The path to be tested.
    * @param ?array $options
    *   (optional) Associative array of Axe options.
-   *
-   * @dataProvider providerTestAnonymousPages
    */
+  #[DataProvider('providerTestAnonymousPages')]
   public function testAnonymousPages(string $uri, ?array $options = NULL): void {
     $this->drupalGet($uri);
     $this->executeAxe($options);
