@@ -196,7 +196,7 @@ class FileStorage implements StorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function decode($raw) {
+  public function decode($raw): array|bool {
     $data = Yaml::decode($raw);
     // A simple string is valid YAML for any reason.
     if (!is_array($data)) {

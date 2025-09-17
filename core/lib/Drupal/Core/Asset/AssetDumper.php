@@ -48,7 +48,7 @@ class AssetDumper implements AssetDumperUriInterface {
   /**
    * {@inheritdoc}
    */
-  public function dumpToUri(string $data, string $file_extension, string $uri): string {
+  public function dumpToUri(string $data, string $file_extension, string $uri): string|bool {
     $path = 'assets://' . $file_extension;
     // Create the CSS or JS file.
     $this->fileSystem->prepareDirectory($path, FileSystemInterface::CREATE_DIRECTORY);

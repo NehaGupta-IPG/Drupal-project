@@ -620,7 +620,7 @@ class Sql extends QueryPluginBase {
    * @param \Drupal\views\Plugin\views\join\JoinPluginBase $join
    *   A Join object (or derived object) to join the alias in.
    *
-   * @return string|null
+   * @return string|null|bool
    *   The alias used to refer to this specific table, or NULL if the table
    *   cannot be ensured.
    */

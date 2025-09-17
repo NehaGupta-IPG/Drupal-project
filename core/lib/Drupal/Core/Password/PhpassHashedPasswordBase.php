@@ -124,7 +124,7 @@ abstract class PhpassHashedPasswordBase implements PasswordInterface {
    *   A string containing the hashed password (and salt) or FALSE on failure.
    *   The return string will be truncated at HASH_LENGTH characters max.
    */
-  protected function crypt($algo, #[\SensitiveParameter] $password, $setting) {
+  protected function crypt($algo, #[\SensitiveParameter] $password, $setting): string|bool {
     // Prevent DoS attacks by refusing to hash large passwords.
     if (strlen($password) > PasswordInterface::PASSWORD_MAX_LENGTH) {
       return FALSE;
