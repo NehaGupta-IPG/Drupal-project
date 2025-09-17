@@ -73,7 +73,7 @@ class MemoryBackend implements FloodInterface, PrefixFloodInterface {
   /**
    * {@inheritdoc}
    */
-  public function isAllowed($name, $threshold, $window = 3600, $identifier = NULL) {
+  public function isAllowed($name, $threshold, $window = 3600, $identifier = NULL, bool $notify = TRUE) {
     if (!isset($identifier)) {
       $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
     }

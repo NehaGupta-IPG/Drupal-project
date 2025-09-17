@@ -216,7 +216,7 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
         // clear any failed login attempts after a successful login, so check
         // for this case first before checking the actual flood limit and store
         // the result in form state.
-        if (!$this->userFloodControl->isAllowed('user.failed_login_user', 1, $flood_config->get('user_window'), $identifier)) {
+        if (!$this->userFloodControl->isAllowed('user.failed_login_user', 1, $flood_config->get('user_window'), $identifier, FALSE)) {
           // Now check the actual limit for the user. Default is to allow 5
           // failed attempts every 6 hours. This means we check the flood table
           // twice if flood control has already been triggered by a previous
