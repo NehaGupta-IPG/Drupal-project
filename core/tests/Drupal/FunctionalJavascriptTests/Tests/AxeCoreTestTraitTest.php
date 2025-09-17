@@ -58,6 +58,7 @@ TEXT
    * Tests Axe call with no options.
    */
   public function testAxeCoreTestTraitDefaults(): void {
+    global $base_url;
 
     $this->drupalGet('accessibility-test');
 
@@ -66,13 +67,13 @@ TEXT
 Accessibility test failures (2 total)
 
 1. [serious] Elements must meet minimum color contrast ratio thresholds
-Test URL: http://web/accessibility-test
+Test URL: {$base_url}/accessibility-test
 Axe rule: `color-contrast`
 Violating targets (1):
   * `span`
 
 2. [critical] Form elements must have labels
-Test URL: http://web/accessibility-test
+Test URL: {$base_url}/accessibility-test
 Axe rule: `label`
 Violating targets (1):
   * `input`
@@ -172,10 +173,14 @@ TEXT
   /**
    * Data provider.
    *
-   * @return \Generator
-   *   Test scenarios.
+   * @return array
+   *   An array of test cases, each containing a array of Axe rules options
+   *   and the expected error message.
    */
   public static function providerAxeCoreTestTraitWithOptions(): \Generator {
+    // The global $base_url isn't available here for some reason.
+    $base_url = getenv('SIMPLETEST_BASE_URL');
+
     yield '`color-contrast` rule disabled via `rules` option' => [
       [
         'rules' => [
@@ -186,7 +191,7 @@ TEXT
 Accessibility test failures (1 total)
 
 1. [critical] Form elements must have labels
-Test URL: http://web/accessibility-test
+Test URL: {$base_url}/accessibility-test
 Axe rule: `label`
 Violating targets (1):
   * `input`
@@ -202,7 +207,7 @@ TEXT
 Accessibility test failures (1 total)
 
 1. [serious] Elements must meet minimum color contrast ratio thresholds
-Test URL: http://web/accessibility-test
+Test URL: {$base_url}/accessibility-test
 Axe rule: `color-contrast`
 Violating targets (1):
   * `span`
@@ -221,7 +226,7 @@ TEXT
 Accessibility test failures (1 total)
 
 1. [critical] Form elements must have labels
-Test URL: http://web/accessibility-test
+Test URL: {$base_url}/accessibility-test
 Axe rule: `label`
 Violating targets (1):
   * `input`
