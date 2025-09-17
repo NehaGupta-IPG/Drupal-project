@@ -12,7 +12,7 @@ install:
   - drupal:path
   - drupal:search
   - drupal:taxonomy
-  - nightwatch_theme_install_utility
+  - drupal:nightwatch_theme_install_utility
 themes:
   - claro
   - olivero
