@@ -43,8 +43,8 @@ interface ContentTranslationHandlerInterface {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return string
-   *   The source language code.
+   * @return string|false
+   *   The source language code or FALSE if no source language is available.
    */
   public function getSourceLangcode(FormStateInterface $form_state);
 
