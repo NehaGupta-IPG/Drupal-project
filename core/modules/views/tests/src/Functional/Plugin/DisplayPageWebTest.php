@@ -8,6 +8,7 @@ use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
+use Drupal\views\Entity\View;
 
 /**
  * Tests the views page display plugin.
@@ -150,6 +151,23 @@ class DisplayPageWebTest extends ViewTestBase {
     /** @var \Drupal\views\ReservedPathChecker $checker */
     $checker = $this->container->get('views.reserved_path_checker');
     foreach ($checker->listReservedFirstSegments() as $segment) {
+
+      // Trying to save a view with a reserved path to trigger validation.
+      $this->drupalGet('admin/structure/views/add');
+      $this->submitForm(
+        [
+          'label' => 'Test view ' . $segment,
+          'id' => 'test_' . $segment,
+          'page[create]' => 1,
+          'page[path]' => $segment,
+        ],
+        'Save and edit'
+      );
+      $this->assertSession()->statusCodeEquals(200);
+      // Check that the validation error message about reserved paths is shown.
+      $this->assertSession()->pageTextContains('Choose a different first segment');
+      // Confirm that the view was not created.
+      $this->assertNull(View::load('test_' . $segment));
       $this->assertReservedPagePath($segment);
     }
   }
