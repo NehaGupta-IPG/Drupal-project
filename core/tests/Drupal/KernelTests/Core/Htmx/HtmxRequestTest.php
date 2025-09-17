@@ -88,13 +88,13 @@ class HtmxRequestTest extends KernelTestBase {
     $this->htmx->$method();
     $render = $this->apply();
     $this->assertTrue(isset($render['#attributes'][$attribute]));
-    $expected = '/htmx-test-attachments/replace?' . MainContentViewSubscriber::WRAPPER_FORMAT . '=drupal_htmx';
-    $this->assertStringEndsWith($expected, $render['#attributes'][$attribute]);
+    $expected = '?' . MainContentViewSubscriber::WRAPPER_FORMAT . '=drupal_htmx';
+    $this->assertTrue($expected === $render['#attributes'][$attribute]);
     // Verify no parameters with no wrapper format.
-    $this->htmx->$method(NULL, TRUE);
+    $this->htmx->$method(full_page: TRUE);
     $render = $this->apply();
     $this->assertTrue(isset($render['#attributes'][$attribute]));
-    $this->assertStringEndsWith('/htmx-test-attachments/replace', $render['#attributes'][$attribute]);
+    $this->assertTrue('' === $render['#attributes'][$attribute]);
   }
 
   /**
