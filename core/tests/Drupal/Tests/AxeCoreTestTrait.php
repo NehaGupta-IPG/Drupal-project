@@ -32,7 +32,7 @@ trait AxeCoreTestTrait {
    *       'region' => ['enabled' => false]
    *     ]
    *   ]
-   *   ```
+   *   ```.
    *
    * @throws \Behat\Mink\Exception\DriverException
    * @throws \Behat\Mink\Exception\UnsupportedDriverActionException
