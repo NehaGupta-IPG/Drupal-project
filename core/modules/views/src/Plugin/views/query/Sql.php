@@ -469,7 +469,7 @@ class Sql extends QueryPluginBase {
    * @param string|null $alias
    *   A specific alias to use, rather than the default alias.
    *
-   * @return string
+   * @return string|false
    *   The alias of the table; this alias can be used to access information
    *   about the table and should always be used to refer to the table when
    *   adding parts to the query. Or FALSE if the table was not able to be
@@ -508,7 +508,7 @@ class Sql extends QueryPluginBase {
    * @param string|null $alias
    *   A specific alias to use, rather than the default alias.
    *
-   * @return string
+   * @return string|false
    *   The alias of the table; this alias can be used to access information
    *   about the table and should always be used to refer to the table when
    *   adding parts to the query. Or FALSE if the table was not able to be
