@@ -14,6 +14,7 @@ use Drupal\views_ui\ViewUI;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\PluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\views\ReservedPathChecker;
 
 /**
  * @defgroup views_wizard_plugins Views wizard plugins
@@ -128,6 +129,13 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
   protected $parentFormSelector;
 
   /**
+   * The ReservedPathChecker Service.
+   *
+   * @var \Drupal\views\ReservedPathChecker
+   */
+  protected $reservedPathChecker;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -136,20 +144,22 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
       $plugin_id,
       $plugin_definition,
       $container->get('entity_type.bundle.info'),
-      $container->get('menu.parent_form_selector')
+      $container->get('menu.parent_form_selector'),
+      $container->get('views.reserved_path_checker')
     );
   }
 
   /**
    * Constructs a WizardPluginBase object.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeBundleInfoInterface $bundle_info_service, MenuParentFormSelectorInterface $parent_form_selector) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeBundleInfoInterface $bundle_info_service, MenuParentFormSelectorInterface $parent_form_selector, ReservedPathChecker $reserved_path_checker) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->bundleInfoService = $bundle_info_service;
     $this->base_table = $this->definition['base_table'];
 
     $this->parentFormSelector = $parent_form_selector;
+    $this->reservedPathChecker = $reserved_path_checker;
 
     $entity_types = \Drupal::entityTypeManager()->getDefinitions();
     foreach ($entity_types as $entity_type_id => $entity_type) {
@@ -233,6 +243,13 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
     $feed_row_options = Views::fetchPluginNames('row', 'feed', [$this->base_table]);
     $path_prefix = Url::fromRoute('<none>', [], ['absolute' => TRUE])->toString();
 
+    // Build a helper message with the reserved first segments (web root dirs).
+    $reserved_paths = $this->reservedPathChecker->listReservedFirstSegments();
+    $reserved_helper = $this->t(
+      'Some path names are reserved because they are directories in the site web root: @list.',
+      ['@list' => implode(', ', $reserved_paths)]
+    );
+
     // Add filters and sorts which apply to the view as a whole.
     $this->buildFilters($form, $form_state);
     $this->buildSorts($form, $form_state);
@@ -277,6 +294,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
       '#field_prefix' => $path_prefix,
       // Account for the leading backslash.
       '#maxlength' => 254,
+      '#description' => $reserved_helper,
     ];
     $form['displays']['page']['options']['style'] = [
       '#type' => 'fieldset',
@@ -354,6 +372,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
         '#field_prefix' => $path_prefix,
         // Account for the leading backslash.
         '#maxlength' => 254,
+        '#description' => $reserved_helper,
       ];
       // This will almost never be visible.
       $form['displays']['page']['options']['feed_properties']['row_plugin'] = [
