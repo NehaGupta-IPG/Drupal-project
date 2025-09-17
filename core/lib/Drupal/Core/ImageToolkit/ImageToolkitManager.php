@@ -74,7 +74,7 @@ class ImageToolkitManager extends DefaultPluginManager {
   /**
    * Gets the default image toolkit.
    *
-   * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
+   * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface|false
    *   Object of the default toolkit, or FALSE on error.
    */
   public function getDefaultToolkit() {
