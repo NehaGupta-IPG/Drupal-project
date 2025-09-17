@@ -118,8 +118,9 @@ interface StorageInterface {
    * @param string $raw
    *   The raw configuration data string to decode.
    *
-   * @return array
-   *   The decoded configuration data as an associative array.
+   * @return array|false
+   *   The decoded configuration data as an associative array or FALSE
+   *   if invalid data was decoded.
    */
   public function decode($raw);
 
