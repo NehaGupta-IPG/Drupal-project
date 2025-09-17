@@ -47,8 +47,8 @@ class TranslateEditForm extends TranslateFormBase {
     $postUrl = Url::fromRoute('<none>', [], ['query' => $query]);
     (new Htmx())
       ->post($postUrl)
-      ->swap('outerHTML')
-      ->select('#locale-translate-edit-form')
+      ->swap('none')
+      ->swapOob(TRUE)
       ->applyTo($form);
 
     $form['langcode'] = [

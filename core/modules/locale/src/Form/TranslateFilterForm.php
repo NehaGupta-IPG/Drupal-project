@@ -30,9 +30,8 @@ class TranslateFilterForm extends TranslateFormBase {
 
     (new Htmx())
       ->get()
-      ->swap('outerHTML')
-      ->select('#locale-translate-edit-form')
-      ->target('#locale-translate-edit-form')
+      ->params(implode(',', array_keys($filter_values)))
+      ->swap('none')
       ->applyTo($form);
 
     $form['filters'] = [
