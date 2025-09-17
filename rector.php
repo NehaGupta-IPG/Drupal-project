@@ -583,7 +583,7 @@ return RectorConfig::configure()
 #        __DIR__ . '/core/tests/Drupal/FunctionalTests',
 #        __DIR__ . '/core/tests/Drupal/FunctionalJavascriptTests',
 #        __DIR__ . '/core',
-        __DIR__,
+#        __DIR__,
     ])
     ->withSkip([
         __DIR__ . '/core/tests/Drupal/Tests/Component/Annotation/Doctrine/Fixtures',
@@ -602,6 +602,9 @@ return RectorConfig::configure()
         __DIR__ . '/core/modules/system/tests/src/Kernel/Entity/MenuValidationTest.php',
         __DIR__ . '/core/modules/package_manager/tests/src/Kernel/ComposerInspectorTest.php',
         __DIR__ . '/core/modules/file/tests/src/Kernel/FileItemValidationTest.php',
+        __DIR__ . '/core/modules/layout_builder/tests/src/Kernel/SectionListTestBase.php',
+        __DIR__ . '/core/modules/path/tests/src/Kernel/Migrate/d7/MigrateUrlAliasTestBase.php',
+        __DIR__ . '/core/modules/views/tests/src/Kernel/Plugin/CastedIntFieldJoinTestBase.php',
 
         __DIR__ . '/vendor',
         '*/ProxyClass/*',
