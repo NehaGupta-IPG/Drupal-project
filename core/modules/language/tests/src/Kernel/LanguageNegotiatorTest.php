@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\language\Kernel;
 
 use Drupal\Core\Language\LanguageInterface;
@@ -49,7 +51,7 @@ class LanguageNegotiatorTest extends LanguageTestBase {
   /**
    * Validate that negotiation methods are returning sorted values.
    */
-  public function testNegotiatorPrioritiesOrder() {
+  public function testNegotiatorPrioritiesOrder(): void {
     $expected_array = [
       [
         'id' => 'language-interface',
@@ -62,7 +64,7 @@ class LanguageNegotiatorTest extends LanguageTestBase {
       ],
     ];
     $negotiated_languages = [];
-    foreach ($this->languageNegotiator->getNegotiationMethods('language_url') as $method_id => $method) {
+    foreach ($this->languageNegotiator->getNegotiationMethods('language_url') as $method) {
       $negotiated_languages[] = [
         'id' => $method['id'],
       ];
@@ -73,7 +75,7 @@ class LanguageNegotiatorTest extends LanguageTestBase {
   /**
    * Validate that setting.php overrides negotiation methods are working.
    */
-  public function testLanguageNegotiatorWithOverrides() {
+  public function testLanguageNegotiatorWithOverrides(): void {
     // Set up an override.
     $GLOBALS['config']['language.types']['negotiation']['language_interface']['enabled'] = ['language-user-admin' => -21];
 

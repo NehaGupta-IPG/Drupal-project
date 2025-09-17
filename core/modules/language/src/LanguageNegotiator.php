@@ -211,7 +211,8 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
     $definitions = $this->negotiatorManager->getDefinitions();
     if (isset($type)) {
       $enabled_methods = $this->getEnabledNegotiators($type);
-      // Reduce the definitions to the enabled ones und sort them by the weight of the enabled methods.
+      // Reduce the definitions to the enabled ones und sort them by the weight
+      // of the enabled methods.
       $definitions = array_merge($enabled_methods, array_intersect_key($definitions, $enabled_methods));
     }
     return $definitions;
