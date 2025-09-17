@@ -5,4 +5,4 @@ version: VERSION
 hidden: true
 install:
   - drupal:locale
-  - locale_test_translate
+  - drupal:locale_test_translate
