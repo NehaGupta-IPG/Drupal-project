@@ -125,7 +125,7 @@ function menu_ui_get_menu_link_defaults(NodeInterface $node) {
         'id' => $menu_link->getPluginId(),
         'title' => $menu_link->getTitle(),
         'title_max_length' => $menu_link->getFieldDefinitions()['title']->getSetting('max_length'),
-        'description' => $menu_link->getDescription(),
+        'description' => $menu_link->getDescription() ?? '',
         'description_max_length' => $menu_link->getFieldDefinitions()['description']->getSetting('max_length'),
         'menu_name' => $menu_link->getMenuName(),
         'parent' => $menu_link->getParentId(),
