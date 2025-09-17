@@ -6,6 +6,14 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Field\FieldItemList;
 use Drupal\Core\Session\AccountInterface;
 
+/**
+ * Defines an item list class for layout translation fields.
+ *
+ * @internal
+ *   Plugin classes are internal.
+ *
+ * @see \Drupal\layout_builder\Plugin\Field\FieldType\LayoutTranslationItem
+ */
 class LayoutTranslationItemList extends FieldItemList {
 
   /**
@@ -13,7 +21,7 @@ class LayoutTranslationItemList extends FieldItemList {
    *
    * @ingroup layout_builder_access
    */
-  public function defaultAccess($operation = 'view', AccountInterface $account = NULL) {
+  public function defaultAccess($operation = 'view', ?AccountInterface $account = NULL) {
     // @todo Allow access in https://www.drupal.org/node/2942975.
     return AccessResult::forbidden();
   }

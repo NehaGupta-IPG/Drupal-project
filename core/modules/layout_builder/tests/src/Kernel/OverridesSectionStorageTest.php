@@ -172,7 +172,13 @@ class OverridesSectionStorageTest extends KernelTestBase {
       FALSE, TRUE, $section_data, ['configure editable entity_test_mul entity_test_mul layout overrides'],
     ];
     $data['enabled, no data, bundle edit overrides, edit access'] = [
-      TRUE, TRUE, [], ['configure editable entity_test_mul entity_test_mul layout overrides', 'administer entity_test content'],
+      TRUE,
+      TRUE,
+      [],
+      [
+        'configure editable entity_test_mul entity_test_mul layout overrides',
+        'administer entity_test content',
+      ],
     ];
     $data['enabled, data, bundle edit overrides, edit access'] = [
       TRUE,

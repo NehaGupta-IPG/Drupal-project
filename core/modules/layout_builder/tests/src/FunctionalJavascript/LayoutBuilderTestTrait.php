@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
 /**
@@ -57,7 +59,7 @@ trait LayoutBuilderTestTrait {
    * @param string $message
    *   (optional) Custom message to display with the assertion.
    *
-   * @todo: Remove after https://www.drupal.org/project/drupal/issues/2892440
+   * @todo Remove after https://www.drupal.org/project/drupal/issues/2892440.
    */
   public function assertNoElementAfterWait($selector, $timeout = 10000, $message = ''): void {
     $page = $this->getSession()->getPage();

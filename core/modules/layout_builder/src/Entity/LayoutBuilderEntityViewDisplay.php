@@ -277,7 +277,7 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
       $field = FieldConfig::create([
         'field_storage' => $field_storage,
         'bundle' => $bundle,
-        'label' => t('Layout Labels'),
+        'label' => $this->t('Layout Labels'),
       ]);
       $field->save();
     }

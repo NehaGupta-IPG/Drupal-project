@@ -486,14 +486,12 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
    *
    * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
    *   The section storage.
-   * @param $delta
+   * @param int $delta
    *   The section delta.
-   * @param $region
+   * @param string $region
    *   The region.
-   * @param $uuid
+   * @param string $uuid
    *   The UUID of the component.
-   * @param $is_translation
-   *   Whether the section storage is handling a translation.
    *
    * @return array|null
    *   The contextual link render array or NULL if none.

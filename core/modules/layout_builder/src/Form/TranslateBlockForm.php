@@ -106,7 +106,7 @@ class TranslateBlockForm extends FormBase {
    * @return array
    *   The form array.
    */
-  public function buildForm(array $form, FormStateInterface $form_state, TranslatableSectionStorageInterface $section_storage = NULL, $delta = NULL, $region = NULL, $uuid = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?TranslatableSectionStorageInterface $section_storage = NULL, $delta = NULL, $region = NULL, $uuid = NULL) {
     $component = $section_storage->getSection($delta)->getComponent($uuid);
 
     $this->sectionStorage = $section_storage;
@@ -182,14 +182,14 @@ class TranslateBlockForm extends FormBase {
         if ($data_type === 'label' || $data_type === 'text') {
           $element_build[$key]['source'] = [
             '#type' => 'item',
-            '#title' => $this->t($definition->getLabel()),
+            '#title' => $definition->getLabel(),
             '#markup' => $typed_datum->getValue() ?: '(' . $this->t('Empty') . ')',
             '#parents' => ['source', $key],
           ];
           $element_build[$key]['translation'] = [
             '#type' => $data_type === 'label' ? 'textfield' : 'textarea',
-            '#title' => $this->t($definition->getLabel()),
-            '#default_value' => isset($translated_configuration[$key]) ? $translated_configuration[$key] : '',
+            '#title' => $definition->getLabel(),
+            '#default_value' => $translated_configuration[$key] ?? '',
             '#parents' => ['translation', $key],
           ];
         }
