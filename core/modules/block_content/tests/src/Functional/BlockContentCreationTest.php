@@ -24,7 +24,7 @@ class BlockContentCreationTest extends BlockContentTestBase {
    *
    * @var array
    */
-  protected static $modules = ['block_content_test', 'dblog', 'field_ui'];
+  protected static $modules = ['block_content_test', 'field_ui'];
 
   /**
    * {@inheritdoc}

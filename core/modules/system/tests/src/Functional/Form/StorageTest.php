@@ -22,7 +22,7 @@ class StorageTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['form_test', 'dblog'];
+  protected static $modules = ['form_test'];
 
   /**
    * {@inheritdoc}

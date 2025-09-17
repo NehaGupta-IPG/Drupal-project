@@ -27,7 +27,7 @@ class SearchCommentCountToggleTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'comment', 'search', 'dblog'];
+  protected static $modules = ['node', 'comment', 'search'];
 
   /**
    * {@inheritdoc}

@@ -22,7 +22,6 @@ class DbImportCommandTest extends KernelTestBase {
   protected static $modules = [
     'system',
     'config',
-    'dblog',
     'menu_link_content',
     'link',
     'block_content',

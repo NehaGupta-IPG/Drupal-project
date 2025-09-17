@@ -30,7 +30,6 @@ class OliveroTest extends BrowserTestBase {
   protected static $modules = [
     'olivero_test',
     'pager_test',
-    'dblog',
   ];
 
   /**

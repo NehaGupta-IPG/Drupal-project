@@ -16,7 +16,7 @@ class SearchAdvancedSearchFormTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'search', 'dblog'];
+  protected static $modules = ['node', 'search'];
 
   /**
    * {@inheritdoc}

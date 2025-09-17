@@ -18,7 +18,6 @@ class MigrateControllerTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'dblog',
     'migrate_drupal_ui',
     'views_ui',
   ];
