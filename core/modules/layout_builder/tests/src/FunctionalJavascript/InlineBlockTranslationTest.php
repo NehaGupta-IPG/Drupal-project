@@ -45,7 +45,7 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
   /**
    * Tests that inline blocks works with content translation.
    */
-  public function testInlineBlockContentTranslation() {
+  public function testInlineBlockContentTranslation(): void {
     $assert_session = $this->assertSession();
 
     $this->drupalLogin($this->drupalCreateUser([
@@ -216,7 +216,7 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
    * @param string $new_body
    *   The new body field value.
    */
-  protected function updateTranslatedBlock($existing_label, $existing_body, $new_label, $new_body) {
+  protected function updateTranslatedBlock($existing_label, $existing_body, $new_label, $new_body): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $this->clickContextualLink(static::INLINE_BLOCK_LOCATOR, 'Translate block');

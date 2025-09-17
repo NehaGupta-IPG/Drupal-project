@@ -10,7 +10,7 @@ trait TranslationTestTrait {
   /**
    * Asserts that non-trans actions have been removed.
    */
-  protected function assertNonTranslationActionsRemoved() {
+  protected function assertNonTranslationActionsRemoved(): void {
     /** @var \Drupal\Tests\WebAssert $assert_session */
     $assert_session = $this->assertSession();
     // Confirm that links do not exist to change the layout.

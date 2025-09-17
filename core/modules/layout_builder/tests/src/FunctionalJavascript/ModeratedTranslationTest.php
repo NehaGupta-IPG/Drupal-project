@@ -136,7 +136,7 @@ class ModeratedTranslationTest extends WebDriverTestBase {
   /**
    * Tests a layout overrides that are moderated and translated.
    */
-  public function testModerationTranslatedOverrides() {
+  public function testModerationTranslatedOverrides(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

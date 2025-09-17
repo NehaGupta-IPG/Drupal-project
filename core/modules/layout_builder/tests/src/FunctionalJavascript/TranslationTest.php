@@ -101,7 +101,7 @@ class TranslationTest extends WebDriverTestBase {
   /**
    * DataProvider for testLabelTranslation().
    */
-  public function providerLabelTranslation() {
+  public static function providerLabelTranslation(): array {
     return [
       'with config_translation' => [TRUE],
       'without config_translation' => [FALSE],
@@ -113,7 +113,7 @@ class TranslationTest extends WebDriverTestBase {
    *
    * @dataProvider providerLabelTranslation
    */
-  public function testLabelTranslation($install_config_translation) {
+  public function testLabelTranslation($install_config_translation): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 

@@ -40,7 +40,7 @@ function layout_builder_removed_post_updates(): array {
 /**
  * Adds the layout translation settings field.
  */
-function layout_builder_post_update_add_translation_field() {
+function layout_builder_post_update_add_translation_field(): void {
   /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager */
   $field_manager = \Drupal::service('entity_field.manager');
   $field_map = $field_manager->getFieldMap();
@@ -69,7 +69,7 @@ function layout_builder_post_update_add_translation_field() {
  * @param string $bundle
  *   The bundle.
  */
-function _layout_builder_add_translation_field($entity_type_id, $bundle) {
+function _layout_builder_add_translation_field($entity_type_id, $bundle): void {
   $field_name = OverridesSectionStorage::TRANSLATED_CONFIGURATION_FIELD_NAME;
   $field = FieldConfig::loadByName($entity_type_id, $bundle, $field_name);
   if (!$field) {

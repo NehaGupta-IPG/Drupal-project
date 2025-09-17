@@ -28,7 +28,7 @@ trait JavascriptTranslationTestTrait {
    * @param array $unexpected_element_selectors
    *   A list of selectors for elements that should be present.
    */
-  protected function updateBlockTranslation($block_selector, $untranslated_label, $new_label, $expected_label = '', array $unexpected_element_selectors = []) {
+  protected function updateBlockTranslation($block_selector, $untranslated_label, $new_label, $expected_label = '', array $unexpected_element_selectors = []): void {
     /** @var \Drupal\Tests\WebAssert $assert_session */
     $assert_session = $this->assertSession();
     /** @var \Behat\Mink\Element\DocumentElement $page */

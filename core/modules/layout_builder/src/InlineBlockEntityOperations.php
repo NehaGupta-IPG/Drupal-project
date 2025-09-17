@@ -274,7 +274,7 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
    * @param bool $new_revision
    *   Whether a new revision of the block should be created.
    */
-  protected function saveTranslatedInlineBlock(EntityInterface $entity, $component_uuid, array $translated_component_configuration, $new_revision) {
+  protected function saveTranslatedInlineBlock(EntityInterface $entity, $component_uuid, array $translated_component_configuration, $new_revision): void {
     /** @var \Drupal\block_content\BlockContentInterface $block */
     $block = unserialize($translated_component_configuration['block_serialized']);
     // Create a InlineBlock plugin from the translated configuration in order to

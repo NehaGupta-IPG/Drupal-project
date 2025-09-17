@@ -19,7 +19,7 @@ trait LayoutBuilderTestTrait {
    * @param string|null $label
    *   The label use.
    */
-  protected function addBlock($block_link_text, $rendered_locator, $label_display = FALSE, $label = NULL) {
+  protected function addBlock($block_link_text, $rendered_locator, $label_display = FALSE, $label = NULL): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -59,7 +59,7 @@ trait LayoutBuilderTestTrait {
    *
    * @todo: Remove after https://www.drupal.org/project/drupal/issues/2892440
    */
-  public function assertNoElementAfterWait($selector, $timeout = 10000, $message = '') {
+  public function assertNoElementAfterWait($selector, $timeout = 10000, $message = ''): void {
     $page = $this->getSession()->getPage();
     if ($message === '') {
       $message = "Element '$selector' was not on the page after wait.";

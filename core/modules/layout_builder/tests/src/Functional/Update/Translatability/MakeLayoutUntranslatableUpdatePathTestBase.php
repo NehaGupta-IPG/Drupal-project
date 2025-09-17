@@ -51,7 +51,7 @@ abstract class MakeLayoutUntranslatableUpdatePathTestBase extends UpdatePathTest
   /**
    * {@inheritdoc}
    */
-  protected function setDatabaseDumpFiles() {
+  protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../../system/tests/fixtures/update/drupal-8.filled.standard.php.gz',
       __DIR__ . '/../../../../fixtures/update/layout-builder.php',
@@ -65,7 +65,7 @@ abstract class MakeLayoutUntranslatableUpdatePathTestBase extends UpdatePathTest
    *
    * @see layout_builder_post_update_make_layout_untranslatable()
    */
-  public function testDisableTranslationOnLayouts() {
+  public function testDisableTranslationOnLayouts(): void {
     $this->runUpdates();
     foreach ($this->expectedBundleUpdates as $bundle => $field_update_expected) {
       $this->assertEquals(

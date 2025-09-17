@@ -259,7 +259,7 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
    * @param string $field_name
    *   The name for the translation field.
    */
-  protected function addTranslationField($entity_type_id, $bundle, $field_name) {
+  protected function addTranslationField($entity_type_id, $bundle, $field_name): void {
     $field = FieldConfig::loadByName($entity_type_id, $bundle, $field_name);
     if (!$field) {
       $field_storage = FieldStorageConfig::loadByName($entity_type_id, $field_name);

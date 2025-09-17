@@ -72,11 +72,11 @@ class TranslateBlockForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('layout_builder.tempstore_repository'),
       $container->get('module_handler'),
-      $container->get('config.typed')
+      $container->get('config.typed'),
     );
   }
 
@@ -202,7 +202,7 @@ class TranslateBlockForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $section_storage = $this->sectionStorage;
     $section_storage->setTranslatedComponentConfiguration($this->uuid, $form_state->getValue('translation'));
     $this->layoutTempstoreRepository->set($this->sectionStorage);

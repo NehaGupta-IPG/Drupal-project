@@ -62,13 +62,13 @@ class BlockContentInlineBlockTranslateForm extends BlockContentForm {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('entity.repository'),
       $container->get('entity_type.bundle.info'),
       $container->get('datetime.time'),
       $container->get('current_route_match'),
-      $container->get('layout_builder.tempstore_repository')
+      $container->get('layout_builder.tempstore_repository'),
     );
   }
 
@@ -136,7 +136,7 @@ class BlockContentInlineBlockTranslateForm extends BlockContentForm {
   /**
    * {@inheritdoc}
    */
-  public function form(array $form, FormStateInterface $form_state) {
+  public function form(array $form, FormStateInterface $form_state): array {
     $form = parent::form($form, $form_state);
     // The language of the translation cannot be changed.
     $form['langcode']['#access'] = FALSE;

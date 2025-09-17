@@ -61,7 +61,7 @@ class ComponentPluginTranslate implements EventSubscriberInterface {
    * @param \Drupal\layout_builder\Event\SectionComponentBuildRenderArrayEvent $event
    *   The section component render event.
    */
-  public function onBuildRender(SectionComponentBuildRenderArrayEvent $event) {
+  public function onBuildRender(SectionComponentBuildRenderArrayEvent $event): void {
     if (!$this->languageManager->isMultilingual()) {
       return;
     }

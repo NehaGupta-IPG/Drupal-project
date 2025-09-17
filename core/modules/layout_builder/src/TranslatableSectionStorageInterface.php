@@ -23,7 +23,7 @@ interface TranslatableSectionStorageInterface extends SectionStorageInterface {
    * @param array $configuration
    *   The component's translated configuration.
    */
-  public function setTranslatedComponentConfiguration($uuid, array $configuration);
+  public function setTranslatedComponentConfiguration($uuid, array $configuration): void;
 
   /**
    * Gets the translated component configuration.
