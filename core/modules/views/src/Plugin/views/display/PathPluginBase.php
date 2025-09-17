@@ -39,6 +39,13 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
   protected $state;
 
   /**
+   * Reserved path checker service.
+   *
+   * @var \Drupal\views\ReservedPathChecker
+   */
+  protected $reservedPathChecker;
+
+  /**
    * Constructs a PathPluginBase object.
    *
    * @param array $configuration
@@ -63,13 +70,15 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
+    $instance = new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
       $container->get('router.route_provider'),
       $container->get('state')
     );
+    $instance->reservedPathChecker = $container->get('views.reserved_path_checker');
+    return $instance;
   }
 
   /**
@@ -496,6 +505,18 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
    */
   protected function validatePath($path) {
     $errors = [];
+
+    if ($path !== '' && isset($this->reservedPathChecker)) {
+      if ($this->reservedPathChecker->isReservedFirstSegment($path)) {
+        $errors[] = $this->t(
+          'The path "/@segment" cannot be used because it matches a directory in the site web root. Choose a different first segment (for example, "site-@segment").',
+          [
+            '@segment' => $this->reservedPathChecker->firstSegmentFromPath($path),
+          ]
+        );
+      }
+    }
+
     if (str_starts_with($path, '%')) {
       $errors[] = $this->t('"%" may not be used for the first segment of a path.');
     }

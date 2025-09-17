@@ -76,7 +76,7 @@ class Feed extends PathPluginBase implements ResponseDisplayPluginInterface {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
+    $instance = new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
@@ -84,6 +84,10 @@ class Feed extends PathPluginBase implements ResponseDisplayPluginInterface {
       $container->get('state'),
       $container->get('renderer')
     );
+    if (property_exists($instance, 'reservedPathChecker') && !$instance->reservedPathChecker) {
+      $instance->reservedPathChecker = $container->get('views.reserved_path_checker');
+    }
+    return $instance;
   }
 
   /**

@@ -87,7 +87,7 @@ class Page extends PathPluginBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
+    $instance = new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
@@ -96,6 +96,10 @@ class Page extends PathPluginBase {
       $container->get('entity_type.manager')->getStorage('menu'),
       $container->get('menu.parent_form_selector')
     );
+    if (property_exists($instance, 'reservedPathChecker') && !$instance->reservedPathChecker) {
+      $instance->reservedPathChecker = $container->get('views.reserved_path_checker');
+    }
+    return $instance;
   }
 
   /**
