@@ -31,6 +31,30 @@ class AxeCoreTestTraitTest extends WebDriverTestBase {
   protected $defaultTheme = 'stark';
 
   /**
+   * Independent smoke test that Axe errors are reported as PHPUnit failures.
+   */
+  public function testAxeCoreTestTraitReportsErrors(): void {
+
+    $this->drupalGet('accessibility-test');
+
+    $this->expectException(AssertionFailedError::class);
+    $this->expectExceptionMessage(<<<TEXT
+Axe encountered errors
+
+1. unknown rule `unknown-rule` in options.runOnly
+Failed asserting that an array is empty.
+TEXT
+    );
+
+    $this->executeAxe([
+      'runOnly' => [
+        'type' => 'rule',
+        'values' => ['unknown-rule'],
+      ],
+    ]);
+  }
+
+  /**
    * Tests Axe call with no options.
    */
   public function testAxeCoreTestTraitDefaults(): void {
@@ -72,35 +96,13 @@ TEXT
   }
 
   /**
-   * Tests that Axe errors are reported as PHPUnit failures.
-   */
-  public function testAxeCoreTestTraitReportsErrors(): void {
-
-    $this->drupalGet('accessibility-test');
-
-    $this->expectException(AssertionFailedError::class);
-    $this->expectExceptionMessage(<<<TEXT
-Axe encountered errors
-
-1. unknown rule `unknown-rule` in options.runOnly
-Failed asserting that an array is empty.
-TEXT
-    );
-
-    $this->executeAxe([
-      'runOnly' => [
-        'type' => 'rule',
-        'values' => ['unknown-rule'],
-      ],
-    ]);
-  }
-
-  /**
    * Tests that results do not bleed into subsequent runs on same session.
    */
   public function testAxeCoreTestTraitClearsPreviousResults(): void {
 
+    // ---------------------
     // Violations
+    // ---------------------
     $this->drupalGet('accessibility-test');
 
     // Expecting violations, but only on the first run.
@@ -124,7 +126,9 @@ TEXT
       ],
     ]);
 
+    // ---------------------
     // Errors
+    // ---------------------
     $this->drupalGet('accessibility-test');
 
     // Expecting errors, but only on the first run.
