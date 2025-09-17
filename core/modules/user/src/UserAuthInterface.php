@@ -4,6 +4,10 @@ namespace Drupal\user;
 
 /**
  * An interface for validating user authentication credentials.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
+ *   UserAuthenticationInterface instead.
+ * @see https://www.drupal.org/project/drupal/issues/3427298
  */
 interface UserAuthInterface {
 
