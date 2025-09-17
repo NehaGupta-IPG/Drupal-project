@@ -172,7 +172,7 @@ class PagerPreprocess {
       }
     }
 
-    if ($this->requestStack->getCurrentRequest()?->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_htmx') {
+    if ($this->requestStack->getCurrentRequest()?->headers->has('HX-Request')) {
       $variables['#attached']['library'][] = 'core/drupal.htmx';
       foreach ($items as $key => &$item) {
         if ($key === 'pages') {
