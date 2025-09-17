@@ -216,23 +216,17 @@ function claro_preprocess_entity_add_list(&$variables): void {
  * Disables contextual links for all blocks except for layout builder blocks.
  */
 function claro_preprocess_block(&$variables): void {
-  $remove_contextual_links = \array_key_exists('contextual_links', $variables['title_suffix']);
-  if (\Drupal::moduleHandler()->moduleExists('layout_builder')) {
-    $remove_contextual_links = \is_array($variables['elements'])
-      && array_key_exists('#contextual_links', $variables['elements'])
-      && !\array_intersect(
-        array_keys($variables['elements']['#contextual_links']),
-        ['layout_builder_block', 'layout_builder_inline_block_translation', 'layout_builder_block_translation'],
-      );
-  }
+  $layout_builder_links = array_intersect(array_keys($variables['elements']['#contextual_links'] ?? []), [
+    'layout_builder_block',
+    'layout_builder_block_translation',
+    'layout_builder_inline_block_translation',
+  ]);
 
-  if ($remove_contextual_links) {
+  if (isset($variables['title_suffix']['contextual_links']) && !$layout_builder_links) {
     unset($variables['title_suffix']['contextual_links']);
     unset($variables['elements']['#contextual_links']);
 
-    if (\is_array($variables['attributes']['class'])) {
-      $variables['attributes']['class'] = array_diff($variables['attributes']['class'], ['contextual-region']);
-    }
+    $variables['attributes']['class'] = array_diff($variables['attributes']['class'], ['contextual-region']);
   }
 }
 
