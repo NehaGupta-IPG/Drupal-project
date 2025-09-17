@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Exception\InvalidParameterException;
 
 /**
  * Confirm that the UrlGenerator is functioning properly.
@@ -96,12 +97,14 @@ class UrlGeneratorTest extends UnitTestCase {
     $second_route = new Route('/test/two/{Lassie}');
     $third_route = new Route('/test/two/');
     $fourth_route = new Route('/test/four', [], [], [], '', ['https']);
+    $fifth_route = new Route('/test/{Lassie}/five');
     $none_route = new Route('', [], [], ['_no_path' => TRUE]);
 
     $routes->add('test_1', $first_route);
     $routes->add('test_2', $second_route);
     $routes->add('test_3', $third_route);
     $routes->add('test_4', $fourth_route);
+    $routes->add('test_5', $fifth_route);
     $routes->add('<none>', $none_route);
 
     // Create a route provider stub.
@@ -128,6 +131,10 @@ class UrlGeneratorTest extends UnitTestCase {
       [
         'route_name' => 'test_4',
         'return' => $fourth_route,
+      ],
+      [
+        'route_name' => 'test_5',
+        'return' => $fifth_route,
       ],
       [
         'route_name' => '<none>',
@@ -525,6 +532,90 @@ class UrlGeneratorTest extends UnitTestCase {
 
     $options = [];
     $this->assertGenerateFromRoute('test_2', ['Lassie' => 5], $options, '/goodbye/cruel/world?zoo=5#foo', (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
+  }
+
+  /**
+   * Test url generation for routes that have parameters between fixed parts.
+   */
+  public function testValidateAllowedAttributesOnRoute(): void {
+
+    $url = $this->generator->generate('test_5', ['Lassie' => '5']);
+    $this->assertEquals('/test/5/five', $url);
+
+    $url = $this->generator->generate('test_5', ['Lassie' => 5]);
+    $this->assertEquals('/test/5/five', $url);
+
+    $url = $this->generator->generate('test_5', ['Lassie' => 5.5]);
+    $this->assertEquals('/test/5.5/five', $url);
+
+    $url = $this->generator->generate('test_5', ['Lassie' => TRUE]);
+    $this->assertEquals('/test/1/five', $url);
+
+    $url = $this->generator->generate('test_5', ['Lassie' => 'my_lassie', 'page' => 1]);
+    $this->assertEquals('/test/my_lassie/five?page=1', $url);
+
+    $url = $this->generator->generate('test_5', ['Lassie' => 'my_lassie', 'param' => '1']);
+    $this->assertEquals('/test/my_lassie/five?param=1', $url);
+
+    $url = $this->generator->generate('test_5', ['Lassie' => 'my_lassie', 'param' => TRUE]);
+    $this->assertEquals('/test/my_lassie/five?param=1', $url);
+
+    $url = $this->generator->generate('test_5', ['Lassie' => 'my_lassie', 'param' => 5.5]);
+    $this->assertEquals('/test/my_lassie/five?param=5.5', $url);
+
+    $url = $this->generator->generate('test_5', ['Lassie' => 'my_lassie', 'param' => ['array' => '1']]);
+    $this->assertEquals('/test/my_lassie/five?param%5Barray%5D=1', $url);
+
+    $newObjectStringable = new class {
+
+      public function __toString() {
+        return 'stringable';
+      }
+
+    };
+
+    $url = $this->generator->generate('test_5', ['Lassie' => $newObjectStringable]);
+    $this->assertEquals('/test/stringable/five', $url);
+  }
+
+  /**
+   * Test url generation for routes that have parameters between fixed parts and parameter is null.
+   */
+  public function testValidateWrongParameterNullForRoute(): void {
+    $this->expectException(InvalidParameterException::class);
+    $this->expectExceptionMessage('Parameter "Lassie" for route "test_5" must match "[^/]++" ("NULL" given "string", "integer", "double", "boolean" or "object that has __toString method implemented" allowed) to generate a corresponding URL.');
+
+    $this->generator->generate('test_5', ['Lassie' => NULL]);
+  }
+
+  /**
+   * Test url generation for routes that have parameters between fixed parts and parameter has a slash.
+   */
+  public function testValidateWrongParameterSlashForRoute(): void {
+    $this->expectException(InvalidParameterException::class);
+    $this->expectExceptionMessage('Parameter "Lassie" for route "test_5" must match "[^/]++" ("/" given) to generate a corresponding URL.');
+
+    $this->generator->generate('test_5', ['Lassie' => '/']);
+  }
+
+  /**
+   * Test url generation for routes that have parameters between fixed parts and parameter that could not be transformed into string.
+   */
+  public function testValidateNotAllowedArrayAttributeOnRoute(): void {
+    $this->expectException(InvalidParameterException::class);
+    $this->expectExceptionMessage('Parameter "Lassie" for route "test_5" must match "[^/]++" ("array" given "string", "integer", "double", "boolean" or "object that has __toString method implemented" allowed) to generate a corresponding URL.');
+
+    $this->generator->generate('test_5', ['Lassie' => ['array' => '1']]);
+  }
+
+  /**
+   * Test url generation for routes that have parameters between fixed parts and parameter that could not be transformed into string.
+   */
+  public function testValidateNotAllowedAObjectAttributeOnRoute(): void {
+    $this->expectException(InvalidParameterException::class);
+    $this->expectExceptionMessage('Parameter "Lassie" for route "test_5" must match "[^/]++" ("object" given "string", "integer", "double", "boolean" or "object that has __toString method implemented" allowed) to generate a corresponding URL.');
+
+    $this->generator->generate('test_5', ['Lassie' => (object) ['array' => '1']]);
   }
 
   /**

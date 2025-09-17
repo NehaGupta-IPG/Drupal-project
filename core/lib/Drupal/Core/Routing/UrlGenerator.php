@@ -217,6 +217,14 @@ class UrlGenerator implements UrlGeneratorInterface {
     foreach ($tokens as $token) {
       if ('variable' === $token[0]) {
         if (!$optional || !array_key_exists($token[3], $defaults) || (isset($mergedParams[$token[3]]) && (string) $mergedParams[$token[3]] !== (string) $defaults[$token[3]])) {
+          // Parameter must be the type that can be cast to string.
+          if (
+            !$this->isStringable($mergedParams[$token[3]])
+          ) {
+            $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given "string", "integer", "double", "boolean" or "object that has __toString method implemented" allowed) to generate a corresponding URL.', $token[3], $name, $token[2], gettype($mergedParams[$token[3]]));
+            throw new InvalidParameterException($message);
+          }
+
           // Check requirement.
           if (!preg_match('#^' . $token[2] . '$#', $mergedParams[$token[3]])) {
             $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given) to generate a corresponding URL.', $token[3], $name, $token[2], $mergedParams[$token[3]]);
@@ -242,6 +250,24 @@ class UrlGenerator implements UrlGeneratorInterface {
     $query_params += array_diff_key($parameters, $variables, $defaults);
 
     return $url;
+  }
+
+  /**
+   * Validate if a parameter is stringable.
+   *
+   * @param mixed $param
+   *   The parameter to check.
+   *
+   * @return bool
+   *   TRUE if the parameter is stringable, FALSE otherwise.
+   */
+  private function isStringable(mixed $param): bool {
+    // Scalar is string, int, double and bool
+    if (is_scalar($param) || is_object($param) && method_exists($param, '__toString')) {
+      return TRUE;
+    }
+
+    return FALSE;
   }
 
   /**
