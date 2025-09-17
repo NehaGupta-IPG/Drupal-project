@@ -1707,9 +1707,9 @@ class ViewExecutable {
    * access logic. To render the view normally with access checks, use
    * views_embed_view() instead.
    *
-   * @return array|null
-   *   A renderable array containing the view output or NULL if the display ID
-   *   of the view to be executed doesn't exist.
+   * @return array|null|false
+   *   A renderable array containing the view output, NULL if the display ID
+   *   of the view to be executed doesn't exist, or FALSE if the display could not be set.
    */
   public function preview($display_id = NULL, $args = []) {
     if (empty($this->current_display) || ((!empty($display_id)) && $this->current_display != $display_id)) {
