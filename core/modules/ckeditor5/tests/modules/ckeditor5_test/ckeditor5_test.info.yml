@@ -4,4 +4,4 @@ description: "Provides test layout and component plugins for CKEditor 5."
 package: Testing
 dependencies:
   - drupal:editor
-  - ckeditor5:ckeditor5
+  - drupal:ckeditor5
