@@ -46,8 +46,8 @@ class SubdirDeprecationManager extends DefaultPluginManager {
 
     // Set up deprecation.
     $this->legacySubdir = 'Plugin/SubdirDeprecationLegacy';
-    $this->deprecationVersion = 'example:12.4.0';
-    $this->removedVersion = 'example:13.0.0';
+    $this->deprecationVersion = 'example:x.x.x';
+    $this->removedVersion = 'example:y.y.y';
     $this->changeRecordUrl = 'http://example.com/change-record/subdir-deprecation';
   }
 
