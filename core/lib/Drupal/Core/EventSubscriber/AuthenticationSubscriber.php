@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\EventSubscriber;
 
+use Drupal\Core\Authentication\AuthenticationCollectorInterface;
+use Drupal\Core\Authentication\AuthenticationManager;
 use Drupal\Core\Authentication\AuthenticationProviderChallengeInterface;
 use Drupal\Core\Authentication\AuthenticationProviderFilterInterface;
 use Drupal\Core\Authentication\AuthenticationProviderInterface;
@@ -93,7 +95,8 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
     if (isset($this->filter) && $event->isMainRequest()) {
       $request = $event->getRequest();
       if ($this->authenticationProvider->applies($request) && !$this->filter->appliesToRoutedRequest($request, TRUE)) {
-        throw new AccessDeniedHttpException('The used authentication method is not allowed on this route.');
+        $message = sprintf('The authentication method %s is not allowed on this route.', $this->getAuthenticationProviderName($request));
+        throw new AccessDeniedHttpException($message);
       }
     }
   }
@@ -132,7 +135,8 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
       $request = $event->getRequest();
       $exception = $event->getThrowable();
       if ($exception instanceof AccessDeniedHttpException && $this->authenticationProvider->applies($request) && !$this->filter->appliesToRoutedRequest($request, TRUE)) {
-        $event->setThrowable(new AccessDeniedHttpException('The used authentication method is not allowed on this route.', $exception));
+        $message = sprintf('The authentication method %s is not allowed on this route.', $this->getAuthenticationProviderName($request));
+        $event->setThrowable(new AccessDeniedHttpException($message, $exception));
       }
     }
   }
@@ -152,6 +156,32 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
     $events[KernelEvents::EXCEPTION][] = ['onExceptionSendChallenge', 75];
     $events[KernelEvents::EXCEPTION][] = ['onExceptionAccessDenied', 80];
     return $events;
+  }
+
+  /**
+   * Gets the name of the authentication provider that applies to the request.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request object.
+   *
+   * @return string|null
+   *   The authentication provider name if it can be determined, NULL otherwise.
+   */
+  protected function getAuthenticationProviderName($request): string {
+    // If the authentication provider is the AuthenticationManager, we can get
+    // the specific provider ID that applies to this request by replicating
+    // the logic from AuthenticationManager::getProvider().
+    if ($this->authenticationProvider instanceof AuthenticationManager) {
+      // Use reflection to access the protected getProvider method.
+      $reflection = new \ReflectionClass($this->authenticationProvider);
+      $method = $reflection->getMethod('getProvider');
+      $method->setAccessible(TRUE);
+      $provider_id = $method->invoke($this->authenticationProvider, $request);
+    }
+
+    // For other authentication providers, we can't easily determine the name,
+    // so return NULL to fall back to the generic message.
+    return $provider_id ?: 'unknown';
   }
 
 }
