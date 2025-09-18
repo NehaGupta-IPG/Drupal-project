@@ -16,17 +16,16 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 // cspell:ignore merhaba siema xsiemax
-
 /**
  * Tests Entity Query functionality.
- *
- * @group Entity
  */
+#[Group('Entity')]
 class EntityQueryTest extends EntityKernelTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -383,6 +382,33 @@ class EntityQueryTest extends EntityKernelTestBase {
     $assert = [4 => '4', 5 => '5', 6 => '6', 7 => '7', 8 => '8', 9 => '9', 10 => '10', 11 => '11', 12 => '12', 20 => '12', 13 => '13', 21 => '13', 14 => '14', 22 => '14', 15 => '15', 23 => '15'];
     $this->assertSame($assert, $results);
 
+    $results = $this->queryResults = $this->storage
+      ->getQuery()
+      ->latestRevision()
+      ->notExists("$figures.color")
+      ->sort('id')
+      ->accessCheck(TRUE)
+      ->execute();
+    $expected = [16 => '4', 8 => '8', 20 => '12'];
+    $this->assertSame($expected, $results);
+
+    // Update an entity.
+    $entity = EntityTestMulRev::load(4);
+    $entity->setNewRevision();
+    $entity->name->value .= 'x';
+    $entity->save();
+
+    // Updated entity should now have revision ID 24.
+    $results = $this->queryResults = $this->storage
+      ->getQuery()
+      ->latestRevision()
+      ->sort('id')
+      ->notExists("$figures.color")
+      ->accessCheck(TRUE)
+      ->execute();
+    $expected = [24 => '4', 8 => '8', 20 => '12'];
+    $this->assertSame($expected, $results);
+
     // Check that a query on the latest revisions without any condition returns
     // the correct results.
     $results = $this->storage
@@ -392,7 +418,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->sort('id')
       ->sort('revision_id')
       ->execute();
-    $expected = [1 => '1', 2 => '2', 3 => '3', 16 => '4', 17 => '5', 18 => '6', 19 => '7', 8 => '8', 9 => '9', 10 => '10', 11 => '11', 20 => '12', 21 => '13', 22 => '14', 23 => '15'];
+    $expected = [1 => '1', 2 => '2', 3 => '3', 24 => '4', 17 => '5', 18 => '6', 19 => '7', 8 => '8', 9 => '9', 10 => '10', 11 => '11', 20 => '12', 21 => '13', 22 => '14', 23 => '15'];
     $this->assertSame($expected, $results);
   }
 
@@ -426,6 +452,7 @@ class EntityQueryTest extends EntityKernelTestBase {
     // As we do not have any conditions, here are the possible colors and
     // language codes, already in order, with the first occurrence of the
     // entity id marked with *:
+
     // 8  NULL pl *
     // 12 NULL pl *
 

@@ -9,12 +9,12 @@ use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the theme administration user interface.
- *
- * @group system
  */
+#[Group('system')]
 class ThemeTest extends BrowserTestBase {
 
   use TestFileCreationTrait {
@@ -49,6 +49,10 @@ class ThemeTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    if ($this->name() === 'testInstallAndSetAsDefault') {
+      $this->markTestSkipped('Skipped due to major version-specific logic. See https://www.drupal.org/project/drupal/issues/3359322');
+    }
+
     parent::setUp();
 
     $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);
@@ -527,7 +531,6 @@ class ThemeTest extends BrowserTestBase {
    * Tests installing a theme and setting it as default.
    */
   public function testInstallAndSetAsDefault(): void {
-    $this->markTestSkipped('Skipped due to major version-specific logic. See https://www.drupal.org/project/drupal/issues/3359322');
     $themes = [
       'olivero' => 'Olivero',
       'test_core_semver' => 'Theme test with semver core version',

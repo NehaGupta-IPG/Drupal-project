@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views_ui\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Tests\views_ui\Traits\FilterEntityReferenceTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the entity reference filter UI.
  *
- * @group views_ui
  * @see \Drupal\views\Plugin\views\filter\EntityReference
  */
+#[Group('views_ui')]
 class FilterEntityReferenceWebTest extends UITestBase {
 
   use FilterEntityReferenceTrait;
@@ -60,8 +60,7 @@ class FilterEntityReferenceWebTest extends UITestBase {
     });
     $i = 0;
     foreach ($this->targetEntities as $entity) {
-      $message = (string) new FormattableMarkup('Expected target entity label found for option :option', [':option' => $i]);
-      $this->assertEquals($options[$i]['label'], $entity->label(), $message);
+      $this->assertEquals($options[$i]['label'], $entity->label(), "Expected target entity label found for option $i");
       $i++;
     }
 
@@ -79,8 +78,7 @@ class FilterEntityReferenceWebTest extends UITestBase {
     $options = $this->getUiOptions();
     $i = 0;
     foreach ($this->targetEntities as $entity) {
-      $message = (string) new FormattableMarkup('Expected target entity label found for option :option', [':option' => $i]);
-      $this->assertEquals($options[$i]['label'], $entity->label(), $message);
+      $this->assertEquals($options[$i]['label'], $entity->label(), "Expected target entity label found for option $i");
       $i++;
     }
 
@@ -96,8 +94,7 @@ class FilterEntityReferenceWebTest extends UITestBase {
     $options = $this->getUiOptions();
     $i = 0;
     foreach ($this->hostEntities + $this->targetEntities as $entity) {
-      $message = (string) new FormattableMarkup('Expected target entity label found for option :option', [':option' => $i]);
-      $this->assertEquals($options[$i]['label'], $entity->label(), $message);
+      $this->assertEquals($options[$i]['label'], $entity->label(), "Expected target entity label found for option $i");
       $i++;
     }
   }

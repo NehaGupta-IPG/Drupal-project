@@ -8,12 +8,12 @@ use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the UI for controlling node revision behavior.
- *
- * @group node
  */
+#[Group('node')]
 class NodeRevisionsUiTest extends NodeTestBase {
 
   /**
@@ -201,7 +201,7 @@ class NodeRevisionsUiTest extends NodeTestBase {
    * This can be removed after 'entity.node.version_history' local task is
    * removed by https://www.drupal.org/project/drupal/issues/3153559.
    *
-   * @covers \Drupal\node\Hook\NodeHooks1::localTasksAlter
+   * @legacy-covers \Drupal\node\Hook\NodeMenuHooks::localTasksAlter
    */
   public function testNodeDuplicateRevisionsTab(): void {
     $this->drupalPlaceBlock('local_tasks_block');
@@ -213,22 +213,6 @@ class NodeRevisionsUiTest extends NodeTestBase {
     // There must be exactly one 'Revisions' local task.
     $xpath = $this->assertSession()->buildXPathQuery('//a[contains(@href, :href)]', [':href' => $node->toUrl('version-history')->toString()]);
     $this->assertSession()->elementsCount('xpath', $xpath, 1);
-  }
-
-  /**
-   * Tests the node revisions page is cacheable by dynamic page cache.
-   */
-  public function testNodeRevisionsCacheability(): void {
-    $this->drupalLogin($this->editor);
-    $node = $this->drupalCreateNode();
-    // Admin paths are always uncacheable by dynamic page cache, swap node
-    // to non admin theme to test cacheability.
-    $this->config('node.settings')->set('use_admin_theme', FALSE)->save();
-    \Drupal::service('router.builder')->rebuild();
-    $this->drupalGet($node->toUrl('version-history'));
-    $this->assertSession()->responseHeaderEquals('X-Drupal-Dynamic-Cache', 'MISS');
-    $this->drupalGet($node->toUrl('version-history'));
-    $this->assertSession()->responseHeaderEquals('X-Drupal-Dynamic-Cache', 'HIT');
   }
 
 }

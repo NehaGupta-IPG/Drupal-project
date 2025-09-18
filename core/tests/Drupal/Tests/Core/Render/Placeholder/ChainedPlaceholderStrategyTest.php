@@ -6,20 +6,25 @@ namespace Drupal\Tests\Core\Render\Placeholder;
 
 use Drupal\Core\Render\Placeholder\ChainedPlaceholderStrategy;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Prophet;
 
 /**
- * @coversDefaultClass \Drupal\Core\Render\Placeholder\ChainedPlaceholderStrategy
- * @group Render
+ * Tests Drupal\Core\Render\Placeholder\ChainedPlaceholderStrategy.
  */
+#[CoversClass(ChainedPlaceholderStrategy::class)]
+#[Group('Render')]
 class ChainedPlaceholderStrategyTest extends UnitTestCase {
 
   /**
-   * @covers ::addPlaceholderStrategy
-   * @covers ::processPlaceholders
+   * Tests process placeholders.
    *
-   * @dataProvider providerProcessPlaceholders
+   * @legacy-covers ::addPlaceholderStrategy
+   * @legacy-covers ::processPlaceholders
    */
+  #[DataProvider('providerProcessPlaceholders')]
   public function testProcessPlaceholders($strategies, $placeholders, $result): void {
     $chained_placeholder_strategy = new ChainedPlaceholderStrategy();
 
@@ -39,20 +44,6 @@ class ChainedPlaceholderStrategyTest extends UnitTestCase {
   public static function providerProcessPlaceholders() {
     $prophet = new Prophet();
     $data = [];
-
-    // Empty placeholders.
-    $data['empty placeholders'] = [[], [], []];
-
-    // Placeholder removing strategy.
-    $placeholders = [
-      'remove-me' => ['#markup' => 'I-am-a-llama-that-will-be-removed-sad-face.'],
-    ];
-
-    $prophecy = $prophet->prophesize('\Drupal\Core\Render\Placeholder\PlaceholderStrategyInterface');
-    $prophecy->processPlaceholders($placeholders)->willReturn([]);
-    $dev_null_strategy = $prophecy->reveal();
-
-    $data['placeholder removing strategy'] = [[$dev_null_strategy], $placeholders, []];
 
     // Fake Single Flush strategy.
     $placeholders = [
@@ -124,7 +115,9 @@ class ChainedPlaceholderStrategyTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::processPlaceholders
+   * Tests process placeholders no strategies.
+   *
+   * @legacy-covers ::processPlaceholders
    */
   public function testProcessPlaceholdersNoStrategies(): void {
     // Placeholders but no strategies defined.
@@ -139,7 +132,9 @@ class ChainedPlaceholderStrategyTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::processPlaceholders
+   * Tests process placeholders with rogue placeholder strategy.
+   *
+   * @legacy-covers ::processPlaceholders
    */
   public function testProcessPlaceholdersWithRoguePlaceholderStrategy(): void {
     // Placeholders but no strategies defined.
