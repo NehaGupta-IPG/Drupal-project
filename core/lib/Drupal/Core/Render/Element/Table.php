@@ -150,7 +150,7 @@ class Table extends RenderElementBase {
   /**
    * {@inheritdoc}
    */
-  public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
+  public static function valueCallback(&$element, $input, FormStateInterface $form_state): array {
     // If #multiple is FALSE, the regular default value of radio buttons is
     // used.
     if (!empty($element['#tableselect']) && !empty($element['#multiple'])) {
