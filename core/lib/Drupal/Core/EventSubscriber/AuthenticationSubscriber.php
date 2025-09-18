@@ -170,6 +170,7 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
     // If the authentication provider is the AuthenticationManager, we can get
     // the specific provider ID that applies to this request by replicating
     // the logic from AuthenticationManager::getProvider().
+    $provider_id = 'unknown';
     if ($this->authenticationProvider instanceof AuthenticationManager) {
       // Use reflection to access the protected getProvider method.
       $reflection = new \ReflectionClass($this->authenticationProvider);
@@ -178,9 +179,7 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
       $provider_id = $method->invoke($this->authenticationProvider, $request);
     }
 
-    // For other authentication providers, we can't easily determine the name,
-    // so return NULL to fall back to the generic message.
-    return $provider_id ?: 'unknown';
+    return $provider_id;
   }
 
 }
