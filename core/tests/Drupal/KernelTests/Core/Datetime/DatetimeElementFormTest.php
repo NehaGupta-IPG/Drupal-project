@@ -258,7 +258,7 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * Tests that submitting the form doesn't throw any errors.
    */
-  public function testFormSubmit() {
+  public function testFormSubmit(): void {
     $form_state = new FormState();
     $form = \Drupal::formBuilder()->getForm($this);
     $this->render($form);
