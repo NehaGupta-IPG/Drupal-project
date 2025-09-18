@@ -109,7 +109,7 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  * @see \Drupal\Core\Render\Element\Tableselect
  */
 #[FormElement('table')]
-class Table extends FormElementBase {
+class Table extends RenderElementBase {
 
   /**
    * {@inheritdoc}
