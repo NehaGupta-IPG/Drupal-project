@@ -65,7 +65,6 @@ class Tableselect extends FormElementBase {
       '#responsive' => TRUE,
       '#sticky' => FALSE,
       '#pre_render' => [
-        [static::class, 'preRenderTable'],
         [static::class, 'preRenderTableselect'],
       ],
       '#process' => [
