@@ -3,14 +3,14 @@
 namespace Drupal\views\Plugin\views\field;
 
 use Drupal\views\ResultRow;
+use Drupal\views\Attribute\ViewsField;
 
 /**
  * Field handler to view the latest revision of an entity.
  *
  * @ingroup views_field_handlers
- *
- * @ViewsField("link_to_latest_revision")
  */
+#[ViewsField('link_to_latest_revision')]
 class LinkToLatestRevision extends EntityLink {
 
   /**
