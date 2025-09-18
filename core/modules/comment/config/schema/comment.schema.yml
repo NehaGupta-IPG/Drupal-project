@@ -19,6 +19,12 @@ field.formatter.settings.comment_default:
     pager_id:
       type: integer
       label: 'Pager ID'
+    language_filter:
+      type: sequence
+      label: 'Filter comments by language'
+      sequence:
+        type: string
+        label: 'Language'
 
 field.widget.settings.comment_default:
   type: mapping

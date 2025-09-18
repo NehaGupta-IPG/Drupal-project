@@ -10,6 +10,8 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FormatterBase;
@@ -36,6 +38,7 @@ class CommentDefaultFormatter extends FormatterBase {
     return [
       'view_mode' => 'default',
       'pager_id' => 0,
+      'language_filter' => [],
     ] + parent::defaultSettings();
   }
 
@@ -80,6 +83,20 @@ class CommentDefaultFormatter extends FormatterBase {
   protected $routeMatch;
 
   /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
+   * Stores the language options for the language filter setting.
+   *
+   * @var array
+   */
+  protected $languageOptions;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -95,6 +112,7 @@ class CommentDefaultFormatter extends FormatterBase {
       $container->get('entity_type.manager'),
       $container->get('entity.form_builder'),
       $container->get('current_route_match'),
+      $container->get('language_manager'),
       $container->get('entity_display.repository')
     );
   }
@@ -124,16 +142,19 @@ class CommentDefaultFormatter extends FormatterBase {
    *   The entity form builder.
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match object.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager object.
    * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
    *   The entity display repository.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AccountInterface $current_user, EntityTypeManagerInterface $entity_type_manager, EntityFormBuilderInterface $entity_form_builder, RouteMatchInterface $route_match, EntityDisplayRepositoryInterface $entity_display_repository) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AccountInterface $current_user, EntityTypeManagerInterface $entity_type_manager, EntityFormBuilderInterface $entity_form_builder, RouteMatchInterface $route_match, LanguageManagerInterface $language_manager, EntityDisplayRepositoryInterface $entity_display_repository) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->viewBuilder = $entity_type_manager->getViewBuilder('comment');
     $this->storage = $entity_type_manager->getStorage('comment');
     $this->currentUser = $current_user;
     $this->entityFormBuilder = $entity_form_builder;
     $this->routeMatch = $route_match;
+    $this->languageManager = $language_manager;
     $this->entityDisplayRepository = $entity_display_repository;
   }
 
@@ -158,16 +179,41 @@ class CommentDefaultFormatter extends FormatterBase {
 
       // Only attempt to render comments if the entity has visible comments.
       // Unpublished comments are not included in
-      // $entity->get($field_name)->comment_count, but unpublished comments
+      // $comment_count, but unpublished comments
       // should display if the user is an administrator.
+      
+      $comment_storage = \Drupal::entityTypeManager()->getStorage('comment');
+      $comment_query = $comment_storage->getQuery()
+        ->condition('entity_id', $entity->id())
+        ->condition('entity_type', $entity->getEntityTypeId())
+        ->condition('langcode', \Drupal::languageManager()->getCurrentLanguage()->getId())
+        ->accessCheck();
+      $comment_count = $comment_query->count()->execute();
+
       $elements['#cache']['contexts'][] = 'user.permissions';
       if ($this->currentUser->hasPermission('access comments') || $this->currentUser->hasPermission('administer comments')) {
         $output['comments'] = [];
 
-        if ($entity->get($field_name)->comment_count || $this->currentUser->hasPermission('administer comments')) {
+        if ($comment_count || $this->currentUser->hasPermission('administer comments')) {
           $mode = $comment_settings['default_mode'];
           $comments_per_page = $comment_settings['per_page'];
-          $comments = $this->storage->loadThread($entity, $field_name, $mode, $comments_per_page, $this->getSetting('pager_id'));
+
+          $langcodes = [];
+          $language_ids = $this->getSetting('language_filter');
+          if (!empty($language_ids)) {
+            foreach ($language_ids as $language_id) {
+              if (!$language_id) {
+                continue;
+              }
+              // Use the interface language for filtering.
+              if ($language_id === LanguageInterface::TYPE_INTERFACE) {
+                $language_id = $langcode;
+              }
+              $langcodes[] = $language_id;
+            }
+          }
+
+          $comments = $this->storage->loadThread($entity, $field_name, $mode, $comments_per_page, $this->getSetting('pager_id'), $langcodes);
           if ($comments) {
             $build = $this->viewBuilder->viewMultiple($comments, $this->getSetting('view_mode'));
             $build['pager']['#type'] = 'pager';
@@ -239,6 +285,13 @@ class CommentDefaultFormatter extends FormatterBase {
       '#default_value' => $this->getSetting('pager_id'),
       '#description' => $this->t("Unless you're experiencing problems with pagers related to this field, you should leave this at 0. If using multiple pagers on one page you may need to set this number to a higher value so as not to conflict within the ?page= array. Large values will add a lot of commas to your URLs, so avoid if possible."),
     ];
+    $element['language_filter'] = [
+      '#type' => 'checkboxes',
+      '#title' => $this->t('Filter by language'),
+      '#options' => $this->getLanguageOptions(),
+      '#default_value' => $this->getSetting('language_filter'),
+      '#description' => $this->t('Show comments in the selected languages. If none selected, all comments will be showed.'),
+    ];
     return $element;
   }
 
@@ -253,7 +306,28 @@ class CommentDefaultFormatter extends FormatterBase {
     if ($pager_id = $this->getSetting('pager_id')) {
       $summary[] = $this->t('Pager ID: @id', ['@id' => $pager_id]);
     }
+    if (!empty($this->getSetting('language_filter'))) {
+      $language_filter = array_intersect_key($this->getLanguageOptions(), array_flip($this->getSetting('language_filter')));
+      $summary[] = $this->t('Show comments in the following languages: @languages', ['@languages' => implode(', ', $language_filter)]);
+    }
     return $summary;
+  }
+
+  /**
+   * Get a list of language options for the language_filter setting.
+   *
+   * @return array
+   *   All available language options.
+   */
+  protected function getLanguageOptions() {
+    if (!isset($this->languageOptions)) {
+      $this->languageOptions[LanguageInterface::TYPE_INTERFACE] = $this->t('Interface text language selected for page');
+      $languages = $this->languageManager->getLanguages(LanguageInterface::STATE_ALL);
+      foreach ($languages as $langcode => $language) {
+        $this->languageOptions[$langcode] = $language->getName();
+      }
+    }
+    return $this->languageOptions;
   }
 
   /**

@@ -273,7 +273,7 @@ class CommentStorage extends SqlContentEntityStorage implements CommentStorageIn
    * spoil the reverse ordering, "ORDER BY thread ASC" -- here, we do not need
    * to consider the trailing "/" so we use a substring only.
    */
-  public function loadThread(EntityInterface $entity, $field_name, $mode, $comments_per_page = 0, $pager_id = 0) {
+  public function loadThread(EntityInterface $entity, $field_name, $mode, $comments_per_page = 0, $pager_id = 0, array $langcodes = []) {
     $data_table = $this->getDataTable();
     $query = $this->database->select($data_table, 'c');
     $query->addField('c', 'cid');
@@ -308,6 +308,13 @@ class CommentStorage extends SqlContentEntityStorage implements CommentStorageIn
         ->addMetaData('entity', $entity)
         ->addMetaData('field_name', $field_name);
       $query->setCountQuery($count_query);
+    }
+
+    if (!empty($langcodes)) {
+      $query->condition('c.langcode', $langcodes, 'IN');
+      if ($comments_per_page) {
+        $count_query->condition('c.langcode', $langcodes, 'IN');
+      }
     }
 
     if (!$this->currentUser->hasPermission('administer comments')) {

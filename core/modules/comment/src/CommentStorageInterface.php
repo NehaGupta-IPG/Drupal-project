@@ -99,11 +99,13 @@ interface CommentStorageInterface extends ContentEntityStorageInterface {
    * @param int $pager_id
    *   (optional) Pager id to use in case of multiple pagers on the one page.
    *   Defaults to 0; is only used when $comments_per_page is greater than zero.
+   * @param array $langcodes
+   *   (optional) Only fetch comments in the specified languages.
    *
    * @return array
    *   Ordered array of comment objects, keyed by comment id.
    */
-  public function loadThread(EntityInterface $entity, $field_name, $mode, $comments_per_page = 0, $pager_id = 0);
+  public function loadThread(EntityInterface $entity, $field_name, $mode, $comments_per_page = 0, $pager_id = 0, array $langcodes = []);
 
   /**
    * Returns the number of unapproved comments.
