@@ -34,14 +34,15 @@ class ModeratedTranslationTest extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'content_translation',
-    'content_moderation',
-    'layout_builder',
     'block',
-    'node',
-    'contextual',
-    'layout_builder_test',
     'block_test',
+    'content_moderation',
+    'content_translation',
+    'contextual',
+    'field_ui',
+    'layout_builder',
+    'layout_builder_test',
+    'node',
   ];
 
   /**

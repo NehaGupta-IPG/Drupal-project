@@ -24,6 +24,7 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
    */
   protected static $modules = [
     'content_translation',
+    'field_ui',
   ];
 
   /**

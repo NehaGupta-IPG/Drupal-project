@@ -32,11 +32,12 @@ class TranslationTest extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'content_translation',
-    'layout_builder',
     'block',
-    'node',
+    'content_translation',
     'contextual',
+    'field_ui',
+    'layout_builder',
+    'node',
   ];
 
   /**
