@@ -37,6 +37,7 @@
         "symfony/dom-crawler": "^8.0",
         "symfony/error-handler": "^8.0",
         "symfony/lock": "^8.0",
-        "symfony/var-dumper": "^8.0"
+        "symfony/var-dumper": "^8.0",
+        "jangregor/phpstan-prophecy": "^2.2"
     }
 }
