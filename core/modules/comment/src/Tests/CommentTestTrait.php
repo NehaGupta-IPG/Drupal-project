@@ -80,6 +80,9 @@ trait CommentTestTrait {
         'entity_type' => $entity_type,
         'bundle' => $bundle,
         'required' => 1,
+        // Comment statistics are not language aware. Remove when #2751267 is
+        // fixed.
+        'translatable' => FALSE,
         'default_value' => [
           [
             'status' => $default_value,
