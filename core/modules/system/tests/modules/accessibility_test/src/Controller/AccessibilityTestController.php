@@ -18,12 +18,13 @@ class AccessibilityTestController extends ControllerBase {
    *   A render array.
    */
   public function page(): array {
+    // The id attribute is for testing Axe selector output in failure messages.
     $html = <<<HTML
       <section>
         <h2>Poor contrast (WCAG 2 AA)</h2>
 
         <div>
-            <span style="color:gray">Low contrast text</span>
+            <span id="target-low-contrast" style="color:gray">Low contrast text</span>
         </div>
       </section>
 

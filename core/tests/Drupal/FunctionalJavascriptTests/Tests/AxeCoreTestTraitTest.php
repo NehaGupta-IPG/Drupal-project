@@ -70,7 +70,7 @@ Accessibility test failures (2 total)
 Test URL: {$base_url}/accessibility-test
 Axe rule: `color-contrast`
 Violating targets (1):
-  * `span`
+  * `#target-low-contrast`
 
 2. [critical] Form elements must have labels
 Test URL: {$base_url}/accessibility-test
@@ -211,7 +211,7 @@ Accessibility test failures (1 total)
 Test URL: {$base_url}/accessibility-test
 Axe rule: `color-contrast`
 Violating targets (1):
-  * `span`
+  * `#target-low-contrast`
 Failed asserting that an array is empty.
 TEXT
     ];
