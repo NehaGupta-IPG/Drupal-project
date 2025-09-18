@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\CommentInterface;
@@ -8,12 +10,12 @@ use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests comments can be accessed on a translated node.
- *
- * @group comment
  */
+#[Group('comment')]
 class CommentOnTranslatedNodeTest extends BrowserTestBase {
 
   use CommentTestTrait;
@@ -95,7 +97,7 @@ class CommentOnTranslatedNodeTest extends BrowserTestBase {
   /**
    * Tests comments can be accessed on a translated node.
    */
-  public function testCommentOnTranslatedNode() {
+  public function testCommentOnTranslatedNode(): void {
     $assertSession = $this->assertSession();
 
     // Verify that user with 'access comments' permission can view the comment.
