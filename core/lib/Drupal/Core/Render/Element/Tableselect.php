@@ -80,7 +80,7 @@ class Tableselect extends Table {
   /**
    * {@inheritdoc}
    */
-  public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
+  public static function valueCallback(&$element, $input, FormStateInterface $form_state): array {
     // If $element['#multiple'] == FALSE, then radio buttons are displayed and
     // the default value handling is used.
     if (isset($element['#multiple']) && $element['#multiple']) {
