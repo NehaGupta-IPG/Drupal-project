@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\Tests\CommentTestTrait;
@@ -44,12 +46,7 @@ class CommentOnMultilingualContentTest extends BrowserTestBase {
     ConfigurableLanguage::createFromLangcode('fr')->save();
     $this->resetAll();
 
-    // Create an article content type.
-    $this->drupalCreateContentType([
-      'type' => 'article',
-      'name' => t('Article'),
-    ]);
-    // Create comment field on article.
+    $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
     $this->addDefaultCommentField('node', 'article');
 
     $this->drupalLogin($this->drupalCreateUser([
