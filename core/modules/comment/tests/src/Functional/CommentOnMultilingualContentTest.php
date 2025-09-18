@@ -10,12 +10,12 @@ use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests comments on multilingual content.
- *
- * @group comment
  */
+#[Group('comment')]
 class CommentOnMultilingualContentTest extends BrowserTestBase {
 
   use CommentTestTrait;
