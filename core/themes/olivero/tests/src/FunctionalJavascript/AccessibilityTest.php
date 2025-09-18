@@ -51,7 +51,7 @@ class AccessibilityTest extends WebDriverTestBase {
   public static function providerTestAnonymousPages(): array {
     return [
       'Homepage' => [
-        '/',
+        '<front>',
         // @todo remove the disabled 'region' rule in https://drupal.org/i/3318396.
         [
           'rules' => [
