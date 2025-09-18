@@ -135,6 +135,26 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
       '#required' => TRUE,
     ];
 
+    // Element inside a table element.
+    $form['table_element'] = [
+      '#type' => 'table',
+      '#header' => [
+        'Datetime',
+      ],
+    ];
+
+    $form['table_element'][] = [
+      'datetime_in_table_element' => [
+        '#type' => 'datetime',
+        '#date_date_format' => 'Y-m-d',
+        '#date_time_format' => 'H:i:s',
+        '#date_date_element' => 'date',
+        '#date_time_element' => 'time',
+        '#default_value' => new DrupalDateTime('2000-01-01 00:00:00'),
+        '#required' => TRUE,
+      ],
+    ];
+
     $form['submit'] = [
       '#type' => 'submit',
       '#value' => 'Submit',
@@ -233,6 +253,18 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
     $form = \Drupal::formBuilder()->getForm($this);
     $this->render($form);
     $this->assertEquals('UTC', $form['datetime_element']['#date_timezone']);
+  }
+
+  /**
+   * Tests that submitting the form doesn't throw any errors.
+   */
+  public function testFormSubmit() {
+    $form_state = new FormState();
+    $form = \Drupal::formBuilder()->getForm($this);
+    $this->render($form);
+    $this->submitForm($form, $form_state);
+
+    $this->assertEmpty($form_state->getErrors(), 'There were submissions errors.');
   }
 
   /**
