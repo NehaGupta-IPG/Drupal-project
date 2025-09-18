@@ -6,6 +6,8 @@ namespace Drupal\entity_test\Controller;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\RevisionableStorageInterface;
 
 /**
  * Controller routines for entity_test routes.
@@ -121,6 +123,28 @@ class EntityTestController extends ControllerBase {
         'tags' => $entity_type_definition->getListCacheTags(),
       ],
     ];
+  }
+
+  /**
+   * Returns the latest revision for the given entity.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity.
+   *
+   * @return array
+   *   A render array for the entity.
+   */
+  public function viewLatestVersion(EntityInterface $entity) {
+    $entity_type_id = $entity->getEntityTypeId();
+    $storage = $this->entityTypeManager->getStorage($entity_type_id);
+    if ($storage instanceof RevisionableStorageInterface) {
+      $latest_revision_id = $storage->getLatestRevisionId($entity->id());
+      if ($latest_revision_id) {
+        $entity = $storage->loadRevision($latest_revision_id);
+      }
+    }
+
+    return $this->entityTypeManager->getViewBuilder($entity_type_id)->view($entity);
   }
 
 }

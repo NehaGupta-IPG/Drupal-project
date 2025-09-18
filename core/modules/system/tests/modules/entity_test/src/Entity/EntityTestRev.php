@@ -57,6 +57,7 @@ use Drupal\views\EntityViewsData;
     'delete-multiple-form' => '/entity_test_rev/delete_multiple',
     'edit-form' => '/entity_test_rev/manage/{entity_test_rev}/edit',
     'revision' => '/entity_test_rev/{entity_test_rev}/revision/{entity_test_rev_revision}/view',
+    "latest-version" => "/entity_test_rev/{entity_test_rev}/latest",
     'revision-delete-form' => '/entity_test_rev/{entity_test_rev}/revision/{entity_test_rev_revision}/delete',
     'revision-revert-form' => '/entity_test_rev/{entity_test_rev}/revision/{entity_test_rev_revision}/revert',
     'version-history' => '/entity_test_rev/{entity_test_rev}/revisions',

@@ -181,6 +181,31 @@ class StringFormatterTest extends KernelTestBase {
     $this->assertLink($value, 0);
     $this->assertLinkByHref('/entity_test_rev/' . $entity_new_revision->id() . '/revision/' . $entity_new_revision->getRevisionId() . '/view');
 
+    // Make the entity a new non-default revision and assert it points to latest
+    // version.
+    $value3 = $this->randomMachineName();
+    $entity->setNewRevision(TRUE);
+    $entity->isDefaultRevision(FALSE);
+    $entity->{$this->fieldName}->value = $value3;
+    $entity->save();
+    $entity_latest_revision_id = $entity->getRevisionId();
+    $entity_latest_revision = $this->entityTypeManager->getStorage('entity_test_rev')->loadRevision($entity_latest_revision_id);
+    $this->renderEntityFields($entity_latest_revision, $this->display);
+    $this->assertLink($value3, 0);
+    $this->assertLinkByHref($entity->toUrl('latest-version')->toString());
+
+    // Check that linking to a revisionable entity works if the entity type does
+    // not specify a 'latest-version' link template.
+    $entity_type = clone $this->entityTypeManager->getDefinition('entity_test_rev');
+    $link_templates = $entity_type->getLinkTemplates();
+    unset($link_templates['latest-version']);
+    $entity_type->set('links', $link_templates);
+    \Drupal::state()->set('entity_test_rev.entity_type', $entity_type);
+    $this->entityTypeManager->clearCachedDefinitions();
+    $this->renderEntityFields($entity_latest_revision, $this->display);
+    $this->assertLink($value3, 0);
+    $this->assertLinkByHref('/entity_test_rev/' . $entity_latest_revision->id() . '/revision/' . $entity_latest_revision->getRevisionId() . '/view');
+
     // Check that linking to a revisionable entity works if the entity type does
     // not specify a 'revision' link template.
     $entity_type = clone $this->entityTypeManager->getDefinition('entity_test_rev');

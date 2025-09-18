@@ -260,3 +260,17 @@ views.field.field:
 views.field.field_language:
   type: views.field.field
   label: 'Views language field handler'
+
+views.field.link_to_latest_revision:
+  type: views_field
+  label: 'Link to latest revision'
+  mapping:
+    text:
+      type: label
+      label: 'Text to display'
+    output_url_as_text:
+      type: boolean
+      label: 'Output the URL as text'
+    absolute:
+      type: boolean
+      label: 'Output an absolute link'

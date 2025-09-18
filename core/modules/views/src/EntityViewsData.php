@@ -280,6 +280,13 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
         'help' => $this->t('Restrict the view to only revisions that are the latest revision of their entity.'),
         'filter' => ['id' => 'latest_revision'],
       ];
+      $data[$revision_table]['link_to_latest_revision'] = [
+        'title' => $this->t('Link to latest revision'),
+        'field' => [
+          'id' => 'link_to_latest_revision',
+          'help' => $this->t('Provides a link to the latest revision of an entity. If the latest revision is the default revision, provide a link to that instead.'),
+        ],
+      ];
       if ($this->entityType->isTranslatable()) {
         $data[$revision_table]['latest_translation_affected_revision'] = [
           'title' => $this->t('Is Latest Translation Affected Revision'),

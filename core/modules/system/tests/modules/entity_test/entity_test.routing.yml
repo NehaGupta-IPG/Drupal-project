@@ -55,6 +55,17 @@ entity.entity_test.collection:
   requirements:
     _access: 'TRUE'
 
+entity.entity_test_rev.latest_version:
+  path: '/entity_test_rev/{entity_test_rev}/latest'
+  defaults:
+    _controller: '\Drupal\entity_test\Controller\EntityTestController::viewLatestVersion'
+  options:
+    parameters:
+      entity_test_rev:
+        type: entity:entity_test_rev
+  requirements:
+    _access: 'TRUE'
+
 entity.entity_test_mulrev.revision:
   path: '/entity_test_mulrev/{entity_test_mulrev}/revision/{entity_test_mulrev_revision}/view'
   defaults:
