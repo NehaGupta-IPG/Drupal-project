@@ -44,8 +44,8 @@ trait AxeCoreTestTrait {
     $driver = $session->getDriver();
 
     // Load axe-core script.
-    $axeSrc = file_get_contents(DRUPAL_ROOT . '/core/node_modules/axe-core/axe.min.js');
-    $driver->executeScript($axeSrc);
+    $axe_src = file_get_contents(DRUPAL_ROOT . '/core/node_modules/axe-core/axe.min.js');
+    $driver->executeScript($axe_src);
 
     // Run axe then wait for the results.
     $options_json = json_encode((object) $options);
