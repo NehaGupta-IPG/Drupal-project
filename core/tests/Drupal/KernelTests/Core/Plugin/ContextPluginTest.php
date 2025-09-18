@@ -11,19 +11,18 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\plugin_test\Plugin\MockBlockManager;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that contexts are properly set and working within plugins.
- *
- * @group Plugin
  */
+#[Group('Plugin')]
 class ContextPluginTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'user',
     'node',
     'field',
