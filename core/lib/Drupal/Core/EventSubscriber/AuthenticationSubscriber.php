@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\EventSubscriber;
 
-use Drupal\Core\Authentication\AuthenticationCollectorInterface;
 use Drupal\Core\Authentication\AuthenticationManager;
 use Drupal\Core\Authentication\AuthenticationProviderChallengeInterface;
 use Drupal\Core\Authentication\AuthenticationProviderFilterInterface;
