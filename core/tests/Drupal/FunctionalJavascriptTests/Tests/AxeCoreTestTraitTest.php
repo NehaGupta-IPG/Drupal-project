@@ -173,9 +173,8 @@ TEXT
   /**
    * Data provider.
    *
-   * @return array
-   *   An array of test cases, each containing a array of Axe rules options
-   *   and the expected error message.
+   * @return \Generator
+   *   Test scenarios.
    */
   public static function providerAxeCoreTestTraitWithOptions(): \Generator {
     // The global $base_url isn't available here for some reason.
