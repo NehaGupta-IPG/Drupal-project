@@ -21,7 +21,7 @@ class LinkToLatestRevision extends EntityLink {
     $template = !$entity->isLatestRevision() && $entity->hasLinkTemplate('latest-version') ? 'latest-version' : $this->getEntityLinkTemplate();
     $entity = $this->getEntity($row);
     if ($this->languageManager->isMultilingual()) {
-      $entity = $this->getEntityTranslation($entity, $row);
+      $entity = $this->getEntityTranslationByRelationship($entity, $row);
       $this->addLangcode($row);
     }
     return $entity->toUrl($template)->setAbsolute($this->options['absolute']);
