@@ -337,6 +337,7 @@ class WorkspaceAssociation implements WorkspaceAssociationInterface, EventSubscr
       $transaction = $this->database->startTransaction();
       $this->doDeleteAssociations(static::TABLE, $workspace_id, $entity_type_id, $entity_ids, $revision_ids);
       $this->doDeleteAssociations(static::REVISION_TABLE, $workspace_id, $entity_type_id, $entity_ids, $revision_ids);
+      $transaction->commitOrRelease();
     }
     catch (\Exception $e) {
       if (isset($transaction)) {
