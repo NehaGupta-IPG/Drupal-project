@@ -85,7 +85,7 @@ class CommentOnMultilingualContentTest extends BrowserTestBase {
     $edit['subject[0][value]'] = $langcode . ': ' . $this->randomString();
     $edit['comment_body[0][value]'] = $this->getRandomGenerator()
       ->paragraphs(2);
-    $this->submitForm($edit, t('Save'));
+    $this->submitForm($edit, 'Save');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains($edit['subject[0][value]']);
   }
