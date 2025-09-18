@@ -7,14 +7,14 @@ namespace Drupal\FunctionalJavascriptTests\Tests;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\AxeCoreTestTrait;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests AxeCoreTestTrait.
- *
- * @coversDefaultClass \Drupal\Tests\AxeCoreTestTrait
  */
+#[CoversClass(AxeCoreTestTrait::class)]
 #[Group('Testing')]
 class AxeCoreTestTraitTest extends WebDriverTestBase {
 
@@ -162,11 +162,13 @@ TEXT
     catch (AssertionFailedError $exception) {
       // If there is an assertion failure,
       // it should not contain prior error message.
-      // Other assertion failures can be swallowed.
       $this->assertStringNotContainsStringIgnoringCase(
         'unknown rule `unknown-rule` in options.runOnly',
         $exception->getMessage()
       );
+      // If above assertion passes, it was an unexpected error.
+      // Re-throw so PHPUnit can handle it.
+      throw $exception;
     }
   }
 
