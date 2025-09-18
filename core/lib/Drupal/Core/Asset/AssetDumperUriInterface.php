@@ -20,6 +20,6 @@ interface AssetDumperUriInterface extends AssetDumperInterface {
    * @return string|false
    *   An URI to access the dumped asset or FALSE if dumping failed.
    */
-  public function dumpToUri(string $data, string $file_extension, string $uri): string;
+  public function dumpToUri(string $data, string $file_extension, string $uri);
 
 }

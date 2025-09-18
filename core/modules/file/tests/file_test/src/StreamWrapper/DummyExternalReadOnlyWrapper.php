@@ -46,14 +46,14 @@ class DummyExternalReadOnlyWrapper extends ReadOnlyStream {
   /**
    * {@inheritdoc}
    */
-  public function realpath(): string|false {
+  public function realpath() {
     return FALSE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function dirname($uri = NULL): string|false {
+  public function dirname($uri = NULL) {
     return FALSE;
   }
 
@@ -137,7 +137,7 @@ class DummyExternalReadOnlyWrapper extends ReadOnlyStream {
   /**
    * {@inheritdoc}
    */
-  public function stream_tell(): int|false {
+  public function stream_tell() {
     return FALSE;
   }
 

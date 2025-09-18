@@ -32,7 +32,7 @@ class DummyRemoteStreamWrapper extends PublicStream {
   /**
    * {@inheritdoc}
    */
-  public function realpath(): string|false {
+  public function realpath() {
     return FALSE;
   }
 

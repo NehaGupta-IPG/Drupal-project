@@ -13,7 +13,7 @@ interface BatchStorageInterface {
    * @param int $id
    *   The ID of the batch to load.
    *
-   * @return array
+   * @return array|false
    *   An array representing the batch, or FALSE if no batch was found.
    */
   public function load($id);

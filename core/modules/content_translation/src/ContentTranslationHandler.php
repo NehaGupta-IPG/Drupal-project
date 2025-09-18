@@ -268,7 +268,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
   /**
    * {@inheritdoc}
    */
-  public function getSourceLangcode(FormStateInterface $form_state): string|false {
+  public function getSourceLangcode(FormStateInterface $form_state) {
     if ($source = $form_state->get(['content_translation', 'source'])) {
       return $source->getId();
     }

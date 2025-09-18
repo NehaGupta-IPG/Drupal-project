@@ -41,7 +41,7 @@ class BatchStorage implements BatchStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function load($id): mixed|bool {
+  public function load($id) {
     // Ensure that a session is started before using the CSRF token generator.
     $this->session->start();
     try {

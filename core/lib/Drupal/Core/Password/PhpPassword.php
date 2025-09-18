@@ -28,7 +28,7 @@ class PhpPassword implements PasswordInterface {
   /**
    * {@inheritdoc}
    */
-  public function hash(#[\SensitiveParameter] $password): string|bool {
+  public function hash(#[\SensitiveParameter] $password) {
     // Prevent DoS attacks by refusing to hash large passwords.
     if (strlen($password) > static::PASSWORD_MAX_LENGTH) {
       return FALSE;
