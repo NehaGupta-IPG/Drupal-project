@@ -52,7 +52,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  * @see \Drupal\Core\Render\Element\Table
  */
 #[FormElement('tableselect')]
-class Tableselect extends Table {
+class Tableselect extends FormElementBase {
 
   /**
    * {@inheritdoc}
@@ -80,7 +80,7 @@ class Tableselect extends Table {
   /**
    * {@inheritdoc}
    */
-  public static function valueCallback(&$element, $input, FormStateInterface $form_state): array {
+  public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
     // If $element['#multiple'] == FALSE, then radio buttons are displayed and
     // the default value handling is used.
     if (isset($element['#multiple']) && $element['#multiple']) {
