@@ -213,6 +213,11 @@ class UserPermissionsTest extends BrowserTestBase {
     // Verify the permissions hash has changed.
     $current_permissions_hash = $permissions_hash_generator->generate($account);
     $this->assertNotEquals($previous_permissions_hash, $current_permissions_hash, 'Permissions hash has changed.');
+
+    // Verify passing an invalid role ID is handled.
+    user_role_change_permissions('non_existing_role', $permissions);
+    user_role_grant_permissions('non_existing_role', $permissions);
+    user_role_revoke_permissions('non_existing_role', $permissions);
   }
 
   /**
