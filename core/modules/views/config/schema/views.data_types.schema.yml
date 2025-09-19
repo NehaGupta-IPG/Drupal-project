@@ -769,6 +769,9 @@ views_filter:
         operator:
           type: string
           label: 'Operator'
+        operator_label:
+          type: string
+          label: 'Operator label'
         operator_limit_selection:
           type: boolean
           label: 'Limit the available operators'

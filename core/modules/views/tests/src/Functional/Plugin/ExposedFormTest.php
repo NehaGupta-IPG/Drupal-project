@@ -29,7 +29,14 @@ class ExposedFormTest extends ViewTestBase {
    *
    * @var array
    */
-  public static $testViews = ['test_exposed_form_buttons', 'test_exposed_block', 'test_exposed_form_sort_items_per_page', 'test_exposed_form_pager', 'test_remember_selected'];
+  public static $testViews = [
+    'test_exposed_form_buttons',
+    'test_exposed_block',
+    'test_exposed_form_sort_items_per_page',
+    'test_exposed_form_pager',
+    'test_remember_selected',
+    'test_exposed_operator_label',
+  ];
 
   /**
    * {@inheritdoc}
@@ -455,6 +462,33 @@ class ExposedFormTest extends ViewTestBase {
     $this->assertIds(range(50, 41));
     $url = $this->getSession()->getCurrentUrl();
     $this->assertStringContainsString('sort_by=' . urlencode($field_identifier), $url);
+  }
+
+  /**
+   * Tests the exposed filter operator label.
+   */
+  public function testExposedOperatorLabel() {
+    $assert_session = $this->assertSession();
+
+    $default_operator_label = 'Operator';
+    $new_operator_label = 'Super content type';
+    $operator_label_selector = 'form#views-exposed-form-test-exposed-operator-label-page-1 label[for=edit-type-op]';
+
+    // Assert the default value is used as the exposed filter operator label.
+    $this->drupalGet('test_exposed_operator_label');
+    $operator_label = $assert_session->elementExists('css', $operator_label_selector);
+    $this->assertEquals($default_operator_label, $operator_label->getText());
+
+    // Update the exposed filter operator label to a new value.
+    $view = Views::getView('test_exposed_operator_label');
+    $display = &$view->storage->getDisplay('default');
+    $display['display_options']['filters']['type']['expose']['operator_label'] = $new_operator_label;
+    $view->save();
+
+    // Assert the new value is used as the exposed filter operator label.
+    $this->drupalGet('test_exposed_operator_label');
+    $operator_label = $assert_session->elementExists('css', $operator_label_selector);
+    $this->assertEquals($new_operator_label, $operator_label->getText());
   }
 
   /**

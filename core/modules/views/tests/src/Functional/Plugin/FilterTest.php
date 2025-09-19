@@ -198,6 +198,8 @@ class FilterTest extends ViewTestBase {
     $edit['options[operator]'] = '>';
     $edit['options[expose][operator_list][]'] = ['>', '>=', 'between'];
     $this->drupalGet('admin/structure/views/nojs/handler/test_filter_in_operator_ui/default/filter/nid');
+    $this->assertSession()->pageTextContains('This will appear before your operator select field.');
+    $this->assertSession()->fieldExists('edit-options-expose-operator-label');
     $this->submitForm($edit, 'Apply');
     $this->drupalGet('admin/structure/views/view/test_filter_in_operator_ui/edit/default');
     $this->submitForm([], 'Save');
@@ -219,6 +221,8 @@ class FilterTest extends ViewTestBase {
     $edit['options[operator]'] = '=';
     $edit['options[expose][operator_list][]'] = ['<', '>'];
     $this->drupalGet('admin/structure/views/nojs/handler/test_filter_in_operator_ui/default/filter/nid');
+    $this->assertSession()->pageTextContains('This will appear before your operator select field.');
+    $this->assertSession()->fieldExists('edit-options-expose-operator-label');
     $this->submitForm($edit, 'Apply');
     $this->assertSession()->pageTextContains('You selected the "Is equal to" operator as the default value but is not included in the list of limited operators.');
   }

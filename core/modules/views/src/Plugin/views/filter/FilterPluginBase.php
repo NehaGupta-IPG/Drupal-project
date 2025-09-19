@@ -170,6 +170,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
         'operator' => ['default' => ''],
         'operator_limit_selection' => ['default' => FALSE],
         'operator_list' => ['default' => []],
+        'operator_label' => ['default' => $this->t('Operator')],
         'identifier' => ['default' => ''],
         'required' => ['default' => FALSE],
         'remember' => ['default' => FALSE],
@@ -364,7 +365,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
     if (!empty($options)) {
       $form['operator'] = [
         '#type' => count($options) < 10 ? 'radios' : 'select',
-        '#title' => $this->t('Operator'),
+        '#title' => $this->options['expose']['operator_label'],
         '#default_value' => $this->operator,
         '#options' => $options,
       ];
@@ -716,6 +717,19 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
         ];
       }
 
+      $form['expose']['operator_label'] = [
+        '#type' => 'textfield',
+        '#default_value' => $this->options['expose']['operator_label'],
+        '#title' => $this->t('Operator label'),
+        '#size' => 40,
+        '#description' => $this->t('This will appear before your operator select field.'),
+        '#states' => [
+          'visible' => [
+            ':input[name="options[expose][use_operator]"]' => ['checked' => TRUE],
+          ],
+        ],
+      ];
+
       $form['expose']['operator_id'] = [
         '#type' => 'textfield',
         '#default_value' => $this->options['expose']['operator_id'],
@@ -956,6 +970,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
       'operator' => $this->options['id'] . '_op',
       'operator_limit_selection' => FALSE,
       'operator_list' => [],
+      'operator_label' => $this->t('Operator'),
       'identifier' => $this->options['id'],
       'label' => $this->definition['title'],
       'description' => NULL,
@@ -1082,9 +1097,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
       $this->valueForm($form, $form_state);
       $form[$value] = $form['value'];
 
-      if (isset($form[$value]['#title']) && !empty($form[$value]['#type']) && $form[$value]['#type'] != 'checkbox') {
-        unset($form[$value]['#title']);
-      }
+      $form[$value]['#title'] = $this->options['expose']['operator_label'];
 
       $this->exposedTranslate($form[$value], 'value');
 
