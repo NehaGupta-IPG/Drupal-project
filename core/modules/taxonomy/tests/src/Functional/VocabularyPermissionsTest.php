@@ -122,7 +122,7 @@ class VocabularyPermissionsTest extends TaxonomyTestBase {
     $assert_session->linkNotExists('Delete');
     $assert_session->buttonNotExists('Save');
     $assert_session->buttonNotExists('Reset to alphabetical');
-    $assert_session->pageTextContains('Weight');
+    $assert_session->pageTextNotContains('Weight');
     $assert_session->fieldNotExists('Weight');
     $assert_session->linkNotExists('Add term');
     $assert_session->pageTextContains($no_edit_help_text);
