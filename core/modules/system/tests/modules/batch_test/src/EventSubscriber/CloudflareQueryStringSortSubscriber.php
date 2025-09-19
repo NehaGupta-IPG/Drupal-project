@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\batch_test\EventSubscriber;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -24,7 +26,7 @@ class CloudflareQueryStringSortSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
    *   The RequestEvent to process.
    */
-  public function sortQueryString(RequestEvent $event) {
+  public function sortQueryString(RequestEvent $event): void {
     $request = $event->getRequest();
 
     // Only process requests for the system.batch_page.json route.
