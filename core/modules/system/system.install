@@ -7,6 +7,7 @@
 
 use Drupal\Component\FileSecurity\FileSecurity;
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Update\EquivalentUpdate;
 
@@ -188,6 +189,9 @@ function system_update_11202(): void {
  * Update .htaccess-files to add a CSP-header for image/svg+xml.
  */
 function system_update_11103(): TranslatableMarkup|null {
+  if (!Settings::get('auto_create_htaccess', TRUE)) {
+    return NULL;
+  }
   $htaccessWriter = \Drupal::service('file.htaccess_writer');
   foreach ($htaccessWriter->defaultProtectedDirs() as $dir) {
     FileSecurity::writeHtaccess($dir->getPath(), $dir->isPrivate(), TRUE);
