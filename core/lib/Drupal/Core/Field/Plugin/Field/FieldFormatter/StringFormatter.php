@@ -189,8 +189,16 @@ class StringFormatter extends FormatterBase {
 
     // If this is not the default revision and is the latest translation
     // affected revision, then show a URL pointing to the latest version.
-    if ($rel == 'revision' && !$entity->isDefaultRevision() && $entity->isLatestTranslationAffectedRevision() && $entity->hasLinkTemplate('latest-version')) {
-      $rel = 'latest-version';
+    if ($rel === 'revision'
+      && !$entity->isDefaultRevision()
+      && $entity->isLatestTranslationAffectedRevision()
+      && $entity->hasLinkTemplate('latest-version')) {
+
+      $url = $entity->toUrl('latest-version');
+      if ($url->access()) {
+        $rel = 'latest-version';
+      }
+      // else keep $rel as 'revision' so consumers that expect revision links aren't broken.
     }
 
     return $entity->toUrl($rel);
