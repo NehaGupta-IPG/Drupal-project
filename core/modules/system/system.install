@@ -188,13 +188,12 @@ function system_update_11202(): void {
 /**
  * Update .htaccess-files to add a CSP-header for image/svg+xml.
  */
-function system_update_11103(): TranslatableMarkup|null {
+function system_update_11103(): void {
   if (!Settings::get('auto_create_htaccess', TRUE)) {
-    return NULL;
+    return;
   }
   $htaccessWriter = \Drupal::service('file.htaccess_writer');
   foreach ($htaccessWriter->defaultProtectedDirs() as $dir) {
     FileSecurity::writeHtaccess($dir->getPath(), $dir->isPrivate(), TRUE);
   }
-  return NULL;
 }
