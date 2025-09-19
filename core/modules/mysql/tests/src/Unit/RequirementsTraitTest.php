@@ -5,20 +5,29 @@ declare(strict_types=1);
 namespace Drupal\Tests\mysql\Unit;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Database\Schema;
 use Drupal\mysql\Driver\Database\mysql\Connection;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\mysql\RequirementsTrait;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests MySQL requirements trait.
- *
- * @coversDefaultClass \Drupal\mysql\RequirementsTrait
- * @group mysql
  */
+#[CoversClass(RequirementsTrait::class)]
+#[Group('mysql')]
 class RequirementsTraitTest extends UnitTestCase {
+
+  /**
+   * The string translation service.
+   *
+   * @var \Drupal\Core\StringTranslation\TranslationInterface
+   */
+  private TranslationInterface $stringTranslation;
 
   /**
    * A mocked MySQL connection.
@@ -50,10 +59,10 @@ class RequirementsTraitTest extends UnitTestCase {
     $this->connection = $this->createMock(Connection::class);
     $this->schema = $this->createMock(Schema::class);
 
-    $translation = $this->getStringTranslationStub();
+    $this->stringTranslation = $this->getStringTranslationStub();
 
     // Create an anonymous class that uses the trait for testing.
-    $this->requirementsTraitObject = new class() {
+    $this->requirementsTraitObject = new class($this->stringTranslation) {
       use RequirementsTrait;
 
       /**
@@ -61,15 +70,15 @@ class RequirementsTraitTest extends UnitTestCase {
        *
        * @var \Drupal\Core\StringTranslation\TranslationInterface
        */
-      private $stringTranslation;
+      private TranslationInterface $stringTranslation;
 
       /**
-       * Sets the string translation service.
+       * Constructor.
        *
        * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
        *   The translation service.
        */
-      public function setStringTranslation($translation): void {
+      public function __construct(TranslationInterface $translation) {
         $this->stringTranslation = $translation;
       }
 
@@ -81,13 +90,12 @@ class RequirementsTraitTest extends UnitTestCase {
       }
 
     };
-    $this->requirementsTraitObject->setStringTranslation($translation);
   }
 
   /**
    * Tests that views are excluded from primary key checking.
    *
-   * @covers ::getRuntimeRequirements
+   * @legacy-covers ::getRuntimeRequirements
    */
   public function testViewsExcludedFromPrimaryKeyCheck(): void {
     // Mock the transaction isolation level query.
@@ -155,7 +163,7 @@ class RequirementsTraitTest extends UnitTestCase {
   /**
    * Tests that tables without primary keys are still detected.
    *
-   * @covers ::getRuntimeRequirements
+   * @legacy-covers ::getRuntimeRequirements
    */
   public function testTablesWithoutPrimaryKeyDetected(): void {
     // Mock the transaction isolation level query.
