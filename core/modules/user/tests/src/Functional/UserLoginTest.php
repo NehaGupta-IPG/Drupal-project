@@ -276,6 +276,34 @@ class UserLoginTest extends BrowserTestBase {
   }
 
   /**
+   * Tests that flood logging works as expected.
+   */
+  public function testFloodLogging(): void {
+    $this->config('user.flood')
+      // Set a high global limit out so that it is not relevant in the test.
+      ->set('ip_limit', 4000)
+      ->set('user_limit', 3)
+      ->save();
+    $database = \Drupal::database();
+    $user = $this->drupalCreateUser();
+    $user->passRaw .= 'incorrect';
+    // Make 2 failed login attempts, which should not trigger flood control
+    // as the limit is 3.
+    for ($i = 0; $i < 3; $i++) {
+      $this->assertFailedLogin($user);
+      $logs = $database->select('watchdog', 'w')
+        ->fields('w', ['message'])
+        ->condition('type', 'user')
+        ->condition('message', 'Flood control blocked%', 'LIKE')
+        ->orderBy('wid', 'DESC')
+        ->execute()
+        ->fetchAssoc();
+      $this->assertEmpty($logs);
+    }
+
+  }
+
+  /**
    * Make an unsuccessful login attempt.
    *
    * @param \Drupal\user\Entity\User $account
