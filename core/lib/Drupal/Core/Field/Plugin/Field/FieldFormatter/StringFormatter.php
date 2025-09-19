@@ -198,7 +198,7 @@ class StringFormatter extends FormatterBase {
       if ($url->access()) {
         $rel = 'latest-version';
       }
-      // else keep $rel as 'revision' so consumers that expect revision links aren't broken.
+      // Else keep $rel as 'revision'.
     }
 
     return $entity->toUrl($rel);
