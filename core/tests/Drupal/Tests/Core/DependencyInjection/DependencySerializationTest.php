@@ -49,39 +49,41 @@ class DependencySerializationTest extends UnitTestCase {
     $this->assertTrue($container->has(ReverseContainer::class));
     $this->assertSame($service, $dependencySerialization->service);
     $this->assertNotEquals($service2, $dependencySerialization->service);
-    $this->assertSame($service2, ($dependencySerialization->serviceClosure)());
-    $this->assertNotEquals($service, ($dependencySerialization->serviceClosure)());
+    $this->assertSame($service2, ($dependencySerialization->closure)());
+    $this->assertNotEquals($service, ($dependencySerialization->closure)());
     $this->assertSame($container, $dependencySerialization->container);
     $this->assertEmpty($dependencySerialization->getServiceIds());
     $this->assertEmpty($dependencySerialization->getServiceClosureIds());
 
-    // Test that DependencySerializationTrait does not handle closure properties
-    // that have arguments.
-    $throwable = NULL;
-    $dependencySerialization->nonServiceClosure = static fn (int $test) => $test;
-    try {
-      serialize($dependencySerialization);
+    // Test that exceptions are thrown when attempting to serialize class
+    // properties that are closures that DependencySerializationTrait does not
+    // handle.
+    $closures = [
+      // Closure with at least one argument.
+      static fn(int $test) => $service2,
+      // Closure that returns an empty value.
+      static fn() => FALSE,
+      // Closure that does not return an object.
+      static fn() => 'test',
+      // Closure that returns an object that is not a registered service object.
+      static fn() => new \stdClass(),
+    ];
+    $countThrown = 0;
+    foreach ($closures as $closure) {
+      $throwable = NULL;
+      $dependencySerialization->closure = $closure;
+      try {
+        serialize($dependencySerialization);
+      }
+      catch (\Throwable $throwable) {
+        $countThrown++;
+      }
+      finally {
+        $this->assertInstanceOf(\Exception::class, $throwable);
+        $this->assertSame("Serialization of 'Closure' is not allowed", $throwable->getMessage());
+      }
     }
-    catch (\Throwable $throwable) {
-    }
-    finally {
-      $this->assertInstanceOf(\Exception::class, $throwable);
-      $this->assertSame("Serialization of 'Closure' is not allowed", $throwable->getMessage());
-    }
-
-    // Test that DependencySerializationTrait does not handle closure properties
-    // that do not return registered service objects.
-    $throwable = NULL;
-    $dependencySerialization->nonServiceClosure = static fn () => new \stdClass();
-    try {
-      serialize($dependencySerialization);
-    }
-    catch (\Throwable $throwable) {
-    }
-    finally {
-      $this->assertInstanceOf(\Exception::class, $throwable);
-      $this->assertSame("Serialization of 'Closure' is not allowed", $throwable->getMessage());
-    }
+    $this->assertEquals(count($closures), $countThrown);
   }
 
 }
@@ -93,17 +95,9 @@ class DependencySerializationTestDummy {
 
   use DependencySerializationTrait;
 
-  /**
-   * Used to test closures that are not "service closures".
-   *
-   * DependencySerializationTrait only handles closures that have no
-   * arguments and return valid registered service objects.
-   */
-  public \Closure $nonServiceClosure;
-
   public function __construct(
     public \stdClass $service,
-    public \Closure $serviceClosure,
+    public \Closure $closure,
     public ?ContainerInterface $container = NULL,
   ) {}
 
