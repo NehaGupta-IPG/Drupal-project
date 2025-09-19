@@ -8,12 +8,13 @@ use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use Drupal\twig_theme_test\TwigThemeTestUtils;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests Twig-specific theme functionality.
- *
- * @group Theme
  */
+#[Group('Theme')]
 class EngineTwigTest extends BrowserTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -44,7 +45,7 @@ class EngineTwigTest extends BrowserTestBase {
       ->set('default', 'test_theme')
       ->save();
     $this->drupalGet('twig-theme-test/php-variables');
-    foreach (_test_theme_twig_php_values() as $type => $value) {
+    foreach (TwigThemeTestUtils::phpValues() as $type => $value) {
       $this->assertSession()->responseContains('<li>' . $type . ': ' . $value['expected'] . '</li>');
     }
   }

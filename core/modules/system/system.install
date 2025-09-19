@@ -170,6 +170,21 @@ function system_update_11201(): void {
 }
 
 /**
+ * Add an [exit_code] column to the {simpletest} table, if existing.
+ */
+function system_update_11202(): void {
+  $schema = \Drupal::database()->schema();
+  if ($schema->tableExists('simpletest') && !$schema->fieldExists('simpletest', 'exit_code')) {
+    $schema->addField('simpletest', 'exit_code', [
+      'type' => 'int',
+      'not null' => TRUE,
+      'default' => 0,
+      'description' => 'The exit code of the test executed.',
+    ]);
+  }
+}
+
+/**
  * Update .htaccess-files to add a CSP-header for image/svg+xml.
  */
 function system_update_11103(): TranslatableMarkup|null {

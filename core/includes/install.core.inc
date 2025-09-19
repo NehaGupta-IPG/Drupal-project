@@ -1197,7 +1197,7 @@ function install_database_errors($database, $settings_file) {
 
   try {
     $driverExtension = Database::getDriverList()->get($database['namespace']);
-    // Run driver specific validation
+    // Run driver specific validation.
     $errors = $driverExtension->getInstallTasks()->validateDatabaseSettings($database);
     if (!empty($errors)) {
       // No point to try further.
@@ -1438,7 +1438,7 @@ function install_retrieve_file($uri, $destination) {
   $file_system = \Drupal::service('file_system');
   if (is_dir($file_system->realpath($destination))) {
     // Prevent URIs with triple slashes when gluing parts together.
-    $path = str_replace('///', '//', "$destination/") . $file_system->basename($parsed_url['path']);
+    $path = str_replace('///', '//', "$destination/") . basename($parsed_url['path']);
   }
   else {
     $path = $destination;
