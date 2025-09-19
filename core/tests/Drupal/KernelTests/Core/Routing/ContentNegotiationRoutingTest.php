@@ -21,7 +21,7 @@ class ContentNegotiationRoutingTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['content_negotiation_test', 'path_alias', 'system'];
+  protected static $modules = ['content_negotiation_test', 'path_alias', 'system', 'user'];
 
   /**
    * {@inheritdoc}
@@ -30,6 +30,7 @@ class ContentNegotiationRoutingTest extends KernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('path_alias');
+    $this->installEntitySchema('user');
   }
 
   /**

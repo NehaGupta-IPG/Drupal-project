@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\path_alias\Functional\Rest;
 
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\path_alias\Entity\PathAlias;
 use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
+use Drupal\path_alias\Entity\PathAlias;
 
 /**
  * Base class for path_alias EntityResource tests.
@@ -61,6 +61,7 @@ abstract class PathAliasResourceTestBase extends EntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getExpectedNormalizedEntity() {
+
     return [
       'id' => [
         [
@@ -97,6 +98,20 @@ abstract class PathAliasResourceTestBase extends EntityResourceTestBase {
           'value' => $this->entity->uuid(),
         ],
       ],
+      'revision_uid' => [],
+      'changed' => [
+        [
+          'value' => (new \DateTime())->setTimestamp($this->entity->getChangedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
+          'format' => \DateTime::RFC3339,
+        ],
+      ],
+      'revision_timestamp' => [
+        [
+          'value' => (new \DateTime())->setTimestamp($this->entity->getChangedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
+          'format' => \DateTime::RFC3339,
+        ],
+      ],
+      "revision_log" => [],
     ];
   }
 

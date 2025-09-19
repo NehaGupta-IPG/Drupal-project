@@ -81,6 +81,7 @@ class PathAliasTest extends ResourceTestBase {
     $self_url = clone $base_url;
     $version_identifier = 'id:' . $this->entity->getRevisionId();
     $self_url = $self_url->setOption('query', ['resourceVersion' => $version_identifier]);
+    $time = (new \DateTime())->setTimestamp($this->entity->getChangedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339);
     return [
       'jsonapi' => [
         'meta' => [
@@ -106,6 +107,22 @@ class PathAliasTest extends ResourceTestBase {
           'status' => TRUE,
           'drupal_internal__id' => 1,
           'drupal_internal__revision_id' => 1,
+          'revision_log' => NULL,
+          'changed' => $time,
+          'revision_timestamp' => $time,
+        ],
+        'relationships' => [
+          'revision_uid' => [
+            'data' => NULL,
+            'links' => [
+              "related" => [
+                "href" => $base_url->toString() . "/revision_uid?resourceVersion=id%3A1",
+              ],
+              "self" => [
+                "href" => $base_url->toString() . "/relationships/revision_uid?resourceVersion=id%3A1",
+              ],
+            ],
+          ],
         ],
       ],
     ];

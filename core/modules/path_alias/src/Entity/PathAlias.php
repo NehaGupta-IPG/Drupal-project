@@ -3,7 +3,8 @@
 namespace Drupal\path_alias\Entity;
 
 use Drupal\Core\Entity\Attribute\ContentEntityType;
-use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EditorialContentEntityBase;
 use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -28,6 +29,7 @@ use Drupal\path_alias\PathAliasStorageSchema;
     'revision' => 'revision_id',
     'langcode' => 'langcode',
     'uuid' => 'uuid',
+    'status' => 'status',
     'published' => 'status',
   ],
   handlers: [
@@ -36,7 +38,9 @@ use Drupal\path_alias\PathAliasStorageSchema;
   ],
   admin_permission: 'administer url aliases',
   base_table: 'path_alias',
+  show_revision_ui: TRUE,
   revision_table: 'path_alias_revision',
+  revision_data_table: 'path_alias_field_revision',
   label_count: [
     'singular' => '@count URL alias',
     'plural' => '@count URL aliases',
@@ -45,8 +49,14 @@ use Drupal\path_alias\PathAliasStorageSchema;
   constraints: [
     'UniquePathAlias' => [],
   ],
+  revision_metadata_keys: [
+    'revision_default' => 'revision_default',
+    'revision_user' => 'revision_uid',
+    'revision_created' => 'revision_timestamp',
+    'revision_log_message' => 'revision_log',
+  ],
 )]
-class PathAlias extends ContentEntityBase implements PathAliasInterface {
+class PathAlias extends EditorialContentEntityBase implements PathAliasInterface {
 
   use EntityPublishedTrait;
 
@@ -81,7 +91,13 @@ class PathAlias extends ContentEntityBase implements PathAliasInterface {
         ],
       ]);
 
-    $fields['langcode']->setDefaultValue(LanguageInterface::LANGCODE_NOT_SPECIFIED);
+    $fields['changed'] = BaseFieldDefinition::create('changed')
+      ->setLabel(t('Changed'))
+      ->setDescription(t('The time when alias was last edited.'))
+      ->setRevisionable(TRUE)
+      ->setTranslatable(TRUE);
+
+    $fields['langcode']->setRevisionable(TRUE)->setDefaultValue(LanguageInterface::LANGCODE_NOT_SPECIFIED);
 
     // Add the published field.
     $fields += static::publishedBaseFieldDefinitions($entity_type);
@@ -99,7 +115,34 @@ class PathAlias extends ContentEntityBase implements PathAliasInterface {
     // Trim the alias value of whitespace and slashes. Ensure to not trim the
     // slash on the left side.
     $alias = rtrim(trim($this->getAlias()), "\\/");
+    $original_alias = isset($this->original) ?
+    rtrim(trim($this->original->getAlias()), "\\/") : $alias;
+    // If alias is changed create a new revision.
+    $route_content_entity = $this->getRouteEntity();
+    $time = \Drupal::service('datetime.time')->getRequestTime();
+    if ($route_content_entity && $original_alias !== $alias) {
+      $this->setNewRevision(TRUE);
+      $current_user = \Drupal::currentUser();
+      $this->setRevisionUserId($current_user->id());
+      $this->setRevisionCreationTime($time);
+    }
+    $this->setChangedTime($time);
     $this->setAlias($alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSaveRevision(EntityStorageInterface $storage, \stdClass $record): void {
+    parent::preSaveRevision($storage, $record);
+
+    if (!$this->isNewRevision() && isset($this->original) && (!isset($record->revision_log) || $record->revision_log === '')) {
+      // If we are updating an existing node without adding a new revision, we
+      // need to make sure $entity->revision_log is reset whenever it is empty.
+      // Therefore, this code allows us to avoid clobbering an existing log
+      // entry with an empty one.
+      $record->revision_log = $this->original->revision_log->value;
+    }
   }
 
   /**
@@ -169,6 +212,28 @@ class PathAlias extends ContentEntityBase implements PathAliasInterface {
    */
   public function getCacheTagsToInvalidate() {
     return ['route_match'];
+  }
+
+  /**
+   * Gets the content entity from the current route.
+   */
+  public function getRouteEntity(): mixed {
+    $route_match = \Drupal::routeMatch();
+    // Entity will be found in the route parameters.
+    if (($route = $route_match->getRouteObject())
+    && ($parameters = $route->getOption('parameters'))) {
+      // Determine if the current route represents an entity.
+      foreach ($parameters as $name => $options) {
+        if (isset($options['type'])
+        && strpos($options['type'], 'entity:') === 0) {
+          $entity = $route_match->getParameter($name);
+          if ($entity instanceof ContentEntityInterface && $entity->hasLinkTemplate('canonical')) {
+            return $entity->getEntityTypeId();
+          }
+        }
+      }
+    }
+    return FALSE;
   }
 
 }

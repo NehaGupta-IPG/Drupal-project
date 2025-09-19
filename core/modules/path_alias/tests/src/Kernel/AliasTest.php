@@ -8,9 +8,9 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\MemoryCounterBackend;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use Drupal\path_alias\AliasManager;
 use Drupal\path_alias\AliasPrefixList;
-use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 
 /**
  * Tests path alias CRUD and lookup functionality.
@@ -26,7 +26,7 @@ class AliasTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['path_alias'];
+  protected static $modules = ['path_alias', 'user'];
 
   /**
    * {@inheritdoc}

@@ -42,6 +42,7 @@ class RouteProviderTest extends KernelTestBase {
     'url_alter_test',
     'language',
     'path_alias',
+    'user',
   ];
 
   /**
@@ -106,7 +107,7 @@ class RouteProviderTest extends KernelTestBase {
     $this->pathProcessor = \Drupal::service('path_processor_manager');
     $this->cacheTagsInvalidator = \Drupal::service('cache_tags.invalidator');
     $this->installEntitySchema('path_alias');
-
+    $this->installEntitySchema('user');
     $this->logger = new TestLogger();
   }
 
