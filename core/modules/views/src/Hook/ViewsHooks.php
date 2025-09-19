@@ -31,6 +31,8 @@ class ViewsHooks {
   public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.views':
+        $segments = \Drupal::service('views.reserved_path_checker')->listReservedFirstSegments();
+
         $output = '';
         $output .= '<h2>' . $this->t('About') . '</h2>';
         $output .= '<p>' . $this->t('The Views module provides a back end to fetch information from content, user accounts, taxonomy terms, and other entities from the database and present it to the user as a grid, HTML list, table, unformatted list, etc. The resulting displays are known generally as <em>views</em>.') . '</p>';
@@ -45,7 +47,18 @@ class ViewsHooks {
         $output .= '<dt>' . $this->t('Adding functionality to administrative pages') . '</dt>';
         $output .= '<dd>' . $this->t('The Views module adds functionality to some core administration pages. For example, <em>admin/content</em> uses Views to filter and sort content. With Views uninstalled, <em>admin/content</em> is more limited.') . '</dd>';
         $output .= '<dt>' . $this->t('Reserved paths') . '</dt>';
-        $output .= '<dd>' . $this->t('Some paths such as "core", "libraries", "modules", "profiles", "sites", and "themes" are reserved, and cannot be used since they are Drupal web root folders.') . '</dd>';
+        if (!empty($segments)) {
+          $output .= '<dd>' . $this->t(
+              'Some paths are reserved and cannot be used because they match directories in the site web root: @list.',
+              ['@list' => implode(', ', $segments)]
+            ) . '</dd>';
+        }
+        else {
+          // If no directories are detected.
+          $output .= '<dd>' . $this->t(
+              'Some paths are reserved and cannot be used because they match directories in the site web root.'
+            ) . '</dd>';
+        }
         $output .= '<dt>' . $this->t('Expanding Views functionality') . '</dt>';
         $output .= '<dd>' . $this->t('Contributed projects that support the Views module can be found in the <a href=":node">online documentation for Views-related contributed modules</a>.', [':node' => 'https://www.drupal.org/documentation/modules/views/add-ons']) . '</dd>';
         $output .= '<dt>' . $this->t('Improving table accessibility') . '</dt>';
