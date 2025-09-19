@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\batch_test\EventSubscriber;
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -34,13 +34,89 @@ class CloudflareQueryStringSortSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    $query_string = $request->getQueryString();
+    $query_string = $this->getQueryStringFromRequestUri($request);
 
     // Only process if there's a query string to sort.
     if (!$query_string) {
       return;
     }
 
+    $sorted_query_string = $this->getSortedQueryString($request, $query_string);
+
+    if ($sorted_query_string !== $query_string) {
+      $this->updateRequestQueryString($request, $sorted_query_string);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getSubscribedEvents(): array {
+    // Use high priority to ensure this runs early in the request cycle.
+    $events[KernelEvents::REQUEST][] = ['sortQueryString', 1000];
+    return $events;
+  }
+
+  /**
+   * Updates the query string in the request object.
+   *
+   * This method updates both the query parameters and server variables to
+   * reflect the new query string. It modifies:
+   * - The request's query parameters.
+   * - The QUERY_STRING server variable.
+   * - The REQUEST_URI server variable.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request object to modify.
+   * @param string $new_query_string
+   *   The new query string to set.
+   */
+  protected function updateRequestQueryString(Request $request, string $new_query_string): void {
+    parse_str($new_query_string, $params);
+
+    $request->query->replace($params);
+    $request->server->set('QUERY_STRING', $new_query_string);
+
+    $pathInfo = $request->getPathInfo();
+    $new_request_uri = $pathInfo . ($new_query_string ? '?' . $new_query_string : '');
+    $request->server->set('REQUEST_URI', $new_request_uri);
+  }
+
+  /**
+   * Extracts the query string from a request's URI.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The Request object to extract the query string from.
+   *
+   * @return string
+   *   The query string portion of the URI, or an empty string if no query
+   *   string exists.
+   */
+  protected function getQueryStringFromRequestUri(Request $request): string {
+    $request_uri = $request->getRequestUri();
+    return parse_url($request_uri, PHP_URL_QUERY);
+  }
+
+  /**
+   * Sorts query string parameters in ascending order by name and value.
+   *
+   * This method parses the query string and sorts parameters according to
+   * Cloudflare's Query String Sort behavior:
+   * - Parameters are primarily sorted by name in ascending order.
+   * - Parameters with the same name are sorted by their values.
+   * - Array parameters (ending with []) are preserved with their array
+   *   notation.
+   * - Parameters without values are maintained as valueless in the output.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The Request object containing the query parameters.
+   * @param string $query_string
+   *   The raw query string to be sorted.
+   *
+   * @return string
+   *   The sorted query string with encoded parameter names and values.
+   */
+  protected function getSortedQueryString(Request $request, string $query_string): string {
     // Parse the query string manually to preserve duplicate parameter names.
     $params = [];
     $pairs = explode('&', $query_string);
@@ -92,24 +168,7 @@ class CloudflareQueryStringSortSubscriber implements EventSubscriberInterface {
       }
     }
 
-    $sorted_query_string = implode('&', $sorted_parts);
-
-    // If the query string changed, redirect to the sorted version.
-    if ($sorted_query_string !== $query_string) {
-      $path = $request->getPathInfo();
-      $redirect_url = $request->getUriForPath($path) . '?' . $sorted_query_string;
-      $response = new RedirectResponse($redirect_url);
-      $event->setResponse($response);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getSubscribedEvents(): array {
-    // Use high priority to ensure this runs early in the request cycle.
-    $events[KernelEvents::REQUEST][] = ['sortQueryString', 1000];
-    return $events;
+    return implode('&', $sorted_parts);
   }
 
 }
