@@ -176,7 +176,12 @@ class ThemeInstaller implements ThemeInstallerInterface {
             ARRAY_FILTER_USE_KEY
           );
           if ($third_party_settings !== $theme_config->get('third_party_settings') ?? []) {
-            $theme_config->set('third_party_settings', $third_party_settings)->save();
+            if (empty($third_party_settings)) {
+              $theme_config->clear('third_party_settings')->save();
+            }
+            else {
+              $theme_config->set('third_party_settings', $third_party_settings)->save();
+            }
           }
         }
       }
