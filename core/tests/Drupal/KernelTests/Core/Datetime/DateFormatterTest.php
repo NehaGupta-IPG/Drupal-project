@@ -139,11 +139,11 @@ class DateFormatterTest extends KernelTestBase {
 
   /**
    * Tests that an ISO 8601 formatted date returns the correct week of the year.
+   *
    * It must use ->format('o-W') not ->format('Y-W') to always return the
    * correct week.
    *
    * @see https://www.php.net/manual/en/datetime.format.php#129945
-   *
    */
   public function testIso8601DateFormat(): void {
     /** @var \Drupal\Core\Datetime\DateFormatterInterface $formatter */
