@@ -421,8 +421,10 @@ class LayoutBuilderHooks {
   /**
    * Implements hook_config_schema_info_alter().
    */
-  #[Hook('config_schema_info_alter')]
+  #[Hook('config_schema_info_alter', order: Order::Last)]
   public function configSchemaInfoAlter(&$definitions): void {
+    // It's needed to run after field_ui module in order to perform
+    // our alterations for the form element once main logic is done.
     $map = [
       'core.entity_view_display.*.*.*.third_party.layout_builder' => LayoutBuilderDisplayElement::class,
       'core.entity_form_display.*.*.*' => LayoutBuilderEntityDisplayElement::class,
