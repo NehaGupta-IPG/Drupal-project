@@ -137,4 +137,20 @@ class DateFormatterTest extends KernelTestBase {
     $this->assertEquals('Sat, 02 Feb 2019 13:30:00 +0100', $formatter->format(1549110600, 'custom', 'r', 'Europe/Berlin'));
   }
 
+  /**
+   * Tests that an ISO 8601 formatted date returns the correct week of the year.
+   * It must use ->format('o-W') not ->format('Y-W') to always return the
+   * correct week.
+   *
+   * @see https://www.php.net/manual/en/datetime.format.php#129945
+   *
+   */
+  public function testIso8601DateFormat(): void {
+    /** @var \Drupal\Core\Datetime\DateFormatterInterface $formatter */
+    $formatter = $this->container->get('date.formatter');
+    // Some dates like this one are gotchas and can return the wrong value.
+    $timestamp = strtotime('2024-12-30T00:00:00+00:00');
+    $this->assertSame('2025-W01', $formatter->format($timestamp, 'html_week'), 'Test gotcha in html_week date format.');
+  }
+
 }
