@@ -721,7 +721,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
   protected function getRankings() {
     if (!$this->rankings) {
       $this->rankings = $this->moduleHandler->invokeAll('node_search_ranking');
-      $this->rankings += $this->moduleHandler->invokeAllDeprecated('Use hook_node_search_ranking() instead. See https://www.drupal.org/node/2690393.', 'ranking');
+      $this->rankings += $this->moduleHandler->invokeAll('ranking');
     }
     return $this->rankings;
   }

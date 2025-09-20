@@ -14,6 +14,7 @@ use Drupal\search\SearchIndexInterface;
 /**
  * Search related hook implementations for node module.
  */
+#[DeprecatedHook('ranking', 'drupal', '11.3.0', '12.0.0', 'Use hook_node_search_ranking() instead.', 'https://www.drupal.org/node/2690393')]
 class NodeSearchHooks {
 
   use StringTranslationTrait;
