@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\olivero\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the update path for Olivero.
- *
- * @group Update
- * @group #slow
  */
+#[Group('olivero')]
+#[Group('Update')]
+#[Group('#slow')]
+#[CoversFunction('olivero_post_update_remove_shortcut_settings_if_not_installed')]
 class OliveroPostUpdateTest extends UpdatePathTestBase {
 
   /**
