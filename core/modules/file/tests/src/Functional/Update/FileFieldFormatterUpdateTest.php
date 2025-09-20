@@ -7,14 +7,14 @@ namespace Drupal\Tests\file\Functional\Update;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\file\FileUrlType;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests update of the 'absolute_url' file and image field formatter setting.
  *
  * @see file_post_update_set_default_absolute_url()
- *
- * @group file
  */
+#[Group(('file'))]
 class FileFieldFormatterUpdateTest extends UpdatePathTestBase {
 
   /**
