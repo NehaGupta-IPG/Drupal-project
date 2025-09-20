@@ -60,7 +60,12 @@ class ManagedFile extends FormElementBase {
    */
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
     // Find the current value of this field.
-    $fids = !empty($input['fids']) ? explode(' ', $input['fids']) : [];
+    if (!empty($input) && \is_array($input['fids'])) {
+      $fids = $input['fids'];
+    }
+    else {
+      $fids = !empty($input['fids']) ? explode(' ', $input['fids']) : [];
+    }
     foreach ($fids as $key => $fid) {
       $fids[$key] = (int) $fid;
     }
