@@ -90,7 +90,7 @@ class MediaLibraryUiBuilder {
   public static function dialogOptions() {
     return [
       'classes' => [
-        'ui-dialog' => 'media-library-widget-modal',
+        'ui-dialog' => 'js-media-library-widget-modal',
       ],
       'title' => t('Add or select media'),
       'height' => '75%',
