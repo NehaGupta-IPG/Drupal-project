@@ -555,7 +555,7 @@ class AliasManagerTest extends UnitTestCase {
    *
    * @legacy-covers ::getAliasByPath
    */
-  public function testInvalidArgumentException() {
+  public function testInvalidArgumentException(): void {
     $this->expectException(\InvalidArgumentException::class);
     $this->aliasManager->getAliasByPath('');
   }
