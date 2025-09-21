@@ -553,7 +553,7 @@ class AliasManagerTest extends UnitTestCase {
   /**
    * Tests getAliasByPath invalid argument exception for an invalid path.
    *
-   * @covers ::getAliasByPath
+   * @legacy-covers ::getAliasByPath
    */
   public function testInvalidArgumentException() {
     $this->expectException(\InvalidArgumentException::class);
