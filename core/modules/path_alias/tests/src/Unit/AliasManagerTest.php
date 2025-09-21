@@ -560,7 +560,7 @@ class AliasManagerTest extends UnitTestCase {
     $this->aliasManager->getAliasByPath('');
   }
 
-    /**
+  /**
    * Tests getAliasByPath invalid argument exception for an invalid path.
    *
    * @legacy-covers ::getAliasByPath
