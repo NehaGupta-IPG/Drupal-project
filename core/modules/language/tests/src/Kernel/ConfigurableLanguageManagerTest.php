@@ -6,6 +6,7 @@ namespace Drupal\Tests\language\Kernel;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
+use Drupal\language\Entity\ConfigurableLanguage;
 
 /**
  * Tests the ConfigurableLanguage entity.
@@ -52,6 +53,22 @@ class ConfigurableLanguageManagerTest extends LanguageTestBase {
   public function testLanguageSwitchLinks(): void {
     $this->languageNegotiator->setCurrentUser($this->prophesize('Drupal\Core\Session\AccountInterface')->reveal());
     $this->languageManager->getLanguageSwitchLinks(LanguageInterface::TYPE_INTERFACE, new Url('<current>'));
+  }
+
+  /**
+   * @covers ::setCurrentLanguage
+   */
+  public function testSetCurrentLanguage() {
+    $this->assertEquals('en', \Drupal::languageManager()
+      ->getCurrentLanguage(LanguageInterface::TYPE_INTERFACE)->getId());
+
+    $language_code = 'es';
+    $current_language = \Drupal::languageManager()
+      ->setCurrentLanguage(ConfigurableLanguage::createFromLangcode($language_code), LanguageInterface::TYPE_INTERFACE);
+    $this->assertEquals('en', $current_language->getId());
+
+    $this->assertEquals($language_code, \Drupal::languageManager()
+      ->getCurrentLanguage(LanguageInterface::TYPE_INTERFACE)->getId());
   }
 
 }
