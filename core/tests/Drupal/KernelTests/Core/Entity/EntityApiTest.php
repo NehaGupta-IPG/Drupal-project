@@ -283,4 +283,17 @@ class EntityApiTest extends EntityKernelTestBase {
     $entity->save();
   }
 
+  /**
+   * Tests that no errors happen if there are preloaded entities.
+   *
+   * @covers \Drupal\Core\Entity\EntityStorageBase::loadMultiple
+   */
+  public function testEntityPreloading(): void {
+    $storage = \Drupal::entityTypeManager()->getStorage('entity_test');
+    $entity = $storage->create(['name' => 'no_preloading']);
+    $entity->save();
+    \Drupal::state()->set('preloaded_entities', [$entity]);
+    $this->assertEquals([$entity->id() => $entity], $storage->loadMultiple());
+  }
+
 }

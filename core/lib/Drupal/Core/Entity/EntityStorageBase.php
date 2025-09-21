@@ -300,7 +300,9 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
 
       // If any entities were pre-loaded, remove them from the IDs still to
       // load.
-      $ids = array_keys(array_diff_key($flipped_ids, $entities));
+      if ($flipped_ids) {
+        $ids = array_keys(array_diff_key($flipped_ids, $entities));
+      }
 
       // Add pre-loaded entities to the cache.
       $this->setStaticCache($preloaded_entities);

@@ -767,4 +767,12 @@ class EntityTestHooks {
     $state->set($key, $hooks);
   }
 
+  /**
+   * Implements hook_entity_preload().
+   */
+  #[Hook('entity_preload')]
+  public function entityPreload(array $entities, string $type) : ?array {
+    return \Drupal::state()->get('preloaded_entities');
+  }
+
 }
