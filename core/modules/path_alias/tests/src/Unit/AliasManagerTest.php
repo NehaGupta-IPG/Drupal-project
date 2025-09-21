@@ -557,6 +557,7 @@ class AliasManagerTest extends UnitTestCase {
    */
   public function testInvalidArgumentExceptionEmptyPath(): void {
     $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage('Source path has to start with a slash.');
     $this->aliasManager->getAliasByPath('');
   }
 
@@ -567,6 +568,7 @@ class AliasManagerTest extends UnitTestCase {
    */
   public function testInvalidArgumentExceptionPathNoForwardSlash(): void {
     $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage('Source path no/leading-forward-slash has to start with a slash.');
     $this->aliasManager->getAliasByPath('no/leading-forward-slash');
   }
 
