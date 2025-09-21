@@ -102,6 +102,10 @@ final class DrupalCustomRector extends AbstractRector implements MinPhpVersionIn
                 return null;
             }
 
+            if ($classReflection->isAbstract()) {
+                return null;
+            }
+
             self::$testedClassName = null;
             self::$currentClassName = $nodeName;
             self::$currentClassNode = $node;
