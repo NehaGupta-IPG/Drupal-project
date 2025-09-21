@@ -555,7 +555,7 @@ class AliasManagerTest extends UnitTestCase {
    *
    * @legacy-covers ::getAliasByPath
    */
-  public function testInvalidArgumentException(): void {
+  public function testInvalidArgumentExceptionEmptyPath(): void {
     $this->expectException(\InvalidArgumentException::class);
     $this->aliasManager->getAliasByPath('');
   }
@@ -565,7 +565,7 @@ class AliasManagerTest extends UnitTestCase {
    *
    * @legacy-covers ::getAliasByPath
    */
-  public function testInvalidArgumentException(): void {
+  public function testInvalidArgumentExceptionPathNoForwardSlash(): void {
     $this->expectException(\InvalidArgumentException::class);
     $this->aliasManager->getAliasByPath('no/leading-forward-slash');
   }
