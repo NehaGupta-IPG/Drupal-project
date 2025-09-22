@@ -6,11 +6,12 @@ namespace Drupal\Tests\file\Functional;
 
 use Drupal\Tests\rest\Functional\CookieResourceTestTrait;
 use Drupal\Tests\rest\Functional\FileUploadResourceTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @group file
- * @group #slow
+ * Tests File Upload Json Cookie.
  */
+#[Group('file')]
 class FileUploadJsonCookieTest extends FileUploadResourceTestBase {
 
   use CookieResourceTestTrait;

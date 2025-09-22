@@ -19,16 +19,13 @@ use Drupal\node\Entity\NodeType;
 class PathItemTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'path',
     'path_alias',
     'node',
     'user',
-    'system',
     'language',
     'content_translation',
   ];

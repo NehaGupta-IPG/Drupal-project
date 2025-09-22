@@ -22,11 +22,6 @@ class DownloadTest extends FileTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system'];
-
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->container->get('stream_wrapper_manager')->registerWrapper('temporary', 'Drupal\Core\StreamWrapper\TemporaryStream', StreamWrapperInterface::LOCAL_NORMAL);
@@ -83,7 +78,7 @@ class DownloadTest extends FileTestBase {
       $fix_permissions();
       $this->fail('MigrateException was not thrown for non-writable destination URI.');
     }
-    catch (MigrateException $e) {
+    catch (MigrateException) {
       $this->assertTrue(TRUE, 'MigrateException was thrown for non-writable destination URI.');
       $fix_permissions();
     }

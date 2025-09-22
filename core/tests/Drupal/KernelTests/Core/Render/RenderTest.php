@@ -5,18 +5,17 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Render;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Performs functional tests on \Drupal::service('renderer')->render().
- *
- * @group Common
  */
+#[Group('Common')]
 class RenderTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'common_test', 'theme_test'];
 
@@ -59,7 +58,7 @@ class RenderTest extends KernelTestBase {
     ];
     $this->render($build);
     $this->removeWhiteSpace();
-    $this->assertNoRaw('<div>kangarookitten</div>');
+    $this->assertNoRaw('<div>kangaroo-kitten</div>');
   }
 
   /**
@@ -76,9 +75,8 @@ class RenderTest extends KernelTestBase {
 
   /**
    * Tests the deprecation of \Drupal\Core\Render\Renderer::renderPlain()
-   *
-   * @group legacy
    */
+  #[IgnoreDeprecations]
   public function testDeprecateRenderPlain(): void {
     $message = ['#markup' => 'Test'];
     \Drupal::service('renderer')->renderPlain($message);

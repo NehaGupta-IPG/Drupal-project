@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the listing of configuration entities.
- *
- * @group config
  */
+#[Group('config')]
 class ConfigEntityNormalizeTest extends KernelTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['config_test'];
 
@@ -28,6 +26,9 @@ class ConfigEntityNormalizeTest extends KernelTestBase {
     $this->installConfig(static::$modules);
   }
 
+  /**
+   * Tests the normalization of configuration data when saved.
+   */
   public function testNormalize(): void {
     $config_entity = \Drupal::entityTypeManager()->getStorage('config_test')->create(['id' => 'system', 'label' => 'foobar', 'weight' => 1]);
     $config_entity->save();

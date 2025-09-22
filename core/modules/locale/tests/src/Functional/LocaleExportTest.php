@@ -6,20 +6,17 @@ namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Core\File\FileExists;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore janvier lundi
-
 /**
  * Tests the exportation of locale files.
- *
- * @group locale
  */
+#[Group('locale')]
 class LocaleExportTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['locale'];
 
@@ -30,6 +27,8 @@ class LocaleExportTest extends BrowserTestBase {
 
   /**
    * A user able to create languages and export translations.
+   *
+   * @var \Drupal\user\Entity\User|false
    */
   protected $adminUser = NULL;
 

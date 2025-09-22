@@ -8,15 +8,15 @@ use Drupal\contact\Entity\ContactForm;
 use Drupal\FunctionalTests\Installer\InstallerTestBase;
 use Drupal\shortcut\Entity\Shortcut;
 use Drupal\Tests\standard\Traits\StandardTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 
 /**
  * Tests installing the Standard recipe via the installer.
- *
- * @group #slow
- * @group Recipe
  */
+#[Group('#slow')]
+#[Group('Recipe')]
 class StandardRecipeInstallTest extends InstallerTestBase {
   use StandardTestTrait {
     testStandard as doTestStandard;
@@ -46,7 +46,7 @@ class StandardRecipeInstallTest extends InstallerTestBase {
    */
   protected function visitInstaller(): void {
     // Use a URL to install from a recipe.
-    $this->drupalGet($GLOBALS['base_url'] . '/core/install.php' . '?profile=&recipe=core/recipes/standard');
+    $this->drupalGet($GLOBALS['base_url'] . '/core/install.php?profile=&recipe=core/recipes/standard');
   }
 
   /**

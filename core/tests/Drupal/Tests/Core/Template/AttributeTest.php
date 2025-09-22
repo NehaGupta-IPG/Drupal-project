@@ -12,12 +12,16 @@ use Drupal\Core\Template\AttributeArray;
 use Drupal\Core\Template\AttributeString;
 use Drupal\Core\Template\Loader\StringLoader;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Twig\Environment;
 
 /**
- * @coversDefaultClass \Drupal\Core\Template\Attribute
- * @group Template
+ * Tests Drupal\Core\Template\Attribute.
  */
+#[CoversClass(Attribute::class)]
+#[Group('Template')]
 class AttributeTest extends UnitTestCase {
 
   /**
@@ -78,7 +82,8 @@ class AttributeTest extends UnitTestCase {
 
   /**
    * Tests setting attributes.
-   * @covers ::setAttribute
+   *
+   * @legacy-covers ::setAttribute
    */
   public function testSetAttribute(): void {
     $attribute = new Attribute();
@@ -106,7 +111,8 @@ class AttributeTest extends UnitTestCase {
 
   /**
    * Tests removing attributes.
-   * @covers ::removeAttribute
+   *
+   * @legacy-covers ::removeAttribute
    */
   public function testRemoveAttribute(): void {
     $attributes = [
@@ -145,15 +151,20 @@ class AttributeTest extends UnitTestCase {
 
   /**
    * Tests adding class attributes with the AttributeArray helper method.
-   * @covers ::addClass
+   *
+   * @legacy-covers ::addClass
    */
   public function testAddClasses(): void {
-    // Add empty Attribute object with no classes.
+    // Add a class with the array syntax without first initializing the 'class'
+    // attribute.
     $attribute = new Attribute();
+    $attribute['class'][] = 'test-class';
+    $this->assertEquals(new AttributeArray('class', ['test-class']), $attribute['class']);
 
+    $attribute = new Attribute();
     // Add no class on empty attribute.
     $attribute->addClass();
-    $this->assertEmpty($attribute['class']);
+    $this->assertEmpty($attribute['class']->value());
 
     // Test various permutations of adding values to empty Attribute objects.
     foreach ([NULL, FALSE, '', []] as $value) {
@@ -197,7 +208,8 @@ class AttributeTest extends UnitTestCase {
 
   /**
    * Tests removing class attributes with the AttributeArray helper method.
-   * @covers ::removeClass
+   *
+   * @legacy-covers ::removeClass
    */
   public function testRemoveClasses(): void {
     // Add duplicate class to ensure that both duplicates are removed.
@@ -228,7 +240,8 @@ class AttributeTest extends UnitTestCase {
 
   /**
    * Tests checking for class names with the Attribute method.
-   * @covers ::hasClass
+   *
+   * @legacy-covers ::hasClass
    */
   public function testHasClass(): void {
     // Test an attribute without any classes.
@@ -243,8 +256,9 @@ class AttributeTest extends UnitTestCase {
 
   /**
    * Tests removing class attributes with the Attribute helper methods.
-   * @covers ::removeClass
-   * @covers ::addClass
+   *
+   * @legacy-covers ::removeClass
+   * @legacy-covers ::addClass
    */
   public function testChainAddRemoveClasses(): void {
     $attribute = new Attribute(
@@ -261,11 +275,11 @@ class AttributeTest extends UnitTestCase {
 
   /**
    * Tests the twig calls to the Attribute.
-   * @dataProvider providerTestAttributeClassHelpers
    *
-   * @covers ::removeClass
-   * @covers ::addClass
+   * @legacy-covers ::removeClass
+   * @legacy-covers ::addClass
    */
+  #[DataProvider('providerTestAttributeClassHelpers')]
   public function testTwigAddRemoveClasses($template, $expected, $seed_attributes = []): void {
     $loader = new StringLoader();
     $twig = new Environment($loader);
@@ -357,9 +371,11 @@ class AttributeTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::createAttributeValue
-   * @dataProvider providerTestAttributeValues
+   * Tests attribute values.
+   *
+   * @legacy-covers ::createAttributeValue
    */
+  #[DataProvider('providerTestAttributeValues')]
   public function testAttributeValues(array $attributes, $expected): void {
     $this->assertEquals($expected, (new Attribute($attributes))->__toString());
   }
@@ -448,7 +464,7 @@ class AttributeTest extends UnitTestCase {
    * @return int
    *   The number of results that are found.
    */
-  protected function getXPathResultCount($query, $html) {
+  protected function getXPathResultCount($query, $html): int {
     $document = Html::load($html);
     $xpath = new \DOMXPath($document);
 
@@ -482,9 +498,11 @@ class AttributeTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::hasAttribute
-   * @dataProvider providerTestHasAttribute
+   * Tests has attribute.
+   *
+   * @legacy-covers ::hasAttribute
    */
+  #[DataProvider('providerTestHasAttribute')]
   public function testHasAttribute(array $test_data, $test_attribute, $expected): void {
     $attributes = new Attribute($test_data);
     $this->assertSame($expected, $attributes->hasAttribute($test_attribute));
@@ -506,15 +524,19 @@ class AttributeTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::merge
-   * @dataProvider providerTestMerge
+   * Tests merge.
+   *
+   * @legacy-covers ::merge
    */
+  #[DataProvider('providerTestMerge')]
   public function testMerge($original, $merge, $expected): void {
     $this->assertEquals($expected, $original->merge($merge));
   }
 
   /**
-   * @covers ::merge
+   * Tests merge argument exception.
+   *
+   * @legacy-covers ::merge
    */
   public function testMergeArgumentException(): void {
     $attributes = new Attribute(['class' => ['example-class']]);

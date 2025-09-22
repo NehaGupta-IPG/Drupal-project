@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\taxonomy\Functional;
 
 use Drupal\Component\Utility\Unicode;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the taxonomy vocabulary permissions.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
 class VocabularyPermissionsTest extends TaxonomyTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['help'];
 

@@ -20,16 +20,13 @@ use Drupal\field\Entity\FieldStorageConfig;
 class RelationshipUserImageDataTest extends ViewsKernelTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'file',
     'field',
     'image',
     'image_test_views',
-    'system',
     'user',
   ];
 

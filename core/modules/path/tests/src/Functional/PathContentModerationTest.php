@@ -7,22 +7,20 @@ namespace Drupal\Tests\path\Functional;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests path aliases with Content Moderation.
- *
- * @group content_moderation
- * @group path
  */
+#[Group('content_moderation')]
+#[Group('path')]
 class PathContentModerationTest extends BrowserTestBase {
 
   use ContentModerationTestTrait;
   use ContentTranslationTestTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node',

@@ -89,7 +89,7 @@ class FileRepository implements FileRepositoryInterface {
    */
   public function writeData(string $data, string $destination, FileExists|int $fileExists = FileExists::Rename): FileInterface {
     if (!$fileExists instanceof FileExists) {
-      // @phpstan-ignore-next-line
+      // @phpstan-ignore staticMethod.deprecated
       $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
     }
     if (!$this->streamWrapperManager->isValidUri($destination)) {
@@ -123,7 +123,7 @@ class FileRepository implements FileRepositoryInterface {
     }
 
     if ($rename && is_file($destination)) {
-      $file->setFilename($this->fileSystem->basename($destination));
+      $file->setFilename(basename($destination));
     }
 
     $file->setPermanent();
@@ -137,7 +137,7 @@ class FileRepository implements FileRepositoryInterface {
    */
   public function copy(FileInterface $source, string $destination, FileExists|int $fileExists = FileExists::Rename): FileInterface {
     if (!$fileExists instanceof FileExists) {
-      // @phpstan-ignore-next-line
+      // @phpstan-ignore staticMethod.deprecated
       $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
     }
     if (!$this->streamWrapperManager->isValidUri($destination)) {
@@ -156,10 +156,10 @@ class FileRepository implements FileRepositoryInterface {
       // If we are renaming around an existing file (rather than a directory),
       // use its basename for the filename.
       if ($fileExists === FileExists::Rename && is_file($destination)) {
-        $file->setFilename($this->fileSystem->basename($destination));
+        $file->setFilename(basename($destination));
       }
       else {
-        $file->setFilename($this->fileSystem->basename($uri));
+        $file->setFilename(basename($uri));
       }
     }
     $file->save();
@@ -175,7 +175,7 @@ class FileRepository implements FileRepositoryInterface {
    */
   public function move(FileInterface $source, string $destination, FileExists|int $fileExists = FileExists::Rename): FileInterface {
     if (!$fileExists instanceof FileExists) {
-      // @phpstan-ignore-next-line
+      // @phpstan-ignore staticMethod.deprecated
       $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
     }
     if (!$this->streamWrapperManager->isValidUri($destination)) {
@@ -197,7 +197,7 @@ class FileRepository implements FileRepositoryInterface {
     // If we are renaming around an existing file (rather than a directory),
     // use its basename for the filename.
     elseif ($fileExists === FileExists::Rename && is_file($destination)) {
-      $file->setFilename($this->fileSystem->basename($destination));
+      $file->setFilename(basename($destination));
     }
 
     $file->save();

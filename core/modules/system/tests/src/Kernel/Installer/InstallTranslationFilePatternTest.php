@@ -15,11 +15,6 @@ use Drupal\KernelTests\KernelTestBase;
 class InstallTranslationFilePatternTest extends KernelTestBase {
 
   /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
-
-  /**
    * @var \Drupal\Core\StringTranslation\Translator\FileTranslation
    */
   protected $fileTranslation;
@@ -49,6 +44,7 @@ class InstallTranslationFilePatternTest extends KernelTestBase {
 
   /**
    * @return array
+   *   Array of valid translation files.
    */
   public static function providerValidTranslationFiles() {
     return [
@@ -68,6 +64,7 @@ class InstallTranslationFilePatternTest extends KernelTestBase {
 
   /**
    * @return array
+   *   Array of invalid translation files.
    */
   public static function providerInvalidTranslationFiles() {
     return [

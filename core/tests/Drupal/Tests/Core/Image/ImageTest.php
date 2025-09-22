@@ -8,13 +8,14 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Image\Image;
 use Drupal\Core\ImageToolkit\ImageToolkitInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
 /**
  * Tests the image class.
- *
- * @requires extension gd
- * @group Image
  */
+#[Group('Image')]
+#[RequiresPhpExtension('gd')]
 class ImageTest extends UnitTestCase {
 
   /**
@@ -62,6 +63,7 @@ class ImageTest extends UnitTestCase {
    *   (optional) Array containing methods to be replaced with stubs.
    *
    * @return \PHPUnit\Framework\MockObject\MockObject
+   *   Mocked GDToolkit instance.
    */
   protected function getToolkitMock(array $stubs = []) {
     $mock_builder = $this->getMockBuilder('Drupal\system\Plugin\ImageToolkit\GDToolkit');
@@ -81,6 +83,7 @@ class ImageTest extends UnitTestCase {
    *   The image toolkit object.
    *
    * @return \PHPUnit\Framework\MockObject\MockObject
+   *   Mocked GDToolkit operation instance.
    */
   protected function getToolkitOperationMock($class_name, ImageToolkitInterface $toolkit) {
     $mock_builder = $this->getMockBuilder('Drupal\system\Plugin\ImageToolkit\Operation\gd\\' . $class_name);

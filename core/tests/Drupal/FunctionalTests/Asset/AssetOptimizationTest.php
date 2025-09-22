@@ -6,14 +6,13 @@ namespace Drupal\FunctionalTests\Asset;
 
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore abcdefghijklmnop
-
 /**
  * Tests asset aggregation.
- *
- * @group asset
  */
+#[Group('asset')]
 class AssetOptimizationTest extends BrowserTestBase {
 
   /**
@@ -23,13 +22,10 @@ class AssetOptimizationTest extends BrowserTestBase {
 
   /**
    * The file assets path settings value.
+   *
+   * @var string
    */
   protected $fileAssetsPath;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * Tests that asset aggregates are rendered and created on disk.
@@ -187,16 +183,12 @@ class AssetOptimizationTest extends BrowserTestBase {
     $session->visit($this->setInvalidLibrary($url));
     $this->assertSession()->statusCodeEquals(200);
 
+    // When an invalid asset hash name is given.
     $session->visit($this->replaceGroupHash($url));
     $this->assertSession()->statusCodeEquals(200);
-    $headers = $session->getResponseHeaders();
-    $this->assertEquals(['no-store, private'], $headers['Cache-Control']);
-
-    // And again to confirm it's not cached on disk.
-    $session->visit($this->replaceGroupHash($url));
-    $this->assertSession()->statusCodeEquals(200);
-    $headers = $session->getResponseHeaders();
-    $this->assertEquals(['no-store, private'], $headers['Cache-Control']);
+    $current_url = $session->getCurrentUrl();
+    // Redirect to the correct one.
+    $this->assertEquals($url, $current_url);
   }
 
   /**

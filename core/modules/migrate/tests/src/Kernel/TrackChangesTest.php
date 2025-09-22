@@ -15,7 +15,6 @@ class TrackChangesTest extends MigrateTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'user',
     'taxonomy',
     'migrate',
@@ -225,8 +224,9 @@ class TrackChangesTest extends MigrateTestBase {
    *   Value to evaluate.
    *
    * @return bool
+   *   TRUE if term exists, FALSE otherwise.
    */
-  protected function termExists($property, $value) {
+  protected function termExists($property, $value): bool {
     $property = $property === 'description' ? 'description__value' : $property;
     $query = \Drupal::entityQuery('taxonomy_term')->accessCheck(FALSE);
     $result = $query

@@ -14,8 +14,6 @@ use Drupal\views\ViewExecutable;
  */
 class StyleMappingTest extends StyleTestBase {
 
-  protected static $modules = ['system'];
-
   /**
    * Views used by this test.
    *
@@ -47,7 +45,7 @@ class StyleMappingTest extends StyleTestBase {
    * @return string
    *   The view rendered as HTML.
    */
-  protected function mappedOutputHelper(ViewExecutable $view) {
+  protected function mappedOutputHelper(ViewExecutable $view): string {
     $output = $view->preview();
     $rendered_output = (string) \Drupal::service('renderer')->renderRoot($output);
     $this->storeViewPreview($rendered_output);

@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Installer;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests that an install profile can implement hook_requirements().
- *
- * @group Installer
  */
+#[Group('Installer')]
 class InstallerProfileRequirementsTest extends InstallerTestBase {
 
   /**
@@ -24,14 +25,14 @@ class InstallerProfileRequirementsTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpSettings() {
+  protected function setUpSettings(): void {
     // This form will never be reached.
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function setUpRequirementsProblem() {
+  protected function setUpRequirementsProblem(): void {
     // The parent method asserts that there are no requirements errors, but
     // this test expects a requirements error in the test method below.
     // Therefore, we override this method to suppress the parent's assertions.
@@ -40,7 +41,7 @@ class InstallerProfileRequirementsTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpSite() {
+  protected function setUpSite(): void {
     // This form will never be reached.
   }
 

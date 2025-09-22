@@ -16,9 +16,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 class PathNoCanonicalLinkTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'path',
@@ -26,7 +24,6 @@ class PathNoCanonicalLinkTest extends KernelTestBase {
     'language',
     'entity_test',
     'user',
-    'system',
   ];
 
   /**

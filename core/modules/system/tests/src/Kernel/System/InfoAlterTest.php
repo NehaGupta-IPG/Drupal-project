@@ -13,8 +13,6 @@ use Drupal\KernelTests\KernelTestBase;
  */
 class InfoAlterTest extends KernelTestBase {
 
-  protected static $modules = ['system'];
-
   /**
    * Tests that theme .info.yml data is rebuild after enabling a module.
    *

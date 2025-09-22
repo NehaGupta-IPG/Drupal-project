@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\locale\Functional;
 
-use Drupal\Tests\BrowserTestBase;
-use Drupal\locale\StringStorageInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\locale\StringStorageInterface;
+use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests translation of configuration strings.
- *
- * @group locale
  */
+#[Group('locale')]
 class LocaleConfigTranslationTest extends BrowserTestBase {
 
   /**
@@ -23,9 +23,7 @@ class LocaleConfigTranslationTest extends BrowserTestBase {
   protected $langcode;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['locale', 'contact', 'contact_test'];
 
@@ -113,7 +111,7 @@ class LocaleConfigTranslationTest extends BrowserTestBase {
     $this->assertEquals($message, $translation['message']);
 
     // Check default medium date format exists and create a translation for it.
-    $string = $this->storage->findString(['source' => 'D, m/d/Y - H:i', 'context' => 'PHP date format', 'type' => 'configuration']);
+    $string = $this->storage->findString(['source' => 'D, j M Y - H:i', 'context' => 'PHP date format', 'type' => 'configuration']);
     $this->assertNotEmpty($string, 'Configuration date formats have been created upon installation.');
 
     // Translate using the UI so configuration is refreshed.

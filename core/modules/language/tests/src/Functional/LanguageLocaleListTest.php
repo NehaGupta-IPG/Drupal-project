@@ -7,20 +7,17 @@ namespace Drupal\Tests\language\Functional;
 use Drupal\Core\Url;
 use Drupal\locale\StringStorageInterface;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore espagnol
-
 /**
  * Adds a new language with translations and tests language list order.
- *
- * @group language
  */
+#[Group('language')]
 class LanguageLocaleListTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language', 'locale'];
 

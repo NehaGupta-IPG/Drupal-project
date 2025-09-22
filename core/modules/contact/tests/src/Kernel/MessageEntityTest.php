@@ -15,12 +15,9 @@ use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 class MessageEntityTest extends EntityKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'contact',
     'field',
     'user',

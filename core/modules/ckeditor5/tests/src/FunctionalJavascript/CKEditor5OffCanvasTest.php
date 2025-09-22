@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests for CKEditor 5 to ensure correct styling in off-canvas.
  *
- * @group ckeditor5
  * @internal
  */
+#[Group('ckeditor5')]
 class CKEditor5OffCanvasTest extends CKEditor5TestBase {
 
   /**
@@ -28,7 +30,7 @@ class CKEditor5OffCanvasTest extends CKEditor5TestBase {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
-    $this->addNewTextFormat($page, $assert_session);
+    $this->addNewTextFormat();
 
     $this->drupalGet('/ckeditor5_test/off_canvas');
 

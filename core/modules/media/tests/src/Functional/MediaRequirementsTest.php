@@ -4,20 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests the Media module's requirements checks.
- *
- * @group media
  */
+#[Group('media')]
 class MediaRequirementsTest extends MediaFunctionalTestBase {
-
-  /**
-   * {@inheritdoc}
-   *
-   * @todo Remove and fix test to not rely on super user.
-   * @see https://www.drupal.org/project/drupal/issues/3437620
-   */
-  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * {@inheritdoc}
@@ -38,7 +31,10 @@ class MediaRequirementsTest extends MediaFunctionalTestBase {
     $field_storage_definition->delete();
     $valid_media_type = $this->createMediaType('test');
 
-    $this->drupalLogin($this->rootUser);
+    $permissions = [
+      'administer site configuration',
+    ];
+    $this->drupalLogin($this->drupalCreateUser($permissions));
     $this->drupalGet('/admin/reports/status');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains("The source field definition for the {$media_type->label()} media type is missing.");

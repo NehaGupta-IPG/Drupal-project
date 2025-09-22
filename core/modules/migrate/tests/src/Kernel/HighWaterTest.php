@@ -17,7 +17,6 @@ class HighWaterTest extends MigrateTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'user',
     'node',
     'migrate',
@@ -295,8 +294,9 @@ class HighWaterTest extends MigrateTestBase {
    *   Title of the node.
    *
    * @return bool
+   *   TRUE if node exists, FALSE otherwise.
    */
-  protected function nodeExists($title) {
+  protected function nodeExists($title): bool {
     $query = \Drupal::entityQuery('node')->accessCheck(FALSE);
     $result = $query
       ->condition('title', $title)

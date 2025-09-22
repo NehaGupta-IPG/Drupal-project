@@ -25,7 +25,6 @@ class RelatedResourceTypesTest extends JsonapiKernelTestBase {
     'node',
     'jsonapi',
     'serialization',
-    'system',
     'user',
     'field',
     'dblog',
@@ -204,7 +203,7 @@ class RelatedResourceTypesTest extends JsonapiKernelTestBase {
     ]);
     $fields = $field_config_storage->loadByProperties(['field_name' => 'field_ref_with_missing_bundle']);
     static::assertSame(['missing_bundle'], $fields['node.foo.field_ref_with_missing_bundle']->getItemDefinition()->getSetting('handler_settings')['target_bundles']);
-    $a = $this->resourceTypeRepository->get('node', 'foo')->getRelatableResourceTypesByField('field_ref_with_missing_bundle');
+    $this->resourceTypeRepository->get('node', 'foo')->getRelatableResourceTypesByField('field_ref_with_missing_bundle');
     static::assertSame(['missing_bundle'], $fields['node.foo.field_ref_with_missing_bundle']->getItemDefinition()->getSetting('handler_settings')['target_bundles']);
     $arguments = [
       '@name' => 'field_ref_with_missing_bundle',

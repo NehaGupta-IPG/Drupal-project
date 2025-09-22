@@ -7,20 +7,20 @@ namespace Drupal\KernelTests\Core\Config;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests reading and writing of configuration files.
- *
- * @group config
  */
+#[Group('config')]
 class ConfigFileContentTest extends KernelTestBase {
 
   /**
    * Exempt from strict schema checking.
    *
-   * @see \Drupal\Core\Config\Development\ConfigSchemaChecker
-   *
    * @var bool
+   *
+   * @see \Drupal\Core\Config\Development\ConfigSchemaChecker
    */
   protected $strictConfigSchema = FALSE;
 

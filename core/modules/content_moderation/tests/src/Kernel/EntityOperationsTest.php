@@ -25,7 +25,6 @@ class EntityOperationsTest extends KernelTestBase {
     'content_moderation',
     'node',
     'user',
-    'system',
     'workflows',
   ];
 
@@ -46,7 +45,7 @@ class EntityOperationsTest extends KernelTestBase {
   /**
    * Creates a page node type to test with, ensuring that it's moderated.
    */
-  protected function createNodeType() {
+  protected function createNodeType(): void {
     $node_type = NodeType::create([
       'type' => 'page',
       'name' => 'Page',
@@ -104,7 +103,8 @@ class EntityOperationsTest extends KernelTestBase {
     // so this won't work for non-nodes. We'd need to use entity queries. This
     // is a core bug that should get fixed.
     $storage = \Drupal::entityTypeManager()->getStorage('node');
-    $revision_ids = $storage->revisionIds($page);
+    $query = $storage->getQuery()->allRevisions()->condition('nid', $page->id())->accessCheck(FALSE);
+    $revision_ids = array_keys($query->execute());
     sort($revision_ids);
     $latest = end($revision_ids);
     $page = $storage->loadRevision($latest);

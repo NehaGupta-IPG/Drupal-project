@@ -10,7 +10,9 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  * Tests the config source plugin.
  *
  * @covers \Drupal\migrate_drupal\Plugin\migrate\source\d8\Config
+ * @group legacy
  * @group migrate_drupal
+ * @coversDefaultClass \Drupal\migrate_drupal\Plugin\migrate\source\d8\Config
  */
 class ConfigTest extends MigrateSqlSourceTestBase {
 

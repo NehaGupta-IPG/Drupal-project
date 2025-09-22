@@ -13,7 +13,6 @@ use Drupal\workspaces\Entity\Workspace;
  * Tests access on workspaces.
  *
  * @group workspaces
- * @group #slow
  */
 class WorkspaceAccessTest extends KernelTestBase {
 
@@ -35,7 +34,7 @@ class WorkspaceAccessTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->installSchema('workspaces', ['workspace_association']);
+    $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
 
     $this->installEntitySchema('workspace');
     $this->installEntitySchema('user');

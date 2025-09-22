@@ -18,15 +18,14 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 use GuzzleHttp\RequestOptions;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * JSON:API regression tests.
  *
- * @group jsonapi
- * @group #slow
- *
  * @internal
  */
+#[Group('jsonapi')]
 class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
 
   use CommentTestTrait;
@@ -51,7 +50,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
   public function testBundleSpecificTargetEntityTypeFromIssue2953207(): void {
     // Set up data model.
     $this->assertTrue($this->container->get('module_installer')->install(['comment'], TRUE), 'Installed modules.');
-    $this->addDefaultCommentField('taxonomy_term', 'tags', 'comment', CommentItemInterface::OPEN, 'tcomment');
+    $this->addDefaultCommentField('taxonomy_term', 'tags', 'comment', CommentItemInterface::OPEN, 'test_comment_type');
     $this->rebuildAll();
 
     // Create data.
@@ -70,7 +69,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
     $user = $this->drupalCreateUser([
       'access comments',
     ]);
-    $response = $this->request('GET', Url::fromUri('internal:/jsonapi/comment/tcomment?include=entity_id&filter[entity_id.name]=foobar'), [
+    $response = $this->request('GET', Url::fromUri('internal:/jsonapi/comment/test_comment_type?include=entity_id&filter[entity_id.name]=foobar'), [
       RequestOptions::AUTH => [
         $user->getAccountName(),
         $user->pass_raw,

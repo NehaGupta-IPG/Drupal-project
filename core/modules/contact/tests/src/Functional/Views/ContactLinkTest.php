@@ -7,13 +7,14 @@ namespace Drupal\Tests\contact\Functional\Views;
 use Drupal\Core\Cache\Cache;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the contact link field.
  *
- * @group contact
  * @see \Drupal\contact\Plugin\views\field\ContactLink.
  */
+#[Group('contact')]
 class ContactLinkTest extends ViewTestBase {
 
   /**
@@ -24,9 +25,7 @@ class ContactLinkTest extends ViewTestBase {
   public $userData;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['contact_test_views'];
 

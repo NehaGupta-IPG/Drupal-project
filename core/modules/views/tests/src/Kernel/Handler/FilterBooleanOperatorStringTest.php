@@ -16,13 +16,6 @@ use Drupal\views\Views;
 class FilterBooleanOperatorStringTest extends ViewsKernelTestBase {
 
   /**
-   * The modules to enable for this test.
-   *
-   * @var array
-   */
-  protected static $modules = ['system'];
-
-  /**
    * Views used by this test.
    *
    * @var array
@@ -178,7 +171,7 @@ class FilterBooleanOperatorStringTest extends ViewsKernelTestBase {
    * @return array
    *   Returns the filter configuration for exposed filters.
    */
-  protected function getGroupedExposedFilters() {
+  protected function getGroupedExposedFilters(): array {
     $filters = [
       'status' => [
         'id' => 'status',

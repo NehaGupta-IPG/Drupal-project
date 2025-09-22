@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\user\Functional\Rest;
 
 use Drupal\Tests\rest\Functional\BasicAuthResourceTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @group rest
- * @group #slow
+ * Tests User Json Basic Auth.
  */
+#[Group('rest')]
 class UserJsonBasicAuthTest extends UserResourceTestBase {
 
   use BasicAuthResourceTestTrait;

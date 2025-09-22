@@ -9,11 +9,13 @@ use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeAppliedEvent;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * @group Recipe
+ * Tests Recipe Events.
  */
+#[Group('Recipe')]
 class RecipeEventsTest extends KernelTestBase implements EventSubscriberInterface {
 
   /**
@@ -32,6 +34,9 @@ class RecipeEventsTest extends KernelTestBase implements EventSubscriberInterfac
     ];
   }
 
+  /**
+   * Handles a recipe apply event for testing.
+   */
   public function onRecipeApply(RecipeAppliedEvent $event): void {
     $this->recipesApplied[] = $event->recipe->name;
   }
@@ -48,6 +53,9 @@ class RecipeEventsTest extends KernelTestBase implements EventSubscriberInterfac
       ->addMethodCall('addSubscriber', [$this]);
   }
 
+  /**
+   * Tests the recipe applied event.
+   */
   public function testRecipeAppliedEvent(): void {
     $recipe = Recipe::createFromDirectory('core/tests/fixtures/recipes/recipe_include');
     RecipeRunner::processRecipe($recipe);

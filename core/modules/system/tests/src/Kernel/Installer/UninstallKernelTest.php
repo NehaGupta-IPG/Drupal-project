@@ -15,12 +15,9 @@ use Drupal\module_test\PluginManagerCacheClearer;
 class UninstallKernelTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'user',
     'field',
     'file',

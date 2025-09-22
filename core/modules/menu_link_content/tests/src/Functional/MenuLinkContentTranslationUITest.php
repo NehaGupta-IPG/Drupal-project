@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\menu_link_content\Functional;
 
-use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the menu link content translation UI.
- *
- * @group Menu
  */
+#[Group('Menu')]
 class MenuLinkContentTranslationUITest extends ContentTranslationUITestBase {
 
   /**
@@ -20,9 +20,7 @@ class MenuLinkContentTranslationUITest extends ContentTranslationUITestBase {
   protected $defaultCacheContexts = ['languages:language_interface', 'session', 'theme', 'url.path', 'url.query_args', 'user.permissions', 'user.roles:authenticated'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',
@@ -49,14 +47,14 @@ class MenuLinkContentTranslationUITest extends ContentTranslationUITestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getTranslatorPermissions() {
+  protected function getTranslatorPermissions(): array {
     return array_merge(parent::getTranslatorPermissions(), ['administer menu']);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getAdministratorPermissions() {
+  protected function getAdministratorPermissions(): array {
     return array_merge(parent::getAdministratorPermissions(), ['administer themes', 'view the administration theme']);
   }
 
@@ -112,10 +110,9 @@ class MenuLinkContentTranslationUITest extends ContentTranslationUITestBase {
   /**
    * {@inheritdoc}
    */
-  protected function doTestTranslationEdit() {
+  protected function doTestTranslationEdit(): void {
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($this->entityTypeId);
-    $storage->resetCache([$this->entityId]);
     $entity = $storage->load($this->entityId);
     $languages = $this->container->get('language_manager')->getLanguages();
 

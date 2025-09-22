@@ -6,15 +6,18 @@ namespace Drupal\Tests\standard\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\standard\Traits\StandardTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests Standard installation profile expectations.
- *
- * @group standard
  */
+#[Group('standard')]
 class StandardTest extends BrowserTestBase {
   use StandardTestTrait;
 
+  /**
+   * {@inheritdoc}
+   */
   protected $profile = 'standard';
 
 }

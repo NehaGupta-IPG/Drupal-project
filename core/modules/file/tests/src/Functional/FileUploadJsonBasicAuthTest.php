@@ -6,11 +6,12 @@ namespace Drupal\Tests\file\Functional;
 
 use Drupal\Tests\rest\Functional\BasicAuthResourceTestTrait;
 use Drupal\Tests\rest\Functional\FileUploadResourceTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @group file
- * @group #slow
+ * Tests File Upload Json Basic Auth.
  */
+#[Group('file')]
 class FileUploadJsonBasicAuthTest extends FileUploadResourceTestBase {
 
   use BasicAuthResourceTestTrait;

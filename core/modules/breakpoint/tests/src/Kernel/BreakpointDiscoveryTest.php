@@ -14,12 +14,9 @@ use Drupal\KernelTests\KernelTestBase;
 class BreakpointDiscoveryTest extends KernelTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'breakpoint',
     'breakpoint_module_test',
   ];

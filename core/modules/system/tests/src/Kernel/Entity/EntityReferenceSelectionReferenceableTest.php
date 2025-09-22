@@ -47,7 +47,6 @@ class EntityReferenceSelectionReferenceableTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'user',
     'field',
     'node',
@@ -96,8 +95,6 @@ class EntityReferenceSelectionReferenceableTest extends KernelTestBase {
   /**
    * Tests referenceable entities with no target entity type 'label' key.
    *
-   * @see \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface::getReferenceableEntities()
-   *
    * @param mixed $match
    *   The input text to be checked.
    * @param string $match_operator
@@ -112,6 +109,8 @@ class EntityReferenceSelectionReferenceableTest extends KernelTestBase {
    *   The total number (unlimited) of entities to be retrieved.
    *
    * @dataProvider providerTestCases
+   *
+   * @see \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface::getReferenceableEntities()
    */
   public function testReferenceablesWithNoLabelKey($match, $match_operator, $limit, $count_limited, array $items, $count_all): void {
     // Test ::getReferenceableEntities().
@@ -143,6 +142,7 @@ class EntityReferenceSelectionReferenceableTest extends KernelTestBase {
    * Provides test cases for ::testReferenceablesWithNoLabelKey() test.
    *
    * @return array[]
+   *   An array of test cases.
    */
   public static function providerTestCases() {
     return [

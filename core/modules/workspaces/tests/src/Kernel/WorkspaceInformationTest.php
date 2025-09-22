@@ -69,7 +69,7 @@ class WorkspaceInformationTest extends KernelTestBase {
     $this->installEntitySchema('entity_test_revpub');
     $this->installEntitySchema('workspace');
 
-    $this->installSchema('workspaces', ['workspace_association']);
+    $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
 
     // Create a new workspace and activate it.
     Workspace::create(['id' => 'stage', 'label' => 'Stage'])->save();
@@ -172,7 +172,7 @@ class WorkspaceInformationTest extends KernelTestBase {
 
     // Check that unsupported entity types can not be saved in a workspace.
     $this->expectException(EntityStorageException::class);
-    $this->expectExceptionMessage('This entity can only be saved in the default workspace.');
+    $this->expectExceptionMessage('The "entity_test" entity type can only be saved in the default workspace.');
     $entity->save();
   }
 
