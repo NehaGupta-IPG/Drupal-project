@@ -8,14 +8,14 @@ use Drupal\Core\File\FileExists;
 use Drupal\file\Entity\File;
 use Drupal\file_test\FileTestHelper;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the _file_save_upload_from_form() function.
  *
- * @group file
- *
  * @see _file_save_upload_from_form()
  */
+#[Group('file')]
 class SaveUploadFormTest extends FileManagedTestBase {
 
   use TestFileCreationTrait {
@@ -157,7 +157,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains("You WIN!");
-    $this->assertFileExists('temporary://' . $dir . '/' . trim(\Drupal::service('file_system')->basename($image3_realpath)));
+    $this->assertFileExists('temporary://' . $dir . '/' . trim(basename($image3_realpath)));
   }
 
   /**

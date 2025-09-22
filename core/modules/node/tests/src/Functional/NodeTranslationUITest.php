@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional;
 
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
-use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
-use Drupal\Tests\language\Traits\LanguageTestTrait;
-use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
+use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
+use Drupal\Tests\language\Traits\LanguageTestTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Node Translation UI.
- *
- * @group node
  */
+#[Group('node')]
 class NodeTranslationUITest extends ContentTranslationUITestBase {
 
   use LanguageTestTrait;
@@ -79,6 +79,15 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
    * Tests the basic translation UI.
    */
   public function testTranslationUI(): void {
+    // Enable promote and sticky fields.
+    \Drupal::service('entity_display.repository')->getFormDisplay('node', 'article')
+      ->setComponent('promote', [
+        'type' => 'boolean_checkbox',
+      ])
+      ->setComponent('sticky', [
+        'type' => 'boolean_checkbox',
+      ])
+      ->save();
     parent::testTranslationUI();
     $this->doUninstallTest();
   }
