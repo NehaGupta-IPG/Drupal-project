@@ -3,7 +3,9 @@
 namespace Drupal\Core\Pager;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
+use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -110,7 +112,7 @@ class PagerPreprocess {
       $options = [
         'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, 0),
       ];
-      $items['first']['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
+      $items['first']['href'] = Url::fromRoute($route_name, $route_parameters, $options);
       if (isset($tags[0])) {
         $items['first']['text'] = $tags[0];
       }
@@ -120,7 +122,7 @@ class PagerPreprocess {
       $options = [
         'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $current_page - 1),
       ];
-      $items['previous']['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
+      $items['previous']['href'] = Url::fromRoute($route_name, $route_parameters, $options);
       if (isset($tags[1])) {
         $items['previous']['text'] = $tags[1];
       }
@@ -135,7 +137,7 @@ class PagerPreprocess {
       $options = [
         'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $i - 1),
       ];
-      $items['pages'][$i]['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
+      $items['pages'][$i]['href'] = Url::fromRoute($route_name, $route_parameters, $options);
       $items['pages'][$i]['attributes'] = new Attribute($link_attributes);
       if ($i == $pager_current) {
         $variables['current'] = $i;
@@ -154,7 +156,7 @@ class PagerPreprocess {
       $options = [
         'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $current_page + 1),
       ];
-      $items['next']['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
+      $items['next']['href'] = Url::fromRoute($route_name, $route_parameters, $options);
       if (isset($tags[3])) {
         $items['next']['text'] = $tags[3];
       }
@@ -164,9 +166,23 @@ class PagerPreprocess {
       $options = [
         'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $pager_max - 1),
       ];
-      $items['last']['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
+      $items['last']['href'] = Url::fromRoute($route_name, $route_parameters, $options);
       if (isset($tags[4])) {
         $items['last']['text'] = $tags[4];
+      }
+    }
+
+    if ($this->requestStack->getCurrentRequest()?->headers->has('HX-Request')) {
+      $variables['#attached']['library'][] = 'core/drupal.htmx';
+      foreach ($items as $key => &$item) {
+        if ($key === 'pages') {
+          foreach ($item as &$page) {
+            $this->processHtmxLink($page);
+          }
+        }
+        if (isset($item['href'])) {
+          $this->processHtmxLink($item);
+        }
       }
     }
 
@@ -183,4 +199,27 @@ class PagerPreprocess {
     $variables['#cache']['contexts'][] = 'url.query_args';
   }
 
+  /**
+   * @param $item
+   *
+   * @return void
+   */
+  protected function processHtmxLink(&$item): void {
+    /** @var Url $url */
+    $url = $item['href'];
+    // Filter the parameters that break non-js navigation.
+    $exclude = [
+      'ajax_page_state',
+      MainContentViewSubscriber::WRAPPER_FORMAT,
+    ];
+    $query = UrlHelper::filterQueryParameters($url->getOption('query'), $exclude);
+    $url->setOption('query', $query);
+    (new Htmx())
+      ->get($url)
+      // Only trigger the AJAX request, updating the necessary element
+      // is done with an out-of-band swap.
+      ->swap('none')
+      ->applyTo($item, 'attributes');
+    $item['href'] = $url;
+  }
 }

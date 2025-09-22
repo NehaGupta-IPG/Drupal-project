@@ -3,6 +3,7 @@
 namespace Drupal\locale\Form;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Htmx\Htmx;
 
 /**
  * Provides a filtered translation edit form.
@@ -26,6 +27,12 @@ class TranslateFilterForm extends TranslateFormBase {
     $filter_values = $this->translateFilterValues();
 
     $form['#attached']['library'][] = 'locale/drupal.locale.admin';
+
+    (new Htmx())
+      ->get()
+      ->params(implode(',', array_keys($filter_values)))
+      ->swap('none')
+      ->applyTo($form);
 
     $form['filters'] = [
       '#type' => 'details',
