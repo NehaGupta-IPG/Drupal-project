@@ -5,20 +5,15 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Extension;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests hook_module_implements_alter().
- *
- * @group Module
- *
- * @group legacy
  */
+#[Group('Module')]
+#[IgnoreDeprecations]
 class ModuleImplementsAlterTest extends KernelTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * Tests hook_module_implements_alter() adding an implementation.
