@@ -2,7 +2,7 @@
 
 namespace Drupal\Core\EventSubscriber;
 
-use Drupal\Core\Authentication\AuthenticationManager;
+use Drupal\Core\Authentication\AuthenticationCollectorInterface;
 use Drupal\Core\Authentication\AuthenticationProviderChallengeInterface;
 use Drupal\Core\Authentication\AuthenticationProviderFilterInterface;
 use Drupal\Core\Authentication\AuthenticationProviderInterface;
@@ -49,18 +49,28 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
   protected $accountProxy;
 
   /**
+   * Authentication collector.
+   *
+   * @var \Drupal\Core\Authentication\AuthenticationCollectorInterface
+   */
+  protected $authenticationCollector;
+
+  /**
    * Constructs an authentication subscriber.
    *
    * @param \Drupal\Core\Authentication\AuthenticationProviderInterface $authentication_provider
    *   An authentication provider.
    * @param \Drupal\Core\Session\AccountProxyInterface $account_proxy
    *   Account proxy.
+   * @param \Drupal\Core\Authentication\AuthenticationCollectorInterface $authentication_collector
+   *   Authentication collector.
    */
-  public function __construct(AuthenticationProviderInterface $authentication_provider, AccountProxyInterface $account_proxy) {
+  public function __construct(AuthenticationProviderInterface $authentication_provider, AccountProxyInterface $account_proxy, AuthenticationCollectorInterface $authentication_collector) {
     $this->authenticationProvider = $authentication_provider;
     $this->filter = ($authentication_provider instanceof AuthenticationProviderFilterInterface) ? $authentication_provider : NULL;
     $this->challengeProvider = ($authentication_provider instanceof AuthenticationProviderChallengeInterface) ? $authentication_provider : NULL;
     $this->accountProxy = $account_proxy;
+    $this->authenticationCollector = $authentication_collector;
   }
 
   /**
@@ -163,23 +173,20 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
    *
-   * @return string|null
-   *   The authentication provider name if it can be determined, NULL otherwise.
+   * @return string
+   *   The authentication provider name if it can be determined,
+   *   'unidentified' otherwise.
    */
   protected function getAuthenticationProviderName($request): string {
-    // If the authentication provider is the AuthenticationManager, we can get
-    // the specific provider ID that applies to this request by replicating
-    // the logic from AuthenticationManager::getProvider().
-    $provider_id = 'unknown';
-    if ($this->authenticationProvider instanceof AuthenticationManager) {
-      // Use reflection to access the protected getProvider method.
-      $reflection = new \ReflectionClass($this->authenticationProvider);
-      $method = $reflection->getMethod('getProvider');
-      $method->setAccessible(TRUE);
-      $provider_id = $method->invoke($this->authenticationProvider, $request);
+    // Loop through all registered authentication providers to find the one
+    // that applies to this request.
+    foreach ($this->authenticationCollector->getSortedProviders() as $provider_id => $provider) {
+      if ($provider->applies($request)) {
+        return $provider_id;
+      }
     }
 
-    return $provider_id;
+    return 'unidentified';
   }
 
 }
