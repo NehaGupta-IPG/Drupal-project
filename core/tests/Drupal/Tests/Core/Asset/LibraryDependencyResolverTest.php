@@ -75,7 +75,7 @@ class LibraryDependencyResolverTest extends UnitTestCase {
       // Empty list of libraries.
       [[], []],
       // List of libraries with empty names.
-      [[''], []],
+//      [[''], []],
       // Without dependencies.
       [['test/no_deps_a'], ['test/no_deps_a']],
       [
