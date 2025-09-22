@@ -111,7 +111,7 @@ final class HtmxTestAttachmentsController extends ControllerBase {
       '#value' => 'Click this',
     ];
     $replace_htmx = (new Htmx())
-      ->get($url)
+      ->get($url, full_page: !$useWrapperFormat)
       ->select('div.ajax-content')
       ->target('[data-drupal-htmx-target]');
     if ($swap !== '') {
