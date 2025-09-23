@@ -4,6 +4,9 @@ namespace Drupal\Core\Extension;
 
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\Exception\UnknownExtensionTypeException;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
  * Factory for getting extension lists by type.
@@ -11,30 +14,15 @@ use Drupal\Core\Extension\Exception\UnknownExtensionTypeException;
 class ExtensionPathResolver {
 
   /**
-   * A associative array of ExtensionList objects keyed by type.
-   *
-   * @var \Drupal\Core\Extension\ExtensionList[]
-   */
-  protected $extensionLists;
-
-  /**
    * ExtensionPathResolver constructor.
    *
-   * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
-   *   The module extension list.
-   * @param \Drupal\Core\Extension\ProfileExtensionList $profile_extension_list
-   *   The profile extension list.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list
-   *   The theme extension list.
-   * @param \Drupal\Core\Extension\ThemeEngineExtensionList $theme_engine_extension_list
-   *   The theme engine extension list.
+   * @param \Psr\Container\ContainerInterface $extensionLists
+   *   The set of extension list services.
    */
-  public function __construct(ModuleExtensionList $module_extension_list, ProfileExtensionList $profile_extension_list, ThemeExtensionList $theme_extension_list, ThemeEngineExtensionList $theme_engine_extension_list) {
-    $this->extensionLists['module'] = $module_extension_list;
-    $this->extensionLists['profile'] = $profile_extension_list;
-    $this->extensionLists['theme'] = $theme_extension_list;
-    $this->extensionLists['theme_engine'] = $theme_engine_extension_list;
-  }
+  public function __construct(
+    #[AutowireLocator('extension_list', 'type')]
+    protected ContainerInterface $extensionLists,
+  ) {}
 
   /**
    * Gets the info file path for the extension.
@@ -51,11 +39,11 @@ class ExtensionPathResolver {
     if ($type === 'core') {
       return 'core/core.info.yml';
     }
-    if (!isset($this->extensionLists[$type])) {
-      throw new UnknownExtensionTypeException(sprintf('Extension type %s is unknown.', $type));
-    }
     try {
-      return $this->extensionLists[$type]->getPathname($name);
+      return $this->extensionLists->get($type)->getPathname($name);
+    }
+    catch (ServiceNotFoundException) {
+      throw new UnknownExtensionTypeException(sprintf('Extension type %s is unknown.', $type));
     }
     catch (UnknownExtensionException) {
       // Catch the exception. This will result in triggering an error.

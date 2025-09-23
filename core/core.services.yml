@@ -678,18 +678,26 @@ services:
   extension.list.module:
     class: Drupal\Core\Extension\ModuleExtensionList
     arguments: ['%app.root%', 'module', '@cache.default', '@info_parser', '@module_handler', '@state', '@config.factory', '@extension.list.profile', '%install_profile%', '%container.modules%']
+    tags:
+      - { name: extension_list, type: module }
   Drupal\Core\Extension\ModuleExtensionList: '@extension.list.module'
   extension.list.profile:
     class: Drupal\Core\Extension\ProfileExtensionList
     arguments: ['%app.root%', 'profile', '@cache.default', '@info_parser', '@module_handler', '@state', '%install_profile%']
+    tags:
+      - { name: extension_list, type: profile }
   Drupal\Core\Extension\ProfileExtensionList: '@extension.list.profile'
   extension.list.theme:
     class: Drupal\Core\Extension\ThemeExtensionList
     arguments: ['%app.root%', 'theme', '@cache.bootstrap', '@info_parser', '@module_handler', '@state', '@config.factory', '@extension.list.theme_engine', '%install_profile%']
+    tags:
+      - { name: extension_list, type: theme }
   Drupal\Core\Extension\ThemeExtensionList: '@extension.list.theme'
   extension.list.theme_engine:
     class: Drupal\Core\Extension\ThemeEngineExtensionList
     arguments: ['%app.root%', 'theme_engine', '@cache.default', '@info_parser', '@module_handler', '@state', '%install_profile%']
+    tags:
+      - { name: extension_list, type: theme_engine }
   Drupal\Core\Extension\ThemeEngineExtensionList: '@extension.list.theme_engine'
   extension.list.database_driver:
     class: Drupal\Core\Extension\DatabaseDriverList
@@ -697,7 +705,7 @@ services:
   Drupal\Core\Extension\DatabaseDriverList: '@extension.list.database_driver'
   extension.path.resolver:
     class: Drupal\Core\Extension\ExtensionPathResolver
-    arguments: ['@extension.list.module', '@extension.list.profile', '@extension.list.theme', '@extension.list.theme_engine']
+    autowire: true
   Drupal\Core\Extension\ExtensionPathResolver: '@extension.path.resolver'
   content_uninstall_validator:
     class: Drupal\Core\Entity\ContentUninstallValidator

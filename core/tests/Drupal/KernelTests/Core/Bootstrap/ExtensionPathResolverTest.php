@@ -7,10 +7,6 @@ namespace Drupal\KernelTests\Core\Bootstrap;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\Exception\UnknownExtensionTypeException;
 use Drupal\Core\Extension\ExtensionPathResolver;
-use Drupal\Core\Extension\ModuleExtensionList;
-use Drupal\Core\Extension\ProfileExtensionList;
-use Drupal\Core\Extension\ThemeEngineExtensionList;
-use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -109,20 +105,9 @@ class ExtensionPathResolverTest extends KernelTestBase {
    * Tests the getPath() method with an unknown extension.
    */
   public function testUnknownExtension(): void {
-    $module_extension_list = $this->prophesize(ModuleExtensionList::class);
-    $profile_extension_list = $this->prophesize(ProfileExtensionList::class);
-    $theme_extension_list = $this->prophesize(ThemeExtensionList::class);
-    $theme_engine_extension_list = $this->prophesize(ThemeEngineExtensionList::class);
-    $resolver = new ExtensionPathResolver(
-      $module_extension_list->reveal(),
-      $profile_extension_list->reveal(),
-      $theme_extension_list->reveal(),
-      $theme_engine_extension_list->reveal()
-    );
-
     $this->expectException(UnknownExtensionTypeException::class);
     $this->expectExceptionMessage('Extension type foo is unknown.');
-    $resolver->getPath('foo', 'bar');
+    \Drupal::service('extension.path.resolver')->getPath('foo', 'bar');
   }
 
 }
