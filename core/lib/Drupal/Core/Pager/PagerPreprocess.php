@@ -110,7 +110,7 @@ class PagerPreprocess {
       $options = [
         'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, 0),
       ];
-      $items['first']['href'] = Url::fromRoute($route_name, $route_parameters, $options);
+      $items['first']['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
       if (isset($tags[0])) {
         $items['first']['text'] = $tags[0];
       }
@@ -120,7 +120,7 @@ class PagerPreprocess {
       $options = [
         'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $current_page - 1),
       ];
-      $items['previous']['href'] = Url::fromRoute($route_name, $route_parameters, $options);
+      $items['previous']['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
       if (isset($tags[1])) {
         $items['previous']['text'] = $tags[1];
       }
@@ -135,7 +135,7 @@ class PagerPreprocess {
       $options = [
         'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $i - 1),
       ];
-      $items['pages'][$i]['href'] = Url::fromRoute($route_name, $route_parameters, $options);
+      $items['pages'][$i]['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
       $items['pages'][$i]['attributes'] = new Attribute($link_attributes);
       if ($i == $pager_current) {
         $variables['current'] = $i;
@@ -154,7 +154,7 @@ class PagerPreprocess {
       $options = [
         'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $current_page + 1),
       ];
-      $items['next']['href'] = Url::fromRoute($route_name, $route_parameters, $options);
+      $items['next']['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
       if (isset($tags[3])) {
         $items['next']['text'] = $tags[3];
       }
@@ -164,7 +164,7 @@ class PagerPreprocess {
       $options = [
         'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $pager_max - 1),
       ];
-      $items['last']['href'] = Url::fromRoute($route_name, $route_parameters, $options);
+      $items['last']['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
       if (isset($tags[4])) {
         $items['last']['text'] = $tags[4];
       }
