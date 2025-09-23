@@ -3,7 +3,6 @@
 namespace Drupal\Core\Pager;
 
 use Drupal\Component\Utility\Html;
-use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Template\Attribute;
@@ -43,6 +42,7 @@ class PagerPreprocess {
    *       append to the pager links.
    *     - #route_parameters: An associative array of the route parameters.
    *     - #quantity: The number of pages in the list.
+   *     - #attributes: add attributes to all links.
    */
   public function preprocessPager(array &$variables): void {
     $element = $variables['pager']['#element'];
@@ -50,15 +50,26 @@ class PagerPreprocess {
     $quantity = empty($variables['pager']['#quantity']) ? 0 : $variables['pager']['#quantity'];
     $route_name = $variables['pager']['#route_name'];
     $route_parameters = $variables['pager']['#route_parameters'] ?? [];
-
-    $link_attributes = [];
+    $link_attributes = $variables['pager']['#attributes'] ?? [];
 
     if ($this->requestStack->getCurrentRequest()?->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_modal') {
       $link_attributes = [
         'class' => ['use-ajax'],
         'data-dialog-type' => 'modal',
         'data-accepts' => 'application/json',
-      ];
+      ] + $link_attributes;
+    }
+
+    if ($this->requestStack->getCurrentRequest()?->headers->has('HX-Request')) {
+      $variables['#attached']['library'][] = 'core/drupal.htmx';
+      $array = [];
+      (new Htmx())
+        ->get('attr(href)')
+        // Only trigger the AJAX request, updating the necessary element
+        // is done with an out-of-band swap.
+        ->swap('none')
+        ->applyTo($array);
+      $link_attributes = $array['#attributes'] + $link_attributes;
     }
 
     $pager = $this->pagerManager->getPager($element);
@@ -162,27 +173,13 @@ class PagerPreprocess {
       }
 
       $items['last'] = [];
-      $items['last']['attributes'] = new Attribute();
+      $items['last']['attributes'] = new Attribute($link_attributes);
       $options = [
         'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $pager_max - 1),
       ];
       $items['last']['href'] = Url::fromRoute($route_name, $route_parameters, $options);
       if (isset($tags[4])) {
         $items['last']['text'] = $tags[4];
-      }
-    }
-
-    if ($this->requestStack->getCurrentRequest()?->headers->has('HX-Request')) {
-      $variables['#attached']['library'][] = 'core/drupal.htmx';
-      foreach ($items as $key => &$item) {
-        if ($key === 'pages') {
-          foreach ($item as &$page) {
-            $this->processHtmxLink($page);
-          }
-        }
-        if (isset($item['href'])) {
-          $this->processHtmxLink($item);
-        }
       }
     }
 
@@ -199,27 +196,4 @@ class PagerPreprocess {
     $variables['#cache']['contexts'][] = 'url.query_args';
   }
 
-  /**
-   * @param $item
-   *
-   * @return void
-   */
-  protected function processHtmxLink(&$item): void {
-    /** @var Url $url */
-    $url = $item['href'];
-    // Filter the parameters that break non-js navigation.
-    $exclude = [
-      'ajax_page_state',
-      MainContentViewSubscriber::WRAPPER_FORMAT,
-    ];
-    $query = UrlHelper::filterQueryParameters($url->getOption('query'), $exclude);
-    $url->setOption('query', $query);
-    (new Htmx())
-      ->get($url)
-      // Only trigger the AJAX request, updating the necessary element
-      // is done with an out-of-band swap.
-      ->swap('none')
-      ->applyTo($item, 'attributes');
-    $item['href'] = $url;
-  }
 }

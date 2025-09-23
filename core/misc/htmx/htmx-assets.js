@@ -37,8 +37,31 @@
    * @see https://htmx.org/events/#htmx:configRequest
    */
   htmx.on('htmx:configRequest', ({ detail }) => {
+    let query = false;
+    // Custom format, take the URL from a CSS selector.
+    // To take the URL from an attribute on the same element, use the CSS
+    // syntax `attr(attributeName)`.
+    const parts = detail.path.match(/^attr\((\w+)\)\s?(.*)?$/);
+    if (parts) {
+      query = parts[2];
+      detail.path = detail.elt.getAttribute(parts[1]) ?? '';
+    }
+
     const url = new URL(detail.path, document.location.href);
-    if (Drupal.url.isLocal(url.toString())) {
+    if (typeof query === 'string' && query !== '') {
+      // We can add some parameters to the url if necessary.
+      const search = url.searchParams;
+      new URLSearchParams(query).forEach((value, key) => {
+        if (search.has(key)) {
+          search.set(key, value);
+        } else {
+          search.append(key, value);
+        }
+      });
+    }
+
+    detail.path = url.toString();
+    if (Drupal.url.isLocal(detail.path)) {
       // Allow Drupal to return new JavaScript and CSS files to load without
       // returning the ones already loaded.
       // @see \Drupal\Core\StackMiddleWare\AjaxPageState

@@ -6,6 +6,7 @@
 
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\TableSort;
@@ -488,6 +489,18 @@ function template_preprocess_views_view_table(&$variables): void {
         $variables['header'][$field]['url'] = $url->toString();
         $variables['header'][$field]['content'] = $label;
         $variables['header'][$field]['title'] = $title;
+
+        if (\Drupal::request()?->headers->has('HX-Request') || $view->ajaxEnabled()) {
+          $array = [];
+          (new Htmx())
+            ->get('attr(href)')
+            // Only trigger the AJAX request, updating the necessary element
+            // is done with an out-of-band swap.
+            ->swap('none')
+            ->applyTo($array);
+          $variables['header'][$field]['link_attributes'] = $array['#attributes'];
+        }
+
       }
 
       $variables['header'][$field]['default_classes'] = $fields[$field]->options['element_default_classes'];

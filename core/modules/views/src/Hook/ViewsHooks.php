@@ -65,6 +65,7 @@ class ViewsHooks {
   public function viewsPreRender($view): void {
     // If using AJAX, send identifying data about this view.
     if ($view->ajaxEnabled() && empty($view->is_attachment) && empty($view->live_preview)) {
+      return;
       $view->element['#attached']['drupalSettings']['views'] = [
         'ajax_path' => Url::fromRoute('views.ajax')->toString(),
         'ajaxViews' => [

@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views\pager;
 
+use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsPager;
 
@@ -97,6 +98,13 @@ class Mini extends SqlBase {
       3 => $this->options['tags']['next'],
     ];
 
+    $render = ['#attributes' => []];
+    if ($this->view->ajaxEnabled()) {
+      (new Htmx())
+        ->get('attr(href)')
+        ->swap('none')
+        ->applyTo($render);
+    }
     return [
       '#theme' => $this->themeFunctions(),
       '#tags' => $tags,
@@ -104,6 +112,7 @@ class Mini extends SqlBase {
       '#pagination_heading_level' => parent::getHeadingLevel(),
       '#parameters' => $input,
       '#route_name' => !empty($this->view->live_preview) ? '<current>' : '<none>',
+      '#attributes' => $render['#attributes'],
     ];
   }
 

@@ -29,8 +29,8 @@ class TranslateFilterForm extends TranslateFormBase {
     $form['#attached']['library'][] = 'locale/drupal.locale.admin';
 
     (new Htmx())
-      ->get()
-      ->params(implode(',', array_keys($filter_values)))
+      ->get('attr(action)')
+      ->params(array_keys($filter_values))
       ->swap('none')
       ->applyTo($form);
 

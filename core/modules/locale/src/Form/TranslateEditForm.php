@@ -44,9 +44,8 @@ class TranslateEditForm extends TranslateFormBase {
       $query['page'] = $page;
     }
 
-    $postUrl = Url::fromRoute('<none>', [], ['query' => $query]);
     (new Htmx())
-      ->post($postUrl)
+      ->post('attr(action)')
       ->swap('none')
       ->swapOob(TRUE)
       ->applyTo($form);
