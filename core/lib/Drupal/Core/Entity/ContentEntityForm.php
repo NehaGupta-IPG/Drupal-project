@@ -74,19 +74,17 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
    * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
    *   The date formatter service.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time, ?AccountInterface $current_user = NULL, DateFormatterInterface $date_formatter = NULL) {
+  public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time, ?AccountInterface $current_user = NULL, ?DateFormatterInterface $date_formatter = NULL) {
     $this->entityRepository = $entity_repository;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->time = $time;
 
     if (is_null($current_user)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $current_user argument is deprecated in 9.2.0 and will be required in 10.0.0.', E_USER_DEPRECATED);
       $current_user = \Drupal::currentUser();
     }
     $this->currentUser = $current_user;
 
     if (is_null($date_formatter)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $date_formatter argument is deprecated in 9.2.0 and will be required in 10.0.0.', E_USER_DEPRECATED);
       $date_formatter = \Drupal::service('date.formatter');
     }
     $this->dateFormatter = $date_formatter;

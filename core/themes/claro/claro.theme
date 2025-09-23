@@ -737,7 +737,7 @@ function claro_form_menu_link_edit_alter(&$form, FormStateInterface $form_state)
 /**
  * Implements hook_form_BASE_FORM_ID_alter() for \Drupal\media\MediaForm.
  */
-function claro_form_media_form_alter(&$form, FormStateInterface $form_state) {
+function claro_form_media_form_alter(&$form, FormStateInterface $form_state): void {
   $form['revision_information']['#attributes']['class'][] = 'entity-meta__revision';
 }
 
