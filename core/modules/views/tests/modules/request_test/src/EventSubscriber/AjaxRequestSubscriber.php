@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\request_test\EventSubscriber;
 
 use Drupal\Core\EventSubscriber\AjaxResponseSubscriber;
@@ -57,9 +59,6 @@ class AjaxRequestSubscriber implements EventSubscriberInterface {
     $this->incrementCount();
   }
 
-  /**
-   * @return int
-   */
   public function getCount(): int {
     return $this->state->get(self::STORAGE_KEY, 0);
   }

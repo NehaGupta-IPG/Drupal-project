@@ -98,6 +98,10 @@ class BlockExposedFilterAJAXTest extends WebDriverTestBase {
     $this->submitForm([], 'Reset');
     $this->assertSession()->addressEquals('some-path');
   }
+
+  /**
+   * Tests if multiple exposed filters on the same page work correctly.
+   */
   public function testMultipleExposedBlocks() {
     // Place a view with exposed filters put in multiple exposed blocks on a single page.
     $this->drupalPlaceBlock('views_block:test_exposed_block_ajax-block_1');
