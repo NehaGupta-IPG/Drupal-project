@@ -163,6 +163,11 @@ class TranslateEditForm extends TranslateFormBase {
       }
     }
     $form['pager']['#type'] = 'pager';
+    (new Htmx())
+      ->get('attr(href)')
+      ->swap('none')
+      ->applyTo($form['pager']);
+
     return $form;
   }
 

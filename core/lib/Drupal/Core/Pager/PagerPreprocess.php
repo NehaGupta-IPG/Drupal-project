@@ -60,18 +60,6 @@ class PagerPreprocess {
       ] + $link_attributes;
     }
 
-    if ($this->requestStack->getCurrentRequest()?->headers->has('HX-Request')) {
-      $variables['#attached']['library'][] = 'core/drupal.htmx';
-      $array = [];
-      (new Htmx())
-        ->get('attr(href)')
-        // Only trigger the AJAX request, updating the necessary element
-        // is done with an out-of-band swap.
-        ->swap('none')
-        ->applyTo($array);
-      $link_attributes = $array['#attributes'] + $link_attributes;
-    }
-
     $pager = $this->pagerManager->getPager($element);
 
     // Nothing to do if there is no pager.
