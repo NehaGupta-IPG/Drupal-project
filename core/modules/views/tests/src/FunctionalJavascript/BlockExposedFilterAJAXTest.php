@@ -30,6 +30,7 @@ class BlockExposedFilterAJAXTest extends WebDriverTestBase {
    * @var string[]
    */
   public static $testViews = ['test_block_exposed_ajax', 'test_block_exposed_ajax_with_page', 'test_exposed_block_ajax'];
+
   /**
    * {@inheritdoc}
    */
