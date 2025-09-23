@@ -2,6 +2,7 @@
 
 namespace Drupal\link\Plugin\Field\FieldWidget;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
@@ -441,7 +442,12 @@ class LinkWidget extends WidgetBase {
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     foreach ($values as &$value) {
       $value['uri'] = static::getUserEnteredStringAsUri($value['uri']);
-      $value += ['options' => []];
+
+      $options = [];
+      if ($value['attributes']) {
+        $options['attributes'] = $value['attributes'];
+      }
+      $value = NestedArray::mergeDeep(['options' => $options], $value);
     }
     return $values;
   }
