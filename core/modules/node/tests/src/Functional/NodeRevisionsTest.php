@@ -39,6 +39,13 @@ class NodeRevisionsTest extends NodeTestBase {
   protected $revisionLogs;
 
   /**
+   * An arbitrary user for revision authoring.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $revisionUser;
+
+  /**
    * {@inheritdoc}
    */
   protected static $modules = [
@@ -97,6 +104,10 @@ class NodeRevisionsTest extends NodeTestBase {
 
     // Create initial node.
     $node = $this->drupalCreateNode();
+
+    // Create a user for revision authoring.
+    // This must be different from user performing revert.
+    $this->revisionUser = $this->drupalCreateUser();
 
     $nodes = [];
     $logs = [];
@@ -186,6 +197,12 @@ class NodeRevisionsTest extends NodeTestBase {
     // Confirm that this is not the default version.
     $node = $node_storage->loadRevision($node->getRevisionId());
     $this->assertFalse($node->isDefaultRevision(), 'Third node revision is not the default one.');
+
+    // Confirm that the node can still be updated.
+    $this->drupalGet("node/" . $reverted_node->id() . "/edit");
+    $this->submitForm(['body[0][value]' => 'We are Drupal.'], 'Save');
+    $this->assertSession()->pageTextContains('Basic page ' . $reverted_node->getTitle() . ' has been updated.');
+    $this->assertSession()->pageTextContains('We are Drupal.');
 
     // Confirm revisions delete properly.
     $this->drupalGet("node/" . $node->id() . "/revisions/" . $nodes[1]->getRevisionId() . "/delete");
@@ -335,6 +352,74 @@ class NodeRevisionsTest extends NodeTestBase {
   }
 
   /**
+   * Tests the revisions pager.
+   */
+  public function testRevisionsPager(): void {
+    $nodes = $this->nodes;
+    $logs = $this->revisionLogs;
+
+    // Create 50 more revisions in order to trigger paging on the revisions
+    // overview screen.
+    $node = $nodes[0];
+    for ($i = 0; $i < 50; $i++) {
+      $logs[] = $node->revision_log = $this->randomMachineName(32);
+      $node = $this->createNodeRevision($node);
+      $nodes[] = clone $node;
+    }
+
+    $this->drupalGet('node/' . $node->id() . '/revisions');
+
+    // Check that the pager exists.
+    $this->assertSession()->responseContains('page=1');
+
+    // Check that the last revision is displayed on the first page.
+    $this->assertSession()->pageTextContains(end($logs));
+
+    // Go to the second page and check that one of the initial three revisions
+    // is displayed.
+    $this->clickLink('Page 2');
+    $this->assertSession()->pageTextContains($logs[2]);
+  }
+
+  /**
+   * Tests node revision operations with global permissions.
+   */
+  public function testRevisionsWithGlobalPermissions(): void {
+    $nodes = $this->nodes;
+
+    // Get last node for testing.
+    $node = $nodes[3];
+
+    // Create and log in user with global revision permissions.
+    $content_admin = $this->drupalCreateUser(
+      [
+        'view all revisions',
+        'revert all revisions',
+        'delete all revisions',
+        'edit any page content',
+        'delete any page content',
+      ]
+    );
+    $this->drupalLogin($content_admin);
+
+    // Test access to view revision.
+    $this->drupalGet("node/" . $node->id() . "/revisions/" . $node->getRevisionId() . "/view");
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Test access to revisions overview page.
+    $this->drupalGet("node/" . $node->id() . "/revisions");
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Test access to revert a revision.
+    $this->drupalGet("node/" . $node->id() . "/revisions/" . $nodes[1]->getRevisionId() . "/revert");
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Test access to delete a revision.
+    $this->drupalGet("node/" . $node->id() . "/revisions/" . $nodes[1]->getRevisionId() . "/delete");
+    $this->assertSession()->statusCodeEquals(200);
+  }
+
+  /**
    * Checks that revisions are correctly saved without log messages.
    */
   public function testNodeRevisionWithoutLogMessage(): void {
@@ -458,6 +543,30 @@ class NodeRevisionsTest extends NodeTestBase {
   }
 
   /**
+   * Creates a new revision for a given node.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   A node object.
+   *
+   * @return \Drupal\node\NodeInterface
+   *   A node object with up to date revision information.
+   */
+  protected function createNodeRevision(NodeInterface $node): NodeInterface {
+    // Create revision with a random title and body and update variables.
+    $node->title = $this->randomMachineName();
+    $node->body = [
+      'value' => $this->randomMachineName(32),
+      'format' => filter_default_format(),
+    ];
+    $node->setNewRevision();
+    // Ensure the revision author is a different user.
+    $node->setRevisionUserId($this->revisionUser->id());
+    $node->save();
+
+    return $node;
+  }
+
+  /**
    * Creates a series of revisions for the specified node.
    *
    * @param \Drupal\node\NodeInterface $node
@@ -465,7 +574,7 @@ class NodeRevisionsTest extends NodeTestBase {
    * @param int $count
    *   The number of revisions to be created.
    */
-  protected function createRevisions(NodeInterface $node, $count): void {
+  protected function createRevisions(NodeInterface $node, int $count): void {
     for ($i = 0; $i < $count; $i++) {
       $node->title = $this->randomString();
       $node->untranslatable_string_field->value = $this->randomString();
