@@ -146,16 +146,15 @@
       'input[type=submit], button[type=submit], input[type=image]',
       this.$exposed_form,
     ).not('[data-drupal-selector=edit-reset]');
-    once('exposed-form-input', $exposedFormInput).forEach(function (
-      input,
-      index,
-    ) {
-      const selfSettings = $.extend({}, that.element_settings, {
-        base: $(input).attr('id'),
-        element: input,
-      });
-      that.exposedFormAjax[index] = Drupal.ajax(selfSettings);
-    });
+    once('exposed-form-input', $exposedFormInput).forEach(
+      function (input, index) {
+        const selfSettings = $.extend({}, that.element_settings, {
+          base: $(input).attr('id'),
+          element: input,
+        });
+        that.exposedFormAjax[index] = Drupal.ajax(selfSettings);
+      },
+    );
   };
 
   /**
