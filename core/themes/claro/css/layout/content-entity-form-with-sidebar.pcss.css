@@ -1,0 +1,59 @@
+/**
+ * Layout overrides for node add/edit form.
+ */
+
+@import "../base/variables.pcss.css";
+
+:root {
+  --content-entity-meta-width: 22.5rem;
+}
+
+.layout-region {
+  box-sizing: border-box;
+}
+
+.layout-region--content-entity-footer .layout-region__content {
+  margin-top: var(--space-l);
+}
+
+/**
+ * Wide screens
+ */
+@media screen and (min-width: 61rem) {
+  .layout-region--content-entity-main,
+  .layout-region--content-entity-footer {
+    float: left; /* LTR */
+    width: calc(100% - var(--content-entity-meta-width));
+    padding-right: var(--space-l); /* LTR */
+  }
+  [dir="rtl"] .layout-region--content-entity-main,
+  [dir="rtl"] .layout-region--content-entity-footer {
+    float: right;
+    padding-right: 0;
+    padding-left: var(--space-l);
+  }
+
+  .layout-region--content-entity-main .layout-region__content,
+  .layout-region--content-entity-footer .layout-region__content {
+    max-width: 48rem;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .layout-region--content-entity-footer .layout-region__content {
+    margin-top: var(--space-xs);
+  }
+
+  .layout-region--content-entity-secondary {
+    float: right; /* LTR */
+    width: var(--content-entity-meta-width);
+  }
+  [dir="rtl"] .layout-region--content-entity-secondary {
+    float: left;
+  }
+
+  /* Push sidebar down to horizontal align with form section */
+  .layout-region--content-entity-secondary {
+    margin-top: var(--space-l);
+  }
+}

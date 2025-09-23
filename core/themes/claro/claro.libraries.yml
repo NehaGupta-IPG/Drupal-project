@@ -348,6 +348,11 @@ tableselect:
     - core/drupal.debounce
     - core/tabbable
     - core/once
+content-entity-form-with-sidebar:
+  version: VERSION
+  css:
+    layout:
+      css/layout/content-entity-form-with-sidebar.css: {}
 
 classy.file:
   version: VERSION

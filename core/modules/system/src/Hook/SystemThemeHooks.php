@@ -132,6 +132,9 @@ class SystemThemeHooks {
           'view_mode' => NULL,
         ],
       ],
+      'content_entity_form_with_sidebar' => [
+        'render element' => 'form',
+      ],
     ];
 
     return array_merge($themeCommonElements, $systemTheme);
