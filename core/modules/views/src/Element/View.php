@@ -105,7 +105,6 @@ class View extends RenderElementBase {
       ->swapOob(TRUE)
       ->applyTo($element);
 
-
     return $element;
   }
 

@@ -181,7 +181,12 @@ class TableSort {
    * @internal
    */
   public static function getQueryParameters(Request $request) {
-    return UrlHelper::filterQueryParameters($request->query->all(), ['sort', 'order', 'ajax_page_state', MainContentViewSubscriber::WRAPPER_FORMAT]);
+    return UrlHelper::filterQueryParameters($request->query->all(), [
+      'sort',
+      'order',
+      'ajax_page_state',
+      MainContentViewSubscriber::WRAPPER_FORMAT,
+    ]);
   }
 
 }

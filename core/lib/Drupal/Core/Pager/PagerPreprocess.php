@@ -4,7 +4,6 @@ namespace Drupal\Core\Pager;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
-use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\RequestStack;

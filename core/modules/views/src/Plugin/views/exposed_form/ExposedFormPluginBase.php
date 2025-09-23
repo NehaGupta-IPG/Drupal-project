@@ -8,7 +8,6 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Htmx\Htmx;
-use Drupal\Core\Url;
 use Drupal\views\Plugin\views\PluginBase;
 
 /**
@@ -349,7 +348,7 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
     }
 
     $form_state->setRedirect('<current>');
-    if (\Drupal::request()->headers->get('HX-Request'))  {
+    if (\Drupal::request()->headers->get('HX-Request')) {
       $form_state->setRedirect('<current>', [], [
         // Keep _wrapper_format and ajax_page_state in the query string.
         'query' => UrlHelper::filterQueryParameters(\Drupal::request()->query->all(), array_keys($this->view->exposed_data)),

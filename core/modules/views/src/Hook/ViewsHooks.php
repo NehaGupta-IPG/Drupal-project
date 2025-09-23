@@ -59,34 +59,6 @@ class ViewsHooks {
   }
 
   /**
-   * Implements hook_views_pre_render().
-   */
-  #[Hook('views_pre_render')]
-  public function viewsPreRender($view): void {
-    // If using AJAX, send identifying data about this view.
-    if ($view->ajaxEnabled() && empty($view->is_attachment) && empty($view->live_preview)) {
-      return;
-      $view->element['#attached']['drupalSettings']['views'] = [
-        'ajax_path' => Url::fromRoute('views.ajax')->toString(),
-        'ajaxViews' => [
-          'views_dom_id:' . $view->dom_id => [
-            'view_name' => $view->storage->id(),
-            'view_display_id' => $view->current_display,
-            'view_args' => Html::escape(implode('/', $view->args)),
-            'view_path' => Html::escape(\Drupal::service('path.current')->getPath()),
-            'view_base_path' => $view->getPath(),
-            'view_dom_id' => $view->dom_id,
-                    // To fit multiple views on a page, the programmer may have
-                    // overridden the display's pager_element.
-            'pager_element' => isset($view->pager) ? $view->pager->getPagerId() : 0,
-          ],
-        ],
-      ];
-      $view->element['#attached']['library'][] = 'views/views.ajax';
-    }
-  }
-
-  /**
    * Implements hook_theme().
    *
    * Register views theming functions and those that are defined via views

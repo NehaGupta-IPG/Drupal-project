@@ -6,7 +6,6 @@ use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Url;
 use Drupal\locale\SourceString;
 
 /**
