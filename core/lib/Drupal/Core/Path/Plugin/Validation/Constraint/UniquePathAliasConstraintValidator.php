@@ -44,7 +44,6 @@ class UniquePathAliasConstraintValidator extends ConstraintValidator implements 
    */
   public function validate($entity, Constraint $constraint): void {
     /** @var \Drupal\path_alias\PathAliasInterface $entity */
-    $path = $entity->getPath();
     $alias = $entity->getAlias();
     $langcode = $entity->language()->getId();
 
@@ -54,11 +53,8 @@ class UniquePathAliasConstraintValidator extends ConstraintValidator implements 
       ->condition('alias', $alias, '=')
       ->condition('langcode', $langcode, '=');
 
-    if (!$entity->isNew()) {
+    if ($entity->id()) {
       $query->condition('id', $entity->id(), '<>');
-    }
-    if ($path) {
-      $query->condition('path', $path, '<>');
     }
 
     if ($result = $query->range(0, 1)->execute()) {

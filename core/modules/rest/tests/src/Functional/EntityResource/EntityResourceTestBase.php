@@ -710,9 +710,10 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     $this->initAuthentication();
     $has_canonical_url = $this->entity->hasLinkTemplate('canonical');
 
-    // Try with all of the following request bodies.
+    // Try with all the following request bodies.
     $not_parseable_request_body = '!{>}<';
-    $parseable_valid_request_body = $this->serializer->encode($this->getNormalizedPostEntity(), static::$format);
+    $normalized_entity = $this->getNormalizedPostEntity();
+    $parseable_valid_request_body = $this->serializer->encode($normalized_entity, static::$format);
     $parseable_invalid_request_body = $this->serializer->encode($this->makeNormalizationInvalid($this->getNormalizedPostEntity(), 'label'), static::$format);
     $parseable_invalid_request_body_2 = $this->serializer->encode($this->getNormalizedPostEntity() + ['uuid' => [$this->randomMachineName(129)]], static::$format);
     $parseable_invalid_request_body_3 = $this->serializer->encode($this->getNormalizedPostEntity() + ['field_rest_test' => [['value' => $this->randomString()]]], static::$format);
@@ -838,7 +839,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       $created_entity = $this->entityStorage->loadUnchanged(static::$firstCreatedEntityId);
       $created_entity_normalization = $this->serializer->normalize($created_entity, static::$format, ['account' => $this->account]);
       $this->assertSame($created_entity_normalization, $this->serializer->decode((string) $response->getBody(), static::$format));
-      $this->assertStoredEntityMatchesSentNormalization($this->getNormalizedPostEntity(), $created_entity);
+      $this->assertStoredEntityMatchesSentNormalization($normalized_entity, $created_entity);
     }
 
     if ($this->entity->getEntityType()->getStorageClass() !== ContentEntityNullStorage::class && $this->entity->getEntityType()->hasKey('uuid')) {
@@ -889,7 +890,8 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
 
     // Try with all of the following request bodies.
     $not_parseable_request_body       = '!{>}<';
-    $parseable_valid_request_body     = $this->serializer->encode($this->getNormalizedPatchEntity(), static::$format);
+    $normalized_entity                = $this->getNormalizedPatchEntity();
+    $parseable_valid_request_body     = $this->serializer->encode($normalized_entity, static::$format);
     $parseable_invalid_request_body   = $this->serializer->encode($this->makeNormalizationInvalid($this->getNormalizedPatchEntity(), 'label'), static::$format);
     $parseable_invalid_request_body_2 = $this->serializer->encode($this->getNormalizedPatchEntity() + ['field_rest_test' => [['value' => $this->randomString()]]], static::$format);
     // The 'field_rest_test' field does not allow 'view' access, so does not end
@@ -1084,7 +1086,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     $updated_entity = $this->entityStorage->loadUnchanged($this->entity->id());
     $updated_entity_normalization = $this->serializer->normalize($updated_entity, static::$format, ['account' => $this->account]);
     $this->assertSame($updated_entity_normalization, $this->serializer->decode((string) $response->getBody(), static::$format));
-    $this->assertStoredEntityMatchesSentNormalization($this->getNormalizedPatchEntity(), $updated_entity);
+    $this->assertStoredEntityMatchesSentNormalization($normalized_entity, $updated_entity);
     // Ensure that fields do not get deleted if they're not present in the PATCH
     // request. Test this using the configurable field that we added, but which
     // is not sent in the PATCH request.

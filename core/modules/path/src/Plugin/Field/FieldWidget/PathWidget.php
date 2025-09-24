@@ -88,6 +88,7 @@ class PathWidget extends WidgetBase {
 
       /** @var \Drupal\path_alias\PathAliasInterface $path_alias */
       $path_alias = \Drupal::entityTypeManager()->getStorage('path_alias')->create([
+        'id' => $element['pid']['#value'],
         'path' => $element['source']['#value'],
         'alias' => $alias,
         'langcode' => $element['langcode']['#value'],

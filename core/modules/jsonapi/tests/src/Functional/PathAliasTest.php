@@ -121,7 +121,8 @@ class PathAliasTest extends ResourceTestBase {
       'data' => [
         'type' => static::$resourceTypeName,
         'attributes' => [
-          'alias' => '/frontpage1',
+          // Generate a random alias, to avoid conflicts.
+          'alias' => '/frontpage1-' . $this->randomMachineName(),
           'path' => '/<front>',
           'langcode' => 'en',
         ],

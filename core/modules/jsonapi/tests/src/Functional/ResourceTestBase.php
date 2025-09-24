@@ -42,6 +42,7 @@ use Drupal\jsonapi\JsonApiResource\ResourceObjectData;
 use Drupal\jsonapi\Normalizer\HttpExceptionNormalizer;
 use Drupal\jsonapi\ResourceResponse;
 use Drupal\path\Plugin\Field\FieldType\PathItem;
+use Drupal\path_alias\PathAliasInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\jsonapi\Traits\GetDocumentFromResponseTrait;
@@ -441,6 +442,12 @@ abstract class ResourceTestBase extends BrowserTestBase {
     if ($needs_manual_id) {
       $duplicate->set($id_key, $original->id() . '_' . $key);
     }
+
+    if ($duplicate instanceof PathAliasInterface) {
+      $alias = '/' . str_replace(' ', '-', $key);
+      $duplicate->setAlias($alias);
+    }
+
     return $duplicate;
   }
 
@@ -1431,8 +1438,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @see ::testRelationships
    */
   protected function doTestRelationshipMutation(array $request_options) {
+    $rand = $this->randomMachineName(20);
     /** @var \Drupal\Core\Entity\FieldableEntityInterface $resource */
-    $resource = $this->createAnotherEntity('dupe');
+    $resource = $this->createAnotherEntity($rand);
     $resource->set('field_jsonapi_test_entity_ref', NULL);
     $violations = $resource->validate();
     assert($violations->count() === 0, (string) $violations);
@@ -1979,7 +1987,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     // Try with all of the following request bodies.
     $not_parseable_request_body = '!{>}<';
-    $parseable_valid_request_body = Json::encode($this->getPostDocument());
+    $post_document = $this->getPostDocument();
+    $parseable_valid_request_body = Json::encode($post_document);
     $parseable_invalid_request_body_missing_type = Json::encode($this->removeResourceTypeFromDocument($this->getPostDocument()));
     if ($this->entity->getEntityType()->hasKey('label')) {
       $parseable_invalid_request_body = Json::encode($this->makeNormalizationInvalid($this->getPostDocument(), 'label'));
@@ -2103,7 +2112,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $decoded_response_body = $this->getDocumentFromResponse($response);
       $this->assertEquals($created_entity_document, $decoded_response_body);
       // Assert that the entity was indeed created using the POSTed values.
-      foreach ($this->getPostDocument()['data']['attributes'] as $field_name => $field_normalization) {
+      foreach ($post_document['data']['attributes'] as $field_name => $field_normalization) {
         // If the value is an array of properties, only verify that the sent
         // properties are present, the server could be computing additional
         // properties.
@@ -2200,7 +2209,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     // Try with all of the following request bodies.
     $not_parseable_request_body = '!{>}<';
-    $parseable_valid_request_body = Json::encode($this->getPatchDocument());
+    $post_document = $this->getPatchDocument();
+    $parseable_valid_request_body = Json::encode($post_document);
     if ($this->entity->getEntityType()->hasKey('label')) {
       $parseable_invalid_request_body = Json::encode($this->makeNormalizationInvalid($this->getPatchDocument(), 'label'));
     }
@@ -2368,7 +2378,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->assertSame($updated_entity_document, $document);
     $prior_revision_id = (int) $updated_entity->getRevisionId();
     // Assert that the entity was indeed created using the PATCHed values.
-    foreach ($this->getPatchDocument()['data']['attributes'] as $field_name => $field_normalization) {
+    foreach ($post_document['data']['attributes'] as $field_name => $field_normalization) {
       // If the value is an array of properties, only verify that the sent
       // properties are present, the server could be computing additional
       // properties.

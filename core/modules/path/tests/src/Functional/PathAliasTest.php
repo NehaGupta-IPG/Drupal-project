@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\path\Functional;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
@@ -149,6 +150,11 @@ class PathAliasTest extends PathTestBase {
     $this->drupalGet($previous);
     $this->assertSession()->pageTextNotContains($node1->label());
     $this->assertSession()->statusCodeEquals(404);
+
+    // Create the same alias again, using the same source.
+    $this->drupalGet('admin/config/search/path/add');
+    $this->submitForm($edit, t('Save'));
+    $this->assertSession()->responseContains(new FormattableMarkup('The alias %alias is already in use in this language.', ['%alias' => $edit['alias[0][value]']]));
 
     // Create second test node.
     $node2 = $this->drupalCreateNode();

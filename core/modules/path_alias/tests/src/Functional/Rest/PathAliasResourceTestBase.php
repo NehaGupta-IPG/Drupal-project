@@ -112,7 +112,8 @@ abstract class PathAliasResourceTestBase extends EntityResourceTestBase {
       ],
       'alias' => [
         [
-          'value' => '/frontpage1',
+          // Generate a random alias, to avoid conflicts.
+          'value' => '/frontpage1-' . $this->randomMachineName(),
         ],
       ],
     ];
