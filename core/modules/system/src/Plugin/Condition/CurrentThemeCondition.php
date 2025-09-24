@@ -81,7 +81,7 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    $this->configuration['themes'] = $form_state->getValue('themes');
+    $this->configuration['themes'] = array_filter($form_state->getValue('themes', []));
     // @todo $this->configuration['theme'] won't be supported in Drupal 12.0.0.
     // remove it:
     // @see https://www.drupal.org/node/3523553
