@@ -179,7 +179,7 @@ class ContentEntityFormWithSidebar extends ContentEntityForm {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * 
+   *
    * @return void
    *   No return value.
    */
