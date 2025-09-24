@@ -27,6 +27,8 @@ field.widget.settings.comment_default:
 comment.type.*:
   type: config_entity
   label: 'Comment type settings'
+  constraints:
+    FullyValidatable: ~
   mapping:
     id:
       type: machine_name
@@ -37,9 +39,15 @@ comment.type.*:
     target_entity_type_id:
       type: string
       label: 'Target Entity Type ID'
+      constraints:
+        NotNull: []
+        EntityTypeExists:
+          interface: '\Drupal\Core\Entity\FieldableEntityInterface'
+        IsCommentable: []
     description:
       type: text
       label: 'Description'
+      nullable: true
 
 field.storage_settings.comment:
   type: mapping

@@ -3,6 +3,7 @@ autoplay
 bartik
 bubbleable
 buytaert
+commentable
 daterange
 dbtng
 dependee
