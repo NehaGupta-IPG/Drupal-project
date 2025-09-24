@@ -3,8 +3,6 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Component\Datetime\TimeInterface;
-use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
-use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
@@ -181,7 +179,9 @@ class ContentEntityFormWithSidebar extends ContentEntityForm {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
+   * 
    * @return void
+   *   No return value.
    */
   protected function addRevisionableFormFields(array &$form): void {
     /** @var ContentEntityTypeInterface $entity_type */
