@@ -92,7 +92,7 @@ class YamlTest extends YamlTestBase {
   /**
    * Tests decoding tags with no tag classes.
    *
-   * @covers ::decodeTags
+   * @legacy-covers ::decodeTags
    */
   public function testDecodeTagsNoTagClasses(): void {
     $yaml = <<<YAML
@@ -108,7 +108,7 @@ class YamlTest extends YamlTestBase {
   /**
    * Tests decoding tags with tag classes.
    *
-   * @covers ::decodeTags
+   * @legacy-covers ::decodeTags
    */
   public function testDecodeTagsWithTagClasses(): void {
     $test_class = new class {
