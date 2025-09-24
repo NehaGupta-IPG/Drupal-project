@@ -381,8 +381,8 @@ use Drupal\Core\Database\Query\SelectInterface;
  *    'referenced_column'). This key is for documentation purposes only; foreign
  *    keys are not created in the database, nor are they enforced by Drupal.
  *  - 'indexes':  An associative array of indexes ('indexname' =>
- *    specification). Each specification is an array of one or more
- *    key column specifiers (see below) that form an index on the
+ *    specification). Each specification is an array or Index object containing
+ *    one or more key column specifiers (see below) that form an index on the
  *    table.
  *
  * A key column specifier is either a string naming a column or an array of two

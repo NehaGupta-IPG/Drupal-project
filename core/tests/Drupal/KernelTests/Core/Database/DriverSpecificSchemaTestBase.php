@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Database;
 
+use Drupal\Core\Database\Schema\Index;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\Schema;
 use Drupal\Core\Database\SchemaException;
+use Drupal\pgsql\Schema\IndexType;
 use Drupal\Tests\Core\Database\SchemaIntrospectionTestTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -1409,6 +1411,40 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     ])->execute();
 
     $this->assertEquals($id + 1, $id_two);
+  }
+
+  /**
+   * Tests creating an index with the index specification value object.
+   */
+  public function testObjectIndexSyntax(): void {
+    $specification = [
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+          'description' => 'Primary Key: Unique ID.',
+        ],
+        'text' => [
+          'type' => 'text',
+          'description' => 'A text field',
+        ],
+      ],
+      'indexes' => [
+        'text_column_index' => new Index(
+          ['text'],
+          [
+            'pgsql' => [
+              'type' => IndexType::Gist,
+              'operator' => 'gist_trgm_ops',
+            ],
+          ]
+        ),
+      ],
+      'primary key' => ['id'],
+    ];
+    $table_name = 'index_with_object';
+    $this->schema->createTable($table_name, $specification);
+    $this->assertIndexOnColumns($table_name, ['text']);
   }
 
 }

@@ -2,15 +2,17 @@
 
 namespace Drupal\pgsql\Driver\Database\pgsql;
 
+use Drupal\Core\Database\Schema\Index;
 use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
+use Drupal\pgsql\Schema\IndexType;
 
 // cSpell:ignore adbin adnum adrelid adsrc attisdropped attname attnum attrdef
 // cSpell:ignore attrelid atttypid atttypmod bigserial conkey conname conrelid
 // cSpell:ignore contype fillfactor indexname indexrelid indisprimary indkey
 // cSpell:ignore indrelid nextval nspname regclass relkind relname relnamespace
-// cSpell:ignore schemaname setval
+// cSpell:ignore schemaname setval indexdef
 
 /**
  * @addtogroup schemaapi
@@ -316,8 +318,8 @@ EOD;
     $statements[] = $sql;
 
     if (isset($table['indexes']) && is_array($table['indexes'])) {
-      foreach ($table['indexes'] as $key_name => $key) {
-        $statements[] = $this->_createIndexSql($name, $key_name, $key);
+      foreach ($table['indexes'] as $key_name => $spec) {
+        $statements[] = $this->_createIndexSql($name, $key_name, $spec);
       }
     }
 
@@ -884,7 +886,7 @@ EOD;
 
     // Get the schema and tablename for the table without identifier quotes.
     $full_name = str_replace('"', '', $this->connection->prefixTables('{' . $table . '}'));
-    $result = $this->connection->query("SELECT i.relname AS index_name, a.attname AS column_name FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND a.attnum = ANY(ix.indkey) AND t.relkind = 'r' AND t.relname = :table_name ORDER BY index_name ASC, column_name ASC", [
+    $result = $this->connection->query("SELECT i.relname AS index_name, a.attname AS column_name, pg_get_indexdef(i.oid) AS indexdef FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND a.attnum = ANY(ix.indkey) AND t.relkind = 'r' AND t.relname = :table_name ORDER BY index_name ASC, column_name ASC", [
       ':table_name' => $full_name,
     ])->fetchAll();
     foreach ($result as $row) {
@@ -896,6 +898,7 @@ EOD;
       }
       elseif (str_ends_with($row->index_name, '_idx')) {
         $index_schema['indexes'][$row->index_name][] = $row->column_name;
+        $index_schema['index_definitions'][$row->index_name] = $row->indexdef;
       }
     }
 
@@ -1025,11 +1028,43 @@ EOD;
   }
 
   /**
-   * Creates a statement for an SQL index for the given fields.
+   * Generate index creation statement.
+   *
+   * @param string $table
+   *   Table name.
+   * @param string $name
+   *   Index name.
+   * @param iterable $fields
+   *   Fields used by the index.
+   *
+   * @return string
+   *   Database statement.
    */
-  protected function _createIndexSql($table, $name, $fields) {
-    $query = 'CREATE INDEX ' . $this->ensureIdentifiersLength($table, $name, 'idx') . ' ON {' . $table . '} (';
-    $query .= $this->_createKeySql($fields) . ')';
+  protected function _createIndexSql(string $table, string $name, iterable $fields): string {
+    $query = 'CREATE INDEX ' . $this->ensureIdentifiersLength($table, $name, 'idx') . ' ON {' . $table . '} ';
+    $operator = '';
+    if ($fields instanceof Index && ($config = $fields->getDatabaseConfig('pgsql')) && !empty($config['type']) && $config['type'] instanceof IndexType) {
+      // Both GIN and GIST indexes may cover only one column.
+      if (count($fields) > 1) {
+        throw new \RuntimeException(sprintf('Postgres indexes of %s type in Drupal are currently limited to single columns. Multi-column indexes are generally discouraged, anyway. Consider a single-column index. See https://www.postgresql.org/docs/current/indexes-multicolumn.html', $config['type']->value));
+      }
+      // Index must be on a full column.
+      if (is_array($fields->getIterator()->current())) {
+        throw new \RuntimeException(sprintf('Postgres %s indexes are incompatible with substring column definition.', $config['type']->value));
+      }
+      $query .= 'USING ' . $config['type']->value . ' ';
+      // While the operator is technically applied to a specific column, we
+      // include it in the index config as it is impractical to introduce a
+      // second layer of value objects into the schema definition array.
+      // In addition, it would significantly complicate multi-column index
+      // creation, which the PGSQL docs discourage anyway.
+      $operator = $config['operator'] ?? '';
+    }
+    $query .= sprintf(
+      '(%s %s)',
+      $this->_createKeySql($fields),
+      $operator,
+    );
     return $query;
   }
 
