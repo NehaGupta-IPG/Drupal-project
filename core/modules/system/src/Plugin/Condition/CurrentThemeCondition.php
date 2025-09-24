@@ -121,7 +121,6 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
    *   TRUE if the current theme is allowed, FALSE otherwise.
    */
   protected function currentThemeAllowed() {
-    $this->execute();
     $configuredThemes = $this->configuration['themes'];
 
     // Handle deprecated 'theme' configuration option.
