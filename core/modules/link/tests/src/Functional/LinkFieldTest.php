@@ -585,7 +585,7 @@ class LinkFieldTest extends BrowserTestBase {
       'label' => 'Read more about this entity',
       'bundle' => 'entity_test',
       'settings' => [
-        'title' => DRUPAL_OPTIONAL,
+        'title' => LinkTitleVisibility::Optional->value,
         'link_type' => LinkItemInterface::LINK_INTERNAL,
       ],
     ])->save();
