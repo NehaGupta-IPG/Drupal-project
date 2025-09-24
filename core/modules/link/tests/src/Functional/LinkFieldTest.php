@@ -567,6 +567,7 @@ class LinkFieldTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->fieldValueEquals("{$field_name}[0][uri]", $invalidUri);
   }
+
   /**
    * Tests that attributes are retained when the link is saved via the UI.
    */
@@ -614,7 +615,7 @@ class LinkFieldTest extends BrowserTestBase {
     ];
 
     $this->drupalGet('entity_test/add');
-    $this->submitForm($edit, t('Save'));
+    $this->submitForm($edit, 'Save');
     preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
 
