@@ -76,7 +76,7 @@ class ContentEntityFormWithSidebar extends ContentEntityForm {
   /**
    * {@inheritdoc}
    */
-  public function form(array $form, FormStateInterface $form_state): void {
+  public function form(array $form, FormStateInterface $form_state): array {
 
     $form['#theme'] = ['content_entity_form'];
 
