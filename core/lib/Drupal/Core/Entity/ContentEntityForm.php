@@ -416,11 +416,11 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
     // Add a log field if the "Create new revision" option is checked, or if the
     // current user has the ability to check that option.
     $form['revision_information'] = [
-      '#type' => 'details',
+      '#type' => 'container',
       '#title' => $this->t('Revision information'),
       // Open by default when "Create new revision" is checked.
       '#open' => $new_revision_default,
-      '#group' => 'advanced',
+      '#group' => 'meta',
       '#weight' => 20,
       '#optional' => TRUE,
       '#attributes' => [
