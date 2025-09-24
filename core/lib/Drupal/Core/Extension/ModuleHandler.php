@@ -743,7 +743,15 @@ class ModuleHandler implements ModuleHandlerInterface {
       $this->listenersByHook[$hook] = [];
       foreach ($this->eventDispatcher->getListeners("drupal_hook.$hook") as $listener) {
         if (is_array($listener) && is_object($listener[0])) {
-          $module = $this->hookImplementationsMap[$hook][get_class($listener[0])][$listener[1]];
+          // The service class for the $listener[0] object might have changed
+          // after HookCollectorPass picked up its definition if the service was
+          // decorated, so
+          // $this->hookImplementationsMap[$hook][get_class($listener[0])] might
+          // not exist.
+          if (!($module = $this->hookImplementationsMap[$hook][get_class($listener[0])][$listener[1]] ?? '')) {
+            continue;
+          }
+
           // Inline ProceduralCall::__call() otherwise references get lost.
           if ($listener[0] instanceof ProceduralCall) {
             $listener[0]->loadFile($listener[1]);

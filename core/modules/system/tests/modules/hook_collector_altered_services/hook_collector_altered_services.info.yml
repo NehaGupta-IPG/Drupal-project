@@ -1,0 +1,7 @@
+name: 'Test Hook attribute with a service decorator and service modifier'
+type: module
+description: 'Test hook invocations when services alter or decorate other services that have hook implementations.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:hook_collector_hook_attribute
