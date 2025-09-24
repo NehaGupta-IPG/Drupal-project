@@ -118,7 +118,7 @@ class DateTimePlus {
     });
 
     if($contains_specialchars) {
-      throw new \InvalidArgumentException('The array is invalid because it contains specialchars.');
+      throw new \InvalidArgumentException('The array is invalid because it contains special characters.');
     }
 
     $date_parts = static::prepareArray($date_parts, TRUE);
