@@ -111,7 +111,8 @@ class DateTimePlus {
    *   If the array date values or value combination is not correct.
    */
   public static function createFromArray(array $date_parts, $timezone = NULL, $settings = []) {
-    // Test the array values for any specialchars.
+    // Test the array values for any special characters.
+    $contains_specialchars = FALSE;
     $contains_specialchars = array_find($date_parts, function (string $str) {
       return (bool)preg_match('/[^a-zA-Z0-9]/', $str) > 0;
     });
