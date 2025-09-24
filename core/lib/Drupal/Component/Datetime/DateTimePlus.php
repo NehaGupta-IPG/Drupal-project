@@ -111,14 +111,15 @@ class DateTimePlus {
    *   If the array date values or value combination is not correct.
    */
   public static function createFromArray(array $date_parts, $timezone = NULL, $settings = []) {
-    if (empty($date_parts['year'])) {
-      $date_parts['year'] = date('Y');
-      $date_parts['month'] = date('m');
-      $date_parts['day'] = date('d');
-      $date_parts['hour'] = date('h');
-      $date_parts['minute'] = date('i');
-      $date_parts['second'] = date('s');
+    // Test the array values for any specialchars.
+    $contains_specialchars = array_find($date_parts, function (string $str) {
+      return (bool)preg_match('/[^a-zA-Z0-9]/', $str) > 0;
+    });
+
+    if($contains_specialchars) {
+      throw new \InvalidArgumentException('The array is invalid because it contains specialchars.');
     }
+
     $date_parts = static::prepareArray($date_parts, TRUE);
     if (static::checkArray($date_parts)) {
       // Even with validation, we can end up with a value that the
