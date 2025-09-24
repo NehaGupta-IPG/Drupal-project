@@ -571,7 +571,7 @@ class LinkFieldTest extends BrowserTestBase {
   /**
    * Tests that attributes are retained when the link is saved via the UI.
    */
-  public function testAttributesOnLink() {
+  public function testAttributesOnLink(): void {
     $field_name = mb_strtolower($this->randomMachineName());
     $this->fieldStorage = FieldStorageConfig::create([
       'field_name' => $field_name,
