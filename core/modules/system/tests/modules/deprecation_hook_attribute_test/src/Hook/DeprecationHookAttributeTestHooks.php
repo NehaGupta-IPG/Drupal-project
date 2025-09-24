@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\deprecation_hook_attribute_test\Hook;
 
+use Drupal\Core\Hook\Attribute\DeprecatedHook;
 use Drupal\Core\Hook\Attribute\Hook;
 
 /**
  * Implements hooks for the deprecation hook attribute test.
  */
+#[DeprecatedHook('deprecated_hook', 'deprecation_test', 'x.x.x', 'y.y.y', 'Use something else.', 'change record')]
+#[DeprecatedHook('deprecated_alter', 'deprecation_test', 'x.x.x', 'y.y.y', 'Use something else.', 'change record')]
+#[DeprecatedHook('unimplemented_hook_name', 'deprecation_test', 'x.x.x', 'y.y.y', 'Use something else.', 'change record')]
 class DeprecationHookAttributeTestHooks {
 
   /**

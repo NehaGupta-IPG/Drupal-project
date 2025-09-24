@@ -421,6 +421,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function invokeDeprecated($description, $module, $hook, array $args = []) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use the #[DeprecatedHook] attribute instead. See https://www.drupal.org/node/3544006', E_USER_DEPRECATED);
     $result = $this->invoke($module, $hook, $args);
     $this->triggerDeprecationError($description, $hook);
     return $result;
@@ -430,6 +431,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function invokeAllDeprecated($description, $hook, array $args = []) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use the #[DeprecatedHook] attribute instead. See https://www.drupal.org/node/3544006', E_USER_DEPRECATED);
     $result = $this->invokeAll($hook, $args);
     $this->triggerDeprecationError($description, $hook);
     return $result;
@@ -656,6 +658,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function alterDeprecated($description, $type, &$data, &$context1 = NULL, &$context2 = NULL) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use the #[DeprecatedHook] attribute instead. See https://www.drupal.org/node/3544006', E_USER_DEPRECATED);
     // Invoke the alter hook. This has the side effect of populating
     // $this->alterEventListeners.
     $this->alter($type, $data, $context1, $context2);

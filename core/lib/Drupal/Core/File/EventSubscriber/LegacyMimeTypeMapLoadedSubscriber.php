@@ -35,11 +35,7 @@ final class LegacyMimeTypeMapLoadedSubscriber implements
     }
     // @phpstan-ignore-next-line method.deprecated
     $mapping = $event->map->getMapping();
-    $this->moduleHandler->alterDeprecated(
-      'This hook is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Implement a \Drupal\Core\File\Event\MimeTypeMapLoadedEvent listener instead. See https://www.drupal.org/node/3494040',
-      'file_mimetype_mapping',
-      $mapping,
-    );
+    $this->moduleHandler->alter('file_mimetype_mapping', $mapping);
     // @phpstan-ignore-next-line method.deprecated
     $event->map->setMapping($mapping);
   }
