@@ -114,10 +114,10 @@ class DateTimePlus {
     // Test the array values for any special characters.
     $contains_special = FALSE;
     $contains_special = array_find($date_parts, function (string $str) {
-      return (bool)preg_match('/[^a-zA-Z0-9]/', $str) > 0;
+      return (bool) preg_match('/[^a-zA-Z0-9]/', $str) > 0;
     });
 
-    if($contains_special) {
+    if ($contains_special) {
       throw new \InvalidArgumentException('The array is invalid because it contains special characters.');
     }
 
