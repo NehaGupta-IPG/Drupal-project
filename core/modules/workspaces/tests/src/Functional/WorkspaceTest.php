@@ -8,12 +8,14 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test the workspace entity.
- *
- * @group workspaces
  */
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceTest extends BrowserTestBase {
 
   use WorkspaceTestUtilities;
@@ -33,6 +35,7 @@ class WorkspaceTest extends BrowserTestBase {
     'user',
     'workspaces',
     'workspaces_ui',
+    'workspaces_test',
   ];
 
   /**
@@ -157,6 +160,7 @@ class WorkspaceTest extends BrowserTestBase {
   public function testWorkspaceFormRevisions(): void {
     $this->drupalLogin($this->editor1);
     $storage = \Drupal::entityTypeManager()->getStorage('workspace');
+    $this->createWorkspaceThroughUi('Stage', 'stage');
 
     // The current 'stage' workspace entity should be revision 1.
     $stage_workspace = $storage->load('stage');
@@ -334,7 +338,7 @@ class WorkspaceTest extends BrowserTestBase {
     $user->delete();
     $this->drupalGet('/admin/config/workflow/workspaces');
     $this->assertSession()->pageTextContains('Summer event');
-    $summer_event_workspace_row = $page->find('css', 'table tbody tr:nth-of-type(3)');
+    $summer_event_workspace_row = $page->find('css', 'table tbody tr:nth-of-type(2)');
     $this->assertEquals('N/A', $summer_event_workspace_row->find('css', 'td:nth-of-type(2)')->getText());
   }
 
@@ -364,7 +368,9 @@ class WorkspaceTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('There are no changes that can be published from Test workspace to Live.');
 
     // Create a node in the workspace.
-    $this->createNodeThroughUi('Test node', 'test');
+    $this->drupalGet('/node/add/test');
+    $this->assertEquals(1, \Drupal::keyValue('ws_test')->get('node.hook_entity_create.count'));
+    $this->submitForm(['title[0][value]' => 'Test node'], 'Save');
 
     $this->drupalGet('/admin/config/workflow/workspaces/manage/test_workspace/publish');
     $this->assertSession()->statusCodeEquals(200);

@@ -8,14 +8,15 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiJSTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore horserad
-
 /**
  * Tests the Field UI "Manage Fields" screens.
- *
- * @group field_ui
  */
+#[Group('field_ui')]
+#[RunTestsInSeparateProcesses]
 class ManageFieldsTest extends WebDriverTestBase {
 
   use FieldUiJSTestTrait;
@@ -37,21 +38,6 @@ class ManageFieldsTest extends WebDriverTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * @var string
-   */
-  protected $type;
-
-  /**
-   * @var string
-   */
-
-  protected $type2;
-  /**
-   * @var \Drupal\Core\Entity\entityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -68,19 +54,16 @@ class ManageFieldsTest extends WebDriverTestBase {
     ]);
     $this->drupalLogin($admin_user);
 
-    $type = $this->drupalCreateContentType([
+    $this->drupalCreateContentType([
       'name' => 'Article',
       'type' => 'article',
     ]);
-    $this->type = $type->id();
 
-    $type2 = $this->drupalCreateContentType([
+    $this->drupalCreateContentType([
       'name' => 'Basic Page',
       'type' => 'page',
     ]);
-    $this->type2 = $type2->id();
 
-    $this->entityTypeManager = $this->container->get('entity_type.manager');
     $this->getSession()->resizeWindow(1100, 800);
   }
 

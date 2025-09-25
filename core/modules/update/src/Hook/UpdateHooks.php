@@ -2,6 +2,7 @@
 
 namespace Drupal\update\Hook;
 
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\update\UpdateManagerInterface;
 use Drupal\Core\Url;
@@ -77,8 +78,7 @@ class UpdateHooks {
           $verbose = TRUE;
           break;
       }
-      \Drupal::moduleHandler()->loadInclude('update', 'install');
-      $status = update_requirements('runtime');
+      $status = \Drupal::moduleHandler()->invoke('update', 'runtime_requirements');
       foreach (['core', 'contrib'] as $report_type) {
         $type = 'update_' . $report_type;
         // hook_requirements() supports render arrays therefore we need to
@@ -89,10 +89,10 @@ class UpdateHooks {
         }
         if (!empty($verbose)) {
           if (isset($status[$type]['severity'])) {
-            if ($status[$type]['severity'] == REQUIREMENT_ERROR) {
+            if ($status[$type]['severity'] === RequirementSeverity::Error) {
               \Drupal::messenger()->addError($status[$type]['description']);
             }
-            elseif ($status[$type]['severity'] == REQUIREMENT_WARNING) {
+            elseif ($status[$type]['severity'] === RequirementSeverity::Warning) {
               \Drupal::messenger()->addWarning($status[$type]['description']);
             }
           }
@@ -104,49 +104,6 @@ class UpdateHooks {
         }
       }
     }
-  }
-
-  /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return [
-      'update_last_check' => [
-        'variables' => [
-          'last' => 0,
-        ],
-      ],
-      'update_report' => [
-        'variables' => [
-          'data' => NULL,
-        ],
-        'file' => 'update.report.inc',
-      ],
-      'update_project_status' => [
-        'variables' => [
-          'project' => [],
-        ],
-        'file' => 'update.report.inc',
-      ],
-      // We are using template instead of '#type' => 'table' here to keep markup
-      // out of preprocess and allow for easier changes to markup.
-      'update_version' => [
-        'variables' => [
-          'version' => NULL,
-          'title' => NULL,
-          'attributes' => [],
-        ],
-        'file' => 'update.report.inc',
-      ],
-      'update_fetch_error_message' => [
-        'file' => 'update.report.inc',
-        'render element' => 'element',
-        'variables' => [
-          'error_message' => [],
-        ],
-      ],
-    ];
   }
 
   /**
@@ -178,8 +135,6 @@ class UpdateHooks {
       \Drupal::moduleHandler()->loadInclude('update', 'inc', 'update.fetch');
       _update_cron_notify();
     }
-    // Clear garbage from disk.
-    update_clear_update_disk_cache();
   }
 
   /**
@@ -305,12 +260,12 @@ class UpdateHooks {
       }
     }
     if (empty($files)) {
-      $errors[] = $this->t('%archive_file does not contain any .info.yml files.', ['%archive_file' => $file_system->basename($archive_file)]);
+      $errors[] = $this->t('%archive_file does not contain any .info.yml files.', ['%archive_file' => basename($archive_file)]);
     }
     elseif (!$compatible_project) {
       $errors[] = \Drupal::translation()->formatPlural(count($incompatible), '%archive_file contains a version of %names that is not compatible with Drupal @version.', '%archive_file contains versions of modules or themes that are not compatible with Drupal @version: %names', [
         '@version' => \Drupal::VERSION,
-        '%archive_file' => $file_system->basename($archive_file),
+        '%archive_file' => basename($archive_file),
         '%names' => implode(', ', $incompatible),
       ]);
     }

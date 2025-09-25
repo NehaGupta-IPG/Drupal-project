@@ -159,10 +159,6 @@ class SystemHooks {
   }
 
   /**
-   * @} End of "defgroup authorize".
-   */
-
-  /**
    * Implements hook_updater_info().
    */
   #[Hook('updater_info')]
@@ -276,7 +272,11 @@ class SystemHooks {
     // before doing so. Also add the loaded libraries to ajaxPageState.
     /** @var \Drupal\Core\Asset\LibraryDependencyResolver $library_dependency_resolver */
     $library_dependency_resolver = \Drupal::service('library.dependency_resolver');
-    if (isset($settings['ajaxPageState']) || in_array('core/drupal.ajax', $library_dependency_resolver->getLibrariesWithDependencies($assets->getAlreadyLoadedLibraries()))) {
+    $loaded_libraries = [];
+    if (!isset($settings['ajaxPageState'])) {
+      $loaded_libraries = $library_dependency_resolver->getLibrariesWithDependencies($assets->getAlreadyLoadedLibraries());
+    }
+    if (isset($settings['ajaxPageState']) || in_array('core/drupal.ajax', $loaded_libraries) || in_array('core/drupal.htmx', $loaded_libraries)) {
       if (!defined('MAINTENANCE_MODE')) {
         // The theme token is only validated when the theme requested is not the
         // default, so don't generate it unless necessary.
@@ -339,7 +339,7 @@ class SystemHooks {
     \Drupal::service('file.htaccess_writer')->ensure();
     if (\Drupal::config('system.advisories')->get('enabled')) {
       // Fetch the security advisories so that they will be pre-fetched during
-      // _system_advisories_requirements() and system_page_top().
+      // systemAdvisoriesRequirements() and system_page_top().
       /** @var \Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher $fetcher */
       $fetcher = \Drupal::service('system.sa_fetcher');
       $fetcher->getSecurityAdvisories();

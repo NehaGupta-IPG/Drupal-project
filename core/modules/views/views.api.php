@@ -13,6 +13,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\views\Plugin\views\cache\CachePluginBase;
 use Drupal\views\Plugin\views\PluginBase;
+use Drupal\views\Plugin\views\query\QueryPluginBase;
 use Drupal\views\ViewExecutable;
 
 /**
@@ -532,8 +533,9 @@ function hook_views_data_alter(array &$data) {
  * When collecting the views data, views_views_data() invokes this hook for each
  * field storage definition, on the module that provides the field storage
  * definition. If the return value is empty, the result of
- * FieldViewsDataProvider::defaultFieldImplementation() is used instead. Then the result is altered
- * by invoking hook_field_views_data_alter() on all modules.
+ * FieldViewsDataProvider::defaultFieldImplementation() is used instead. Then
+ * the result is altered by invoking hook_field_views_data_alter() on all
+ * modules.
  *
  * If no hook implementation exists, hook_views_data() falls back to
  * FieldViewsDataProvider::defaultFieldImplementation().

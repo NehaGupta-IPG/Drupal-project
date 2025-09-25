@@ -9,17 +9,16 @@ use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore basefield
-
 /**
  * Tests Field SQL Storage .
  *
  * Field_sql_storage.module implements the default back-end storage plugin
  * for the Field Storage API.
- *
- * @group Entity
  */
+#[Group('Entity')]
 class FieldSqlStorageTest extends EntityKernelTestBase {
 
   /**
@@ -503,7 +502,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
     $expected = 'short_entity_type_revision__short_field_name';
     $this->assertEquals($expected, $this->tableMapping->getDedicatedRevisionTableName($field_storage));
 
-    // Short entity type, long field name
+    // Short entity type, long field name.
     $entity_type = 'short_entity_type';
     $field_name = 'long_field_name_abcdefghijklmnopqrstuvwxyz';
     $field_storage = FieldStorageConfig::create([
@@ -516,7 +515,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
     $expected = 'short_entity_type_r__' . substr(hash('sha256', $field_storage->uuid()), 0, 10);
     $this->assertEquals($expected, $this->tableMapping->getDedicatedRevisionTableName($field_storage));
 
-    // Long entity type, short field name
+    // Long entity type, short field name.
     $entity_type = 'long_entity_type_all_forty_three_characters';
     $field_name = 'short_field_name';
     $field_storage = FieldStorageConfig::create([
@@ -575,6 +574,60 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
     $field_storage->save();
     $table_mapping = \Drupal::entityTypeManager()->getStorage('entity_test_rev')->getTableMapping();
     $this->assertEquals($table_mapping->getDedicatedDataTableName($field_storage), $table_mapping->getFieldTableName('some_field_name'));
+  }
+
+  /**
+   * Tests loading base and configurable serialized fields with NULL values.
+   *
+   * Note that this tests loading field values that are literally NULL. It
+   * doesn't test that NULL values are serialized and unserialized properly.
+   */
+  public function testNullSerializedFieldLoad(): void {
+    $connection = Database::getConnection();
+    $entity_type = $bundle = 'entity_test_serialized_field';
+    $this->installEntitySchema($entity_type);
+    $storage = $this->container->get('entity_type.manager')->getStorage($entity_type);
+
+    // The serialized base field is already part of the test entity type, but
+    // a configurable field has to be created.
+    $serialized_field = $this->randomMachineName();
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => $serialized_field,
+      'entity_type' => $entity_type,
+      'type' => 'nullable_serialized_item_test',
+      'cardinality' => 1,
+      'required' => FALSE,
+    ]);
+    $field_storage->save();
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => $bundle,
+    ]);
+    $field->save();
+
+    $entity = $storage->create();
+    $entity->save();
+
+    // Manually set the field values to NULL with database queries.
+    $connection->update('entity_test_serialized_fields')
+      ->fields(['serialized' => NULL])
+      ->condition('id', $entity->id())
+      ->execute();
+    $connection->insert($entity_type . '__' . $serialized_field)
+      ->fields([
+        'bundle' => $bundle,
+        'deleted' => 0,
+        'entity_id' => $entity->id(),
+        'revision_id' => $entity->id(),
+        'langcode' => $entity->language()->getId(),
+        'delta' => 0,
+        $serialized_field . '_value' => NULL,
+      ])
+      ->execute();
+
+    $storage->load($entity->id());
+    $this->assertNull($entity->serialized->value);
+    $this->assertNull($entity->{$serialized_field}->value);
   }
 
 }

@@ -11,8 +11,8 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\node\Form\DeleteMultiple;
 use Drupal\node\Form\NodeDeleteForm;
+use Drupal\node\Form\NodeForm;
 use Drupal\node\NodeAccessControlHandler;
-use Drupal\node\NodeForm;
 use Drupal\node\NodeInterface;
 use Drupal\node\NodeListBuilder;
 use Drupal\node\NodeStorage;
@@ -169,12 +169,6 @@ class Node extends EditorialContentEntityBase implements NodeInterface {
       $access_control_handler = \Drupal::entityTypeManager()->getAccessControlHandler('node');
       $grants = $access_control_handler->acquireGrants($this);
       \Drupal::service('node.grant_storage')->write($this, $grants, NULL, $update);
-    }
-
-    // Reindex the node when it is updated. The node is automatically indexed
-    // when it is added, simply by being added to the node table.
-    if ($update) {
-      node_reindex_node_search($this->id());
     }
   }
 
@@ -357,13 +351,9 @@ class Node extends EditorialContentEntityBase implements NodeInterface {
       ->setLabel(t('Promoted to front page'))
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
-      ->setDefaultValue(TRUE)
+      ->setDefaultValue(FALSE)
       ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'settings' => [
-          'display_label' => TRUE,
-        ],
-        'weight' => 15,
+        'region' => 'hidden',
       ])
       ->setDisplayConfigurable('form', TRUE);
 
@@ -373,11 +363,7 @@ class Node extends EditorialContentEntityBase implements NodeInterface {
       ->setTranslatable(TRUE)
       ->setDefaultValue(FALSE)
       ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'settings' => [
-          'display_label' => TRUE,
-        ],
-        'weight' => 16,
+        'region' => 'hidden',
       ])
       ->setDisplayConfigurable('form', TRUE);
 

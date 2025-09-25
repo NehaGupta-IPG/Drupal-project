@@ -68,7 +68,7 @@ class WorkspaceCRUDTest extends KernelTestBase {
     $this->installSchema('node', ['node_access']);
 
     $this->installEntitySchema('workspace');
-    $this->installSchema('workspaces', ['workspace_association']);
+    $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
     $this->installEntitySchema('node');
 
     $this->installConfig(['filter', 'node', 'system']);
@@ -231,7 +231,7 @@ class WorkspaceCRUDTest extends KernelTestBase {
     $workspace->save();
     $this->workspaceManager->setActiveWorkspace($workspace);
 
-    // Create a new node in the 'stage' workspace
+    // Create a new node in the 'stage' workspace.
     $node = $this->createNode(['status' => TRUE]);
 
     // Create an additional workspace-specific revision for the node.

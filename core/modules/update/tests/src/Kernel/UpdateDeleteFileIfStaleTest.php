@@ -10,6 +10,7 @@ use Drupal\KernelTests\KernelTestBase;
  * Tests the update_delete_file_if_stale() function.
  *
  * @group update
+ * @group legacy
  */
 class UpdateDeleteFileIfStaleTest extends KernelTestBase {
 
@@ -27,7 +28,6 @@ class UpdateDeleteFileIfStaleTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'update',
   ];
 
