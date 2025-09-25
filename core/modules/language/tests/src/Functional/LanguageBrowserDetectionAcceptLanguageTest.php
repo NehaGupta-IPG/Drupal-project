@@ -140,7 +140,7 @@ class LanguageBrowserDetectionAcceptLanguageTest extends BrowserTestBase {
    * Mainly the correct "Content-Language" header is validated as well as the
    * state of the "X-Drupal-Cache" header.
    */
-  public function testEmptyLanguagePrefixForDefaultLanguage() {
+  public function testEmptyLanguagePrefixForDefaultLanguage(): void {
     $this->drupalLogin($this->adminUser);
     // Leave default "en" prefix empty:
     $this->drupalGet('/admin/config/regional/language/detection/url');
