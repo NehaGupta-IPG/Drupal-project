@@ -461,6 +461,8 @@ block.settings.field_block:*:*:*:
     show_when_empty:
       type: boolean
       label: 'Show when empty'
+  constraints:
+    FullyValidatable: ~
 
 block.settings.extra_field_block:*:*:*:
   type: block_settings
