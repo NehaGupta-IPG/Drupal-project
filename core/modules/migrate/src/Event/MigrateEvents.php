@@ -110,6 +110,21 @@ final class MigrateEvents {
   const POST_ROW_SAVE = 'migrate.post_row_save';
 
   /**
+   * Name of the event fired when a single item has failed to be imported.
+   *
+   * This event allows modules to perform an action whenever a specific item
+   * has failed to be imported. The event listener method receives a
+   * \Drupal\migrate\Event\MigrateRowFailEvent instance.
+   *
+   * @Event
+   *
+   * @see \Drupal\migrate\Event\MigrateRowFailEvent
+   *
+   * @var string
+   */
+  const ROW_FAIL = 'migrate.row_fail';
+
+  /**
    * Name of the event fired when beginning a migration rollback operation.
    *
    * This event allows modules to perform an action whenever a migration

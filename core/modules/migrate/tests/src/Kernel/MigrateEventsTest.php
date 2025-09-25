@@ -12,6 +12,7 @@ use Drupal\migrate\Event\MigratePreRowSaveEvent;
 use Drupal\migrate\Event\MigrateEvents;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\migrate\Event\MigrateRowFailEvent;
 
 /**
  * Tests events fired on migrations.
@@ -30,7 +31,7 @@ class MigrateEventsTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['migrate', 'migrate_events_test'];
+  protected static $modules = ['migrate', 'migrate_events_test', 'node'];
 
   /**
    * {@inheritdoc}
@@ -50,6 +51,8 @@ class MigrateEventsTest extends KernelTestBase {
       [$this, 'preRowSaveEventRecorder']);
     \Drupal::service('event_dispatcher')->addListener(MigrateEvents::POST_ROW_SAVE,
       [$this, 'postRowSaveEventRecorder']);
+    \Drupal::service('event_dispatcher')->addListener(MigrateEvents::ROW_FAIL,
+      [$this, 'rowFailEventRecorder']);
   }
 
   /**
@@ -211,6 +214,53 @@ class MigrateEventsTest extends KernelTestBase {
       'migration' => $event->getMigration(),
       'row' => $event->getRow(),
       'destination_id_values' => $event->getDestinationIdValues(),
+    ]);
+  }
+
+  /**
+   * Tests migration row fail event.
+   */
+  public function testMigrationRowFailEvent(): void {
+    // Create a simple node migration. This will fail as other dependent
+    // modules like 'user' are not enabled.
+    $data_row = [
+      ['key' => '1', 'field1' => 'f1value1', 'field2' => 'f2value1'],
+    ];
+    $ids = ['key' => ['type' => 'integer']];
+    $definition = [
+      'migration_tags' => ['Embedded data test'],
+      'source' => [
+        'plugin' => 'embedded_data',
+        'data_rows' => $data_row,
+        'ids' => $ids,
+      ],
+      'process' => ['title' => 'field1', 'body' => 'field2'],
+      'destination' => ['plugin' => 'entity:node', 'default_bundle' => 'page'],
+    ];
+
+    $migration = \Drupal::service('plugin.manager.migration')->createStubMigration($definition);
+    $executable = new MigrateExecutable($migration);
+    // As the import runs, events will be dispatched, recording the received
+    // information in state.
+    $executable->import();
+    $event = $this->state->get('migrate_events_test.row_fail_event', []);
+    $this->assertSame(MigrateEvents::ROW_FAIL, $event['event_name']);
+    // Validating id of failed row.
+    $this->assertSame('1', $event['row']->getSourceProperty('key'));
+  }
+
+  /**
+   * Reacts to migration row fail event.
+   *
+   * @param \Drupal\migrate\Event\MigrateRowFailEvent $event
+   *   The migration event.
+   * @param string $name
+   *   The event name.
+   */
+  public function rowFailEventRecorder(MigrateRowFailEvent $event, string $name): void {
+    $this->state->set('migrate_events_test.row_fail_event', [
+      'event_name' => $name,
+      'row' => $event->getRow(),
     ]);
   }
 
