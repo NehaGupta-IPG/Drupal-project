@@ -10,16 +10,19 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @covers \Drupal\field\Plugin\ConfigAction\AddToAllBundles
+ * Tests Add To All Bundles Config Action.
  *
- * @group Recipe
- * @group field
+ * @legacy-covers \Drupal\field\Plugin\ConfigAction\AddToAllBundles
  */
+#[Group('Recipe')]
+#[Group('field')]
 class AddToAllBundlesConfigActionTest extends KernelTestBase {
 
   use RecipeTestTrait;
@@ -84,7 +87,15 @@ class AddToAllBundlesConfigActionTest extends KernelTestBase {
    */
   public function testFailIfExists(): void {
     $this->installConfig('node');
-    node_add_body_field(NodeType::load('one'));
+
+    $field_storage = FieldStorageConfig::loadByName('node', 'body');
+    // Manually create the field.
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => 'one',
+      'label' => 'Body',
+    ]);
+    $field->save();
 
     $this->expectException(ConfigActionException::class);
     $this->expectExceptionMessage('Field node.one.body already exists.');
@@ -97,10 +108,14 @@ class AddToAllBundlesConfigActionTest extends KernelTestBase {
   public function testIgnoreExistingFields(): void {
     $this->installConfig('node');
 
-    node_add_body_field(NodeType::load('one'))
-      ->setLabel('Original label')
-      ->setDescription('Original description')
-      ->save();
+    $field_storage = FieldStorageConfig::loadByName('node', 'body');
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => 'one',
+      'label' => 'Original label',
+      'description' => 'Original description',
+    ]);
+    $field->save();
 
     $this->applyAction('field.storage.node.body');
 

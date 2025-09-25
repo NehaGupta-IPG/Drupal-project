@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Functional\Plugin;
 
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
-use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore eerste laatste volgende vorige
 /**
  * Tests the pluggable pager system.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class PagerTest extends ViewTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -334,7 +336,7 @@ class PagerTest extends ViewTestBase {
     $this->executeView($view);
     $this->assertCount(3, $view->result, 'Make sure that only a certain count of items is returned');
 
-    // Test items per page = 0
+    // Test items per page = 0.
     $view = Views::getView('test_view_pager_full_zero_items_per_page');
     $this->executeView($view);
 

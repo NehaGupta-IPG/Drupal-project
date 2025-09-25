@@ -5,16 +5,19 @@ declare(strict_types=1);
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\CommentManagerInterface;
+use Drupal\comment\CommentPreviewMode;
+use Drupal\comment\Entity\Comment;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\comment\Entity\Comment;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests comment preview.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentPreviewTest extends CommentTestBase {
 
   use TestFileCreationTrait {
@@ -35,7 +38,7 @@ class CommentPreviewTest extends CommentTestBase {
    * Tests comment preview.
    */
   public function testCommentPreview(): void {
-    $this->setCommentPreview(DRUPAL_OPTIONAL);
+    $this->setCommentPreview(CommentPreviewMode::Optional);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
@@ -93,7 +96,7 @@ class CommentPreviewTest extends CommentTestBase {
    * Tests comment preview.
    */
   public function testCommentPreviewDuplicateSubmission(): void {
-    $this->setCommentPreview(DRUPAL_OPTIONAL);
+    $this->setCommentPreview(CommentPreviewMode::Optional);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
@@ -142,7 +145,7 @@ class CommentPreviewTest extends CommentTestBase {
       'edit own comments',
     ]);
     $this->drupalLogin($this->adminUser);
-    $this->setCommentPreview(DRUPAL_OPTIONAL);
+    $this->setCommentPreview(CommentPreviewMode::Optional);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');

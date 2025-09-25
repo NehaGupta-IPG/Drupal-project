@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
+use Drupal\comment\CommentInterface;
+use Drupal\comment\Entity\Comment;
 use Drupal\comment\Entity\CommentType;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\comment\CommentInterface;
-use Drupal\comment\Entity\Comment;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests comments with other entities.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentEntityTest extends CommentTestBase {
 
   use TaxonomyTestTrait;
@@ -100,7 +102,7 @@ class CommentEntityTest extends CommentTestBase {
     // Request the node with the comment.
     $this->drupalGet('taxonomy/term/' . $term->id());
     $settings = $this->getDrupalSettings();
-    $this->assertFalse(isset($settings['ajaxPageState']['libraries']) && in_array('comment/drupal.comment-new-indicator', explode(',', $settings['ajaxPageState']['libraries'])), 'drupal.comment-new-indicator library is present.');
+    $this->assertFalse(isset($settings['ajaxPageState']['libraries']) && in_array('history/drupal.comment-new-indicator', explode(',', $settings['ajaxPageState']['libraries'])), 'drupal.comment-new-indicator library is present.');
     $this->assertFalse(isset($settings['history']['lastReadTimestamps']) && in_array($term->id(), array_keys($settings['history']['lastReadTimestamps'])), 'history.lastReadTimestamps is present.');
   }
 

@@ -7,12 +7,13 @@ namespace Drupal\Tests\Core\Asset;
 use Drupal\Core\Asset\CssOptimizer;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the CSS asset optimizer.
- *
- * @group Asset
  */
+#[Group('Asset')]
 class CssOptimizerUnitTest extends UnitTestCase {
 
   /**
@@ -236,9 +237,8 @@ class CssOptimizerUnitTest extends UnitTestCase {
 
   /**
    * Tests optimizing a CSS asset group containing 'type' => 'file'.
-   *
-   * @dataProvider providerTestOptimize
    */
+  #[DataProvider('providerTestOptimize')]
   public function testOptimize($css_asset, $expected): void {
     global $base_path;
     $original_base_path = $base_path;
@@ -286,19 +286,6 @@ class CssOptimizerUnitTest extends UnitTestCase {
       'data' => 'http://example.com/foo.js',
     ];
     $this->optimizer->optimize($css_asset);
-  }
-
-}
-
-/**
- * CssCollectionRenderer uses file_uri_scheme() which need to be mocked.
- */
-namespace Drupal\Core\Asset;
-
-if (!function_exists('Drupal\Core\Asset\file_uri_scheme')) {
-
-  function file_uri_scheme($uri) {
-    return FALSE;
   }
 
 }

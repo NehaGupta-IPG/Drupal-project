@@ -1086,7 +1086,7 @@ function claro_preprocess_field_multiple_value_form(&$variables): void {
   if ($variables['multiple']) {
     // Add an additional CSS class to the field label table cell. The table
     // header cell should always exist unless removed by contrib.
-    // @see template_preprocess_field_multiple_value_form().
+    // @see \Drupal\Core\Field\FieldPreprocess::preprocessFieldMultipleValueForm().
     if (isset($variables['table']['#header'][0]['data']['#attributes'])) {
       $variables['table']['#header'][0]['data']['#attributes']->removeClass('label');
       $variables['table']['#header'][0]['data']['#attributes']->addClass('form-item__label', 'form-item__label--multiple-value-form');
@@ -1181,7 +1181,7 @@ function claro_preprocess_table(&$variables): void {
         $first_cell_key = array_key_first($row['cells']);
         // The 'attributes' key is always here and it is an
         // \Drupal\Core\Template\Attribute.
-        // @see template_preprocess_table();
+        // @see \Drupal\Core\Theme\ThemePreprocess::preprocessTable();
         $row['cells'][$first_cell_key]['attributes']->addClass('tabledrag-cell');
 
         // Check that the first cell is empty or not.

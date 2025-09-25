@@ -7,14 +7,15 @@ namespace Drupal\Tests\image\Functional;
 use Drupal\file\Entity\File;
 use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore Scarlett Johansson ribisi
-
 /**
  * Uploads images to translated nodes.
- *
- * @group image
  */
+#[Group('image')]
+#[RunTestsInSeparateProcesses]
 class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
 
   use ContentTranslationTestTrait;

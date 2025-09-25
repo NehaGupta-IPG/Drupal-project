@@ -11,17 +11,20 @@ use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\NodeType;
+use Drupal\node\NodePreviewMode;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the node entity preview functionality.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class PagePreviewTest extends NodeTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -334,7 +337,7 @@ class PagePreviewTest extends NodeTestBase {
 
     // Check with required preview.
     $node_type = NodeType::load('page');
-    $node_type->setPreviewMode(DRUPAL_REQUIRED);
+    $node_type->setPreviewMode(NodePreviewMode::Required);
     $node_type->save();
     $this->drupalGet('node/add/page');
     $this->assertSession()->responseNotContains('edit-submit');

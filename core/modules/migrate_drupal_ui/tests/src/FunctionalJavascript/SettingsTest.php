@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate_drupal_ui\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore drupalmysqldriverdatabasemysql
-
 /**
  * Tests migrate upgrade credential form with settings in settings.php.
- *
- * @group migrate_drupal_ui
  */
+#[Group('migrate_drupal_ui')]
+#[RunTestsInSeparateProcesses]
 class SettingsTest extends WebDriverTestBase {
 
   /**
@@ -55,9 +57,8 @@ class SettingsTest extends WebDriverTestBase {
    *
    * @throws \Behat\Mink\Exception\ElementNotFoundException
    * @throws \Behat\Mink\Exception\ExpectationException
-   *
-   * @dataProvider providerTestCredentialForm
    */
+  #[DataProvider('providerTestCredentialForm')]
   public function testCredentialForm($source_connection, $version, array $manual, array $databases, $expected_source_connection): void {
     // Write settings.
     $migrate_file_public_path = '/var/www/drupal7/sites/default/files';

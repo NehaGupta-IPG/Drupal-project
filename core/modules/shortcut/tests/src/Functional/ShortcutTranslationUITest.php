@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\shortcut\Functional;
 
-use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Language\Language;
+use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the shortcut translation UI.
- *
- * @group Shortcut
  */
+#[Group('Shortcut')]
+#[RunTestsInSeparateProcesses]
 class ShortcutTranslationUITest extends ContentTranslationUITestBase {
 
   /**

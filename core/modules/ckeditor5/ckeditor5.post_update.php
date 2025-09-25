@@ -8,6 +8,8 @@
 use Drupal\Core\Config\FileStorage;
 
 // cspell:ignore multiblock
+use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\editor\Entity\Editor;
 
 /**
  * Implements hook_removed_post_updates().
