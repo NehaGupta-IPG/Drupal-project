@@ -219,7 +219,7 @@
             if (currentSelection && currentSelection.length > 0) {
               setTimeout(() => {
                 currentSelection.forEach((value) => {
-                  const $checkbox = $(`input[type="checkbox"][value="${value}"]`,);
+                  const $checkbox = $(input[type="checkbox"][value="${value}"],);
                   if ($checkbox.length && !$checkbox.prop('checked')) {
                     $checkbox.prop('checked', true).trigger('change');
                   }
