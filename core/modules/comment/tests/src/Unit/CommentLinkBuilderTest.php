@@ -107,8 +107,6 @@ class CommentLinkBuilderTest extends UnitTestCase {
    *   Context for the links.
    * @param bool $has_access_comments
    *   TRUE if the user has 'access comments' permission.
-   * @param bool $history_exists
-   *   TRUE if the history module exists.
    * @param bool $has_post_comments
    *   TRUE if the use has 'post comments' permission.
    * @param bool $is_anonymous
@@ -120,12 +118,8 @@ class CommentLinkBuilderTest extends UnitTestCase {
    * @legacy-covers ::buildCommentedEntityLinks
    */
   #[DataProvider('getLinkCombinations')]
-  public function testCommentLinkBuilder(array $node_args, $context, $has_access_comments, $history_exists, $has_post_comments, $is_anonymous, $expected): void {
+  public function testCommentLinkBuilder(array $node_args, $context, $has_access_comments, $has_post_comments, $is_anonymous, $expected): void {
     $node = $this->getMockNode(...$node_args);
-    $this->moduleHandler->expects($this->any())
-      ->method('moduleExists')
-      ->with('history')
-      ->willReturn($history_exists);
     $this->currentUser->expects($this->any())
       ->method('hasPermission')
       ->willReturnMap([
@@ -175,7 +169,6 @@ class CommentLinkBuilderTest extends UnitTestCase {
       TRUE,
       TRUE,
       TRUE,
-      TRUE,
       [],
     ];
     foreach (['search_result', 'search_index', 'print'] as $view_mode) {
@@ -183,7 +176,6 @@ class CommentLinkBuilderTest extends UnitTestCase {
       $cases[] = [
         [TRUE, CommentItemInterface::OPEN, CommentItemInterface::FORM_BELOW, 1],
         ['view_mode' => $view_mode],
-        TRUE,
         TRUE,
         TRUE,
         TRUE,
@@ -195,7 +187,6 @@ class CommentLinkBuilderTest extends UnitTestCase {
       'is_anonymous' => [FALSE, TRUE],
       'comment_count' => [0, 1],
       'has_access_comments' => [0, 1],
-      'history_exists' => [FALSE, TRUE],
       'has_post_comments'   => [0, 1],
       'form_location'            => [CommentItemInterface::FORM_BELOW, CommentItemInterface::FORM_SEPARATE_PAGE],
       'comments'        => [
@@ -213,7 +204,6 @@ class CommentLinkBuilderTest extends UnitTestCase {
         [TRUE, $combination['comments'], $combination['form_location'], $combination['comment_count']],
         ['view_mode' => $combination['view_mode']],
         $combination['has_access_comments'],
-        $combination['history_exists'],
         $combination['has_post_comments'],
         $combination['is_anonymous'],
       ];
@@ -222,10 +212,6 @@ class CommentLinkBuilderTest extends UnitTestCase {
       // user has access - we can output the comment count.
       if ($combination['comments'] && $combination['view_mode'] == 'teaser' && $combination['comment_count'] && $combination['has_access_comments']) {
         $expected['comment-comments'] = '1 comment';
-        // And if history module exists, we can show a 'new comments' link.
-        if ($combination['history_exists']) {
-          $expected['comment-new-comments'] = '';
-        }
       }
       // All view modes other than RSS.
       if ($combination['view_mode'] != 'rss') {
@@ -330,19 +316,6 @@ class CommentLinkBuilderTest extends UnitTestCase {
       ->willReturn($url);
 
     return $node;
-  }
-
-}
-
-namespace Drupal\comment;
-
-if (!function_exists('history_read')) {
-
-  /**
-   * Gets a timestamp for the current user's last view of a specified node.
-   */
-  function history_read($nid) {
-    return 0;
   }
 
 }

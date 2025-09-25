@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\node\Kernel;
+namespace Drupal\Tests\field\Kernel;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests node body field storage.
- *
- * @group node
  */
+#[Group('field')]
 class NodeBodyFieldStorageTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;
@@ -46,6 +46,13 @@ class NodeBodyFieldStorageTest extends KernelTestBase {
    * Tests node body field storage persistence even if there are no instances.
    */
   public function testFieldOverrides(): void {
+    FieldStorageConfig::create([
+      'field_name' => 'body',
+      'type' => 'text_long',
+      'entity_type' => 'node',
+      'cardinality' => 1,
+      'persist_with_no_fields' => TRUE,
+    ])->save();
     $field_storage = FieldStorageConfig::loadByName('node', 'body');
     $this->assertNotEmpty($field_storage, 'Node body field storage exists.');
     $this->createContentType(['name' => 'Ponies', 'type' => 'ponies']);

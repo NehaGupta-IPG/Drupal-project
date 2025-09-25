@@ -2,30 +2,35 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\comment\Functional;
+namespace Drupal\Tests\history\Functional;
 
 use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
+use Drupal\Tests\comment\Functional\CommentTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Http\Message\ResponseInterface;
 
 /**
  * Tests the 'new' indicator posted on comments.
  */
-#[Group('comment')]
+#[Group('history')]
+#[RunTestsInSeparateProcesses]
 class CommentNewIndicatorTest extends CommentTestBase {
 
   /**
    * Use the main node listing to test rendering on teasers.
    *
    * @var array
-   *
-   * @todo Remove this dependency.
    */
-  protected static $modules = ['views'];
+  protected static $modules = [
+    'history',
+    // @todo Remove this dependency.
+    'views',
+  ];
 
   /**
    * {@inheritdoc}

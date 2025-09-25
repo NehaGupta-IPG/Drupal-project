@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\editor\Kernel;
 
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\editor\Entity\Editor;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
-use Drupal\node\Entity\Node;
-use Drupal\file\Entity\File;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\file\Entity\File;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\node\Entity\Node;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests tracking of file usage by the Text Editor module.
- *
- * @group editor
  */
+#[Group('editor')]
 class EditorFileUsageTest extends EntityKernelTestBase {
 
   use ContentTypeCreationTrait;
@@ -47,11 +47,6 @@ class EditorFileUsageTest extends EntityKernelTestBase {
     ]);
     $filtered_html_format->save();
 
-    // Set cardinality for body field.
-    FieldStorageConfig::loadByName('node', 'body')
-      ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
-      ->save();
-
     // Set up text editor.
     $editor = Editor::create([
       'format' => 'filtered_html',
@@ -64,6 +59,11 @@ class EditorFileUsageTest extends EntityKernelTestBase {
 
     // Create a node type for testing.
     $this->createContentType(['type' => 'page', 'name' => 'page']);
+    // Set cardinality for body field.
+    FieldStorageConfig::loadByName('node', 'body')
+      ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
+      ->save();
+
     FieldStorageConfig::create([
       'field_name' => 'description',
       'entity_type' => 'node',
