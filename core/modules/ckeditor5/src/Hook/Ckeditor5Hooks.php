@@ -119,7 +119,11 @@ class Ckeditor5Hooks {
    */
   #[Hook('theme_suggestions_media_alter')]
   public function themeSuggestionsMediaAlter(array &$suggestions, array $variables): void {
-    if ($variables['elements']['#view_mode'] == 'ckeditor_inline') {
+    $view_mode_id = $variables['elements']['#view_mode'];
+    if ($view_mode_id != 'ckeditor_inline') {
+      $view_mode = \Drupal::service('entity.repository')->loadEntityByConfigTarget('entity_view_mode', "media." . $variables['elements']['#view_mode']);
+    }
+    if ($view_mode_id == 'ckeditor_inline' || $view_mode?->getThirdPartySetting('ckeditor5', 'inline', FALSE)) {
       $suggestions[] = 'media__ckeditor_inline_embed';
     }
   }
