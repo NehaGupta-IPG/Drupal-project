@@ -9,6 +9,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
 use Drupal\Core\Path\CurrentPathStack;
@@ -708,6 +709,16 @@ class ViewsThemeHooks {
           $variables['header'][$field]['url'] = $url->toString();
           $variables['header'][$field]['content'] = $label;
           $variables['header'][$field]['title'] = $title;
+          if (\Drupal::request()?->headers->has('HX-Request') || $view->ajaxEnabled()) {
+            $array = [];
+            (new Htmx())
+              ->get('attr(href)')
+              // Only trigger the AJAX request, updating the necessary element
+              // is done with an out-of-band swap.
+              ->swap('none')
+              ->applyTo($array);
+            $variables['header'][$field]['link_attributes'] = $array['#attributes'];
+          }
         }
 
         $variables['header'][$field]['default_classes'] = $fields[$field]->options['element_default_classes'];
