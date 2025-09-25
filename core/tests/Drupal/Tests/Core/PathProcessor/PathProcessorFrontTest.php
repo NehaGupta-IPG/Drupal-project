@@ -88,8 +88,8 @@ class PathProcessorFrontTest extends UnitTestCase {
    * Tests basic outbound processing functionality.
    *
    * @legacy-covers ::processOutbound
-   * @dataProvider providerProcessOutbound
    */
+  #[DataProvider('providerProcessOutbound')]
   public function testProcessOutbound($frontpage_path, $path, $expected, array $expected_query = []): void {
     $config_factory = $this->prophesize(ConfigFactoryInterface::class);
     $config = $this->prophesize(ImmutableConfig::class);
