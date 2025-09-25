@@ -87,7 +87,7 @@ class PathProcessorFrontTest extends UnitTestCase {
   /**
    * Tests basic outbound processing functionality.
    *
-   * @covers ::processOutbound
+   * @legacy-covers ::processOutbound
    * @dataProvider providerProcessOutbound
    */
   public function testProcessOutbound($frontpage_path, $path, $expected, array $expected_query = []): void {
@@ -106,7 +106,7 @@ class PathProcessorFrontTest extends UnitTestCase {
   /**
    * Inbound paths and expected results.
    */
-  public static function providerProcessOutbound() {
+  public static function providerProcessOutbound(): array {
     return [
       'frontpage path is turned into a single slash' => ['/node', '/node', '/'],
     ];
