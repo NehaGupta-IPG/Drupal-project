@@ -143,6 +143,9 @@ views.filter.entity_reference:
     widget:
       type: string
       label: 'Selection type'
+    list_max:
+      type: string
+      label: 'Maximum entities in select list'      
     sub_handler_settings:
       type: entity_reference_selection.[%parent.sub_handler]
       label: 'Selection handler settings'

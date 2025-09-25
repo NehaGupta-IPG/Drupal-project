@@ -110,3 +110,15 @@ function views_post_update_block_items_per_page(?array &$sandbox = NULL): void {
       return FALSE;
     });
 }
+
+/**
+ * Adds the default Entity Reference Filter list_max setting.
+ */
+function views_post_update_entity_reference_list_max(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::service(ViewsConfigUpdater::class);
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsEntityReferenceListListMaxUpdate($view);
+  });
+}

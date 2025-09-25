@@ -104,9 +104,15 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
     // Choose the default handler using the select widget with article type
     // checked.
     $page->checkField('options[reference_default:node][target_bundles][article]');
+    // The list_max field should not be visible until select widget is selected.
+    $list_max_field = $page->findField('options[list_max]');
+    $this->assertFalse($list_max_field->isVisible());
     $page->selectFieldOption('options[widget]', 'select');
     $this->assertSame($page->findField('options[widget]')
       ->getValue(), 'select');
+    // Ensure list_max field is now visible and set to default value.
+    $this->assertTrue($list_max_field->isVisible());
+    $this->assertSame($list_max_field->getValue(), '100');
     $page->find('xpath', "//*[contains(text(), 'Apply and continue')]")
       ->press();
 
@@ -130,15 +136,46 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
     $this->assertTrue($page->find('css', 'select[name="field_test_target_id[]"]')
       ->hasAttribute('multiple'));
 
-    // Opening the settings form and change the handler to use an Entity
-    // Reference view.
-    // @see views.view.test_entity_reference.yml
+    // Open the settings form and change the list_max setting to less than
+    // the total number of nodes to cause the widget to switch to autocomplete.
     $base_url = Url::fromRoute('entity.view.collection')->toString();
     $url = $base_url . '/nojs/handler-extra/content/page_1/filter/field_test_target_id';
     $extra_settings_selector = 'a[href="' . $url . '"]';
     $element = $this->assertSession()->waitForElementVisible('css', $extra_settings_selector);
     $this->assertNotNull($element);
     $element->click();
+    $assert->waitForField('options[list_max]');
+    $page->findField('options[list_max]')->setValue(9);
+    $page->find('xpath', "//*[contains(text(), 'Apply')]")
+      ->press();
+
+    // Ensure field has switched to autocomplete.
+    $assert->waitForField('field_test_target_id');
+    $this->assertTrue($page->findField('field_test_target_id')
+      ->isVisible());
+    $this->assertTrue($page->find('css', 'input[name="field_test_target_id"]')
+      ->hasAttribute('data-autocomplete-path'));
+
+    // Open the settings form and change the list_max setting to 0 to ensure
+    // it switches back to a select widget
+    $page->find('css', $extra_settings_selector)
+      ->click();
+    $assert->waitForField('options[list_max]');
+    $page->findField('options[list_max]')->setValue(0);
+    $page->find('xpath', "//*[contains(text(), 'Apply')]")
+      ->press();
+
+    // Ensure field has switched back to select.
+    $assert->waitForField('field_test_config_target_id[]');
+    $this->assertTrue($page->findField('field_test_target_id[]')
+      ->isVisible());
+    $this->assertTrue($page->find('css', 'select[name="field_test_target_id[]"]')
+      ->hasAttribute('multiple'));
+
+    // Opening the settings form and change the handler to use an Entity
+    // Reference view.
+    // @see views.view.test_entity_reference.yml
+    $page->find('css', $extra_settings_selector)->click();
     $assert->waitForField('options[sub_handler]');
     $page->selectFieldOption('options[sub_handler]', 'views');
     $page->selectFieldOption('options[reference_views][view][view_and_display]', 'test_entity_reference:entity_reference');
@@ -165,6 +202,8 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
     $page->selectFieldOption('options[widget]', 'autocomplete');
     $this->assertSame($page->findField('options[widget]')
       ->getValue(), 'autocomplete');
+    // Ensure list_max field is not visible.
+    $this->assertFalse($page->findField('options[list_max]')->isVisible());
     $this->getSession()
       ->getPage()
       ->find('xpath', "//*[contains(text(), 'Apply')]")

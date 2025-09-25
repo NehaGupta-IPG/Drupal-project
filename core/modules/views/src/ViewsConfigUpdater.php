@@ -76,6 +76,9 @@ class ViewsConfigUpdater {
       if ($this->processTableCssClassUpdate($view)) {
         $changed = TRUE;
       }
+      if ($this->processEntityReferenceListListMaxUpdate($handler, $handler_type)) {
+        $changed = TRUE;
+      }
       return $changed;
     });
   }
@@ -296,6 +299,41 @@ class ViewsConfigUpdater {
     }
 
     return $changed;
+  }
+
+  /**
+   * Checks for Entity Reference filters needing a default list_max value.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   *
+   * @return bool
+   *   TRUE if the view has any entity reference filters that need to have
+   *   a default list_max value added.
+   */
+  public function needsEntityReferenceListListMaxUpdate(ViewEntityInterface $view): bool {
+    return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type) {
+      return $this->processEntityReferenceListListMaxUpdate($handler, $handler_type);
+    });
+  }
+
+  /**
+   * Processes Entity Reference filters and adds default list_max value.
+   *
+   * @param array $handler
+   *   A display handler.
+   * @param string $handler_type
+   *   The handler type.
+   *
+   * @return bool
+   *   Whether the handler was updated.
+   */
+  public function processEntityReferenceListListMaxUpdate(array &$handler, string $handler_type): bool {
+    if ($handler_type === 'filter' && ($handler['plugin_id'] ?? '') === 'entity_reference' && !array_key_exists('list_max', $handler)) {
+      $handler['list_max'] = '100';
+      return TRUE;
+    }
+    return FALSE;
   }
 
 }

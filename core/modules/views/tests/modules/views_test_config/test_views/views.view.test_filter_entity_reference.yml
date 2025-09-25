@@ -194,6 +194,7 @@ display:
             auto_create_bundle: ''
           widget: select
           plugin_id: entity_reference
+          list_max: '100'
         field_test_config_target_id:
           id: field_test_config_target_id
           table: node__field_test_config
@@ -239,6 +240,7 @@ display:
           sub_handler_settings:
             target_bundles: null
             auto_create: false
+          list_max: '100'  
       sorts:
         created:
           id: created
