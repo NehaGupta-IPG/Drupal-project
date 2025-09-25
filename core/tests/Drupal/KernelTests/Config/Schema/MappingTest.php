@@ -174,6 +174,7 @@ class MappingTest extends KernelTestBase {
     $available_block_settings_types = [
       'block.settings.field_block:*:*:*' => [
         'formatter',
+        'show_when_empty',
       ],
       'block.settings.extra_field_block:*:*:*' => [
         'formatter',
