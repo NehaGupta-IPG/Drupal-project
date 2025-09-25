@@ -326,7 +326,7 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
         $view_mode = $view_mode ?? $this->entityRepository->loadEntityByConfigTarget('entity_view_mode', "media.$view_mode_id");
         // If an invalid view mode for inline content has been chosen, fall
         // back to ckeditor_inline.
-        if (!$view_mode?->getThirdPartySetting('ckeditor5', 'inline', false)) {
+        if (!$view_mode?->getThirdPartySetting('ckeditor5', 'inline', FALSE)) {
           $view_mode = $this->entityRepository->loadEntityByConfigTarget('entity_view_mode', "media.ckeditor_inline");
         }
       }

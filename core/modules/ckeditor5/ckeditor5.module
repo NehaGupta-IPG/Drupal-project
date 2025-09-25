@@ -276,7 +276,7 @@ function _ckeditor5_theme_css($theme = NULL): array {
 /**
  * Entity builder for the inline setting on the entity_view_mode entity.
  */
-function ckeditor5_entity_view_mode_form_builder($entity_type, $entity, &$form, \Drupal\Core\Form\FormStateInterface $form_state): void {
+function ckeditor5_entity_view_mode_form_builder($entity_type, $entity, &$form, FormStateInterface $form_state): void {
   if (is_null($form_state->getValue('inline'))) {
     $entity->unsetThirdPartySetting('ckeditor5', 'inline');
   }
