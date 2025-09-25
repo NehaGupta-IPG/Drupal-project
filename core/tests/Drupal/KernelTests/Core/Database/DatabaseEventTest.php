@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Event\StatementEvent;
@@ -7,12 +9,12 @@ use Drupal\Core\Database\Event\StatementExecutionEndEvent;
 use Drupal\Core\Database\Event\StatementExecutionFailureEvent;
 use Drupal\Core\Database\Event\StatementExecutionStartEvent;
 use Drupal\database_test\EventSubscriber\DatabaseEventSubscriber;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the database API events.
- *
- * @group Database
  */
+#[Group('Database')]
 class DatabaseEventTest extends DatabaseTestBase {
 
   /**
@@ -65,7 +67,7 @@ class DatabaseEventTest extends DatabaseTestBase {
       $this->connection->query('bananas on the palm tree');
       $this->fail('An exception was expected, but was not thrown');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       // Expected, keep going.
     }
     $this->assertSame(3, $subscriber->countStatementStarts);

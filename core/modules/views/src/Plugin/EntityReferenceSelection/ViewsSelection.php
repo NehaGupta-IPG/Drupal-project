@@ -72,7 +72,7 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -254,7 +254,7 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
    * @return array
    *   The results.
    */
-  protected function getDisplayExecutionResults(string $match = NULL, string $match_operator = 'CONTAINS', int $limit = 0, array $ids = NULL) {
+  protected function getDisplayExecutionResults(?string $match = NULL, string $match_operator = 'CONTAINS', int $limit = 0, ?array $ids = NULL) {
     $display_name = $this->getConfiguration()['view']['display_name'];
     $arguments = $this->getConfiguration()['view']['arguments'];
     $results = [];

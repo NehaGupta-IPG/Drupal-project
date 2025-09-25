@@ -7,12 +7,16 @@ namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the JavaScript functionality of the block add filter.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class BlockFilterTest extends WebDriverTestBase {
 
   /**
@@ -23,6 +27,7 @@ class BlockFilterTest extends WebDriverTestBase {
     'node',
     'datetime',
     'layout_builder',
+    'layout_builder_expose_all_field_blocks',
     'user',
   ];
 
@@ -36,12 +41,6 @@ class BlockFilterTest extends WebDriverTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    // This test makes assertions on lists of blocks, this includes a derived
-    // block from the user entity.
-    \Drupal::configFactory()->getEditable('layout_builder.settings')
-      ->set('expose_all_field_blocks', TRUE)
-      ->save();
 
     $this->drupalLogin($this->drupalCreateUser([
       'configure any layout',
@@ -57,7 +56,7 @@ class BlockFilterTest extends WebDriverTestBase {
   /**
    * Tests block filter.
    */
-  public function testBlockFilter() {
+  public function testBlockFilter(): void {
     $assert_session = $this->assertSession();
     $session = $this->getSession();
     $page = $session->getPage();
@@ -119,7 +118,7 @@ class BlockFilterTest extends WebDriverTestBase {
     $visible_categories = $this->filterVisibleElements($categories);
     $this->assertCount(3, $visible_categories);
 
-    // Test blocks reappear after being filtered by repeating search for "a"
+    // Test blocks reappear after being filtered by repeating search for "a".
     $filter->setValue('a');
     $this->assertAnnounceContains('All available blocks are listed.');
 
@@ -159,7 +158,7 @@ class BlockFilterTest extends WebDriverTestBase {
    * @return \Behat\Mink\Element\NodeElement[]
    *   An array of visible node elements.
    */
-  protected function filterVisibleElements(array $elements) {
+  protected function filterVisibleElements(array $elements): array {
     return array_filter($elements, function (NodeElement $element) {
       return $element->isVisible();
     });

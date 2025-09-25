@@ -8,12 +8,14 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests moderated content administration page functionality.
- *
- * @group content_moderation
  */
+#[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class ModeratedContentViewTest extends BrowserTestBase {
 
   use ContentModerationTestTrait;
@@ -67,7 +69,7 @@ class ModeratedContentViewTest extends BrowserTestBase {
   /**
    * Tests the moderated content page.
    */
-  public function testModeratedContentPage() {
+  public function testModeratedContentPage(): void {
     $assert_session = $this->assertSession();
     $this->drupalLogin($this->adminUser);
 
@@ -151,7 +153,7 @@ class ModeratedContentViewTest extends BrowserTestBase {
   /**
    * Tests the moderated content page with multilingual content.
    */
-  public function testModeratedContentPageMultilingual() {
+  public function testModeratedContentPageMultilingual(): void {
     ConfigurableLanguage::createFromLangcode('fr')->save();
 
     $node = $this->drupalCreateNode([

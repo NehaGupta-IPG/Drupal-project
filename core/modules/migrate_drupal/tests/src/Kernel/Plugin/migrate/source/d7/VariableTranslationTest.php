@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal\Kernel\Plugin\migrate\source\d7;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -10,6 +12,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  * @covers \Drupal\migrate_drupal\Plugin\migrate\source\d7\VariableTranslation
  *
  * @group migrate_drupal
+ * @coversDefaultClass \Drupal\migrate_drupal\Plugin\migrate\source\d7\VariableTranslation
  */
 class VariableTranslationTest extends MigrateSqlSourceTestBase {
 

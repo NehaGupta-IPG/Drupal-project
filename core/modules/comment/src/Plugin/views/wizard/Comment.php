@@ -7,7 +7,7 @@ use Drupal\views\Attribute\ViewsWizard;
 use Drupal\views\Plugin\views\wizard\WizardPluginBase;
 
 /**
- * @todo: replace numbers with constants.
+ * @todo replace numbers with constants.
  */
 
 /**
@@ -29,6 +29,8 @@ class Comment extends WizardPluginBase {
 
   /**
    * Set default values for the filters.
+   *
+   * @var array
    */
   protected $filters = [
     'status_node' => [

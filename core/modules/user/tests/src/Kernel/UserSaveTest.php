@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -16,14 +18,13 @@ class UserSaveTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'user',
   ];
 
   /**
    * Ensures that an existing password is unset after the user was saved.
    */
-  public function testExistingPasswordRemoval() {
+  public function testExistingPasswordRemoval(): void {
     $this->installEntitySchema('user');
 
     /** @var \Drupal\user\Entity\User $user */

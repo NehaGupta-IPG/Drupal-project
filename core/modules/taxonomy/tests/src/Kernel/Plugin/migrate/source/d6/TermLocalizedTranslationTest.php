@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Kernel\Plugin\migrate\source\d6;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -11,6 +13,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  *
  * @covers \Drupal\taxonomy\Plugin\migrate\source\d6\TermLocalizedTranslation
  * @group taxonomy
+ * @coversDefaultClass \Drupal\taxonomy\Plugin\migrate\source\d6\TermLocalizedTranslation
  */
 class TermLocalizedTranslationTest extends MigrateSqlSourceTestBase {
 

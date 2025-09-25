@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Installer;
 
 use Drupal\Core\StringTranslation\Translator\FileTranslation;
@@ -11,11 +13,6 @@ use Drupal\KernelTests\KernelTestBase;
  * @group Installer
  */
 class InstallTranslationFilePatternTest extends KernelTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * @var \Drupal\Core\StringTranslation\Translator\FileTranslation
@@ -40,13 +37,14 @@ class InstallTranslationFilePatternTest extends KernelTestBase {
   /**
    * @dataProvider providerValidTranslationFiles
    */
-  public function testFilesPatternValid($langcode, $filename) {
+  public function testFilesPatternValid($langcode, $filename): void {
     $pattern = $this->filePatternMethod->invoke($this->fileTranslation, $langcode);
     $this->assertNotEmpty(preg_match($pattern, $filename));
   }
 
   /**
    * @return array
+   *   Array of valid translation files.
    */
   public static function providerValidTranslationFiles() {
     return [
@@ -59,13 +57,14 @@ class InstallTranslationFilePatternTest extends KernelTestBase {
   /**
    * @dataProvider providerInvalidTranslationFiles
    */
-  public function testFilesPatternInvalid($langcode, $filename) {
+  public function testFilesPatternInvalid($langcode, $filename): void {
     $pattern = $this->filePatternMethod->invoke($this->fileTranslation, $langcode);
     $this->assertEmpty(preg_match($pattern, $filename));
   }
 
   /**
    * @return array
+   *   Array of invalid translation files.
    */
   public static function providerInvalidTranslationFiles() {
     return [

@@ -1,25 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Url;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests link generation with hooks.
- *
- * @group Utility
  */
+#[Group('Utility')]
 class LinkGenerationTest extends KernelTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['link_generation_test'];
 
   /**
    * Tests how hook_link_alter() can affect escaping of the link text.
    */
-  public function testHookLinkAlter() {
+  public function testHookLinkAlter(): void {
     $url = Url::fromUri('http://example.com');
     $renderer = \Drupal::service('renderer');
 

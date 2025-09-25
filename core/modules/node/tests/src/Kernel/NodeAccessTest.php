@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel;
 
 /**
@@ -12,7 +14,7 @@ class NodeAccessTest extends NodeAccessTestBase {
   /**
    * Runs basic tests for node_access function.
    */
-  public function testNodeAccess() {
+  public function testNodeAccess(): void {
     // Ensures user without 'access content' permission can do nothing.
     $web_user1 = $this->drupalCreateUser([
       'create page content',
@@ -116,7 +118,7 @@ class NodeAccessTest extends NodeAccessTestBase {
   /**
    * Tests operations not supported by node grants.
    */
-  public function testUnsupportedOperation() {
+  public function testUnsupportedOperation(): void {
     $this->enableModules(['node_access_test_empty']);
     $web_user = $this->drupalCreateUser(['access content']);
     $node = $this->drupalCreateNode();
@@ -152,6 +154,49 @@ class NodeAccessTest extends NodeAccessTestBase {
     $query->addTag('node_access');
 
     $this->assertEquals(4, $query->countQuery()->execute()->fetchField());
+  }
+
+  /**
+   * Tests that multiple calls to node_access_rebuild only result in one batch.
+   */
+  public function testDuplicateBatchRebuild(): void {
+    $this->enableModules(['node_access_test']);
+    $batch = batch_get();
+    $this->assertEmpty($batch);
+    node_access_rebuild(TRUE);
+    $batch = batch_get();
+    $this->assertCount(1, $batch['sets']);
+    node_access_rebuild(TRUE);
+    $batch = batch_get();
+    $this->assertCount(1, $batch['sets']);
+  }
+
+  /**
+   * Tests node_access_needs_rebuild is set when node_access_rebuild is called.
+   */
+  public function testNodeAccessRebuildNeedsRebuild(): void {
+    $this->assertFalse(node_access_needs_rebuild());
+    $this->enableModules(['node_access_test']);
+    // Call as batch so rebuild is not run immediately.
+    node_access_rebuild(TRUE);
+    $this->assertTrue(node_access_needs_rebuild());
+  }
+
+  /**
+   * @see node_access_view_all_nodes()
+   * @see drupal_static_reset()
+   *
+   * @group legacy
+   */
+  public function testNodeAccessViewAllNodesDeprecation(): void {
+    $this->expectDeprecation('node_access_view_all_nodes() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use  \Drupal::entityTypeManager()->getAccessControlHandler(\'node\')->checkAllGrants(). See https://www.drupal.org/node/3038909');
+    $this->assertTrue(node_access_view_all_nodes());
+    $this->expectDeprecation('Calling drupal_static_reset() with "node_access_view_all_nodes" as argument is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal::service(\'node.view_all_nodes_memory_cache\')->deleteAll(); instead. See https://www.drupal.org/node/3038909');
+    drupal_static_reset('node_access_view_all_nodes');
+
+    // Enable a node access module.
+    $this->enableModules(['node_access_test']);
+    $this->assertSame('0', node_access_view_all_nodes());
   }
 
 }

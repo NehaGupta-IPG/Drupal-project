@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Kernel;
 
 use Drupal\comment\Entity\CommentType;
@@ -15,7 +17,7 @@ class CommentTypeValidationTest extends ConfigEntityValidationTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['comment', 'node'];
+  protected static $modules = ['comment', 'node', 'user'];
 
   /**
    * {@inheritdoc}

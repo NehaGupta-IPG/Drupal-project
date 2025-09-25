@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\image\Kernel\Plugin\migrate\source\d6;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -12,6 +14,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  * @covers \Drupal\image\Plugin\migrate\source\d6\ImageCachePreset
  *
  * @group image
+ * @coversDefaultClass \Drupal\image\Plugin\migrate\source\d6\ImageCachePreset
  */
 class ImageCachePresetTest extends MigrateSqlSourceTestBase {
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\Migrate\d7;
 
 use Drupal\field\Entity\FieldStorageConfig;
@@ -25,7 +27,6 @@ class MigrateFieldTest extends MigrateDrupal7TestBase {
     'image',
     'link',
     'node',
-    'system',
     'taxonomy',
     'telephone',
     'text',
@@ -68,7 +69,7 @@ class MigrateFieldTest extends MigrateDrupal7TestBase {
   /**
    * Tests migrating D7 fields to field_storage_config entities.
    */
-  public function testFields() {
+  public function testFields(): void {
     \Drupal::service('module_installer')->install(['datetime_range']);
     $this->installConfig(static::$modules);
     $this->executeMigration('d7_field');
@@ -130,7 +131,7 @@ class MigrateFieldTest extends MigrateDrupal7TestBase {
     $field = FieldStorageConfig::load('node.field_term_entityreference');
     $this->assertEquals('taxonomy_term', $field->getSetting('target_type'));
 
-    // Make sure that datetime fields get the right datetime_type setting
+    // Make sure that datetime fields get the right datetime_type setting.
     $field = FieldStorageConfig::load('node.field_date');
     $this->assertEquals('datetime', $field->getSetting('datetime_type'));
     $field = FieldStorageConfig::load('node.field_date_without_time');
@@ -194,7 +195,7 @@ class MigrateFieldTest extends MigrateDrupal7TestBase {
   /**
    * Tests migrating D7 datetime fields.
    */
-  public function testDatetimeFields() {
+  public function testDatetimeFields(): void {
     $this->installConfig(static::$modules);
     $this->executeMigration('d7_field');
 

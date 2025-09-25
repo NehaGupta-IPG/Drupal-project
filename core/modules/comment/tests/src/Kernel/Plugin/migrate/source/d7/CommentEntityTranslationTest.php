@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Kernel\Plugin\migrate\source\d7;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -10,6 +12,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  * Tests D7 comment entity translation source plugin.
  *
  * @covers \Drupal\comment\Plugin\migrate\source\d7\CommentEntityTranslation
+ * @coversDefaultClass \Drupal\comment\Plugin\migrate\source\d7\CommentEntityTranslation
  * @group comment
  */
 class CommentEntityTranslationTest extends MigrateSqlSourceTestBase {

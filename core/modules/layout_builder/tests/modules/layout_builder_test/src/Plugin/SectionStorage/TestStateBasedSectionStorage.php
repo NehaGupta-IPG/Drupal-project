@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\layout_builder_test\Plugin\SectionStorage;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
@@ -41,7 +43,7 @@ class TestStateBasedSectionStorage extends SectionStorageBase {
   /**
    * {@inheritdoc}
    */
-  public function access($operation, AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access($operation, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
     throw new \RuntimeException(__METHOD__ . " not implemented for " . __CLASS__);
   }
 

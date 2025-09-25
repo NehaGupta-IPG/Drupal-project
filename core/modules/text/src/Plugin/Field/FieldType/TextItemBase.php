@@ -97,7 +97,7 @@ abstract class TextItemBase extends FieldItemBase {
    * {@inheritdoc}
    */
   public function applyDefaultValue($notify = TRUE) {
-    // @todo: Add in the filter default format here.
+    // @todo Add in the filter default format here.
     $this->setValue(['format' => NULL], $notify);
     return $this;
   }
@@ -133,12 +133,12 @@ abstract class TextItemBase extends FieldItemBase {
     $settings = $field_definition->getSettings();
 
     if (empty($settings['max_length'])) {
-      // Textarea handling
+      // Textarea handling.
       $value = $random->paragraphs();
     }
     else {
       // Textfield handling.
-      $max = ceil($settings['max_length'] / 3);
+      $max = (int) ceil($settings['max_length'] / 3);
       $value = substr($random->sentences(mt_rand(1, $max), FALSE), 0, $settings['max_length']);
     }
 

@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Form;
 
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * Ensures that form actions can't be tricked into sending to external URLs.
- *
- * @group system
  */
+#[Group('system')]
 class ExternalFormUrlTest extends KernelTestBase implements FormInterface {
 
   /**
@@ -68,7 +70,7 @@ class ExternalFormUrlTest extends KernelTestBase implements FormInterface {
   /**
    * Tests form behavior.
    */
-  public function testActionUrlBehavior() {
+  public function testActionUrlBehavior(): void {
     // Create a new request which has a request uri with multiple leading
     // slashes and make it the master request.
     $request_stack = \Drupal::service('request_stack');

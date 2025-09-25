@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Kernel;
 
 /**
@@ -13,7 +15,6 @@ class TrackChangesTest extends MigrateTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'user',
     'taxonomy',
     'migrate',
@@ -89,7 +90,7 @@ class TrackChangesTest extends MigrateTestBase {
   /**
    * Tests track changes property of SqlBase.
    */
-  public function testTrackChanges() {
+  public function testTrackChanges(): void {
     // Assert all of the terms have been imported.
     $this->assertTermExists('name', 'Item 1');
     $this->assertTermExists('name', 'Item 2');
@@ -223,8 +224,9 @@ class TrackChangesTest extends MigrateTestBase {
    *   Value to evaluate.
    *
    * @return bool
+   *   TRUE if term exists, FALSE otherwise.
    */
-  protected function termExists($property, $value) {
+  protected function termExists($property, $value): bool {
     $property = $property === 'description' ? 'description__value' : $property;
     $query = \Drupal::entityQuery('taxonomy_term')->accessCheck(FALSE);
     $result = $query

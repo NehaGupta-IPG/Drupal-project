@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -23,7 +25,6 @@ class EntityOperationsTest extends KernelTestBase {
     'content_moderation',
     'node',
     'user',
-    'system',
     'workflows',
   ];
 
@@ -44,7 +45,7 @@ class EntityOperationsTest extends KernelTestBase {
   /**
    * Creates a page node type to test with, ensuring that it's moderated.
    */
-  protected function createNodeType() {
+  protected function createNodeType(): void {
     $node_type = NodeType::create([
       'type' => 'page',
       'name' => 'Page',
@@ -58,7 +59,7 @@ class EntityOperationsTest extends KernelTestBase {
   /**
    * Verifies that the process of saving pending revisions works as expected.
    */
-  public function testPendingRevisions() {
+  public function testPendingRevisions(): void {
     // Create a new node in draft.
     $page = Node::create([
       'type' => 'page',
@@ -102,7 +103,8 @@ class EntityOperationsTest extends KernelTestBase {
     // so this won't work for non-nodes. We'd need to use entity queries. This
     // is a core bug that should get fixed.
     $storage = \Drupal::entityTypeManager()->getStorage('node');
-    $revision_ids = $storage->revisionIds($page);
+    $query = $storage->getQuery()->allRevisions()->condition('nid', $page->id())->accessCheck(FALSE);
+    $revision_ids = array_keys($query->execute());
     sort($revision_ids);
     $latest = end($revision_ids);
     $page = $storage->loadRevision($latest);
@@ -132,7 +134,7 @@ class EntityOperationsTest extends KernelTestBase {
   /**
    * Verifies that a newly-created node can go straight to published.
    */
-  public function testPublishedCreation() {
+  public function testPublishedCreation(): void {
     // Create a new node in draft.
     $page = Node::create([
       'type' => 'page',
@@ -154,7 +156,7 @@ class EntityOperationsTest extends KernelTestBase {
   /**
    * Verifies that an unpublished state may be made the default revision.
    */
-  public function testArchive() {
+  public function testArchive(): void {
     $page = Node::create([
       'type' => 'page',
       'title' => $this->randomString(),

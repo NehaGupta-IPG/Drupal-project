@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Kernel\Plugin\source;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -12,6 +14,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  * @covers \Drupal\migrate\Plugin\migrate\source\SourcePluginBase::count
  *
  * @group migrate
+ * @coversDefaultClass \Drupal\migrate_sql_count_cache_test\Plugin\migrate\source\SqlCountCache
  */
 class MigrateSqlSourceCountCacheTest extends MigrateSqlSourceTestBase {
 

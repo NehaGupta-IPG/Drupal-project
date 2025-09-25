@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Plugin\migrate\source;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -10,6 +12,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  * @covers Drupal\system\Plugin\migrate\source\Menu
  *
  * @group system
+ * @coversDefaultClass Drupal\system\Plugin\migrate\source\Menu
  */
 class MenuTest extends MigrateSqlSourceTestBase {
 

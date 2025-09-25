@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block_content\Kernel\Plugin\migrate\source\d6;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -12,6 +14,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  * @covers \Drupal\block_content\Plugin\migrate\source\d6\BoxTranslation
  *
  * @group content_translation
+ * @coversDefaultClass \Drupal\block_content\Plugin\migrate\source\d6\BoxTranslation
  */
 class BoxTranslationTest extends MigrateSqlSourceTestBase {
 
@@ -27,7 +30,7 @@ class BoxTranslationTest extends MigrateSqlSourceTestBase {
     $tests = [];
 
     // The source data.
-    $tests[0]['database']['boxes'] = [
+    $tests[0]['source_data']['boxes'] = [
       [
         'bid' => 1,
         'body' => 'box 1 body',
@@ -42,7 +45,7 @@ class BoxTranslationTest extends MigrateSqlSourceTestBase {
       ],
     ];
 
-    $tests[0]['database']['i18n_strings'] = [
+    $tests[0]['source_data']['i18n_strings'] = [
       [
         'lid' => 1,
         'objectid' => 1,
@@ -69,7 +72,7 @@ class BoxTranslationTest extends MigrateSqlSourceTestBase {
       ],
     ];
 
-    $tests[0]['database']['locales_target'] = [
+    $tests[0]['source_data']['locales_target'] = [
       [
         'lid' => 1,
         'language' => 'fr',
@@ -96,7 +99,7 @@ class BoxTranslationTest extends MigrateSqlSourceTestBase {
       ],
     ];
 
-    $tests[0]['expected_results'] = [
+    $tests[0]['expected_data'] = [
       [
         'lid' => '1',
         'property' => 'title',

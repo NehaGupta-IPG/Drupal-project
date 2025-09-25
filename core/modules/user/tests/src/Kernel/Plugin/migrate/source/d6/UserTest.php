@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel\Plugin\migrate\source\d6;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -9,6 +11,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  *
  * @covers \Drupal\user\Plugin\migrate\source\d6\User
  * @group user
+ * @coversDefaultClass \Drupal\user\Plugin\migrate\source\d6\User
  */
 class UserTest extends MigrateSqlSourceTestBase {
 

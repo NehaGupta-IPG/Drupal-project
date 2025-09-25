@@ -6,20 +6,20 @@ namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the proper removal of submitted form values.
  *
  * @see \Drupal\Core\Form\FormState::cleanValues()
- *
- * @group Form
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class StateValuesCleanTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['form_test'];
 
@@ -31,7 +31,7 @@ class StateValuesCleanTest extends BrowserTestBase {
   /**
    * Tests \Drupal\Core\Form\FormState::cleanValues().
    */
-  public function testFormStateValuesClean() {
+  public function testFormStateValuesClean(): void {
     $this->drupalGet('form_test/form-state-values-clean');
     $this->submitForm([], 'Submit');
     $values = Json::decode($this->getSession()->getPage()->getContent());

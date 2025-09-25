@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Component\Utility\Crypt;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the installer when a custom config directory set up but does not exist.
- *
- * @group Installer
  */
+#[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class InstallerConfigDirectorySetNoDirectoryTest extends InstallerTestBase {
 
   /**
@@ -28,7 +30,7 @@ class InstallerConfigDirectorySetNoDirectoryTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function prepareEnvironment() {
+  protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
     $this->syncDirectory = $this->publicFilesDirectory . '/config_' . Crypt::randomBytesBase64() . '/sync';
     $this->settings['settings']['config_sync_directory'] = (object) [
@@ -40,7 +42,7 @@ class InstallerConfigDirectorySetNoDirectoryTest extends InstallerTestBase {
   /**
    * Verifies that installation succeeded.
    */
-  public function testInstaller() {
+  public function testInstaller(): void {
     $this->assertSession()->addressEquals('user/1');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertDirectoryExists($this->syncDirectory);

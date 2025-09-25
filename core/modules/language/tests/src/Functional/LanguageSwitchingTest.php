@@ -4,26 +4,25 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\language\Functional;
 
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\Core\Url;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore publi publié
-
 /**
  * Functional tests for the language switching feature.
- *
- * @group language
  */
+#[Group('language')]
+#[RunTestsInSeparateProcesses]
 class LanguageSwitchingTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'locale',
@@ -62,7 +61,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
   /**
    * Functional tests for the language switcher block.
    */
-  public function testLanguageBlock() {
+  public function testLanguageBlock(): void {
     // Add language.
     $edit = [
       'predefined_langcode' => 'fr',
@@ -110,7 +109,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
    *
    * @see self::testLanguageBlock()
    */
-  protected function doTestHomePageLinks($block_label) {
+  protected function doTestHomePageLinks($block_label): void {
     // Create a node and set as home page.
     $this->createHomePage();
     // Go to home page.
@@ -172,7 +171,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
    *
    * @see self::testLanguageBlock()
    */
-  protected function doTestLanguageBlockAuthenticated($block_label) {
+  protected function doTestLanguageBlockAuthenticated($block_label): void {
     // Assert that the language switching block is displayed on the frontpage.
     $this->drupalGet('');
     $this->assertSession()->pageTextContains($block_label);
@@ -221,7 +220,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
    *
    * @see self::testLanguageBlock()
    */
-  protected function doTestLanguageBlockAnonymous($block_label) {
+  protected function doTestLanguageBlockAnonymous($block_label): void {
     $this->drupalLogout();
 
     // Assert that the language switching block is displayed on the frontpage
@@ -274,7 +273,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
    *
    * @see self::testLanguageBlock()
    */
-  protected function doTestLanguageBlock404(string $block_label, string $system_path) {
+  protected function doTestLanguageBlock404(string $block_label, string $system_path): void {
     $this->drupalGet('does-not-exist-' . $this->randomMachineName());
     $this->assertSession()->pageTextContains($block_label);
 
@@ -313,7 +312,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
   /**
    * Tests language switcher links for domain based negotiation.
    */
-  public function testLanguageBlockWithDomain() {
+  public function testLanguageBlockWithDomain(): void {
     // Add the Italian language.
     ConfigurableLanguage::createFromLangcode('it')->save();
 
@@ -358,11 +357,11 @@ class LanguageSwitchingTest extends BrowserTestBase {
     /** @var \Drupal\Core\Routing\UrlGenerator $generator */
     $generator = $this->container->get('url_generator');
 
-    // Verify the English URL is correct
+    // Verify the English URL is correct.
     $english_url = $generator->generateFromRoute('entity.user.canonical', ['user' => 2], ['language' => $languages['en']]);
     $this->assertSession()->elementAttributeContains('xpath', '//div[@id="block-test-language-block"]/ul/li/a[@hreflang="en"]', 'href', $english_url);
 
-    // Verify the Italian URL is correct
+    // Verify the Italian URL is correct.
     $italian_url = $generator->generateFromRoute('entity.user.canonical', ['user' => 2], ['language' => $languages['it']]);
     $this->assertSession()->elementAttributeContains('xpath', '//div[@id="block-test-language-block"]/ul/li/a[@hreflang="it"]', 'href', $italian_url);
   }
@@ -370,7 +369,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
   /**
    * Tests active class on links when switching languages.
    */
-  public function testLanguageLinkActiveClass() {
+  public function testLanguageLinkActiveClass(): void {
     // Add language.
     $edit = [
       'predefined_langcode' => 'fr',
@@ -390,7 +389,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
   /**
    * Check the path-admin class, as same as on default language.
    */
-  public function testLanguageBodyClass() {
+  public function testLanguageBodyClass(): void {
     // Add language.
     $edit = [
       'predefined_langcode' => 'fr',
@@ -430,12 +429,10 @@ class LanguageSwitchingTest extends BrowserTestBase {
    *
    * @see self::testLanguageLinkActiveClass()
    */
-  protected function doTestLanguageLinkActiveClassAuthenticated() {
-    $function_name = '#type link';
+  protected function doTestLanguageLinkActiveClassAuthenticated(): void {
     $path = 'language_test/type-link-active-class';
 
     // Test links generated by the link generator on an English page.
-    $current_language = 'English';
     $this->drupalGet($path);
 
     // Language code 'none' link should be active.
@@ -456,7 +453,6 @@ class LanguageSwitchingTest extends BrowserTestBase {
     $this->assertSame('en', $settings['path']['currentLanguage'], 'drupalSettings.path.currentLanguage is set correctly to allow drupal.active-link to mark the correct links as active.');
 
     // Test links generated by the link generator on a French page.
-    $current_language = 'French';
     $this->drupalGet('fr/language_test/type-link-active-class');
 
     // Language code 'none' link should be active.
@@ -482,13 +478,10 @@ class LanguageSwitchingTest extends BrowserTestBase {
    *
    * @see self::testLanguageLinkActiveClass()
    */
-  protected function doTestLanguageLinkActiveClassAnonymous() {
-    $function_name = '#type link';
-
+  protected function doTestLanguageLinkActiveClassAnonymous(): void {
     $this->drupalLogout();
 
     // Test links generated by the link generator on an English page.
-    $current_language = 'English';
     $this->drupalGet('language_test/type-link-active-class');
 
     // Language code 'none' link should be active.
@@ -501,7 +494,6 @@ class LanguageSwitchingTest extends BrowserTestBase {
     $this->assertSession()->elementExists('xpath', "//a[@id = 'fr_link' and not(contains(@class, 'is-active'))]");
 
     // Test links generated by the link generator on a French page.
-    $current_language = 'French';
     $this->drupalGet('fr/language_test/type-link-active-class');
 
     // Language code 'none' link should be active.
@@ -517,7 +509,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
   /**
    * Tests language switcher links for session based negotiation.
    */
-  public function testLanguageSessionSwitchLinks() {
+  public function testLanguageSessionSwitchLinks(): void {
     // Add language.
     $edit = [
       'predefined_langcode' => 'fr',
@@ -695,7 +687,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
    * @param string $label
    *   The native name of the language.
    */
-  protected function saveNativeLanguageName($langcode, $label) {
+  protected function saveNativeLanguageName($langcode, $label): void {
     \Drupal::service('language.config_factory_override')
       ->getOverride($langcode, 'language.entity.' . $langcode)->set('label', $label)->save();
   }
@@ -703,7 +695,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
   /**
    * Create a node and set it as the home pages.
    */
-  protected function createHomePage() {
+  protected function createHomePage(): void {
     $entity_type_manager = \Drupal::entityTypeManager();
 
     // Create a node type and make it translatable.

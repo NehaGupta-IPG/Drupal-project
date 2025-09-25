@@ -212,8 +212,8 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
    */
   protected function findBinOverlap(array $binaries, array $clean_paths): array {
     // Make a filesystem model to explore. This is a keyed array that looks like
-    // all the places that will be removed by cleanup. 'tests/src' becomes
-    // $filesystem['tests']['src'] = TRUE;
+    // all the places that will be removed by cleanup. For example, the path
+    // "tests/src" becomes "$filesystem['tests']['src'] = TRUE".
     $filesystem = [];
     foreach ($clean_paths as $clean_path) {
       $clean_pieces = explode("/", $clean_path);
@@ -331,8 +331,8 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
    *
    * @param \Composer\Package\PackageInterface $package
    *   The package to clean.
-   * @param string $paths_for_package
-   *   List of directories in $package_name to remove
+   * @param string[] $paths_for_package
+   *   List of directories in $package_name to remove.
    */
   protected function cleanPathsForPackage(PackageInterface $package, $paths_for_package): void {
     // Whatever happens here, this package counts as cleaned so that we don't
@@ -370,18 +370,15 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
   }
 
   /**
-   * Place .htaccess and web.config files into the vendor directory.
+   * Place .htaccess file into the vendor directory.
    *
    * @param string $vendor_dir
    *   Path to vendor directory.
    */
   public function writeAccessRestrictionFiles(string $vendor_dir): void {
-    $this->io->writeError('<info>Hardening vendor directory with .htaccess and web.config files.</info>');
+    $this->io->writeError('<info>Hardening vendor directory with .htaccess file.</info>');
     // Prevent access to vendor directory on Apache servers.
     FileSecurity::writeHtaccess($vendor_dir, TRUE);
-
-    // Prevent access to vendor directory on IIS servers.
-    FileSecurity::writeWebConfig($vendor_dir);
   }
 
 }

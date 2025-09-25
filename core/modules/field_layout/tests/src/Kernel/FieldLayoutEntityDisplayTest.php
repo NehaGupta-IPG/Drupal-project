@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field_layout\Kernel;
 
 use Drupal\field_layout\Entity\FieldLayoutEntityViewDisplay;
@@ -21,13 +23,15 @@ class FieldLayoutEntityDisplayTest extends KernelTestBase {
     'field_layout_test',
     'field_test',
     'system',
+    'user',
   ];
 
   /**
    * @covers ::preSave
    * @covers ::calculateDependencies
    */
-  public function testPreSave() {
+  public function testPreSave(): void {
+    $this->installSchema('user', ['users_data']);
     // Create an entity display with one hidden and one visible field.
     $entity_display = FieldLayoutEntityViewDisplay::create([
       'targetEntityType' => 'entity_test',

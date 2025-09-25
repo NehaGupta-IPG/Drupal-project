@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel\Plugin\migrate\source\d6;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -12,6 +14,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  * @covers \Drupal\node\Plugin\migrate\source\d6\NodeRevision
  *
  * @group node
+ * @coversDefaultClass \Drupal\node\Plugin\migrate\source\d6\NodeRevision
  */
 class NodeRevisionByNodeTypeTest extends MigrateSqlSourceTestBase {
 

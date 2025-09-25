@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\path\Kernel\Plugin\migrate\source\d7;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -9,6 +11,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  *
  * @covers \Drupal\path\Plugin\migrate\source\d7\UrlAlias
  * @group path
+ * @coversDefaultClass \Drupal\path\Plugin\migrate\source\d7\UrlAlias
  */
 class UrlAliasTest extends MigrateSqlSourceTestBase {
 

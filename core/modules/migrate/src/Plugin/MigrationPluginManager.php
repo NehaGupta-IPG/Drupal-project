@@ -121,7 +121,7 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
     // @todo Remove loop when the ability to call ::getMigrationDependencies()
     //   without expanding plugins is removed.
     foreach ($instances as $migration) {
-      $migration->set('migration_dependencies', $migration->getMigrationDependencies(TRUE));
+      $migration->set('migration_dependencies', $migration->getMigrationDependencies());
     }
 
     // Sort the migrations based on their dependencies.
@@ -169,7 +169,7 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
       $id = $migration->id();
       $requirements[$id] = [];
       $dependency_graph[$id]['edges'] = [];
-      $migration_dependencies = $migration->getMigrationDependencies(TRUE);
+      $migration_dependencies = $migration->getMigrationDependencies();
 
       if (isset($migration_dependencies['required'])) {
         foreach ($migration_dependencies['required'] as $dependency) {
@@ -247,9 +247,10 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
    * @return array
    *   List of definitions to store in cache.
    *
-   * @todo This is a temporary solution to the fact that migration source
-   *   plugins have more than one provider. This functionality will be moved to
-   *   core in https://www.drupal.org/node/2786355.
+   * @todo This provides backwards compatibility for migration source plugins
+   *   using annotations and having more than one provider. This functionality
+   *   will be deprecated and removed with plugin discovery by annotations in
+   *   https://www.drupal.org/project/drupal/issues/3522409.
    */
   protected function findDefinitions() {
     $definitions = $this->getDiscovery()->getDefinitions();

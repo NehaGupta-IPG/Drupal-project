@@ -6,43 +6,45 @@ namespace Drupal\Tests\Component\Serialization;
 
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Serialization\Yaml;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Yaml serialization implementation.
- *
- * @group Drupal
- * @group Serialization
- * @coversDefaultClass \Drupal\Component\Serialization\Yaml
  */
+#[CoversClass(Yaml::class)]
+#[Group('Drupal')]
+#[Group('Serialization')]
 class YamlTest extends YamlTestBase {
 
   /**
    * Tests encoding and decoding basic data structures.
    *
-   * @covers ::encode
-   * @covers ::decode
-   * @dataProvider providerEncodeDecodeTests
+   * @legacy-covers ::encode
+   * @legacy-covers ::decode
    */
-  public function testEncodeDecode($data) {
+  #[DataProvider('providerEncodeDecodeTests')]
+  public function testEncodeDecode(array $data): void {
     $this->assertSame($data, Yaml::decode(Yaml::encode($data)));
   }
 
   /**
    * Tests decoding YAML node anchors.
    *
-   * @covers ::decode
-   * @dataProvider providerDecodeTests
+   * @legacy-covers ::decode
    */
-  public function testDecode($string, $data) {
+  #[DataProvider('providerDecodeTests')]
+  public function testDecode($string, $data): void {
     $this->assertSame($data, Yaml::decode($string));
   }
 
   /**
    * Tests our encode settings.
    *
-   * @covers ::encode
+   * @legacy-covers ::encode
    */
-  public function testEncode() {
+  public function testEncode(): void {
     // cSpell:disable
     $this->assertSame('foo:
   bar: \'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sapien ex, venenatis vitae nisi eu, posuere luctus dolor. Nullam convallis\'
@@ -51,18 +53,18 @@ class YamlTest extends YamlTestBase {
   }
 
   /**
-   * @covers ::getFileExtension
+   * @legacy-covers ::getFileExtension
    */
-  public function testGetFileExtension() {
+  public function testGetFileExtension(): void {
     $this->assertSame('yml', Yaml::getFileExtension());
   }
 
   /**
    * Tests that invalid YAML throws an exception.
    *
-   * @covers ::decode
+   * @legacy-covers ::decode
    */
-  public function testError() {
+  public function testError(): void {
     $this->expectException(InvalidDataTypeException::class);
     Yaml::decode('foo: [ads');
   }
@@ -70,9 +72,9 @@ class YamlTest extends YamlTestBase {
   /**
    * Ensures that php object support is disabled.
    *
-   * @covers ::encode
+   * @legacy-covers ::encode
    */
-  public function testEncodeObjectSupportDisabled() {
+  public function testEncodeObjectSupportDisabled(): void {
     $this->expectException(InvalidDataTypeException::class);
     $this->expectExceptionMessage('Object support when dumping a YAML file has been disabled.');
     $object = new \stdClass();
@@ -83,9 +85,9 @@ class YamlTest extends YamlTestBase {
   /**
    * Ensures that decoding PHP objects does not work in Symfony.
    *
-   * @covers ::decode
+   * @legacy-covers ::decode
    */
-  public function testDecodeObjectSupportDisabled() {
+  public function testDecodeObjectSupportDisabled(): void {
     $this->expectException(InvalidDataTypeException::class);
     $this->expectExceptionMessageMatches('/^Object support when parsing a YAML file has been disabled/');
     $yaml = <<<YAML

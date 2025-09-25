@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\search\Kernel\Migrate\d7;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -9,6 +11,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  *
  * @covers \Drupal\search\Plugin\migrate\source\d7\SearchPage
  * @group search
+ * @coversDefaultClass \Drupal\search\Plugin\migrate\source\d7\SearchPage
  */
 class SearchPageTest extends MigrateSqlSourceTestBase {
 

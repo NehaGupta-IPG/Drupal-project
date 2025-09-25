@@ -8,20 +8,20 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\CronRunTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the behavior of a field module after being disabled and re-enabled.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class ReEnableModuleFieldTest extends BrowserTestBase {
 
   use CronRunTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'field',
@@ -54,7 +54,7 @@ class ReEnableModuleFieldTest extends BrowserTestBase {
    *
    * @see field_system_info_alter()
    */
-  public function testReEnabledField() {
+  public function testReEnabledField(): void {
     // Add a telephone field to the article content type.
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'field_telephone',

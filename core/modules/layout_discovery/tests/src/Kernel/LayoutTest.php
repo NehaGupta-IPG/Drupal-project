@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_discovery\Kernel;
 
 use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\layout_discovery\Hook\LayoutDiscoveryThemeHooks;
 
 /**
  * Tests Layout functionality.
  *
  * @group Layout
- * @group #slow
  */
 class LayoutTest extends KernelTestBase {
 
@@ -37,12 +39,12 @@ class LayoutTest extends KernelTestBase {
   /**
    * Tests that a layout provided by a theme has the preprocess function set.
    */
-  public function testThemeProvidedLayout() {
+  public function testThemeProvidedLayout(): void {
     $this->container->get('theme_installer')->install(['test_layout_theme']);
     $this->config('system.theme')->set('default', 'test_layout_theme')->save();
 
     $theme_definitions = $this->container->get('theme.registry')->get();
-    $this->assertContains('template_preprocess_layout', $theme_definitions['test_layout_theme']['preprocess functions']);
+    $this->assertSame(LayoutDiscoveryThemeHooks::class . ':preprocessLayout', $theme_definitions['test_layout_theme']['initial preprocess']);
   }
 
   /**
@@ -50,7 +52,7 @@ class LayoutTest extends KernelTestBase {
    *
    * @dataProvider renderLayoutData
    */
-  public function testRenderLayout($layout_id, $config, $regions, array $html) {
+  public function testRenderLayout($layout_id, $config, $regions, array $html): void {
     $layout = $this->layoutPluginManager->createInstance($layout_id, $config);
     $built['layout'] = $layout->build($regions);
     $built['layout']['#prefix'] = 'Test prefix' . "\n";

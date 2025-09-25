@@ -8,14 +8,17 @@ use Drupal\comment\CommentLinkBuilder;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Url;
-use Drupal\node\NodeInterface;
 use Drupal\Tests\Traits\Core\GeneratePermutationsTrait;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\comment\CommentLinkBuilder
- * @group comment
+ * Tests Drupal\comment\CommentLinkBuilder.
  */
+#[CoversClass(CommentLinkBuilder::class)]
+#[Group('comment')]
 class CommentLinkBuilderTest extends UnitTestCase {
 
   use GeneratePermutationsTrait;
@@ -63,6 +66,8 @@ class CommentLinkBuilderTest extends UnitTestCase {
   protected $timestamp;
 
   /**
+   * The comment link builder.
+   *
    * @var \Drupal\comment\CommentLinkBuilderInterface
    */
   protected $commentLinkBuilder;
@@ -96,8 +101,8 @@ class CommentLinkBuilderTest extends UnitTestCase {
   /**
    * Tests the buildCommentedEntityLinks method.
    *
-   * @param \Drupal\node\NodeInterface|\PHPUnit\Framework\MockObject\MockObject $node
-   *   Mock node.
+   * @param array $node_args
+   *   Arguments for the mock node.
    * @param array $context
    *   Context for the links.
    * @param bool $has_access_comments
@@ -112,11 +117,11 @@ class CommentLinkBuilderTest extends UnitTestCase {
    *   Array of expected links keyed by link ID. Can be either string (link
    *   title) or array of link properties.
    *
-   * @dataProvider getLinkCombinations
-   *
-   * @covers ::buildCommentedEntityLinks
+   * @legacy-covers ::buildCommentedEntityLinks
    */
-  public function testCommentLinkBuilder(NodeInterface $node, $context, $has_access_comments, $history_exists, $has_post_comments, $is_anonymous, $expected) {
+  #[DataProvider('getLinkCombinations')]
+  public function testCommentLinkBuilder(array $node_args, $context, $has_access_comments, $history_exists, $has_post_comments, $is_anonymous, $expected): void {
+    $node = $this->getMockNode(...$node_args);
     $this->moduleHandler->expects($this->any())
       ->method('moduleExists')
       ->with('history')
@@ -161,11 +166,11 @@ class CommentLinkBuilderTest extends UnitTestCase {
   /**
    * Data provider for ::testCommentLinkBuilder.
    */
-  public function getLinkCombinations() {
+  public static function getLinkCombinations() {
     $cases = [];
     // No links should be created if the entity doesn't have the field.
     $cases[] = [
-      $this->getMockNode(FALSE, CommentItemInterface::OPEN, CommentItemInterface::FORM_BELOW, 1),
+      [FALSE, CommentItemInterface::OPEN, CommentItemInterface::FORM_BELOW, 1],
       ['view_mode' => 'teaser'],
       TRUE,
       TRUE,
@@ -176,7 +181,7 @@ class CommentLinkBuilderTest extends UnitTestCase {
     foreach (['search_result', 'search_index', 'print'] as $view_mode) {
       // Nothing should be output in these view modes.
       $cases[] = [
-        $this->getMockNode(TRUE, CommentItemInterface::OPEN, CommentItemInterface::FORM_BELOW, 1),
+        [TRUE, CommentItemInterface::OPEN, CommentItemInterface::FORM_BELOW, 1],
         ['view_mode' => $view_mode],
         TRUE,
         TRUE,
@@ -202,10 +207,10 @@ class CommentLinkBuilderTest extends UnitTestCase {
         'teaser', 'rss', 'full',
       ],
     ];
-    $permutations = $this->generatePermutations($combinations);
+    $permutations = static::generatePermutations($combinations);
     foreach ($permutations as $combination) {
       $case = [
-        $this->getMockNode(TRUE, $combination['comments'], $combination['form_location'], $combination['comment_count']),
+        [TRUE, $combination['comments'], $combination['form_location'], $combination['comment_count']],
         ['view_mode' => $combination['view_mode']],
         $combination['has_access_comments'],
         $combination['history_exists'],
@@ -239,7 +244,13 @@ class CommentLinkBuilderTest extends UnitTestCase {
               }
               else {
                 // On a separate page.
-                $expected['comment-add']['url'] = Url::fromRoute('comment.reply', ['entity_type' => 'node', 'entity' => 1, 'field_name' => 'comment']);
+                $expected['comment-add']['url'] = Url::fromRoute(
+                  'comment.reply',
+                  [
+                    'entity_type' => 'node',
+                    'entity' => 1,
+                    'field_name' => 'comment',
+                  ]);
               }
             }
           }
@@ -263,9 +274,9 @@ class CommentLinkBuilderTest extends UnitTestCase {
    * @param bool $has_field
    *   TRUE if the node has the 'comment' field.
    * @param int $comment_status
-   *   One of CommentItemInterface::OPEN|HIDDEN|CLOSED
+   *   One of CommentItemInterface::OPEN|HIDDEN|CLOSED.
    * @param int $form_location
-   *   One of CommentItemInterface::FORM_BELOW|FORM_SEPARATE_PAGE
+   *   One of CommentItemInterface::FORM_BELOW|FORM_SEPARATE_PAGE.
    * @param int $comment_count
    *   Number of comments against the field.
    *
@@ -327,6 +338,9 @@ namespace Drupal\comment;
 
 if (!function_exists('history_read')) {
 
+  /**
+   * Gets a timestamp for the current user's last view of a specified node.
+   */
   function history_read($nid) {
     return 0;
   }

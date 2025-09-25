@@ -5,24 +5,23 @@ declare(strict_types=1);
 namespace Drupal\Tests\config\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore loquesea
 /**
  * Tests language-negotiation overrides are not on language-negotiation form.
  *
- * @group config
  * @see \Drupal\Core\Form\ConfigFormBase
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class LanguageNegotiationFormOverrideTest extends BrowserTestBase {
-
-  protected static $modules = ['language', 'locale', 'locale_test'];
 
   /**
    * {@inheritdoc}
-   *
-   * @todo Remove and fix test to not rely on super user.
-   * @see https://www.drupal.org/project/drupal/issues/3437620
    */
-  protected bool $usesSuperUserAccessPolicy = TRUE;
+  protected static $modules = ['language', 'locale', 'locale_test'];
 
   /**
    * {@inheritdoc}
@@ -32,8 +31,13 @@ class LanguageNegotiationFormOverrideTest extends BrowserTestBase {
   /**
    * Tests that overrides do not affect language-negotiation form values.
    */
-  public function testFormWithOverride() {
-    $this->drupalLogin($this->rootUser);
+  public function testFormWithOverride(): void {
+    $this->drupalLogin($this->drupalCreateUser([
+      'access administration pages',
+      'administer site configuration',
+      'administer languages',
+      'view the administration theme',
+    ]));
     $overridden_value_en = 'whatever';
     $overridden_value_es = 'loquesea';
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal\Kernel\Plugin\migrate\source;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -12,6 +14,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  * @covers \Drupal\migrate_drupal\Plugin\migrate\source\VariableMultiRow
  *
  * @group migrate_drupal
+ * @coversDefaultClass \Drupal\migrate_drupal\Plugin\migrate\source\VariableMultiRow
  */
 class VariableMultiRowTest extends MigrateSqlSourceTestBase {
 

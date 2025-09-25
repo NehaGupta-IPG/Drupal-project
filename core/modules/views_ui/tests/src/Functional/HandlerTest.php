@@ -8,14 +8,16 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\ViewExecutable;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests handler UI for views.
  *
- * @group views_ui
- * @group #slow
  * @see \Drupal\views\Plugin\views\HandlerBase
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class HandlerTest extends UITestBase {
 
   /**
@@ -97,7 +99,7 @@ class HandlerTest extends UITestBase {
   /**
    * Tests UI CRUD.
    */
-  public function testUiCrud() {
+  public function testUiCrud(): void {
     $handler_types = ViewExecutable::getHandlerTypes();
     foreach ($handler_types as $type => $type_info) {
       // Test adding handlers.
@@ -140,13 +142,14 @@ class HandlerTest extends UITestBase {
       // Test that the  handler edit link has the right label.
       $this->assertSession()->elementExists('xpath', "//a[starts-with(normalize-space(text()), '{$random_label}')]");
 
-      // Save the view and have a look whether the handler was added as expected.
+      // Save the view and have a look whether the handler was added as
+      // expected.
       $this->submitForm([], 'Save');
       $view = $this->container->get('entity_type.manager')->getStorage('view')->load('test_view_empty');
       $display = $view->getDisplay('default');
       $this->assertTrue(isset($display['display_options'][$type_info['plural']][$id]), 'Ensure the field was added to the view itself.');
 
-      // Remove the item and check that it's removed
+      // Remove the item and check that it's removed.
       $this->drupalGet($edit_handler_url);
       $this->submitForm([], 'Remove');
       $this->assertSession()->linkByHrefNotExists($edit_handler_url, 0, 'The handler edit link does not appears in the UI after removing.');
@@ -188,7 +191,7 @@ class HandlerTest extends UITestBase {
   /**
    * Tests escaping of field labels in help text.
    */
-  public function testHandlerHelpEscaping() {
+  public function testHandlerHelpEscaping(): void {
     // Setup a field with two instances using a different label.
     // Ensure that the label is escaped properly.
 
@@ -223,7 +226,7 @@ class HandlerTest extends UITestBase {
   /**
    * Tests broken handlers.
    */
-  public function testBrokenHandlers() {
+  public function testBrokenHandlers(): void {
     $handler_types = ViewExecutable::getHandlerTypes();
     foreach ($handler_types as $type => $type_info) {
       $this->drupalGet('admin/structure/views/view/test_view_broken/edit');
@@ -233,7 +236,7 @@ class HandlerTest extends UITestBase {
 
       // Test that the handler edit link is present.
       $this->assertSession()->elementsCount('xpath', "//a[contains(@href, '{$href}')]", 1);
-      $result = $this->assertSession()->elementTextEquals('xpath', "//a[contains(@href, '{$href}')]", $text);
+      $this->assertSession()->elementTextEquals('xpath', "//a[contains(@href, '{$href}')]", $text);
 
       $this->drupalGet($href);
       $this->assertSession()->elementTextContains('xpath', '//h1', $text);
@@ -257,7 +260,7 @@ class HandlerTest extends UITestBase {
    *
    * @see \Drupal\views\EntityViewsData
    */
-  public function testNoDuplicateFields() {
+  public function testNoDuplicateFields(): void {
     $handler_types = ['field', 'filter', 'sort', 'argument'];
 
     foreach ($handler_types as $handler_type) {
@@ -278,7 +281,7 @@ class HandlerTest extends UITestBase {
    *
    * @see \Drupal\views\EntityViewsData
    */
-  public function testErrorMissingHelp() {
+  public function testErrorMissingHelp(): void {
     // Test that the error message is not shown for entity fields but an empty
     // description field is shown instead.
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_node_view/default/field');

@@ -322,10 +322,8 @@
       // Additional styles that need to be explicity added in addition to the
       // prefixed versions of existing css in `existingCss`.
       const addedCss = [
-        `${prefix} .ck.ck-content {display:block;min-height:5rem;}`,
         `${prefix} .ck.ck-content * {display:revert;background:revert;color:initial;padding:revert;}`,
         `${prefix} .ck.ck-content li {display:list-item}`,
-        `${prefix} .ck.ck-content ol li {list-style-type: decimal}`,
       ];
 
       const prefixedCss = [...addedCss].join('\n');
@@ -626,6 +624,30 @@
     },
   };
 
+  Drupal.behaviors.editorStyleFix = {
+    attach(context) {
+      // CKEditor's DLL injects a style tag that overrides native list
+      // type styling. The following find the style(s) causing the problem
+      // and removes them.
+      // @todo remove this entire behavior when this issue is fixed
+      //  https://github.com/ckeditor/ckeditor5/issues/14613
+      [...document.styleSheets]
+        .filter((sheet) => sheet.ownerNode.hasAttribute('data-cke'))
+        .forEach((sheet) => {
+          [...sheet.cssRules].forEach((rule, ruleIndex) => {
+            if (
+              rule?.selectorText &&
+              (rule.selectorText.includes(' ol') ||
+                rule.selectorText.includes(' ul')) &&
+              !rule.selectorText.includes('type')
+            ) {
+              sheet.cssRules[ruleIndex].style['list-style-type'] = null;
+            }
+          });
+        });
+    },
+  };
+
   // Redirect on hash change when the original hash has an associated CKEditor 5.
   function redirectTextareaFragmentToCKEditor5Instance() {
     const hash = window.location.hash.substring(1);
@@ -650,13 +672,19 @@
   );
 
   // Respond to new dialogs that are opened by CKEditor, closing the AJAX loader.
-  $(window).on('dialog:beforecreate', () => {
-    $('.ckeditor5-dialog-loading').animate(
-      { top: '-40px' },
-      function removeDialogLoading() {
-        $(this).remove();
-      },
-    );
+  window.addEventListener('dialog:beforecreate', () => {
+    const dialogLoading = document.querySelector('.ckeditor5-dialog-loading');
+
+    if (dialogLoading) {
+      dialogLoading.addEventListener(
+        'transitionend',
+        function removeDialogLoading() {
+          dialogLoading.remove();
+        },
+      );
+      dialogLoading.style.transition = 'top 0.5s ease';
+      dialogLoading.style.top = '-40px';
+    }
   });
 
   // Respond to dialogs that are saved, sending data back to CKEditor.
@@ -667,7 +695,7 @@
   });
 
   // Respond to dialogs that are closed, removing the current save handler.
-  $(window).on('dialog:afterclose', () => {
+  window.addEventListener('dialog:afterclose', () => {
     if (Drupal.ckeditor5.saveCallback) {
       Drupal.ckeditor5.saveCallback = null;
     }

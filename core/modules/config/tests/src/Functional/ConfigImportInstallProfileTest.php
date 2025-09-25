@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\config\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the importing/exporting configuration based on the install profile.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigImportInstallProfileTest extends BrowserTestBase {
 
   /**
@@ -21,9 +23,7 @@ class ConfigImportInstallProfileTest extends BrowserTestBase {
   protected $profile = 'testing_config_import';
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['config'];
 
@@ -58,7 +58,7 @@ class ConfigImportInstallProfileTest extends BrowserTestBase {
    *
    * @see \Drupal\Core\EventSubscriber\ConfigImportSubscriber
    */
-  public function testInstallProfileValidation() {
+  public function testInstallProfileValidation(): void {
     $sync = $this->container->get('config.storage.sync');
     $this->copyConfig($this->container->get('config.storage'), $sync);
     $core = $sync->read('core.extension');

@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests\Core\Form;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests for form grouping elements.
- *
- * @group form
  */
+#[Group('form')]
+#[RunTestsInSeparateProcesses]
 class FormGroupingElementsTest extends WebDriverTestBase {
 
   /**
@@ -42,7 +44,7 @@ class FormGroupingElementsTest extends WebDriverTestBase {
    * becomes visible when the tab is clicked, a fragment link to the child is
    * clicked or when the URI fragment pointing to that child changes.
    */
-  public function testVerticalTabChildVisibility() {
+  public function testVerticalTabChildVisibility(): void {
     $session = $this->getSession();
     $web_assert = $this->assertSession();
 
@@ -92,7 +94,7 @@ class FormGroupingElementsTest extends WebDriverTestBase {
    * becomes visible when a fragment link to the child is clicked or when the
    * URI fragment pointing to that child changes.
    */
-  public function testDetailsChildVisibility() {
+  public function testDetailsChildVisibility(): void {
     $session = $this->getSession();
     $web_assert = $this->assertSession();
 
@@ -139,7 +141,7 @@ class FormGroupingElementsTest extends WebDriverTestBase {
   /**
    * Confirms tabs containing a field with a validation error are open.
    */
-  public function testVerticalTabValidationVisibility() {
+  public function testVerticalTabValidationVisibility(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 

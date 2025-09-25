@@ -8,14 +8,19 @@ use Drupal\Component\Plugin\Context\ContextDefinitionInterface;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\UsesClass;
 
 /**
  * Tests the ContextDefinition class.
- *
- * @group Plugin
- *
- * @coversDefaultClass \Drupal\Core\Plugin\Context\ContextDefinition
  */
+#[CoversClass(ContextDefinition::class)]
+#[Group('Plugin')]
+#[UsesClass(\Drupal::class)]
+#[UsesClass(\Drupal::class)]
+#[UsesClass(\Drupal::class)]
 class ContextDefinitionTest extends UnitTestCase {
 
   /**
@@ -29,11 +34,12 @@ class ContextDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * @dataProvider providerGetDataDefinition
-   * @covers ::getDataDefinition
-   * @uses \Drupal
+   * Tests get data definition.
+   *
+   * @legacy-covers ::getDataDefinition
    */
-  public function testGetDataDefinition($is_multiple) {
+  #[DataProvider('providerGetDataDefinition')]
+  public function testGetDataDefinition($is_multiple): void {
     $data_type = 'valid';
     $mock_data_definition = $this->createMock(ContextDefinitionInterface::class);
     $mock_data_definition->expects($this->once())
@@ -102,11 +108,12 @@ class ContextDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * @dataProvider providerGetDataDefinition
-   * @covers ::getDataDefinition
-   * @uses \Drupal
+   * Tests get data definition invalid type.
+   *
+   * @legacy-covers ::getDataDefinition
    */
-  public function testGetDataDefinitionInvalidType($is_multiple) {
+  #[DataProvider('providerGetDataDefinition')]
+  public function testGetDataDefinitionInvalidType($is_multiple): void {
     // Since we're trying to make getDataDefinition() throw an exception in
     // isolation, we use a data type which is not valid.
     $data_type = 'not_valid';
@@ -168,11 +175,12 @@ class ContextDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * @dataProvider providerGetConstraint
-   * @covers ::getConstraint
-   * @uses \Drupal
+   * Tests get constraint.
+   *
+   * @legacy-covers ::getConstraint
    */
-  public function testGetConstraint($expected, $constraint_array, $constraint) {
+  #[DataProvider('providerGetConstraint')]
+  public function testGetConstraint($expected, $constraint_array, $constraint): void {
     $mock_context_definition = $this->getMockBuilder('Drupal\Core\Plugin\Context\ContextDefinition')
       ->disableOriginalConstructor()
       ->onlyMethods([
@@ -187,10 +195,12 @@ class ContextDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getDefaultValue
-   * @covers ::setDefaultValue
+   * Tests default value.
+   *
+   * @legacy-covers ::getDefaultValue
+   * @legacy-covers ::setDefaultValue
    */
-  public function testDefaultValue() {
+  public function testDefaultValue(): void {
     $context_definition = new ContextDefinition();
     $this->assertNull($context_definition->getDefaultValue());
     $context_definition->setDefaultValue('test');

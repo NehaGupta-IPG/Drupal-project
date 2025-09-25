@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\File;
 
 use Drupal\Core\File\Exception\FileException;
@@ -7,19 +9,19 @@ use Drupal\Core\File\Exception\FileNotExistsException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystem;
 use Drupal\Core\Site\Settings;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the unmanaged file move function.
- *
- * @group File
  */
+#[Group('File')]
 class FileMoveTest extends FileTestBase {
 
   /**
    * Move a normal file.
    */
-  public function testNormal() {
-    // Create a file for testing
+  public function testNormal(): void {
+    // Create a file for testing.
     $uri = $this->createUri();
 
     // Moving to a new name.
@@ -44,14 +46,14 @@ class FileMoveTest extends FileTestBase {
     $this->assertFileDoesNotExist($new_filepath);
     $this->assertFilePermissions($newer_filepath, Settings::get('file_chmod_file', FileSystem::CHMOD_FILE));
 
-    // TODO: test moving to a directory (rather than full directory/file path)
-    // TODO: test creating and moving normal files (rather than streams)
+    // @todo Test moving to a directory (rather than full directory/file path)
+    // @todo Test creating and moving normal files (rather than streams)
   }
 
   /**
    * Try to move a missing file.
    */
-  public function testMissing() {
+  public function testMissing(): void {
     // Move non-existent file.
     $this->expectException(FileNotExistsException::class);
     \Drupal::service('file_system')->move($this->randomMachineName(), $this->randomMachineName());
@@ -60,7 +62,7 @@ class FileMoveTest extends FileTestBase {
   /**
    * Try to move a file onto itself.
    */
-  public function testOverwriteSelf() {
+  public function testOverwriteSelf(): void {
     // Create a file for testing.
     $uri = $this->createUri();
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Kernel;
 
 use Drupal\Core\Entity\EntityStorageException;
@@ -38,7 +40,7 @@ class MoveTest extends FileManagedUnitTestBase {
    *
    * @covers ::move
    */
-  public function testNormal() {
+  public function testNormal(): void {
     $contents = $this->randomMachineName(10);
     $source = $this->createFile(NULL, $contents);
     $desired_filepath = 'public://' . $this->randomMachineName();
@@ -70,7 +72,7 @@ class MoveTest extends FileManagedUnitTestBase {
    *
    * @covers ::move
    */
-  public function testExistingRename() {
+  public function testExistingRename(): void {
     // Setup a file to overwrite.
     $contents = $this->randomMachineName(10);
     $source = $this->createFile(NULL, $contents);
@@ -107,7 +109,7 @@ class MoveTest extends FileManagedUnitTestBase {
    *
    * @covers ::move
    */
-  public function testExistingReplace() {
+  public function testExistingReplace(): void {
     // Setup a file to overwrite.
     $contents = $this->randomMachineName(10);
     $source = $this->createFile(NULL, $contents);
@@ -141,7 +143,7 @@ class MoveTest extends FileManagedUnitTestBase {
    *
    * @covers ::move
    */
-  public function testExistingReplaceSelf() {
+  public function testExistingReplaceSelf(): void {
     // Setup a file to overwrite.
     $contents = $this->randomMachineName(10);
     $source = $this->createFile(NULL, $contents);
@@ -153,7 +155,6 @@ class MoveTest extends FileManagedUnitTestBase {
       $this->fail('expected FileExistsException');
     }
     catch (FileExistsException $e) {
-      // expected exception.
       $this->assertStringContainsString("could not be copied because a file by that name already exists in the destination directory", $e->getMessage());
     }
     $this->assertEquals($contents, file_get_contents($source->getFileUri()), 'Contents of file were not altered.');
@@ -171,7 +172,7 @@ class MoveTest extends FileManagedUnitTestBase {
    *
    * @covers ::move
    */
-  public function testExistingError() {
+  public function testExistingError(): void {
     $contents = $this->randomMachineName(10);
     $source = $this->createFile();
     $target = $this->createFile(NULL, $contents);
@@ -185,7 +186,6 @@ class MoveTest extends FileManagedUnitTestBase {
     }
     // FileExistsException is a subclass of FileException.
     catch (FileExistsException $e) {
-      // expected exception.
       $this->assertStringContainsString("could not be copied because a file by that name already exists in the destination directory", $e->getMessage());
     }
     // Check the return status and that the contents did not change.
@@ -206,7 +206,7 @@ class MoveTest extends FileManagedUnitTestBase {
    *
    * @covers ::move
    */
-  public function testInvalidStreamWrapper() {
+  public function testInvalidStreamWrapper(): void {
     $this->expectException(InvalidStreamWrapperException::class);
     $this->expectExceptionMessage('Invalid stream wrapper: foo://');
     $source = $this->createFile();
@@ -218,7 +218,7 @@ class MoveTest extends FileManagedUnitTestBase {
    *
    * @covers ::move
    */
-  public function testEntityStorageException() {
+  public function testEntityStorageException(): void {
     /** @var \Drupal\Core\Entity\EntityTypeManager $entityTypeManager */
     $entityTypeManager = $this->prophesize(EntityTypeManager::class);
     $entityTypeManager->getStorage('file')

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\contact\Kernel\Plugin\migrate\source;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -9,6 +11,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  *
  * @covers \Drupal\contact\Plugin\migrate\source\ContactCategory
  * @group contact
+ * @coversDefaultClass \Drupal\contact\Plugin\migrate\source\ContactCategory
  */
 class ContactCategoryTest extends MigrateSqlSourceTestBase {
 

@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\File;
 
+use Drupal\Core\File\HtaccessWriter;
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests .htaccess file saving.
- *
- * @coversDefaultClass \Drupal\Core\File\HtaccessWriter
- * @group File
  */
+#[CoversClass(HtaccessWriter::class)]
+#[Group('File')]
 class HtaccessTest extends KernelTestBase {
 
   /**
@@ -30,11 +34,6 @@ class HtaccessTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system'];
-
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->public = Settings::get('file_public_path') . '/test/public';
@@ -42,9 +41,11 @@ class HtaccessTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::write
+   * Tests htaccess save.
+   *
+   * @legacy-covers ::write
    */
-  public function testHtaccessSave() {
+  public function testHtaccessSave(): void {
     // Prepare test directories.
     $private = Settings::get('file_public_path') . '/test/private';
     $stream = 'public://test/stream';
@@ -87,6 +88,17 @@ class HtaccessTest extends KernelTestBase {
     $this->assertFilePermissions($stream . '/.htaccess', 0444);
 
     $this->assertTrue($this->htaccessWriter->write($stream));
+  }
+
+  /**
+   * Tests htaccess save disabled.
+   *
+   * @legacy-covers ::write
+   */
+  public function testHtaccessSaveDisabled(): void {
+    $this->setSetting('auto_create_htaccess', FALSE);
+    $this->assertTrue($this->htaccessWriter->write($this->public, FALSE));
+    $this->assertFileDoesNotExist($this->public . '/.htaccess');
   }
 
   /**

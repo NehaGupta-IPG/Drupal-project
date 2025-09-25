@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Theme;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -12,12 +14,6 @@ use Twig\Error\LoaderError;
  * @group Theme
  */
 class TwigIncludeTest extends KernelTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
-
   /**
    * The Twig configuration to set the container parameter to during rebuilds.
    *
@@ -45,7 +41,7 @@ class TwigIncludeTest extends KernelTestBase {
     $element = [];
     $element['test'] = [
       '#type' => 'inline_template',
-      '#template' => "{% include '@__main__\/core/tests/fixtures/files/sql-2.sql' %}",
+      '#template' => "{% include '@__main__/core/tests/fixtures/files/sql-2.sql' %}",
     ];
     try {
       $renderer->renderRoot($element);
@@ -134,7 +130,7 @@ class TwigIncludeTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
     if (!empty($this->twigConfig)) {
       $container->setParameter('twig.config', $this->twigConfig);

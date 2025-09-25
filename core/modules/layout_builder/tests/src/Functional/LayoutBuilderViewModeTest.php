@@ -6,13 +6,14 @@ namespace Drupal\Tests\layout_builder\Functional;
 
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\layout_builder\Traits\EnableLayoutBuilderTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Layout Builder UI with view modes.
- *
- * @group layout_builder
- * @group #slow
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderViewModeTest extends LayoutBuilderTestBase {
 
   use EnableLayoutBuilderTrait;
@@ -20,7 +21,7 @@ class LayoutBuilderViewModeTest extends LayoutBuilderTestBase {
   /**
    * Tests that a non-default view mode works as expected.
    */
-  public function testNonDefaultViewMode() {
+  public function testNonDefaultViewMode(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -77,7 +78,7 @@ class LayoutBuilderViewModeTest extends LayoutBuilderTestBase {
    *
    * @see \Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage::getDefaultSectionStorage()
    */
-  public function testLayoutBuilderUiFullViewMode() {
+  public function testLayoutBuilderUiFullViewMode(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -253,7 +254,7 @@ class LayoutBuilderViewModeTest extends LayoutBuilderTestBase {
   /**
    * Ensures that one bundle doesn't interfere with another bundle.
    */
-  public function testFullViewModeMultipleBundles() {
+  public function testFullViewModeMultipleBundles(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

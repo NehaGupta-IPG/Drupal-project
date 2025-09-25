@@ -1,19 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityDisplayRepository;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore pastafazoul
-
 /**
- * @coversDefaultClass \Drupal\Core\Entity\EntityDisplayRepository
- *
- * @group Entity
+ * Tests Drupal\Core\Entity\EntityDisplayRepository.
  */
+#[CoversClass(EntityDisplayRepository::class)]
+#[Group('Entity')]
 class EntityDisplayRepositoryTest extends KernelTestBase {
 
   /**
@@ -57,9 +61,11 @@ class EntityDisplayRepositoryTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::getViewDisplay
+   * Tests view display.
+   *
+   * @legacy-covers ::getViewDisplay
    */
-  public function testViewDisplay() {
+  public function testViewDisplay(): void {
     $display = $this->displayRepository->getViewDisplay('user', 'user');
     $this->assertInstanceOf(EntityViewDisplayInterface::class, $display);
     $this->assertTrue($display->isNew(), 'Default view display was created on demand.');
@@ -79,9 +85,11 @@ class EntityDisplayRepositoryTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::getFormDisplay
+   * Tests form display.
+   *
+   * @legacy-covers ::getFormDisplay
    */
-  public function testFormDisplay() {
+  public function testFormDisplay(): void {
     $display = $this->displayRepository->getFormDisplay('user', 'user');
     $this->assertInstanceOf(EntityFormDisplayInterface::class, $display);
     $this->assertTrue($display->isNew(), 'Default form display was created on demand.');

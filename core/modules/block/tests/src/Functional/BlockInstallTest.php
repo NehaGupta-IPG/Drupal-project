@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\block\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests block module's installation.
- *
- * @group block
  */
+#[Group('block')]
+#[RunTestsInSeparateProcesses]
 class BlockInstallTest extends BrowserTestBase {
 
   /**
@@ -18,7 +20,10 @@ class BlockInstallTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  public function testCacheTagInvalidationUponInstallation() {
+  /**
+   * Tests cache tag invalidation after installing the block module.
+   */
+  public function testCacheTagInvalidationUponInstallation(): void {
     // Warm the page cache.
     $this->drupalGet('');
     $this->assertSession()->pageTextNotContains('Powered by Drupal');

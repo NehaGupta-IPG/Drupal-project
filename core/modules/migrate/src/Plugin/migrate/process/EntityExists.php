@@ -42,7 +42,7 @@ class EntityExists extends ProcessPluginBase implements ContainerFactoryPluginIn
    *   The plugin ID.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param $storage
+   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
    *   The entity storage.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityStorageInterface $storage) {
@@ -53,7 +53,7 @@ class EntityExists extends ProcessPluginBase implements ContainerFactoryPluginIn
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
     return new static(
       $configuration,
       $plugin_id,

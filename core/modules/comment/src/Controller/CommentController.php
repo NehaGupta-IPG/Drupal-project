@@ -12,6 +12,7 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -84,6 +85,7 @@ class CommentController extends ControllerBase {
    *   A comment entity.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   *   A redirect response to the comment's permalink after approval.
    */
   public function commentApprove(CommentInterface $comment) {
     $comment->setPublished();
@@ -127,7 +129,7 @@ class CommentController extends ControllerBase {
 
       // Find the current display page for this comment.
       $page = $this->entityTypeManager()->getStorage('comment')->getDisplayOrdinal($comment, $field_definition->getSetting('default_mode'), $field_definition->getSetting('per_page'));
-      // @todo: Cleaner sub request handling.
+      // @todo Cleaner sub request handling.
       $subrequest_url = $entity->toUrl()->setOption('query', ['page' => $page])->toString(TRUE);
       $redirect_request = Request::create($subrequest_url->getGeneratedUrl(), 'GET', $request->query->all(), $request->cookies->all(), [], $request->server->all());
       // Carry over the session to the subrequest.
@@ -202,7 +204,7 @@ class CommentController extends ControllerBase {
    *   (optional) Some comments are replies to other comments. In those cases,
    *   $pid is the parent comment's comment ID. Defaults to NULL.
    *
-   * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
+   * @return array
    *   An associative array containing:
    *   - An array for rendering the entity or parent comment.
    *     - comment_entity: If the comment is a reply to the entity.
@@ -251,6 +253,19 @@ class CommentController extends ControllerBase {
     $build['comment_form'] = $this->entityFormBuilder()->getForm($comment);
 
     return $build;
+  }
+
+  /**
+   * Title callback for the reply form.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity this comment belongs to.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   *   The reply form title.
+   */
+  public function replyFormTitle(EntityInterface $entity): TranslatableMarkup {
+    return $this->t('Add new comment to %label', ['%label' => $entity->label()]);
   }
 
   /**

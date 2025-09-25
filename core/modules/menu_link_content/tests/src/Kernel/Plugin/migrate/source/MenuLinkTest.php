@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\menu_link_content\Kernel\Plugin\migrate\source;
 
 use Drupal\Component\Utility\Unicode;
@@ -14,6 +16,7 @@ use Drupal\TestTools\Random;
  * @covers \Drupal\menu_link_content\Plugin\migrate\source\MenuLink
  *
  * @group menu_link_content
+ * @coversDefaultClass \Drupal\menu_link_content\Plugin\migrate\source\MenuLink
  */
 class MenuLinkTest extends MigrateSqlSourceTestBase {
 

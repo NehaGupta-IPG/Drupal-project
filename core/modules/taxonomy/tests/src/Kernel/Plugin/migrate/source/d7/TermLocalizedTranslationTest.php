@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Kernel\Plugin\migrate\source\d7;
 
 // cspell:ignore ltlanguage objectid objectindex plid tdlanguage tsid
@@ -9,6 +11,7 @@ namespace Drupal\Tests\taxonomy\Kernel\Plugin\migrate\source\d7;
  *
  * @covers \Drupal\taxonomy\Plugin\migrate\source\d7\TermLocalizedTranslation
  * @group taxonomy
+ * @coversDefaultClass \Drupal\taxonomy\Plugin\migrate\source\d7\TermLocalizedTranslation
  */
 class TermLocalizedTranslationTest extends TermTest {
 

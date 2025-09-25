@@ -43,7 +43,6 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
     'node',
     'language',
     'text',
-    'path_alias',
     'views_ui',
     'workspaces',
   ];
@@ -74,7 +73,7 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
     $this->installConfig(['filter', 'node', 'system', 'language', 'content_translation']);
 
     $this->installSchema('node', ['node_access']);
-    $this->installSchema('workspaces', ['workspace_association']);
+    $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
 
     $language = ConfigurableLanguage::createFromLangcode('ro');
     $language->save();
@@ -101,8 +100,8 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
   /**
    * Tests workspace query alter for views.
    *
-   * @covers \Drupal\workspaces\ViewsQueryAlter::alterQueryForEntityType
-   * @covers \Drupal\workspaces\ViewsQueryAlter::getRevisionTableJoin
+   * @covers \Drupal\workspaces\Hook\ViewsOperations::alterQueryForEntityType
+   * @covers \Drupal\workspaces\Hook\ViewsOperations::getRevisionTableJoin
    */
   public function testViewsQueryAlter(): void {
     // Create a test entity and two nodes.
@@ -115,11 +114,13 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
       'body' => 'node 1',
       'created' => $this->createdTimestamp++,
       'field_reference' => $test_entity->id(),
+      'promote' => TRUE,
     ]);
     $node_2 = $this->createNode([
       'title' => 'node - live - 2',
       'body' => 'node 2',
       'created' => $this->createdTimestamp++,
+      'promote' => TRUE,
     ]);
 
     // Create a new workspace and activate it.

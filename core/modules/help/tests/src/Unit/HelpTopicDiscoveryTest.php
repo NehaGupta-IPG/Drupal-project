@@ -11,17 +11,22 @@ use Drupal\help\HelpTopicDiscovery;
 use Drupal\help\HelpTopicTwig;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\help\HelpTopicDiscovery
- * @group help
+ * Tests Drupal\help\HelpTopicDiscovery.
  */
+#[CoversClass(HelpTopicDiscovery::class)]
+#[Group('help')]
 class HelpTopicDiscoveryTest extends UnitTestCase {
 
   /**
-   * @covers ::findAll
+   * Tests discovery exception missing label.
+   *
+   * @legacy-covers ::findAll
    */
-  public function testDiscoveryExceptionMissingLabel() {
+  public function testDiscoveryExceptionMissingLabel(): void {
     vfsStream::setup('root');
 
     vfsStream::create([
@@ -42,9 +47,11 @@ class HelpTopicDiscoveryTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::findAll
+   * Tests discovery exception invalid yaml key.
+   *
+   * @legacy-covers ::findAll
    */
-  public function testDiscoveryExceptionInvalidYamlKey() {
+  public function testDiscoveryExceptionInvalidYamlKey(): void {
     vfsStream::setup('root');
     $topic_content = <<<EOF
 ---
@@ -70,9 +77,11 @@ EOF;
   }
 
   /**
-   * @covers ::findAll
+   * Tests discovery exception invalid top level.
+   *
+   * @legacy-covers ::findAll
    */
-  public function testDiscoveryExceptionInvalidTopLevel() {
+  public function testDiscoveryExceptionInvalidTopLevel(): void {
     vfsStream::setup('root');
     $topic_content = <<<EOF
 ---
@@ -98,9 +107,11 @@ EOF;
   }
 
   /**
-   * @covers ::findAll
+   * Tests discovery exception invalid related.
+   *
+   * @legacy-covers ::findAll
    */
-  public function testDiscoveryExceptionInvalidRelated() {
+  public function testDiscoveryExceptionInvalidRelated(): void {
     vfsStream::setup('root');
     $topic_content = <<<EOF
 ---
@@ -126,9 +137,11 @@ EOF;
   }
 
   /**
-   * @covers ::findAll
+   * Tests help topics extension provider special case.
+   *
+   * @legacy-covers ::findAll
    */
-  public function testHelpTopicsExtensionProviderSpecialCase() {
+  public function testHelpTopicsExtensionProviderSpecialCase(): void {
     vfsStream::setup('root');
     $topic_content = <<<EOF
 ---
@@ -151,9 +164,11 @@ EOF;
   }
 
   /**
-   * @covers ::findAll
+   * Tests help topics in core.
+   *
+   * @legacy-covers ::findAll
    */
-  public function testHelpTopicsInCore() {
+  public function testHelpTopicsInCore(): void {
     vfsStream::setup('root');
     $topic_content = <<<EOF
 ---
@@ -174,9 +189,11 @@ EOF;
   }
 
   /**
-   * @covers ::findAll
+   * Tests help topics broken yaml.
+   *
+   * @legacy-covers ::findAll
    */
-  public function testHelpTopicsBrokenYaml() {
+  public function testHelpTopicsBrokenYaml(): void {
     vfsStream::setup('root');
     $topic_content = <<<EOF
 ---
@@ -201,9 +218,11 @@ EOF;
   }
 
   /**
-   * @covers ::findAll
+   * Tests help topics definition.
+   *
+   * @legacy-covers ::findAll
    */
-  public function testHelpTopicsDefinition() {
+  public function testHelpTopicsDefinition(): void {
     $container = new ContainerBuilder();
     $container->set('string_translation', $this->getStringTranslationStub());
     \Drupal::setContainer($container);

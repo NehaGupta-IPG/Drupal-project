@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel\Plugin\migrate\source\d7;
 
 // cspell:ignore tnid
@@ -10,6 +12,7 @@ namespace Drupal\Tests\node\Kernel\Plugin\migrate\source\d7;
  * @covers \Drupal\node\Plugin\migrate\source\d7\Node
  *
  * @group node
+ * @coversDefaultClass \Drupal\node\Plugin\migrate\source\d7\Node
  */
 class NodeTranslationTest extends NodeTest {
 

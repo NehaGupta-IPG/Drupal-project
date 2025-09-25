@@ -6,14 +6,21 @@ namespace Drupal\Tests\node\Functional;
 
 use Drupal\Core\Database\Database;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\node\Entity\NodeType;
+use Drupal\node\NodeInterface;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests node administration page functionality.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeAdminTest extends NodeTestBase {
+
+  use NodeAccessTrait;
 
   /**
    * {@inheritdoc}
@@ -49,9 +56,7 @@ class NodeAdminTest extends NodeTestBase {
   protected $baseUser3;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['views'];
 
@@ -86,7 +91,7 @@ class NodeAdminTest extends NodeTestBase {
   /**
    * Tests that the table sorting works on the content admin pages.
    */
-  public function testContentAdminSort() {
+  public function testContentAdminSort(): void {
     $this->drupalLogin($this->adminUser);
 
     $changed = \Drupal::time()->getRequestTime();
@@ -141,7 +146,7 @@ class NodeAdminTest extends NodeTestBase {
    *
    * @see TaxonomyNodeFilterTestCase
    */
-  public function testContentAdminPages() {
+  public function testContentAdminPages(): void {
     $this->drupalLogin($this->adminUser);
 
     // Use an explicit changed time to ensure the expected order in the content
@@ -238,9 +243,63 @@ class NodeAdminTest extends NodeTestBase {
   }
 
   /**
+   * Tests that the content overview page does not filter out nodes.
+   */
+  public function testContentAdminPageWithLimitedContentViewer(): void {
+    \Drupal::service('module_installer')->install(['node_access_test']);
+    $this->addPrivateField(NodeType::load('page'));
+    node_access_rebuild();
+
+    $role_id = $this->drupalCreateRole([
+      'access content overview',
+      'view own unpublished content',
+      'node test view',
+    ]);
+    $viewer_user = $this->drupalCreateUser(values: ['roles' => [$role_id]]);
+    // Create published and unpublished content authored by an administrator and
+    // the viewer user.
+    $nodes_visible = [];
+    $nodes_visible[] = $this->drupalCreateNode(['type' => 'page', 'uid' => $this->adminUser->id(), 'title' => 'Published page by admin']);
+    $nodes_visible[] = $this->drupalCreateNode(['type' => 'page', 'uid' => $viewer_user->id(), 'title' => 'Published own page']);
+    $nodes_visible[] = $this->drupalCreateNode(['type' => 'page', 'uid' => $this->adminUser->id(), 'title' => 'Published private page by admin', 'private' => ['value' => 1]]);
+    $nodes_visible[] = $this->drupalCreateNode(['type' => 'page', 'uid' => $viewer_user->id(), 'title' => 'Published own private page', 'private' => ['value' => 1]]);
+    $nodes_visible[] = $this->drupalCreateNode(['type' => 'page', 'uid' => $viewer_user->id(), 'title' => 'Unpublished own page', 'status' => NodeInterface::NOT_PUBLISHED]);
+    $nodes_visible[] = $this->drupalCreateNode(['type' => 'page', 'uid' => $viewer_user->id(), 'title' => 'Unpublished own private page', 'status' => NodeInterface::NOT_PUBLISHED, 'private' => ['value' => 1]]);
+    $nodes_visible[] = $this->drupalCreateNode(['type' => 'page', 'uid' => $this->adminUser->id(), 'title' => 'Unpublished private page by admin', 'status' => NodeInterface::NOT_PUBLISHED, 'private' => ['value' => 1]]);
+
+    $this->drupalLogin($viewer_user);
+    // Confirm the current user has limited privileges.
+    $admin_permissions = ['administer nodes', 'bypass node access'];
+    foreach ($admin_permissions as $admin_permission) {
+      $this->assertFalse(\Drupal::service('current_user')->hasPermission($admin_permission), sprintf('The current user does not have "%s" permission.', $admin_permission));
+    }
+    // Confirm that the nodes are visible to the less privileged user.
+    foreach ($nodes_visible as $node) {
+      self::assertTrue($node->access('view', $viewer_user));
+      $this->drupalGet('admin/content');
+      $this->assertSession()->linkByHrefExists('node/' . $node->id(), 0, sprintf('The "%s" node is visible on the admin/content page.', $node->getTitle()));
+    }
+
+    // Without the "node test view" permission the unpublished page of the
+    // admin user is not visible.
+    $this->drupalLogin($this->drupalCreateUser(values: [
+      'roles' => [
+        $this->drupalCreateRole([
+          'access content overview',
+          'view own unpublished content',
+        ]),
+      ],
+    ]));
+    $unpublished_node_by_admin = $this->drupalCreateNode(['type' => 'page', 'uid' => $this->adminUser->id(), 'title' => 'Unpublished page by admin', 'status' => 0]);
+    self::assertFalse($unpublished_node_by_admin->access('view'));
+    $this->drupalGet('admin/content');
+    $this->assertSession()->linkByHrefNotExists('node/' . $unpublished_node_by_admin->id());
+  }
+
+  /**
    * Tests content overview for a multilingual site.
    */
-  public function testContentAdminPageMultilingual() {
+  public function testContentAdminPageMultilingual(): void {
     $this->drupalLogin($this->adminUser);
 
     \Drupal::service('module_installer')->install(['language']);

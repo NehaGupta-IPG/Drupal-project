@@ -16,12 +16,15 @@ use Drupal\Core\Session\PermissionsHashGenerator;
 use Drupal\Core\Session\RefinableCalculatedPermissions;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 
 /**
- * @coversDefaultClass \Drupal\Core\Session\PermissionsHashGenerator
- * @group Session
+ * Tests Drupal\Core\Session\PermissionsHashGenerator.
  */
+#[CoversClass(PermissionsHashGenerator::class)]
+#[Group('Session')]
 class PermissionsHashGeneratorTest extends UnitTestCase {
 
   /**
@@ -94,9 +97,9 @@ class PermissionsHashGeneratorTest extends UnitTestCase {
   /**
    * Tests the generate method for regular accounts.
    *
-   * @covers ::generate
+   * @legacy-covers ::generate
    */
-  public function testGenerateRegular() {
+  public function testGenerateRegular(): void {
     $permissions = new CalculatedPermissions(
       (new RefinableCalculatedPermissions())->addItem(new CalculatedPermissionsItem([
         'permission foo',
@@ -115,9 +118,9 @@ class PermissionsHashGeneratorTest extends UnitTestCase {
   /**
    * Tests the generate method for admin users.
    *
-   * @covers ::generate
+   * @legacy-covers ::generate
    */
-  public function testGenerateAdmin() {
+  public function testGenerateAdmin(): void {
     $permissions = new CalculatedPermissions((new RefinableCalculatedPermissions())->addItem(new CalculatedPermissionsItem([], TRUE)));
     $this->processor->processAccessPolicies($this->account1)->willReturn($permissions);
     $this->processor->processAccessPolicies($this->account2)->willReturn($permissions);
@@ -134,9 +137,9 @@ class PermissionsHashGeneratorTest extends UnitTestCase {
   /**
    * Tests the generate method with no access policies.
    *
-   * @covers ::generate
+   * @legacy-covers ::generate
    */
-  public function testGenerateNoAccessPolicies() {
+  public function testGenerateNoAccessPolicies(): void {
     $permissions = new CalculatedPermissions(new RefinableCalculatedPermissions());
     $this->processor->processAccessPolicies($this->account1)->willReturn($permissions);
     $this->processor->processAccessPolicies($this->account2)->willReturn($permissions);
@@ -153,9 +156,9 @@ class PermissionsHashGeneratorTest extends UnitTestCase {
   /**
    * Tests the generate method's caching.
    *
-   * @covers ::generate
+   * @legacy-covers ::generate
    */
-  public function testGenerateCache() {
+  public function testGenerateCache(): void {
     $permissions = new CalculatedPermissions(new RefinableCalculatedPermissions());
     $this->processor->processAccessPolicies($this->account1)->willReturn($permissions);
     $this->processor->processAccessPolicies($this->account2)->willReturn($permissions);

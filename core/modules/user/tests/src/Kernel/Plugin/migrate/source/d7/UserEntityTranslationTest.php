@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel\Plugin\migrate\source\d7;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -10,6 +12,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  * @covers \Drupal\user\Plugin\migrate\source\d7\UserEntityTranslation
  *
  * @group user
+ * @coversDefaultClass \Drupal\user\Plugin\migrate\source\d7\UserEntityTranslation
  */
 class UserEntityTranslationTest extends MigrateSqlSourceTestBase {
 

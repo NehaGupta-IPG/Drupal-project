@@ -5,16 +5,19 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Flood;
 
 use Drupal\Core\Flood\MemoryBackend;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Request;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Medium;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Tests the memory flood implementation.
- *
- * @group flood
- * @coversDefaultClass \Drupal\Core\Flood\MemoryBackend
  */
+#[CoversClass(MemoryBackend::class)]
+#[Group('flood')]
+#[Medium]
 class MemoryBackendTest extends UnitTestCase {
 
   /**
@@ -38,7 +41,7 @@ class MemoryBackendTest extends UnitTestCase {
   /**
    * Tests an allowed flood event.
    */
-  public function testAllowedProceeding() {
+  public function testAllowedProceeding(): void {
     $threshold = 2;
     $window_expired = -1;
 
@@ -49,7 +52,7 @@ class MemoryBackendTest extends UnitTestCase {
   /**
    * Tests a flood event with more than the allowed calls.
    */
-  public function testNotAllowedProceeding() {
+  public function testNotAllowedProceeding(): void {
     $threshold = 1;
     $window_expired = -1;
 
@@ -62,10 +65,8 @@ class MemoryBackendTest extends UnitTestCase {
 
   /**
    * Tests a flood event with expiring, so cron will allow to proceed.
-   *
-   * @medium
    */
-  public function testExpiring() {
+  public function testExpiring(): void {
     $threshold = 1;
     $window_expired = -1;
 
@@ -83,7 +84,7 @@ class MemoryBackendTest extends UnitTestCase {
   /**
    * Tests a flood event with no expiring, so cron will not allow to proceed.
    */
-  public function testNotExpiring() {
+  public function testNotExpiring(): void {
     $threshold = 2;
 
     $this->flood->register('test_event', 1);
@@ -100,7 +101,7 @@ class MemoryBackendTest extends UnitTestCase {
   /**
    * Tests memory backend records events to the nearest microsecond.
    */
-  public function testMemoryBackendThreshold() {
+  public function testMemoryBackendThreshold(): void {
     $this->flood->register('new event');
     $this->assertTrue($this->flood->isAllowed('new event', '2'));
     $this->flood->register('new event');

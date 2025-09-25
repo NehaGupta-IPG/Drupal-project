@@ -6,12 +6,14 @@ namespace Drupal\Tests\workspaces\Functional\Rest;
 
 use Drupal\Tests\rest\Functional\AnonResourceTestTrait;
 use Drupal\Tests\rest\Functional\EntityResource\XmlEntityNormalizationQuirksTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test workspace entities for unauthenticated XML requests.
- *
- * @group workspaces
  */
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceXmlAnonTest extends WorkspaceResourceTestBase {
 
   use AnonResourceTestTrait;
@@ -31,13 +33,5 @@ class WorkspaceXmlAnonTest extends WorkspaceResourceTestBase {
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testPatchPath() {
-    // Deserialization of the XML format is not supported.
-    $this->markTestSkipped();
-  }
 
 }

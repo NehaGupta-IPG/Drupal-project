@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Kernel\Plugin\migrate\source\d6;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -9,6 +11,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  *
  * @covers \Drupal\comment\Plugin\migrate\source\d6\Comment
  * @group comment
+ * @coversDefaultClass \Drupal\comment\Plugin\migrate\source\d6\Comment
  */
 class CommentTest extends MigrateSqlSourceTestBase {
 

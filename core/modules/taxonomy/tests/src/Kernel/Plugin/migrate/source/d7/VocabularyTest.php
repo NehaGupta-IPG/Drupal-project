@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Kernel\Plugin\migrate\source\d7;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -9,6 +11,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  *
  * @covers \Drupal\taxonomy\Plugin\migrate\source\d7\Vocabulary
  * @group taxonomy
+ * @coversDefaultClass \Drupal\taxonomy\Plugin\migrate\source\d7\Vocabulary
  */
 class VocabularyTest extends MigrateSqlSourceTestBase {
 

@@ -1,19 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Database;
+
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the hook_query_alter capabilities of the Select builder.
  *
- * @group Database
  * @see database_test_query_alter()
  */
+#[Group('Database')]
 class AlterTest extends DatabaseTestBase {
 
   /**
    * Tests that we can do basic alters.
    */
-  public function testSimpleAlter() {
+  public function testSimpleAlter(): void {
     $query = $this->connection->select('test');
     $query->addField('test', 'name');
     $query->addField('test', 'age', 'age');
@@ -27,7 +31,7 @@ class AlterTest extends DatabaseTestBase {
   /**
    * Tests that we can alter the joins on a query.
    */
-  public function testAlterWithJoin() {
+  public function testAlterWithJoin(): void {
     $query = $this->connection->select('test_task');
     $tid_field = $query->addField('test_task', 'tid');
     $task_field = $query->addField('test_task', 'task');
@@ -51,7 +55,7 @@ class AlterTest extends DatabaseTestBase {
   /**
    * Tests that we can alter a query's conditionals.
    */
-  public function testAlterChangeConditional() {
+  public function testAlterChangeConditional(): void {
     $query = $this->connection->select('test_task');
     $tid_field = $query->addField('test_task', 'tid');
     $pid_field = $query->addField('test_task', 'pid');
@@ -76,7 +80,7 @@ class AlterTest extends DatabaseTestBase {
   /**
    * Tests that we can alter the fields of a query.
    */
-  public function testAlterChangeFields() {
+  public function testAlterChangeFields(): void {
     $query = $this->connection->select('test');
     $name_field = $query->addField('test', 'name');
     $age_field = $query->addField('test', 'age', 'age');
@@ -91,7 +95,7 @@ class AlterTest extends DatabaseTestBase {
   /**
    * Tests that we can alter expressions in the query.
    */
-  public function testAlterExpression() {
+  public function testAlterExpression(): void {
     $query = $this->connection->select('test');
     $name_field = $query->addField('test', 'name');
     $age_field = $query->addExpression("[age]*2", 'double_age');
@@ -111,7 +115,7 @@ class AlterTest extends DatabaseTestBase {
    *
    * This also tests hook_query_TAG_alter().
    */
-  public function testAlterRemoveRange() {
+  public function testAlterRemoveRange(): void {
     $query = $this->connection->select('test');
     $query->addField('test', 'name');
     $query->addField('test', 'age', 'age');
@@ -126,7 +130,7 @@ class AlterTest extends DatabaseTestBase {
   /**
    * Tests that we can do basic alters on subqueries.
    */
-  public function testSimpleAlterSubquery() {
+  public function testSimpleAlterSubquery(): void {
     // Create a sub-query with an alter tag.
     $subquery = $this->connection->select('test', 'p');
     $subquery->addField('p', 'name');

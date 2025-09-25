@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel\Views;
 
-use Drupal\node\Entity\NodeType;
+use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
@@ -17,6 +19,7 @@ use Drupal\views\Views;
  */
 class RowPluginTest extends ViewsKernelTestBase {
 
+  use ContentTypeCreationTrait;
   use NodeCreationTrait;
   use UserCreationTrait;
 
@@ -60,12 +63,10 @@ class RowPluginTest extends ViewsKernelTestBase {
 
     \Drupal::currentUser()->setAccount($this->createUser(['access content']));
 
-    $node_type = NodeType::create([
+    $this->createContentType([
       'type' => 'article',
       'name' => 'Article',
     ]);
-    $node_type->save();
-    node_add_body_field($node_type);
 
     // Create two nodes.
     for ($i = 0; $i < 2; $i++) {

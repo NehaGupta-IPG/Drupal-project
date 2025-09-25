@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\image\Kernel\Plugin\migrate\source\d7;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -12,6 +14,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  * @covers \Drupal\image\Plugin\migrate\source\d7\ImageStyles
  *
  * @group image
+ * @coversDefaultClass \Drupal\image\Plugin\migrate\source\d7\ImageStyles
  */
 class ImageStylesTest extends MigrateSqlSourceTestBase {
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Kernel\Plugin\migrate\source\d6;
 
 use Drupal\Tests\block\Kernel\Plugin\migrate\source\BlockTest;
@@ -10,6 +12,7 @@ use Drupal\Tests\block\Kernel\Plugin\migrate\source\BlockTest;
  * @covers \Drupal\block\Plugin\migrate\source\d6\BlockTranslation
  *
  * @group content_translation
+ * @coversDefaultClass \Drupal\block\Plugin\migrate\source\d6\BlockTranslation
  */
 class BlockTranslationTest extends BlockTest {
 

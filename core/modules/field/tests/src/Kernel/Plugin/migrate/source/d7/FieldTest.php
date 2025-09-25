@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\Plugin\migrate\source\d7;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -9,6 +11,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  *
  * @covers \Drupal\field\Plugin\migrate\source\d7\Field
  * @group field
+ * @coversDefaultClass \Drupal\field\Plugin\migrate\source\d7\Field
  */
 class FieldTest extends MigrateSqlSourceTestBase {
 

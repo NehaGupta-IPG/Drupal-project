@@ -6,12 +6,14 @@ namespace Drupal\Tests\taxonomy\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the new_revision setting of taxonomy vocabularies.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class TaxonomyRevisionTest extends BrowserTestBase {
 
   use TaxonomyTestTrait;
@@ -32,7 +34,7 @@ class TaxonomyRevisionTest extends BrowserTestBase {
   /**
    * Tests default revision settings on vocabularies.
    */
-  public function testVocabularyTermRevision() {
+  public function testVocabularyTermRevision(): void {
     $assert = $this->assertSession();
     $vocabulary1 = $this->createVocabulary(['new_revision' => TRUE]);
     $vocabulary2 = $this->createVocabulary(['new_revision' => FALSE]);

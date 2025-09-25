@@ -4,26 +4,26 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
+use Drupal\comment\CommentInterface;
+use Drupal\comment\Entity\Comment;
 use Drupal\comment\Entity\CommentType;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\comment\CommentInterface;
-use Drupal\comment\Entity\Comment;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests comments with other entities.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentEntityTest extends CommentTestBase {
 
   use TaxonomyTestTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -40,7 +40,18 @@ class CommentEntityTest extends CommentTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * A vocabulary used for testing.
+   *
+   * @var \Drupal\taxonomy\VocabularyInterface
+   */
   protected $vocab;
+
+  /**
+   * The comment type used for testing.
+   *
+   * @var \Drupal\comment\CommentTypeInterface
+   */
   protected $commentType;
 
   /**
@@ -69,7 +80,7 @@ class CommentEntityTest extends CommentTestBase {
   /**
    * Tests CSS classes on comments.
    */
-  public function testEntityChanges() {
+  public function testEntityChanges(): void {
     $this->drupalLogin($this->webUser);
     // Create a new node.
     $term = $this->createTerm($this->vocab, ['uid' => $this->webUser->id()]);

@@ -5,21 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the locked functionality of date formats.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class DateFormatsLockedTest extends BrowserTestBase {
-
-  /**
-   * {@inheritdoc}
-   *
-   * @todo Remove and fix test to not rely on super user.
-   * @see https://www.drupal.org/project/drupal/issues/3437620
-   */
-  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * {@inheritdoc}
@@ -29,8 +23,8 @@ class DateFormatsLockedTest extends BrowserTestBase {
   /**
    * Tests attempts at listing, editing, and deleting locked date formats.
    */
-  public function testDateLocking() {
-    $this->drupalLogin($this->rootUser);
+  public function testDateLocking(): void {
+    $this->drupalLogin($this->drupalCreateUser(['administer site configuration']));
 
     // Locked date formats are not linked on the listing page, locked date
     // formats are clearly marked as such; unlocked formats are not marked as

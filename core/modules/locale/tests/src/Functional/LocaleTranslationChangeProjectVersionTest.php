@@ -6,12 +6,14 @@ namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests how translations are handled when a project gets updated.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleTranslationChangeProjectVersionTest extends LocaleUpdateBase {
 
   /**
@@ -59,7 +61,7 @@ class LocaleTranslationChangeProjectVersionTest extends LocaleUpdateBase {
   /**
    * Tests update translations when project version changes.
    */
-  public function testUpdateImportSourceRemote() {
+  public function testUpdateImportSourceRemote(): void {
 
     // Verify that the project status has the old version.
     $status = locale_translation_get_status(['contrib_module_one']);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel\Views;
 
 use Drupal\node\Entity\Node;
@@ -26,7 +28,6 @@ class RevisionUidTest extends ViewsKernelTestBase {
   protected static $modules = [
     'node',
     'node_test_views',
-    'system',
     'user',
     'views',
   ];
@@ -68,7 +69,7 @@ class RevisionUidTest extends ViewsKernelTestBase {
   /**
    * Tests the node_revision_uid relationship.
    */
-  public function testRevisionUid() {
+  public function testRevisionUid(): void {
     $primary_author = $this->createUser();
     $secondary_author = $this->createUser();
 

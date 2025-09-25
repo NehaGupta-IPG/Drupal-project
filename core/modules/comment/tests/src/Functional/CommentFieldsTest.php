@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
-use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\field\Entity\FieldConfig;
 use Drupal\comment\Entity\CommentType;
+use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests fields on comments.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentFieldsTest extends CommentTestBase {
 
   /**
-   * Install the field UI.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field_ui'];
 
@@ -31,7 +31,7 @@ class CommentFieldsTest extends CommentTestBase {
   /**
    * Tests that the default 'comment_body' field is correctly added.
    */
-  public function testCommentDefaultFields() {
+  public function testCommentDefaultFields(): void {
     // Do not make assumptions on default node types created by the test
     // installation profile, and create our own.
     $this->drupalCreateContentType(['type' => 'test_node_type']);
@@ -69,7 +69,7 @@ class CommentFieldsTest extends CommentTestBase {
   /**
    * Tests that you can remove a comment field.
    */
-  public function testCommentFieldDelete() {
+  public function testCommentFieldDelete(): void {
     $this->drupalCreateContentType(['type' => 'test_node_type']);
     $this->addDefaultCommentField('node', 'test_node_type');
     // We want to test the handling of removing the primary comment field, so we
@@ -99,7 +99,7 @@ class CommentFieldsTest extends CommentTestBase {
   /**
    * Tests link building with non-default comment field names.
    */
-  public function testCommentFieldLinksNonDefaultName() {
+  public function testCommentFieldLinksNonDefaultName(): void {
     $this->drupalCreateContentType(['type' => 'test_node_type']);
     $this->addDefaultCommentField('node', 'test_node_type', 'comment2');
 
@@ -116,6 +116,7 @@ class CommentFieldsTest extends CommentTestBase {
     $node = $this->drupalCreateNode([
       'title' => 'Baloney',
       'type' => 'test_node_type',
+      'promote' => TRUE,
     ]);
 
     // Go to the node first so that web_user2 see new comments.
@@ -145,7 +146,7 @@ class CommentFieldsTest extends CommentTestBase {
   /**
    * Tests creating a comment field through the interface.
    */
-  public function testCommentFieldCreate() {
+  public function testCommentFieldCreate(): void {
     // Create user who can administer user fields.
     $user = $this->drupalCreateUser([
       'administer user fields',
@@ -154,14 +155,11 @@ class CommentFieldsTest extends CommentTestBase {
 
     // Create comment field in account settings.
     $edit = [
-      'new_storage_type' => 'comment',
-    ];
-    $this->drupalGet('admin/config/people/accounts/fields/add-field');
-    $this->submitForm($edit, 'Continue');
-    $edit = [
       'label' => 'User comment',
       'field_name' => 'user_comment',
     ];
+    $this->drupalGet('admin/config/people/accounts/fields/add-field');
+    $this->clickLink('Comments');
     $this->submitForm($edit, 'Continue');
 
     // Try to save the comment field without selecting a comment type.
@@ -194,7 +192,7 @@ class CommentFieldsTest extends CommentTestBase {
       'settings[per_page]' => 0,
     ];
     $this->drupalGet('admin/config/people/accounts/add-field/user/field_user_comment');
-    $this->submitForm($edit, 'Save settings');
+    $this->submitForm($edit, 'Save');
     $this->assertSession()->statusMessageContains('Saved User comment configuration.', 'status');
   }
 

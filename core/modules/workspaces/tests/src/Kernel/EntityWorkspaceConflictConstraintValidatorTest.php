@@ -25,8 +25,6 @@ class EntityWorkspaceConflictConstraintValidatorTest extends KernelTestBase {
    */
   protected static $modules = [
     'entity_test',
-    'path_alias',
-    'system',
     'user',
     'workspaces',
   ];
@@ -44,7 +42,7 @@ class EntityWorkspaceConflictConstraintValidatorTest extends KernelTestBase {
 
     $this->entityTypeManager = \Drupal::entityTypeManager();
 
-    $this->installSchema('workspaces', ['workspace_association']);
+    $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
 
     $this->installEntitySchema('entity_test_mulrevpub');
     $this->installEntitySchema('workspace');

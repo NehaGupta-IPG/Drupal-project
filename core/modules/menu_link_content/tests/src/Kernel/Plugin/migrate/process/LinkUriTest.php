@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\menu_link_content\Kernel\Plugin\migrate\process;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -22,9 +24,7 @@ class LinkUriTest extends KernelTestBase {
   use UserCreationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'user'];
 
@@ -49,7 +49,7 @@ class LinkUriTest extends KernelTestBase {
    *
    * @covers ::transform
    */
-  public function testRouted($value, $expected) {
+  public function testRouted($value, $expected): void {
     $actual = $this->doTransform($value);
     $this->assertSame($expected, $actual);
   }
@@ -73,9 +73,21 @@ class LinkUriTest extends KernelTestBase {
     $expected = 'internal:/';
     $tests['front'] = [$value, $expected];
 
+    $value = '';
+    $expected = 'route:<nolink>';
+    $tests['empty'] = [$value, $expected];
+
+    $value = '<none>';
+    $expected = 'route:<nolink>';
+    $tests['none'] = [$value, $expected];
+
     $value = '<nolink>';
     $expected = 'route:<nolink>';
     $tests['nolink'] = [$value, $expected];
+
+    $value = '<button>';
+    $expected = 'route:<button>';
+    $tests['button'] = [$value, $expected];
 
     return $tests;
   }
@@ -90,7 +102,7 @@ class LinkUriTest extends KernelTestBase {
    *
    * @dataProvider providerTestNotRouted
    */
-  public function testNotRouted($value, $exception_message) {
+  public function testNotRouted($value, $exception_message): void {
     $this->expectException(MigrateException::class);
     $this->expectExceptionMessage($exception_message);
     $this->doTransform($value);
@@ -135,7 +147,7 @@ class LinkUriTest extends KernelTestBase {
    *
    * @covers ::transform
    */
-  public function testDisablingRouteValidation($value, $expected) {
+  public function testDisablingRouteValidation($value, $expected): void {
     // Create a node so we have a valid route.
     Node::create([
       'nid' => 1,

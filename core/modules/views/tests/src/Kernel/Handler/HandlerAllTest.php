@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\comment\Entity\CommentType;
@@ -33,7 +35,6 @@ class HandlerAllTest extends ViewsKernelTestBase {
     'field',
     'filter',
     'file',
-    'forum',
     'history',
     'image',
     'language',
@@ -41,11 +42,9 @@ class HandlerAllTest extends ViewsKernelTestBase {
     'media',
     'node',
     'search',
-    'system',
     'options',
     'taxonomy',
     'text',
-    'tracker',
     'user',
   ];
 
@@ -65,9 +64,7 @@ class HandlerAllTest extends ViewsKernelTestBase {
     $this->installEntitySchema('taxonomy_term');
     $this->installEntitySchema('user');
     $this->installSchema('file', ['file_usage']);
-    $this->installSchema('forum', ['forum_index']);
     $this->installSchema('dblog', ['watchdog']);
-    $this->installSchema('tracker', ['tracker_user']);
     // Create the comment body field storage.
     FieldStorageConfig::create([
       'type' => 'text_long',

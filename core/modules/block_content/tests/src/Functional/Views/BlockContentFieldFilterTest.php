@@ -6,12 +6,14 @@ namespace Drupal\Tests\block_content\Functional\Views;
 
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests block_content field filters with translations.
- *
- * @group block_content
  */
+#[Group('block_content')]
+#[RunTestsInSeparateProcesses]
 class BlockContentFieldFilterTest extends BlockContentTestBase {
 
   /**
@@ -73,7 +75,7 @@ class BlockContentFieldFilterTest extends BlockContentTestBase {
   /**
    * Tests body and info filters.
    */
-  public function testFilters() {
+  public function testFilters(): void {
     // Test the info filter page, which filters for info contains 'Comida'.
     // Should show just the Spanish translation, once.
     $this->assertPageCounts('test-info-filter', ['es' => 1, 'fr' => 0, 'en' => 0], 'Comida info filter');

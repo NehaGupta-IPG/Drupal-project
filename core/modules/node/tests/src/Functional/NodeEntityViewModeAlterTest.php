@@ -6,18 +6,22 @@ namespace Drupal\Tests\node\Functional;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Tests\EntityViewTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests changing view modes for nodes.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeEntityViewModeAlterTest extends NodeTestBase {
 
   use EntityViewTrait;
 
   /**
    * Enable dummy module that implements hook_ENTITY_TYPE_view() for nodes.
+   *
+   * @var string[]
    */
   protected static $modules = ['node_test'];
 
@@ -29,7 +33,7 @@ class NodeEntityViewModeAlterTest extends NodeTestBase {
   /**
    * Create a "Basic page" node and verify its consistency in the database.
    */
-  public function testNodeViewModeChange() {
+  public function testNodeViewModeChange(): void {
     $web_user = $this->drupalCreateUser([
       'create page content',
       'edit own page content',

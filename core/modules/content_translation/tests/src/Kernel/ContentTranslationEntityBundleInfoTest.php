@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_translation\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -19,7 +21,6 @@ class ContentTranslationEntityBundleInfoTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'node',
     'user',
     'language',
@@ -59,7 +60,7 @@ class ContentTranslationEntityBundleInfoTest extends KernelTestBase {
   /**
    * Tests that modules can know whether bundles are translatable.
    */
-  public function testHookInvocationOrder() {
+  public function testHookInvocationOrder(): void {
     $this->contentTranslationManager->setEnabled('entity_test_mul', 'entity_test_mul', TRUE);
     $this->bundleInfo->clearCachedBundles();
     $this->bundleInfo->getAllBundleInfo();
@@ -86,7 +87,7 @@ class ContentTranslationEntityBundleInfoTest extends KernelTestBase {
   /**
    * Tests that field synchronization is skipped for disabled bundles.
    */
-  public function testFieldSynchronizationWithDisabledBundle() {
+  public function testFieldSynchronizationWithDisabledBundle(): void {
     $entity = EntityTestMul::create();
     $entity->save();
 
@@ -102,7 +103,7 @@ class ContentTranslationEntityBundleInfoTest extends KernelTestBase {
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  public function testBundleClearOnLanguageContentSettingInsert() {
+  public function testBundleClearOnLanguageContentSettingInsert(): void {
     $node = $this->getBundledNode();
     $this->assertFalse($node->isTranslatable());
     $this->contentTranslationManager->setEnabled('node', 'bundle_test', TRUE);
@@ -115,7 +116,7 @@ class ContentTranslationEntityBundleInfoTest extends KernelTestBase {
    * @throws \Drupal\Core\Entity\EntityStorageException
    * @throws \Exception
    */
-  public function testBundleClearOnLanguageContentSettingUpdate() {
+  public function testBundleClearOnLanguageContentSettingUpdate(): void {
     $node = $this->getBundledNode();
     $this->assertFalse($node->isTranslatable());
     $this->container->get('entity_type.manager')->getStorage('language_content_settings')->create([

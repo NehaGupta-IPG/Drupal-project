@@ -10,13 +10,16 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
 /**
- * @coversDefaultClass \Drupal\Core\Access\CustomAccessCheck
- * @group Access
+ * Tests Drupal\Core\Access\CustomAccessCheck.
  */
+#[CoversClass(CustomAccessCheck::class)]
+#[Group('Access')]
 class CustomAccessCheckTest extends UnitTestCase {
 
   /**
@@ -54,7 +57,7 @@ class CustomAccessCheckTest extends UnitTestCase {
   /**
    * Tests the access method.
    */
-  public function testAccess() {
+  public function testAccess(): void {
     $route_match = $this->createMock('Drupal\Core\Routing\RouteMatchInterface');
 
     $this->callableResolver
@@ -111,7 +114,7 @@ class CustomAccessCheckTest extends UnitTestCase {
   /**
    * Tests the access method exception for invalid access callbacks.
    */
-  public function testAccessException() {
+  public function testAccessException(): void {
     // Create callableResolver mock to return InvalidArgumentException.
     $this->callableResolver = $this->getMockBuilder(CallableResolver::class)
       ->disableOriginalConstructor()
@@ -139,6 +142,9 @@ class CustomAccessCheckTest extends UnitTestCase {
 
 }
 
+/**
+ * Controller for testing custom access.
+ */
 class TestController {
 
   public function accessAllow() {

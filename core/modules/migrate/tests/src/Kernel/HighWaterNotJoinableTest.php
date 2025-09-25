@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Kernel;
 
 /**
@@ -7,6 +9,7 @@ namespace Drupal\Tests\migrate\Kernel;
  *
  * @covers \Drupal\migrate_high_water_test\Plugin\migrate\source\HighWaterTest
  * @group migrate
+ * @coversDefaultClass \Drupal\migrate_high_water_test\Plugin\migrate\source\HighWaterTest
  */
 class HighWaterNotJoinableTest extends MigrateSqlSourceTestBase {
 

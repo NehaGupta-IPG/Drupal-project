@@ -1,25 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Test\Comparator;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
-use PHPUnit\Framework\Error\Warning;
-use SebastianBergmann\Comparator\Factory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use SebastianBergmann\Comparator\ComparisonFailure;
+use SebastianBergmann\Comparator\Factory;
 
 /**
  * Tests \Drupal\TestTools\Comparator\MarkupInterfaceComparator.
  *
  * We need to test the class with a kernel test since casting MarkupInterface
  * objects to strings can require an initialized container.
- *
- * @group Test
- *
- * @coversDefaultClass \Drupal\TestTools\Comparator\MarkupInterfaceComparator
  */
+#[CoversClass(MarkupInterfaceComparator::class)]
+#[Group('Test')]
+#[Group('#slow')]
 class MarkupInterfaceComparatorTest extends KernelTestBase {
 
   /**
@@ -108,7 +111,7 @@ class MarkupInterfaceComparatorTest extends KernelTestBase {
         new FormattableMarkup('GoldFinger', []),
         ['GoldFinger'],
         FALSE,
-        Warning::class,
+        \InvalidArgumentException::class,
       ],
       'stdClass vs TranslatableMarkup' => [
         (object) ['GoldFinger'],
@@ -146,59 +149,39 @@ class MarkupInterfaceComparatorTest extends KernelTestBase {
         TRUE,
         FALSE,
       ],
-    ];
-  }
-
-  /**
-   * Provides test data for the comparator - deprecated cases.
-   *
-   * @return array
-   *   Each array entry has:
-   *   - test expected value,
-   *   - test actual value,
-   *   - a bool indicating the expected return value of ::accepts,
-   *   - a value indicating the expected result of ::assertEquals, TRUE if
-   *     comparison should match, FALSE if error, or a class name of an object
-   *     thrown.
-   *   - the expected deprecation message.
-   */
-  public static function dataSetProviderDeprecatedCases() {
-    return [
       'html string with tags vs FormattableMarkup, equal' => [
         '<em class="placeholder">For Your Eyes</em> Only',
         new FormattableMarkup('%placeholder Only', ['%placeholder' => 'For Your Eyes']),
         TRUE,
-        TRUE,
-        'Using assert[Not]Equals() to compare markup between MarkupInterface objects and plain strings is deprecated in drupal:10.1.0 and will throw an error from drupal:11.0.0. Expected: \'<em class="placeholder">For Your Eyes</em> Only\' - Actual \'<em class="placeholder">For Your Eyes</em> Only\'. Use assert[Not]Same() and cast objects to string instead. See https://www.drupal.org/node/3334057',
+        \RuntimeException::class,
       ],
       'html string with tags vs FormattableMarkup, not equal' => [
         '<em class="placeholder">For Your Eyes</em> Too',
         new FormattableMarkup('%placeholder Only', ['%placeholder' => 'For Your Eyes']),
         TRUE,
-        FALSE,
-        'Using assert[Not]Equals() to compare markup between MarkupInterface objects and plain strings is deprecated in drupal:10.1.0 and will throw an error from drupal:11.0.0. Expected: \'<em class="placeholder">For Your Eyes</em> Too\' - Actual \'<em class="placeholder">For Your Eyes</em> Only\'. Use assert[Not]Same() and cast objects to string instead. See https://www.drupal.org/node/3334057',
+        \RuntimeException::class,
       ],
       'FormattableMarkup vs html string with tags, equal' => [
         new FormattableMarkup('%placeholder Only', ['%placeholder' => 'For Your Eyes']),
         '<em class="placeholder">For Your Eyes</em> Only',
         TRUE,
-        TRUE,
-        'Using assert[Not]Equals() to compare markup between MarkupInterface objects and plain strings is deprecated in drupal:10.1.0 and will throw an error from drupal:11.0.0. Expected: \'<em class="placeholder">For Your Eyes</em> Only\' - Actual \'<em class="placeholder">For Your Eyes</em> Only\'. Use assert[Not]Same() and cast objects to string instead. See https://www.drupal.org/node/3334057',
+        \RuntimeException::class,
       ],
       'FormattableMarkup vs html string with tags, not equal' => [
         new FormattableMarkup('%placeholder Only', ['%placeholder' => 'For Your Eyes']),
         '<em class="placeholder">For Your Eyes</em> Too',
         TRUE,
-        FALSE,
-        'Using assert[Not]Equals() to compare markup between MarkupInterface objects and plain strings is deprecated in drupal:10.1.0 and will throw an error from drupal:11.0.0. Expected: \'<em class="placeholder">For Your Eyes</em> Only\' - Actual \'<em class="placeholder">For Your Eyes</em> Too\'. Use assert[Not]Same() and cast objects to string instead. See https://www.drupal.org/node/3334057',
+        \RuntimeException::class,
       ],
     ];
   }
 
   /**
-   * @covers ::accepts
-   * @dataProvider dataSetProvider
+   * Tests accepts.
+   *
+   * @legacy-covers ::accepts
    */
+  #[DataProvider('dataSetProvider')]
   public function testAccepts($expected, $actual, bool $accepts_result, $equals_result): void {
     if ($accepts_result) {
       $this->assertTrue($this->comparator->accepts($expected, $actual));
@@ -209,39 +192,12 @@ class MarkupInterfaceComparatorTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::assertEquals
-   * @dataProvider dataSetProvider
+   * Tests assert equals.
+   *
+   * @legacy-covers ::assertEquals
    */
+  #[DataProvider('dataSetProvider')]
   public function testAssertEquals($expected, $actual, bool $accepts_result, $equals_result): void {
-    try {
-      $this->assertNull($this->comparator->assertEquals($expected, $actual));
-      $this->assertTrue($equals_result);
-    }
-    catch (\Throwable $e) {
-      if ($equals_result === FALSE) {
-        $this->assertNotNull($e->getMessage());
-      }
-      else {
-        $this->assertInstanceOf($equals_result, $e);
-      }
-    }
-  }
-
-  /**
-   * @covers ::assertEquals
-   * @dataProvider dataSetProviderDeprecatedCases
-   * @group legacy
-   */
-  public function testDeprecatedAssertEquals($expected, $actual, bool $accepts_result, $equals_result, string $deprecation_message): void {
-    if ($accepts_result) {
-      $this->assertTrue($this->comparator->accepts($expected, $actual));
-    }
-    else {
-      $this->assertFalse($this->comparator->accepts($expected, $actual));
-    }
-    if ($deprecation_message) {
-      $this->expectDeprecation($deprecation_message);
-    }
     try {
       $this->assertNull($this->comparator->assertEquals($expected, $actual));
       $this->assertTrue($equals_result);

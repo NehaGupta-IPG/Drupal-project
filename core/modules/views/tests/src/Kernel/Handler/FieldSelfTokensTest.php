@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Core\Render\RenderContext;
@@ -47,7 +49,7 @@ class FieldSelfTokensTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testSelfTokenEscaping() {
+  public function testSelfTokenEscaping(): void {
     $view = Views::getView('test_field_self_tokens');
     $view->initHandlers();
     $this->executeView($view);

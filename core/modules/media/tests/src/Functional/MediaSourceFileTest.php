@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\media\Functional;
 
 use Drupal\field\Entity\FieldConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the file media source.
- *
- * @group media
  */
+#[Group('media')]
+#[RunTestsInSeparateProcesses]
 class MediaSourceFileTest extends MediaFunctionalTestBase {
 
   /**
@@ -21,7 +23,7 @@ class MediaSourceFileTest extends MediaFunctionalTestBase {
   /**
    * Tests that it's possible to change the allowed file extensions.
    */
-  public function testSourceFieldSettingsEditing() {
+  public function testSourceFieldSettingsEditing(): void {
     $session = $this->getSession();
     $page = $session->getPage();
     $assert_session = $this->assertSession();
@@ -49,7 +51,7 @@ class MediaSourceFileTest extends MediaFunctionalTestBase {
   /**
    * Ensure source field deletion is not possible.
    */
-  public function testPreventSourceFieldDeletion() {
+  public function testPreventSourceFieldDeletion(): void {
     $media_type = $this->createMediaType('file');
     $media_type_id = $media_type->id();
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel\Plugin\migrate\source\d7;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -12,6 +14,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  * @covers \Drupal\node\Plugin\migrate\source\d7\NodeEntityTranslation
  *
  * @group node
+ * @coversDefaultClass \Drupal\node\Plugin\migrate\source\d7\NodeEntityTranslation
  */
 class NodeEntityTranslationTest extends MigrateSqlSourceTestBase {
 

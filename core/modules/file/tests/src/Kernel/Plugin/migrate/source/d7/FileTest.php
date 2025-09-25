@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Kernel\Plugin\migrate\source\d7;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -9,6 +11,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  *
  * @covers \Drupal\file\Plugin\migrate\source\d7\File
  * @group file
+ * @coversDefaultClass \Drupal\file\Plugin\migrate\source\d7\File
  */
 class FileTest extends MigrateSqlSourceTestBase {
 

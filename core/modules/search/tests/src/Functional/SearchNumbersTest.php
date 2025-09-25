@@ -7,12 +7,14 @@ namespace Drupal\Tests\search\Functional;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\CronRunTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that numbers can be searched.
- *
- * @group search
  */
+#[Group('search')]
+#[RunTestsInSeparateProcesses]
 class SearchNumbersTest extends BrowserTestBase {
 
   use CronRunTrait;
@@ -102,7 +104,7 @@ class SearchNumbersTest extends BrowserTestBase {
   /**
    * Tests that all the numbers can be searched.
    */
-  public function testNumberSearching() {
+  public function testNumberSearching(): void {
     $types = array_keys($this->numbers);
 
     foreach ($types as $type) {

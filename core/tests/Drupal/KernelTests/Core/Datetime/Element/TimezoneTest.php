@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Datetime\Element;
 
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -9,6 +11,7 @@ use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the timezone handling of datetime and datelist element types.
@@ -16,15 +19,9 @@ use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
  * A range of different permutations of #default_value and #date_timezone
  * for an element are setup in a single form by the buildForm() method, and
  * tested in various ways for both element types.
- *
- * @group Form
  */
+#[Group('Form')]
 class TimezoneTest extends EntityKernelTestBase implements FormInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * The date used in tests.
@@ -203,7 +200,7 @@ class TimezoneTest extends EntityKernelTestBase implements FormInterface {
    * save the form, otherwise stored times may be changed without the user
    * changing the element's values.
    */
-  public function testDatetimeElementTimesUnderstoodCorrectly() {
+  public function testDatetimeElementTimesUnderstoodCorrectly(): void {
     $this->assertTimesUnderstoodCorrectly('datetime', ['date', 'time']);
   }
 
@@ -212,7 +209,7 @@ class TimezoneTest extends EntityKernelTestBase implements FormInterface {
    *
    * See testDatetimeElementTimesUnderstoodCorrectly() for more explanation.
    */
-  public function testDatelistElementTimesUnderstoodCorrectly() {
+  public function testDatelistElementTimesUnderstoodCorrectly(): void {
     $this->assertTimesUnderstoodCorrectly('datelist', [
       'day',
       'month',
@@ -230,7 +227,7 @@ class TimezoneTest extends EntityKernelTestBase implements FormInterface {
    * accurately reflect the timezone that will be used to interpret times
    * entered through the element.
    */
-  public function testDatetimeTimezonePropertyProcessed() {
+  public function testDatetimeTimezonePropertyProcessed(): void {
     $this->assertDateTimezonePropertyProcessed('datetime');
   }
 
@@ -239,7 +236,7 @@ class TimezoneTest extends EntityKernelTestBase implements FormInterface {
    *
    * See testDatetimeTimezonePropertyProcessed() for more explanation.
    */
-  public function testDatelistTimezonePropertyProcessed() {
+  public function testDatelistTimezonePropertyProcessed(): void {
     $this->assertDateTimezonePropertyProcessed('datelist');
   }
 
@@ -340,7 +337,7 @@ class TimezoneTest extends EntityKernelTestBase implements FormInterface {
 
     // Check the #date_timezone property on each processed test element.
     $wrongTimezones = [];
-    foreach ($form_state->getCompleteForm() as $elementName => $element) {
+    foreach ($form_state->getCompleteForm() as $element) {
       if (isset($element['#type']) && $element['#type'] === $this->elementType) {
         // Check the correct timezone is set on the value object.
         $actualTimezone = array_search($element['#date_timezone'], $this->timezones, TRUE);

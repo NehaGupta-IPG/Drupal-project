@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Core\Render\RenderContext;
@@ -11,11 +13,13 @@ use Drupal\views\Views;
  * Tests the generic field handler.
  *
  * @group views
- * @group #slow
  * @see \Drupal\views\Plugin\views\field\FieldPluginBase
  */
 class FieldKernelTest extends ViewsKernelTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['user'];
 
   /**
@@ -48,7 +52,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
   /**
    * Tests that the render function is called.
    */
-  public function testRender() {
+  public function testRender(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
@@ -66,7 +70,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
   /**
    * Tests all things related to the query.
    */
-  public function testQuery() {
+  public function testQuery(): void {
     // Tests adding additional fields to the query.
     $view = Views::getView('test_view');
     $view->initHandlers();
@@ -131,7 +135,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
   /**
    * Tests general rewriting of the output.
    */
-  public function testRewrite() {
+  public function testRewrite(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
@@ -158,7 +162,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
   /**
    * Tests rewriting of the output with HTML.
    */
-  public function testRewriteHtmlWithTokens() {
+  public function testRewriteHtmlWithTokens(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
@@ -187,7 +191,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
   /**
    * Tests rewriting of the output with HTML and aggregation.
    */
-  public function testRewriteHtmlWithTokensAndAggregation() {
+  public function testRewriteHtmlWithTokensAndAggregation(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
@@ -219,7 +223,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
   /**
    * Tests the arguments tokens on field level.
    */
-  public function testArgumentTokens() {
+  public function testArgumentTokens(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
@@ -257,7 +261,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
   /**
    * Tests the field tokens, row level and field level.
    */
-  public function testFieldTokens() {
+  public function testFieldTokens(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
@@ -356,7 +360,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
   /**
    * Tests the exclude setting.
    */
-  public function testExclude() {
+  public function testExclude(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $view = Views::getView('test_field_output');
@@ -383,7 +387,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
   /**
    * Tests everything related to empty output of a field.
    */
-  public function testEmpty() {
+  public function testEmpty(): void {
     $this->_testHideIfEmpty();
     $this->_testEmptyText();
   }
@@ -394,7 +398,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
    * This tests alters the result to get easier and less coupled results. It is
    * important that assertSame() is used in this test since in PHP 0 == ''.
    */
-  public function _testHideIfEmpty() {
+  public function _testHideIfEmpty(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
@@ -528,7 +532,8 @@ class FieldKernelTest extends ViewsKernelTestBase {
     });
     $this->assertSame($random_name, (string) $render, 'If the rewritten string is not empty, "0" should not be treated as empty.');
 
-    // Test when results are rewritten to an empty string and non-zero empty results are hidden.
+    // Test when results are rewritten to an empty string and non-zero empty
+    // results are hidden.
     $view->field['name']->options['hide_alter_empty'] = TRUE;
     $view->field['name']->options['hide_empty'] = TRUE;
     $view->field['name']->options['empty_zero'] = FALSE;
@@ -675,7 +680,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
   /**
    * Tests the usage of the empty text.
    */
-  public function _testEmptyText() {
+  public function _testEmptyText(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
@@ -725,7 +730,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
   /**
    * Tests views_handler_field::isValueEmpty().
    */
-  public function testIsValueEmpty() {
+  public function testIsValueEmpty(): void {
     $view = Views::getView('test_view');
     $view->initHandlers();
     $field = $view->field['name'];
@@ -747,7 +752,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
   /**
    * Tests whether the filters are click sortable as expected.
    */
-  public function testClickSortable() {
+  public function testClickSortable(): void {
     // Test that clickSortable is TRUE by default.
     $item = [
       'table' => 'views_test_data',
@@ -770,7 +775,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
   /**
    * Tests the trimText method.
    */
-  public function testTrimText() {
+  public function testTrimText(): void {
     // Test unicode. See https://www.drupal.org/node/513396#comment-2839416.
     // cSpell:disable
     $text = [
@@ -803,7 +808,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
       $this->assertEquals($expect[$key], $result_text);
     }
 
-    // Test also word_boundary
+    // Test also word_boundary.
     $alter['word_boundary'] = TRUE;
     $expect = [
       'Tuy nhiên',

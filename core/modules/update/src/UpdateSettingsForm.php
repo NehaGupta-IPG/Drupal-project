@@ -36,10 +36,13 @@ class UpdateSettingsForm extends ConfigFormBase {
     $form['update_check_frequency'] = [
       '#type' => 'radios',
       '#title' => $this->t('Check for updates'),
-      '#config_target' => 'update.settings:check.interval_days',
+      '#config_target' => new ConfigTarget(
+        'update.settings',
+        'check.interval_days',
+        toConfig: fn($value) => intval($value)),
       '#options' => [
-        '1' => $this->t('Daily'),
-        '7' => $this->t('Weekly'),
+        1 => $this->t('Daily'),
+        7 => $this->t('Weekly'),
       ],
       '#description' => $this->t('Select how frequently you want to automatically check for new releases of your currently installed modules and themes.'),
     ];
@@ -123,7 +126,7 @@ class UpdateSettingsForm extends ConfigFormBase {
    *   The value to be stored in config.
    */
   public static function multiLineStringToArray(string $value): array {
-    return array_map('trim', explode("\n", trim($value)));
+    return trim($value) ? array_map('trim', explode("\n", $value)) : [];
   }
 
   /**

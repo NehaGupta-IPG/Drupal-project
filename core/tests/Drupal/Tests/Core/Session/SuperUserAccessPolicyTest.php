@@ -12,13 +12,17 @@ use Drupal\Core\Session\CalculatedPermissionsItem;
 use Drupal\Core\Session\RefinableCalculatedPermissions;
 use Drupal\Core\Session\SuperUserAccessPolicy;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @coversDefaultClass \Drupal\Core\Session\SuperUserAccessPolicy
- * @group Session
+ * Tests Drupal\Core\Session\SuperUserAccessPolicy.
  */
+#[CoversClass(SuperUserAccessPolicy::class)]
+#[Group('Session')]
 class SuperUserAccessPolicyTest extends UnitTestCase {
 
   /**
@@ -44,7 +48,9 @@ class SuperUserAccessPolicyTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::applies
+   * Tests applies.
+   *
+   * @legacy-covers ::applies
    */
   public function testApplies(): void {
     $this->assertTrue($this->accessPolicy->applies(AccessPolicyInterface::SCOPE_DRUPAL));
@@ -60,9 +66,9 @@ class SuperUserAccessPolicyTest extends UnitTestCase {
    * @param bool $expect_admin_rights
    *   Whether to expect admin rights to be granted.
    *
-   * @covers ::calculatePermissions
-   * @dataProvider calculatePermissionsProvider
+   * @legacy-covers ::calculatePermissions
    */
+  #[DataProvider('calculatePermissionsProvider')]
   public function testCalculatePermissions(int $uid, bool $expect_admin_rights): void {
     $account = $this->prophesize(AccountInterface::class);
     $account->id()->willReturn($uid);
@@ -86,7 +92,7 @@ class SuperUserAccessPolicyTest extends UnitTestCase {
    * @return array
    *   A list of test scenarios.
    */
-  public function calculatePermissionsProvider(): array {
+  public static function calculatePermissionsProvider(): array {
     $cases['is-super-user'] = [1, TRUE];
     $cases['is-normal-user'] = [2, FALSE];
     return $cases;
@@ -98,9 +104,9 @@ class SuperUserAccessPolicyTest extends UnitTestCase {
    * @param int $uid
    *   The UID for the account the policy checks.
    *
-   * @covers ::alterPermissions
-   * @dataProvider alterPermissionsProvider
+   * @legacy-covers ::alterPermissions
    */
+  #[DataProvider('alterPermissionsProvider')]
   public function testAlterPermissions(int $uid): void {
     $account = $this->prophesize(AccountInterface::class);
     $account->id()->willReturn($uid);
@@ -122,7 +128,7 @@ class SuperUserAccessPolicyTest extends UnitTestCase {
    * @return array
    *   A list of test scenarios.
    */
-  public function alterPermissionsProvider(): array {
+  public static function alterPermissionsProvider(): array {
     $cases['is-super-user'] = [1];
     $cases['is-normal-user'] = [2];
     return $cases;
@@ -131,7 +137,7 @@ class SuperUserAccessPolicyTest extends UnitTestCase {
   /**
    * Tests the getPersistentCacheContexts method.
    *
-   * @covers ::getPersistentCacheContexts
+   * @legacy-covers ::getPersistentCacheContexts
    */
   public function testGetPersistentCacheContexts(): void {
     $this->assertSame(['user.is_super_user'], $this->accessPolicy->getPersistentCacheContexts(AccessPolicyInterface::SCOPE_DRUPAL));

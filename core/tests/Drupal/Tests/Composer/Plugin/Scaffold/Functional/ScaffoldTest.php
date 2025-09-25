@@ -8,7 +8,8 @@ use Composer\Util\Filesystem;
 use Drupal\Tests\Composer\Plugin\Scaffold\AssertUtilsTrait;
 use Drupal\Tests\Composer\Plugin\Scaffold\Fixtures;
 use Drupal\Tests\Composer\Plugin\Scaffold\ScaffoldTestResult;
-use Drupal\Tests\PhpUnitCompatibilityTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -16,12 +17,10 @@ use PHPUnit\Framework\TestCase;
  *
  * The purpose of this test file is to exercise all of the different kinds of
  * scaffold operations: copy, symlinks, skips and so on.
- *
- * @group Scaffold
  */
+#[Group('Scaffold')]
 class ScaffoldTest extends TestCase {
   use AssertUtilsTrait;
-  use PhpUnitCompatibilityTrait;
 
   /**
    * The root of this project.
@@ -92,7 +91,7 @@ class ScaffoldTest extends TestCase {
    * @return string
    *   The path to the created System-Under-Test.
    */
-  protected function createSut($fixture_name, array $replacements = []) {
+  protected function createSut($fixture_name, array $replacements = []): string {
     $sut = $this->fixturesDir . '/' . $fixture_name;
     // Erase just our sut, to ensure it is clean. Recopy all of the fixtures.
     $this->fileSystem->remove($sut);
@@ -169,10 +168,9 @@ class ScaffoldTest extends TestCase {
    *   The expected exception message.
    * @param bool $is_link
    *   Whether or not symlinking should be used.
-   *
-   * @dataProvider scaffoldExpectedExceptionTestValues
    */
-  public function testScaffoldWithExpectedException($fixture_name, $expected_exception_message, $is_link) {
+  #[DataProvider('scaffoldExpectedExceptionTestValues')]
+  public function testScaffoldWithExpectedException($fixture_name, $expected_exception_message, $is_link): void {
     // Test scaffold. Expect an error.
     $this->expectException(\Exception::class);
     $this->expectExceptionMessage($expected_exception_message);
@@ -182,7 +180,7 @@ class ScaffoldTest extends TestCase {
   /**
    * Try to scaffold a project that does not scaffold anything.
    */
-  public function testEmptyProject() {
+  public function testEmptyProject(): void {
     $fixture_name = 'empty-fixture';
 
     $result = $this->scaffoldSut($fixture_name, FALSE, FALSE);
@@ -192,7 +190,7 @@ class ScaffoldTest extends TestCase {
   /**
    * Try to scaffold a project that allows a project with no scaffold files.
    */
-  public function testProjectThatScaffoldsEmptyProject() {
+  public function testProjectThatScaffoldsEmptyProject(): void {
     $fixture_name = 'project-allowing-empty-fixture';
     $result = $this->scaffoldSut($fixture_name, FALSE, FALSE);
     $this->assertStringContainsString('The allowed package fixtures/empty-fixture does not provide a file mapping for Composer Scaffold', $result->scaffoldOutput());
@@ -200,6 +198,9 @@ class ScaffoldTest extends TestCase {
     $this->assertAutoloadFileCorrect($result->docroot());
   }
 
+  /**
+   * Provides test values for testScaffoldOverridingSettingsExcludingHtaccess.
+   */
   public static function scaffoldOverridingSettingsExcludingHtaccessValues() {
     return [
       [
@@ -226,10 +227,9 @@ class ScaffoldTest extends TestCase {
    *   Whether to use symlinks for 'replace' operations.
    * @param bool $relocated_docroot
    *   Whether the named fixture has a relocated document root.
-   *
-   * @dataProvider scaffoldOverridingSettingsExcludingHtaccessValues
    */
-  public function testScaffoldOverridingSettingsExcludingHtaccess($fixture_name, $is_link, $relocated_docroot) {
+  #[DataProvider('scaffoldOverridingSettingsExcludingHtaccessValues')]
+  public function testScaffoldOverridingSettingsExcludingHtaccess($fixture_name, $is_link, $relocated_docroot): void {
     $result = $this->scaffoldSut($fixture_name, $is_link, $relocated_docroot);
 
     $this->assertCommonDrupalAssetsWereScaffolded($result->docroot(), $is_link);
@@ -245,7 +245,7 @@ class ScaffoldTest extends TestCase {
    * replaced, and that files that were not supposed to be replaced remain
    * unchanged.
    */
-  public function testDrupalDrupalFileWasReplaced() {
+  public function testDrupalDrupalFileWasReplaced(): void {
     $fixture_name = 'drupal-drupal-test-overwrite';
     $result = $this->scaffoldSut($fixture_name, FALSE, FALSE);
 
@@ -286,7 +286,7 @@ include __DIR__ . "/settings-custom-additions.php";',
    * @param bool $is_link
    *   Whether or not symlinking should be used.
    */
-  protected static function scaffoldAppendTestValuesToPermute($is_link) {
+  protected static function scaffoldAppendTestValuesToPermute($is_link): array {
     return [
       [
         'drupal-drupal-test-append',
@@ -338,12 +338,12 @@ include __DIR__ . "/settings-custom-additions.php";',
    * @param string $scaffold_file_path
    *   Relative path to the scaffold file target we are testing.
    * @param string $scaffold_file_contents
-   *   A string expected to be contained inside the scaffold file we are testing.
+   *   A string expected to be contained inside the scaffold file we are
+   *   testing.
    * @param string $scaffoldOutputContains
    *   A string expected to be contained in the scaffold command output.
-   *
-   * @dataProvider scaffoldAppendTestValues
    */
+  #[DataProvider('scaffoldAppendTestValues')]
   public function testDrupalDrupalFileWasAppended(string $fixture_name, bool $is_link, string $scaffold_file_path, string $scaffold_file_contents, string $scaffoldOutputContains): void {
     $result = $this->scaffoldSut($fixture_name, $is_link, FALSE);
     $this->assertStringContainsString($scaffoldOutputContains, $result->scaffoldOutput());
@@ -408,7 +408,6 @@ include __DIR__ . "/settings-custom-additions.php";',
     $this->assertScaffoldedFile($docroot . '/sites/example.sites.php', $is_link, 'Test version of example.sites.php from drupal/core.');
     $this->assertScaffoldedFile($docroot . '/index.php', $is_link, 'Test version of index.php from drupal/core.');
     $this->assertScaffoldedFile($docroot . '/update.php', $is_link, 'Test version of update.php from drupal/core.');
-    $this->assertScaffoldedFile($docroot . '/web.config', $is_link, 'Test version of web.config from drupal/core.');
   }
 
   /**

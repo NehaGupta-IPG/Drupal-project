@@ -5,19 +5,23 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Render;
 
 use Drupal\Core\Access\AccessResult;
-use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Render\Element;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Render\Element
- * @group Render
+ * Tests Drupal\Core\Render\Element.
  */
+#[CoversClass(Element::class)]
+#[Group('Render')]
 class ElementTest extends UnitTestCase {
 
   /**
    * Tests the property() method.
    */
-  public function testProperty() {
+  public function testProperty(): void {
     $this->assertTrue(Element::property('#property'));
     $this->assertFalse(Element::property('property'));
     $this->assertFalse(Element::property('property#'));
@@ -27,7 +31,7 @@ class ElementTest extends UnitTestCase {
   /**
    * Tests the properties() method.
    */
-  public function testProperties() {
+  public function testProperties(): void {
     $element = [
       '#property1' => 'property1',
       '#property2' => 'property2',
@@ -43,7 +47,7 @@ class ElementTest extends UnitTestCase {
   /**
    * Tests the child() method.
    */
-  public function testChild() {
+  public function testChild(): void {
     $this->assertFalse(Element::child('#property'));
     $this->assertTrue(Element::child('property'));
     $this->assertTrue(Element::child('property#'));
@@ -52,7 +56,7 @@ class ElementTest extends UnitTestCase {
   /**
    * Tests the children() method.
    */
-  public function testChildren() {
+  public function testChildren(): void {
     $element = [
       'child2' => ['#weight' => 10],
       'child1' => ['#weight' => 0],
@@ -104,7 +108,7 @@ class ElementTest extends UnitTestCase {
   /**
    * Tests the children() method with an invalid key.
    */
-  public function testInvalidChildren() {
+  public function testInvalidChildren(): void {
     $element = [
       'foo' => 'bar',
     ];
@@ -116,7 +120,7 @@ class ElementTest extends UnitTestCase {
   /**
    * Tests the children() method with an ignored key/value pair.
    */
-  public function testIgnoredChildren() {
+  public function testIgnoredChildren(): void {
     $element = [
       'foo' => NULL,
     ];
@@ -130,10 +134,9 @@ class ElementTest extends UnitTestCase {
    *   The test element array.
    * @param array $expected_keys
    *   The expected keys to be returned from Element::getVisibleChildren().
-   *
-   * @dataProvider providerVisibleChildren
    */
-  public function testVisibleChildren(array $element, array $expected_keys) {
+  #[DataProvider('providerVisibleChildren')]
+  public function testVisibleChildren(array $element, array $expected_keys): void {
     $this->assertSame($expected_keys, Element::getVisibleChildren($element));
   }
 
@@ -141,6 +144,7 @@ class ElementTest extends UnitTestCase {
    * Data provider for testVisibleChildren.
    *
    * @return array
+   *   An array of test cases.
    */
   public static function providerVisibleChildren() {
     return [
@@ -158,10 +162,9 @@ class ElementTest extends UnitTestCase {
 
   /**
    * Tests the setAttributes() method.
-   *
-   * @dataProvider providerTestSetAttributes
    */
-  public function testSetAttributes($element, $map, $expected_element) {
+  #[DataProvider('providerTestSetAttributes')]
+  public function testSetAttributes($element, $map, $expected_element): void {
     Element::setAttributes($element, $map);
     $this->assertSame($expected_element, $element);
   }
@@ -179,11 +182,12 @@ class ElementTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::isEmpty
+   * Tests is empty.
    *
-   * @dataProvider providerTestIsEmpty
+   * @legacy-covers ::isEmpty
    */
-  public function testIsEmpty(array $element, $expected) {
+  #[DataProvider('providerTestIsEmpty')]
+  public function testIsEmpty(array $element, $expected): void {
     $this->assertSame(Element::isEmpty($element), $expected);
   }
 
@@ -226,17 +230,19 @@ class ElementTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::isRenderArray
-   * @dataProvider dataProviderIsRenderArray
+   * Tests is render array.
+   *
+   * @legacy-covers ::isRenderArray
    */
-  public function testIsRenderArray($build, $expected) {
+  #[DataProvider('dataProviderIsRenderArray')]
+  public function testIsRenderArray($build, $expected): void {
     $this->assertSame(
       $expected,
       Element::isRenderArray($build)
     );
   }
 
-  public function dataProviderIsRenderArray() {
+  public static function dataProviderIsRenderArray() {
     return [
       'valid markup render array' => [['#markup' => 'hello world'], TRUE],
       'invalid "foo" string' => [['foo', '#markup' => 'hello world'], FALSE],

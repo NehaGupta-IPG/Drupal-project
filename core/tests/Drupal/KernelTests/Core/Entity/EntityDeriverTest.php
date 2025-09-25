@@ -1,19 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\comment\Entity\CommentType;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Core\Entity\Plugin\DataType\Deriver\EntityDeriver;
+use Drupal\entity_test\EntityTestHelper;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests EntityDeriver functionality.
- *
- * @coversDefaultClass \Drupal\Core\Entity\Plugin\DataType\Deriver\EntityDeriver
- *
- * @group Entity
  */
+#[CoversClass(EntityDeriver::class)]
+#[Group('Entity')]
 class EntityDeriverTest extends KernelTestBase {
 
   /**
@@ -27,7 +32,6 @@ class EntityDeriverTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'field',
     'user',
     'node',
@@ -48,17 +52,16 @@ class EntityDeriverTest extends KernelTestBase {
       'label' => 'Default comment',
       'target_entity_type_id' => 'node',
     ])->save();
-    entity_test_create_bundle('foo', NULL, 'entity_test_no_bundle');
-    entity_test_create_bundle('entity_test_no_bundle', NULL, 'entity_test_no_bundle');
+    EntityTestHelper::createBundle('foo', NULL, 'entity_test_no_bundle');
+    EntityTestHelper::createBundle('entity_test_no_bundle', NULL, 'entity_test_no_bundle');
     $this->typedDataManager = $this->container->get('typed_data_manager');
   }
 
   /**
    * Tests that types are derived for entity types with and without bundles.
-   *
-   * @dataProvider derivativesProvider
    */
-  public function testDerivatives($data_type, $expect_exception) {
+  #[DataProvider('derivativesProvider')]
+  public function testDerivatives($data_type, $expect_exception): void {
     if ($expect_exception) {
       $this->expectException(PluginNotFoundException::class);
     }

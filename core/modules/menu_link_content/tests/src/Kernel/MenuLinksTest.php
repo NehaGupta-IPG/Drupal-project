@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\menu_link_content\Kernel;
 
+use Drupal\Core\Link;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\entity_test\Entity\EntityTestExternal;
 use Drupal\KernelTests\KernelTestBase;
@@ -136,7 +139,7 @@ class MenuLinksTest extends KernelTestBase {
   /**
    * Assert that a link entity's created timestamp is set.
    */
-  public function testCreateLink() {
+  public function testCreateLink(): void {
     $options = [
       'menu_name' => 'menu-test',
       'bundle' => 'menu_link_content',
@@ -160,7 +163,7 @@ class MenuLinksTest extends KernelTestBase {
   /**
    * Tests that menu link pointing to entities get removed on entity remove.
    */
-  public function testMenuLinkOnEntityDelete() {
+  public function testMenuLinkOnEntityDelete(): void {
 
     // Create user.
     $user = User::create(['name' => 'username']);
@@ -207,9 +210,9 @@ class MenuLinksTest extends KernelTestBase {
   }
 
   /**
-   * Tests automatic reparenting of menu links.
+   * Tests automatic update of parent menu links.
    */
-  public function testMenuLinkReparenting($module = 'menu_test') {
+  public function testMenuLinkParentUpdate($module = 'menu_test'): void {
     // Check the initial hierarchy.
     $links = $this->createLinkHierarchy($module);
 
@@ -275,7 +278,7 @@ class MenuLinksTest extends KernelTestBase {
   /**
    * Tests the MenuLinkContent::preDelete function.
    */
-  public function testMenuLinkContentReparenting() {
+  public function testMenuLinkContentParentUpdate(): void {
     // Add new menu items in a hierarchy.
     $parent = MenuLinkContent::create([
       'title' => $this->randomMachineName(8),
@@ -309,7 +312,7 @@ class MenuLinksTest extends KernelTestBase {
   /**
    * Tests uninstalling a module providing default links.
    */
-  public function testModuleUninstalledMenuLinks() {
+  public function testModuleUninstalledMenuLinks(): void {
     \Drupal::service('module_installer')->install(['menu_test']);
     \Drupal::service('plugin.manager.menu.link')->rebuild();
     $menu_links = $this->menuLinkManager->loadLinksByRoute('menu_test.menu_test');
@@ -329,7 +332,7 @@ class MenuLinksTest extends KernelTestBase {
    *
    * @covers \Drupal\menu_link_content\Plugin\Validation\Constraint\MenuTreeHierarchyConstraintValidator::validate
    */
-  public function testPendingRevisions() {
+  public function testPendingRevisions(): void {
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = \Drupal::entityTypeManager()->getStorage('menu_link_content');
 
@@ -473,6 +476,34 @@ class MenuLinksTest extends KernelTestBase {
     // the links menu name doesn't exist.
     $build = \Drupal::service('entity.form_builder')->getForm($menu_link);
     static::assertIsArray($build);
+  }
+
+  /**
+   * Assert that attributes are filtered.
+   */
+  public function testXssFiltering(): void {
+    $options = [
+      'menu_name' => 'menu-test',
+      'bundle' => 'menu_link_content',
+      'link' => [
+        [
+          'uri' => 'https://www.drupal.org/',
+          'options' => [
+            'attributes' => [
+              'class' => 'classy',
+              'onmouseover' => 'alert(document.cookie)',
+            ],
+          ],
+        ],
+      ],
+      'title' => 'Link test',
+    ];
+    $link = MenuLinkContent::create($options);
+    $link->save();
+    assert($link instanceof MenuLinkContent);
+    $output = Link::fromTextAndUrl($link->getTitle(), $link->getUrlObject())->toString()->getGeneratedLink();
+    $this->assertStringContainsString('<a href="https://www.drupal.org/" class="classy">', $output);
+    $this->assertStringNotContainsString('onmouseover=', $output);
   }
 
 }

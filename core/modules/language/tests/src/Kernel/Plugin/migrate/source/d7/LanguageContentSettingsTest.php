@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\language\Kernel\Plugin\migrate\source\d7;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -10,6 +12,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  * @covers \Drupal\language\Plugin\migrate\source\d7\LanguageContentSettings
  *
  * @group language
+ * @coversDefaultClass \Drupal\language\Plugin\migrate\source\d7\LanguageContentSettings
  */
 class LanguageContentSettingsTest extends MigrateSqlSourceTestBase {
 

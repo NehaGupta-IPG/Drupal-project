@@ -7,12 +7,14 @@ namespace Drupal\Tests\views\Functional\Plugin;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the views page display plugin.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class DisplayPageWebTest extends ViewTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -25,19 +27,9 @@ class DisplayPageWebTest extends ViewTestBase {
   public static $testViews = ['test_page_display', 'test_page_display_arguments', 'test_page_display_menu', 'test_page_display_path'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'views_ui'];
-
-  /**
-   * {@inheritdoc}
-   *
-   * @todo Remove and fix test to not rely on super user.
-   * @see https://www.drupal.org/project/drupal/issues/3437620
-   */
-  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * {@inheritdoc}
@@ -57,7 +49,7 @@ class DisplayPageWebTest extends ViewTestBase {
   /**
    * Tests arguments.
    */
-  public function testArguments() {
+  public function testArguments(): void {
     $xpath = '//span[@class="field-content"]';
 
     // Ensure that all the entries are returned.
@@ -102,7 +94,7 @@ class DisplayPageWebTest extends ViewTestBase {
   /**
    * Tests menu settings of page displays.
    */
-  public function testPageDisplayMenu() {
+  public function testPageDisplayMenu(): void {
     // Check local tasks.
     $this->drupalGet('test_page_display_menu');
     $this->assertSession()->statusCodeEquals(200);
@@ -139,7 +131,7 @@ class DisplayPageWebTest extends ViewTestBase {
   /**
    * Tests the title is not displayed in the output.
    */
-  public function testTitleOutput() {
+  public function testTitleOutput(): void {
     $this->drupalGet('test_page_display_200');
 
     $view = Views::getView('test_page_display');
@@ -150,8 +142,8 @@ class DisplayPageWebTest extends ViewTestBase {
   /**
    * Tests the views page path functionality.
    */
-  public function testPagePaths() {
-    $this->drupalLogin($this->rootUser);
+  public function testPagePaths(): void {
+    $this->drupalLogin($this->createUser(['administer views']));
     $this->assertPagePath('0');
     $this->assertPagePath('9999');
     $this->assertPagePath('☺');

@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Menu;
 
+use Drupal\Core\Menu\LocalActionManager;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the local action manager.
- *
- * @coversDefaultClass \Drupal\Core\Menu\LocalActionManager
- * @group Menu
  */
+#[CoversClass(LocalActionManager::class)]
+#[Group('Menu')]
 class LocalActionManagerTest extends KernelTestBase {
 
   /**
@@ -20,7 +24,7 @@ class LocalActionManagerTest extends KernelTestBase {
   /**
    * Tests the cacheability of local actions.
    */
-  public function testCacheability() {
+  public function testCacheability(): void {
     /** @var \Drupal\Core\Menu\LocalActionManager $local_action_manager */
     $local_action_manager = \Drupal::service('plugin.manager.menu.local_action');
     $build = [

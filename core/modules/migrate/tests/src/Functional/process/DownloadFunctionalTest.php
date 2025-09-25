@@ -8,14 +8,15 @@ use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore destid
-
 /**
  * Tests the 'download' process plugin.
- *
- * @group migrate
  */
+#[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class DownloadFunctionalTest extends BrowserTestBase {
 
   /**
@@ -31,7 +32,7 @@ class DownloadFunctionalTest extends BrowserTestBase {
   /**
    * Tests that an exception is thrown bu migration continues with the next row.
    */
-  public function testExceptionThrow() {
+  public function testExceptionThrow(): void {
     $invalid_url = "{$this->baseUrl}/not-existent-404";
     $valid_url = "{$this->baseUrl}/core/misc/favicon.ico";
 

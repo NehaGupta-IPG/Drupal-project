@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Session;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Test case for getting all permissions as a super user.
  *
- * @covers \Drupal\Core\DependencyInjection\Compiler\SuperUserAccessPolicyPass
- * @group Session
+ * @legacy-covers \Drupal\Core\DependencyInjection\Compiler\SuperUserAccessPolicyPass
  */
+#[Group('Session')]
 class SuperUserPermissionsTest extends KernelTestBase {
 
   use UserCreationTrait;

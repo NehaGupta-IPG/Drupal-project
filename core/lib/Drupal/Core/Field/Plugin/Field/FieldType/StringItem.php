@@ -3,27 +3,28 @@
 namespace Drupal\Core\Field\Plugin\Field\FieldType;
 
 use Drupal\Component\Utility\Random;
+use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Defines the 'string' entity field type.
- *
- * @FieldType(
- *   id = "string",
- *   label = @Translation("Text (plain)"),
- *   description = {
- *     @Translation("Ideal for titles and names"),
- *     @Translation("Efficient storage for short text"),
- *     @Translation("Requires specifying a maximum length"),
- *     @Translation("Good for fields with known or predictable length"),
- *   },
- *   category = "plain_text",
- *   default_widget = "string_textfield",
- *   default_formatter = "string"
- * )
  */
+#[FieldType(
+  id: "string",
+  label: new TranslatableMarkup("Text (plain)"),
+  description: [
+    new TranslatableMarkup("Ideal for titles and names"),
+    new TranslatableMarkup("Efficient storage for short text"),
+    new TranslatableMarkup("Requires specifying a maximum length"),
+    new TranslatableMarkup("Good for fields with known or predictable length"),
+  ],
+  category: "plain_text",
+  default_widget: "string_textfield",
+  default_formatter: "string"
+)]
 class StringItem extends StringItemBase {
 
   /**
@@ -61,7 +62,10 @@ class StringItem extends StringItemBase {
       $constraint_manager = \Drupal::typedDataManager()->getValidationConstraintManager();
       $options['max'] = $max_length;
       if ($label = $this->getFieldDefinition()->getLabel()) {
-        $options['maxMessage'] = $this->t('%name: may not be longer than @max characters.', ['%name' => $label, '@max' => $max_length]);
+        $options['maxMessage'] = $this->t('%name: may not be longer than @max characters.', [
+          '%name' => $label,
+          '@max' => $max_length,
+        ]);
       }
       $constraints[] = $constraint_manager->create('ComplexData', [
         'value' => [

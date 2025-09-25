@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Config\Storage;
 
-use Drupal\Core\Config\StorageManagerInterface;
 use Drupal\Core\Config\ManagedStorage;
 use Drupal\Core\Config\MemoryStorage;
+use Drupal\Core\Config\StorageManagerInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests ManagedStorage operations.
- *
- * @group config
  */
+#[Group('config')]
 class ManagedStorageTest extends ConfigStorageTestBase implements StorageManagerInterface {
 
   /**
@@ -40,28 +42,28 @@ class ManagedStorageTest extends ConfigStorageTestBase implements StorageManager
   /**
    * {@inheritdoc}
    */
-  protected function insert($name, $data) {
+  protected function insert($name, $data): void {
     $this->storage->write($name, $data);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function update($name, $data) {
+  protected function update($name, $data): void {
     $this->storage->write($name, $data);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function delete($name) {
+  protected function delete($name): void {
     $this->storage->delete($name);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function testInvalidStorage() {
+  public function testInvalidStorage(): void {
     $this->markTestSkipped('ManagedStorage cannot be invalid.');
   }
 

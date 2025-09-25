@@ -5,26 +5,26 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\Color;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Tests Color utility class conversions.
- *
- * @group Utility
  */
+#[Group('Utility')]
 class ColorTest extends TestCase {
 
   /**
-   * @covers \Drupal\Component\Utility\Color::validateHex
    *
    * @param bool $expected
    *   The expected result of validation.
    * @param string $value
    *   The hex color value.
-   *
-   * @dataProvider providerTestValidateHex
+   * @legacy-covers \Drupal\Component\Utility\Color::validateHex
    */
-  public function testValidateHex($expected, $value) {
+  #[DataProvider('providerTestValidateHex')]
+  public function testValidateHex($expected, $value): void {
     $this->assertSame($expected, Color::validateHex($value));
   }
 
@@ -77,10 +77,9 @@ class ColorTest extends TestCase {
    *   The expected rgb color value.
    * @param bool $invalid
    *   Whether this value is invalid and exception should be expected.
-   *
-   * @dataProvider providerTestHexToRgb
    */
-  public function testHexToRgb($value, $expected, $invalid = FALSE) {
+  #[DataProvider('providerTestHexToRgb')]
+  public function testHexToRgb($value, $expected, $invalid = FALSE): void {
     if ($invalid) {
       $this->expectException('InvalidArgumentException');
     }
@@ -119,14 +118,14 @@ class ColorTest extends TestCase {
     // And some valid values.
     $valid = [
       // Shorthands without alpha.
-      ['hex' => '#000', 'rgb' => ['red' => 0, 'green' => 0, 'blue' => 0]],
-      ['hex' => '#fff', 'rgb' => ['red' => 255, 'green' => 255, 'blue' => 255]],
-      ['hex' => '#abc', 'rgb' => ['red' => 170, 'green' => 187, 'blue' => 204]],
-      ['hex' => 'cba', 'rgb' => ['red' => 204, 'green' => 187, 'blue' => 170]],
+      ['value' => '#000', 'expected' => ['red' => 0, 'green' => 0, 'blue' => 0]],
+      ['value' => '#fff', 'expected' => ['red' => 255, 'green' => 255, 'blue' => 255]],
+      ['value' => '#abc', 'expected' => ['red' => 170, 'green' => 187, 'blue' => 204]],
+      ['value' => 'cba', 'expected' => ['red' => 204, 'green' => 187, 'blue' => 170]],
       // Full without alpha.
-      ['hex' => '#000000', 'rgb' => ['red' => 0, 'green' => 0, 'blue' => 0]],
-      ['hex' => '#ffffff', 'rgb' => ['red' => 255, 'green' => 255, 'blue' => 255]],
-      ['hex' => '#010203', 'rgb' => ['red' => 1, 'green' => 2, 'blue' => 3]],
+      ['value' => '#000000', 'expected' => ['red' => 0, 'green' => 0, 'blue' => 0]],
+      ['value' => '#ffffff', 'expected' => ['red' => 255, 'green' => 255, 'blue' => 255]],
+      ['value' => '#010203', 'expected' => ['red' => 1, 'green' => 2, 'blue' => 3]],
     ];
     return array_merge($invalid, $valid);
   }
@@ -138,10 +137,9 @@ class ColorTest extends TestCase {
    *   The rgb color value.
    * @param string $expected
    *   The expected hex color value.
-   *
-   * @dataProvider providerTestRbgToHex
    */
-  public function testRgbToHex($value, $expected) {
+  #[DataProvider('providerTestRbgToHex')]
+  public function testRgbToHex($value, $expected): void {
     $this->assertSame($expected, Color::rgbToHex($value));
   }
 
@@ -163,7 +161,7 @@ class ColorTest extends TestCase {
       [['red' => 119, 'green' => 119, 'blue' => 119], '#777777'],
       [['red' => 1, 'green' => 2, 'blue' => 3], '#010203'],
     ];
-    // Input using indexed RGB array (e.g.: array(10, 10, 10)).
+    // Input using indexed RGB array (e.g.: [10, 10, 10]).
     foreach ($tests as $test) {
       $tests[] = [array_values($test[0]), $test[1]];
     }
@@ -205,10 +203,9 @@ class ColorTest extends TestCase {
    *   The input hex color value.
    * @param string $expected
    *   The expected normalized hex color value.
-   *
-   * @dataProvider providerTestNormalizeHexLength
    */
-  public function testNormalizeHexLength($value, $expected) {
+  #[DataProvider('providerTestNormalizeHexLength')]
+  public function testNormalizeHexLength($value, $expected): void {
     $this->assertSame($expected, Color::normalizeHexLength($value));
   }
 

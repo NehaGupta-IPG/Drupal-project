@@ -5,19 +5,20 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the views bulk form with batch action.
  *
- * @group action
  * @see \Drupal\action\Plugin\views\field\BulkForm
  */
+#[Group('action')]
+#[RunTestsInSeparateProcesses]
 class UserBatchActionTest extends BrowserTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'user',
@@ -25,13 +26,6 @@ class UserBatchActionTest extends BrowserTestBase {
     'views',
   ];
 
-  /**
-   * {@inheritdoc}
-   *
-   * @todo Remove and fix test to not rely on super user.
-   * @see https://www.drupal.org/project/drupal/issues/3437620
-   */
-  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * {@inheritdoc}
@@ -41,11 +35,11 @@ class UserBatchActionTest extends BrowserTestBase {
   /**
    * Tests user admin batch.
    */
-  public function testUserAction() {
+  public function testUserAction(): void {
     $themes = ['stark', 'olivero', 'claro'];
     $this->container->get('theme_installer')->install($themes);
 
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->createUser(['administer users']));
 
     foreach ($themes as $theme) {
       $this->config('system.theme')->set('default', $theme)->save();

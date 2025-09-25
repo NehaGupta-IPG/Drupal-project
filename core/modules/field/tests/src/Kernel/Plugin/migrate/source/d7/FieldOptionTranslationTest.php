@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\Plugin\migrate\source\d7;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -11,6 +13,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
  *
  * @covers \Drupal\field\Plugin\migrate\source\d7\FieldOptionTranslation
  * @group migrate_drupal
+ * @coversDefaultClass \Drupal\field\Plugin\migrate\source\d7\FieldOptionTranslation
  */
 class FieldOptionTranslationTest extends MigrateSqlSourceTestBase {
 
@@ -173,7 +176,7 @@ class FieldOptionTranslationTest extends MigrateSqlSourceTestBase {
         'i18n_status' => '0',
       ],
     ];
-    $test[0]['expected_results'] = [
+    $test[0]['expected_data'] = [
       [
         'i18n_lid' => '1',
         'textgroup' => 'field',

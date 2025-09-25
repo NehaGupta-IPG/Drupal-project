@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\Kernel;
 
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -44,7 +46,7 @@ class MediaEmbedFilterTranslationTest extends MediaEmbedFilterTestBase {
    *
    * @dataProvider providerTranslationSituations
    */
-  public function testTranslationSelection($text_langcode, $expected_title_langcode) {
+  public function testTranslationSelection($text_langcode, $expected_title_langcode): void {
     $text = $this->createEmbedCode([
       'data-entity-type' => 'media',
       'data-entity-uuid' => static::EMBEDDED_ENTITY_UUID,

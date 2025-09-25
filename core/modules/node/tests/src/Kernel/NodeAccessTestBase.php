@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel;
 
 use Drupal\Core\Session\AccountInterface;
@@ -56,8 +58,7 @@ abstract class NodeAccessTestBase extends KernelTestBase {
     $this->installSchema('node', 'node_access');
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
-    $this->installConfig('filter');
-    $this->installConfig('node');
+    $this->installConfig(['filter', 'node', 'user']);
 
     $this->accessHandler = \Drupal::entityTypeManager()->getAccessControlHandler('node');
 

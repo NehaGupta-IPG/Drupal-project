@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @covers \Drupal\Core\Entity\Plugin\Validation\Constraint\EntityHasFieldConstraintValidator
+ * Tests Entity Has Field Constraint Validator.
  *
- * @group Entity
+ * @legacy-covers \Drupal\Core\Entity\Plugin\Validation\Constraint\EntityHasFieldConstraintValidator
  */
+#[Group('Entity')]
 class EntityHasFieldConstraintValidatorTest extends EntityKernelTestBase {
 
   /**
@@ -26,7 +30,10 @@ class EntityHasFieldConstraintValidatorTest extends EntityKernelTestBase {
     $this->createUser();
   }
 
-  public function testValidation() {
+  /**
+   * Tests validation of an entity with a field.
+   */
+  public function testValidation(): void {
     $this->state->set('entity_test_constraints.build', [
       'EntityHasField' => 'body',
     ]);
