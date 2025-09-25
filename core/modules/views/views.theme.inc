@@ -867,9 +867,11 @@ function template_preprocess_views_view_unformatted(&$variables): void {
  */
 function template_preprocess_views_view_list(&$variables): void {
   $handler = $variables['view']->style_plugin;
+  if (empty($variables['list']['attributes'])) {
+    $variables['list']['attributes'] = new Attribute();
+  }
 
   // Fetch classes from handler options.
-  $variables['list']['attributes'] = new Attribute();
   if ($handler->options['class']) {
     $class = explode(' ', $handler->options['class']);
     $class = array_map('\Drupal\Component\Utility\Html::cleanCssIdentifier', $class);
