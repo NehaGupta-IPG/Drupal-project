@@ -15,9 +15,10 @@ class FormOptionsHelper {
   const OPTIONS_EMPTY_OPTION = '_none';
 
   /**
-   * Converts an array of options to HTML, for use in select list form elements.
+   * Converts an array of options to HTML.
    *
-   * This function calls itself recursively to obtain the values for each
+   * This is intended to be used with select list form elements. Recursion is
+   * used to get the values for each option group within the list of options.
    * optgroup within the list of options and when the function encounters an
    * object with an 'options' property inside $element['#options'].
    *
@@ -53,7 +54,8 @@ class FormOptionsHelper {
    *   call.
    *
    * @return array
-   *   An HTML string of options and optgroups for use in a select form element.
+   *   An HTML string of options and option groups for use in a select form
+   *   element.
    */
   public static function formSelectOptions(array $element, $choices = NULL): array {
     if (!isset($choices)) {
@@ -72,9 +74,9 @@ class FormOptionsHelper {
       unset($choices['#sort_start']);
     }
 
-    // array_key_exists() accommodates the rare event where $element['#value']
-    // is NULL. isset() fails in this situation.
-    $value_valid = isset($element['#value']) || array_key_exists('#value', $element);
+    // The function array_key_exists() accommodates the rare event where
+    // $element['#value'] is NULL. isset() fails in this situation.
+    $value_valid = array_key_exists('#value', $element);
     $value_is_array = $value_valid && is_array($element['#value']);
     // Check if the element is multiple select and no value has been selected.
     $empty_value = (empty($element['#value']) && !empty($element['#multiple']));
