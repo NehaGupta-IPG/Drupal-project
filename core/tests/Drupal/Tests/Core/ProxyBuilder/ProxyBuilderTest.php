@@ -45,7 +45,7 @@ class ProxyBuilderTest extends UnitTestCase {
     $result = $this->proxyBuilder->build($class);
 
     // @todo Solve the silly linebreak for an empty array.
-    //   @see \Drupal\Component\Utility::export()
+    // @see \Drupal\Component\Utility::export()
     $method_body = <<<'EOS'
 
 /**

@@ -288,7 +288,7 @@ EOS;
    * @return string
    *   The string representation of the type.
    */
-  protected function buildType(\ReflectionType $type, \ReflectionClass $declaring_class) {
+  protected function buildType(\ReflectionType $type, \ReflectionClass $declaring_class): string {
     $separator = $type instanceof \ReflectionIntersectionType ? '&' : '|';
     $type_names = [];
     $check_nullables = TRUE;
