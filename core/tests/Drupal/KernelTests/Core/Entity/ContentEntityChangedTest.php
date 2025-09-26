@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\entity_test\Entity\EntityTestMulChanged;
 use Drupal\entity_test\Entity\EntityTestMulRevChanged;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Mocks\TestMockedTime;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests basic EntityChangedInterface functionality.
  */
 #[Group('Entity')]
-#[Group('#slow')]
-class ContentEntityChangedTest extends EntityKernelTestBase {
+class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceModifierInterface {
 
   /**
    * {@inheritdoc}
@@ -43,6 +45,13 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
   protected $mulRevChangedStorage;
 
   /**
+   * The mocked time service.
+   *
+   * @var \Drupal\Mocks\TestMockedTime
+   */
+  protected $time;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -57,10 +66,23 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
 
     $this->mulChangedStorage = $this->entityTypeManager->getStorage('entity_test_mul_changed');
     $this->mulRevChangedStorage = $this->entityTypeManager->getStorage('entity_test_mulrev_changed');
+
+    $this->time = $this->container->get('datetime.time');
+    $this->time->setRequestTime(10_000);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function alter(ContainerBuilder $container) {
+    $service_definition = $container->getDefinition('datetime.time');
+    $service_definition->setClass(TestMockedTime::class);
   }
 
   /**
    * Tests basic EntityChangedInterface functionality.
+   *
+   * @group fuck
    */
   public function testChanged(): void {
     $user1 = $this->createUser();
@@ -75,23 +97,15 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
     ]);
     $entity->save();
 
-    $requestTime = \Drupal::time()->getRequestTime();
-    $this->assertGreaterThanOrEqual($requestTime, $entity->getChangedTime(), 'Changed time of original language is valid.');
-
-    // We can't assert equality here because the created time is set to the
-    // request time, while instances of ChangedTestItem use the current
-    // timestamp every time. Therefore we check if the changed timestamp is
-    // between the created time and now.
-    $this->assertTrue(
-      ($entity->getChangedTime() >= $entity->get('created')->value) &&
-      (($entity->getChangedTime() - $entity->get('created')->value) <= time() - $requestTime),
-      'Changed and created time of original language can be assumed to be identical.'
-    );
-
+    $requestTime = $this->time->getRequestTime();
+    $this->assertEquals($requestTime, $entity->getChangedTime(), 'Changed time of original language is valid.');
+    $this->assertEquals($requestTime, $entity->get('created')->value, 'Created time of original language is valid.');
     $this->assertEquals($entity->getChangedTimeAcrossTranslations(), $entity->getChangedTime(), 'Changed time of original language is the same as changed time across all translations.');
 
     $changed_en = $entity->getChangedTime();
 
+    // Advance the current time.
+    $this->time->incrementRequestTime();
     /** @var \Drupal\entity_test\Entity\EntityTestMulRevChanged $german */
     $german = $entity->addTranslation('de');
 
@@ -108,6 +122,8 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
 
     $changed_de = $german->getChangedTime();
 
+    // Advance the current time.
+    $this->time->incrementRequestTime();
     $entity->save();
 
     $this->assertEquals($changed_en, $entity->getChangedTime(), 'Changed time of original language did not change.');
@@ -133,8 +149,9 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
     $changed_en = $entity->getChangedTime();
     $changed_de = $german->getChangedTime();
 
+    // Advance the current time.
+    $this->time->incrementRequestTime();
     $entity->setOwner($user2);
-
     $entity->save();
 
     $this->assertTrue(
@@ -153,6 +170,8 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
 
     $changed_en = $entity->getChangedTime();
 
+    // Advance the current time.
+    $this->time->incrementRequestTime();
     // Save entity without any changes.
     $entity->save();
 
@@ -256,14 +275,9 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
       'Changed time of original language is valid.'
     );
 
-    // We can't assert equality here because the created time is set to the
-    // request time while instances of ChangedTestItem use the current
-    // timestamp every time.
-    $this->assertTrue(
-      ($entity->getChangedTime() >= $entity->get('created')->value) &&
-      (($entity->getChangedTime() - $entity->get('created')->value) <= time() - \Drupal::time()->getRequestTime()),
-      'Changed and created time of original language can be assumed to be identical.'
-    );
+    $requestTime = $this->time->getRequestTime();
+    $this->assertEquals($requestTime, $entity->getChangedTime(), 'Changed time of original language is valid.');
+    $this->assertEquals($requestTime, $entity->get('created')->value, 'Created time of original language is valid.');
 
     $this->assertEquals($entity->getChangedTimeAcrossTranslations(), $entity->getChangedTime(), 'Changed time of original language is the same as changed time across all translations.');
 
@@ -273,6 +287,9 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
     );
 
     $changed_en = $entity->getChangedTime();
+
+    // Advance the current time.
+    $this->time->incrementRequestTime();
 
     $entity->setNewRevision();
     // Save entity without any changes but create new revision.
@@ -284,6 +301,9 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
       $this->getRevisionTranslationAffectedFlag($entity),
       'Changed flag of original language is not set for new revision without changes.'
     );
+
+    // Advance the current time.
+    $this->time->incrementRequestTime();
 
     $entity->setNewRevision();
     $entity->setOwner($user2);
@@ -300,6 +320,9 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
     );
 
     $changed_en = $entity->getChangedTime();
+
+    // Advance the current time.
+    $this->time->incrementRequestTime();
 
     /** @var \Drupal\entity_test\Entity\EntityTestMulRevChanged $german */
     $german = $entity->addTranslation('de');
@@ -327,6 +350,9 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
 
     $changed_de = $german->getChangedTime();
 
+    // Advance the current time.
+    $this->time->incrementRequestTime();
+
     $entity->setNewRevision();
     // Save entity without any changes but create new revision.
     $entity->save();
@@ -344,6 +370,9 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
       $this->getRevisionTranslationAffectedFlag($german),
       'Changed flag of the German translation is not set for new revision without changes.'
     );
+
+    // Advance the current time.
+    $this->time->incrementRequestTime();
 
     $entity->setNewRevision();
     $german->setOwner($user2);
@@ -367,6 +396,9 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
       $this->getRevisionTranslationAffectedFlag($german),
       'Changed flag of German translation is set when changing the German translation.'
     );
+
+    // Advance the current time.
+    $this->time->incrementRequestTime();
 
     $french = $entity->addTranslation('fr');
 
@@ -402,6 +434,9 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
       'Changed flag of French translation is set when adding the translation and a new revision.'
     );
 
+    // Advance the current time.
+    $this->time->incrementRequestTime();
+
     $entity->removeTranslation('fr');
 
     $entity->setNewRevision();
@@ -434,6 +469,9 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
       'Changed flag of French translation is set when adding the translation and a new revision.'
     );
 
+    // Advance the current time.
+    $this->time->incrementRequestTime();
+
     // Since above a clone of the entity was saved and then this entity is saved
     // again, we have to update the revision ID to the current one.
     $german->set('revision_id', $form_entity_builder_clone->getRevisionId());
@@ -447,6 +485,9 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
       'German translation changed but the changed flag is reset manually.'
     );
 
+    // Advance the current time.
+    $this->time->incrementRequestTime();
+
     $entity->setNewRevision();
     $german->setRevisionTranslationAffected(TRUE);
     $entity->save();
@@ -455,6 +496,9 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
       $this->getRevisionTranslationAffectedFlag($german),
       'German translation is not changed and a new revision is created but the changed flag is set manually.'
     );
+
+    // Advance the current time.
+    $this->time->incrementRequestTime();
 
     $german->setOwner($user2);
     $entity->setNewRevision();
@@ -476,12 +520,18 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
     $entity->save();
     $changed_time_1 = $entity->getChangedTime();
 
+    // Advance the current time.
+    $this->time->incrementRequestTime();
+
     // Without the syncing flag the changed time will increment when content is
     // changed.
     $entity->setName($this->randomString());
     $entity->save();
     $changed_time_2 = $entity->getChangedTime();
     $this->assertTrue($changed_time_2 > $changed_time_1);
+
+    // Advance the current time.
+    $this->time->incrementRequestTime();
 
     // With the syncing flag, the changed time will not change.
     $entity->setName($this->randomString());
