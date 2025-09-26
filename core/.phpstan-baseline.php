@@ -46615,6 +46615,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Element/PathElementFormTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\ContentEntityChangedTest\\:\\:alter\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/ContentEntityChangedTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$title might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 2,
