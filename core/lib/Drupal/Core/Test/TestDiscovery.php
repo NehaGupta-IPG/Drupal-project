@@ -95,6 +95,7 @@ class TestDiscovery {
     $this->testNamespaces['Drupal\\Tests\\'] = [$this->root . '/core/tests/Drupal/Tests'];
     $this->testNamespaces['Drupal\\KernelTests\\'] = [$this->root . '/core/tests/Drupal/KernelTests'];
     $this->testNamespaces['Drupal\\TestTools\\'] = [$this->root . '/core/tests/Drupal/TestTools'];
+    $this->testNamespaces['Drupal\\Mocks\\'] = [$this->root . '/core/tests/Drupal/Mocks'];
 
     $this->availableExtensions = [];
     foreach ($this->getExtensions() as $name => $extension) {
