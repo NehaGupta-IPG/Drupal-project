@@ -5,19 +5,21 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Theme;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\ExtensionNameLengthException;
 use Drupal\Core\Extension\ExtensionNameReservedException;
 use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\Extension\ModuleUninstallValidatorException;
-use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests installing and uninstalling of themes.
- *
- * @group Extension
  */
+#[Group('Extension')]
 class ThemeInstallerTest extends KernelTestBase {
 
   /**
@@ -170,9 +172,8 @@ class ThemeInstallerTest extends KernelTestBase {
 
   /**
    * Tests installing a theme with unmet module dependencies.
-   *
-   * @dataProvider providerTestInstallThemeWithUnmetModuleDependencies
    */
+  #[DataProvider('providerTestInstallThemeWithUnmetModuleDependencies')]
   public function testInstallThemeWithUnmetModuleDependencies($theme_name, $installed_modules, $message): void {
     $this->moduleInstaller()->install($installed_modules);
     $themes = $this->themeHandler()->listInfo();
@@ -185,10 +186,9 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Tests trying to install a deprecated theme.
    *
-   * @covers \Drupal\Core\Extension\ThemeInstaller::install
-   *
-   * @group legacy
+   * @legacy-covers \Drupal\Core\Extension\ThemeInstaller::install
    */
+  #[IgnoreDeprecations]
   public function testInstallDeprecated(): void {
     $this->expectDeprecation("The theme 'deprecated_theme_test' is deprecated. See https://example.com/deprecated");
     $this->themeInstaller()->install(['deprecated_theme_test']);
@@ -453,6 +453,7 @@ class ThemeInstallerTest extends KernelTestBase {
    * Returns the theme handler service.
    *
    * @return \Drupal\Core\Extension\ThemeHandlerInterface
+   *   The theme handler service.
    */
   protected function themeHandler() {
     return $this->container->get('theme_handler');
@@ -462,6 +463,7 @@ class ThemeInstallerTest extends KernelTestBase {
    * Returns the theme installer service.
    *
    * @return \Drupal\Core\Extension\ThemeInstallerInterface
+   *   The theme installer service.
    */
   protected function themeInstaller() {
     return $this->container->get('theme_installer');
@@ -471,6 +473,7 @@ class ThemeInstallerTest extends KernelTestBase {
    * Returns the system.theme config object.
    *
    * @return \Drupal\Core\Config\Config
+   *   The system.theme config object.
    */
   protected function extensionConfig() {
     return $this->config('core.extension');
@@ -480,6 +483,7 @@ class ThemeInstallerTest extends KernelTestBase {
    * Returns the ModuleHandler.
    *
    * @return \Drupal\Core\Extension\ModuleHandlerInterface
+   *   The ModuleHandler.
    */
   protected function moduleHandler(): ?object {
     return $this->container->get('module_handler');
@@ -489,6 +493,7 @@ class ThemeInstallerTest extends KernelTestBase {
    * Returns the ModuleInstaller.
    *
    * @return \Drupal\Core\Extension\ModuleInstallerInterface
+   *   The ModuleInstaller.
    */
   protected function moduleInstaller(): ?object {
     return $this->container->get('module_installer');
@@ -498,6 +503,7 @@ class ThemeInstallerTest extends KernelTestBase {
    * Returns the ThemeExtensionList.
    *
    * @return \Drupal\Core\Extension\ThemeExtensionList
+   *   The ThemeExtensionList.
    */
   protected function extensionListTheme(): ThemeExtensionList {
     return $this->container->get('extension.list.theme');

@@ -4,19 +4,26 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\package_manager\Kernel;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\package_manager\Event\PreCreateEvent;
-use Drupal\package_manager\Exception\StageEventException;
+use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\ValidationResult;
 use PhpTuf\ComposerStager\API\Environment\Service\EnvironmentInterface;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 
 /**
- * @covers \Drupal\package_manager\Validator\SymlinkValidator
- * @group package_manager
+ * Tests Symlink Validator.
+ *
  * @internal
+ * @legacy-covers \Drupal\package_manager\Validator\SymlinkValidator
  */
+#[Group('package_manager')]
 class SymlinkValidatorTest extends PackageManagerKernelTestBase {
+
+  use StringTranslationTrait;
 
   /**
    * Tests that relative symlinks within the same package are supported.
@@ -48,7 +55,7 @@ class SymlinkValidatorTest extends PackageManagerKernelTestBase {
 
     link($project_root . '/composer.json', $project_root . '/composer.link');
     $result = ValidationResult::createError([
-      t('The %which directory at %dir contains hard links, which is not supported. The first one is %file.', [
+      $this->t('The %which directory at %dir contains hard links, which is not supported. The first one is %file.', [
         '%which' => 'active',
         '%dir' => $project_root,
         '%file' => $project_root . '/composer.json',
@@ -66,7 +73,7 @@ class SymlinkValidatorTest extends PackageManagerKernelTestBase {
 
     symlink($project_root . '/composer.json', $project_root . '/composer.link');
     $result = ValidationResult::createError([
-      t('The %which directory at %dir contains absolute links, which is not supported. The first one is %file.', [
+      $this->t('The %which directory at %dir contains absolute links, which is not supported. The first one is %file.', [
         '%which' => 'active',
         '%dir' => $project_root,
         '%file' => $project_root . '/composer.link',
@@ -89,7 +96,7 @@ class SymlinkValidatorTest extends PackageManagerKernelTestBase {
     chdir($project_root);
     symlink('../hello.txt', 'fail.txt');
     $result = ValidationResult::createError([
-      t('The %which directory at %dir contains links that point outside the codebase, which is not supported. The first one is %file.', [
+      $this->t('The %which directory at %dir contains links that point outside the codebase, which is not supported. The first one is %file.', [
         '%which' => 'active',
         '%dir' => $project_root,
         '%file' => $project_root . '/fail.txt',
@@ -109,7 +116,7 @@ class SymlinkValidatorTest extends PackageManagerKernelTestBase {
     $stage->create();
     $stage->require(['ext-json:*']);
 
-    $stage_dir = $stage->getStageDirectory();
+    $stage_dir = $stage->getSandboxDirectory();
     $parent_dir = dirname($stage_dir);
     touch($parent_dir . '/hello.txt');
     // Relative symlinks must be made from their actual directory to be
@@ -118,7 +125,7 @@ class SymlinkValidatorTest extends PackageManagerKernelTestBase {
     symlink('../hello.txt', 'fail.txt');
 
     $result = ValidationResult::createError([
-      t('The %which directory at %dir contains links that point outside the codebase, which is not supported. The first one is %file.', [
+      $this->t('The %which directory at %dir contains links that point outside the codebase, which is not supported. The first one is %file.', [
         '%which' => 'staging',
         '%dir' => $stage_dir,
         '%file' => $stage_dir . '/fail.txt',
@@ -128,7 +135,7 @@ class SymlinkValidatorTest extends PackageManagerKernelTestBase {
       $stage->apply();
       $this->fail('Expected an exception, but none was thrown.');
     }
-    catch (StageEventException $e) {
+    catch (SandboxEventException $e) {
       $this->assertExpectedResultsFromException([$result], $e);
     }
   }
@@ -169,7 +176,7 @@ class SymlinkValidatorTest extends PackageManagerKernelTestBase {
     symlink('composer.json', 'composer.link');
 
     $result = ValidationResult::createError([
-      t('The %which directory at %dir contains links, which is not supported on Windows. The first one is %file.', [
+      $this->t('The %which directory at %dir contains links, which is not supported on Windows. The first one is %file.', [
         '%which' => 'active',
         '%dir' => $project_root,
         '%file' => $project_root . '/composer.link',
@@ -181,11 +188,10 @@ class SymlinkValidatorTest extends PackageManagerKernelTestBase {
   /**
    * Tests that unsupported links are excluded if they're under excluded paths.
    *
-   * @depends testAbsoluteSymlinks
-   *
-   * @covers \Drupal\package_manager\PathExcluder\GitExcluder
-   * @covers \Drupal\package_manager\PathExcluder\NodeModulesExcluder
+   * @legacy-covers \Drupal\package_manager\PathExcluder\GitExcluder
+   * @legacy-covers \Drupal\package_manager\PathExcluder\NodeModulesExcluder
    */
+  #[Depends('testAbsoluteSymlinks')]
   public function testUnsupportedLinkUnderExcludedPath(): void {
     $project_root = $this->container->get(PathLocator::class)
       ->getProjectRoot();

@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Entity\Exception\AmbiguousBundleClassException;
@@ -46,13 +45,6 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    * @var \Drupal\Core\Cache\CacheBackendInterface
    */
   protected $cacheBackend;
-
-  /**
-   * Stores the latest revision IDs for entities.
-   *
-   * @var array
-   */
-  protected $latestRevisionIds = [];
 
   /**
    * Constructs a ContentEntityStorageBase object.
@@ -233,7 +225,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
         throw new EntityStorageException(sprintf("Missing entity bundle. The \"%s\" bundle does not exist", $bundle));
       }
       $values[$bundle_key] = $bundle;
-      // Bundle is already set
+      // Bundle is already set.
       $forbidden_keys[] = $bundle_key;
     }
     // Forbid sample generation on any keys whose values were submitted.
@@ -480,17 +472,20 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       return NULL;
     }
 
-    if (!isset($this->latestRevisionIds[$entity_id][LanguageInterface::LANGCODE_DEFAULT])) {
+    $cached = $this->memoryCache->get("latest_revision_id:{$this->entityTypeId}:$entity_id");
+    $latest_revision_ids = $cached ? $cached->data : [];
+    if (!isset($latest_revision_ids[LanguageInterface::LANGCODE_DEFAULT])) {
       $result = $this->getQuery()
         ->latestRevision()
         ->condition($this->entityType->getKey('id'), $entity_id)
         ->accessCheck(FALSE)
         ->execute();
 
-      $this->latestRevisionIds[$entity_id][LanguageInterface::LANGCODE_DEFAULT] = key($result);
+      $latest_revision_ids[LanguageInterface::LANGCODE_DEFAULT] = key($result);
+      $this->memoryCache->set("latest_revision_id:{$this->entityTypeId}:$entity_id", $latest_revision_ids, MemoryCacheInterface::CACHE_PERMANENT, [$this->memoryCacheTag]);
     }
 
-    return $this->latestRevisionIds[$entity_id][LanguageInterface::LANGCODE_DEFAULT];
+    return $latest_revision_ids[LanguageInterface::LANGCODE_DEFAULT];
   }
 
   /**
@@ -505,7 +500,9 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       return $this->getLatestRevisionId($entity_id);
     }
 
-    if (!isset($this->latestRevisionIds[$entity_id][$langcode])) {
+    $cached = $this->memoryCache->get("latest_revision_id:{$this->entityTypeId}:$entity_id");
+    $latest_revision_ids = $cached ? $cached->data : [];
+    if (!isset($latest_revision_ids[$langcode])) {
       $result = $this->getQuery()
         ->allRevisions()
         ->condition($this->entityType->getKey('id'), $entity_id)
@@ -513,11 +510,15 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
         ->range(0, 1)
         ->sort($this->entityType->getKey('revision'), 'DESC')
         ->accessCheck(FALSE)
+        ->addMetaData('entity_id', $entity_id)
+        ->addTag('latest_translated_affected_revision')
         ->execute();
 
-      $this->latestRevisionIds[$entity_id][$langcode] = key($result);
+      $latest_revision_ids[$langcode] = key($result);
+      $this->memoryCache->set("latest_revision_id:{$this->entityTypeId}:$entity_id", $latest_revision_ids, MemoryCacheInterface::CACHE_PERMANENT, [$this->memoryCacheTag]);
     }
-    return $this->latestRevisionIds[$entity_id][$langcode];
+
+    return $latest_revision_ids[$langcode];
   }
 
   /**
@@ -757,6 +758,14 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     }
 
     $id = parent::doPreSave($entity);
+
+    $previously_default_revision = $entity->wasDefaultRevision();
+    $no_longer_default = !$entity->isDefaultRevision();
+    $original_same_as_current = $entity->getOriginal()?->getRevisionId() == $entity->getLoadedRevisionId();
+    $not_new_revision = !$entity->isNewRevision();
+    if ($previously_default_revision && $no_longer_default && $original_same_as_current && $not_new_revision) {
+      throw new EntityStorageException("An existing default revision of the '{$this->entityTypeId}' entity type can not be changed to a non-default revision.");
+    }
 
     if (!$entity->isNew()) {
       // If the ID changed then original can't be loaded, throw an exception
@@ -1121,15 +1130,11 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       return;
     }
 
-    $cache_tags = [
-      $this->entityTypeId . '_values',
-      'entity_field_info',
-    ];
     $items = [];
     foreach ($entities as $id => $entity) {
       $items[$this->buildCacheId($id)] = [
         'data' => $entity,
-        'tags' => $cache_tags,
+        'tags' => ['entity_field_info'],
       ];
     }
     $this->cacheBackend->setMultiple($items);
@@ -1197,21 +1202,33 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     if ($ids) {
       parent::resetCache($ids);
       if ($this->entityType->isPersistentlyCacheable()) {
-        $cids = [];
+        $cids = $latest_revision_cids = [];
         foreach ($ids as $id) {
-          unset($this->latestRevisionIds[$id]);
           $cids[] = $this->buildCacheId($id);
+          $latest_revision_cids[] = "latest_revision_id:{$this->entityTypeId}:$id";
         }
         $this->cacheBackend->deleteMultiple($cids);
+        $this->memoryCache->deleteMultiple($latest_revision_cids);
       }
     }
     else {
       parent::resetCache();
       if ($this->entityType->isPersistentlyCacheable()) {
-        Cache::invalidateTags([$this->entityTypeId . '_values']);
+        $this->cacheBackend->deleteAll();
       }
-      $this->latestRevisionIds = [];
     }
+  }
+
+  /**
+   * Warns about deprecated/removed properties.
+   */
+  public function __get(string $name): mixed {
+    if ($name === 'latestRevisionIds') {
+      @trigger_error('Getting the static cache of latest revision IDs is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. You can retrieve it from the \'entity.memory_cache\' service instead. See https://www.drupal.org/node/3535160', E_USER_DEPRECATED);
+      return [];
+    }
+
+    return $this->$name ?? NULL;
   }
 
 }

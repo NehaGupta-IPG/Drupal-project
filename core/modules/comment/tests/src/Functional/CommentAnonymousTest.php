@@ -6,12 +6,14 @@ namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\CommentInterface;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests anonymous commenting.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentAnonymousTest extends CommentTestBase {
 
   /**
@@ -139,7 +141,8 @@ class CommentAnonymousTest extends CommentTestBase {
     $this->drupalLogin($this->adminUser);
     $this->drupalGet('comment/' . $anonymous_comment3->id() . '/edit');
     $this->assertSession()->responseContains($author_name);
-    // Check the author field is empty (i.e. anonymous) when editing the comment.
+    // Check the author field is empty (i.e. anonymous) when editing the
+    // comment.
     $this->assertSession()->fieldValueEquals('uid', '');
     $this->assertSession()->responseContains($author_mail);
 

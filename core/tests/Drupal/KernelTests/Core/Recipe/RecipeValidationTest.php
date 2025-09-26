@@ -8,11 +8,14 @@ use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeFileException;
 use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @group Recipe
- * @group #slow
+ * Tests Recipe Validation.
  */
+#[Group('Recipe')]
+#[Group('#slow')]
 class RecipeValidationTest extends KernelTestBase {
 
   /**
@@ -722,6 +725,75 @@ input:
 YAML,
       NULL,
     ];
+    yield 'extra is present and not an array' => [
+      <<<YAML
+name: Bad extra
+extra: 'yes!'
+YAML,
+      [
+        '[extra]' => ['This value should be of type associative_array.'],
+      ],
+    ];
+    yield 'extra is an indexed array' => [
+      <<<YAML
+name: Bad extra
+extra:
+  - one
+  - two
+YAML,
+      [
+        '[extra]' => ['This value should be of type associative_array.'],
+      ],
+    ];
+    yield 'invalid key in extra' => [
+      <<<YAML
+name: Bad extra
+extra:
+  'not a valid extension name': true
+YAML,
+      [
+        '[extra]' => ['not a valid extension name is not a valid extension name.'],
+      ],
+    ];
+    yield 'valid extra' => [
+      <<<YAML
+name: Bad extra
+extra:
+  project_browser:
+    yes: sir
+YAML,
+      NULL,
+    ];
+    yield 'input env variable name is not a string' => [
+      <<<YAML
+name: Bad input
+input:
+  bad_news:
+    data_type: string
+    description: 'Bad default definition'
+    default:
+      source: env
+      env: -40
+YAML,
+      [
+        '[input][bad_news][default][env]' => ['This value should be of type string.'],
+      ],
+    ];
+    yield 'input env variable name is empty' => [
+      <<<YAML
+name: Bad input
+input:
+  bad_news:
+    data_type: string
+    description: 'Bad default definition'
+    default:
+      source: env
+      env: ''
+YAML,
+      [
+        '[input][bad_news][default][env]' => ['This value should not be blank.'],
+      ],
+    ];
   }
 
   /**
@@ -736,9 +808,8 @@ YAML,
    * @param string|null $recipe_name
    *   (optional) The name of the directory containing `recipe.yml`, or NULL to
    *   randomly generate one.
-   *
-   * @dataProvider providerRecipeValidation
    */
+  #[DataProvider('providerRecipeValidation')]
   public function testRecipeValidation(string $recipe, ?array $expected_violations, ?string $recipe_name = NULL): void {
     $dir = 'public://' . ($recipe_name ?? uniqid());
     mkdir($dir);

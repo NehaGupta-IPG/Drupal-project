@@ -18,18 +18,21 @@ use Drupal\Core\Database\Event\StatementExecutionEndEvent;
 class Log {
 
   /**
-   * Cache of logged queries. This will only be used if the query logger is enabled.
+   * Cache of logged queries.
    *
-   * The structure for the logging array is as follows:
-   *
-   * array(
-   *   $logging_key = array(
-   *     array('query' => '', 'args' => array(), 'caller' => '', 'target' => '', 'time' => 0, 'start' => 0),
-   *     array('query' => '', 'args' => array(), 'caller' => '', 'target' => '', 'time' => 0, 'start' => 0),
-   *   ),
-   * );
+   * This will only be used if the query logger is enabled.
    *
    * @var array
+   * The structure for the logging array is as follows:
+   *
+   * @code
+   * [
+   *   $logging_key = [
+   *     ['query' => '', 'args' => [], 'caller' => '', 'target' => '', 'time' => 0, 'start' => 0],
+   *     ['query' => '', 'args' => [], 'caller' => '', 'target' => '', 'time' => 0, 'start' => 0],
+   *   ],
+   * ];
+   * @endcode
    */
   protected $queryLog = [];
 

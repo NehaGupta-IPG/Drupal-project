@@ -6,21 +6,16 @@ namespace Drupal\KernelTests\Core\Extension;
 
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the ExtensionExists constraint validator.
  *
- * @group Validation
- *
- * @covers \Drupal\Core\Extension\Plugin\Validation\Constraint\ExtensionExistsConstraint
- * @covers \Drupal\Core\Extension\Plugin\Validation\Constraint\ExtensionExistsConstraintValidator
+ * @legacy-covers \Drupal\Core\Extension\Plugin\Validation\Constraint\ExtensionExistsConstraint
+ * @legacy-covers \Drupal\Core\Extension\Plugin\Validation\Constraint\ExtensionExistsConstraintValidator
  */
+#[Group('Validation')]
 class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * Tests the ExtensionExists constraint validator.
@@ -45,6 +40,7 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
     $this->assertSame("Module 'user' is not installed.", (string) $violations->get(0)->getMessage());
 
     $this->enableModules(['user']);
+    $data = $typed_data->create($definition, 'core');
     $this->assertCount(0, $data->validate());
 
     // NULL should not trigger a validation error: a value may be nullable.

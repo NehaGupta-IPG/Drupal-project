@@ -6,13 +6,14 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Plugin\Validation\Constraint\CompositeConstraintBase;
+use Drupal\entity_test\EntityTestHelper;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Entity Validation API.
- *
- * @group Entity
  */
+#[Group('Entity')]
 class EntityValidationTest extends EntityKernelTestBase {
 
   /**
@@ -116,7 +117,7 @@ class EntityValidationTest extends EntityKernelTestBase {
     $this->assertContains('Drupal\Core\Validation\ConstraintManager', $cached_discovery_classes);
 
     // All entity variations have to have the same results.
-    foreach (entity_test_entity_types() as $entity_type) {
+    foreach (EntityTestHelper::getEntityTypes() as $entity_type) {
       $this->checkValidation($entity_type);
     }
   }

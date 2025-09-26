@@ -11,22 +11,25 @@ use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\Site\Settings;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore suis
-
 /**
  * Tests configuration objects before and after module install and uninstall.
  *
  * The installation and removal of configuration objects in install, disable
  * and uninstall functionality is tested.
- *
- * @group config
- * @group #slow
  */
+#[Group('config')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class ConfigInstallWebTest extends BrowserTestBase {
 
   /**
    * The admin user used in this test.
+   *
+   * @var \Drupal\user\Entity\User|false
    */
   protected $adminUser;
 
@@ -87,9 +90,10 @@ class ConfigInstallWebTest extends BrowserTestBase {
     $config_entity->set('label', 'Customized integration config label')->save();
 
     // @todo FIXME: Setting config keys WITHOUT SAVING retains the changed config
-    //   object in memory. Every new call to $this->config() MUST revert in-memory changes
-    //   that haven't been saved!
-    //   In other words: This test passes even without this reset, but it shouldn't.
+    //   object in memory. Every new call to $this->config() MUST revert
+    //   in-memory changes that haven't been saved!
+    //   In other words: This test passes even without this reset, but it
+    //   shouldn't.
     $this->container->get('config.factory')->reset();
 
     // Disable and uninstall the integration module.

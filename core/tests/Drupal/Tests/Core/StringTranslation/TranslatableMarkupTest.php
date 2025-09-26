@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\StringTranslation;
 
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the TranslatableMarkup class.
- *
- * @coversDefaultClass \Drupal\Core\StringTranslation\TranslatableMarkup
- * @group StringTranslation
  */
+#[CoversClass(TranslatableMarkup::class)]
+#[Group('StringTranslation')]
 class TranslatableMarkupTest extends UnitTestCase {
 
   /**
@@ -51,7 +52,7 @@ class TranslatableMarkupTest extends UnitTestCase {
   /**
    * Tests that errors are correctly handled when a __toString() fails.
    *
-   * @covers ::__toString
+   * @legacy-covers ::__toString
    */
   public function testToString(): void {
     $translation = $this->createMock(TranslationInterface::class);
@@ -73,7 +74,8 @@ class TranslatableMarkupTest extends UnitTestCase {
         throw new \Exception('Yes you may.');
       });
 
-    // We set a custom error handler because of https://github.com/sebastianbergmann/phpunit/issues/487
+    // We set a custom error handler because of
+    // https://github.com/sebastianbergmann/phpunit/issues/487
     set_error_handler([$this, 'errorHandler']);
     // We want this to trigger an error.
     (string) $text;
@@ -84,7 +86,9 @@ class TranslatableMarkupTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::__construct
+   * Tests is string assertion.
+   *
+   * @legacy-covers ::__construct
    */
   public function testIsStringAssertion(): void {
     $translation = $this->getStringTranslationStub();
@@ -95,7 +99,9 @@ class TranslatableMarkupTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::__construct
+   * Tests is string assertion with formattable markup.
+   *
+   * @legacy-covers ::__construct
    */
   public function testIsStringAssertionWithFormattableMarkup(): void {
     $formattable_string = new FormattableMarkup('@bar', ['@bar' => 'foo']);

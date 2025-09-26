@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 
-use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Render\RenderContext;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\views\Plugin\views\PluginBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the PluginBase class.
- *
- * @group views
  */
+#[Group('views')]
 class PluginBaseTest extends KernelTestBase {
 
   /**
@@ -88,6 +88,9 @@ class TestPluginBase extends PluginBase {
     parent::__construct([], '', []);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function viewsTokenReplace($text, $tokens) {
     return parent::viewsTokenReplace($text, $tokens);
   }

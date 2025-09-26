@@ -9,20 +9,20 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\Plugin\Field\FieldFormatter\EntityReferenceEntityFormatter;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\entity_test\Entity\EntityTestLabel;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
-use Drupal\entity_test\Entity\EntityTestLabel;
-use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the formatters functionality.
- *
- * @group entity_reference
  */
+#[Group('entity_reference')]
 class EntityReferenceFormatterTest extends EntityKernelTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -422,6 +422,44 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
     $entity_with_user->save();
     $build = $entity_with_user->get('user_id')->view(['type' => $formatter, 'settings' => ['link' => TRUE]]);
     $this->assertEquals($build[0]['#plain_text'], $entity_with_user->get('user_id')->entity->label(), 'For inaccessible links, the label should be displayed in plain text.');
+  }
+
+  /**
+   * Tests formatters set the correct _referringItem on referenced entities.
+   */
+  public function testFormatterReferencingItem(): void {
+    $storage = \Drupal::entityTypeManager()->getStorage($this->entityType);
+    // Create a referencing entity and confirm that the _referringItem property
+    // on the referenced entity in the built render array's items is set to the
+    // field item on the referencing entity.
+    $referencing_entity_1 = $storage->create([
+      'name' => $this->randomMachineName(),
+      $this->fieldName => $this->referencedEntity,
+    ]);
+    $referencing_entity_1->save();
+    $build_1 = $referencing_entity_1->get($this->fieldName)->view(['type' => 'entity_reference_entity_view']);
+    $this->assertEquals($this->referencedEntity->id(), $build_1['#items'][0]->entity->id());
+    $this->assertEquals($referencing_entity_1->id(), $build_1['#items'][0]->entity->_referringItem->getEntity()->id());
+    $this->assertEquals($referencing_entity_1->id(), $build_1[0]['#' . $this->entityType]->_referringItem->getEntity()->id());
+    // Create a second referencing entity and confirm that the _referringItem
+    // property on the referenced entity in the built render array's items is
+    // set to the field item on the second referencing entity.
+    $referencing_entity_2 = $storage->create([
+      'name' => $this->randomMachineName(),
+      $this->fieldName => $this->referencedEntity,
+    ]);
+    $referencing_entity_2->save();
+    $build_2 = $referencing_entity_2->get($this->fieldName)->view(['type' => 'entity_reference_entity_view']);
+    $this->assertEquals($this->referencedEntity->id(), $build_2['#items'][0]->entity->id());
+    $this->assertEquals($referencing_entity_2->id(), $build_2['#items'][0]->entity->_referringItem->getEntity()->id());
+    $this->assertEquals($referencing_entity_2->id(), $build_2[0]['#' . $this->entityType]->_referringItem->getEntity()->id());
+    // Confirm that the _referringItem property for the entity referenced by the
+    // first referencing entity is still set to the field item on the first
+    // referencing entity.
+    $this->assertEquals($referencing_entity_1->id(), $build_1['#items'][0]->entity->_referringItem->getEntity()->id());
+    // Confirm that the _referringItem property is not the same for the two
+    // render arrays.
+    $this->assertNotEquals($build_1['#items'][0]->entity->_referringItem->getEntity()->id(), $build_2['#items'][0]->entity->_referringItem->getEntity()->id());
   }
 
   /**

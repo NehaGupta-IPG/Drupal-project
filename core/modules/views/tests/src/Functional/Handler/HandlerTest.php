@@ -7,17 +7,18 @@ namespace Drupal\Tests\views\Functional\Handler;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Entity\View;
-use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\HandlerBase;
+use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore wõrd
-
 /**
  * Tests abstract handler definitions.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class HandlerTest extends ViewTestBase {
 
   use CommentTestTrait;
@@ -80,7 +81,7 @@ class HandlerTest extends ViewTestBase {
     // Check defaults.
     $this->assertEquals((object) ['value' => [], 'operator' => NULL], HandlerBase::breakString(''));
 
-    // Test ors
+    // Test ors.
     $handler = HandlerBase::breakString('word1 word2+word');
     $this->assertEquals(['word1', 'word2', 'word'], $handler->value);
     $this->assertEquals('or', $handler->operator);
@@ -114,13 +115,13 @@ class HandlerTest extends ViewTestBase {
     $this->assertEquals(['wõrd1', 'wõrd2', 'wõrd'], $handler->value);
     $this->assertEquals('and', $handler->operator);
 
-    // Test a single word
+    // Test a single word.
     $handler = HandlerBase::breakString('word');
     $this->assertEquals(['word'], $handler->value);
     $this->assertEquals('and', $handler->operator);
 
     $s1 = $this->randomMachineName();
-    // Generate three random numbers which can be used below;
+    // Generate three random numbers which can be used below.
     $n1 = rand(0, 100);
     $n2 = rand(0, 100);
     $n3 = rand(0, 100);
@@ -168,7 +169,7 @@ class HandlerTest extends ViewTestBase {
     $this->assertEquals([(int) $s1, $n2, $n3], $handlerBase->value);
     $this->assertEquals('or', $handlerBase->operator);
 
-    // Generate three random decimals which can be used below;
+    // Generate three random decimals which can be used below.
     $d1 = rand(0, 10) / 10;
     $d2 = rand(0, 10) / 10;
     $d3 = rand(0, 10) / 10;

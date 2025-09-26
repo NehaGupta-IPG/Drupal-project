@@ -7,14 +7,16 @@ namespace Drupal\Tests\workspaces\Kernel;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\workspaces\Entity\Workspace;
+use Drupal\workspaces\WorkspaceAssociation;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests workspace associations.
- *
- * @coversDefaultClass \Drupal\workspaces\WorkspaceAssociation
- *
- * @group workspaces
  */
+#[CoversClass(WorkspaceAssociation::class)]
+#[Group('workspaces')]
 class WorkspaceAssociationTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -53,7 +55,7 @@ class WorkspaceAssociationTest extends KernelTestBase {
 
     $this->installConfig(['system']);
 
-    $this->installSchema('workspaces', ['workspace_association']);
+    $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
 
     $permissions = array_intersect([
       'administer nodes',
@@ -77,11 +79,10 @@ class WorkspaceAssociationTest extends KernelTestBase {
    * @param array $entity_values
    *   An array of values for the entities created in this test.
    *
-   * @covers ::getTrackedEntities
-   * @covers ::getAssociatedRevisions
-   *
-   * @dataProvider getEntityTypeIds
+   * @legacy-covers ::getTrackedEntities
+   * @legacy-covers ::getAssociatedRevisions
    */
+  #[DataProvider('getEntityTypeIds')]
   public function testWorkspaceAssociation(string $entity_type_id, array $entity_values): void {
     $entity_1 = $this->createEntity($entity_type_id, $entity_values[1]);
     $this->createEntity($entity_type_id, $entity_values[2]);
@@ -192,6 +193,31 @@ class WorkspaceAssociationTest extends KernelTestBase {
         ],
       ],
     ];
+  }
+
+  /**
+   * Tests the count of revisions returned for tracked entities listing.
+   *
+   * @legacy-covers ::getTrackedEntitiesForListing
+   */
+  public function testWorkspaceAssociationForListing(): void {
+    $this->switchToWorkspace($this->workspaces['stage']->id());
+    $entity_type_id = 'entity_test_mulrevpub';
+
+    for ($i = 1; $i <= 51; ++$i) {
+      $this->createEntity($entity_type_id, ['name' => "Test entity {$i}"]);
+    }
+
+    /** @var \Drupal\workspaces\WorkspaceAssociationInterface $workspace_association */
+    $workspace_association = \Drupal::service('workspaces.association');
+
+    // The default behavior uses a pager with 50 items per page.
+    $tracked_items = $workspace_association->getTrackedEntitiesForListing($this->workspaces['stage']->id());
+    $this->assertEquals(50, count($tracked_items[$entity_type_id]));
+
+    // Verifies that all items are returned, not broken into pages.
+    $tracked_items_no_pager = $workspace_association->getTrackedEntitiesForListing($this->workspaces['stage']->id(), NULL, FALSE);
+    $this->assertEquals(51, count($tracked_items_no_pager[$entity_type_id]));
   }
 
   /**

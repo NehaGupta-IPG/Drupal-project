@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Functional;
 
-use Drupal\Core\Link;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Link;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the hook implementations that maintain the taxonomy index.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class TermIndexTest extends TaxonomyTestBase {
 
   /**
@@ -172,7 +174,6 @@ class TermIndexTest extends TaxonomyTestBase {
     $this->assertEquals(1, $index_count, 'Term 2 is indexed once.');
 
     // Redo the above tests without interface.
-    $node_storage->resetCache([$node->id()]);
     $node = $node_storage->load($node->id());
     $node->title = $this->randomMachineName();
 

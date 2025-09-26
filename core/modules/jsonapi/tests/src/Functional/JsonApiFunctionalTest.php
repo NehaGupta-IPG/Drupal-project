@@ -8,15 +8,20 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Core\Url;
 use Drupal\jsonapi\Query\OffsetPage;
 use Drupal\node\Entity\Node;
+use Drupal\Tests\WaitTerminateTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * General functional test class.
  *
- * @group jsonapi
- *
  * @internal
  */
+#[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
+
+  use WaitTerminateTestTrait;
 
   /**
    * {@inheritdoc}
@@ -517,6 +522,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $this->assertCount(0, $collection_output['data']);
 
     // Request in maintenance mode returns valid JSON.
+    $this->setWaitForTerminate();
     $this->container->get('state')->set('system.maintenance_mode', TRUE);
     $response = $this->drupalGet('/jsonapi/taxonomy_term/tags');
     $this->assertSession()->statusCodeEquals(503);
@@ -580,7 +586,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
       'resource_meta_title' => $node->getTitle(),
     ];
     $this->assertEquals($expectedMeta, $result['data']['meta']);
-    // Test if the cache tags bubbled up
+    // Test if the cache tags bubbled up.
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'jsonapi_test_meta_events.object_meta');
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Contexts', 'user.roles');
 
@@ -598,11 +604,11 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
 
     }
 
-    // Test if the cache tags bubbled up
+    // Test if the cache tags bubbled up.
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'jsonapi_test_meta_events.object_meta');
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Contexts', 'user.roles');
 
-    // Now try the same requests with a superuser, see if we get other caches
+    // Now try the same requests with a superuser, see if we get other caches.
     $this->mink->resetSessions();
     $this->drupalResetSession();
     $this->drupalLogin($this->adminUser);
@@ -670,7 +676,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     // Test if the cache tags bubbled up.
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'jsonapi_test_meta_events.relationship_meta');
 
-    // Test if relationship has correct metadata when loading a single resource
+    // Test if relationship has correct metadata when loading a single resource.
     $resource = Json::decode($this->drupalGet('jsonapi/node/article/' . $node->uuid()));
     if ($resource['data']['id'] === $node->uuid()) {
       $tagNames = $resource['data']['relationships']['field_tags']['meta']['relationship_meta_name'];
@@ -683,7 +689,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
 
     }
 
-    // Test if the cache tags bubbled up
+    // Test if the cache tags bubbled up.
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'jsonapi_test_meta_events.relationship_meta');
   }
 
@@ -702,7 +708,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
       'fields' => ['name'],
     ]);
 
-    // Test if relationship has correct metadata when loading a single resource
+    // Test if relationship has correct metadata when loading a single resource.
     $str = $this->drupalGet('jsonapi/node/article/' . $node->uuid() . '/relationships/field_tags');
     $resource = Json::decode($str);
 

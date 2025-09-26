@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block\Kernel;
 
+use Drupal\block\Entity\Block;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\block\Entity\Block;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the block view builder.
- *
- * @group block
  */
+#[Group('block')]
 class BlockViewBuilderTest extends KernelTestBase {
 
   /**
@@ -67,6 +67,27 @@ class BlockViewBuilderTest extends KernelTestBase {
     $this->container->get('cache.render')->deleteAll();
 
     $this->renderer = $this->container->get('renderer');
+  }
+
+  /**
+   * Tests rendering a block plugin that returns an empty array.
+   */
+  public function testEmptyRender(): void {
+    \Drupal::keyValue('block_test')->set('content', '');
+
+    $entity = $this->controller->create([
+      'id' => 'test_block1',
+      'theme' => 'stark',
+      'plugin' => 'test_empty',
+    ]);
+    $entity->save();
+
+    // Test the rendering of a block.
+    $entity = Block::load('test_block1');
+    $builder = \Drupal::entityTypeManager()->getViewBuilder('block');
+    $output = $builder->view($entity, 'block');
+    $expected_output = '';
+    $this->assertSame($expected_output, (string) $this->renderer->renderRoot($output));
   }
 
   /**
@@ -140,6 +161,30 @@ class BlockViewBuilderTest extends KernelTestBase {
 
     // Verify cache handling for an empty block.
     $this->verifyRenderCacheHandling();
+  }
+
+  /**
+   * Tests title block render cache handling.
+   *
+   * @see \Drupal\block_test\Hook\BlockTestHooks::blockViewPageTitleBlockAlter()
+   */
+  public function testBlockViewBuilderCacheTitleBlock(): void {
+    // Create title block.
+    $this->block = $this->controller->create([
+      'id' => 'test_block_title',
+      'theme' => 'stark',
+      'plugin' => 'page_title_block',
+    ]);
+    $this->block->save();
+
+    $entity = Block::load('test_block_title');
+    $builder = \Drupal::entityTypeManager()->getViewBuilder('block');
+    $output = $builder->view($entity, 'block');
+
+    $this->assertSame(
+      ['block_view', 'config:block.block.test_block_title', 'custom_cache_tag'],
+      $output['#cache']['tags']
+    );
   }
 
   /**
@@ -303,17 +348,17 @@ class BlockViewBuilderTest extends KernelTestBase {
 
     $required_cache_contexts = ['languages:' . LanguageInterface::TYPE_INTERFACE, 'theme', 'user.permissions'];
 
-    // Check that the expected cacheability metadata is present in:
-    // - the built render array;
+    // Check that the expected cacheability metadata is present in the built
+    // render array.
     $build = $this->getBlockRenderArray();
     $this->assertSame($expected_keys, $build['#cache']['keys']);
     $this->assertEqualsCanonicalizing($expected_contexts, $build['#cache']['contexts']);
     $this->assertEqualsCanonicalizing($expected_tags, $build['#cache']['tags']);
     $this->assertSame($expected_max_age, $build['#cache']['max-age']);
     $this->assertFalse(isset($build['#create_placeholder']));
-    // - the rendered render array;
+    // And also in the rendered render array.
     $this->renderer->renderRoot($build);
-    // - the render cache item.
+    // And also in the render cache item.
     $final_cache_contexts = Cache::mergeContexts($expected_contexts, $required_cache_contexts);
     $cache_item = $cache_bin->get($expected_keys, CacheableMetadata::createFromRenderArray($build));
     $this->assertNotEmpty($cache_item, 'The block render element has been cached with the expected cache keys.');

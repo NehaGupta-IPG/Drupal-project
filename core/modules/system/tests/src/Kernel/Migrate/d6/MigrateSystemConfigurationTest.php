@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Kernel\Migrate\d6;
 
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Migrates various configuration objects owned by the System module.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
 class MigrateSystemConfigurationTest extends MigrateDrupal6TestBase {
 
   /**
@@ -20,6 +20,8 @@ class MigrateSystemConfigurationTest extends MigrateDrupal6TestBase {
 
   /**
    * The expected configuration after migration.
+   *
+   * @var array
    */
   protected $expectedConfig = [
     'system.cron' => [

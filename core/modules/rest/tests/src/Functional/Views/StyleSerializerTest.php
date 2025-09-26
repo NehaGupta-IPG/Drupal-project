@@ -12,16 +12,19 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the serializer style plugin.
  *
- * @group rest
  * @see \Drupal\rest\Plugin\views\display\RestExport
  * @see \Drupal\rest\Plugin\views\style\Serializer
  * @see \Drupal\rest\Plugin\views\row\DataEntityRow
  * @see \Drupal\rest\Plugin\views\row\DataFieldRow
  */
+#[Group('rest')]
+#[RunTestsInSeparateProcesses]
 class StyleSerializerTest extends ViewTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -53,7 +56,7 @@ class StyleSerializerTest extends ViewTestBase {
   public static $testViews = ['test_serializer_display_field', 'test_serializer_display_entity', 'test_serializer_display_entity_translated', 'test_serializer_node_display_field', 'test_serializer_node_exposed_filter', 'test_serializer_shared_path'];
 
   /**
-   * A user with administrative privileges to look at test entity and configure views.
+   * A user with permissions to look at test entity and configure views.
    *
    * @var \Drupal\user\Entity\User|false
    */

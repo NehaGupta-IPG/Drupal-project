@@ -7,10 +7,12 @@ namespace Drupal\Tests\contact\Kernel;
 use Drupal\contact\Entity\ContactForm;
 use Drupal\Core\Config\Action\ConfigActionManager;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @group contact
+ * Tests Config Actions.
  */
+#[Group('contact')]
 class ConfigActionsTest extends KernelTestBase {
 
   /**
@@ -34,6 +36,9 @@ class ConfigActionsTest extends KernelTestBase {
     $this->configActionManager = $this->container->get('plugin.manager.config_action');
   }
 
+  /**
+   * Tests the application of configuration actions on a contact form.
+   */
   public function testConfigActions(): void {
     $form = ContactForm::load('personal');
     $this->assertSame('Your message has been sent.', $form->getMessage());

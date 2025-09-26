@@ -7,12 +7,14 @@ namespace Drupal\Tests\taxonomy\Functional;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\TermInterface;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests managing taxonomy parents through the user interface.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class TermParentsTest extends BrowserTestBase {
 
   /**
@@ -302,7 +304,7 @@ class TermParentsTest extends BrowserTestBase {
    * Creates a term, saves it and returns it.
    *
    * @param string $name
-   *   The name of the term to create
+   *   The name of the term to create.
    * @param int[] $parent_ids
    *   (optional) A list of parent term IDs.
    *

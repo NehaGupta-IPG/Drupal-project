@@ -13,12 +13,12 @@ use Drupal\node\NodeInterface;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests row render caching.
- *
- * @group views
  */
+#[Group('views')]
 class RowRenderCacheTest extends ViewsKernelTestBase {
 
   use UserCreationTrait;
@@ -72,7 +72,12 @@ class RowRenderCacheTest extends ViewsKernelTestBase {
     ])->save();
 
     $this->editorUser = $this->createUser(['bypass node access']);
-    $this->powerUser = $this->createUser(['access content', 'create test content', 'edit own test content', 'delete own test content']);
+    $this->powerUser = $this->createUser([
+      'access content',
+      'create test content',
+      'edit own test content',
+      'delete own test content',
+    ]);
     $this->regularUser = $this->createUser(['access content']);
 
     // Create some test entities.
