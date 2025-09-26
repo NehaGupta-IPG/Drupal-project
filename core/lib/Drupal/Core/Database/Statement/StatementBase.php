@@ -335,7 +335,7 @@ abstract class StatementBase implements \Iterator, StatementInterface {
     if (isset($constructorArguments)) {
       $this->fetchOptions['constructor_args'] = $constructorArguments;
     }
-    if (isset($additionalFetchMethod)) {
+    if (isset($additionalMode)) {
       $this->fetchOptions['additional_mode'] = $additionalMode;
     }
 
