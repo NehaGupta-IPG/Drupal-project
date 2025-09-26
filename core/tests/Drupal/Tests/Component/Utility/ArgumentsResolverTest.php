@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\ArgumentsResolver;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -94,7 +93,14 @@ class ArgumentsResolverTest extends TestCase {
     $arguments = (new ArgumentsResolver([], ['string' => $string], []))->getArguments($callable);
     $this->assertSame([$string], $arguments);
 
-    $stringable = new TranslatableMarkup('Translated string');
+    $stringable = new class implements \Stringable {
+
+      public function __toString(): string {
+        return 'Translated string';
+      }
+
+    };
+
     $arguments = (new ArgumentsResolver([], ['string' => $stringable], []))->getArguments($callable);
     $this->assertSame([$stringable], $arguments);
   }
