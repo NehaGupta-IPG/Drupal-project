@@ -439,27 +439,6 @@ class ContentTranslationHooks {
   }
 
   /**
-   * Implements hook_entity_extra_field_info().
-   */
-  #[Hook('entity_extra_field_info')]
-  public function entityExtraFieldInfo(): array {
-    $extra = [];
-    $bundle_info_service = \Drupal::service('entity_type.bundle.info');
-    foreach (\Drupal::entityTypeManager()->getDefinitions() as $entity_type => $info) {
-      foreach ($bundle_info_service->getBundleInfo($entity_type) as $bundle => $bundle_info) {
-        if (\Drupal::service('content_translation.manager')->isEnabled($entity_type, $bundle)) {
-          $extra[$entity_type][$bundle]['form']['translation'] = [
-            'label' => $this->t('Translation'),
-            'description' => $this->t('Translation settings'),
-            'weight' => 10,
-          ];
-        }
-      }
-    }
-    return $extra;
-  }
-
-  /**
    * Implements hook_form_FORM_ID_alter() for 'field_config_edit_form'.
    */
   #[Hook('form_field_config_edit_form_alter')]
