@@ -34,7 +34,7 @@
  * @ingroup themeable
  */
 #}
-{% set heading_id = attributes.id|default('block-' ~ base_plugin_id ~ '-' ~ derivative_plugin_id) ~ '-menu'|clean_id %}
+{% set heading_id = attributes.id|default('block-' ~ base_plugin_id ~ '-' ~ derivative_plugin_id) ~ '-menu'|clean_unique_id %}
 <nav role="navigation" aria-labelledby="{{ heading_id }}"{{ attributes|without('role', 'aria-labelledby') }}>
   {# Label. If not displayed, we still provide it for screen readers. #}
   {% if not configuration.label_display %}

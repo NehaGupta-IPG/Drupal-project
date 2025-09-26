@@ -414,7 +414,7 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
     // Assert that the blocks are visible, and save the layout.
     $assert_session->pageTextContains('Powered by Drupal');
     $assert_session->pageTextContains('My Menu');
-    $assert_session->elementExists('css', '.block.menu--my-menu');
+    $assert_session->elementExists('css', '#block-my-menu-menu');
     $page->pressButton('Save layout');
 
     // Delete the menu.
