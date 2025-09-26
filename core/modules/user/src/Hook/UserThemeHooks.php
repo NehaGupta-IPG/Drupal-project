@@ -80,6 +80,8 @@ class UserThemeHooks {
    */
   public function preprocessUsername(array &$variables): void {
     $account = $variables['account'] ?: new AnonymousUserSession();
+    $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    $variables['attributes']['lang'] = !empty($account->getPreferredLangcode()) ? $account->getPreferredLangcode() : $language;
 
     $variables['extra'] = '';
     $variables['uid'] = $account->id();
