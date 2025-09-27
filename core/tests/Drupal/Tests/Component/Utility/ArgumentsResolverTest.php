@@ -90,7 +90,7 @@ class ArgumentsResolverTest extends TestCase {
     $callable = function (string|\Stringable $string) {};
 
     $string = 'Untranslated string';
-    $arguments = (new ArgumentsResolver([], ['string' => $string], []))->getArguments($callable);
+    $arguments = (new ArgumentsResolver(['string' => $string], [], []))->getArguments($callable);
     $this->assertSame([$string], $arguments);
 
     $stringable = new class implements \Stringable {

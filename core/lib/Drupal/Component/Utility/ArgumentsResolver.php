@@ -90,6 +90,9 @@ class ArgumentsResolver implements ArgumentsResolverInterface {
       if (isset($this->objects[$parameter_name]) && $parameter_type->accepts($this->objects[$parameter_name])) {
         return $this->objects[$parameter_name];
       }
+      elseif (isset($this->scalars[$parameter_name]) && $parameter_type->accepts($this->scalars[$parameter_name])) {
+        return $this->scalars[$parameter_name];
+      }
       foreach ($this->wildcards as $wildcard) {
         if ($parameter_type->accepts($wildcard)) {
           return $wildcard;
