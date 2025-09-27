@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Plugin\Validation\Constraint\CompositeConstraintBase;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Mocks\TestMockedTime;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Entity Validation API.
  */
 #[Group('Entity')]
-class EntityValidationTest extends EntityKernelTestBase {
+class EntityValidationTest extends EntityKernelTestBase implements ServiceModifierInterface {
 
   /**
    * {@inheritdoc}
@@ -64,6 +67,14 @@ class EntityValidationTest extends EntityKernelTestBase {
 
     // Install required default configuration for filter module.
     $this->installConfig(['system', 'filter']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function alter(ContainerBuilder $container) {
+    $service_definition = $container->getDefinition('datetime.time');
+    $service_definition->setClass(TestMockedTime::class);
   }
 
   /**
@@ -231,6 +242,10 @@ class EntityValidationTest extends EntityKernelTestBase {
     $violations = $entity->validate();
     $this->assertEquals(1, $violations->count());
     $this->assertEquals('The content has either been modified by another user, or you have already submitted modifications. As a result, your changes cannot be saved.', $violations[0]->getMessage());
+
+    // Advance the current time.
+    $time = $this->container->get('datetime.time');
+    $time->incrementRequestTime();
 
     $entity = $storage->loadUnchanged($entity->id());
     $translation = $entity->addTranslation('de');
