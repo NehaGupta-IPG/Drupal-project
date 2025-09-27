@@ -17,7 +17,7 @@ class TestMockedTime extends Time {
   /**
    * The mocked request time.
    */
-  protected int $requestTime = 0;
+  protected int $requestTime = 10_000;
 
   /**
    * Sets the request time.
