@@ -31,6 +31,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Validation;
 
 /**
+ * Defines a recipe object.
+ *
  * @internal
  *   This API is experimental.
  */
@@ -39,6 +41,8 @@ final class Recipe {
   const COMPOSER_PROJECT_TYPE = 'drupal-recipe';
 
   /**
+   * Constructs a new Recipe object.
+   *
    * @param string $name
    *   The human-readable name of the recipe.
    * @param string $description
@@ -234,7 +238,7 @@ final class Recipe {
                 ]),
               ]),
               // Every input must define a default value.
-              'default' => new Required([
+              'default_value' => new Required([
                 new Collection([
                   'source' => new Required([
                     new Choice(['value', 'config', 'env']),

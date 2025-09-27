@@ -24,8 +24,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 
 /**
- * Tests Input.
+ * Tests recipe input collection and default value handling.
  *
+ * @group Recipe
+ * @covers \Drupal\Core\Recipe\InputConfigurator
  * @legacy-covers \Drupal\Core\Recipe\InputConfigurator
  */
 #[Group('Recipe')]
@@ -127,7 +129,7 @@ input:
         question: What is the capital of Assyria?
         # This argument should be discarded.
         validator: 'test_validator'
-    default:
+    default_value:
       source: value
       value: "I don't know that!"
 YAML
@@ -154,7 +156,7 @@ input:
     description: The capital of a long-defunct country.
     prompt:
       method: ask
-    default:
+    default_value:
       source: value
       value: "I don't know that!"
 YAML
@@ -181,7 +183,7 @@ YAML
         'capital' => [
           'data_type' => 'string',
           'description' => 'This will use the fallback value.',
-          'default' => [
+          'default_value' => [
             'source' => 'config',
             'config' => ['foo.baz', 'bar'],
             'fallback' => 'fallback',
@@ -201,13 +203,13 @@ YAML
     $this->assertSame(['capital' => 'fallback'], $recipe->input->getValues());
 
     // NULL is an allowable fallback value.
-    $recipe_data['input']['capital']['default']['fallback'] = NULL;
+    $recipe_data['input']['capital']['default_value']['fallback'] = NULL;
     $recipe = $this->createRecipe($recipe_data);
     $recipe->input->collectAll($collector);
     $this->assertSame(['capital' => NULL], $recipe->input->getValues());
 
     // If there's no fallback value at all, we should get an exception.
-    unset($recipe_data['input']['capital']['default']['fallback']);
+    unset($recipe_data['input']['capital']['default_value']['fallback']);
     $recipe = $this->createRecipe($recipe_data);
     $this->expectException(\RuntimeException::class);
     $this->expectExceptionMessage("The 'foo.baz' config object does not exist.");
@@ -226,25 +228,25 @@ input:
   capital:
     data_type: string
     description: Your favorite state capital.
-    default:
+    default_value:
       source: value
       value: Boston
   some_int:
     data_type: integer
     description: This is an integer and should be stored as an integer.
-    default:
+    default_value:
       source: value
       value: 1234
   some_bool:
     data_type: boolean
     description: This is a boolean and should be stored as a boolean.
-    default:
+    default_value:
       source: value
       value: false
   some_float:
     data_type: float
     description: Pi is a float, should be stored as a float.
-    default:
+    default_value:
       source: value
       value: 3.141
 config:
@@ -337,7 +339,7 @@ input:
     description: Foo
     prompt:
       method: askHidden
-    default:
+    default_value:
       source: value
       value: bar
 YAML
@@ -364,7 +366,7 @@ input:
   name:
     data_type: string
     description: The name of the site.
-    default:
+    default_value:
       source: env
       env: SITE_NAME
 config:
@@ -401,7 +403,7 @@ YAML
         'capital' => [
           'data_type' => 'string',
           'description' => 'This will use the fallback value.',
-          'default' => [
+          'default_value' => [
             'source' => 'env',
             'env' => 'NO_SUCH_THING',
             'fallback' => 'fallback',
@@ -421,13 +423,13 @@ YAML
     $this->assertSame(['capital' => 'fallback'], $recipe->input->getValues());
 
     // NULL is an allowable fallback value.
-    $recipe_data['input']['capital']['default']['fallback'] = NULL;
+    $recipe_data['input']['capital']['default_value']['fallback'] = NULL;
     $recipe = $this->createRecipe($recipe_data);
     $recipe->input->collectAll($collector);
     $this->assertSame(['capital' => NULL], $recipe->input->getValues());
 
     // If there's no fallback value at all, we should get an exception.
-    unset($recipe_data['input']['capital']['default']['fallback']);
+    unset($recipe_data['input']['capital']['default_value']['fallback']);
     $recipe = $this->createRecipe($recipe_data);
     $this->expectException(\RuntimeException::class);
     $this->expectExceptionMessage("The 'NO_SUCH_THING' environment variable is not defined.");
