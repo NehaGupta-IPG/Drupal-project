@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\locale\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests locale batches.
- *
- * @group locale
  */
+#[Group('locale')]
 class LocaleBatchTest extends KernelTestBase {
 
   /**
@@ -18,7 +18,6 @@ class LocaleBatchTest extends KernelTestBase {
    */
   protected static $modules = [
     'locale',
-    'system',
     'language',
   ];
 
