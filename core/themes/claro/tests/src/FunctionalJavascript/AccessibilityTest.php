@@ -52,20 +52,29 @@ class AccessibilityTest extends WebDriverTestBase {
    *
    * @param string $uri
    *   The path to be tested.
-   * @param ?array $options
+   * @param ?array $axe_options
    *   (optional) Associative array of Axe options.
+   * @param ?array $browser_options
+   *   (optional) Associative array of browser options.
    */
   #[DataProvider('providerTestAdminPages')]
-  public function testAdminPages(string $uri, ?array $options = NULL): void {
+  public function testAdminPages(string $uri, ?array $axe_options = NULL, ?array $browser_options = NULL): void {
     $this->drupalGet($uri);
-    $this->executeAxe($options);
+    if (isset($browser_options['window_size'])) {
+      $this->getSession()->resizeWindow($browser_options['window_size']['width'], $browser_options['window_size']['height']);
+    }
+    $this->executeAxe($axe_options);
   }
 
   /**
    * Data provider for testAdminPages.
    *
    * @return array
-   *   Test cases.
+   *   Test cases. Each case is a key-value pair. The key is the test name
+   *   and the value is an array containing:
+   *    - Path to be tested.
+   *    - Optional associative array of Axe options.
+   *    - Optional associative array of browser options.
    */
   public static function providerTestAdminPages(): array {
     return [
@@ -98,6 +107,34 @@ class AccessibilityTest extends WebDriverTestBase {
             'color-contrast' => ['enabled' => FALSE],
             'duplicate-id-active' => ['enabled' => FALSE],
             'region' => ['enabled' => FALSE],
+          ],
+        ],
+      ],
+      // Tests long breadcrumb for https://drupal.org/i/3223147.
+      'Manage text format, mobile' => [
+        '/admin/config/content/formats/manage/restricted_html',
+        [
+          // This is the only way to add WCAG 2.2 tags to defaults.
+          // See https://github.com/dequelabs/axe-core/issues/4717.
+          'runOnly' => [
+            'type' => 'tag',
+            'values' => [
+              'wcag2a',
+              'wcag2aa',
+              'wcag21a',
+              'wcag21aa',
+              'best-practice',
+              'wcag22a',
+              'wcag22aa',
+            ],
+          ],
+        ],
+        [
+          'window_size' => [
+            // Minimum window size seems to be 500px.
+            'width' => 500,
+            // Height used by Lighthouse for mobile.
+            'height' => 823,
           ],
         ],
       ],
