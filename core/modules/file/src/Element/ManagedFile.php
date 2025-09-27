@@ -246,7 +246,7 @@ class ManagedFile extends FormElementBase {
       '#type' => 'submit',
       '#value' => t('Upload'),
       '#attributes' => ['class' => ['js-hide']],
-      '#validate' => [],
+      '#validate' => ['::validateNone'],
       '#submit' => ['file_managed_file_submit'],
       '#limit_validation_errors' => [$element['#parents']],
       '#ajax' => $ajax_settings,
@@ -262,7 +262,7 @@ class ManagedFile extends FormElementBase {
       '#name' => $parents_prefix . '_remove_button',
       '#type' => 'submit',
       '#value' => $element['#multiple'] ? t('Remove selected') : t('Remove'),
-      '#validate' => [],
+      '#validate' => ['::validateNone'],
       '#submit' => ['file_managed_file_submit'],
       '#limit_validation_errors' => [$element['#parents']],
       '#ajax' => $ajax_settings,
@@ -469,6 +469,15 @@ class ManagedFile extends FormElementBase {
    */
   protected static function fileUsage() {
     return \Drupal::service('file.usage');
+  }
+
+  /**
+   * Validator for upload and remove button.
+   *
+   * This method is intentionally left empty as no validation.
+   */
+  public function validateNone($form, FormStateInterface $form_state): void {
+    // Do nothing.
   }
 
 }
