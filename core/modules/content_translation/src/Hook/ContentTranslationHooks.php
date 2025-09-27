@@ -350,6 +350,11 @@ class ContentTranslationHooks {
           ],
         ];
       }
+
+      $data_table = $entity_type->getDataTable();
+      if (isset($data[$data_table]['content_translation_outdated']) && $manager->isEnabled($entity_type_id)) {
+        $data[$data_table]['content_translation_outdated']['field']['id'] = 'language_boolean';
+      }
     }
   }
 
