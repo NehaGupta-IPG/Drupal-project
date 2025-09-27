@@ -18,7 +18,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  *
  * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
  * \Drupal\Mocks\TestMockedTime or \Drupal\update_test\Datetime\TestTime
- * instead. See https://www.drupal.org/project/drupal/issues/2908210
+ * instead.
+ * @see https://www.drupal.org/project/drupal/issues/2908210
  */
 #[FieldType(
   id: "changed_test",
