@@ -6,14 +6,14 @@ namespace Drupal\Tests\views\Kernel;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the template retrieval of views.
  *
- * @group views
- *
  * @see \Drupal\views_test_data\Plugin\views\style\StyleTemplateTest
  */
+#[Group('views')]
 class ViewsTemplateTest extends ViewsKernelTestBase {
 
   /**
@@ -24,7 +24,7 @@ class ViewsTemplateTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
     // Enable Twig debugging.
     $parameters = $container->getParameter('twig.config');
@@ -45,8 +45,11 @@ class ViewsTemplateTest extends ViewsKernelTestBase {
   }
 
   /**
-   * @covers views_theme_suggestions_container_alter
+   * Tests theme suggestions container alter.
+   *
    * @throws \Exception
+   *
+   * @legacy-covers \Drupal\views\Hook\ViewsHooks::themeSuggestionsContainerAlter
    */
   public function testThemeSuggestionsContainerAlter(): void {
     $build = [

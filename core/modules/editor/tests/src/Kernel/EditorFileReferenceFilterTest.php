@@ -10,20 +10,18 @@ use Drupal\file\Entity\File;
 use Drupal\filter\FilterPluginCollection;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests Editor module's file reference filter.
- *
- * @group editor
  */
+#[Group('editor')]
 class EditorFileReferenceFilterTest extends KernelTestBase {
 
   use TestFileCreationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',

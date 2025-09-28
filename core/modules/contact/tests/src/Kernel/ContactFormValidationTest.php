@@ -7,13 +7,12 @@ namespace Drupal\Tests\contact\Kernel;
 use Drupal\contact\ContactFormInterface;
 use Drupal\contact\Entity\ContactForm;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests validation of contact_form entities.
- *
- * @group contact
- * @group #slow
  */
+#[Group('contact')]
 class ContactFormValidationTest extends ConfigEntityValidationTestBase {
 
   /**

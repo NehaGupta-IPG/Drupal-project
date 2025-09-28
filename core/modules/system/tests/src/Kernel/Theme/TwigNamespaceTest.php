@@ -5,19 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Kernel\Theme;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 use Twig\TemplateWrapper;
 
 /**
  * Tests Twig namespaces.
- *
- * @group Theme
  */
+#[Group('Theme')]
 class TwigNamespaceTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'twig_theme_test',

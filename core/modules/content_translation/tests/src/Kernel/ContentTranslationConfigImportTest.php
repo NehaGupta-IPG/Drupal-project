@@ -7,12 +7,12 @@ namespace Drupal\Tests\content_translation\Kernel;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests content translation updates performed during config import.
- *
- * @group content_translation
  */
+#[Group('content_translation')]
 class ContentTranslationConfigImportTest extends KernelTestBase {
 
   /**
@@ -23,9 +23,7 @@ class ContentTranslationConfigImportTest extends KernelTestBase {
   protected $configImporter;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',

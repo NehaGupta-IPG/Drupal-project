@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\shortcut\Functional;
 
-use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Language\Language;
+use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the shortcut translation UI.
- *
- * @group Shortcut
  */
+#[Group('Shortcut')]
+#[RunTestsInSeparateProcesses]
 class ShortcutTranslationUITest extends ContentTranslationUITestBase {
 
   /**
@@ -21,9 +23,7 @@ class ShortcutTranslationUITest extends ContentTranslationUITestBase {
   protected $defaultCacheContexts = ['languages:language_interface', 'session', 'theme', 'user', 'url.path', 'url.query_args', 'url.site'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',
@@ -70,12 +70,14 @@ class ShortcutTranslationUITest extends ContentTranslationUITestBase {
     return ['title' => [['value' => $this->randomMachineName()]]] + parent::getNewEntityValues($langcode);
   }
 
-  protected function doTestBasicTranslation() {
+  /**
+   * Tests basic translation functionality for an entity.
+   */
+  protected function doTestBasicTranslation(): void {
     parent::doTestBasicTranslation();
 
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($this->entityTypeId);
-    $storage->resetCache([$this->entityId]);
     $entity = $storage->load($this->entityId);
     foreach ($this->langcodes as $langcode) {
       if ($entity->hasTranslation($langcode)) {
@@ -93,10 +95,9 @@ class ShortcutTranslationUITest extends ContentTranslationUITestBase {
   /**
    * {@inheritdoc}
    */
-  protected function doTestTranslationEdit() {
+  protected function doTestTranslationEdit(): void {
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($this->entityTypeId);
-    $storage->resetCache([$this->entityId]);
     $entity = $storage->load($this->entityId);
     $languages = $this->container->get('language_manager')->getLanguages();
 
@@ -114,10 +115,9 @@ class ShortcutTranslationUITest extends ContentTranslationUITestBase {
   /**
    * Tests the basic translation workflow.
    */
-  protected function doTestTranslationChanged() {
+  protected function doTestTranslationChanged(): void {
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($this->entityTypeId);
-    $storage->resetCache([$this->entityId]);
     $entity = $storage->load($this->entityId);
 
     $this->assertFalse(

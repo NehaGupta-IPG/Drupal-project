@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Form\FormState;
 use Drupal\views\Plugin\views\area\Broken as BrokenArea;
 use Drupal\views\Plugin\views\field\Broken as BrokenField;
@@ -12,12 +11,12 @@ use Drupal\views\Plugin\views\filter\Broken as BrokenFilter;
 use Drupal\views\Plugin\views\filter\Standard;
 use Drupal\views\Plugin\views\ViewsHandlerInterface;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests basic functions from the Views module.
- *
- * @group views
  */
+#[Group('views')]
 class ModuleTest extends ViewsKernelTestBase {
 
   /**
@@ -28,9 +27,7 @@ class ModuleTest extends ViewsKernelTestBase {
   public static $testViews = ['test_view_status', 'test_view', 'test_argument'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field', 'user', 'block'];
 
@@ -80,7 +77,7 @@ class ModuleTest extends ViewsKernelTestBase {
         $this->assertEquals($description_bottom, $form['description']['description_bottom']['#markup']);
         $details = [];
         foreach ($item as $key => $value) {
-          $details[] = new FormattableMarkup('@key: @value', ['@key' => $key, '@value' => $value]);
+          $details[] = "$key: $value";
         }
         $this->assertEquals($details, $form['description']['detail_list']['#items']);
       }

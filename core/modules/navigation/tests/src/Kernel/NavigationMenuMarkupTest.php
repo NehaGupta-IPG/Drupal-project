@@ -11,22 +11,21 @@ use Drupal\navigation\Plugin\Block\NavigationMenuBlock;
 use Drupal\system\Entity\Menu;
 use Drupal\system\Tests\Routing\MockRouteProvider;
 use Drupal\Tests\Core\Menu\MenuLinkMock;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Tests \Drupal\navigation\Plugin\Block\NavigationMenuBlock.
  *
- * @group navigation
  * @see \Drupal\navigation\Plugin\Derivative\SystemMenuNavigationBlock
  * @see \Drupal\navigation\Plugin\Block\NavigationMenuBlock
  */
+#[Group('navigation')]
 class NavigationMenuMarkupTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
@@ -120,7 +119,7 @@ class NavigationMenuMarkupTest extends KernelTestBase {
     $links = [
       1 => MenuLinkMock::create(['id' => 'test.example1', 'route_name' => 'example1', 'title' => 'title 1', 'parent' => '', 'weight' => 0]),
       2 => MenuLinkMock::create(['id' => 'test.example2', 'route_name' => 'example2', 'title' => 'Another title', 'parent' => '', 'route_parameters' => ['foo' => 'bar'], 'weight' => 1]),
-      3 => MenuLinkMock::create(['id' => 'test.example3', 'route_name' => 'example3', 'title' => 'A menu link', 'parent' => 'test.example2', 'weight' => 2]),
+      3 => MenuLinkMock::create(['id' => 'test.example3', 'route_name' => 'example3', 'title' => 'Nested menu link', 'parent' => 'test.example2', 'weight' => 2]),
     ];
     // phpcs:enable
     foreach ($links as $instance) {
@@ -151,12 +150,12 @@ class NavigationMenuMarkupTest extends KernelTestBase {
       "//li[contains(@class,'toolbar-block__list-item')]/a[@data-icon-text='ti']",
       "//li[contains(@class,'toolbar-block__list-item')]/button[@data-index-text='a']",
       "//li[contains(@class,'toolbar-block__list-item')]/button[@data-icon-text='An']",
-      "//li[contains(@class,'toolbar-menu__item--level-1')]/a[@data-index-text='a']",
-      "//li[contains(@class,'toolbar-menu__item--level-1')]/a[not(@data-icon-text)]",
+      "//li[contains(@class,'toolbar-menu__item--level-1')]/a[@data-index-text='n']",
+      "//li[contains(@class,'toolbar-menu__item--level-1')]/a[@data-icon-text='Ne']",
     ];
     foreach ($items_query as $query) {
-      $span = $xpath->query($query);
-      $this->assertEquals(1, $span->length, $query);
+      $element = $xpath->query($query);
+      $this->assertEquals(1, $element->length, $query);
     }
   }
 

@@ -7,12 +7,13 @@ namespace Drupal\KernelTests\Core\Theme;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Theme\Registry;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests Stable 9's template overrides.
- *
- * @group Theme
  */
+#[Group('Theme')]
+#[Group('#slow')]
 class Stable9TemplateOverrideTest extends KernelTestBase {
 
   /**
@@ -63,7 +64,7 @@ class Stable9TemplateOverrideTest extends KernelTestBase {
   /**
    * Installs all core modules.
    */
-  protected function installAllModules() {
+  protected function installAllModules(): void {
     // Enable all core modules.
     $all_modules = $this->container->get('extension.list.module')->getList();
     $all_modules = array_filter($all_modules, function ($module) {
@@ -97,7 +98,7 @@ class Stable9TemplateOverrideTest extends KernelTestBase {
 
     $registry_full = $registry->get();
 
-    foreach ($registry_full as $hook => $info) {
+    foreach ($registry_full as $info) {
       if (isset($info['template'])) {
         // Allow skipping templates.
         if (in_array($info['template'], $this->templatesToSkip)) {

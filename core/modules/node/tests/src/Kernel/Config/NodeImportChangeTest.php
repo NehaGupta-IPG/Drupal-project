@@ -4,20 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel\Config;
 
-use Drupal\node\Entity\NodeType;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Change content types during config create method invocation.
- *
- * @group node
  */
+#[Group('node')]
 class NodeImportChangeTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node',

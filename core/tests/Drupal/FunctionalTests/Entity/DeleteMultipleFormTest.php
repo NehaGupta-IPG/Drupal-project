@@ -9,14 +9,16 @@ use Drupal\entity_test\Entity\EntityTestMulRevPub;
 use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the delete multiple confirmation form.
- *
- * @group Entity
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
  */
+#[Group('Entity')]
+#[PreserveGlobalState(FALSE)]
+#[RunTestsInSeparateProcesses]
 class DeleteMultipleFormTest extends BrowserTestBase {
 
   /**
@@ -27,9 +29,7 @@ class DeleteMultipleFormTest extends BrowserTestBase {
   protected $account;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test', 'user', 'language'];
 

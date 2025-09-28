@@ -6,18 +6,16 @@ namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Drupal\views\Plugin\views\field\Counter handler.
- *
- * @group views
  */
+#[Group('views')]
 class FieldCounterTest extends ViewsKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['user'];
 
@@ -28,6 +26,9 @@ class FieldCounterTest extends ViewsKernelTestBase {
    */
   public static $testViews = ['test_view'];
 
+  /**
+   * Tests the behavior of a simple View rendering with overridden field options.
+   */
   public function testSimple(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();

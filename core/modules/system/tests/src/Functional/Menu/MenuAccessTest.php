@@ -7,18 +7,18 @@ namespace Drupal\Tests\system\Functional\Menu;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the route access checks on menu links.
- *
- * @group Menu
  */
+#[Group('Menu')]
+#[RunTestsInSeparateProcesses]
 class MenuAccessTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'filter', 'toolbar', 'menu_ui'];
 
@@ -78,8 +78,8 @@ class MenuAccessTest extends BrowserTestBase {
   /**
    * Test routes implementing _access_admin_menu_block_page.
    *
-   * @covers \Drupal\system\EventSubscriber\AccessRouteAlterSubscriber::accessAdminMenuBlockPage
-   * @covers \Drupal\system\Access\SystemAdminMenuBlockAccessCheck::access
+   * @legacy-covers \Drupal\system\EventSubscriber\AccessRouteAlterSubscriber::accessAdminMenuBlockPage
+   * @legacy-covers \Drupal\system\Access\SystemAdminMenuBlockAccessCheck::access
    */
   public function testSystemAdminMenuBlockAccessCheck(): void {
     // Create an admin user.
@@ -329,10 +329,11 @@ class MenuAccessTest extends BrowserTestBase {
       Url::fromRoute('menu_test.child_test_param_explicit', ['param' => 'my_default'])
     );
 
-    // If we try to access a route that takes a parameter but route is not in the
-    // with that parameter we should always be denied access because the sole
-    // purpose of \Drupal\system\Controller\SystemController::systemAdminMenuBlockPage
-    // is to display items in the menu.
+    // If we try to access a route that takes a parameter but route is not in
+    // the with that parameter we should always be denied access because the
+    // sole purpose of
+    // \Drupal\system\Controller\SystemController::systemAdminMenuBlockPage is
+    // to display items in the menu.
     $this->drupalLogin($parentUser);
     $this->assertMenuItemRoutesAccess(
       403,

@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 
-use Drupal\views\Views;
 use Drupal\views\ViewExecutable;
+use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests mapping style functionality.
- *
- * @group views
  */
+#[Group('views')]
 class StyleMappingTest extends StyleTestBase {
-
-  protected static $modules = ['system'];
 
   /**
    * Views used by this test.
@@ -47,7 +45,7 @@ class StyleMappingTest extends StyleTestBase {
    * @return string
    *   The view rendered as HTML.
    */
-  protected function mappedOutputHelper(ViewExecutable $view) {
+  protected function mappedOutputHelper(ViewExecutable $view): string {
     $output = $view->preview();
     $rendered_output = (string) \Drupal::service('renderer')->renderRoot($output);
     $this->storeViewPreview($rendered_output);

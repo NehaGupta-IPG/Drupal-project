@@ -6,21 +6,18 @@ namespace Drupal\Tests\system\Kernel\Installer;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\module_test\PluginManagerCacheClearer;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the uninstallation of modules.
- *
- * @group Module
  */
+#[Group('Module')]
 class UninstallKernelTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'user',
     'field',
     'file',

@@ -5,19 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\serialization\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Functional tests for serialization system.
- *
- * @group serialization
  */
+#[Group('serialization')]
 class SerializationTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['serialization', 'serialization_test'];
 

@@ -8,15 +8,16 @@ use Drupal\Component\PhpStorage\MTimeProtectedFileStorage;
 use Drupal\Core\PhpStorage\PhpStorageFactory;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PublicStream;
-use Drupal\system\PhpStorage\MockPhpStorage;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\system\PhpStorage\MockPhpStorage;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the PHP storage factory.
  *
- * @group PhpStorage
  * @see \Drupal\Core\PhpStorage\PhpStorageFactory
  */
+#[Group('PhpStorage')]
 class PhpStorageFactoryTest extends KernelTestBase {
 
   /**
@@ -94,7 +95,7 @@ class PhpStorageFactoryTest extends KernelTestBase {
    * @param array $configuration
    *   An array of configuration to set. Will be merged with default values.
    */
-  protected function setSettings($name = 'default', array $configuration = []) {
+  protected function setSettings($name = 'default', array $configuration = []): void {
     $settings['php_storage'][$name] = $configuration + [
       'class' => 'Drupal\system\PhpStorage\MockPhpStorage',
       'directory' => 'tmp://',

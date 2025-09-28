@@ -92,14 +92,14 @@ class DrupalDialogEvent extends Event {
       dialog.open = true;
 
       // Locks the body scroll only when it opens in modal.
-      if (settings.modal) {
+      if (event.settings.modal) {
         // Locks the body when the dialog opens.
         bodyScrollLock.lock(domElement);
       }
 
       $($element.get(0).parentElement).removeAttr('tabindex');
       domElement.dispatchEvent(
-        new DrupalDialogEvent('aftercreate', dialog, settings),
+        new DrupalDialogEvent('aftercreate', dialog, event.settings),
       );
     }
 
@@ -117,10 +117,10 @@ class DrupalDialogEvent extends Event {
     }
 
     dialog.show = () => {
-      openDialog({ modal: false });
+      openDialog({ modal: false, uiDialogTitleHeadingLevel: 2 });
     };
     dialog.showModal = () => {
-      openDialog({ modal: true });
+      openDialog({ modal: true, uiDialogTitleHeadingLevel: 1 });
     };
     dialog.close = closeDialog;
 

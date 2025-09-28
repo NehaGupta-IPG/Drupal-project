@@ -6,18 +6,22 @@ namespace Drupal\Tests\layout_builder\Kernel;
 
 use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\entity_test\EntityTestHelper;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use Drupal\layout_builder\Hook\LayoutBuilderHooks;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Routing\Route;
 
 /**
- * @covers layout_builder_entity_view_alter
+ * Tests Entity View Alter.
  *
- * @group layout_builder
+ * @legacy-covers \Drupal\layout_builder\Hook\LayoutBuilderHooks::entityViewAlter
  */
+#[Group('layout_builder')]
 class EntityViewAlterTest extends KernelTestBase {
 
   /**
@@ -36,7 +40,7 @@ class EntityViewAlterTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    entity_test_create_bundle('bundle_with_extra_fields');
+    EntityTestHelper::createBundle('bundle_with_extra_fields');
     $this->installEntitySchema('entity_test');
     $this->installConfig(['layout_builder_defaults_test']);
   }
@@ -57,7 +61,8 @@ class EntityViewAlterTest extends KernelTestBase {
     $request->setSession(new Session(new MockArraySessionStorage()));
     \Drupal::requestStack()->push($request);
     // Assert the contextual links are removed.
-    layout_builder_entity_view_alter($build, $entity, $display);
+    $layoutBuilderEntityViewAlter = new LayoutBuilderHooks();
+    $layoutBuilderEntityViewAlter->entityViewAlter($build, $entity, $display);
     $this->assertArrayNotHasKey('#contextual_links', $build);
   }
 

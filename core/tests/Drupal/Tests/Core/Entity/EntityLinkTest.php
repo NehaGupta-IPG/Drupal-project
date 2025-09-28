@@ -4,17 +4,22 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Entity\EntityBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Link;
+use Drupal\Tests\Core\Config\Entity\StubConfigEntity;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Entity\EntityBase
- * @group Entity
+ * Tests Drupal\Core\Entity\EntityBase.
  */
+#[CoversClass(EntityBase::class)]
+#[Group('Entity')]
 class EntityLinkTest extends UnitTestCase {
 
   /**
@@ -58,10 +63,9 @@ class EntityLinkTest extends UnitTestCase {
   /**
    * Tests for the EntityBase::toLink() method.
    *
-   * @covers ::toLink
-   *
-   * @dataProvider providerTestLink
+   * @legacy-covers ::toLink
    */
+  #[DataProvider('providerTestLink')]
   public function testToLink($entity_label, $link_text, $expected_text, $link_rel = 'canonical', array $link_options = []): void {
     $language = new Language(['id' => 'es']);
     $link_options += ['language' => $language];
@@ -95,11 +99,10 @@ class EntityLinkTest extends UnitTestCase {
       ->with($entity_type_id)
       ->willReturn($entity_type);
 
-    /** @var \Drupal\Core\Entity\Entity $entity */
-    $entity = $this->getMockForAbstractClass(ConfigEntityBase::class, [
+    $entity = new StubConfigEntity(
       ['id' => $entity_id, 'label' => $entity_label, 'langcode' => 'es'],
       $entity_type_id,
-    ]);
+    );
 
     $expected_link = Link::createFromRoute(
       $expected_text,
@@ -149,7 +152,7 @@ class EntityLinkTest extends UnitTestCase {
       'link text',
       'link text',
       'edit-form',
-      ['foo' => 'qwer'],
+      ['foo' => 'bar'],
     ];
     return $data;
   }

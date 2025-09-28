@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests processing of theme .info.yml properties.
- *
- * @group Theme
  */
+#[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class ThemeInfoTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['theme_test'];
 
@@ -61,12 +61,12 @@ class ThemeInfoTest extends BrowserTestBase {
    * Tests libraries-override.
    */
   public function testStylesheets(): void {
-    $this->themeInstaller->install(['test_basetheme', 'test_subtheme']);
+    $this->themeInstaller->install(['test_base_theme', 'test_subtheme']);
     $this->config('system.theme')
       ->set('default', 'test_subtheme')
       ->save();
 
-    $base = $this->getThemePath('test_basetheme');
+    $base = $this->getThemePath('test_base_theme');
     $sub = $this->getThemePath('test_subtheme') . '/css';
 
     // All removals are expected to be based on a file's path and name and
@@ -80,9 +80,10 @@ class ThemeInfoTest extends BrowserTestBase {
     $this->assertSession()->elementNotExists('xpath', '//link[contains(@href, "sub-remove.css")]');
     $this->assertSession()->elementNotExists('xpath', '//link[contains(@href, "base-add.sub-remove.css")]');
 
-    // Verify that CSS files with the same name are loaded from both the base theme and subtheme.
-    $this->assertSession()->elementsCount('xpath', '//link[contains(@href, "' . $base . '/samename.css")]', 1);
-    $this->assertSession()->elementsCount('xpath', '//link[contains(@href, "' . $sub . '/samename.css")]', 1);
+    // Verify that CSS files with the same name are loaded from both the base
+    // theme and subtheme.
+    $this->assertSession()->elementsCount('xpath', '//link[contains(@href, "' . $base . '/same-name.css")]', 1);
+    $this->assertSession()->elementsCount('xpath', '//link[contains(@href, "' . $sub . '/same-name.css")]', 1);
 
   }
 

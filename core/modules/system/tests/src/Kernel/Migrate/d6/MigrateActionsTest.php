@@ -6,14 +6,17 @@ namespace Drupal\Tests\system\Kernel\Migrate\d6;
 
 use Drupal\system\Entity\Action;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests migration of action items.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
 class MigrateActionsTest extends MigrateDrupal6TestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['comment', 'node'];
 
   /**

@@ -6,12 +6,12 @@ namespace Drupal\Tests\node\Kernel;
 
 use Drupal\Core\Database\Database;
 use Drupal\node\Entity\Node;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests hook_node_access_records when acquiring grants.
- *
- * @group node
  */
+#[Group('node')]
 class NodeAccessRecordsTest extends NodeAccessTestBase {
 
   /**
@@ -88,7 +88,7 @@ class NodeAccessRecordsTest extends NodeAccessTestBase {
     // Create a user that is allowed to access content.
     $web_user = $this->drupalCreateUser(['access content']);
     foreach ($operations as $op) {
-      $grants = node_test_node_grants($web_user, $op);
+      $grants = \Drupal::moduleHandler()->invoke('node', 'node_grants', [$web_user, $op]);
       $altered_grants = $grants;
       \Drupal::moduleHandler()->alter('node_grants', $altered_grants, $web_user, $op);
       $this->assertNotEquals($grants, $altered_grants, "Altered the $op grant for a user.");

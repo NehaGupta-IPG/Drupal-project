@@ -4,21 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\contact\Kernel\Migrate;
 
-use Drupal\contact\Entity\ContactForm;
 use Drupal\contact\ContactFormInterface;
+use Drupal\contact\Entity\ContactForm;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Migrate contact categories to contact.form.*.yml.
- *
- * @group contact_category
  */
+#[Group('contact_category')]
 class MigrateContactCategoryTest extends MigrateDrupal6TestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['contact'];
 

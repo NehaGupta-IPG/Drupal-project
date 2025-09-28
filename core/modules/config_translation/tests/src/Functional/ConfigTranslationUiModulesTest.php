@@ -6,18 +6,19 @@ namespace Drupal\Tests\config_translation\Functional;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Language\Language;
+use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore testcontent tuvan
-
 /**
  * Translate settings and entities to various languages.
- *
- * @group config_translation
- * @group #slow
  */
+#[Group('config_translation')]
+#[RunTestsInSeparateProcesses]
 class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
 
   /**
@@ -222,7 +223,7 @@ class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
     $field_storage->save();
 
     $bundle = $this->randomMachineName();
-    entity_test_create_bundle($bundle);
+    EntityTestHelper::createBundle($bundle);
     $field = FieldConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'entity_test',
@@ -257,7 +258,7 @@ class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
     ])->save();
 
     $bundle = $this->randomMachineName();
-    entity_test_create_bundle($bundle);
+    EntityTestHelper::createBundle($bundle);
     $field = FieldConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'entity_test',
@@ -277,7 +278,7 @@ class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
 
     // Checks the text of details summary element that surrounds the translation
     // options.
-    $this->assertSession()->responseContains(Html::escape(strip_tags($on_label)) . ' Boolean settings');
+    $this->assertSession()->responseContains(Html::escape($on_label) . ' Boolean settings');
 
     // Checks that the correct on and off labels appear on the form.
     $this->assertSession()->assertEscaped($on_label);
@@ -392,9 +393,8 @@ class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
       'entity_type' => 'node',
       'type' => 'text',
     ]);
-
-    $field_storage->setSetting('translatable_storage_setting', 'translatable_storage_setting');
     $field_storage->save();
+
     $field = FieldConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'node',

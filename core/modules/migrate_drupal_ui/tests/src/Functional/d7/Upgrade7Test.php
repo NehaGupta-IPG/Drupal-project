@@ -7,17 +7,18 @@ namespace Drupal\Tests\migrate_drupal_ui\Functional\d7;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\migrate_drupal_ui\Functional\MigrateUpgradeExecuteTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore Filefield Multiupload Imagefield
-
 /**
  * Tests Drupal 7 upgrade using the migrate UI.
  *
  * The test method is provided by the MigrateUpgradeTestBase class.
- *
- * @group migrate_drupal_ui
- * @group #slow
  */
+#[Group('migrate_drupal_ui')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
 
   /**
@@ -67,7 +68,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getSourceBasePath() {
+  protected function getSourceBasePath(): string {
     return __DIR__ . '/files';
   }
 
@@ -76,7 +77,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
    */
   protected function getEntityCounts(): array {
     return [
-      'block' => 27,
+      'block' => 26,
       'block_content' => 1,
       'block_content_type' => 1,
       'comment' => 4,

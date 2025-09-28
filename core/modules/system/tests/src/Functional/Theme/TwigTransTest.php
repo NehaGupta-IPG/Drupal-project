@@ -6,22 +6,21 @@ namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Twig\Error\SyntaxError;
 
 // cspell:ignore contaynz errrf herro kontex muun playsholdr starrrrr starzzzz
 // cspell:ignore sunz sunzzzzzzz txtzzzz
-
 /**
  * Tests Twig "trans" tags.
- *
- * @group Theme
  */
+#[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class TwigTransTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'theme_test',
@@ -127,6 +126,27 @@ class TwigTransTest extends BrowserTestBase {
   }
 
   /**
+   * Testing trans with render array value.
+   */
+  public function testTransRenderArray(): void {
+    $elements = [
+      '#type' => 'inline_template',
+      '#template' => '{% trans %}This is a {{ var }}.{% endtrans %}',
+      '#context' => [
+        'var' => [
+          '#prefix' => '<strong>',
+          '#markup' => 'trans render array',
+          '#suffix' => '</strong>',
+        ],
+      ],
+    ];
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = \Drupal::service('renderer');
+    $text = (string) $renderer->renderInIsolation($elements);
+    $this->assertSame('This is a <strong>trans render array</strong>.', $text);
+  }
+
+  /**
    * Asserts Twig trans tags.
    *
    * @internal
@@ -190,7 +210,7 @@ class TwigTransTest extends BrowserTestBase {
   /**
    * Helper function: install languages.
    */
-  protected function installLanguages() {
+  protected function installLanguages(): void {
     $file_system = \Drupal::service('file_system');
     foreach ($this->languages as $langcode => $name) {
       // Generate custom .po contents for the language.

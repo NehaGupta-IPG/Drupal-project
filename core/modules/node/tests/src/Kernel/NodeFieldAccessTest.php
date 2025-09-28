@@ -7,18 +7,16 @@ namespace Drupal\Tests\node\Kernel;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests node field level access.
- *
- * @group node
  */
+#[Group('node')]
 class NodeFieldAccessTest extends EntityKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node'];
 
@@ -84,7 +82,7 @@ class NodeFieldAccessTest extends EntityKernelTestBase {
     // An unprivileged user.
     $page_unrelated_user = $this->createUser(['access content']);
 
-    // List of all users
+    // List of all users.
     $test_users = [
       $content_admin_user,
       $page_creator_user,

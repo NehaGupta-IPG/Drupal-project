@@ -10,22 +10,22 @@ use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment_base_field_test\Entity\CommentTestBaseField;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that comment as a base field.
- *
- * @group comment
  */
+#[Group('comment')]
 class CommentBaseFieldTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'user',
     'comment',
     'comment_base_field_test',
+    'entity_test',
   ];
 
   /**

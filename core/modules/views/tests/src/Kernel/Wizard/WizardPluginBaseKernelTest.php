@@ -8,19 +8,18 @@ use Drupal\Core\Form\FormState;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views_ui\ViewUI;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the wizard base plugin class.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\wizard\WizardPluginBase
  */
+#[Group('views')]
 class WizardPluginBaseKernelTest extends ViewsKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language', 'system', 'user', 'views_ui'];
 

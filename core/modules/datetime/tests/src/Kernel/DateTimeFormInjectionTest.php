@@ -10,12 +10,12 @@ use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests serializing a form with an injected datetime instance.
- *
- * @group datetime
  */
+#[Group('datetime')]
 class DateTimeFormInjectionTest extends KernelTestBase implements FormInterface {
 
   use DependencySerializationTrait;
@@ -28,9 +28,7 @@ class DateTimeFormInjectionTest extends KernelTestBase implements FormInterface 
   protected $logger;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'datetime'];
 
@@ -85,7 +83,7 @@ class DateTimeFormInjectionTest extends KernelTestBase implements FormInterface 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->assertTrue(TRUE);
     $form_state->setRebuild();
   }

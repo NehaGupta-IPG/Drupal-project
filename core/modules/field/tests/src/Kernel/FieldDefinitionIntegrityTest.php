@@ -11,12 +11,12 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the integrity of field API plugin definitions.
- *
- * @group field
  */
+#[Group('field')]
 class FieldDefinitionIntegrityTest extends KernelTestBase {
 
   /**
@@ -143,7 +143,7 @@ class FieldDefinitionIntegrityTest extends KernelTestBase {
    * @param string $display_context
    *   Defines which display options should be loaded.
    */
-  protected function checkDisplayOption($entity_type_id, $field_id, BaseFieldDefinition $field_definition, DiscoveryInterface $plugin_manager, $display_context) {
+  protected function checkDisplayOption($entity_type_id, $field_id, BaseFieldDefinition $field_definition, DiscoveryInterface $plugin_manager, $display_context): void {
     $display_options = $field_definition->getDisplayOptions($display_context);
     if (!empty($display_options['type'])) {
       $plugin = $plugin_manager->getDefinition($display_options['type'], FALSE);

@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\File;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests the unmanaged file move function.
- *
- * @group File
  */
+#[Group('File')]
 class RemoteFileMoveTest extends FileMoveTest {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['file_test'];
 
