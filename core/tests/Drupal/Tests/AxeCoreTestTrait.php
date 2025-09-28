@@ -41,15 +41,14 @@ trait AxeCoreTestTrait {
    */
   protected function executeAxe(?array $options = NULL): void {
     $session = $this->getSession();
-    $driver = $session->getDriver();
 
     // Load axe-core script.
     $axe_src = file_get_contents(DRUPAL_ROOT . '/core/node_modules/axe-core/axe.min.js');
-    $driver->executeScript($axe_src);
+    $session->executeScript($axe_src);
 
     // Run axe then wait for the results.
     $options_json = json_encode((object) $options);
-    $driver->executeScript(<<<JS
+    $session->executeScript(<<<JS
       // Clear any results or errors from prior runs on same session.
       window.axe_results = undefined;
       window.axe_errors = undefined;
@@ -69,10 +68,10 @@ trait AxeCoreTestTrait {
         });
     JS);
 
-    $driver->wait(1000, 'window.axe_results !== undefined || window.axe_errors !== undefined');
+    $session->wait(1000, 'window.axe_results !== undefined || window.axe_errors !== undefined');
 
     // Retrieve any errors.
-    $errors = $driver->evaluateScript('return window.axe_errors');
+    $errors = $session->evaluateScript('return window.axe_errors');
 
     $this->assertEmpty(
       $errors,
@@ -80,7 +79,8 @@ trait AxeCoreTestTrait {
     );
 
     // Retrieve the results.
-    $results = $driver->evaluateScript('return window.axe_results');
+    // For debugging, `$results['passes']` contains a list of the passed rules.
+    $results = $session->evaluateScript('return window.axe_results');
 
     // Ensure axe returned its results.
     $this->assertNotEmpty($results, 'Axe did not return its results in time.');
@@ -96,6 +96,8 @@ trait AxeCoreTestTrait {
    *
    * @param array $results
    *   Array of violations returned from `axe.run()`.
+   *
+   * @see https://github.com/dequelabs/axe-core/blob/develop/doc/API.md#result-arrays
    */
   protected function formatViolationsReport(array $results): string {
     $message = 'Accessibility test failures';
@@ -123,6 +125,8 @@ trait AxeCoreTestTrait {
    *
    * @param array $nodes
    *   Array of nodes for a single violation.
+   *
+   * @see https://github.com/dequelabs/axe-core/blob/develop/doc/API.md#result-arrays
    */
   protected function formatViolationTargets(array $nodes): string {
     $message = 'Violating targets';
@@ -141,6 +145,8 @@ trait AxeCoreTestTrait {
    *
    * @param ?array $errors
    *   Array of errors returned from `axe.run()`, or NULL.
+   *
+   * @see https://github.com/dequelabs/axe-core/blob/develop/doc/API.md#result-arrays
    */
   protected function formatErrorsReport(?array $errors): string {
 
