@@ -19,6 +19,12 @@ field.formatter.settings.link:
     target:
       type: string
       label: 'Open link in new window'
+    noopener:
+      type: string
+      label: 'Add rel="noopener" to links'
+    noreferrer:
+      type: string
+      label: 'Add rel="noreferrer" to links'
 
 field.formatter.settings.link_separate:
   type: field.formatter.settings.link

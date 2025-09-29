@@ -68,6 +68,8 @@ class LinkFormatter extends FormatterBase {
       'url_plain' => '',
       'rel' => '',
       'target' => '',
+      'noopener' => '',
+      'noreferrer' => '',
     ] + parent::defaultSettings();
   }
 
@@ -114,6 +116,30 @@ class LinkFormatter extends FormatterBase {
       '#return_value' => '_blank',
       '#default_value' => $this->getSetting('target'),
     ];
+    $elements['noopener'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Add rel="noopener" to links'),
+      '#description' => $this->t('Recommended when "Open link in new window" is checked.'),
+      '#states' => [
+        'visible' => [
+          ':input[name*="target"]' => ['checked' => TRUE],
+        ],
+      ],
+      '#return_value' => 'noopener',
+      '#default_value' => $this->getSetting('noopener'),
+    ];
+    $elements['noreferrer'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Add rel="noreferrer" to links'),
+      '#description' => $this->t('Recommended when "Open link in new window" is checked.'),
+      '#states' => [
+        'visible' => [
+          ':input[name*="target"]' => ['checked' => TRUE],
+        ],
+      ],
+      '#return_value' => 'noreferrer',
+      '#default_value' => $this->getSetting('noreferrer'),
+    ];
 
     return $elements;
   }
@@ -145,6 +171,12 @@ class LinkFormatter extends FormatterBase {
     }
     if (!empty($settings['target'])) {
       $summary[] = $this->t('Open link in new window');
+    }
+    if (!empty($settings['noopener'])) {
+      $summary[] = $this->t('Add rel="noopener" to links');
+    }
+    if (!empty($settings['noreferrer'])) {
+      $summary[] = $this->t('Add rel="noreferrer" to links');
     }
 
     return $summary;
@@ -231,9 +263,17 @@ class LinkFormatter extends FormatterBase {
     $options = $item->options ?? [];
     $options += $url->getOptions();
 
-    // Add optional 'rel' attribute to link options.
-    if (!empty($settings['rel'])) {
-      $options['attributes']['rel'] = $settings['rel'];
+    // Add optional 'rel' attributes to link options.
+    if (
+      !empty($settings['rel'])
+      || !empty($settings['noopener'])
+      || !empty($settings['noreferrer'])
+    ) {
+      $options['attributes']['rel'] = [
+        $settings['rel'],
+        $settings['noopener'],
+        $settings['noreferrer'],
+      ];
     }
     // Add optional 'target' attribute to link options.
     if (!empty($settings['target'])) {
