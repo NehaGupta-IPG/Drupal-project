@@ -11,6 +11,9 @@ core.menu.static_menu_link_overrides:
         type: mapping
         label: Definition
         mapping:
+          title:
+            type: label
+            label: 'Menu link title'
           menu_name:
             type: string
             label: 'Menu name'

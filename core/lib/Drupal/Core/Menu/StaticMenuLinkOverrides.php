@@ -126,6 +126,7 @@ class StaticMenuLinkOverrides implements StaticMenuLinkOverridesInterface {
   public function saveOverride($id, array $definition) {
     // Only allow to override a specific subset of the keys.
     $expected = [
+      'title' => '',
       'menu_name' => '',
       'parent' => '',
       'weight' => 0,
@@ -138,6 +139,7 @@ class StaticMenuLinkOverrides implements StaticMenuLinkOverridesInterface {
     $definition = $definition + $expected;
     if ($definition) {
       // Cast keys to avoid config schema during save.
+      $definition['title'] = (string) $definition['title'];
       $definition['menu_name'] = (string) $definition['menu_name'];
       $definition['parent'] = (string) $definition['parent'];
       $definition['weight'] = (int) $definition['weight'];

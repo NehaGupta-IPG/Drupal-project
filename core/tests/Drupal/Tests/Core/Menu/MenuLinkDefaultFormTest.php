@@ -41,6 +41,7 @@ class MenuLinkDefaultFormTest extends UnitTestCase {
 
     $form_state = new FormState();
     $form_state->setValue('id', 'my_plugin_id');
+    $form_state->setValue('title', 'My Plugin');
     $form_state->setValue('enabled', FALSE);
     $form_state->setValue('weight', 5);
     $form_state->setValue('expanded', TRUE);
@@ -51,6 +52,7 @@ class MenuLinkDefaultFormTest extends UnitTestCase {
 
     $this->assertEquals([
       'id' => 'my_plugin_id',
+      'title' => 'My Plugin',
       'enabled' => 0,
       'weight' => 5,
       'expanded' => 1,

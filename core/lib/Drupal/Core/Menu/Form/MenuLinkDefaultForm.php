@@ -104,11 +104,17 @@ class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionIn
     $provider = $this->menuLink->getProvider();
     $form['info'] = [
       '#type' => 'item',
-      '#title' => $this->t('This link is provided by the @name module. The title and path cannot be edited.', ['@name' => $this->moduleExtensionList->getName($provider)]),
+      '#title' => $this->t('This link is provided by the @name module. The path cannot be edited.', ['@name' => $this->moduleHandler->getName($provider)]),
     ];
     $form['id'] = [
       '#type' => 'value',
       '#value' => $this->menuLink->getPluginId(),
+    ];
+    $form['title'] = [
+      '#type' => 'textfield',
+      '#required' => TRUE,
+      '#title' => $this->t('Menu link title'),
+      '#default_value' => $this->menuLink->getTitle(),
     ];
     $link = [
       '#type' => 'link',
@@ -163,6 +169,7 @@ class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionIn
     // Since the ID may not be present in the definition used to construct the
     // plugin, add it here so it's available to any consumers of this method.
     $new_definition['id'] = $form_state->getValue('id');
+    $new_definition['title'] = $form_state->getValue('title');    
     $new_definition['enabled'] = $form_state->getValue('enabled') ? 1 : 0;
     $new_definition['weight'] = (int) $form_state->getValue('weight');
     $new_definition['expanded'] = $form_state->getValue('expanded') ? 1 : 0;
