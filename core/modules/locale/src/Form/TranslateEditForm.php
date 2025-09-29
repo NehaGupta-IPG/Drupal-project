@@ -164,7 +164,10 @@ class TranslateEditForm extends TranslateFormBase {
       }
     }
     $form['pager']['#type'] = 'pager';
-    $form['pager']['#htmx'] = TRUE;
+    (new Htmx())
+      ->boost()
+      ->swap('none')
+      ->applyTo($form['pager']);
     return $form;
   }
 

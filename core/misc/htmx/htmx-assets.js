@@ -37,8 +37,23 @@
    * @see https://htmx.org/events/#htmx:configRequest
    */
   htmx.on('htmx:configRequest', ({ detail }) => {
-    const url = new URL(detail.path, document.location.href);
-    if (Drupal.url.isLocal(url.toString())) {
+    if (
+      Drupal.url.isLocal(detail.path) &&
+      !detail.elt.hasAttribute('data-hx-drupal-full-page')
+    ) {
+      // When boosting a page non-full page query, make sure the url pushed does
+      // not include extra parameters.
+      if (detail.boosted) {
+        // When using a hx-boost type request.
+        detail.elt.setAttribute('data-hx-push-url', detail.path);
+      }
+
+      // Add _wrapper_format query parameter for all non full page requests.
+      // Drupal expects this parameter to be in the query string, not the post
+      // values.
+      const url = new URL(detail.path, window.location);
+      url.searchParams.set('_wrapper_format', 'drupal_htmx');
+      detail.path = url.toString();
       // Allow Drupal to return new JavaScript and CSS files to load without
       // returning the ones already loaded.
       // @see \Drupal\Core\StackMiddleWare\AjaxPageState
