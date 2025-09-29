@@ -52,9 +52,9 @@ class AccessibilityTest extends WebDriverTestBase {
    *
    * @param string $uri
    *   The path to be tested.
-   * @param ?array $axe_options
+   * @param array|null $axe_options
    *   (optional) Associative array of Axe options.
-   * @param ?array $browser_options
+   * @param array|null $browser_options
    *   (optional) Associative array of browser options.
    */
   #[DataProvider('providerTestAdminPages')]
