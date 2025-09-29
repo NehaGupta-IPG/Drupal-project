@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Kernel;
 
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\views\Hook\ViewsThemeHooks;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * Tests the preprocessing functionality in views.theme.inc.
- *
- * @group views
+ * Tests the preprocessing functionality in views theme hooks.
  */
+#[Group('views')]
 class ViewsPreprocessTest extends ViewsKernelTestBase {
 
   /**
@@ -62,10 +63,9 @@ class ViewsPreprocessTest extends ViewsKernelTestBase {
   /**
    * Tests template_preprocess_views_mini_pager() when an empty pagination_heading_level value is passed.
    *
-   * @covers ::template_preprocess_views_mini_pager
+   * @legacy-covers ::template_preprocess_views_mini_pager
    */
   public function testEmptyPaginationHeadingLevelSet(): void {
-    require_once $this->root . '/core/modules/views/views.theme.inc';
     $variables = [
       'tags' => [],
       'quantity' => 9,
@@ -73,7 +73,7 @@ class ViewsPreprocessTest extends ViewsKernelTestBase {
       'pagination_heading_level' => '',
       'parameters' => [],
     ];
-    template_preprocess_views_mini_pager($variables);
+    \Drupal::service(ViewsThemeHooks::class)->preprocessViewsMiniPager($variables);
 
     $this->assertEquals('h4', $variables['pagination_heading_level']);
   }
@@ -81,17 +81,16 @@ class ViewsPreprocessTest extends ViewsKernelTestBase {
   /**
    * Tests template_preprocess_views_mini_pager() when no pagination_heading_level is passed.
    *
-   * @covers ::template_preprocess_views_mini_pager
+   * @legacy-covers ::template_preprocess_views_mini_pager
    */
   public function testPaginationHeadingLevelNotSet(): void {
-    require_once $this->root . '/core/modules/views/views.theme.inc';
     $variables = [
       'tags' => [],
       'quantity' => 9,
       'element' => 0,
       'parameters' => [],
     ];
-    template_preprocess_views_mini_pager($variables);
+    \Drupal::service(ViewsThemeHooks::class)->preprocessViewsMiniPager($variables);
 
     $this->assertEquals('h4', $variables['pagination_heading_level']);
   }
@@ -99,10 +98,9 @@ class ViewsPreprocessTest extends ViewsKernelTestBase {
   /**
    * Tests template_preprocess_views_mini_pager() when a pagination_heading_level value is passed.
    *
-   * @covers ::template_preprocess_views_mini_pager
+   * @legacy-covers ::template_preprocess_views_mini_pager
    */
   public function testPaginationHeadingLevelSet(): void {
-    require_once $this->root . '/core/modules/views/views.theme.inc';
     $variables = [
       'tags' => [],
       'quantity' => 9,
@@ -110,7 +108,7 @@ class ViewsPreprocessTest extends ViewsKernelTestBase {
       'pagination_heading_level' => 'h5',
       'parameters' => [],
     ];
-    template_preprocess_views_mini_pager($variables);
+    \Drupal::service(ViewsThemeHooks::class)->preprocessViewsMiniPager($variables);
 
     $this->assertEquals('h5', $variables['pagination_heading_level']);
   }
