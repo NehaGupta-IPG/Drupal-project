@@ -854,7 +854,7 @@ class ViewsThemeHooks {
       // Calculate the amounts of rows with output.
       $variables['rows'][0]['columns'][0]['attributes'] = new Attribute([
         'colspan' => count($variables['header']),
-        'class' => ['views-empty'],
+        'class' => ['view-empty'],
       ]);
     }
 
