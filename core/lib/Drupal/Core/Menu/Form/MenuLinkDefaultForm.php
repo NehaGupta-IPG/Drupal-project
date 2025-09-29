@@ -104,7 +104,7 @@ class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionIn
     $provider = $this->menuLink->getProvider();
     $form['info'] = [
       '#type' => 'item',
-      '#title' => $this->t('This link is provided by the @name module. The path cannot be edited.', ['@name' => $this->moduleHandler->getName($provider)]),
+      '#title' => $this->t('This link is provided by the @name module. The path cannot be edited.', ['@name' => $this->moduleExtensionList->getName($provider)]),
     ];
     $form['id'] = [
       '#type' => 'value',
