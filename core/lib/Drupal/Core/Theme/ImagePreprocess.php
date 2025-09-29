@@ -47,7 +47,14 @@ class ImagePreprocess {
    *     - http://www.whatwg.org/specs/web-apps/current-work/multipage/embedded-content.html#introduction-3:viewport-based-selection-2
    */
   public function preprocessImage(array &$variables): void {
-    if (!empty($variables['uri'])) {
+    if ($variables['uri'] instanceof MarkupInterface) {
+      /*
+       * This is used to explicitly bypass XSS filtering
+       * so we don't want to cast it to a string.
+       */
+      $variables['attributes']['src'] = $variables['uri'];
+    }
+    elseif (!empty($variables['uri'])) {
       $variables['attributes']['src'] = $this->fileUrlGenerator->generateString($variables['uri']);
     }
     // Generate a srcset attribute conforming to the spec at
