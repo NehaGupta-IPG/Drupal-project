@@ -233,6 +233,29 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
         // Store the user ID in form state as a flag for self::validateFinal().
         $form_state->set('uid', $this->userAuth->authenticateAccount($account, $password) ? $account->id() : FALSE);
       }
+      // Register login attempts without a valid username
+      // with the username as user identifier.
+      if (!$account && $flood_config->get('use_username') && $form_state->isValueEmpty('uid')) {
+        $name = $form_state->getValue('name');
+        $user_identifier = hash('sha256', mb_strtolower(trim($name), 'UTF-8'));
+
+        if ($flood_config->get('uid_only')) {
+          $identifier = $user_identifier;
+        }
+        else {
+          $identifier = $user_identifier . '-' . $this->getRequest()->getClientIP();
+        }
+        $form_state->set('flood_control_user_identifier', $identifier);
+
+        if (!$this->userFloodControl->isAllowed('user.failed_login_user', 1, $flood_config->get('user_window'), $identifier)) {
+          if (!$this->userFloodControl->isAllowed('user.failed_login_user', $flood_config->get('user_limit'), $flood_config->get('user_window'), $identifier)) {
+            $form_state->set('flood_control_triggered', 'user');
+          }
+        }
+        else {
+          $form_state->set('flood_control_skip_clear', 'user');
+        }
+      }
     }
   }
 
