@@ -6,6 +6,7 @@ namespace Drupal\Core\Mailer;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Render\RenderableInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Utility\CallableResolver;
@@ -42,6 +43,9 @@ class EmailRenderer implements EmailRendererInterface {
       $email = new Email();
       // Build render array.
       $build = $plugin->build($email, $params);
+      if ($build instanceof RenderableInterface) {
+        $build = $build->toRenderable();
+      }
 
       // Render the result.
       if (is_array($build)) {
