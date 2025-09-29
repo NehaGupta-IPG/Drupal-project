@@ -67,7 +67,7 @@ interface EmailBuilderInterface {
    * Renders and sends the built email.
    *
    * @param (\Closure():\Psr\Log\LoggerInterface)|null $logger
-   *   The logger closure to use when an error occures.
+   *   The logger closure to use when an error occurs.
    *
    * @return bool
    *   TRUE when a mail has been queued successfully, FALSE otherwise.
