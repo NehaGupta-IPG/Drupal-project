@@ -351,8 +351,8 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
     // Try to post non valid values and check that they are rejected.
     $langcode = 'en';
     $entity_types = ['block_content', 'image', 'media', 'menu_link_content', 'shortcut', 'taxonomy_term', 'user'];
-    $uid = (in_array($entity->getEntityTypeId(), $entity_types)) ? 'content_translation[uid]' : 'uid';
-    $created = (in_array($entity->getEntityTypeId(), $entity_types)) ? 'content_translation[created]' : 'created';
+    $uid = (in_array($entity->getEntityTypeId(), $entity_types)) ? 'uid' : 'content_translation[uid]';
+    $created = (in_array($entity->getEntityTypeId(), $entity_types)) ? 'created' : 'content_translation[created]';
     $edit = [
       // User names have by default length 8.
       $uid => $this->randomMachineName(12),
