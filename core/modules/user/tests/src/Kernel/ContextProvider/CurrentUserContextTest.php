@@ -30,6 +30,16 @@ class CurrentUserContextTest extends KernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('user');
+
+    // Create a record for the anonymous user to mimic user_install().
+    $storage = \Drupal::entityTypeManager()->getStorage('user');
+    $storage
+      ->create([
+        'uid' => 0,
+        'status' => 0,
+        'name' => '',
+      ])
+      ->save();
   }
 
   /**
@@ -62,7 +72,8 @@ class CurrentUserContextTest extends KernelTestBase {
     $contexts = $context_repository->getAvailableContexts();
     $this->assertArrayHasKey('@user.current_user_context:current_user', $contexts);
     $this->assertSame('entity:user', $contexts['@user.current_user_context:current_user']->getContextDefinition()->getDataType());
-    $this->assertFalse($contexts['@user.current_user_context:current_user']->hasContextValue());
+    $this->assertTrue($contexts['@user.current_user_context:current_user']->hasContextValue());
+    $this->assertNotNull($contexts['@user.current_user_context:current_user']->getContextValue());
   }
 
 }

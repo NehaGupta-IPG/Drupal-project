@@ -8,6 +8,7 @@ use Drupal\Core\Plugin\Context\ContextProviderInterface;
 use Drupal\Core\Plugin\Context\EntityContext;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\user\Entity\User;
 
 /**
  * Sets the current user as a context.
@@ -47,7 +48,7 @@ class CurrentUserContext implements ContextProviderInterface {
    * {@inheritdoc}
    */
   public function getRuntimeContexts(array $unqualified_context_ids) {
-    $current_user = $this->userStorage->load($this->account->id());
+    $current_user = $this->account->id() ? $this->userStorage->load($this->account->id()) : User::getAnonymousUser();
 
     if ($current_user) {
       // @todo Do not validate protected fields to avoid bug in TypedData,
