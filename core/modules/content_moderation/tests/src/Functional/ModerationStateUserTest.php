@@ -6,12 +6,14 @@ namespace Drupal\Tests\content_moderation\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests general content moderation workflow related with user and nodes.
- *
- * @group content_moderation
  */
+#[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class ModerationStateUserTest extends ModerationStateTestBase {
 
   /**
@@ -127,7 +129,8 @@ class ModerationStateUserTest extends ModerationStateTestBase {
     $this->drupalGet('user/' . $web_user->id() . '/cancel');
     $this->submitForm([], 'Confirm');
 
-    // Verify that the revision of the first user was assigned to the anonymous user.
+    // Verify that the revision of the first user was assigned to the anonymous
+    // user.
     $this->assertUserNodeCount($web_user->id(), 0, 'en', 'node_field_data');
     $this->assertUserNodeCount(0, 1, 'en', 'node_field_data');
     $this->assertUserNodeCount($second_web_user->id(), 1, 'es', 'node_field_data');
@@ -150,7 +153,8 @@ class ModerationStateUserTest extends ModerationStateTestBase {
     $this->assertEquals(0, $node->uid->entity->id());
     $this->assertEquals('First version of the content en.', $node->title->value);
 
-    // Check that the translation revision still has the right user "second_web_user".
+    // Check that the translation revision still has the right user
+    // "second_web_user".
     $translation = $node->getTranslation('es');
 
     // Check the translation.
