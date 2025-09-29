@@ -101,7 +101,7 @@ class Mini extends SqlBase {
     $render = ['#attributes' => []];
     if ($this->view->ajaxEnabled()) {
       (new Htmx())
-        ->get()
+        ->boost()
         ->swap('none')
         ->applyTo($render);
     }

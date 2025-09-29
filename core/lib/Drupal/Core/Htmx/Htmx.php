@@ -216,14 +216,7 @@ class Htmx {
       // The Htmx helper should not modify the original URL object.
       $request_url = clone $url;
     }
-    if (!$full_page) {
-      $options = [
-        'query' => [
-          MainContentViewSubscriber::WRAPPER_FORMAT => 'drupal_htmx',
-        ],
-      ];
-      $request_url->mergeOptions($options);
-    }
+    $this->createBooleanAttribute('hx-drupal-full-page', $full_page);
     $this->createStringAttribute($method, $this->urlValue($request_url));
     return $this;
   }
@@ -883,8 +876,11 @@ class Htmx {
    *
    * @see https://htmx.org/attributes/hx-boost/
    */
-  public function boost(bool $value): static {
+  public function boost(bool $value = TRUE, bool $full_page = FALSE): static {
     $this->createStringAttribute('hx-boost', $value ? 'true' : 'false');
+    // When boosting a full_page, nothing to do here. If it is not a full page
+    // add a special attribute that the JS will pick up for processing.
+    $this->createBooleanAttribute('hx-drupal-full-page', $full_page);
     return $this;
   }
 

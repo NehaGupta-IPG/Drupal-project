@@ -44,7 +44,7 @@ class TranslateEditForm extends TranslateFormBase {
     }
 
     (new Htmx())
-      ->post()
+      ->boost()
       ->swap('none')
       ->swapOob(TRUE)
       ->applyTo($form);
@@ -163,7 +163,7 @@ class TranslateEditForm extends TranslateFormBase {
     }
     $form['pager']['#type'] = 'pager';
     (new Htmx())
-      ->boost(TRUE)
+      ->boost()
       ->swap('none')
       ->applyTo($form['pager']);
 

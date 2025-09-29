@@ -712,8 +712,7 @@ class ViewsThemeHooks {
           if (\Drupal::request()?->headers->has('HX-Request') || $view->ajaxEnabled()) {
             $array = [];
             (new Htmx())
-              ->get()
-              ->pushUrl($url)
+              ->boost()
               // Only trigger the AJAX request, updating the necessary element
               // is done with an out-of-band swap.
               ->swap('none')

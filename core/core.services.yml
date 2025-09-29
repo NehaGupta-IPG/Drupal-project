@@ -967,10 +967,6 @@ services:
     class: Drupal\Core\StackMiddleware\AjaxPageState
     tags:
       - { name: http_middleware, priority: 500 }
-  http_middleware.htmx_headers:
-    class: Drupal\Core\StackMiddleware\HtmxHeaders
-    tags:
-      - { name: http_middleware, priority: 500 }
   http_middleware.negotiation:
     class: Drupal\Core\StackMiddleware\NegotiationMiddleware
     tags:
