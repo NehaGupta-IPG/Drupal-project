@@ -350,7 +350,7 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
 
     // Try to post non valid values and check that they are rejected.
     $langcode = 'en';
-    $entity_types = ['image'];
+    $entity_types = ['image', 'taxonomy_term', 'shortcut'];
     $uid = (in_array($entity->getEntityTypeId(), $entity_types)) ? 'content_translation[uid]' : 'uid';
     $created = (in_array($entity->getEntityTypeId(), $entity_types)) ? 'content_translation[created]' : 'created';
     $edit = [
