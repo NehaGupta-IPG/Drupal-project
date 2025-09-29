@@ -134,7 +134,6 @@ class StyleTableUnitTest extends PluginKernelTestBase {
     $this->assertStringNotContainsString('custom text', $output, 'Empty handler was not rendered on a non empty table.');
     $this->assertStringNotContainsString('view-empty', $output, 'Empty handler wrapper was not rendered on a non empty table.');
 
-
     // Render an empty result, and ensure that the area handler is rendered.
     $view->setDisplay('default');
     $view->executed = TRUE;
