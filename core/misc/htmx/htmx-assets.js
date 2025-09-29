@@ -38,7 +38,7 @@
    */
   htmx.on('htmx:configRequest', ({ detail }) => {
     if (
-      Drupal.url.isLocal(detail.path) ||
+      Drupal.url.isLocal(detail.path) &&
       !detail.elt.hasAttribute('data-hx-drupal-full-page')
     ) {
       // When boosting a page non-full page query, make sure the url pushed does
