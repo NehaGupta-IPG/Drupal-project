@@ -259,9 +259,7 @@ class ImageFieldValidateTest extends ImageFieldTestBase {
       'optional-multiple-limited' => ['field_image', FALSE, 2, 'files[field_image_0][]', 'Article Article with edit-access-allowed image field has been created.', 'Article Article with edit-access-forbidden image field has been created.'],
       'required-single' => ['field_image', TRUE, 1, 'files[field_image_0]', 'field_image field is required.', 'field_image field is required.'],
       'required-unlimited' => ['field_image', TRUE, FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED, 'files[field_image_0][]', 'field_image field is required.', 'field_image field is required.'],
-
-      // @todo Fix this discrepancy in https://www.drupal.org/project/drupal/issues/3011744.
-      'required-multiple-limited' => ['field_image', TRUE, 2, 'files[field_image_0][]', 'This value should not be null.', 'Article Article with edit-access-forbidden image field has been created.'],
+      'required-multiple-limited' => ['field_image', TRUE, 2, 'files[field_image_0][]', 'field_image field is required.', 'field_image field is required.'],
     ];
   }
 

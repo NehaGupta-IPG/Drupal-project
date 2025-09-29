@@ -277,7 +277,10 @@ class FileWidget extends WidgetBase {
       $element['#description'] = \Drupal::service('renderer')->renderInIsolation($file_upload_help);
       $element['#multiple'] = $cardinality != 1 ? TRUE : FALSE;
       if ($cardinality != 1 && $cardinality != -1) {
-        $element['#element_validate'] = [[static::class, 'validateMultipleCount']];
+        $element['#element_validate'] = array_merge(
+          $element_info['#element_validate'],
+          [[static::class, 'validateMultipleCount']],
+        );
       }
     }
 
