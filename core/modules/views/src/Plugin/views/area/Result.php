@@ -20,14 +20,14 @@ class Result extends AreaPluginBase {
    *
    * @var int
    */
-  protected $total;
+  protected int $total;
 
   /**
    * The token replacements.
    *
    * @var array
    */
-  protected $replacements = [];
+  protected array $replacements = [];
 
   /**
    * {@inheritdoc}
