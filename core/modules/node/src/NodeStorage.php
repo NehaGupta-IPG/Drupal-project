@@ -39,47 +39,6 @@ class NodeStorage extends SqlContentEntityStorage implements NodeStorageInterfac
   /**
    * {@inheritdoc}
    */
-  public function userRevisionIdsGroupedByLanguage(AccountInterface $account) {
-    $query = $this->getQuery()
-      ->accessCheck(FALSE)
-      ->allRevisions()
-      ->condition('uid', $account->id())
-      ->sort('vid');
-    $revision_ids = array_keys($query->execute());
-
-    $grouped = [];
-    foreach ($revision_ids as $revision_id) {
-      $revision = $this->loadRevision($revision_id);
-      if ($revision) {
-        // The revision may have translations which are not authored by our
-        // user.
-        foreach ($revision->getTranslationLanguages() as $langcode => $language) {
-          $revisionInLanguage = $revision->getTranslation($langcode);
-          if ($revisionInLanguage->getOwnerId() == $account->id()) {
-            $grouped[$langcode][] = $revision_id;
-          }
-        }
-      }
-    }
-
-    return $grouped;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function userRevisionIdsByRevisionAuthor(AccountInterface $account): array {
-    $query = $this->getQuery()
-      ->accessCheck(FALSE)
-      ->allRevisions()
-      ->condition('revision_uid', $account->id())
-      ->sort('vid');
-    return array_keys($query->execute());
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function countDefaultLanguageRevisions(NodeInterface $node) {
     @trigger_error(__CLASS__ . "::" . __FUNCTION__ . " is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3519185", E_USER_DEPRECATED);
     return $this->database->query('SELECT COUNT(*) FROM {' . $this->getRevisionDataTable() . '} WHERE [nid] = :nid AND [default_langcode] = 1', [':nid' => $node->id()])->fetchField();
