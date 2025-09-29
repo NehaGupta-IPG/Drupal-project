@@ -47,7 +47,6 @@ class NodeUserHooks {
    */
   #[Hook('user_cancel')]
   public function userCancelReassign($edit, UserInterface $account, $method): void {
-    $nodeStorage = $this->entityTypeManager->getStorage('node');
     if ($method === 'user_cancel_reassign') {
       // Reassign node ownership.
       // Since the translation revision creates a new record for each
