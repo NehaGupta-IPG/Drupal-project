@@ -199,7 +199,7 @@ class Htmx {
    *
    * @param string $method
    *   The request method.
-   * @param \Drupal\Core\Url|string|null $url
+   * @param \Drupal\Core\Url|null $url
    *   The URL for the request. If NULL is passed it will use the current URL
    *   without any query parameter.
    * @param bool $full_page
@@ -208,11 +208,8 @@ class Htmx {
    * @return static
    *   returns self so that attribute methods may be chained.
    */
-  protected function buildRequestAttribute(string $method, null|string|Url $url = NULL, bool $full_page = FALSE): static {
-    if (is_string($url) && !str_starts_with($url, 'attr(')) {
-      throw new \InvalidArgumentException("The user-entered attribute name in '$url' must be wrapped in 'attr()'.");
-    }
-    if (is_null($url) || is_string($url)) {
+  protected function buildRequestAttribute(string $method, ?Url $url = NULL, bool $full_page = FALSE): static {
+    if (is_null($url)) {
       $request_url = Url::fromRoute('<none>');
     }
     else {
@@ -227,11 +224,7 @@ class Htmx {
       ];
       $request_url->mergeOptions($options);
     }
-    $value = $this->urlValue($request_url);
-    if (is_string($url)) {
-      $value = "$url $value";
-    }
-    $this->createStringAttribute($method, $value);
+    $this->createStringAttribute($method, $this->urlValue($request_url));
     return $this;
   }
 
@@ -548,7 +541,7 @@ class Htmx {
    *
    * @see https://htmx.org/attributes/hx-get/
    */
-  public function get(null|string|Url $url = NULL, bool $full_page = FALSE): static {
+  public function get(?Url $url = NULL, bool $full_page = FALSE): static {
     return $this->buildRequestAttribute('hx-get', $url, $full_page);
   }
 
@@ -571,7 +564,7 @@ class Htmx {
    *
    * @see https://htmx.org/attributes/hx-post/
    */
-  public function post(null|string|Url $url = NULL, bool $full_page = FALSE): static {
+  public function post(?Url $url = NULL, bool $full_page = FALSE): static {
     return $this->buildRequestAttribute('hx-post', $url, $full_page);
   }
 
@@ -594,7 +587,7 @@ class Htmx {
    *
    * @see https://htmx.org/attributes/hx-put/
    */
-  public function put(null|string|Url $url = NULL, bool $full_page = FALSE): static {
+  public function put(?Url $url = NULL, bool $full_page = FALSE): static {
     return $this->buildRequestAttribute('hx-put', $url, $full_page);
   }
 
@@ -617,7 +610,7 @@ class Htmx {
    *
    * @see https://htmx.org/attributes/hx-patch/
    */
-  public function patch(null|string|Url $url = NULL, bool $full_page = FALSE): static {
+  public function patch(?Url $url = NULL, bool $full_page = FALSE): static {
     return $this->buildRequestAttribute('hx-patch', $url, $full_page);
   }
 
@@ -641,7 +634,7 @@ class Htmx {
    *
    * @see https://htmx.org/attributes/hx-delete/
    */
-  public function delete(null|string|Url $url = NULL, bool $full_page = FALSE): static {
+  public function delete(?Url $url = NULL, bool $full_page = FALSE): static {
     return $this->buildRequestAttribute('hx-delete', $url, $full_page);
   }
 

@@ -37,30 +37,28 @@
    * @see https://htmx.org/events/#htmx:configRequest
    */
   htmx.on('htmx:configRequest', ({ detail }) => {
-    let query = false;
-    // Custom format, take the URL from a CSS selector.
-    // To take the URL from an attribute on the same element, use the CSS
-    // syntax `attr(attributeName)`.
-    const parts = detail.path.match(/^attr\((\w+)\)\s?(.*)?$/);
-    if (parts) {
-      query = parts[2];
-      detail.path = detail.elt.getAttribute(parts[1]) ?? '';
+    let query = '';
+    if (detail.path === '' || detail.path[0] === '?') {
+      const elt = detail.elt;
+      query = detail.path;
+      if (elt.hasAttribute('href')) {
+        detail.path = elt.getAttribute('href');
+      } else if (elt.hasAttribute('action')) {
+        detail.path = elt.getAttribute('action');
+      }
     }
 
     const url = new URL(detail.path, document.location.href);
-    if (typeof query === 'string' && query !== '') {
+    if (query !== '') {
       // We can add some parameters to the url if necessary.
       const search = url.searchParams;
       new URLSearchParams(query).forEach((value, key) => {
-        if (search.has(key)) {
-          search.set(key, value);
-        } else {
-          search.append(key, value);
-        }
+        search.set(key, value);
       });
     }
 
     detail.path = url.toString();
+    console.log(detail.path);
     if (Drupal.url.isLocal(detail.path)) {
       // Allow Drupal to return new JavaScript and CSS files to load without
       // returning the ones already loaded.

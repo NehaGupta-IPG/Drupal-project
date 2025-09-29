@@ -266,7 +266,7 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
 
       // Add the HTMX magic
       (new Htmx())
-        ->get('attr(action)')
+        ->get()
         ->swapOob(TRUE)
         ->params(array_merge(array_keys($all_exposed), ['op']))
         ->applyTo($form);

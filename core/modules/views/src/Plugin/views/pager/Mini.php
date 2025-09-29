@@ -101,7 +101,7 @@ class Mini extends SqlBase {
     $render = ['#attributes' => []];
     if ($this->view->ajaxEnabled()) {
       (new Htmx())
-        ->get('attr(href)')
+        ->get()
         ->swap('none')
         ->applyTo($render);
     }
