@@ -101,9 +101,7 @@ TEXT
    */
   public function testAxeCoreTestTraitClearsPreviousResults(): void {
 
-    // ---------------------
     // Violations
-    // ---------------------
     $this->drupalGet('accessibility-test');
 
     // Expecting violations, but only on the first run.
@@ -127,9 +125,7 @@ TEXT
       ],
     ]);
 
-    // ---------------------
     // Errors
-    // ---------------------
     $this->drupalGet('accessibility-test');
 
     // Expecting errors, but only on the first run.
@@ -174,9 +170,6 @@ TEXT
 
   /**
    * Data provider.
-   *
-   * @return \Generator
-   *   Test scenarios.
    */
   public static function providerAxeCoreTestTraitWithOptions(): \Generator {
     // The global $base_url isn't available here for some reason.

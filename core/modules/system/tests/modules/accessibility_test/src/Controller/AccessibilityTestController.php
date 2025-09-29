@@ -13,9 +13,6 @@ class AccessibilityTestController extends ControllerBase {
 
   /**
    * Prints known accessibility failures to the screen.
-   *
-   * @return array
-   *   A render array.
    */
   public function page(): array {
     // The id attribute is for testing Axe selector output in failure messages.

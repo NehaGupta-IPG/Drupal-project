@@ -14,7 +14,7 @@ trait AxeCoreTestTrait {
   /**
    * Executes axe on the current session and checks the results.
    *
-   * @param ?array $options
+   * @param array|null $options
    *   (optional) An associative array of additional Axe options.
    *   The provided options will be passed to `axe.run()` as a Javascript object.
    *   Examples:
@@ -100,8 +100,7 @@ trait AxeCoreTestTrait {
    * @see https://github.com/dequelabs/axe-core/blob/develop/doc/API.md#result-arrays
    */
   protected function formatViolationsReport(array $results): string {
-    $message = 'Accessibility test failures';
-    $message .= ' (' . count($results['violations']) . ' total)';
+    $message = sprintf('Accessibility test failures (%d total)', count($results['violations']));
 
     foreach ($results['violations'] as $key => $violation) {
       $message .= PHP_EOL . PHP_EOL;

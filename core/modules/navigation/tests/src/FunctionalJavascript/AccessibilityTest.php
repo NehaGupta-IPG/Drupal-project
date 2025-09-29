@@ -31,8 +31,6 @@ class AccessibilityTest extends WebDriverTestBase {
 
   /**
    * A user with permission to access all admin pages & functionality.
-   *
-   * @var \Drupal\user\UserInterface
    */
   protected UserInterface $user;
 
@@ -63,9 +61,6 @@ class AccessibilityTest extends WebDriverTestBase {
 
   /**
    * Data provider for testNavigationModule.
-   *
-   * @return array
-   *   Test cases.
    */
   public static function providerTestNavigationModule(): array {
     return [
