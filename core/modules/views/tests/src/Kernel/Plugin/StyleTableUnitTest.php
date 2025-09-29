@@ -132,6 +132,8 @@ class StyleTableUnitTest extends PluginKernelTestBase {
     $output = (string) \Drupal::service('renderer')->renderRoot($output);
 
     $this->assertStringNotContainsString('custom text', $output, 'Empty handler was not rendered on a non empty table.');
+    $this->assertStringNotContainsString('view-empty', $output, 'Empty handler wrapper was not rendered on a non empty table.');
+
 
     // Render an empty result, and ensure that the area handler is rendered.
     $view->setDisplay('default');
@@ -141,6 +143,7 @@ class StyleTableUnitTest extends PluginKernelTestBase {
     $output = (string) \Drupal::service('renderer')->renderRoot($output);
 
     $this->assertStringContainsString('custom text', $output, 'Empty handler got rendered on an empty table.');
+    $this->assertStringContainsString('view-empty', $output, 'Empty handler wrapper got rendered on an empty table.');
   }
 
   /**
