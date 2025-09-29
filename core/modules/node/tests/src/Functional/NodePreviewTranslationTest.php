@@ -7,12 +7,12 @@ namespace Drupal\Tests\node\Functional;
 use Drupal\node\Form\NodePreviewForm;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\language\Traits\LanguageTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Node Preview with translations.
- *
- * @group node
  */
+#[Group('node')]
 class NodePreviewTranslationTest extends BrowserTestBase {
 
   use LanguageTestTrait;
