@@ -147,6 +147,43 @@ class UserLoginTest extends BrowserTestBase {
   }
 
   /**
+   * Tests the per-unknown-user login flood control with use_username.
+   */
+  public function testPerUnknownUserLoginFloodControlWithUseUsername(): void {
+    $this->config('user.flood')
+      // Set a high global limit out so that it is not relevant in the test.
+      ->set('ip_limit', 4000)
+      ->set('user_limit', 3)
+      ->set('use_username', TRUE)
+      ->save();
+
+    // Create a user so we can sanity check flood control is not active for an existing user.
+    $user1 = $this->drupalCreateUser([]);
+    $non_existent_user2 = clone $user1;
+    $non_existent_user2->setUsername('user2');
+
+    // Try 3 failed logins for user 1, they will not trigger flood control.
+    for ($i = 0; $i < 3; $i++) {
+      $this->assertFailedLogin($non_existent_user2);
+    }
+
+    // Try one successful attempt for user 1, it should not trigger any
+    // flood control.
+    $this->drupalLogin($user1);
+    $this->drupalLogout();
+
+    // Try one more attempt for the non existing user 1, it should be blocked.
+    $this->assertFailedLogin($non_existent_user2, 'user');
+
+    // Create user 2.
+    $user2 = $this->drupalCreateUser([], 'user2');
+
+    // Try to log in as user 2, as it now exists, it should be successful.
+    $this->drupalLogin($user2);
+    $this->assertSession()->responseContains('Member for');
+  }
+
+  /**
    * Tests user password is re-hashed upon login after changing $count_log2.
    */
   public function testPasswordRehashOnLogin(): void {
