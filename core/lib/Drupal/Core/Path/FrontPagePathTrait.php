@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Path;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
+
 /**
  * Provides a trait for resolving the front page path.
  */
@@ -12,14 +14,14 @@ trait FrontPagePathTrait {
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  protected $configFactory;
+  protected ?ConfigFactoryInterface $configFactory;
 
   /**
    * The default front page.
    *
    * @var string
    */
-  protected $frontPage;
+  protected ?string $frontPage;
 
   /**
    * Gets the current front page path.
@@ -27,7 +29,7 @@ trait FrontPagePathTrait {
    * @return string
    *   The front page path.
    */
-  protected function getFrontPagePath() {
+  protected function getFrontPagePath(): string {
     // Lazy-load front page config.
     if (!isset($this->frontPage)) {
       $this->frontPage = $this->getConfigFactory()->get('system.site')
@@ -42,7 +44,7 @@ trait FrontPagePathTrait {
    * @return \Drupal\Core\Config\ConfigFactoryInterface
    *   The config factory.
    */
-  protected function getConfigFactory() {
+  protected function getConfigFactory(): ConfigFactoryInterface {
     if (!$this->configFactory) {
       $this->configFactory = \Drupal::configFactory();
     }
