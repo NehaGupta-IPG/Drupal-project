@@ -350,6 +350,14 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
 
     // Try to post non valid values and check that they are rejected.
     $langcode = 'en';
+    $uid_types = ['image'];
+    $uid = (in_array($entity->getEntityTypeId(), $uid_types)) ? 'content_translation[uid]' : 'uid'; 
+    $created = (in_array($entity->getEntityTypeId(), $uid_types)) ? 'content_translation[created]' : 'created'; 
+    $edit = [
+      // User names have by default length 8.
+      $uid => $this->randomMachineName(12),
+      $created => '19/11/1978',
+    ];
     $this->drupalGet($entity->toUrl('edit-form'));
     $edit = $this->getMetadataValueAndAssertNoField('uid', $this->randomMachineName(12));
     $edit += $this->getMetadataValueAndAssertNoField('created', '19/11/1978');
@@ -363,8 +371,8 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
     $user = $this->drupalCreateUser([], $this->randomMachineName(UserInterface::USERNAME_MAX_LENGTH));
     $edit = [
       // Format the username as it is entered in autocomplete fields.
-      'content_translation[uid]' => $user->getAccountName() . ' (' . $user->id() . ')',
-      'content_translation[created]' => $this->container->get('date.formatter')->format($values[$langcode]['created'], 'custom', 'Y-m-d H:i:s O'),
+      $uid => $user->getAccountName() . ' (' . $user->id() . ')',
+      $created => $this->container->get('date.formatter')->format($values[$langcode]['created'], 'custom', 'Y-m-d H:i:s O'),
     ];
     $this->submitForm($edit, $this->getFormSubmitAction($entity, $langcode));
     $reloaded_entity = $storage->load($this->entityId);
