@@ -8,12 +8,14 @@ use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verifies role permissions can be added and removed via the permissions page.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserPermissionsTest extends BrowserTestBase {
 
   use CommentTestTrait;
@@ -148,6 +150,9 @@ class UserPermissionsTest extends BrowserTestBase {
     $this->drupalGet('admin/people/role-settings');
     $this->submitForm($edit, 'Save configuration');
 
+    // Check that the success message appears.
+    $this->assertSession()->pageTextContains('The role settings have been updated.');
+
     \Drupal::entityTypeManager()->getStorage('user_role')->resetCache();
     $this->assertTrue(Role::load($this->rid)->isAdmin());
 
@@ -162,6 +167,9 @@ class UserPermissionsTest extends BrowserTestBase {
     $edit['user_admin_role'] = '';
     $this->drupalGet('admin/people/role-settings');
     $this->submitForm($edit, 'Save configuration');
+
+    // Check that the success message appears.
+    $this->assertSession()->pageTextContains('The role settings have been updated.');
 
     \Drupal::entityTypeManager()->getStorage('user_role')->resetCache();
     \Drupal::configFactory()->reset();

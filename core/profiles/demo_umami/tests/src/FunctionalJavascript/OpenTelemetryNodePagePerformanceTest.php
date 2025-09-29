@@ -6,16 +6,18 @@ namespace Drupal\Tests\demo_umami\FunctionalJavascript;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\FunctionalJavascriptTests\PerformanceTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore languageswitcher
-
 /**
  * Tests demo_umami profile performance.
- *
- * @group OpenTelemetry
- * @group #slow
- * @requires extension apcu
  */
+#[Group('OpenTelemetry')]
+#[Group('#slow')]
+#[RequiresPhpExtension('apcu')]
+#[RunTestsInSeparateProcesses]
 class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
   /**
@@ -37,15 +39,33 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
    * Logs node page tracing data with a cold cache.
    */
   protected function testNodePageColdCache(): void {
-    // @todo Chromedriver doesn't collect tracing performance logs for the very
-    //   first request in a test, so warm it up.
-    //   https://www.drupal.org/project/drupal/issues/3379750
-    $this->drupalGet('user/login');
-    $this->rebuildAll();
-    $this->collectPerformanceData(function () {
+    // Request the node page twice then clear caches, this allows asset
+    // aggregate requests to complete so they are excluded from the performance
+    // test itself. Including the asset aggregates would lead to
+    // a non-deterministic test since they happen in parallel and therefore post
+    // response tasks run in different orders each time.
+    $this->drupalGet('node/1');
+    // Allow time for image style and aggregate requests to finish.
+    sleep(1);
+    $this->drupalGet('node/1');
+    $this->clearCaches();
+    $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('node/1');
     }, 'umamiNodePageColdCache');
     $this->assertSession()->pageTextContains('quiche');
+
+    $expected = [
+      'QueryCount' => 458,
+      'CacheSetCount' => 441,
+      'CacheDeleteCount' => 0,
+      'CacheTagLookupQueryCount' => 43,
+      'CacheTagInvalidationCount' => 0,
+      'ScriptCount' => 1,
+      'ScriptBytes' => 12000,
+      'StylesheetCount' => 2,
+      'StylesheetBytes' => 40800,
+    ];
+    $this->assertMetrics($expected, $performance_data);
   }
 
   /**
@@ -63,12 +83,18 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       $this->drupalGet('node/1');
     }, 'umamiNodePageHotCache');
     $this->assertSession()->pageTextContains('quiche');
+
     $expected = [
       'QueryCount' => 0,
       'CacheGetCount' => 1,
       'CacheSetCount' => 0,
       'CacheDeleteCount' => 0,
+      'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 1,
+      'ScriptCount' => 1,
+      'ScriptBytes' => 12000,
+      'StylesheetCount' => 2,
+      'StylesheetBytes' => 40800,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
@@ -85,10 +111,24 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
     $this->clearCaches();
     // Now visit a non-node page to warm non-route-specific caches.
     $this->drupalGet('user/login');
-    $this->collectPerformanceData(function () {
+    $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('node/1');
     }, 'umamiNodePageCoolCache');
     $this->assertSession()->pageTextContains('quiche');
+
+    $expected = [
+      'QueryCount' => 190,
+      'CacheGetCount' => 210,
+      'CacheSetCount' => 65,
+      'CacheDeleteCount' => 0,
+      'CacheTagInvalidationCount' => 0,
+      'CacheTagLookupQueryCount' => 22,
+      'ScriptCount' => 1,
+      'ScriptBytes' => 12000,
+      'StylesheetCount' => 2,
+      'StylesheetBytes' => 40800,
+    ];
+    $this->assertMetrics($expected, $performance_data);
   }
 
   /**
@@ -100,9 +140,12 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
   protected function testNodePageWarmCache(): void {
     // First of all visit the node page to ensure the image style exists.
     $this->drupalGet('node/1');
+    // Allow time for the image style and asset aggregate requests to finish.
+    sleep(1);
     $this->clearCaches();
     // Now visit a different node page to warm non-path-specific caches.
     $this->drupalGet('node/2');
+    sleep(1);
     $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('node/1');
     }, 'umamiNodePageWarmCache');
@@ -194,7 +237,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'SELECT "t".* FROM "node_revision__field_summary" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
       'SELECT "t".* FROM "node_revision__field_tags" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
       'SELECT "t".* FROM "node_revision__layout_builder__layout" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
-      'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node_revision" "base_table" LEFT OUTER JOIN "node_revision" "base_table_2" ON "base_table"."nid" = "base_table_2"."nid" AND "base_table"."vid" < "base_table_2"."vid" INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE ("base_table_2"."nid" IS NULL) AND ("node_field_data"."nid" = "1")',
+      'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node_revision" "base_table" INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE ("base_table"."vid" IN (SELECT MAX(base_table.vid) AS "expression" FROM "node_revision" "base_table" GROUP BY "base_table"."nid")) AND ("node_field_data"."nid" = "1")',
       'SELECT "revision"."vid" AS "vid", "revision"."langcode" AS "langcode", "revision"."revision_uid" AS "revision_uid", "revision"."revision_timestamp" AS "revision_timestamp", "revision"."revision_log" AS "revision_log", "revision"."revision_default" AS "revision_default", "base"."nid" AS "nid", "base"."type" AS "type", "base"."uuid" AS "uuid", CASE "base"."vid" WHEN "revision"."vid" THEN 1 ELSE 0 END AS "isDefaultRevision" FROM "node" "base" INNER JOIN "node_revision" "revision" ON "revision"."nid" = "base"."nid" AND "revision"."vid" IN (75)',
       'SELECT "revision".* FROM "node_field_revision" "revision" WHERE ("revision"."vid" IN (75)) AND ("revision"."vid" IN ("75")) ORDER BY "revision"."vid" ASC',
       'SELECT "t".* FROM "node_revision__field_cooking_time" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
@@ -263,7 +306,6 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'SELECT "t".* FROM "node_revision__field_summary" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
       'SELECT "t".* FROM "node_revision__field_tags" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
       'SELECT "t".* FROM "node_revision__layout_builder__layout" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
-      'SELECT "config"."name" AS "name" FROM "config" "config" WHERE ("collection" = "") AND ("name" LIKE "workflows.workflow.%" ESCAPE \'\\\\\') ORDER BY "collection" ASC, "name" ASC',
       'SELECT "revision"."vid" AS "vid", "revision"."langcode" AS "langcode", "revision"."revision_uid" AS "revision_uid", "revision"."revision_timestamp" AS "revision_timestamp", "revision"."revision_log" AS "revision_log", "revision"."revision_default" AS "revision_default", "base"."nid" AS "nid", "base"."type" AS "type", "base"."uuid" AS "uuid", CASE "base"."vid" WHEN "revision"."vid" THEN 1 ELSE 0 END AS "isDefaultRevision" FROM "node" "base" INNER JOIN "node_revision" "revision" ON "revision"."nid" = "base"."nid" AND "revision"."vid" IN (75)',
       'SELECT "revision".* FROM "node_field_revision" "revision" WHERE ("revision"."vid" IN (75)) AND ("revision"."vid" IN ("75")) ORDER BY "revision"."vid" ASC',
       'SELECT "t".* FROM "node_revision__field_cooking_time" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
@@ -286,7 +328,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
 
     $expected = [
-      'QueryCount' => 171,
+      'QueryCount' => 170,
       'CacheGetCount' => 202,
       'CacheGetCountByBin' => [
         'page' => 1,
@@ -416,7 +458,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'ScriptCount' => 1,
       'ScriptBytes' => 12000,
       'StylesheetCount' => 2,
-      'StylesheetBytes' => 41200,
+      'StylesheetBytes' => 41000,
     ];
     $this->assertMetrics($expected, $performance_data);
   }

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Kernel\Plugin\migrate\source\d6;
 
+use Drupal\field\Plugin\migrate\source\d6\FieldInstanceOptionTranslation;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests the field instance option translation source plugin.
- *
- * @covers \Drupal\field\Plugin\migrate\source\d6\FieldInstanceOptionTranslation
- * @group migrate_drupal
  */
+#[CoversClass(FieldInstanceOptionTranslation::class)]
+#[Group('migrate_drupal')]
 class FieldInstanceOptionTranslationTest extends FieldOptionTranslationTest {
 
   /**

@@ -10,19 +10,14 @@ use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the core Drupal\views\Plugin\views\filter\InOperator handler.
- *
- * @group views
  */
+#[Group('views')]
 class FilterInOperatorTest extends ViewsKernelTestBase {
   use StringTranslationTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * Views used by this test.
@@ -126,7 +121,7 @@ class FilterInOperatorTest extends ViewsKernelTestBase {
     $filters = $this->getGroupedExposedFilters();
     $view = Views::getView('test_view');
 
-    // Filter: Age, Operator: in, Value: 26, 30
+    // Filter: Age, Operator: in, Value: 26, 30.
     $filters['age']['group_info']['default_group'] = 1;
     $view->setDisplay();
     $view->displayHandlers->get('default')->overrideOption('filters', $filters);
@@ -155,7 +150,7 @@ class FilterInOperatorTest extends ViewsKernelTestBase {
     $filters = $this->getGroupedExposedFilters();
     $view = Views::getView('test_view');
 
-    // Filter: Age, Operator: in, Value: 26, 30
+    // Filter: Age, Operator: in, Value: 26, 30.
     $filters['age']['group_info']['default_group'] = 2;
     $view->setDisplay();
     $view->displayHandlers->get('default')->overrideOption('filters', $filters);

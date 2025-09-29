@@ -4,22 +4,24 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\contact\Functional;
 
-use Drupal\Core\Url;
 use Drupal\contact\Entity\ContactForm;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Mail\MailFormatHelper;
 use Drupal\Core\Test\AssertMailTrait;
+use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests site-wide contact form functionality.
  *
  * @see \Drupal\Tests\contact\Functional\ContactStorageTest
- *
- * @group contact
  */
+#[Group('contact')]
+#[RunTestsInSeparateProcesses]
 class ContactSitewideTest extends BrowserTestBase {
 
   use FieldUiTestTrait;
@@ -70,7 +72,7 @@ class ContactSitewideTest extends BrowserTestBase {
     // Ensure that there is no textfield for email.
     $this->assertSession()->fieldNotExists('mail');
 
-    // Logout and retrieve the page as an anonymous user
+    // Logout and retrieve the page as an anonymous user.
     $this->drupalLogout();
     user_role_grant_permissions('anonymous', ['access site-wide contact form']);
     $this->drupalGet('contact');

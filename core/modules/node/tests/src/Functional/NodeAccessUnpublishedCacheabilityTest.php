@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\node\NodeInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests cacheability on unpublished nodes inherited from node access.
- *
- * @group node
- * @group Cache
  */
+#[Group('node')]
+#[Group('Cache')]
+#[RunTestsInSeparateProcesses]
 class NodeAccessUnpublishedCacheabilityTest extends NodeTestBase {
 
   /**

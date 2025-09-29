@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Kernel\Migrate\d7;
 
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Migrates various configuration objects owned by the System module.
- *
- * @group migrate_drupal_7
  */
+#[Group('migrate_drupal_7')]
 class MigrateSystemConfigurationTest extends MigrateDrupal7TestBase {
 
   /**
@@ -27,8 +27,7 @@ class MigrateSystemConfigurationTest extends MigrateDrupal7TestBase {
     'system.authorize' => [],
     'system.cron' => [
       'threshold' => [
-        // Auto-run is not handled by the migration.
-        // 'autorun' => 0,
+        // Auto-run is not handled by the migration, so ignore "'autorun' => 0".
         'requirements_warning' => 172800,
         'requirements_error' => 1209600,
       ],

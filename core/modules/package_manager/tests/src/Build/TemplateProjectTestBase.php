@@ -347,7 +347,7 @@ END;
     $this->assertDirectoryIsWritable($log);
     $log .= '/' . str_replace('\\', '_', static::class) . '-' . $this->name();
     if ($this->usesDataProvider()) {
-      $log .= '-' . preg_replace('/[^a-z0-9]+/i', '_', $this->dataName());
+      $log .= '-' . preg_replace('/[^a-z0-9]+/i', '_', (string) $this->dataName());
     }
     $code .= <<<END
 \$config['package_manager.settings']['log'] = '$log-package_manager.log';
@@ -441,6 +441,8 @@ END;
         $requirements['symfony/polyfill-php81'],
         $requirements['symfony/polyfill-php82'],
         $requirements['symfony/polyfill-php83'],
+        // Needed for PHP 8.4 features while PHP 8.3 is the minimum.
+        $requirements['symfony/polyfill-php84'],
       );
       // If this package requires any Drupal core packages, ensure it allows
       // any version.
@@ -719,6 +721,9 @@ END;
       $this->serverErrorLog,
     );
     $this->assertSame(200, $session->getStatusCode(), $message);
+    // Sometimes we get a 200 response after a PHP timeout or OOM error, so we
+    // also check the page content to ensure it's what we expect.
+    $this->assertSame('Finished', $session->getPage()->getText());
   }
 
   /**

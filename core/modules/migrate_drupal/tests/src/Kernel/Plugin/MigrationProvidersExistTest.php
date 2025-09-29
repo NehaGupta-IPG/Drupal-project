@@ -8,15 +8,15 @@ use Drupal\KernelTests\FileSystemModuleDiscoveryDataProviderTrait;
 use Drupal\migrate\Plugin\Exception\BadPluginDefinitionException;
 use Drupal\migrate_drupal\Plugin\MigrateFieldPluginManager;
 use Drupal\Tests\migrate_drupal\Kernel\MigrateDrupalTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore entityreference filefield imagefield nodereference
 // cspell:ignore optionwidgets userreference
-
 /**
  * Tests that modules exist for all source and destination plugins.
- *
- * @group migrate_drupal
  */
+#[Group('migrate_drupal')]
 class MigrationProvidersExistTest extends MigrateDrupalTestBase {
 
   use FileSystemModuleDiscoveryDataProviderTrait;
@@ -42,8 +42,16 @@ class MigrationProvidersExistTest extends MigrateDrupalTestBase {
 
     foreach ($plugin_manager->getDefinitions() as $definition) {
       // If the source plugin uses annotations, then the 'provider' key is the
-      // array of providers and the 'providers' key is not defined.
-      $providers = $definition['providers'] ?? $definition['provider'];
+      // array of providers. If the source plugin uses attributes, then combine
+      // the singular string provider with the providers for the plugin
+      // dependencies.
+      if (is_array($definition['provider'])) {
+        $providers = $definition['provider'];
+      }
+      else {
+        $providers = $definition['dependencies']['provider'] ?? [];
+        $providers[] = $definition['provider'];
+      }
       if (in_array('migrate_drupal', $providers, TRUE)) {
         $id = $definition['id'];
         $this->assertArrayHasKey('source_module', $definition, "No source_module property in '$id'");
@@ -178,9 +186,8 @@ class MigrationProvidersExistTest extends MigrateDrupalTestBase {
    *   A field plugin definition.
    * @param string $missing_property
    *   The name of the property missing from the definition.
-   *
-   * @dataProvider fieldPluginDefinitionsProvider
    */
+  #[DataProvider('fieldPluginDefinitionsProvider')]
   public function testFieldProviderMissingRequiredProperty(array $definitions, $missing_property): void {
     $discovery = $this->getMockBuilder(MigrateFieldPluginManager::class)
       ->disableOriginalConstructor()

@@ -50,14 +50,14 @@
   text-decoration: none;
   color: var(--color-text-neutral-loud);
   background-color: transparent;
-  background-image: linear-gradient(var(--color--primary-50), var(--color--primary-50)); /* Two values are needed for IE11 support. */
+  background-image: linear-gradient(var(--color--primary-50));
   background-repeat: no-repeat;
   background-position: bottom left; /* LTR */
   background-size: 0 0.1875rem;
 }
 
-.node__title a:hover,
-.node__title a:focus {
+:is(.node__title a):hover,
+:is(.node__title a):focus {
   color: var(--color-text-primary-medium);
 }
 

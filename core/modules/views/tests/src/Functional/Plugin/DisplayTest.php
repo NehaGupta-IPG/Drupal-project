@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Functional\Plugin;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
 use Drupal\views_test_data\Plugin\views\display\DisplayTest as DisplayTestPlugin;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the basic display plugin.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class DisplayTest extends ViewTestBase {
 
   /**
@@ -317,6 +318,14 @@ class DisplayTest extends ViewTestBase {
     $output = $view->preview();
     $output = (string) $renderer->renderRoot($output);
     $this->assertStringContainsString('/node?date=22&amp;foo=bar#22', $output, 'The read more link with href "/node?date=22&foo=bar#22" was found.');
+
+    // Test more link isn't rendered if user doesn't have permission to the
+    // more link URL.
+    $view->display_handler->setOption('link_url', 'admin/content');
+    $this->executeView($view);
+    $output = $view->preview();
+    $output = (string) $renderer->renderRoot($output);
+    $this->assertStringNotContainsString('/admin/content', $output, 'The read more link with href "/admin/content" was not found.');
   }
 
   /**
@@ -385,12 +394,12 @@ class DisplayTest extends ViewTestBase {
 
     // Remove the relationship used by other handlers.
     $view->removeHandler('default', 'relationship', 'uid');
-    // Validate display
+    // Validate display.
     $errors = $view->validate();
     // Check that the error messages are shown.
     $this->assertCount(2, $errors['default'], 'Error messages found for required relationship');
-    $this->assertEquals(new FormattableMarkup('The %relationship_name relationship used in %handler_type %handler is not present in the %display_name display.', ['%relationship_name' => 'uid', '%handler_type' => 'field', '%handler' => 'User: Last login', '%display_name' => 'Default']), $errors['default'][0]);
-    $this->assertEquals(new FormattableMarkup('The %relationship_name relationship used in %handler_type %handler is not present in the %display_name display.', ['%relationship_name' => 'uid', '%handler_type' => 'field', '%handler' => 'User: Created', '%display_name' => 'Default']), $errors['default'][1]);
+    $this->assertEquals("The uid relationship used in field User: Last login is not present in the Default display.", $errors['default'][0]);
+    $this->assertEquals("The uid relationship used in field User: Created is not present in the Default display.", $errors['default'][1]);
   }
 
   /**

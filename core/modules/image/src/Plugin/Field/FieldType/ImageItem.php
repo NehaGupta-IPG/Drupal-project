@@ -386,10 +386,12 @@ class ImageItem extends FileItem {
         $image->setOwnerId(\Drupal::currentUser()->id());
         $guesser = \Drupal::service('file.mime_type.guesser');
         $image->setMimeType($guesser->guessMimeType($path));
-        $image->setFileName($file_system->basename($path));
+        $image->setFileName(basename($path));
         $destination_dir = static::doGetUploadLocation($settings);
         $file_system->prepareDirectory($destination_dir, FileSystemInterface::CREATE_DIRECTORY);
-        $destination = $destination_dir . '/' . basename($path);
+        // Ensure directory ends with a slash.
+        $destination_dir .= str_ends_with($destination_dir, '/') ? '' : '/';
+        $destination = $destination_dir . basename($path);
         $file = \Drupal::service('file.repository')->move($image, $destination);
         $images[$extension][$min_resolution][$max_resolution][$file->id()] = $file;
       }
