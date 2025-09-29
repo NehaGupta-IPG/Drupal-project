@@ -1433,6 +1433,9 @@ services:
     autowire: true
   redirect_leading_slashes_subscriber:
     class: Drupal\Core\EventSubscriber\RedirectLeadingSlashesSubscriber
+  redirect_front_page_subscriber:
+    class: Drupal\Core\EventSubscriber\RedirectFrontPageSubscriber
+    arguments: ['@config.factory']
   config_import_subscriber:
     class: Drupal\Core\EventSubscriber\ConfigImportSubscriber
     autowire: true

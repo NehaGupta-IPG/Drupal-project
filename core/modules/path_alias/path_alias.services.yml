@@ -7,6 +7,9 @@ services:
   path_alias.subscriber:
     class: Drupal\path_alias\EventSubscriber\PathAliasSubscriber
     arguments: ['@path_alias.manager', '@path.current']
+  path_alias.redirect_subscriber:
+    class: Drupal\path_alias\EventSubscriber\PathAliasRedirectSubscriber
+    arguments: ['@path_alias.repository', '@language_manager']
   path_alias.path_processor:
     class: Drupal\path_alias\PathProcessor\AliasPathProcessor
     tags:
