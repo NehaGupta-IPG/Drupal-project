@@ -24,14 +24,15 @@ class TranslateFilterForm extends TranslateFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $filters = $this->translateFilters();
-    $filter_values = $this->translateFilterValues();
+    $filter_values = $this->translateFilterValues(true);
 
     $form['#attached']['library'][] = 'locale/drupal.locale.admin';
 
     (new Htmx())
-      ->get()
-      ->params(implode(',', array_keys($filter_values)))
-      ->swap('none')
+      ->post()
+      ->swap('innerHTML')
+      ->target('this')
+      ->select('form[data-drupal-selector="locale-translate-filter-form"]')
       ->applyTo($form);
 
     $form['filters'] = [
@@ -98,7 +99,7 @@ class TranslateFilterForm extends TranslateFormBase {
       }
     }
     $this->getRequest()->getSession()->set('locale_translate_filter', $session_filters);
-    $form_state->setRedirect('locale.translate_page');
+    $form_state->setRebuild();
   }
 
   /**
@@ -106,7 +107,8 @@ class TranslateFilterForm extends TranslateFormBase {
    */
   public function resetForm(array &$form, FormStateInterface $form_state) {
     $this->getRequest()->getSession()->remove('locale_translate_filter');
-    $form_state->setRedirect('locale.translate_page');
+    $form_state->setUserInput([]);
+    $form_state->setRebuild();
   }
 
 }

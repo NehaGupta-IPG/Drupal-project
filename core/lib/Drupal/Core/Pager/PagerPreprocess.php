@@ -17,10 +17,45 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class PagerPreprocess {
 
+  /**
+   * Indicates if the current request is an Htmx request.
+   *
+   * @var bool
+   */
+  protected bool $isHtmxRequest;
+
+  /**
+   * The pager element ID.
+   *
+   * @var int|null
+   */
+  protected ?int $element;
+
+  /**
+   * The current query parameters.
+   *
+   * @var array|null
+   */
+  protected ?array $parameters;
+
+  /**
+   * Default link attributes.
+   *
+   * @var array
+   */
+  protected array $default_link_attributes = [];
+
   public function __construct(
     protected PagerManagerInterface $pagerManager,
     protected RequestStack $requestStack,
   ) {
+    if ($this->requestStack->getCurrentRequest()?->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_modal') {
+      $this->default_link_attributes = [
+        'class' => ['use-ajax'],
+        'data-dialog-type' => 'modal',
+        'data-accepts' => 'application/json',
+      ];
+    }
   }
 
   /**
@@ -46,20 +81,12 @@ class PagerPreprocess {
    */
   public function preprocessPager(array &$variables): void {
     $element = $variables['pager']['#element'];
-    $parameters = $variables['pager']['#parameters'];
+    $this->element = $element;
+    $this->isHtmxRequest = $this->requestStack->getCurrentRequest()?->headers->has('HX-Request') || !empty($variables["pager"]["#htmx"]);
+    $this->parameters = $variables['pager']['#parameters'];
     $quantity = empty($variables['pager']['#quantity']) ? 0 : $variables['pager']['#quantity'];
     $route_name = $variables['pager']['#route_name'];
     $route_parameters = $variables['pager']['#route_parameters'] ?? [];
-
-    $link_attributes = [];
-
-    if ($this->requestStack->getCurrentRequest()?->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_modal') {
-      $link_attributes = [
-        'class' => ['use-ajax'],
-        'data-dialog-type' => 'modal',
-        'data-accepts' => 'application/json',
-      ];
-    }
 
     $pager = $this->pagerManager->getPager($element);
 
@@ -107,25 +134,8 @@ class PagerPreprocess {
     // Create the "first" and "previous" links if we are not on the first page.
     $items = [];
     if ($current_page > 0) {
-      $items['first'] = [];
-      $items['first']['attributes'] = new Attribute($link_attributes);
-      $options = [
-        'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, 0),
-      ];
-      $items['first']['href'] = Url::fromRoute($route_name, $route_parameters, $options);
-      if (isset($tags[0])) {
-        $items['first']['text'] = $tags[0];
-      }
-
-      $items['previous'] = [];
-      $items['previous']['attributes'] = new Attribute($link_attributes);
-      $options = [
-        'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $current_page - 1),
-      ];
-      $items['previous']['href'] = Url::fromRoute($route_name, $route_parameters, $options);
-      if (isset($tags[1])) {
-        $items['previous']['text'] = $tags[1];
-      }
+      $items['first'] = $this->buildPageLink($route_name, $route_parameters, 0, $tags[0] ?? NULL);
+      $items['previous'] = $this->buildPageLink($route_name, $route_parameters, $current_page - 1, $tags[1] ?? NULL);
     }
 
     // Add an ellipsis if there are further previous pages.
@@ -134,11 +144,7 @@ class PagerPreprocess {
     }
     // Now generate the actual pager piece.
     for (; $i <= $pager_last && $i <= $pager_max; $i++) {
-      $options = [
-        'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $i - 1),
-      ];
-      $items['pages'][$i]['href'] = Url::fromRoute($route_name, $route_parameters, $options);
-      $items['pages'][$i]['attributes'] = new Attribute($link_attributes);
+      $items['pages'][$i] = $this->buildPageLink($route_name, $route_parameters, $i - 1);
       if ($i == $pager_current) {
         $variables['current'] = $i;
         $items['pages'][$i]['attributes']->setAttribute('aria-current', 'page');
@@ -151,39 +157,8 @@ class PagerPreprocess {
 
     // Create the "next" and "last" links if we are not on the last page.
     if ($current_page < ($pager_max - 1)) {
-      $items['next'] = [];
-      $items['next']['attributes'] = new Attribute($link_attributes);
-      $options = [
-        'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $current_page + 1),
-      ];
-      $items['next']['href'] = Url::fromRoute($route_name, $route_parameters, $options);
-      if (isset($tags[3])) {
-        $items['next']['text'] = $tags[3];
-      }
-
-      $items['last'] = [];
-      $items['last']['attributes'] = new Attribute();
-      $options = [
-        'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $pager_max - 1),
-      ];
-      $items['last']['href'] = Url::fromRoute($route_name, $route_parameters, $options);
-      if (isset($tags[4])) {
-        $items['last']['text'] = $tags[4];
-      }
-    }
-
-    if ($this->requestStack->getCurrentRequest()?->headers->has('HX-Request')) {
-      $variables['#attached']['library'][] = 'core/drupal.htmx';
-      foreach ($items as $key => &$item) {
-        if ($key === 'pages') {
-          foreach ($item as &$page) {
-            $this->processHtmxLink($page);
-          }
-        }
-        if (isset($item['href'])) {
-          $this->processHtmxLink($item);
-        }
-      }
+      $items['next'] = $this->buildPageLink($route_name, $route_parameters, $current_page + 1, $tags[3] ?? NULL);
+      $items['last'] = $this->buildPageLink($route_name, $route_parameters, $pager_max - 1, $tags[4] ?? NULL);
     }
 
     $variables['items'] = $items;
@@ -200,11 +175,48 @@ class PagerPreprocess {
   }
 
   /**
-   * @param $item
+   * Builds a page link array, processing it for Htmx if needed.
    *
-   * @return void
+   * @param string $route_name
+   *   The route name.
+   * @param array $route_parameters
+   *   The route parameters.
+   * @param int $index
+   *   The page index.
+   * @param string|null $text
+   *   (optional) The link text.
+   *
+   * @return array
+   *   A renderable link array.
    */
-  protected function processHtmxLink(&$item): void {
+  protected function buildPageLink(string $route_name, array $route_parameters, int $index, string $text = NULL): array {
+    $link = [
+      'attributes' => new Attribute($this->default_link_attributes),
+      'href' => Url::fromRoute(
+        $route_name,
+        $route_parameters,
+        [
+          'query' => $this->pagerManager->getUpdatedParameters($this->parameters, $this->element, $index),
+        ]
+      ),
+    ];
+    if ($this->isHtmxRequest) {
+      $this->processHtmxLink($link);
+    }
+    if (!empty($text)) {
+      $link['text'] = $text;
+    }
+    $link['href'] = $link['href']->toString();
+    return $link;
+  }
+
+  /**
+   * Modifies a link item to work with Htmx.
+   *
+   * @param array $item
+   *   A link item with 'href' and 'attributes' keys. The 'href' key
+   */
+  protected function processHtmxLink(array &$item): void {
     /** @var Url $url */
     $url = $item['href'];
     // Filter the parameters that break non-js navigation.
@@ -218,6 +230,7 @@ class PagerPreprocess {
       ->get($url)
       // Only trigger the AJAX request, updating the necessary element
       // is done with an out-of-band swap.
+      ->pushUrl($url)
       ->swap('none')
       ->applyTo($item, 'attributes');
     $item['href'] = $url;

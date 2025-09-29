@@ -58,6 +58,8 @@ class Pager extends RenderElementBase {
       // path is provided, which will make links relative to the current URL.
       // This makes the page more effectively cacheable.
       '#route_name' => '<none>',
+      // Flag to indicate that navigation must build htmx links.
+      '#htmx' => FALSE,
     ];
   }
 
