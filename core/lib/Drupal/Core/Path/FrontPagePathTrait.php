@@ -26,10 +26,10 @@ trait FrontPagePathTrait {
   /**
    * Gets the current front page path.
    *
-   * @return string
-   *   The front page path.
+   * @return string|null
+   *   The front page path or null if "system.site:page.front" is not set.
    */
-  protected function getFrontPagePath(): string {
+  protected function getFrontPagePath(): ?string {
     // Lazy-load front page config.
     if (!isset($this->frontPage)) {
       $this->frontPage = $this->getConfigFactory()->get('system.site')
