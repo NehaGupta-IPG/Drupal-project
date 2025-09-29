@@ -550,9 +550,7 @@ class AttributeTest extends UnitTestCase {
     $attributes->merge('not an array');
   }
 
-  /**
-   * @dataProvider providerTestAttributesWithUrls
-   */
+  #[DataProvider('providerTestAttributesWithUrls')]
   public function testAttributesWithUrls($attributes, $expected_output): void {
     UrlHelper::setAllowedProtocols(['http', 'https', 'mailto']);
     $attribute = new Attribute($attributes);
