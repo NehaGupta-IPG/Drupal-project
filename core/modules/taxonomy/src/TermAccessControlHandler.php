@@ -2,17 +2,51 @@
 
 namespace Drupal\taxonomy;
 
+use Drupal\content_translation\ContentTranslationManagerInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityAccessControlHandler;
+use Drupal\Core\Entity\EntityHandlerInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Session\AccountInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines the access control handler for the taxonomy term entity type.
  *
  * @see \Drupal\taxonomy\Entity\Term
  */
-class TermAccessControlHandler extends EntityAccessControlHandler {
+class TermAccessControlHandler extends EntityAccessControlHandler implements EntityHandlerInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entityType) {
+    return new static(
+      $entityType,
+      $container->get('language_manager'),
+      $container->get('content_translation.manager')
+    );
+  }
+
+  /**
+   * Constructs an access control handler instance.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entityType
+   *   The entity type interface.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   *   The entity type definition.
+   * @param \Drupal\content_translation\ContentTranslationManagerInterface $contentTranslationManager
+   *   The content translation manager.
+   */
+  public function __construct(
+    EntityTypeInterface $entityType,
+    protected LanguageManagerInterface $languageManager,
+    protected ContentTranslationManagerInterface $contentTranslationManager,
+  ) {
+    parent::__construct($entityType);
+  }
 
   /**
    * {@inheritdoc}
@@ -24,6 +58,13 @@ class TermAccessControlHandler extends EntityAccessControlHandler {
 
     switch ($operation) {
       case 'view':
+        if ($entity->isTranslatable() && $this->contentTranslationManager->isEnabled('taxonomy_term', $entity->bundle())) {
+          $langcode = $this->languageManager->getCurrentLanguage()->getId();
+          // If the term has a translation, check its status.
+          if ($entity->hasTranslation($langcode)) {
+            $entity = $entity->getTranslation($langcode);
+          }
+        }
         $access_result = AccessResult::allowedIf($account->hasPermission('access content') && $entity->isPublished())
           ->cachePerPermissions()
           ->addCacheableDependency($entity);
