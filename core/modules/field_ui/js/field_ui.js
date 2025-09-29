@@ -71,7 +71,7 @@
   // eslint-disable-next-line func-names
   Drupal.Ajax.prototype.beforeSend = function () {
     // Disable the submit button on AJAX request initiation.
-    $('.field-config-edit-form [data-drupal-selector="edit-submit"]').prop(
+    $('.field-config-edit-form [data-drupal-selector="edit-submit"]').add($('.field-config-edit-form').closest('.ui-dialog').find('.ui-dialog-buttonset.form-actions .js-form-submit')).prop(
       'disabled',
       true,
     );
@@ -81,7 +81,7 @@
   // Re-enable the submit button after AJAX request is completed.
   // eslint-disable-next-line
   $(document).on('ajaxComplete', () => {
-    $('.field-config-edit-form [data-drupal-selector="edit-submit"]').prop(
+    $('.field-config-edit-form [data-drupal-selector="edit-submit"]').add($('.field-config-edit-form').closest('.ui-dialog').find('.ui-dialog-buttonset.form-actions .js-form-submit')).prop(
       'disabled',
       false,
     );
