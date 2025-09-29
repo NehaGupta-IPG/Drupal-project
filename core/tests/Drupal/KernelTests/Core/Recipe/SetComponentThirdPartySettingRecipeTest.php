@@ -84,6 +84,39 @@ YAML;
   }
 
   /**
+   * Tests applying third-party settings to a user display components.
+   */
+  public function testApplyRecipeMultipleComponents(): void {
+    $contents = <<<YAML
+name: 'Set third-party setting via recipe'
+config:
+  actions:
+    core.entity_view_display.user.user.default:
+      setComponentThirdPartySetting:
+        -
+          component: user_picture
+          provider: system
+          settings:
+            example_flag: false
+        -
+          component: member_for
+          provider: system
+          settings:
+            example_flag: false
+YAML;
+    $this->applyRecipeFromYaml($contents, TRUE);
+
+    $display = $this->container->get(EntityDisplayRepositoryInterface::class)
+      ->getViewDisplay('user', 'user', 'default');
+    $component = $display->getComponent('user_picture');
+    $this->assertIsArray($component);
+    $this->assertFalse($component['third_party_settings']['system']['example_flag']);
+    $component = $display->getComponent('member_for');
+    $this->assertIsArray($component);
+    $this->assertFalse($component['third_party_settings']['system']['example_flag']);
+  }
+
+  /**
    * Ensures scalar settings are stored under the 'value' key.
    */
   public function testScalarSettingStoredUnderValueKey(): void {
@@ -195,8 +228,8 @@ YAML;
    * Ensures a non-array action value is rejected.
    */
   public function testRejectsNonArrayValue(): void {
-    $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage("requires an array with 'component' and 'provider'");
+    $this->expectException(\AssertionError::class);
+    $this->expectExceptionMessage('assert(is_array($value))');
     $contents = <<<YAML
 name: 'Invalid non-array value'
 config:

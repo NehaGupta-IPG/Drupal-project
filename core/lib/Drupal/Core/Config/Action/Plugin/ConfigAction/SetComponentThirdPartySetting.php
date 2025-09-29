@@ -26,17 +26,33 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * - settings (array|scalar): The setting value or an array of settings.
  *   If an array is provided, it will be merged into the component's
  *   third_party_settings for the given provider.
+ * Or alternatively a list of parameters with the same structure as above.
  *
- * Example usage in a recipe:
+ * Example usages in a recipe:
+ *
  * @code
  * config:
  *   actions:
+ *     # Sets 3rd party setting of 'system' module on 'user_picture' component.
  *     core.entity_view_display.user.user.default:
  *       setComponentThirdPartySetting:
  *         component: user_picture
  *         provider: system
  *         settings:
  *           example_flag: true
+ *     # It is possible to set 3rd party settings of multiple components.
+ *     core.entity_view_display.user.user.compact:
+ *       setComponentThirdPartySetting:
+ *         -
+ *           component: user_picture
+ *           provider: system
+ *           settings:
+ *             example_flag: true
+ *         -
+ *           component: field_first_name
+ *           provider: user
+ *           settings:
+ *             type: text
  * @endcode
  *
  * @internal
@@ -79,10 +95,39 @@ final class SetComponentThirdPartySetting implements ConfigActionPluginInterface
    * {@inheritdoc}
    */
   public function apply(string $configName, mixed $value): void {
+    // If config action settings are not an array, do early exit, as action is
+    // not possible to execute.
+    assert(is_array($value));
+    // Convert the parameters to a list of parameters.
+    if (!array_is_list($value)) {
+      $value = [$value];
+    }
+    else {
+      // Check that each config action parameter is an array.
+      foreach ($value as $item) {
+        if (!is_array($item)) {
+          throw new ConfigActionException("The setComponentThirdPartySetting action requires an array of settings.");
+        }
+      }
+    }
     $entity = $this->configManager->loadConfigEntityByName($configName);
     assert($entity instanceof EntityDisplayInterface);
+    array_walk($value, [$this, 'applySingle'], $entity);
+    $entity->save();
+  }
 
-    if (!is_array($value) || !isset($value['component'], $value['provider'])) {
+  /**
+   * Applies single set of parameters for this config action.
+   *
+   * @param array $value
+   *   The config action parameters.
+   * @param int $key
+   *   The id of set of parameters.
+   * @param \Drupal\Core\Entity\Display\EntityDisplayInterface $entity
+   *   The display entity.
+   */
+  protected function applySingle(array $value, int $key, EntityDisplayInterface $entity): void {
+    if (!isset($value['component'], $value['provider'])) {
       throw new ConfigActionException("The setComponentThirdPartySetting action requires an array with 'component' and 'provider'.");
     }
 
@@ -122,7 +167,6 @@ final class SetComponentThirdPartySetting implements ConfigActionPluginInterface
     }
 
     $entity->setComponent($component, $component_config);
-    $entity->save();
   }
 
 }
