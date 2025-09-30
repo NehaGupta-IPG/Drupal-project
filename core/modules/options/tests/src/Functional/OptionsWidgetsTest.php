@@ -335,7 +335,10 @@ class OptionsWidgetsTest extends FieldTestBase {
     // Display form.
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     // A non-required field has an empty '' option value.
-    $this->assertNotEmpty($this->xpath('//select[@id=:id]//option[@value="" and text()=:label]', [':id' => 'edit-card-1', ':label' => '- None -']), 'A non-required select list has a "None" choice.');
+    $this->assertNotEmpty($this->xpath('//select[@id=:id]//option[@value="" and text()=:label]', [
+      ':id' => 'edit-card-1',
+      ':label' => '- None -',
+    ]), 'A non-required select list has a "None" choice.');
     $this->assertSame('- None -', $option->getText());
     // Submit form: Unselect the option.
     $edit = ['card_1' => ''];
