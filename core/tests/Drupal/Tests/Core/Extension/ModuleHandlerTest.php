@@ -65,7 +65,12 @@ class ModuleHandlerTest extends UnitTestCase {
     $callableResolver = $this->createStub(CallableResolver::class);
     $callableResolver
       ->method('getCallableFromDefinition')
-      ->willReturnCallback(fn ($definition) => $definition);
+      ->willReturnCallback(function ($definition) {
+        if (!is_callable($definition)) {
+          throw new \InvalidArgumentException('The callable definition provided was invalid.');
+        }
+        return $definition;
+      });
     $moduleHandler = new ModuleHandler($this->root, $moduleList, $keyvalue, $callableResolver, $cache);
     if ($loadAll) {
       $moduleHandler->loadAll();
@@ -344,6 +349,26 @@ class ModuleHandlerTest extends UnitTestCase {
       'module_handler_test' => $this->root . '/core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test',
     ];
     $this->assertEquals($moduleDirectories, $module_handler->getModuleDirectories());
+  }
+
+  /**
+   * Tests invalid callables.
+   *
+   * This may happen during install or when code is changing without rebuilds.
+   */
+  #[IgnoreDeprecations]
+  public function testInvalidCallable(): void {
+    $implementations = [
+      'hook' => [
+        'module_handler_test_hook' => 'module_handler_test',
+        'module_handler_test_no_hook' => 'module_handler_test_no_hook',
+      ],
+    ];
+    $moduleList = [
+      'module_handler_test_no_hook' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_no_hook',
+    ];
+    $module_handler = $this->getModuleHandler($moduleList, $implementations);
+    $this->assertEquals([TRUE], $module_handler->invokeAll('hook', [TRUE]));
   }
 
 }
