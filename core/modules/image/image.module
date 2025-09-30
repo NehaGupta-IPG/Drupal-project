@@ -106,11 +106,15 @@ function template_preprocess_image_style(&$variables): void {
     // to override that if they need to.
     $variables['image']['#access'] = FALSE;
 
-    // Inform the site builders why their image didn't work.
-    \Drupal::logger('image')->warning('Could not apply @style image style to @uri because the style does not support it.', [
-      '@style' => $style->label(),
-      '@uri' => $variables['uri'],
-    ]);
+    // Don't log for svg files.
+    $ext = mb_strtolower(pathinfo($variables['uri'], PATHINFO_EXTENSION));
+    if ($ext !== 'svg') {
+      // Inform the site builders why their image didn't work.
+      \Drupal::logger('image')->warning('Could not apply @style image style to @uri because the style does not support it.', [
+        '@style' => $style->label(),
+        '@uri' => $variables['uri'],
+      ]);
+    }
   }
 
   if (\array_key_exists('alt', $variables)) {
