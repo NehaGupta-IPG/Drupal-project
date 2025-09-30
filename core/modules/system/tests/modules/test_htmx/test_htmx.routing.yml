@@ -55,3 +55,21 @@ test_htmx.form_builder_test:
     selected: NULL
   requirements:
     _permission: 'access content'
+
+test_htmx.build_response_by_params:
+  path: '/htmx-test/build-response-by-params'
+  defaults:
+    _title: 'Test dynamic HTMX form'
+    _controller: '\Drupal\test_htmx\Controller\HtmxTestAttachmentsController::buildHtmxResponseByParams'
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
+  requirements:
+    _permission: 'access content'
+
+
+test_htmx.ajax_request_wrapper_format:
+  path: '/htmx-test/ajax-request-wrapper-format'
+  defaults:
+    _title: 'Test dynamic HTMX form'
+    _controller: '\Drupal\test_htmx\Controller\HtmxTestAttachmentsController::buildPageWithHtmxRequestsExamples'
+  requirements:
+    _permission: 'access content'
