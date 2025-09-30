@@ -24,7 +24,7 @@ class TranslateFilterForm extends TranslateFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $filters = $this->translateFilters();
-    $filter_values = $this->translateFilterValues(true);
+    $filter_values = $this->translateFilterValues(TRUE);
 
     $form['#attached']['library'][] = 'locale/drupal.locale.admin';
 

@@ -547,9 +547,9 @@ class Htmx {
    *
    * @param \Drupal\Core\Url|null $url
    *   The URL for the GET request. If NULL the current page is used without the
-   *    query parameters.
+   *   query parameters.
    * @param bool $full_page
-   *    Toggle to use the full HTML response or just the main content.
+   *   Toggle to use the full HTML response or just the main content.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
@@ -572,7 +572,7 @@ class Htmx {
    *   The URL for the GET request. If NULL the current page is used without the
    *   query parameters.
    * @param bool $full_page
-   *    Toggle to use the full HTML response or just the main content.
+   *   Toggle to use the full HTML response or just the main content.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
@@ -593,9 +593,9 @@ class Htmx {
    *
    * @param \Drupal\Core\Url|null $url
    *   The URL for the GET request. If NULL the current page is used without the
-   *    query parameters.
+   *   query parameters.
    * @param bool $full_page
-   *    Toggle to use the full HTML response or just the main content.
+   *   Toggle to use the full HTML response or just the main content.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
@@ -619,7 +619,7 @@ class Htmx {
    *   The URL for the GET request. If NULL the current page is used without the
    *   query parameters.
    * @param bool $full_page
-   *    Toggle to use the full HTML response or just the main content.
+   *   Toggle to use the full HTML response or just the main content.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
@@ -869,6 +869,8 @@ class Htmx {
    *
    * @param bool $value
    *   Should the element and its descendants be "boosted"?
+   * @param bool $full_page
+   *    Toggle to use the full HTML response or just the main content.
    *
    * @return static
    *   Returns this object to allow chaining methods.

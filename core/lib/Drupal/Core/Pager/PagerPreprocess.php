@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @internal
  */
 class PagerPreprocess {
+
   public function __construct(
     protected PagerManagerInterface $pagerManager,
     protected RequestStack $requestStack,
