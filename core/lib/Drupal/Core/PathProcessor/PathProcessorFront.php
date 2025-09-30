@@ -56,6 +56,11 @@ class PathProcessorFront implements InboundPathProcessorInterface, OutboundPathP
   public function processOutbound($path, &$options = [], ?Request $request = NULL, ?BubbleableMetadata $bubbleable_metadata = NULL) {
     if ($path === $this->getFrontPagePath()) {
       $path = '/';
+      // Add cache context to ensure cache invalidation when front page changes.
+      if ($bubbleable_metadata) {
+        $bubbleable_metadata->addCacheContexts(['url.path.is_front']);
+        $bubbleable_metadata->addCacheTags(['config:system.site']);
+      }
     }
     return $path;
   }
