@@ -253,7 +253,12 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
       // - All instances of the object need to be renamed.
       $this->configFactory->rename($prefix . $id, $config_name);
     }
-    $config = $this->configFactory->getEditable($config_name);
+    if ($is_new) {
+      $config = $this->configFactory->create($config_name);
+    }
+    else {
+      $config = $this->configFactory->getEditable($config_name);
+    }
 
     // Retrieve the desired properties and set them in config.
     $config->setData($this->mapToStorageRecord($entity));
@@ -292,8 +297,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
    */
   protected function has($id, EntityInterface $entity) {
     $prefix = $this->getPrefix();
-    $config = $this->configFactory->get($prefix . $id);
-    return !$config->isNew();
+    return $this->configFactory->exists($prefix . $id);
   }
 
   /**

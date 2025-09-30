@@ -420,7 +420,13 @@ function locale_form_language_admin_edit_form_alter_submit($form, FormStateInter
  *   Whether $langcode can be translated to in locale.
  */
 function locale_is_translatable($langcode) {
-  return $langcode != 'en' || \Drupal::config('locale.settings')->get('translate_english');
+  if ($langcode != 'en') {
+    return TRUE;
+  }
+  if (!\Drupal::configFactory()->exists('locale.settings')) {
+    return FALSE;
+  }
+  return \Drupal::config('locale.settings')->get('translate_english');
 }
 
 /**

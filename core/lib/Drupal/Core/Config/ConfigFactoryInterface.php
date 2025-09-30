@@ -35,6 +35,31 @@ interface ConfigFactoryInterface {
   public function getEditable($name);
 
   /**
+   * Returns a mutable configuration object for a given name.
+   *
+   * Should not be used for config that will have runtime effects. Therefore it
+   * is always loaded override free.
+   *
+   * @param string $name
+   *   The name of the configuration object to create.
+   *
+   * @return \Drupal\Core\Config\Config
+   *   A configuration object.
+   */
+  public function create(string $name): Config;
+
+  /**
+   * Checks whether a configuration object exists.
+   *
+   * @param string $name
+   *   The name of the configuration object to check for existence.
+   *
+   * @return bool
+   *   TRUE if the configuration object exists, FALSE otherwise.
+   */
+  public function exists(string $name): bool;
+
+  /**
    * Returns a list of configuration objects for the given names.
    *
    * This will pre-load all requested configuration objects does not create

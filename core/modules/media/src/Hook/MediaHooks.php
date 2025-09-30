@@ -211,7 +211,7 @@ class MediaHooks {
    */
   #[Hook('entity_type_alter')]
   public function entityTypeAlter(array &$entity_types) : void {
-    if (\Drupal::config('media.settings')->get('standalone_url')) {
+    if (\Drupal::configFactory()->exists('media.settings') && \Drupal::config('media.settings')->get('standalone_url')) {
       /** @var \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type */
       $entity_type = $entity_types['media'];
       $entity_type->setLinkTemplate('canonical', '/media/{media}');

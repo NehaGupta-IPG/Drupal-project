@@ -78,13 +78,15 @@ class ConfigFactoryTest extends UnitTestCase {
    */
   public function testRename(): void {
     $old = new Config($this->randomMachineName(), $this->storage, $this->eventDispatcher, $this->typedConfig);
+    $old->initWithData(['foo' => 'bar']);
     $new = new Config($this->randomMachineName(), $this->storage, $this->eventDispatcher, $this->typedConfig);
+    $new->initWithData(['foo' => 'bar']);
 
     $this->storage->expects($this->exactly(2))
       ->method('readMultiple')
       ->willReturnMap([
-        [[$old->getName()], $old->getRawData()],
-        [[$new->getName()], $new->getRawData()],
+        [[$old->getName()], [$old->getName() => $old->getRawData()]],
+        [[$new->getName()], [$new->getName() => $new->getRawData()]],
       ]);
 
     $this->cacheTagsInvalidator->expects($this->once())
