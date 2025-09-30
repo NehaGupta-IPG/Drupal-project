@@ -213,7 +213,9 @@ class ThemeCommonElements {
       'menu_local_tasks' => [
         'variables' => [
           'primary' => [],
+          'primary_attributes' => [],
           'secondary' => [],
+          'secondary_attributes' => [],
         ],
       ],
       // From form system.
