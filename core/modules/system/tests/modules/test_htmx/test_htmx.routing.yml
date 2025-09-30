@@ -65,7 +65,6 @@ test_htmx.build_response_by_params:
   requirements:
     _permission: 'access content'
 
-
 test_htmx.ajax_request_wrapper_format:
   path: '/htmx-test/ajax-request-wrapper-format'
   defaults:
