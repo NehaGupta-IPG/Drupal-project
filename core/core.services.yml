@@ -2030,7 +2030,7 @@ services:
       - [setValidator, []]
   Drupal\Core\Theme\ComponentNegotiator:
     arguments:
-      - '@theme.manager'
+      - '@theme_handler'
   plugin.manager.sdc:
     public: true
     class: Drupal\Core\Theme\ComponentPluginManager

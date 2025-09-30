@@ -3,7 +3,7 @@
 namespace Drupal\Core\Theme;
 
 use Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait;
-use Drupal\Core\Extension\Extension;
+use Drupal\Core\Extension\ThemeHandlerInterface;
 
 /**
  * Determines which component should be used.
@@ -24,14 +24,8 @@ class ComponentNegotiator {
    */
   protected array $cache = [];
 
-  /**
-   * Constructs ComponentNegotiator objects.
-   *
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
-   *   The theme manager.
-   */
   public function __construct(
-    protected ThemeManagerInterface $themeManager,
+    protected ThemeHandlerInterface $themeHandler,
   ) {
   }
 
@@ -93,14 +87,12 @@ class ComponentNegotiator {
    *   The plugin ID for the negotiated component, or NULL if none was found.
    */
   private function maybeNegotiateByTheme(array $candidates): ?string {
-    // Prepare the error message.
-    $theme_name = $this->themeManager->getActiveTheme()->getName();
+    $defaultThemeName = $this->themeHandler->getDefault();
+    $defaultTheme = $this->themeHandler->getTheme($defaultThemeName);
+
     // Let's do theme based negotiation.
-    $base_theme_names = array_map(
-      static fn(Extension $extension) => $extension->getName(),
-      $this->themeManager->getActiveTheme()->getBaseThemeExtensions()
-    );
-    $considered_themes = [$theme_name, ...$base_theme_names];
+    $base_theme_names = array_keys($defaultTheme->base_themes);
+    $considered_themes = [$defaultThemeName, ...$base_theme_names];
     // Only consider components in the theme hierarchy tree.
     $candidates = array_filter(
       $candidates,
@@ -150,7 +142,7 @@ class ComponentNegotiator {
     return sprintf(
       'component-negotiation::%s::%s',
       $component_id,
-      $this->themeManager->getActiveTheme()->getName()
+      $this->themeHandler->getDefault()
     );
   }
 
