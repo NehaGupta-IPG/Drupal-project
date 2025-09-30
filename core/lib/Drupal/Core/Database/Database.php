@@ -418,6 +418,10 @@ abstract class Database {
       throw new DriverNotSpecifiedException('Driver not specified for this database connection: ' . $key);
     }
 
+    if (!self::$databaseInfo[$key][$target]['namespace']) {
+      throw new DriverNotSpecifiedException('Namespace not specified for this database connection: ' . $key);
+    }
+
     $driver_class = self::$databaseInfo[$key][$target]['namespace'] . '\\Connection';
 
     $client_connection = $driver_class::open(self::$databaseInfo[$key][$target]);
