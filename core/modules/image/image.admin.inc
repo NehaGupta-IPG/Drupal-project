@@ -41,13 +41,19 @@ function template_preprocess_image_style_preview(&$variables): void {
     'width' => $original_image->getWidth(),
     'height' => $original_image->getHeight(),
   ];
-  if ($variables['original']['width'] > $variables['original']['height']) {
-    $variables['preview']['original']['width'] = min($variables['original']['width'], $sample_width);
-    $variables['preview']['original']['height'] = round($variables['preview']['original']['width'] / $variables['original']['width'] * $variables['original']['height']);
+  if (empty($variables['original']['width']) || empty($variables['original']['height'])) {
+    $variables['preview']['original']['width'] = $sample_width;
+    $variables['preview']['original']['height'] = $sample_height;
   }
   else {
-    $variables['preview']['original']['height'] = min($variables['original']['height'], $sample_height);
-    $variables['preview']['original']['width'] = round($variables['preview']['original']['height'] / $variables['original']['height'] * $variables['original']['width']);
+    if ($variables['original']['width'] > $variables['original']['height']) {
+      $variables['preview']['original']['width'] = min($variables['original']['width'], $sample_width);
+      $variables['preview']['original']['height'] = round($variables['preview']['original']['width'] / $variables['original']['width'] * $variables['original']['height']);
+    }
+    else {
+      $variables['preview']['original']['height'] = min($variables['original']['height'], $sample_height);
+      $variables['preview']['original']['width'] = round($variables['preview']['original']['height'] / $variables['original']['height'] * $variables['original']['width']);
+    }
   }
 
   // Set up derivative file information.
@@ -67,13 +73,19 @@ function template_preprocess_image_style_preview(&$variables): void {
     'width' => $preview_image->getWidth(),
     'height' => $preview_image->getHeight(),
   ];
-  if ($variables['derivative']['width'] > $variables['derivative']['height']) {
-    $variables['preview']['derivative']['width'] = min($variables['derivative']['width'], $sample_width);
-    $variables['preview']['derivative']['height'] = round($variables['preview']['derivative']['width'] / $variables['derivative']['width'] * $variables['derivative']['height']);
+  if (empty($variables['derivative']['width']) || empty($variables['derivative']['height'])) {
+    $variables['preview']['derivative']['width'] = $sample_width;
+    $variables['preview']['derivative']['height'] = $sample_height;
   }
   else {
-    $variables['preview']['derivative']['height'] = min($variables['derivative']['height'], $sample_height);
-    $variables['preview']['derivative']['width'] = round($variables['preview']['derivative']['height'] / $variables['derivative']['height'] * $variables['derivative']['width']);
+    if ($variables['derivative']['width'] > $variables['derivative']['height']) {
+      $variables['preview']['derivative']['width'] = min($variables['derivative']['width'], $sample_width);
+      $variables['preview']['derivative']['height'] = round($variables['preview']['derivative']['width'] / $variables['derivative']['width'] * $variables['derivative']['height']);
+    }
+    else {
+      $variables['preview']['derivative']['height'] = min($variables['derivative']['height'], $sample_height);
+      $variables['preview']['derivative']['width'] = round($variables['preview']['derivative']['height'] / $variables['derivative']['height'] * $variables['derivative']['width']);
+    }
   }
 
   // Build the preview of the original image.
