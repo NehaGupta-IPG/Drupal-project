@@ -103,7 +103,7 @@ class FileSystemForm extends ConfigFormBase {
       '#type' => 'item',
       '#title' => $this->t('Application root directory'),
       '#markup' => $this->appRoot,
-      '#description' => $this->t('The top level directory of the Drupal installation. Relative paths shown below are relative to this location.'),
+      '#description' => $this->t('The top level directory of the Drupal installation.'),
     ];
 
     $form['file_public_path'] = [
