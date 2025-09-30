@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel\Plugin\migrate\source\d7;
 
+use Drupal\system\Plugin\migrate\source\d7\ThemeSettings;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests D7 theme settings source plugin.
- *
- * @covers Drupal\system\Plugin\migrate\source\d7\ThemeSettings
- *
- * @group system
  */
+#[CoversClass(ThemeSettings::class)]
+#[Group('system')]
 class ThemeSettingsTest extends MigrateSqlSourceTestBase {
 
   /**

@@ -12,15 +12,16 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\jsonapi\Kernel\JsonapiKernelTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the JSON:API serializer.
  *
  * @coversClass \Drupal\jsonapi\Serializer\Serializer
- * @group jsonapi
  *
  * @internal
  */
+#[Group('jsonapi')]
 class SerializerTest extends JsonapiKernelTestBase {
 
   /**
@@ -29,7 +30,6 @@ class SerializerTest extends JsonapiKernelTestBase {
   protected static $modules = [
     'file',
     'serialization',
-    'system',
     'node',
     'user',
     'field',
@@ -103,7 +103,9 @@ class SerializerTest extends JsonapiKernelTestBase {
   }
 
   /**
-   * @covers \Drupal\jsonapi\Serializer\Serializer::normalize
+   * Tests fallback normalizer.
+   *
+   * @legacy-covers \Drupal\jsonapi\Serializer\Serializer::normalize
    */
   public function testFallbackNormalizer(): void {
     $context = [

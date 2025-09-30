@@ -9,14 +9,16 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the field synchronization behavior for the image field.
- *
- * @legacy-covers ::_content_translation_form_language_content_settings_form_alter
  */
 #[Group('content_translation')]
+#[CoversFunction('_content_translation_form_language_content_settings_form_alter')]
+#[RunTestsInSeparateProcesses]
 class ContentTranslationSyncImageTest extends ContentTranslationTestBase {
 
   use TestFileCreationTrait {
