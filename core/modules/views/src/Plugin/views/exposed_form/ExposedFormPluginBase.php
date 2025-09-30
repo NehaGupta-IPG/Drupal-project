@@ -264,10 +264,10 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
       }
       $all_exposed = array_merge($exposed_sorts, $exposed_filters);
 
-      // Add the HTMX magic
       (new Htmx())
-        ->get()
+        ->boost()
         ->swapOob(TRUE)
+        ->swap('none')
         ->params(array_merge(array_keys($all_exposed), ['op']))
         ->applyTo($form);
 
