@@ -281,9 +281,8 @@ class User extends ContentEntityBase implements UserInterface {
    */
   public function getCreatedTime() {
     $value = $this->get('created')->value;
-    // @todo This method should not return NULL according to its documentation
-    // in UserInterface.
-    // @see https://www.drupal.org/project/drupal/issues/3533981
+    // @todo Change to not return NULL according to UserInterface in
+    //   https://www.drupal.org/project/drupal/issues/3533981
     return isset($value) ? (int) $value : NULL;
   }
 
