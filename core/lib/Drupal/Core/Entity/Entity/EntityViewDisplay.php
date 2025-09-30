@@ -85,78 +85,8 @@ class EntityViewDisplay extends EntityDisplayBase implements EntityViewDisplayIn
    * @see hook_entity_view_display_alter()
    */
   public static function collectRenderDisplays($entities, $view_mode) {
-    if (empty($entities)) {
-      return [];
-    }
-
-    // Collect entity type and bundles.
-    $entity_type = current($entities)->getEntityTypeId();
-    $bundles = [];
-    foreach ($entities as $entity) {
-      $bundles[$entity->bundle()] = TRUE;
-    }
-    $bundles = array_keys($bundles);
-
-    // For each bundle, check the existence and status of:
-    // - the display for the view mode,
-    // - the 'default' display.
-    $candidate_ids = [];
-    foreach ($bundles as $bundle) {
-      if ($view_mode != 'default') {
-        $candidate_ids[$bundle][] = $entity_type . '.' . $bundle . '.' . $view_mode;
-      }
-      $candidate_ids[$bundle][] = $entity_type . '.' . $bundle . '.default';
-    }
-    $results = \Drupal::entityQuery('entity_view_display')
-      ->condition('id', NestedArray::mergeDeepArray($candidate_ids))
-      ->condition('status', TRUE)
-      ->execute();
-
-    // For each bundle, select the first valid candidate display, if any.
-    $load_ids = [];
-    foreach ($bundles as $bundle) {
-      foreach ($candidate_ids[$bundle] as $candidate_id) {
-        if (isset($results[$candidate_id])) {
-          $load_ids[$bundle] = $candidate_id;
-          break;
-        }
-      }
-    }
-
-    // Load the selected displays.
-    $storage = \Drupal::entityTypeManager()->getStorage('entity_view_display');
-    $displays = $storage->loadMultiple($load_ids);
-
-    $displays_by_bundle = [];
-    foreach ($bundles as $bundle) {
-      // Use the selected display if any, or create a fresh runtime object.
-      if (isset($load_ids[$bundle])) {
-        $display = $displays[$load_ids[$bundle]];
-      }
-      else {
-        $display = $storage->create([
-          'targetEntityType' => $entity_type,
-          'bundle' => $bundle,
-          'mode' => $view_mode,
-          'status' => TRUE,
-        ]);
-      }
-
-      // Let the display know which view mode was originally requested.
-      $display->originalMode = $view_mode;
-
-      // Let modules alter the display.
-      $display_context = [
-        'entity_type' => $entity_type,
-        'bundle' => $bundle,
-        'view_mode' => $view_mode,
-      ];
-      \Drupal::moduleHandler()->alter('entity_view_display', $display, $display_context);
-
-      $displays_by_bundle[$bundle] = $display;
-    }
-
-    return $displays_by_bundle;
+    $entity_display_repository = \Drupal::service('entity_display.repository');
+    return $entity_display_repository->collectViewDisplays($entities, $view_mode);
   }
 
   /**
@@ -175,8 +105,8 @@ class EntityViewDisplay extends EntityDisplayBase implements EntityViewDisplayIn
    * @see \Drupal\Core\Entity\Entity\EntityViewDisplay::collectRenderDisplays()
    */
   public static function collectRenderDisplay(FieldableEntityInterface $entity, $view_mode) {
-    $displays = static::collectRenderDisplays([$entity], $view_mode);
-    return $displays[$entity->bundle()];
+    $entity_display_repository = \Drupal::service('entity_display.repository');
+    return $entity_display_repository->collectViewDisplay($entity, $view_mode);
   }
 
   /**

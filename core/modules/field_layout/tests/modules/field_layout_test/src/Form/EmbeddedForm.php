@@ -38,7 +38,7 @@ class EmbeddedForm extends FormBase {
     $entity = EntityTest::load(1);
     if ($entity) {
       if ($entity) {
-        $display = EntityFormDisplay::collectRenderDisplay($entity, 'default');
+        $display = \Drupal::service('entity_display.repository')->collectFormDisplay($entity, 'default');
         $subform_state = SubformState::createForSubform($form['foo'], $form, $form_state);
         $display->buildForm($entity, $form['foo'], $subform_state);
         \Drupal::classResolver(FieldLayoutBuilder::class)->buildForm($form['foo'], $display, $subform_state);

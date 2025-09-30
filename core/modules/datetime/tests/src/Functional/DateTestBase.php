@@ -173,7 +173,7 @@ abstract class DateTestBase extends BrowserTestBase {
       $this->container->get('entity_type.manager')->getStorage('entity_test')->resetCache([$id]);
     }
     $entity = EntityTest::load($id);
-    $display = EntityViewDisplay::collectRenderDisplay($entity, $view_mode);
+    $display = \Drupal::service('entity_display.repository')->collectViewDisplay($entity, $view_mode);
     $build = $display->build($entity);
     return (string) $this->container->get('renderer')->renderRoot($build);
   }

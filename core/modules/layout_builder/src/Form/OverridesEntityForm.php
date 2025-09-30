@@ -77,7 +77,7 @@ class OverridesEntityForm extends ContentEntityForm implements WorkspaceDynamicS
   protected function init(FormStateInterface $form_state) {
     parent::init($form_state);
 
-    $form_display = EntityFormDisplay::collectRenderDisplay($this->entity, $this->getOperation(), FALSE);
+    $form_display = \Drupal::service('entity_display.repository')->collectFormDisplay($this->entity, $this->getOperation(), FALSE);
     $form_display->setComponent(OverridesSectionStorage::FIELD_NAME, [
       'type' => 'layout_builder_widget',
       'weight' => -10,

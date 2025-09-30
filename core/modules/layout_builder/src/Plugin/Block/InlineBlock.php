@@ -165,7 +165,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
   public static function processBlockForm(array $element, FormStateInterface $form_state) {
     /** @var \Drupal\block_content\BlockContentInterface $block */
     $block = $element['#block'];
-    EntityFormDisplay::collectRenderDisplay($block, 'edit')->buildForm($block, $element, $form_state);
+    \Drupal::service('entity_display.repository')->collectFormDisplay($block, 'edit')->buildForm($block, $element, $form_state);
     $element['revision_log']['#access'] = FALSE;
     $element['info']['#access'] = FALSE;
     return $element;
@@ -178,7 +178,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
     $block_form = $form['block_form'];
     /** @var \Drupal\block_content\BlockContentInterface $block */
     $block = $block_form['#block'];
-    $form_display = EntityFormDisplay::collectRenderDisplay($block, 'edit');
+    $form_display = \Drupal::service('entity_display.repository')->collectFormDisplay($block, 'edit');
     $complete_form_state = $form_state instanceof SubformStateInterface ? $form_state->getCompleteFormState() : $form_state;
     $form_display->extractFormValues($block, $block_form, $complete_form_state);
     $form_display->validateFormValues($block, $block_form, $complete_form_state);
@@ -196,7 +196,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
     $block_form = NestedArray::getValue($form, $form_state->getTemporaryValue('block_form_parents'));
     /** @var \Drupal\block_content\BlockContentInterface $block */
     $block = $block_form['#block'];
-    $form_display = EntityFormDisplay::collectRenderDisplay($block, 'edit');
+    $form_display = \Drupal::service('entity_display.repository')->collectFormDisplay($block, 'edit');
     $complete_form_state = $form_state instanceof SubformStateInterface ? $form_state->getCompleteFormState() : $form_state;
     $form_display->extractFormValues($block, $block_form, $complete_form_state);
     $block->setInfo($this->configuration['label']);

@@ -315,7 +315,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
       ];
     }
 
-    $form_display = EntityFormDisplay::collectRenderDisplay($media, 'media_library');
+    $form_display = \Drupal::service('entity_display.repository')->collectFormDisplay($media, 'media_library');
     // When the name is not added to the form as an editable field, output
     // the name as a fixed element to confirm the right file was uploaded.
     if (!$form_display->getComponent('name')) {
@@ -664,7 +664,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    *   The delta of the media item.
    */
   protected function validateMediaEntity(MediaInterface $media, array $form, FormStateInterface $form_state, $delta) {
-    $form_display = EntityFormDisplay::collectRenderDisplay($media, 'media_library');
+    $form_display = \Drupal::service('entity_display.repository')->collectFormDisplay($media, 'media_library');
     $form_display->extractFormValues($media, $form['media'][$delta]['fields'], $form_state);
     $form_display->validateFormValues($media, $form['media'][$delta]['fields'], $form_state);
   }
@@ -674,7 +674,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     foreach ($this->getAddedMediaItems($form_state) as $delta => $media) {
-      EntityFormDisplay::collectRenderDisplay($media, 'media_library')
+      \Drupal::service('entity_display.repository')->collectFormDisplay($media, 'media_library')
         ->extractFormValues($media, $form['media'][$delta]['fields'], $form_state);
       $this->prepareMediaEntityForSave($media);
       $media->save();

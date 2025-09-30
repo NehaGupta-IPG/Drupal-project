@@ -2,8 +2,12 @@
 
 namespace Drupal\Core\Entity;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\UseCacheBackendTrait;
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -290,6 +294,145 @@ class EntityDisplayRepository implements EntityDisplayRepositoryInterface {
       ]);
     }
     return $entity_form_display;
+  }
+
+  public function collectFormDisplay(FieldableEntityInterface $entity, $form_mode, $default_fallback = TRUE): EntityFormDisplayInterface {
+    $entity_type = $entity->getEntityTypeId();
+    $bundle = $entity->bundle();
+    $storage = $this->entityTypeManager->getStorage('entity_form_display');
+
+    $this->moduleHandler->alter(
+      [$entity_type . '_form_mode', 'entity_form_mode'],
+      $form_mode,
+      $entity
+    );
+
+    // Check the existence and status of:
+    // - the display for the form mode,
+    // - the 'default' display.
+    // @todo we only have 2 candidate IDs, should we just call `getFormDisplay`
+    //   and if the result `isNew` we check for $default_fallback and call it
+    //   again?
+    if ($form_mode != 'default') {
+      $candidate_ids[] = $entity_type . '.' . $bundle . '.' . $form_mode;
+    }
+    if ($default_fallback) {
+      $candidate_ids[] = $entity_type . '.' . $bundle . '.default';
+    }
+    $results = $storage->getQuery()
+      ->condition('id', $candidate_ids)
+      ->condition('status', TRUE)
+      ->execute();
+
+    // Load the first valid candidate display, if any.
+    foreach ($candidate_ids as $candidate_id) {
+      if (isset($results[$candidate_id])) {
+        $display = $storage->load($candidate_id);
+        break;
+      }
+    }
+    // Else create a fresh runtime object.
+    if (empty($display)) {
+      $display = $storage->create([
+        'targetEntityType' => $entity_type,
+        'bundle' => $bundle,
+        'mode' => $default_fallback ? $form_mode : EntityDisplayBase::CUSTOM_MODE,
+        'status' => TRUE,
+      ]);
+    }
+
+    // Let the display know which form mode was originally requested.
+    $display->originalMode = $form_mode;
+
+    // Let modules alter the display.
+    $display_context = [
+      'entity_type' => $entity_type,
+      'bundle' => $bundle,
+      'form_mode' => $form_mode,
+    ];
+    $this->moduleHandler->alter('entity_form_display', $display, $display_context);
+
+    return $display;
+  }
+
+  public function collectViewDisplays($entities, $view_mode): array {
+    if (empty($entities)) {
+      return [];
+    }
+    $storage = $this->entityTypeManager->getStorage('entity_view_display');
+
+    // Collect entity type and bundles.
+    $entity_type = current($entities)->getEntityTypeId();
+    $bundles = [];
+    foreach ($entities as $entity) {
+      $bundles[$entity->bundle()] = TRUE;
+    }
+    $bundles = array_keys($bundles);
+
+    // For each bundle, check the existence and status of:
+    // - the display for the view mode,
+    // - the 'default' display.
+    $candidate_ids = [];
+    foreach ($bundles as $bundle) {
+      if ($view_mode != 'default') {
+        $candidate_ids[$bundle][] = $entity_type . '.' . $bundle . '.' . $view_mode;
+      }
+      $candidate_ids[$bundle][] = $entity_type . '.' . $bundle . '.default';
+    }
+    $results = $storage->getQuery()
+      ->condition('id', NestedArray::mergeDeepArray($candidate_ids))
+      ->condition('status', TRUE)
+      ->execute();
+
+    // For each bundle, select the first valid candidate display, if any.
+    $load_ids = [];
+    foreach ($bundles as $bundle) {
+      foreach ($candidate_ids[$bundle] as $candidate_id) {
+        if (isset($results[$candidate_id])) {
+          $load_ids[$bundle] = $candidate_id;
+          break;
+        }
+      }
+    }
+
+    // Load the selected displays.
+    $displays = $storage->loadMultiple($load_ids);
+
+    $displays_by_bundle = [];
+    foreach ($bundles as $bundle) {
+      // Use the selected display if any, or create a fresh runtime object.
+      if (isset($load_ids[$bundle])) {
+        $display = $displays[$load_ids[$bundle]];
+      }
+      else {
+        $display = $storage->create([
+          'targetEntityType' => $entity_type,
+          'bundle' => $bundle,
+          'mode' => $view_mode,
+          'status' => TRUE,
+        ]);
+      }
+
+      // Let the display know which view mode was originally requested.
+      $display->originalMode = $view_mode;
+
+      // Let modules alter the display.
+      $display_context = [
+        'entity_type' => $entity_type,
+        'bundle' => $bundle,
+        'view_mode' => $view_mode,
+      ];
+      $this->moduleHandler->alter('entity_view_display', $display, $display_context);
+
+      $displays_by_bundle[$bundle] = $display;
+    }
+
+    return $displays_by_bundle;
+  }
+
+  public function collectViewDisplay(FieldableEntityInterface $entity, $view_mode): EntityViewDisplayInterface {
+    $displays = $this->collectViewDisplays([$entity], $view_mode);
+    return $displays[$entity->bundle()];
   }
 
 }

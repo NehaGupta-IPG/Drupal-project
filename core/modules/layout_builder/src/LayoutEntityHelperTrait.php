@@ -113,7 +113,7 @@ trait LayoutEntityHelperTrait {
     else {
       $contexts['entity'] = EntityContext::fromEntity($entity);
       if ($entity instanceof FieldableEntityInterface) {
-        $display = EntityViewDisplay::collectRenderDisplay($entity, $view_mode);
+        $display = \Drupal::service('entity_display.repository')->collectViewDisplay($entity, $view_mode);
         if ($display instanceof LayoutEntityDisplayInterface) {
           $contexts['display'] = EntityContext::fromEntity($display);
         }

@@ -182,7 +182,7 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
       $view_mode = 'full';
       // Retrieve the actual view mode from the returned view display as the
       // requested view mode may not exist and a fallback will be used.
-      $view_mode = LayoutBuilderEntityViewDisplay::collectRenderDisplay($entity, $view_mode)->getMode();
+      $view_mode = \Drupal::service('entity_display.repository')->collectViewDisplay($entity, $view_mode)->getMode();
       $contexts['view_mode'] = new Context(new ContextDefinition('string'), $view_mode);
     }
     return $contexts;
@@ -295,7 +295,7 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
    * {@inheritdoc}
    */
   public function getDefaultSectionStorage() {
-    $display = LayoutBuilderEntityViewDisplay::collectRenderDisplay($this->getEntity(), $this->getContextValue('view_mode'));
+    $display = \Drupal::service('entity_display.repository')->collectViewDisplay($this->getEntity(), $this->getContextValue('view_mode'));
     return $this->sectionStorageManager->load('defaults', ['display' => EntityContext::fromEntity($display)]);
   }
 

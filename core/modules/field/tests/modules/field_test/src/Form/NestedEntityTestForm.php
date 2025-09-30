@@ -30,13 +30,13 @@ class NestedEntityTestForm extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state, ?EntityInterface $entity_1 = NULL, ?EntityInterface $entity_2 = NULL) {
     // First entity.
     $form_state->set('entity_1', $entity_1);
-    $form_display_1 = EntityFormDisplay::collectRenderDisplay($entity_1, 'default');
+    $form_display_1 = \Drupal::service('entity_display.repository')->collectFormDisplay($entity_1, 'default');
     $form_state->set('form_display_1', $form_display_1);
     $form_display_1->buildForm($entity_1, $form, $form_state);
 
     // Second entity.
     $form_state->set('entity_2', $entity_2);
-    $form_display_2 = EntityFormDisplay::collectRenderDisplay($entity_2, 'default');
+    $form_display_2 = \Drupal::service('entity_display.repository')->collectFormDisplay($entity_2, 'default');
     $form_state->set('form_display_2', $form_display_2);
     $form['entity_2'] = [
       '#type' => 'details',

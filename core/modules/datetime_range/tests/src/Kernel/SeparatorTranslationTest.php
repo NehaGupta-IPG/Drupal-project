@@ -104,7 +104,7 @@ class SeparatorTranslationTest extends KernelTestBase {
     ]);
 
     // Verify the untranslated separator.
-    $display = EntityViewDisplay::collectRenderDisplay($entity, 'default');
+    $display = \Drupal::service('entity_display.repository')->collectViewDisplay($entity, 'default');
     $build = $display->build($entity);
     $output = $this->container->get('renderer')->renderRoot($build);
     $this->assertStringContainsString('UNTRANSLATED', (string) $output);
@@ -120,7 +120,7 @@ class SeparatorTranslationTest extends KernelTestBase {
     $this->container->get('language.config_factory_override')
       ->setLanguage(new Language(['id' => 'nl']));
     $this->container->get('cache_tags.invalidator')->invalidateTags($entity->getCacheTags());
-    $display = EntityViewDisplay::collectRenderDisplay($entity, 'default');
+    $display = \Drupal::service('entity_display.repository')->collectViewDisplay($entity, 'default');
     $build = $display->build($entity);
     $output = $this->container->get('renderer')->renderRoot($build);
     $this->assertStringContainsString('NL_TRANSLATED!', (string) $output);

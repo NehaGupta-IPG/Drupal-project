@@ -278,8 +278,9 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
     }
 
     // Build content for the displays represented by the entities.
+    $entity_display_repository = \Drupal::service('entity_display.repository');
     foreach ($view_modes as $view_mode => $view_mode_entities) {
-      $displays = EntityViewDisplay::collectRenderDisplays($view_mode_entities, $view_mode);
+      $displays = $entity_display_repository->collectViewDisplays($view_mode_entities, $view_mode);
       $this->buildComponents($build_list, $view_mode_entities, $displays, $view_mode);
       foreach (array_keys($view_mode_entities) as $key) {
         // Allow for alterations while building, before rendering.
@@ -508,7 +509,7 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
     if (is_string($display_options)) {
       // View mode: use the Display configured for the view mode.
       $view_mode = $display_options;
-      $display = EntityViewDisplay::collectRenderDisplay($entity, $view_mode);
+      $display = \Drupal::service('entity_display.repository')->collectViewDisplay($entity, $view_mode);
       // Hide all fields except the current one.
       foreach (array_keys($entity->getFieldDefinitions()) as $name) {
         if ($name != $field_name) {

@@ -103,7 +103,7 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
       $this->assertInstanceOf(Context::class, $result['view_mode']);
       $this->assertEquals('full', $result['view_mode']->getContextData()->getValue());
 
-      $expected_display = EntityViewDisplay::collectRenderDisplay($entity, 'full');
+      $expected_display = \Drupal::service('entity_display.repository')->collectViewDisplay($entity, 'full');
       $this->assertInstanceOf(EntityContext::class, $result['display']);
       /** @var \Drupal\Core\Plugin\Context\EntityContext $display_entity_context */
       $display_entity_context = $result['display'];

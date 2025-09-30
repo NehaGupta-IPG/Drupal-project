@@ -227,7 +227,7 @@ class ImageItemTest extends FieldKernelTestBase {
     $form_object = $this->container->get(EntityTypeManagerInterface::class)->getFormObject('entity_test', 'default');
     \assert($form_object instanceof ContentEntityForm);
     $form_object->setEntity($entity);
-    $form_display = EntityFormDisplay::collectRenderDisplay($entity, 'default');
+    $form_display = \Drupal::service('entity_display.repository')->collectFormDisplay($entity, 'default');
     \assert($form_display instanceof EntityFormDisplay);
     $form_state = new FormState();
     $form_object->setFormDisplay($form_display, $form_state);

@@ -90,60 +90,8 @@ class EntityFormDisplay extends EntityDisplayBase implements EntityFormDisplayIn
    * @see hook_entity_form_display_alter()
    */
   public static function collectRenderDisplay(FieldableEntityInterface $entity, $form_mode, $default_fallback = TRUE) {
-    $entity_type = $entity->getEntityTypeId();
-    $bundle = $entity->bundle();
-
-    // Allow modules to change the form mode.
-    \Drupal::moduleHandler()->alter(
-      [$entity_type . '_form_mode', 'entity_form_mode'],
-      $form_mode,
-      $entity
-    );
-
-    // Check the existence and status of:
-    // - the display for the form mode,
-    // - the 'default' display.
-    if ($form_mode != 'default') {
-      $candidate_ids[] = $entity_type . '.' . $bundle . '.' . $form_mode;
-    }
-    if ($default_fallback) {
-      $candidate_ids[] = $entity_type . '.' . $bundle . '.default';
-    }
-    $results = \Drupal::entityQuery('entity_form_display')
-      ->condition('id', $candidate_ids)
-      ->condition('status', TRUE)
-      ->execute();
-
-    // Load the first valid candidate display, if any.
-    $storage = \Drupal::entityTypeManager()->getStorage('entity_form_display');
-    foreach ($candidate_ids as $candidate_id) {
-      if (isset($results[$candidate_id])) {
-        $display = $storage->load($candidate_id);
-        break;
-      }
-    }
-    // Else create a fresh runtime object.
-    if (empty($display)) {
-      $display = $storage->create([
-        'targetEntityType' => $entity_type,
-        'bundle' => $bundle,
-        'mode' => $default_fallback ? $form_mode : static::CUSTOM_MODE,
-        'status' => TRUE,
-      ]);
-    }
-
-    // Let the display know which form mode was originally requested.
-    $display->originalMode = $form_mode;
-
-    // Let modules alter the display.
-    $display_context = [
-      'entity_type' => $entity_type,
-      'bundle' => $bundle,
-      'form_mode' => $form_mode,
-    ];
-    \Drupal::moduleHandler()->alter('entity_form_display', $display, $display_context);
-
-    return $display;
+    $entity_display_repository = \Drupal::service('entity_display.repository');
+    return $entity_display_repository->collectFormDisplay($entity, $form_mode, $default_fallback);
   }
 
   /**

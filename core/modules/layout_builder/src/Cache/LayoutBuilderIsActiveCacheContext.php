@@ -87,7 +87,7 @@ class LayoutBuilderIsActiveCacheContext implements CalculatedCacheContextInterfa
         // @todo Expand to work for all view modes in
         //   https://www.drupal.org/node/2907413.
         $view_mode = 'full';
-        $display = EntityViewDisplay::collectRenderDisplay($entity, $view_mode);
+        $display = \Drupal::service('entity_display.repository')->collectViewDisplay($entity, $view_mode);
         if ($display instanceof LayoutEntityDisplayInterface) {
           return $display;
         }
