@@ -41,13 +41,6 @@
       Drupal.url.isLocal(detail.path) &&
       !detail.elt.hasAttribute('data-hx-drupal-full-page')
     ) {
-      // When boosting a page non-full page query, make sure the url pushed does
-      // not include extra parameters.
-      if (detail.boosted) {
-        // When using a hx-boost type request.
-        detail.elt.setAttribute('data-hx-push-url', detail.path);
-      }
-
       // Add _wrapper_format query parameter for all non full page requests.
       // Drupal expects this parameter to be in the query string, not the post
       // values.
@@ -69,6 +62,23 @@
           detail.headers['HX-Trigger-Name'];
       }
     }
+  });
+
+  // When saving to the browser history always remove wrapper format and ajax
+  // page state from the query string.
+  htmx.on('htmx:beforeHistoryUpdate', ({ detail }) => {
+    const url = new URL(detail.history.path, window.location);
+    [
+      '_wrapper_format',
+      'ajax_page_state[theme]',
+      'ajax_page_state[theme_token]',
+      'ajax_page_state[libraries]',
+      '_triggering_element_name',
+      '_triggering_element_value',
+    ].forEach((key) => {
+      url.searchParams.delete(key);
+    });
+    detail.history.path = url.toString();
   });
 
   // @see https://htmx.org/events/#htmx:beforeSwap

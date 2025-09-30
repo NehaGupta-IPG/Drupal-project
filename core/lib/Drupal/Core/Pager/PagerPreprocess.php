@@ -48,8 +48,6 @@ class PagerPreprocess {
     $quantity = empty($variables['pager']['#quantity']) ? 0 : $variables['pager']['#quantity'];
     $route_name = $variables['pager']['#route_name'];
     $route_parameters = $variables['pager']['#route_parameters'] ?? [];
-
-    $pager = $this->pagerManager->getPager($element);
     $link_attributes = $variables['pager']['#attributes'] ?? [];
 
     if ($this->requestStack->getCurrentRequest()?->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_modal') {
@@ -59,6 +57,8 @@ class PagerPreprocess {
         'data-accepts' => 'application/json',
       ] + $link_attributes;
     }
+
+    $pager = $this->pagerManager->getPager($element);
 
     // Nothing to do if there is no pager.
     if (!isset($pager)) {

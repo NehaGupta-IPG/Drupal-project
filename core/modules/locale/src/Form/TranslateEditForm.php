@@ -37,16 +37,8 @@ class TranslateEditForm extends TranslateFormBase {
 
     $form['#attached']['library'][] = 'locale/drupal.locale.admin';
 
-    // We need the values from TranslateFilterForm and the pager when
-    // submitting the translations.
-    $query = $filter_values;
-    if ($page = \Drupal::request()->query->get('page')) {
-      $query['page'] = $page;
-    }
-
-    $postUrl = Url::fromRoute('<none>', [], ['query' => $query]);
     (new Htmx())
-      ->post($postUrl)
+      ->boost()
       ->swap('none')
       ->swapOob(TRUE)
       ->applyTo($form);

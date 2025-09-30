@@ -29,8 +29,8 @@ class TranslateFilterForm extends TranslateFormBase {
     $form['#attached']['library'][] = 'locale/drupal.locale.admin';
 
     (new Htmx())
-      ->post()
-      ->swap('innerHTML')
+      ->boost()
+      ->swap('outerHTML')
       ->target('this')
       ->select('form[data-drupal-selector="locale-translate-filter-form"]')
       ->applyTo($form);
