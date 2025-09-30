@@ -14,6 +14,7 @@ use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -69,7 +70,7 @@ class FileSystemForm extends ConfigFormBase {
     $this->streamWrapperManager = $stream_wrapper_manager;
     $this->fileSystem = $file_system;
     if ($this->appRoot === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $root argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3341696', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $appRoot argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3341696', E_USER_DEPRECATED);
       $this->appRoot = \Drupal::root();
     }
   }
@@ -109,7 +110,7 @@ class FileSystemForm extends ConfigFormBase {
     $form['file_public_path'] = [
       '#type' => 'item',
       '#title' => $this->t('Public file system path'),
-      '#markup' => $this->resolveAbsolutePath(PublicStream::basePath()) ?? PublicStream::basePath(),
+      '#markup' => $this->prepareItemValue(PublicStream::basePath()),
       '#description' => $this->t('A local file system path where public files will be stored. This directory must exist and be writable by Drupal. This directory must be relative to the Drupal installation directory and be accessible over the web. This must be changed in settings.php'),
     ];
 
@@ -123,23 +124,36 @@ class FileSystemForm extends ConfigFormBase {
     $form['file_assets_path'] = [
       '#type' => 'item',
       '#title' => $this->t('Optimized assets file system path'),
-      '#markup' => $this->resolveAbsolutePath(AssetsStream::basePath()) ?? (string) $this->t('Not set'),
+      '#markup' => $this->prepareItemValue(AssetsStream::basePath()),
       '#description' => $this->t('A local file system path where optimized assets files will be stored. This directory must exist and be writable by Drupal. This directory must be relative to the Drupal installation directory and be accessible over the web. This must be changed in settings.php'),
     ];
+
+    if (!$this->isAccessibleOverTheWeb(AssetsStream::basePath())) {
+      $this->messenger()->addWarning($this->t('The optimized assets file system path is probably not accessible over the web.'));
+    }
 
     $form['file_private_path'] = [
       '#type' => 'item',
       '#title' => $this->t('Private file system path'),
-      '#markup' => $this->resolveAbsolutePath(PrivateStream::basePath()) ?? PrivateStream::basePath() ?? (string) $this->t('Not set'),
+      '#markup' => $this->prepareItemValue(PrivateStream::basePath()),
       '#description' => $this->t('An existing local file system path for storing private files. It should be writable by Drupal and not accessible over the web. This must be changed in settings.php'),
     ];
+
+    if ($this->isAccessibleOverTheWeb(PrivateStream::basePath())) {
+      $this->messenger()->addWarning($this->t('The private file system path is probably accessible over the web.'));
+    }
 
     $form['file_temporary_path'] = [
       '#type' => 'item',
       '#title' => $this->t('Temporary directory'),
-      '#markup' => $this->resolveAbsolutePath($this->fileSystem->getTempDirectory()) ?? $this->fileSystem->getTempDirectory(),
+      '#markup' => $this->prepareItemValue($this->fileSystem->getTempDirectory()),
       '#description' => $this->t('A local file system path where temporary files will be stored. This directory should not be accessible over the web. This must be changed in settings.php.'),
     ];
+
+    if ($this->isAccessibleOverTheWeb($this->fileSystem->getTempDirectory())) {
+      $this->messenger()->addWarning($this->t('The temporary file system path is probably accessible over the web.'));
+    }
+
     // Any visible, writable wrapper can potentially be used for the files
     // directory, including a remote file system that integrates with a CDN.
     $options = $this->streamWrapperManager->getDescriptions(StreamWrapperInterface::WRITE_VISIBLE);
@@ -171,24 +185,67 @@ class FileSystemForm extends ConfigFormBase {
   /**
    * Absolute path resolver.
    *
-   * @param string|null $path
+   * @param string $path
    *   A given path.
    *
-   * @return null|string
-   *   Resolved absolute path, null otherwise.
+   * @return string
+   *   Resolved an absolute path, initial otherwise.
    */
-  private function resolveAbsolutePath(?string $path): ?string {
+  private function resolveAbsolutePath(string $path): string {
     if (!$path || str_starts_with($path, '/') || str_contains($path, '://')) {
-      return NULL;
+      return $path;
     }
-    $realpath = $this->fileSystem->realpath($this->appRoot . '/' . $path);
-    if (!$realpath) {
+    $absolute = $this->fileSystem->realpath($this->appRoot . '/' . $path);
+    if (!$absolute) {
       $this->messenger()->addWarning($this->t(
         "The path '@uri' is inaccessible.",
         ['@uri' => $path]
       ));
     }
-    return $realpath ?: NULL;
+    return $absolute ?: $path;
+  }
+
+  /**
+   * Prepares the display value for an item.
+   *
+   * @param string|null $initial
+   *   The initial value of the item.
+   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $message
+   *   An optional fallback message to use if the initial value is null.
+   *
+   * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup
+   *   Returns an absolute path or a formatted translatable message.
+   */
+  private function prepareItemValue(?string $initial, ?TranslatableMarkup $message = NULL): string|TranslatableMarkup {
+    if ($initial === NULL) {
+      return $message ?? $this->t('Not set');
+    }
+    $absolute = $this->resolveAbsolutePath($initial);
+    return $absolute === $initial ?
+      $initial :
+      $this->t(
+        '@initial<br /><small><b>Absolute path:</b> %absolute</small>',
+        ['%absolute' => $absolute, '@initial' => $initial],
+      );
+  }
+
+  /**
+   * Checks if a given path is accessible over the web.
+   *
+   * @param string|null $path
+   *   The path to check for web accessibility.
+   *
+   * @return bool
+   *   TRUE if the path is accessible over the web, FALSE otherwise.
+   */
+  private function isAccessibleOverTheWeb(?string $path): bool {
+    if ($path === NULL) {
+      return FALSE;
+    }
+    return str_starts_with(
+      $this->resolveAbsolutePath($path) . '/',
+      $this->appRoot . '/',
+    );
   }
 
 }
