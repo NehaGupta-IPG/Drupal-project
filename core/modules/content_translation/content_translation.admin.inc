@@ -135,8 +135,16 @@ function _content_translation_form_language_content_settings_form_alter(array &$
       }
 
       $fields = $entity_field_manager->getFieldDefinitions($entity_type_id, $bundle);
+      $base_field_definitions = $entity_field_manager->getBaseFieldDefinitions($entity_type_id);
       if ($fields) {
         foreach ($fields as $field_name => $definition) {
+          // Skip bundle fields - they are defined via hook_entity_bundle_field_info()
+          // and don't exist in base field definitions, so cannot have field config overrides.
+          $is_bundle_field = !isset($base_field_definitions[$field_name]) && !isset($storage_definitions[$field_name]);
+          if ($is_bundle_field) {
+            continue;
+          }
+
           if ($definition->isComputed() || (!empty($storage_definitions[$field_name]) && _content_translation_is_field_translatability_configurable($entity_type, $storage_definitions[$field_name]))) {
             $form['settings'][$entity_type_id][$bundle]['fields'][$field_name] = [
               '#label' => $definition->getLabel(),
