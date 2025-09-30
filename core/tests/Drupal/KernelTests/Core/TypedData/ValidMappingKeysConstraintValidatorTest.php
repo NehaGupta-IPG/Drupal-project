@@ -11,14 +11,14 @@ use Drupal\KernelTests\KernelTestBase;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * Tests the ValidKeys validation constraint.
+ * Tests the ValidMappingKeys validation constraint.
  *
  * @group Validation
  *
- * @covers \Drupal\Core\Validation\Plugin\Validation\Constraint\ValidKeysConstraint
- * @covers \Drupal\Core\Validation\Plugin\Validation\Constraint\ValidKeysConstraintValidator
+ * @covers \Drupal\Core\Validation\Plugin\Validation\Constraint\ValidMappingKeysConstraint
+ * @covers \Drupal\Core\Validation\Plugin\Validation\Constraint\ValidMappingKeysConstraintValidator
  */
-class ValidKeysConstraintValidatorTest extends KernelTestBase {
+class ValidMappingKeysConstraintValidatorTest extends KernelTestBase {
 
   /**
    * The typed config under test.
@@ -69,7 +69,7 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
   /**
    * Tests detecting unsupported keys.
    *
-   * @see \Drupal\Core\Validation\Plugin\Validation\Constraint\ValidKeysConstraint::$invalidKeyMessage
+   * @see \Drupal\Core\Validation\Plugin\Validation\Constraint\Constraint::$invalidKeyMessage
    */
   public function testSupportedKeys(): void {
     // Start from the valid config.
@@ -92,7 +92,7 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
   /**
    * Tests detecting unknown keys.
    *
-   * @see \Drupal\Core\Validation\Plugin\Validation\Constraint\ValidKeysConstraint::$dynamicInvalidKeyMessage
+   * @see \Drupal\Core\Validation\Plugin\Validation\Constraint\Constraint::$dynamicInvalidKeyMessage
    */
   public function testUnknownKeys(): void {
     // Start from the valid config.
@@ -123,7 +123,7 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
    * @testWith [true, {"settings": "'label_display' is a required key."}]
    *           [false, {}]
    *
-   * @see \Drupal\Core\Validation\Plugin\Validation\Constraint\ValidKeysConstraint::$missingRequiredKeyMessage
+   * @see \Drupal\Core\Validation\Plugin\Validation\Constraint\Constraint::$missingRequiredKeyMessage
    */
   public function testRequiredKeys(bool $block_is_fully_validatable, array $expected_validation_errors): void {
     // Set or unset the `FullyValidatable` constraint on `block.block.*`.
@@ -155,7 +155,7 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
    * @testWith [true, {"settings": "'use_site_name' is a required key because plugin is system_branding_block (see config schema type block.settings.system_branding_block)."}]
    *           [false, {}]
    *
-   * @see \Drupal\Core\Validation\Plugin\Validation\Constraint\ValidKeysConstraint::$dynamicMissingRequiredKeyMessage
+   * @see \Drupal\Core\Validation\Plugin\Validation\Constraint\Constraint::$dynamicMissingRequiredKeyMessage
    */
   public function testDynamicallyRequiredKeys(bool $block_is_fully_validatable, array $expected_validation_errors): void {
     // Set or unset the `FullyValidatable` constraint on `block.block.*`.
@@ -187,8 +187,8 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
    * @testWith [true, ["'primary' is a required key because plugin is local_tasks_block (see config schema type block.settings.local_tasks_block).", "'secondary' is a required key because plugin is local_tasks_block (see config schema type block.settings.local_tasks_block)."]]
    *           [false, []]
    *
-   * @see \Drupal\Core\Validation\Plugin\Validation\Constraint\ValidKeysConstraint::$dynamicInvalidKeyMessage
-   * @see \Drupal\Core\Validation\Plugin\Validation\Constraint\ValidKeysConstraint::$dynamicMissingRequiredKeyMessage
+   * @see \Drupal\Core\Validation\Plugin\Validation\Constraint\Constraint::$dynamicInvalidKeyMessage
+   * @see \Drupal\Core\Validation\Plugin\Validation\Constraint\Constraint::$dynamicMissingRequiredKeyMessage
    */
   public function testBothUnknownAndDynamicallyRequiredKeys(bool $block_is_fully_validatable, array $additional_expected_validation_errors): void {
     // Set or unset the `FullyValidatable` constraint on `block.block.*`.
@@ -223,12 +223,12 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
   }
 
   /**
-   * Tests the ValidKeys constraint validator.
+   * Tests the ValidMappingKeys constraint validator.
    */
   public function testValidation(): void {
     // Create a data definition that specifies certain allowed keys.
     $definition = MapDataDefinition::create('mapping')
-      ->addConstraint('ValidKeys', ['north', 'south', 'west']);
+      ->addConstraint('ValidMappingKeys', ['north', 'south', 'west']);
     $definition['mapping'] = [
       'north' => ['type' => 'string', 'requiredKey' => FALSE],
       'east' => ['type' => 'string', 'requiredKey' => FALSE],
@@ -289,7 +289,7 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
     // words, all keys are required unless they individually
     // specify otherwise.
     // First test without changing the value: no error should occur because all
-    // keys passed to the ValidKeys constraint have a value.
+    // keys passed to the ValidMappingKeys constraint have a value.
     unset($definition['mapping']['south']['requiredKey']);
     unset($definition['mapping']['east']['requiredKey']);
     $violations = $typed_config->create(clone $definition, $value)->validate();
@@ -298,7 +298,7 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
     // If in the mapping definition some keys that do NOT have
     // `requiredKey: false` set, then they MUST be set.
     // First test without changing the value: no error should occur because all
-    // keys passed to the ValidKeys constraint have a value.
+    // keys passed to the ValidMappingKeys constraint have a value.
     unset($definition['mapping']['south']['requiredKey']);
     unset($definition['mapping']['east']['requiredKey']);
     $violations = $typed_config->create(clone $definition, $value)->validate();
@@ -326,7 +326,7 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
     $config = $this->container->get('config.typed')
       ->get('system.site');
     $config->getDataDefinition()
-      ->addConstraint('ValidKeys', '<infer>');
+      ->addConstraint('ValidMappingKeys', '<infer>');
 
     $data = $config->getValue();
     $data['invalid-key'] = "There's a snake in my boots.";
@@ -335,16 +335,16 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
     $this->assertCount(1, $violations);
     $this->assertSame("'invalid-key' is not a supported key.", (string) $violations->get(0)->getMessage());
 
-    // Ensure that ValidKeys will freak out if the option is not exactly
+    // Ensure that ValidMappingKeys will freak out if the option is not exactly
     // `<infer>`.
     $config->getDataDefinition()
-      ->addConstraint('ValidKeys', 'infer');
+      ->addConstraint('', 'infer');
     $this->expectExceptionMessage("'infer' is not a valid set of allowed keys.");
     $config->validate();
   }
 
   /**
-   * Tests ValidKeys constraint validator detecting optional keys.
+   * Tests ValidMappingKeys constraint validator detecting optional keys.
    */
   public function testMarkedAsOptional(): void {
     \Drupal::state()->set('config_schema_test_block_fully_validatable', TRUE);

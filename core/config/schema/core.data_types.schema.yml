@@ -53,7 +53,7 @@ mapping:
   constraints:
     # By default, allow the explicitly listed mapping keys, and require their
     # presence unless `requiredKey: false` is specified.
-    ValidKeys: '<infer>'
+    ValidMappingKeys: '<infer>'
 sequence:
   label: Sequence
   class: '\Drupal\Core\Config\Schema\Sequence'
@@ -206,7 +206,7 @@ _core_config_info:
         # works, this is always going to be 43 characters long.
         Length: 43
   constraints:
-    ValidKeys: ['default_config_hash']
+    ValidMappingKeys: ['default_config_hash']
 
 config_object:
   type: mapping
@@ -395,7 +395,7 @@ config_dependencies_base:
           ExtensionName: []
           ExtensionExists: theme
   constraints:
-    ValidKeys: '<infer>'
+    ValidMappingKeys: '<infer>'
 
 config_dependencies:
   type: config_dependencies_base
@@ -407,7 +407,7 @@ config_dependencies:
       type: config_dependencies_base
       label: 'Enforced configuration dependencies'
   constraints:
-    ValidKeys: '<infer>'
+    ValidMappingKeys: '<infer>'
 
 config_entity:
   type: mapping

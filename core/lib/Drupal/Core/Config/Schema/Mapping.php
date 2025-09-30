@@ -58,7 +58,7 @@ class Mapping extends ArrayElement {
    * @return string[]
    *   A list of keys allowed in this mapping.
    */
-  public function getValidKeys(): array {
+  public function getValidMappingKeys(): array {
     $all_keys = $this->getDefinedKeys();
     return array_keys($all_keys);
   }
@@ -169,7 +169,7 @@ class Mapping extends ArrayElement {
     // necessary resolving, but TypedConfigManager::getDefinitions() does not
     // 🤷‍♂️!
     // @see \Drupal\Core\Config\TypedConfigManager::getDefinitionWithReplacements()
-    // @see ::getValidKeys()
+    // @see ::getValidMappingKeys()
     $valid_keys_per_type = [];
     foreach (array_keys($possible_type_definitions) as $possible_type_name) {
       $valid_keys_per_type[$possible_type_name] = array_keys($typed_data_manager->getDefinition($possible_type_name)['mapping'] ?? []);
@@ -205,7 +205,7 @@ class Mapping extends ArrayElement {
    *   A list of optional keys given the values in this mapping.
    */
   public function getOptionalKeys(): array {
-    return array_values(array_diff($this->getValidKeys(), $this->getRequiredKeys()));
+    return array_values(array_diff($this->getValidMappingKeys(), $this->getRequiredKeys()));
   }
 
   /**

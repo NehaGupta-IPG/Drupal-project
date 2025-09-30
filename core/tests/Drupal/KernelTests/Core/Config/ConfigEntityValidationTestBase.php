@@ -66,7 +66,7 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
    * @var string[]
    * @see \Drupal\Core\Config\Entity\ConfigEntityType::getPropertiesToExport()
    * @see ::testRequiredPropertyKeysMissing()
-   * @see \Drupal\Core\Validation\Plugin\Validation\Constraint\ValidKeysConstraintValidator
+   * @see \Drupal\Core\Validation\Plugin\Validation\Constraint\ConstraintValidator
    */
   protected static array $propertiesWithRequiredKeys = [];
 

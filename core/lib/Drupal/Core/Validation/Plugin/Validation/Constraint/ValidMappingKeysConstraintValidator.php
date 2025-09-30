@@ -13,15 +13,15 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * Validates the ValidKeys constraint.
+ * Validates the ValidMappingKeys constraint.
  */
-class ValidKeysConstraintValidator extends ConstraintValidator {
+class ValidMappingKeysConstraintValidator extends ConstraintValidator {
 
   /**
    * {@inheritdoc}
    */
   public function validate(mixed $value, Constraint $constraint): void {
-    assert($constraint instanceof ValidKeysConstraint);
+    assert($constraint instanceof ValidMappingKeysConstraint);
 
     if (!is_array($value)) {
       // If the value is NULL, then the `NotNull` constraint validator will
@@ -65,7 +65,7 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
     // Dynamically valid: keys that are valid not for all possible types, but
     // for the actually resolved type definition of this mapping (in addition to
     // the statically valid keys).
-    // @see \Drupal\Core\Config\Schema\Mapping::getDynamicallyValidKeys()
+    // @see \Drupal\Core\Config\Schema\Mapping::getDynamicallyValidMappingKeys()
     if (!empty($all_dynamically_valid_keys)) {
       // For example, `block.block.*:settings` has the following dynamically
       // valid keys when the block plugin is `system_branding_block`:
@@ -185,7 +185,7 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
    *      condition
    *   - '@dynamic_type_property_value': value of the condition
    *
-   * @see \Drupal\Core\Validation\Plugin\Validation\Constraint\ValidKeysConstraint::$dynamicInvalidKeyMessage
+   * @see \Drupal\Core\Validation\Plugin\Validation\Constraint\ValidMappingKeysConstraint::$dynamicInvalidKeyMessage
    */
   protected static function getDynamicMessageParameters(Mapping $mapping): array {
     $definition = $mapping->getDataDefinition();
@@ -241,7 +241,7 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
     // this type.
     // @see \Drupal\Core\Config\TypedConfigManager::replaceExpression()
     $property_path_parts = explode('.', $property_path_mapping);
-    // @see \Drupal\Core\Config\Schema\Mapping::getDynamicallyValidKeys()
+    // @see \Drupal\Core\Config\Schema\Mapping::getDynamicallyValidMappingKeys()
     assert(!in_array('%type', $instructions, TRUE));
 
     // The %key instruction can only be used on its own. In this case, there is

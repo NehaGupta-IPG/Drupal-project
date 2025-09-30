@@ -15,11 +15,11 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
  * Checks that all the keys of a mapping are valid and required keys present.
  */
 #[Constraint(
-  id: 'ValidKeys',
+  id: 'ValidMappingKeys',
   label: new TranslatableMarkup('Valid mapping keys', [], ['context' => 'Validation']),
   type: ['mapping']
 )]
-class ValidKeysConstraint extends SymfonyConstraint {
+class ValidMappingKeysConstraint extends SymfonyConstraint {
 
   /**
    * The error message if a key is invalid.
@@ -90,7 +90,7 @@ class ValidKeysConstraint extends SymfonyConstraint {
     $mapping = $context->getObject();
     assert($mapping instanceof Mapping);
     $resolved_type = $mapping->getDataDefinition()->getDataType();
-    $valid_keys = $mapping->getValidKeys();
+    $valid_keys = $mapping->getValidMappingKeys();
 
     // If we were given an explicit array of allowed keys, return that.
     if (is_array($this->allowedKeys)) {
@@ -106,7 +106,7 @@ class ValidKeysConstraint extends SymfonyConstraint {
     }
     // The only other value we'll accept is the string `<infer>`.
     elseif ($this->allowedKeys === '<infer>') {
-      return $mapping->getValidKeys();
+      return $mapping->getValidMappingKeys();
     }
     throw new InvalidArgumentException("'$this->allowedKeys' is not a valid set of allowed keys.");
   }

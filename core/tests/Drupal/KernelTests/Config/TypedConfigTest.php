@@ -214,7 +214,7 @@ class TypedConfigTest extends KernelTestBase {
     $this->assertCount(3, $result);
     // 2 constraint violations triggered by the default validation constraint
     // for `type: mapping`
-    // @see \Drupal\Core\Validation\Plugin\Validation\Constraint\ValidKeysConstraint
+    // @see \Drupal\Core\Validation\Plugin\Validation\Constraint\ValidMappingKeysConstraint
     $this->assertSame('elephant', $result->get(0)->getPropertyPath());
     $this->assertEquals("'elephant' is not a supported key.", $result->get(0)->getMessage());
     $this->assertSame('zebra', $result->get(1)->getPropertyPath());
