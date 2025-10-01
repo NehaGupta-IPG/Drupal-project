@@ -42,7 +42,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function viewsData(): array {
+  protected function viewsData() {
     $data = parent::viewsData();
     $data['views_test_data']['job']['field']['id'] = 'test_field';
     $data['views_test_data']['job']['field']['click sortable'] = FALSE;
