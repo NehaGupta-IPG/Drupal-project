@@ -49,7 +49,7 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
    *
    * @var \Drupal\Mocks\TestMockedTime
    */
-  protected $time;
+  protected TestMockedTime $time;
 
   /**
    * {@inheritdoc}

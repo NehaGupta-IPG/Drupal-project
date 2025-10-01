@@ -29,7 +29,7 @@ class SaveActionTest extends KernelTestBase implements ServiceModifierInterface 
    *
    * @var \Drupal\Mocks\TestMockedTime
    */
-  protected $time;
+  protected TestMockedTime $time;
 
   /**
    * {@inheritdoc}
