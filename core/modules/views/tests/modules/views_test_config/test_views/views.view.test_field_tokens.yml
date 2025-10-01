@@ -42,6 +42,11 @@ display:
           table: views_test_data
           field: job
           plugin_id: string
+        100_test_string:
+          id: 100_test_string
+          table: views_test_data
+          field: 100_test_string
+          plugin_id: string
       style:
         type: default
       row:

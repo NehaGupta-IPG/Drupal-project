@@ -42,12 +42,56 @@ class FieldKernelTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function viewsData() {
+  protected function viewsData(): array {
     $data = parent::viewsData();
     $data['views_test_data']['job']['field']['id'] = 'test_field';
     $data['views_test_data']['job']['field']['click sortable'] = FALSE;
     $data['views_test_data']['id']['field']['click sortable'] = TRUE;
+    $data['views_test_data']['100_test_string'] = [
+      'title' => '100 Test string',
+      'help' => 'Testing column names',
+      'field' => [
+        'id' => 'standard',
+      ],
+      'argument' => [
+        'id' => 'string',
+      ],
+      'filter' => [
+        'id' => 'string',
+      ],
+      'sort' => [
+        'id' => 'standard',
+      ],
+    ];
     return $data;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function dataSet(): array {
+    $data = parent::dataSet();
+    foreach (array_keys($data) as $key) {
+      $data[$key]['100_test_string'] = '100-' . $data[$key]['name'];
+    }
+    return $data;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function schemaDefinition() {
+    $schema = parent::schemaDefinition();
+
+    $schema['views_test_data']['fields']['100_test_string'] = [
+      'description' => "100 test string",
+      'type' => 'varchar_ascii',
+      'length' => 255,
+      'not null' => TRUE,
+      'default' => '',
+    ];
+
+    return $schema;
   }
 
   /**
@@ -317,6 +361,15 @@ class FieldKernelTest extends ViewsKernelTestBase {
       $random_text,
       $output,
     ));
+
+    // Verify fields starting with numbers are prefixed by an underscore.
+    $field_starting_with_number = $view->field['100_test_string'];
+    $field_starting_with_number->options['alter']['alter_text'] = TRUE;
+    $field_starting_with_number->options['alter']['text'] = 'Testing: {{ _100_test_string }}';
+    $output = (string) $renderer->executeInRenderContext(new RenderContext(), function () use ($field_starting_with_number, $row) {
+      return $field_starting_with_number->advancedRender($row);
+    });
+    $this->assertSame('Testing: 100-' . $row->views_test_data_name, $output);
 
     // Verify the token format used in D7 and earlier does not get substituted.
     $old_token = '[job]';

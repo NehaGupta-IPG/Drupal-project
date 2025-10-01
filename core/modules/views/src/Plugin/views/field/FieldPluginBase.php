@@ -1709,7 +1709,15 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
    *   A token placeholder.
    */
   protected function getFieldTokenPlaceholder() {
-    return '{{ ' . $this->options['id'] . ' }}';
+    $id = $this->options['id'];
+    // If the field name starts with a number, which is possible for base
+    // fields, then prefix with an underscore so that it is a valid twig
+    // variable and \Drupal\views\Plugin\views\PluginBase::viewsTokenReplace()
+    // works.
+    if (preg_match('/^\d/', $id)) {
+      $id = "_$id";
+    }
+    return '{{ ' . $id . ' }}';
   }
 
   /**
