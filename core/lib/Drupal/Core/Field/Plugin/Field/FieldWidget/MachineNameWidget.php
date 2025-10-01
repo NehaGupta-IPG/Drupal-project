@@ -212,7 +212,7 @@ class MachineNameWidget extends WidgetBase implements ContainerFactoryPluginInte
    *
    * This method is assigned as a #process callback in formElement() method.
    */
-  public static function processMachineNameSource($element, FormStateInterface $form_state, $form) {
+  public static function processMachineNameSource($element, FormStateInterface $form_state, $form): array {
     $source_field_state = static::getWidgetState($element['#field_parents'], $element['#source_field'], $form_state);
 
     // Hide the field widget if the source field is not configured properly or

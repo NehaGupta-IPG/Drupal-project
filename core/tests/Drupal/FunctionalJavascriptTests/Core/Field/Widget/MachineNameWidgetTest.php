@@ -37,7 +37,7 @@ class MachineNameWidgetTest extends WebDriverTestBase {
   /**
    * Tests the machine name field widget.
    */
-  public function testMachineNameWidget() {
+  public function testMachineNameWidget(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
