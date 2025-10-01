@@ -14,7 +14,7 @@ trait AxeCoreTestTrait {
   /**
    * Executes axe on the current session and checks the results.
    *
-   * @param array|null $options
+   * @param array $options
    *   (optional) An associative array of additional Axe options.
    *   The provided options will be passed to `axe.run()` as a Javascript object.
    *   Examples:
@@ -39,7 +39,7 @@ trait AxeCoreTestTrait {
    *
    * @see https://github.com/dequelabs/axe-core/blob/develop/doc/API.md#options-parameter
    */
-  protected function executeAxe(?array $options = NULL): void {
+  protected function executeAxe(array $options = []): void {
     $session = $this->getSession();
 
     // Load axe-core script.

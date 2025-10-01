@@ -37,7 +37,7 @@ class AccessibilityTest extends WebDriverTestBase {
    *   (optional) Associative array of Axe options.
    */
   #[DataProvider('providerTestAnonymousPages')]
-  public function testAnonymousPages(string $uri, ?array $options = NULL): void {
+  public function testAnonymousPages(string $uri, array $options = []): void {
     $this->drupalGet($uri);
     $this->executeAxe($options);
   }

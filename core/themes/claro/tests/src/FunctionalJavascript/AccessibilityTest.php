@@ -58,7 +58,7 @@ class AccessibilityTest extends WebDriverTestBase {
    *   (optional) Associative array of browser options.
    */
   #[DataProvider('providerTestAdminPages')]
-  public function testAdminPages(string $uri, ?array $axe_options = NULL, ?array $browser_options = NULL): void {
+  public function testAdminPages(string $uri, array $axe_options = [], ?array $browser_options = NULL): void {
     $this->drupalGet($uri);
     if (isset($browser_options['window_size'])) {
       $this->getSession()->resizeWindow($browser_options['window_size']['width'], $browser_options['window_size']['height']);
