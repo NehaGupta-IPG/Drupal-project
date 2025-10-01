@@ -8,12 +8,12 @@ use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\RoleInterface;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that a warning message appears when dangerous HTML tags are allowed in a filter format.
- *
- * @group filter
  */
+#[Group('filter')]
 class FilterDangerousHTMLWarningTest extends BrowserTestBase {
 
   /**
