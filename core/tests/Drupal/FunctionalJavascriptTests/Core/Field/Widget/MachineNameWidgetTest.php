@@ -150,6 +150,8 @@ class MachineNameWidgetTest extends WebDriverTestBase {
     /** @var NodeElement $test_source_field */
     $test_source_field->setValue('');
 
+    $this->getSession()->getDriver()->executeScript('jQuery("#edit-id-0-value").val("")');
+
     $test_values = [
       'input' => 'Test value !0-9@',
       'expected' => 'test_value_0_9',
