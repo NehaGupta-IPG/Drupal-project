@@ -37,16 +37,15 @@
    * @see https://htmx.org/events/#htmx:configRequest
    */
   htmx.on('htmx:configRequest', ({ detail }) => {
-    if (
-      Drupal.url.isLocal(detail.path) &&
-      !detail.elt.hasAttribute('data-hx-drupal-full-page')
-    ) {
-      // Add _wrapper_format query parameter for all non full page requests.
-      // Drupal expects this parameter to be in the query string, not the post
-      // values.
-      const url = new URL(detail.path, window.location);
-      url.searchParams.set('_wrapper_format', 'drupal_htmx');
-      detail.path = url.toString();
+    if (Drupal.url.isLocal(detail.path)) {
+      if (!detail.elt.hasAttribute('data-hx-drupal-full-page')) {
+        // Add _wrapper_format query parameter for all non full page requests.
+        // Drupal expects this parameter to be in the query string, not the post
+        // values.
+        const url = new URL(detail.path, window.location);
+        url.searchParams.set('_wrapper_format', 'drupal_htmx');
+        detail.path = url.toString();
+      }
       // Allow Drupal to return new JavaScript and CSS files to load without
       // returning the ones already loaded.
       // @see \Drupal\Core\StackMiddleWare\AjaxPageState
