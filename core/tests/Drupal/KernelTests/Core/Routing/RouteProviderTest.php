@@ -786,7 +786,7 @@ class RouteProviderTest extends KernelTestBase {
     $provider = new RouteProvider($connection, $this->state, $this->currentPath, $this->cache, $this->pathProcessor, $this->cacheTagsInvalidator, 'test_routes');
 
     $this->fixtures->createTables($connection);
-    $dumper = new MatcherDumper($connection, $this->state, 'test_routes');
+    $dumper = new MatcherDumper($connection, $this->state, $this->logger, 'test_routes');
     $collection = new RouteCollection();
     $route = new Route($route_path);
     $route->setRequirement($parameter, $route_requirement);
@@ -795,10 +795,15 @@ class RouteProviderTest extends KernelTestBase {
     $dumper->dump();
     $request = Request::create($request_path, 'GET');
     $provider->getRouteCollectionForRequest($request);
-    $cache = $this->cache->get("route:[language]=en:{$request_path}:");
+    $cache = $this->cache->get("route:[language]=en:[query_parameters]=:{$request_path}");
     $this->assertNotEmpty($cache);
     $route_collection = $cache->data['routes'];
-    $this->assertEquals($route_collection->count(), $expected_routes);
+    if ($expected_routes == 0) {
+      $this->assertFalse($route_collection);
+    }
+    else {
+      $this->assertEquals($route_collection->count(), $expected_routes);
+    }
   }
 
   /**
