@@ -4,27 +4,26 @@ namespace Drupal\Core\Field\Plugin\Field\FieldWidget;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\ElementInfoManagerInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'machine_name' field widget.
  *
  * This widget is only available to fields that have a 'UniqueField' constraint.
- *
- * @FieldWidget(
- *   id = "machine_name",
- *   label = @Translation("Machine name"),
- *   field_types = {
- *     "string"
- *   }
- * )
  */
+#[FieldWidget(
+  id: 'machine_name',
+  label: new TranslatableMarkup('Machine name'),
+  field_types: ['string'],
+)]
 class MachineNameWidget extends WidgetBase implements ContainerFactoryPluginInterface {
 
   /**

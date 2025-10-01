@@ -6,12 +6,12 @@ namespace Drupal\FunctionalJavascriptTests\Core\Field\Widget;
 
 use Drupal\entity_test\Entity\EntityTestStringId;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests for the machine name field widget.
- *
- * @group Field
  */
+#[Group('Field')]
 class MachineNameWidgetTest extends WebDriverTestBase {
 
   /**
