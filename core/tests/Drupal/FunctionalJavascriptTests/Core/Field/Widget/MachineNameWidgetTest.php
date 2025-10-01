@@ -147,6 +147,11 @@ class MachineNameWidgetTest extends WebDriverTestBase {
     $this->assertNotEmpty($id);
     $this->assertNotEmpty($id_machine_name_value, 'Test field with the machine name widget has been initialized.');
 
+    /** @var NodeElement $test_source_field */
+    $test_source_field->setValue('');
+    /** @var NodeElement $test_source_field */
+    $id->setValue('');
+
     $test_values = [
       'input' => 'Test value !0-9@',
       'expected' => 'test_value_0_9',
