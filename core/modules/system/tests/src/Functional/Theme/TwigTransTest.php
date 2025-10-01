@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Functional\Theme;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Twig\Error\SyntaxError;
 
 // cspell:ignore contaynz errrf herro kontex muun playsholdr starrrrr starzzzz
@@ -15,6 +16,7 @@ use Twig\Error\SyntaxError;
  * Tests Twig "trans" tags.
  */
 #[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class TwigTransTest extends BrowserTestBase {
 
   /**
@@ -121,6 +123,27 @@ class TwigTransTest extends BrowserTestBase {
     catch (\Exception) {
       $this->fail('{% trans %}{% endtrans %} threw an unexpected exception.');
     }
+  }
+
+  /**
+   * Testing trans with render array value.
+   */
+  public function testTransRenderArray(): void {
+    $elements = [
+      '#type' => 'inline_template',
+      '#template' => '{% trans %}This is a {{ var }}.{% endtrans %}',
+      '#context' => [
+        'var' => [
+          '#prefix' => '<strong>',
+          '#markup' => 'trans render array',
+          '#suffix' => '</strong>',
+        ],
+      ],
+    ];
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = \Drupal::service('renderer');
+    $text = (string) $renderer->renderInIsolation($elements);
+    $this->assertSame('This is a <strong>trans render array</strong>.', $text);
   }
 
   /**

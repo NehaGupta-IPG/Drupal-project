@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\file\Kernel\Validation;
 
 use Drupal\file_test\FileTestHelper;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the file validator.
- *
- * @group file
  */
+#[Group('file')]
 class FileValidatorTest extends FileValidatorTestBase {
 
   /**
@@ -21,7 +21,6 @@ class FileValidatorTest extends FileValidatorTestBase {
     'file_test',
     'file_validator_test',
     'user',
-    'system',
   ];
 
   /**
