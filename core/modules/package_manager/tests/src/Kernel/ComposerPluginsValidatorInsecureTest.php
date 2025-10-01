@@ -8,14 +8,19 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\fixture_manipulator\ActiveFixtureManipulator;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\PreCreateEvent;
-use Drupal\package_manager\Exception\StageEventException;
+use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\ValidationResult;
+use Drupal\package_manager\Validator\ComposerPluginsValidator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @covers \Drupal\package_manager\Validator\ComposerPluginsValidator
- * @group package_manager
+ * Tests Composer Plugins Validator Insecure.
+ *
  * @internal
  */
+#[Group('package_manager')]
+#[CoversClass(ComposerPluginsValidator::class)]
 class ComposerPluginsValidatorInsecureTest extends PackageManagerKernelTestBase {
 
   /**
@@ -86,7 +91,7 @@ class ComposerPluginsValidatorInsecureTest extends PackageManagerKernelTestBase 
       // so we expect the operation to fail on PreApplyEvent.
       $stage->apply();
     }
-    catch (StageEventException $e) {
+    catch (SandboxEventException $e) {
       // Processing is required because the error message we get from Composer
       // contains multiple white spaces at the start or end of line.
       $this->assertStringContainsString($expected_message, preg_replace('/\s\s+/', '', $e->getMessage()));

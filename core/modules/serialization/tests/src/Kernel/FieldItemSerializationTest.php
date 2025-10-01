@@ -7,13 +7,14 @@ namespace Drupal\Tests\serialization\Kernel;
 use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Test field level normalization process.
- *
- * @group serialization
  */
+#[Group('serialization')]
 class FieldItemSerializationTest extends NormalizerTestBase {
 
   /**
@@ -21,7 +22,6 @@ class FieldItemSerializationTest extends NormalizerTestBase {
    */
   protected static $modules = [
     'serialization',
-    'system',
     'field',
     'entity_test',
     'text',
@@ -167,9 +167,8 @@ class FieldItemSerializationTest extends NormalizerTestBase {
    *   The test modules to install.
    * @param string $format
    *   The format to test. (NULL results in the format-agnostic normalization.)
-   *
-   * @dataProvider providerTestCustomBooleanNormalization
    */
+  #[DataProvider('providerTestCustomBooleanNormalization')]
   public function testCustomBooleanNormalization(array $test_modules, $format): void {
     // Asserts the entity contains the value we set.
     $this->assertFalse($this->entity->field_test_boolean->value);
@@ -185,11 +184,12 @@ class FieldItemSerializationTest extends NormalizerTestBase {
       $this->assertTrue($denormalized_entity->field_test_boolean->value);
     };
 
-    // Asserts denormalizing the entity DOES yield the value we set:
-    // - when using the detailed representation
+    // Asserts denormalizing the entity DOES yield the value we set in two
+    // cases.
+    // One is when using the detailed representation.
     $core_normalization['field_test_boolean'][0]['value'] = TRUE;
     $assert_denormalization($core_normalization);
-    // - and when using the shorthand representation
+    // The second is and when using the shorthand representation.
     $core_normalization['field_test_boolean'][0] = TRUE;
     $assert_denormalization($core_normalization);
 
@@ -200,11 +200,12 @@ class FieldItemSerializationTest extends NormalizerTestBase {
     $core_normalization = $this->container->get('serializer')->normalize($this->entity, $format);
     $this->assertSame('👎', $core_normalization['field_test_boolean'][0]['value']);
 
-    // Asserts denormalizing the entity DOES NOT ANYMORE yield the value we set:
-    // - when using the detailed representation
+    // Asserts denormalizing the entity DOES NOT ANYMORE yield the value we set
+    // in two cases.
+    // One is when using the detailed representation.
     $core_normalization['field_test_boolean'][0]['value'] = '👍';
     $assert_denormalization($core_normalization);
-    // - and when using the shorthand representation
+    // The second is when using the shorthand representation.
     $core_normalization['field_test_boolean'][0] = '👍';
     $assert_denormalization($core_normalization);
   }

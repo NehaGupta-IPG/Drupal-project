@@ -14,12 +14,12 @@ use Drupal\entity_test\Entity\EntityTestStringId;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the EntityAutocomplete Form API element.
- *
- * @group Form
  */
+#[Group('Form')]
 class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements FormInterface {
 
   /**
@@ -296,7 +296,7 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
   public function testInvalidEntityAutocompleteElement(): void {
     $form_builder = $this->container->get('form_builder');
 
-    // Test 'single' with an entity label that doesn't exist
+    // Test 'single' with an entity label that doesn't exist.
     $form_state = (new FormState())
       ->setValues([
         'single' => 'single - non-existent label',
