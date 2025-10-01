@@ -66,7 +66,7 @@ class RouteCompiler extends SymfonyRouteCompiler implements RouteCompilerInterfa
     }, ARRAY_FILTER_USE_BOTH);
 
     if (count($unlimited_requirements) > 0) {
-      $num_parts = static::NUM_PARTS_UNLIMITED;
+      $num_parts = self::NUM_PARTS_UNLIMITED;
     }
 
     return new CompiledRoute(

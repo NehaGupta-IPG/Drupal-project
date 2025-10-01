@@ -781,7 +781,7 @@ class RouteProviderTest extends KernelTestBase {
    *
    * @dataProvider providerTestParameterInfiniteParts
    */
-  public function testParameterInfiniteParts(string $route_path, string $parameter, string $route_requirement, string $request_path, int $expected_routes) {
+  public function testParameterInfiniteParts(string $route_path, string $parameter, string $route_requirement, string $request_path, int $expected_routes): void {
     $connection = Database::getConnection();
     $provider = new RouteProvider($connection, $this->state, $this->currentPath, $this->cache, $this->pathProcessor, $this->cacheTagsInvalidator, 'test_routes');
 
@@ -808,7 +808,7 @@ class RouteProviderTest extends KernelTestBase {
    *   An array of test cases, each containing the route path, the parameter with a requirement, the requirement, the
    *   path that is requested, and the expected routes that match the request.
    */
-  public function providerTestParameterInfiniteParts() {
+  public static function providerTestParameterInfiniteParts() {
     return [
       ['/some/param/{with_unlimited_parts}', 'with_unlimited_parts', '.*', '/some/param/hello/world', 1],
       ['/some/param/{with_unlimited_parts}', 'with_unlimited_parts', '.+', '/some/param/hello/world', 1],
