@@ -17,12 +17,12 @@ class DefaultEmail extends EmailBase {
    *
    * @param \Drupal\Core\StringTranslation\TranslatableMarkup $subject
    *   Email subject.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|\Drupal\Core\StringTranslation\TranslatableMarkup[]|null $lines
+   * @param \Stringable|\Stringable[]|null $lines
    *   Optional line or lines of text to use as the email body.
    * @param string|null $format
    *   Optional text format to use for the email body.
    */
-  public static function createParams(TranslatableMarkup $subject, TranslatableMarkup|array|null $lines = NULL, ?string $format = NULL): array {
+  public static function createParams(TranslatableMarkup $subject, \Stringable|array|null $lines = NULL, ?string $format = NULL): array {
     return [
       'subject' => $subject,
       'lines' => match (TRUE) {
@@ -37,7 +37,7 @@ class DefaultEmail extends EmailBase {
   /**
    * Builds an email body from a list of text lines.
    *
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup[] $lines
+   * @param \Stringable[] $lines
    *   List of lines of text to use as the email body.
    * @param string|null $format
    *   Optional text format to use for the email body.
@@ -51,10 +51,9 @@ class DefaultEmail extends EmailBase {
   protected function getBody(?array $lines = [], ?string $format = NULL, ?string $langcode = NULL): array {
     $build = [];
     foreach ($lines as $line) {
-      assert($line instanceof TranslatableMarkup);
       $build['lines'][] = [
         '#type' => 'processed_text',
-        '#text' => $line,
+        '#text' => (string) $line,
         '#format' => $format,
         '#langcode' => $langcode,
       ];
