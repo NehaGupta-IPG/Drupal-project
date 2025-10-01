@@ -80,7 +80,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function schemaDefinition() {
+  protected function schemaDefinition(): array {
     $schema = parent::schemaDefinition();
 
     $schema['views_test_data']['fields']['100_test_string'] = [
