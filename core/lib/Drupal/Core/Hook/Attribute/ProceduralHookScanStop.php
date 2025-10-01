@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Hook\Attribute;
 
+@trigger_error('The ' . __NAMESPACE__ . '\ProceduralHookScanStop is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3549644', E_USER_DEPRECATED);
+
 /**
  * Defines a ProceduralHookScanStop attribute object.
  *
@@ -16,6 +18,11 @@ namespace Drupal\Core\Hook\Attribute;
  * - hook_requirements()
  * - hook_preprocess()
  * - hook_preprocess_HOOK()
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no
+ * replacement.
+ *
+ * @see https://www.drupal.org/node/3549644
  */
 #[\Attribute(\Attribute::TARGET_FUNCTION)]
 class ProceduralHookScanStop {

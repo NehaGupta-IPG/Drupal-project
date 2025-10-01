@@ -450,6 +450,7 @@ class HookCollectorPass implements CompilerPassInterface {
           $implementations = [];
           foreach ($parser->getMethodAttributes() as $function => $attributes) {
             if (StaticReflectionParser::hasAttribute($attributes, ProceduralHookScanStop::class)) {
+              @trigger_error(ProceduralHookScanStop::class . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3549644', E_USER_DEPRECATED);
               break;
             }
             if (!StaticReflectionParser::hasAttribute($attributes, LegacyHook::class) && preg_match($module_preg, $function, $matches) && !StaticReflectionParser::hasAttribute($attributes, LegacyModuleImplementsAlter::class)) {
