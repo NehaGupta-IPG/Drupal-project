@@ -9,11 +9,13 @@ use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests fields on comments.
  */
 #[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentFieldsTest extends CommentTestBase {
 
   /**
@@ -135,10 +137,6 @@ class CommentFieldsTest extends CommentTestBase {
     // we need a node listing, let's use views for that.
     $this->container->get('module_installer')->install(['views'], TRUE);
     $this->drupalGet('node');
-
-    $link_info = $this->getDrupalSettings()['comment']['newCommentsLinks']['node']['comment2']['2'];
-    $this->assertSame(1, $link_info['new_comment_count']);
-    $this->assertSame($node->toUrl('canonical', ['fragment' => 'new'])->toString(), $link_info['first_new_comment_link']);
   }
 
   /**

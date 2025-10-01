@@ -16,11 +16,13 @@ use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API integration test for the "User" content entity type.
  */
 #[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class UserTest extends ResourceTestBase {
 
   const BATCH_TEST_NODE_COUNT = 15;
@@ -474,7 +476,17 @@ class UserTest extends ResourceTestBase {
 
     $response = $this->request('GET', $collection_url, $request_options);
     $expected_cache_contexts = ['url.path', 'url.query_args', 'url.site'];
-    $this->assertResourceErrorResponse(400, "Filtering on config entities is not supported by Drupal's entity API. You tried to filter on a Role config entity.", $collection_url, $response, FALSE, ['4xx-response', 'http_response'], $expected_cache_contexts, NULL, 'MISS');
+    $this->assertResourceErrorResponse(
+      400,
+      "Filtering on config entities is not supported by Drupal's entity API. You tried to filter on a Role config entity.",
+      $collection_url,
+      $response,
+      FALSE,
+      ['4xx-response', 'http_response'],
+      $expected_cache_contexts,
+      NULL,
+      'MISS',
+    );
   }
 
   /**

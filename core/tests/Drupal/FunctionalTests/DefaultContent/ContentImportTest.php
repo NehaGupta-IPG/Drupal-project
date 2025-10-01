@@ -27,19 +27,21 @@ use Drupal\taxonomy\TermInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\UserInterface;
 use Drupal\workspaces\Entity\Workspace;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Log\LogLevel;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Tests Content Import.
- *
- * @legacy-covers \Drupal\Core\DefaultContent\Importer
  */
 #[Group('DefaultContent')]
 #[Group('Recipe')]
 #[Group('#slow')]
+#[CoversClass(Importer::class)]
+#[RunTestsInSeparateProcesses]
 class ContentImportTest extends BrowserTestBase {
 
   use RecipeTestTrait;
