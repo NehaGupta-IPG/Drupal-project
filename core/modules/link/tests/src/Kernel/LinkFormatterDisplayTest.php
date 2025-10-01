@@ -204,8 +204,8 @@ class LinkFormatterDisplayTest extends FieldKernelTestBase {
       ],
     ];
 
-    yield 'attribute rel=noopener target=_blank' => [
-      'display_settings' => ['rel' => 'noopener', 'target' => '_blank'],
+    yield 'attribute target=_blank rel=noopener' => [
+      'display_settings' => ['target' => '_blank', 'rel' => 'noopener'],
       'expected_results' => [
         0 => '<div><a href="http://www.example.com/content/articles/archive?author=John&amp;year=2012#com" target="_blank" rel="noopener">http://www.example.com/content/articles/archive?author=John&amp;year=2012#com</a></div>',
         1 => '<div><a href="http://www.example.org/content/articles/archive?author=John&amp;year=2012#org" target="_blank" rel="noopener">A very long &amp; strange example title that could break the nice layout of the site</a></div>',
