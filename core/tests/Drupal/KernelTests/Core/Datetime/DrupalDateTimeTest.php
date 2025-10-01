@@ -46,12 +46,6 @@ class DrupalDateTimeTest extends KernelTestBase {
   public function testDateTimezone(): void {
     $date_string = '2007-01-31 21:00:00';
 
-    // Make sure no site timezone has been set.
-    $this->config('system.date')
-      ->set('timezone.user.configurable', 0)
-      ->set('timezone.default', NULL)
-      ->save();
-
     // Detect the system timezone.
     $system_timezone = date_default_timezone_get();
 

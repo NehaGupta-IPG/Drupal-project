@@ -115,11 +115,11 @@ system.date:
         default:
           type: string
           label: 'Default time zone'
-          nullable: true
           constraints:
-            # @see \Drupal\system\Form\RegionalForm::buildForm()
-            Choice:
-              callback: 'DateTimeZone::listIdentifiers'
+            AfterInstall:
+              # @see \Drupal\system\Form\RegionalForm::buildForm()
+              Choice:
+                callback: 'DateTimeZone::listIdentifiers'
         user:
           type: mapping
           label: 'User'
