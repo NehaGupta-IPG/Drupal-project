@@ -149,8 +149,6 @@ class MachineNameWidgetTest extends WebDriverTestBase {
 
     /** @var NodeElement $test_source_field */
     $test_source_field->setValue('');
-    /** @var NodeElement $test_source_field */
-    $id->setValue('');
 
     $test_values = [
       'input' => 'Test value !0-9@',
