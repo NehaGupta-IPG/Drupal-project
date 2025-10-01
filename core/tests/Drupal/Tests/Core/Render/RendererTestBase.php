@@ -13,11 +13,13 @@ use Drupal\Core\Cache\Context\ContextCacheKeys;
 use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Cache\VariationCache;
 use Drupal\Core\Cache\VariationCacheFactoryInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Render\PlaceholderGenerator;
 use Drupal\Core\Render\PlaceholderingRenderCache;
 use Drupal\Core\Render\Renderer;
 use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Theme\Style\StylePluginManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
@@ -83,6 +85,16 @@ abstract class RendererTestBase extends UnitTestCase {
   protected ThemeManagerInterface&Stub $themeManager;
 
   /**
+   * The style plugin manager.
+   */
+  protected StylePluginManagerInterface&Stub $stylePluginManager;
+
+  /**
+   * The logger factory.
+   */
+  protected LoggerChannelFactoryInterface&Stub $loggerFactory;
+
+  /**
    * The element info.
    */
   protected ElementInfoManagerInterface&Stub $elementInfo;
@@ -128,6 +140,8 @@ abstract class RendererTestBase extends UnitTestCase {
       ->method('getCallableFromDefinition')
       ->willReturnArgument(0);
     $this->themeManager = $this->createStub(ThemeManagerInterface::class);
+    $this->stylePluginManager = $this->createStub(StylePluginManagerInterface::class);
+    $this->loggerFactory = $this->createStub(LoggerChannelFactoryInterface::class);
     $this->elementInfo = $this->createStub(ElementInfoManagerInterface::class);
     $this->elementInfo
       ->method('getInfo')
@@ -186,7 +200,7 @@ abstract class RendererTestBase extends UnitTestCase {
       });
     $this->placeholderGenerator = new PlaceholderGenerator($this->cacheContextsManager, $this->rendererConfig);
     $this->renderCache = new PlaceholderingRenderCache($this->requestStack, $this->cacheFactory, $this->cacheContextsManager, $this->placeholderGenerator);
-    $this->renderer = new Renderer($this->callableResolver, $this->themeManager, $this->elementInfo, $this->placeholderGenerator, $this->renderCache, $this->requestStack, $this->rendererConfig);
+    $this->renderer = new Renderer($this->callableResolver, $this->themeManager, $this->elementInfo, $this->placeholderGenerator, $this->renderCache, $this->requestStack, $this->stylePluginManager, $this->loggerFactory, $this->rendererConfig);
     $this->datetimeTime = new Time($this->requestStack);
 
     $container = new ContainerBuilder();

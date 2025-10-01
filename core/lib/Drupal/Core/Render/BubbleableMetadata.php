@@ -162,6 +162,13 @@ class BubbleableMetadata extends CacheableMetadata implements AttachmentsInterfa
       unset($a['placeholders']);
       unset($b['placeholders']);
     }
+    // Optimize merging of styles: keep one value per key.
+    if (!empty($a['styles']) && !empty($b['styles'])) {
+      $styles = $a['styles'] + $b['styles'];
+      // No need for re-merging them.
+      unset($a['styles']);
+      unset($b['styles']);
+    }
     // page_top and page_bottom may contain complete render arrays. Merge only
     // their top-level elements to avoid recursively traversing cyclic
     // references within those render arrays.
@@ -184,6 +191,10 @@ class BubbleableMetadata extends CacheableMetadata implements AttachmentsInterfa
     if (isset($placeholders)) {
       // Save the custom merge for the placeholders.
       $a['placeholders'] = $placeholders;
+    }
+    if (isset($styles)) {
+      // Save the custom merge for the styles.
+      $a['styles'] = $styles;
     }
     // Save the custom merges for the page regions.
     return $a + $page_regions;

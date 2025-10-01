@@ -76,6 +76,55 @@ class AttributeHelperTest extends UnitTestCase {
         new Attribute(['id' => 'foo', 'href' => 'bar']),
         ['class' => ['example-class'], 'id' => 'foo', 'href' => 'bar'],
       ],
+      [
+        ['class' => ['example-class']],
+        ['class' => ['class1']],
+        ['class' => ['example-class', 'class1']],
+      ],
+      [
+        ['class' => ['example-class']],
+        new Attribute(['class' => ['class1']]),
+        ['class' => ['example-class', 'class1']],
+      ],
+      [
+        ['class' => ['example-class']],
+        ['id' => 'foo', 'href' => 'bar'],
+        ['class' => ['example-class'], 'id' => 'foo', 'href' => 'bar'],
+      ],
+      [
+        ['class' => ['example-class']],
+        new Attribute(['id' => 'foo', 'href' => 'bar']),
+        ['class' => ['example-class'], 'id' => 'foo', 'href' => 'bar'],
+      ],
+      [
+        ['class' => ['example-class'], 'style' => 'color: pink;'],
+        ['class' => ['class1'], 'style' => 'color: red;'],
+        ['class' => ['example-class', 'class1'], 'style' => 'color: red;'],
+      ],
+      [
+        ['class' => ['example-class'], 'style' => 'color: pink;'],
+        ['class' => ['class1'], 'style' => ['color: red;']],
+        [
+          'class' => ['example-class', 'class1'],
+          'style' => ['color: pink;', 'color: red;'],
+        ],
+      ],
+      [
+        ['class' => ['example-class'], 'style' => ['color: pink;']],
+        ['class' => ['class1'], 'style' => 'color: red;'],
+        [
+          'class' => ['example-class', 'class1'],
+          'style' => ['color: pink;', 'color: red;'],
+        ],
+      ],
+      [
+        ['class' => ['example-class'], 'style' => ['color: pink;']],
+        ['class' => ['class1'], 'style' => ['color: red;']],
+        [
+          'class' => ['example-class', 'class1'],
+          'style' => ['color: pink;', 'color: red;'],
+        ],
+      ],
     ];
   }
 
@@ -108,6 +157,79 @@ class AttributeHelperTest extends UnitTestCase {
     $this->expectExceptionMessageIs('Invalid collection argument');
     // @phpstan-ignore argument.type
     AttributeHelper::mergeCollections('not an array', $attributes);
+  }
+
+  /**
+   * Data provider for ::testMergeCollections.
+   *
+   * @return \Generator
+   *   The test cases.
+   */
+  public static function providerTestMatchCollectionsTypes(): iterable {
+    yield 'Default: matching types' => [
+      [
+        'class' => ['my-class'],
+        'style' => 'color: pink;',
+        'target' => '_blank',
+      ],
+      [
+        'class' => ['my-second-class'],
+        'style' => 'color: red;',
+        'target' => '_same',
+      ],
+      [
+        'class' => ['my-class'],
+        'style' => 'color: pink;',
+        'target' => '_blank',
+      ],
+      [
+        'class' => ['my-second-class'],
+        'style' => 'color: red;',
+        'target' => '_same',
+      ],
+    ];
+
+    yield 'First array has string attribute, second has array attribute' => [
+      [
+        'style' => 'color: pink;',
+      ],
+      [
+        'style' => ['color: red;'],
+      ],
+      [
+        'style' => ['color: pink;'],
+      ],
+      [
+        'style' => ['color: red;'],
+      ],
+    ];
+
+    yield 'Second array has string attribute, first has array attribute' => [
+      [
+        'style' => ['color: pink;'],
+      ],
+      [
+        'style' => 'color: red;',
+      ],
+      [
+        'style' => ['color: pink;'],
+      ],
+      [
+        'style' => ['color: red;'],
+      ],
+    ];
+  }
+
+  /**
+   * Tests match collections types.
+   *
+   * @legacy-covers ::matchCollectionsTypes
+   */
+  #[DataProvider('providerTestMatchCollectionsTypes')]
+  public function testMatchCollectionsTypes(array $array1, array $array2, array $expectedArray1, array $expectedArray2): void {
+    AttributeHelper::matchCollectionsTypes($array1, $array2);
+    $this->assertEquals($expectedArray1, $array1);
+    $this->assertEquals($expectedArray2, $array2);
   }
 
 }

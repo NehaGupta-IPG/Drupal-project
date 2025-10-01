@@ -4,17 +4,25 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Template;
 
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeArray;
 use Drupal\Core\Template\AttributeString;
 use Drupal\Core\Template\Loader\StringLoader;
+use Drupal\Core\Theme\Style\Exception\StyleDefinitionErrorException;
+use Drupal\Core\Theme\Style\StyleDefinitionInterface;
+use Drupal\Core\Theme\Style\StylePluginManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Twig\Environment;
 use Twig\Markup as TwigMarkup;
 
@@ -218,6 +226,100 @@ class AttributeTest extends UnitTestCase {
   }
 
   /**
+   * Tests adding style.
+   *
+   * @legacy-covers ::addStyle
+   */
+  public function testAddStyle(): void {
+    $attribute = new Attribute();
+
+    $definition = $this->createMock(StyleDefinitionInterface::class);
+    $definition->expects($this->once())
+      ->method('applyOrBubbleOnAttribute')
+      ->with('option_1', $attribute);
+
+    $stylePluginManager = $this->createMock(StylePluginManagerInterface::class);
+    $stylePluginManager->expects($this->once())
+      ->method('getDefinition')
+      ->with('id_1')
+      ->willReturn($definition);
+
+    $container = new ContainerBuilder();
+    $container->set(StylePluginManagerInterface::class, $stylePluginManager);
+    \Drupal::setContainer($container);
+
+    $attribute->addStyle('id_1', 'option_1');
+  }
+
+  /**
+   * Tests adding style: exception missing plugin.
+   *
+   * @legacy-covers ::addStyle
+   */
+  public function testAddStyleMissingPlugin(): void {
+    $exception = new PluginNotFoundException('id_1');
+
+    $stylePluginManager = $this->createMock(StylePluginManagerInterface::class);
+    $stylePluginManager->expects($this->once())
+      ->method('getDefinition')
+      ->with('id_1')
+      ->willThrowException($exception);
+
+    $logger = $this->createMock(LoggerChannelInterface::class);
+    $logger->expects($this->once())
+      ->method('error')
+      ->with("Plugin ID 'id_1' was not found.");
+
+    $loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
+    $loggerFactory->expects($this->once())
+      ->method('get')
+      ->with('twig')
+      ->willReturn($logger);
+
+    $container = new ContainerBuilder();
+    $container->set(StylePluginManagerInterface::class, $stylePluginManager);
+    $container->set('logger.factory', $loggerFactory);
+    \Drupal::setContainer($container);
+
+    $attribute = new Attribute();
+    $attribute->addStyle('id_1', 'option_1');
+  }
+
+  /**
+   * Tests adding style: exception style definition error.
+   *
+   * @legacy-covers ::addStyle
+   */
+  public function testAddStyleStyleDefinitionError(): void {
+    $exception = new StyleDefinitionErrorException('message');
+
+    $stylePluginManager = $this->createMock(StylePluginManagerInterface::class);
+    $stylePluginManager->expects($this->once())
+      ->method('getDefinition')
+      ->with('id_1')
+      ->willThrowException($exception);
+
+    $logger = $this->createMock(LoggerChannelInterface::class);
+    $logger->expects($this->once())
+      ->method('error')
+      ->with('message');
+
+    $loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
+    $loggerFactory->expects($this->once())
+      ->method('get')
+      ->with('twig')
+      ->willReturn($logger);
+
+    $container = new ContainerBuilder();
+    $container->set(StylePluginManagerInterface::class, $stylePluginManager);
+    $container->set('logger.factory', $loggerFactory);
+    \Drupal::setContainer($container);
+
+    $attribute = new Attribute();
+    $attribute->addStyle('id_1', 'option_1');
+  }
+
+  /**
    * Tests removing class attributes with the AttributeArray helper method.
    */
   public function testRemoveClasses(): void {
@@ -375,6 +477,34 @@ class AttributeTest extends UnitTestCase {
     $this->assertNoID('example-id2', $html);
 
     $this->assertStringContainsString('enabled', $html);
+  }
+
+  /**
+   * Tests printing of an attribute with attachments.
+   */
+  public function testPrintWithAttachments(): void {
+    $inlineTemplate = [
+      '#attached' => [
+        'library' => ['core/drupal.ajax'],
+      ],
+    ];
+
+    $renderer = $this->createMock(RendererInterface::class);
+    $renderer->expects($this->once())
+      ->method('render')
+      ->with($inlineTemplate);
+
+    $container = new ContainerBuilder();
+    $container->set(RendererInterface::class, $renderer);
+    \Drupal::setContainer($container);
+
+    $attribute = new Attribute(['class' => ['example-class']]);
+    $attribute->setAttachments(['library' => ['core/drupal.ajax']]);
+
+    $content = $this->randomMachineName();
+    $html = '<div' . (string) $attribute . '>' . $content . '</div>';
+    $this->assertClass('example-class', $html);
+    $this->assertNoClass('example-class2', $html);
   }
 
   /**
@@ -562,6 +692,45 @@ class AttributeTest extends UnitTestCase {
           'href' => 'bar',
         ]),
       ],
+      [
+        new Attribute([]),
+        new Attribute(['class' => ['class1']]),
+        new Attribute(['class' => ['class1']]),
+      ],
+      [
+        new Attribute(['class' => ['example-class']]),
+        new Attribute(['class' => ['class1']]),
+        new Attribute(['class' => ['example-class', 'class1']]),
+      ],
+      [
+        new Attribute(['class' => ['example-class']]),
+        new Attribute(['id' => 'foo', 'href' => 'bar']),
+        new Attribute([
+          'class' => ['example-class'],
+          'id' => 'foo',
+          'href' => 'bar',
+        ]),
+      ],
+      [
+        new Attribute(['style' => 'color: pink;']),
+        new Attribute(['style' => 'color: red;']),
+        new Attribute(['style' => 'color: red;']),
+      ],
+      [
+        new Attribute(['style' => ['color: pink;']]),
+        new Attribute(['style' => 'color: red;']),
+        new Attribute(['style' => ['color: pink;', 'color: red;']]),
+      ],
+      [
+        new Attribute(['style' => 'color: pink;']),
+        new Attribute(['style' => ['color: red;']]),
+        new Attribute(['style' => ['color: pink;', 'color: red;']]),
+      ],
+      [
+        new Attribute(['style' => ['color: pink;']]),
+        new Attribute(['style' => ['color: red;']]),
+        new Attribute(['style' => ['color: pink;', 'color: red;']]),
+      ],
     ];
   }
 
@@ -580,6 +749,120 @@ class AttributeTest extends UnitTestCase {
     $attributes = new Attribute(['class' => ['example-class']]);
     $this->expectException(\TypeError::class);
     $attributes->merge('not an array');
+  }
+
+  /**
+   * Tests merge with attachments.
+   *
+   * @legacy-covers ::merge
+   */
+  public function testMergeWithAttachments(): void {
+    $attribute1 = new Attribute();
+    $attribute1->addAttachments([
+      'library' => [
+        'my_module/my_library',
+      ],
+      'styles' => [
+        'my_style' => 'my_option',
+      ],
+    ]);
+
+    $attribute2 = new Attribute();
+    $attribute2->addAttachments([
+      'library' => [
+        'my_module/my_library',
+        'my_module_2/my_library',
+      ],
+      'styles' => [
+        'my_style' => 'my_option_2',
+        'my_style_2' => 'my_option',
+      ],
+    ]);
+
+    $expected = [
+      'library' => [
+        'my_module/my_library',
+        'my_module/my_library',
+        'my_module_2/my_library',
+      ],
+      'styles' => [
+        'my_style' => 'my_option',
+        'my_style_2' => 'my_option',
+      ],
+    ];
+
+    $attribute1->merge($attribute2);
+    $this->assertEquals($expected, $attribute1->getAttachments());
+  }
+
+  /**
+   * Tests setting attachments.
+   *
+   * @legacy-covers ::setAttachments
+   */
+  public function testSetAttachments(): void {
+    $attribute = new Attribute();
+
+    $this->assertEmpty($attribute->getAttachments());
+
+    $attribute->setAttachments(['foo' => 'bar']);
+    $this->assertEquals(['foo' => 'bar'], $attribute->getAttachments());
+
+    $attribute->setAttachments(['foo2' => 'bar']);
+    $this->assertEquals(['foo2' => 'bar'], $attribute->getAttachments());
+  }
+
+  /**
+   * Tests adding attachments.
+   *
+   * @legacy-covers ::addAttachments
+   */
+  public function testAddAttachments(): void {
+    $attribute = new Attribute();
+    $this->assertEmpty($attribute->getAttachments());
+
+    // First addition.
+    $attribute->addAttachments([
+      'library' => [
+        'my_module/my_library',
+      ],
+      'styles' => [
+        'my_style' => 'my_option',
+      ],
+    ]);
+    $expected = [
+      'library' => [
+        'my_module/my_library',
+      ],
+      'styles' => [
+        'my_style' => 'my_option',
+      ],
+    ];
+    $this->assertEquals($expected, $attribute->getAttachments());
+
+    // Second addition, test merging.
+    $attribute->addAttachments([
+      'library' => [
+        'my_module/my_library',
+        'my_module_2/my_library',
+      ],
+      'styles' => [
+        'my_style' => 'my_option_2',
+        'my_style_2' => 'my_option',
+      ],
+    ]);
+    $expected = [
+      'library' => [
+        'my_module/my_library',
+        'my_module/my_library',
+        'my_module_2/my_library',
+      ],
+      'styles' => [
+        'my_style' => 'my_option',
+        'my_style_2' => 'my_option',
+      ],
+    ];
+    $this->assertEquals($expected, $attribute->getAttachments());
   }
 
 }

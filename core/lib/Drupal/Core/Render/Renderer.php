@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Render;
 
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Variable;
@@ -11,9 +12,12 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Form\FormHelper;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Render\Element\RenderCallbackInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
+use Drupal\Core\Theme\Style\Exception\StyleDefinitionErrorException;
+use Drupal\Core\Theme\Style\StylePluginManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Core\Utility\FiberResumeType;
@@ -71,6 +75,10 @@ class Renderer implements RendererInterface {
    *   The render cache service.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
+   * @param \Drupal\Core\Theme\Style\StylePluginManagerInterface $stylePluginManager
+   *   The style plugin manager.
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $loggerFactory
+   *   The logger factory.
    * @param array $renderer_config
    *   The renderer configuration array.
    */
@@ -81,6 +89,8 @@ class Renderer implements RendererInterface {
     protected PlaceholderGeneratorInterface $placeholderGenerator,
     protected RenderCacheInterface $renderCache,
     protected RequestStack $requestStack,
+    protected StylePluginManagerInterface $stylePluginManager,
+    protected LoggerChannelFactoryInterface $loggerFactory,
     array $renderer_config,
   ) {
     if (!isset($renderer_config['debug'])) {
@@ -418,6 +428,23 @@ class Renderer implements RendererInterface {
       }
       $elements = $new_elements;
       $elements['#lazy_builder_built'] = TRUE;
+    }
+
+    if (isset($elements['#styles']) && !empty($elements['#styles'])) {
+      foreach ($elements['#styles'] as $styleId => $styleOption) {
+        try {
+          $style = $this->stylePluginManager->getDefinition($styleId);
+          $style->applyOrBubbleOnArray($styleOption, $elements);
+        }
+        catch (PluginNotFoundException $exception) {
+          $this->loggerFactory->get('renderer')->error($exception->getMessage());
+        }
+        catch (StyleDefinitionErrorException $exception) {
+          $this->loggerFactory->get('renderer')->error($exception->getMessage());
+        }
+      }
+      // Avoid processing multiple times.
+      unset($elements['#styles']);
     }
 
     // Make any final changes to the element before it is rendered. This means

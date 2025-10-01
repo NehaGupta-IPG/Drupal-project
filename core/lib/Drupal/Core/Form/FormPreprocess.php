@@ -250,7 +250,7 @@ class FormPreprocess {
     $resizable = !empty($element['#resizable']) ? $element['#resizable'] : NULL;
     $variables['resizable'] = $resizable;
     if ($resizable) {
-      $variables['attributes']->addClass('resize-' . $resizable);
+      $variables['attributes']->addStyle('core_resize', $resizable);
     }
     $variables['required'] = !empty($element['#required']) ? $element['#required'] : NULL;
   }

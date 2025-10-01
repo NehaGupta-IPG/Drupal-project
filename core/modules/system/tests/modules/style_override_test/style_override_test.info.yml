@@ -1,0 +1,4 @@
+name: 'Style Override Test'
+type: module
+description: 'Override test styles for style API.'
+package: 'Testing'

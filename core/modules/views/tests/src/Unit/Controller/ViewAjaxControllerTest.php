@@ -6,6 +6,7 @@ namespace Drupal\Tests\views\Unit\Controller;
 
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Path\CurrentPathStack;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Render\PlaceholderGeneratorInterface;
@@ -15,6 +16,7 @@ use Drupal\Core\Render\Renderer;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\Core\Theme\Style\StylePluginManagerInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Core\Utility\UnroutedUrlAssemblerInterface;
@@ -150,6 +152,8 @@ class ViewAjaxControllerTest extends UnitTestCase {
       $this->createStub(PlaceholderGeneratorInterface::class),
       $this->createStub(RenderCacheInterface::class),
       $request_stack,
+      $this->createStub(StylePluginManagerInterface::class),
+      $this->createStub(LoggerChannelFactoryInterface::class),
       [
         'required_cache_contexts' => [
           'languages:language_interface',

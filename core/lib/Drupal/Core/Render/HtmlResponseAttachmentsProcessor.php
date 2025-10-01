@@ -95,6 +95,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
         'drupalSettings',
         'page_top',
         'page_bottom',
+        'styles',
       ]
     );
     if (!empty($unsupported_types)) {

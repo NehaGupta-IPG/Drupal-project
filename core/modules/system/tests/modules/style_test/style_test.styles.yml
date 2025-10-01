@@ -1,0 +1,58 @@
+test_mode:
+  label: 'Mode label'
+  description: 'Test mode.'
+  type: 'mode'
+  options:
+    any:
+      label: 'Any'
+      value: 'any-tag-class'
+    meta:
+      label: 'Meta'
+      value: 'meta-style-value'
+      attribute: 'meta-style-name'
+      target: 'meta'
+    html:
+      label: 'HTML'
+      value: 'html-style-value'
+      target: 'html'
+    body:
+      label: 'Body'
+      value: 'body-style-value'
+      target: 'body'
+
+test_utility:
+  label: 'Utility label'
+  description: 'Test utility.'
+  options:
+    small:
+      label: 'Small'
+      value: 'text-sm'
+    medium:
+      label: 'Medium'
+      value: 'font-size: 15px'
+      attribute: 'style'
+    large:
+      label: 'Large'
+      value: 'large'
+      attribute: 'cds-text'
+    experimental:
+      label: 'Experimental'
+      value: 'experimental'
+      status: 'experimental'
+    deprecated:
+      label: 'Deprecated'
+      value: 'deprecated'
+      status: 'deprecated'
+    obsolete:
+      label: 'Obsolete'
+      value: 'obsolete'
+      status: 'obsolete'
+
+test_utility_library:
+  label: 'Utility with library'
+  description: 'Test utility.'
+  options:
+    with_library:
+      label: 'Library'
+      value: 'my-class'
+  library: 'style_test/style_test'

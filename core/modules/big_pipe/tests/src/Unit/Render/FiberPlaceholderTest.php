@@ -7,6 +7,7 @@ namespace Drupal\Tests\big_pipe\Unit\Render;
 use Drupal\big_pipe\Render\BigPipe;
 use Drupal\big_pipe\Render\BigPipeResponse;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Render\HtmlResponse;
@@ -15,6 +16,7 @@ use Drupal\Core\Render\RenderCacheInterface;
 use Drupal\Core\Render\Renderer;
 use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Theme\Style\StylePluginManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
@@ -57,6 +59,8 @@ class FiberPlaceholderTest extends UnitTestCase {
       $this->prophesize(PlaceholderGeneratorInterface::class)->reveal(),
       $this->prophesize(RenderCacheInterface::class)->reveal(),
       $request_stack->reveal(),
+      $this->prophesize(StylePluginManagerInterface::class)->reveal(),
+      $this->prophesize(LoggerChannelFactoryInterface::class)->reveal(),
       [
         'required_cache_contexts' => [
           'languages:language_interface',

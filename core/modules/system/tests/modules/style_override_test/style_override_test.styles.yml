@@ -1,0 +1,6 @@
+test_mode:
+  enabled: false
+  label: 'Overridden style'
+  options:
+    foo:
+      label: bar

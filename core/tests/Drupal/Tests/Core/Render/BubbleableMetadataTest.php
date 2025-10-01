@@ -7,11 +7,13 @@ namespace Drupal\Tests\Core\Render;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Render\PlaceholderGeneratorInterface;
 use Drupal\Core\Render\PlaceholderingRenderCache;
 use Drupal\Core\Render\Renderer;
+use Drupal\Core\Theme\Style\StylePluginManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
@@ -61,6 +63,8 @@ class BubbleableMetadataTest extends UnitTestCase {
         $this->createStub(PlaceholderGeneratorInterface::class),
         $this->createStub(PlaceholderingRenderCache::class),
         new RequestStack(),
+        $this->createStub(StylePluginManagerInterface::class),
+        $this->createStub(LoggerChannelFactoryInterface::class),
         [],
       );
     }
@@ -530,6 +534,98 @@ class BubbleableMetadataTest extends UnitTestCase {
     $this->assertSame(['core/drupal', 'core/jquery'], $merged['library']);
     $this->assertSame('Preview from b', $merged['page_top']['node_preview']['#markup']);
     $this->assertSame('Preview from b', $merged['page_bottom']['node_preview']['#markup']);
+  }
+
+  /**
+   * Tests style merging.
+   *
+   * @legacy-covers ::mergeAttachments
+   */
+  #[DataProvider('providerTestMergeAttachmentsStyleMerging')]
+  public function testMergeAttachmentsStyleMerging(array $a, array $b, array $expected): void {
+    $this->assertSame($expected, BubbleableMetadata::mergeAttachments($a, $b));
+  }
+
+  /**
+   * Data provider for ::testMergeAttachmentsStyleMerging.
+   *
+   * @return \Generator
+   *   The test cases.
+   */
+  public static function providerTestMergeAttachmentsStyleMerging(): iterable {
+    yield 'Default: different styles' => [
+      [
+        'styles' => [
+          'my_style' => 'my_option',
+        ],
+      ],
+      [
+        'styles' => [
+          'my_style_2' => 'my_option_2',
+        ],
+      ],
+      [
+        'styles' => [
+          'my_style' => 'my_option',
+          'my_style_2' => 'my_option_2',
+        ],
+      ],
+    ];
+
+    yield 'Inverted order' => [
+      [
+        'styles' => [
+          'my_style_2' => 'my_option_2',
+        ],
+      ],
+      [
+        'styles' => [
+          'my_style' => 'my_option',
+        ],
+      ],
+      [
+        'styles' => [
+          'my_style_2' => 'my_option_2',
+          'my_style' => 'my_option',
+        ],
+      ],
+    ];
+
+    yield 'Same style: first option is kept' => [
+      [
+        'styles' => [
+          'my_style' => 'my_option',
+        ],
+      ],
+      [
+        'styles' => [
+          'my_style' => 'my_option_2',
+        ],
+      ],
+      [
+        'styles' => [
+          'my_style' => 'my_option',
+        ],
+      ],
+    ];
+
+    yield 'Same style: first option is kept, inverted order' => [
+      [
+        'styles' => [
+          'my_style' => 'my_option_2',
+        ],
+      ],
+      [
+        'styles' => [
+          'my_style' => 'my_option',
+        ],
+      ],
+      [
+        'styles' => [
+          'my_style' => 'my_option_2',
+        ],
+      ],
+    ];
   }
 
   /**

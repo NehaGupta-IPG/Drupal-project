@@ -2,10 +2,15 @@
 
 namespace Drupal\Core\Template;
 
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Serialization\Attribute\JsonSchema;
+use Drupal\Core\Theme\Style\Exception\StyleDefinitionErrorException;
+use Drupal\Core\Theme\Style\StylePluginManagerInterface;
 
 /**
  * Collects, sanitizes, and renders HTML attributes.
@@ -78,6 +83,13 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
    * @var array<string, \Drupal\Core\Template\AttributeValueBase>
    */
   protected $storage = [];
+
+  /**
+   * The attachments for this attribute.
+   *
+   * @var array
+   */
+  protected $attachments = [];
 
   /**
    * Constructs a \Drupal\Core\Template\Attribute object.
@@ -322,6 +334,38 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
   }
 
   /**
+   * Add style into an Attribute object. Handle library dependency.
+   *
+   * Allows Twig templates to set style using
+   * @code
+   * {{ attributes.addStyle('my_style', 'my_value') }}
+   * @endcode
+   *
+   * @param string $styleId
+   *   The style id.
+   * @param string $styleOption
+   *   The style option.
+   *
+   * @return $this
+   */
+  public function addStyle(string $styleId, string $styleOption) {
+    try {
+      /** @var \Drupal\Core\Theme\Style\StylePluginManagerInterface $stylePluginManager */
+      $stylePluginManager = \Drupal::service(StylePluginManagerInterface::class);
+      $style = $stylePluginManager->getDefinition($styleId);
+      $style->applyOrBubbleOnAttribute($styleOption, $this);
+    }
+    catch (PluginNotFoundException $exception) {
+      \Drupal::logger('twig')->error($exception->getMessage());
+    }
+    catch (StyleDefinitionErrorException $exception) {
+      \Drupal::logger('twig')->error($exception->getMessage());
+    }
+
+    return $this;
+  }
+
+  /**
    * Implements the magic __toString() method.
    */
   #[JsonSchema(['type' => 'string', 'description' => 'Rendered HTML element attributes'])]
@@ -337,6 +381,17 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
         $return .= ' ' . $rendered;
       }
     }
+
+    // When printing the attribute object, we want the attachments to be
+    // processed.
+    // So if the attribute has libraries or styles attached, it can bubble up.
+    // @see \Drupal\Core\Template\TwigExtension::attachLibrary()
+    $attachments = $this->getAttachments();
+    if (!empty($attachments)) {
+      $template_attached = ['#attached' => $attachments];
+      \Drupal::service(RendererInterface::class)->render($template_attached);
+    }
+
     return $return;
   }
 
@@ -400,10 +455,54 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
    * @return $this
    */
   public function merge(Attribute $collection) {
-    $merged_attributes = NestedArray::mergeDeep($this->toArray(), $collection->toArray());
+    $selfArray = $this->toArray();
+    $otherArray = $collection->toArray();
+
+    // Ensure arrays are preserved.
+    AttributeHelper::matchCollectionsTypes($selfArray, $otherArray);
+    $merged_attributes = NestedArray::mergeDeep($selfArray, $otherArray);
     foreach ($merged_attributes as $name => $value) {
       $this->storage[$name] = $this->createAttributeValue($name, $value);
     }
+
+    // Merge attachments.
+    $this->addAttachments($collection->getAttachments());
+    return $this;
+  }
+
+  /**
+   * Gets this object's attached collection.
+   *
+   * @return array
+   *   The attachments array.
+   */
+  public function getAttachments(): array {
+    return $this->attachments;
+  }
+
+  /**
+   * Merges an array of attached data into this object's collection.
+   *
+   * @param array $attachments
+   *   The attachments to add.
+   *
+   * @return $this
+   */
+  public function addAttachments(array $attachments) {
+    $this->attachments = BubbleableMetadata::mergeAttachments($this->attachments, $attachments);
+    return $this;
+  }
+
+  /**
+   * Replaces this object's attached data with the provided array.
+   *
+   * @param array $attachments
+   *   The attachments to set.
+   *
+   * @return $this
+   */
+  public function setAttachments(array $attachments) {
+    $this->attachments = $attachments;
     return $this;
   }
 
