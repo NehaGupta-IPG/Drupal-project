@@ -6,20 +6,14 @@ namespace Drupal\Tests\system\Kernel\Theme;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 use Twig\Error\LoaderError;
 
 /**
  * Tests including files in Twig templates.
- *
- * @group Theme
  */
+#[Group('Theme')]
 class TwigIncludeTest extends KernelTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
-
   /**
    * The Twig configuration to set the container parameter to during rebuilds.
    *
