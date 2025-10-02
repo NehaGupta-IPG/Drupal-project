@@ -198,7 +198,6 @@ class ResponsiveImageStyleForm extends EntityForm {
       '#type' => 'select',
       '#default_value' => $responsive_image_style->getFallbackImageStyle(),
       '#options' => $image_styles,
-      '#required' => TRUE,
       '#description' => $this->t('Select the image style you wish to use as the style when a browser does not support responsive images.'),
     ];
 
