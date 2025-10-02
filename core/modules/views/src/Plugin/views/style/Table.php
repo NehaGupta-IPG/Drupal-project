@@ -191,7 +191,7 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
       }
 
       // If the field is the column, mark it so, or the column
-      // it's set to is a column, that's ok
+      // it's set to is a column, that's ok.
       if ($field == $column || $columns[$column] == $column && !empty($sanitized[$column])) {
         $sanitized[$field] = $column;
       }
@@ -395,13 +395,13 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
         ],
       ];
 
-      // Markup for the field name
+      // Markup for the field name.
       $form['info'][$field]['name'] = [
         '#markup' => $field_names[$field],
       ];
     }
 
-    // Provide a radio for no default sort
+    // Provide a radio for no default sort.
     $form['default'][-1] = [
       '#title' => $this->t('No default sort'),
       '#title_display' => 'invisible',

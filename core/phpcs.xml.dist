@@ -77,6 +77,7 @@
     <include-pattern>*/Unit/*</include-pattern>
     <include-pattern>core/lib/*</include-pattern>
     <exclude-pattern>core/*/src/Plugin/*</exclude-pattern>
+    <exclude-pattern>core/modules/*/</exclude-pattern>
     <exclude-pattern>*/tests/*</exclude-pattern>
   </rule>
   <rule ref="Drupal.Commenting.FunctionComment.MissingParamType"/>

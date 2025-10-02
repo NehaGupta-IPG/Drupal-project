@@ -1231,6 +1231,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
       // - The operator.
       // - The value (or values) to use in the filter with the selected
       //   operator.
+
       // In each row, we have to display the operator form and the value from
       // $row acts as a fake form to render each widget in a row.
       $row = [];
