@@ -169,6 +169,9 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
    * {@inheritdoc}
    */
   public function toLink(): Link {
+    if ($this->isEmpty()) {
+      throw new \InvalidArgumentException('The field item is empty and cannot be converted to a link.');
+    }
     return Link::fromTextAndUrl($this->get('title')->getValue(), $this->getUrl());
   }
 

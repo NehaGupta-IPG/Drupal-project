@@ -38,6 +38,10 @@ interface LinkItemInterface extends FieldItemInterface {
    *
    * @return \Drupal\Core\Link
    *   Returns a Link object.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown if there is an issue with the item's URI and the link cannot be
+   *   created.
    */
   public function toLink(): Link;
 
