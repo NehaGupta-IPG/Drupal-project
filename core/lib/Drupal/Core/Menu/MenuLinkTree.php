@@ -124,7 +124,7 @@ class MenuLinkTree implements MenuLinkTreeInterface {
     }
 
     if (is_null($context)) {
-      @trigger_error('Transforming menu links without $context is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3380512', E_USER_DEPRECATED);
+      @trigger_error('Transforming menu links without $context is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3380512', E_USER_DEPRECATED);
 
       $context = [];
     }
