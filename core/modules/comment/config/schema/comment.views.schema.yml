@@ -67,6 +67,8 @@ views.filter.comment_ces_last_updated:
 views.filter_value.comment_ces_last_updated:
   type: views.filter_value.date
   label: 'Last updated'
+  constraints:
+    FullyValidatable: ~
 
 views.filter.comment_user_uid:
   type: views_filter
