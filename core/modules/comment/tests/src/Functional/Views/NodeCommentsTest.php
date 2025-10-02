@@ -30,8 +30,6 @@ class NodeCommentsTest extends CommentTestBase {
     'test_comment_last_updated_click_sort',
   ];
 
-
-
   /**
    * Test the comment count field.
    */
