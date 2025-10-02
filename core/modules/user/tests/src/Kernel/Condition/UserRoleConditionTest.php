@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Kernel\Condition;
 
-use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the user role condition.
- *
- * @group user
  */
+#[Group('user')]
 class UserRoleConditionTest extends KernelTestBase {
 
   /**
@@ -155,7 +155,7 @@ class UserRoleConditionTest extends KernelTestBase {
     $condition->setConfig('roles', [$this->role->id() => $this->role->id()]);
     $condition->setConfig('negate', FALSE);
     $this->assertTrue($condition->execute(), 'Authenticated user is a member of the custom role.');
-    $this->assertEquals(new FormattableMarkup('The user is a member of @roles', ['@roles' => $this->role->label()]), $condition->summary());
+    $this->assertEquals('The user is a member of ' . Html::escape($this->role->label()), $condition->summary());
   }
 
 }

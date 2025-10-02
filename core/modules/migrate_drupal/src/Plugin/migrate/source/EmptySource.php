@@ -4,7 +4,6 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source;
 
 use Drupal\Component\Plugin\DependentPluginInterface;
 use Drupal\Core\Entity\DependencyTrait;
-use Drupal\migrate\Attribute\MigrateSource;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\source\EmptySource as BaseEmptySource;
@@ -19,11 +18,17 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
  *
  * @see \Drupal\migrate\Plugin\migrate\source\EmptySource
  * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
+ *
+ * @MigrateSource(
+ *   id = "md_empty",
+ *   source_module = "system",
+ * )
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no
+ *   replacement.
+ *
+ * @see https://www.drupal.org/node/3533564
  */
-#[MigrateSource(
-  id: 'md_empty',
-  source_module: 'system',
-)]
 class EmptySource extends BaseEmptySource implements ContainerFactoryPluginInterface, DependentPluginInterface {
 
   use DependencyTrait;
@@ -39,6 +44,7 @@ class EmptySource extends BaseEmptySource implements ContainerFactoryPluginInter
    * {@inheritdoc}
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityTypeManagerInterface $entity_type_manager) {
+    @trigger_error('Migrate source plugin "md_empty" used in migration "' . $migration->id() . '" is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3533564', E_USER_DEPRECATED);
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     $this->entityTypeManager = $entity_type_manager;
   }

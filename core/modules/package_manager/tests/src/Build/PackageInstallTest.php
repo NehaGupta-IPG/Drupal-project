@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\package_manager\Build;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests installing packages in a stage directory.
  *
- * @group package_manager
- * @group #slow
  * @internal
  */
+#[Group('package_manager')]
+#[Group('#slow')]
 class PackageInstallTest extends TemplateProjectTestBase {
 
   /**
@@ -18,7 +20,6 @@ class PackageInstallTest extends TemplateProjectTestBase {
    */
   public function testPackageInstall(): void {
     $this->createTestProject('RecommendedProject');
-
     $this->setReleaseMetadata([
       'alpha' => __DIR__ . '/../../fixtures/release-history/alpha.1.1.0.xml',
     ]);

@@ -11,12 +11,14 @@ use Drupal\node\Entity\NodeType;
 use Drupal\system\Entity\Menu;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Add, edit, and delete a node with menu link.
- *
- * @group menu_ui
  */
+#[Group('menu_ui')]
+#[RunTestsInSeparateProcesses]
 class MenuUiNodeTest extends BrowserTestBase {
 
   use ContentTranslationTestTrait;
@@ -191,7 +193,9 @@ class MenuUiNodeTest extends BrowserTestBase {
     $this->drupalGet('test-page');
     $this->assertSession()->linkNotExists($node_title, 'Found no menu link with the node unpublished');
     // Assert that the link exists if published.
-    $edit['status[value]'] = TRUE;
+    $edit = [
+      'status[value]' => TRUE,
+    ];
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm($edit, 'Save');
     $this->drupalGet('test-page');
@@ -325,7 +329,11 @@ class MenuUiNodeTest extends BrowserTestBase {
 
     // Create translation.
     $translated_node_title = $this->randomMachineName(8);
-    $node->addTranslation($langcodes[1], ['title' => $translated_node_title, 'body' => $this->randomMachineName(16), 'status' => 1]);
+    $node->addTranslation($langcodes[1], [
+      'title' => $translated_node_title,
+      'body' => $this->randomMachineName(16),
+      'status' => 1,
+    ]);
     $node->save();
 
     // Edit the node and create a menu link.

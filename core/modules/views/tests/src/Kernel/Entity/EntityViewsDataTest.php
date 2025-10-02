@@ -13,13 +13,15 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\views\EntityViewsData;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests entity views data.
- *
- * @coversDefaultClass \Drupal\views\EntityViewsData
- * @group views
  */
+#[CoversClass(EntityViewsData::class)]
+#[Group('views')]
 class EntityViewsDataTest extends KernelTestBase {
 
   /**
@@ -50,7 +52,6 @@ class EntityViewsDataTest extends KernelTestBase {
    */
   protected static $modules = [
     'user',
-    'system',
     'field',
     'text',
     'filter',
@@ -123,7 +124,7 @@ class EntityViewsDataTest extends KernelTestBase {
       ->setTranslatable(TRUE)
       ->setSetting('max_length', 255);
 
-    // A base field with cardinality > 1
+    // A base field with cardinality > 1.
     $this->commonBaseFields['string'] = BaseFieldDefinition::create('string')
       ->setLabel('Strong')
       ->setTranslatable(TRUE)
@@ -428,6 +429,14 @@ class EntityViewsDataTest extends KernelTestBase {
         ],
       ],
     ], $data['entity_test__string']['table']['join']['entity_test']);
+
+    // Check the "allow empty" option for non-required fields.
+    $this->assertArrayHasKey('allow empty', $data['entity_test']['name']['filter']);
+    $this->assertTrue($data['entity_test']['name']['filter']['allow empty']);
+    // Reconfigure the field to be required.
+    $this->commonBaseFields['name']->setRequired(TRUE);
+    $data = $this->entityTypeManager->getHandler('entity_test', 'views_data')->getViewsData();
+    $this->assertArrayNotHasKey('allow empty', $data['entity_test']['name']['filter']);
   }
 
   /**
@@ -667,9 +676,8 @@ class EntityViewsDataTest extends KernelTestBase {
 
   /**
    * Tests EntityViewsData deprecations.
-   *
-   * @group legacy
    */
+  #[IgnoreDeprecations]
   public function testDeprecations(): void {
     $this->baseEntityType->setHandlerClass('views_data', EntityViewsDataWithDeprecations::class);
     $this->setUpEntityType($this->baseEntityType, $this->commonBaseFields);

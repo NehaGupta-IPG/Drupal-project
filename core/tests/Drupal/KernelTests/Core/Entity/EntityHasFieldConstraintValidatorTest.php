@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Entity\Plugin\Validation\Constraint\EntityHasFieldConstraintValidator;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @covers \Drupal\Core\Entity\Plugin\Validation\Constraint\EntityHasFieldConstraintValidator
- *
- * @group Entity
+ * Tests Entity Has Field Constraint Validator.
  */
+#[Group('Entity')]
+#[CoversClass(EntityHasFieldConstraintValidator::class)]
 class EntityHasFieldConstraintValidatorTest extends EntityKernelTestBase {
 
   /**

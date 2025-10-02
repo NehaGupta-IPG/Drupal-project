@@ -14,6 +14,7 @@ use Drupal\Core\Plugin\Discovery\YamlDiscoveryDecorator;
 use Drupal\Core\Layout\Attribute\Layout;
 use Drupal\Core\Plugin\FilteredPluginManagerTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\layout_discovery\Hook\LayoutDiscoveryThemeHooks;
 
 /**
  * Provides a plugin manager for layouts.
@@ -164,6 +165,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
     $hooks = [];
     $hooks['layout'] = [
       'render element' => 'content',
+      'initial preprocess' => LayoutDiscoveryThemeHooks::class . ':preprocessLayout',
     ];
     /** @var \Drupal\Core\Layout\LayoutDefinition[] $definitions */
     $definitions = $this->getDefinitions();
@@ -196,8 +198,8 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
    * {@inheritdoc}
    *
    * @return \Drupal\Core\Layout\LayoutDefinition[]
+   *   An array of plugin definitions, sorted by category and label.
    */
-  // phpcs:ignore Drupal.Commenting.FunctionComment.MissingReturnComment
   public function getSortedDefinitions(?array $definitions = NULL, $label_key = 'label') {
     // Sort the plugins first by category, then by label.
     $definitions = $definitions ?? $this->getDefinitions();
@@ -214,8 +216,9 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
    * {@inheritdoc}
    *
    * @return \Drupal\Core\Layout\LayoutDefinition[][]
+   *   Keys are category names, and values are arrays of which the keys are
+   *   plugin IDs and the values are plugin definitions.
    */
-  // phpcs:ignore Drupal.Commenting.FunctionComment.MissingReturnComment
   public function getGroupedDefinitions(?array $definitions = NULL, $label_key = 'label') {
     $definitions = $this->getSortedDefinitions($definitions ?? $this->getDefinitions(), $label_key);
     $grouped_definitions = [];

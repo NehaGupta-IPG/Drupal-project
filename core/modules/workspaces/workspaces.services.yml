@@ -1,11 +1,14 @@
+parameters:
+  workspaces.skip_procedural_hook_scan: true
+
 services:
   _defaults:
     autoconfigure: true
   workspaces.manager:
     class: Drupal\workspaces\WorkspaceManager
-    arguments: ['@request_stack', '@entity_type.manager', '@entity.memory_cache', '@current_user', '@state', '@logger.channel.workspaces', '@class_resolver', '@workspaces.association', '@workspaces.information']
+    autowire: true
     tags:
-      - { name: service_id_collector, tag: workspace_negotiator }
+      - { name: service_collector, call: addNegotiator, tag: workspace_negotiator }
   Drupal\workspaces\WorkspaceManagerInterface: '@workspaces.manager'
   workspaces.information:
     class: Drupal\workspaces\WorkspaceInformation
@@ -13,7 +16,7 @@ services:
   Drupal\workspaces\WorkspaceInformationInterface: '@workspaces.information'
   workspaces.operation_factory:
     class: Drupal\workspaces\WorkspaceOperationFactory
-    arguments: ['@entity_type.manager', '@database', '@workspaces.manager', '@workspaces.association', '@event_dispatcher', '@logger.channel.workspaces']
+    autowire: true
   Drupal\workspaces\WorkspaceOperationFactory: '@workspaces.operation_factory'
   workspaces.association:
     class: Drupal\workspaces\WorkspaceAssociation
@@ -78,12 +81,6 @@ services:
     decoration_priority: 50
     tags:
       - { name: backend_overridable }
-  pgsql.workspaces.entity.query.sql:
-    decorates: pgsql.entity.query.sql
-    class: Drupal\workspaces\EntityQuery\PgsqlQueryFactory
-    arguments: ['@database', '@workspaces.manager', '@workspaces.information']
-    public: false
-    decoration_priority: 50
 
   workspaces.menu.tree_storage:
     decorates: menu.tree_storage

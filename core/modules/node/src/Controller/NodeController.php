@@ -117,22 +117,6 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
   }
 
   /**
-   * Page title callback for a node revision.
-   *
-   * @param \Drupal\node\NodeInterface $node_revision
-   *   The node revision.
-   *
-   * @return string
-   *   The page title.
-   */
-  public function revisionPageTitle(NodeInterface $node_revision) {
-    return $this->t('Revision of %title from %date', [
-      '%title' => $node_revision->label(),
-      '%date' => $this->dateFormatter->format($node_revision->getRevisionCreationTime()),
-    ]);
-  }
-
-  /**
    * Generates an overview table of older revisions of a node.
    *
    * @param \Drupal\node\NodeInterface $node
@@ -193,13 +177,15 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
             '#template' => '{% trans %}{{ date }} by {{ username }}{% endtrans %}{% if message %}<p class="revision-log">{{ message }}</p>{% endif %}',
             '#context' => [
               'date' => $link,
-              'username' => $this->renderer->renderInIsolation($username),
+              'username' => $username,
               'message' => ['#markup' => $revision->revision_log->value, '#allowed_tags' => Xss::getHtmlTagList()],
+            ],
+            // @todo Fix this properly in https://www.drupal.org/project/drupal/issues/3227637.
+            '#cache' => [
+              'max-age' => 0,
             ],
           ],
         ];
-        // @todo Simplify once https://www.drupal.org/node/2334319 lands.
-        $this->renderer->addCacheableDependency($column['data'], $username);
         $row[] = $column;
 
         if ($is_current_revision) {
