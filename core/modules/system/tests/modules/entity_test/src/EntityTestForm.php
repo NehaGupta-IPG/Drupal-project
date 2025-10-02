@@ -7,6 +7,7 @@ namespace Drupal\entity_test;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\entity_test\Entity\EntityTestStringId;
 
 /**
  * Form controller for the test entity edit forms.
@@ -19,7 +20,7 @@ class EntityTestForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   protected function prepareEntity() {
-    if (empty($this->entity->name->value)) {
+    if (empty($this->entity->name->value) && !$this->entity instanceof EntityTestStringId) {
       // Assign a random name to new EntityTest entities, to avoid repetition in
       // tests.
       $random = new Random();
