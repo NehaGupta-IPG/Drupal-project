@@ -81,6 +81,10 @@ class TaxonomyTokensHooks {
       'description' => $this->t("The date the taxonomy was most recently updated."),
       'type' => 'date',
     ];
+    $term['published_status'] = [
+      'name' => $this->t('Published'),
+      'description' => $this->t('The publication status of the taxonomy ("Published" or "Unpublished").'),
+    ];
     return ['types' => $types, 'tokens' => ['term' => $term, 'vocabulary' => $vocabulary]];
   }
 
@@ -123,6 +127,10 @@ class TaxonomyTokensHooks {
 
           case 'url':
             $replacements[$original] = $term->toUrl('canonical', ['absolute' => TRUE])->toString();
+            break;
+
+          case 'published_status':
+            $replacements[$original] = $term->isPublished() ? $this->t('Published') : $this->t('Unpublished');
             break;
 
           case 'node-count':
