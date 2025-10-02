@@ -8,9 +8,6 @@ use Drupal\Core\Hook\Attribute\Hook;
  * Hook implementations for help.
  */
 class HelpThemeHooks {
-  /**
-   * @file
-   */
 
   /**
    * Implements hook_preprocess_HOOK() for block templates.

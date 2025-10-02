@@ -39,6 +39,8 @@ class Rss extends RssPluginBase {
   public string $field_alias;
 
   /**
+   * An array of comments keyed by comment ID.
+   *
    * @var \Drupal\comment\CommentInterface[]
    */
   protected $comments;

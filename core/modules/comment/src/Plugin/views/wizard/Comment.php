@@ -7,11 +7,9 @@ use Drupal\views\Attribute\ViewsWizard;
 use Drupal\views\Plugin\views\wizard\WizardPluginBase;
 
 /**
- * @todo replace numbers with constants.
- */
-
-/**
  * Tests creating comment views with the wizard.
+ *
+ * @todo Replace numbers with constants.
  */
 #[ViewsWizard(
   id: 'comment',

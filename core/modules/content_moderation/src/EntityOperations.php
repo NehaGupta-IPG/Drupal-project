@@ -127,6 +127,8 @@ class EntityOperations implements ContainerInjectionInterface {
   }
 
   /**
+   * Respond to creation of a new entity.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity that was just saved.
    *
@@ -139,6 +141,8 @@ class EntityOperations implements ContainerInjectionInterface {
   }
 
   /**
+   * Respond to updates to an entity.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity that was just saved.
    *
@@ -216,6 +220,8 @@ class EntityOperations implements ContainerInjectionInterface {
   }
 
   /**
+   * Respond to entity deletion.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity being deleted.
    *
@@ -229,6 +235,8 @@ class EntityOperations implements ContainerInjectionInterface {
   }
 
   /**
+   * Respond to entity revision deletion.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity revision being deleted.
    *
@@ -248,6 +256,8 @@ class EntityOperations implements ContainerInjectionInterface {
   }
 
   /**
+   * Respond to entity translation deletion.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $translation
    *   The entity translation being deleted.
    *

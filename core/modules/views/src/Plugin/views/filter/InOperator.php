@@ -31,8 +31,9 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
   protected $valueFormType = 'checkboxes';
 
   /**
-   * @var array
    * Stores all operations which are available on the form.
+   *
+   * @var array
    */
   protected $valueOptions = NULL;
 

@@ -8,9 +8,6 @@ use Drupal\Core\Hook\Attribute\Hook;
  * Hook implementations for inline_form_errors.
  */
 class InlineFormErrorsThemeHooks {
-  /**
-   * @file
-   */
 
   /**
    * Implements hook_preprocess_HOOK() for form element templates.

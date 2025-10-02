@@ -40,6 +40,8 @@ class FieldFormatterSettingsDefaults extends ProcessPluginBase {
   }
 
   /**
+   * Number settings for some languages.
+   *
    * @param string $type
    *   The field type.
    * @param string $format

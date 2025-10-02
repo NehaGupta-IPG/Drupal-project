@@ -32,8 +32,9 @@ class Schema extends DatabaseSchema {
   const COMMENT_MAX_COLUMN = 255;
 
   /**
+   * List of MySQL string types.
+   *
    * @var array
-   *   List of MySQL string types.
    */
   protected $mysqlStringTypes = [
     'VARCHAR',

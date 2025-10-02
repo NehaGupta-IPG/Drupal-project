@@ -89,6 +89,8 @@ class ResponsiveImageStyle extends ConfigEntityBase implements ResponsiveImageSt
   protected $image_style_mappings = [];
 
   /**
+   * An array of image style mappings keyed by the breakpoint ID.
+   *
    * @var array
    */
   protected $keyedImageStyleMappings;

@@ -2,17 +2,13 @@
 
 /**
  * @file
+ * Hooks provided by the Field UI module.
  */
 
 use Drupal\Core\Field\FormatterInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\WidgetInterface;
-
-/**
- * @file
- * Hooks provided by the Field UI module.
- */
 
 /**
  * @addtogroup field_types

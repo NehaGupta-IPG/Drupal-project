@@ -2,14 +2,10 @@
 
 /**
  * @file
+ * Hooks for file module.
  */
 
 use Drupal\file\FileInterface;
-
-/**
- * @file
- * Hooks for file module.
- */
 
 /**
  * @defgroup file File interface

@@ -6,6 +6,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
+ * A trait for accessing an entity resource.
+ *
  * @internal
  * @todo Consider making public in https://www.drupal.org/node/2300677
  */

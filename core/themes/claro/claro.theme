@@ -1578,6 +1578,8 @@ function claro_preprocess_media_library_item__small(array &$variables): void {
 }
 
 /**
+ * Preprocess teh media library widget.
+ *
  * @todo Remove this when https://www.drupal.org/project/drupal/issues/2999549
  *   lands.
  *

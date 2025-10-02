@@ -8,6 +8,8 @@ use Drupal\Core\Entity\FieldableEntityInterface;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 /**
+ * Trait for validating entity resources.
+ *
  * @internal
  * @todo Consider making public in https://www.drupal.org/node/2300677
  */

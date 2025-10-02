@@ -17,6 +17,8 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 class UserData extends DestinationBase implements ContainerFactoryPluginInterface {
 
   /**
+   * The user data service.
+   *
    * @var \Drupal\user\UserData
    */
   protected $userData;

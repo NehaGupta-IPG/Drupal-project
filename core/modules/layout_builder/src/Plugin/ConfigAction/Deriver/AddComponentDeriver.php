@@ -12,6 +12,8 @@ use Drupal\layout_builder\SectionListInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Defines class to add derivatives of a component.
+ *
  * @internal
  *   This API is experimental.
  */

@@ -2,6 +2,7 @@
 
 /**
  * @file
+ * Field API documentation.
  */
 
 use Drupal\field\FieldStorageConfigInterface;
@@ -9,11 +10,6 @@ use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
-
-/**
- * @file
- * Field API documentation.
- */
 
 /**
  * @addtogroup hooks

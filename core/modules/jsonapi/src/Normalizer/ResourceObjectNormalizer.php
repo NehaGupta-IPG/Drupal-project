@@ -43,16 +43,22 @@ class ResourceObjectNormalizer extends NormalizerBase {
   protected $cacher;
 
   /**
+   * The event dispatcher.
+   *
    * @var mixed|\Symfony\Component\EventDispatcher\EventDispatcherInterface|null
    */
   private EventDispatcherInterface $eventDispatcher;
 
   /**
+   * The entity field manager.
+   *
    * @var mixed|\Drupal\Core\Entity\EntityFieldManagerInterface|null
    */
   private EntityFieldManagerInterface $entityFieldManager;
 
   /**
+   * The entity type manager.
+   *
    * @var mixed|\Drupal\Core\Entity\EntityTypeManagerInterface|null
    */
   private EntityTypeManagerInterface $entityTypeManager;

@@ -44,6 +44,8 @@ class TranslationsStream extends LocalStream {
   }
 
   /**
+   * Returns a web accessible URL for the resource.
+   *
    * phpcs:ignore Drupal.Files.LineLength
    * Implements Drupal\Core\StreamWrapper\StreamWrapperInterface::getExternalUrl().
    *

@@ -2,14 +2,10 @@
 
 /**
  * @file
+ * Hooks provided by the Shortcut module.
  */
 
 use Drupal\Core\Session\AccountInterface;
-
-/**
- * @file
- * Hooks provided by the Shortcut module.
- */
 
 /**
  * @addtogroup hooks

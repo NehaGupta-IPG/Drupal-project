@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class BanAdmin extends FormBase {
 
   /**
+   * The ban IP address manager.
+   *
    * @var \Drupal\ban\BanIpManagerInterface
    */
   protected $ipManager;

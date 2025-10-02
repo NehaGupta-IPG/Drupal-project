@@ -23,9 +23,9 @@ use Drupal\views\ManyToOneHelper;
 class ManyToOne extends InOperator {
 
   /**
-   * @var \Drupal\views\ManyToOneHelper
-   *
    * Stores the Helper object which handles the many_to_one complexity.
+   *
+   * @var \Drupal\views\ManyToOneHelper
    */
   public $helper = NULL;
 

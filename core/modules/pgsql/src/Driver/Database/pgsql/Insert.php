@@ -8,12 +8,10 @@ use Drupal\Core\Database\Query\Insert as QueryInsert;
 // cSpell:ignore nextval setval
 
 /**
+ * PostGreSQL implementation of \Drupal\Core\Database\Query\Insert.
+ *
  * @ingroup database
  * @{
- */
-
-/**
- * PostgreSQL implementation of \Drupal\Core\Database\Query\Insert.
  */
 class Insert extends QueryInsert {
 
