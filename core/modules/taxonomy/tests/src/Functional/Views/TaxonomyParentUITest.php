@@ -37,7 +37,7 @@ class TaxonomyParentUITest extends UITestBase {
   /**
    * {@inheritdoc}
    */
-  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing, Generic.CodeAnalysis.UselessOverridingMethod
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   protected function setUp($import_test_views = TRUE, $modules = ['taxonomy_test_views']): void {
     parent::setUp($import_test_views, $modules);
   }

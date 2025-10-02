@@ -39,7 +39,7 @@ class CommentApproveLinkTest extends CommentTestBase {
   /**
    * {@inheritdoc}
    */
-  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing, Generic.CodeAnalysis.UselessOverridingMethod
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   protected function setUp($import_test_views = TRUE, $modules = ['comment_test_views']): void {
     parent::setUp($import_test_views, $modules);
   }

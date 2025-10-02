@@ -25,13 +25,6 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
   protected $profile = 'demo_umami';
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-  }
-
-  /**
    * Logs front page tracing data with an authenticated user and warm cache.
    */
   public function testFrontPageAuthenticatedWarmCache(): void {

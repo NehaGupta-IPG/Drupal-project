@@ -23,7 +23,7 @@ class ConditionPluginCollection extends DefaultLazyPluginCollection {
    * @return \Drupal\Core\Condition\ConditionInterface
    *   The condition plugin instance for the given instance ID.
    */
-  // phpcs:ignore Drupal.Commenting.FunctionComment.MissingReturnComment, Generic.CodeAnalysis.UselessOverridingMethod
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function &get($instance_id) {
     return parent::get($instance_id);
   }
