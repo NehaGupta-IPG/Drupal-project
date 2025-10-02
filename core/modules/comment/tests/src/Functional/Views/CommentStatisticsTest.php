@@ -11,12 +11,14 @@ use Drupal\entity_test\Entity\EntityTestMulChanged;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the comment statistics handlers.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentStatisticsTest extends ViewTestBase {
 
   use CommentTestTrait;
@@ -41,7 +43,7 @@ class CommentStatisticsTest extends ViewTestBase {
   /**
    * Tests view for entity with "changed" field.
    */
-  public function testEntityMulChanged():void {
+  public function testEntityMulChanged(): void {
     ViewTestData::createTestViews(get_class($this), ['comment_test_views']);
 
     Role::load('anonymous')
