@@ -54,7 +54,7 @@ class NodeSearchHooks {
     $ranking = [
       'relevance' => [
         'title' => $this->t('Keyword relevance'),
-        // Average relevance values hover around 0.15
+        // Average relevance values hover around 0.15.
         'score' => 'i.relevance',
       ],
       'sticky' => [

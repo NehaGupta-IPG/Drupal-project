@@ -154,7 +154,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       $sqlite->createCollation('NOCASE_UTF8', Unicode::strcasecmp(...));
     }
     else {
-      // Fallback for PHP < 8.4
+      // Fallback for PHP < 8.4.
       $sqlite->sqliteCreateFunction('if', [__CLASS__, 'sqlFunctionIf']);
       $sqlite->sqliteCreateFunction('greatest', [__CLASS__, 'sqlFunctionGreatest']);
       $sqlite->sqliteCreateFunction('least', [__CLASS__, 'sqlFunctionLeast']);

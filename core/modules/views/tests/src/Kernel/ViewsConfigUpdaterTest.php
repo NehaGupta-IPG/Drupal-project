@@ -93,7 +93,7 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
     $display = $test_view->getDisplay('feed_1');
     $updatedRowViewMode = $display['display_options']['row']['options']['view_mode'] ?? FALSE;
 
-    // This should be the first node view mode since we have nothing else
+    // This should be the first node view mode since we have nothing else.
     $this->assertEquals('rss', $updatedRowViewMode);
   }
 
@@ -121,7 +121,7 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
     $display = $test_view->getDisplay('feed_1');
     $updatedRowViewMode = $display['display_options']['row']['options']['view_mode'] ?? FALSE;
 
-    // This should be the first node view mode since we have nothing else
+    // This should be the first node view mode since we have nothing else.
     $this->assertEquals('rss', $updatedRowViewMode);
   }
 

@@ -32,7 +32,7 @@ class ImageFieldWidgetValidationTest extends ImageFieldTestBase {
   public function testWidgetElementValidation(): void {
     $page = $this->getSession()->getPage();
 
-    // Check for image widget in add/node/article page
+    // Check for image widget in add/node/article page.
     $field_name = 'field_image';
     $field_settings = [
       'description' => 'Image test description',
