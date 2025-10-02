@@ -7,12 +7,14 @@ namespace Drupal\Tests\content_translation\Functional;
 use Drupal\comment\Entity\CommentType;
 use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Content translation settings.
- *
- * @group content_translation
  */
+#[Group('content_translation')]
+#[RunTestsInSeparateProcesses]
 class ContentTranslationStandardFieldsTest extends BrowserTestBase {
 
   use BlockContentCreationTrait;

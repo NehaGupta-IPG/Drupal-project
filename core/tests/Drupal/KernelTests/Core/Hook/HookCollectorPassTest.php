@@ -6,13 +6,17 @@ namespace Drupal\KernelTests\Core\Hook;
 
 use Drupal\Core\Hook\HookCollectorPass;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
- * @coversDefaultClass \Drupal\Core\Hook\HookCollectorPass
- * @group Hook
+ * Tests Drupal\Core\Hook\HookCollectorPass.
  */
+#[CoversClass(HookCollectorPass::class)]
+#[Group('Hook')]
 class HookCollectorPassTest extends KernelTestBase {
 
   /**
@@ -52,9 +56,8 @@ class HookCollectorPassTest extends KernelTestBase {
 
   /**
    * Test that ordering works.
-   *
-   * @group legacy
    */
+  #[IgnoreDeprecations]
   public function testOrdering(): void {
     $container = new ContainerBuilder();
     $module_filenames = [
@@ -270,6 +273,24 @@ class HookCollectorPassTest extends KernelTestBase {
     ];
     $calls = $module_handler->invokeAll('custom_hook1');
     $this->assertEquals($expected_calls, $calls);
+  }
+
+  /**
+   * Tests that legacy install/update hooks are ignored.
+   */
+  public function testHookIgnoreNonOop(): void {
+    $module_installer = $this->container->get('module_installer');
+    $this->assertTrue($module_installer->install(['system_module_test', 'update', 'update_test_2']));
+
+    $map = $this->container->getParameter('hook_implementations_map');
+    $this->assertArrayHasKey('help', $map);
+    // Ensure that no install or update hooks are registered in the
+    // implementations map, including update functions incorrectly mapped to
+    // the wrong module.
+    $this->assertArrayNotHasKey('install', $map);
+    $this->assertArrayNotHasKey('update_dependencies', $map);
+    $this->assertArrayNotHasKey('test_2_update_8001', $map);
+    $this->assertArrayNotHasKey('update_8001', $map);
   }
 
   /**

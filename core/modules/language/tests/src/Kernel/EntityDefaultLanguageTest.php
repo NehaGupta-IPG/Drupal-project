@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\language\Kernel;
 
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Entity\ContentLanguageSettings;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests default language code is properly generated for entities.
- *
- * @group language
  */
+#[Group('language')]
 class EntityDefaultLanguageTest extends KernelTestBase {
 
   /**
@@ -24,7 +24,6 @@ class EntityDefaultLanguageTest extends KernelTestBase {
     'field',
     'text',
     'user',
-    'system',
   ];
 
   /**

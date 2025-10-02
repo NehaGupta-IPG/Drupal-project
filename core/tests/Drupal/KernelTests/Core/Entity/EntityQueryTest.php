@@ -16,17 +16,16 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 // cspell:ignore merhaba siema xsiemax
-
 /**
  * Tests Entity Query functionality.
- *
- * @group Entity
  */
+#[Group('Entity')]
 class EntityQueryTest extends EntityKernelTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -387,6 +386,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->getQuery()
       ->latestRevision()
       ->notExists("$figures.color")
+      ->sort('id')
       ->accessCheck(TRUE)
       ->execute();
     $expected = [16 => '4', 8 => '8', 20 => '12'];
@@ -402,6 +402,7 @@ class EntityQueryTest extends EntityKernelTestBase {
     $results = $this->queryResults = $this->storage
       ->getQuery()
       ->latestRevision()
+      ->sort('id')
       ->notExists("$figures.color")
       ->accessCheck(TRUE)
       ->execute();
