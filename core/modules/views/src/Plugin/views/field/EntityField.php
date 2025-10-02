@@ -984,8 +984,16 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
    */
   protected function documentSelfTokens(&$tokens) {
     $field = $this->getFieldDefinition();
+    $base_token = $this->options['id'];
+    // If the field name starts with a number, which is possible for base
+    // fields, then prefix with an underscore so that it is a valid twig
+    // variable and \Drupal\views\Plugin\views\PluginBase::viewsTokenReplace()
+    // works.
+    if (preg_match('/^\d/', $base_token)) {
+      $base_token = "_$base_token";
+    }
     foreach ($field->getColumns() as $id => $column) {
-      $tokens['{{ ' . $this->options['id'] . '__' . $id . ' }}'] = $this->t('Raw @column', ['@column' => $id]);
+      $tokens['{{ ' . $base_token . '__' . $id . ' }}'] = $this->t('Raw @column', ['@column' => $id]);
     }
   }
 
@@ -994,6 +1002,14 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
    */
   protected function addSelfTokens(&$tokens, $item) {
     $field = $this->getFieldDefinition();
+    $base_token = $this->options['id'];
+    // If the field name starts with a number, which is possible for base
+    // fields, then prefix with an underscore so that it is a valid twig
+    // variable and \Drupal\views\Plugin\views\PluginBase::viewsTokenReplace()
+    // works.
+    if (preg_match('/^\d/', $base_token)) {
+      $base_token = "_$base_token";
+    }
     foreach ($field->getColumns() as $id => $column) {
       // Use \Drupal\Component\Utility\Xss::filterAdmin() because it's user data
       // and we can't be sure it is safe. We know nothing about the data,
@@ -1003,11 +1019,11 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
 
         if (is_array($raw)) {
           if (isset($raw[$id]) && is_scalar($raw[$id])) {
-            $tokens['{{ ' . $this->options['id'] . '__' . $id . ' }}'] = $raw[$id];
+            $tokens['{{ ' . $base_token . '__' . $id . ' }}'] = $raw[$id];
           }
           else {
             // Make sure that empty values are replaced as well.
-            $tokens['{{ ' . $this->options['id'] . '__' . $id . ' }}'] = '';
+            $tokens['{{ ' . $base_token . '__' . $id . ' }}'] = '';
           }
         }
 
@@ -1016,11 +1032,11 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
           // Check if TypedDataInterface is implemented so we know how to render
           // the item as a string.
           if (!empty($property) && $property instanceof TypedDataInterface) {
-            $tokens['{{ ' . $this->options['id'] . '__' . $id . ' }}'] = $property->getString();
+            $tokens['{{ ' . $base_token . '__' . $id . ' }}'] = $property->getString();
           }
           else {
             // Make sure that empty values are replaced as well.
-            $tokens['{{ ' . $this->options['id'] . '__' . $id . ' }}'] = '';
+            $tokens['{{ ' . $base_token . '__' . $id . ' }}'] = '';
           }
         }
       }
