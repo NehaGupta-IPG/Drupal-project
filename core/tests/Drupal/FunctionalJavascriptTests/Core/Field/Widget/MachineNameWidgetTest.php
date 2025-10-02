@@ -234,7 +234,7 @@ class MachineNameWidgetTest extends WebDriverTestBase {
     $this->submitForm([], 'Save');
 
     // Check that a form-level error has been thrown.
-    $assert_session->pageTextContains('A test entity with string_id with id test-value2-0-9- already exists.');
+    $assert_session->pageTextContains('A test entity with string_id with id test-value2-0-9 already exists.');
   }
 
 }
