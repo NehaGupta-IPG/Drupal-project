@@ -89,6 +89,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->assertArrayHasKey('type', $single_output['data']);
     $this->assertEquals($this->nodes[0]->getTitle(), $single_output['data']['attributes']['title']);
+    $this->assertArrayHasKey('arity', $single_output['data']['meta']);
 
     // 5.1 Single article with access denied because unauthenticated.
     Json::decode($this->drupalGet('/jsonapi/node/article/' . $this->nodes[60]->uuid()));
@@ -772,6 +773,9 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
             ],
           ],
         ],
+        'meta' => [
+          'arity' => 0,
+        ],
       ],
     ];
     $response = $this->request('POST', $collection_url, [
@@ -905,6 +909,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
         'id' => $uuid,
         'type' => 'node--article',
         'attributes' => ['title' => 'My updated title'],
+        'meta' => ['arity' => 0],
       ],
     ];
     $individual_url = Url::fromRoute('jsonapi.node--article.individual', [
