@@ -702,8 +702,6 @@ services:
   extension.list.database_driver:
     class: Drupal\Core\Extension\DatabaseDriverList
     arguments: ['%app.root%', 'database_driver', '@cache.default']
-    tags:
-      - { name: extension_list, type: database_driver }
   Drupal\Core\Extension\DatabaseDriverList: '@extension.list.database_driver'
   extension.path.resolver:
     class: Drupal\Core\Extension\ExtensionPathResolver
