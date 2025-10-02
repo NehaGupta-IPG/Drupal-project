@@ -92,7 +92,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -143,7 +143,14 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
     return [
       // For the 'target_bundles' setting, a NULL value is equivalent to "allow
       // entities from any bundle to be referenced" and an empty array value is
-      // equivalent to "no entities from any bundle can be referenced".
+      // equivalent to "no entities from any bundle can be referenced". The
+      // reason for NULL and an empty array having a different meaning is to
+      // correctly handle config updates.
+      // For example, in the scenario where a single target bundle is allowed,
+      // and that bundle is then deleted, the automatic removal of that bundle
+      // from the entity reference field's settings leaves an empty array.
+      // This empty array must therefore indicate that no bundles are allowed,
+      // as otherwise the field would suddenly allow all bundles.
       'target_bundles' => NULL,
       'sort' => [
         'field' => '_none',

@@ -4,22 +4,24 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\editor\Kernel;
 
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\editor\Entity\Editor;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
-use Drupal\node\Entity\Node;
-use Drupal\node\Entity\NodeType;
-use Drupal\file\Entity\File;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\file\Entity\File;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\node\Entity\Node;
+use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests tracking of file usage by the Text Editor module.
- *
- * @group editor
  */
+#[Group('editor')]
 class EditorFileUsageTest extends EntityKernelTestBase {
+
+  use ContentTypeCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -45,11 +47,6 @@ class EditorFileUsageTest extends EntityKernelTestBase {
     ]);
     $filtered_html_format->save();
 
-    // Set cardinality for body field.
-    FieldStorageConfig::loadByName('node', 'body')
-      ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
-      ->save();
-
     // Set up text editor.
     $editor = Editor::create([
       'format' => 'filtered_html',
@@ -61,9 +58,12 @@ class EditorFileUsageTest extends EntityKernelTestBase {
     $editor->save();
 
     // Create a node type for testing.
-    $type = NodeType::create(['type' => 'page', 'name' => 'page']);
-    $type->save();
-    node_add_body_field($type);
+    $this->createContentType(['type' => 'page', 'name' => 'page']);
+    // Set cardinality for body field.
+    FieldStorageConfig::loadByName('node', 'body')
+      ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
+      ->save();
+
     FieldStorageConfig::create([
       'field_name' => 'description',
       'entity_type' => 'node',
@@ -131,7 +131,7 @@ class EditorFileUsageTest extends EntityKernelTestBase {
     foreach ($image_paths as $key => $image_path) {
       $image = File::create();
       $image->setFileUri($image_path);
-      $image->setFilename(\Drupal::service('file_system')->basename($image->getFileUri()));
+      $image->setFilename(basename($image->getFileUri()));
       $image->save();
 
       $file_usage = $this->container->get('file.usage');

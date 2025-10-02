@@ -8,12 +8,12 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Render\RenderContext;
 use Drupal\filter\FilterPluginCollection;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the caption filter with Twig debugging on.
- *
- * @group filter
  */
+#[Group('filter')]
 class FilterCaptionTwigDebugTest extends KernelTestBase {
 
   /**
@@ -24,7 +24,7 @@ class FilterCaptionTwigDebugTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
     // Enable Twig debugging.
     $parameters = $container->getParameter('twig.config');

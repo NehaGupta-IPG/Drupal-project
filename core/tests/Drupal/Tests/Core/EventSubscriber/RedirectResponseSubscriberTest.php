@@ -8,6 +8,9 @@ use Drupal\Core\EventSubscriber\RedirectResponseSubscriber;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Utility\UnroutedUrlAssemblerInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -18,9 +21,10 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * @coversDefaultClass \Drupal\Core\EventSubscriber\RedirectResponseSubscriber
- * @group EventSubscriber
+ * Tests Drupal\Core\EventSubscriber\RedirectResponseSubscriber.
  */
+#[CoversClass(RedirectResponseSubscriber::class)]
+#[Group('EventSubscriber')]
 class RedirectResponseSubscriberTest extends UnitTestCase {
 
   /**
@@ -83,9 +87,9 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
    * @param string|bool $expected
    *   The expected target URL or FALSE.
    *
-   * @covers ::checkRedirectUrl
-   * @dataProvider providerTestDestinationRedirect
+   * @legacy-covers ::checkRedirectUrl
    */
+  #[DataProvider('providerTestDestinationRedirect')]
   public function testDestinationRedirect(Request $request, $expected): void {
     $dispatcher = new EventDispatcher();
     $kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
@@ -125,8 +129,9 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
   }
 
   /**
-   * @dataProvider providerTestDestinationRedirectToExternalUrl
-   */
+ * Tests destination redirect to external url.
+ */
+  #[DataProvider('providerTestDestinationRedirectToExternalUrl')]
   public function testDestinationRedirectToExternalUrl($request, $expected): void {
     $dispatcher = new EventDispatcher();
     $kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
@@ -140,7 +145,9 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::checkRedirectUrl
+   * Tests redirect with opt in external url.
+   *
+   * @legacy-covers ::checkRedirectUrl
    */
   public function testRedirectWithOptInExternalUrl(): void {
     $dispatcher = new EventDispatcher();
@@ -166,15 +173,16 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
       'absolute external url' => [new Request(['destination' => 'http://example.com']), 'http://example.com'],
       'absolute external url with folder' => [new Request(['destination' => 'http://example.com/foobar']), 'http://example.com/foobar'],
       'absolute external url with folder2' => [new Request(['destination' => 'http://example.ca/drupal']), 'http://example.ca/drupal'],
-      'path without drupal basepath' => [new Request(['destination' => '/test']), 'http://example.com/test'],
+      'path without drupal base path' => [new Request(['destination' => '/test']), 'http://example.com/test'],
       'path with URL' => [new Request(['destination' => '/example.com']), 'http://example.com/example.com'],
       'path with URL and two slashes' => [new Request(['destination' => '//example.com']), 'http://example.com//example.com'],
     ];
   }
 
   /**
-   * @dataProvider providerTestDestinationRedirectWithInvalidUrl
-   */
+ * Tests destination redirect with invalid url.
+ */
+  #[DataProvider('providerTestDestinationRedirectWithInvalidUrl')]
   public function testDestinationRedirectWithInvalidUrl(Request $request): void {
     $dispatcher = new EventDispatcher();
     $kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
@@ -196,7 +204,7 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
     $data[] = [new Request(['destination' => '//example:com/test'])];
     $data['absolute external url'] = [new Request(['destination' => 'http://example.com'])];
     $data['absolute external url with folder'] = [new Request(['destination' => 'http://example.ca/drupal'])];
-    $data['path without drupal basepath'] = [new Request(['destination' => '/test'])];
+    $data['path without drupal base path'] = [new Request(['destination' => '/test'])];
     $data['path with URL'] = [new Request(['destination' => '/example.com'])];
     $data['path with URL and two slashes'] = [new Request(['destination' => '//example.com'])];
 

@@ -7,13 +7,14 @@ namespace Drupal\Tests\views\Kernel\Handler;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the view area handler.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\area\View
  */
+#[Group('views')]
 class AreaOrderTest extends ViewsKernelTestBase {
 
   use BlockCreationTrait;
@@ -33,7 +34,7 @@ class AreaOrderTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpFixtures() {
+  protected function setUpFixtures(): void {
     // Install the themes used for this test.
     $this->container->get('theme_installer')->install(['olivero']);
 

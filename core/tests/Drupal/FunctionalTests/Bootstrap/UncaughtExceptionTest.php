@@ -6,12 +6,14 @@ namespace Drupal\FunctionalTests\Bootstrap;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests kernel panic when things are really messed up.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class UncaughtExceptionTest extends BrowserTestBase {
 
   /**
@@ -92,11 +94,20 @@ class UncaughtExceptionTest extends BrowserTestBase {
    * Tests displaying an uncaught fatal error.
    */
   public function testUncaughtFatalError(): void {
-    $fatal_error = [
-      '%type' => 'TypeError',
-      '@message' => 'Drupal\error_test\Controller\ErrorTestController::Drupal\error_test\Controller\{closure}(): Argument #1 ($test) must be of type array, string given, called in ' . \Drupal::root() . '/core/modules/system/tests/modules/error_test/src/Controller/ErrorTestController.php on line 67',
-      '%function' => 'Drupal\error_test\Controller\ErrorTestController->Drupal\error_test\Controller\{closure}()',
-    ];
+    if (PHP_VERSION_ID >= 80400) {
+      $fatal_error = [
+        '%type' => 'TypeError',
+        '@message' => 'Drupal\error_test\Controller\ErrorTestController::{closure:Drupal\error_test\Controller\ErrorTestController::generateFatalErrors():64}(): Argument #1 ($test) must be of type array, string given, called in ' . \Drupal::root() . '/core/modules/system/tests/modules/error_test/src/Controller/ErrorTestController.php on line 67',
+        '%function' => 'Drupal\error_test\Controller\ErrorTestController->{closure:Drupal\error_test\Controller\ErrorTestController::generateFatalErrors():64}()',
+      ];
+    }
+    else {
+      $fatal_error = [
+        '%type' => 'TypeError',
+        '@message' => 'Drupal\error_test\Controller\ErrorTestController::Drupal\error_test\Controller\{closure}(): Argument #1 ($test) must be of type array, string given, called in ' . \Drupal::root() . '/core/modules/system/tests/modules/error_test/src/Controller/ErrorTestController.php on line 67',
+        '%function' => 'Drupal\error_test\Controller\ErrorTestController->Drupal\error_test\Controller\{closure}()',
+      ];
+    }
     $this->drupalGet('error-test/generate-fatal-errors');
     $this->assertSession()->statusCodeEquals(500);
     $message = new FormattableMarkup('%type: @message in %function (line ', $fatal_error);
@@ -155,7 +166,9 @@ class UncaughtExceptionTest extends BrowserTestBase {
     $this->writeSettings($settings);
     \Drupal::service('kernel')->invalidateContainer();
 
-    $this->expectedExceptionMessage = 'Drupal\FunctionalTests\Bootstrap\ErrorContainer::Drupal\FunctionalTests\Bootstrap\{closure}(): Argument #1 ($container) must be of type Drupal\FunctionalTests\Bootstrap\ErrorContainer';
+    $this->expectedExceptionMessage = PHP_VERSION_ID >= 80400 ?
+    'Drupal\FunctionalTests\Bootstrap\ErrorContainer::{closure:Drupal\FunctionalTests\Bootstrap\ErrorContainer::get():21}(): Argument #1 ($container) must be of type Drupal\FunctionalTests\Bootstrap\ErrorContainer' :
+    'Drupal\FunctionalTests\Bootstrap\ErrorContainer::Drupal\FunctionalTests\Bootstrap\{closure}(): Argument #1 ($container) must be of type Drupal\FunctionalTests\Bootstrap\ErrorContainer';
     $this->drupalGet('');
     $this->assertSession()->statusCodeEquals(500);
 
@@ -192,6 +205,7 @@ class UncaughtExceptionTest extends BrowserTestBase {
     switch ($this->container->get('database')->driver()) {
       case 'pgsql':
       case 'mysql':
+      case 'mysqli':
         $this->expectedExceptionMessage = $incorrect_username;
         break;
 
@@ -234,7 +248,7 @@ class UncaughtExceptionTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('The website encountered an unexpected error. Try again later.');
     $this->assertSession()->pageTextContains($this->expectedExceptionMessage);
 
-    // Find fatal error logged to the error.log
+    // Find fatal error logged to the error.log.
     $errors = file(\Drupal::root() . '/' . $this->siteDirectory . '/error.log');
     $this->assertCount(10, $errors, 'The error + the error that the logging service is broken has been written to the error log.');
     $this->assertStringContainsString('Failed to log error', $errors[0], 'The error handling logs when an error could not be logged to the logger.');

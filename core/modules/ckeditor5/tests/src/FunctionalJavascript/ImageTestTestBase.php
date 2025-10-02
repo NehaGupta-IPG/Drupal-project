@@ -8,17 +8,16 @@ use Drupal\editor\Entity\Editor;
 use Drupal\file\Entity\File;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
-use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 // cspell:ignore imageresize imageupload
 
 /**
- * @coversDefaultClass \Drupal\ckeditor5\Plugin\CKEditor5Plugin\Image
- * @group ckeditor5
- * @group #slow
+ * Provides a base class for testing CKEditor 5 image embedding and uploads.
+ *
  * @internal
  */
-class ImageTestTestBase extends ImageTestBase {
+abstract class ImageTestTestBase extends ImageTestBase {
 
   /**
    * The sample image File entity to embed.
@@ -77,7 +76,7 @@ class ImageTestTestBase extends ImageTestBase {
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolation $v) {
+      function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -113,6 +112,7 @@ class ImageTestTestBase extends ImageTestBase {
    * Provides the relevant image attributes.
    *
    * @return string[]
+   *   Default image attributes for tests.
    */
   protected function imageAttributes(): array {
     return [
@@ -124,6 +124,9 @@ class ImageTestTestBase extends ImageTestBase {
     ];
   }
 
+  /**
+   * Uploads a test image.
+   */
   protected function addImage() {
     $page = $this->getSession()->getPage();
     $this->assertNotEmpty($image_upload_field = $page->find('css', '.ck-file-dialog-button input[type="file"]'));

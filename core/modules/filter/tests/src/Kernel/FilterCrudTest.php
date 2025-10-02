@@ -6,12 +6,12 @@ namespace Drupal\Tests\filter\Kernel;
 
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests creation, loading, updating, deleting of text formats and filters.
- *
- * @group filter
  */
+#[Group('filter')]
 class FilterCrudTest extends KernelTestBase {
 
   /**
@@ -88,7 +88,7 @@ class FilterCrudTest extends KernelTestBase {
   /**
    * Verifies that a text format is properly stored.
    */
-  public function verifyTextFormat($format) {
+  public function verifyTextFormat($format): void {
     $default_langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
 
     // Verify the loaded filter has all properties.

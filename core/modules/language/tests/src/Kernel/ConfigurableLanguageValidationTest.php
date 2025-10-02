@@ -6,13 +6,12 @@ namespace Drupal\Tests\language\Kernel;
 
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests validation of configurable_language entities.
- *
- * @group language
- * @group #slow
  */
+#[Group('language')]
 class ConfigurableLanguageValidationTest extends ConfigEntityValidationTestBase {
 
   /**

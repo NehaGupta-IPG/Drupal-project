@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\block\Kernel\Migrate\d7;
 
 use Drupal\block\Entity\Block;
+use Drupal\block\Hook\BlockHooks;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the migration of blocks without Block Content installed.
- *
- * @group block
  */
+#[Group('block')]
 class MigrateBlockNoBlockContentTest extends MigrateDrupal7TestBase {
 
   /**
@@ -52,7 +53,8 @@ class MigrateBlockNoBlockContentTest extends MigrateDrupal7TestBase {
       'd7_user_role',
       'd7_block',
     ]);
-    block_rebuild();
+    $blockRebuild = new BlockHooks();
+    $blockRebuild->rebuild();
   }
 
   /**

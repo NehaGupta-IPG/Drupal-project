@@ -7,12 +7,14 @@ namespace Drupal\Tests\system\Functional\Theme;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\RequirementsPageTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensures theme update functions are registered for maintenance themes.
- *
- * @group Theme
  */
+#[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class MaintenanceThemeUpdateRegistryTest extends BrowserTestBase {
   use RequirementsPageTrait;
 
@@ -24,7 +26,7 @@ class MaintenanceThemeUpdateRegistryTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function prepareSettings() {
+  protected function prepareSettings(): void {
     parent::prepareSettings();
     $this->writeSettings([
       'settings' => [
@@ -39,7 +41,7 @@ class MaintenanceThemeUpdateRegistryTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function prepareEnvironment() {
+  protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
     $info = [
       'type' => 'profile',

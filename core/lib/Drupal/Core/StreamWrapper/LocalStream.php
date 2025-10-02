@@ -10,8 +10,8 @@ namespace Drupal\Core\StreamWrapper;
  * "sites/default/files/example.txt" and then PHP filesystem functions are
  * invoked.
  *
- * Drupal\Core\StreamWrapper\LocalStream implementations need to implement at least the
- * getDirectoryPath() and getExternalUrl() methods.
+ * Drupal\Core\StreamWrapper\LocalStream implementations need to implement at
+ * least the getDirectoryPath() and getExternalUrl() methods.
  */
 abstract class LocalStream implements StreamWrapperInterface {
   /**
@@ -132,7 +132,7 @@ abstract class LocalStream implements StreamWrapperInterface {
     $realpath = realpath($path);
     if (!$realpath) {
       // This file does not yet exist.
-      $realpath = realpath(dirname($path)) . '/' . \Drupal::service('file_system')->basename($path);
+      $realpath = realpath(dirname($path)) . '/' . basename($path);
     }
     $directory = realpath($this->getDirectoryPath());
     if (!$realpath || !$directory || !str_starts_with($realpath, $directory)) {
@@ -235,7 +235,7 @@ abstract class LocalStream implements StreamWrapperInterface {
    * {@inheritdoc}
    */
   public function stream_cast($cast_as) {
-    return $this->handle ? $this->handle : FALSE;
+    return $this->handle ?: FALSE;
   }
 
   /**

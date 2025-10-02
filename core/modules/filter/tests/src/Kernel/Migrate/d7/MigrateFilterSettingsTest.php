@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\filter\Kernel\Migrate\d7;
 
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests migration of Filter's settings to configuration.
- *
- * @group filter
  */
+#[Group('filter')]
 class MigrateFilterSettingsTest extends MigrateDrupal7TestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['filter'];
 
   /**

@@ -6,14 +6,17 @@ namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Component\Gettext\PoHeader;
 use Drupal\Component\Gettext\PoItem;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\file\Entity\File;
 use Drupal\Tests\views\Functional\ViewTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the creation of numeric fields.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class NumericFormatPluralTest extends ViewTestBase {
 
   /**
@@ -151,7 +154,7 @@ class NumericFormatPluralTest extends ViewTestBase {
    * @return \Drupal\Core\Entity\EntityInterface
    *   A file entity.
    */
-  protected function createFile() {
+  protected function createFile(): EntityInterface {
     // Create a new file entity.
     $file = File::create([
       'uid' => 1,

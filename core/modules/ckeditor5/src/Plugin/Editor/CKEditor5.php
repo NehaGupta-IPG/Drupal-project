@@ -111,13 +111,13 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface $ckeditor5_plugin_manager
    *   The CKEditor 5 plugin manager.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager
+   *   The language manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
    * @param \Drupal\ckeditor5\SmartDefaultSettings $smart_default_settings
@@ -925,6 +925,8 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
         'shouldNotGroupWhenFull' => in_array('-', $toolbar_items, TRUE),
       ],
     ] + $plugin_config;
+
+    $settings['config']['licenseKey'] ??= 'GPL';
 
     if ($this->moduleHandler->moduleExists('locale')) {
       $language_interface = $this->languageManager->getCurrentLanguage();

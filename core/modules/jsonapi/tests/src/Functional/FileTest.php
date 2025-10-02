@@ -8,15 +8,18 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
+use Drupal\jsonapi\JsonApiSpec;
 use Drupal\Tests\jsonapi\Traits\CommonCollectionFilterAccessTestPatternsTrait;
 use Drupal\user\Entity\User;
 use GuzzleHttp\RequestOptions;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API integration test for the "File" content entity type.
- *
- * @group jsonapi
  */
+#[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class FileTest extends ResourceTestBase {
 
   use CommonCollectionFilterAccessTestPatternsTrait;
@@ -69,7 +72,7 @@ class FileTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     switch ($method) {
       case 'GET':
         $this->grantPermissionsToTestedRole(['access content']);
@@ -92,7 +95,7 @@ class FileTest extends ResourceTestBase {
   /**
    * Makes the current user the file owner.
    */
-  protected function makeCurrentUserFileOwner() {
+  protected function makeCurrentUserFileOwner(): void {
     $account = User::load(2);
     $this->entity->setOwnerId($account->id());
     $this->entity->setOwner($account);
@@ -138,10 +141,10 @@ class FileTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
           ],
         ],
-        'version' => '1.0',
+        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
       ],
       'links' => [
         'self' => ['href' => $self_url],

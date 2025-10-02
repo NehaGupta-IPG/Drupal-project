@@ -9,13 +9,14 @@ use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\PreExistingConfigException;
 use Drupal\Core\Config\UnmetDependenciesException;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests installation of configuration objects in installation functionality.
  *
- * @group config
  * @see \Drupal\Core\Config\ConfigInstaller
  */
+#[Group('config')]
 class ConfigInstallTest extends KernelTestBase {
 
   /**
@@ -276,7 +277,7 @@ class ConfigInstallTest extends KernelTestBase {
    * @param array $modules
    *   The module names.
    */
-  protected function installModules(array $modules) {
+  protected function installModules(array $modules): void {
     $this->container->get('module_installer')->install($modules);
     $this->container = \Drupal::getContainer();
   }

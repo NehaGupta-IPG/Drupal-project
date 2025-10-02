@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\language\Kernel;
 
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationContentEntity;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
-use Drupal\Core\Routing\RouteObjectInterface;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -17,8 +18,8 @@ use Symfony\Component\Routing\Route;
 
 /**
  * Tests the language of entity URLs.
- * @group language
  */
+#[Group('language')]
 class EntityUrlLanguageTest extends LanguageTestBase {
 
   /**
@@ -114,7 +115,7 @@ class EntityUrlLanguageTest extends LanguageTestBase {
   /**
    * Creates a translated entity.
    */
-  protected function createTranslatableEntity() {
+  protected function createTranslatableEntity(): void {
     $this->entity = EntityTest::create();
     $this->entity->addTranslation('es', ['name' => 'name spanish']);
     $this->entity->addTranslation('fr', ['name' => 'name french']);
@@ -130,7 +131,7 @@ class EntityUrlLanguageTest extends LanguageTestBase {
    *   The route name for which the route object for the request should be
    *   created.
    */
-  protected function setCurrentRequestForRoute($path, $route_name) {
+  protected function setCurrentRequestForRoute($path, $route_name): void {
     $request = Request::create($path);
     $request->attributes->set(RouteObjectInterface::ROUTE_NAME, $route_name);
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route($path));

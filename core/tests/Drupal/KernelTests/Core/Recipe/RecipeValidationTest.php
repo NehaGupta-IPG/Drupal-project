@@ -8,11 +8,14 @@ use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeFileException;
 use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @group Recipe
- * @group #slow
+ * Tests Recipe Validation.
  */
+#[Group('Recipe')]
+#[Group('#slow')]
 class RecipeValidationTest extends KernelTestBase {
 
   /**
@@ -258,6 +261,58 @@ YAML,
         '[config][import][0]' => ['This value should satisfy at least one of the following constraints: [1] This value should be identical to string "*". [2] Each element of this collection should satisfy its own set of constraints.'],
       ],
     ];
+    yield 'config strict is not a boolean or array' => [
+      <<<YAML
+name: Invalid strict flag
+config:
+  strict: 40
+YAML,
+      [
+        '[config][strict]' => ['This value must be a boolean, or a list of config names.'],
+      ],
+    ];
+    yield 'config strict is an array of not-strings' => [
+      <<<YAML
+name: Invalid item in strict list
+config:
+  strict:
+    - 40
+YAML,
+      [
+        '[config][strict]' => ['This value must be a boolean, or a list of config names.'],
+      ],
+    ];
+    yield 'config strict list contains blank strings' => [
+      <<<YAML
+name: Invalid item in strict list
+config:
+  strict:
+    - ''
+YAML,
+      [
+        '[config][strict]' => ['This value must be a boolean, or a list of config names.'],
+      ],
+    ];
+    yield 'config strict list item does not have a period' => [
+      <<<YAML
+name: Invalid item in strict list
+config:
+  strict:
+    - 'something'
+YAML,
+      [
+        '[config][strict]' => ['This value must be a boolean, or a list of config names.'],
+      ],
+    ];
+    yield 'valid strict list' => [
+      <<<YAML
+name: Valid strict list
+config:
+  strict:
+    - system.menu.foo
+YAML,
+      NULL,
+    ];
     yield 'config actions list is valid' => [
       <<<YAML
 name: 'Correct config actions list'
@@ -456,6 +511,88 @@ YAML,
         '[input][foo][prompt][arguments]' => ['This value should be of type associative_array.'],
       ],
     ];
+    yield 'form element is not an array' => [
+      <<<YAML
+name: Bad input definitions
+input:
+  foo:
+    data_type: string
+    description: 'Form element must be array'
+    form: true
+    default:
+      source: value
+      value: Here be dragons
+YAML,
+      [
+        '[input][foo][form]' => ['This value should be of type associative_array.'],
+      ],
+    ];
+    yield 'form element is an indexed array' => [
+      <<<YAML
+name: Bad input definitions
+input:
+  foo:
+    data_type: string
+    description: 'Form element must be associative'
+    form: [text]
+    default:
+      source: value
+      value: Here be dragons
+YAML,
+      [
+        '[input][foo][form]' => ['This value should be of type associative_array.'],
+      ],
+    ];
+    yield 'form element is an empty array' => [
+      <<<YAML
+name: Bad input definitions
+input:
+  foo:
+    data_type: string
+    description: 'Form elements cannot be empty'
+    form: []
+    default:
+      source: value
+      value: Here be dragons
+YAML,
+      [
+        '[input][foo][form]' => ['This value should be of type associative_array.'],
+      ],
+    ];
+    yield 'form element has children' => [
+      <<<YAML
+name: Bad input definitions
+input:
+  foo:
+    data_type: string
+    description: 'Form elements cannot have children'
+    form:
+      '#type': textfield
+      child:
+        '#type': select
+    default:
+      source: value
+      value: Here be dragons
+YAML,
+      [
+        '[input][foo][form]' => ['Form elements for recipe inputs cannot have child elements.'],
+      ],
+    ];
+    yield 'Valid form element' => [
+      <<<YAML
+name: Form input definitions
+input:
+  foo:
+    data_type: string
+    description: 'This has a valid form element'
+    form:
+      '#type': textfield
+    default:
+      source: value
+      value: Here be dragons
+YAML,
+      NULL,
+    ];
     yield 'input definition without default value' => [
       <<<YAML
 name: Bad input definitions
@@ -588,6 +725,75 @@ input:
 YAML,
       NULL,
     ];
+    yield 'extra is present and not an array' => [
+      <<<YAML
+name: Bad extra
+extra: 'yes!'
+YAML,
+      [
+        '[extra]' => ['This value should be of type associative_array.'],
+      ],
+    ];
+    yield 'extra is an indexed array' => [
+      <<<YAML
+name: Bad extra
+extra:
+  - one
+  - two
+YAML,
+      [
+        '[extra]' => ['This value should be of type associative_array.'],
+      ],
+    ];
+    yield 'invalid key in extra' => [
+      <<<YAML
+name: Bad extra
+extra:
+  'not a valid extension name': true
+YAML,
+      [
+        '[extra]' => ['not a valid extension name is not a valid extension name.'],
+      ],
+    ];
+    yield 'valid extra' => [
+      <<<YAML
+name: Bad extra
+extra:
+  project_browser:
+    yes: sir
+YAML,
+      NULL,
+    ];
+    yield 'input env variable name is not a string' => [
+      <<<YAML
+name: Bad input
+input:
+  bad_news:
+    data_type: string
+    description: 'Bad default definition'
+    default:
+      source: env
+      env: -40
+YAML,
+      [
+        '[input][bad_news][default][env]' => ['This value should be of type string.'],
+      ],
+    ];
+    yield 'input env variable name is empty' => [
+      <<<YAML
+name: Bad input
+input:
+  bad_news:
+    data_type: string
+    description: 'Bad default definition'
+    default:
+      source: env
+      env: ''
+YAML,
+      [
+        '[input][bad_news][default][env]' => ['This value should not be blank.'],
+      ],
+    ];
   }
 
   /**
@@ -602,9 +808,8 @@ YAML,
    * @param string|null $recipe_name
    *   (optional) The name of the directory containing `recipe.yml`, or NULL to
    *   randomly generate one.
-   *
-   * @dataProvider providerRecipeValidation
    */
+  #[DataProvider('providerRecipeValidation')]
   public function testRecipeValidation(string $recipe, ?array $expected_violations, ?string $recipe_name = NULL): void {
     $dir = 'public://' . ($recipe_name ?? uniqid());
     mkdir($dir);

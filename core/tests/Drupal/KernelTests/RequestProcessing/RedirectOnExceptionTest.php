@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\RequestProcessing;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Tests redirects on exception pages.
- *
- * @group request_processing
  */
+#[Group('request_processing')]
 class RedirectOnExceptionTest extends KernelTestBase {
 
   /**
@@ -20,6 +20,9 @@ class RedirectOnExceptionTest extends KernelTestBase {
    */
   protected static $modules = ['system', 'test_page_test'];
 
+  /**
+   * Tests redirects with a 404.
+   */
   public function testRedirectOn404(): void {
     \Drupal::configFactory()->getEditable('system.site')
       ->set('page.404', '/test-http-response-exception/' . Response::HTTP_PERMANENTLY_REDIRECT)

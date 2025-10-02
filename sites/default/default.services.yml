@@ -51,23 +51,6 @@ parameters:
     # information.
     # @default no value
     cookie_samesite: Lax
-    #
-    # Set the session ID string length. The length can be between 22 to 256. The
-    # PHP recommended value is 48. See
-    # https://www.php.net/manual/session.security.ini.php for more information.
-    # This value should be kept in sync with
-    # \Drupal\Core\Session\SessionConfiguration::__construct()
-    # @default 48
-    sid_length: 48
-    #
-    # Set the number of bits in encoded session ID character. The possible
-    # values are '4' (0-9, a-f), '5' (0-9, a-v), and '6' (0-9, a-z, A-Z, "-",
-    # ","). The PHP recommended value is 6. See
-    # https://www.php.net/manual/session.security.ini.php for more information.
-    # This value should be kept in sync with
-    # \Drupal\Core\Session\SessionConfiguration::__construct()
-    # @default 6
-    sid_bits_per_character: 6
     # By default, Drupal generates a session cookie name based on the full
     # domain name. Set the name_suffix to a short random string to ensure this
     # session cookie name is unique on different installations on the same
@@ -254,6 +237,11 @@ parameters:
     # Sets the Access-Control-Allow-Credentials header if set to true. See
     # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
     supportsCredentials: false
+
+  # The maximum number of entities stored in memory. Lowering this number can
+  # reduce the amount of memory used in long-running processes like migrations,
+  # however will also increase requests to the database or entity cache backend.
+  entity.memory_cache.slots: 1000
 
   queue.config:
     # The maximum number of seconds to wait if a queue is temporarily suspended.

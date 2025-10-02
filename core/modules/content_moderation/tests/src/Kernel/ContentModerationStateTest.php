@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\State\StateInterface;
+use Drupal\entity_test\EntityTestHelper;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
@@ -18,13 +19,13 @@ use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
 use Drupal\workflows\Entity\Workflow;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests links between a content entity and a content_moderation_state entity.
- *
- * @group content_moderation
- * @group #slow
  */
+#[Group('content_moderation')]
 class ContentModerationStateTest extends KernelTestBase {
 
   use ContentModerationTestTrait;
@@ -502,9 +503,8 @@ class ContentModerationStateTest extends KernelTestBase {
 
   /**
    * Tests that entities with special languages can be moderated.
-   *
-   * @dataProvider moderationWithSpecialLanguagesTestCases
    */
+  #[DataProvider('moderationWithSpecialLanguagesTestCases')]
   public function testModerationWithSpecialLanguages($original_language, $updated_language): void {
     $workflow = $this->createEditorialWorkflow();
     $this->addEntityTypeAndBundleToWorkflow($workflow, $this->revEntityTypeId, $this->revEntityTypeId);
@@ -683,7 +683,7 @@ class ContentModerationStateTest extends KernelTestBase {
    */
   public function testWorkflowNonConfigBundleDependencies(): void {
     // Create a bundle not based on any particular configuration.
-    entity_test_create_bundle('test_bundle');
+    EntityTestHelper::createBundle('test_bundle');
 
     $workflow = $this->createEditorialWorkflow();
     $workflow->getTypePlugin()->addEntityTypeAndBundle('entity_test', 'test_bundle');
@@ -702,7 +702,7 @@ class ContentModerationStateTest extends KernelTestBase {
 
     // Delete the test bundle to ensure the workflow entity responds
     // appropriately.
-    entity_test_delete_bundle('test_bundle');
+    EntityTestHelper::deleteBundle('test_bundle');
 
     $workflow = Workflow::load('editorial');
     $this->assertEquals([], $workflow->getTypePlugin()->getBundlesForEntityType('entity_test'));
@@ -835,7 +835,7 @@ class ContentModerationStateTest extends KernelTestBase {
    * @return \Drupal\Core\Entity\EntityInterface
    *   The reloaded entity.
    */
-  protected function reloadEntity(EntityInterface $entity, $revision_id = FALSE) {
+  protected function reloadEntity(EntityInterface $entity, $revision_id = FALSE): EntityInterface {
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId());
     $storage->resetCache([$entity->id()]);

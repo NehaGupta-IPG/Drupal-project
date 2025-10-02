@@ -22,14 +22,16 @@ use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
 use GuzzleHttp\RequestOptions;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API regression tests.
  *
- * @group jsonapi
- *
  * @internal
  */
+#[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class JsonApiRegressionTest extends JsonApiFunctionalTestBase {
 
   use CommentTestTrait;
@@ -342,7 +344,7 @@ class JsonApiRegressionTest extends JsonApiFunctionalTestBase {
     $response = $this->request('GET', Url::fromUri('internal:/jsonapi/node/dog'), $request_options);
     $this->assertSame(200, $response->getStatusCode());
 
-    $this->createEntityReferenceField('node', 'dog', 'field_test', NULL, 'node');
+    $this->createEntityReferenceField('node', 'dog', 'field_test', '', 'node');
     \Drupal::service('router.builder')->rebuildIfNeeded();
 
     $dog = Node::create(['type' => 'dog', 'title' => 'retriever']);
@@ -351,7 +353,7 @@ class JsonApiRegressionTest extends JsonApiFunctionalTestBase {
     $response = $this->request('GET', Url::fromUri('internal:/jsonapi/node/dog/' . $dog->uuid() . '/field_test'), $request_options);
     $this->assertSame(200, $response->getStatusCode());
 
-    $this->createEntityReferenceField('node', 'cat', 'field_test', NULL, 'node');
+    $this->createEntityReferenceField('node', 'cat', 'field_test', '', 'node');
     \Drupal::service('router.builder')->rebuildIfNeeded();
 
     $cat = Node::create(['type' => 'cat', 'title' => 'E. Napoleon']);

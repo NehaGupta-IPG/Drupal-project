@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\block\Entity\Block;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\block\Entity\Block;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\file\Entity\File;
+use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\taxonomy\Entity\Term;
-use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\user\Entity\User;
-use Drupal\file\Entity\File;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests entity CRUD via hooks.
@@ -32,9 +33,8 @@ use Drupal\file\Entity\File;
  * - hook_entity_delete() and hook_ENTITY_TYPE_delete()
  *
  * These hooks are each tested for several entity types.
- *
- * @group Entity
  */
+#[Group('Entity')]
 class EntityCrudHookTest extends EntityKernelTestBase {
 
   use CommentTestTrait;
@@ -51,8 +51,6 @@ class EntityCrudHookTest extends EntityKernelTestBase {
     'node',
     'comment',
   ];
-
-  protected $ids = [];
 
   /**
    * {@inheritdoc}
@@ -74,7 +72,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    * Module entity_crud_hook_test implements all core entity CRUD hooks and
    * stores a message for each in $GLOBALS['entity_crud_hook_test'].
    *
-   * @param array $messages
+   * @param string[] $messages
    *   An array of plain-text messages in the order they should appear.
    *
    * @internal
