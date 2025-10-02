@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate_drupal_ui\Functional;
 
-use Drupal\views\Entity\View;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\views\Entity\View;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests for the MigrateController class.
- *
- * @group migrate_drupal_ui
  */
+#[Group('migrate_drupal_ui')]
+#[RunTestsInSeparateProcesses]
 class MigrateControllerTest extends BrowserTestBase {
 
   /**

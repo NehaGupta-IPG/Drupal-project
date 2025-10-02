@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace Drupal\Tests\contact\Kernel;
 
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the message entity class.
  *
- * @group contact
  * @see \Drupal\contact\Entity\Message
  */
+#[Group('contact')]
 class MessageEntityTest extends EntityKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'contact',
     'field',
     'user',

@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block_content\Kernel;
 
-use Drupal\KernelTests\KernelTestBase;
+use Drupal\block_content\BlockContentPermissions;
 use Drupal\block_content\Entity\BlockContentType;
+use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the permissions of content blocks.
- *
- * @coversDefaultClass \Drupal\block_content\BlockContentPermissions
- *
- * @group block_content
  */
+#[CoversClass(BlockContentPermissions::class)]
+#[Group('block_content')]
 class BlockContentPermissionsTest extends KernelTestBase {
 
   /**
@@ -23,7 +24,6 @@ class BlockContentPermissionsTest extends KernelTestBase {
     'block',
     'block_content',
     'block_content_test',
-    'system',
     'user',
   ];
 
@@ -46,7 +46,9 @@ class BlockContentPermissionsTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::blockTypePermissions
+   * Tests dynamic permissions.
+   *
+   * @legacy-covers ::blockTypePermissions
    */
   public function testDynamicPermissions(): void {
     $permissions = $this->permissionHandler->getPermissions();
