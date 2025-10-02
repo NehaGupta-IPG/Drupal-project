@@ -9,16 +9,14 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
- * Factory for getting extension lists by type.
+ * Class for getting extension directories and info paths.
+ *
+ * This uses a service locator to gather all extension lists. You can use this
+ * to get the directory or info file path for a given type and machine name of
+ * an extension.
  */
 class ExtensionPathResolver {
 
-  /**
-   * ExtensionPathResolver constructor.
-   *
-   * @param \Psr\Container\ContainerInterface $extensionLists
-   *   The set of extension list services.
-   */
   public function __construct(
     #[AutowireLocator('extension_list', 'type')]
     protected ContainerInterface $extensionLists,
