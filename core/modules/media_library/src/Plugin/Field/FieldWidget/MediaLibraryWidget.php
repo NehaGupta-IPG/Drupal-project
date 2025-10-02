@@ -90,16 +90,16 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *   The current active user.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Utility\LinkGeneratorInterface $link_generator
+   * @param \Drupal\Core\Utility\LinkGeneratorInterface|null $link_generator
    *   The link generator service.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, ModuleHandlerInterface $module_handler, LinkGeneratorInterface $link_generator = NULL) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, ModuleHandlerInterface $module_handler, ?LinkGeneratorInterface $link_generator = NULL) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
     $this->entityTypeManager = $entity_type_manager;
     $this->currentUser = $current_user;
     $this->moduleHandler = $module_handler;
     if ($link_generator === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $link_generator argument is deprecated in drupal:10.1.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/3337223', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __CLASS__ . ' without the $link_generator argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3337223', E_USER_DEPRECATED);
       $link_generator = \Drupal::service('link_generator');
     }
     $this->linkGenerator = $link_generator;
