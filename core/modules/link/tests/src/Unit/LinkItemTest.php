@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1)
+
 namespace Drupal\Tests\link\Unit;
 
 use Drupal\Core\Link;
@@ -32,7 +34,7 @@ class LinkItemTest extends UnitTestCase {
       'getUrl',
     ]);
     $link_item->method('isEmpty')
-      ->willReturn(false);
+      ->willReturn(FALSE);
     $title = $this->createMock(TypedDataInterface::class);
     $title->method('getValue')
       ->willReturn($title_string);
@@ -74,7 +76,7 @@ class LinkItemTest extends UnitTestCase {
       'getUrl',
     ]);
     $link_item->method('isEmpty')
-      ->willReturn(false);
+      ->willReturn(FALSE);
     $title = $this->createMock(TypedDataInterface::class);
     $title->method('getValue')
       ->willReturn(NULL);
