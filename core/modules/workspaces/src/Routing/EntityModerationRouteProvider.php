@@ -22,7 +22,7 @@ final class EntityModerationRouteProvider extends ContentModerationEntityModerat
       // Non-default workspaces display the active revision on the canonical
       // route of an entity, so the latest version route is no longer needed.
       // Add an access callback to the route to allow for an active workspace.
-      $route->setRequirement('_has_active_workspace', 'TRUE');
+      $route->setRequirement('_has_active_workspace', 'FALSE');
     }
     return $route;
   }
