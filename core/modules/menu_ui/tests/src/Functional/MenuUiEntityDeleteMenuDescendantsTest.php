@@ -7,16 +7,18 @@ namespace Drupal\Tests\menu_ui\Functional;
 use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Drupal\menu_ui\Hook\MenuUiEntityDeleteFormHooks;
 use Drupal\system\Entity\Menu;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests warnings for menu item changes on entity delete forms.
- *
- * @group menu_ui
- *
- * @coversDefaultClass \Drupal\menu_ui\Hook\MenuUiEntityDeleteFormHooks
  */
+#[Group('menu_ui')]
+#[CoversClass(MenuUiEntityDeleteFormHooks::class)]
 final class MenuUiEntityDeleteMenuDescendantsTest extends BrowserTestBase {
 
   /**
@@ -45,9 +47,8 @@ final class MenuUiEntityDeleteMenuDescendantsTest extends BrowserTestBase {
    *   An entity type with a menu item, or just a menu link content.
    * @param bool $hasMultipleMenuItemChildren
    *   Whether the menu item has one or multiple children.
-   *
-   * @dataProvider providerDeleteEntityWithMenuAndChildren
    */
+  #[DataProvider('providerDeleteEntityWithMenuAndChildren')]
   public function testDeleteEntityWithMenuAndChildren(string $testEntityType, bool $hasMultipleMenuItemChildren): void {
     $testingAsMenuDelete = $testEntityType === MenuLinkContent::class;
     $this->drupalLogin($this->drupalCreateUser(permissions: [
