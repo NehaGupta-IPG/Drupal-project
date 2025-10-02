@@ -9,13 +9,13 @@ use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Ensures the setComponentThirdPartySetting action works via recipes.
- *
- * @group Recipe
  */
+#[Group('Recipe')]
 class SetComponentThirdPartySettingRecipeTest extends KernelTestBase {
 
   use RecipeTestTrait;
