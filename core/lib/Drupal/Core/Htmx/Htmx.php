@@ -6,7 +6,6 @@ namespace Drupal\Core\Htmx;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeBoolean;
 use Drupal\Core\Template\AttributeHelper;
@@ -870,6 +869,8 @@ class Htmx {
    *
    * @param bool $value
    *   Should the element and its descendants be "boosted"?
+   * @param bool $full_page
+   *   Toggle to use the full HTML response or just the main content.
    *
    * @return static
    *   Returns this object to allow chaining methods.

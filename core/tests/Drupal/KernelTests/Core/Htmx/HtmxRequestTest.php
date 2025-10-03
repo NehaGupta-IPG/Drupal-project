@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Htmx;
 
-use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
@@ -73,14 +72,16 @@ class HtmxRequestTest extends KernelTestBase {
     $this->htmx->$method($this->url);
     $render = $this->apply();
     $this->assertTrue(isset($render['#attributes'][$attribute]));
-    $expected = '/htmx-test-attachments/page?' . MainContentViewSubscriber::WRAPPER_FORMAT . '=drupal_htmx';
+    $expected = '/htmx-test-attachments/page';
     // The paths in GitLabCI include a subfolder.
     $this->assertStringEndsWith($expected, $render['#attributes'][$attribute]);
+    $this->assertTrue(empty($render['#attributes']['data-hx-drupal-full-page']));
     // Verify no wrapper format.
     $this->htmx->$method($this->url, TRUE);
     $render = $this->apply();
     $this->assertTrue(isset($render['#attributes'][$attribute]));
     $this->assertStringEndsWith('/htmx-test-attachments/page', $render['#attributes'][$attribute]);
+    $this->assertTrue($render['#attributes']['data-hx-drupal-full-page']);
     // Verify no parameters.
     $url = Url::fromRoute('test_htmx.attachments.replace');
     $request = Request::create($url->toString());
@@ -88,13 +89,16 @@ class HtmxRequestTest extends KernelTestBase {
     $this->htmx->$method();
     $render = $this->apply();
     $this->assertTrue(isset($render['#attributes'][$attribute]));
-    $expected = '?' . MainContentViewSubscriber::WRAPPER_FORMAT . '=drupal_htmx';
+    $expected = '';
     $this->assertTrue($expected === $render['#attributes'][$attribute]);
+    $this->assertTrue(empty($render['#attributes']['data-hx-drupal-full-page']));
+
     // Verify no parameters with no wrapper format.
     $this->htmx->$method(full_page: TRUE);
     $render = $this->apply();
     $this->assertTrue(isset($render['#attributes'][$attribute]));
     $this->assertTrue('' === $render['#attributes'][$attribute]);
+    $this->assertTrue($render['#attributes']['data-hx-drupal-full-page']);
   }
 
   /**
