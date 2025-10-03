@@ -2,7 +2,7 @@
     "name": "drupal/phpstan-testing",
     "description": "Tests Drupal core's PHPStan rules",
     "require-dev": {
-        "phpunit/phpunit": "^11.5.39 | ^12.3.12",
+        "phpunit/phpunit": "^11.5.39 | ^12.4",
         "phpstan/phpstan": "2.1.26"
     },
     "license": "GPL-2.0-or-later",
