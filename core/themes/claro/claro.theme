@@ -213,7 +213,7 @@ function claro_preprocess_entity_add_list(&$variables): void {
  *
  * Disables contextual links for all blocks except for layout builder blocks.
  */
-function claro_preprocess_block(&$variables) {
+function claro_preprocess_block(&$variables): void {
   if (isset($variables['title_suffix']['contextual_links'])) {
     $denied = !isset($variables['elements']['#contextual_links']['layout_builder_block']);
     // Allow contextual links for layout builder symmetric translations.
