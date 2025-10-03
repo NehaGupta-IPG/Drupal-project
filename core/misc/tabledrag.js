@@ -337,7 +337,8 @@
         // Add 1 to our indexes. The nth-child selector is 1 based, not 0
         // based. Match immediate children of the parent element to allow
         // nesting.
-        columnIndex = cell.parent().find('> td').index(cell.get(0)) + 1;
+        columnIndex =
+          $(cell[0].parentElement).find('> td').index(cell.get(0)) + 1;
         $table
           .find('> thead > tr, > tbody > tr, > tr')
           .each(this.addColspanClass(columnIndex));
