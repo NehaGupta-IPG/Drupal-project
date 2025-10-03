@@ -2024,3 +2024,11 @@ services:
       - { name: needs_destruction }
   Drupal\Core\Extension\ThemeSettingsProvider:
     autowire: true
+  icon.search:
+    class: Drupal\Core\Theme\Icon\IconSearch
+    arguments:
+      [
+        '@plugin.manager.icon_pack',
+        '@cache.default',
+        '@renderer',
+      ]

@@ -1,0 +1,76 @@
+/**
+ * @file
+ * Styles for icon autocomplete form element.
+ */
+
+.icon-wrapper {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.icon-wrapper label {
+  margin-left: -3.5rem;
+}
+
+.icon-wrapper .form-item__description {
+  margin-left: -3.5rem;
+}
+
+.icon-wrapper .form-item {
+  width: 100%;
+  margin: unset;
+}
+
+.icon-wrapper .form-item > div,
+.icon-wrapper .form-item > div input {
+  width: 100%;
+}
+
+.icon-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-right: 0.5rem;
+  border: var(--input-border-size) solid var(--input-border-color);
+  background-color: var(--color-gray-050);
+}
+
+.icon-preview svg {
+  width: auto;
+  height: 30px;
+}
+
+.icon-preview img {
+  width: auto;
+  height: 30px;
+}
+
+/* Autocomplete dropdown scrollable container */
+.ui-autocomplete:has(.icon-autocomplete-result) {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Autocomplete results styling */
+.icon-autocomplete-result {
+  display: flex;
+  align-items: center;
+}
+
+.icon-autocomplete-result img,
+.icon-autocomplete-result svg {
+  margin-right: 10px;
+}
+
+.icon-autocomplete-result__name {
+  margin-right: 8px;
+}
+
+.icon-autocomplete-result .icon-autocomplete-pack {
+  margin-left: auto;
+  color: #849fdc;
+  font-size: 12px;
+}

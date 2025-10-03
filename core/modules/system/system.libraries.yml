@@ -71,3 +71,16 @@ drupal.system.date:
     - core/drupalSettings
     - core/once
     - core/drupal.form
+
+icon_autocomplete:
+  version: VERSION
+  css:
+    component:
+      css/components/icon-autocomplete.css: {}
+  js:
+    js/icon-autocomplete.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - core/jquery
+    - core/drupalSettings
