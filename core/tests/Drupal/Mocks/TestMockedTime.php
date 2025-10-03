@@ -16,6 +16,10 @@ class TestMockedTime extends Time {
 
   /**
    * The mocked request time.
+   *
+   * The time should not be 0, because \Drupal\Core\Cache\MemoryBackend
+   * subtracts 1 from cache item expiry time to invalidate cache items, and -1
+   * means permanent.
    */
   protected int $requestTime = 10_000;
 
