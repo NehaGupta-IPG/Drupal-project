@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests processing of theme .info.yml properties.
- *
- * @group Theme
  */
+#[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class ThemeInfoTest extends BrowserTestBase {
 
   /**
@@ -78,7 +80,8 @@ class ThemeInfoTest extends BrowserTestBase {
     $this->assertSession()->elementNotExists('xpath', '//link[contains(@href, "sub-remove.css")]');
     $this->assertSession()->elementNotExists('xpath', '//link[contains(@href, "base-add.sub-remove.css")]');
 
-    // Verify that CSS files with the same name are loaded from both the base theme and subtheme.
+    // Verify that CSS files with the same name are loaded from both the base
+    // theme and subtheme.
     $this->assertSession()->elementsCount('xpath', '//link[contains(@href, "' . $base . '/same-name.css")]', 1);
     $this->assertSession()->elementsCount('xpath', '//link[contains(@href, "' . $sub . '/same-name.css")]', 1);
 
@@ -95,13 +98,19 @@ class ThemeInfoTest extends BrowserTestBase {
     $active_theme = $this->themeManager->getActiveTheme();
     // Make sure we are not testing the wrong theme.
     $this->assertEquals('test_theme', $active_theme->getName());
-    $this->assertEquals(['starterkit_theme/base', 'starterkit_theme/messages', 'core/normalize', 'test_theme/global-styling'], $active_theme->getLibraries());
+    $this->assertEquals(
+      ['starterkit_theme/base', 'starterkit_theme/messages', 'core/normalize', 'test_theme/global-styling'],
+      $active_theme->getLibraries(),
+    );
 
     // @see theme_test_system_info_alter()
     $this->state->set('theme_test.modify_info_files', TRUE);
     $this->resetAll();
     $active_theme = $this->themeManager->getActiveTheme();
-    $this->assertEquals(['starterkit_theme/base', 'starterkit_theme/messages', 'core/normalize', 'test_theme/global-styling', 'core/once'], $active_theme->getLibraries());
+    $this->assertEquals(
+      ['starterkit_theme/base', 'starterkit_theme/messages', 'core/normalize', 'test_theme/global-styling', 'core/once'],
+      $active_theme->getLibraries(),
+    );
   }
 
 }

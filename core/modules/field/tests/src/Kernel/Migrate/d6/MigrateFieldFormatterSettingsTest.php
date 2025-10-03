@@ -6,12 +6,12 @@ namespace Drupal\Tests\field\Kernel\Migrate\d6;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Upgrade field formatter settings to entity.display.*.*.yml.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
 class MigrateFieldFormatterSettingsTest extends MigrateDrupal6TestBase {
 
   /**
@@ -208,7 +208,12 @@ class MigrateFieldFormatterSettingsTest extends MigrateDrupal6TestBase {
     $component = $display->getComponent('field_test_datetime');
     $this->assertSame($expected, $component);
     // Test that our Id map has the correct data.
-    $this->assertSame([['node', 'story', 'teaser', 'field_test']], $this->getMigration('d6_field_formatter_settings')->getIdMap()->lookupDestinationIds(['story', 'teaser', 'node', 'field_test']));
+    $this->assertSame(
+      [['node', 'story', 'teaser', 'field_test']],
+      $this->getMigration('d6_field_formatter_settings')
+        ->getIdMap()
+        ->lookupDestinationIds(['story', 'teaser', 'node', 'field_test'])
+    );
 
     // Test hidden field.
     $this->assertComponentNotExists('node.test_planet.teaser', 'field_test_text_single_checkbox');

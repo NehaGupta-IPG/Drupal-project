@@ -8,14 +8,14 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the loading of entities and entity revisions.
  *
- * @group views
- *
  * @see \Drupal\views\Plugin\views\query\Sql
  */
+#[Group('views')]
 class SqlEntityLoadingTest extends ViewsKernelTestBase {
 
   /**
@@ -39,6 +39,9 @@ class SqlEntityLoadingTest extends ViewsKernelTestBase {
     $this->installSchema('node', 'node_access');
   }
 
+  /**
+   * Tests entity loading with a non-default pending revision in Views.
+   */
   public function testViewWithNonDefaultPendingRevision(): void {
     $node_type = NodeType::create([
       'type' => 'page',

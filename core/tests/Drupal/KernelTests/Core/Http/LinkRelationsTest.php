@@ -6,16 +6,16 @@ namespace Drupal\KernelTests\Core\Http;
 
 use Drupal\Core\Http\LinkRelationType;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests link relationships in Drupal.
- *
- * @group HTTP
  */
+#[Group('HTTP')]
 class LinkRelationsTest extends KernelTestBase {
 
   /**
-   * Tests correct Link Relations are returned from the Link Relation Type Manager.
+   * Tests the Link Relations returned from the Link Relation Type Manager.
    */
   public function testAvailableLinkRelationships(): void {
     /** @var \Drupal\Core\Http\LinkRelationTypeManager $link_relation_type_manager */

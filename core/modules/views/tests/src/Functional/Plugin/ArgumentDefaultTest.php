@@ -10,13 +10,15 @@ use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
 use Drupal\views_test_data\Plugin\views\argument_default\ArgumentDefaultTest as ArgumentDefaultTestPlugin;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests pluggable argument_default for views.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ArgumentDefaultTest extends ViewTestBase {
 
   /**
@@ -127,7 +129,7 @@ class ArgumentDefaultTest extends ViewTestBase {
 
     $this->assertEquals($random, $view->argument['null']->getDefaultArgument(), 'Fixed argument should be used by default.');
 
-    // Make sure that a normal argument provided is used
+    // Make sure that a normal argument provided is used.
     $random_string = $this->randomMachineName();
     $view->executeDisplay('default', [$random_string]);
 

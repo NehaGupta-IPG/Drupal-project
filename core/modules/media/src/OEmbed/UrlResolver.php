@@ -101,7 +101,7 @@ class UrlResolver implements UrlResolverInterface {
     }
 
     $document = Html::load((string) $response->getBody());
-    $xpath = new \DOMXpath($document);
+    $xpath = new \DOMXPath($document);
 
     return $this->findUrl($xpath, 'json') ?: $this->findUrl($xpath, 'xml');
   }
@@ -141,7 +141,7 @@ class UrlResolver implements UrlResolverInterface {
       return $this->resourceFetcher->fetchResource($resource_url)->getProvider();
     }
 
-    throw new ResourceException('No matching provider found.', $url);
+    throw new ResourceException("No matching oEmbed provider found for resource: \"{$url}\"", $url);
   }
 
   /**

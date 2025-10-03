@@ -7,10 +7,12 @@ namespace Drupal\Tests\image\Kernel;
 use Drupal\Core\Config\Action\ConfigActionManager;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @group image
+ * Tests Config Actions.
  */
+#[Group('image')]
 class ConfigActionsTest extends KernelTestBase {
 
   /**
@@ -18,6 +20,9 @@ class ConfigActionsTest extends KernelTestBase {
    */
   protected static $modules = ['image', 'system'];
 
+  /**
+   * The configuration action manager.
+   */
   private readonly ConfigActionManager $configActionManager;
 
   /**
@@ -29,6 +34,9 @@ class ConfigActionsTest extends KernelTestBase {
     $this->configActionManager = $this->container->get('plugin.manager.config_action');
   }
 
+  /**
+   * Tests adding an image effect using the configuration action manager.
+   */
   public function testConfigActions(): void {
     $style = ImageStyle::load('large');
     $this->assertCount(2, $style->getEffects());

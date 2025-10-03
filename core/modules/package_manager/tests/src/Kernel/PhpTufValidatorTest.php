@@ -4,22 +4,31 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\package_manager\Kernel;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\fixture_manipulator\ActiveFixtureManipulator;
 use Drupal\fixture_manipulator\FixtureManipulator;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\PreCreateEvent;
 use Drupal\package_manager\Event\PreRequireEvent;
-use Drupal\package_manager\Exception\StageEventException;
+use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\ValidationResult;
 use Drupal\package_manager\Validator\LockFileValidator;
 use Drupal\package_manager\Validator\PhpTufValidator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\package_manager\Validator\PhpTufValidator
- * @group package_manager
+ * Tests Drupal\package_manager\Validator\PhpTufValidator.
+ *
  * @internal
  */
+#[CoversClass(PhpTufValidator::class)]
+#[Group('package_manager')]
+#[Group('#slow')]
 class PhpTufValidatorTest extends PackageManagerKernelTestBase {
+
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -49,7 +58,8 @@ class PhpTufValidatorTest extends PackageManagerKernelTestBase {
           'class' => 'PhpTufComposerPlugin',
         ],
       ])
-      ->commitChanges();
+      ->commitChanges()
+      ->updateLock();
   }
 
   /**
@@ -66,15 +76,16 @@ class PhpTufValidatorTest extends PackageManagerKernelTestBase {
   public function testPluginNotInstalledInProjectRoot(): void {
     (new ActiveFixtureManipulator())
       ->removePackage(PhpTufValidator::PLUGIN_NAME)
-      ->commitChanges();
+      ->commitChanges()
+      ->updateLock();
 
     $messages = [
-      t('The <code>php-tuf/composer-integration</code> plugin is not installed.'),
+      $this->t('The <code>php-tuf/composer-integration</code> plugin is not installed.'),
       // Composer automatically removes the plugin from the `allow-plugins`
       // list when the plugin package is removed.
-      t('The <code>php-tuf/composer-integration</code> plugin is not listed as an allowed plugin.'),
+      $this->t('The <code>php-tuf/composer-integration</code> plugin is not listed as an allowed plugin.'),
     ];
-    $result = ValidationResult::createError($messages, t('The active directory is not protected by PHP-TUF, which is required to use Package Manager securely.'));
+    $result = ValidationResult::createError($messages, $this->t('The active directory is not protected by PHP-TUF, which is required to use Package Manager securely.'));
     $this->assertStatusCheckResults([$result]);
     $this->assertResults([$result], PreCreateEvent::class);
   }
@@ -87,12 +98,12 @@ class PhpTufValidatorTest extends PackageManagerKernelTestBase {
       ->removePackage(PhpTufValidator::PLUGIN_NAME);
 
     $messages = [
-      t('The <code>php-tuf/composer-integration</code> plugin is not installed.'),
+      $this->t('The <code>php-tuf/composer-integration</code> plugin is not installed.'),
       // Composer automatically removes the plugin from the `allow-plugins`
       // list when the plugin package is removed.
-      t('The <code>php-tuf/composer-integration</code> plugin is not listed as an allowed plugin.'),
+      $this->t('The <code>php-tuf/composer-integration</code> plugin is not listed as an allowed plugin.'),
     ];
-    $result = ValidationResult::createError($messages, t('The stage directory is not protected by PHP-TUF, which is required to use Package Manager securely.'));
+    $result = ValidationResult::createError($messages, $this->t('The stage directory is not protected by PHP-TUF, which is required to use Package Manager securely.'));
     $this->assertResults([$result], PreRequireEvent::class);
   }
 
@@ -106,20 +117,20 @@ class PhpTufValidatorTest extends PackageManagerKernelTestBase {
 
     (new FixtureManipulator())
       ->removePackage(PhpTufValidator::PLUGIN_NAME)
-      ->commitChanges($stage->getStageDirectory());
+      ->commitChanges($stage->getSandboxDirectory());
 
     $messages = [
-      t('The <code>php-tuf/composer-integration</code> plugin is not installed.'),
+      $this->t('The <code>php-tuf/composer-integration</code> plugin is not installed.'),
       // Composer automatically removes the plugin from the `allow-plugins`
       // list when the plugin package is removed.
-      t('The <code>php-tuf/composer-integration</code> plugin is not listed as an allowed plugin.'),
+      $this->t('The <code>php-tuf/composer-integration</code> plugin is not listed as an allowed plugin.'),
     ];
-    $result = ValidationResult::createError($messages, t('The stage directory is not protected by PHP-TUF, which is required to use Package Manager securely.'));
+    $result = ValidationResult::createError($messages, $this->t('The stage directory is not protected by PHP-TUF, which is required to use Package Manager securely.'));
     try {
       $stage->apply();
       $this->fail('Expected an exception but none was thrown.');
     }
-    catch (StageEventException $e) {
+    catch (SandboxEventException $e) {
       $this->assertInstanceOf(PreApplyEvent::class, $e->event);
       $this->assertValidationResultsEqual([$result], $e->event->getResults());
     }
@@ -186,13 +197,12 @@ class PhpTufValidatorTest extends PackageManagerKernelTestBase {
    *   The Composer configuration to set.
    * @param \Drupal\Core\StringTranslation\TranslatableMarkup[] $expected_messages
    *   The expected error messages.
-   *
-   * @dataProvider providerInvalidConfiguration
    */
+  #[DataProvider('providerInvalidConfiguration')]
   public function testInvalidConfigurationInProjectRoot(array $config, array $expected_messages): void {
-    (new ActiveFixtureManipulator())->addConfig($config)->commitChanges();
+    (new ActiveFixtureManipulator())->addConfig($config)->commitChanges()->updateLock();
 
-    $result = ValidationResult::createError($expected_messages, t('The active directory is not protected by PHP-TUF, which is required to use Package Manager securely.'));
+    $result = ValidationResult::createError($expected_messages, $this->t('The active directory is not protected by PHP-TUF, which is required to use Package Manager securely.'));
     $this->assertStatusCheckResults([$result]);
     $this->assertResults([$result], PreCreateEvent::class);
   }
@@ -206,14 +216,14 @@ class PhpTufValidatorTest extends PackageManagerKernelTestBase {
    *   The expected error messages.
    * @param string $event_class
    *   The event before which the plugin's configuration should be changed.
-   *
-   * @dataProvider providerInvalidConfigurationInStage
    */
+  #[DataProvider('providerInvalidConfigurationInStage')]
   public function testInvalidConfigurationInStage(array $config, array $expected_messages, string $event_class): void {
     $listener = function (PreRequireEvent|PreApplyEvent $event) use ($config): void {
       (new FixtureManipulator())
         ->addConfig($config)
-        ->commitChanges($event->stage->getStageDirectory());
+        ->commitChanges($event->sandboxManager->getSandboxDirectory())
+        ->updateLock();
     };
     $this->addEventTestListener($listener, $event_class);
 
@@ -226,7 +236,7 @@ class PhpTufValidatorTest extends PackageManagerKernelTestBase {
         ->removeSubscriber($lock_file_validator);
     }
 
-    $result = ValidationResult::createError($expected_messages, t('The stage directory is not protected by PHP-TUF, which is required to use Package Manager securely.'));
+    $result = ValidationResult::createError($expected_messages, $this->t('The stage directory is not protected by PHP-TUF, which is required to use Package Manager securely.'));
     $this->assertResults([$result], $event_class);
   }
 

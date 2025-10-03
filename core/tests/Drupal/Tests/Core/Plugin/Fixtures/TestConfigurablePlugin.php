@@ -4,32 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Plugin\Fixtures;
 
-use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Plugin\DependentPluginInterface;
-use Drupal\Component\Plugin\PluginBase;
+use Drupal\Core\Plugin\ConfigurablePluginBase;
 
-class TestConfigurablePlugin extends PluginBase implements ConfigurableInterface, DependentPluginInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConfiguration() {
-    return $this->configuration;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setConfiguration(array $configuration) {
-    $this->configuration = $configuration;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function defaultConfiguration() {
-    return [];
-  }
+/**
+ * A configurable plugin implementation used for testing.
+ */
+class TestConfigurablePlugin extends ConfigurablePluginBase implements DependentPluginInterface {
 
   /**
    * {@inheritdoc}

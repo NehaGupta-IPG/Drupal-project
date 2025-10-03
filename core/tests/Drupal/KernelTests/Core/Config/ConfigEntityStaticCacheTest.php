@@ -6,12 +6,12 @@ namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\config_entity_static_cache_test\ConfigOverrider;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the entity static cache when used by config entities.
- *
- * @group config
  */
+#[Group('config')]
 class ConfigEntityStaticCacheTest extends KernelTestBase {
 
   /**
@@ -110,6 +110,12 @@ class ConfigEntityStaticCacheTest extends KernelTestBase {
 
     // Enable overrides and reload the entity and ensure the cache is used.
     $this->assertSame($entity_override->_loadStamp, $storage->load($this->entityId)->_loadStamp);
+
+    // Reset the cache, ensure that all variations of this entity are
+    // invalidated.
+    $storage->resetCache([$this->entityId]);
+    $this->assertNotSame($entity_no_override->_loadStamp, $storage->loadOverrideFree($this->entityId)->_loadStamp);
+    $this->assertNotSame($entity_override->_loadStamp, $storage->load($this->entityId)->_loadStamp);
   }
 
 }

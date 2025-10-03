@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\block\Kernel;
 
 use Drupal\block\Entity\Block;
+use Drupal\block\Hook\BlockHooks;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests block_rebuild().
- *
- * @group block
  */
+#[Group('block')]
 class BlockRebuildTest extends KernelTestBase {
 
   use BlockCreationTrait;
@@ -45,40 +46,37 @@ class BlockRebuildTest extends KernelTestBase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public static function setUpBeforeClass(): void {
-    parent::setUpBeforeClass();
-
-    // @todo Once block_rebuild() is refactored to auto-loadable code, remove
-    //   this require statement.
-    require_once static::getDrupalRoot() . '/core/modules/block/block.module';
-  }
-
-  /**
-   * @covers ::block_rebuild
+   * Tests rebuild no blocks.
+   *
+   * @legacy-covers \Drupal\block\Hook\BlockHooks::rebuild
    */
   public function testRebuildNoBlocks(): void {
-    block_rebuild();
+    $blockRebuild = new BlockHooks();
+    $blockRebuild->rebuild();
     $messages = \Drupal::messenger()->all();
     \Drupal::messenger()->deleteAll();
     $this->assertEquals([], $messages);
   }
 
   /**
-   * @covers ::block_rebuild
+   * Tests rebuild no invalid blocks.
+   *
+   * @legacy-covers \Drupal\block\Hook\BlockHooks::rebuild
    */
   public function testRebuildNoInvalidBlocks(): void {
     $this->placeBlock('system_powered_by_block', ['region' => 'content']);
 
-    block_rebuild();
+    $blockRebuild = new BlockHooks();
+    $blockRebuild->rebuild();
     $messages = \Drupal::messenger()->all();
     \Drupal::messenger()->deleteAll();
     $this->assertEquals([], $messages);
   }
 
   /**
-   * @covers ::block_rebuild
+   * Tests rebuild invalid blocks.
+   *
+   * @legacy-covers \Drupal\block\Hook\BlockHooks::rebuild
    */
   public function testRebuildInvalidBlocks(): void {
     $this->placeBlock('system_powered_by_block', ['region' => 'content']);
@@ -102,7 +100,8 @@ class BlockRebuildTest extends KernelTestBase {
     $this->assertSame('INVALID', $block2->getRegion());
     $this->assertFalse($block2->status());
 
-    block_rebuild();
+    $blockRebuild = new BlockHooks();
+    $blockRebuild->rebuild();
 
     // Reload block entities.
     $block1 = Block::load($block1->id());
@@ -110,7 +109,14 @@ class BlockRebuildTest extends KernelTestBase {
 
     $messages = \Drupal::messenger()->all();
     \Drupal::messenger()->deleteAll();
-    $expected = ['warning' => [new TranslatableMarkup('The block %info was assigned to the invalid region %region and has been disabled.', ['%info' => $block1->id(), '%region' => 'INVALID'])]];
+    $expected = [
+      'warning' => [
+        new TranslatableMarkup('The block %info was assigned to the invalid region %region and has been disabled.', [
+          '%info' => $block1->id(),
+          '%region' => 'INVALID',
+        ]),
+      ],
+    ];
     $this->assertEquals($expected, $messages);
 
     $default_region = system_default_region('stark');

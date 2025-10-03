@@ -2,7 +2,9 @@
 
 namespace Drupal\workspaces;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -11,6 +13,8 @@ use Drupal\workspaces\Event\WorkspacePostPublishEvent;
 use Drupal\workspaces\Event\WorkspacePrePublishEvent;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+
+// cspell:ignore differring
 
 /**
  * Default implementation of the workspace publisher.
@@ -21,7 +25,20 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
 
   use StringTranslationTrait;
 
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected Connection $database, protected WorkspaceManagerInterface $workspaceManager, protected WorkspaceAssociationInterface $workspaceAssociation, protected EventDispatcherInterface $eventDispatcher, protected WorkspaceInterface $sourceWorkspace, protected LoggerInterface $logger) {
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected Connection $database,
+    protected WorkspaceManagerInterface $workspaceManager,
+    protected WorkspaceAssociationInterface $workspaceAssociation,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected WorkspaceInterface $sourceWorkspace,
+    protected LoggerInterface $logger,
+    protected ?TimeInterface $time = NULL,
+  ) {
+    if ($time === NULL) {
+      @trigger_error('Calling ' . __CLASS__ . ' constructor without the $time argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3531037', E_USER_DEPRECATED);
+      $this->time = \Drupal::time();
+    }
   }
 
   /**
@@ -65,11 +82,16 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
             $entity->setSyncing(TRUE);
             $entity->isDefaultRevision(TRUE);
 
+            // Update the changed time of the entity to be the publishing time.
+            if ($entity instanceof EntityChangedInterface) {
+              $entity->setChangedTime($this->time->getRequestTime());
+            }
+
             // The default revision is not workspace-specific anymore.
             $field_name = $entity->getEntityType()->getRevisionMetadataKey('workspace');
             $entity->{$field_name}->target_id = NULL;
 
-            $entity->original = $default_revisions[$entity->id()];
+            $entity->setOriginal($default_revisions[$entity->id()]);
             $entity->save();
             $counter++;
 

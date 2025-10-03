@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Kernel\Plugin\migrate\source\d6;
 
+use Drupal\comment\Plugin\migrate\source\d6\Comment;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Drupal 6 comment source w/ high water handling.
- *
- * @covers \Drupal\comment\Plugin\migrate\source\d6\Comment
- *
- * @group comment
  */
+#[CoversClass(Comment::class)]
+#[Group('comment')]
 class CommentSourceWithHighWaterTest extends MigrateSqlSourceTestBase {
 
   /**

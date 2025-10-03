@@ -121,7 +121,7 @@ interface FileSystemInterface {
    * @param string $uri
    *   A URI or pathname.
    * @param resource $context
-   *   Refer to http://php.net/manual/ref.stream.php
+   *   Refer to http://php.net/manual/ref.stream.php.
    *
    * @return bool
    *   Boolean TRUE on success, or FALSE on failure.
@@ -185,6 +185,9 @@ interface FileSystemInterface {
    * @see basename()
    *
    * @ingroup php_wrappers
+   *
+   * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use PHP native basename() instead.
+   * @see https://www.drupal.org/node/3530869
    */
   public function basename($uri, $suffix = NULL);
 
@@ -204,7 +207,7 @@ interface FileSystemInterface {
    *   Create directories recursively, defaults to FALSE. Cannot work with a
    *   mode which denies writing or execution to the owner of the process.
    * @param resource $context
-   *   Refer to http://php.net/manual/ref.stream.php
+   *   Refer to http://php.net/manual/ref.stream.php.
    *
    * @return bool
    *   Boolean TRUE on success, or FALSE on failure.
@@ -227,7 +230,7 @@ interface FileSystemInterface {
    * @param string $uri
    *   A URI or pathname.
    * @param resource $context
-   *   Refer to http://php.net/manual/ref.stream.php
+   *   Refer to http://php.net/manual/ref.stream.php.
    *
    * @return bool
    *   Boolean TRUE on success, or FALSE on failure.
