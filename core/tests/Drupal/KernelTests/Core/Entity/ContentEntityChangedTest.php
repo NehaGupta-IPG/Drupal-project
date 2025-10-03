@@ -81,8 +81,6 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
 
   /**
    * Tests basic EntityChangedInterface functionality.
-   *
-   * @group fuck
    */
   public function testChanged(): void {
     $user1 = $this->createUser();
