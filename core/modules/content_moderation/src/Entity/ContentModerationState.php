@@ -4,6 +4,8 @@ namespace Drupal\content_moderation\Entity;
 
 use Drupal\content_moderation\ContentModerationStateAccessControlHandler;
 use Drupal\content_moderation\ContentModerationStateStorageSchema;
+use Drupal\content_moderation\Event\ContentModerationEvents;
+use Drupal\content_moderation\Event\ContentModerationStateChangedEvent;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\ContentEntityBase;
@@ -162,9 +164,12 @@ class ContentModerationState extends ContentEntityBase implements ContentModerat
   }
 
   /**
-   * {@inheritdoc}
+   * Load the entity whose state is being tracked by this entity.
+   *
+   * @return \Drupal\Core\Entity\ContentEntityInterface
+   *   The entity whose state is being tracked.
    */
-  public function save() {
+  protected function loadModeratedEntity() {
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = \Drupal::entityTypeManager()
       ->getStorage($this->content_entity_type_id->value);
@@ -173,6 +178,14 @@ class ContentModerationState extends ContentEntityBase implements ContentModerat
     if ($related_entity instanceof TranslatableInterface) {
       $related_entity = $related_entity->getTranslation($this->activeLangcode);
     }
+    return $related_entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function save() {
+    $related_entity = $this->loadModeratedEntity();
     $related_entity->moderation_state = $this->moderation_state;
     return $related_entity->save();
   }
@@ -190,7 +203,25 @@ class ContentModerationState extends ContentEntityBase implements ContentModerat
    *   In case of failures an exception is thrown.
    */
   protected function realSave() {
-    return parent::save();
+    if (!$this->getLoadedRevisionId()) {
+      $original_state = FALSE;
+    }
+    else {
+      $original_content_moderation_state = \Drupal::entityTypeManager()
+        ->getStorage($this->getEntityTypeId())
+        ->loadRevision($this->getLoadedRevisionId());
+      if (!$this->isDefaultTranslation() && $original_content_moderation_state->hasTranslation($this->activeLangcode)) {
+        $original_content_moderation_state = $original_content_moderation_state->getTranslation($this->activeLangcode);
+      }
+      $original_state = $original_content_moderation_state->moderation_state->value;
+    }
+
+    $result = parent::save();
+
+    $event = new ContentModerationStateChangedEvent($this->loadModeratedEntity(), $this->moderation_state->value, $original_state, $this->workflow->target_id);
+    \Drupal::service('event_dispatcher')->dispatch($event, ContentModerationEvents::STATE_CHANGED);
+
+    return $result;
   }
 
   /**
