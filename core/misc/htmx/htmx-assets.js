@@ -63,7 +63,6 @@
     }
   });
 
-
   // When saving to the browser history always remove wrapper format and ajax
   // page state from the query string.
   htmx.on('htmx:beforeHistoryUpdate', ({ detail }) => {
