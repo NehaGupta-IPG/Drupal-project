@@ -58,21 +58,21 @@ trait AxeCoreTestTrait {
           out.results = await axe.run('body', {$options_json});
         }
         catch (e) {
-          out.errors = [e.message];
+          out.err = e.message;
         }
         return out;
       })()
     JS);
 
     // `@` avoids "Undefined array key" warning when assigning.
-    @['results' => $results, 'errors' => $errors] = $axe_run;
+    @['results' => $results, 'err' => $error] = $axe_run;
 
     $this->assertEmpty(
-      $errors,
-      $this->formatErrorsReport($errors)
+      $error,
+      sprintf("Axe encountered errors\n\n%s", $error)
     );
 
-    // Check that Axe returned *something* in the results array.
+    // Check that Axe did return something overall.
     $this->assertNotEmpty($results, 'Axe returned no results. This should not have happened.');
 
     // @todo Include `incomplete` results, as they are warnings that need review.
@@ -125,32 +125,6 @@ trait AxeCoreTestTrait {
     foreach ($nodes as $node) {
       $message .= PHP_EOL;
       $message .= "  * `{$node['target'][0]}`";
-    }
-
-    return $message;
-  }
-
-  /**
-   * Format the Axe errors report.
-   *
-   * @param ?array $errors
-   *   Array of errors returned from `axe.run()`, or NULL.
-   *
-   * @see https://github.com/dequelabs/axe-core/blob/develop/doc/API.md#result-arrays
-   */
-  protected function formatErrorsReport(?array $errors): string {
-
-    // Function may be called by the respective assertion even
-    // when there are no errors.
-    if (!$errors) {
-      return '';
-    }
-
-    $message = 'Axe encountered errors' . PHP_EOL;
-
-    foreach ($errors as $key => $error) {
-      $message .= PHP_EOL;
-      $message .= $key + 1 . ". {$error}";
     }
 
     return $message;

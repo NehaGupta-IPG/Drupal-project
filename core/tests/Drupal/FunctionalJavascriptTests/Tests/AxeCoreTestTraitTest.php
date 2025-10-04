@@ -41,8 +41,8 @@ class AxeCoreTestTraitTest extends WebDriverTestBase {
     $this->expectExceptionMessage(<<<TEXT
 Axe encountered errors
 
-1. unknown rule `unknown-rule` in options.runOnly
-Failed asserting that an array is empty.
+unknown rule `unknown-rule` in options.runOnly
+Failed asserting that a string is empty.
 TEXT
     );
 
