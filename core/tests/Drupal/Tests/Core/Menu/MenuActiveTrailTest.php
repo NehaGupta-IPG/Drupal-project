@@ -116,7 +116,7 @@ class MenuActiveTrailTest extends UnitTestCase {
    *     - expected_link: The expected active link for the given menu.
    *     - expected_trail: The expected active trail for the given menu.
    */
-  public static function provider() {
+  public static function provider(): array {
     $data = [];
 
     $mock_route = new Route('');
@@ -162,7 +162,7 @@ class MenuActiveTrailTest extends UnitTestCase {
    * @legacy-covers ::getActiveLink
    */
   #[DataProvider('provider')]
-  public function testGetActiveLink(Request $request, $links, $menu_name, $expected_link): void {
+  public function testGetActiveLink(Request $request, array|false $links, string $menu_name, ?MenuLinkMock $expected_link, array $expected_trail): void {
     $this->requestStack->push($request);
     if ($links !== FALSE) {
       $this->menuLinkManager->expects($this->exactly(2))
@@ -218,7 +218,7 @@ class MenuActiveTrailTest extends UnitTestCase {
    * @legacy-covers ::getActiveTrailIds
    */
   #[DataProvider('provider')]
-  public function testGetActiveTrailIds(Request $request, $links, $menu_name, $expected_link, $expected_trail): void {
+  public function testGetActiveTrailIds(Request $request, array|false $links, string $menu_name, ?MenuLinkMock $expected_link, array $expected_trail): void {
     $expected_trail_ids = array_combine($expected_trail, $expected_trail);
 
     $this->requestStack->push($request);

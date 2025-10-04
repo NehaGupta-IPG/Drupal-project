@@ -196,7 +196,7 @@ class ConfigTest extends UnitTestCase {
    * @legacy-covers ::hasOverrides
    */
   #[DataProvider('overrideDataProvider')]
-  public function testOverrideData($data, $module_data, $setting_data): void {
+  public function testOverrideData(array $data, array $module_data, array $setting_data): void {
     // Set initial data.
     $this->config->setData($data);
 
@@ -367,7 +367,7 @@ class ConfigTest extends UnitTestCase {
    * @legacy-covers ::delete
    */
   #[DataProvider('overrideDataProvider')]
-  public function testDelete($data, $module_data): void {
+  public function testDelete(array $data, array $module_data, array $setting_data): void {
     $this->cacheTagsInvalidator->expects($this->once())
       ->method('invalidateTags')
       ->with(['config:config.test']);
@@ -499,7 +499,7 @@ class ConfigTest extends UnitTestCase {
    * @see \Drupal\Tests\Core\Config\ConfigTest::testOverrideData()
    * @see \Drupal\Tests\Core\Config\ConfigTest::testDelete()
    */
-  public static function overrideDataProvider() {
+  public static function overrideDataProvider(): array {
     $test_cases = [
       [
         // Original data.

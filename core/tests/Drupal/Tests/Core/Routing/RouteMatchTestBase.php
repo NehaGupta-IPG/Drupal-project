@@ -86,7 +86,7 @@ abstract class RouteMatchTestBase extends UnitTestCase {
    * @legacy-covers ::getRouteName
    */
   #[DataProvider('routeMatchProvider')]
-  public function testGetRouteName(RouteMatchInterface $route_match): void {
+  public function testGetRouteName(RouteMatchInterface $route_match, Route $route, array $parameters, array $expected_filtered_parameters): void {
     $this->assertSame('test_route', $route_match->getRouteName());
   }
 
@@ -96,7 +96,7 @@ abstract class RouteMatchTestBase extends UnitTestCase {
    * @legacy-covers ::getRouteObject
    */
   #[DataProvider('routeMatchProvider')]
-  public function testGetRouteObject(RouteMatchInterface $route_match, Route $route): void {
+  public function testGetRouteObject(RouteMatchInterface $route_match, Route $route, array $parameters, array $expected_filtered_parameters): void {
     $this->assertSame($route, $route_match->getRouteObject());
   }
 
