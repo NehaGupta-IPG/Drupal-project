@@ -24,6 +24,7 @@ parameters:
     debug: false
     auto_reload: null
     cache: true
+    use_yield: true
     allowed_file_extensions:
       - css
       - html
@@ -1833,7 +1834,7 @@ services:
     lazy: true
   file.mime_type.guesser.extension:
     class: Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser
-    arguments: ['@Drupal\Core\File\MimeType\MimeTypeMapInterface', '@file_system']
+    arguments: ['@Drupal\Core\File\MimeType\MimeTypeMapInterface']
     tags:
       - { name: mime_type_guesser }
     lazy: true
