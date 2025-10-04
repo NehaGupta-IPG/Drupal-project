@@ -299,6 +299,8 @@ class DefaultTableMappingTest extends UnitTestCase {
    *   An array of available field column names.
    * @param string $column
    *   The name of the column to be processed.
+   * @param string $expected
+   *   The expected result.
    *
    * @legacy-covers ::getFieldColumnName
    */

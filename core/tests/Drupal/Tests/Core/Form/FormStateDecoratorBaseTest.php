@@ -763,7 +763,7 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
   /**
    * Provides data to self::testGetTemporaryValue().
    */
-  public static function providerGetTemporaryValue() {
+  public static function providerGetTemporaryValue(): array {
     return [
       ['FOO', 'BAR'],
       ['FOO', NULL],
