@@ -52,6 +52,12 @@
       if (detail.headers['HX-Trigger-Name']) {
         detail.parameters._triggering_element_name =
           detail.headers['HX-Trigger-Name'];
+        const value =
+          detail.parameters[detail.parameters._triggering_element_name] ||
+          false;
+        if (value !== false) {
+          detail.parameters._triggering_element_value = value;
+        }
       }
     }
   });

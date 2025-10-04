@@ -37,6 +37,14 @@ class HtmxTestForm extends FormBase {
         'b' => 'B',
       ],
       '#default_value' => $type,
+      '#callback' => [static::class, 'test'],
+    ];
+    $form['test'] = [
+      '#type' => 'button',
+      '#button_type' => 'submit',
+      '#name' => '_triggering_element_name',
+      '#value' => 'type',
+      #'#callback' => [static::class, 'testsubmit'],
     ];
     (new Htmx())
       ->post($formUrl)
@@ -67,8 +75,8 @@ class HtmxTestForm extends FormBase {
 
     $push = FALSE;
     if ($this->getTriggerElement($form_state) === 'type') {
-      $form['data']['#markup'] = '';
-      $push = Url::fromRoute('test_htmx.form_builder_test');
+      //$form['data']['#markup'] = '';
+      //$push = Url::fromRoute('test_htmx.form_builder_test');
     }
     elseif ($this->getTriggerElement($form_state) === 'selected') {
       // A value is selected.
@@ -90,6 +98,14 @@ class HtmxTestForm extends FormBase {
       $htmxPost->applyTo($form['selected']);
     }
     return $form;
+  }
+
+  public static function test($form, FormStateInterface $form_state, $request) {
+    dump('ok');
+    $form['data']['#markup'] = '';
+  }
+  public static function testsubmit(&$form, FormStateInterface &$form_state, $request) {
+    $form['plop'] = ['#type' => 'button', '#title' => 'ok', '#value' => 'group'];
   }
 
   /**

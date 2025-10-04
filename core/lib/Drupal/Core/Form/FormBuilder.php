@@ -18,6 +18,7 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\HttpFoundation\InputBag;
@@ -1169,7 +1170,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // been identified yet, default it to the first button.
       $buttons = $form_state->getButtons();
       if (!$form_state->isProgrammed() && !$form_state->getTriggeringElement() && !empty($buttons)) {
-        $form_state->setTriggeringElement($buttons[0]);
+        //$form_state->setTriggeringElement($buttons[0]);
       }
 
       $triggering_element = $form_state->getTriggeringElement();
@@ -1201,6 +1202,20 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
         // forms to have several buttons named 'op' and switch on
         // $form_state->getValue('op') during submit handler execution.
         $form_state->setValue($triggering_element['#name'], $triggering_element['#value']);
+      }
+      if (isset($triggering_element['#callback'])) {
+        $callback = $form_state->prepareCallback($triggering_element['#callback']);
+        if (empty($callback) || !is_callable($callback)) {
+          throw new HttpException(500, 'The specified #callback is empty or not callable.');
+        }
+        $form_state->disableRedirect();
+        // We only allow altering of the form, not replacing the form with
+        // something else.
+        call_user_func_array($callback, [
+          &$element,
+          &$form_state,
+          $this->requestStack->getCurrentRequest()
+        ]);
       }
     }
     return $element;
