@@ -6,7 +6,6 @@ namespace Drupal\Tests\navigation\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\AxeCoreTestTrait;
-use Drupal\user\UserInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
@@ -30,19 +29,13 @@ class AccessibilityTest extends WebDriverTestBase {
   protected $profile = 'nightwatch_a11y_testing';
 
   /**
-   * A user with permission to access all admin pages & functionality.
-   */
-  protected UserInterface $user;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
 
     // Create an admin user and log in.
-    $this->user = $this->drupalCreateUser(admin: TRUE);
-    $this->drupalLogin($this->user);
+    $this->drupalLogin($this->drupalCreateUser(admin: TRUE));
   }
 
   /**
