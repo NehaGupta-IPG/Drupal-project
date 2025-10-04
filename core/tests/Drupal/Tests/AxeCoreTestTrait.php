@@ -76,6 +76,7 @@ trait AxeCoreTestTrait {
     $this->assertNotEmpty($results, 'Axe returned no results. This should not have happened.');
 
     // @todo Include `incomplete` results, as they are warnings that need review.
+    // @see https://docs.deque.com/devtools-for-web/4/en/needs-review-incomplete
     $this->assertEmpty(
       $results['violations'],
       $this->formatViolationsReport($results)
