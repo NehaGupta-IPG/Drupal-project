@@ -84,3 +84,7 @@
 
 # Ignore .env files as they are personal
 .env
+
+# Ignore database export files such as db.sql and db.sql.gz
+*.sql
+*.sql.gz
