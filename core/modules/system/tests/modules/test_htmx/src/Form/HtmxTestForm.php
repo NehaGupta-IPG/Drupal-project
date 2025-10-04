@@ -43,8 +43,8 @@ class HtmxTestForm extends FormBase {
       '#type' => 'button',
       '#button_type' => 'submit',
       '#name' => '_triggering_element_name',
-      '#value' => 'type',
-      #'#callback' => [static::class, 'testsubmit'],
+      '#value' => 'TEST!',
+      '#callback' => [static::class, 'testsubmit'],
     ];
     (new Htmx())
       ->post($formUrl)
