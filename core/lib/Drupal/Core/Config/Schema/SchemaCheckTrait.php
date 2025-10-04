@@ -92,36 +92,43 @@ trait SchemaCheckTrait {
    *   FALSE if no schema found. List of errors if any found. TRUE if fully
    *   valid.
    */
-  public function checkConfigSchema(TypedConfigManagerInterface $typed_config, $config_name, $config_data, bool $validate_constraints = FALSE) {
+  public function checkConfigSchema(
+    TypedConfigManagerInterface $typed_config,
+    $config_name,
+    $config_data,
+    bool $validate_constraints = FALSE,
+  ) {
+    // Ensure schema definitions are refreshed.
+    $typed_config->clearCachedDefinitions();
+
     $this->configName = $config_name;
+
     if (!$typed_config->hasConfigSchema($config_name)) {
       return FALSE;
     }
+
     $this->schema = $typed_config->createFromNameAndData($config_name, $config_data);
     $errors = [];
     foreach ($config_data as $key => $value) {
       $errors[] = $this->checkValue($key, $value);
     }
     $errors = array_merge(...$errors);
+
     if ($validate_constraints) {
-      // Also perform explicit validation. Note this does NOT require every node
-      // in the config schema tree to have validation constraints defined.
+      // Also perform explicit validation.
       $violations = $this->schema->validate();
       $filtered_violations = array_filter(
-        iterator_to_array($violations),
-        fn(ConstraintViolation $v) => !static::isViolationForIgnoredPropertyPath($v),
-      );
+            iterator_to_array($violations),
+            fn(ConstraintViolation $v) => !static::isViolationForIgnoredPropertyPath($v),
+        );
       $validation_errors = array_map(
-        fn(ConstraintViolation $v) => sprintf("[%s] %s", $v->getPropertyPath(), (string) $v->getMessage()),
-        $filtered_violations
-      );
-      // @todo Decide in https://www.drupal.org/project/drupal/issues/3395099 when/how to trigger deprecation errors or even failures for contrib modules.
+            fn(ConstraintViolation $v) => sprintf("[%s] %s", $v->getPropertyPath(), (string) $v->getMessage()),
+            $filtered_violations
+        );
+      // Merge validation errors with other schema errors.
       $errors = array_merge($errors, $validation_errors);
     }
 
-    if (empty($errors)) {
-      return TRUE;
-    }
     return $errors;
   }
 

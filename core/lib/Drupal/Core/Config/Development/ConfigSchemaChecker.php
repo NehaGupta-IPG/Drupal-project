@@ -73,8 +73,8 @@ class ConfigSchemaChecker implements EventSubscriberInterface {
    *   Exception thrown when configuration does not match its schema.
    */
   public function onConfigSave(ConfigCrudEvent $event) {
-    // Only validate configuration if in the default collection. Other
-    // collections may have incomplete configuration (for example language
+    // Only validate configuration if in the default collection.
+    // Other collections may have incomplete configuration (for example, language
     // overrides only). These are not valid in themselves.
     $saved_config = $event->getConfig();
     if ($saved_config->getStorage()->getCollectionName() != StorageInterface::DEFAULT_COLLECTION) {
@@ -84,9 +84,17 @@ class ConfigSchemaChecker implements EventSubscriberInterface {
     $name = $saved_config->getName();
     $data = $saved_config->get();
     $checksum = Crypt::hashBase64(serialize($data));
+
+    // Clear the cached configuration definitions to ensure they are reloaded.
+    \Drupal::service('config.typed')->clearCachedDefinitions();
+
+    // Check the schema only if it's not excluded and not already checked.
     if (!in_array($name, $this->exclude) && !isset($this->checked[$name . ':' . $checksum])) {
       $this->checked[$name . ':' . $checksum] = TRUE;
+
+      // Check the schema for this configuration.
       $errors = $this->checkConfigSchema($this->typedManager, $name, $data, $this->validateConstraints);
+
       if ($errors === FALSE) {
         throw new SchemaIncompleteException("No schema for $name");
       }
