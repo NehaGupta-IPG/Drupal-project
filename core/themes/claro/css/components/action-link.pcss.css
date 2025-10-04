@@ -289,6 +289,11 @@
       background-image: url(../../images/icons/ab1b1b/checkmark.svg);
     }
   }
+  &[title="Install Stark as default theme"] {
+    &::before {
+      background-image: url(../../images/configuration.png);
+    }
+  }
 }
 
 .action-link--icon-cog {

@@ -306,6 +306,10 @@
   background-image: url("data:image/svg+xml,%3csvg fill='none' height='16' stroke='%23ab1b1b' stroke-width='2' width='16' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M2 8.571L5.6 12 14 4'/%3e%3c/svg%3e");
 }
 
+.action-link--icon-checkmark[title="Install Stark as default theme"]::before {
+  background-image: url(../../images/configuration.png);
+}
+
 /* Cog */
 
 .action-link--icon-cog::before {
