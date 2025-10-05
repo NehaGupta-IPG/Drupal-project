@@ -8,12 +8,12 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Tests\file\Kernel\FileItemTest;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\workspaces\Entity\Workspace;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests using entity fields of the file field type in a workspace.
- *
- * @group workspaces
  */
+#[Group('workspaces')]
 class WorkspacesFileItemTest extends FileItemTest {
 
   use UserCreationTrait;
@@ -42,7 +42,7 @@ class WorkspacesFileItemTest extends FileItemTest {
     $this->entityTypeManager = \Drupal::entityTypeManager();
 
     $this->installEntitySchema('workspace');
-    $this->installSchema('workspaces', ['workspace_association']);
+    $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
 
     // Create a new workspace and activate it.
     Workspace::create(['id' => 'stage', 'label' => 'Stage'])->save();

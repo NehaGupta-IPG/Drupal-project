@@ -9,12 +9,12 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests aggregate functionality of views, for example count.
- *
- * @group views
  */
+#[Group('views')]
 class QueryGroupByTest extends ViewsKernelTestBase {
 
   /**
@@ -36,7 +36,6 @@ class QueryGroupByTest extends ViewsKernelTestBase {
    */
   protected static $modules = [
     'entity_test',
-    'system',
     'field',
     'user',
     'language',

@@ -11,12 +11,12 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the core Drupal\views\Plugin\views\field\Dropbutton handler.
- *
- * @group views
  */
+#[Group('views')]
 class FieldDropbuttonTest extends ViewsKernelTestBase {
 
   use ContentTypeCreationTrait;
@@ -32,7 +32,6 @@ class FieldDropbuttonTest extends ViewsKernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'user',
     'node',
     'field',
