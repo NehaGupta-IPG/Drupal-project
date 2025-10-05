@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcess;
  * Tests for the UnitTestCase class.
  */
 #[Group('Tests')]
-class UnitTestCaseTest extends UnitTestCase {
+final class UnitTestCaseTest extends UnitTestCase {
 
   /**
    * Tests the dump() function in a test run in the same process.
