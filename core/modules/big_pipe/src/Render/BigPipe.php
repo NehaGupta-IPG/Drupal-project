@@ -29,6 +29,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use function Drupal\Core\Async\stream;
 
 /**
  * Service for sending an HTML response in chunks (to get faster page loads).
@@ -488,7 +489,7 @@ class BigPipe {
     $fake_request->headers->set('Accept', 'application/vnd.drupal-ajax');
 
     // Create a Fiber for each placeholder.
-    $fibers = [];
+    $placeholder_operations = [];
 
     $cacheable_metadata = new CacheableMetadata();
 
@@ -497,145 +498,124 @@ class BigPipe {
         continue;
       }
       $placeholder_render_array = $placeholders[$placeholder_id];
-      $fibers[$placeholder_id] = new \Fiber(fn() => $this->renderPlaceholder($placeholder_id, $placeholder_render_array));
+      $placeholder_operations[$placeholder_id] = fn() => $this->renderPlaceholder($placeholder_id, $placeholder_render_array);
     }
-    $iterations = 0;
-    while (count($fibers) > 0) {
-      foreach ($fibers as $placeholder_id => $fiber) {
-        try {
-          if (!$fiber->isStarted()) {
-            $fiber->start();
-          }
-          elseif ($fiber->isSuspended()) {
-            $fiber->resume();
-          }
-          // If the Fiber hasn't terminated by this point, move onto the next
-          // placeholder, we'll resume this Fiber again when we get back here.
-          if (!$fiber->isTerminated()) {
-            // If we've gone through the placeholders once already, and they're
-            // still not finished, then start to allow code higher up the stack
-            // to get on with something else.
-            if ($iterations) {
-              $fiber = \Fiber::getCurrent();
-              if ($fiber !== NULL) {
-                $fiber->suspend();
-              }
-            }
-            continue;
-          }
-          $elements = $fiber->getReturn();
-          unset($fibers[$placeholder_id]);
+    foreach (stream($placeholder_operations) as $placeholder_id => $result) {
+      try {
+        // Errors are handled differently depending on configuration so throw
+        // a failed operation into our generic catch block.
+        if ($result->isError()) {
+          throw $result->getValue();
+        }
 
-          if ($this->debugCacheabilityHeaders) {
-            $cacheable_metadata->addCacheableDependency(CacheableMetadata::createFromRenderArray($elements));
+        $elements = $result->getValue();
+
+        if ($this->debugCacheabilityHeaders) {
+          $cacheable_metadata->addCacheableDependency(CacheableMetadata::createFromRenderArray($elements));
+        }
+
+        // Create a new AjaxResponse.
+        $ajax_response = new AjaxResponse();
+        // JavaScript's querySelector automatically decodes HTML entities in
+        // attributes, so we must decode the entities of the current BigPipe
+        // placeholder ID (which has HTML entities encoded since we use it to
+        // find the placeholders).
+        $big_pipe_js_placeholder_id = Html::decodeEntities($placeholder_id);
+        $ajax_response->addCommand(new ReplaceCommand(sprintf('[data-big-pipe-placeholder-id="%s"]', $big_pipe_js_placeholder_id), $elements['#markup']));
+        $ajax_response->setAttachments($elements['#attached']);
+
+        // Delete all messages that were generated during the rendering of this
+        // placeholder, to render them in a BigPipe-optimized way.
+        $messages = $this->messenger->deleteAll();
+        foreach ($messages as $type => $type_messages) {
+          foreach ($type_messages as $message) {
+            $ajax_response->addCommand(new MessageCommand($message, NULL, ['type' => $type], FALSE));
           }
-
-          // Create a new AjaxResponse.
-          $ajax_response = new AjaxResponse();
-          // JavaScript's querySelector automatically decodes HTML entities in
-          // attributes, so we must decode the entities of the current BigPipe
-          // placeholder ID (which has HTML entities encoded since we use it to
-          // find the placeholders).
-          $big_pipe_js_placeholder_id = Html::decodeEntities($placeholder_id);
-          $ajax_response->addCommand(new ReplaceCommand(sprintf('[data-big-pipe-placeholder-id="%s"]', $big_pipe_js_placeholder_id), $elements['#markup']));
-          $ajax_response->setAttachments($elements['#attached']);
-
-          // Delete all messages that were generated during the rendering of
-          // this placeholder, to render them in a BigPipe-optimized way.
-          $messages = $this->messenger->deleteAll();
-          foreach ($messages as $type => $type_messages) {
-            foreach ($type_messages as $message) {
-              $ajax_response->addCommand(new MessageCommand($message, NULL, ['type' => $type], FALSE));
-            }
-          }
-
-          // Push a fake request with the asset libraries loaded so far and
-          // dispatch KernelEvents::RESPONSE event. This results in the
-          // attachments for the AJAX response being processed by
-          // AjaxResponseAttachmentsProcessor and hence:
-          // - the necessary AJAX commands to load the necessary missing asset
-          //   libraries and updated AJAX page state are added to the AJAX
-          //   response
-          // - the attachments associated with the response are finalized,
-          // which allows us to track the total set of asset libraries sent in
-          // the initial HTML response plus all embedded AJAX responses sent so
-          // far.
-          $fake_request->query->set('ajax_page_state', ['libraries' => implode(',', $cumulative_assets->getAlreadyLoadedLibraries())] + $cumulative_assets->getSettings()['ajaxPageState']);
-          $ajax_response = $this->filterEmbeddedResponse($fake_request, $ajax_response);
-          // Send this embedded AJAX response.
-          $json = $ajax_response->getContent();
-          $output = <<<EOF
+        }
+        // Push a fake request with the asset libraries loaded so far and
+        // dispatch KernelEvents::RESPONSE event. This results in the
+        // attachments for the AJAX response being processed by
+        // AjaxResponseAttachmentsProcessor and hence:
+        // - the necessary AJAX commands to load the necessary missing asset
+        //   libraries and updated AJAX page state are added to the AJAX
+        //   response
+        // - the attachments associated with the response are finalized,
+        // which allows us to track the total set of asset libraries sent in
+        // the initial HTML response plus all embedded AJAX responses sent so
+        // far.
+        $fake_request->query->set('ajax_page_state', ['libraries' => implode(',', $cumulative_assets->getAlreadyLoadedLibraries())] + $cumulative_assets->getSettings()['ajaxPageState']);
+        $ajax_response = $this->filterEmbeddedResponse($fake_request, $ajax_response);
+        // Send this embedded AJAX response.
+        $json = $ajax_response->getContent();
+        $output = <<<EOF
 <script type="application/vnd.drupal-ajax" data-big-pipe-replacement-for-placeholder-with-id="$placeholder_id">
 $json
 </script>
 EOF;
-          $this->sendChunk($output);
+        $this->sendChunk($output);
 
-          // Another placeholder was rendered and sent, track the set of asset
-          // libraries sent so far. Any new settings are already sent; we
-          // don't need to track those.
-          if (isset($ajax_response->getAttachments()['drupalSettings']['ajaxPageState']['libraries'])) {
-            $cumulative_assets->setAlreadyLoadedLibraries(explode(',', $ajax_response->getAttachments()['drupalSettings']['ajaxPageState']['libraries']));
-          }
-        }
-        // Handle enforced redirect responses.
-        // A typical use case where this might happen are forms using GET as
-        // #method that are build inside a lazy builder.
-        catch (EnforcedResponseException $e) {
-          $response = $e->getResponse();
-          if (!$response instanceof RedirectResponse) {
-            throw $e;
-          }
-          $ajax_response = new AjaxResponse();
-          if ($response instanceof SecuredRedirectResponse) {
-            // Only redirect to safe locations.
-            $ajax_response->addCommand(new RedirectCommand($response->getTargetUrl()));
-          }
-          else {
-            try {
-              // SecuredRedirectResponse is an abstract class that requires a
-              // concrete implementation. Default to LocalRedirectResponse,
-              // which considers only redirects to within the same site as safe.
-              $safe_response = LocalRedirectResponse::createFromRedirectResponse($response);
-              $safe_response->setRequestContext($this->requestContext);
-              $ajax_response->addCommand(new RedirectCommand($safe_response->getTargetUrl()));
-            }
-            catch (\InvalidArgumentException) {
-              // If the above failed, it's because the redirect target wasn't
-              // local. Do not follow that redirect. Log an error message
-              // instead, then return a 400 response to the client with the
-              // error message. We don't throw an exception, because this is a
-              // client error rather than a server error.
-              $message = 'Redirects to external URLs are not allowed by default, use \Drupal\Core\Routing\TrustedRedirectResponse for it.';
-              $this->logger->error($message);
-              $ajax_response->addCommand(new MessageCommand($message));
-            }
-          }
-          $ajax_response = $this->filterEmbeddedResponse($fake_request, $ajax_response);
-
-          $json = $ajax_response->getContent();
-          $output = <<<EOF
-<script type="application/vnd.drupal-ajax" data-big-pipe-replacement-for-placeholder-with-id="$placeholder_id">
-$json
-</script>
-EOF;
-          $this->sendChunk($output);
-
-          // Send the stop signal.
-          $this->sendChunk("\n" . static::STOP_SIGNAL . "\n");
-          break;
-        }
-        catch (\Exception $e) {
-          unset($fibers[$placeholder_id]);
-          if ($this->configFactory->get('system.logging')->get('error_level') === ERROR_REPORTING_DISPLAY_VERBOSE) {
-            throw $e;
-          }
-          else {
-            trigger_error($e, E_USER_WARNING);
-          }
+        // Another placeholder was rendered and sent, track the set of asset
+        // libraries sent so far. Any new settings are already sent; we
+        // don't need to track those.
+        if (isset($ajax_response->getAttachments()['drupalSettings']['ajaxPageState']['libraries'])) {
+          $cumulative_assets->setAlreadyLoadedLibraries(explode(',', $ajax_response->getAttachments()['drupalSettings']['ajaxPageState']['libraries']));
         }
       }
-      $iterations++;
+      // Handle enforced redirect responses.
+      // A typical use case where this might happen are forms using GET as
+      // #method that are build inside a lazy builder.
+      catch (EnforcedResponseException $e) {
+        $response = $e->getResponse();
+        if (!$response instanceof RedirectResponse) {
+          throw $e;
+        }
+        $ajax_response = new AjaxResponse();
+        if ($response instanceof SecuredRedirectResponse) {
+          // Only redirect to safe locations.
+          $ajax_response->addCommand(new RedirectCommand($response->getTargetUrl()));
+        }
+        else {
+          try {
+            // SecuredRedirectResponse is an abstract class that requires a
+            // concrete implementation. Default to LocalRedirectResponse,
+            // which considers only redirects to within the same site as safe.
+            $safe_response = LocalRedirectResponse::createFromRedirectResponse($response);
+            $safe_response->setRequestContext($this->requestContext);
+            $ajax_response->addCommand(new RedirectCommand($safe_response->getTargetUrl()));
+          }
+          catch (\InvalidArgumentException) {
+            // If the above failed, it's because the redirect target wasn't
+            // local. Do not follow that redirect. Log an error message
+            // instead, then return a 400 response to the client with the
+            // error message. We don't throw an exception, because this is a
+            // client error rather than a server error.
+            $message = 'Redirects to external URLs are not allowed by default, use \Drupal\Core\Routing\TrustedRedirectResponse for it.';
+            $this->logger->error($message);
+            $ajax_response->addCommand(new MessageCommand($message));
+          }
+        }
+        $ajax_response = $this->filterEmbeddedResponse($fake_request, $ajax_response);
+
+        $json = $ajax_response->getContent();
+        $output = <<<EOF
+<script type="application/vnd.drupal-ajax" data-big-pipe-replacement-for-placeholder-with-id="$placeholder_id">
+$json
+</script>
+EOF;
+        $this->sendChunk($output);
+
+        // Send the stop signal.
+        $this->sendChunk("\n" . static::STOP_SIGNAL . "\n");
+        break;
+      }
+      catch (\Exception $e) {
+        if ($this->configFactory->get('system.logging')->get('error_level') === ERROR_REPORTING_DISPLAY_VERBOSE) {
+          throw $e;
+        }
+        else {
+          trigger_error($e, E_USER_ERROR);
+        }
+      }
     }
 
     if ($this->debugCacheabilityHeaders) {
