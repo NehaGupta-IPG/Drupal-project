@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -95,30 +96,33 @@ class ConfigSingleExportForm extends FormBase {
       '#type' => 'select',
       '#options' => $config_types,
       '#default_value' => $config_type,
-      '#ajax' => [
-        'callback' => '::updateConfigurationType',
-        'wrapper' => 'js-config-form-wrapper',
-      ],
+      '#callback' => '::updateConfigurationType',
     ];
+    (new Htmx())
+      ->post()
+      ->swap('none')
+      ->params('not config_name')
+      ->applyTo($form['config_type']);
     $default_type = $form_state->getValue('config_type', $config_type);
     $form['config_name'] = [
       '#title' => $this->t('Configuration name'),
       '#type' => 'select',
       '#options' => $this->findConfiguration($default_type),
       '#default_value' => $config_name,
-      '#prefix' => '<div id="edit-config-type-wrapper">',
+      '#prefix' => '<div id="edit-config-type-wrapper" data-hx-swap-oob="true">',
       '#suffix' => '</div>',
-      '#ajax' => [
-        'callback' => '::updateExport',
-        'wrapper' => 'edit-export-wrapper',
-      ],
+      '#callback' => '::updateExport',
     ];
+    (new Htmx())
+      ->post()
+      ->swap('none')
+      ->applyTo($form['config_name']);
 
     $form['export'] = [
       '#title' => $this->t('Here is your configuration:'),
       '#type' => 'textarea',
       '#rows' => 24,
-      '#prefix' => '<div id="edit-export-wrapper">',
+      '#prefix' => '<div id="edit-export-wrapper" data-hx-swap-oob="true">',
       '#suffix' => '</div>',
     ];
     if ($config_type && $config_name) {
@@ -134,7 +138,7 @@ class ConfigSingleExportForm extends FormBase {
   /**
    * Handles switching the configuration type selector.
    */
-  public function updateConfigurationType($form, FormStateInterface $form_state) {
+  public function updateConfigurationType(&$form, FormStateInterface &$form_state) {
     $form['config_name']['#options'] = $this->findConfiguration($form_state->getValue('config_type'));
     $form['export']['#value'] = NULL;
     return $form;
@@ -143,7 +147,7 @@ class ConfigSingleExportForm extends FormBase {
   /**
    * Handles switching the export textarea.
    */
-  public function updateExport($form, FormStateInterface $form_state) {
+  public function updateExport(&$form, FormStateInterface &$form_state) {
     // Determine the full config name for the selected config entity.
     if ($form_state->getValue('config_type') !== 'system.simple') {
       $definition = $this->entityTypeManager->getDefinition($form_state->getValue('config_type'));
