@@ -238,8 +238,7 @@
       // Update .first marker for items. We need recurse from parent to retain
       // the actual DOM element order as jQuery implements sortOrder, but not
       // as public method.
-      this.item
-        .parent()
+      $(this.item[0].parentElement)
         .children('.vertical-tabs__menu-item')
         .removeClass('first')
         .filter(':visible')
@@ -264,8 +263,7 @@
       // Update .first marker for items. We need recurse from parent to retain
       // the actual DOM element order as jQuery implements sortOrder, but not
       // as public method.
-      this.item
-        .parent()
+      $(this.item[0].parentElement)
         .children('.vertical-tabs__menu-item')
         .removeClass('first')
         .filter(':visible')
