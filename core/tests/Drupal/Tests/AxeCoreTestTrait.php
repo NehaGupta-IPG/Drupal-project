@@ -43,7 +43,14 @@ trait AxeCoreTestTrait {
     $session = $this->getSession();
 
     // Load axe-core script.
-    $axe_src = file_get_contents(DRUPAL_ROOT . '/core/node_modules/axe-core/axe.min.js');
+    @$axe_src = file_get_contents(DRUPAL_ROOT . '/core/node_modules/axe-core/axe.min.js');
+
+    if ($axe_src === FALSE) {
+      throw new \Exception(
+        'Failed loading the axe-core JavaScript library. You may need to run `yarn install` in the `core` directory.'
+      );
+    }
+
     $session->executeScript($axe_src);
 
     // Run axe then wait for the results.
