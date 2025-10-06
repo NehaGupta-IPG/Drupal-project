@@ -384,6 +384,7 @@
         )}</a><ul class="action-list" style="display:none;"></ul></li>`,
       );
       const $displayButtons = $menu.nextAll('input.add-display').detach();
+      // eslint-disable-next-line no-jquery/no-parent
       $displayButtons
         .appendTo($addDisplayDropdown.find('.action-list'))
         .wrap('<li>')
@@ -1213,7 +1214,14 @@
    */
   Drupal.viewsUi.Checkboxifier = function (button) {
     this.$button = $(button);
-    this.$parent = this.$button.parent('div.views-expose, div.views-grouped');
+    this.$parent = $(
+      document.evaluate(
+        './parent::div[contains(@class, "views-expose") or contains(@class, "views-grouped")]',
+        this.$button[0],
+        null,
+        XPathResult.FIRST_ORDERED_NODE_TYPE,
+      ).singleNodeValue,
+    );
     this.$input = this.$parent.find('input:checkbox, input:radio');
     // Hide the button and its description.
     this.$button.hide();
