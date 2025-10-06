@@ -707,6 +707,24 @@ JS;
         $this->waitForEditor();
       }
     }
+
+    // Test AdjacentListsSupport plugin.
+    $this->drupalGet($edit_url);
+    $this->waitForEditor();
+
+    $this->pressEditorButton('Source');
+    $source_text_area = $assert_session->waitForElement('css', '.ck-source-editing-area textarea');
+
+    $expected_markup = '<ul class="list-1"><li>apple</li><li>banana</li></ul><ul class="list-2"><li>cantaloupe</li><li>orange</li></ul>';
+    $source_text_area->setValue($expected_markup);
+
+    // Click source again to make source inactive.
+    $this->pressEditorButton('Source');
+    $this->waitForEditor();
+    $actual_markup = $this->getEditorDataAsHtmlString();
+    $this->assertSame($expected_markup, $actual_markup);
+    $page->pressButton('Save');
+    $assert_session->responseContains($expected_markup);
   }
 
   /**
