@@ -82,7 +82,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
    *
    * @var bool
    */
-  protected static $noViewAccessControl = FALSE;
+  protected static bool $noViewAccessControl = FALSE;
 
   /**
    * The tested entity type.
