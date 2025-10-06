@@ -7,6 +7,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
 use Drupal\Core\TypedData\Plugin\DataType\Map;
 use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\Core\TypedData\DataDefinition;
 
 /**
  * An entity field item.
@@ -61,7 +62,7 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
     parent::__construct($definition, $name, $parent);
     // Initialize computed properties by default, such that they get cloned
     // with the whole item.
-    foreach ($this->definition->getPropertyDefinitions() as $name => $definition) {
+    foreach ($this->getPropertyDefinitions() as $name => $definition) {
       if ($definition->isComputed()) {
         $this->properties[$name] = \Drupal::typedDataManager()->getPropertyInstance($this, $name);
       }
@@ -72,21 +73,35 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
    * {@inheritdoc}
    */
   public function getEntity() {
-    return $this->getParent()->getEntity();
+    return $this->getParent()?->getEntity();
   }
 
   /**
    * {@inheritdoc}
    */
   public function getLangcode() {
-    return $this->getParent()->getLangcode();
+    return $this->getParent()?->getLangcode();
   }
 
   /**
    * {@inheritdoc}
    */
   public function getFieldDefinition() {
-    return $this->definition->getFieldDefinition();
+    return $this->getDataDefinition()->getFieldDefinition();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPropertyDefinitions(): array {
+    return $this->getDataDefinition()->getPropertyDefinitions();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPropertyDefinition($name): ?DataDefinition {
+    return $this->getDataDefinition()->getPropertyDefinition($name);
   }
 
   /**
@@ -119,7 +134,7 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
     // Treat the values as property value of the first property, if no array is
     // given.
     if (isset($values) && !is_array($values)) {
-      $keys = array_keys($this->definition->getPropertyDefinitions());
+      $keys = array_keys($this->getPropertyDefinitions());
       $values = [$keys[0] => $values];
     }
     parent::setValue($values, $notify);
@@ -184,7 +199,7 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
    * {@inheritdoc}
    */
   public function __unset($name) {
-    if ($this->definition->getPropertyDefinition($name)) {
+    if ($this->getPropertyDefinition($name)) {
       $this->set($name, NULL);
     }
     else {
