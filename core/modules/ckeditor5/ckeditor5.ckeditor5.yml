@@ -394,6 +394,7 @@ ckeditor5_list:
     plugins:
       - list.List
       - list.ListProperties
+      - list.AdjacentListsSupport
     # @see \Drupal\ckeditor5\Plugin\CKEditor5Plugin\ListPlugin::getDynamicPluginConfig()
     config: {}
   drupal:
