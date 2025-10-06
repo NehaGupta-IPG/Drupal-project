@@ -109,10 +109,7 @@ abstract class AreaPluginBase extends HandlerBase {
   public function validateOptionsForm(&$form, FormStateInterface $form_state): void {
     $area_id = $form_state->getValue(['options', 'area_id', 'area_id']);
     if ($area_id) {
-      if (preg_match(
-        '/[^a-z0-9_]/',
-        $form_state->getValue(['options', 'area_id', 'area_id']))
-      ) {
+      if (preg_match('/[^a-z0-9_]/', $form_state->getValue(['options', 'area_id', 'area_id']))) {
         $form_state->setError($form['area_id'], $this->t(
           'Area id must contain only lowercase letters, numbers, or underscores.'
         ));

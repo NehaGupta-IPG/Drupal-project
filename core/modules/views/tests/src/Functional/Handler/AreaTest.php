@@ -116,6 +116,22 @@ class AreaTest extends ViewTestBase {
       $this->assertNotEmpty($handlers[$new_id], 'Data found for new area ID key.');
       $this->assertSame($new_id, $handlers[$new_id]['id'], 'New area ID matches the area ID key.');
       $this->assertArrayNotHasKey('test_example', $handlers);
+
+      // Test form validation for invalid area ids.
+      $error_text = 'Area id must contain only lowercase letters, numbers, or underscores.';
+
+      $this->drupalGet($edit_path);
+      $this->submitForm(['options[area_id][area_id]' => 'test 1'], 'Apply');
+      $this->assertSession()->pageTextContains($error_text);
+
+      $this->drupalGet($edit_path);
+      $this->submitForm(['options[area_id][area_id]' => 'test_1#'], 'Apply');
+      $this->assertSession()->pageTextContains($error_text);
+
+      // Test using a non-unique area id.
+      $this->drupalGet($edit_path);
+      $this->submitForm(['options[area_id][area_id]' => 'test_example_2'], 'Apply');
+      $this->assertSession()->pageTextContains('Area id should be unique.');
     }
   }
 
