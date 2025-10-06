@@ -75,6 +75,16 @@ use Psr\Http\Message\ResponseInterface;
 abstract class EntityResourceTestBase extends ResourceTestBase {
 
   /**
+   * Set to TRUE if there is no view access control.
+   *
+   * For example, Menu Link Content entities to external URLs are accessible to
+   * anonymous users.
+   *
+   * @var bool
+   */
+  protected static $noViewAccessControl = FALSE;
+
+  /**
    * The tested entity type.
    *
    * @var string
@@ -526,7 +536,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
 
     // DX: forgetting authentication: authentication provider-specific error
     // response.
-    if (static::$auth) {
+    if (static::$auth && !static::$noViewAccessControl) {
       $response = $this->request('GET', $url, $request_options);
       // Mitigate https://www.drupal.org/project/drupal/issues/3451483 until
       // it gets resolved.
@@ -566,13 +576,16 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       $this->assertResourceErrorResponse(403, FALSE, $response, $expected_403_cacheability->getCacheTags(), $expected_403_cacheability->getCacheContexts(), static::$auth ? FALSE : 'MISS', FALSE);
     }
     $this->assertSame(static::$auth ? ['UNCACHEABLE (request policy)'] : ['MISS'], $response->getHeader('X-Drupal-Cache'));
-    // DX: 403 because unauthorized.
-    $url->setOption('query', ['_format' => static::$format]);
-    $response = $this->request('GET', $url, $request_options);
-    // Mitigate https://www.drupal.org/project/drupal/issues/3451483 until
-    // it gets resolved.
-    $response = $response->withoutHeader('X-Drupal-Dynamic-Cache');
-    $this->assertResourceErrorResponse(403, FALSE, $response, $expected_403_cacheability->getCacheTags(), $expected_403_cacheability->getCacheContexts(), static::$auth ? FALSE : 'MISS', FALSE);
+
+    if (!static::$noViewAccessControl) {
+      // DX: 403 because unauthorized.
+      $url->setOption('query', ['_format' => static::$format]);
+      $response = $this->request('GET', $url, $request_options);
+      // Mitigate https://www.drupal.org/project/drupal/issues/3451483 until
+      // it gets resolved.
+      $response = $response->withoutHeader('X-Drupal-Dynamic-Cache');
+      $this->assertResourceErrorResponse(403, FALSE, $response, $expected_403_cacheability->getCacheTags(), $expected_403_cacheability->getCacheContexts(), static::$auth ? FALSE : 'MISS', FALSE);
+    }
 
     // Then, what we'll use for the remainder of the test: multiple formats.
     $this->provisionEntityResource();
@@ -596,12 +609,14 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
 
     // DX: 403 because unauthorized.
     $url->setOption('query', ['_format' => static::$format]);
-    $response = $this->request('GET', $url, $request_options);
-    // Mitigate https://www.drupal.org/project/drupal/issues/3451483 until
-    // it gets resolved.
-    $response = $response->withoutHeader('X-Drupal-Dynamic-Cache');
-    $this->assertResourceErrorResponse(403, $this->getExpectedUnauthorizedAccessMessage('GET'), $response, $expected_403_cacheability->getCacheTags(), $expected_403_cacheability->getCacheContexts(), static::$auth ? FALSE : 'MISS', FALSE);
-    $this->assertArrayNotHasKey('Link', $response->getHeaders());
+    if (!static::$noViewAccessControl) {
+      $response = $this->request('GET', $url, $request_options);
+      // Mitigate https://www.drupal.org/project/drupal/issues/3451483 until
+      // it gets resolved.
+      $response = $response->withoutHeader('X-Drupal-Dynamic-Cache');
+      $this->assertResourceErrorResponse(403, $this->getExpectedUnauthorizedAccessMessage('GET'), $response, $expected_403_cacheability->getCacheTags(), $expected_403_cacheability->getCacheContexts(), static::$auth ? FALSE : 'MISS', FALSE);
+      $this->assertArrayNotHasKey('Link', $response->getHeaders());
+    }
 
     $this->setUpAuthorization('GET');
 
