@@ -10,12 +10,12 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\workspaces\Entity\Workspace;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the entity repository integration for workspaces.
- *
- * @group workspaces
  */
+#[Group('workspaces')]
 class WorkspaceEntityRepositoryTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -55,7 +55,7 @@ class WorkspaceEntityRepositoryTest extends KernelTestBase {
     $this->installEntitySchema('entity_test_mulrevpub');
     $this->installEntitySchema('workspace');
 
-    $this->installSchema('workspaces', ['workspace_association']);
+    $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
 
     $this->installConfig(['system', 'language']);
     ConfigurableLanguage::createFromLangcode('ro')
@@ -69,8 +69,8 @@ class WorkspaceEntityRepositoryTest extends KernelTestBase {
   /**
    * Tests retrieving active variants in a workspace.
    *
-   * @covers \Drupal\Core\Entity\EntityRepository::getActive
-   * @covers \Drupal\Core\Entity\EntityRepository::getActiveMultiple
+   * @legacy-covers \Drupal\Core\Entity\EntityRepository::getActive
+   * @legacy-covers \Drupal\Core\Entity\EntityRepository::getActiveMultiple
    */
   public function testGetActive(): void {
     $en_contexts = ['langcode' => 'en'];

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block\Kernel\Migrate\d7;
 
-use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
 use Drupal\block\Hook\BlockHooks;
+use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests migration of i18n block translations.
- *
- * @group migrate_drupal_7
  */
+#[Group('migrate_drupal_7')]
 class MigrateBlockContentTranslationTest extends MigrateDrupal7TestBase {
 
   /**
@@ -48,6 +48,7 @@ class MigrateBlockContentTranslationTest extends MigrateDrupal7TestBase {
       'd7_filter_format',
       'block_content_type',
       'block_content_body_field',
+      'block_content_body_field_storage',
       'd7_custom_block',
       'd7_user_role',
       'd7_block',

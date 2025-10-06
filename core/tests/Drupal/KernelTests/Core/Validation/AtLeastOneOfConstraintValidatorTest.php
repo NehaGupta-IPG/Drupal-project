@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Validation;
 
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\Core\Validation\Plugin\Validation\Constraint\AtLeastOneOfConstraint;
+use Drupal\Core\Validation\Plugin\Validation\Constraint\AtLeastOneOfConstraintValidator;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests AtLeastOneOf validation constraint with both valid and invalid values.
- *
- * @legacy-covers \Drupal\Core\Validation\Plugin\Validation\Constraint\AtLeastOneOfConstraint
- * @legacy-covers \Drupal\Core\Validation\Plugin\Validation\Constraint\AtLeastOneOfConstraintValidator
  */
 #[Group('Validation')]
+#[CoversClass(AtLeastOneOfConstraint::class)]
+#[CoversClass(AtLeastOneOfConstraintValidator::class)]
 class AtLeastOneOfConstraintValidatorTest extends KernelTestBase {
 
   /**
@@ -23,14 +25,14 @@ class AtLeastOneOfConstraintValidatorTest extends KernelTestBase {
    *
    * @var \Drupal\Core\TypedData\TypedDataManager
    */
-  protected $typedData;
+  protected $typedDataManager;
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->typedData = $this->container->get('typed_data_manager');
+    $this->typedDataManager = $this->container->get('typed_data_manager');
   }
 
   /**
@@ -54,7 +56,7 @@ class AtLeastOneOfConstraintValidatorTest extends KernelTestBase {
     ]);
 
     // Test the validation.
-    $typed_data = $this->typedData->create($definition, $value);
+    $typed_data = $this->typedDataManager->create($definition, $value);
     $violations = $typed_data->validate();
 
     $violationMessages = [];
