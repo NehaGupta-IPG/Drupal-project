@@ -13,12 +13,12 @@ use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\CancellationHandlerInterface;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests how comments react to user cancellation.
- *
- * @group comment
  */
+#[Group('comment')]
 class UserCancellationTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;

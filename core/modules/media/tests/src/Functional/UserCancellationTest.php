@@ -8,12 +8,12 @@ use Drupal\media\Entity\Media;
 use Drupal\Tests\user\Traits\UserCancellationTrait;
 use Drupal\user\CancellationHandlerInterface;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests how media items react to user cancellation.
- *
- * @group media
  */
+#[Group('media')]
 class UserCancellationTest extends MediaFunctionalTestBase {
 
   use UserCancellationTrait;

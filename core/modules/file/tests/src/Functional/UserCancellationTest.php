@@ -8,12 +8,12 @@ use Drupal\file\Entity\File;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\user\Traits\UserCancellationTrait;
 use Drupal\user\CancellationHandlerInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests how file entities react to user cancellation.
- *
- * @group file
  */
+#[Group('file')]
 class UserCancellationTest extends BrowserTestBase {
 
   use UserCancellationTrait;

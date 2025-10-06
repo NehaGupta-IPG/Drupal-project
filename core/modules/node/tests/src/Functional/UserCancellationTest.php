@@ -9,12 +9,12 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\user\Traits\UserCancellationTrait;
 use Drupal\user\CancellationHandlerInterface;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests how nodes react to user cancellation.
- *
- * @group node
  */
+#[Group('node')]
 class UserCancellationTest extends BrowserTestBase {
 
   use UserCancellationTrait;
