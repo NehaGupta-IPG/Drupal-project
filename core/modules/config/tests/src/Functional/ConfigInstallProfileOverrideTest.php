@@ -13,6 +13,7 @@ use Drupal\system\Entity\Action;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that configuration objects are correct after various operations.
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\Group;
  * and uninstall functionality is tested.
  */
 #[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigInstallProfileOverrideTest extends BrowserTestBase {
 
   /**
@@ -109,7 +111,11 @@ class ConfigInstallProfileOverrideTest extends BrowserTestBase {
     // type does not exist.
     $optional_dir = $this->getModulePath('testing_config_overrides') . '/' . InstallStorage::CONFIG_OPTIONAL_DIRECTORY;
     $optional_storage = new FileStorage($optional_dir);
-    foreach (['config_test.dynamic.dotted.default', 'config_test.dynamic.override', 'config_test.dynamic.override_unmet'] as $id) {
+    foreach ([
+      'config_test.dynamic.dotted.default',
+      'config_test.dynamic.override',
+      'config_test.dynamic.override_unmet',
+    ] as $id) {
       $this->assertTrue(\Drupal::config($id)->isNew(), "The config_test entity $id contained in the profile's optional directory does not exist.");
       // Make that we don't get false positives from the assertion above.
       $this->assertTrue($optional_storage->exists($id), "The config_test entity $id does exist in the profile's optional directory.");

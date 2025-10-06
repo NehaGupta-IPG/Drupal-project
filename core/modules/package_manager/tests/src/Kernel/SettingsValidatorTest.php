@@ -7,12 +7,18 @@ namespace Drupal\Tests\package_manager\Kernel;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\PreCreateEvent;
 use Drupal\package_manager\ValidationResult;
+use Drupal\package_manager\Validator\SettingsValidator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @covers \Drupal\package_manager\Validator\SettingsValidator
- * @group package_manager
+ * Tests Settings Validator.
+ *
  * @internal
  */
+#[Group('package_manager')]
+#[CoversClass(SettingsValidator::class)]
 class SettingsValidatorTest extends PackageManagerKernelTestBase {
 
   /**
@@ -37,9 +43,8 @@ class SettingsValidatorTest extends PackageManagerKernelTestBase {
    *   The value of the update_fetch_with_http_fallback setting.
    * @param \Drupal\package_manager\ValidationResult[] $expected_results
    *   The expected validation results.
-   *
-   * @dataProvider providerSettingsValidation
    */
+  #[DataProvider('providerSettingsValidation')]
   public function testSettingsValidation(bool $setting, array $expected_results): void {
     $this->setSetting('update_fetch_with_http_fallback', $setting);
     $this->assertStatusCheckResults($expected_results);
@@ -53,9 +58,8 @@ class SettingsValidatorTest extends PackageManagerKernelTestBase {
    *   The value of the update_fetch_with_http_fallback setting.
    * @param \Drupal\package_manager\ValidationResult[] $expected_results
    *   The expected validation results.
-   *
-   * @dataProvider providerSettingsValidation
    */
+  #[DataProvider('providerSettingsValidation')]
   public function testSettingsValidationDuringPreApply(bool $setting, array $expected_results): void {
     $this->addEventTestListener(function () use ($setting): void {
       $this->setSetting('update_fetch_with_http_fallback', $setting);

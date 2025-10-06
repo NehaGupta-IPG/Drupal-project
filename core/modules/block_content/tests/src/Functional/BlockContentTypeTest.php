@@ -9,11 +9,13 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensures that block type functions work correctly.
  */
 #[Group('block_content')]
+#[RunTestsInSeparateProcesses]
 class BlockContentTypeTest extends BlockContentTestBase {
 
   use AssertBreadcrumbTrait;
@@ -246,7 +248,10 @@ class BlockContentTypeTest extends BlockContentTestBase {
         $blocks = $storage->loadByProperties(['info' => $edit['info[0][value]']]);
         if (!empty($blocks)) {
           $block = reset($blocks);
-          $this->assertSession()->addressEquals(Url::fromRoute('block.admin_add', ['plugin_id' => 'block_content:' . $block->uuid(), 'theme' => $theme]));
+          $this->assertSession()->addressEquals(Url::fromRoute('block.admin_add', [
+            'plugin_id' => 'block_content:' . $block->uuid(),
+            'theme' => $theme,
+          ]));
           $this->submitForm(['region' => 'content'], 'Save block');
           $this->assertSession()->addressEquals(Url::fromRoute('block.admin_display_theme', ['theme' => $theme], ['query' => ['block-placement' => $theme . '-' . Html::getClass($edit['info[0][value]'])]]));
         }
