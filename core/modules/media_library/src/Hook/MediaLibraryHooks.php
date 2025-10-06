@@ -2,13 +2,13 @@
 
 namespace Drupal\media_library\Hook;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseModalDialogCommand;
-use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Ajax\InvokeCommand;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -31,6 +31,7 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Render\Element;
 use Drupal\media_library\MediaLibraryDisplayManager;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Hook implementations for media_library.
@@ -242,52 +243,42 @@ class MediaLibraryHooks {
   public function formMediaFormAlter(array &$form, FormStateInterface $form_state, $form_id) : void {
     // Make the media edit form work inside modal dialogs.
     $form_object = $form_state->getFormObject();
-    if (is_object($form_object) && $form_object->getOperation() === 'edit') {
-      $currentRequest = $this->requestStack->getCurrentRequest();
-      $wrapper_format = $currentRequest->query->get(MainContentViewSubscriber::WRAPPER_FORMAT);
+    if (!$form_object instanceof EntityFormInterface || $form_object->getOperation() !== 'edit') {
+      return;
+    }
 
-      // Make sure that the media library opener is actually the 'field_widget'.
-      // Get the request uri for the $form.
-      $mediaLibraryOpenerId = $currentRequest->getRequestUri();
+    $request = $this->requestStack->getCurrentRequest();
 
-      // Extract and parse the 'media_library_opener_id' from the request URI.
-      $queryString = parse_url($mediaLibraryOpenerId, PHP_URL_QUERY);
-      parse_str($queryString ?? '', $queryParams);
-      $mediaLibraryOpenerId = $queryParams['media_library_opener_id'] ?? NULL;
+    try {
+      $state = MediaLibraryState::fromRequest($request);
+    } catch (BadRequestHttpException $e) {
+      return;
+    } catch (\InvalidArgumentException $e) {
+      return;
+    }
+    if ($state->getOpenerId() !== 'media_library.opener.field_widget') {
+      return;
+    }
 
-      if (($wrapper_format === 'drupal_modal' || $wrapper_format === 'drupal_ajax') && $mediaLibraryOpenerId === 'media_library.opener.field_widget') {
-        foreach (Element::children($form['actions']) as $key) {
-          if ($key === 'submit') {
-            // The default name is 'op', but we change it on purpose so that it is
-            // easier to detect our modified AJAX call above.
-            $form['actions'][$key]['#name'] = 'media_library_ajax_submit';
-            $form['actions'][$key]['#ajax'] = [
-              'callback' => [$this, 'mediaEditFormAjaxCallback'],
-            ];
+    $wrapper_format = $request->query->get(MainContentViewSubscriber::WRAPPER_FORMAT);
+    if ($wrapper_format !== 'drupal_modal' && $wrapper_format !== 'drupal_ajax') {
+      return;
+    }
 
-            // Prevent the form that opened the modal dialog to refocus to the
-            // 'Save' button at the bottom of the form.
-            $form['actions'][$key]['#attributes']['data-disable-refocus'] = 'true';
+    foreach (Element::children($form['actions']) as $key) {
+      if ($key === 'submit') {
+        // Add an AJAX submit handler to the 'Save' button.
+        $form['actions'][$key]['#submit'][] = [$this, 'mediaEditFormAjaxCallback'];
+        $form['actions'][$key]['#attributes']['class'][] = 'use-ajax-submit';
 
-            // Reattach dialog AJAX library.
-            $form['#attached']['library'][] = 'core/drupal.dialog.ajax';
-
-            // The data-drupal-selector needs to be the same between the various
-            // AJAX requests. A bug in \Drupal\Core\Form\FormBuilder prevents that
-            // from happening unless $form['#id'] is also the same. Normally, #id
-            // is set to a unique HTML ID via Html::getUniqueId(), but here we
-            // bypass that in order to work around the data-drupal-selector bug.
-            // This is okay so long as we assume that this form only ever occurs
-            // once on a page.
-            // @todo: Remove once https://www.drupal.org/node/2897377 is fixed.
-            $form['#id'] = Html::getId($form_state->getBuildInfo()['form_id']);
-          }
-          else {
-            // We just want to allow the save action for now. Just hide other
-            // actions like the delete action.
-            $form['actions'][$key]['#access'] = FALSE;
-          }
-        }
+        // Prevent the form that opened the modal dialog to refocus to the
+        // 'Save' button at the bottom of the form.
+        $form['actions'][$key]['#attributes']['data-disable-refocus'] = 'true';
+      }
+      else {
+        // We just want to allow the save action for now. Just hide other
+        // actions like the delete action.
+        $form['actions'][$key]['#access'] = FALSE;
       }
     }
   }
@@ -381,26 +372,30 @@ class MediaLibraryHooks {
    *
    * @internal
    */
-  public function mediaEditFormAjaxCallback(array &$form, FormStateInterface $form_state): AjaxResponse {
-    $response = new AjaxResponse();
-    if (!$form_state->hasAnyErrors()) {
-      $media = $form_state->getFormObject()->getEntity();
-      $render_array = $this->entityTypeManager->getViewBuilder('media')->view($media, 'media_library');
-      $html = $this->renderer->render($render_array);
-      $response->addCommand(new CloseModalDialogCommand());
-      $response->addCommand(new ReplaceCommand('.selected-media', $html));
+  public function mediaEditFormAjaxCallback(array &$form, FormStateInterface $form_state): void {
+    $request = $this->requestStack->getCurrentRequest();
 
-      // Remove status messages when editing medias.
-      $this->messenger->deleteByType(MessengerInterface::TYPE_STATUS);
+    try {
+      $state = MediaLibraryState::fromRequest($request);
+    } catch (BadRequestHttpException $e) {
+      return;
+    } catch (\InvalidArgumentException $e) {
+      return;
     }
-    else {
-      $form['status_messages'] = [
-        '#type' => 'status_messages',
-        '#weight' => -1000,
-      ];
-      $response->addCommand(new ReplaceCommand('[data-drupal-selector="' . $form['#attributes']['data-drupal-selector'] . '"]', $form));
+
+    $opener_parameters = $state->getOpenerParameters();
+    if (empty($opener_parameters['field_widget_id'])) {
+      return;
     }
-    return $response;
+
+    // Trigger the field widget to update itself and close the dialog.
+    $response = new AjaxResponse();
+    $response->addCommand(new InvokeCommand("[data-media-library-widget-update=\"{$opener_parameters['field_widget_id']}\"]", 'trigger', ['mousedown']));
+    $response->addCommand(new CloseModalDialogCommand());
+    $form_state->setResponse($response);
+
+    // Remove status messages when editing medias.
+    $this->messenger->deleteByType(MessengerInterface::TYPE_STATUS);
   }
 
 }
