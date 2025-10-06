@@ -9,7 +9,9 @@ use Drupal\comment\Entity\CommentType;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\node\NodeInterface;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\CancellationHandlerInterface;
 use Drupal\user\UserInterface;
@@ -23,6 +25,7 @@ class UserCancellationTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;
   use UserCreationTrait;
+  use NodeCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -31,6 +34,7 @@ class UserCancellationTest extends KernelTestBase {
     'comment',
     'field',
     'node',
+    'filter',
     'system',
     'text',
     'user',
@@ -48,6 +52,7 @@ class UserCancellationTest extends KernelTestBase {
     $this->installEntitySchema('user');
     $this->installConfig('node');
     $this->installConfig('user');
+    $this->installConfig('filter');
 
     CommentType::create([
       'id' => 'test',
@@ -82,7 +87,8 @@ class UserCancellationTest extends KernelTestBase {
     // With the BLOCK_UNPUBLISH method, the comment should still be associated
     // with the cancelled account, but be unpublished.
     $user = $this->createUser();
-    $comment = $this->createComment($user);
+    $node = $this->createNode();
+    $comment = $this->createComment($user, $node);
     user_cancel([], $user->id(), CancellationHandlerInterface::METHOD_BLOCK_UNPUBLISH);
     $comment = Comment::load($comment->id());
     $this->assertSame($user->id(), $comment->getOwnerId());
@@ -91,7 +97,7 @@ class UserCancellationTest extends KernelTestBase {
     // With the REASSIGN method, the comment should still be published, but
     // associated with the anonymous user.
     $user = $this->createUser();
-    $comment = $this->createComment($user);
+    $comment = $this->createComment($user, $node);
     user_cancel([], $user->id(), CancellationHandlerInterface::METHOD_REASSIGN);
     $comment = Comment::load($comment->id());
     $this->assertTrue($comment->getOwner()->isAnonymous());
@@ -100,7 +106,7 @@ class UserCancellationTest extends KernelTestBase {
 
     // The DELETE method should delete the comment outright.
     $user = $this->createUser();
-    $comment = $this->createComment($user);
+    $comment = $this->createComment($user, $node);
     user_cancel([], $user->id(), CancellationHandlerInterface::METHOD_DELETE);
     $this->assertNull(Comment::load($comment->id()));
   }
@@ -110,14 +116,17 @@ class UserCancellationTest extends KernelTestBase {
    *
    * @param \Drupal\user\UserInterface $user
    *   The user account which should own the comment.
+   * @param \Drupal\node\NodeInterface $node
+   *   The node this comment is for.
    *
    * @return \Drupal\comment\Entity\Comment
    *   The saved comment entity.
    */
-  protected function createComment(UserInterface $user): Comment {
+  protected function createComment(UserInterface $user, NodeInterface $node): Comment {
     $comment = Comment::create([
       'comment_type' => 'test',
       'entity_type' => 'node',
+      'entity_id' => $node->id(),
       'field_name' => 'comments',
     ]);
     $comment->setOwner($user)->setPublished()->save();
