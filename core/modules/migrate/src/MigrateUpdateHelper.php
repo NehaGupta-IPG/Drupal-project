@@ -142,7 +142,7 @@ class MigrateUpdateHelper {
   protected function getLegacyTableNames($id) {
     // The legacy method for creating the migrate table names.
     $machine_name = str_replace(':', '__', $id);
-    $prefix_length = strlen($this->database->tablePrefix());
+    $prefix_length = strlen($this->database->getPrefix());
     $mapTableName = 'migrate_map_' . mb_strtolower($machine_name);
     $mapTableName = mb_substr($mapTableName, 0, 63 - $prefix_length);
     $messageTableName = 'migrate_message_' . mb_strtolower($machine_name);

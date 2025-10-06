@@ -78,7 +78,7 @@ class MigrateLookupTest extends MigrateTestBase {
 
     // The test database type use different prefix lengths so we recalculate the
     // table name.
-    $prefix_length = strlen(\Drupal::database()->tablePrefix());
+    $prefix_length = strlen(\Drupal::database()->getPrefix());
     $table_name = 'migrate_map_' . mb_strtolower('sample_lookup_migration');
     $table_name = mb_substr($table_name, 0, 63 - $prefix_length) === $table_name
       ? $table_name
