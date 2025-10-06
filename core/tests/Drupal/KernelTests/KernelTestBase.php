@@ -439,7 +439,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       throw new \Exception('There is no database connection so no tests can be run. You must provide a SIMPLETEST_DB environment variable to run PHPUnit based functional tests outside of run-tests.sh. See https://www.drupal.org/node/2116263#skipped-tests for more information.');
     }
     else {
-      $database = Database::convertDbUrlToConnectionInfo($db_url, $this->root, TRUE);
+      $database = Database::convertDbUrlToConnectionInfo($db_url, TRUE);
       Database::addConnectionInfo('default', 'default', $database);
     }
 
@@ -675,7 +675,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     }
 
     // If the test used the regular file system, remove any files created.
-    if (!str_starts_with($this->siteDirectory, 'vfs://')) {
+    if ($this->siteDirectory && !str_starts_with($this->siteDirectory, 'vfs://')) {
       // Delete test site directory.
       $callback = function (string $path) {
         @chmod($path, 0700);
@@ -967,7 +967,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       ->save();
 
     // The installation profile is provided by a container parameter. Saving
-    // the configuration doesn't automatically trigger invalidation
+    // the configuration doesn't automatically trigger invalidation.
     $this->container->get('kernel')->rebuildContainer();
   }
 

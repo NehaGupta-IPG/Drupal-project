@@ -7,12 +7,12 @@ namespace Drupal\Tests\field\Kernel\Migrate\d7;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Migrates Drupal 7 fields.
- *
- * @group field
  */
+#[Group('field')]
 class MigrateFieldTest extends MigrateDrupal7TestBase {
 
   /**
@@ -27,7 +27,6 @@ class MigrateFieldTest extends MigrateDrupal7TestBase {
     'image',
     'link',
     'node',
-    'system',
     'taxonomy',
     'telephone',
     'text',
@@ -132,7 +131,7 @@ class MigrateFieldTest extends MigrateDrupal7TestBase {
     $field = FieldStorageConfig::load('node.field_term_entityreference');
     $this->assertEquals('taxonomy_term', $field->getSetting('target_type'));
 
-    // Make sure that datetime fields get the right datetime_type setting
+    // Make sure that datetime fields get the right datetime_type setting.
     $field = FieldStorageConfig::load('node.field_date');
     $this->assertEquals('datetime', $field->getSetting('datetime_type'));
     $field = FieldStorageConfig::load('node.field_date_without_time');

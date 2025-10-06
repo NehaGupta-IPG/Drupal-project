@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Kernel\Plugin\migrate\source\d7;
 
+use Drupal\field\Plugin\migrate\source\d7\FieldInstance;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests D7 field instance source plugin.
- *
- * @covers \Drupal\field\Plugin\migrate\source\d7\FieldInstance
- * @group field
  */
+#[CoversClass(FieldInstance::class)]
+#[Group('field')]
 class FieldInstanceTest extends MigrateSqlSourceTestBase {
 
   /**

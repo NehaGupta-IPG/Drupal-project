@@ -8,12 +8,14 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\field\Functional\FieldTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Options widgets.
- *
- * @group options
  */
+#[Group('options')]
+#[RunTestsInSeparateProcesses]
 class OptionsWidgetsTest extends FieldTestBase {
 
   /**
@@ -347,7 +349,7 @@ class OptionsWidgetsTest extends FieldTestBase {
     $this->card1->setSetting('allowed_values_function', '\Drupal\options_test\OptionsAllowedValues::simpleValues');
     $this->card1->save();
 
-    // Display form: with no field data, nothing is selected
+    // Display form: with no field data, nothing is selected.
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     $this->assertFalse($this->assertSession()->optionExists('card_1', 0)->isSelected());
     $this->assertFalse($this->assertSession()->optionExists('card_1', 1)->isSelected());

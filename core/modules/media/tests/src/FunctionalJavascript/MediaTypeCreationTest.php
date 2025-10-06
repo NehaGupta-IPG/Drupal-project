@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Tests\media\FunctionalJavascript;
 
 use Drupal\Component\Utility\Html;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore pastafazoul
-
 /**
  * Tests the media type creation.
- *
- * @group media
  */
+#[Group('media')]
+#[RunTestsInSeparateProcesses]
 class MediaTypeCreationTest extends MediaJavascriptTestBase {
 
   /**

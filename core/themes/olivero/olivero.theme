@@ -22,7 +22,7 @@ function olivero_preprocess_html(&$variables): void {
     $variables['attributes']['class'][] = 'is-always-mobile-nav';
   }
 
-  // Convert custom hex to hsl so we can use the hue value
+  // Convert custom hex to hsl so we can use the hue value.
   $brand_color_hex = theme_get_setting('base_primary_color') ?? '#1b9ae4';
   [$h, $s, $l] = _olivero_hex_to_hsl($brand_color_hex);
 
@@ -83,7 +83,7 @@ function olivero_preprocess_maintenance_page(&$variables): void {
   // By default, site_name is set to Drupal if no db connection is available
   // or during site installation. Setting site_name to an empty string makes
   // the site and update pages look cleaner.
-  // @see template_preprocess_maintenance_page
+  // @see \Drupal\Core\Theme\ThemePreprocess::preprocessMaintenancePage()
   if (!$variables['db_is_active']) {
     $variables['site_name'] = '';
   }
@@ -365,6 +365,7 @@ function olivero_preprocess_field(&$variables): void {
 
   if (in_array($variables['field_type'], $rich_field_types, TRUE)) {
     $variables['attributes']['class'][] = 'text-content';
+    $variables['#attached']['library'][] = 'olivero/olivero.table';
   }
 
   if ($variables['field_type'] == 'image' && $variables['element']['#view_mode'] == 'full' && !$variables["element"]["#is_multiple"] && $variables['field_name'] !== 'user_picture') {
@@ -381,13 +382,12 @@ function olivero_preprocess_field_multiple_value_form(&$variables): void {
 
   if (!empty($variables['multiple'])) {
     // Add an additional CSS class for the field label table cell.
-    // This repeats the logic of template_preprocess_field_multiple_value_form()
+    // This repeats the logic of
+    // \Drupal\Core\Field\FieldPreprocess::preprocessFieldMultipleValueForm()
     // without using '#prefix' and '#suffix' for the wrapper element.
     //
     // If the field is multiple, we don't have to check the existence of the
     // table header cell.
-    //
-    // @see template_preprocess_field_multiple_value_form().
     $header_attributes = ['class' => ['form-item__label', 'form-item__label--multiple-value-form']];
     if (!empty($variables['element']['#required'])) {
       $header_attributes['class'][] = 'js-form-required';
@@ -617,6 +617,15 @@ function olivero_preprocess_table(&$variables): void {
       }
     }
   }
+
+  $variables['#attached']['library'][] = 'olivero/olivero.table';
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for views-view-table templates.
+ */
+function olivero_preprocess_views_view_table(&$variables): void {
+  $variables['#attached']['library'][] = 'olivero/olivero.table';
 }
 
 /**

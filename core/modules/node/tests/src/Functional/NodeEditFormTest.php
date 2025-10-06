@@ -6,12 +6,14 @@ namespace Drupal\Tests\node\Functional;
 
 use Drupal\node\NodeInterface;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Create a node and test node edit functionality.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeEditFormTest extends NodeTestBase {
 
   /**
@@ -251,10 +253,15 @@ class NodeEditFormTest extends NodeTestBase {
     $edit['body[0][value]'] = $this->randomMachineName(16);
     $this->submitForm($edit, 'Save');
 
+    // Enable user_hooks_test to test the users display name is visible on the
+    // edit form.
+    \Drupal::service('module_installer')->install(['user_hooks_test']);
+    \Drupal::keyValue('user_hooks_test')->set('user_format_name_alter', TRUE);
     $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
-    $this->drupalGet("node/" . $node->id() . "/edit");
+    $this->drupalGet($node->toUrl('edit-form'));
     $this->assertSession()->pageTextContains('Published');
     $this->assertSession()->pageTextContains($this->container->get('date.formatter')->format($node->getChangedTime(), 'short'));
+    $this->assertSession()->responseContains('<em>' . $this->adminUser->id() . '</em>');
   }
 
   /**

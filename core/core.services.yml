@@ -24,6 +24,7 @@ parameters:
     debug: false
     auto_reload: null
     cache: true
+    use_yield: true
     allowed_file_extensions:
       - css
       - html
@@ -76,6 +77,10 @@ services:
     arguments: ['@config.manager', '@config.storage', '@config.typed', '@config.factory']
   Drupal\Core\DefaultContent\Importer:
     autowire: true
+  Drupal\Core\DefaultContent\Exporter:
+    autowire: true
+    calls:
+      - [setLogger, ['@logger.channel.default_content']]
   Drupal\Core\DefaultContent\AdminAccountSwitcher:
     arguments:
       $isSuperUserAccessEnabled: '%security.enable_super_user%'
@@ -512,15 +517,19 @@ services:
     arguments: ['%app.root%', '@keyvalue.expirable', '@module_handler', '@current_user', '@csrf_token', '@logger.channel.form', '@request_stack', '@page_cache_request_policy']
     public: false  # Private to form_builder
   Drupal\Core\Form\FormCacheInterface: '@form_cache'
+  Drupal\Core\Form\FormPreprocess:
+    class: Drupal\Core\Form\FormPreprocess
   keyvalue:
     class: Drupal\Core\KeyValueStore\KeyValueFactory
     arguments: ['@service_container', '%factory.keyvalue%']
+  Drupal\Core\KeyValueStore\KeyValueFactoryInterface: '@keyvalue'
   keyvalue.database:
     class: Drupal\Core\KeyValueStore\KeyValueDatabaseFactory
     arguments: ['@serialization.phpserialize', '@database']
   keyvalue.expirable:
     class: Drupal\Core\KeyValueStore\KeyValueExpirableFactory
     arguments: ['@service_container', '%factory.keyvalue.expirable%']
+  Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface: '@keyvalue.expirable'
   keyvalue.expirable.database:
     class: Drupal\Core\KeyValueStore\KeyValueDatabaseExpirableFactory
     arguments: ['@serialization.phpserialize', '@database', '@datetime.time']
@@ -537,6 +546,9 @@ services:
   logger.channel.default:
     parent: logger.channel_base
     arguments: ['system']
+  logger.channel.default_content:
+    parent: logger.channel_base
+    arguments: ['default_content']
   logger.channel.php:
     parent: logger.channel_base
     arguments: ['php']
@@ -771,6 +783,9 @@ services:
     class: Drupal\Core\Field\FieldDefinitionListener
     arguments: ['@entity_type.manager', '@entity_field.manager', '@keyvalue', '@cache.discovery']
   Drupal\Core\Field\FieldDefinitionListenerInterface: '@field_definition.listener'
+  Drupal\Core\Field\FieldPreprocess:
+    class: Drupal\Core\Field\FieldPreprocess
+    autowire: true
   entity.form_builder:
     class: Drupal\Core\Entity\EntityFormBuilder
     arguments: ['@entity_type.manager', '@form_builder']
@@ -851,6 +866,9 @@ services:
     class: Drupal\Core\Menu\ContextualLinkManager
     arguments: ['@controller_resolver', '@module_handler', '@cache.discovery', '@language_manager', '@access_manager', '@current_user', '@request_stack']
   Drupal\Core\Menu\ContextualLinkManagerInterface: '@plugin.manager.menu.contextual_link'
+  Drupal\Core\Menu\MenuPreprocess:
+    class: Drupal\Core\Menu\MenuPreprocess
+    autowire: true
   plugin.manager.display_variant:
     class: Drupal\Core\Display\VariantManager
     parent: default_plugin_manager
@@ -892,6 +910,7 @@ services:
     class: Symfony\Component\EventDispatcher\EventDispatcher
   Psr\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
   Symfony\Contracts\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
+  Symfony\Component\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
   controller_resolver:
     class: Drupal\Core\Controller\ControllerResolver
     arguments: ['@callable_resolver']
@@ -1102,7 +1121,7 @@ services:
   Drupal\Core\Routing\AccessAwareRouterInterface: '@router'
   router.no_access_checks:
     class: \Drupal\Core\Routing\Router
-    arguments: ['@router.route_provider', '@path.current', '@url_generator']
+    arguments: ['@router.route_provider', '@path.current']
     tags:
       - { name: service_collector, tag: route_enhancer, call: addRouteEnhancer  }
       - { name: service_collector, tag: route_filter, call: addRouteFilter }
@@ -1264,6 +1283,11 @@ services:
     arguments: ['@title_resolver', '@plugin.manager.display_variant', '@event_dispatcher', '@module_handler', '@renderer', '@render_cache', '%renderer.config%', '@theme.manager']
     tags:
       - { name: render.main_content_renderer, format: html }
+  main_content_renderer.htmx:
+    class: Drupal\Core\Render\MainContent\HtmxRenderer
+    arguments: ['@title_resolver', '@renderer', '@render_cache', '%renderer.config%']
+    tags:
+      - { name: render.main_content_renderer, format: drupal_htmx }
   main_content_renderer.ajax:
     class: Drupal\Core\Render\MainContent\AjaxRenderer
     arguments: ['@element_info', '@renderer']
@@ -1532,6 +1556,9 @@ services:
     tags:
       - { name: service_collector, tag: breadcrumb_builder, call: addBuilder }
   Drupal\Core\Breadcrumb\ChainBreadcrumbBuilderInterface: '@breadcrumb'
+  Drupal\Core\Breadcrumb\BreadcrumbPreprocess:
+    class: Drupal\Core\Breadcrumb\BreadcrumbPreprocess
+    autowire: true
   token:
     class: Drupal\Core\Utility\Token
     arguments: ['@module_handler', '@cache.default', '@language_manager', '@cache_tags.invalidator', '@renderer']
@@ -1571,6 +1598,9 @@ services:
   Drupal\Core\Theme\Registry: '@theme.registry'
   Drupal\Core\Theme\ThemePreprocess:
     class: Drupal\Core\Theme\ThemePreprocess
+    autowire: true
+  Drupal\Core\Theme\ImagePreprocess:
+    class: Drupal\Core\Theme\ImagePreprocess
     autowire: true
   Drupal\Core\Datetime\DatePreprocess:
     class: Drupal\Core\Datetime\DatePreprocess
@@ -1794,7 +1824,7 @@ services:
     alias: plugin.manager.element_info
   file.htaccess_writer:
     class: Drupal\Core\File\HtaccessWriter
-    arguments: ['@logger.channel.security', '@stream_wrapper_manager']
+    arguments: ['@logger.channel.security', '@stream_wrapper_manager', '@settings']
   Drupal\Core\File\HtaccessWriterInterface: '@file.htaccess_writer'
   file.mime_type.guesser:
     class: Drupal\Core\File\MimeType\MimeTypeGuesser
@@ -1804,7 +1834,7 @@ services:
     lazy: true
   file.mime_type.guesser.extension:
     class: Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser
-    arguments: ['@Drupal\Core\File\MimeType\MimeTypeMapInterface', '@file_system']
+    arguments: ['@Drupal\Core\File\MimeType\MimeTypeMapInterface']
     tags:
       - { name: mime_type_guesser }
     lazy: true
@@ -1899,6 +1929,9 @@ services:
     class: Drupal\Core\Pager\PagerParameters
     arguments: ['@request_stack']
   Drupal\Core\Pager\PagerParametersInterface: '@pager.parameters'
+  Drupal\Core\Pager\PagerPreprocess:
+    class: Drupal\Core\Pager\PagerPreprocess
+    autowire: true
   Drupal\Core\Theme\Component\SchemaCompatibilityChecker: {}
   Drupal\Core\Theme\Component\ComponentValidator:
     calls:

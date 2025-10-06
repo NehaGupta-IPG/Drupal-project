@@ -75,7 +75,7 @@ use Drupal\Core\Utility\UpdateException;
  * Once a module requires 12.0.0 as a minimum version of Drupal the module can
  * safely remove hook_hook_info() implementations.
  *
- * @return array
+ * @return array<string, array{group: string}>
  *   An associative array whose keys are hook names and whose values are an
  *   associative array containing:
  *   - group: A string defining the group to which the hook belongs. The module
@@ -114,7 +114,7 @@ function hook_hook_info(): array {
  * you will have to change the order of hook_form_alter() implementation in
  * hook_module_implements_alter().
  *
- * @param array $implementations
+ * @param array<string, string|false> $implementations
  *   An array keyed by the module's name. The value of each item corresponds
  *   to a $group, which is usually FALSE, unless the implementation is in a
  *   file named $module.$group.inc.
@@ -788,7 +788,7 @@ function hook_install_tasks_alter(&$tasks, $install_state) {
 // phpcs:enable
 function hook_update_N(&$sandbox) {
   // For non-batch updates, the signature can simply be:
-  // function hook_update_N() {
+  // "function hook_update_N() {".
 
   // Example function body for adding a field to a database table, which does
   // not require a batch operation:
@@ -862,6 +862,12 @@ function hook_update_N(&$sandbox) {
  * Drupal also ensures to not execute the same hook_post_update_NAME() function
  * twice.
  *
+ * Post update hooks are not executed at module install time. During install
+ * they are skipped and added to an internal "already executed" list in the
+ * key_value database table, making them appear as if they have been executed
+ * properly. For tasks that need to run at module installation time, use
+ * hook_install() instead.
+ *
  * @section sec_bulk Batch updates
  * If running your update all at once could possibly cause PHP to time out, use
  * the $sandbox parameter to indicate that the Batch API should be used for your
@@ -916,6 +922,8 @@ function hook_post_update_NAME(&$sandbox) {
 /**
  * Return an array of removed hook_post_update_NAME() function names.
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * This should be used to indicate post-update functions that have existed in
  * some previous version of the module, but are no longer available.
  *
@@ -939,6 +947,8 @@ function hook_removed_post_updates(): array {
 
 /**
  * Return an array of information about module update dependencies.
+ *
+ * Only procedural implementations are supported for this hook.
  *
  * This can be used to indicate update functions from other modules that your
  * module's update functions depend on, or vice versa. It is used by the update
@@ -1140,7 +1150,7 @@ function hook_updater_info_alter(&$updaters) {
 function hook_requirements($phase): array {
   $requirements = [];
 
-  // Report Drupal version
+  // Report Drupal version.
   if ($phase == 'runtime') {
     $requirements['drupal'] = [
       'title' => t('Drupal'),
@@ -1149,7 +1159,7 @@ function hook_requirements($phase): array {
     ];
   }
 
-  // Test PHP version
+  // Test PHP version.
   $requirements['php'] = [
     'title' => t('PHP'),
     'value' => ($phase == 'runtime') ? Link::fromTextAndUrl(phpversion(), Url::fromRoute('system.php'))->toString() : phpversion(),
@@ -1159,7 +1169,7 @@ function hook_requirements($phase): array {
     $requirements['php']['severity'] = RequirementSeverity::Error;
   }
 
-  // Report cron status
+  // Report cron status.
   if ($phase == 'runtime') {
     $cron_last = \Drupal::state()->get('system.cron_last');
 
@@ -1234,14 +1244,14 @@ function hook_requirements_alter(array &$requirements): void {
 function hook_runtime_requirements(): array {
   $requirements = [];
 
-  // Report Drupal version
+  // Report Drupal version.
   $requirements['drupal'] = [
     'title' => t('Drupal'),
     'value' => \Drupal::VERSION,
     'severity' => RequirementSeverity::Info,
   ];
 
-  // Test PHP version
+  // Test PHP version.
   $requirements['php'] = [
     'title' => t('PHP'),
     'value' => Link::fromTextAndUrl(phpversion(), Url::fromRoute('system.php'))->toString(),
@@ -1251,7 +1261,7 @@ function hook_runtime_requirements(): array {
     $requirements['php']['severity'] = RequirementSeverity::Error;
   }
 
-  // Report cron status
+  // Report cron status.
   $cron_last = \Drupal::state()->get('system.cron_last');
   $requirements['cron']['title'] = t('Cron maintenance tasks');
   if (is_numeric($cron_last)) {
@@ -1311,7 +1321,7 @@ function hook_runtime_requirements_alter(array &$requirements): void {
 function hook_update_requirements() {
   $requirements = [];
 
-  // Test PHP version
+  // Test PHP version.
   $requirements['php'] = [
     'title' => t('PHP'),
     'value' => phpversion(),
