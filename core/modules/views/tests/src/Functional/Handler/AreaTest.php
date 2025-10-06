@@ -118,6 +118,7 @@ class AreaTest extends ViewTestBase {
       $this->assertArrayNotHasKey('test_example', $handlers);
 
       // Test form validation for invalid area ids.
+      $edit_path = 'admin/structure/views/nojs/handler/test_example_area/default/' . $type . '/' . $new_id;
       $error_text = 'Area id must contain only lowercase letters, numbers, or underscores.';
 
       $this->drupalGet($edit_path);
