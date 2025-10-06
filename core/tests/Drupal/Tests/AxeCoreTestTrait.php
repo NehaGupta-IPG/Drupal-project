@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests;
 
+use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+
 /**
  * Provides methods to run axe-core tests in the WebDriver.
  *
@@ -40,6 +42,8 @@ trait AxeCoreTestTrait {
    * @see https://github.com/dequelabs/axe-core/blob/develop/doc/API.md#options-parameter
    */
   protected function executeAxe(array $options = []): void {
+    assert($this instanceof WebDriverTestBase);
+
     $session = $this->getSession();
 
     // Load axe-core script.
