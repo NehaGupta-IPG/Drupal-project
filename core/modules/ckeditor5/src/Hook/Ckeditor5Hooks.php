@@ -98,7 +98,36 @@ class Ckeditor5Hooks {
    */
   #[Hook('theme')]
   public function theme() : array {
-    return ['ckeditor5_settings_toolbar' => ['render element' => 'form']];
+    return [
+      // The theme hook is used for rendering the CKEditor 5 toolbar settings in
+      // the Drupal admin UI. The toolbar settings UI is internal, and utilizing
+      // it outside of core usages is not supported because the UI can change at
+      // any point.
+      // @internal
+      'ckeditor5_settings_toolbar' => [
+        'render element' => 'form',
+      ],
+      'field__ckeditor_inline' => [
+        'base hook' => 'field',
+      ],
+      'media__ckeditor_inline_embed' => [
+        'base hook' => 'media',
+      ],
+    ];
+  }
+
+  /**
+   * Implements hook_theme_suggestions_HOOK_alter().
+   */
+  #[Hook('theme_suggestions_media_alter')]
+  public function themeSuggestionsMediaAlter(array &$suggestions, array $variables): void {
+    $view_mode_id = $variables['elements']['#view_mode'];
+    if ($view_mode_id != 'ckeditor_inline') {
+      $view_mode = \Drupal::service('entity.repository')->loadEntityByConfigTarget('entity_view_mode', "media." . $variables['elements']['#view_mode']);
+    }
+    if ($view_mode_id == 'ckeditor_inline' || $view_mode?->getThirdPartySetting('ckeditor5', 'inline', FALSE)) {
+      $suggestions[] = 'media__ckeditor_inline_embed';
+    }
   }
 
   /**
@@ -215,6 +244,23 @@ class Ckeditor5Hooks {
     ];
     $form['#validate'][] = [CKEditor5::class, 'validateSwitchingToCKEditor5'];
     array_unshift($form['actions']['submit']['#submit'], 'ckeditor5_filter_format_edit_form_submit');
+  }
+
+  /**
+   * Implements hook_form_FORM_ID_alter().
+   */
+  #[Hook('form_entity_view_mode_form_alter')]
+  public function formEntityViewModeFormAlter(&$form, FormStateInterface $form_state, $form_id) : void {
+    $viewMode = $form_state->getFormObject()->getEntity();
+    if ($viewMode->getTargetType() === 'media') {
+      $form['inline'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Enable this view mode for inline media'),
+        '#description' => $this->t('Check this box to allow media of this type to be embedded inline.'),
+        '#default_value' => $viewMode->getThirdPartySetting('ckeditor5', 'inline'),
+      ];
+      $form['#entity_builders'][] = 'ckeditor5_entity_view_mode_form_builder';
+    }
   }
 
   /**

@@ -2,15 +2,42 @@
 /* cspell:ignore drupalelementstyle drupalelementstyleediting */
 /* cspell:ignore insertdrupalmediacommand */
 import { Command } from 'ckeditor5/src/core';
+import { first } from 'ckeditor5/src/utils';
 import { groupNameToModelAttributeKey } from './utils';
 
 /**
  * @module drupalMedia/insertdrupalmediacommand
  */
 
-function createDrupalMedia(writer, attributes) {
-  const drupalMedia = writer.createElement('drupalMedia', attributes);
-  return drupalMedia;
+function createDrupalMedia(writer, attributes, model) {
+  return writer.createElement(model, attributes);
+}
+
+function determineImageTypeForInsertionAtSelection(schema, selection) {
+  const firstBlock = first(selection.getSelectedBlocks());
+  // Insert a block media if the selection is not in/on block elements or it's
+  // on a block widget.
+  if (!firstBlock || schema.isObject(firstBlock)) {
+    return 'drupalMedia';
+  }
+  // A block image should also be inserted into an empty block element
+  // (that is not an empty list item so the list won't get split).
+  if (firstBlock.isEmpty && firstBlock.name !== 'listItem') {
+    return 'drupalMedia';
+  }
+  // Otherwise insert an inline media.
+  return 'drupalMediaInline';
+}
+
+function determineImageTypeForInsertion(editor, selectable) {
+  const schema = editor.model.schema;
+  // Try to replace the selected widget (e.g. another image).
+  if (selectable.is('selection')) {
+    return determineImageTypeForInsertionAtSelection(schema, selectable);
+  }
+  return schema.checkChild(selectable, 'drupalMediaInline')
+    ? 'drupalMediaInline'
+    : 'drupalMedia';
 }
 
 /**
@@ -84,9 +111,14 @@ export default class InsertDrupalMediaCommand extends Command {
       }
     }
 
+    const insertedModel = determineImageTypeForInsertion(
+      this.editor,
+      this.editor.model.document.selection,
+    );
+
     this.editor.model.change((writer) => {
       this.editor.model.insertObject(
-        createDrupalMedia(writer, modelAttributes),
+        createDrupalMedia(writer, modelAttributes, insertedModel),
       );
     });
   }
@@ -94,9 +126,10 @@ export default class InsertDrupalMediaCommand extends Command {
   refresh() {
     const model = this.editor.model;
     const selection = model.document.selection;
+    const mediaModel = determineImageTypeForInsertion(this.editor, selection);
     const allowedIn = model.schema.findAllowedParent(
       selection.getFirstPosition(),
-      'drupalMedia',
+      mediaModel,
     );
     this.isEnabled = allowedIn !== null;
   }

@@ -44,7 +44,7 @@ class MediaEmbedFilterTest extends MediaEmbedFilterTestBase {
     $this->assertEqualsCanonicalizing($expected_cacheability->getCacheContexts(), $result->getCacheContexts());
     $this->assertSame($expected_cacheability->getCacheMaxAge(), $result->getCacheMaxAge());
     $this->assertSame(['library'], array_keys($result->getAttachments()));
-    $this->assertSame(['media/filter.caption'], $result->getAttachments()['library']);
+    $this->assertSame(['media/filter.caption', 'media/media.inline'], $result->getAttachments()['library']);
   }
 
   /**
@@ -197,7 +197,7 @@ class MediaEmbedFilterTest extends MediaEmbedFilterTestBase {
           ])
           ->setCacheContexts(['timezone', 'user', 'user.permissions'])
           ->setCacheMaxAge(Cache::PERMANENT),
-        ['library' => ['media/filter.caption']],
+        ['library' => ['media/filter.caption', 'media/media.inline']],
       ],
     ];
   }
@@ -434,7 +434,7 @@ class MediaEmbedFilterTest extends MediaEmbedFilterTestBase {
    * Data provider for testFilterIntegration().
    */
   public static function providerFilterIntegration() {
-    $default_asset_libraries = ['media/filter.caption'];
+    $default_asset_libraries = ['media/filter.caption', 'media/media.inline'];
 
     $caption_additional_attributes = ['data-caption' => 'Yo.'];
     $caption_verification_selector = 'figure > figcaption';
@@ -451,14 +451,14 @@ class MediaEmbedFilterTest extends MediaEmbedFilterTestBase {
         $caption_additional_attributes,
         $caption_verification_selector,
         TRUE,
-        ['filter/caption', 'media/filter.caption'],
+        ['filter/caption', 'media/filter.caption', 'media/media.inline'],
       ],
       '`<a>` + `data-caption`; `filter_caption` + `media_embed` ⇒ caption present, link preserved' => [
         ['filter_caption', 'media_embed'],
         $caption_additional_attributes,
         'figure > a[href="https://www.drupal.org"] + figcaption',
         TRUE,
-        ['filter/caption', 'media/filter.caption'],
+        ['filter/caption', 'media/filter.caption', 'media/media.inline'],
         '<a href="https://www.drupal.org">',
         '</a>',
       ],
@@ -498,14 +498,14 @@ class MediaEmbedFilterTest extends MediaEmbedFilterTestBase {
         $align_additional_attributes + $caption_additional_attributes,
         'figure.align-center > figcaption',
         TRUE,
-        ['filter/caption', 'media/filter.caption'],
+        ['filter/caption', 'media/filter.caption', 'media/media.inline'],
       ],
       '`<a>` + `data-caption` + `data-align`; `filter_align` + `filter_caption` + `media_embed` ⇒ aligned caption present, link preserved' => [
         ['filter_align', 'filter_caption', 'media_embed'],
         $align_additional_attributes + $caption_additional_attributes,
         'figure.align-center > a[href="https://www.drupal.org"] + figcaption',
         TRUE,
-        ['filter/caption', 'media/filter.caption'],
+        ['filter/caption', 'media/filter.caption', 'media/media.inline'],
         '<a href="https://www.drupal.org">',
         '</a>',
       ],

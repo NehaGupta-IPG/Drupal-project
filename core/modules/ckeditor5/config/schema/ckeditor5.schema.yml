@@ -238,3 +238,12 @@ ckeditor5.plugin.ckeditor5_style:
                     minAttributeValueCount: 1
               StyleSensibleElement: []
             label: 'Style tag + classes'
+
+# Adds an inline setting to media view modes.
+core.entity_view_mode.media.*.third_party.ckeditor5:
+  type: mapping
+  label: 'Media embed view mode settings'
+  mapping:
+    inline:
+      type: boolean
+      label: 'Provides inline (flow) content'

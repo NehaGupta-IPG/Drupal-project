@@ -32,6 +32,12 @@ filter.caption:
   dependencies:
     - filter/caption
 
+media.inline:
+  version: VERSION
+  css:
+    component:
+      css/media.inline.css: {}
+
 # Despite the name, this is actually not specific to CKEditor 4, and can be
 # used by all text editor plugins.
 media_embed_ckeditor_theme:

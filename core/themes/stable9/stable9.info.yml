@@ -190,6 +190,11 @@ libraries-override:
       component:
         css/filter.caption.css: css/media/filter.caption.css
 
+  media/media.inline:
+    css:
+      component:
+        css/media.inline.css: css/media/media.inline.css
+
   media/oembed.formatter:
     css:
       component:
