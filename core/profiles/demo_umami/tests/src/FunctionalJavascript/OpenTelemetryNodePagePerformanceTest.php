@@ -6,16 +6,18 @@ namespace Drupal\Tests\demo_umami\FunctionalJavascript;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\FunctionalJavascriptTests\PerformanceTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore languageswitcher
-
 /**
  * Tests demo_umami profile performance.
- *
- * @group OpenTelemetry
- * @group #slow
- * @requires extension apcu
  */
+#[Group('OpenTelemetry')]
+#[Group('#slow')]
+#[RequiresPhpExtension('apcu')]
+#[RunTestsInSeparateProcesses]
 class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
   /**
@@ -37,15 +39,33 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
    * Logs node page tracing data with a cold cache.
    */
   protected function testNodePageColdCache(): void {
-    // @todo Chromedriver doesn't collect tracing performance logs for the very
-    //   first request in a test, so warm it up.
-    //   https://www.drupal.org/project/drupal/issues/3379750
-    $this->drupalGet('user/login');
-    $this->rebuildAll();
-    $this->collectPerformanceData(function () {
+    // Request the node page twice then clear caches, this allows asset
+    // aggregate requests to complete so they are excluded from the performance
+    // test itself. Including the asset aggregates would lead to
+    // a non-deterministic test since they happen in parallel and therefore post
+    // response tasks run in different orders each time.
+    $this->drupalGet('node/1');
+    // Allow time for image style and aggregate requests to finish.
+    sleep(2);
+    $this->drupalGet('node/1');
+    $this->clearCaches();
+    $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('node/1');
     }, 'umamiNodePageColdCache');
     $this->assertSession()->pageTextContains('quiche');
+
+    $expected = [
+      'QueryCount' => 457,
+      'CacheSetCount' => 440,
+      'CacheDeleteCount' => 0,
+      'CacheTagLookupQueryCount' => 43,
+      'CacheTagInvalidationCount' => 0,
+      'ScriptCount' => 1,
+      'ScriptBytes' => 12000,
+      'StylesheetCount' => 2,
+      'StylesheetBytes' => 40800,
+    ];
+    $this->assertMetrics($expected, $performance_data);
   }
 
   /**
@@ -63,12 +83,18 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       $this->drupalGet('node/1');
     }, 'umamiNodePageHotCache');
     $this->assertSession()->pageTextContains('quiche');
+
     $expected = [
       'QueryCount' => 0,
       'CacheGetCount' => 1,
       'CacheSetCount' => 0,
       'CacheDeleteCount' => 0,
+      'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 1,
+      'ScriptCount' => 1,
+      'ScriptBytes' => 12000,
+      'StylesheetCount' => 2,
+      'StylesheetBytes' => 40800,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
@@ -85,10 +111,24 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
     $this->clearCaches();
     // Now visit a non-node page to warm non-route-specific caches.
     $this->drupalGet('user/login');
-    $this->collectPerformanceData(function () {
+    $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('node/1');
     }, 'umamiNodePageCoolCache');
     $this->assertSession()->pageTextContains('quiche');
+
+    $expected = [
+      'QueryCount' => 189,
+      'CacheGetCount' => 209,
+      'CacheSetCount' => 64,
+      'CacheDeleteCount' => 0,
+      'CacheTagInvalidationCount' => 0,
+      'CacheTagLookupQueryCount' => 22,
+      'ScriptCount' => 1,
+      'ScriptBytes' => 12000,
+      'StylesheetCount' => 2,
+      'StylesheetBytes' => 40800,
+    ];
+    $this->assertMetrics($expected, $performance_data);
   }
 
   /**
@@ -100,9 +140,12 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
   protected function testNodePageWarmCache(): void {
     // First of all visit the node page to ensure the image style exists.
     $this->drupalGet('node/1');
+    // Allow time for the image style and asset aggregate requests to finish.
+    sleep(1);
     $this->clearCaches();
     // Now visit a different node page to warm non-path-specific caches.
     $this->drupalGet('node/2');
+    sleep(1);
     $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('node/1');
     }, 'umamiNodePageWarmCache');
@@ -125,7 +168,6 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'SELECT "t".* FROM "node__field_summary" "t" WHERE ("entity_id" IN (1)) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
       'SELECT "t".* FROM "node__field_tags" "t" WHERE ("entity_id" IN (1)) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
       'SELECT "t".* FROM "node__layout_builder__layout" "t" WHERE ("entity_id" IN (1)) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
-      'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/node/1" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
       'SELECT "revision"."revision_id" AS "revision_id", "revision"."langcode" AS "langcode", "revision"."revision_user" AS "revision_user", "revision"."revision_created" AS "revision_created", "revision"."revision_log_message" AS "revision_log_message", "revision"."revision_default" AS "revision_default", "base"."tid" AS "tid", "base"."vid" AS "vid", "base"."uuid" AS "uuid", CASE "base"."revision_id" WHEN "revision"."revision_id" THEN 1 ELSE 0 END AS "isDefaultRevision" FROM "taxonomy_term_data" "base" INNER JOIN "taxonomy_term_revision" "revision" ON "revision"."revision_id" = "base"."revision_id" WHERE "base"."tid" IN (31)',
       'SELECT "revision".*, "data"."weight" AS "weight" FROM "taxonomy_term_field_revision" "revision" LEFT OUTER JOIN "taxonomy_term_field_data" "data" ON ("revision"."tid" = "data"."tid" AND "revision"."langcode" = "data"."langcode") WHERE ("revision"."tid" IN (31)) AND ("revision"."revision_id" IN ("31")) ORDER BY "revision"."tid" ASC',
       'SELECT "t".* FROM "taxonomy_term__parent" "t" WHERE ("entity_id" IN (31)) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
@@ -149,32 +191,32 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'SELECT "t".* FROM "node__field_summary" "t" WHERE ("entity_id" IN (3, 6, 7, 10)) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
       'SELECT "t".* FROM "node__field_tags" "t" WHERE ("entity_id" IN (3, 6, 7, 10)) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
       'SELECT "t".* FROM "node__layout_builder__layout" "t" WHERE ("entity_id" IN (3, 6, 7, 10)) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
-      'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/taxonomy/term/31" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
-      'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/taxonomy/term/22" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
-      'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/taxonomy/term/13" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
+      'SELECT "base_table"."path" AS "path", "base_table"."alias" AS "alias" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/taxonomy/term/31" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
+      'SELECT "base_table"."path" AS "path", "base_table"."alias" AS "alias" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/taxonomy/term/22" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
+      'SELECT "base_table"."path" AS "path", "base_table"."alias" AS "alias" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/taxonomy/term/13" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
       'SELECT "base"."fid" AS "fid", "base"."uuid" AS "uuid", "base"."langcode" AS "langcode", "base"."uid" AS "uid", "base"."filename" AS "filename", "base"."uri" AS "uri", "base"."filemime" AS "filemime", "base"."filesize" AS "filesize", "base"."status" AS "status", "base"."created" AS "created", "base"."changed" AS "changed" FROM "file_managed" "base" WHERE "base"."fid" IN (1)',
       'SELECT "revision"."vid" AS "vid", "revision"."langcode" AS "langcode", "revision"."revision_user" AS "revision_user", "revision"."revision_created" AS "revision_created", "revision"."revision_log_message" AS "revision_log_message", "revision"."revision_default" AS "revision_default", "base"."mid" AS "mid", "base"."bundle" AS "bundle", "base"."uuid" AS "uuid", CASE "base"."vid" WHEN "revision"."vid" THEN 1 ELSE 0 END AS "isDefaultRevision" FROM "media" "base" INNER JOIN "media_revision" "revision" ON "revision"."vid" = "base"."vid" WHERE "base"."mid" IN (21)',
       'SELECT "revision".* FROM "media_field_revision" "revision" WHERE ("revision"."mid" IN (21)) AND ("revision"."vid" IN ("21")) ORDER BY "revision"."mid" ASC',
       'SELECT "t".* FROM "media__field_media_image" "t" WHERE ("entity_id" IN (21)) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
-      'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/node/10" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
+      'SELECT "base_table"."path" AS "path", "base_table"."alias" AS "alias" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/node/10" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
       'SELECT "base"."fid" AS "fid", "base"."uuid" AS "uuid", "base"."langcode" AS "langcode", "base"."uid" AS "uid", "base"."filename" AS "filename", "base"."uri" AS "uri", "base"."filemime" AS "filemime", "base"."filesize" AS "filesize", "base"."status" AS "status", "base"."created" AS "created", "base"."changed" AS "changed" FROM "file_managed" "base" WHERE "base"."fid" IN (41)',
       'SELECT "revision"."vid" AS "vid", "revision"."langcode" AS "langcode", "revision"."revision_user" AS "revision_user", "revision"."revision_created" AS "revision_created", "revision"."revision_log_message" AS "revision_log_message", "revision"."revision_default" AS "revision_default", "base"."mid" AS "mid", "base"."bundle" AS "bundle", "base"."uuid" AS "uuid", CASE "base"."vid" WHEN "revision"."vid" THEN 1 ELSE 0 END AS "isDefaultRevision" FROM "media" "base" INNER JOIN "media_revision" "revision" ON "revision"."vid" = "base"."vid" WHERE "base"."mid" IN (7)',
       'SELECT "revision".* FROM "media_field_revision" "revision" WHERE ("revision"."mid" IN (7)) AND ("revision"."vid" IN ("7")) ORDER BY "revision"."mid" ASC',
       'SELECT "t".* FROM "media__field_media_image" "t" WHERE ("entity_id" IN (7)) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
-      'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/node/7" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
+      'SELECT "base_table"."path" AS "path", "base_table"."alias" AS "alias" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/node/7" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
       'SELECT "base"."fid" AS "fid", "base"."uuid" AS "uuid", "base"."langcode" AS "langcode", "base"."uid" AS "uid", "base"."filename" AS "filename", "base"."uri" AS "uri", "base"."filemime" AS "filemime", "base"."filesize" AS "filesize", "base"."status" AS "status", "base"."created" AS "created", "base"."changed" AS "changed" FROM "file_managed" "base" WHERE "base"."fid" IN (13)',
       'SELECT "revision"."vid" AS "vid", "revision"."langcode" AS "langcode", "revision"."revision_user" AS "revision_user", "revision"."revision_created" AS "revision_created", "revision"."revision_log_message" AS "revision_log_message", "revision"."revision_default" AS "revision_default", "base"."mid" AS "mid", "base"."bundle" AS "bundle", "base"."uuid" AS "uuid", CASE "base"."vid" WHEN "revision"."vid" THEN 1 ELSE 0 END AS "isDefaultRevision" FROM "media" "base" INNER JOIN "media_revision" "revision" ON "revision"."vid" = "base"."vid" WHERE "base"."mid" IN (6)',
       'SELECT "revision".* FROM "media_field_revision" "revision" WHERE ("revision"."mid" IN (6)) AND ("revision"."vid" IN ("6")) ORDER BY "revision"."mid" ASC',
       'SELECT "t".* FROM "media__field_media_image" "t" WHERE ("entity_id" IN (6)) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
-      'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/node/6" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
+      'SELECT "base_table"."path" AS "path", "base_table"."alias" AS "alias" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/node/6" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
       'SELECT "base"."fid" AS "fid", "base"."uuid" AS "uuid", "base"."langcode" AS "langcode", "base"."uid" AS "uid", "base"."filename" AS "filename", "base"."uri" AS "uri", "base"."filemime" AS "filemime", "base"."filesize" AS "filesize", "base"."status" AS "status", "base"."created" AS "created", "base"."changed" AS "changed" FROM "file_managed" "base" WHERE "base"."fid" IN (11)',
       'SELECT "revision"."vid" AS "vid", "revision"."langcode" AS "langcode", "revision"."revision_user" AS "revision_user", "revision"."revision_created" AS "revision_created", "revision"."revision_log_message" AS "revision_log_message", "revision"."revision_default" AS "revision_default", "base"."mid" AS "mid", "base"."bundle" AS "bundle", "base"."uuid" AS "uuid", CASE "base"."vid" WHEN "revision"."vid" THEN 1 ELSE 0 END AS "isDefaultRevision" FROM "media" "base" INNER JOIN "media_revision" "revision" ON "revision"."vid" = "base"."vid" WHERE "base"."mid" IN (3)',
       'SELECT "revision".* FROM "media_field_revision" "revision" WHERE ("revision"."mid" IN (3)) AND ("revision"."vid" IN ("3")) ORDER BY "revision"."mid" ASC',
       'SELECT "t".* FROM "media__field_media_image" "t" WHERE ("entity_id" IN (3)) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
-      'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/node/3" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
+      'SELECT "base_table"."path" AS "path", "base_table"."alias" AS "alias" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/node/3" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
       'SELECT "base"."fid" AS "fid", "base"."uuid" AS "uuid", "base"."langcode" AS "langcode", "base"."uid" AS "uid", "base"."filename" AS "filename", "base"."uri" AS "uri", "base"."filemime" AS "filemime", "base"."filesize" AS "filesize", "base"."status" AS "status", "base"."created" AS "created", "base"."changed" AS "changed" FROM "file_managed" "base" WHERE "base"."fid" IN (5)',
       'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "theme:umami" ) AND "collection" = "config.entity.key_store.block"',
-      'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/node/1" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("es", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
+      'SELECT "base_table"."path" AS "path", "base_table"."alias" AS "alias" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/node/1" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("es", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
       'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "entity.node.canonical") AND ("route_param_key" = "node=1") AND ("menu_name" = "account") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
       'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "entity.node.canonical") AND ("route_param_key" = "node=1") AND ("menu_name" = "main") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
       'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "entity.node.canonical") AND ("route_param_key" = "node=1") AND ("menu_name" = "footer") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
@@ -194,7 +236,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'SELECT "t".* FROM "node_revision__field_summary" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
       'SELECT "t".* FROM "node_revision__field_tags" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
       'SELECT "t".* FROM "node_revision__layout_builder__layout" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
-      'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node_revision" "base_table" LEFT OUTER JOIN "node_revision" "base_table_2" ON "base_table"."nid" = "base_table_2"."nid" AND "base_table"."vid" < "base_table_2"."vid" INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE ("base_table_2"."nid" IS NULL) AND ("node_field_data"."nid" = "1")',
+      'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node_revision" "base_table" INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE ("base_table"."vid" IN (SELECT MAX(base_table.vid) AS "expression" FROM "node_revision" "base_table" GROUP BY "base_table"."nid")) AND ("node_field_data"."nid" = "1")',
       'SELECT "revision"."vid" AS "vid", "revision"."langcode" AS "langcode", "revision"."revision_uid" AS "revision_uid", "revision"."revision_timestamp" AS "revision_timestamp", "revision"."revision_log" AS "revision_log", "revision"."revision_default" AS "revision_default", "base"."nid" AS "nid", "base"."type" AS "type", "base"."uuid" AS "uuid", CASE "base"."vid" WHEN "revision"."vid" THEN 1 ELSE 0 END AS "isDefaultRevision" FROM "node" "base" INNER JOIN "node_revision" "revision" ON "revision"."nid" = "base"."nid" AND "revision"."vid" IN (75)',
       'SELECT "revision".* FROM "node_field_revision" "revision" WHERE ("revision"."vid" IN (75)) AND ("revision"."vid" IN ("75")) ORDER BY "revision"."vid" ASC',
       'SELECT "t".* FROM "node_revision__field_cooking_time" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
@@ -263,7 +305,6 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'SELECT "t".* FROM "node_revision__field_summary" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
       'SELECT "t".* FROM "node_revision__field_tags" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
       'SELECT "t".* FROM "node_revision__layout_builder__layout" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
-      'SELECT "config"."name" AS "name" FROM "config" "config" WHERE ("collection" = "") AND ("name" LIKE "workflows.workflow.%" ESCAPE \'\\\\\') ORDER BY "collection" ASC, "name" ASC',
       'SELECT "revision"."vid" AS "vid", "revision"."langcode" AS "langcode", "revision"."revision_uid" AS "revision_uid", "revision"."revision_timestamp" AS "revision_timestamp", "revision"."revision_log" AS "revision_log", "revision"."revision_default" AS "revision_default", "base"."nid" AS "nid", "base"."type" AS "type", "base"."uuid" AS "uuid", CASE "base"."vid" WHEN "revision"."vid" THEN 1 ELSE 0 END AS "isDefaultRevision" FROM "node" "base" INNER JOIN "node_revision" "revision" ON "revision"."nid" = "base"."nid" AND "revision"."vid" IN (75)',
       'SELECT "revision".* FROM "node_field_revision" "revision" WHERE ("revision"."vid" IN (75)) AND ("revision"."vid" IN ("75")) ORDER BY "revision"."vid" ASC',
       'SELECT "t".* FROM "node_revision__field_cooking_time" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
@@ -286,21 +327,21 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
 
     $expected = [
-      'QueryCount' => 171,
-      'CacheGetCount' => 202,
+      'QueryCount' => 169,
+      'CacheGetCount' => 201,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 66,
         'bootstrap' => 10,
         'discovery' => 67,
-        'data' => 13,
+        'data' => 12,
         'entity' => 18,
         'dynamic_page_cache' => 1,
         'render' => 21,
         'default' => 3,
         'menu' => 2,
       ],
-      'CacheSetCount' => 41,
+      'CacheSetCount' => 40,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 22,
@@ -416,7 +457,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'ScriptCount' => 1,
       'ScriptBytes' => 12000,
       'StylesheetCount' => 2,
-      'StylesheetBytes' => 41200,
+      'StylesheetBytes' => 41000,
     ];
     $this->assertMetrics($expected, $performance_data);
   }

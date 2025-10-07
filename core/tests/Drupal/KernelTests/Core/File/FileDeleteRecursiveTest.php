@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\File;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests the unmanaged file delete recursive function.
- *
- * @group File
  */
+#[Group('File')]
 class FileDeleteRecursiveTest extends FileTestBase {
 
   /**
    * Delete a normal file.
    */
   public function testSingleFile(): void {
-    // Create a file for testing
+    // Create a file for testing.
     $filepath = 'public://' . $this->randomMachineName();
     file_put_contents($filepath, '');
 

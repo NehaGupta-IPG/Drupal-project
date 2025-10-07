@@ -5,19 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\breakpoint\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests discovery of breakpoints provided by themes and modules.
- *
- * @group breakpoint
  */
+#[Group('breakpoint')]
 class BreakpointDiscoveryTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'breakpoint',
     'breakpoint_module_test',
   ];

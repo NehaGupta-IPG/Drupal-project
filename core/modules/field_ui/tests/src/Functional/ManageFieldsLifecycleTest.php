@@ -7,12 +7,14 @@ namespace Drupal\Tests\field_ui\Functional;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Field UI "Manage fields" screen.
- *
- * @group field_ui
  */
+#[Group('field_ui')]
+#[RunTestsInSeparateProcesses]
 class ManageFieldsLifecycleTest extends ManageFieldsFunctionalTestBase {
 
   /**
@@ -174,7 +176,12 @@ class ManageFieldsLifecycleTest extends ManageFieldsFunctionalTestBase {
     $this->assertSession()->pageTextContains("There is 1 entity with 2 or more values in this field");
 
     // Create a second entity with three values.
-    $edit = ['title[0][value]' => 'Cardinality 3', 'body[0][value]' => 'Body 1', 'body[1][value]' => 'Body 2', 'body[2][value]' => 'Body 3'];
+    $edit = [
+      'title[0][value]' => 'Cardinality 3',
+      'body[0][value]' => 'Body 1',
+      'body[1][value]' => 'Body 2',
+      'body[2][value]' => 'Body 3',
+    ];
     $this->drupalGet('node/add/article');
     $this->submitForm($edit, 'Save');
 

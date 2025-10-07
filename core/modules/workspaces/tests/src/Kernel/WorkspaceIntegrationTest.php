@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\workspaces\Kernel;
 
-// cspell:ignore differring
-
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Session\AnonymousUserSession;
@@ -21,12 +19,14 @@ use Drupal\views\Tests\ViewResultAssertionTrait;
 use Drupal\views\Views;
 use Drupal\workspaces\Entity\Workspace;
 use Drupal\workspaces\WorkspacePublishException;
+use PHPUnit\Framework\Attributes\DataProvider;
+// cspell:ignore differring
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests a complete publishing scenario across different workspaces.
- *
- * @group workspaces
  */
+#[Group('workspaces')]
 class WorkspaceIntegrationTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;
@@ -110,12 +110,14 @@ class WorkspaceIntegrationTest extends KernelTestBase {
       'body' => 'node 1',
       'created' => $this->createdTimestamp++,
       'status' => TRUE,
+      'promote' => TRUE,
     ]);
     $this->nodes[] = $this->createNode([
       'title' => 'live - 2 - r2 - unpublished',
       'body' => 'node 2',
       'created' => $this->createdTimestamp++,
       'status' => FALSE,
+      'promote' => TRUE,
     ]);
 
     $translation = $this->nodes[0]->addTranslation('de');
@@ -355,6 +357,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
       'title' => 'stage - 4 - r6 - published',
       'created' => $this->createdTimestamp++,
       'status' => TRUE,
+      'promote' => TRUE,
     ]);
     $this->assertWorkspaceStatus($test_scenarios['add_published_node_in_stage'], 'node');
     $this->assertWorkspaceAssociation($expected_workspace_association['add_published_node_in_stage'], 'node');
@@ -392,10 +395,10 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   /**
    * Tests the workspace association data integrity for entity CRUD operations.
    *
-   * @covers \Drupal\workspaces\Hook\EntityOperations::entityPresave
-   * @covers \Drupal\workspaces\Hook\EntityOperations::entityInsert
-   * @covers \Drupal\workspaces\Hook\EntityOperations::entityDelete
-   * @covers \Drupal\workspaces\Hook\EntityOperations::entityRevisionDelete
+   * @legacy-covers \Drupal\workspaces\Hook\EntityOperations::entityPresave
+   * @legacy-covers \Drupal\workspaces\Hook\EntityOperations::entityInsert
+   * @legacy-covers \Drupal\workspaces\Hook\EntityOperations::entityDelete
+   * @legacy-covers \Drupal\workspaces\Hook\EntityOperations::entityRevisionDelete
    */
   public function testWorkspaceAssociationDataIntegrity(): void {
     $this->initializeWorkspacesModule();
@@ -703,9 +706,8 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
   /**
    * Tests CREATE operations for unsupported entity types.
-   *
-   * @dataProvider providerTestAllowedEntityCrudInNonDefaultWorkspace
    */
+  #[DataProvider('providerTestAllowedEntityCrudInNonDefaultWorkspace')]
   public function testDisallowedEntityCreateInNonDefaultWorkspace($entity_type_id, $allowed): void {
     $this->initializeWorkspacesModule();
     /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
@@ -729,9 +731,8 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
   /**
    * Tests UPDATE operations for unsupported entity types.
-   *
-   * @dataProvider providerTestAllowedEntityCrudInNonDefaultWorkspace
    */
+  #[DataProvider('providerTestAllowedEntityCrudInNonDefaultWorkspace')]
   public function testDisallowedEntityUpdateInNonDefaultWorkspace($entity_type_id, $allowed): void {
     $this->initializeWorkspacesModule();
     /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
@@ -760,9 +761,8 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
   /**
    * Tests DELETE operations for unsupported entity types.
-   *
-   * @dataProvider providerTestAllowedEntityCrudInNonDefaultWorkspace
    */
+  #[DataProvider('providerTestAllowedEntityCrudInNonDefaultWorkspace')]
   public function testDisallowedEntityDeleteInNonDefaultWorkspace($entity_type_id, $allowed): void {
     $this->initializeWorkspacesModule();
     /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
@@ -808,7 +808,9 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   }
 
   /**
-   * @covers \Drupal\workspaces\WorkspaceManager::executeInWorkspace
+   * Tests execute in workspace context.
+   *
+   * @legacy-covers \Drupal\workspaces\WorkspaceManager::executeInWorkspace
    */
   public function testExecuteInWorkspaceContext(): void {
     $this->initializeWorkspacesModule();

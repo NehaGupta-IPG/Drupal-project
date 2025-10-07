@@ -7,15 +7,21 @@ namespace Drupal\Tests\package_manager\Kernel\PathExcluder;
 use ColinODell\PsrTestLogger\TestLogger;
 use Drupal\Component\FileSystem\FileSystem as DrupalFileSystem;
 use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\package_manager\PathExcluder\UnknownPathExcluder;
 use Drupal\package_manager\PathLocator;
 use Drupal\Tests\package_manager\Kernel\PackageManagerKernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @covers \Drupal\package_manager\PathExcluder\UnknownPathExcluder
- * @group package_manager
+ * Tests Unknown Path Excluder.
+ *
  * @internal
  */
+#[Group('package_manager')]
+#[CoversClass(UnknownPathExcluder::class)]
 class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
 
   /**
@@ -140,9 +146,8 @@ class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
    *   The path of unknown directory to test or NULL none should be tested.
    * @param string[] $unknown_files
    *   The list of unknown files.
-   *
-   * @dataProvider providerTestUnknownPath
    */
+  #[DataProvider('providerTestUnknownPath')]
   public function testUnknownPath(bool $use_nested_webroot, ?string $unknown_dir, array $unknown_files): void {
     $this->createTestProjectForTemplate($use_nested_webroot);
 
@@ -180,7 +185,7 @@ class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
 
     $stage->create();
     $stage->require(['ext-json:*']);
-    $stage_dir = $stage->getStageDirectory();
+    $stage_dir = $stage->getSandboxDirectory();
 
     foreach ($unknown_files as $path) {
       $this->assertFileExists("$active_dir/$path");
@@ -219,13 +224,13 @@ class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
 
     $stage = $this->createStage();
     $stage->create();
-    $this->assertFileExists($stage->getStageDirectory() . '/unknown/file.txt');
+    $this->assertFileExists($stage->getSandboxDirectory() . '/unknown/file.txt');
     $stage->destroy();
 
     $config->set('include_unknown_files_in_project_root', FALSE)->save();
     $this->assertFileExists($project_root . '/unknown/file.txt');
     $stage->create();
-    $this->assertFileDoesNotExist($stage->getStageDirectory() . '/unknown/file.txt');
+    $this->assertFileDoesNotExist($stage->getSandboxDirectory() . '/unknown/file.txt');
   }
 
   /**
@@ -240,7 +245,7 @@ class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
 
     $stage = $this->createStage();
     $stage->create();
-    $this->assertDirectoryExists($stage->getStageDirectory() . '/custom');
+    $this->assertDirectoryExists($stage->getSandboxDirectory() . '/custom');
     $stage->require(['ext-json:*']);
     $stage->apply();
     $this->assertDirectoryExists($project_root . '/custom');

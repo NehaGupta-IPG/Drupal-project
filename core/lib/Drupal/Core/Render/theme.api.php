@@ -47,7 +47,8 @@
  * implementing hook_theme() also need to provide a default implementation for
  * each of their theme hooks in a Twig file, and they may also provide
  * preprocessing functions. For example, the core Search module defines a theme
- * hook for a search result item in search_theme():
+ * hook for a search result item in
+ * \Drupal\search\Hook\SearchThemeHooks::theme():
  * @code
  * return [
  *   'search_result' => [
@@ -55,15 +56,15 @@
  *       'result' => NULL,
  *       'plugin_id' => NULL,
  *     ],
- *    'file' => 'search.pages.inc',
+ *    'initial preprocess' => static::class . ':preprocessSearchResult',
  *   ],
  * ];
  * @endcode
  * Given this definition, the template file with the default implementation is
  * search-result.html.twig, which can be found in the
  * core/modules/search/templates directory, and the variables for rendering are
- * the search result and the plugin ID. In addition, there is a function
- * template_preprocess_search_result(), located in file search.pages.inc, which
+ * the search result and the plugin ID. In addition, there is the initial
+ * preprocess method preprocessSearchResult in the same class, which
  * preprocesses the information from the input variables so that it can be
  * rendered by the Twig template; the processed variables that the Twig template
  * receives are documented in the header of the default Twig template file.
@@ -605,8 +606,9 @@ function hook_preprocess(&$variables, $hook): void {
  *   The variables array (modify in place).
  */
 function hook_preprocess_HOOK(&$variables): void {
-  // This example is from node_preprocess_html(). It adds the node type to
-  // the body classes, when on an individual node page or node preview page.
+  // This example is from \Drupal\node\Hook\NodeThemeHooks::preprocessHtml().
+  // It adds the node type to the body classes, when on an individual node page
+  // or node preview page.
   if (($node = \Drupal::routeMatch()->getParameter('node')) || ($node = \Drupal::routeMatch()->getParameter('node_preview'))) {
     if ($node instanceof NodeInterface) {
       $variables['node_type'] = $node->getType();
@@ -665,6 +667,11 @@ function hook_theme_suggestions_HOOK(array $variables): array {
   $suggestions = [];
 
   $suggestions[] = 'hookname__' . $variables['elements']['#langcode'];
+
+  // Theme suggestions can be deprecated by specifying them in the __DEPRECATED
+  // key.
+  $suggestions[] = 'hookname__outdated';
+  $suggestions['__DEPRECATED']['hookname__outdated'] = 'Theme suggestion hookname__outdated is deprecated in drupal:X.0.0 and is removed from drupal:Y.0.0. See http://drupal.org/node/the-change-notice-nid.';
 
   return $suggestions;
 }
@@ -1290,7 +1297,6 @@ function hook_theme($existing, $type, $theme, $path): array {
     ],
     'status_report' => [
       'render element' => 'requirements',
-      'file' => 'system.admin.inc',
     ],
   ];
 }

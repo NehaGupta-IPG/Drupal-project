@@ -7,14 +7,14 @@ namespace Drupal\Tests\image\Kernel;
 use Drupal\Core\Form\FormState;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\image\Form\ImageEffectEditForm;
-use Drupal\Tests\Traits\Core\Image\ToolkitTestTrait;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\Traits\Core\Image\ToolkitTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests image effects.
- *
- * @group image
  */
+#[Group('image')]
 class ImageEffectsTest extends KernelTestBase {
 
   use ToolkitTestTrait;
@@ -33,7 +33,6 @@ class ImageEffectsTest extends KernelTestBase {
     'image',
     'image_module_test',
     'image_test',
-    'system',
   ];
 
   /**
@@ -117,6 +116,31 @@ class ImageEffectsTest extends KernelTestBase {
     $calls = $this->imageTestGetAllCalls();
     // Extension was passed correctly.
     $this->assertEquals('jpeg', $calls['convert'][0][0]);
+  }
+
+  /**
+   * Tests the 'image_convert_avif' effect when avif is supported.
+   */
+  public function testConvertAvifEffect(): void {
+    $this->container->get('keyvalue')->get('image_test')->set('avif_enabled', TRUE);
+    $this->assertImageEffect(['convert'], 'image_convert_avif', [
+      'extension' => 'webp',
+    ]);
+
+    $calls = $this->imageTestGetAllCalls();
+    $this->assertEquals('avif', $calls['convert'][0][0]);
+  }
+
+  /**
+   * Tests the 'image_convert_avif' effect with webp fallback.
+   */
+  public function testConvertAvifEffectFallback(): void {
+    $this->assertImageEffect(['convert'], 'image_convert_avif', [
+      'extension' => 'webp',
+    ]);
+
+    $calls = $this->imageTestGetAllCalls();
+    $this->assertEquals('webp', $calls['convert'][0][0]);
   }
 
   /**

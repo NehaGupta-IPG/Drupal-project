@@ -164,6 +164,10 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
   public function clearCachedDefinitions(): void {
     parent::clearCachedDefinitions();
     $this->componentNegotiator->clearCache();
+    // When clearing cached definitions from theme install or uninstall, the
+    // container is not rebuilt. Unset discovery so it will be re-instantiated
+    // in getDiscovery() with the updated list of theme directories.
+    $this->discovery = NULL;
   }
 
   /**
@@ -225,7 +229,7 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
   protected function getDiscovery(): DirectoryWithMetadataPluginDiscovery {
     if (!isset($this->discovery)) {
       $directories = $this->getScanDirectories();
-      $this->discovery = new DirectoryWithMetadataPluginDiscovery($directories, 'component', $this->fileSystem);
+      $this->discovery = new DirectoryWithMetadataPluginDiscovery($directories, 'component');
     }
     return $this->discovery;
   }

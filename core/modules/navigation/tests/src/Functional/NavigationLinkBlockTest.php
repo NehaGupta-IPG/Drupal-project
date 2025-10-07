@@ -10,12 +10,14 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Url;
 use Drupal\layout_builder\SectionComponent;
 use Drupal\Tests\system\Functional\Cache\PageCacheTagsTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests for \Drupal\navigation\Plugin\Block\NavigationLinkBlockTest.
- *
- * @group navigation
  */
+#[Group('navigation')]
+#[RunTestsInSeparateProcesses]
 class NavigationLinkBlockTest extends PageCacheTagsTestBase {
 
   /**
@@ -162,7 +164,7 @@ class NavigationLinkBlockTest extends PageCacheTagsTestBase {
     $this->assertSession()->pageTextNotContains($help_link_title);
 
     // Enable Help module and grant permissions to admin user.
-    // Admin user should be capable to access to all the links
+    // Admin user should be capable to access to all the links.
     \Drupal::service('module_installer')->install(['help']);
     $this->adminUser->addRole($this->drupalCreateRole(['access help pages']))->save();
 

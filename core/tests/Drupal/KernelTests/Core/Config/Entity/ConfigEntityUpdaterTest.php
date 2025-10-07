@@ -7,13 +7,14 @@ namespace Drupal\KernelTests\Core\Config\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityUpdater;
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests \Drupal\Core\Config\Entity\ConfigEntityUpdater.
- *
- * @coversDefaultClass \Drupal\Core\Config\Entity\ConfigEntityUpdater
- * @group config
  */
+#[CoversClass(ConfigEntityUpdater::class)]
+#[Group('config')]
 class ConfigEntityUpdaterTest extends KernelTestBase {
 
   /**
@@ -22,7 +23,9 @@ class ConfigEntityUpdaterTest extends KernelTestBase {
   protected static $modules = ['config_test', 'system'];
 
   /**
-   * @covers ::update
+   * Tests update.
+   *
+   * @legacy-covers ::update
    */
   public function testUpdate(): void {
     // Create some entities to update.
@@ -75,7 +78,9 @@ class ConfigEntityUpdaterTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::update
+   * Tests update default callback.
+   *
+   * @legacy-covers ::update
    */
   public function testUpdateDefaultCallback(): void {
     // Create some entities to update.
@@ -115,10 +120,12 @@ class ConfigEntityUpdaterTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::update
+   * Tests update exception.
+   *
+   * @legacy-covers ::update
    */
   public function testUpdateException(): void {
-    $this->enableModules(['entity_test']);
+    $this->enableModules(['user', 'entity_test']);
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage('The provided entity type ID \'entity_test_mul_changed\' is not a configuration entity type');
     $updater = $this->container->get('class_resolver')->getInstanceFromDefinition(ConfigEntityUpdater::class);
@@ -127,7 +134,9 @@ class ConfigEntityUpdaterTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::update
+   * Tests update once per update exception.
+   *
+   * @legacy-covers ::update
    */
   public function testUpdateOncePerUpdateException(): void {
     $this->expectException(\RuntimeException::class);
