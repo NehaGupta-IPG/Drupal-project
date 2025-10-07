@@ -85,10 +85,10 @@ class TextareaWithSummaryWidget extends TextareaWidget {
       '#suffix' => '</div>',
       '#weight' => -10,
       '#required' => $required,
-      // Since field values submitted via JSON:API will not have "\r\n" 
+      // Since field values submitted via JSON:API will not have "\r\n"
       // normalized to "\n", do not normalize the newlines in the form element,
       // so that field values saved to storage are the same whether submitted
-      // by form or JSON:API. 
+      // by form or JSON:API.
       '#normalize_newlines' => FALSE,
     ];
 
