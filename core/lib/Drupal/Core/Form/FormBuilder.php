@@ -380,6 +380,10 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       throw new EnforcedResponseException($response);
     }
 
+    if ($form_state->getRebuildInfo()['callback_partial'] ?? FALSE) {
+      return $form_state->getRebuildInfo()['callback_partial'];
+    }
+
     // If this was a successful submission of a single-step form or the last
     // step of a multi-step form, then self::processForm() issued a redirect to
     // another page, or back to this page, but as a new request. Therefore, if
@@ -1170,7 +1174,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // been identified yet, default it to the first button.
       $buttons = $form_state->getButtons();
       if (!$form_state->isProgrammed() && !$form_state->getTriggeringElement() && !empty($buttons)) {
-        //$form_state->setTriggeringElement($buttons[0]);
+        // $form_state->setTriggeringElement($buttons[0]);
       }
 
       $triggering_element = $form_state->getTriggeringElement();
@@ -1211,11 +1215,12 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
         $form_state->disableRedirect();
         // We only allow altering of the form, not replacing the form with
         // something else.
-        call_user_func_array($callback, [
+        $partial = call_user_func_array($callback, [
           &$element,
           &$form_state,
-          $this->requestStack->getCurrentRequest()
+          $this->requestStack->getCurrentRequest(),
         ]);
+        $form_state->addRebuildInfo('callback_partial', $partial);
       }
     }
     return $element;
