@@ -106,6 +106,16 @@ abstract class ResourceTestBase extends BrowserTestBase {
   protected $resourceType;
 
   /**
+   * Set to TRUE if there is no view access control.
+   *
+   * For example, Menu Link Content entities to external URLs are accessible to
+   * anonymous users.
+   *
+   * @var bool
+   */
+  protected static bool $noViewAccessControl = FALSE;
+
+  /**
    * The fields that are protected against modification during PATCH requests.
    *
    * @var string[]
@@ -939,7 +949,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // supported by the entity type.
     $response = $this->request('GET', $url, $request_options);
     $dynamic_cache_label_only = NULL;
-    if (!static::$anonymousUsersCanViewLabels) {
+    if (!static::$anonymousUsersCanViewLabels && !static::$noViewAccessControl) {
       $expected_403_cacheability = $this->getExpectedUnauthorizedAccessCacheability();
       $reason = $this->getExpectedUnauthorizedAccessMessage('GET');
       $message = trim("The current user is not allowed to GET the selected resource. $reason");
@@ -948,11 +958,17 @@ abstract class ResourceTestBase extends BrowserTestBase {
     }
     else {
       $expected_document = $this->getExpectedDocument();
-      $label_field_name = $this->entity->getEntityType()->hasKey('label') ? $this->entity->getEntityType()->getKey('label') : static::$labelFieldName;
-      $expected_document['data']['attributes'] = array_intersect_key($expected_document['data']['attributes'], [$label_field_name => TRUE]);
-      unset($expected_document['data']['relationships']);
-      $dynamic_cache_label_only = $this->generateDynamicPageCacheExpectedHeaderValue($this->getExpectedCacheContexts([$label_field_name]));
-      $this->assertResourceResponse(200, $expected_document, $response, $this->getExpectedCacheTags(), $this->getExpectedCacheContexts([$label_field_name]), 'UNCACHEABLE (request policy)', TRUE);
+      $expected_cache_contexts = $this->getExpectedCacheContexts();
+      // Anonymous users cannot access the revision log.
+      unset($expected_document['data']['attributes']['revision_log_message']);
+      if (!static::$noViewAccessControl) {
+        $label_field_name = $this->entity->getEntityType()->hasKey('label') ? $this->entity->getEntityType()->getKey('label') : static::$labelFieldName;
+        $expected_document['data']['attributes'] = array_intersect_key($expected_document['data']['attributes'], [$label_field_name => TRUE]);
+        unset($expected_document['data']['relationships']);
+        $expected_cache_contexts = $this->getExpectedCacheContexts([$label_field_name]);
+        $dynamic_cache_label_only = $this->generateDynamicPageCacheExpectedHeaderValue($expected_cache_contexts);
+      }
+      $this->assertResourceResponse(200, $expected_document, $response, $this->getExpectedCacheTags(), $expected_cache_contexts, 'UNCACHEABLE (request policy)', TRUE);
     }
 
     $this->setUpAuthorization('GET');
@@ -2940,15 +2956,17 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
 
-    // Ensure 403 forbidden on typical GET.
-    $actual_response = $this->request('GET', $url, $request_options);
-    $expected_cacheability = $this->getExpectedUnauthorizedAccessCacheability();
     $result = $entity->access('view', $this->account, TRUE);
-    $detail = 'The current user is not allowed to GET the selected resource.';
-    if ($result instanceof AccessResultReasonInterface && ($reason = $result->getReason()) && !empty($reason)) {
-      $detail .= ' ' . $reason;
+    if (!static::$noViewAccessControl) {
+      // Ensure 403 forbidden on typical GET.
+      $actual_response = $this->request('GET', $url, $request_options);
+      $expected_cacheability = $this->getExpectedUnauthorizedAccessCacheability();
+      $detail = 'The current user is not allowed to GET the selected resource.';
+      if ($result instanceof AccessResultReasonInterface && ($reason = $result->getReason()) && !empty($reason)) {
+        $detail .= ' ' . $reason;
+      }
+      $this->assertResourceErrorResponse(403, $detail, $url, $actual_response, '/data', $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), NULL, TRUE);
     }
-    $this->assertResourceErrorResponse(403, $detail, $url, $actual_response, '/data', $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), NULL, TRUE);
 
     // Ensure that targeting a revision does not bypass access.
     $actual_response = $this->request('GET', $original_revision_id_url, $request_options);

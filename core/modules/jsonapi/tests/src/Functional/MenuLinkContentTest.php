@@ -50,6 +50,11 @@ class MenuLinkContentTest extends ResourceTestBase {
 
   /**
    * {@inheritdoc}
+   */
+  protected static bool $noViewAccessControl = TRUE;
+
+  /**
+   * {@inheritdoc}
    *
    * @var \Drupal\menu_link_content\MenuLinkContentInterface
    */

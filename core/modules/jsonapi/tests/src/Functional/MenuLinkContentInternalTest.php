@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use PHPUnit\Framework\Attributes\Group;
@@ -17,6 +19,11 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('jsonapi')]
 #[RunTestsInSeparateProcesses]
 class MenuLinkContentInternalTest extends MenuLinkContentTest {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static bool $noViewAccessControl = FALSE;
 
   /**
    * {@inheritdoc}
@@ -55,10 +62,10 @@ class MenuLinkContentInternalTest extends MenuLinkContentTest {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+            'self' => ['href' => 'http://jsonapi.org/format/1.1/'],
           ],
         ],
-        'version' => '1.0',
+        'version' => '1.1',
       ],
       'links' => [
         'self' => ['href' => $base_url->toString()],
@@ -125,11 +132,31 @@ class MenuLinkContentInternalTest extends MenuLinkContentTest {
    * {@inheritdoc}
    */
   protected function getExpectedCacheTags(?array $sparse_fieldset = NULL) {
-    return [
-      'http_response',
-      'menu_link_content:1',
-      'user:1',
-    ];
+    $tags = parent::getExpectedCacheTags($sparse_fieldset);
+    if ($sparse_fieldset === NULL || in_array('link', $sparse_fieldset)) {
+      $tags = Cache::mergeTags($tags, ['user:1']);
+    }
+    return $tags;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static function getExpectedCollectionCacheability(AccountInterface $account, array $collection, ?array $sparse_fieldset = NULL, $filtered = FALSE) {
+    $cacheability = parent::getExpectedCollectionCacheability($account, $collection, $sparse_fieldset, $filtered);
+    if ($account->hasPermission('access user profiles')) {
+      $cacheability->addCacheTags(['user:1']);
+    }
+    return $cacheability;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getExpectedUnauthorizedAccessCacheability() {
+    $cacheability = parent::getExpectedUnauthorizedAccessCacheability();
+    $cacheability->addCacheContexts(['user']);
+    return $cacheability;
   }
 
 }
