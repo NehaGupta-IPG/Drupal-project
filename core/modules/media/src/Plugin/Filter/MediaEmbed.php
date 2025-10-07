@@ -4,9 +4,6 @@ namespace Drupal\media\Plugin\Filter;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
-use Drupal\Core\Entity\EntityRepositoryInterface;
-use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\Plugin\Field\FieldFormatter\EntityReferenceEntityFormatter;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
@@ -16,6 +13,10 @@ use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
+use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\filter\Attribute\Filter;
 use Drupal\filter\FilterProcessResult;
 use Drupal\filter\Plugin\FilterBase;
@@ -44,48 +45,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, TrustedCallbackInterface {
 
   /**
-   * The entity repository.
-   *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
-   */
-  protected $entityRepository;
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The entity display repository.
-   *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
-   */
-  protected $entityDisplayRepository;
-
-  /**
-   * The entity type bundle info service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
-   */
-  protected $entityTypeBundleInfo;
-
-  /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
-   * The logger factory.
-   *
-   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface
-   */
-  protected $loggerFactory;
-
-  /**
    * An array of counters for the recursive rendering protection.
    *
    * Each counter takes into account all the relevant information about the
@@ -106,27 +65,31 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
    *   The entity repository.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
+   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
    *   The entity display repository.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
    *   The entity type bundle info service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $loggerFactory
    *   The logger factory.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityRepositoryInterface $entity_repository, EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entity_display_repository, EntityTypeBundleInfoInterface $bundle_info, RendererInterface $renderer, LoggerChannelFactoryInterface $logger_factory) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityRepositoryInterface $entityRepository,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityDisplayRepositoryInterface $entityDisplayRepository,
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+    protected RendererInterface $renderer,
+    protected LoggerChannelFactoryInterface $loggerFactory,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->entityRepository = $entity_repository;
-    $this->entityTypeManager = $entity_type_manager;
-    $this->entityDisplayRepository = $entity_display_repository;
-    $this->entityTypeBundleInfo = $bundle_info;
-    $this->renderer = $renderer;
-    $this->loggerFactory = $logger_factory;
   }
 
   /**
@@ -164,12 +127,17 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
     $bundle_options = array_map(function ($item) {
       return $item['label'];
     }, $bundles);
+
+    $description = empty($bundle_options)
+      ? $this->t('No media types defined. <a href=":url">Add media types</a>.', [':url' => Url::fromRoute('entity.media_type.collection')->toString()])
+      : $this->t('If none are selected, all will be allowed.');
+
     $form['allowed_media_types'] = [
       '#title' => $this->t('Media types selectable in the Media Library'),
       '#type' => 'checkboxes',
       '#options' => $bundle_options,
       '#default_value' => $this->settings['allowed_media_types'],
-      '#description' => $this->t('If none are selected, all will be allowed.'),
+      '#description' => $description,
       '#element_validate' => [[static::class, 'validateOptions']],
     ];
 
@@ -194,6 +162,20 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
    *   The form state.
    */
   public static function validateOptions(array &$element, FormStateInterface $form_state) {
+    $filters = $form_state->getValue('filters');
+    $is_enabled = isset($filters['media_embed']) ? $filters['media_embed']['status'] : NULL;
+    if ($is_enabled) {
+      // Check if bundles in media type exist.
+      $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo('media');
+      if (empty($bundles)) {
+        $filter_title = \Drupal::service('plugin.manager.filter')
+          ->getDefinition('media_embed')['title']->render();
+        $form_state->setError($element, t('No media types are defined. <a href=":url">Add media types</a> before configuring the @filter filter.', [
+          ':url' => Url::fromRoute('entity.media_type.collection')->toString(),
+          '@filter' => $filter_title,
+        ]));
+      }
+    }
     // Filters the #value property so only selected values appear in the
     // config.
     $form_state->setValueForElement($element, array_filter($element['#value']));

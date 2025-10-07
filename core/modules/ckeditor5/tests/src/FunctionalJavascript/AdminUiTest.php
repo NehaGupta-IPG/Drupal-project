@@ -225,8 +225,9 @@ JS;
 
     // No more validation errors, let's save.
     $this->assertNoRealtimeValidationErrors();
-    $page->pressButton('Save configuration');
-    $assert_session->pageTextContains('The text format ckeditor5 has been updated');
+    $page->pressButton(locator: 'Save configuration');
+    // $this->assertSession()->waitForElementVisible('css', '[role="status"], .messages--status');
+    $assert_session->pageTextContains('The text format ckeditor5 has been updated.');
   }
 
   /**
