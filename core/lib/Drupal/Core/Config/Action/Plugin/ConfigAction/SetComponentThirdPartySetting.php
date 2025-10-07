@@ -69,6 +69,27 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 final class SetComponentThirdPartySetting implements ConfigActionPluginInterface, ContainerFactoryPluginInterface {
 
   /**
+   * The placeholder which is replaced with the ID of the current bundle.
+   *
+   * @var string
+   */
+  private const BUNDLE_PLACEHOLDER = '%bundle';
+
+  /**
+   * The placeholder which is replaced with the ID of the current entity type.
+   *
+   * @var string
+   */
+  private const ENTITY_TYPE_PLACEHOLDER = '%entity_type';
+
+  /**
+   * The placeholder which is replaced with the ID of the current view mode.
+   *
+   * @var string
+   */
+  private const VIEW_MODE_PLACEHOLDER = '%view_mode';
+
+  /**
    * Constructs a SetComponentThirdPartySetting object.
    *
    * @param \Drupal\Core\Config\ConfigManagerInterface $configManager
@@ -142,6 +163,13 @@ final class SetComponentThirdPartySetting implements ConfigActionPluginInterface
     if (!$this->moduleHandler->moduleExists($provider)) {
       throw new ConfigActionException("The 'provider' module '$provider' does not exist or is not enabled.");
     }
+    // Replace placeholders.
+    $value = static::replacePlaceholders($value, [
+      static::BUNDLE_PLACEHOLDER => $entity->getTargetBundle(),
+      static::ENTITY_TYPE_PLACEHOLDER => $entity->getTargetEntityTypeId(),
+      static::VIEW_MODE_PLACEHOLDER => $entity->getMode(),
+    ]);
+
     $settings = $value['settings'] ?? NULL;
 
     // Ensure the component exists in the display; if hidden, we still allow
@@ -167,6 +195,41 @@ final class SetComponentThirdPartySetting implements ConfigActionPluginInterface
     }
 
     $entity->setComponent($component, $component_config);
+  }
+
+  /**
+   * Replaces placeholders recursively.
+   *
+   * @param mixed $data
+   *   The data to process. If this is an array, it'll be processed recursively.
+   * @param array $replacements
+   *   An array whose keys are the placeholders to replace in the data, and
+   *   whose values are the the replacements. Normally this will only mention
+   *   the `%bundle` and `%label` placeholders. If $data is an array, the only
+   *   placeholder that is replaced in the array's keys is `%bundle`.
+   *
+   * @return mixed
+   *   The given $data, with the `%bundle` and `%label` placeholders replaced.
+   */
+  private static function replacePlaceholders(mixed $data, array $replacements): mixed {
+    assert(array_key_exists(static::BUNDLE_PLACEHOLDER, $replacements));
+
+    if (is_string($data)) {
+      $data = str_replace(array_keys($replacements), $replacements, $data);
+    }
+    elseif (is_array($data)) {
+      foreach ($data as $old_key => $value) {
+        $value = static::replacePlaceholders($value, $replacements);
+
+        // Only replace the `%bundle` placeholder in array keys.
+        $new_key = str_replace(static::BUNDLE_PLACEHOLDER, $replacements[static::BUNDLE_PLACEHOLDER], $old_key);
+        if ($old_key !== $new_key) {
+          unset($data[$old_key]);
+        }
+        $data[$new_key] = $value;
+      }
+    }
+    return $data;
   }
 
 }
