@@ -27,6 +27,10 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
   default_widget: "daterange_default",
   default_formatter: "daterange_default",
   list_class: DateRangeFieldItemList::class,
+  constraints: [
+    "DateRangeFormat" => [],
+    "DateRangeStartEnd" => [],
+  ],
 )]
 class DateRangeItem extends DateTimeItem {
 
