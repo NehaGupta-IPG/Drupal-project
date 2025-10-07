@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\path\Kernel\Migrate\d7;
+
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests URL alias migration.
- *
- * @group path
  */
+#[Group('path')]
 class MigrateUrlAliasNoTranslationTest extends MigrateUrlAliasTestBase {
 
   /**

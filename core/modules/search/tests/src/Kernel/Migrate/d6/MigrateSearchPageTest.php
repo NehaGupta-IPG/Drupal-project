@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\search\Kernel\Migrate\d6;
 
 use Drupal\Core\Database\Database;
-use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
 use Drupal\search\Entity\SearchPage;
+use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Upgrade search page variables.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
 class MigrateSearchPageTest extends MigrateDrupal6TestBase {
 
   /**
@@ -29,7 +31,7 @@ class MigrateSearchPageTest extends MigrateDrupal6TestBase {
   /**
    * Tests Drupal 6 search settings to Drupal 8 search page entity migration.
    */
-  public function testSearchPage() {
+  public function testSearchPage(): void {
     $id = 'node_search';
     /** @var \Drupal\search\Entity\SearchPage $search_page */
     $search_page = SearchPage::load($id);

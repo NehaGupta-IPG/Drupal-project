@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests validation constraints for BundleConstraintValidator.
- *
- * @group Entity
  */
+#[Group('Entity')]
 class BundleConstraintValidatorTest extends KernelTestBase {
 
   /**
@@ -17,8 +19,11 @@ class BundleConstraintValidatorTest extends KernelTestBase {
    *
    * @var \Drupal\Core\TypedData\TypedDataManager
    */
-  protected $typedData;
+  protected $typedDataManager;
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['node', 'field', 'text', 'user'];
 
   /**
@@ -27,13 +32,13 @@ class BundleConstraintValidatorTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('user');
-    $this->typedData = $this->container->get('typed_data_manager');
+    $this->typedDataManager = $this->container->get('typed_data_manager');
   }
 
   /**
    * Tests bundle constraint validation.
    */
-  public function testValidation() {
+  public function testValidation(): void {
     // Test with multiple values.
     $this->assertValidation(['foo', 'bar']);
     // Test with a single string value as well.
@@ -56,14 +61,14 @@ class BundleConstraintValidatorTest extends KernelTestBase {
     // Test the validation.
     $node = $this->container->get('entity_type.manager')->getStorage('node')->create(['type' => 'foo']);
 
-    $typed_data = $this->typedData->create($definition, $node);
+    $typed_data = $this->typedDataManager->create($definition, $node);
     $violations = $typed_data->validate();
     $this->assertEquals(0, $violations->count(), 'Validation passed for correct value.');
 
     // Test the validation when an invalid value is passed.
     $page_node = $this->container->get('entity_type.manager')->getStorage('node')->create(['type' => 'baz']);
 
-    $typed_data = $this->typedData->create($definition, $page_node);
+    $typed_data = $this->typedDataManager->create($definition, $page_node);
     $violations = $typed_data->validate();
     $this->assertEquals(1, $violations->count(), 'Validation failed for incorrect value.');
 

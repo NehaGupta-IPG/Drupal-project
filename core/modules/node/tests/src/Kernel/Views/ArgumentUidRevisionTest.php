@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel\Views;
 
 use Drupal\node\Entity\Node;
@@ -7,12 +9,12 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the argument_node_uid_revision handler.
- *
- * @group node
  */
+#[Group('node')]
 class ArgumentUidRevisionTest extends ViewsKernelTestBase {
   use UserCreationTrait;
 
@@ -49,7 +51,7 @@ class ArgumentUidRevisionTest extends ViewsKernelTestBase {
   /**
    * Tests the node_uid_revision argument.
    */
-  public function testArgument() {
+  public function testArgument(): void {
     $expected_result = [];
 
     $author = $this->createUser();

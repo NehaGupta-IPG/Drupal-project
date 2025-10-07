@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block_content\Kernel\Migrate\d6;
 
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests migration of i18n content block strings.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
 class MigrateCustomBlockContentTranslationTest extends MigrateDrupal6TestBase {
 
   /**
@@ -33,6 +35,7 @@ class MigrateCustomBlockContentTranslationTest extends MigrateDrupal6TestBase {
       'd6_filter_format',
       'block_content_type',
       'block_content_body_field',
+      'block_content_body_field_storage',
       'd6_custom_block',
       'd6_custom_block_translation',
     ]);
@@ -41,7 +44,7 @@ class MigrateCustomBlockContentTranslationTest extends MigrateDrupal6TestBase {
   /**
    * Tests the Drupal 6 i18n content block strings to Drupal 8 migration.
    */
-  public function testCustomBlockContentTranslation() {
+  public function testCustomBlockContentTranslation(): void {
     /** @var \Drupal\block_content\Entity\BlockContent $block */
     $block = BlockContent::load(1)->getTranslation('fr');
     $this->assertSame('fr - Static Block', $block->label());

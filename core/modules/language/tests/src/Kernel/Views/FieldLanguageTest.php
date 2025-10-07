@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\language\Kernel\Views;
 
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the field language handler.
  *
- * @group language
  * @see \Drupal\language\Plugin\views\field\Language
  */
+#[Group('language')]
 class FieldLanguageTest extends LanguageTestBase {
 
   /**
@@ -22,7 +25,7 @@ class FieldLanguageTest extends LanguageTestBase {
   /**
    * Tests the language field.
    */
-  public function testField() {
+  public function testField(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
     $view->displayHandlers->get('default')->overrideOption('fields', [

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Core\Render\RenderContext;
@@ -7,12 +9,12 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests token escaping in the EntityField handler.
- *
- * @group views
  */
+#[Group('views')]
 class FieldSelfTokensTest extends ViewsKernelTestBase {
 
   /**
@@ -47,7 +49,7 @@ class FieldSelfTokensTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testSelfTokenEscaping() {
+  public function testSelfTokenEscaping(): void {
     $view = Views::getView('test_field_self_tokens');
     $view->initHandlers();
     $this->executeView($view);

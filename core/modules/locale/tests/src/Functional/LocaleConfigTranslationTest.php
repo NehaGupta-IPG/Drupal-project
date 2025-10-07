@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\locale\Functional;
 
-use Drupal\Tests\BrowserTestBase;
-use Drupal\locale\StringStorageInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\locale\StringStorageInterface;
+use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests translation of configuration strings.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleConfigTranslationTest extends BrowserTestBase {
 
   /**
@@ -23,9 +25,7 @@ class LocaleConfigTranslationTest extends BrowserTestBase {
   protected $langcode;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['locale', 'contact', 'contact_test'];
 
@@ -84,7 +84,7 @@ class LocaleConfigTranslationTest extends BrowserTestBase {
   /**
    * Tests basic configuration translation.
    */
-  public function testConfigTranslation() {
+  public function testConfigTranslation(): void {
     // Check that the maintenance message exists and create translation for it.
     $source = '@site is currently under maintenance. We should be back shortly. Thank you for your patience.';
     $string = $this->storage->findString(['source' => $source, 'context' => '', 'type' => 'configuration']);
@@ -113,7 +113,11 @@ class LocaleConfigTranslationTest extends BrowserTestBase {
     $this->assertEquals($message, $translation['message']);
 
     // Check default medium date format exists and create a translation for it.
-    $string = $this->storage->findString(['source' => 'D, m/d/Y - H:i', 'context' => 'PHP date format', 'type' => 'configuration']);
+    $string = $this->storage->findString([
+      'source' => 'D, j M Y - H:i',
+      'context' => 'PHP date format',
+      'type' => 'configuration',
+    ]);
     $this->assertNotEmpty($string, 'Configuration date formats have been created upon installation.');
 
     // Translate using the UI so configuration is refreshed.
@@ -157,7 +161,11 @@ class LocaleConfigTranslationTest extends BrowserTestBase {
     $this->assertArrayHasKey('image.style.medium', $locations['configuration']);
 
     // Check the string is unique and has no translation yet.
-    $translations = $this->storage->getTranslations(['language' => $this->langcode, 'type' => 'configuration', 'name' => 'image.style.medium']);
+    $translations = $this->storage->getTranslations([
+      'language' => $this->langcode,
+      'type' => 'configuration',
+      'name' => 'image.style.medium',
+    ]);
     $this->assertCount(1, $translations);
     $translation = reset($translations);
     $this->assertEquals($string->source, $translation->source);
@@ -181,7 +189,11 @@ class LocaleConfigTranslationTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save translations');
 
     // Check the right single translation has been created.
-    $translations = $this->storage->getTranslations(['language' => $this->langcode, 'type' => 'configuration', 'name' => 'image.style.medium']);
+    $translations = $this->storage->getTranslations([
+      'language' => $this->langcode,
+      'type' => 'configuration',
+      'name' => 'image.style.medium',
+    ]);
     $translation = reset($translations);
     $this->assertCount(1, $translations, 'Got only one translation for image configuration.');
     $this->assertEquals($string->source, $translation->source);
@@ -231,7 +243,7 @@ class LocaleConfigTranslationTest extends BrowserTestBase {
   /**
    * Tests translatability of optional configuration in locale.
    */
-  public function testOptionalConfiguration() {
+  public function testOptionalConfiguration(): void {
     $this->assertNodeConfig(FALSE, FALSE);
     // Enable the node module.
     $this->drupalGet('admin/modules');
@@ -271,7 +283,11 @@ class LocaleConfigTranslationTest extends BrowserTestBase {
     }
 
     // Check the optional default configuration in node module.
-    $string = $this->storage->findString(['source' => 'No front page content has been created yet.<br/>Follow the <a target="_blank" href="https://www.drupal.org/docs/user_guide/en/index.html">User Guide</a> to start building your site.', 'context' => '', 'type' => 'configuration']);
+    $string = $this->storage->findString([
+      'source' => 'No front page content has been created yet.<br/>Follow the <a target="_blank" href="https://www.drupal.org/docs/user_guide/en/index.html">User Guide</a> to start building your site.',
+      'context' => '',
+      'type' => 'configuration',
+    ]);
     if ($optional) {
       $this->assertFalse($this->config('views.view.frontpage')->isNew());
       $this->assertNotEmpty($string, 'Node view text can be found with node and views modules.');

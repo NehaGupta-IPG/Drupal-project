@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Entity;
 
 use Drupal\field\Entity\FieldConfig;
@@ -10,19 +12,18 @@ use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\user\Entity\User;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the entity row renderers.
  *
- * @group views
  * @see \Drupal\views\Entity\Render\RendererBase
  */
+#[Group('views')]
 class RowEntityRenderersTest extends ViewsKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'field',
@@ -166,35 +167,35 @@ class RowEntityRenderersTest extends ViewsKernelTestBase {
   /**
    * Tests the entity row renderers.
    */
-  public function testEntityRenderers() {
+  public function testEntityRenderers(): void {
     $this->checkLanguageRenderers('page_1', $this->values);
   }
 
   /**
    * Tests the field row renderers.
    */
-  public function testFieldRenderers() {
+  public function testFieldRenderers(): void {
     $this->checkLanguageRenderers('page_2', $this->values);
   }
 
   /**
    * Tests the entity row renderers for relationships.
    */
-  public function testEntityRenderersRelationship() {
+  public function testEntityRenderersRelationship(): void {
     $this->checkLanguageRenderersRelationship('page_3', $this->values);
   }
 
   /**
    * Tests the field row renderers for relationships.
    */
-  public function testFieldRenderersRelationship() {
+  public function testFieldRenderersRelationship(): void {
     $this->checkLanguageRenderersRelationship('page_4', $this->values);
   }
 
   /**
    * Tests the row renderer with a revision base table.
    */
-  public function testRevisionBaseTable() {
+  public function testRevisionBaseTable(): void {
     $view = Views::getView('test_entity_row_renderers_revisions_base');
     $view->execute();
     $this->assertIdenticalResultset($view, $this->ids, ['nid' => 'nid', 'uid' => 'uid']);
@@ -210,7 +211,7 @@ class RowEntityRenderersTest extends ViewsKernelTestBase {
    *   associated with language keys appropriate for the translation of that
    *   node.
    */
-  protected function checkLanguageRenderers($display, $values) {
+  protected function checkLanguageRenderers($display, $values): void {
     $expected = [
       $values[0]['en'],
       $values[0]['en'],
@@ -294,7 +295,7 @@ class RowEntityRenderersTest extends ViewsKernelTestBase {
    *   associated with language keys appropriate for the translation of that
    *   node.
    */
-  protected function checkLanguageRenderersRelationship($display, $values) {
+  protected function checkLanguageRenderersRelationship($display, $values): void {
     $expected = [
       $values[1]['en'],
       $values[1]['en'],

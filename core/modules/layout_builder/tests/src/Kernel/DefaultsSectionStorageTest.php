@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Kernel;
 
 use Drupal\Core\Plugin\Context\Context;
@@ -7,19 +9,22 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\Context\EntityContext;
 use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\entity_test\EntityTestHelper;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\layout_builder\Plugin\SectionStorage\DefaultsSectionStorage;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionComponent;
 use Drupal\layout_builder\SectionStorage\SectionStorageDefinition;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\layout_builder\Plugin\SectionStorage\DefaultsSectionStorage
- *
- * @group layout_builder
- * @group #slow
+ * Tests Drupal\layout_builder\Plugin\SectionStorage\DefaultsSectionStorage.
  */
+#[CoversClass(DefaultsSectionStorage::class)]
+#[Group('layout_builder')]
 class DefaultsSectionStorageTest extends KernelTestBase {
 
   /**
@@ -31,7 +36,6 @@ class DefaultsSectionStorageTest extends KernelTestBase {
     'layout_builder_defaults_test',
     'entity_test',
     'field',
-    'system',
     'user',
   ];
 
@@ -48,7 +52,7 @@ class DefaultsSectionStorageTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    entity_test_create_bundle('bundle_with_extra_fields');
+    EntityTestHelper::createBundle('bundle_with_extra_fields');
     $this->installEntitySchema('entity_test');
     $this->installEntitySchema('user');
     $this->installConfig(['layout_builder_defaults_test']);
@@ -62,7 +66,7 @@ class DefaultsSectionStorageTest extends KernelTestBase {
   /**
    * Tests installing defaults via config install.
    */
-  public function testConfigInstall() {
+  public function testConfigInstall(): void {
     /** @var \Drupal\layout_builder\Entity\LayoutEntityDisplayInterface $display */
     $display = LayoutBuilderEntityViewDisplay::load('entity_test.bundle_with_extra_fields.default');
     $section = $display->getSection(0);
@@ -75,8 +79,7 @@ class DefaultsSectionStorageTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::access
-   * @dataProvider providerTestAccess
+   * Tests access.
    *
    * @param bool $expected
    *   The expected outcome of ::access().
@@ -86,8 +89,11 @@ class DefaultsSectionStorageTest extends KernelTestBase {
    *   Whether Layout Builder is enabled for this display.
    * @param array $section_data
    *   Data to store as the sections value for Layout Builder.
+   *
+   * @legacy-covers ::access
    */
-  public function testAccess($expected, $operation, $is_enabled, array $section_data) {
+  #[DataProvider('providerTestAccess')]
+  public function testAccess($expected, $operation, $is_enabled, array $section_data): void {
     $display = LayoutBuilderEntityViewDisplay::create([
       'targetEntityType' => 'entity_test',
       'bundle' => 'entity_test',
@@ -135,9 +141,11 @@ class DefaultsSectionStorageTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::getContexts
+   * Tests get contexts.
+   *
+   * @legacy-covers ::getContexts
    */
-  public function testGetContexts() {
+  public function testGetContexts(): void {
     $display = LayoutBuilderEntityViewDisplay::create([
       'targetEntityType' => 'entity_test',
       'bundle' => 'entity_test',
@@ -155,9 +163,11 @@ class DefaultsSectionStorageTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::getContextsDuringPreview
+   * Tests get contexts during preview.
+   *
+   * @legacy-covers ::getContextsDuringPreview
    */
-  public function testGetContextsDuringPreview() {
+  public function testGetContextsDuringPreview(): void {
     $display = LayoutBuilderEntityViewDisplay::create([
       'targetEntityType' => 'entity_test',
       'bundle' => 'entity_test',
@@ -185,9 +195,11 @@ class DefaultsSectionStorageTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::getTempstoreKey
+   * Tests get tempstore key.
+   *
+   * @legacy-covers ::getTempstoreKey
    */
-  public function testGetTempstoreKey() {
+  public function testGetTempstoreKey(): void {
     $display = LayoutBuilderEntityViewDisplay::create([
       'targetEntityType' => 'entity_test',
       'bundle' => 'entity_test',
@@ -206,7 +218,7 @@ class DefaultsSectionStorageTest extends KernelTestBase {
   /**
    * Tests loading given a display.
    */
-  public function testLoadFromDisplay() {
+  public function testLoadFromDisplay(): void {
     $display = LayoutBuilderEntityViewDisplay::create([
       'targetEntityType' => 'entity_test',
       'bundle' => 'entity_test',

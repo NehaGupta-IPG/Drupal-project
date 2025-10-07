@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Plugin;
 
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests unformatted style functionality.
- *
- * @group views
  */
+#[Group('views')]
 class StyleUnformattedTest extends StyleTestBase {
 
   /**
@@ -21,7 +23,7 @@ class StyleUnformattedTest extends StyleTestBase {
   /**
    * Make sure that the default css classes works as expected.
    */
-  public function testDefaultRowClasses() {
+  public function testDefaultRowClasses(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
     $output = $view->preview();

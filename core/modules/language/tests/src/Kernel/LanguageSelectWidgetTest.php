@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\language\Kernel;
 
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the language select widget.
- *
- * @group language
  */
+#[Group('language')]
 class LanguageSelectWidgetTest extends KernelTestBase {
 
   /**
@@ -50,7 +52,7 @@ class LanguageSelectWidgetTest extends KernelTestBase {
   /**
    * Tests the widget with the locked languages.
    */
-  public function testWithIncludedLockedLanguage() {
+  public function testWithIncludedLockedLanguage(): void {
     $this->entityFormDisplay->setComponent('langcode', [
       'type' => 'language_select',
     ])->save();
@@ -63,7 +65,7 @@ class LanguageSelectWidgetTest extends KernelTestBase {
   /**
    * Tests the widget without the locked languages.
    */
-  public function testWithoutIncludedLockedLanguage() {
+  public function testWithoutIncludedLockedLanguage(): void {
     $this->entityFormDisplay->setComponent('langcode', [
       'type' => 'language_select',
       'settings' => ['include_locked' => FALSE],

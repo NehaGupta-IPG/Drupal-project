@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\Number;
 
 use Drupal\Core\Field\FieldItemInterface;
@@ -8,20 +10,19 @@ use Drupal\Core\Field\Plugin\Field\FieldType\NumericItemBase;
 use Drupal\Core\Form\FormState;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Tests\field\Kernel\FieldKernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the new entity API for the number field type.
- *
- * @group field
  */
+#[Group('field')]
 class NumberItemTest extends FieldKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [];
 
@@ -49,7 +50,7 @@ class NumberItemTest extends FieldKernelTestBase {
   /**
    * Tests using entity fields of the number field type.
    */
-  public function testNumberItem() {
+  public function testNumberItem(): void {
     // Verify entity creation.
     $entity = EntityTest::create();
     $integer = rand(0, 10);
@@ -128,8 +129,6 @@ class NumberItemTest extends FieldKernelTestBase {
   /**
    * Tests constraints on numeric item fields.
    *
-   * @dataProvider dataNumberFieldSettingsProvider
-   *
    * @param string $type
    *   The field type.
    * @param int|float $min
@@ -145,7 +144,8 @@ class NumberItemTest extends FieldKernelTestBase {
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  public function testConstraints($type, $min, $max, $value, $expect_constraints, $expected_constraint_message = '') {
+  #[DataProvider('dataNumberFieldSettingsProvider')]
+  public function testConstraints($type, $min, $max, $value, $expect_constraints, $expected_constraint_message = ''): void {
     $field = FieldConfig::loadByName('entity_test', 'entity_test', 'field_' . $type);
     $field->setSetting('min', $min);
     $field->setSetting('max', $max);
@@ -203,9 +203,8 @@ class NumberItemTest extends FieldKernelTestBase {
    *   Expected validation result.
    * @param string $message
    *   (optional) Error message result.
-   *
-   * @dataProvider dataTestMinMaxValue
    */
+  #[DataProvider('dataTestMinMaxValue')]
   public function testFormFieldMinMaxValue(int|float|string $min, int|float|string $max, int|float|string $value, bool $hasError, string $message = ''): void {
     $element = [
       '#type' => 'number',

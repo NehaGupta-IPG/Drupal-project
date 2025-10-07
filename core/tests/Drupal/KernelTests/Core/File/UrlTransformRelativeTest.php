@@ -1,27 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\File;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * Tests URL transform to relative.
- *
- * @group Utility
  */
+#[Group('Utility')]
 class UrlTransformRelativeTest extends KernelTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['file_test'];
 
   /**
    * Tests transformRelative() function.
-   *
-   * @dataProvider providerFileUrlTransformRelative
    */
-  public function testFileUrlTransformRelative($host, $port, $https, $base_path, $root_relative, $url, $expected) {
+  #[DataProvider('providerFileUrlTransformRelative')]
+  public function testFileUrlTransformRelative($host, $port, $https, $base_path, $root_relative, $url, $expected): void {
 
     $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
     $_SERVER['SERVER_ADDR'] = '127.0.0.1';
@@ -43,6 +48,9 @@ class UrlTransformRelativeTest extends KernelTestBase {
     $this->assertSame($expected, \Drupal::service('file_url_generator')->transformRelative($url, $root_relative));
   }
 
+  /**
+   * Provides data for testing URL transformation.
+   */
   public static function providerFileUrlTransformRelative() {
     $data = [
       'http' => [

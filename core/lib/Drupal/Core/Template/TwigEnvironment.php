@@ -75,6 +75,7 @@ class TwigEnvironment extends Environment {
       'cache' => TRUE,
       'debug' => FALSE,
       'auto_reload' => NULL,
+      'use_yield' => TRUE,
     ];
     // Ensure autoescaping is always on.
     $options['autoescape'] = 'html';
@@ -194,7 +195,7 @@ class TwigEnvironment extends Environment {
    * @return string
    *   The template class name.
    */
-  public function getTemplateClass(string $name, int $index = NULL): string {
+  public function getTemplateClass(string $name, ?int $index = NULL): string {
     // We override this method to add caching because it gets called multiple
     // times when the same template is used more than once. For example, a page
     // rendering 50 nodes without any node template overrides will use the same

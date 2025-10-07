@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Plugin;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests pager-related APIs.
- *
- * @group views
  */
+#[Group('views')]
 class PagerKernelTest extends ViewsKernelTestBase {
 
   /**
@@ -40,7 +42,7 @@ class PagerKernelTest extends ViewsKernelTestBase {
    * @see \Drupal\views\ViewExecutable::setOffset
    * @see \Drupal\views\ViewExecutable::setCurrentPage
    */
-  public function testSetPagerMethods() {
+  public function testSetPagerMethods(): void {
     $view = Views::getView('test_pager_full');
 
     // Mark the view as cacheable in order have the cache checking working

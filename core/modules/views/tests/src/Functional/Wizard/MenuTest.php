@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Functional\Wizard;
 
 use Drupal\Core\Url;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the ability of the views wizard to put views in a menu.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class MenuTest extends WizardTestBase {
 
   /**
@@ -21,7 +23,7 @@ class MenuTest extends WizardTestBase {
   /**
    * Tests the menu functionality.
    */
-  public function testMenus() {
+  public function testMenus(): void {
     $this->drupalPlaceBlock('system_menu_block:main');
 
     // Create a view with a page display and a menu link in the Main Menu.

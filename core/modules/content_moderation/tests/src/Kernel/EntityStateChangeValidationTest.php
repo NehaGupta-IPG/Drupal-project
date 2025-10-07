@@ -1,18 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Kernel;
 
+use Drupal\content_moderation\Plugin\Validation\Constraint\ModerationStateConstraintValidator;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\content_moderation\Plugin\Validation\Constraint\ModerationStateConstraintValidator
- * @group content_moderation
+ * Tests Drupal\content_moderation\Plugin\Validation\Constraint\ModerationStateConstraintValidator.
  */
+#[CoversClass(ModerationStateConstraintValidator::class)]
+#[Group('content_moderation')]
 class EntityStateChangeValidationTest extends KernelTestBase {
 
   use ContentModerationTestTrait;
@@ -56,10 +63,9 @@ class EntityStateChangeValidationTest extends KernelTestBase {
   /**
    * Tests valid transitions.
    *
-   * @covers ::validate
+   * @legacy-covers ::validate
    */
-  public function testValidTransition() {
-    $this->setCurrentUser($this->adminUser);
+  public function testValidTransition(): void {
 
     $node_type = NodeType::create([
       'type' => 'example',
@@ -77,6 +83,7 @@ class EntityStateChangeValidationTest extends KernelTestBase {
     $node->moderation_state->value = 'draft';
     $node->save();
 
+    $this->setCurrentUser($this->createUser(['use editorial transition publish']));
     $node->moderation_state->value = 'published';
     $this->assertCount(0, $node->validate());
     $node->save();
@@ -87,9 +94,9 @@ class EntityStateChangeValidationTest extends KernelTestBase {
   /**
    * Tests invalid transitions.
    *
-   * @covers ::validate
+   * @legacy-covers ::validate
    */
-  public function testInvalidTransition() {
+  public function testInvalidTransition(): void {
     $this->setCurrentUser($this->adminUser);
 
     $node_type = NodeType::create([
@@ -118,7 +125,7 @@ class EntityStateChangeValidationTest extends KernelTestBase {
   /**
    * Tests validation with an invalid state.
    */
-  public function testInvalidState() {
+  public function testInvalidState(): void {
     $node_type = NodeType::create([
       'type' => 'example',
       'name' => 'Example',
@@ -142,8 +149,7 @@ class EntityStateChangeValidationTest extends KernelTestBase {
   /**
    * Tests validation with no initial state or an invalid state.
    */
-  public function testInvalidStateWithoutExisting() {
-    $this->setCurrentUser($this->adminUser);
+  public function testInvalidStateWithoutExisting(): void {
     // Create content without moderation enabled for the content type.
     $node_type = NodeType::create([
       'type' => 'example',
@@ -163,6 +169,7 @@ class EntityStateChangeValidationTest extends KernelTestBase {
     $workflow->getTypePlugin()->addEntityTypeAndBundle('node', 'example');
     $workflow->save();
 
+    $this->setCurrentUser($this->createUser(['use editorial transition create_new_draft']));
     // Validate the invalid state.
     $node = Node::load($node->id());
     $node->moderation_state->value = 'invalid_state';
@@ -173,7 +180,7 @@ class EntityStateChangeValidationTest extends KernelTestBase {
     $node->moderation_state->value = 'deleted_state';
     $node->save();
 
-    // Delete the state so $node->original contains an invalid state when
+    // Delete the state so the original entity contains an invalid state when
     // validating.
     $workflow->getTypePlugin()->deleteState('deleted_state');
     $workflow->save();
@@ -192,8 +199,7 @@ class EntityStateChangeValidationTest extends KernelTestBase {
   /**
    * Tests state transition validation with multiple languages.
    */
-  public function testInvalidStateMultilingual() {
-    $this->setCurrentUser($this->adminUser);
+  public function testInvalidStateMultilingual(): void {
 
     ConfigurableLanguage::createFromLangcode('fr')->save();
     $node_type = NodeType::create([
@@ -206,6 +212,7 @@ class EntityStateChangeValidationTest extends KernelTestBase {
     $workflow->getTypePlugin()->addEntityTypeAndBundle('node', 'example');
     $workflow->save();
 
+    $this->setCurrentUser($this->createUser(['use editorial transition archive']));
     $node = Node::create([
       'type' => 'example',
       'title' => 'English Published Node',
@@ -250,8 +257,7 @@ class EntityStateChangeValidationTest extends KernelTestBase {
   /**
    * Tests that content without prior moderation information can be moderated.
    */
-  public function testExistingContentWithNoModeration() {
-    $this->setCurrentUser($this->adminUser);
+  public function testExistingContentWithNoModeration(): void {
 
     $node_type = NodeType::create([
       'type' => 'example',
@@ -272,6 +278,7 @@ class EntityStateChangeValidationTest extends KernelTestBase {
     $workflow->getTypePlugin()->addEntityTypeAndBundle('node', 'example');
     $workflow->save();
 
+    $this->setCurrentUser($this->createUser(['use editorial transition publish']));
     $node = Node::load($nid);
 
     // Having no previous state should not break validation.
@@ -287,7 +294,7 @@ class EntityStateChangeValidationTest extends KernelTestBase {
   /**
    * Tests that content without prior moderation information can be translated.
    */
-  public function testExistingMultilingualContentWithNoModeration() {
+  public function testExistingMultilingualContentWithNoModeration(): void {
     $this->setCurrentUser($this->adminUser);
 
     // Enable French.
@@ -331,9 +338,10 @@ class EntityStateChangeValidationTest extends KernelTestBase {
   }
 
   /**
-   * @dataProvider transitionAccessValidationTestCases
-   */
-  public function testTransitionAccessValidation($permissions, $target_state, $messages) {
+ * Tests transition access validation.
+ */
+  #[DataProvider('transitionAccessValidationTestCases')]
+  public function testTransitionAccessValidation($permissions, $target_state, $messages): void {
     $node_type = NodeType::create([
       'type' => 'example',
       'name' => 'Example',

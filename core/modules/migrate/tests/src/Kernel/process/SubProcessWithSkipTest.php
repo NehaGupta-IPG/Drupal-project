@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Kernel\process;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\Plugin\MigrationInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests process pipelines when a sub_process skips a row or process.
- *
- * @group migrate
  */
+#[Group('migrate')]
 class SubProcessWithSkipTest extends KernelTestBase {
 
   /**
@@ -22,6 +25,7 @@ class SubProcessWithSkipTest extends KernelTestBase {
    * Provides the test migration definition.
    *
    * @return array
+   *   The test migration definition.
    */
   public function getDefinition() {
     return [
@@ -81,13 +85,12 @@ class SubProcessWithSkipTest extends KernelTestBase {
   /**
    * Test use of skip_on_empty within sub_process.
    *
-   * @dataProvider providerTestSubProcessSkip
-   *
    * @param string $method
    *   The method to use with skip_on_empty (row or process).
    * @param array $expected_data
    *   The expected result of the migration.
    */
+  #[DataProvider('providerTestSubProcessSkip')]
   public function testSubProcessSkip(string $method, array $expected_data): void {
     $definition = $this->getDefinition();
     $definition['process']['second']['process']['prop_1'][0]['method'] = $method;
@@ -108,12 +111,13 @@ class SubProcessWithSkipTest extends KernelTestBase {
    * Data provider for testNotFoundSubProcess().
    *
    * @return array
+   *   The data for the testNotFoundSubProcess() test.
    */
   public static function providerTestSubProcessSkip(): array {
     return [
       'skip row' => [
         'method' => 'row',
-        'expected' => [
+        'expected_data' => [
           'first' => 'something outside of sub_process',
           'second' => [
             [
@@ -125,7 +129,7 @@ class SubProcessWithSkipTest extends KernelTestBase {
       ],
       'skip process' => [
         'method' => 'process',
-        'expected' => [
+        'expected_data' => [
           'first' => 'something outside of sub_process',
           'second' => [
             [

@@ -1,26 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Extension;
 
+use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Extension\ThemeExtensionList
- * @group Extension
+ * Tests Drupal\Core\Extension\ThemeExtensionList.
  */
+#[CoversClass(ThemeExtensionList::class)]
+#[Group('Extension')]
 class ThemeExtensionListTest extends KernelTestBase {
 
   /**
-   * @covers ::getList
+   * Tests get list.
+   *
+   * @legacy-covers ::getList
    */
-  public function testGetList() {
+  public function testGetList(): void {
     \Drupal::configFactory()->getEditable('core.extension')
       ->set('module.testing', 1000)
       ->set('theme.test_theme', 0)
       ->save();
 
     // The installation profile is provided by a container parameter.
-    // Saving the configuration doesn't automatically trigger invalidation
+    // Saving the configuration doesn't automatically trigger invalidation.
     $this->container->get('kernel')->rebuildContainer();
 
     /** @var \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list */
@@ -33,7 +41,7 @@ class ThemeExtensionListTest extends KernelTestBase {
   /**
    * Tests that themes have an empty default version set.
    */
-  public function testThemeWithoutVersion() {
+  public function testThemeWithoutVersion(): void {
     $theme = \Drupal::service('extension.list.theme')->get('test_theme_settings_features');
     $this->assertNull($theme->info['version']);
   }

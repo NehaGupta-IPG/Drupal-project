@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Migrate\d6;
 
-use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use Drupal\Tests\SchemaCheckTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Upgrade variables to null.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
 class MigrateActionConfigsTest extends MigrateDrupal6TestBase {
 
   use SchemaCheckTestTrait;
@@ -25,7 +27,7 @@ class MigrateActionConfigsTest extends MigrateDrupal6TestBase {
   /**
    * Tests migration of action variables to null.
    */
-  public function testActionSettings() {
+  public function testActionSettings(): void {
     $config = $this->config('action.settings');
     $this->assertTrue($config->isNew());
   }

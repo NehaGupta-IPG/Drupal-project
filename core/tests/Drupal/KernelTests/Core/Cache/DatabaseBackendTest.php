@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Cache;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\DatabaseBackend;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Unit test of the database backend using the generic cache unit test base.
- *
- * @group Cache
  */
+#[Group('Cache')]
 class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
 
   /**
@@ -18,13 +20,6 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
    * @var int
    */
   protected static $maxRows = 100;
-
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  protected static $modules = ['system'];
 
   /**
    * Creates a new instance of DatabaseBackend.
@@ -46,7 +41,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testSetGet() {
+  public function testSetGet(): void {
     parent::testSetGet();
     $backend = $this->getCacheBackend();
 
@@ -75,7 +70,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
   /**
    * Tests the row count limiting of cache bin database tables.
    */
-  public function testGarbageCollection() {
+  public function testGarbageCollection(): void {
     $backend = $this->getCacheBackend();
     $max_rows = static::$maxRows;
 
@@ -112,7 +107,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
    * @return int
    *   The number of rows in the test cache bin database table.
    */
-  protected function getNumRows() {
+  protected function getNumRows(): int {
     $table = 'cache_' . $this->testBin;
     $connection = $this->container->get('database');
     $query = $connection->select($table);
@@ -121,9 +116,9 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
   }
 
   /**
-   * Test that the service "cache_tags.invalidator.checksum" is backend overridable.
+   * Tests that "cache_tags.invalidator.checksum" is backend overridable.
    */
-  public function testCacheTagsInvalidatorChecksumIsBackendOverridable() {
+  public function testCacheTagsInvalidatorChecksumIsBackendOverridable(): void {
     $definition = $this->container->getDefinition('cache_tags.invalidator.checksum');
     $this->assertTrue($definition->hasTag('backend_overridable'));
   }
@@ -131,7 +126,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
   /**
    * Test that the service "cache.backend.database" is backend overridable.
    */
-  public function testCacheBackendDatabaseIsBackendOverridable() {
+  public function testCacheBackendDatabaseIsBackendOverridable(): void {
     $definition = $this->container->getDefinition('cache.backend.database');
     $this->assertTrue($definition->hasTag('backend_overridable'));
   }

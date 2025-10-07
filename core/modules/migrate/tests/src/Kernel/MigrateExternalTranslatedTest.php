@@ -1,26 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Kernel;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests migrating non-Drupal translated content.
  *
  * Ensure it's possible to migrate in translations, even if there's no nid or
  * tnid property on the source.
- *
- * @group migrate
  */
+#[Group('migrate')]
 class MigrateExternalTranslatedTest extends MigrateTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'user',
     'language',
     'node',
@@ -52,7 +53,7 @@ class MigrateExternalTranslatedTest extends MigrateTestBase {
   /**
    * Tests importing and rolling back our data.
    */
-  public function testMigrations() {
+  public function testMigrations(): void {
     /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
     $storage = $this->container->get('entity_type.manager')->getStorage('node');
     $this->assertCount(0, $storage->loadMultiple());

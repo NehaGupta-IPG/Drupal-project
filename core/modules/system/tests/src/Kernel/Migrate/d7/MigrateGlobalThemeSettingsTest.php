@@ -1,20 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Migrate\d7;
 
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests migration of global theme settings variables to configuration.
- *
- * @group system
  */
+#[Group('system')]
 class MigrateGlobalThemeSettingsTest extends MigrateDrupal7TestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * {@inheritdoc}
@@ -27,7 +24,7 @@ class MigrateGlobalThemeSettingsTest extends MigrateDrupal7TestBase {
   /**
    * Tests migration of global theme settings to configuration.
    */
-  public function testMigrateThemeSettings() {
+  public function testMigrateThemeSettings(): void {
     $config = $this->config('system.theme.global');
 
     $this->assertSame('image/png', $config->get('favicon.mimetype'));

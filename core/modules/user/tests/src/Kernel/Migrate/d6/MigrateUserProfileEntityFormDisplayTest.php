@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel\Migrate\d6;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the user profile entity form display migration.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
 class MigrateUserProfileEntityFormDisplayTest extends MigrateDrupal6TestBase {
 
   /**
@@ -27,7 +29,7 @@ class MigrateUserProfileEntityFormDisplayTest extends MigrateDrupal6TestBase {
   /**
    * Tests migration of user profile fields.
    */
-  public function testUserProfileEntityFormDisplay() {
+  public function testUserProfileEntityFormDisplay(): void {
     $display = EntityFormDisplay::load('user.user.default');
 
     // Test a text field.

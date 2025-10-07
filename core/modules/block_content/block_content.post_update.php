@@ -5,148 +5,47 @@
  * Post update functions for Content Block.
  */
 
-use Drupal\block_content\BlockContentTypeInterface;
+use Drupal\block\BlockConfigUpdater;
+use Drupal\block\BlockInterface;
 use Drupal\Core\Config\Entity\ConfigEntityUpdater;
-use Drupal\Core\Site\Settings;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\user\Entity\Role;
-use Drupal\views\Entity\View;
+use Drupal\views\ViewEntityInterface;
+use Drupal\views\ViewsConfigUpdater;
 
 /**
  * Implements hook_removed_post_updates().
  */
-function block_content_removed_post_updates() {
+function block_content_removed_post_updates(): array {
   return [
     'block_content_post_update_add_views_reusable_filter' => '9.0.0',
+    'block_content_post_update_entity_changed_constraint' => '11.0.0',
+    'block_content_post_update_move_custom_block_library' => '11.0.0',
+    'block_content_post_update_block_library_view_permission' => '11.0.0',
+    'block_content_post_update_sort_permissions' => '11.0.0',
+    'block_content_post_update_revision_type' => '11.0.0',
   ];
 }
 
 /**
- * Clear the entity type cache.
+ * Remove deprecated status and info keys from block_content blocks.
  */
-function block_content_post_update_entity_changed_constraint() {
-  // Empty post_update hook.
-}
-
-/**
- * Moves the custom block library to Content.
- */
-function block_content_post_update_move_custom_block_library() {
-
-  if (!\Drupal::service('module_handler')->moduleExists('views')) {
-    return;
-  }
-  if (!$view = View::load('block_content')) {
-    return;
-  }
-
-  $display =& $view->getDisplay('page_1');
-  if (empty($display) || $display['display_options']['path'] !== 'admin/structure/block/block-content') {
-    return;
-  }
-
-  $display['display_options']['path'] = 'admin/content/block';
-  $menu =& $display['display_options']['menu'];
-  $menu['title'] = 'Blocks';
-  $menu['description'] = 'Create and edit block content.';
-  $menu['expanded'] = FALSE;
-  $menu['parent'] = 'system.admin_content';
-  $view->set('label', 'Content blocks');
-
-  $view->save();
-}
-
-/**
- * Update block_content 'block library' view permission.
- */
-function block_content_post_update_block_library_view_permission() {
-  $config_factory = \Drupal::configFactory();
-  $config = $config_factory->getEditable('views.view.block_content');
-  $current_perm = $config->get('display.default.display_options.access.options.perm');
-  if ($current_perm === 'administer blocks') {
-    $config->set('display.default.display_options.access.options.perm', 'access block library')
-      ->save(TRUE);
-  }
-}
-
-/**
- * Update permissions for users with "administer blocks" permission.
- */
-function block_content_post_update_sort_permissions(&$sandbox = NULL) {
-  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'user_role', function (Role $role) {
-    if ($role->hasPermission('administer blocks')) {
-      $role->grantPermission('administer block content');
-      $role->grantPermission('access block library');
-      $role->grantPermission('administer block types');
-      return TRUE;
-    }
-    return FALSE;
-  });
-}
-
-/**
- * Update configuration for revision type.
- */
-function block_content_post_update_revision_type(&$sandbox = NULL) {
+function block_content_post_update_remove_block_content_status_info_keys(array &$sandbox = []): void {
+  /** @var \Drupal\block\BlockConfigUpdater $blockConfigUpdater */
+  $blockConfigUpdater = \Drupal::service(BlockConfigUpdater::class);
+  $blockConfigUpdater->setDeprecationsEnabled(FALSE);
   \Drupal::classResolver(ConfigEntityUpdater::class)
-    ->update($sandbox, 'block_content_type', function (BlockContentTypeInterface $block_content_type) {
-      $block_content_type->set('revision', (bool) $block_content_type->get('revision'));
-      return TRUE;
+    ->update($sandbox, 'block', function (BlockInterface $block) use ($blockConfigUpdater): bool {
+      return $blockConfigUpdater->needsInfoStatusSettingsRemoved($block);
     });
 }
 
 /**
- * Set a default author for block content entities.
+ * Remove block_content_listing_empty from views.
  */
-function block_content_post_update_set_owner(&$sandbox = NULL): TranslatableMarkup {
-  $blockContentStorage = \Drupal::entityTypeManager()
-    ->getStorage('block_content');
-
-  if (!isset($sandbox['total'])) {
-    $sandbox['total'] = $blockContentStorage
-      ->getQuery()
-      ->accessCheck(FALSE)
-      ->condition('uid', NULL, 'IS NULL')
-      ->count()
-      ->execute();
-    $sandbox['progress'] = 0;
-
-    // Handle the case of 0 block to process.
-    if ($sandbox['total'] == 0) {
-      $sandbox['total'] = 1;
-      $sandbox['progress'] = 1;
-    }
-  }
-
-  $ids = $blockContentStorage
-    ->getQuery()
-    ->accessCheck(FALSE)
-    ->condition('uid', NULL, 'IS NULL')
-    ->range(0, (int) Settings::get('entity_update_batch_size', 50))
-    ->execute();
-
-  $database = \Drupal::database();
-  /** @var \Drupal\block_content\BlockContentInterface $blockContent */
-  foreach ($blockContentStorage->loadMultiple($ids) as $blockContent) {
-    // Get the revision_user from the first revision of this block to use
-    // as the author.
-    $query = $database->select('block_content_revision', 'bcr')
-      ->condition('id', $blockContent->id());
-    $query->addExpression('MIN(revision_id)', 'revision_id');
-    $revisionId = $query->execute()->fetchField();
-    /** @var \Drupal\block_content\BlockContentInterface $revision */
-    $revision = $blockContentStorage->loadRevision($revisionId);
-
-    $blockContent->setOwnerId($revision->getRevisionUserId() ?? 0)
-      ->setSyncing(TRUE)
-      ->save();
-    $sandbox['progress'] += 1;
-  }
-
-  $sandbox['#finished'] = empty($sandbox['total']) ? 1 : ($sandbox['progress'] / $sandbox['total']);
-
-  return new TranslatableMarkup('Processed Block Content Entities (@count/@total)', [
-    '@count' => $sandbox['progress'],
-    '@total' => $sandbox['total'],
-  ]);
+function block_content_post_update_remove_block_content_listing_empty(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsBlockContentListingEmptyUpdate($view);
+  });
 }

@@ -1,16 +1,17 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\ckeditor5\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Test the ckeditor5-stylesheets theme config property.
- *
- * @group ckeditor5
  */
+#[Group('ckeditor5')]
 class CKEditor5StylesheetsTest extends KernelTestBase {
 
   /**
@@ -31,10 +32,9 @@ class CKEditor5StylesheetsTest extends KernelTestBase {
    *   The machine name of the theme.
    * @param array $expected
    *   The expected CKEditor 5 CSS paths from the theme.
-   *
-   * @dataProvider externalStylesheetsProvider
    */
-  public function testExternalStylesheets($theme, $expected) {
+  #[DataProvider('externalStylesheetsProvider')]
+  public function testExternalStylesheets($theme, $expected): void {
     \Drupal::service('theme_installer')->install([$theme]);
     $this->config('system.theme')->set('default', $theme)->save();
     $this->assertSame($expected, _ckeditor5_theme_css($theme));

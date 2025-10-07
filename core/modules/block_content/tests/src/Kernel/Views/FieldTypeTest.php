@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block_content\Kernel\Views;
 
 use Drupal\block_content\Entity\BlockContent;
@@ -7,12 +9,12 @@ use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Drupal\block_content\Plugin\views\field\Type handler.
- *
- * @group block_content
  */
+#[Group('block_content')]
 class FieldTypeTest extends ViewsKernelTestBase {
 
   /**

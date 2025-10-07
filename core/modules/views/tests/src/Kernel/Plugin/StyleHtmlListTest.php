@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Plugin;
 
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the HTML list style plugin.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\style\HtmlList
  */
+#[Group('views')]
 class StyleHtmlListTest extends ViewsKernelTestBase {
 
   /**
@@ -23,7 +26,7 @@ class StyleHtmlListTest extends ViewsKernelTestBase {
   /**
    * Make sure that the HTML list style markup is correct.
    */
-  public function testDefaultRowClasses() {
+  public function testDefaultRowClasses(): void {
     $view = Views::getView('test_style_html_list');
     $output = $view->preview();
     $output = (string) \Drupal::service('renderer')->renderRoot($output);

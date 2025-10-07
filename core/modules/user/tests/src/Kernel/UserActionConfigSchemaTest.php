@@ -1,31 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel;
 
-use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that the config schema is valid when roles are added or removed.
- *
- * @group user
  */
+#[Group('user')]
 class UserActionConfigSchemaTest extends KernelTestBase {
 
   use SchemaCheckTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'user'];
 
   /**
    * Tests whether the user action config schema are valid.
    */
-  public function testValidUserActionConfigSchema() {
+  public function testValidUserActionConfigSchema(): void {
     $rid = $this->randomMachineName(8);
     Role::create(['id' => $rid, 'label' => $rid])->save();
 

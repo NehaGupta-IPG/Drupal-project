@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Migrate\d7;
 
 use Drupal\migrate\MigrateExecutable;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests menu translation migration.
- *
- * @group migrate_drupal_7
  */
+#[Group('migrate_drupal_7')]
 class MigrateMenuTranslationTest extends MigrateDrupal7TestBase {
 
   /**
@@ -39,7 +41,7 @@ class MigrateMenuTranslationTest extends MigrateDrupal7TestBase {
   /**
    * Tests migration of menu translations.
    */
-  public function testMenuTranslation() {
+  public function testMenuTranslation(): void {
     $language_manager = \Drupal::service('language_manager');
 
     $config_translation = $language_manager->getLanguageConfigOverride('is', 'system.menu.main');

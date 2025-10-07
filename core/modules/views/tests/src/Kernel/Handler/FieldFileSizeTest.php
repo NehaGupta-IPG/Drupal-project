@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the core Drupal\views\Plugin\views\field\FileSize handler.
  *
- * @group views
  * @see CommonXssUnitTest
  */
+#[Group('views')]
 class FieldFileSizeTest extends ViewsKernelTestBase {
 
   /**
@@ -20,6 +23,9 @@ class FieldFileSizeTest extends ViewsKernelTestBase {
    */
   public static $testViews = ['test_view'];
 
+  /**
+   * Provides a dataset with various 'age' values representing file sizes.
+   */
   public function dataSet() {
     $data = parent::dataSet();
     $data[0]['age'] = 0;
@@ -30,6 +36,9 @@ class FieldFileSizeTest extends ViewsKernelTestBase {
     return $data;
   }
 
+  /**
+   * Maps the 'age' field to the 'file_size' handler for Views.
+   */
   public function viewsData() {
     $data = parent::viewsData();
     $data['views_test_data']['age']['field']['id'] = 'file_size';
@@ -37,7 +46,10 @@ class FieldFileSizeTest extends ViewsKernelTestBase {
     return $data;
   }
 
-  public function testFieldFileSize() {
+  /**
+   * Tests the FileSize field handler for correct formatting in Views.
+   */
+  public function testFieldFileSize(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 

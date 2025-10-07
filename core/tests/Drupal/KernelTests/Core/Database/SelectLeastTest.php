@@ -1,24 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Database;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the SQL LEAST operator.
- *
- * @group Database
  */
+#[Group('Database')]
 class SelectLeastTest extends DatabaseTestBase {
 
   /**
    * Tests the SQL LEAST operator.
-   *
-   * @dataProvider selectLeastProvider
    */
-  public function testSelectLeast($values, $expected) {
+  #[DataProvider('selectLeastProvider')]
+  public function testSelectLeast($values, $expected): void {
     $least = $this->connection->query("SELECT LEAST(:values[])", [':values[]' => $values])->fetchField();
     $this->assertEquals($expected, $least);
   }
 
+  /**
+   * Provides data for testing the LEAST operator.
+   */
   public static function selectLeastProvider() {
     return [
       [[1, 2, 3, 4, 5, 6], 1],

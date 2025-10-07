@@ -1,20 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests user_install().
- *
- * @group user
  */
+#[Group('user')]
 class UserInstallTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['user'];
 
@@ -31,7 +31,7 @@ class UserInstallTest extends KernelTestBase {
   /**
    * Tests that the initial users have correct values.
    */
-  public function testUserInstall() {
+  public function testUserInstall(): void {
     $user_ids = \Drupal::entityQuery('user')->sort('uid')->accessCheck(FALSE)->execute();
     $users = \Drupal::entityTypeManager()->getStorage('user')->loadMultiple($user_ids);
     $anon = $users[0];

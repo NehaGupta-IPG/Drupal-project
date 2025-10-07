@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Condition;
 
 use Drupal\Core\Condition\ConditionPluginCollection;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Condition\ConditionPluginCollection
- *
- * @group Condition
+ * Tests Drupal\Core\Condition\ConditionPluginCollection.
  */
+#[CoversClass(ConditionPluginCollection::class)]
+#[Group('Condition')]
 class ConditionPluginCollectionTest extends KernelTestBase {
 
   /**
@@ -22,7 +26,9 @@ class ConditionPluginCollectionTest extends KernelTestBase {
   ];
 
   /**
-   * @covers ::getConfiguration
+   * Tests get configuration.
+   *
+   * @legacy-covers ::getConfiguration
    */
   public function testGetConfiguration(): void {
     // Include a condition that has custom configuration and a type mismatch on

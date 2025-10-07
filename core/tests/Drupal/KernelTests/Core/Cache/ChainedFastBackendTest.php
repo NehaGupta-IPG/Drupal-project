@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Cache;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\ChainedFastBackend;
 use Drupal\Core\Cache\DatabaseBackend;
 use Drupal\Core\Cache\PhpBackend;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Unit test of the fast chained backend using the generic cache unit test base.
- *
- * @group Cache
  */
+#[Group('Cache')]
 class ChainedFastBackendTest extends GenericCacheBackendUnitTestBase {
 
   /**

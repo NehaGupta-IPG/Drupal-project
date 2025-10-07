@@ -4,13 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Component\Plugin\Discovery;
 
+use Drupal\Component\Plugin\Discovery\DiscoveryTrait;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @group Plugin
- * @coversDefaultClass \Drupal\Component\Plugin\Discovery\DiscoveryTrait
+ * Tests Drupal\Component\Plugin\Discovery\DiscoveryTrait.
  */
+#[CoversTrait(DiscoveryTrait::class)]
+#[Group('Plugin')]
+#[UsesClass(PluginNotFoundException::class)]
 class DiscoveryTraitTest extends TestCase {
 
   /**
@@ -29,12 +36,11 @@ class DiscoveryTraitTest extends TestCase {
   }
 
   /**
-   * @covers ::doGetDefinition
-   * @dataProvider providerDoGetDefinition
+   * @legacy-covers ::doGetDefinition
    */
-  public function testDoGetDefinition($expected, $definitions, $plugin_id) {
-    // Mock the trait.
-    $trait = $this->getMockForTrait('Drupal\Component\Plugin\Discovery\DiscoveryTrait');
+  #[DataProvider('providerDoGetDefinition')]
+  public function testDoGetDefinition($expected, $definitions, $plugin_id): void {
+    $trait = new DiscoveryTraitMockableClass();
     // Un-protect the method using reflection.
     $method_ref = new \ReflectionMethod($trait, 'doGetDefinition');
     // Call doGetDefinition, with $exception_on_invalid always FALSE.
@@ -59,13 +65,11 @@ class DiscoveryTraitTest extends TestCase {
   }
 
   /**
-   * @covers ::doGetDefinition
-   * @dataProvider providerDoGetDefinitionException
-   * @uses \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @legacy-covers ::doGetDefinition
    */
-  public function testDoGetDefinitionException($expected, $definitions, $plugin_id) {
-    // Mock the trait.
-    $trait = $this->getMockForTrait('Drupal\Component\Plugin\Discovery\DiscoveryTrait');
+  #[DataProvider('providerDoGetDefinitionException')]
+  public function testDoGetDefinitionException($expected, $definitions, $plugin_id): void {
+    $trait = new DiscoveryTraitMockableClass();
     // Un-protect the method using reflection.
     $method_ref = new \ReflectionMethod($trait, 'doGetDefinition');
     // Call doGetDefinition, with $exception_on_invalid always TRUE.
@@ -74,14 +78,16 @@ class DiscoveryTraitTest extends TestCase {
   }
 
   /**
-   * @covers ::getDefinition
-   * @dataProvider providerDoGetDefinition
+   * @legacy-covers ::getDefinition
    */
-  public function testGetDefinition($expected, $definitions, $plugin_id) {
+  #[DataProvider('providerDoGetDefinition')]
+  public function testGetDefinition($expected, $definitions, $plugin_id): void {
     // Since getDefinition is a wrapper around doGetDefinition(), we can re-use
     // its data provider. We just have to tell abstract method getDefinitions()
     // to use the $definitions array.
-    $trait = $this->getMockForTrait('Drupal\Component\Plugin\Discovery\DiscoveryTrait');
+    $trait = $this->getMockBuilder(DiscoveryTraitMockableClass::class)
+      ->onlyMethods(['getDefinitions'])
+      ->getMock();
     $trait->expects($this->once())
       ->method('getDefinitions')
       ->willReturn($definitions);
@@ -93,15 +99,16 @@ class DiscoveryTraitTest extends TestCase {
   }
 
   /**
-   * @covers ::getDefinition
-   * @dataProvider providerDoGetDefinitionException
-   * @uses \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @legacy-covers ::getDefinition
    */
-  public function testGetDefinitionException($expected, $definitions, $plugin_id) {
+  #[DataProvider('providerDoGetDefinitionException')]
+  public function testGetDefinitionException($expected, $definitions, $plugin_id): void {
     // Since getDefinition is a wrapper around doGetDefinition(), we can re-use
     // its data provider. We just have to tell abstract method getDefinitions()
     // to use the $definitions array.
-    $trait = $this->getMockForTrait('Drupal\Component\Plugin\Discovery\DiscoveryTrait');
+    $trait = $this->getMockBuilder(DiscoveryTraitMockableClass::class)
+      ->onlyMethods(['getDefinitions'])
+      ->getMock();
     $trait->expects($this->once())
       ->method('getDefinitions')
       ->willReturn($definitions);
@@ -125,13 +132,13 @@ class DiscoveryTraitTest extends TestCase {
   }
 
   /**
-   * @covers ::hasDefinition
-   * @dataProvider providerHasDefinition
+   * @legacy-covers ::hasDefinition
    */
-  public function testHasDefinition($expected, $plugin_id) {
-    $trait = $this->getMockBuilder('Drupal\Component\Plugin\Discovery\DiscoveryTrait')
+  #[DataProvider('providerHasDefinition')]
+  public function testHasDefinition($expected, $plugin_id): void {
+    $trait = $this->getMockBuilder(DiscoveryTraitMockableClass::class)
       ->onlyMethods(['getDefinition'])
-      ->getMockForTrait();
+      ->getMock();
     // Set up our mocked getDefinition() to return TRUE for 'valid' and FALSE
     // for 'not_valid'.
     $trait->expects($this->once())
@@ -145,6 +152,19 @@ class DiscoveryTraitTest extends TestCase {
       $expected,
       $trait->hasDefinition($plugin_id)
     );
+  }
+
+}
+
+/**
+ * A class using the DiscoveryTrait for mocking purposes.
+ */
+class DiscoveryTraitMockableClass {
+
+  use DiscoveryTrait;
+
+  public function getDefinitions(): array {
+    return [];
   }
 
 }

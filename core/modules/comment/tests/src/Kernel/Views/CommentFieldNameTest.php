@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Kernel\Views;
 
 use Drupal\comment\Entity\Comment;
@@ -13,12 +15,12 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\views\Tests\ViewResultAssertionTrait;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the comment field name field.
- *
- * @group comment
  */
+#[Group('comment')]
 class CommentFieldNameTest extends KernelTestBase {
 
   use CommentTestTrait;
@@ -51,7 +53,7 @@ class CommentFieldNameTest extends KernelTestBase {
   /**
    * Tests comment field name.
    */
-  public function testCommentFieldName() {
+  public function testCommentFieldName(): void {
     $renderer = $this->container->get('renderer');
 
     $this->installEntitySchema('user');

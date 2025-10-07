@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\datetime\Kernel\Views;
 
 use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Drupal\datetime\Plugin\views schemas.
- *
- * @group datetime
  */
+#[Group('datetime')]
 class DateTimeSchemaTest extends DateTimeHandlerTestBase {
 
   use SchemaCheckTestTrait;
@@ -22,7 +24,7 @@ class DateTimeSchemaTest extends DateTimeHandlerTestBase {
   /**
    * Tests argument plugin schema.
    */
-  public function testDateTimeSchema() {
+  public function testDateTimeSchema(): void {
     // Test argument schema.
     $view = Views::getView('test_argument_datetime');
     $view->initHandlers();

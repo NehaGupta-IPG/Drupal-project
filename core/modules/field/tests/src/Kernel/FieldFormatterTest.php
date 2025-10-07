@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
@@ -7,12 +9,12 @@ use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests for field formatters.
- *
- * @group field
  */
+#[Group('field')]
 class FieldFormatterTest extends KernelTestBase {
 
   /**
@@ -85,7 +87,7 @@ class FieldFormatterTest extends KernelTestBase {
   /**
    * Tests availability of third party settings in field render arrays.
    */
-  public function testThirdPartySettings() {
+  public function testThirdPartySettings(): void {
     $third_party_settings = [
       'field_test' => [
         'foo' => 'bar',

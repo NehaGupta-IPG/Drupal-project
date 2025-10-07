@@ -6,21 +6,23 @@ namespace Drupal\Tests\config\Functional;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Uuid\Uuid;
+use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\system\Entity\Action;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\Core\Config\FileStorage;
 use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that configuration objects are correct after various operations.
  *
  * The installation and removal of configuration objects in install, disable
  * and uninstall functionality is tested.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigInstallProfileOverrideTest extends BrowserTestBase {
 
   /**
@@ -38,7 +40,7 @@ class ConfigInstallProfileOverrideTest extends BrowserTestBase {
   /**
    * Tests install profile config changes.
    */
-  public function testInstallProfileConfigOverwrite() {
+  public function testInstallProfileConfigOverwrite(): void {
     $config_name = 'system.cron';
     // The expected configuration from the system module.
     $expected_original_data = [
@@ -46,7 +48,7 @@ class ConfigInstallProfileOverrideTest extends BrowserTestBase {
         'requirements_warning' => 172800,
         'requirements_error' => 1209600,
       ],
-      'logging' => 1,
+      'logging' => TRUE,
     ];
     // The expected active configuration altered by the install profile.
     $expected_profile_data = [
@@ -54,7 +56,7 @@ class ConfigInstallProfileOverrideTest extends BrowserTestBase {
         'requirements_warning' => 259200,
         'requirements_error' => 1209600,
       ],
-      'logging' => 1,
+      'logging' => TRUE,
     ];
     $expected_profile_data = ['_core' => ['default_config_hash' => Crypt::hashBase64(serialize($expected_profile_data))]] + $expected_profile_data;
 
@@ -109,7 +111,11 @@ class ConfigInstallProfileOverrideTest extends BrowserTestBase {
     // type does not exist.
     $optional_dir = $this->getModulePath('testing_config_overrides') . '/' . InstallStorage::CONFIG_OPTIONAL_DIRECTORY;
     $optional_storage = new FileStorage($optional_dir);
-    foreach (['config_test.dynamic.dotted.default', 'config_test.dynamic.override', 'config_test.dynamic.override_unmet'] as $id) {
+    foreach ([
+      'config_test.dynamic.dotted.default',
+      'config_test.dynamic.override',
+      'config_test.dynamic.override_unmet',
+    ] as $id) {
       $this->assertTrue(\Drupal::config($id)->isNew(), "The config_test entity $id contained in the profile's optional directory does not exist.");
       // Make that we don't get false positives from the assertion above.
       $this->assertTrue($optional_storage->exists($id), "The config_test entity $id does exist in the profile's optional directory.");
@@ -144,7 +150,8 @@ class ConfigInstallProfileOverrideTest extends BrowserTestBase {
     $config_test_storage = \Drupal::entityTypeManager()->getStorage('config_test');
     $this->assertNull($config_test_storage->load('completely_new'));
 
-    // Ensure the authenticated role has the access entity_test_bundle permission.
+    // Ensure the authenticated role has the access entity_test_bundle
+    // permission.
     $role = Role::load(Role::AUTHENTICATED_ID);
     $this->assertTrue($role->hasPermission('administer entity_test_bundle content'), 'The Authenticated role has the "administer entity_test_bundle content" permission.');
     $this->assertEquals(['module' => ['entity_test']], $role->getDependencies());

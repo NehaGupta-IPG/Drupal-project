@@ -235,7 +235,7 @@ class StaticReflectionClass extends ReflectionClass
     /**
      * {@inheritDoc}
      */
-    public function getStaticProperties(): ?array
+    public function getStaticProperties(): array
     {
         throw new ReflectionException('Method not implemented');
     }

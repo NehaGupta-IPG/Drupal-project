@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Kernel\Views;
 
-use Drupal\views\Views;
 use Drupal\views\ViewExecutable;
+use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the taxonomy term on node relationship handler.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
 class RelationshipNodeTermDataTest extends TaxonomyTestBase {
 
   /**
@@ -22,7 +24,7 @@ class RelationshipNodeTermDataTest extends TaxonomyTestBase {
   /**
    * Tests relations limited by vocabulary.
    *
-   * @covers \Drupal\taxonomy\Plugin\views\relationship\NodeTermData::calculateDependencies
+   * @legacy-covers \Drupal\taxonomy\Plugin\views\relationship\NodeTermData::calculateDependencies
    */
   public function testViewsHandlerRelationshipNodeTermData(): void {
     $view = Views::getView('test_taxonomy_node_term_data');

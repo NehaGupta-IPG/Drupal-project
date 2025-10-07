@@ -1,18 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel;
 
 use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\decorated_service_test\TestServiceDecorator;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * Test handling of decorated services in DependencySerializationTraitPass.
- *
- * @group system
+ * Test handling of decorated services with the reverse container.
  */
+#[Group('system')]
 class DecoratedServiceTest extends KernelTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = [
     'decorated_service_test',
   ];
@@ -20,7 +25,7 @@ class DecoratedServiceTest extends KernelTestBase {
   /**
    * Check that decorated services keep their original service ID.
    */
-  public function testDecoratedServiceId() {
+  public function testDecoratedServiceId(): void {
     // Service decorated once.
     $test_service = $this->container->get('test_service');
     $this->assertEquals('test_service', $this->container->get(ReverseContainer::class)->getId($test_service));

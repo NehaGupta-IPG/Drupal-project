@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media_library\Kernel;
 
 use Drupal\Core\Access\AccessResult;
@@ -13,12 +15,13 @@ use Drupal\media_library\MediaLibraryState;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the media library access.
- *
- * @group media_library
  */
+#[Group('media_library')]
 class MediaLibraryAccessTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -86,7 +89,7 @@ class MediaLibraryAccessTest extends KernelTestBase {
   /**
    * Tests that the field widget opener respects entity creation permissions.
    */
-  public function testFieldWidgetEntityCreateAccess() {
+  public function testFieldWidgetEntityCreateAccess(): void {
     /** @var \Drupal\media_library\MediaLibraryUiBuilder $ui_builder */
     $ui_builder = $this->container->get('media_library.ui_builder');
 
@@ -98,7 +101,16 @@ class MediaLibraryAccessTest extends KernelTestBase {
     ]);
 
     $access_result = $ui_builder->checkAccess($this->createUser(), $state);
-    $this->assertAccess($access_result, FALSE, "The following permissions are required: 'administer entity_test content' OR 'administer entity_test_with_bundle content' OR 'create test entity_test_with_bundle entities'.", [], ['url.query_args', 'user.permissions']);
+    $this->assertAccess(
+      $access_result,
+      FALSE,
+      "The following permissions are required: 'administer entity_test content' OR 'administer entity_test_with_bundle content' OR 'create test entity_test_with_bundle entities'.",
+      [],
+      [
+        'url.query_args',
+        'user.permissions',
+      ]
+    );
 
     // Create a user with the appropriate permissions and assert that access is
     // granted.
@@ -107,20 +119,30 @@ class MediaLibraryAccessTest extends KernelTestBase {
       'view media',
     ]);
     $access_result = $ui_builder->checkAccess($account, $state);
-    $this->assertAccess($access_result, TRUE, NULL, Views::getView('media_library')->storage->getCacheTags(), ['url.query_args', 'user.permissions']);
+    $this->assertAccess(
+      $access_result,
+      TRUE,
+      NULL,
+      Views::getView('media_library')->storage->getCacheTags(),
+      [
+        'url.query_args',
+        'user.permissions',
+      ]
+    );
   }
 
   /**
-   * @covers \Drupal\media_library\MediaLibraryEditorOpener::checkAccess
+   * Tests editor opener access.
    *
    * @param bool $media_embed_enabled
    *   Whether to test with media_embed filter enabled on the text format.
    * @param bool $can_use_format
    *   Whether the logged in user is allowed to use the text format.
    *
-   * @dataProvider editorOpenerAccessProvider
+   * @legacy-covers \Drupal\media_library\MediaLibraryEditorOpener::checkAccess
    */
-  public function testEditorOpenerAccess($media_embed_enabled, $can_use_format) {
+  #[DataProvider('editorOpenerAccessProvider')]
+  public function testEditorOpenerAccess($media_embed_enabled, $can_use_format): void {
     $format = $this->container
       ->get('entity_type.manager')
       ->getStorage('filter_format')->create([
@@ -183,7 +205,7 @@ class MediaLibraryAccessTest extends KernelTestBase {
   /**
    * Tests that the field widget opener respects entity-specific access.
    */
-  public function testFieldWidgetEntityEditAccess() {
+  public function testFieldWidgetEntityEditAccess(): void {
     /** @var \Drupal\media_library\MediaLibraryUiBuilder $ui_builder */
     $ui_builder = $this->container->get('media_library.ui_builder');
 
@@ -235,7 +257,13 @@ class MediaLibraryAccessTest extends KernelTestBase {
       'view media',
     ]);
     $access_result = $ui_builder->checkAccess($account, $state);
-    $this->assertAccess($access_result, TRUE, NULL, Views::getView('media_library')->storage->getCacheTags(), ['url.query_args', 'user.permissions']);
+    $this->assertAccess(
+      $access_result,
+      TRUE,
+      NULL,
+      Views::getView('media_library')->storage->getCacheTags(),
+      ['url.query_args', 'user.permissions']
+    );
   }
 
   /**
@@ -256,10 +284,9 @@ class MediaLibraryAccessTest extends KernelTestBase {
    *
    * @param string $field_type
    *   The field type.
-   *
-   * @dataProvider providerFieldWidgetEntityFieldAccess
    */
-  public function testFieldWidgetEntityFieldAccess(string $field_type) {
+  #[DataProvider('providerFieldWidgetEntityFieldAccess')]
+  public function testFieldWidgetEntityFieldAccess(string $field_type): void {
     $field_storage = FieldStorageConfig::create([
       'type' => $field_type,
       'entity_type' => 'entity_test_with_bundle',
@@ -291,7 +318,13 @@ class MediaLibraryAccessTest extends KernelTestBase {
       'field_name' => $field_storage->getName(),
     ]);
     $access_result = $ui_builder->checkAccess($account, $state);
-    $this->assertAccess($access_result, FALSE, 'Field access denied by test module', [], ['url.query_args', 'user.permissions']);
+    $this->assertAccess(
+      $access_result,
+      FALSE,
+      'Field access denied by test module',
+      [],
+      ['url.query_args', 'user.permissions']
+    );
 
     // Assert that field access is also checked with a real entity.
     $entity = EntityTestWithBundle::create([
@@ -311,13 +344,21 @@ class MediaLibraryAccessTest extends KernelTestBase {
       $parameters
     );
     $access_result = $ui_builder->checkAccess($account, $state);
-    $this->assertAccess($access_result, FALSE, 'Field access denied by test module', [], ['url.query_args', 'user.permissions']);
+    $this->assertAccess(
+      $access_result,
+      FALSE,
+      'Field access denied by test module',
+      [],
+      [
+        'url.query_args',
+        'user.permissions',
+      ]);
   }
 
   /**
    * Tests that media library access respects the media_library view.
    */
-  public function testViewAccess() {
+  public function testViewAccess(): void {
     /** @var \Drupal\media_library\MediaLibraryUiBuilder $ui_builder */
     $ui_builder = $this->container->get('media_library.ui_builder');
 
@@ -345,7 +386,12 @@ class MediaLibraryAccessTest extends KernelTestBase {
     // Assert the 'view media' permission is needed to access the library and
     // validate the cache dependencies.
     $access_result = $ui_builder->checkAccess($forbidden_account, $state);
-    $this->assertAccess($access_result, FALSE, "The 'view media' permission is required.", $view_original->storage->getCacheTags(), ['url.query_args', 'user.permissions']);
+    $this->assertAccess(
+      $access_result,
+      FALSE,
+      "The 'view media' permission is required.",
+      $view_original->storage->getCacheTags(),
+      ['url.query_args', 'user.permissions']);
 
     // Assert that the media library access is denied when the view widget
     // display is deleted.
@@ -361,13 +407,21 @@ class MediaLibraryAccessTest extends KernelTestBase {
     // works again.
     $view_original->storage->save();
     $access_result = $ui_builder->checkAccess($allowed_account, $state);
-    $this->assertAccess($access_result, TRUE, NULL, $view_original->storage->getCacheTags(), ['url.query_args', 'user.permissions']);
+    $this->assertAccess(
+      $access_result,
+      TRUE,
+      NULL,
+      $view_original->storage->getCacheTags(),
+      ['url.query_args', 'user.permissions']);
 
     // Assert that the media library access is denied when the entire media
     // library view is deleted.
     Views::getView('media_library')->storage->delete();
     $access_result = $ui_builder->checkAccess($allowed_account, $state);
-    $this->assertAccess($access_result, FALSE, 'The media library view does not exist.');
+    $this->assertAccess(
+      $access_result,
+      FALSE,
+      'The media library view does not exist.');
   }
 
   /**
@@ -412,7 +466,7 @@ class MediaLibraryAccessTest extends KernelTestBase {
    * @param string[] $expected_cache_contexts
    *   (optional) The expected cache contexts attached to the access result.
    */
-  private function assertAccess(AccessResult $access_result, bool $is_allowed, string $expected_reason = NULL, array $expected_cache_tags = [], array $expected_cache_contexts = []): void {
+  private function assertAccess(AccessResult $access_result, bool $is_allowed, ?string $expected_reason = NULL, array $expected_cache_tags = [], array $expected_cache_contexts = []): void {
     $this->assertSame($is_allowed, $access_result->isAllowed());
     if ($access_result instanceof AccessResultReasonInterface && isset($expected_reason)) {
       $this->assertSame($expected_reason, $access_result->getReason());

@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\help\Kernel;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\help_test\SupernovaGenerator;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the empty HTML page.
- *
- * @group help
  */
+#[Group('help')]
 class HelpEmptyPageTest extends KernelTestBase {
 
   /**
@@ -22,7 +24,7 @@ class HelpEmptyPageTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
 
     $container->set('url_generator', new SupernovaGenerator());
@@ -31,7 +33,7 @@ class HelpEmptyPageTest extends KernelTestBase {
   /**
    * Ensures that no URL generator is called on a page without hook_help().
    */
-  public function testEmptyHookHelp() {
+  public function testEmptyHookHelp(): void {
     $all_modules = \Drupal::service('extension.list.module')->getList();
     $all_modules = array_filter($all_modules, function ($module) {
       // Filter contrib, hidden, already enabled modules and modules in the

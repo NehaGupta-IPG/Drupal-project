@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\Migrate\d6;
 
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Migrate fields.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
 class MigrateFieldTest extends MigrateDrupal6TestBase {
 
   /**
@@ -23,7 +25,7 @@ class MigrateFieldTest extends MigrateDrupal6TestBase {
   /**
    * Tests the Drupal 6 field to Drupal 8 migration.
    */
-  public function testFields() {
+  public function testFields(): void {
     // Text field.
     /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
     $field_storage = FieldStorageConfig::load('node.field_test');

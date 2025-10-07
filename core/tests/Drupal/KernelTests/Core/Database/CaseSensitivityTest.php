@@ -1,18 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Database;
+
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests handling case sensitive collation.
- *
- * @group Database
  */
+#[Group('Database')]
 class CaseSensitivityTest extends DatabaseTestBase {
 
   /**
    * Tests BINARY collation in MySQL.
    */
-  public function testCaseSensitiveInsert() {
+  public function testCaseSensitiveInsert(): void {
     $num_records_before = $this->connection->query('SELECT COUNT(*) FROM {test}')->fetchField();
 
     $this->connection->insert('test')

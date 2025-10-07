@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\Kernel\Views;
 
 use Drupal\media\Entity\Media;
+use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Tests\ViewResultAssertionTrait;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
-use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the media_revision_user field.
- *
- * @group media
  */
+#[Group('media')]
 class RevisionUserTest extends ViewsKernelTestBase {
 
   use UserCreationTrait;
@@ -28,7 +30,6 @@ class RevisionUserTest extends ViewsKernelTestBase {
     'media',
     'media_test_views',
     'media_test_source',
-    'system',
     'user',
     'views',
     'image',
@@ -84,7 +85,7 @@ class RevisionUserTest extends ViewsKernelTestBase {
   /**
    * Tests the media_revision_user relationship.
    */
-  public function testRevisionUser() {
+  public function testRevisionUser(): void {
     $primary_author = $this->createUser();
     $secondary_author = $this->createUser();
 

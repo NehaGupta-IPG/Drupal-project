@@ -82,15 +82,13 @@ class LanguageNegotiationSession extends LanguageNegotiationMethodBase implement
   /**
    * {@inheritdoc}
    */
-  public function getLangcode(Request $request = NULL) {
+  public function getLangcode(?Request $request = NULL) {
     $config = $this->config->get('language.negotiation')->get('session');
     if (($param = $config['parameter']) && $request) {
       if ($request->query->has($param)) {
         return $request->query->get($param);
       }
-      // @todo Remove hasSession() from condition in
-      //   https://www.drupal.org/node/2484991
-      if ($request->hasSession() && $request->getSession()->has($param)) {
+      if ($request->getSession()->has($param)) {
         return $request->getSession()->get($param);
       }
     }
@@ -116,7 +114,7 @@ class LanguageNegotiationSession extends LanguageNegotiationMethodBase implement
   /**
    * {@inheritdoc}
    */
-  public function processOutbound($path, &$options = [], Request $request = NULL, BubbleableMetadata $bubbleable_metadata = NULL) {
+  public function processOutbound($path, &$options = [], ?Request $request = NULL, ?BubbleableMetadata $bubbleable_metadata = NULL) {
     if ($request) {
       // The following values are not supposed to change during a single page
       // request processing.

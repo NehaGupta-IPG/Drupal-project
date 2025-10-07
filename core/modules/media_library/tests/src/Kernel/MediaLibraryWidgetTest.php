@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media_library\Kernel;
 
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -10,14 +12,16 @@ use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\media\Entity\MediaType;
 use Drupal\media_library\MediaLibraryState;
+use Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the media library widget.
- *
- * @coversDefaultClass \Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget
- * @group media_library
  */
+#[CoversClass(MediaLibraryWidget::class)]
+#[Group('media_library')]
 class MediaLibraryWidgetTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -29,6 +33,8 @@ class MediaLibraryWidgetTest extends KernelTestBase {
     'media',
     'media_library',
     'field',
+    'file',
+    'filter',
     'image',
     'system',
     'views',
@@ -95,7 +101,7 @@ class MediaLibraryWidgetTest extends KernelTestBase {
   /**
    * Test the media library widget access.
    */
-  public function testWidgetAccess() {
+  public function testWidgetAccess(): void {
     $entity = EntityTest::create([
       'name' => 'sample entity',
     ]);
@@ -107,7 +113,7 @@ class MediaLibraryWidgetTest extends KernelTestBase {
   /**
    * Test the media library widget access with a revisionable entity type.
    */
-  public function testRevisionableWidgetAccess() {
+  public function testRevisionableWidgetAccess(): void {
     $allowed_revision = EntityTestRev::create([
       'name' => 'allowed_access',
     ]);

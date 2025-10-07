@@ -13,15 +13,16 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Log\LoggerInterface;
 
 /**
  * Tests update functionality unrelated to the database.
- *
- * @coversDefaultClass \Drupal\update\UpdateFetcher
- *
- * @group update
  */
+#[CoversClass(UpdateFetcher::class)]
+#[Group('update')]
 class UpdateFetcherTest extends UnitTestCase {
 
   /**
@@ -98,11 +99,10 @@ class UpdateFetcherTest extends UnitTestCase {
    * @param string $expected
    *   The expected URL returned from UpdateFetcher::buildFetchUrl()
    *
-   * @dataProvider providerTestUpdateBuildFetchUrl
-   *
    * @see \Drupal\update\UpdateFetcher::buildFetchUrl()
    */
-  public function testUpdateBuildFetchUrl(array $project, $site_key, $expected) {
+  #[DataProvider('providerTestUpdateBuildFetchUrl')]
+  public function testUpdateBuildFetchUrl(array $project, $site_key, $expected): void {
     $url = $this->updateFetcher->buildFetchUrl($project, $site_key);
     $this->assertEquals($url, $expected);
     $this->assertFalse($this->logger->hasErrorRecords());
@@ -131,14 +131,14 @@ class UpdateFetcherTest extends UnitTestCase {
 
     $data[] = [$project, $site_key, $expected];
 
-    // For disabled projects it shouldn't add the site key either.
+    // For uninstalled projects it shouldn't add the site key either.
     $site_key = 'site_key';
     $project['project_type'] = 'disabled';
     $expected = "http://www.example.com/{$project['name']}/current";
 
     $data[] = [$project, $site_key, $expected];
 
-    // For enabled projects, test adding the site key.
+    // For installed projects, test adding the site key.
     $project['project_type'] = '';
     $expected = "http://www.example.com/{$project['name']}/current";
     $expected .= '?site_key=site_key';
@@ -160,10 +160,10 @@ class UpdateFetcherTest extends UnitTestCase {
   /**
    * Mocks the HTTP client.
    *
-   * @param \GuzzleHttp\Psr7\Response ...
+   * @param \GuzzleHttp\Psr7\Response ...$responses
    *   Variable number of Response objects that the mocked client should return.
    */
-  protected function mockClient(Response ...$responses) {
+  protected function mockClient(Response ...$responses): void {
     // Create a mock and queue responses.
     $mock_handler = new MockHandler($responses);
     $handler_stack = HandlerStack::create($mock_handler);
@@ -173,10 +173,12 @@ class UpdateFetcherTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::doRequest
-   * @covers ::fetchProjectData
+   * Tests update fetcher no fallback.
+   *
+   * @legacy-covers ::doRequest
+   * @legacy-covers ::fetchProjectData
    */
-  public function testUpdateFetcherNoFallback() {
+  public function testUpdateFetcherNoFallback(): void {
     // First, try without the HTTP fallback setting, and HTTPS mocked to fail.
     $settings = new Settings([]);
     $this->mockClient(
@@ -202,10 +204,12 @@ class UpdateFetcherTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::doRequest
-   * @covers ::fetchProjectData
+   * Tests update fetcher http fallback.
+   *
+   * @legacy-covers ::doRequest
+   * @legacy-covers ::fetchProjectData
    */
-  public function testUpdateFetcherHttpFallback() {
+  public function testUpdateFetcherHttpFallback(): void {
     $settings = new Settings(['update_fetch_with_http_fallback' => TRUE]);
     $this->mockClient(
       new Response(500, [], 'HTTPS failed'),

@@ -5,19 +5,23 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Unit;
 
 use Drupal\Tests\UnitTestCase;
-use Drupal\views\ViewsDataHelper;
 use Drupal\views\Tests\ViewTestData;
+use Drupal\views\ViewsDataHelper;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\views\ViewsDataHelper
- * @group views
+ * Tests Drupal\views\ViewsDataHelper.
  */
+#[CoversClass(ViewsDataHelper::class)]
+#[Group('views')]
 class ViewsDataHelperTest extends UnitTestCase {
 
   /**
    * Returns the views data definition.
    *
    * @return array
+   *   The views data definition.
    */
   protected function viewsData() {
     $data = ViewTestData::viewsData();
@@ -40,7 +44,7 @@ class ViewsDataHelperTest extends UnitTestCase {
   /**
    * Tests fetchFields.
    */
-  public function testFetchFields() {
+  public function testFetchFields(): void {
     $views_data = $this->getMockBuilder('Drupal\views\ViewsData')
       ->disableOriginalConstructor()
       ->getMock();

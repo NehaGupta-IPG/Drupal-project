@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel\Views;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -7,12 +9,12 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\User;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the handler of the user: uid Argument.
- *
- * @group user
  */
+#[Group('user')]
 class HandlerArgumentUserUidTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -37,7 +39,7 @@ class HandlerArgumentUserUidTest extends KernelTestBase {
   /**
    * Tests the generated title of a user: uid argument.
    */
-  public function testArgumentTitle() {
+  public function testArgumentTitle(): void {
     $this->installEntitySchema('user');
     $this->installConfig(['user']);
     User::create(['uid' => 0, 'name' => ''])->save();

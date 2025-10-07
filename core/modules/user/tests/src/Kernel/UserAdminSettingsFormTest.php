@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel;
 
 use Drupal\KernelTests\ConfigFormTestBase;
 use Drupal\user\AccountSettingsForm;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Configuration object user.mail and user.settings save test.
- *
- * @group user
  */
+#[Group('user')]
 class UserAdminSettingsFormTest extends ConfigFormTestBase {
 
   /**
@@ -22,6 +24,7 @@ class UserAdminSettingsFormTest extends ConfigFormTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installConfig(['user']);
 
     $this->form = AccountSettingsForm::create($this->container);
     $this->values = [

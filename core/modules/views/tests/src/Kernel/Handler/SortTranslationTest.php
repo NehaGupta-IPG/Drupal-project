@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\field\Entity\FieldConfig;
@@ -9,12 +11,12 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests sorting on translatable and not translatable fields.
- *
- * @group views
  */
+#[Group('views')]
 class SortTranslationTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
@@ -97,7 +99,7 @@ class SortTranslationTest extends ViewsKernelTestBase {
   /**
    * Tests sorting on an untranslated field.
    */
-  public function testSortbyUntranslatedIntegerField() {
+  public function testSortbyUntranslatedIntegerField(): void {
     $map = [
       'nid' => 'nid',
       'node_field_data_langcode' => 'langcode',

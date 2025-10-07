@@ -1,20 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\contextual\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests edge cases for converting between contextual links and IDs.
- *
- * @group contextual
  */
+#[Group('contextual')]
 class ContextualUnitTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['contextual'];
 
@@ -104,11 +105,10 @@ class ContextualUnitTest extends KernelTestBase {
    * @param string $id
    *   The serialized representation of the passed links.
    *
-   * @covers ::_contextual_links_to_id
-   *
-   * @dataProvider contextualLinksDataProvider
+   * @legacy-covers ::_contextual_links_to_id
    */
-  public function testContextualLinksToId(array $links, string $id) {
+  #[DataProvider('contextualLinksDataProvider')]
+  public function testContextualLinksToId(array $links, string $id): void {
     $this->assertSame($id, _contextual_links_to_id($links));
   }
 
@@ -120,11 +120,10 @@ class ContextualUnitTest extends KernelTestBase {
    * @param string $id
    *   The serialized representation of the passed links.
    *
-   * @covers ::_contextual_id_to_links
-   *
-   * @dataProvider contextualLinksDataProvider
+   * @legacy-covers ::_contextual_id_to_links
    */
-  public function testContextualIdToLinks(array $links, string $id) {
+  #[DataProvider('contextualLinksDataProvider')]
+  public function testContextualIdToLinks(array $links, string $id): void {
     $this->assertSame($links, _contextual_id_to_links($id));
   }
 

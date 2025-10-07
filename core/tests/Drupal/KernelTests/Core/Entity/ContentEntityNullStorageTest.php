@@ -1,26 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\contact\Entity\ContactForm;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests ContentEntityNullStorage entity query support.
  *
  * @see \Drupal\Core\Entity\ContentEntityNullStorage
  * @see \Drupal\Core\Entity\Query\Null\Query
- *
- * @group Entity
  */
+#[Group('Entity')]
 class ContentEntityNullStorageTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'contact', 'user'];
 
@@ -29,7 +29,7 @@ class ContentEntityNullStorageTest extends KernelTestBase {
    *
    * @see \Drupal\Core\Entity\Query\Null\Query
    */
-  public function testEntityQuery() {
+  public function testEntityQuery(): void {
     $this->assertSame(0, \Drupal::entityQuery('contact_message')->accessCheck(FALSE)->count()->execute(), 'Counting a null storage returns 0.');
     $this->assertSame([], \Drupal::entityQuery('contact_message')->accessCheck(FALSE)->execute(), 'Querying a null storage returns an empty array.');
     $this->assertSame([], \Drupal::entityQuery('contact_message')->accessCheck(FALSE)->condition('contact_form', 'test')->execute(), 'Querying a null storage returns an empty array and conditions are ignored.');
@@ -42,7 +42,7 @@ class ContentEntityNullStorageTest extends KernelTestBase {
    *
    * @see \Drupal\Core\Entity\Event\BundleConfigImportValidate
    */
-  public function testDeleteThroughImport() {
+  public function testDeleteThroughImport(): void {
     $this->installConfig(['system']);
     $contact_form = ContactForm::create(['id' => 'test', 'label' => 'Test contact form']);
     $contact_form->save();

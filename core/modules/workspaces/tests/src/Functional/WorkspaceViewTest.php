@@ -6,12 +6,14 @@ namespace Drupal\Tests\workspaces\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use Drupal\workspaces\Entity\Workspace;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests permission controls on workspaces.
- *
- * @group workspaces
  */
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceViewTest extends BrowserTestBase {
 
   use WorkspaceTestUtilities;
@@ -19,7 +21,7 @@ class WorkspaceViewTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['workspaces'];
+  protected static $modules = ['workspaces', 'workspaces_ui'];
 
   /**
    * {@inheritdoc}
@@ -29,7 +31,7 @@ class WorkspaceViewTest extends BrowserTestBase {
   /**
    * Verifies that a user can view their own workspace.
    */
-  public function testViewOwnWorkspace() {
+  public function testViewOwnWorkspace(): void {
     $permissions = [
       'access administration pages',
       'administer site configuration',
@@ -67,7 +69,7 @@ class WorkspaceViewTest extends BrowserTestBase {
   /**
    * Verifies that a user can view any workspace.
    */
-  public function testViewAnyWorkspace() {
+  public function testViewAnyWorkspace(): void {
     $permissions = [
       'access administration pages',
       'administer site configuration',

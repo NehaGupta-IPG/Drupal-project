@@ -92,9 +92,6 @@ td .claro-details {
   list-style: none;
   cursor: pointer;
   transition: background-color var(--details-bg-color-transition-duration) ease-in-out;
-  word-wrap: break-word;
-  -webkit-hyphens: auto;
-  hyphens: auto;
   color: var(--color-gray-800);
   border-radius: var(--size-summary-border-radius);
   background-color: transparent;
@@ -157,7 +154,7 @@ td .claro-details {
   background-size: contain;
 }
 
-[dir="rtl"] .claro-details__summary::before {
+[dir="rtl"] :is(.claro-details__summary::before) {
   transform: rotate(-270deg);
 }
 
@@ -179,7 +176,8 @@ td .claro-details {
     border-inline-end: 0.125rem solid;
     background: none;
   }
-  [dir="rtl"] .claro-details__summary::before {
+
+  [dir="rtl"] :is(.claro-details__summary::before) {
     transform: rotate(-225deg);
   }
 }
@@ -330,9 +328,7 @@ td .claro-details {
   box-shadow: none;
 }
 
-[dir="rtl"] :is([open] > .claro-details__summary--accordion:not(:focus, :active)::after),
-[dir="rtl"] :is([open] > .claro-details__summary--accordion-item:not(:focus, :active)::after),
-[dir="rtl"] :is([open] > .claro-details__summary--vertical-tabs-item:not(:focus, :active)::after) {
+[dir="rtl"] :is([open] > .claro-details__summary--accordion:not(:focus, :active)::after, [open] > .claro-details__summary--accordion-item:not(:focus, :active)::after, [open] > .claro-details__summary--vertical-tabs-item:not(:focus, :active)::after) {
   border-width: 0 var(--details-summary-focus-border-size) 0 0;
 }
 

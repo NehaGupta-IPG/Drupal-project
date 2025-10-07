@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Form;
 
 use Drupal\form_test\Form\FormTestFileForm;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests for the 'file' form element.
- *
- * @group Form
  */
+#[Group('Form')]
 class FileElementTest extends KernelTestBase {
 
   /**
@@ -20,7 +22,7 @@ class FileElementTest extends KernelTestBase {
   /**
    * Tests that file elements are built and processed correctly.
    */
-  public function testFileElement() {
+  public function testFileElement(): void {
     $form = $this->container->get('form_builder')
       ->getForm(FormTestFileForm::class);
 

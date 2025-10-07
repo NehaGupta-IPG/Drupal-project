@@ -10,6 +10,7 @@ use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\StatementWrapperIterator;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
+use Pdo\Mysql;
 
 /**
  * @addtogroup database
@@ -37,21 +38,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   const CONNECTION_REFUSED = 2002;
 
   /**
-   * Error code for "Can't initialize character set" error.
-   */
-  const UNSUPPORTED_CHARSET = 2019;
-
-  /**
-   * Driver-specific error code for "Unknown character set" error.
-   */
-  const UNKNOWN_CHARSET = 1115;
-
-  /**
-   * SQLSTATE error code for "Syntax error or access rule violation".
-   */
-  const SQLSTATE_SYNTAX_ERROR = 42000;
-
-  /**
    * {@inheritdoc}
    */
   protected $statementWrapperClass = StatementWrapperIterator::class;
@@ -69,7 +55,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * The minimal possible value for the max_allowed_packet setting of MySQL.
    *
    * @link https://mariadb.com/kb/en/mariadb/server-system-variables/#max_allowed_packet
-   * @link https://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_max_allowed_packet
+   * @link https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_max_allowed_packet
    *
    * @var int
    */
@@ -84,15 +70,14 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * {@inheritdoc}
    */
   public function __construct(\PDO $connection, array $connection_options) {
+    // @phpstan-ignore class.notFound
+    assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof Mysql : TRUE);
     // If the SQL mode doesn't include 'ANSI_QUOTES' (explicitly or via a
     // combination mode), then MySQL doesn't interpret a double quote as an
     // identifier quote, in which case use the non-ANSI-standard backtick.
     //
-    // Because we still support MySQL 5.7, check for the deprecated combination
-    // modes as well.
-    //
-    // @see https://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sqlmode_ansi_quotes
-    $ansi_quotes_modes = ['ANSI_QUOTES', 'ANSI', 'DB2', 'MAXDB', 'MSSQL', 'ORACLE', 'POSTGRESQL'];
+    // @see https://dev.mysql.com/doc/refman/8.0/en/sql-mode.html#sqlmode_ansi_quotes
+    $ansi_quotes_modes = ['ANSI_QUOTES', 'ANSI'];
     $is_ansi_quotes_mode = FALSE;
     if (isset($connection_options['init_commands']['sql_mode'])) {
       foreach ($ansi_quotes_modes as $mode) {
@@ -116,13 +101,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * {@inheritdoc}
    */
   public static function open(array &$connection_options = []) {
-    if (isset($connection_options['_dsn_utf8_fallback']) && $connection_options['_dsn_utf8_fallback'] === TRUE) {
-      // Only used during the installer version check, as a fallback from utf8mb4.
-      $charset = 'utf8';
-    }
-    else {
-      $charset = 'utf8mb4';
-    }
     // The DSN should use either a socket or a host/port.
     if (isset($connection_options['unix_socket'])) {
       $dsn = 'mysql:unix_socket=' . $connection_options['unix_socket'];
@@ -134,7 +112,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // Character set is added to dsn to ensure PDO uses the proper character
     // set when escaping. This has security implications. See
     // https://www.drupal.org/node/1201452 for further discussion.
-    $dsn .= ';charset=' . $charset;
+    $dsn .= ';charset=utf8mb4';
     if (!empty($connection_options['database'])) {
       $dsn .= ';dbname=' . $connection_options['database'];
     }
@@ -144,16 +122,21 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     ];
     $connection_options['pdo'] += [
       \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-      // So we don't have to mess around with cursors and unbuffered queries by default.
-      \PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => TRUE,
+      // So we don't have to mess around with cursors and unbuffered queries by
+      // default.
+      // @phpstan-ignore class.notFound
+      (\PHP_VERSION_ID < 80400 ? \PDO::MYSQL_ATTR_USE_BUFFERED_QUERY : Mysql::ATTR_USE_BUFFERED_QUERY) => TRUE,
       // Make sure MySQL returns all matched rows on update queries including
       // rows that actually didn't have to be updated because the values didn't
       // change. This matches common behavior among other database systems.
-      \PDO::MYSQL_ATTR_FOUND_ROWS => TRUE,
-      // Because MySQL's prepared statements skip the query cache, because it's dumb.
+      // @phpstan-ignore class.notFound
+      (\PHP_VERSION_ID < 80400 ? \PDO::MYSQL_ATTR_FOUND_ROWS : Mysql::ATTR_FOUND_ROWS) => TRUE,
+      // Because MySQL's prepared statements skip the query cache, because it's
+      // dumb.
       \PDO::ATTR_EMULATE_PREPARES => TRUE,
       // Limit SQL to a single statement like mysqli.
-      \PDO::MYSQL_ATTR_MULTI_STATEMENTS => FALSE,
+      // @phpstan-ignore class.notFound
+      (\PHP_VERSION_ID < 80400 ? \PDO::MYSQL_ATTR_MULTI_STATEMENTS : Mysql::ATTR_MULTI_STATEMENTS) => FALSE,
       // Convert numeric values to strings when fetching. In PHP 8.1,
       // \PDO::ATTR_EMULATE_PREPARES now behaves the same way as non emulated
       // prepares and returns integers. See https://externals.io/message/113294
@@ -162,7 +145,13 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     ];
 
     try {
-      $pdo = new \PDO($dsn, $connection_options['username'], $connection_options['password'], $connection_options['pdo']);
+      if (\PHP_VERSION_ID >= 80400) {
+        // @phpstan-ignore class.notFound
+        $mysql = new Mysql($dsn, $connection_options['username'], $connection_options['password'], $connection_options['pdo']);
+      }
+      else {
+        $mysql = new \PDO($dsn, $connection_options['username'], $connection_options['password'], $connection_options['pdo']);
+      }
     }
     catch (\PDOException $e) {
       switch ($e->getCode()) {
@@ -177,7 +166,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
             // Show message for socket connection via 'host' option.
             $message = 'Drupal was attempting to connect to the database server via a socket, but the socket file could not be found.';
             $message .= ' A Unix socket file is used if you do not specify a host name or if you specify the special host name localhost.';
-            $message .= ' To connect via TPC/IP use an IP address (127.0.0.1 for IPv4) instead of "localhost".';
+            $message .= ' To connect via TCP/IP use an IP address (127.0.0.1 for IPv4) instead of "localhost".';
             $message .= ' This message normally means that there is no MySQL server running on the system or that you are using an incorrect Unix socket file name when trying to connect to the server.';
             throw new DatabaseConnectionRefusedException($e->getMessage() . ' [Tip: ' . $message . '] ', $e->getCode(), $e);
           }
@@ -202,10 +191,10 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // 'utf8mb4_general_ci' (MySQL 5) or 'utf8mb4_0900_ai_ci' (MySQL 8) for
     // utf8mb4.
     if (!empty($connection_options['collation'])) {
-      $pdo->exec('SET NAMES ' . $charset . ' COLLATE ' . $connection_options['collation']);
+      $mysql->exec('SET NAMES utf8mb4 COLLATE ' . $connection_options['collation']);
     }
     else {
-      $pdo->exec('SET NAMES ' . $charset);
+      $mysql->exec('SET NAMES utf8mb4');
     }
 
     // Set MySQL init_commands if not already defined.  Default Drupal's MySQL
@@ -231,12 +220,15 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
 
     // Execute initial commands.
     foreach ($connection_options['init_commands'] as $sql) {
-      $pdo->exec($sql);
+      $mysql->exec($sql);
     }
 
-    return $pdo;
+    return $mysql;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function queryRange($query, $from, $count, array $args = [], array $options = []) {
     return $this->query($query . ' LIMIT ' . (int) $from . ', ' . (int) $count, $args, $options);
   }
@@ -250,6 +242,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     return $tablename;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function driver() {
     return 'mysql';
   }
@@ -304,6 +299,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     return $this->serverVersion;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function databaseType() {
     return 'mysql';
   }
@@ -330,6 +328,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function mapConditionOperator($operator) {
     // We don't want to override any of the defaults.
     return NULL;

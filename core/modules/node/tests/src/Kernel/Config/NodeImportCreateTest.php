@@ -1,23 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel\Config;
 
 use Drupal\Core\Site\Settings;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\node\Entity\NodeType;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Create content types during config create method invocation.
- *
- * @group node
  */
+#[Group('node')]
 class NodeImportCreateTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'field', 'text', 'system', 'user'];
 
@@ -35,7 +35,7 @@ class NodeImportCreateTest extends KernelTestBase {
   /**
    * Tests creating a content type during default config import.
    */
-  public function testImportCreateDefault() {
+  public function testImportCreateDefault(): void {
     $node_type_id = 'default';
 
     // Check that the content type does not exist yet.
@@ -51,7 +51,7 @@ class NodeImportCreateTest extends KernelTestBase {
   /**
    * Tests creating a content type during config import.
    */
-  public function testImportCreate() {
+  public function testImportCreate(): void {
     $node_type_id = 'import';
     $node_type_config_name = "node.type.$node_type_id";
 

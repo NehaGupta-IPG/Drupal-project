@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Entity;
 
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -7,12 +9,12 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the 'Latest translation affected revision' filter.
- *
- * @group views
  */
+#[Group('views')]
 class LatestTranslationAffectedRevisionTest extends ViewsKernelTestBase {
 
   /**
@@ -25,7 +27,6 @@ class LatestTranslationAffectedRevisionTest extends ViewsKernelTestBase {
    */
   protected static $modules = [
     'node',
-    'system',
     'language',
     'content_translation',
   ];
@@ -33,7 +34,7 @@ class LatestTranslationAffectedRevisionTest extends ViewsKernelTestBase {
   /**
    * Tests the 'Latest revision' filter.
    */
-  public function testLatestRevisionFilter() {
+  public function testLatestRevisionFilter(): void {
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     $this->installSchema('node', ['node_access']);

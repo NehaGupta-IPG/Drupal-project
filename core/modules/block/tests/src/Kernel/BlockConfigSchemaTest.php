@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Kernel;
 
 use Drupal\block\Entity\Block;
-use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\SchemaCheckTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the block config schema.
- *
- * @group block
  */
+#[Group('block')]
 class BlockConfigSchemaTest extends KernelTestBase {
 
   use SchemaCheckTestTrait;
@@ -61,8 +63,12 @@ class BlockConfigSchemaTest extends KernelTestBase {
   /**
    * Tests the block config schema for block plugins.
    */
-  public function testBlockConfigSchema() {
+  public function testBlockConfigSchema(): void {
     foreach ($this->blockManager->getDefinitions() as $block_id => $definition) {
+      // Skip the syndicate block as it is deprecated.
+      if ($block_id === 'node_syndicate_block') {
+        continue;
+      }
       $id = $this->randomMachineName();
       $block = Block::create([
         'id' => $id,

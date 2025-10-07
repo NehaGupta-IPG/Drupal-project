@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the queryOpBoolean() with default operator.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\filter\BooleanOperator
  */
+#[Group('views')]
 class FilterBooleanOperatorDefaultTest extends ViewsKernelTestBase {
 
   /**
@@ -37,7 +40,7 @@ class FilterBooleanOperatorDefaultTest extends ViewsKernelTestBase {
   /**
    * Tests the queryOpBoolean() with default operator.
    */
-  public function testFilterBooleanOperatorDefault() {
+  public function testFilterBooleanOperatorDefault(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 

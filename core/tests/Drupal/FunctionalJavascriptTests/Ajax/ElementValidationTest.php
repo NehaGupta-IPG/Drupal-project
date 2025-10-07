@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests\Ajax;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Various tests of AJAX behavior.
- *
- * @group Ajax
  */
+#[Group('Ajax')]
+#[RunTestsInSeparateProcesses]
 class ElementValidationTest extends WebDriverTestBase {
 
   /**
@@ -29,7 +31,7 @@ class ElementValidationTest extends WebDriverTestBase {
    * Drupal AJAX commands update the DOM echoing back the validated values in
    * the form of messages that appear on the page.
    */
-  public function testAjaxElementValidation() {
+  public function testAjaxElementValidation(): void {
     $this->drupalGet('ajax_validation_test');
     $page = $this->getSession()->getPage();
     $assert = $this->assertSession();

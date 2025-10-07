@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Kernel\Revisions;
 
 use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
@@ -11,15 +13,16 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\jsonapi\Kernel\JsonapiKernelTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * The test class for version negotiators.
  *
- * @coversDefaultClass \Drupal\jsonapi\Revisions\VersionNegotiator
- * @group jsonapi
- *
  * @internal
  */
+#[CoversClass(VersionNegotiator::class)]
+#[Group('jsonapi')]
 class VersionNegotiatorTest extends JsonapiKernelTestBase {
 
   /**
@@ -66,7 +69,6 @@ class VersionNegotiatorTest extends JsonapiKernelTestBase {
     'field',
     'jsonapi',
     'serialization',
-    'system',
     'user',
   ];
 
@@ -124,36 +126,44 @@ class VersionNegotiatorTest extends JsonapiKernelTestBase {
   }
 
   /**
-   * @covers \Drupal\jsonapi\Revisions\VersionById::getRevision
+   * Tests old revision.
+   *
+   * @legacy-covers \Drupal\jsonapi\Revisions\VersionById::getRevision
    */
-  public function testOldRevision() {
+  public function testOldRevision(): void {
     $revision = $this->versionNegotiator->getRevision($this->node, 'id:' . $this->nodePreviousRevisionId);
     $this->assertEquals($this->node->id(), $revision->id());
     $this->assertEquals($this->nodePreviousRevisionId, $revision->getRevisionId());
   }
 
   /**
-   * @covers \Drupal\jsonapi\Revisions\VersionById::getRevision
+   * Tests invalid revision id.
+   *
+   * @legacy-covers \Drupal\jsonapi\Revisions\VersionById::getRevision
    */
-  public function testInvalidRevisionId() {
+  public function testInvalidRevisionId(): void {
     $this->expectException(CacheableNotFoundHttpException::class);
     $this->expectExceptionMessage(sprintf('The requested version, identified by `id:%s`, could not be found.', $this->node2->getRevisionId()));
     $this->versionNegotiator->getRevision($this->node, 'id:' . $this->node2->getRevisionId());
   }
 
   /**
-   * @covers \Drupal\jsonapi\Revisions\VersionByRel::getRevision
+   * Tests latest version.
+   *
+   * @legacy-covers \Drupal\jsonapi\Revisions\VersionByRel::getRevision
    */
-  public function testLatestVersion() {
+  public function testLatestVersion(): void {
     $revision = $this->versionNegotiator->getRevision($this->node, 'rel:' . VersionByRel::LATEST_VERSION);
     $this->assertEquals($this->node->id(), $revision->id());
     $this->assertEquals($this->node->getRevisionId(), $revision->getRevisionId());
   }
 
   /**
-   * @covers \Drupal\jsonapi\Revisions\VersionByRel::getRevision
+   * Tests current version.
+   *
+   * @legacy-covers \Drupal\jsonapi\Revisions\VersionByRel::getRevision
    */
-  public function testCurrentVersion() {
+  public function testCurrentVersion(): void {
     $revision = $this->versionNegotiator->getRevision($this->node, 'rel:' . VersionByRel::WORKING_COPY);
     $this->assertEquals($this->node->id(), $revision->id());
     $this->assertEquals($this->node->id(), $revision->id());
@@ -161,9 +171,11 @@ class VersionNegotiatorTest extends JsonapiKernelTestBase {
   }
 
   /**
-   * @covers \Drupal\jsonapi\Revisions\VersionByRel::getRevision
+   * Tests invalid revision rel.
+   *
+   * @legacy-covers \Drupal\jsonapi\Revisions\VersionByRel::getRevision
    */
-  public function testInvalidRevisionRel() {
+  public function testInvalidRevisionRel(): void {
     $this->expectException(CacheableBadRequestHttpException::class);
     $this->expectExceptionMessage('An invalid resource version identifier, `rel:erroneous-revision-name`, was provided.');
     $this->versionNegotiator->getRevision($this->node, 'rel:erroneous-revision-name');

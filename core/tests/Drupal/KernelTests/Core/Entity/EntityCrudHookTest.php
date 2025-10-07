@@ -1,19 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\block\Entity\Block;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\block\Entity\Block;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\file\Entity\File;
+use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\taxonomy\Entity\Term;
-use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\user\Entity\User;
-use Drupal\file\Entity\File;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests entity CRUD via hooks.
@@ -30,17 +33,14 @@ use Drupal\file\Entity\File;
  * - hook_entity_delete() and hook_ENTITY_TYPE_delete()
  *
  * These hooks are each tested for several entity types.
- *
- * @group Entity
  */
+#[Group('Entity')]
 class EntityCrudHookTest extends EntityKernelTestBase {
 
   use CommentTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -51,8 +51,6 @@ class EntityCrudHookTest extends EntityKernelTestBase {
     'node',
     'comment',
   ];
-
-  protected $ids = [];
 
   /**
    * {@inheritdoc}
@@ -74,7 +72,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    * Module entity_crud_hook_test implements all core entity CRUD hooks and
    * stores a message for each in $GLOBALS['entity_crud_hook_test'].
    *
-   * @param array $messages
+   * @param string[] $messages
    *   An array of plain-text messages in the order they should appear.
    *
    * @internal
@@ -97,7 +95,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
   /**
    * Tests hook invocations for CRUD operations on blocks.
    */
-  public function testBlockHooks() {
+  public function testBlockHooks(): void {
     $entity = Block::create([
       'id' => 'stark_test_html',
       'plugin' => 'test_html',
@@ -152,7 +150,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
   /**
    * Tests hook invocations for CRUD operations on comments.
    */
-  public function testCommentHooks() {
+  public function testCommentHooks(): void {
     $account = $this->createUser();
     NodeType::create([
       'type' => 'article',
@@ -237,7 +235,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
   /**
    * Tests hook invocations for CRUD operations on files.
    */
-  public function testFileHooks() {
+  public function testFileHooks(): void {
     $this->installEntitySchema('file');
 
     $url = 'public://entity_crud_hook_test.file';
@@ -302,7 +300,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
   /**
    * Tests hook invocations for CRUD operations on nodes.
    */
-  public function testNodeHooks() {
+  public function testNodeHooks(): void {
     $account = $this->createUser();
 
     $node = Node::create([
@@ -366,7 +364,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
   /**
    * Tests hook invocations for CRUD operations on taxonomy terms.
    */
-  public function testTaxonomyTermHooks() {
+  public function testTaxonomyTermHooks(): void {
     $this->installEntitySchema('taxonomy_term');
 
     $vocabulary = Vocabulary::create([
@@ -435,7 +433,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
   /**
    * Tests hook invocations for CRUD operations on taxonomy vocabularies.
    */
-  public function testTaxonomyVocabularyHooks() {
+  public function testTaxonomyVocabularyHooks(): void {
     $this->installEntitySchema('taxonomy_term');
 
     $vocabulary = Vocabulary::create([
@@ -494,7 +492,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
   /**
    * Tests hook invocations for CRUD operations on users.
    */
-  public function testUserHooks() {
+  public function testUserHooks(): void {
     $account = User::create([
       'name' => 'Test user',
       'mail' => 'test@example.com',
@@ -551,13 +549,13 @@ class EntityCrudHookTest extends EntityKernelTestBase {
   /**
    * Tests rollback from failed entity save.
    */
-  public function testEntityRollback() {
+  public function testEntityRollback(): void {
     // Create a block.
     try {
       EntityTest::create(['name' => 'fail_insert'])->save();
       $this->fail('Expected exception has not been thrown.');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       // Expected exception; just continue testing.
     }
 

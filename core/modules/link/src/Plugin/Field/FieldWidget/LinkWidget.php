@@ -10,6 +10,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\link\LinkItemInterface;
+use Drupal\link\LinkTitleVisibility;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
@@ -46,6 +47,7 @@ class LinkWidget extends WidgetBase {
    *   The URI to get the displayable string for.
    *
    * @return string
+   *   The displayable string for the URI.
    *
    * @see static::getUserEnteredStringAsUri()
    */
@@ -158,8 +160,8 @@ class LinkWidget extends WidgetBase {
    */
   public static function validateTitleElement(&$element, FormStateInterface $form_state, $form) {
     if ($element['uri']['#value'] !== '' && $element['title']['#value'] === '') {
-      // We expect the field name placeholder value to be wrapped in $this->t() here,
-      // so it won't be escaped again as it's already marked safe.
+      // We expect the field name placeholder value to be wrapped in $this->t()
+      // here, so it won't be escaped again as it's already marked safe.
       $form_state->setError($element['title'], new TranslatableMarkup('@title field is required if there is @uri input.', ['@title' => $element['title']['#title'], '@uri' => $element['uri']['#title']]));
     }
   }
@@ -192,7 +194,7 @@ class LinkWidget extends WidgetBase {
           $display_uri = static::getUriAsDisplayableString($item->uri);
         }
       }
-      catch (\InvalidArgumentException $e) {
+      catch (\InvalidArgumentException) {
         // If $item->uri is invalid, show value as is, so the user can see what
         // to edit.
         // @todo Add logging here in https://www.drupal.org/project/drupal/issues/3348020
@@ -218,7 +220,7 @@ class LinkWidget extends WidgetBase {
       //   in https://www.drupal.org/node/2423093.
       $element['uri']['#target_type'] = 'node';
       // Disable autocompletion when the first character is '/', '#' or '?'.
-      $element['uri']['#attributes']['data-autocomplete-first-character-blacklist'] = '/#?';
+      $element['uri']['#attributes']['data-autocomplete-first-character-denylist'] = '/#?';
 
       // The link widget is doing its own processing in
       // static::getUriAsDisplayableString().
@@ -234,16 +236,17 @@ class LinkWidget extends WidgetBase {
     // If the field is configured to allow both internal and external links,
     // show a useful description.
     elseif ($this->supportsExternalLinks() && $this->supportsInternalLinks()) {
-      $element['uri']['#description'] = $this->t('Start typing the title of a piece of content to select it. You can also enter an internal path such as %add-node or an external URL such as %url. Enter %front to link to the front page. Enter %nolink to display link text only. Enter %button to display keyboard-accessible link text only.', ['%front' => '<front>', '%add-node' => '/node/add', '%url' => 'http://example.com', '%nolink' => '<nolink>', '%button' => '<button>']);
+      $element['uri']['#description'] = $this->t('Start typing the title of a piece of content to select it. You can also enter an internal path such as %add-node or an external URL such as %url. Enter %front to link to the front page. Enter %nolink to display link text only. Enter %button to display keyboard-accessible link text only.', ['%front' => '<front>', '%add-node' => '/node/add', '%url' => 'https://example.com', '%nolink' => '<nolink>', '%button' => '<button>']);
     }
     // If the field is configured to allow only external links, show a useful
     // description.
     elseif ($this->supportsExternalLinks() && !$this->supportsInternalLinks()) {
-      $element['uri']['#description'] = $this->t('This must be an external URL such as %url.', ['%url' => 'http://example.com']);
+      $element['uri']['#description'] = $this->t('This must be an external URL such as %url.', ['%url' => 'https://example.com']);
     }
 
     // Make uri required on the front-end when title filled-in.
-    if (!$this->isDefaultValueWidget($form_state) && $this->getFieldSetting('title') !== DRUPAL_DISABLED && !$element['uri']['#required']) {
+    $title_visibility_setting = LinkTitleVisibility::tryFrom((int) $this->getFieldSetting('title'));
+    if (!$this->isDefaultValueWidget($form_state) && $title_visibility_setting !== LinkTitleVisibility::Disabled && !$element['uri']['#required']) {
       $parents = $element['#field_parents'];
       $parents[] = $this->fieldDefinition->getName();
       $selector = $root = array_shift($parents);
@@ -262,8 +265,8 @@ class LinkWidget extends WidgetBase {
       '#placeholder' => $this->getSetting('placeholder_title'),
       '#default_value' => $items[$delta]->title ?? NULL,
       '#maxlength' => 255,
-      '#access' => $this->getFieldSetting('title') != DRUPAL_DISABLED,
-      '#required' => $this->getFieldSetting('title') === DRUPAL_REQUIRED && $element['#required'],
+      '#access' => $title_visibility_setting != LinkTitleVisibility::Disabled,
+      '#required' => $title_visibility_setting === LinkTitleVisibility::Required && $element['#required'],
     ];
     // Post-process the title field to make it conditionally required if URL is
     // non-empty. Omit the validation on the field edit form, since the field
@@ -271,7 +274,7 @@ class LinkWidget extends WidgetBase {
     //
     // Validate that title field is filled out (regardless of uri) when it is a
     // required field.
-    if (!$this->isDefaultValueWidget($form_state) && $this->getFieldSetting('title') === DRUPAL_REQUIRED) {
+    if (!$this->isDefaultValueWidget($form_state) && $title_visibility_setting === LinkTitleVisibility::Required) {
       $element['#element_validate'][] = [static::class, 'validateTitleElement'];
       $element['#element_validate'][] = [static::class, 'validateTitleNoLink'];
 
@@ -293,12 +296,12 @@ class LinkWidget extends WidgetBase {
 
     // Ensure that a URI is always entered when an optional title field is
     // submitted.
-    if (!$this->isDefaultValueWidget($form_state) && $this->getFieldSetting('title') == DRUPAL_OPTIONAL) {
+    if (!$this->isDefaultValueWidget($form_state) && $title_visibility_setting == LinkTitleVisibility::Optional) {
       $element['#element_validate'][] = [static::class, 'validateTitleNoLink'];
     }
 
-    // Exposing the attributes array in the widget is left for alternate and more
-    // advanced field widgets.
+    // Exposing the attributes array in the widget is left for alternate and
+    // more advanced field widgets.
     $element['attributes'] = [
       '#type' => 'value',
       '#tree' => TRUE,
@@ -310,7 +313,7 @@ class LinkWidget extends WidgetBase {
     if ($this->fieldDefinition->getFieldStorageDefinition()->getCardinality() == 1) {
       // If the link title is disabled, use the field definition label as the
       // title of the 'uri' element.
-      if ($this->getFieldSetting('title') == DRUPAL_DISABLED) {
+      if ($title_visibility_setting == LinkTitleVisibility::Disabled) {
         $element['uri']['#title'] = $element['#title'];
         // By default the field description is added to the title field. Since
         // the title field is disabled, we add the description, if given, to the
@@ -390,7 +393,7 @@ class LinkWidget extends WidgetBase {
       '#description' => $this->t('Text that will be shown inside the field until a value is entered. This hint is usually a sample value or a brief description of the expected format.'),
       '#states' => [
         'invisible' => [
-          ':input[name="instance[settings][title]"]' => ['value' => DRUPAL_DISABLED],
+          ':input[name="instance[settings][title]"]' => ['value' => LinkTitleVisibility::Disabled->value],
         ],
       ],
     ];
@@ -445,6 +448,7 @@ class LinkWidget extends WidgetBase {
       if (isset($parameters['@uri'])) {
         $parameters['@uri'] = static::getUriAsDisplayableString($parameters['@uri']);
         $violations->set($offset, new ConstraintViolation(
+          // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
           $this->t($violation->getMessageTemplate(), $parameters),
           $violation->getMessageTemplate(),
           $parameters,

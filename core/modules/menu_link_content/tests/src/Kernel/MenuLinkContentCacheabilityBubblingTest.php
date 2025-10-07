@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\menu_link_content\Kernel;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\User;
-use Drupal\Core\Routing\RouteObjectInterface;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -20,9 +23,8 @@ use Symfony\Component\Routing\Route;
  * Ensures that rendered menu links bubble the necessary bubbleable metadata.
  *
  * This for outbound path/route processing.
- *
- * @group menu_link_content
  */
+#[Group('menu_link_content')]
 class MenuLinkContentCacheabilityBubblingTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -56,7 +58,7 @@ class MenuLinkContentCacheabilityBubblingTest extends KernelTestBase {
   /**
    * Tests bubbleable metadata of menu links' outbound route/path processing.
    */
-  public function testOutboundPathAndRouteProcessing() {
+  public function testOutboundPathAndRouteProcessing(): void {
     $request_stack = \Drupal::requestStack();
     /** @var \Symfony\Component\Routing\RequestContext $request_context */
     $request_context = \Drupal::service('router.request_context');
@@ -89,7 +91,8 @@ class MenuLinkContentCacheabilityBubblingTest extends KernelTestBase {
     // cacheability metadata of the same type is working (two links with cache
     // tags).
     $test_cases = [
-      // \Drupal\Core\RouteProcessor\RouteProcessorCurrent: 'route' cache context.
+      // \Drupal\Core\RouteProcessor\RouteProcessorCurrent: 'route' cache
+      // context.
       [
         'uri' => 'route:<current>',
         'cacheability' => (new BubbleableMetadata())->setCacheContexts(['route']),

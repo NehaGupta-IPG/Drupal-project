@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel;
 
 use Drupal\views\Exception\ViewRenderElementException;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the view render element.
- *
- * @group views
  */
+#[Group('views')]
 class ViewElementTest extends ViewsKernelTestBase {
 
   /**
@@ -22,7 +24,7 @@ class ViewElementTest extends ViewsKernelTestBase {
   /**
    * Tests the rendered output and form output of a view element.
    */
-  public function testViewElement() {
+  public function testViewElement(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $view = Views::getView('test_view_embed');
@@ -72,7 +74,7 @@ class ViewElementTest extends ViewsKernelTestBase {
   /**
    * Tests the rendered output and form output of the "embed" display plugin.
    */
-  public function testViewElementEmbed() {
+  public function testViewElementEmbed(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $view = Views::getView('test_view_embed');
@@ -132,7 +134,7 @@ class ViewElementTest extends ViewsKernelTestBase {
   /**
    * Tests that an exception is thrown when an invalid View is passed.
    */
-  public function testInvalidView() {
+  public function testInvalidView(): void {
     $renderer = $this->container->get('renderer');
     $render_element = [
       '#type' => 'view',

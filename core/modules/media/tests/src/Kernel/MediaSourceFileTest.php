@@ -1,18 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\Kernel;
+
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the file media source.
- *
- * @group media
  */
+#[Group('media')]
 class MediaSourceFileTest extends MediaKernelTestBase {
 
   /**
    * Tests the file extension constraint.
    */
-  public function testFileExtensionConstraint() {
+  public function testFileExtensionConstraint(): void {
     $mediaType = $this->createMediaType('file');
     // Create a random file that should fail.
     $media = $this->generateMedia('test.patch', $mediaType);
@@ -30,7 +33,7 @@ class MediaSourceFileTest extends MediaKernelTestBase {
   /**
    * Tests a media file can be deleted.
    */
-  public function testFileDeletion() {
+  public function testFileDeletion(): void {
     $mediaType = $this->createMediaType('file');
     $media = $this->generateMedia('test.txt', $mediaType);
     $media->save();

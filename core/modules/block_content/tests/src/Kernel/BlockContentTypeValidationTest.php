@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block_content\Kernel;
 
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests validation of block_content_type entities.
- *
- * @group block_content
  */
+#[Group('block_content')]
+#[Group('#slow')]
 class BlockContentTypeValidationTest extends ConfigEntityValidationTestBase {
 
   /**

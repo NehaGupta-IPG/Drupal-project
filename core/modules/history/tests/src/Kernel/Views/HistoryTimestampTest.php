@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\history\Kernel\Views;
 
 use Drupal\Core\Database\Database;
@@ -7,20 +9,19 @@ use Drupal\node\Entity\Node;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\user\Entity\User;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the history timestamp handlers.
  *
- * @group history
  * @see \Drupal\history\Plugin\views\field\HistoryUserTimestamp
  * @see \Drupal\history\Plugin\views\filter\HistoryUserTimestamp
  */
+#[Group('history')]
 class HistoryTimestampTest extends ViewsKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['history', 'node'];
 
@@ -49,7 +50,7 @@ class HistoryTimestampTest extends ViewsKernelTestBase {
   /**
    * Tests the handlers.
    */
-  public function testHandlers() {
+  public function testHandlers(): void {
     $nodes = [];
     $node = Node::create([
       'title' => 'n1',

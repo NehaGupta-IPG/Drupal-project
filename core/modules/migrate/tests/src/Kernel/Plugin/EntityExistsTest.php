@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Kernel\Plugin;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\Row;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the EntityExists process plugin.
- *
- * @group migrate
  */
+#[Group('migrate')]
 class EntityExistsTest extends KernelTestBase {
 
   /**
@@ -30,7 +32,7 @@ class EntityExistsTest extends KernelTestBase {
   /**
    * Tests the EntityExists plugin.
    */
-  public function testEntityExists() {
+  public function testEntityExists(): void {
     $user = User::create([
       'name' => $this->randomString(),
     ]);

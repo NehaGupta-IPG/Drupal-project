@@ -232,7 +232,7 @@ abstract class RendererTestBase extends UnitTestCase {
   /**
    * Sets up a memory-based render cache back-end.
    */
-  protected function setupMemoryCache() {
+  protected function setUpMemoryCache() {
     $this->memoryCache = $this->memoryCache ?: new VariationCache($this->requestStack, new MemoryBackend(new Time($this->requestStack)), $this->cacheContextsManager);
 
     $this->cacheFactory->expects($this->atLeastOnce())
@@ -286,11 +286,15 @@ abstract class RendererTestBase extends UnitTestCase {
 
 }
 
-
+/**
+ * Placeholders test class with implemented trusted callbacks.
+ */
 class PlaceholdersTest implements TrustedCallbackInterface {
 
   /**
-   * #lazy_builder callback; attaches setting, generates markup.
+   * Render API callback: Attaches setting and generates markup.
+   *
+   * This function is assigned as an #lazy_builder callback.
    *
    * @param string $animal
    *   An animal.
@@ -317,7 +321,7 @@ class PlaceholdersTest implements TrustedCallbackInterface {
   }
 
   /**
-   * #lazy_builder callback; attaches setting, generates markup, user-specific.
+   * The #lazy_builder callback; attaches setting, generates markup, user-specific.
    *
    * @param string $animal
    *   An animal.
@@ -337,7 +341,7 @@ class PlaceholdersTest implements TrustedCallbackInterface {
   }
 
   /**
-   * #lazy_builder callback; attaches setting, generates markup, cache tag.
+   * The #lazy_builder callback; attaches setting, generates markup, cache tag.
    *
    * @param string $animal
    *   An animal.

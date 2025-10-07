@@ -1,23 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel\Views;
 
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests rendering when the role is numeric.
- *
- * @group user
  */
+#[Group('user')]
 class UserRoleTest extends ViewsKernelTestBase {
 
   /**
    * Tests numeric role.
    */
-  public function testNumericRole() {
+  public function testNumericRole(): void {
     $this->installEntitySchema('user');
     $this->installSchema('user', ['users_data']);
 

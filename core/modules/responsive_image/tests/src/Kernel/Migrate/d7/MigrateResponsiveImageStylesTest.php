@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\responsive_image\Kernel\Migrate\d7;
 
 use Drupal\responsive_image\Entity\ResponsiveImageStyle;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests migration of responsive image styles.
- *
- * @group responsive_image
  */
+#[Group('responsive_image')]
 class MigrateResponsiveImageStylesTest extends MigrateDrupal7TestBase {
 
   /**
@@ -33,7 +35,7 @@ class MigrateResponsiveImageStylesTest extends MigrateDrupal7TestBase {
   /**
    * Tests the Drupal 7 to Drupal 8 responsive image styles migration.
    */
-  public function testResponsiveImageStyles() {
+  public function testResponsiveImageStyles(): void {
     $expected_image_style_mappings = [
       [
         'image_mapping_type' => 'image_style',

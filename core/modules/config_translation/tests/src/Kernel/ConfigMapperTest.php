@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config_translation\Kernel;
 
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Routing\Route;
 
 /**
  * Tests config mapper.
- *
- * @group config_translation
  */
+#[Group('config_translation')]
 class ConfigMapperTest extends KernelTestBase {
 
   /**
@@ -27,7 +29,7 @@ class ConfigMapperTest extends KernelTestBase {
   /**
    * Tests adding config names to mapper.
    */
-  public function testAddingConfigNames() {
+  public function testAddingConfigNames(): void {
     // Get a config names mapper.
     $mappers = \Drupal::service('plugin.manager.config_translation.mapper')->getMappers();
     $mapper = $mappers['system.site_information_settings'];

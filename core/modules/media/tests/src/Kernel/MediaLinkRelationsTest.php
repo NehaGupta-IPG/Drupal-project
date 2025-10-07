@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\Kernel;
 
 use Drupal\media\Entity\Media;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests link relationships for media items.
- *
- * @group media
  */
+#[Group('media')]
 class MediaLinkRelationsTest extends MediaKernelTestBase {
 
   /**
    * Tests that all link relationships for Media exist.
    */
-  public function testExistLinkRelationships() {
+  public function testExistLinkRelationships(): void {
     /** @var \Drupal\Core\Http\LinkRelationTypeManager $link_relation_type_manager */
     $link_relation_type_manager = $this->container->get('plugin.manager.link_relation_type');
     $media = Media::create(['bundle' => $this->testMediaType->id()]);

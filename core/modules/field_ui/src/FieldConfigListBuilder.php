@@ -174,7 +174,7 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function getDefaultOperations(EntityInterface $entity) {
+  public function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
     /** @var \Drupal\field\FieldConfigInterface $entity */
     $operations = parent::getDefaultOperations($entity);
 
@@ -185,6 +185,11 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
         'url' => $entity->toUrl("{$entity->getTargetEntityTypeId()}-field-edit-form"),
         'attributes' => [
           'title' => $this->t('Edit field settings.'),
+          'class' => ['use-ajax'],
+          'data-dialog-type' => 'modal',
+          'data-dialog-options' => Json::encode([
+            'width' => 1100,
+          ]),
         ],
       ];
     }

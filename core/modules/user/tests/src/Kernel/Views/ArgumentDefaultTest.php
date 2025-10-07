@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel\Views;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests views user argument default plugin.
- *
- * @group user
  */
+#[Group('user')]
 class ArgumentDefaultTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -37,7 +39,7 @@ class ArgumentDefaultTest extends KernelTestBase {
   /**
    * Tests the current user with argument default.
    */
-  public function testPluginArgumentDefaultCurrentUser() {
+  public function testPluginArgumentDefaultCurrentUser(): void {
     $this->installEntitySchema('user');
     ViewTestData::createTestViews(static::class, ['user_test_views']);
 

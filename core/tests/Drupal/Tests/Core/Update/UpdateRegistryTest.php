@@ -4,22 +4,28 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Update;
 
+use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Update\RemovedPostUpdateNameException;
 use Drupal\Core\Update\UpdateRegistry;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\Core\Update\UpdateRegistry
- * @group Update
+ * Tests UpdateRegistry.
  *
  * Note we load code, so isolate the tests.
- *
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
  */
+#[CoversClass(UpdateRegistry::class)]
+#[Group('Update')]
+#[Group('#slow')]
+#[PreserveGlobalState(FALSE)]
+#[RunTestsInSeparateProcesses]
 class UpdateRegistryTest extends UnitTestCase {
 
   /**
@@ -36,7 +42,7 @@ class UpdateRegistryTest extends UnitTestCase {
   /**
    * Sets up some extensions with some update functions.
    */
-  protected function setupBasicExtensions() {
+  protected function setupBasicExtensions(): void {
     $info_a = <<<'EOS'
 type: module
 name: Module A
@@ -58,6 +64,7 @@ EOS;
     $info_d = <<<'EOS'
 type: theme
 name: Theme D
+core_version_requirement: '*'
 EOS;
 
     $module_a = <<<'EOS'
@@ -88,7 +95,7 @@ function module_b_post_update_a() {
 /**
  * Implements hook_removed_post_updates().
  */
-function module_b_removed_post_updates() {
+function module_b_removed_post_updates(): array {
   return [
     'module_b_post_update_b' => '8.9.0',
     'module_b_post_update_c' => '8.9.0',
@@ -115,7 +122,7 @@ function module_c_post_update_b() {
 /**
  * Implements hook_removed_post_updates().
  */
-function module_c_removed_post_updates() {
+function module_c_removed_post_updates(): array {
   return [
     'module_c_post_update_b' => '8.9.0',
     'module_c_post_update_c' => '8.9.0',
@@ -142,7 +149,7 @@ function theme_d_post_update_c() {
 /**
  * Implements hook_removed_post_updates().
  */
-function theme_d_removed_post_updates() {
+function theme_d_removed_post_updates(): array {
   return [
     'theme_d_post_update_a' => '8.9.0',
   ];
@@ -170,7 +177,7 @@ EOS;
           'themes' => [
             'theme_d' => [
               'theme_d.post_update.php' => $theme_d,
-              'theme_d.info.yml' => $info_c,
+              'theme_d.info.yml' => $info_d,
             ],
           ],
         ],
@@ -179,21 +186,42 @@ EOS;
   }
 
   /**
-   * @covers ::getPendingUpdateFunctions
+   * Tests get pending update functions no existing updates.
+   *
+   * @legacy-covers ::getPendingUpdateFunctions
    */
-  public function testGetPendingUpdateFunctionsNoExistingUpdates() {
+  public function testGetPendingUpdateFunctionsNoExistingUpdates(): void {
     $this->setupBasicExtensions();
 
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
     $key_value->get('existing_updates', [])->willReturn([]);
     $key_value = $key_value->reveal();
 
-    $update_registry = new UpdateRegistry('vfs://drupal', 'sites/default', [
-      'module_a',
-      'module_b',
-      'theme_d',
-    ], $key_value, FALSE);
+    $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
+    $theme_handler->listInfo()->willReturn([
+      'theme_d' => [
+        'type' => 'theme',
+        'pathname' => 'core/themes/theme_d/theme_d.info.yml',
+      ],
+    ]);
+    $theme_handler = $theme_handler->reveal();
 
+    $update_registry = new UpdateRegistry('vfs://drupal', 'sites/default', [
+      'module_a' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_a/module_a.info.yml',
+          'filename' => 'module_a.module',
+        ],
+      'module_b' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_b/module_b.info.yml',
+          'filename' => 'module_b.module',
+        ],
+    ], $key_value, $theme_handler, 'post_update');
+
+    // Confirm the updates are sorted alphabetically.
     $this->assertEquals([
       'module_a_post_update_a',
       'module_a_post_update_b',
@@ -204,14 +232,20 @@ EOS;
   }
 
   /**
-   * @covers ::getPendingUpdateFunctions
+   * Tests get pending update functions with loaded modules but not enabled.
+   *
+   * @legacy-covers ::getPendingUpdateFunctions
    */
-  public function testGetPendingUpdateFunctionsWithLoadedModulesButNotEnabled() {
+  public function testGetPendingUpdateFunctionsWithLoadedModulesButNotEnabled(): void {
     $this->setupBasicExtensions();
 
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
     $key_value->get('existing_updates', [])->willReturn([]);
     $key_value = $key_value->reveal();
+
+    $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
+    $theme_handler->listInfo()->willReturn([]);
+    $theme_handler = $theme_handler->reveal();
 
     // Preload modules to ensure that ::getAvailableUpdateFunctions filters out
     // not enabled modules.
@@ -219,9 +253,15 @@ EOS;
     include_once 'vfs://drupal/sites/default/modules/module_b/module_b.post_update.php';
 
     $update_registry = new UpdateRegistry('vfs://drupal', 'sites/default', [
-      'module_a',
-    ], $key_value, FALSE);
+      'module_a' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_a/module_a.info.yml',
+          'filename' => 'module_a.module',
+        ],
+    ], $key_value, $theme_handler, 'post_update');
 
+    // Confirm the updates are sorted alphabetically.
     $this->assertEquals([
       'module_a_post_update_a',
       'module_a_post_update_b',
@@ -229,21 +269,46 @@ EOS;
   }
 
   /**
-   * @covers ::getPendingUpdateFunctions
+   * Tests get pending update functions existing updates.
+   *
+   * @legacy-covers ::getPendingUpdateFunctions
    */
-  public function testGetPendingUpdateFunctionsExistingUpdates() {
+  public function testGetPendingUpdateFunctionsExistingUpdates(): void {
     $this->setupBasicExtensions();
 
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
-    $key_value->get('existing_updates', [])->willReturn(['module_a_post_update_a', 'theme_d_post_update_a', 'theme_d_post_update_b']);
+    $key_value->get('existing_updates', [])->willReturn([
+      'module_a_post_update_a',
+      'theme_d_post_update_a',
+      'theme_d_post_update_b',
+    ]);
     $key_value = $key_value->reveal();
 
-    $update_registry = new UpdateRegistry('vfs://drupal', 'sites/default', [
-      'module_a',
-      'module_b',
-      'theme_d',
-    ], $key_value, FALSE);
+    $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
+    $theme_handler->listInfo()->willReturn([
+      'theme_d' => [
+        'type' => 'theme',
+        'pathname' => 'core/themes/theme_d/theme_d.info.yml',
+      ],
+    ]);
+    $theme_handler = $theme_handler->reveal();
 
+    $update_registry = new UpdateRegistry('vfs://drupal', 'sites/default', [
+      'module_a' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_a/module_a.info.yml',
+          'filename' => 'module_a.module',
+        ],
+      'module_b' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_b/module_b.info.yml',
+          'filename' => 'module_b.module',
+        ],
+    ], $key_value, $theme_handler, 'post_update');
+
+    // Confirm the updates are sorted alphabetically.
     $this->assertEquals(array_values([
       'module_a_post_update_b',
       'module_b_post_update_a',
@@ -253,21 +318,42 @@ EOS;
   }
 
   /**
-   * @covers ::getPendingUpdateInformation
+   * Tests get pending update information.
+   *
+   * @legacy-covers ::getPendingUpdateInformation
    */
-  public function testGetPendingUpdateInformation() {
+  public function testGetPendingUpdateInformation(): void {
     $this->setupBasicExtensions();
 
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
     $key_value->get('existing_updates', [])->willReturn([]);
     $key_value = $key_value->reveal();
 
-    $update_registry = new UpdateRegistry('vfs://drupal', 'sites/default', [
-      'module_a',
-      'module_b',
-      'theme_d',
-    ], $key_value, FALSE);
+    $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
+    $theme_handler->listInfo()->willReturn([
+      'theme_d' => [
+        'type' => 'theme',
+        'pathname' => 'core/themes/theme_d/theme_d.info.yml',
+      ],
+    ]);
+    $theme_handler = $theme_handler->reveal();
 
+    $update_registry = new UpdateRegistry('vfs://drupal', 'sites/default', [
+      'module_a' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_a/module_a.info.yml',
+          'filename' => 'module_a.module',
+        ],
+      'module_b' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_b/module_b.info.yml',
+          'filename' => 'module_b.module',
+        ],
+    ], $key_value, $theme_handler, 'post_update');
+
+    // Confirm the updates are sorted alphabetically.
     $expected = [];
     $expected['module_a']['pending']['a'] = 'Module A update A.';
     $expected['module_a']['pending']['b'] = 'Module A update B.';
@@ -282,21 +368,46 @@ EOS;
   }
 
   /**
-   * @covers ::getPendingUpdateInformation
+   * Tests get pending update information with existing updates.
+   *
+   * @legacy-covers ::getPendingUpdateInformation
    */
-  public function testGetPendingUpdateInformationWithExistingUpdates() {
+  public function testGetPendingUpdateInformationWithExistingUpdates(): void {
     $this->setupBasicExtensions();
 
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
-    $key_value->get('existing_updates', [])->willReturn(['module_a_post_update_a', 'theme_d_post_update_a', 'theme_d_post_update_b']);
+    $key_value->get('existing_updates', [])->willReturn([
+      'module_a_post_update_a',
+      'theme_d_post_update_a',
+      'theme_d_post_update_b',
+    ]);
     $key_value = $key_value->reveal();
 
-    $update_registry = new UpdateRegistry('vfs://drupal', 'sites/default', [
-      'module_a',
-      'module_b',
-      'theme_d',
-    ], $key_value, FALSE);
+    $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
+    $theme_handler->listInfo()->willReturn([
+      'theme_d' => [
+        'type' => 'theme',
+        'pathname' => 'core/themes/theme_d/theme_d.info.yml',
+      ],
+    ]);
+    $theme_handler = $theme_handler->reveal();
 
+    $update_registry = new UpdateRegistry('vfs://drupal', 'sites/default', [
+      'module_a' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_a/module_a.info.yml',
+          'filename' => 'module_a.module',
+        ],
+      'module_b' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_b/module_b.info.yml',
+          'filename' => 'module_b.module',
+        ],
+    ], $key_value, $theme_handler, 'post_update');
+
+    // Confirm the updates are sorted alphabetically.
     $expected = [];
     $expected['module_a']['pending']['b'] = 'Module A update B.';
     $expected['module_a']['start'] = 'b';
@@ -309,35 +420,66 @@ EOS;
   }
 
   /**
-   * @covers ::getPendingUpdateInformation
+   * Tests get pending update information with removed updates.
+   *
+   * @legacy-covers ::getPendingUpdateInformation
    */
-  public function testGetPendingUpdateInformationWithRemovedUpdates() {
+  public function testGetPendingUpdateInformationWithRemovedUpdates(): void {
     $this->setupBasicExtensions();
 
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
     $key_value->get('existing_updates', [])->willReturn(['module_a_post_update_a']);
     $key_value = $key_value->reveal();
 
+    $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
+    $theme_handler->listInfo()->willReturn([]);
+    $theme_handler = $theme_handler->reveal();
+
     $update_registry = new UpdateRegistry('vfs://drupal', 'sites/default', [
-      'module_c',
-    ], $key_value, FALSE);
+      'module_c' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_c/module_c.info.yml',
+          'filename' => 'module_c.module',
+        ],
+    ], $key_value, $theme_handler, 'post_update');
 
     $this->expectException(RemovedPostUpdateNameException::class);
     $update_registry->getPendingUpdateInformation();
   }
 
   /**
-   * @covers ::getUpdateFunctions
+   * Tests get update functions.
+   *
+   * @legacy-covers ::getUpdateFunctions
    */
-  public function testGetUpdateFunctions() {
+  public function testGetUpdateFunctions(): void {
     $this->setupBasicExtensions();
     $key_value = $this->prophesize(KeyValueStoreInterface::class)->reveal();
 
+    $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
+    $theme_handler->listInfo()->willReturn([
+      'theme_d' => [
+        'type' => 'theme',
+        'pathname' => 'core/themes/theme_d/theme_d.info.yml',
+      ],
+    ]);
+    $theme_handler = $theme_handler->reveal();
+
     $update_registry = new UpdateRegistry('vfs://drupal', 'sites/default', [
-      'module_a',
-      'module_b',
-      'theme_d',
-    ], $key_value, FALSE);
+      'module_a' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_a/module_a.info.yml',
+          'filename' => 'module_a.module',
+        ],
+      'module_b' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_b/module_b.info.yml',
+          'filename' => 'module_b.module',
+        ],
+    ], $key_value, $theme_handler, 'post_update');
 
     $this->assertEquals(['module_a_post_update_a', 'module_a_post_update_b'], array_values($update_registry->getUpdateFunctions('module_a')));
     $this->assertEquals(['module_b_post_update_a'], array_values($update_registry->getUpdateFunctions('module_b')));
@@ -345,9 +487,11 @@ EOS;
   }
 
   /**
-   * @covers ::registerInvokedUpdates
+   * Tests register invoked updates without existing updates.
+   *
+   * @legacy-covers ::registerInvokedUpdates
    */
-  public function testRegisterInvokedUpdatesWithoutExistingUpdates() {
+  public function testRegisterInvokedUpdatesWithoutExistingUpdates(): void {
     $this->setupBasicExtensions();
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
     $key_value->get('existing_updates', [])
@@ -358,18 +502,38 @@ EOS;
       ->shouldBeCalledTimes(1);
     $key_value = $key_value->reveal();
 
+    $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
+    $theme_handler->listInfo()->willReturn([
+      'theme_d' => [
+        'type' => 'theme',
+        'pathname' => 'core/themes/theme_d/theme_d.info.yml',
+      ],
+    ]);
+    $theme_handler = $theme_handler->reveal();
+
     $update_registry = new UpdateRegistry('vfs://drupal', 'sites/default', [
-      'module_a',
-      'module_b',
-      'theme_d',
-    ], $key_value, FALSE);
+      'module_a' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_a/module_a.info.yml',
+          'filename' => 'module_a.module',
+        ],
+      'module_b' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_b/module_b.info.yml',
+          'filename' => 'module_b.module',
+        ],
+    ], $key_value, $theme_handler, 'post_update');
     $update_registry->registerInvokedUpdates(['module_a_post_update_a']);
   }
 
   /**
-   * @covers ::registerInvokedUpdates
+   * Tests register invoked updates with multiple.
+   *
+   * @legacy-covers ::registerInvokedUpdates
    */
-  public function testRegisterInvokedUpdatesWithMultiple() {
+  public function testRegisterInvokedUpdatesWithMultiple(): void {
     $this->setupBasicExtensions();
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
     $key_value->get('existing_updates', [])
@@ -380,18 +544,38 @@ EOS;
       ->shouldBeCalledTimes(1);
     $key_value = $key_value->reveal();
 
+    $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
+    $theme_handler->listInfo()->willReturn([
+      'theme_d' => [
+        'type' => 'theme',
+        'pathname' => 'core/themes/theme_d/theme_d.info.yml',
+      ],
+    ]);
+    $theme_handler = $theme_handler->reveal();
+
     $update_registry = new UpdateRegistry('vfs://drupal', 'sites/default', [
-      'module_a',
-      'module_b',
-      'theme_d',
-    ], $key_value, FALSE);
+      'module_a' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_a/module_a.info.yml',
+          'filename' => 'module_a.module',
+        ],
+      'module_b' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_b/module_b.info.yml',
+          'filename' => 'module_b.module',
+        ],
+    ], $key_value, $theme_handler, 'post_update');
     $update_registry->registerInvokedUpdates(['module_a_post_update_a', 'module_a_post_update_b', 'theme_d_post_update_c']);
   }
 
   /**
-   * @covers ::registerInvokedUpdates
+   * Tests register invoked updates with existing updates.
+   *
+   * @legacy-covers ::registerInvokedUpdates
    */
-  public function testRegisterInvokedUpdatesWithExistingUpdates() {
+  public function testRegisterInvokedUpdatesWithExistingUpdates(): void {
     $this->setupBasicExtensions();
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
     $key_value->get('existing_updates', [])
@@ -402,17 +586,33 @@ EOS;
       ->shouldBeCalledTimes(1);
     $key_value = $key_value->reveal();
 
+    $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
+    $theme_handler->listInfo()->willReturn([]);
+    $theme_handler = $theme_handler->reveal();
+
     $update_registry = new UpdateRegistry('vfs://drupal', 'sites/default', [
-      'module_a',
-      'module_b',
-    ], $key_value, FALSE);
+      'module_a' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_a/module_a.info.yml',
+          'filename' => 'module_a.module',
+        ],
+      'module_b' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_b/module_b.info.yml',
+          'filename' => 'module_b.module',
+        ],
+    ], $key_value, $theme_handler, 'post_update');
     $update_registry->registerInvokedUpdates(['module_a_post_update_a']);
   }
 
   /**
-   * @covers ::filterOutInvokedUpdatesByExtension
+   * Tests filter out invoked updates by extension.
+   *
+   * @legacy-covers ::filterOutInvokedUpdatesByExtension
    */
-  public function testFilterOutInvokedUpdatesByExtension() {
+  public function testFilterOutInvokedUpdatesByExtension(): void {
     $this->setupBasicExtensions();
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
     $key_value->get('existing_updates', [])
@@ -423,13 +623,118 @@ EOS;
       ->shouldBeCalledTimes(1);
     $key_value = $key_value->reveal();
 
-    $update_registry = new UpdateRegistry('vfs://drupal', 'sites/default', [
-      'module_a',
-      'module_b',
-      'theme_d',
-    ], $key_value, FALSE);
+    $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
+    $theme_handler->listInfo()->willReturn([
+      'theme_d' => [
+        'type' => 'theme',
+        'pathname' => 'core/themes/theme_d/theme_d.info.yml',
+      ],
+    ]);
+    $theme_handler = $theme_handler->reveal();
 
+    $update_registry = new UpdateRegistry('vfs://drupal', 'sites/default', [
+      'module_a' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_a/module_a.info.yml',
+          'filename' => 'module_a.module',
+        ],
+      'module_b' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_b/module_b.info.yml',
+          'filename' => 'module_b.module',
+        ],
+    ], $key_value, $theme_handler, 'post_update');
     $update_registry->filterOutInvokedUpdatesByExtension('module_a');
+  }
+
+  /**
+   * Tests get pending custom update functions.
+   *
+   * @legacy-covers ::getPendingUpdateFunctions
+   */
+  public function testGetPendingCustomUpdateFunctions(): void {
+    // Set up a simplified module structure with custom update hooks.
+    $info_a = <<<'EOS'
+type: module
+name: Module A
+core_version_requirement: '*'
+EOS;
+
+    $info_d = <<<'EOS'
+type: theme
+name: Theme D
+core_version_requirement: '*'
+EOS;
+
+    $module_a = <<<'EOS'
+<?php
+
+/**
+ * Module A update A.
+ */
+function module_a_custom_update_a() {
+}
+
+EOS;
+
+    $theme_d = <<<'EOS'
+<?php
+
+/**
+ * Theme D update B.
+ */
+function theme_d_custom_update_a() {
+}
+
+EOS;
+    vfsStream::setup('drupal');
+    vfsStream::create([
+      'sites' => [
+        'default' => [
+          'modules' => [
+            'module_a' => [
+              'module_a.custom_update.php' => $module_a,
+              'module_a.info.yml' => $info_a,
+            ],
+          ],
+          'themes' => [
+            'theme_d' => [
+              'theme_d.custom_update.php' => $theme_d,
+              'theme_d.info.yml' => $info_d,
+            ],
+          ],
+        ],
+      ],
+    ]);
+
+    $key_value = $this->prophesize(KeyValueStoreInterface::class);
+    $key_value->get('existing_updates', [])->willReturn([]);
+    $key_value = $key_value->reveal();
+
+    $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
+    $theme_handler->listInfo()->willReturn([
+      'theme_d' => [
+        'type' => 'theme',
+        'pathname' => 'core/themes/theme_d/theme_d.info.yml',
+      ],
+    ]);
+    $theme_handler = $theme_handler->reveal();
+
+    $update_registry = new UpdateRegistry('vfs://drupal', 'sites/default', [
+      'module_a' =>
+        [
+          'type' => 'module',
+          'pathname' => 'core/modules/module_a/module_a.info.yml',
+          'filename' => 'module_a.module',
+        ],
+    ], $key_value, $theme_handler, 'custom_update');
+
+    // Themes are not supported.
+    $this->assertEquals([
+      'module_a_custom_update_a',
+    ], $update_registry->getPendingUpdateFunctions());
   }
 
 }

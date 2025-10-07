@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\mysql\Kernel\mysql;
 
 use Drupal\KernelTests\Core\Database\DriverSpecificConnectionUnitTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
+// cspell:ignore processlist
 /**
  * MySQL-specific connection unit tests.
- *
- * @group Database
  */
+#[Group('Database')]
 class ConnectionUnitTest extends DriverSpecificConnectionUnitTestBase {
 
   /**

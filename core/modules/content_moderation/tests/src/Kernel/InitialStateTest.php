@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Kernel;
 
 use Drupal\entity_test\Entity\EntityTestRev;
@@ -7,12 +9,12 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the correct initial states are set on install.
- *
- * @group content_moderation
  */
+#[Group('content_moderation')]
 class InitialStateTest extends KernelTestBase {
 
   use ContentModerationTestTrait;
@@ -24,7 +26,6 @@ class InitialStateTest extends KernelTestBase {
     'entity_test',
     'node',
     'user',
-    'system',
   ];
 
   /**
@@ -42,7 +43,7 @@ class InitialStateTest extends KernelTestBase {
   /**
    * Tests the correct initial state.
    */
-  public function testInitialState() {
+  public function testInitialState(): void {
     $node_type = NodeType::create([
       'type' => 'example',
       'name' => 'Example',

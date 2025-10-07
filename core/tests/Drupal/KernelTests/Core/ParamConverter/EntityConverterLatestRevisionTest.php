@@ -1,27 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\ParamConverter;
 
+use Drupal\Core\ParamConverter\EntityConverter;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the entity converter when the "load_latest_revision" flag is set.
- *
- * @group ParamConverter
- * @coversDefaultClass \Drupal\Core\ParamConverter\EntityConverter
  */
+#[CoversClass(EntityConverter::class)]
+#[Group('ParamConverter')]
 class EntityConverterLatestRevisionTest extends KernelTestBase {
 
   use UserCreationTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'entity_test',
@@ -57,7 +59,7 @@ class EntityConverterLatestRevisionTest extends KernelTestBase {
   /**
    * Tests with no matching entity.
    */
-  public function testNoEntity() {
+  public function testNoEntity(): void {
     $converted = $this->converter->convert(1, [
       'load_latest_revision' => TRUE,
       'type' => 'entity:entity_test_mulrev',
@@ -68,7 +70,7 @@ class EntityConverterLatestRevisionTest extends KernelTestBase {
   /**
    * Tests with no pending revision.
    */
-  public function testEntityNoPendingRevision() {
+  public function testEntityNoPendingRevision(): void {
     $entity = EntityTestMulRev::create();
     $entity->save();
 
@@ -82,7 +84,7 @@ class EntityConverterLatestRevisionTest extends KernelTestBase {
   /**
    * Tests with a pending revision.
    */
-  public function testEntityWithPendingRevision() {
+  public function testEntityWithPendingRevision(): void {
     $entity = EntityTestMulRev::create();
     $entity->save();
 
@@ -101,7 +103,7 @@ class EntityConverterLatestRevisionTest extends KernelTestBase {
   /**
    * Tests with a translated pending revision.
    */
-  public function testWithTranslatedPendingRevision() {
+  public function testWithTranslatedPendingRevision(): void {
     // Enable translation for test entities.
     $this->container->get('state')->set('entity_test.translation', TRUE);
     $this->container->get('entity_type.bundle.info')->clearCachedBundles();
@@ -149,7 +151,7 @@ class EntityConverterLatestRevisionTest extends KernelTestBase {
   /**
    * Tests that pending revisions are loaded only when needed.
    */
-  public function testOptimizedConvert() {
+  public function testOptimizedConvert(): void {
     $entity = EntityTestMulRev::create();
     $entity->save();
 
@@ -177,7 +179,7 @@ class EntityConverterLatestRevisionTest extends KernelTestBase {
   /**
    * Tests the latest revision flag and non-revisionable entities.
    */
-  public function testConvertNonRevisionableEntityType() {
+  public function testConvertNonRevisionableEntityType(): void {
     $entity = EntityTest::create();
     $entity->save();
 
@@ -192,7 +194,7 @@ class EntityConverterLatestRevisionTest extends KernelTestBase {
   /**
    * Tests an entity route parameter having 'bundle' definition property.
    *
-   * @covers ::convert
+   * @legacy-covers ::convert
    */
   public function testRouteParamWithBundleDefinition(): void {
     $entity1 = EntityTestMulRev::create([

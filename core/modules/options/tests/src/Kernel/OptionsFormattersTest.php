@@ -1,29 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\options\Kernel;
 
 use Drupal\entity_test\Entity\EntityTest;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Options field type formatters.
  *
- * @group options
  * @see \Drupal\options\Plugin\Field\FieldFormatter\OptionsDefaultFormatter
  * @see \Drupal\options\Plugin\Field\FieldFormatter\OptionsKeyFormatter
  */
+#[Group('options')]
 class OptionsFormattersTest extends OptionsFieldUnitTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-  }
 
   /**
    * Tests the formatters.
    */
-  public function testFormatter() {
+  public function testFormatter(): void {
     $entity = EntityTest::create();
     $entity->{$this->fieldName}->value = 1;
 

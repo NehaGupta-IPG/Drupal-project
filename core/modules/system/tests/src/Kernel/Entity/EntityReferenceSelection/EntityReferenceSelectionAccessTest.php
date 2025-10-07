@@ -1,28 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Entity\EntityReferenceSelection;
 
+use Drupal\comment\CommentInterface;
+use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\comment\CommentInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\media\Entity\Media;
 use Drupal\node\Entity\Node;
+use Drupal\node\NodeInterface;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\node\NodeInterface;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\User;
-use Drupal\comment\Entity\Comment;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests for the base handlers provided by Entity Reference.
- *
- * @group entity_reference
  */
+#[Group('entity_reference')]
 class EntityReferenceSelectionAccessTest extends KernelTestBase {
 
   use CommentTestTrait;
@@ -31,9 +33,7 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
   use UserCreationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'comment',
@@ -72,10 +72,13 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
       'name' => '',
     ]);
     $anonymous_user->save();
+
+    // Create role for administrator.
     $admin_user = User::create([
       'uid' => 1,
       'name' => 'admin',
       'status' => 1,
+      'roles' => [$this->createRole(['administer users'])],
     ]);
     $admin_user->save();
   }

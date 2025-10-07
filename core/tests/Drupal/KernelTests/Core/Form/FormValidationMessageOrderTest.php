@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Form;
 
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests form validation messages are displayed in the same order as the fields.
- *
- * @group Form
  */
+#[Group('Form')]
 class FormValidationMessageOrderTest extends KernelTestBase implements FormInterface {
 
   /**
@@ -75,7 +77,7 @@ class FormValidationMessageOrderTest extends KernelTestBase implements FormInter
   /**
    * Tests that fields validation messages are sorted in the fields order.
    */
-  public function testValidationErrorMessagesSortedWithWeight() {
+  public function testValidationErrorMessagesSortedWithWeight(): void {
     $form_state = new FormState();
     $form_builder = $this->container->get('form_builder');
     $form_builder->submitForm($this, $form_state);

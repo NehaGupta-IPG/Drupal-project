@@ -6,12 +6,14 @@ namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\CommentInterface;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests anonymous commenting.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentAnonymousTest extends CommentTestBase {
 
   /**
@@ -41,7 +43,7 @@ class CommentAnonymousTest extends CommentTestBase {
   /**
    * Tests anonymous comment functionality.
    */
-  public function testAnonymous() {
+  public function testAnonymous(): void {
     $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
 
     // Preview comments (with `skip comment approval` permission).
@@ -132,14 +134,20 @@ class CommentAnonymousTest extends CommentTestBase {
     // Post comment with contact info (required).
     $author_name = $this->randomMachineName();
     $author_mail = $this->randomMachineName() . '@example.com';
-    $anonymous_comment3 = $this->postComment($this->node, $this->randomMachineName(), $this->randomMachineName(), ['name' => $author_name, 'mail' => $author_mail]);
+    $anonymous_comment3 = $this->postComment(
+      $this->node,
+      $this->randomMachineName(),
+      $this->randomMachineName(),
+      ['name' => $author_name, 'mail' => $author_mail],
+    );
     $this->assertTrue($this->commentExists($anonymous_comment3), 'Anonymous comment with contact info (required) found.');
 
     // Make sure the user data appears correctly when editing the comment.
     $this->drupalLogin($this->adminUser);
     $this->drupalGet('comment/' . $anonymous_comment3->id() . '/edit');
     $this->assertSession()->responseContains($author_name);
-    // Check the author field is empty (i.e. anonymous) when editing the comment.
+    // Check the author field is empty (i.e. anonymous) when editing the
+    // comment.
     $this->assertSession()->fieldValueEquals('uid', '');
     $this->assertSession()->responseContains($author_mail);
 

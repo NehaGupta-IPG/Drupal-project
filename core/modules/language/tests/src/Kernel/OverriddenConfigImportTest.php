@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\language\Kernel;
 
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests importing of config with language overrides.
- *
- * @group language
  */
+#[Group('language')]
 class OverriddenConfigImportTest extends KernelTestBase {
 
   /**
@@ -57,7 +59,7 @@ class OverriddenConfigImportTest extends KernelTestBase {
   /**
    * Tests importing overridden config alongside config in the default language.
    */
-  public function testConfigImportUpdates() {
+  public function testConfigImportUpdates(): void {
     $storage = $this->container->get('config.storage');
     $sync = $this->container->get('config.storage.sync');
     /** @var \Drupal\language\ConfigurableLanguageManagerInterface $language_manager */

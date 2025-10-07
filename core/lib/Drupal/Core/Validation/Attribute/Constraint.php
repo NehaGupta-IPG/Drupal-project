@@ -34,14 +34,14 @@ class Constraint extends Plugin {
    *   multiple type names. For supporting all types, FALSE may be specified.
    *   The key defaults to an empty array, which indicates no types are
    *   supported.
-   * @param string|null $deriver
+   * @param class-string|null $deriver
    *   (optional) The deriver class.
    */
   public function __construct(
     public readonly string $id,
     public readonly ?TranslatableMarkup $label = NULL,
     public readonly string|array|false $type = [],
-    public readonly ?string $deriver = NULL
+    public readonly ?string $deriver = NULL,
   ) {}
 
 }

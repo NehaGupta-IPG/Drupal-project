@@ -10,13 +10,16 @@ use Drupal\Core\Form\FormAjaxResponseBuilder;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
- * @coversDefaultClass \Drupal\Core\Form\FormAjaxResponseBuilder
- * @group Form
+ * Tests Drupal\Core\Form\FormAjaxResponseBuilder.
  */
+#[CoversClass(FormAjaxResponseBuilder::class)]
+#[Group('Form')]
 class FormAjaxResponseBuilderTest extends UnitTestCase {
 
   /**
@@ -45,9 +48,11 @@ class FormAjaxResponseBuilderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::buildResponse
+   * Tests build response no triggering element.
+   *
+   * @legacy-covers ::buildResponse
    */
-  public function testBuildResponseNoTriggeringElement() {
+  public function testBuildResponseNoTriggeringElement(): void {
     $this->renderer->expects($this->never())
       ->method('renderResponse');
 
@@ -61,9 +66,11 @@ class FormAjaxResponseBuilderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::buildResponse
+   * Tests build response no callable.
+   *
+   * @legacy-covers ::buildResponse
    */
-  public function testBuildResponseNoCallable() {
+  public function testBuildResponseNoCallable(): void {
     $this->renderer->expects($this->never())
       ->method('renderResponse');
 
@@ -79,9 +86,11 @@ class FormAjaxResponseBuilderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::buildResponse
+   * Tests build response render array.
+   *
+   * @legacy-covers ::buildResponse
    */
-  public function testBuildResponseRenderArray() {
+  public function testBuildResponseRenderArray(): void {
     $triggering_element = [
       '#ajax' => [
         'callback' => function (array $form, FormStateInterface $form_state) {
@@ -110,9 +119,11 @@ class FormAjaxResponseBuilderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::buildResponse
+   * Tests build response response.
+   *
+   * @legacy-covers ::buildResponse
    */
-  public function testBuildResponseResponse() {
+  public function testBuildResponseResponse(): void {
     $triggering_element = [
       '#ajax' => [
         'callback' => function (array $form, FormStateInterface $form_state) {
@@ -135,9 +146,11 @@ class FormAjaxResponseBuilderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::buildResponse
+   * Tests build response with commands.
+   *
+   * @legacy-covers ::buildResponse
    */
-  public function testBuildResponseWithCommands() {
+  public function testBuildResponseWithCommands(): void {
     $triggering_element = [
       '#ajax' => [
         'callback' => function (array $form, FormStateInterface $form_state) {
@@ -168,9 +181,11 @@ class FormAjaxResponseBuilderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::buildResponse
+   * Tests build response with update command.
+   *
+   * @legacy-covers ::buildResponse
    */
-  public function testBuildResponseWithUpdateCommand() {
+  public function testBuildResponseWithUpdateCommand(): void {
     $triggering_element = [
       '#ajax' => [
         'callback' => function (array $form, FormStateInterface $form_state) {

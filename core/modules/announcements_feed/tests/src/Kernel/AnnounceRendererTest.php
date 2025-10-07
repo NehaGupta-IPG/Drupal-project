@@ -4,19 +4,22 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\announcements_feed\Kernel;
 
+use Drupal\announcements_feed\AnnounceRenderer;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\announcements_feed\AnnounceRenderer
- *
- * @group announcements_feed
+ * Tests Drupal\announcements_feed\AnnounceRenderer.
  */
+#[CoversClass(AnnounceRenderer::class)]
+#[Group('announcements_feed')]
 class AnnounceRendererTest extends AnnounceTestBase {
 
   /**
    * Tests rendered valid when something goes wrong.
    */
-  public function testRendererException() {
+  public function testRendererException(): void {
     $this->setTestFeedResponses([
       new Response(403),
     ]);
@@ -28,7 +31,7 @@ class AnnounceRendererTest extends AnnounceTestBase {
   /**
    * Tests rendered valid content.
    */
-  public function testRendererContent() {
+  public function testRendererContent(): void {
     $feed_item_1 = [
       'id' => '1001',
       'content_html' => 'Test teaser 1',

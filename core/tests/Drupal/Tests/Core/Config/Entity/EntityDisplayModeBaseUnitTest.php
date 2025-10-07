@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Config\Entity;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Entity\EntityDisplayModeBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Entity\EntityDisplayModeBase
- * @group Config
+ * Tests Drupal\Core\Entity\EntityDisplayModeBase.
  */
+#[CoversClass(EntityDisplayModeBase::class)]
+#[Group('Config')]
 class EntityDisplayModeBaseUnitTest extends UnitTestCase {
 
   /**
@@ -74,9 +78,11 @@ class EntityDisplayModeBaseUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::calculateDependencies
+   * Tests calculate dependencies.
+   *
+   * @legacy-covers ::calculateDependencies
    */
-  public function testCalculateDependencies() {
+  public function testCalculateDependencies(): void {
     $target_entity_type_id = $this->randomMachineName(16);
 
     $target_entity_type = $this->createMock('\Drupal\Core\Entity\EntityTypeInterface');
@@ -92,19 +98,17 @@ class EntityDisplayModeBaseUnitTest extends UnitTestCase {
         [$this->entityType, TRUE, $this->entityInfo],
       ]);
 
-    $this->entity = $this->getMockBuilder('\Drupal\Core\Entity\EntityDisplayModeBase')
-      ->setConstructorArgs([$values, $this->entityType])
-      ->addMethods(['getFilterFormat'])
-      ->getMock();
-
+    $this->entity = new EntityDisplayModeBaseTestableClass($values, $this->entityType);
     $dependencies = $this->entity->calculateDependencies()->getDependencies();
     $this->assertContains('test_module', $dependencies['module']);
   }
 
   /**
-   * @covers ::setTargetType
+   * Tests set target type.
+   *
+   * @legacy-covers ::setTargetType
    */
-  public function testSetTargetType() {
+  public function testSetTargetType(): void {
     // Generate mock.
     $mock = $this->getMockBuilder('Drupal\Core\Entity\EntityDisplayModeBase')
       ->onlyMethods([])
@@ -129,9 +133,11 @@ class EntityDisplayModeBaseUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getTargetType
+   * Tests get target type.
+   *
+   * @legacy-covers ::getTargetType
    */
-  public function testGetTargetType() {
+  public function testGetTargetType(): void {
     // Generate mock.
     $mock = $this->getMockBuilder('Drupal\Core\Entity\EntityDisplayModeBase')
       ->onlyMethods([])
@@ -153,4 +159,10 @@ class EntityDisplayModeBaseUnitTest extends UnitTestCase {
     $this->assertEquals($value, $property->getValue($mock));
   }
 
+}
+
+/**
+ * A class extending EntityDisplayModeBase for testing purposes.
+ */
+class EntityDisplayModeBaseTestableClass extends EntityDisplayModeBase {
 }

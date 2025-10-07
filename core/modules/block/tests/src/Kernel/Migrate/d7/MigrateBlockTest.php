@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Kernel\Migrate\d7;
 
 use Drupal\block\Entity\Block;
+use Drupal\block\Hook\BlockHooks;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests migration of blocks to configuration entities.
- *
- * @group block
  */
+#[Group('block')]
 class MigrateBlockTest extends MigrateDrupal7TestBase {
 
   /**
@@ -53,10 +56,12 @@ class MigrateBlockTest extends MigrateDrupal7TestBase {
       'd7_user_role',
       'block_content_type',
       'block_content_body_field',
+      'block_content_body_field_storage',
       'd7_custom_block',
       'd7_block',
     ]);
-    block_rebuild();
+    $blockRebuild = new BlockHooks();
+    $blockRebuild->rebuild();
   }
 
   /**
@@ -113,7 +118,7 @@ class MigrateBlockTest extends MigrateDrupal7TestBase {
   /**
    * Tests the block migration.
    */
-  public function testBlockMigration() {
+  public function testBlockMigration(): void {
     $this->assertEntity('bartik_system_main', 'system_main_block', [], '', 'content', 'olivero', 0, '', '0');
     $this->assertEntity('bartik_search_form', 'search_form_block', [], '', 'content', 'olivero', -1, '', '0');
     $this->assertEntity('bartik_user_login', 'user_login_block', [], '', 'content', 'olivero', 0, 'User login title', 'visible');

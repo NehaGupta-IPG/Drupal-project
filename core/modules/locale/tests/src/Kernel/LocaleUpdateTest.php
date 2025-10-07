@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\locale\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests for updating the interface translations of projects.
- *
- * @group locale
  */
+#[Group('locale')]
 class LocaleUpdateTest extends KernelTestBase {
 
   /**
@@ -17,13 +19,12 @@ class LocaleUpdateTest extends KernelTestBase {
   protected static $modules = [
     'locale',
     'locale_test',
-    'system',
   ];
 
   /**
    * Checks if a list of translatable projects gets build.
    */
-  public function testUpdateProjects() {
+  public function testUpdateProjects(): void {
     $this->container->get('module_handler')->loadInclude('locale', 'compare.inc');
 
     // Make the test modules look like a normal custom module. I.e. make the

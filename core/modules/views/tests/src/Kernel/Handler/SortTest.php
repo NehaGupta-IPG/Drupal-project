@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests for core Drupal\views\Plugin\views\sort\SortPluginBase handler.
- *
- * @group views
  */
+#[Group('views')]
 class SortTest extends ViewsKernelTestBase {
 
   /**
@@ -22,11 +24,11 @@ class SortTest extends ViewsKernelTestBase {
   /**
    * Tests numeric ordering of the result set.
    */
-  public function testNumericOrdering() {
+  public function testNumericOrdering(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 
-    // Change the ordering
+    // Change the ordering.
     $view->displayHandlers->get('default')->overrideOption('sorts', [
       'age' => [
         'order' => 'ASC',
@@ -50,7 +52,7 @@ class SortTest extends ViewsKernelTestBase {
     $view->destroy();
     $view->setDisplay();
 
-    // Reverse the ordering
+    // Reverse the ordering.
     $view->displayHandlers->get('default')->overrideOption('sorts', [
       'age' => [
         'order' => 'DESC',
@@ -75,11 +77,11 @@ class SortTest extends ViewsKernelTestBase {
   /**
    * Tests string ordering of the result set.
    */
-  public function testStringOrdering() {
+  public function testStringOrdering(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 
-    // Change the ordering
+    // Change the ordering.
     $view->displayHandlers->get('default')->overrideOption('sorts', [
       'name' => [
         'order' => 'ASC',
@@ -103,7 +105,7 @@ class SortTest extends ViewsKernelTestBase {
     $view->destroy();
     $view->setDisplay();
 
-    // Reverse the ordering
+    // Reverse the ordering.
     $view->displayHandlers->get('default')->overrideOption('sorts', [
       'name' => [
         'order' => 'DESC',

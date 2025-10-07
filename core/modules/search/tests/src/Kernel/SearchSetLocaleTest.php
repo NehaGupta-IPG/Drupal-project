@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\search\Kernel;
 
 use Drupal\Core\Datetime\Entity\DateFormat;
@@ -8,12 +10,12 @@ use Drupal\node\Plugin\Search\NodeSearch;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that search works with numeric locale settings.
- *
- * @group search
  */
+#[Group('search')]
 class SearchSetLocaleTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;

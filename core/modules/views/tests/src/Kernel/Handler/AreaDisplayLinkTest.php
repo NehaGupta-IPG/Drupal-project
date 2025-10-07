@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Core\EventSubscriber\AjaxResponseSubscriber;
@@ -11,6 +13,7 @@ use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,9 +23,9 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 /**
  * Tests the core views_handler_area_display_link handler.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\area\DisplayLink
  */
+#[Group('views')]
 class AreaDisplayLinkTest extends ViewsKernelTestBase {
 
   /**
@@ -127,7 +130,7 @@ class AreaDisplayLinkTest extends ViewsKernelTestBase {
   /**
    * Tests the views area display_link handler.
    */
-  public function testAreaDisplayLink() {
+  public function testAreaDisplayLink(): void {
     $view = Views::getView('test_view');
 
     // Assert only path-based displays are available in the display link

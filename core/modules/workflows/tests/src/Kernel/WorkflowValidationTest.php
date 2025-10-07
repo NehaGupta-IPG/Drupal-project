@@ -1,16 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\workflows\Kernel;
 
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
 use Drupal\workflows\Entity\Workflow;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests validation of workflow entities.
- *
- * @group workflows
- * @group #slow
  */
+#[Group('workflows')]
 class WorkflowValidationTest extends ConfigEntityValidationTestBase {
 
   /**

@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Token;
 
-use Drupal\Core\Url;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Url;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * Tests token replacement.
- *
- * @group system
  */
+#[Group('system')]
 class TokenReplaceKernelTest extends TokenReplaceKernelTestBase {
 
   /**
@@ -29,7 +31,7 @@ class TokenReplaceKernelTest extends TokenReplaceKernelTestBase {
   /**
    * Tests whether token-replacement works in various contexts.
    */
-  public function testSystemTokenRecognition() {
+  public function testSystemTokenRecognition(): void {
     // Generate prefixes and suffixes for the token context.
     $tests = [
       ['prefix' => 'this is the ', 'suffix' => ' site'],
@@ -59,7 +61,7 @@ class TokenReplaceKernelTest extends TokenReplaceKernelTestBase {
   /**
    * Tests the clear parameter.
    */
-  public function testClear() {
+  public function testClear(): void {
     // Valid token.
     $source = '[site:name]';
     // No user passed in, should be untouched.
@@ -69,7 +71,13 @@ class TokenReplaceKernelTest extends TokenReplaceKernelTestBase {
 
     // Replace with the clear parameter, only the valid token should remain.
     $target = Html::escape($this->config('system.site')->get('name'));
-    $result = $this->tokenService->replace($source, [], ['langcode' => $this->interfaceLanguage->getId(), 'clear' => TRUE]);
+    $result = $this->tokenService->replace(
+      $source,
+      [],
+      [
+        'langcode' => $this->interfaceLanguage->getId(),
+        'clear' => TRUE,
+      ]);
     $this->assertEquals($target, $result, 'Valid tokens replaced while invalid tokens ignored.');
 
     $target .= '[user:name]';
@@ -81,7 +89,7 @@ class TokenReplaceKernelTest extends TokenReplaceKernelTestBase {
   /**
    * Tests the generation of all system site information tokens.
    */
-  public function testSystemSiteTokenReplacement() {
+  public function testSystemSiteTokenReplacement(): void {
     $url_options = [
       'absolute' => TRUE,
       'language' => $this->interfaceLanguage,
@@ -154,7 +162,7 @@ class TokenReplaceKernelTest extends TokenReplaceKernelTestBase {
   /**
    * Tests the generation of all system date tokens.
    */
-  public function testSystemDateTokenReplacement() {
+  public function testSystemDateTokenReplacement(): void {
     // Set time to one hour before request.
     $date = \Drupal::time()->getRequestTime() - 3600;
 

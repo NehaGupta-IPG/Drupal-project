@@ -1,22 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel\Views;
 
-use Drupal\node\Entity\NodeType;
+use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the node row plugin.
  *
- * @group node
  * @see \Drupal\node\Plugin\views\row\NodeRow
  */
+#[Group('node')]
 class RowPluginTest extends ViewsKernelTestBase {
 
+  use ContentTypeCreationTrait;
   use NodeCreationTrait;
   use UserCreationTrait;
 
@@ -60,12 +64,10 @@ class RowPluginTest extends ViewsKernelTestBase {
 
     \Drupal::currentUser()->setAccount($this->createUser(['access content']));
 
-    $node_type = NodeType::create([
+    $this->createContentType([
       'type' => 'article',
       'name' => 'Article',
     ]);
-    $node_type->save();
-    node_add_body_field($node_type);
 
     // Create two nodes.
     for ($i = 0; $i < 2; $i++) {
@@ -98,7 +100,7 @@ class RowPluginTest extends ViewsKernelTestBase {
 
     // Test with view_mode full.
     $output = $view->preview();
-    $output = $renderer->renderRoot($output);
+    $output = (string) $renderer->renderRoot($output);
     foreach ($this->nodes as $node) {
       $this->assertStringNotContainsString($node->body->summary, $output, 'Make sure the teaser appears in the output of the view.');
       $this->assertStringContainsString($node->body->value, $output, 'Make sure the full text appears in the output of the view.');
@@ -107,7 +109,7 @@ class RowPluginTest extends ViewsKernelTestBase {
     // Test with teasers.
     $view->rowPlugin->options['view_mode'] = 'teaser';
     $output = $view->preview();
-    $output = $renderer->renderRoot($output);
+    $output = (string) $renderer->renderRoot($output);
     foreach ($this->nodes as $node) {
       $this->assertStringContainsString($node->body->summary, $output, 'Make sure the teaser appears in the output of the view.');
       $this->assertStringNotContainsString($node->body->value, $output);

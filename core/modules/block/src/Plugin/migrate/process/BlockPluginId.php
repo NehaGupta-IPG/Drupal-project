@@ -4,6 +4,7 @@ namespace Drupal\block\Plugin\migrate\process;
 
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateLookupInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\MigrateExecutableInterface;
@@ -12,10 +13,9 @@ use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @MigrateProcessPlugin(
- *   id = "block_plugin_id"
- * )
+ * Determines the block plugin ID.
  */
+#[MigrateProcess('block_plugin_id')]
 class BlockPluginId extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
   /**
@@ -56,7 +56,7 @@ class BlockPluginId extends ProcessPluginBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
     $entity_type_manager = $container->get('entity_type.manager');
     return new static(
       $configuration,

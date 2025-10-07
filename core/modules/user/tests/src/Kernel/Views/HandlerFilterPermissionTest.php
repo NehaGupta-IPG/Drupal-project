@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel\Views;
 
 use Drupal\Component\Utility\Html;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the permissions filter handler.
  *
- * @group user
  * @see \Drupal\user\Plugin\views\filter\Permissions
  */
+#[Group('user')]
 class HandlerFilterPermissionTest extends UserKernelTestBase {
 
   /**
@@ -20,15 +23,13 @@ class HandlerFilterPermissionTest extends UserKernelTestBase {
    */
   public static $testViews = ['test_filter_permission'];
 
-  protected $columnMap;
-
   /**
    * Tests the permission filter handler.
    *
    * @todo Fix the different commented out tests by fixing the many to one
    *   handler handling with the NOT operator.
    */
-  public function testFilterPermission() {
+  public function testFilterPermission(): void {
     $this->setupPermissionTestData();
 
     $column_map = ['uid' => 'uid'];

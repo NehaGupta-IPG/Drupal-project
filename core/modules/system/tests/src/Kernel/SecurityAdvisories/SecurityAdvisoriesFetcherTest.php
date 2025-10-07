@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\SecurityAdvisories;
 
 use Drupal\Core\Extension\Extension;
@@ -7,20 +9,24 @@ use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Logger\RfcLoggerTrait;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * @coversDefaultClass \Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher
- *
- * @group system
+ * Tests Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher.
  */
+#[CoversClass(SecurityAdvisoriesFetcher::class)]
+#[Group('system')]
 class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInterface {
 
   use RfcLoggerTrait;
@@ -71,10 +77,9 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
    *   because they do not need to vary between test cases.
    * @param string|null $existing_version
    *   The existing version of the module.
-   *
-   * @dataProvider providerShowAdvisories
    */
-  public function testShowAdvisories(array $feed_item, string $existing_version = NULL): void {
+  #[DataProvider('providerShowAdvisories')]
+  public function testShowAdvisories(array $feed_item, ?string $existing_version = NULL): void {
     $this->setFeedItems([$feed_item]);
     if ($existing_version !== NULL) {
       $this->setExistingProjectVersion($existing_version);
@@ -242,10 +247,9 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
    *   because they do not need to vary between test cases.
    * @param string|null $existing_version
    *   The existing version of the module.
-   *
-   * @dataProvider providerIgnoreAdvisories
    */
-  public function testIgnoreAdvisories(array $feed_item, string $existing_version = NULL): void {
+  #[DataProvider('providerIgnoreAdvisories')]
+  public function testIgnoreAdvisories(array $feed_item, ?string $existing_version = NULL): void {
     $this->setFeedItems([$feed_item]);
     if ($existing_version !== NULL) {
       $this->setExistingProjectVersion($existing_version);
@@ -620,8 +624,10 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
   }
 
   /**
-   * @covers ::doRequest
-   * @covers ::getSecurityAdvisories
+   * Tests http fallback.
+   *
+   * @legacy-covers ::doRequest
+   * @legacy-covers ::getSecurityAdvisories
    */
   public function testHttpFallback(): void {
     $this->setSetting('update_fetch_with_http_fallback', TRUE);
@@ -662,8 +668,10 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
   }
 
   /**
-   * @covers ::doRequest
-   * @covers ::getSecurityAdvisories
+   * Tests no http fallback.
+   *
+   * @legacy-covers ::doRequest
+   * @legacy-covers ::getSecurityAdvisories
    */
   public function testNoHttpFallback(): void {
     $this->setTestFeedResponses([

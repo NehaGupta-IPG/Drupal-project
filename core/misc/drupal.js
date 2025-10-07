@@ -370,12 +370,7 @@ window.Drupal = { behaviors: {}, locale: {} };
     options.context = options.context || '';
 
     // Fetch the localized version of the string.
-    if (
-      typeof drupalTranslations !== 'undefined' &&
-      drupalTranslations.strings &&
-      drupalTranslations.strings[options.context] &&
-      drupalTranslations.strings[options.context][str]
-    ) {
+    if (drupalTranslations?.strings?.[options.context]?.[str]) {
       str = drupalTranslations.strings[options.context][str];
     }
 
@@ -409,7 +404,6 @@ window.Drupal = { behaviors: {}, locale: {} };
    *
    * @see https://github.com/angular/angular.js/blob/v1.4.4/src/ng/urlUtils.js
    * @see https://grack.com/blog/2009/11/17/absolutizing-url-in-javascript
-   * @see https://github.com/jquery/jquery-ui/blob/1.11.4/ui/tabs.js#L53
    */
   Drupal.url.toAbsolute = function (url) {
     const urlParsingNode = document.createElement('a');
@@ -424,9 +418,7 @@ window.Drupal = { behaviors: {}, locale: {} };
 
     urlParsingNode.setAttribute('href', url);
 
-    // IE <= 7 normalizes the URL when assigned to the anchor node similar to
-    // the other browsers.
-    return urlParsingNode.cloneNode(false).href;
+    return urlParsingNode.href;
   };
 
   /**
@@ -448,7 +440,7 @@ window.Drupal = { behaviors: {}, locale: {} };
 
     // Consider URLs that match this site's base URL but use HTTPS instead of HTTP
     // as local as well.
-    if (protocol === 'http:' && absoluteUrl.indexOf('https:') === 0) {
+    if (protocol === 'http:' && absoluteUrl.startsWith('https:')) {
       protocol = 'https:';
     }
     let baseUrl = `${protocol}//${
@@ -469,7 +461,7 @@ window.Drupal = { behaviors: {}, locale: {} };
 
     // The given URL matches the site's base URL, or has a path under the site's
     // base URL.
-    return absoluteUrl === baseUrl || absoluteUrl.indexOf(`${baseUrl}/`) === 0;
+    return absoluteUrl === baseUrl || absoluteUrl.startsWith(`${baseUrl}/`);
   };
 
   /**
@@ -518,10 +510,7 @@ window.Drupal = { behaviors: {}, locale: {} };
     let index = 0;
 
     // Determine the index of the plural form.
-    if (
-      typeof drupalTranslations !== 'undefined' &&
-      drupalTranslations.pluralFormula
-    ) {
+    if (drupalTranslations?.pluralFormula) {
       index =
         count in drupalTranslations.pluralFormula
           ? drupalTranslations.pluralFormula[count]
@@ -562,11 +551,7 @@ window.Drupal = { behaviors: {}, locale: {} };
    * @see https://www.drupal.org/core/deprecation#javascript
    */
   Drupal.deprecationError = ({ message }) => {
-    if (
-      drupalSettings.suppressDeprecationErrors === false &&
-      typeof console !== 'undefined' &&
-      console.warn
-    ) {
+    if (drupalSettings.suppressDeprecationErrors === false && console?.warn) {
       console.warn(`[Deprecation] ${message}`);
     }
   };
@@ -628,9 +613,13 @@ window.Drupal = { behaviors: {}, locale: {} };
    *   but also a complex object.
    */
   Drupal.theme = function (func, ...args) {
-    if (func in Drupal.theme) {
+    if (typeof Drupal.theme?.[func] === 'function') {
       return Drupal.theme[func](...args);
     }
+
+    Drupal.throwError(
+      new TypeError(`Drupal.theme.${func} must be function type.`),
+    );
   };
 
   /**

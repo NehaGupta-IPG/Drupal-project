@@ -1,21 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Drupal\views\Plugin\views\field\Counter handler.
- *
- * @group views
  */
+#[Group('views')]
 class FieldCounterTest extends ViewsKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['user'];
 
@@ -26,7 +26,10 @@ class FieldCounterTest extends ViewsKernelTestBase {
    */
   public static $testViews = ['test_view'];
 
-  public function testSimple() {
+  /**
+   * Tests the behavior of a simple View rendering with overridden field options.
+   */
+  public function testSimple(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
     $view->displayHandlers->get('default')->overrideOption('fields', [
@@ -87,7 +90,7 @@ class FieldCounterTest extends ViewsKernelTestBase {
   /**
    * Tests the counter field when using a pager.
    */
-  public function testPager() {
+  public function testPager(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
     $view->displayHandlers->get('default')->overrideOption('fields', [

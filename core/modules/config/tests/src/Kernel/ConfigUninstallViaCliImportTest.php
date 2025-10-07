@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config\Kernel;
 
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests importing configuration from files into active configuration.
- *
- * @group config
  */
+#[Group('config')]
 class ConfigUninstallViaCliImportTest extends KernelTestBase {
   /**
    * Config Importer object used for testing.
@@ -20,9 +22,7 @@ class ConfigUninstallViaCliImportTest extends KernelTestBase {
   protected $configImporter;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'config'];
 
@@ -63,7 +63,7 @@ class ConfigUninstallViaCliImportTest extends KernelTestBase {
    *
    * @see \Drupal\config\ConfigSubscriber
    */
-  public function testConfigUninstallViaCli() {
+  public function testConfigUninstallViaCli(): void {
     $this->assertTrue($this->container->get('module_handler')->moduleExists('config'));
     $sync = $this->container->get('config.storage.sync');
     $extensions = $sync->read('core.extension');

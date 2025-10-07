@@ -1,22 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\Kernel;
 
 use Drupal\entity_test\Entity\EntityTestBundle;
+use Drupal\media\Plugin\Field\FieldFormatter\MediaThumbnailFormatter;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\media\Plugin\Field\FieldFormatter\MediaThumbnailFormatter
- * @group media
+ * Tests Drupal\media\Plugin\Field\FieldFormatter\MediaThumbnailFormatter.
  */
+#[CoversClass(MediaThumbnailFormatter::class)]
+#[Group('media')]
 class MediaThumbnailFormatterTest extends MediaKernelTestBase {
 
   use EntityReferenceFieldCreationTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'entity_test',
@@ -48,6 +53,7 @@ class MediaThumbnailFormatterTest extends MediaKernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installEntitySchema('entity_test_with_bundle');
     // Create an entity bundle that has a media reference field.
     $entity_test_bundle = EntityTestBundle::create([
       'id' => $this->testEntityBundleId,
@@ -70,10 +76,9 @@ class MediaThumbnailFormatterTest extends MediaKernelTestBase {
    * @param array $expected_summary
    *   The expected settings summary.
    *
-   * @covers ::settingsSummary
-   *
-   * @dataProvider providerTestSettingsSummary
+   * @legacy-covers ::settingsSummary
    */
+  #[DataProvider('providerTestSettingsSummary')]
   public function testSettingsSummary(array $settings, array $expected_summary): void {
     /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display  */
     $display = \Drupal::service('entity_display.repository')->getViewDisplay($this->testEntityTypeId, $this->testEntityBundleId);
@@ -90,6 +95,7 @@ class MediaThumbnailFormatterTest extends MediaKernelTestBase {
    * Data provider for testSettingsSummary().
    *
    * @return array[]
+   *   An array of test data.
    */
   public static function providerTestSettingsSummary(): array {
     return [

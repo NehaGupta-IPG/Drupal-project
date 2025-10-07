@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\sqlite\Kernel\sqlite;
 
 use Drupal\KernelTests\Core\Database\SchemaUniquePrefixedKeysIndexTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests adding UNIQUE keys to tables.
- *
- * @group Database
  */
+#[Group('Database')]
 class SchemaUniquePrefixedKeysIndexTest extends SchemaUniquePrefixedKeysIndexTestBase {
 
   /**

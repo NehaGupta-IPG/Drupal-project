@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Kernel\Views;
 
 use Drupal\file\Entity\File;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\user\Entity\User;
 use Drupal\Tests\views\Kernel\Handler\FieldFieldAccessTestBase;
+use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests base field access in Views for the file entity.
- *
- * @group File
  */
+#[Group('File')]
 class FileViewsFieldAccessTest extends FieldFieldAccessTestBase {
 
   /**
@@ -31,7 +33,7 @@ class FileViewsFieldAccessTest extends FieldFieldAccessTestBase {
   /**
    * Check access for file fields.
    */
-  public function testFileFields() {
+  public function testFileFields(): void {
     ConfigurableLanguage::create([
       'id' => 'fr',
       'label' => 'French',

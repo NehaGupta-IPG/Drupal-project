@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Kernel\Migrate\d6;
 
-use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
 use Drupal\node\Entity\Node;
+use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Upgrade taxonomy term node associations.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
+#[Group('#slow')]
 class MigrateTermNodeTranslationTest extends MigrateDrupal6TestBase {
 
   /**
@@ -51,7 +54,7 @@ class MigrateTermNodeTranslationTest extends MigrateDrupal6TestBase {
   /**
    * Tests the Drupal 6 term-node association to Drupal 8 migration.
    */
-  public function testTermNode() {
+  public function testTermNode(): void {
     $this->container->get('entity_type.manager')
       ->getStorage('node')
       ->resetCache([18, 21]);

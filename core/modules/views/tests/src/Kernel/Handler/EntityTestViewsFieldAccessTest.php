@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests base field access in Views for the entity_test entity.
- *
- * @group entity_test
  */
+#[Group('entity_test')]
 class EntityTestViewsFieldAccessTest extends FieldFieldAccessTestBase {
 
   /**
@@ -28,7 +30,10 @@ class EntityTestViewsFieldAccessTest extends FieldFieldAccessTestBase {
     ConfigurableLanguage::create(['id' => 'es', 'title' => 'Spanish title', 'label' => 'Spanish label'])->save();
   }
 
-  public function testEntityTestFields() {
+  /**
+   * Tests field access permissions for the 'entity_test' entity in Views.
+   */
+  public function testEntityTestFields(): void {
     $entity_test = EntityTest::create([
       'name' => 'test entity name',
     ]);

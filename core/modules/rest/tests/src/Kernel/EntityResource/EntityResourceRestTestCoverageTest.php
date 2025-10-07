@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\rest\Kernel\EntityResource;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
@@ -7,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Checks that all core content/config entity types have REST test coverage.
@@ -16,9 +19,9 @@ use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
  * - every authentication provider in core (anon, cookie, basic_auth)
  *
  * Additionally, every entity type must have the correct parent test class.
- *
- * @group rest
  */
+#[Group('rest')]
+#[Group('#slow')]
 class EntityResourceRestTestCoverageTest extends KernelTestBase {
 
   /**
@@ -65,7 +68,7 @@ class EntityResourceRestTestCoverageTest extends KernelTestBase {
   /**
    * Tests that all core content/config entity types have REST test coverage.
    */
-  public function testEntityTypeRestTestCoverage() {
+  public function testEntityTypeRestTestCoverage(): void {
     $tests = [
       // Test coverage for formats provided by the 'serialization' module.
       'serialization' => [

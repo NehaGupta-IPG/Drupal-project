@@ -3,6 +3,7 @@
 namespace Drupal\filter\Plugin\migrate\process\d6;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\MigrateLookupInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
@@ -33,12 +34,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *  filter formats for a role.
  *
  * @see \Drupal\migrate\Plugin\MigrateProcessInterface
- *
- * @MigrateProcessPlugin(
- *   id = "filter_format_permission",
- *   handle_multiples = TRUE
- * )
  */
+#[MigrateProcess(
+  id: "filter_format_permission",
+  handle_multiples: TRUE,
+)]
 class FilterFormatPermission extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
   /**
@@ -76,7 +76,7 @@ class FilterFormatPermission extends ProcessPluginBase implements ContainerFacto
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
     return new static(
       $configuration,
       $plugin_id,

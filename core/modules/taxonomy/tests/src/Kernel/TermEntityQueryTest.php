@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Verifies operation of a taxonomy-based Entity Query.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
 class TermEntityQueryTest extends KernelTestBase {
 
   use TaxonomyTestTrait;
@@ -28,7 +30,7 @@ class TermEntityQueryTest extends KernelTestBase {
   /**
    * Tests that a basic taxonomy entity query works.
    */
-  public function testTermEntityQuery() {
+  public function testTermEntityQuery(): void {
     $this->installEntitySchema('taxonomy_term');
     $vocabulary = $this->createVocabulary();
 

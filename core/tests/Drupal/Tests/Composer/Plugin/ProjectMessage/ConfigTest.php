@@ -6,13 +6,17 @@ namespace Drupal\Tests\Composer\Plugin\ProjectMessage;
 
 use Composer\Package\RootPackageInterface;
 use Drupal\Composer\Plugin\ProjectMessage\Message;
-use PHPUnit\Framework\TestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass Drupal\Composer\Plugin\ProjectMessage\Message
- * @group ProjectMessage
+ * Tests Drupal\Composer\Plugin\ProjectMessage\Message.
  */
+#[CoversClass(Message::class)]
+#[Group('ProjectMessage')]
 class ConfigTest extends TestCase {
 
   public static function setUpBeforeClass(): void {
@@ -56,14 +60,14 @@ class ConfigTest extends TestCase {
   }
 
   /**
-   * @dataProvider provideGetMessageText
-   * @covers ::getText
+   * Tests get message text.
+   *
+   * @legacy-covers ::getText
    */
-  public function testGetMessageText($expected, $config) {
+  #[DataProvider('provideGetMessageText')]
+  public function testGetMessageText($expected, $config): void {
     // Root package has our config.
-    $root = $this->getMockBuilder(RootPackageInterface::class)
-      ->onlyMethods(['getExtra'])
-      ->getMockForAbstractClass();
+    $root = $this->createMock(RootPackageInterface::class);
     $root->expects($this->once())
       ->method('getExtra')
       ->willReturn($config);
@@ -74,13 +78,13 @@ class ConfigTest extends TestCase {
   }
 
   /**
-   * @covers ::getText
+   * Tests default file.
+   *
+   * @legacy-covers ::getText
    */
-  public function testDefaultFile() {
+  public function testDefaultFile(): void {
     // Root package has no extra field.
-    $root = $this->getMockBuilder(RootPackageInterface::class)
-      ->onlyMethods(['getExtra'])
-      ->getMockForAbstractClass();
+    $root = $this->createMock(RootPackageInterface::class);
     $root->expects($this->once())
       ->method('getExtra')
       ->willReturn([]);

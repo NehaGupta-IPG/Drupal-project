@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\language\Kernel\Migrate\d7;
 
 use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests migration of language comment settings.
- *
- * @group migrate_drupal_7
  */
+#[Group('migrate_drupal_7')]
 class MigrateLanguageContentCommentSettingsTest extends MigrateDrupal7TestBase {
 
   /**
@@ -39,7 +41,7 @@ class MigrateLanguageContentCommentSettingsTest extends MigrateDrupal7TestBase {
   /**
    * Tests migration of content language settings.
    */
-  public function testLanguageCommentSettings() {
+  public function testLanguageCommentSettings(): void {
     // Confirm there is no message about a missing bundle.
     $this->assertEmpty($this->migrateMessages, $this->migrateMessages['error'][0] ?? '');
 

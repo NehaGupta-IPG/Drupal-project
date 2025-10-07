@@ -3,7 +3,7 @@
 namespace Drupal\user;
 
 use Drupal\Core\Discovery\YamlDiscovery;
-use Drupal\Core\Controller\ControllerResolverInterface;
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
@@ -82,14 +82,12 @@ class PermissionHandler implements PermissionHandlerInterface {
    *   The module handler.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation.
-   * @param \Drupal\Core\Utility\CallableResolver|\Drupal\Core\Controller\ControllerResolverInterface $callable_resolver
+   * @param \Drupal\Core\Utility\CallableResolver $callable_resolver
    *   The callable resolver.
+   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   *   The module extension list.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, TranslationInterface $string_translation, ControllerResolverInterface|CallableResolver $callable_resolver) {
-    if ($callable_resolver instanceof ControllerResolverInterface) {
-      @trigger_error('Calling ' . __METHOD__ . '() with an argument of ControllerResolverInterface is deprecated in drupal:10.2.0 and is removed in drupal:11.0.0. Use \Drupal\Core\Utility\CallableResolver instead. See https://www.drupal.org/node/3397954', E_USER_DEPRECATED);
-      $callable_resolver = \Drupal::service('callable_resolver');
-    }
+  public function __construct(ModuleHandlerInterface $module_handler, TranslationInterface $string_translation, CallableResolver $callable_resolver, protected ModuleExtensionList $moduleExtensionList) {
     $this->callableResolver = $callable_resolver;
 
     // @todo It would be nice if you could pull all module directories from the
@@ -124,8 +122,8 @@ class PermissionHandler implements PermissionHandlerInterface {
    * {@inheritdoc}
    */
   public function moduleProvidesPermissions($module_name) {
-    // @TODO Static cache this information, see
-    // https://www.drupal.org/node/2339487
+    // @todo Static cache this information.
+    //   https://www.drupal.org/node/2339487
     $permissions = $this->getPermissions();
 
     foreach ($permissions as $permission) {
@@ -185,7 +183,9 @@ class PermissionHandler implements PermissionHandlerInterface {
             'title' => $permission,
           ];
         }
+        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
         $permission['title'] = $this->t($permission['title']);
+        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
         $permission['description'] = isset($permission['description']) ? $this->t($permission['description']) : NULL;
         $permission['provider'] = !empty($permission['provider']) ? $permission['provider'] : $provider;
       }
@@ -233,7 +233,7 @@ class PermissionHandler implements PermissionHandlerInterface {
   protected function getModuleNames() {
     $modules = [];
     foreach (array_keys($this->moduleHandler->getModuleList()) as $module) {
-      $modules[$module] = $this->moduleHandler->getName($module);
+      $modules[$module] = $this->moduleExtensionList->getName($module);
     }
     asort($modules);
     return $modules;

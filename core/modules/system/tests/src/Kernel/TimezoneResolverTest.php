@@ -1,17 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\system\TimeZoneResolver;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
- * @coversDefaultClass \Drupal\system\TimeZoneResolver
- * @group system
+ * Tests Drupal\system\TimeZoneResolver.
  */
+#[CoversClass(TimeZoneResolver::class)]
+#[Group('system')]
 class TimezoneResolverTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -27,7 +33,7 @@ class TimezoneResolverTest extends KernelTestBase {
   /**
    * Tests time zone resolution.
    */
-  public function testGetTimeZone() {
+  public function testGetTimeZone(): void {
     $this->installEntitySchema('user');
     $this->installConfig(['system']);
 

@@ -5,24 +5,27 @@ declare(strict_types=1);
 namespace Drupal\Tests\field\Unit\Plugin\migrate\process\d6;
 
 use Drupal\field\Plugin\migrate\process\d6\FieldSettings;
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\Row;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\field\Plugin\migrate\process\d6\FieldSettings
- * @group field
+ * Tests Drupal\field\Plugin\migrate\process\d6\FieldSettings.
  */
+#[CoversClass(FieldSettings::class)]
+#[Group('field')]
 class FieldSettingsTest extends UnitTestCase {
 
   /**
-   * @covers ::getSettings
+   * Tests get settings.
    *
-   * @dataProvider getSettingsProvider
+   * @legacy-covers ::getSettings
    */
-  public function testGetSettings($field_type, $field_settings, $allowed_values) {
-    $migration = $this->createMock(MigrationInterface::class);
+  #[DataProvider('getSettingsProvider')]
+  public function testGetSettings($field_type, $field_settings, $allowed_values): void {
     $plugin = new FieldSettings([], 'd6_field_settings', []);
 
     $executable = $this->createMock(MigrateExecutableInterface::class);

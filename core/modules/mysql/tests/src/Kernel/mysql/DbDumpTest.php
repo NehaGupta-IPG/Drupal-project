@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\mysql\Kernel\mysql;
 
 use Drupal\Component\Datetime\TimeInterface;
@@ -10,14 +12,14 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\Core\Database\DriverSpecificKernelTestBase;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Tests for the database dump commands.
- *
- * @group Update
  */
+#[Group('Update')]
 class DbDumpTest extends DriverSpecificKernelTestBase {
 
   use PathAliasTestTrait;
@@ -26,7 +28,6 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'config',
     'dblog',
     'menu_link_content',
@@ -70,7 +71,7 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
    *
    * Register a database cache backend rather than memory-based.
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
     $container->register('cache_factory', 'Drupal\Core\Cache\DatabaseBackendFactory')
       ->addArgument(new Reference('database'))
@@ -87,7 +88,6 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
     parent::setUp();
 
     // Create some schemas so our export contains tables.
-    $this->installSchema('system', ['sessions']);
     $this->installSchema('dblog', ['watchdog']);
     $this->installEntitySchema('block_content');
     $this->installEntitySchema('user');
@@ -131,7 +131,6 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
       'menu_link_content_data',
       'menu_link_content_revision',
       'menu_link_content_field_revision',
-      'sessions',
       'path_alias',
       'path_alias_revision',
       'user__roles',
@@ -144,7 +143,7 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
   /**
    * Tests the command directly.
    */
-  public function testDbDumpCommand() {
+  public function testDbDumpCommand(): void {
     $application = new DbDumpApplication();
     $command = $application->find('dump-database-d8-mysql');
     $command_tester = new CommandTester($command);
@@ -173,7 +172,7 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
   /**
    * Tests loading the script back into the database.
    */
-  public function testScriptLoad() {
+  public function testScriptLoad(): void {
     // Generate the script.
     $application = new DbDumpApplication();
     $command = $application->find('dump-database-d8-mysql');
@@ -221,7 +220,7 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
    * @return array
    *   Array keyed by field name, with the values being the field type.
    */
-  protected function getTableSchema($table) {
+  protected function getTableSchema($table): array {
     // Verify the field type on the data column in the cache table.
     // @todo this is MySQL specific.
     $query = Database::getConnection()->query("SHOW COLUMNS FROM {" . $table . "}");
@@ -242,7 +241,7 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
    *   The 'primary key', 'unique keys', and 'indexes' portion of the Drupal
    *   table schema.
    */
-  protected function getTableIndexes($table) {
+  protected function getTableIndexes($table): array {
     $query = Database::getConnection()->query("SHOW INDEX FROM {" . $table . "}");
     $definition = [];
     while ($row = $query->fetchAssoc()) {

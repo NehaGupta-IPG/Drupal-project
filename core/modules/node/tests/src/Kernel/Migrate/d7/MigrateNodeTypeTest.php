@@ -1,24 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel\Migrate\d7;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\FieldConfigInterface;
-use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\NodeTypeInterface;
+use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Upgrade node types to node.type.*.yml.
- *
- * @group node
  */
+#[Group('node')]
 class MigrateNodeTypeTest extends MigrateDrupal7TestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'text', 'menu_ui'];
 
@@ -80,7 +80,7 @@ class MigrateNodeTypeTest extends MigrateDrupal7TestBase {
   /**
    * Tests Drupal 7 node type to Drupal 8 migration.
    */
-  public function testNodeType() {
+  public function testNodeType(): void {
     $expected_available_menus = ['main'];
     $expected_parent = 'main:';
 

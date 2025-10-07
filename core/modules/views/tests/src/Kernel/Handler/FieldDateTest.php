@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the core Drupal\views\Plugin\views\field\Date handler.
- *
- * @group views
  */
+#[Group('views')]
 class FieldDateTest extends ViewsKernelTestBase {
 
   /**
@@ -67,7 +69,7 @@ class FieldDateTest extends ViewsKernelTestBase {
   /**
    * Sets up functional test of the views date field.
    */
-  public function testFieldDate() {
+  public function testFieldDate(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 

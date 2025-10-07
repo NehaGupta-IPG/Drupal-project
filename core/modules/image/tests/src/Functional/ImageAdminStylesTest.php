@@ -11,13 +11,14 @@ use Drupal\image\Entity\ImageStyle;
 use Drupal\image\ImageStyleInterface;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests creation, deletion, and editing of image styles and effects.
- *
- * @group image
- * @group #slow
  */
+#[Group('image')]
+#[RunTestsInSeparateProcesses]
 class ImageAdminStylesTest extends ImageFieldTestBase {
 
   use TestFileCreationTrait {
@@ -61,7 +62,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
   /**
    * Tests creating an image style with a numeric name.
    */
-  public function testNumericStyleName() {
+  public function testNumericStyleName(): void {
     $style_name = rand();
     $style_label = $this->randomString();
     $edit = [
@@ -78,7 +79,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
   /**
    * General test to add a style, add/remove/edit effects to it, then delete it.
    */
-  public function testStyle() {
+  public function testStyle(): void {
     $admin_path = 'admin/config/media/image-styles';
 
     // Setup a style to be created and effects to add to it.
@@ -307,7 +308,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
   /**
    * Tests deleting a style and choosing a replacement style.
    */
-  public function testStyleReplacement() {
+  public function testStyleReplacement(): void {
     // Create a new style.
     $style_name = $this->randomMachineName(10);
     $style_label = $this->randomString();
@@ -317,7 +318,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
 
     // Create an image field that uses the new style.
     $field_name = $this->randomMachineName(10);
-    $this->createImageField($field_name, 'article');
+    $this->createImageField($field_name, 'node', 'article');
     \Drupal::service('entity_display.repository')
       ->getViewDisplay('node', 'article')
       ->setComponent($field_name, [
@@ -374,7 +375,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
   /**
    * Verifies that editing an image effect does not cause it to be duplicated.
    */
-  public function testEditEffect() {
+  public function testEditEffect(): void {
     // Add a scale effect.
     $style_name = 'test_style_effect_edit';
     $this->drupalGet('admin/config/media/image-styles/add');
@@ -429,7 +430,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
   /**
    * Tests flush user interface.
    */
-  public function testFlushUserInterface() {
+  public function testFlushUserInterface(): void {
     $admin_path = 'admin/config/media/image-styles';
 
     // Create a new style.
@@ -461,7 +462,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
   /**
    * Tests image style configuration import that does a delete.
    */
-  public function testConfigImport() {
+  public function testConfigImport(): void {
     // Create a new style.
     $style_name = $this->randomMachineName(10);
     $style_label = $this->randomString();
@@ -470,7 +471,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
 
     // Create an image field that uses the new style.
     $field_name = $this->randomMachineName(10);
-    $this->createImageField($field_name, 'article');
+    $this->createImageField($field_name, 'node', 'article');
     \Drupal::service('entity_display.repository')
       ->getViewDisplay('node', 'article')
       ->setComponent($field_name, [
@@ -511,7 +512,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
   /**
    * Tests access for the image style listing.
    */
-  public function testImageStyleAccess() {
+  public function testImageStyleAccess(): void {
     $style = ImageStyle::create(['name' => 'style_foo', 'label' => $this->randomString()]);
     $style->save();
 
@@ -535,7 +536,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $style->save();
 
     // Build the derivative preview image file with the Image Style.
-    // @see template_preprocess_image_style_preview()
+    // @see \Drupal\image\Hook\ImageThemeHooks::preprocessImageStylePreview()
     $preview_file = $style->buildUri($original_path);
     $style->createDerivative($original_path, $preview_file);
 

@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests output on the status overview page.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class TrustedHostsTest extends BrowserTestBase {
 
   /**
@@ -34,9 +36,9 @@ class TrustedHostsTest extends BrowserTestBase {
    * Tests the status page behavior with no setting.
    *
    * Checks that an error is shown when the trusted host setting is missing from
-   * settings.php
+   * settings.php.
    */
-  public function testStatusPageWithoutConfiguration() {
+  public function testStatusPageWithoutConfiguration(): void {
     $this->drupalGet('admin/reports/status');
     $this->assertSession()->statusCodeEquals(200);
 
@@ -47,7 +49,7 @@ class TrustedHostsTest extends BrowserTestBase {
   /**
    * Tests that the status page shows the trusted patterns from settings.php.
    */
-  public function testStatusPageWithConfiguration() {
+  public function testStatusPageWithConfiguration(): void {
     $settings['settings']['trusted_host_patterns'] = (object) [
       'value' => ['^' . preg_quote(\Drupal::request()->getHost()) . '$'],
       'required' => TRUE,
@@ -67,7 +69,7 @@ class TrustedHostsTest extends BrowserTestBase {
    *
    * @see \Drupal\Core\Http\TrustedHostsRequestFactory
    */
-  public function testFakeRequests() {
+  public function testFakeRequests(): void {
     $this->container->get('module_installer')->install(['trusted_hosts_test']);
 
     $host = $this->container->get('request_stack')->getCurrentRequest()->getHost();
@@ -85,7 +87,7 @@ class TrustedHostsTest extends BrowserTestBase {
   /**
    * Tests that shortcut module works together with host verification.
    */
-  public function testShortcut() {
+  public function testShortcut(): void {
     $this->container->get('module_installer')->install(['block', 'shortcut']);
     $this->rebuildContainer();
 
@@ -94,7 +96,7 @@ class TrustedHostsTest extends BrowserTestBase {
     $shortcut_storage = $entity_type_manager->getStorage('shortcut');
 
     $shortcut = $shortcut_storage->create([
-      'title' => $this->randomString(),
+      'title' => 'Test Shortcut Label',
       'link' => 'internal:/admin/reports/status',
       'shortcut_set' => 'default',
     ]);
@@ -120,7 +122,7 @@ class TrustedHostsTest extends BrowserTestBase {
    *
    * @see \Drupal\Core\Http\TrustedHostsRequestFactory
    */
-  public function testRequestBags() {
+  public function testRequestBags(): void {
     $this->container->get('module_installer')->install(['trusted_hosts_test']);
 
     $host = $this->container->get('request_stack')->getCurrentRequest()->getHost();

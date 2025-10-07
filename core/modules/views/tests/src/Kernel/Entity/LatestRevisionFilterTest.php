@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Entity;
 
 use Drupal\node\Entity\Node;
@@ -7,12 +9,12 @@ use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the 'Latest revision' filter.
- *
- * @group views
  */
+#[Group('views')]
 class LatestRevisionFilterTest extends ViewsKernelTestBase {
 
   /**
@@ -28,7 +30,7 @@ class LatestRevisionFilterTest extends ViewsKernelTestBase {
   /**
    * Tests the 'Latest revision' filter.
    */
-  public function testLatestRevisionFilter() {
+  public function testLatestRevisionFilter(): void {
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     $this->installSchema('node', ['node_access']);

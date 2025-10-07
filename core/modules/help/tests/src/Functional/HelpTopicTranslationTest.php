@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\help\Functional;
 
-// cspell:ignore hilfetestmodul testen übersetzung
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore hilfetestmodul testen übersetzung
 /**
  * Verifies help topic translations.
- *
- * @group help
  */
+#[Group('help')]
+#[RunTestsInSeparateProcesses]
 class HelpTopicTranslationTest extends HelpTopicTranslatedTestBase {
 
   /**
@@ -35,7 +37,7 @@ class HelpTopicTranslationTest extends HelpTopicTranslatedTestBase {
   /**
    * Tests help topic translations.
    */
-  public function testHelpTopicTranslations() {
+  public function testHelpTopicTranslations(): void {
     $session = $this->assertSession();
 
     // Verify that help topic link is translated on admin/help.

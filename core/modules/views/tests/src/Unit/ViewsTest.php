@@ -4,20 +4,24 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Unit;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Tests\UnitTestCase;
-use Drupal\views\Views;
 use Drupal\views\Entity\View;
 use Drupal\views\ViewExecutableFactory;
-use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @coversDefaultClass \Drupal\views\Views
- * @group views
+ * Tests Drupal\views\Views.
  */
+#[CoversClass(Views::class)]
+#[Group('views')]
 class ViewsTest extends UnitTestCase {
 
   /**
@@ -41,7 +45,10 @@ class ViewsTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
     $route_provider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
-    $this->container->set('views.executable', new ViewExecutableFactory($user, $request_stack, $views_data, $route_provider));
+    $display_plugin_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->container->set('views.executable', new ViewExecutableFactory($user, $request_stack, $views_data, $route_provider, $display_plugin_manager));
 
     \Drupal::setContainer($this->container);
   }
@@ -49,9 +56,9 @@ class ViewsTest extends UnitTestCase {
   /**
    * Tests the getView() method.
    *
-   * @covers ::getView
+   * @legacy-covers ::getView
    */
-  public function testGetView() {
+  public function testGetView(): void {
     $view = new View(['id' => 'test_view'], 'view');
 
     $view_storage = $this->getMockBuilder('Drupal\Core\Config\Entity\ConfigEntityStorage')
@@ -78,9 +85,9 @@ class ViewsTest extends UnitTestCase {
   /**
    * Tests the getView() method against a non-existent view.
    *
-   * @covers ::getView
+   * @legacy-covers ::getView
    */
-  public function testGetNonExistentView() {
+  public function testGetNonExistentView(): void {
     $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
     $storage = $this->prophesize(EntityStorageInterface::class);
     $storage->load('test_view_non_existent')->willReturn(NULL);
@@ -91,11 +98,12 @@ class ViewsTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getApplicableViews
+   * Tests get applicable views.
    *
-   * @dataProvider providerTestGetApplicableViews
+   * @legacy-covers ::getApplicableViews
    */
-  public function testGetApplicableViews($applicable_type, $expected) {
+  #[DataProvider('providerTestGetApplicableViews')]
+  public function testGetApplicableViews($applicable_type, $expected): void {
     $view_1 = new View([
       'id' => 'test_view_1',
       'display' => [
@@ -208,6 +216,7 @@ class ViewsTest extends UnitTestCase {
    * Data provider for testGetApplicableViews.
    *
    * @return array
+   *   An array of test data.
    */
   public static function providerTestGetApplicableViews() {
     return [

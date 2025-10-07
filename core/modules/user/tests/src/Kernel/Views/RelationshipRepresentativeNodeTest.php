@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel\Views;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -8,12 +10,12 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\views\Tests\ViewResultAssertionTrait;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the representative node relationship for users.
- *
- * @group user
  */
+#[Group('user')]
 class RelationshipRepresentativeNodeTest extends KernelTestBase {
 
   use NodeCreationTrait;
@@ -42,7 +44,7 @@ class RelationshipRepresentativeNodeTest extends KernelTestBase {
   /**
    * Tests the relationship.
    */
-  public function testRelationship() {
+  public function testRelationship(): void {
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     $this->installConfig(['filter']);

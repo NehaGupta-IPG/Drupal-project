@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\rest\Kernel\Entity;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\rest\Entity\RestResourceConfig;
+use Drupal\rest\RestPermissions;
 use Drupal\rest\RestResourceConfigInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\rest\RestPermissions
- *
- * @group rest
+ * Tests Drupal\rest\RestPermissions.
  */
+#[CoversClass(RestPermissions::class)]
+#[Group('rest')]
 class RestPermissionsTest extends KernelTestBase {
 
   /**
@@ -25,9 +30,11 @@ class RestPermissionsTest extends KernelTestBase {
   ];
 
   /**
-   * @covers ::permissions
+   * Tests permissions.
+   *
+   * @legacy-covers ::permissions
    */
-  public function testPermissions() {
+  public function testPermissions(): void {
     RestResourceConfig::create([
       'id' => 'dblog',
       'plugin_id' => 'dblog',

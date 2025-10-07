@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\locale\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests building the translatable project information.
- *
- * @group locale
  */
+#[Group('locale')]
 class LocaleBuildTest extends KernelTestBase {
 
   /**
@@ -17,13 +19,12 @@ class LocaleBuildTest extends KernelTestBase {
   protected static $modules = [
     'locale',
     'locale_test',
-    'system',
   ];
 
   /**
    * Checks if a list of translatable projects gets built.
    */
-  public function testBuildProjects() {
+  public function testBuildProjects(): void {
     $this->container->get('module_handler')->loadInclude('locale', 'compare.inc');
     /** @var \Drupal\Core\Extension\ExtensionList $module_list */
     $module_list = \Drupal::service('extension.list.module');

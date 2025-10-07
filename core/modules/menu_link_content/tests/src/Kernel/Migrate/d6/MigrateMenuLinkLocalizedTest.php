@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\menu_link_content\Kernel\Migrate\d6;
 
 use Drupal\Tests\menu_link_content\Kernel\Migrate\MigrateMenuLinkTestTrait;
 use Drupal\Tests\node\Kernel\Migrate\d6\MigrateNodeTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests Menu link localized translation migration.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
 class MigrateMenuLinkLocalizedTest extends MigrateNodeTestBase {
 
   use MigrateMenuLinkTestTrait;
@@ -47,9 +49,9 @@ class MigrateMenuLinkLocalizedTest extends MigrateNodeTestBase {
   /**
    * Tests migration of menu link localized translations.
    */
-  public function testMenuLinkLocalized() {
+  public function testMenuLinkLocalized(): void {
     // A localized menu link.
-    $this->assertEntity('463', 'fr', 'fr - Test 1', 'secondary-links', 'fr - Test menu link 1', TRUE, FALSE, [
+    $this->assertEntity(463, 'fr', 'fr - Test 1', 'secondary-links', 'fr - Test menu link 1', TRUE, FALSE, [
       'attributes' => ['title' => 'fr - Test menu link 1'],
       'langcode' => 'fr',
       'alter' => TRUE,

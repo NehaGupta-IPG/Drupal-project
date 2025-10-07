@@ -6,19 +6,24 @@ namespace Drupal\Tests\Core\Ajax;
 
 use Drupal\Core\Ajax\OpenOffCanvasDialogCommand;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Ajax\OpenOffCanvasDialogCommand
- * @group Ajax
+ * Tests Drupal\Core\Ajax\OpenOffCanvasDialogCommand.
  */
+#[CoversClass(OpenOffCanvasDialogCommand::class)]
+#[Group('Ajax')]
 class OpenOffCanvasDialogCommandTest extends UnitTestCase {
 
   /**
-   * @covers ::render
+   * Tests render.
    *
-   * @dataProvider dialogPosition
+   * @legacy-covers ::render
    */
-  public function testRender($position) {
+  #[DataProvider('dialogPosition')]
+  public function testRender($position): void {
     $command = new OpenOffCanvasDialogCommand('Title', '<p>Text!</p>', ['url' => 'example'], NULL, $position);
 
     $expected = [
@@ -34,8 +39,10 @@ class OpenOffCanvasDialogCommandTest extends UnitTestCase {
         'resizable' => 'w',
         'draggable' => FALSE,
         'drupalAutoButtons' => FALSE,
-        'dialogClass' => 'ui-dialog-off-canvas ui-dialog-position-' . $position,
-        'classes' => ['ui-dialog-content' => 'drupal-off-canvas-reset'],
+        'classes' => [
+          'ui-dialog' => 'ui-dialog-off-canvas ui-dialog-position-' . $position,
+          'ui-dialog-content' => 'drupal-off-canvas-reset',
+        ],
         'width' => 300,
         'drupalOffCanvasPosition' => $position,
       ],
@@ -49,6 +56,7 @@ class OpenOffCanvasDialogCommandTest extends UnitTestCase {
    * The data provider for potential dialog positions.
    *
    * @return array
+   *   An array of dialog positions.
    */
   public static function dialogPosition() {
     return [

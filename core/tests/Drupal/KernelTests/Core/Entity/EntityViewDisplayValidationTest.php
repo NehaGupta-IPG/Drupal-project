@@ -1,21 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
-use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
-use Drupal\layout_builder\Section;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
+use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
+use Drupal\layout_builder\Section;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests validation of entity_view_display entities.
- *
- * @group Entity
- * @group Validation
  */
+#[Group('Entity')]
+#[Group('Validation')]
 class EntityViewDisplayValidationTest extends ConfigEntityValidationTestBase {
 
   use ContentTypeCreationTrait;
@@ -36,6 +38,7 @@ class EntityViewDisplayValidationTest extends ConfigEntityValidationTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installEntitySchema('node');
     $this->installConfig('node');
     $this->createContentType(['type' => 'one']);
     $this->createContentType(['type' => 'two']);
@@ -90,6 +93,7 @@ class EntityViewDisplayValidationTest extends ConfigEntityValidationTestBase {
    */
   public function testImmutableProperties(array $valid_values = []): void {
     parent::testImmutableProperties([
+      'id' => 'entity_test_with_bundle.two.full',
       'targetEntityType' => 'entity_test_with_bundle',
       'bundle' => 'two',
     ]);

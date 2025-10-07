@@ -8,18 +8,18 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests email field functionality.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class EmailFieldTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'entity_test', 'field_ui'];
 
@@ -58,7 +58,7 @@ class EmailFieldTest extends BrowserTestBase {
   /**
    * Tests email field.
    */
-  public function testEmailField() {
+  public function testEmailField(): void {
     // Create a field with settings to validate.
     $field_name = $this->randomMachineName();
     $this->fieldStorage = FieldStorageConfig::create([

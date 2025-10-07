@@ -10,18 +10,24 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\jsonapi\Traits\GetDocumentFromResponseTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use GuzzleHttp\RequestOptions;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Asserts external normalizers are handled as expected by the JSON:API module.
  *
  * @see jsonapi.normalizers
- *
- * @group jsonapi
  */
+#[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class ExternalNormalizersTest extends BrowserTestBase {
+
+  use GetDocumentFromResponseTrait;
 
   /**
    * {@inheritdoc}
@@ -107,10 +113,9 @@ class ExternalNormalizersTest extends BrowserTestBase {
    *   The expected JSON:API denormalization of the tested field. Must be either
    *   - static::VALUE_OVERRIDDEN (denormalizer IS NOT expected to override)
    *   - static::VALUE_ORIGINAL (denormalizer IS expected to override)
-   *
-   * @dataProvider providerTestFormatAgnosticNormalizers
    */
-  public function testFormatAgnosticNormalizers($test_module, $expected_value_jsonapi_normalization, $expected_value_jsonapi_denormalization) {
+  #[DataProvider('providerTestFormatAgnosticNormalizers')]
+  public function testFormatAgnosticNormalizers($test_module, $expected_value_jsonapi_normalization, $expected_value_jsonapi_denormalization): void {
     assert(in_array($expected_value_jsonapi_normalization, [static::VALUE_ORIGINAL, static::VALUE_OVERRIDDEN], TRUE));
     assert(in_array($expected_value_jsonapi_denormalization, [static::VALUE_ORIGINAL, static::VALUE_OVERRIDDEN], TRUE));
 
@@ -152,7 +157,7 @@ class ExternalNormalizersTest extends BrowserTestBase {
     // $url = $this->entity->toUrl('jsonapi');
     $client = $this->getSession()->getDriver()->getClient()->getClient();
     $response = $client->request('GET', $url->setAbsolute(TRUE)->toString());
-    $document = Json::decode((string) $response->getBody());
+    $document = $this->getDocumentFromResponse($response);
     $this->assertSame($expected_value_jsonapi_normalization, $document['data']['attributes']['field_test']);
 
     // Asserts the expected JSON:API denormalization.
@@ -167,7 +172,7 @@ class ExternalNormalizersTest extends BrowserTestBase {
     ]);
     $request_options[RequestOptions::HEADERS]['Content-Type'] = 'application/vnd.api+json';
     $response = $client->request('POST', Url::fromRoute('jsonapi.entity_test--entity_test.collection.post')->setAbsolute(TRUE)->toString(), $request_options);
-    $document = Json::decode((string) $response->getBody());
+    $document = $this->getDocumentFromResponse($response);
     $this->assertSame(static::VALUE_OVERRIDDEN, $document['data']['attributes']['field_test']);
     $entity_type_manager = $this->container->get('entity_type.manager');
     $uuid_key = $entity_type_manager->getDefinition('entity_test')->getKey('uuid');

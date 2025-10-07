@@ -9,12 +9,14 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\language\Traits\LanguageTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the untranslatable fields behaviors.
- *
- * @group content_translation
  */
+#[Group('content_translation')]
+#[RunTestsInSeparateProcesses]
 class ContentTranslationUntranslatableFieldsTest extends ContentTranslationPendingRevisionTestBase {
 
   use LanguageTestTrait;
@@ -50,7 +52,7 @@ class ContentTranslationUntranslatableFieldsTest extends ContentTranslationPendi
   /**
    * {@inheritdoc}
    */
-  protected function setupTestFields() {
+  protected function setupTestFields(): void {
     parent::setupTestFields();
 
     $field_storage = FieldStorageConfig::create([
@@ -76,7 +78,7 @@ class ContentTranslationUntranslatableFieldsTest extends ContentTranslationPendi
   /**
    * Tests that hiding untranslatable field widgets works correctly.
    */
-  public function testHiddenWidgets() {
+  public function testHiddenWidgets(): void {
     /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
     $entity_type_manager = $this->container->get('entity_type.manager');
     $id = $this->createEntity(['title' => $this->randomString()], 'en');

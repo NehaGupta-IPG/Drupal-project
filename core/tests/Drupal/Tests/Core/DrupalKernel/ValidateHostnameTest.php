@@ -6,19 +6,25 @@ namespace Drupal\Tests\Core\DrupalKernel;
 
 use Drupal\Core\DrupalKernel;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @coversDefaultClass \Drupal\Core\DrupalKernel
- * @group DrupalKernel
+ * Tests Drupal\Core\DrupalKernel.
  */
+#[CoversClass(DrupalKernel::class)]
+#[Group('DrupalKernel')]
 class ValidateHostnameTest extends UnitTestCase {
 
   /**
-   * @covers ::validateHostname
-   * @dataProvider providerTestValidateHostname
+   * Tests validate hostname.
+   *
+   * @legacy-covers ::validateHostname
    */
-  public function testValidateHostname($hostname, $message, $expected = FALSE) {
+  #[DataProvider('providerTestValidateHostname')]
+  public function testValidateHostname($hostname, $message, $expected = FALSE): void {
     $server = ['HTTP_HOST' => $hostname];
     $request = new Request([], [], [], [], [], $server);
     $validated_hostname = DrupalKernel::validateHostname($request);

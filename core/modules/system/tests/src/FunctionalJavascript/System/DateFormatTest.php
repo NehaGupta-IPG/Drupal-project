@@ -6,12 +6,14 @@ namespace Drupal\Tests\system\FunctionalJavascript\System;
 
 use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that date formats UI with JavaScript enabled.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class DateFormatTest extends WebDriverTestBase {
 
   /**
@@ -40,7 +42,7 @@ class DateFormatTest extends WebDriverTestBase {
   /**
    * Tests XSS via date format configuration.
    */
-  public function testDateFormatXss() {
+  public function testDateFormatXss(): void {
     $page = $this->getSession()->getPage();
     $assert = $this->assertSession();
 

@@ -1,20 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests configuration overrides via $config in settings.php.
- *
- * @group config
  */
+#[Group('config')]
 class ConfigOverrideTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'config_test'];
 
@@ -30,7 +30,7 @@ class ConfigOverrideTest extends KernelTestBase {
   /**
    * Tests configuration override.
    */
-  public function testConfOverride() {
+  public function testConfOverride(): void {
     $expected_original_data = [
       'foo' => 'bar',
       'baz' => NULL,
@@ -95,7 +95,7 @@ class ConfigOverrideTest extends KernelTestBase {
     // Write file to sync.
     $sync = $this->container->get('config.storage.sync');
     $expected_new_data = [
-      'foo' => 'barbar',
+      'foo' => 'new_foo',
       '404' => 'try again',
     ];
     $sync->write('config_test.system', $expected_new_data);

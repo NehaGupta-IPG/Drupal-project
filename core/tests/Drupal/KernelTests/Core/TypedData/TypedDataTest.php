@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\TypedData;
 
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\ListDataDefinition;
 use Drupal\Core\TypedData\MapDataDefinition;
@@ -19,15 +22,16 @@ use Drupal\Core\TypedData\Type\UriInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\file\Entity\File;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore eins
-
 /**
  * Tests the functionality of all core data types.
- *
- * @group TypedData
  */
+#[Group('TypedData')]
 class TypedDataTest extends KernelTestBase {
+
+  use StringTranslationTrait;
 
   /**
    * The typed data manager to use.
@@ -37,9 +41,7 @@ class TypedDataTest extends KernelTestBase {
   protected $typedDataManager;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'field', 'file', 'user'];
 
@@ -70,7 +72,7 @@ class TypedDataTest extends KernelTestBase {
   /**
    * Tests the basics around constructing and working with typed data objects.
    */
-  public function testGetAndSet() {
+  public function testGetAndSet(): void {
     // Boolean type.
     $typed_data = $this->createTypedData(['type' => 'boolean'], TRUE);
     $this->assertInstanceOf(BooleanInterface::class, $typed_data);
@@ -194,13 +196,17 @@ class TypedDataTest extends KernelTestBase {
     $typed_data = $this->createTypedData(['type' => 'datetime_iso8601'], $value);
     $this->assertInstanceOf(DateTimeInterface::class, $typed_data);
     $this->assertSame($value, $typed_data->getValue(), 'Date value was fetched.');
-    // @todo Uncomment this assertion in https://www.drupal.org/project/drupal/issues/2716891.
+    // @todo Uncomment this assertion in
+    //   https://www.drupal.org/project/drupal/issues/2716891.
+    // phpcs:ignore
     // $this->assertEquals($typed_data->getDateTime()->format('c'), $typed_data->getValue(), 'Value representation of a date is ISO 8601');
     $this->assertSame('UTC', $typed_data->getDateTime()->getTimezone()->getName());
     $this->assertEquals(0, $typed_data->validate()->count());
     $new_value = '2014-01-02T20:00';
     $typed_data->setValue($new_value);
-    // @todo Uncomment this assertion in https://www.drupal.org/project/drupal/issues/2716891.
+    // @todo Uncomment this assertion in
+    //   https://www.drupal.org/project/drupal/issues/2716891.
+    // phpcs:ignore
     // $this->assertTrue($typed_data->getDateTime()->format('c') === $new_value, 'Date value was changed and set by an ISO8601 date.');
     $this->assertEquals(0, $typed_data->validate()->count());
     $this->assertSame('2014-01-02', $typed_data->getDateTime()->format('Y-m-d'), 'Date value was changed and set by date string.');
@@ -268,7 +274,7 @@ class TypedDataTest extends KernelTestBase {
     $typed_data = $this->createTypedData(['type' => 'duration_iso8601'], 'PT20S');
     $this->assertInstanceOf(\DateInterval::class, $typed_data->getDuration());
     $typed_data->setDuration(new \DateInterval('P40D'));
-    // @todo: Should we make this "nicer"?
+    // @todo Should we make this "nicer"?
     $this->assertEquals('P0Y0M40DT0H0M0S', $typed_data->getValue());
     $typed_data->setValue(NULL);
     $this->assertNull($typed_data->getDuration());
@@ -384,7 +390,7 @@ class TypedDataTest extends KernelTestBase {
   /**
    * Tests using typed data lists.
    */
-  public function testTypedDataLists() {
+  public function testTypedDataLists(): void {
     // Test working with an existing list of strings.
     $value = ['one', 'two', 'three'];
     $typed_data = $this->createTypedData(ListDataDefinition::create('string'), $value);
@@ -455,7 +461,7 @@ class TypedDataTest extends KernelTestBase {
       $typed_data->setValue('string');
       $this->fail('No exception has been thrown when setting an invalid value.');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       // Expected exception; just continue testing.
     }
   }
@@ -463,7 +469,7 @@ class TypedDataTest extends KernelTestBase {
   /**
    * Tests the filter() method on typed data lists.
    */
-  public function testTypedDataListsFilter() {
+  public function testTypedDataListsFilter(): void {
     // Check that an all-pass filter leaves the list untouched.
     $value = ['zero', 'one'];
     $typed_data = $this->createTypedData(ListDataDefinition::create('string'), $value);
@@ -500,7 +506,7 @@ class TypedDataTest extends KernelTestBase {
   /**
    * Tests using a typed data map.
    */
-  public function testTypedDataMaps() {
+  public function testTypedDataMaps(): void {
     // Test working with a simple map.
     $value = [
       'one' => 'eins',
@@ -573,7 +579,7 @@ class TypedDataTest extends KernelTestBase {
       $typed_data->get('invalid');
       $this->fail('No exception has been thrown when getting an invalid value.');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       // Expected exception; just continue testing.
     }
 
@@ -582,7 +588,7 @@ class TypedDataTest extends KernelTestBase {
       $typed_data->setValue('invalid');
       $this->fail('No exception has been thrown when setting an invalid value.');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       // Expected exception; just continue testing.
     }
 
@@ -597,7 +603,7 @@ class TypedDataTest extends KernelTestBase {
   /**
    * Tests typed data validation.
    */
-  public function testTypedDataValidation() {
+  public function testTypedDataValidation(): void {
     $definition = DataDefinition::create('integer')
       ->setConstraints([
         'Range' => ['min' => 5],
@@ -610,7 +616,7 @@ class TypedDataTest extends KernelTestBase {
     $this->assertEquals(1, $violations->count());
 
     // Test translating violation messages.
-    $message = t('This value should be %limit or more.', ['%limit' => 5]);
+    $message = $this->t('This value should be %limit or more.', ['%limit' => 5]);
     $this->assertEquals($message, $violations[0]->getMessage(), 'Translated violation message retrieved.');
     $this->assertEquals('', $violations[0]->getPropertyPath());
     $this->assertSame($integer, $violations[0]->getRoot(), 'Root object returned.');
@@ -622,7 +628,7 @@ class TypedDataTest extends KernelTestBase {
       ]);
     $violations = $this->typedDataManager->create($definition, "short")->validate();
     $this->assertEquals(1, $violations->count());
-    $message = t('This value is too short. It should have %limit characters or more.', ['%limit' => 10]);
+    $message = $this->t('This value is too short. It should have %limit characters or more.', ['%limit' => 10]);
     $this->assertEquals($message, $violations[0]->getMessage(), 'Translated violation message retrieved.');
 
     // Test having multiple violations.
@@ -693,6 +699,27 @@ class TypedDataTest extends KernelTestBase {
 
     $this->assertEquals('string', $violations[0]->getInvalidValue());
     $this->assertSame('0.value', $violations[0]->getPropertyPath());
+  }
+
+  /**
+   * Tests the last() method on typed data lists.
+   */
+  public function testTypedDataListsLast(): void {
+    // Create an ItemList with two string items.
+    $value = ['zero', 'one'];
+    $typed_data = $this->createTypedData(ListDataDefinition::create('string'), $value);
+
+    // Assert that the last item is the second one ('one').
+    $this->assertEquals('one', $typed_data->last()->getValue());
+
+    // Add another item to the list and check the last item.
+    $value[] = 'two';
+    $typed_data = $this->createTypedData(ListDataDefinition::create('string'), $value);
+    $this->assertEquals('two', $typed_data->last()->getValue());
+
+    // Check behavior with an empty list.
+    $typed_data = $this->createTypedData(ListDataDefinition::create('string'), []);
+    $this->assertNull($typed_data->last(), 'Empty list should return NULL.');
   }
 
 }

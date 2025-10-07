@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel;
 
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests general rendering of a view.
- *
- * @group views
  */
+#[Group('views')]
 class ViewRenderTest extends ViewsKernelTestBase {
 
   /**
@@ -19,7 +21,7 @@ class ViewRenderTest extends ViewsKernelTestBase {
   /**
    * Tests render functionality.
    */
-  public function testRender() {
+  public function testRender(): void {
     $state = $this->container->get('state');
     $state->set('views_render.test', 0);
 

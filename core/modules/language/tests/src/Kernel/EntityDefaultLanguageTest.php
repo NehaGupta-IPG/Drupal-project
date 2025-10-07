@@ -1,22 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\language\Kernel;
 
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Entity\ContentLanguageSettings;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests default language code is properly generated for entities.
- *
- * @group language
  */
+#[Group('language')]
 class EntityDefaultLanguageTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',
@@ -24,7 +24,6 @@ class EntityDefaultLanguageTest extends KernelTestBase {
     'field',
     'text',
     'user',
-    'system',
   ];
 
   /**
@@ -51,7 +50,7 @@ class EntityDefaultLanguageTest extends KernelTestBase {
   /**
    * Tests that default language code is properly set for new nodes.
    */
-  public function testEntityTranslationDefaultLanguageViaCode() {
+  public function testEntityTranslationDefaultLanguageViaCode(): void {
     // With language module activated, and a content type that is configured to
     // have no language by default, a new node of this content type will have
     // "und" language code when language is not specified.
@@ -108,7 +107,7 @@ class EntityDefaultLanguageTest extends KernelTestBase {
    * @param string $langcode
    *   Default language code of the nodes of this type.
    */
-  protected function createContentType($name, $langcode) {
+  protected function createContentType($name, $langcode): void {
     $content_type = $this->container->get('entity_type.manager')->getStorage('node_type')->create([
       'name' => 'Test ' . $name,
       'title_label' => 'Title',

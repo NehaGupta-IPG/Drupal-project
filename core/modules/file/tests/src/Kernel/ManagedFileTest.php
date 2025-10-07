@@ -1,18 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Kernel;
 
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Managed file element test.
  *
- * @group file
- *
  * @see \Drupal\file\Element\ManagedFile
  */
+#[Group('file')]
 class ManagedFileTest extends FileManagedUnitTestBase implements FormInterface {
 
   /**
@@ -45,7 +47,7 @@ class ManagedFileTest extends FileManagedUnitTestBase implements FormInterface {
   /**
    * Tests that managed file elements can be programmatically submitted.
    */
-  public function testManagedFileElement() {
+  public function testManagedFileElement(): void {
     $form_state = new FormState();
     $values['managed_file'] = NULL;
     $form_state->setValues($values);

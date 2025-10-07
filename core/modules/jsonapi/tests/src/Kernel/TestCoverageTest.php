@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Kernel;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
@@ -7,13 +9,13 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\jsonapi\Functional\ConfigEntityResourceTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Checks that all core content/config entity types have JSON:API test coverage.
- *
- * @group jsonapi
- * @group #slow
  */
+#[Group('jsonapi')]
+#[Group('#slow')]
 class TestCoverageTest extends KernelTestBase {
 
   /**
@@ -60,7 +62,7 @@ class TestCoverageTest extends KernelTestBase {
   /**
    * Tests that all core entity types have JSON:API test coverage.
    */
-  public function testEntityTypeRestTestCoverage() {
+  public function testEntityTypeRestTestCoverage(): void {
     $problems = [];
     foreach ($this->definitions as $entity_type_id => $info) {
       $class_name_full = $info->getClass();

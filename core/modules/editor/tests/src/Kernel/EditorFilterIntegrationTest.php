@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\editor\Kernel;
 
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests integration with filter module.
- *
- * @group editor
  */
+#[Group('editor')]
 class EditorFilterIntegrationTest extends KernelTestBase {
 
   /**
@@ -21,7 +23,7 @@ class EditorFilterIntegrationTest extends KernelTestBase {
   /**
    * Tests text format removal or disabling.
    */
-  public function testTextFormatIntegration() {
+  public function testTextFormatIntegration(): void {
     // Create an arbitrary text format.
     $format = FilterFormat::create([
       'format' => $this->randomMachineName(),
@@ -30,7 +32,13 @@ class EditorFilterIntegrationTest extends KernelTestBase {
     $format->save();
 
     // Create a paired editor.
-    Editor::create(['format' => $format->id(), 'editor' => 'unicorn'])->save();
+    Editor::create([
+      'format' => $format->id(),
+      'editor' => 'unicorn',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
+    ])->save();
 
     // Disable the text format.
     $format->disable()->save();

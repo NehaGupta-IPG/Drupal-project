@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
+
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests entity level validation constraints.
- *
- * @group Entity
  */
+#[Group('Entity')]
 class EntityTypeConstraintsTest extends EntityKernelTestBase {
 
   /**
@@ -20,7 +23,7 @@ class EntityTypeConstraintsTest extends EntityKernelTestBase {
   /**
    * Tests defining entity constraints via entity type annotations and hooks.
    */
-  public function testConstraintDefinition() {
+  public function testConstraintDefinition(): void {
     // Test reading the annotation. There should be two constraints, the defined
     // constraint and the automatically added EntityChanged constraint.
     $entity_type = $this->entityTypeManager->getDefinition('entity_test_constraints');
@@ -58,7 +61,7 @@ class EntityTypeConstraintsTest extends EntityKernelTestBase {
   /**
    * Tests entity constraints are validated.
    */
-  public function testConstraintValidation() {
+  public function testConstraintValidation(): void {
     $entity = $this->entityTypeManager->getStorage('entity_test_constraints')->create();
     $entity->user_id->target_id = 0;
     $violations = $entity->validate();

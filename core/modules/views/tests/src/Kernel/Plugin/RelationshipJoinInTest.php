@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Plugin;
 
 use Drupal\Core\Database\Database;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
 
+// cspell:ignore Kristiaan Silvie
 /**
  * Tests the base relationship handler.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\relationship\RelationshipPluginBase
  */
+#[Group('views')]
 class RelationshipJoinInTest extends RelationshipJoinTestBase {
 
   use UserCreationTrait;
@@ -36,7 +40,7 @@ class RelationshipJoinInTest extends RelationshipJoinTestBase {
   /**
    * Tests the query result of a view with a relationship with an IN condition.
    */
-  public function testRelationshipInQuery() {
+  public function testRelationshipInQuery(): void {
     // Update the first two Beatles to be authored by Kristiaan.
     $account_k = $this->createUser([], 'Kristiaan');
     $connection = Database::getConnection();

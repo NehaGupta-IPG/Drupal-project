@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block_content\Kernel\Migrate\d6;
 
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Upgrade content blocks.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
 class MigrateBlockContentTest extends MigrateDrupal6TestBase {
 
   /**
@@ -29,6 +31,7 @@ class MigrateBlockContentTest extends MigrateDrupal6TestBase {
       'd6_filter_format',
       'block_content_type',
       'block_content_body_field',
+      'block_content_body_field_storage',
       'd6_custom_block',
     ]);
   }
@@ -36,7 +39,7 @@ class MigrateBlockContentTest extends MigrateDrupal6TestBase {
   /**
    * Tests the Drupal 6 content block to Drupal 8 migration.
    */
-  public function testBlockMigration() {
+  public function testBlockMigration(): void {
     /** @var \Drupal\block_content\Entity\BlockContent $block */
     $block = BlockContent::load(1);
     $this->assertSame('My block 1', $block->label());

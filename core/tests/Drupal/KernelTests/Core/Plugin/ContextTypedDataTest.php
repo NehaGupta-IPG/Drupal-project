@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Plugin;
 
 use Drupal\Core\Plugin\Context\Context;
@@ -8,19 +10,21 @@ use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\Plugin\DataType\StringData;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that contexts work properly with the typed data manager.
- *
- * @coversDefaultClass \Drupal\Core\Plugin\Context\Context
- * @group Context
  */
+#[CoversClass(Context::class)]
+#[Group('Context')]
 class ContextTypedDataTest extends KernelTestBase {
 
   /**
    * Tests that contexts can be serialized.
    */
-  public function testSerialize() {
+  public function testSerialize(): void {
     $definition = new ContextDefinition('any');
     $data_definition = DataDefinition::create('string');
     $typed_data = new StringData($data_definition);
@@ -40,9 +44,9 @@ class ContextTypedDataTest extends KernelTestBase {
    * This test ensures that the typed data manager is set correctly on the
    * Context class.
    *
-   * @covers ::getContextValue
+   * @legacy-covers ::getContextValue
    */
-  public function testGetContextValue() {
+  public function testGetContextValue(): void {
     $data_definition = DataDefinition::create('string');
     $typed_data = new StringData($data_definition);
     $typed_data->setValue('example string');
@@ -78,9 +82,11 @@ class ContextTypedDataTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::hasContextValue
-   * @dataProvider providerHasContextValue
+   * Tests has context value.
+   *
+   * @legacy-covers ::hasContextValue
    */
+  #[DataProvider('providerHasContextValue')]
   public function testHasContextValue($has_context_value, $default_value): void {
     $definition = new ContextDefinition('any');
     $definition->setDefaultValue($default_value);

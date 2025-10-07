@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Confirm that the fingerprinting meta tag appears as expected.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class AdminMetaTagTest extends BrowserTestBase {
 
   /**
@@ -21,7 +23,7 @@ class AdminMetaTagTest extends BrowserTestBase {
   /**
    * Verify that the meta tag HTML is generated correctly.
    */
-  public function testMetaTag() {
+  public function testMetaTag(): void {
     [$version] = explode('.', \Drupal::VERSION);
     $string = '<meta name="Generator" content="Drupal ' . $version . ' (https://www.drupal.org)" />';
     $this->drupalGet('node');
