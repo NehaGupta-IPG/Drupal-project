@@ -634,6 +634,10 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
     if ($this->view->display_handler->hasPath()) {
       $defaults['not found']['title'] = $this->t('Show "Page not found"');
     }
+    else {
+      // Disable summary for display which doesn't implement PathPluginBase.
+      unset($defaults['summary']);
+    }
 
     if ($which) {
       if (!empty($defaults[$which])) {
