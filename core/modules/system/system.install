@@ -6,31 +6,11 @@
  */
 
 use Drupal\Component\Utility\Crypt;
-use Drupal\Component\Utility\Environment;
-use Drupal\Component\Utility\OpCodeCache;
-use Drupal\Component\Utility\Unicode;
-use Drupal\Core\Cache\Cache;
-use Drupal\Core\Database\Database;
 use Drupal\Core\Database\SchemaDefinition\Column;
-use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\ConvertDefinition;
-use Drupal\Core\Database\SchemaDefinition\ForeignKey;
-use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Table;
-use Drupal\Core\DrupalKernel;
-use Drupal\Core\Extension\ExtensionLifecycle;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\File\FileSystemInterface;
-use Drupal\Core\Link;
-use Drupal\Core\Utility\PhpRequirements;
-use Drupal\Core\Render\Markup;
-use Drupal\Core\Site\Settings;
-use Drupal\Core\StreamWrapper\PrivateStream;
-use Drupal\Core\StreamWrapper\PublicStream;
-use Drupal\Core\StringTranslation\ByteSizeMarkup;
-use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Update\EquivalentUpdate;
 
@@ -90,7 +70,7 @@ function system_install(): void {
 function system_schema(bool $returnArraySchema = TRUE): array {
   // @deprecated The sequences table has been deprecated in drupal:10.2.0 and is
   // removed from drupal:12.0.0. See https://www.drupal.org/node/3220378.
-  // @todo: Remove sequences table in Drupal 12. See https://www.drupal.org/i/3335756
+  // @todo Remove sequences table in Drupal 12. See https://www.drupal.org/i/3335756
   $schema[] = new Table(
     name: 'sequences',
     description: 'Stores IDs.',

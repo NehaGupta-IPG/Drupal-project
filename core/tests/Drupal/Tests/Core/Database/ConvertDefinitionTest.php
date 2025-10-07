@@ -15,12 +15,12 @@ use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests conversion of SchemaDefinition objects to legacy array-based structure.
- *
- * @group Database
  */
+#[Group('Database')]
 class ConvertDefinitionTest extends UnitTestCase {
 
   /**
