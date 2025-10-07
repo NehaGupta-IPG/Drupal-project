@@ -195,6 +195,15 @@ class MenuLinkContentTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected function getExpectedUnauthorizedAccessCacheability() {
+    $cacheability = parent::getExpectedUnauthorizedAccessCacheability();
+    $cacheability->addCacheTags(['menu_link_content:1']);
+    return $cacheability;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function testCollectionFilterAccess(): void {
     $this->doTestCollectionFilterAccessBasedOnPermissions('title', 'administer menu');
   }

@@ -2956,8 +2956,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
 
-    $result = $entity->access('view', $this->account, TRUE);
     if (!static::$noViewAccessControl) {
+      $result = $entity->access('view', $this->account, TRUE);
       // Ensure 403 forbidden on typical GET.
       $actual_response = $this->request('GET', $url, $request_options);
       $expected_cacheability = $this->getExpectedUnauthorizedAccessCacheability();
@@ -2969,6 +2969,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     }
 
     // Ensure that targeting a revision does not bypass access.
+    $result = $entity->access('view all revisions', $this->account, TRUE);
     $actual_response = $this->request('GET', $original_revision_id_url, $request_options);
     $expected_cacheability = $this->getExpectedUnauthorizedAccessCacheability();
     $detail = 'The current user is not allowed to GET the selected resource. The user does not have access to the requested version.';
