@@ -23,7 +23,7 @@ final class Column implements SchemaDefinitionInterface {
    *   (Optional) A string in non-markup plain text describing this field and
    *   its purpose. References to other tables should be enclosed in curly
    *   brackets. For example, the users_data table 'uid' field description
-   *   might contain "The {users}.uid this record affects."
+   *   might contain "The {users}.uid this record affects.".
    * @param Property|bool $serialize
    *   (Optional) A boolean indicating whether the field will be stored as a
    *   serialized string.
