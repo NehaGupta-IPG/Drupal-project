@@ -15,7 +15,7 @@ abstract class MenuLinkContentResourceTestBase extends EntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $noViewAccessControl = TRUE;
+  protected static bool $noViewAccessControl = TRUE;
 
   /**
    * {@inheritdoc}
