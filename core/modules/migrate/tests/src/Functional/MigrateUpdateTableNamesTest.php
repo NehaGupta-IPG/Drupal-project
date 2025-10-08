@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate\Functional;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests the update of migrate table names.
- *
- * @group legacy
  */
+#[IgnoreDeprecations]
 class MigrateUpdateTableNamesTest extends UpdatePathTestBase {
 
   /**

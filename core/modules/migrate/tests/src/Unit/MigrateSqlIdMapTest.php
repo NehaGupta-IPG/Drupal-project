@@ -1080,9 +1080,8 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
 
   /**
    * Tests the delayed creation of the "map" and "message" migrate tables.
-   *
-   * @dataProvider providerTestMapTableCreation
    */
+  #[DataProvider('providerTestMapTableCreation')]
   public function testMapTableCreation($configuration, $expected_map_table, $expected_message_table): void {
     $this->migrationConfiguration = ['id' => $configuration];
     $id_map = $this->getIdMap();
