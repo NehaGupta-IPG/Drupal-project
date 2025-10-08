@@ -46,7 +46,7 @@ class ConfigOverrider implements ConfigFactoryOverrideInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCacheableMetadata($name): \Drupal\Core\Cache\CacheableMetadata {
+  public function getCacheableMetadata($name): CacheableMetadata {
     return new CacheableMetadata();
   }
 

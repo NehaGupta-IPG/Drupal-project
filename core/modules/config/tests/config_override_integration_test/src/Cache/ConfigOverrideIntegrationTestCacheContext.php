@@ -33,7 +33,7 @@ class ConfigOverrideIntegrationTestCacheContext implements CacheContextInterface
   /**
    * {@inheritdoc}
    */
-  public function getCacheableMetadata(): \Drupal\Core\Cache\CacheableMetadata {
+  public function getCacheableMetadata(): CacheableMetadata {
     // Since this depends on State this can change at any time and is not
     // cacheable.
     $metadata = new CacheableMetadata();

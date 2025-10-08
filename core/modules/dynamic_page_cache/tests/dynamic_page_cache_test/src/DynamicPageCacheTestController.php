@@ -26,7 +26,7 @@ class DynamicPageCacheTestController {
    * @return \Symfony\Component\HttpFoundation\Response
    *   A Response object.
    */
-  public function response(): \Symfony\Component\HttpFoundation\Response {
+  public function response(): Response {
     return new Response('foobar');
   }
 
@@ -46,7 +46,7 @@ class DynamicPageCacheTestController {
    * @return \Drupal\Core\Cache\CacheableResponseInterface
    *   A CacheableResponseInterface object.
    */
-  public function cacheableResponse(): \Drupal\Core\Cache\CacheableResponse {
+  public function cacheableResponse(): CacheableResponse {
     $user = User::load(1);
     $response = new CacheableResponse($user->label());
     $response->addCacheableDependency($user);

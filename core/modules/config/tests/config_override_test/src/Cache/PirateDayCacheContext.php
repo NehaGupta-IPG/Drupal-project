@@ -58,7 +58,7 @@ class PirateDayCacheContext implements CacheContextInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCacheableMetadata(): \Drupal\Core\Cache\CacheableMetadata {
+  public function getCacheableMetadata(): CacheableMetadata {
     return new CacheableMetadata();
   }
 

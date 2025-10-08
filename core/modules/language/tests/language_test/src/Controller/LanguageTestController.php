@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\language_test\Controller;
 
+use Symfony\Component\HttpFoundation\Response;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -121,7 +122,7 @@ class LanguageTestController implements ContainerInjectionInterface {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The kernels response to the sub request.
    */
-  public function testSubRequest(): \Symfony\Component\HttpFoundation\Response {
+  public function testSubRequest(): Response {
     $request = Request::createFromGlobals();
     $server = $request->server->all();
     if (basename($server['SCRIPT_FILENAME']) != basename($server['SCRIPT_NAME'])) {

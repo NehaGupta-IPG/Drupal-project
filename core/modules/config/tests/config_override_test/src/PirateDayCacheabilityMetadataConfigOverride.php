@@ -54,7 +54,7 @@ class PirateDayCacheabilityMetadataConfigOverride implements ConfigFactoryOverri
   /**
    * {@inheritdoc}
    */
-  public function getCacheableMetadata($name): \Drupal\Core\Cache\CacheableMetadata {
+  public function getCacheableMetadata($name): CacheableMetadata {
     $metadata = new CacheableMetadata();
     $metadata
       ->setCacheContexts(['pirate_day'])

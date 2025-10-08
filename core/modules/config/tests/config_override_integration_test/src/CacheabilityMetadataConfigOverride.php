@@ -49,7 +49,7 @@ class CacheabilityMetadataConfigOverride implements ConfigFactoryOverrideInterfa
   /**
    * {@inheritdoc}
    */
-  public function getCacheableMetadata($name): \Drupal\Core\Cache\CacheableMetadata {
+  public function getCacheableMetadata($name): CacheableMetadata {
     $metadata = new CacheableMetadata();
     if ($name === 'block.block.config_override_test') {
       $metadata
