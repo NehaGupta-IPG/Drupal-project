@@ -44,6 +44,8 @@ trait NodeMigrateTypeTestTrait {
     $hashed_tables = [
       'node' => [
         'migrate_map_daafa58d37',
+        // d6_node:a_thirty_two_character_type_name
+        'migrate_map_b14c3affc4',
       ],
       'node_complete' => [
         'migrate_map_4e7ad69646',
