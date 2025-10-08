@@ -11,7 +11,7 @@ use Drupal\migrate\Plugin\migrate\id_map\Sql;
  *
  * Only tables for currently available migrations are modified.
  */
-class MigrateUpdateTableNames {
+class MigrateTableNamesUpdate {
 
   /**
    * Database connection.

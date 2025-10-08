@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
  */
 #[Group('migrate')]
 #[IgnoreDeprecations]
-class MigrateUpdateTableNamesTest extends UpdatePathTestBase {
+class MigrateTableNamesUpdateTest extends UpdatePathTestBase {
 
   /**
    * {@inheritdoc}
