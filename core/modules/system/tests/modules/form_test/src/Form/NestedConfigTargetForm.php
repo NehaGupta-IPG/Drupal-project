@@ -19,7 +19,7 @@ class NestedConfigTargetForm extends TreeConfigTargetForm {
   /**
    * {@inheritdoc}
    */
-  protected function getEditableConfigNames() {
+  protected function getEditableConfigNames(): array {
     return ['form_test.object'];
   }
 
