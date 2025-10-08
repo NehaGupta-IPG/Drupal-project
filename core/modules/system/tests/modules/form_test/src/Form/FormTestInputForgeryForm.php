@@ -19,7 +19,7 @@ class FormTestInputForgeryForm extends FormBase implements TrustedCallbackInterf
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return '_form_test_input_forgery';
   }
 
@@ -60,21 +60,21 @@ class FormTestInputForgeryForm extends FormBase implements TrustedCallbackInterf
    *
    * @see \Drupal\Tests\system\Functional\Form\FormTest::testInputForgery()
    */
-  public static function postRender($rendered_form) {
+  public static function postRender($rendered_form): string {
     return str_replace('value="two"', 'value="FORGERY"', (string) $rendered_form);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): \Symfony\Component\HttpFoundation\JsonResponse {
     return new JsonResponse($form_state->getValues());
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return ['postRender'];
   }
 

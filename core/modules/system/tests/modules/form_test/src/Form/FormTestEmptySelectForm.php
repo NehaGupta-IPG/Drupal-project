@@ -17,7 +17,7 @@ class FormTestEmptySelectForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_empty_select';
   }
 

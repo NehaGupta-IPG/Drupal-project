@@ -51,7 +51,7 @@ class FormTestLabelForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_label_test_form';
   }
 

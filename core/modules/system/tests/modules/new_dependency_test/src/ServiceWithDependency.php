@@ -34,7 +34,7 @@ class ServiceWithDependency {
    * @return string
    *   The greeting.
    */
-  public function greet() {
+  public function greet(): string {
     if (isset($this->service)) {
       return $this->service->greet() . ' World';
     }

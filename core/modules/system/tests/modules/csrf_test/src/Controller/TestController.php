@@ -17,7 +17,7 @@ class TestController {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response object.
    */
-  public function testMethod() {
+  public function testMethod(): \Symfony\Component\HttpFoundation\Response {
     return new Response('Sometimes it is hard to think of test content!');
   }
 

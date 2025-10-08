@@ -59,7 +59,7 @@ class TestItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function schema(FieldStorageDefinitionInterface $field_definition) {
+  public static function schema(FieldStorageDefinitionInterface $field_definition): array {
     return [
       'columns' => [
         'value' => [
@@ -113,7 +113,7 @@ class TestItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public function delete() {
+  public function delete(): void {
     // Reports that delete() method is executed for testing purposes.
     FieldTestHelper::memorize('field_test_field_delete', [$this->getEntity()]);
   }
@@ -146,7 +146,7 @@ class TestItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public function isEmpty() {
+  public function isEmpty(): bool {
     return empty($this->value);
   }
 

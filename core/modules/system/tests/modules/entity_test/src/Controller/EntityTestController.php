@@ -17,7 +17,7 @@ class EntityTestController extends ControllerBase {
    *
    * @see \Drupal\entity_test\Routing\EntityTestRoutes::routes()
    */
-  public function testAdmin() {
+  public function testAdmin(): array {
     return [];
   }
 
@@ -63,7 +63,7 @@ class EntityTestController extends ControllerBase {
    * @return array
    *   A renderable array.
    */
-  public function listEntitiesAlphabetically($entity_type_id) {
+  public function listEntitiesAlphabetically($entity_type_id): array {
     $entity_type_definition = $this->entityTypeManager()->getDefinition($entity_type_id);
     $query = $this->entityTypeManager()->getStorage($entity_type_id)->getQuery()->accessCheck(TRUE);
 
@@ -111,7 +111,7 @@ class EntityTestController extends ControllerBase {
    * @return array
    *   A renderable array.
    */
-  public function listEntitiesEmpty($entity_type_id) {
+  public function listEntitiesEmpty($entity_type_id): array {
     $entity_type_definition = $this->entityTypeManager()->getDefinition($entity_type_id);
     return [
       '#theme' => 'item_list',

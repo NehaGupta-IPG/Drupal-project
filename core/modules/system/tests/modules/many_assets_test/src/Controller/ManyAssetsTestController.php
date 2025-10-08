@@ -17,7 +17,7 @@ class ManyAssetsTestController extends ControllerBase {
    * @return array
    *   A render array with a message and attached asset libraries.
    */
-  public function build() {
+  public function build(): array {
     return [
       '#markup' => 'I am a page that tests loading order of many dependencies',
       '#attached' => [

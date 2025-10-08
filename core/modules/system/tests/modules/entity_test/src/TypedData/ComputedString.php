@@ -23,7 +23,7 @@ class ComputedString extends TypedData implements CacheableDependencyInterface {
   /**
    * {@inheritdoc}
    */
-  public function getValue() {
+  public function getValue(): string {
     /** @var \Drupal\Core\Field\FieldItemInterface $item */
     $item = $this->getParent();
     $computed_value = "Computed! " . $item->get('value')->getString();
@@ -41,21 +41,21 @@ class ComputedString extends TypedData implements CacheableDependencyInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCacheTags() {
+  public function getCacheTags(): array {
     return ['you_are_it', 'no_tag_backs'];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCacheContexts() {
+  public function getCacheContexts(): array {
     return ['request_format'];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCacheMaxAge() {
+  public function getCacheMaxAge(): int {
     return Cache::PERMANENT;
   }
 

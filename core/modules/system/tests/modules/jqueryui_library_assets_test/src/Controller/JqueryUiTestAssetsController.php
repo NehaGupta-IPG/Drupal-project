@@ -20,7 +20,7 @@ class JqueryUiTestAssetsController extends ControllerBase {
    * @return array
    *   The render array.
    */
-  public function build($library) {
+  public function build($library): array {
     // If there are pipes in $library, they are separating multiple library
     // names.
     if (str_contains($library, '|')) {

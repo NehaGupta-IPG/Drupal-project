@@ -14,7 +14,7 @@ class TrustedHostsTestController {
   /**
    * Creates a fake request and prints out its host.
    */
-  public function fakeRequestHost() {
+  public function fakeRequestHost(): array {
     $request = Request::create('/');
     return ['#markup' => 'Host: ' . $request->getHost()];
   }
@@ -22,7 +22,7 @@ class TrustedHostsTestController {
   /**
    * Creates a fake request and prints out the class name of the specified bag.
    */
-  public function bagType($bag) {
+  public function bagType($bag): array {
     $request = Request::create('/');
     return ['#markup' => 'Type: ' . get_class($request->$bag)];
   }

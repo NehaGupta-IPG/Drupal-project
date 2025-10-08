@@ -47,7 +47,7 @@ class JsonRenderer implements MainContentRendererInterface {
   /**
    * {@inheritdoc}
    */
-  public function renderResponse(array $main_content, Request $request, RouteMatchInterface $route_match) {
+  public function renderResponse(array $main_content, Request $request, RouteMatchInterface $route_match): \Drupal\Core\Cache\CacheableJsonResponse {
     $json = [];
 
     $json['content'] = (string) $this->renderer->renderRoot($main_content);

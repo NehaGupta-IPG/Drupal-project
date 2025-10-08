@@ -19,7 +19,7 @@ class AjaxTestFocusFirstForm implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'ajax_test_focus_first_command_form';
   }
 

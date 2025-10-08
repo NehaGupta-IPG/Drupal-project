@@ -20,7 +20,7 @@ class MockComplexContextBlock extends PluginBase implements ContextAwarePluginIn
   /**
    * Returns the title of the block.
    */
-  public function getTitle() {
+  public function getTitle(): string {
     $user = $this->getContextValue('user');
     $node = $this->getContextValue('node');
     return $user->label() . ' -- ' . $node->label();

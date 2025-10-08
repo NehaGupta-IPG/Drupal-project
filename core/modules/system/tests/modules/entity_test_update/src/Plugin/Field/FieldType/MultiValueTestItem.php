@@ -36,7 +36,7 @@ class MultiValueTestItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function schema(FieldStorageDefinitionInterface $field_definition) {
+  public static function schema(FieldStorageDefinitionInterface $field_definition): array {
     return [
       'columns' => [
         'value1' => [
@@ -54,7 +54,7 @@ class MultiValueTestItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public function isEmpty() {
+  public function isEmpty(): bool {
     $item = $this->getValue();
     return empty($item['value1']) && empty($item['value2']);
   }
@@ -62,7 +62,7 @@ class MultiValueTestItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function mainPropertyName() {
+  public static function mainPropertyName(): string {
     return 'value1';
   }
 

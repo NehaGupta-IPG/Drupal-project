@@ -16,7 +16,7 @@ class UserLanguageTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'user_language_test';
   }
 

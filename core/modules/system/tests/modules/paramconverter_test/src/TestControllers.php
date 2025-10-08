@@ -12,12 +12,12 @@ use Drupal\node\NodeInterface;
  */
 class TestControllers {
 
-  public function testUserNodeFoo(EntityInterface $user, NodeInterface $node, $foo) {
+  public function testUserNodeFoo(EntityInterface $user, NodeInterface $node, $foo): array {
     $foo = is_object($foo) ? $foo->label() : $foo;
     return ['#markup' => "user: {$user->label()}, node: {$node->label()}, foo: $foo"];
   }
 
-  public function testNodeSetParent(NodeInterface $node, NodeInterface $parent) {
+  public function testNodeSetParent(NodeInterface $node, NodeInterface $parent): array {
     return ['#markup' => "Setting '{$parent->label()}' as parent of '{$node->label()}'."];
   }
 

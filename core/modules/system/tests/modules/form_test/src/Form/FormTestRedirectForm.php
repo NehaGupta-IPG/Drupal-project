@@ -18,7 +18,7 @@ class FormTestRedirectForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_redirect';
   }
 
@@ -59,7 +59,7 @@ class FormTestRedirectForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     if (!$form_state->isValueEmpty('redirection')) {
       if (!$form_state->isValueEmpty('destination')) {
         // The destination is a random URL, so we can't use routed URLs.

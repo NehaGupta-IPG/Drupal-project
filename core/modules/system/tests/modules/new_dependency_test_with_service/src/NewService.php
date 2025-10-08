@@ -15,7 +15,7 @@ class NewService {
    * @return string
    *   The greeting provided by the new service.
    */
-  public function greet() {
+  public function greet(): string {
     return 'Hello';
   }
 

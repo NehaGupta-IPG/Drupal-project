@@ -19,7 +19,7 @@ class BinaryFileResponseTestController {
    * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
    *   The response wrapping the file content.
    */
-  public function download(Request $request) {
+  public function download(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse {
     if (!$request->query->has('relative_file_url')) {
       throw new BadRequestHttpException();
     }

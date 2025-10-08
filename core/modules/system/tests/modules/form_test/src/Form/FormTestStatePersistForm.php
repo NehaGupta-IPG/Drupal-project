@@ -17,7 +17,7 @@ class FormTestStatePersistForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_state_persist';
   }
 
@@ -43,7 +43,7 @@ class FormTestStatePersistForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus($form_state->get('value'));
     $form_state->setRebuild();
   }

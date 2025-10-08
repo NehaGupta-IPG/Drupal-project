@@ -52,6 +52,17 @@ class TestFormApiFormBlock extends BlockBase implements ContainerFactoryPluginIn
   /**
    * {@inheritdoc}
    */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('form_builder'));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function build() {
     return $this->formBuilder->getForm($this);
   }
@@ -59,7 +70,7 @@ class TestFormApiFormBlock extends BlockBase implements ContainerFactoryPluginIn
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'layout_builder_form_block_test_search_form';
   }
 

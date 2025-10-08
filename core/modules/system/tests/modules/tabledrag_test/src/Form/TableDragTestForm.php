@@ -34,14 +34,14 @@ class TableDragTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static($container->get('state'));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'tabledrag_test_form';
   }
 
@@ -182,7 +182,7 @@ class TableDragTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $operation = $form_state->getTriggeringElement()['#op'] ?? 'save';
 
     switch ($operation) {
@@ -206,7 +206,7 @@ class TableDragTestForm extends FormBase {
    * @return array
    *   The renderable array of form actions.
    */
-  protected function buildFormActions() {
+  protected function buildFormActions(): array {
     return [
       '#type' => 'actions',
       'save' => [

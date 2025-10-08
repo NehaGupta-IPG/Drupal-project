@@ -15,7 +15,7 @@ class TestLocalAction extends LocalActionDefault {
   /**
    * {@inheritdoc}
    */
-  public function getTitle(?Request $request = NULL) {
+  public function getTitle(?Request $request = NULL): string {
     return 'Title override';
   }
 

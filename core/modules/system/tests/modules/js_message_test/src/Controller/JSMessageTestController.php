@@ -15,7 +15,7 @@ class JSMessageTestController {
    * @return string[]
    *   The test types.
    */
-  public static function getTypes() {
+  public static function getTypes(): array {
     return ['status', 'error', 'warning'];
   }
 
@@ -27,7 +27,7 @@ class JSMessageTestController {
    *
    * @see core/modules/system/tests/themes/test_messages/templates/status-messages.html.twig
    */
-  public static function getMessagesSelectors() {
+  public static function getMessagesSelectors(): array {
     return ['', '[data-drupal-messages-other]'];
   }
 

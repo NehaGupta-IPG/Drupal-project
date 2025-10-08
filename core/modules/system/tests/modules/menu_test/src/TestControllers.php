@@ -15,21 +15,21 @@ class TestControllers {
   /**
    * Returns page to be used as a login path.
    */
-  public function testLogin() {
+  public function testLogin(): array {
     return ['#markup' => 'This is TestControllers::testLogin.'];
   }
 
   /**
    * Prints out test data.
    */
-  public function test1() {
+  public function test1(): array {
     return ['#markup' => 'test1'];
   }
 
   /**
    * Prints out test data.
    */
-  public function test2() {
+  public function test2(): array {
     return ['#markup' => 'test2'];
   }
 
@@ -42,7 +42,7 @@ class TestControllers {
    * @return array
    *   Render array.
    */
-  public function testSession(Request $request) {
+  public function testSession(Request $request): array {
     $counter = $request->getSession()->get('menu_test', 0);
     $request->getSession()->set('menu_test', ++$counter);
     return ['#markup' => new FormattableMarkup('Session menu_test is @count', ['@count' => $counter])];
@@ -51,7 +51,7 @@ class TestControllers {
   /**
    * Prints out test data.
    */
-  public function testDerived() {
+  public function testDerived(): array {
     return ['#markup' => 'testDerived'];
   }
 
@@ -76,7 +76,7 @@ class TestControllers {
   /**
    * Prints out test data with contextual links.
    */
-  public function testContextual() {
+  public function testContextual(): array {
     return [
       '#markup' => 'testContextual',
       'stuff' => [

@@ -38,14 +38,14 @@ class Auth implements AuthenticationProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function applies(Request $request) {
+  public function applies(Request $request): bool {
     return FALSE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function authenticate(Request $request) {
+  public function authenticate(Request $request): null {
     return NULL;
   }
 

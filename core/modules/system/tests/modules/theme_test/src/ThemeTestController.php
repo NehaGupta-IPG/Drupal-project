@@ -18,7 +18,7 @@ class ThemeTestController extends ControllerBase {
    * @return array
    *   A render array containing custom stylesheets.
    */
-  public function testInfoStylesheets() {
+  public function testInfoStylesheets(): array {
     return [
       '#attached' => [
         'library' => [
@@ -34,7 +34,7 @@ class ThemeTestController extends ControllerBase {
    * @return array
    *   A render array containing a theme override.
    */
-  public function testTemplate() {
+  public function testTemplate(): array {
     return ['#markup' => \Drupal::theme()->render('theme_test_template_test', [])];
   }
 
@@ -60,7 +60,7 @@ class ThemeTestController extends ControllerBase {
    * @return string
    *   An HTML string containing the themed output.
    */
-  public function testSuggestion() {
+  public function testSuggestion(): array {
     return ['#markup' => \Drupal::theme()->render(['theme_test__suggestion', 'theme_test'], [])];
   }
 
@@ -70,35 +70,35 @@ class ThemeTestController extends ControllerBase {
    * @return string
    *   Content in theme_test_output GLOBAL.
    */
-  public function testRequestListener() {
+  public function testRequestListener(): array {
     return ['#markup' => $GLOBALS['theme_test_output']];
   }
 
   /**
    * Menu callback for testing suggestion alter hooks with template files.
    */
-  public function suggestionProvided() {
+  public function suggestionProvided(): array {
     return ['#theme' => 'theme_test_suggestion_provided'];
   }
 
   /**
    * Menu callback for testing suggestion alter hooks with template files.
    */
-  public function suggestionAlter() {
+  public function suggestionAlter(): array {
     return ['#theme' => 'theme_test_suggestions'];
   }
 
   /**
    * Menu callback for testing hook_theme_suggestions_alter().
    */
-  public function generalSuggestionAlter() {
+  public function generalSuggestionAlter(): array {
     return ['#theme' => 'theme_test_general_suggestions'];
   }
 
   /**
    * Menu callback for testing suggestion alter hooks with specific suggestions.
    */
-  public function specificSuggestionAlter() {
+  public function specificSuggestionAlter(): array {
     return ['#theme' => 'theme_test_specific_suggestions__variant'];
   }
 
@@ -108,7 +108,7 @@ class ThemeTestController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   The json response with the theme initialized information.
    */
-  public function nonHtml() {
+  public function nonHtml(): \Symfony\Component\HttpFoundation\JsonResponse {
     $theme_initialized = \Drupal::theme()->hasActiveTheme();
     return new JsonResponse(['theme_initialized' => $theme_initialized]);
   }
@@ -116,7 +116,7 @@ class ThemeTestController extends ControllerBase {
   /**
    * Controller for testing preprocess functions with theme suggestions.
    */
-  public function preprocessSuggestions() {
+  public function preprocessSuggestions(): array {
     return [
       [
         '#theme' => 'theme_test_preprocess_suggestions',
@@ -137,9 +137,19 @@ class ThemeTestController extends ControllerBase {
   /**
    * Controller for testing callable preprocess functions.
    */
-  public function preprocessCallback() {
+  public function preprocessCallback(): array {
     return [
       '#theme' => 'theme_test_preprocess_callback',
+    ];
+  }
+
+  /**
+   * Controller for testing a namespaced class in a theme.
+   */
+  public function testThemeClass(): array {
+    return [
+      '#theme' => 'theme_test_theme_class',
+      '#title' => 'Testing loading a class from a .theme file',
     ];
   }
 

@@ -30,7 +30,7 @@ class PluginExample extends AnnotationBase {
   /**
    * {@inheritdoc}
    */
-  public function get() {
+  public function get(): array {
     return [
       'id' => $this->id,
       'custom' => $this->custom,

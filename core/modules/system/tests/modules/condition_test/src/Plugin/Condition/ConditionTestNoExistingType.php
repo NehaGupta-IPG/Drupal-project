@@ -27,7 +27,7 @@ class ConditionTestNoExistingType extends ConditionPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function evaluate() {
+  public function evaluate(): bool {
     return TRUE;
   }
 

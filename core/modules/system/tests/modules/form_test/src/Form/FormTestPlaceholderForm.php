@@ -17,7 +17,7 @@ class FormTestPlaceholderForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_placeholder_test';
   }
 

@@ -22,7 +22,7 @@ class BatchTestController {
    * @return array
    *   Render array containing success message.
    */
-  public function testRedirect() {
+  public function testRedirect(): array {
     return [
       'success' => [
         '#markup' => 'Redirection successful.',
@@ -110,7 +110,7 @@ class BatchTestController {
    * @return array
    *   Render array containing markup.
    */
-  public function testProgrammatic($value = 1) {
+  public function testProgrammatic($value = 1): array {
     $form_state = (new FormState())->setValues([
       'value' => $value,
     ]);

@@ -105,7 +105,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return string
    *   The text to display.
    */
-  public function mainContentFallback() {
+  public function mainContentFallback(): array {
     return ['#markup' => $this->t('Content to test main content fallback')];
   }
 
@@ -115,7 +115,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return string
    *   Empty string, we just test the setting of messages.
    */
-  public function messengerServiceTest() {
+  public function messengerServiceTest(): array {
     // Set two messages.
     $this->messenger->addStatus('First message (removed).');
     $this->messenger->addStatus($this->t('Second message with <em>markup!</em> (not removed).'));
@@ -196,7 +196,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response.
    */
-  public function getDestination(Request $request) {
+  public function getDestination(Request $request): \Symfony\Component\HttpFoundation\Response {
     $response = new Response($request->query->get('destination'));
     return $response;
   }
@@ -210,7 +210,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response.
    */
-  public function requestDestination(Request $request) {
+  public function requestDestination(Request $request): \Symfony\Component\HttpFoundation\Response {
     $response = new Response($request->request->get('destination'));
     return $response;
   }
@@ -298,9 +298,20 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   }
 
   /**
+   * Initialize authorize.php during testing.
+   *
+   * @see system_authorized_init()
+   */
+  public function authorizeInit($page_title): \Symfony\Component\HttpFoundation\RedirectResponse {
+    $authorize_url = Url::fromUri('base:core/authorize.php', ['absolute' => TRUE])->toString();
+    system_authorized_init('system_test_authorize_run', __DIR__ . '/../../system_test.module', [], $page_title);
+    return new RedirectResponse($authorize_url);
+  }
+
+  /**
    * Sets a header.
    */
-  public function setHeader(Request $request) {
+  public function setHeader(Request $request): \Drupal\Core\Cache\CacheableResponse {
     $query = $request->query->all();
     $response = new CacheableResponse();
     $response->headers->set($query['name'], $query['value']);
@@ -316,7 +327,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * A simple page callback that uses a plain Symfony response object.
    */
-  public function respondWithResponse(Request $request) {
+  public function respondWithResponse(Request $request): \Symfony\Component\HttpFoundation\Response {
     return new Response('test');
   }
 
@@ -330,14 +341,14 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * A simple page callback that uses a CacheableResponse object.
    */
-  public function respondWithCacheableResponse(Request $request) {
+  public function respondWithCacheableResponse(Request $request): \Drupal\Core\Cache\CacheableResponse {
     return new CacheableResponse('test');
   }
 
   /**
    * A simple page callback which adds a register shutdown function.
    */
-  public function shutdownFunctions($arg1, $arg2) {
+  public function shutdownFunctions($arg1, $arg2): array {
     drupal_register_shutdown_function('_system_test_first_shutdown_function', $arg1, $arg2);
     // If using PHP-FPM then fastcgi_finish_request() will have been fired
     // preventing further output to the browser which means that the escaping of
@@ -359,7 +370,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return string
    *   The value of title.
    */
-  public function configureTitle($foo) {
+  public function configureTitle($foo): string {
     return 'Bar.' . $foo;
   }
 
@@ -372,7 +383,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return array
    *   A render array.
    */
-  public function simpleEcho($text) {
+  public function simpleEcho($text): array {
     return [
       '#plain_text' => $text,
     ];
@@ -408,7 +419,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return \Symfony\Component\HttpFoundation\Response
    *   A Response object containing the current date.
    */
-  public function getCurrentDate() {
+  public function getCurrentDate(): \Symfony\Component\HttpFoundation\Response {
     // Uses specific time to test that the right timezone is used.
     $response = new Response(\Drupal::service('date.formatter')->format(1452702549));
     return $response;
@@ -420,7 +431,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return \Symfony\Component\HttpFoundation\Response
    *   A Response object containing the test header.
    */
-  public function getTestHeader(Request $request) {
+  public function getTestHeader(Request $request): \Symfony\Component\HttpFoundation\Response {
     $response = new Response();
     $response->headers->set('Test-Header', $request->headers->get('Test-Header'));
     return $response;
@@ -429,7 +440,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * Returns a cacheable response with a custom cache control.
    */
-  public function getCacheableResponseWithCustomCacheControl() {
+  public function getCacheableResponseWithCustomCacheControl(): \Drupal\Core\Cache\CacheableResponse {
     return new CacheableResponse('Foo', 200, ['Cache-Control' => 'bar']);
   }
 
@@ -457,14 +468,14 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return ['preRenderCacheTags'];
   }
 
   /**
    * Use a plain Symfony response object to output the current install_profile.
    */
-  public function getInstallProfile() {
+  public function getInstallProfile(): \Symfony\Component\HttpFoundation\Response {
     $install_profile = \Drupal::installProfile() ?: 'NONE';
     return new Response('install_profile: ' . $install_profile);
   }

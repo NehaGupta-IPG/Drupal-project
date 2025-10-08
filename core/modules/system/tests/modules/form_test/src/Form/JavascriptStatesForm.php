@@ -18,7 +18,7 @@ class JavascriptStatesForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'javascript_states_form';
   }
 

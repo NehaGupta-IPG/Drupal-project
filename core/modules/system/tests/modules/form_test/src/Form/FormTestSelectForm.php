@@ -19,7 +19,7 @@ class FormTestSelectForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_select';
   }
 
@@ -184,7 +184,7 @@ class FormTestSelectForm extends FormBase {
    * @return array
    *   Options array, including option groups, for testing.
    */
-  protected function makeSortableOptions($prefix) {
+  protected function makeSortableOptions($prefix): array {
     return [
       // Don't use $this->t() here, to avoid adding strings to
       // localize.drupal.org. Do use TranslatableMarkup in places, to test
@@ -216,7 +216,7 @@ class FormTestSelectForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $form_state->setResponse(new JsonResponse($form_state->getValues()));
   }
 

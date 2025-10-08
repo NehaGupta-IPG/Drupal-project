@@ -21,7 +21,7 @@ class FixtureDeprecatedClass {
    * @return string
    *   A known return value.
    */
-  public function testFunction() {
+  public function testFunction(): string {
     return 'test';
   }
 

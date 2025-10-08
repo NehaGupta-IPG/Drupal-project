@@ -18,7 +18,7 @@ class TestController {
    * @return string
    *   Return Hello string.
    */
-  public function thing1() {
+  public function thing1(): array {
     return [
       '#type' => 'markup',
       '#markup' => 'Thing 1 says hello',
@@ -31,7 +31,7 @@ class TestController {
    * @return string
    *   Return Hello string.
    */
-  public function thing2() {
+  public function thing2(): array {
     return [
       '#type' => 'markup',
       '#markup' => 'Thing 2 says hello',
@@ -44,7 +44,7 @@ class TestController {
    * @return array
    *   Render array with links.
    */
-  public function linksDisplay() {
+  public function linksDisplay(): array {
     return [
       'off_canvas_link_1' => [
         '#title' => 'Open side panel 1',
@@ -141,7 +141,7 @@ class TestController {
    * @return array
    *   Render array with links.
    */
-  public function otherDialogLinks() {
+  public function otherDialogLinks(): array {
     return [
       '#theme' => 'links',
       '#links' => [

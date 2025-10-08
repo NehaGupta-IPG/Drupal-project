@@ -23,7 +23,7 @@ class LonelyMonkeyController extends ControllerBase implements ContainerInjectio
     $this->class = $class;
   }
 
-  public function testBrokenClass() {
+  public function testBrokenClass(): array {
     return [
       '#markup' => $this->t('This should be broken.'),
     ];
@@ -32,7 +32,7 @@ class LonelyMonkeyController extends ControllerBase implements ContainerInjectio
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static($container->get('broken_class_with_missing_dependency'));
   }
 

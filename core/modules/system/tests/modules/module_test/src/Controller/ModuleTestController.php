@@ -39,7 +39,7 @@ class ModuleTestController {
    * @return array
    *   Renderable array.
    */
-  public function testClassLoading() {
+  public function testClassLoading(): array {
     $markup = NULL;
     if (class_exists('Drupal\module_autoload_test\SomeClass')) {
       $obj = new SomeClass();

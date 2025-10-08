@@ -34,6 +34,16 @@ class ThemeInstallController extends ControllerBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container): static {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('theme_installer')
+    );
+  }
+
+  /**
    * Install a theme as default.
    *
    * @param string $theme

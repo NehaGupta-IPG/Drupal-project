@@ -33,7 +33,7 @@ class MockMenuBlock {
   /**
    * Returns the content to display.
    */
-  public function getContent() {
+  public function getContent(): string {
     // Since this is a mock object, we just return some HTML of the desired
     // nesting level. For depth=2, this returns:
     // '<ul><li>1<ul><li>1.1</li></ul></li></ul>'.

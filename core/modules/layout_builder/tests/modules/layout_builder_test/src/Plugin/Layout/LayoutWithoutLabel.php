@@ -26,7 +26,7 @@ class LayoutWithoutLabel extends LayoutDefault {
   /**
    * {@inheritdoc}
    */
-  public function defaultConfiguration() {
+  public function defaultConfiguration(): array {
     return [];
   }
 

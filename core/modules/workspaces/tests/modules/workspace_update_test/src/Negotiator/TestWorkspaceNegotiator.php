@@ -17,7 +17,7 @@ class TestWorkspaceNegotiator implements WorkspaceNegotiatorInterface, Workspace
   /**
    * {@inheritdoc}
    */
-  public function applies(Request $request) {
+  public function applies(Request $request): bool {
     return TRUE;
   }
 
@@ -31,14 +31,21 @@ class TestWorkspaceNegotiator implements WorkspaceNegotiatorInterface, Workspace
   /**
    * {@inheritdoc}
    */
-  public function setActiveWorkspace(WorkspaceInterface $workspace) {
+  public function getActiveWorkspace(Request $request) {
+    return Workspace::load($this->getActiveWorkspaceId($request));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setActiveWorkspace(WorkspaceInterface $workspace): void {
     // Nothing to do here.
   }
 
   /**
    * {@inheritdoc}
    */
-  public function unsetActiveWorkspace() {
+  public function unsetActiveWorkspace(): void {
     // Nothing to do here.
   }
 

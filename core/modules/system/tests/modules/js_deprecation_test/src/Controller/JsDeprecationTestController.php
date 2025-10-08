@@ -15,7 +15,7 @@ class JsDeprecationTestController {
    * @return array
    *   Render array.
    */
-  public function jsDeprecationTest() {
+  public function jsDeprecationTest(): array {
     return [
       '#attached' => ['library' => ['js_deprecation_test/deprecation_test']],
     ];

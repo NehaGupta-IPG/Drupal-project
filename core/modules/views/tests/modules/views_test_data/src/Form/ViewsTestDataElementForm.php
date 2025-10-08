@@ -17,7 +17,7 @@ class ViewsTestDataElementForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'views_test_data_element_form';
   }
 

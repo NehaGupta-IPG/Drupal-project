@@ -24,7 +24,7 @@ class TestItemWithPreconfiguredOptions extends TestItem implements Preconfigured
   /**
    * {@inheritdoc}
    */
-  public static function getPreconfiguredOptions() {
+  public static function getPreconfiguredOptions(): array {
     return [
       'custom_options' => [
         'label' => new TranslatableMarkup('All custom options'),

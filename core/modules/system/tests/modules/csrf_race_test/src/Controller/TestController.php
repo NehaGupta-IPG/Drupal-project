@@ -21,6 +21,15 @@ class TestController extends ControllerBase {
   protected $tokenGenerator;
 
   /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container): static {
+    return new static(
+      $container->get('csrf_token')
+    );
+  }
+
+  /**
    * Controller constructor.
    */
   public function __construct(CsrfTokenGenerator $token_generator) {
@@ -33,7 +42,7 @@ class TestController extends ControllerBase {
    * @return array
    *   Empty page with jQuery.
    */
-  public function testMethod() {
+  public function testMethod(): array {
     return [
       '#markup' => '',
       '#attached' => [
@@ -51,7 +60,7 @@ class TestController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\Response
    *   CSRF token.
    */
-  public function getCsrfToken(int $num) {
+  public function getCsrfToken(int $num): \Symfony\Component\HttpFoundation\JsonResponse {
     sleep($num);
     return new JsonResponse($this->tokenGenerator->get());
   }

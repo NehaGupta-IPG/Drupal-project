@@ -17,7 +17,7 @@ class PathEncodedTestController {
    * @return \Symfony\Component\HttpFoundation\Response
    *   A simple HTML response.
    */
-  public function simple() {
+  public function simple(): \Symfony\Component\HttpFoundation\Response {
     return new Response('<html><body>PathEncodedTestController works</body></html>');
   }
 

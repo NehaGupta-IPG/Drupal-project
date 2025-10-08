@@ -26,7 +26,7 @@ class EntityTestViewGrantsCacheContext implements CacheContextInterface {
   /**
    * {@inheritdoc}
    */
-  public function getContext() {
+  public function getContext(): string {
     // Return a constant value, so we can fetch render cache both in actual
     // requests and test code itself.
     return '299792458';
@@ -35,7 +35,7 @@ class EntityTestViewGrantsCacheContext implements CacheContextInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCacheableMetadata() {
+  public function getCacheableMetadata(): \Drupal\Core\Cache\CacheableMetadata {
     return new CacheableMetadata();
   }
 

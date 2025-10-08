@@ -33,7 +33,7 @@ class ErrorTestController extends ControllerBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('database')
     );
@@ -42,7 +42,7 @@ class ErrorTestController extends ControllerBase {
   /**
    * Generate warnings to test the error handler.
    */
-  public function generateWarnings($collect_errors = FALSE) {
+  public function generateWarnings($collect_errors = FALSE): array {
     // Tell Drupal error reporter to collect test errors or not.
     define('SIMPLETEST_COLLECT_ERRORS', $collect_errors);
     // This will generate a notice.
@@ -60,8 +60,8 @@ class ErrorTestController extends ControllerBase {
   /**
    * Generate fatal errors to test the error handler.
    */
-  public function generateFatalErrors() {
-    $function = function (array $test) {
+  public function generateFatalErrors(): array {
+    $function = function (array $test): void {
     };
     // Use an incorrect parameter type, string, for testing a fatal error.
     $function("test-string");
@@ -87,7 +87,7 @@ class ErrorTestController extends ControllerBase {
   /**
    * Trigger an exception to test the PDO exception handler.
    */
-  public function triggerPDOException() {
+  public function triggerPDOException(): void {
     define('SIMPLETEST_COLLECT_ERRORS', FALSE);
     $this->database->select('bananas_are_awesome', 'b')
       ->fields('b')
@@ -97,11 +97,11 @@ class ErrorTestController extends ControllerBase {
   /**
    * Trigger an exception during rendering.
    */
-  public function triggerRendererException() {
+  public function triggerRendererException(): array {
     return [
       '#type' => 'page',
       '#post_render' => [
-        function () {
+        function (): void {
           throw new \Exception('This is an exception that occurs during rendering');
         },
       ],

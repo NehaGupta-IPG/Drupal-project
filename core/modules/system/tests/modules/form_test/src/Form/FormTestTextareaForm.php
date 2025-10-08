@@ -18,7 +18,7 @@ class FormTestTextareaForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return '_test_textarea_form';
   }
 

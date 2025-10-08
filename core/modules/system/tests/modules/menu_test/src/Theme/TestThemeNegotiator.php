@@ -18,7 +18,7 @@ class TestThemeNegotiator implements ThemeNegotiatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function applies(RouteMatchInterface $route_match) {
+  public function applies(RouteMatchInterface $route_match): bool {
     return (bool) $route_match->getParameter('inherited');
   }
 

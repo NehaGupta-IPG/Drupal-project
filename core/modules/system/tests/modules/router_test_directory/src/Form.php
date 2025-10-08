@@ -17,7 +17,7 @@ class Form extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'router_test_form';
   }
 

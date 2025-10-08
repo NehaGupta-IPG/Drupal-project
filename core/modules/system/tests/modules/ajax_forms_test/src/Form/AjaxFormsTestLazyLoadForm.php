@@ -18,7 +18,7 @@ class AjaxFormsTestLazyLoadForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'ajax_forms_test_lazy_load_form';
   }
 
@@ -52,7 +52,7 @@ class AjaxFormsTestLazyLoadForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $form_state->setRebuild();
   }
 

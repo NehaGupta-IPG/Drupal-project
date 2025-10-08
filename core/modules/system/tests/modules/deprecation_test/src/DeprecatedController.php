@@ -15,7 +15,7 @@ class DeprecatedController {
    * @return array
    *   Render array.
    */
-  public function deprecatedMethod() {
+  public function deprecatedMethod(): array {
     return [
       '#markup' => deprecation_test_function(),
     ];

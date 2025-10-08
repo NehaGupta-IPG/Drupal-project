@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class DefaultFormatTestController {
 
-  public function content(Request $request) {
+  public function content(Request $request): \Drupal\Core\Cache\CacheableResponse {
     $format = $request->getRequestFormat();
     return new CacheableResponse('format:' . $format, 200, ['Content-Type' => $request->getMimeType($format)]);
   }

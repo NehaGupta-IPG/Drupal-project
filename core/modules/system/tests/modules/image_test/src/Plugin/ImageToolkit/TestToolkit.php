@@ -86,6 +86,21 @@ class TestToolkit extends ImageToolkitBase {
   /**
    * {@inheritdoc}
    */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('image.toolkit.operation.manager'),
+      $container->get('logger.channel.image'),
+      $container->get('config.factory'),
+      $container->get('state')
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $this->logCall('settings', func_get_args());
     $form['test_parameter'] = [
@@ -102,7 +117,7 @@ class TestToolkit extends ImageToolkitBase {
   /**
    * {@inheritdoc}
    */
-  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state): void {
     if ($form_state->getValue(['test', 'test_parameter']) == 0) {
       $form_state->setErrorByName('test][test_parameter', $this->t('Test parameter should be different from 0.'));
     }
@@ -111,7 +126,7 @@ class TestToolkit extends ImageToolkitBase {
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     $this->configFactory->getEditable('system.image.test_toolkit')
       ->set('test_parameter', $form_state->getValue(['test', 'test_parameter']))
       ->save();
@@ -120,14 +135,14 @@ class TestToolkit extends ImageToolkitBase {
   /**
    * {@inheritdoc}
    */
-  public function isValid() {
+  public function isValid(): bool {
     return isset($this->type);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function parseFile() {
+  public function parseFile(): bool {
     $this->logCall('parseFile', func_get_args());
     $data = @getimagesize($this->getSource());
     if ($data && in_array($data[2], static::supportedTypes())) {
@@ -142,7 +157,7 @@ class TestToolkit extends ImageToolkitBase {
   /**
    * {@inheritdoc}
    */
-  public function save($destination) {
+  public function save($destination): bool {
     $this->logCall('save', func_get_args());
     // Return false so that image_save() doesn't try to chmod the destination
     // file that we didn't bother to create.
@@ -217,14 +232,14 @@ class TestToolkit extends ImageToolkitBase {
   /**
    * {@inheritdoc}
    */
-  public function getMimeType() {
+  public function getMimeType(): string {
     return $this->getType() ? image_type_to_mime_type($this->getType()) : '';
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function isAvailable() {
+  public static function isAvailable(): bool {
     return TRUE;
   }
 

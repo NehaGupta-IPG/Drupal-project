@@ -17,7 +17,7 @@ class FormTestRangeInvalidForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_range_invalid';
   }
 

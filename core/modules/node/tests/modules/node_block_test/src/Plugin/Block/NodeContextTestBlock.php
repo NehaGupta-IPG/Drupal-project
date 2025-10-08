@@ -24,7 +24,7 @@ class NodeContextTestBlock extends BlockBase {
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     /** @var \Drupal\node\NodeInterface $node */
     $node = $this->getContextValue('node');
     return [

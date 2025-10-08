@@ -21,7 +21,7 @@ class DatabaseTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'database_test_theme_tablesort';
   }
 

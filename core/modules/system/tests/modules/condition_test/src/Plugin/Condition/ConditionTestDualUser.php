@@ -31,7 +31,7 @@ class ConditionTestDualUser extends ConditionPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function evaluate() {
+  public function evaluate(): bool {
     $user1 = $this->getContextValue('user1');
     $user2 = $this->getContextValue('user2');
     return $user1->id() === $user2->id();

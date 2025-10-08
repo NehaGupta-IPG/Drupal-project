@@ -20,7 +20,7 @@ class AjaxTestFormPromise extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'ajax_test_form_promise';
   }
 
@@ -52,7 +52,7 @@ class AjaxTestFormPromise extends FormBase {
   /**
    * Ajax callback for the "Execute commands button" button.
    */
-  public static function executeCommands(array $form, FormStateInterface $form_state) {
+  public static function executeCommands(array $form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse {
     $selector = '#ajax_test_form_promise_wrapper';
     $response = new AjaxResponse();
 
@@ -68,7 +68,7 @@ class AjaxTestFormPromise extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     // An empty implementation, as we never submit the actual form.
   }
 

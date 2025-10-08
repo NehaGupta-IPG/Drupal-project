@@ -23,7 +23,7 @@ class CommonTestController {
    * Using #type 'link' causes these links to be rendered with the link
    * generator.
    */
-  public function typeLinkActiveClass() {
+  public function typeLinkActiveClass(): array {
     return [
       'no_query' => [
         '#type' => 'link',
@@ -91,7 +91,7 @@ class CommonTestController {
    *   A new Response object containing a string with the destination query
    *   parameter.
    */
-  public function destination() {
+  public function destination(): \Symfony\Component\HttpFoundation\Response {
     $destination = \Drupal::destination()->getAsArray();
     $output = "The destination: " . Html::escape($destination['destination']);
     return new Response($output);

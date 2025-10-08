@@ -28,7 +28,7 @@ class TestPhpMailFailure extends PhpMail implements MailInterface {
   /**
    * {@inheritdoc}
    */
-  public function mail(array $message) {
+  public function mail(array $message): bool {
     // Simulate a failed mail send by returning FALSE.
     return FALSE;
   }

@@ -15,7 +15,7 @@ class CustomThemeNegotiator implements ThemeNegotiatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function applies(RouteMatchInterface $route_match) {
+  public function applies(RouteMatchInterface $route_match): bool {
     $route = $route_match->getRouteObject();
     return ($route && $route->hasOption('_custom_theme'));
   }

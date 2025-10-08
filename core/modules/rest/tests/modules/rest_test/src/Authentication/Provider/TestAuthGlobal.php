@@ -22,7 +22,7 @@ class TestAuthGlobal implements AuthenticationProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function authenticate(Request $request) {
+  public function authenticate(Request $request): null {
     return NULL;
   }
 

@@ -18,7 +18,7 @@ class FormTestResponseForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_response';
   }
 
@@ -45,7 +45,7 @@ class FormTestResponseForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $values = $form_state->getValues();
     $form_state->setResponse(new JsonResponse($values['content'], (int) $values['status']));
   }

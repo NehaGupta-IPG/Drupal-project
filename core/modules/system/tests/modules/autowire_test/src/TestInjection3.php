@@ -14,7 +14,7 @@ class TestInjection3 implements TrustedCallbackInterface, TestInjectionInterface
   /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return [];
   }
 

@@ -31,7 +31,7 @@ class OptionalContextCondition extends ConditionPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function evaluate() {
+  public function evaluate(): bool {
     // Grant access if no context value is given.
     return !$this->getContextValue('node');
   }

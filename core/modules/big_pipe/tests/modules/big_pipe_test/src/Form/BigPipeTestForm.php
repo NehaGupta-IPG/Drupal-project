@@ -17,7 +17,7 @@ class BigPipeTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'big_pipe_test_form';
   }
 

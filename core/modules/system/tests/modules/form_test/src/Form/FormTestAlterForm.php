@@ -17,7 +17,7 @@ class FormTestAlterForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_alter_form';
   }
 

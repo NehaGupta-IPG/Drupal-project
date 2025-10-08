@@ -17,7 +17,7 @@ class HtmxTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'htmx_form_builder_test';
   }
 

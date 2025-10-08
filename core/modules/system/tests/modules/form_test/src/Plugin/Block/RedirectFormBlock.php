@@ -50,6 +50,18 @@ class RedirectFormBlock extends BlockBase implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('form_builder')
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function build() {
     return $this->formBuilder->getForm('Drupal\form_test\Form\RedirectBlockForm');
   }

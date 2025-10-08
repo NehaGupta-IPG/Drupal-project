@@ -25,7 +25,7 @@ class IHaveRuntimeContexts extends BlockBase {
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     return [
       '#markup' => $this->getContextValue('runtime_contexts'),
     ];

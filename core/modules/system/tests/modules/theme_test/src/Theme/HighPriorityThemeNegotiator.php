@@ -15,14 +15,14 @@ class HighPriorityThemeNegotiator implements ThemeNegotiatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function applies(RouteMatchInterface $route_match) {
+  public function applies(RouteMatchInterface $route_match): bool {
     return ($route_match->getRouteName() == 'theme_test.priority');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function determineActiveTheme(RouteMatchInterface $route_match) {
+  public function determineActiveTheme(RouteMatchInterface $route_match): string {
     return 'starterkit_theme';
   }
 

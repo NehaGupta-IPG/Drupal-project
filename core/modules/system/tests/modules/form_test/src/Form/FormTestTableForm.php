@@ -16,7 +16,7 @@ class FormTestTableForm extends FormTestTableSelectFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return '_form_test_table_form';
   }
 

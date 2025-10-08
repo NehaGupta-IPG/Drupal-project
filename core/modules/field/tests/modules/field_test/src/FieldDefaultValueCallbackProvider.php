@@ -12,7 +12,7 @@ class FieldDefaultValueCallbackProvider {
   /**
    * Helper callback calculating a default value.
    */
-  public static function calculateDefaultValue() {
+  public static function calculateDefaultValue(): array {
     return [['value' => 'Calculated default value']];
   }
 

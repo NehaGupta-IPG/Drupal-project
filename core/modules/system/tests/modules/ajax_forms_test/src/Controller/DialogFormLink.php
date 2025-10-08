@@ -17,7 +17,7 @@ class DialogFormLink {
    * @return array
    *   An associative array of link to a form to be opened.
    */
-  public function makeDialogFormLink() {
+  public function makeDialogFormLink(): array {
     return [
       'dialog' => [
         '#type' => 'link',

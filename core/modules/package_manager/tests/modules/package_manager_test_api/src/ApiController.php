@@ -38,7 +38,7 @@ class ApiController extends ControllerBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     $stage = new ControllerSandboxManager(
       $container->get(PathLocator::class),
       $container->get(BeginnerInterface::class),

@@ -19,7 +19,7 @@ class BrokenToolkit extends TestToolkit {
   /**
    * {@inheritdoc}
    */
-  public static function isAvailable() {
+  public static function isAvailable(): bool {
     return FALSE;
   }
 

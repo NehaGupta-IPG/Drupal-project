@@ -15,7 +15,7 @@ class CommentTestController extends ControllerBase {
   /**
    * Provides a comment report.
    */
-  public function commentReport(CommentInterface $comment) {
+  public function commentReport(CommentInterface $comment): array {
     return ['#markup' => $this->t('Report for a comment')];
   }
 

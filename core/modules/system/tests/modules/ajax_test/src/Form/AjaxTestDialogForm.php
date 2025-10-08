@@ -23,7 +23,7 @@ class AjaxTestDialogForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'ajax_test_dialog_form';
   }
 
@@ -69,7 +69,7 @@ class AjaxTestDialogForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $form_state->setRedirect('ajax_test.dialog_contents');
   }
 
@@ -105,7 +105,7 @@ class AjaxTestDialogForm extends FormBase {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   An ajax response object.
    */
-  protected function dialog(bool $is_modal = FALSE, bool $is_url = FALSE) {
+  protected function dialog(bool $is_modal = FALSE, bool $is_url = FALSE): \Drupal\Core\Ajax\AjaxResponse {
     $content = AjaxTestController::dialogContents();
     $response = new AjaxResponse();
     $title = $this->t('AJAX Dialog & contents');

@@ -19,7 +19,7 @@ class AjaxTestMessageCommandForm implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'ajax_test_message_command_form';
   }
 

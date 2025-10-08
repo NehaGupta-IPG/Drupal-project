@@ -11,7 +11,7 @@ class SomeClass {
 
   const TEST = '\Drupal\module_autoload_test\SomeClass::TEST';
 
-  public function testMethod() {
+  public function testMethod(): string {
     return 'Drupal\\module_autoload_test\\SomeClass::testMethod() was invoked.';
   }
 

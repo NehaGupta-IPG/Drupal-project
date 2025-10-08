@@ -16,7 +16,7 @@ class FormTestTableSelectMultipleTrueForm extends FormTestTableSelectFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return '_form_test_tableselect_multiple_true_form';
   }
 
@@ -30,7 +30,7 @@ class FormTestTableSelectMultipleTrueForm extends FormTestTableSelectFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $selected = $form_state->getValue('tableselect');
     foreach ($selected as $key => $value) {
       $this->messenger()->addStatus($this->t('Submitted: @key = @value', ['@key' => $key, '@value' => $value]));

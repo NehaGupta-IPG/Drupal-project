@@ -14,7 +14,7 @@ class ExampleRenderable implements RenderableInterface {
   /**
    * {@inheritdoc}
    */
-  public function toRenderable() {
+  public function toRenderable(): array {
     return [
       '#markup' => 'Example markup',
     ];

@@ -15,7 +15,7 @@ class HelpPageTestController {
    * @return array
    *   A render array.
    */
-  public function hasHelp() {
+  public function hasHelp(): array {
     return ['#markup' => 'A route with help.'];
   }
 
@@ -25,7 +25,7 @@ class HelpPageTestController {
    * @return array
    *   A render array.
    */
-  public function noHelp() {
+  public function noHelp(): array {
     return ['#markup' => 'A route without help.'];
   }
 
@@ -35,7 +35,7 @@ class HelpPageTestController {
    * @return array
    *   A render array.
    */
-  public function testArray() {
+  public function testArray(): array {
     return ['#markup' => 'A route which has multiple array returns from hook_help().'];
   }
 

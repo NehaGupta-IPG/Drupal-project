@@ -36,6 +36,15 @@ class DatabaseTestController extends ControllerBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container): static {
+    return new static(
+      $container->get('database')
+    );
+  }
+
+  /**
    * Runs a pager query and returns the results.
    *
    * This function does care about the page GET parameter, as set by the
@@ -44,7 +53,7 @@ class DatabaseTestController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response containing the names of the test entries.
    */
-  public function pagerQueryEven($limit) {
+  public function pagerQueryEven($limit): \Symfony\Component\HttpFoundation\JsonResponse {
     $query = $this->connection->select('test', 't');
     $query
       ->fields('t', ['name'])
@@ -71,7 +80,7 @@ class DatabaseTestController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response containing the names of the test entries.
    */
-  public function pagerQueryOdd($limit) {
+  public function pagerQueryOdd($limit): \Symfony\Component\HttpFoundation\JsonResponse {
     $query = $this->connection->select('test_task', 't');
     $query
       ->fields('t', ['task'])
@@ -98,7 +107,7 @@ class DatabaseTestController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response containing the test tasks.
    */
-  public function testTablesort() {
+  public function testTablesort(): \Symfony\Component\HttpFoundation\JsonResponse {
     $header = [
       'tid' => ['data' => $this->t('Task ID'), 'field' => 'tid', 'sort' => 'desc'],
       'pid' => ['data' => $this->t('Person ID'), 'field' => 'pid'],
@@ -131,7 +140,7 @@ class DatabaseTestController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response containing the test tasks.
    */
-  public function testTablesortFirst() {
+  public function testTablesortFirst(): \Symfony\Component\HttpFoundation\JsonResponse {
     $header = [
       'tid' => ['data' => $this->t('Task ID'), 'field' => 'tid', 'sort' => 'desc'],
       'pid' => ['data' => $this->t('Person ID'), 'field' => 'pid'],

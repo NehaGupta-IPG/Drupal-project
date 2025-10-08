@@ -49,7 +49,7 @@ class Test {
    * @return string
    *   The page title.
    */
-  public function dynamicTitle() {
+  public function dynamicTitle(): string {
     return 'Dynamic title';
   }
 
@@ -74,7 +74,7 @@ class Test {
    *   A render array as expected by
    *   \Drupal\Core\Render\RendererInterface::render().
    */
-  public function renderPage() {
+  public function renderPage(): array {
     return [
       '#markup' => 'Content',
     ];
@@ -90,14 +90,14 @@ class Test {
     throw new HttpException($code);
   }
 
-  public function error() {
+  public function error(): array {
     trigger_error('foo', E_USER_NOTICE);
     return [
       '#markup' => 'Content',
     ];
   }
 
-  public function escapedCharacters() {
+  public function escapedCharacters(): array {
     return [
       '#prefix' => '<div class="escaped">',
       '#plain_text' => 'Escaped: <"\'&>',
@@ -105,7 +105,7 @@ class Test {
     ];
   }
 
-  public function escapedScript() {
+  public function escapedScript(): array {
     return [
       '#prefix' => '<div class="escaped">',
       // We use #plain_text because #markup would be filtered and that is not
@@ -115,7 +115,7 @@ class Test {
     ];
   }
 
-  public function unEscapedScript() {
+  public function unEscapedScript(): array {
     return [
       '#prefix' => '<div class="unescaped">',
       '#markup' => Markup::create("<script>alert('Marked safe');alert(\"Marked safe\");</script>"),
@@ -131,14 +131,14 @@ class Test {
    *
    * @see \Symfony\Component\HttpFoundation\RedirectResponse
    */
-  public function metaRefresh() {
+  public function metaRefresh(): \Symfony\Component\HttpFoundation\RedirectResponse {
     return new RedirectResponse(Url::fromRoute('test_page_test.test_page', [], ['absolute' => TRUE])->toString(), 302);
   }
 
   /**
    * Returns a page while triggering deprecation notices.
    */
-  public function deprecations() {
+  public function deprecations(): array {
     // Create 2 identical deprecation messages. This should only trigger a
     // single response header.
     // phpcs:ignore Drupal.Semantics.FunctionTriggerError

@@ -17,7 +17,7 @@ class FormTestDetailsForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_details_form';
   }
 
@@ -37,7 +37,7 @@ class FormTestDetailsForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     $form_state->setErrorByName('meta', 'I am an error on the details element.');
   }
 

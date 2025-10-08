@@ -61,7 +61,7 @@ class NestedConfigTargetForm extends TreeConfigTargetForm {
         'favorite_fruits.1',
         fn (?string $second_favorite_fruit) : string => $second_favorite_fruit ?? 'Orange',
         // The "toConfig" callable for the first choice sets all choices.
-        fn () => ToConfig::NoOp,
+        fn (): \Drupal\Core\Form\ToConfig => ToConfig::NoOp,
       ),
     ];
     $form['could_not_live_without'] = [

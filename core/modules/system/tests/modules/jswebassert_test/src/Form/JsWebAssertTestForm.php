@@ -18,7 +18,7 @@ class JsWebAssertTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'jswebassert_test_form';
   }
 
