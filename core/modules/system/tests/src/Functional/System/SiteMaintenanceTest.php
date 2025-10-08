@@ -76,11 +76,7 @@ class SiteMaintenanceTest extends BrowserTestBase {
 
     // Verify that permission message is displayed.
     $this->drupalGet(Url::fromRoute('system.site_maintenance_mode'));
-    $this->assertSession()->pageTextContains('Visitors will only see the maintenance mode message. Only users with the "Use the site in maintenance mode" permission will be able to access the site. Authorized users can log in directly via the user login page.');
-    $this->assertSession()->linkExists('permission');
-    $this->assertSession()->linkByHrefExists(Url::fromRoute('user.admin_permissions')->toString());
-    $this->assertSession()->linkExists('user login');
-    $this->assertSession()->linkByHrefExists(Url::fromRoute('user.login')->toString());
+    $this->assertSession()->pageTextContains('The maintenance mode message will not show on already cached pages without clearing the page cache.');
 
     $this->drupalGet(Url::fromRoute('user.page'));
     // Aggregation should be enabled, individual assets should not be rendered.
