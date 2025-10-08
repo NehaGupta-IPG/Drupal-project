@@ -49,7 +49,7 @@ class TestLazyPluginCollection extends LazyPluginCollection {
   /**
    * {@inheritdoc}
    */
-  public function setConfiguration($configuration) {
+  public function setConfiguration($configuration): static {
     return $this;
   }
 

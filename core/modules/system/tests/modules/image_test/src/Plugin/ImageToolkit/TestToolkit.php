@@ -222,7 +222,7 @@ class TestToolkit extends ImageToolkitBase {
    *
    * @return $this
    */
-  public function setType($type) {
+  public function setType($type): static {
     if (in_array($type, static::supportedTypes())) {
       $this->type = $type;
     }

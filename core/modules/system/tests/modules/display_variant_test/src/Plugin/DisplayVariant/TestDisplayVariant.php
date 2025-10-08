@@ -61,7 +61,7 @@ class TestDisplayVariant extends VariantBase implements PageVariantInterface, Co
    *
    * @return $this
    */
-  public function setContexts(array $contexts) {
+  public function setContexts(array $contexts): static {
     $this->contexts = $contexts;
     return $this;
   }
@@ -69,7 +69,7 @@ class TestDisplayVariant extends VariantBase implements PageVariantInterface, Co
   /**
    * {@inheritdoc}
    */
-  public function setMainContent(array $main_content) {
+  public function setMainContent(array $main_content): static {
     assert(!empty($this->getConfiguration()['required_configuration']), 'Ensure that ::setMainContent() is called with the variant configuration');
     $this->mainContent = $main_content;
     return $this;
@@ -78,7 +78,7 @@ class TestDisplayVariant extends VariantBase implements PageVariantInterface, Co
   /**
    * {@inheritdoc}
    */
-  public function setTitle($title) {
+  public function setTitle($title): static {
     assert(!empty($this->getConfiguration()['required_configuration']), 'Ensure that ::setTitle() is called with the variant configuration');
     $this->title = $title;
     return $this;

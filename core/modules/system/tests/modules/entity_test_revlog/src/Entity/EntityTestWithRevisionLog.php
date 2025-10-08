@@ -95,7 +95,7 @@ class EntityTestWithRevisionLog extends RevisionableContentEntityBase {
    *
    * @return $this
    */
-  public function setName(string $name) {
+  public function setName(string $name): static {
     $this->set('name', $name);
     return $this;
   }

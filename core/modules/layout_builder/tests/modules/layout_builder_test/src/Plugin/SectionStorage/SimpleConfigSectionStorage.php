@@ -115,7 +115,7 @@ class SimpleConfigSectionStorage extends PluginBase implements SectionStorageInt
   /**
    * {@inheritdoc}
    */
-  protected function setSections(array $sections) {
+  protected function setSections(array $sections): static {
     $this->sections = array_values($sections);
     return $this;
   }
