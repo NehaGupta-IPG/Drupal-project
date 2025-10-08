@@ -40,6 +40,23 @@ trait NodeMigrateTypeTestTrait {
       $base_tables = preg_grep('/^migrate_map_d' . $version . '_' . $base . '_{2}.*$/', $tables);
       $results[$base] = count($base_tables);
     }
+    // Add in the hashed table names, if they were created.
+    $hashed_tables = [
+      'node' => [
+        'migrate_map_daafa58d37',
+      ],
+      'node_complete' => [
+        'migrate_map_4e7ad69646',
+        'migrate_map_9d4bf1d51a',
+      ],
+    ];
+    foreach ($hashed_tables as $type => $tables) {
+      foreach ($tables as $table) {
+        if (\Drupal::database()->schema()->tableExists($table)) {
+          $results[$type]++;
+        }
+      }
+    }
     return $results;
   }
 
