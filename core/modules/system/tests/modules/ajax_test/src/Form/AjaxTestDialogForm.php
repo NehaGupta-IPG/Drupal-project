@@ -76,21 +76,21 @@ class AjaxTestDialogForm extends FormBase {
   /**
    * AJAX callback handler for AjaxTestDialogForm.
    */
-  public function modal(&$form, FormStateInterface $form_state) {
+  public function modal(&$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse {
     return $this->dialog(TRUE);
   }
 
   /**
    * AJAX callback handler for Url modal, AjaxTestDialogForm.
    */
-  public function modalFromUrl(&$form, FormStateInterface $form_state) {
+  public function modalFromUrl(&$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse {
     return $this->dialog(TRUE, TRUE);
   }
 
   /**
    * AJAX callback handler for AjaxTestDialogForm.
    */
-  public function nonModal(&$form, FormStateInterface $form_state) {
+  public function nonModal(&$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse {
     return $this->dialog(FALSE);
   }
 

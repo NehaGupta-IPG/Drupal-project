@@ -34,7 +34,7 @@ class SetterInjection {
    * @return string
    *   The greeting.
    */
-  public function greet() {
+  public function greet(): string {
     return $this->service->greet();
   }
 

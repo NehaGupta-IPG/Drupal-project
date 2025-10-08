@@ -334,7 +334,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * A plain Symfony response with Cache-Control: public, max-age=60.
    */
-  public function respondWithPublicResponse() {
+  public function respondWithPublicResponse(): \Symfony\Component\HttpFoundation\Response {
     return (new Response('test'))->setPublic()->setMaxAge(60);
   }
 

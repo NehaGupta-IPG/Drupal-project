@@ -62,7 +62,7 @@ class TestContent extends ControllerBase {
   /**
    * Uses a subrequest to determine the content.
    */
-  public function subrequestTest(UserInterface $user) {
+  public function subrequestTest(UserInterface $user): \Symfony\Component\HttpFoundation\Response {
     $request = \Drupal::request();
     $request = Request::create('/router_test/test13/' . $user->id(), 'GET', $request->query->all(), $request->cookies->all(), [], $request->server->all());
 

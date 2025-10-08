@@ -52,7 +52,7 @@ class ThemeInstallController extends ControllerBase {
    * @return array
    *   A render array confirming installation.
    */
-  public function installDefault(string $theme) {
+  public function installDefault(string $theme): array {
     return $this->installTheme($theme, 'default');
   }
 
@@ -65,7 +65,7 @@ class ThemeInstallController extends ControllerBase {
    * @return array
    *   A render array confirming installation.
    */
-  public function installAdmin($theme) {
+  public function installAdmin($theme): array {
     return $this->installTheme($theme, 'admin');
   }
 

@@ -66,7 +66,7 @@ class MultipleStaticContext implements ContextProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getAvailableContexts() {
+  public function getAvailableContexts(): array {
     return $this->getRuntimeContexts([]);
   }
 
