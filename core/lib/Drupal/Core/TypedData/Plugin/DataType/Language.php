@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\TypedData\Plugin\DataType;
 
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\Attribute\DataType;
 use Drupal\Core\TypedData\TypedData;
@@ -23,12 +24,12 @@ class Language extends TypedData {
   /**
    * The id of the language.
    *
-   * @var string
+   * @var string|null
    */
   protected $id;
 
   /**
-   * @var \Drupal\Core\Language\Language
+   * @var \Drupal\Core\Language\LanguageInterface|null
    */
   protected $language;
 
@@ -48,15 +49,21 @@ class Language extends TypedData {
   /**
    * Overrides TypedData::setValue().
    *
-   * Both the langcode and the language object may be passed as value.
+   * Both the langcode and the language object may be passed as value, or NULL
+   * to unset the value. If a string is passed it is assumed to be the
+   * langcode. The language object must be an instance of
+   * \Drupal\Core\Language\LanguageInterface.
+   *
+   * @throws \InvalidArgumentException
+   *   If the value input is neither a string, language object or NULL.
    */
   public function setValue($value, $notify = TRUE) {
     // Support passing language objects.
-    if (is_object($value)) {
+    if ($value instanceof LanguageInterface) {
       $this->id = $value->getId();
       $this->language = $value;
     }
-    elseif (isset($value) && !is_scalar($value)) {
+    elseif (isset($value) && !is_string($value)) {
       throw new \InvalidArgumentException('Value is no valid langcode or language object.');
     }
     else {
