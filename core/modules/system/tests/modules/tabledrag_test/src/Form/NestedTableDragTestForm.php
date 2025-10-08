@@ -14,7 +14,7 @@ class NestedTableDragTestForm extends TableDragTestForm {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'nested_tabledrag_test_form';
   }
 

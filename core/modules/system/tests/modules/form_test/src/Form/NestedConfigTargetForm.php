@@ -26,7 +26,7 @@ class NestedConfigTargetForm extends TreeConfigTargetForm {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_nested_config_target_form';
   }
 
