@@ -8,12 +8,18 @@ use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\PreCreateEvent;
 use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\ValidationResult;
+use Drupal\package_manager\Validator\MultisiteValidator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @covers \Drupal\package_manager\Validator\MultisiteValidator
- * @group package_manager
+ * Tests Multisite Validator.
+ *
  * @internal
  */
+#[Group('package_manager')]
+#[CoversClass(MultisiteValidator::class)]
 class MultisiteValidatorTest extends PackageManagerKernelTestBase {
 
   /**
@@ -71,9 +77,8 @@ PHP,
    *   created.
    * @param \Drupal\package_manager\ValidationResult[] $expected_results
    *   The expected validation results.
-   *
-   * @dataProvider providerMultisite
    */
+  #[DataProvider('providerMultisite')]
   public function testMultisite(?string $sites_php, array $expected_results = []): void {
     if ($sites_php) {
       $project_root = $this->container->get(PathLocator::class)->getProjectRoot();
@@ -91,9 +96,8 @@ PHP,
    *   created.
    * @param \Drupal\package_manager\ValidationResult[] $expected_results
    *   The expected validation results.
-   *
-   * @dataProvider providerMultisite
    */
+  #[DataProvider('providerMultisite')]
   public function testMultisiteDuringPreApply(?string $sites_php, array $expected_results = []): void {
     $this->addEventTestListener(function () use ($sites_php): void {
       if ($sites_php) {

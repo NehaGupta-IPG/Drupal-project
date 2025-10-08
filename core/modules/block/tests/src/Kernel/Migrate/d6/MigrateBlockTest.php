@@ -7,12 +7,12 @@ namespace Drupal\Tests\block\Kernel\Migrate\d6;
 use Drupal\block\Entity\Block;
 use Drupal\block\Hook\BlockHooks;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests migration of blocks to configuration entities.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
 class MigrateBlockTest extends MigrateDrupal6TestBase {
 
   /**
@@ -51,6 +51,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'd6_filter_format',
       'block_content_type',
       'block_content_body_field',
+      'block_content_body_field_storage',
       'd6_menu',
       'd6_custom_block',
       'd6_user_role',
