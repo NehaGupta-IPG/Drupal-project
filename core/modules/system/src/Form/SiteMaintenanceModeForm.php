@@ -4,12 +4,9 @@ namespace Drupal\system\Form;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Form\ConfigFormBase;
-use Drupal\Core\Url;
-use Drupal\user\PermissionHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -28,17 +25,11 @@ class SiteMaintenanceModeForm extends ConfigFormBase {
    *   The typed config manager.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state keyvalue collection to use.
-   * @param \Drupal\user\PermissionHandlerInterface $permissionHandler
-   *   The permission handler.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   The module handler.
    */
   public function __construct(
     ConfigFactoryInterface $config_factory,
     TypedConfigManagerInterface $typedConfigManager,
     protected StateInterface $state,
-    protected PermissionHandlerInterface $permissionHandler,
-    protected ModuleHandlerInterface $moduleHandler,
   ) {
     parent::__construct($config_factory, $typedConfigManager);
   }
@@ -51,8 +42,6 @@ class SiteMaintenanceModeForm extends ConfigFormBase {
       $container->get('config.factory'),
       $container->get('config.typed'),
       $container->get('state'),
-      $container->get('user.permissions'),
-      $container->get('module_handler'),
     );
   }
 
@@ -74,23 +63,18 @@ class SiteMaintenanceModeForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $permissions = $this->permissionHandler->getPermissions();
-    $permission_label = $permissions['access site in maintenance mode']['title'];
-    $form['maintenance_mode'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Put site into maintenance mode'),
-      '#default_value' => $this->state->get('system.maintenance_mode'),
-      '#description' => $this->t('Visitors will only see the maintenance mode message. Only users with the "@permission-label" <a href=":permissions-url">permission</a> will be able to access the site. Authorized users can log in directly via the <a href=":user-login">user login</a> page.', ['@permission-label' => $permission_label, ':permissions-url' => Url::fromRoute('user.admin_permissions')->toString(), ':user-login' => Url::fromRoute('user.login')->toString()]),
-    ];
     $form['maintenance_mode_message'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Message to display when in maintenance mode'),
       '#config_target' => 'system.maintenance:message',
     ];
 
-    if ($this->moduleHandler->moduleExists('page_cache')) {
-      $form['maintenance_mode_message']['#description'] = $this->t('The message will not show on already cached pages without clearing the page cache.');
-    }
+    $form['maintenance_mode'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Put site into maintenance mode'),
+      '#default_value' => $this->state->get('system.maintenance_mode'),
+      '#description' => $this->t('The maintenance mode message will not show on already cached pages without clearing the page cache.'),
+    ];
 
     return parent::buildForm($form, $form_state);
   }

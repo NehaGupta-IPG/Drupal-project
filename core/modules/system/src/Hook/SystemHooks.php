@@ -147,8 +147,14 @@ class SystemHooks {
         break;
 
       case 'system.site_maintenance_mode':
+        $permissions = \Drupal::service('user.permissions')->getPermissions();
+        $permission_label = $permissions['access site in maintenance mode']['title'];
         if (\Drupal::currentUser()->id() == 1) {
-          return '<p>' . $this->t('Use maintenance mode when making major updates, particularly if the updates could disrupt visitors or the update process. Examples include upgrading, importing or exporting content, modifying a theme, modifying content types, and making backups.') . '</p>';
+          return '<p>' . $this->t('Use maintenance mode when making major updates, particularly if the updates could disrupt visitors or the update process. Examples include upgrading, importing or exporting content, modifying a theme, modifying content types, and making backups.</br> Only users with the "@permission-label" <a href=":permissions-url">permission</a> will be able to access the site. Authorized users can log in directly via the <a href=":user-login">user login</a> page. Visitors will only see the maintenance mode message. It will not show on already cached pages without clearing the page cache.', [
+            '@permission-label' => $permission_label,
+            ':permissions-url' => Url::fromRoute('user.admin_permissions')->toString(),
+            ':user-login' => Url::fromRoute('user.login')->toString(),
+          ]) . '</p>';
         }
         break;
 
