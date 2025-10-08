@@ -26,7 +26,7 @@ class BatchTestSimpleForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['batch'] = [
       '#type' => 'select',
       '#title' => 'Choose batch',

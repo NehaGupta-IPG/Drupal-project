@@ -24,7 +24,7 @@ class FormTestVerticalTabsAccessForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['vertical_tabs1'] = [
       '#type' => 'vertical_tabs',
     ];

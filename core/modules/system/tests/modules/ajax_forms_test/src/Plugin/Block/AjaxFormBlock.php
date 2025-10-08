@@ -87,7 +87,7 @@ class AjaxFormBlock extends BlockBase implements FormInterface, ContainerFactory
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['test1'] = [
       '#type' => 'select',
       '#title' => $this->t('Test 1'),

@@ -24,7 +24,7 @@ class FormTestEmptySelectForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['empty_select'] = [
       '#type' => 'select',
       '#title' => $this->t('Empty Select'),

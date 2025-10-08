@@ -44,7 +44,7 @@ class FormTestControllerObject extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, ?Request $request = NULL, $custom_attributes = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?Request $request = NULL, $custom_attributes = NULL): array {
     $form['element'] = ['#markup' => 'The FormTestControllerObject::buildForm() method was used for this form.'];
 
     $form['custom_attribute']['#markup'] = $custom_attributes;

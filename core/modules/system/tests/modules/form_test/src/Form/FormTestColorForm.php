@@ -25,7 +25,7 @@ class FormTestColorForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['color'] = [
       '#type' => 'color',
       '#title' => 'Color',

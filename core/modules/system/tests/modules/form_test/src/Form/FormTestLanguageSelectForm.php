@@ -26,7 +26,7 @@ class FormTestLanguageSelectForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['languages_all'] = [
       '#title' => $this->t('Languages: All'),
       '#type' => 'language_select',

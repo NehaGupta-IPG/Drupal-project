@@ -24,7 +24,7 @@ class FormTestAlterForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     // Elements can be added as needed for future testing needs, but for now,
     // we're only testing alter hooks that do not require any elements added by
     // this function.

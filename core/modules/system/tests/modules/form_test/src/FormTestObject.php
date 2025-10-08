@@ -31,7 +31,7 @@ class FormTestObject extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['element'] = ['#markup' => 'The FormTestObject::buildForm() method was used for this form.'];
 
     $form['bananas'] = [

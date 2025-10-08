@@ -68,7 +68,7 @@ class TestFieldWidgetMultiple extends WidgetBase {
   /**
    * {@inheritdoc}
    */
-  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
+  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state): array {
     $values = [];
     foreach ($items as $item) {
       $values[] = $item->value;
@@ -84,7 +84,7 @@ class TestFieldWidgetMultiple extends WidgetBase {
   /**
    * {@inheritdoc}
    */
-  public function errorElement(array $element, ConstraintViolationInterface $violation, array $form, FormStateInterface $form_state) {
+  public function errorElement(array $element, ConstraintViolationInterface $violation, array $form, FormStateInterface $form_state): array {
     return $element;
   }
 

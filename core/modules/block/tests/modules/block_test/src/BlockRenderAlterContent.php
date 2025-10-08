@@ -16,7 +16,7 @@ class BlockRenderAlterContent implements RenderCallbackInterface {
    *
    * This function is assigned as a #pre_render callback.
    */
-  public static function preRender(array $build) {
+  public static function preRender(array $build): array {
     $build['#prefix'] = 'Hiya!<br>';
     return $build;
   }

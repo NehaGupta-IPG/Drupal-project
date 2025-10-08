@@ -26,7 +26,7 @@ class BatchTestChainedForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     // This value is used to test that $form_state persists through batched
     // submit handlers.
     $form['value'] = [

@@ -24,7 +24,7 @@ class FormTestCheckboxTypeJugglingForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $default_value = NULL, $return_value = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, $default_value = NULL, $return_value = NULL): array {
     $form['checkbox'] = [
       '#title' => $this->t('Checkbox'),
       '#type' => 'checkbox',

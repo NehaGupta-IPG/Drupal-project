@@ -23,7 +23,7 @@ class FormTestTableForm extends FormTestTableSelectFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['table'] = [
       '#type' => 'table',
       '#tableselect' => TRUE,

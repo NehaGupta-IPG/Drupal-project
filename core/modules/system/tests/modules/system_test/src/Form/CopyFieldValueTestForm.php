@@ -22,7 +22,7 @@ class CopyFieldValueTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['#attached']['library'][] = 'system/drupal.system';
     $form['#attached']['drupalSettings']['copyFieldValue']['edit-source-field'] = ['edit-target-field'];
 

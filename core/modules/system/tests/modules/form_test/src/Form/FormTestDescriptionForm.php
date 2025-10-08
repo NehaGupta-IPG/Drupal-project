@@ -26,7 +26,7 @@ class FormTestDescriptionForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['form_textfield_test_description_before'] = [
       '#type' => 'textfield',
       '#title' => 'Textfield test for description before element',

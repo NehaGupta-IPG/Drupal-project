@@ -24,7 +24,7 @@ class FormTestFormStateValuesCleanAdvancedForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     // Build an example form containing a managed file and a submit form
     // element.
     $form['image'] = [

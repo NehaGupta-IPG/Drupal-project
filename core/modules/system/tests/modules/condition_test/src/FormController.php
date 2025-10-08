@@ -50,7 +50,7 @@ class FormController implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['#tree'] = TRUE;
     $form['entity_bundle'] = [];
     $subformState = SubformState::createForSubform($form['entity_bundle'], $form, $form_state);

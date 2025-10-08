@@ -25,7 +25,7 @@ class JavascriptStatesForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
 
     $form['header_triggers'] = [
       '#type' => 'html_tag',

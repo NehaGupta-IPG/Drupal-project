@@ -25,7 +25,7 @@ class FormTestMachineNameForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['machine_name_1_label'] = [
       '#type' => 'textfield',
       '#title' => 'Machine name 1 label',

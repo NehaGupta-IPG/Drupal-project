@@ -39,7 +39,7 @@ class LayoutTestPlugin extends LayoutDefault implements PluginFormInterface {
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
     $form['setting_1'] = [
       '#type' => 'textfield',
       '#title' => 'Blah',

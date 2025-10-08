@@ -26,7 +26,7 @@ class FormTestDisabledElementsForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     // Elements that take a simple default value.
     foreach (['textfield', 'textarea', 'search', 'tel', 'hidden'] as $type) {
       $form[$type] = [

@@ -25,7 +25,7 @@ class BatchTestMockForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['test_value'] = [
       '#title' => $this->t('Test value'),
       '#type' => 'textfield',

@@ -22,7 +22,7 @@ class FormTestMachineNameValidationForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     // Disable client-side validation so that we can test AJAX requests with
     // invalid input.
     $form['#attributes']['novalidate'] = 'novalidate';

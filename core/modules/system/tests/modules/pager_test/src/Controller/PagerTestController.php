@@ -152,7 +152,7 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
    *
    * This function is assigned as a #pre_render callback.
    */
-  public static function showPagerCacheContext(array $pager) {
+  public static function showPagerCacheContext(array $pager): array {
     \Drupal::messenger()->addStatus(\Drupal::service('cache_contexts_manager')->convertTokensToKeys(['url.query_args.pagers:' . $pager['#element']])->getKeys()[0]);
     return $pager;
   }

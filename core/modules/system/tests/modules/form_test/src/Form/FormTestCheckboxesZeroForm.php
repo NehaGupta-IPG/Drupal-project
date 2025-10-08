@@ -25,7 +25,7 @@ class FormTestCheckboxesZeroForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $json = TRUE) {
+  public function buildForm(array $form, FormStateInterface $form_state, $json = TRUE): array {
     $form_state->set('json', $json);
     $form['checkbox_off'] = [
       '#title' => $this->t('Checkbox off'),

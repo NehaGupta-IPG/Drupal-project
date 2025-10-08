@@ -25,7 +25,7 @@ class FormTestRadiosCheckedForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['radios'] = [
       '#type' => 'radios',
       '#title' => 'Radios',

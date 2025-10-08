@@ -25,7 +25,7 @@ class AjaxFormsTestLazyLoadForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     // We attach a JavaScript setting, so that one of the generated AJAX
     // commands will be a settings command. We can then check the settings
     // command to ensure that the 'currentPath' setting is not part

@@ -34,7 +34,7 @@ class FormTestValidateForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $object = new Callbacks();
 
     $form['name'] = [

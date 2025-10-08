@@ -24,7 +24,7 @@ class FormTestGroupContainerForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['container'] = [
       '#type' => 'container',
     ];

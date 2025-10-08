@@ -171,7 +171,7 @@ class TableDragTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     // Provide a default set of five rows.
     $form['table'] = $this->buildTestTable();
     $form['actions'] = $this->buildFormActions();

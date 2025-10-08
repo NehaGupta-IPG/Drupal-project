@@ -26,7 +26,7 @@ class FormTestInputForgeryForm extends FormBase implements TrustedCallbackInterf
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     // For testing that a user can't submit a value not matching one of the
     // allowed options.
     $form['checkboxes'] = [

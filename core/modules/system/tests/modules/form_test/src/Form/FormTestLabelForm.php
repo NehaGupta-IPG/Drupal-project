@@ -58,7 +58,7 @@ class FormTestLabelForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['form_checkboxes_test'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Checkboxes test'),

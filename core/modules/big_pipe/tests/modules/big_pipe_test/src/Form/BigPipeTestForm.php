@@ -24,7 +24,7 @@ class BigPipeTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['#token'] = FALSE;
 
     $form['big_pipe'] = [

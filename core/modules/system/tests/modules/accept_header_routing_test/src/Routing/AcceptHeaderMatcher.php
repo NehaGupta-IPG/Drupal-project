@@ -17,7 +17,7 @@ class AcceptHeaderMatcher implements FilterInterface {
   /**
    * {@inheritdoc}
    */
-  public function filter(RouteCollection $collection, Request $request) {
+  public function filter(RouteCollection $collection, Request $request): RouteCollection {
     // Generates a list of Symfony formats matching the acceptable MIME types.
     // @todo replace by proper content negotiation library.
     $acceptable_mime_types = $request->getAcceptableContentTypes();

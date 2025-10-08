@@ -153,7 +153,7 @@ class TestItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function storageSettingsToConfigData(array $settings) {
+  public static function storageSettingsToConfigData(array $settings): array {
     $settings['config_data_from_storage_setting'] = 'TRUE';
     unset($settings['storage_setting_from_config_data']);
     return $settings;
@@ -162,7 +162,7 @@ class TestItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function storageSettingsFromConfigData(array $settings) {
+  public static function storageSettingsFromConfigData(array $settings): array {
     $settings['storage_setting_from_config_data'] = 'TRUE';
     unset($settings['config_data_from_storage_setting']);
     return $settings;
@@ -171,7 +171,7 @@ class TestItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function fieldSettingsToConfigData(array $settings) {
+  public static function fieldSettingsToConfigData(array $settings): array {
     $settings['config_data_from_field_setting'] = 'TRUE';
     unset($settings['field_setting_from_config_data']);
     return $settings;
@@ -180,7 +180,7 @@ class TestItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function fieldSettingsFromConfigData(array $settings) {
+  public static function fieldSettingsFromConfigData(array $settings): array {
     $settings['field_setting_from_config_data'] = 'TRUE';
     unset($settings['config_data_from_field_setting']);
     return $settings;

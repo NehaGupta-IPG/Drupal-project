@@ -101,7 +101,7 @@ class TestToolkit extends ImageToolkitBase {
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
     $this->logCall('settings', func_get_args());
     $form['test_parameter'] = [
       '#type' => 'number',

@@ -26,7 +26,7 @@ class BatchTestMultiStepForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $step = $form_state->get('step');
     if (empty($step)) {
       $step = 1;

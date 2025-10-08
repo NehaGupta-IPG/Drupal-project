@@ -24,7 +24,7 @@ class FormTestFileForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['file'] = [
       '#type' => 'file',
       '#multiple' => TRUE,

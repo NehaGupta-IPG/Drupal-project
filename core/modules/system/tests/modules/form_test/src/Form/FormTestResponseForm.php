@@ -25,7 +25,7 @@ class FormTestResponseForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['content'] = [
       '#type' => 'textfield',
       '#title' => 'Content',

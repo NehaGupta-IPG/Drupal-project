@@ -25,7 +25,7 @@ class DummyAjaxWidget extends WidgetBase {
   /**
    * {@inheritdoc}
    */
-  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
+  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state): array {
     $element['select_widget'] = [
       '#type' => 'select',
       '#title' => $this->t('Dummy select'),

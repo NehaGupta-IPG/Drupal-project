@@ -25,7 +25,7 @@ class JsWebAssertTestForm extends FormBase {
   /**
    * Form for testing the addition of various types of elements via AJAX.
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['#prefix'] = '<div id="jswebassert_test_form_wrapper">';
     $form['#suffix'] = '</div>';
 
@@ -137,7 +137,7 @@ class JsWebAssertTestForm extends FormBase {
   /**
    * Ajax callback for the "Add button" button.
    */
-  public static function addButton(array $form, FormStateInterface $form_state) {
+  public static function addButton(array $form, FormStateInterface $form_state): array {
     $form['added_button'] = [
       '#type' => 'submit',
       '#value' => 'Added button',
@@ -149,7 +149,7 @@ class JsWebAssertTestForm extends FormBase {
   /**
    * Ajax callback for the "Add link" button.
    */
-  public static function addLink(array $form, FormStateInterface $form_state) {
+  public static function addLink(array $form, FormStateInterface $form_state): array {
     $form['added_link'] = [
       '#title' => 'Added link',
       '#type' => 'link',
@@ -161,7 +161,7 @@ class JsWebAssertTestForm extends FormBase {
   /**
    * Ajax callback for the "Add field" button.
    */
-  public static function addField(array $form, FormStateInterface $form_state) {
+  public static function addField(array $form, FormStateInterface $form_state): array {
     $form['added_field'] = [
       '#type' => 'textfield',
       '#title' => 'Added textfield',
@@ -173,7 +173,7 @@ class JsWebAssertTestForm extends FormBase {
   /**
    * Ajax callback for the "Add ID" button.
    */
-  public static function addId(array $form, FormStateInterface $form_state) {
+  public static function addId(array $form, FormStateInterface $form_state): array {
     $form['added_id'] = [
       '#id' => 'jswebassert_test_field_id',
       '#type' => 'submit',
@@ -186,7 +186,7 @@ class JsWebAssertTestForm extends FormBase {
   /**
    * Ajax callback for the "Test waitForAjax" button.
    */
-  public static function addAssertWaitOnAjaxRequest(array $form, FormStateInterface $form_state) {
+  public static function addAssertWaitOnAjaxRequest(array $form, FormStateInterface $form_state): array {
     // Attach the library necessary for this test.
     $form['#attached']['library'][] = 'jswebassert_test/wait_for_ajax_request';
 
@@ -201,7 +201,7 @@ class JsWebAssertTestForm extends FormBase {
   /**
    * Ajax callback for the "Test waitForElementVisible" button.
    */
-  public static function addWaitForElementVisible(array $form, FormStateInterface $form_state) {
+  public static function addWaitForElementVisible(array $form, FormStateInterface $form_state): array {
     // Attach the library necessary for this test.
     $form['#attached']['library'][] = 'jswebassert_test/wait_for_element';
 

@@ -21,7 +21,7 @@ class NestedTableDragTestForm extends TableDragTestForm {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $parent_row_ids = ['parent_1', 'parent_2', 'parent_3'];
     $parent_rows = array_combine($parent_row_ids, $parent_row_ids);
 

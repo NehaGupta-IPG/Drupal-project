@@ -27,7 +27,7 @@ class AjaxTestFormPromise extends FormBase {
   /**
    * Form for testing the addition of various types of elements via Ajax.
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['#attached']['library'][] = 'ajax_test/command_promise';
     $form['custom']['#prefix'] = '<div id="ajax_test_form_promise_wrapper">';
     $form['custom']['#suffix'] = '</div>';

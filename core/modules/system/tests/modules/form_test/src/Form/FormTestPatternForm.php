@@ -24,7 +24,7 @@ class FormTestPatternForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['textfield'] = [
       '#type' => 'textfield',
       '#title' => 'One digit followed by lowercase letters',

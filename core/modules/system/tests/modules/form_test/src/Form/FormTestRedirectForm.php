@@ -25,7 +25,7 @@ class FormTestRedirectForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['redirection'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Use redirection'),
