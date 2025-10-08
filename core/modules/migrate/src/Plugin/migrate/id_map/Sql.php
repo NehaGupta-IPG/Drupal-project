@@ -183,17 +183,16 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
     }
 
     // Generate default table names and ensure they fit in the 48 characters
-    // limit, keeping a 16 characters margin for db prefixes.
+    // limit, keeping a 16 characters margin for db prefixes. Do as a pair to
+    // keep the name the same. And ensureTables() only created a message table
+    // if the corresponding map table does not exit.
     $machine_name = str_replace(':', '__', $this->migration->id());
-
     $this->mapTableName = 'migrate_map_' . mb_strtolower($machine_name);
-    if (strlen($this->mapTableName) > 48) {
-      $this->mapTableName = 'migrate_map_' . substr(hash('sha256', $machine_name), 0, 10);
-    }
-
     $this->messageTableName = 'migrate_message_' . mb_strtolower($machine_name);
     if (strlen($this->messageTableName) > 48) {
-      $this->messageTableName = 'migrate_message_' . substr(hash('sha256', $machine_name), 0, 10);
+      $hash = substr(hash('sha256', $machine_name), 0, 10);
+      $this->mapTableName = 'migrate_map_' . $hash;
+      $this->messageTableName = 'migrate_message_' . $hash;
     }
   }
 

@@ -10,4 +10,5 @@ source:
 process:
   id: id
 destination:
-  plugin: null
+  plugin: config
+  config_name: system.site

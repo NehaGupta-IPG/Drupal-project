@@ -85,6 +85,7 @@ class MigrateLookupTest extends MigrateTestBase {
       : mb_substr($table_name, 0, 45 - $prefix_length) . '_' . substr(md5($table_name), 0, 17);
 
     $this->expectExceptionMessage("Extra unknown items for map $table_name in source IDs: array (\n  'invalid_id' => 25,\n)");
+
     // Test invalidly indexed source id.
     $this->migrateLookup->lookup('sample_lookup_migration', ['invalid_id' => 25]);
   }

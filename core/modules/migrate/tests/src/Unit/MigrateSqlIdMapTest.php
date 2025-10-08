@@ -1116,13 +1116,13 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
       ],
       'too long for message table' => [
         'migration_with_a_long_id_for_testing_table_names',
-        'migrate_map_migration_with_a_long_id_for_testing_table_names',
-        'migrate_message_migration_with_a_long_id_for__5a6490b98f599fdca',
+        'migrate_map_514fb9bb7f',
+        'migrate_message_514fb9bb7f',
       ],
       'too long for map and message table' => [
         'migration_with_a_long_id_for_testing_migrate_table_names',
-        'migrate_map_migration_with_a_long_id_for_test_45d8c7015ff9da8a8',
-        'migrate_message_migration_with_a_long_id_for__45d8c7015ff9da8a8',
+        'migrate_map_b9b3d8d1ff',
+        'migrate_message_b9b3d8d1ff',
       ],
     ];
   }

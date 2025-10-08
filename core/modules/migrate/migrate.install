@@ -6,7 +6,7 @@
  */
 
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\migrate\MigrateUpdateHelper;
+use Drupal\migrate\MigrateUpdateTableNames;
 
 /**
  * Implements hook_update_last_removed().
@@ -16,8 +16,8 @@ function migrate_update_last_removed(): int {
 }
 
 /**
- * Copy values from legacy migration map and message tables to new ones.
+ * Update the names of migration tables to unique values.
  */
-function migrate_update_10101(&$sandbox): ?FormattableMarkup {
-  return \Drupal::classResolver(MigrateUpdateHelper::class)->updateMapAndMessageTables($sandbox);
+function migrate_update_110300(&$sandbox): ?FormattableMarkup {
+  return \Drupal::classResolver(MigrateUpdateTableNames::class)->updateMapAndMessageTables($sandbox);
 }
