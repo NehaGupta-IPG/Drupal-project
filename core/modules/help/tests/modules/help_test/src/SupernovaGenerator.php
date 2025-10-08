@@ -36,14 +36,14 @@ class SupernovaGenerator implements UrlGeneratorInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPathFromRoute($name, $parameters = []) {
+  public function getPathFromRoute($name, $parameters = []): never {
     throw new \Exception();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function generateFromRoute($name, $parameters = [], $options = [], $collect_bubbleable_metadata = FALSE) {
+  public function generateFromRoute($name, $parameters = [], $options = [], $collect_bubbleable_metadata = FALSE): never {
     throw new \Exception();
   }
 

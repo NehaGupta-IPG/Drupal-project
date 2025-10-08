@@ -142,7 +142,7 @@ class TestControllers {
    * @throws \Exception
    *   Always thrown.
    */
-  protected function throwException($message) {
+  protected function throwException($message): never {
     throw new \Exception($message);
   }
 

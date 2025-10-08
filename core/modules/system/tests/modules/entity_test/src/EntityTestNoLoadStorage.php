@@ -15,7 +15,7 @@ class EntityTestNoLoadStorage extends SqlContentEntityStorage {
   /**
    * {@inheritdoc}
    */
-  public function load($id) {
+  public function load($id): never {
     throw new EntityStorageException('No load operation is supposed to happen.');
   }
 

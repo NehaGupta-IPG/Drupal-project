@@ -22,7 +22,7 @@ class Failing extends OperationBase {
   /**
    * {@inheritdoc}
    */
-  public function execute(array $arguments) {
+  public function execute(array $arguments): never {
     throw new \RuntimeException('Ahem, this image operation failed');
   }
 

@@ -427,7 +427,7 @@ class AjaxTestController {
    * @throws \Exception
    *   The expected exception.
    */
-  public function throwException() {
+  public function throwException(): never {
     throw new \Exception('This is an exception.');
   }
 

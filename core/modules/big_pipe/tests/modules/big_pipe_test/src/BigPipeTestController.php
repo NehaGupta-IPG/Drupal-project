@@ -193,7 +193,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
    *
    * @throws \Exception
    */
-  public static function exception() {
+  public static function exception(): never {
     throw new \Exception('You are not allowed to say llamas are not cool!');
   }
 
