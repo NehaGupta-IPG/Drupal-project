@@ -96,7 +96,7 @@ class TestControllers {
     return new CacheableResponse('test21');
   }
 
-  public function test23(): \GuzzleHttp\Psr7\Response {
+  public function test23(): Psr7Response {
     return new Psr7Response(200, [], 'test23');
   }
 
