@@ -20,7 +20,7 @@ class NodeAccessTestAutoBubblingController extends ControllerBase implements Con
    * @return array
    *   A render array.
    */
-  public function latest() {
+  public function latest(): array {
     $nids = $this->entityTypeManager()->getStorage('node')->getQuery()
       ->accessCheck(TRUE)
       ->condition('status', NodeInterface::PUBLISHED)

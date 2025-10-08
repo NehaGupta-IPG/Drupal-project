@@ -50,7 +50,7 @@ class LanguageTestController implements ContainerInjectionInterface {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static($container->get('http_kernel'), $container->get('language_manager'));
   }
 
@@ -63,7 +63,7 @@ class LanguageTestController implements ContainerInjectionInterface {
    * @return string
    *   Testing feedback based on (translated) entity title.
    */
-  public function testEntity(ConfigurableLanguageInterface $configurable_language) {
+  public function testEntity(ConfigurableLanguageInterface $configurable_language): array {
     return ['#markup' => $this->t('Loaded %label.', ['%label' => $configurable_language->label()])];
   }
 
@@ -73,7 +73,7 @@ class LanguageTestController implements ContainerInjectionInterface {
    * Using #type 'link' causes these links to be rendered with the link
    * generator.
    */
-  public function typeLinkActiveClass() {
+  public function typeLinkActiveClass(): array {
     // We assume that 'en' and 'fr' have been configured.
     $languages = $this->languageManager->getLanguages();
     return [
@@ -121,7 +121,7 @@ class LanguageTestController implements ContainerInjectionInterface {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The kernels response to the sub request.
    */
-  public function testSubRequest() {
+  public function testSubRequest(): \Symfony\Component\HttpFoundation\Response {
     $request = Request::createFromGlobals();
     $server = $request->server->all();
     if (basename($server['SCRIPT_FILENAME']) != basename($server['SCRIPT_NAME'])) {

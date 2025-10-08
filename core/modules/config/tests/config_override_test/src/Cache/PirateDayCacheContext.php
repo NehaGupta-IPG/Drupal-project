@@ -37,7 +37,7 @@ class PirateDayCacheContext implements CacheContextInterface {
   /**
    * {@inheritdoc}
    */
-  public function getContext() {
+  public function getContext(): string {
     $is_pirate_day = static::isPirateDay() ? 'yarr' : 'nay';
     return "pirate_day." . $is_pirate_day;
   }
@@ -51,14 +51,14 @@ class PirateDayCacheContext implements CacheContextInterface {
    * @return bool
    *   Returns TRUE if it is Pirate Day today.
    */
-  public static function isPirateDay() {
+  public static function isPirateDay(): bool {
     return !empty($GLOBALS['it_is_pirate_day']);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCacheableMetadata() {
+  public function getCacheableMetadata(): \Drupal\Core\Cache\CacheableMetadata {
     return new CacheableMetadata();
   }
 

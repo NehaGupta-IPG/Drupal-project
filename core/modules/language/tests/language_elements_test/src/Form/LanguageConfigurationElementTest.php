@@ -17,14 +17,14 @@ class LanguageConfigurationElementTest extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'language_elements_configuration_element_test';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['langcode'] = [
       '#title' => $this->t('Language select'),
       '#type' => 'language_select',

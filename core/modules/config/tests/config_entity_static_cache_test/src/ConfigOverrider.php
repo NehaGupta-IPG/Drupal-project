@@ -16,7 +16,7 @@ class ConfigOverrider implements ConfigFactoryOverrideInterface {
   /**
    * {@inheritdoc}
    */
-  public function loadOverrides($names) {
+  public function loadOverrides($names): array {
     return [
       'config_test.dynamic.test_1' => [
         'label' => 'Overridden label',
@@ -27,21 +27,21 @@ class ConfigOverrider implements ConfigFactoryOverrideInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCacheSuffix() {
+  public function getCacheSuffix(): string {
     return 'config_entity_static_cache_test';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function createConfigObject($name, $collection = StorageInterface::DEFAULT_COLLECTION) {
+  public function createConfigObject($name, $collection = StorageInterface::DEFAULT_COLLECTION): null {
     return NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCacheableMetadata($name) {
+  public function getCacheableMetadata($name): \Drupal\Core\Cache\CacheableMetadata {
     return new CacheableMetadata();
   }
 

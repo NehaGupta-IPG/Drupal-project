@@ -14,21 +14,21 @@ class DummyRemoteReadOnlyStreamWrapper extends DummyRemoteStreamWrapper {
   /**
    * {@inheritdoc}
    */
-  public static function getType() {
+  public static function getType(): int {
     return StreamWrapperInterface::READ_VISIBLE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getName() {
+  public function getName(): string {
     return 'Dummy remote read-only files';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getDescription() {
+  public function getDescription(): string {
     return 'Dummy remote read-only stream wrapper for testing.';
   }
 

@@ -130,7 +130,7 @@ class ConfigTestForm extends EntityForm {
   /**
    * Element submit handler for non-JS testing.
    */
-  public static function changeSize(array $form, FormStateInterface $form_state) {
+  public static function changeSize(array $form, FormStateInterface $form_state): void {
     $form_state->setRebuild();
   }
 
@@ -165,7 +165,7 @@ class ConfigTestForm extends EntityForm {
    * @return bool
    *   TRUE if the entity exists, FALSE otherwise.
    */
-  public function exists($entity_id, array $element, FormStateInterface $form_state) {
+  public function exists($entity_id, array $element, FormStateInterface $form_state): bool {
     /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
     $entity = $form_state->getFormObject()->getEntity();
     /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $storage */

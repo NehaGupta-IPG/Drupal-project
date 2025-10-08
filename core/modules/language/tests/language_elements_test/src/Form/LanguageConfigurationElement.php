@@ -18,14 +18,14 @@ class LanguageConfigurationElement extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'language_elements_configuration_element';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $conf = ContentLanguageSettings::loadByEntityTypeBundle('entity_test', 'some_bundle');
 
     $form['lang_configuration'] = [

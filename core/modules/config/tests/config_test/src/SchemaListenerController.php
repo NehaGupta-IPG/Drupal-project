@@ -24,6 +24,15 @@ class SchemaListenerController extends ControllerBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container): static {
+    return new static(
+      $container->get('config.factory')
+    );
+  }
+
+  /**
    * Tests the BrowserTestBase tests can use strict schema checking.
    */
   public function test() {
