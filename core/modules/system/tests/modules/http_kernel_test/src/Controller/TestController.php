@@ -23,7 +23,7 @@ class TestController implements ContainerInjectionInterface {
   /**
    * Return an empty response.
    */
-  public function get(): \Symfony\Component\HttpFoundation\Response {
+  public function get(): Response {
     return new Response();
   }
 

@@ -77,70 +77,70 @@ class EarlyRenderingTestController extends ControllerBase {
     ];
   }
 
-  public function ajaxResponse(): \Drupal\Core\Ajax\AjaxResponse {
+  public function ajaxResponse(): AjaxResponse {
     $response = new AjaxResponse();
     $response->addCommand(new InsertCommand(NULL, $this->renderArray()));
     return $response;
   }
 
-  public function ajaxResponseEarly(): \Drupal\Core\Ajax\AjaxResponse {
+  public function ajaxResponseEarly(): AjaxResponse {
     $response = new AjaxResponse();
     $response->addCommand(new InsertCommand(NULL, $this->renderArrayEarly()));
     return $response;
   }
 
-  public function response(): \Symfony\Component\HttpFoundation\Response {
+  public function response(): Response {
     return new Response('Hello world!');
   }
 
-  public function responseEarly(): \Symfony\Component\HttpFoundation\Response {
+  public function responseEarly(): Response {
     $render_array = $this->earlyRenderContent();
     return new Response((string) $this->renderer->render($render_array));
   }
 
-  public function responseWithAttachments(): \Drupal\early_rendering_controller_test\AttachmentsTestResponse {
+  public function responseWithAttachments(): AttachmentsTestResponse {
     return new AttachmentsTestResponse('Hello world!');
   }
 
-  public function responseWithAttachmentsEarly(): \Drupal\early_rendering_controller_test\AttachmentsTestResponse {
+  public function responseWithAttachmentsEarly(): AttachmentsTestResponse {
     $render_array = $this->earlyRenderContent();
     return new AttachmentsTestResponse((string) $this->renderer->render($render_array));
   }
 
-  public function cacheableResponse(): \Drupal\early_rendering_controller_test\CacheableTestResponse {
+  public function cacheableResponse(): CacheableTestResponse {
     return new CacheableTestResponse('Hello world!');
   }
 
-  public function cacheableResponseEarly(): \Drupal\early_rendering_controller_test\CacheableTestResponse {
+  public function cacheableResponseEarly(): CacheableTestResponse {
     $render_array = $this->earlyRenderContent();
     return new CacheableTestResponse((string) $this->renderer->render($render_array));
   }
 
-  public function domainObject(): \Drupal\early_rendering_controller_test\TestDomainObject {
+  public function domainObject(): TestDomainObject {
     return new TestDomainObject();
   }
 
-  public function domainObjectEarly(): \Drupal\early_rendering_controller_test\TestDomainObject {
+  public function domainObjectEarly(): TestDomainObject {
     $render_array = $this->earlyRenderContent();
     $this->renderer->render($render_array);
     return new TestDomainObject();
   }
 
-  public function domainObjectWithAttachments(): \Drupal\early_rendering_controller_test\AttachmentsTestDomainObject {
+  public function domainObjectWithAttachments(): AttachmentsTestDomainObject {
     return new AttachmentsTestDomainObject();
   }
 
-  public function domainObjectWithAttachmentsEarly(): \Drupal\early_rendering_controller_test\AttachmentsTestDomainObject {
+  public function domainObjectWithAttachmentsEarly(): AttachmentsTestDomainObject {
     $render_array = $this->earlyRenderContent();
     $this->renderer->render($render_array);
     return new AttachmentsTestDomainObject();
   }
 
-  public function cacheableDomainObject(): \Drupal\early_rendering_controller_test\CacheableTestDomainObject {
+  public function cacheableDomainObject(): CacheableTestDomainObject {
     return new CacheableTestDomainObject();
   }
 
-  public function cacheableDomainObjectEarly(): \Drupal\early_rendering_controller_test\CacheableTestDomainObject {
+  public function cacheableDomainObjectEarly(): CacheableTestDomainObject {
     $render_array = $this->earlyRenderContent();
     $this->renderer->render($render_array);
     return new CacheableTestDomainObject();

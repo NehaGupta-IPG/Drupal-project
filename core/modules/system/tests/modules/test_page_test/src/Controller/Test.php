@@ -131,7 +131,7 @@ class Test {
    *
    * @see \Symfony\Component\HttpFoundation\RedirectResponse
    */
-  public function metaRefresh(): \Symfony\Component\HttpFoundation\RedirectResponse {
+  public function metaRefresh(): RedirectResponse {
     return new RedirectResponse(Url::fromRoute('test_page_test.test_page', [], ['absolute' => TRUE])->toString(), 302);
   }
 

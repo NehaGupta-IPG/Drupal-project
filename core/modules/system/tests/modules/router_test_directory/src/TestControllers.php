@@ -19,11 +19,11 @@ class TestControllers {
 
   const LONG_TEXT = 'This is text long enough to trigger Apache mod_deflate to add a `vary: accept-encoding` header to the response.';
 
-  public function test(): \Symfony\Component\HttpFoundation\Response {
+  public function test(): Response {
     return new Response('test');
   }
 
-  public function test1(): \Symfony\Component\HttpFoundation\Response {
+  public function test1(): Response {
     return new Response(self::LONG_TEXT);
   }
 
@@ -43,19 +43,19 @@ class TestControllers {
     return ['#markup' => "test5"];
   }
 
-  public function test6(): \Symfony\Component\HttpFoundation\Response {
+  public function test6(): Response {
     return new Response('test6');
   }
 
-  public function test7(): \Symfony\Component\HttpFoundation\Response {
+  public function test7(): Response {
     return new Response('test7text');
   }
 
-  public function test8(): \Symfony\Component\HttpFoundation\Response {
+  public function test8(): Response {
     return new Response('test8');
   }
 
-  public function test9($uid): \Symfony\Component\HttpFoundation\Response {
+  public function test9($uid): Response {
     $text = 'Route not matched.';
     try {
       $match = \Drupal::service('router.no_access_checks')->match('/user/' . $uid);
@@ -92,7 +92,7 @@ class TestControllers {
     ];
   }
 
-  public function test21(): \Drupal\Core\Cache\CacheableResponse {
+  public function test21(): CacheableResponse {
     return new CacheableResponse('test21');
   }
 
@@ -129,7 +129,7 @@ class TestControllers {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response.
    */
-  public function rejectsQueryStrings(Request $request): \Symfony\Component\HttpFoundation\Response {
+  public function rejectsQueryStrings(Request $request): Response {
     return new Response('', $request->query->keys() ? Response::HTTP_BAD_REQUEST : Response::HTTP_OK);
   }
 

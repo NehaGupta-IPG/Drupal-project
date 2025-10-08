@@ -17,7 +17,7 @@ class EntityTestDeleteForm extends ContentEntityDeleteForm {
   /**
    * {@inheritdoc}
    */
-  public function getCancelUrl(): \Drupal\Core\Url {
+  public function getCancelUrl(): Url {
     return new Url('<front>');
   }
 

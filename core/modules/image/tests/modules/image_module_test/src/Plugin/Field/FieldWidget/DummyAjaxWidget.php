@@ -51,7 +51,7 @@ class DummyAjaxWidget extends WidgetBase {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   Ajax response.
    */
-  public static function dummyAjaxCallback(array &$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse {
+  public static function dummyAjaxCallback(array &$form, FormStateInterface $form_state): AjaxResponse {
     return new AjaxResponse();
   }
 

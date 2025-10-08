@@ -196,7 +196,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response.
    */
-  public function getDestination(Request $request): \Symfony\Component\HttpFoundation\Response {
+  public function getDestination(Request $request): Response {
     $response = new Response($request->query->get('destination'));
     return $response;
   }
@@ -210,7 +210,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response.
    */
-  public function requestDestination(Request $request): \Symfony\Component\HttpFoundation\Response {
+  public function requestDestination(Request $request): Response {
     $response = new Response($request->request->get('destination'));
     return $response;
   }
@@ -302,7 +302,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    *
    * @see system_authorized_init()
    */
-  public function authorizeInit($page_title): \Symfony\Component\HttpFoundation\RedirectResponse {
+  public function authorizeInit($page_title): RedirectResponse {
     $authorize_url = Url::fromUri('base:core/authorize.php', ['absolute' => TRUE])->toString();
     system_authorized_init('system_test_authorize_run', __DIR__ . '/../../system_test.module', [], $page_title);
     return new RedirectResponse($authorize_url);
@@ -311,7 +311,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * Sets a header.
    */
-  public function setHeader(Request $request): \Drupal\Core\Cache\CacheableResponse {
+  public function setHeader(Request $request): CacheableResponse {
     $query = $request->query->all();
     $response = new CacheableResponse();
     $response->headers->set($query['name'], $query['value']);
@@ -327,21 +327,21 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * A simple page callback that uses a plain Symfony response object.
    */
-  public function respondWithResponse(Request $request): \Symfony\Component\HttpFoundation\Response {
+  public function respondWithResponse(Request $request): Response {
     return new Response('test');
   }
 
   /**
    * A plain Symfony response with Cache-Control: public, max-age=60.
    */
-  public function respondWithPublicResponse(): \Symfony\Component\HttpFoundation\Response {
+  public function respondWithPublicResponse(): Response {
     return (new Response('test'))->setPublic()->setMaxAge(60);
   }
 
   /**
    * A simple page callback that uses a CacheableResponse object.
    */
-  public function respondWithCacheableResponse(Request $request): \Drupal\Core\Cache\CacheableResponse {
+  public function respondWithCacheableResponse(Request $request): CacheableResponse {
     return new CacheableResponse('test');
   }
 
@@ -419,7 +419,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return \Symfony\Component\HttpFoundation\Response
    *   A Response object containing the current date.
    */
-  public function getCurrentDate(): \Symfony\Component\HttpFoundation\Response {
+  public function getCurrentDate(): Response {
     // Uses specific time to test that the right timezone is used.
     $response = new Response(\Drupal::service('date.formatter')->format(1452702549));
     return $response;
@@ -431,7 +431,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return \Symfony\Component\HttpFoundation\Response
    *   A Response object containing the test header.
    */
-  public function getTestHeader(Request $request): \Symfony\Component\HttpFoundation\Response {
+  public function getTestHeader(Request $request): Response {
     $response = new Response();
     $response->headers->set('Test-Header', $request->headers->get('Test-Header'));
     return $response;
@@ -440,7 +440,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * Returns a cacheable response with a custom cache control.
    */
-  public function getCacheableResponseWithCustomCacheControl(): \Drupal\Core\Cache\CacheableResponse {
+  public function getCacheableResponseWithCustomCacheControl(): CacheableResponse {
     return new CacheableResponse('Foo', 200, ['Cache-Control' => 'bar']);
   }
 
@@ -475,7 +475,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * Use a plain Symfony response object to output the current install_profile.
    */
-  public function getInstallProfile(): \Symfony\Component\HttpFoundation\Response {
+  public function getInstallProfile(): Response {
     $install_profile = \Drupal::installProfile() ?: 'NONE';
     return new Response('install_profile: ' . $install_profile);
   }

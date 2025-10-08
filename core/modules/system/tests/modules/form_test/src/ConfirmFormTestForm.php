@@ -32,7 +32,7 @@ class ConfirmFormTestForm extends ConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getCancelUrl(): \Drupal\Core\Url {
+  public function getCancelUrl(): Url {
     return new Url('form_test.route8');
   }
 

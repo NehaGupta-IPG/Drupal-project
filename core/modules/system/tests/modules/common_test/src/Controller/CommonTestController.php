@@ -91,7 +91,7 @@ class CommonTestController {
    *   A new Response object containing a string with the destination query
    *   parameter.
    */
-  public function destination(): \Symfony\Component\HttpFoundation\Response {
+  public function destination(): Response {
     $destination = \Drupal::destination()->getAsArray();
     $output = "The destination: " . Html::escape($destination['destination']);
     return new Response($output);

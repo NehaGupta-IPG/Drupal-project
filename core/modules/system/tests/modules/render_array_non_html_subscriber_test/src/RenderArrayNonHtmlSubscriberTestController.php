@@ -16,7 +16,7 @@ class RenderArrayNonHtmlSubscriberTestController extends ControllerBase {
    * @return string
    *   The value of raw string.
    */
-  public function rawString(): \Symfony\Component\HttpFoundation\Response {
+  public function rawString(): Response {
     return new Response((string) $this->t('Raw controller response.'));
   }
 

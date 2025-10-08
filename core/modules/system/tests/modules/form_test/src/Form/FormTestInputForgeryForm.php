@@ -67,7 +67,7 @@ class FormTestInputForgeryForm extends FormBase implements TrustedCallbackInterf
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state): \Symfony\Component\HttpFoundation\JsonResponse {
+  public function submitForm(array &$form, FormStateInterface $form_state): JsonResponse {
     return new JsonResponse($form_state->getValues());
   }
 

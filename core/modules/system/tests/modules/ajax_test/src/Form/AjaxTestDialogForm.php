@@ -76,21 +76,21 @@ class AjaxTestDialogForm extends FormBase {
   /**
    * AJAX callback handler for AjaxTestDialogForm.
    */
-  public function modal(&$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse {
+  public function modal(&$form, FormStateInterface $form_state): AjaxResponse {
     return $this->dialog(TRUE);
   }
 
   /**
    * AJAX callback handler for Url modal, AjaxTestDialogForm.
    */
-  public function modalFromUrl(&$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse {
+  public function modalFromUrl(&$form, FormStateInterface $form_state): AjaxResponse {
     return $this->dialog(TRUE, TRUE);
   }
 
   /**
    * AJAX callback handler for AjaxTestDialogForm.
    */
-  public function nonModal(&$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse {
+  public function nonModal(&$form, FormStateInterface $form_state): AjaxResponse {
     return $this->dialog(FALSE);
   }
 
@@ -105,7 +105,7 @@ class AjaxTestDialogForm extends FormBase {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   An ajax response object.
    */
-  protected function dialog(bool $is_modal = FALSE, bool $is_url = FALSE): \Drupal\Core\Ajax\AjaxResponse {
+  protected function dialog(bool $is_modal = FALSE, bool $is_url = FALSE): AjaxResponse {
     $content = AjaxTestController::dialogContents();
     $response = new AjaxResponse();
     $title = $this->t('AJAX Dialog & contents');

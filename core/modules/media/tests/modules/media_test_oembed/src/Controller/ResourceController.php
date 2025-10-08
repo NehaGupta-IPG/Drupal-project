@@ -45,7 +45,7 @@ class ResourceController {
    * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
    *   The response.
    */
-  public function getThumbnailWithNoExtension(): \Symfony\Component\HttpFoundation\BinaryFileResponse {
+  public function getThumbnailWithNoExtension(): BinaryFileResponse {
     $response = new BinaryFileResponse('core/misc/druplicon.png');
     $response->headers->set('Content-Type', 'image/png');
     return $response;

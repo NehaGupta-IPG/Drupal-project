@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\router_test;
 
+use Symfony\Component\HttpFoundation\Response;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\user\UserInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -62,7 +63,7 @@ class TestContent extends ControllerBase {
   /**
    * Uses a subrequest to determine the content.
    */
-  public function subrequestTest(UserInterface $user): \Symfony\Component\HttpFoundation\Response {
+  public function subrequestTest(UserInterface $user): Response {
     $request = \Drupal::request();
     $request = Request::create('/router_test/test13/' . $user->id(), 'GET', $request->query->all(), $request->cookies->all(), [], $request->server->all());
 

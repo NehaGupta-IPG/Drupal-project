@@ -53,7 +53,7 @@ class DatabaseTestController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response containing the names of the test entries.
    */
-  public function pagerQueryEven($limit): \Symfony\Component\HttpFoundation\JsonResponse {
+  public function pagerQueryEven($limit): JsonResponse {
     $query = $this->connection->select('test', 't');
     $query
       ->fields('t', ['name'])
@@ -80,7 +80,7 @@ class DatabaseTestController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response containing the names of the test entries.
    */
-  public function pagerQueryOdd($limit): \Symfony\Component\HttpFoundation\JsonResponse {
+  public function pagerQueryOdd($limit): JsonResponse {
     $query = $this->connection->select('test_task', 't');
     $query
       ->fields('t', ['task'])
@@ -107,7 +107,7 @@ class DatabaseTestController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response containing the test tasks.
    */
-  public function testTablesort(): \Symfony\Component\HttpFoundation\JsonResponse {
+  public function testTablesort(): JsonResponse {
     $header = [
       'tid' => ['data' => $this->t('Task ID'), 'field' => 'tid', 'sort' => 'desc'],
       'pid' => ['data' => $this->t('Person ID'), 'field' => 'pid'],
@@ -140,7 +140,7 @@ class DatabaseTestController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response containing the test tasks.
    */
-  public function testTablesortFirst(): \Symfony\Component\HttpFoundation\JsonResponse {
+  public function testTablesortFirst(): JsonResponse {
     $header = [
       'tid' => ['data' => $this->t('Task ID'), 'field' => 'tid', 'sort' => 'desc'],
       'pid' => ['data' => $this->t('Person ID'), 'field' => 'pid'],

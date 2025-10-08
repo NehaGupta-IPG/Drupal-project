@@ -203,7 +203,7 @@ class AjaxTestController {
    *
    * Helps verifying AjaxResponse reorders commands to ensure correct execution.
    */
-  public function order(): \Drupal\Core\Ajax\AjaxResponse {
+  public function order(): AjaxResponse {
     $response = new AjaxResponse();
     // HTML insertion command.
     $response->addCommand(new HtmlCommand('body', 'Hello, world!'));
@@ -222,7 +222,7 @@ class AjaxTestController {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The JSON response object.
    */
-  public function renderError(Request $request): \Drupal\Core\Ajax\AjaxResponse {
+  public function renderError(Request $request): AjaxResponse {
     $message = '';
     $query = $request->query;
     if ($query->has('message')) {
@@ -344,7 +344,7 @@ class AjaxTestController {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The JSON response object.
    */
-  public function dialogClose(): \Drupal\Core\Ajax\AjaxResponse {
+  public function dialogClose(): AjaxResponse {
     $response = new AjaxResponse();
     $response->addCommand(new CloseDialogCommand('#ajax-test-dialog-wrapper-1'));
     return $response;
@@ -415,7 +415,7 @@ class AjaxTestController {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The JSON response object.
    */
-  public function globalEventsClearLog(): \Drupal\Core\Ajax\AjaxResponse {
+  public function globalEventsClearLog(): AjaxResponse {
     $response = new AjaxResponse();
     $response->addCommand(new HtmlCommand('#test_global_events_log', ''));
     return $response;

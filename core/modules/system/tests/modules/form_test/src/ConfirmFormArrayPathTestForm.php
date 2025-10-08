@@ -23,7 +23,7 @@ class ConfirmFormArrayPathTestForm extends ConfirmFormTestForm {
   /**
    * {@inheritdoc}
    */
-  public function getCancelUrl(): \Drupal\Core\Url {
+  public function getCancelUrl(): Url {
     return new Url('form_test.route6', [], [
       'query' => [
         'destination' => 'admin/config',

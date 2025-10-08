@@ -108,7 +108,7 @@ class ThemeTestController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   The json response with the theme initialized information.
    */
-  public function nonHtml(): \Symfony\Component\HttpFoundation\JsonResponse {
+  public function nonHtml(): JsonResponse {
     $theme_initialized = \Drupal::theme()->hasActiveTheme();
     return new JsonResponse(['theme_initialized' => $theme_initialized]);
   }

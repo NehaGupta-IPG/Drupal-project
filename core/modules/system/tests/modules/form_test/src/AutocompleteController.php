@@ -20,7 +20,7 @@ class AutocompleteController {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response.
    */
-  public function delayed_autocomplete(): \Symfony\Component\HttpFoundation\JsonResponse {
+  public function delayed_autocomplete(): JsonResponse {
     sleep(1);
     return new JsonResponse([['value' => 'value', 'label' => 'label']]);
   }

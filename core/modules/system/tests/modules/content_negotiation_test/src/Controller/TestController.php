@@ -19,7 +19,7 @@ class TestController {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   The Json response value.
    */
-  public function simple(): \Symfony\Component\HttpFoundation\JsonResponse {
+  public function simple(): JsonResponse {
     return new JsonResponse(['some' => 'data']);
   }
 
@@ -44,7 +44,7 @@ class TestController {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response.
    */
-  public function format(Request $request): \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response {
+  public function format(Request $request): JsonResponse|Response {
     switch ($request->getRequestFormat()) {
       case 'json':
         return new JsonResponse(['some' => 'data']);

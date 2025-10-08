@@ -19,7 +19,7 @@ class UpdateTestController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\Response
    *   Returns the response with a special header.
    */
-  public function updateError(): \Symfony\Component\HttpFoundation\Response {
+  public function updateError(): Response {
     $response = new Response();
     $response->setStatusCode(503);
     $response->headers->set('Status', '503 Service unavailable');
@@ -49,7 +49,7 @@ class UpdateTestController extends ControllerBase {
    *   file for the specified project if one is available; a Response object
    *   with no content otherwise.
    */
-  public function updateTest($project_name, $version): \Symfony\Component\HttpFoundation\Response|\Symfony\Component\HttpFoundation\BinaryFileResponse {
+  public function updateTest($project_name, $version): Response|BinaryFileResponse {
     $xml_map = $this->config('update_test.settings')->get('xml_map');
     if (isset($xml_map[$project_name])) {
       $availability_scenario = $xml_map[$project_name];

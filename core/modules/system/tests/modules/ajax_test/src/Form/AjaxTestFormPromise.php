@@ -52,7 +52,7 @@ class AjaxTestFormPromise extends FormBase {
   /**
    * Ajax callback for the "Execute commands button" button.
    */
-  public static function executeCommands(array $form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse {
+  public static function executeCommands(array $form, FormStateInterface $form_state): AjaxResponse {
     $selector = '#ajax_test_form_promise_wrapper';
     $response = new AjaxResponse();
 

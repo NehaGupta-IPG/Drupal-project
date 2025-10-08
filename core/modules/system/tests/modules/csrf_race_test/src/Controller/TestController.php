@@ -60,7 +60,7 @@ class TestController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\Response
    *   CSRF token.
    */
-  public function getCsrfToken(int $num): \Symfony\Component\HttpFoundation\JsonResponse {
+  public function getCsrfToken(int $num): JsonResponse {
     sleep($num);
     return new JsonResponse($this->tokenGenerator->get());
   }

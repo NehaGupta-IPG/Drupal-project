@@ -75,7 +75,7 @@ class AjaxTestForm extends FormBase {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   An AJAX response.
    */
-  public function helloWorld(array &$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse {
+  public function helloWorld(array &$form, FormStateInterface $form_state): AjaxResponse {
     $response = new AjaxResponse();
     $response->addCommand(new MessageCommand('Hello world!'));
     return $response;
