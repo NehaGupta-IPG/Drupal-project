@@ -55,8 +55,9 @@ class AccessibilityTestBase extends WebDriverTestBase {
 
     $this->drupalGet($uri);
 
-    // Overlooked modules or missing routes could cause a 404, which means the
-    // wrong page is being tested and will likely result in a false negative.
+    // Missing modules or routes could cause a 404, which means the
+    // wrong page is being tested and will likely result in
+    // falsely-passing tests.
     $this->assertSession()
       ->responseNotContains('Page not found');
 
