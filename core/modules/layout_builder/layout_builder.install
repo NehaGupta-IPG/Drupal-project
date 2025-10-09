@@ -9,6 +9,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\layout_builder\Section;
+use Drupal\user\Entity\Role;
 
 /**
  * Implements hook_install().
@@ -81,4 +82,53 @@ function layout_builder_schema(): array {
  */
 function layout_builder_update_last_removed(): int {
   return 8602;
+}
+
+/**
+ * Add the 'revert {bundle} {entityTypeId} to default layout' permission.
+ */
+function layout_builder_update_11200(): void {
+  // Get all layouts with overrides enabled.
+  $displays = \Drupal::entityTypeManager()
+    ->getStorage('entity_view_display')
+    ->loadByProperties(['third_party_settings.layout_builder.allow_custom' => TRUE]);
+  if (!$displays) {
+    // No custom overrides, nothing to do.
+    return;
+  }
+  $rolesToSave = [];
+  $roles = \Drupal::entityTypeManager()->getStorage('user_role')->loadMultiple();
+  $rolesPermissions = \array_map(static fn (Role $role) => $role->getPermissions(), $roles);
+  foreach ($displays as $display) {
+    /** @var \Drupal\layout_builder\Entity\LayoutEntityDisplayInterface $display */
+    if (!$display->isOverridable()) {
+      // This should always be true, but just in case.
+      continue;
+    }
+    // Check if any role has the
+    // 'configure all $bundle $entityTypeId layout overrides' permission.
+    $entityTypeId = $display->getTargetEntityTypeId();
+    $bundle = $display->getTargetBundle();
+    $layoutPermissions = [
+      \sprintf('configure all %s %s layout overrides', $bundle, $entityTypeId),
+      \sprintf('configure editable %s %s layout overrides', $bundle, $entityTypeId),
+    ];
+    foreach ($rolesPermissions as $rid => $permissions) {
+      // Use array_intersect to check if any of the permissions exist.
+      if (!\array_intersect($permissions, $layoutPermissions)) {
+        continue;
+      }
+      $role = $roles[$rid];
+      // Add the new permission.
+      $new_permission = \sprintf('revert %s %s to default layout', $bundle, $entityTypeId);
+      if (!$role->hasPermission($new_permission)) {
+        $role->grantPermission($new_permission);
+        $rolesToSave[$rid] = $role;
+      }
+    }
+  }
+  // Save all roles that were modified.
+  foreach ($rolesToSave as $role) {
+    $role->save();
+  }
 }
