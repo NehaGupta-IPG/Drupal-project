@@ -2,7 +2,6 @@
 
 namespace Drupal\link;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldItemInterface;
 
 /**

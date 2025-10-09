@@ -3,7 +3,6 @@
 namespace Drupal\link\Plugin\Field\FieldType;
 
 use Drupal\Component\Utility\Random;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
