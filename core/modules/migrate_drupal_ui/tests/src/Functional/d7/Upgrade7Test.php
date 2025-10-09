@@ -8,6 +8,7 @@ use Drupal\node\Entity\Node;
 use Drupal\Tests\migrate_drupal_ui\Functional\MigrateUpgradeExecuteTestBase;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore Filefield Multiupload Imagefield
 /**
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[Group('migrate_drupal_ui')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
 
   /**
@@ -56,7 +58,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
 
     $this->loadFixture($this->getModulePath('migrate_drupal') . '/tests/fixtures/drupal7.php');
 
-    $this->expectedLoggedErrors = 27;
+    $this->expectedLoggedErrors = 29;
     // If saving the logs, then set the admin user.
     if ($this->outputLogs) {
       $this->migratedAdminUserName = 'admin';

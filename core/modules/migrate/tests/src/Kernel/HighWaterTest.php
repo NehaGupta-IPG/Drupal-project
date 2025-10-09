@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Kernel;
 
-// cspell:ignore Highwater
+use PHPUnit\Framework\Attributes\Group;
 
+// cspell:ignore Highwater
 /**
  * Tests migration high water property.
- *
- * @group migrate
  */
+#[Group('migrate')]
 class HighWaterTest extends MigrateTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'user',
     'node',
     'migrate',

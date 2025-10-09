@@ -6,14 +6,16 @@ namespace Drupal\KernelTests\Core\TypedData;
 
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
+use Drupal\Core\Validation\Plugin\Validation\Constraint\ClassResolverConstraintValidator;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests ClassResolver validation constraint with both valid and invalid values.
- *
- * @covers \Drupal\Core\Validation\Plugin\Validation\Constraint\ClassResolverConstraintValidator
- * @group Validation
  */
+#[Group('Validation')]
+#[CoversClass(ClassResolverConstraintValidator::class)]
 class ClassResolverConstraintValidatorTest extends KernelTestBase {
 
   /**
@@ -21,7 +23,7 @@ class ClassResolverConstraintValidatorTest extends KernelTestBase {
    *
    * @var \Drupal\Core\TypedData\TypedDataManager
    */
-  protected TypedDataManagerInterface $typedData;
+  protected TypedDataManagerInterface $typedDataManager;
 
   /**
    * {@inheritdoc}
@@ -29,7 +31,7 @@ class ClassResolverConstraintValidatorTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->typedData = $this->container->get('typed_data_manager');
+    $this->typedDataManager = $this->container->get('typed_data_manager');
     $this->container->set('test.service', new class() {
 
       /**
@@ -97,7 +99,7 @@ class ClassResolverConstraintValidatorTest extends KernelTestBase {
   public function testValidationForService(string $method, int $expected_violations, string $message, ?string $expected_violation_message = NULL): void {
     $definition = DataDefinition::create('integer')
       ->addConstraint('ClassResolver', ['classOrService' => 'test.service', 'method' => $method]);
-    $typed_data = $this->typedData->create($definition, 1);
+    $typed_data = $this->typedDataManager->create($definition, 1);
     $violations = $typed_data->validate();
     $this->assertEquals($expected_violations, $violations->count(), $message);
     if ($expected_violation_message) {
@@ -114,7 +116,7 @@ class ClassResolverConstraintValidatorTest extends KernelTestBase {
   public function testNonExistingMethod(): void {
     $definition = DataDefinition::create('integer')
       ->addConstraint('ClassResolver', ['classOrService' => 'test.service', 'method' => 'missingMethod']);
-    $typed_data = $this->typedData->create($definition, 1);
+    $typed_data = $this->typedDataManager->create($definition, 1);
 
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage('The method "missingMethod" does not exist on the service "test.service".');
@@ -130,7 +132,7 @@ class ClassResolverConstraintValidatorTest extends KernelTestBase {
   public function testNonExistingClass(): void {
     $definition = DataDefinition::create('integer')
       ->addConstraint('ClassResolver', ['classOrService' => '\Drupal\NonExisting\Class', 'method' => 'boo']);
-    $typed_data = $this->typedData->create($definition, 1);
+    $typed_data = $this->typedDataManager->create($definition, 1);
 
     $this->expectExceptionMessage('Class "\Drupal\NonExisting\Class" does not exist.');
     $typed_data->validate();

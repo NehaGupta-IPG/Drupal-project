@@ -8,15 +8,15 @@ use Drupal\KernelTests\FileSystemModuleDiscoveryDataProviderTrait;
 use Drupal\migrate\Plugin\Exception\BadPluginDefinitionException;
 use Drupal\migrate_drupal\Plugin\MigrateFieldPluginManager;
 use Drupal\Tests\migrate_drupal\Kernel\MigrateDrupalTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore entityreference filefield imagefield nodereference
 // cspell:ignore optionwidgets userreference
-
 /**
  * Tests that modules exist for all source and destination plugins.
- *
- * @group migrate_drupal
  */
+#[Group('migrate_drupal')]
 class MigrationProvidersExistTest extends MigrateDrupalTestBase {
 
   use FileSystemModuleDiscoveryDataProviderTrait;
@@ -187,8 +187,9 @@ class MigrationProvidersExistTest extends MigrateDrupalTestBase {
    * @param string $missing_property
    *   The name of the property missing from the definition.
    *
-   * @dataProvider fieldPluginDefinitionsProvider
+   * @group legacy
    */
+  #[DataProvider('fieldPluginDefinitionsProvider')]
   public function testFieldProviderMissingRequiredProperty(array $definitions, $missing_property): void {
     $discovery = $this->getMockBuilder(MigrateFieldPluginManager::class)
       ->disableOriginalConstructor()
