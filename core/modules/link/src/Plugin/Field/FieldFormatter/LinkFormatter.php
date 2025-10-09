@@ -9,6 +9,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Path\PathValidatorInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\link\AttributeXss;
@@ -46,31 +47,22 @@ class LinkFormatter extends FormatterBase {
       $configuration['label'],
       $configuration['view_mode'],
       $configuration['third_party_settings'],
-      $container->get('path.validator')
+      $container->get('path.validator'),
+      $container->get('renderer'),
     );
   }
 
-  /**
-   * Constructs a new LinkFormatter.
-   *
-   * @param string $plugin_id
-   *   The plugin ID for the formatter.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
-   *   The definition of the field to which the formatter is associated.
-   * @param array $settings
-   *   The formatter settings.
-   * @param string $label
-   *   The formatter label display setting.
-   * @param string $view_mode
-   *   The view mode.
-   * @param array $third_party_settings
-   *   Third party settings.
-   * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
-   *   The path validator service.
-   */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, PathValidatorInterface $path_validator) {
+  public function __construct(
+    $plugin_id,
+    $plugin_definition,
+    FieldDefinitionInterface $field_definition,
+    array $settings,
+    $label,
+    $view_mode,
+    array $third_party_settings,
+    PathValidatorInterface $path_validator,
+    protected RendererInterface $renderer,
+  ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->pathValidator = $path_validator;
   }
@@ -175,6 +167,7 @@ class LinkFormatter extends FormatterBase {
     $entity = $items->getEntity();
     $settings = $this->getSettings();
 
+    /** @var \Drupal\link\LinkItemInterface $item */
     foreach ($items as $delta => $item) {
       // By default use the full URL as the link text.
       $url = $this->buildUrl($item);
@@ -219,6 +212,16 @@ class LinkFormatter extends FormatterBase {
           // Unset field item attributes since they have been included in the
           // formatter output and should not be rendered in the field template.
           unset($item->_attributes);
+        }
+      }
+
+      // Add a cache dependency on any entity referenced by the link.
+      if ($item->isEntityLink()) {
+        try {
+          $this->renderer->addCacheableDependency($element, $item->getLinkedEntity());
+        }
+        catch (\Exception $e) {
+          // Do nothing.
         }
       }
     }

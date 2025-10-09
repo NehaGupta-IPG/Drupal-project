@@ -3,6 +3,7 @@
 namespace Drupal\link\Plugin\Field\FieldType;
 
 use Drupal\Component\Utility\Random;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
@@ -193,6 +194,35 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
       ];
     }
     parent::setValue($values, $notify);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isEntityLink(): bool {
+    $uri_parts = parse_url($this->uri);
+    if ($uri_parts === FALSE) {
+      throw new \InvalidArgumentException("The URI '$this->uri' is malformed.");
+    }
+    return !empty($uri_parts['scheme']) && $uri_parts['scheme'] == 'entity';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getLinkedEntity(): EntityInterface {
+    $uri_parts = parse_url($this->uri);
+    [$entity_type_id, $entity_id] = explode('/', $uri_parts['path'], 2);
+    if ($uri_parts === FALSE || $uri_parts['scheme'] != 'entity' || $entity_id === '') {
+      throw new \InvalidArgumentException("The URI '$this->uri' does not reference an entity.");
+    }
+    try {
+      $entity = \Drupal::entityTypeManager()->getStorage($entity_type_id)->load($entity_id);
+    }
+    catch (\Exception $e) {
+      throw new \InvalidArgumentException('Could not load a referenced entity.');
+    }
+    return $entity;
   }
 
 }

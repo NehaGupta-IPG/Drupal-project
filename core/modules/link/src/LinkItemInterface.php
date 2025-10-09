@@ -2,6 +2,7 @@
 
 namespace Drupal\link;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldItemInterface;
 
 /**
@@ -50,5 +51,27 @@ interface LinkItemInterface extends FieldItemInterface {
    *   Returns the link title.
    */
   public function getTitle(): ?string;
+
+  /**
+   * Checks if the link's URI references a Drupal entity.
+   *
+   * @return bool
+   *   TRUE if the URI references an entity, FALSE otherwise.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown if the URI is malformed.
+   */
+  public function isEntityLink(): bool;
+
+  /**
+   * Gets the entity referenced by the link, if any.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   The referenced entity.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown if the URI does not reference a Drupal entity.
+   */
+  public function getLinkedEntity(): EntityInterface;
 
 }
