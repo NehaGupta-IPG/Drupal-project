@@ -201,7 +201,7 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
   public function getCacheTags(): array {
     // Get cache tags from any referenced entity.
     $uri_parts = parse_url($this->uri);
-    if ($uri_parts === FALSE || $uri_parts['scheme'] != 'entity') {
+    if ($uri_parts === FALSE || !isset($uri_parts['scheme']) || $uri_parts['scheme'] != 'entity') {
       return [];
     }
     [$entity_type_id, $entity_id] = explode('/', $uri_parts['path'], 2);
