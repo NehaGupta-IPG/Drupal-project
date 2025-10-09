@@ -220,9 +220,7 @@ class LinkFormatter extends FormatterBase {
         try {
           $this->renderer->addCacheableDependency($element, $item->getLinkedEntity());
         }
-        catch (\Exception $e) {
-          // Do nothing.
-        }
+        catch (\Exception $e) {}
       }
     }
 
