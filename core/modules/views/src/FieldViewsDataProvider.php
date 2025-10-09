@@ -327,6 +327,7 @@ class FieldViewsDataProvider {
     // Expose data for each field property individually.
     foreach ($field_columns as $column => $attributes) {
       $allow_sort = TRUE;
+      // It does not make sense to sort by blob.
       if ($attributes['type'] == 'blob') {
         $allow_sort = FALSE;
       }
