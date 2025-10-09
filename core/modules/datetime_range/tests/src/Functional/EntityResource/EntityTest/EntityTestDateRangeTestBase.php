@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\datetime_range\Functional\EntityResource\EntityTest;
 
 use Drupal\Core\Url;
@@ -103,13 +105,13 @@ class EntityTestDateRangeTestBase extends EntityTestResourceTestBase {
    */
   protected function getExpectedNormalizedEntity() {
     return parent::getExpectedNormalizedEntity() + [
-        static::$fieldName => [
+      static::$fieldName => [
           [
             'value' => $this->entity->get(static::$fieldName)->value,
             'end_value' => $this->entity->get(static::$fieldName)->end_value,
           ],
-        ],
-      ];
+      ],
+    ];
   }
 
   /**
@@ -117,13 +119,13 @@ class EntityTestDateRangeTestBase extends EntityTestResourceTestBase {
    */
   protected function getNormalizedPostEntity() {
     return parent::getNormalizedPostEntity() + [
-        static::$fieldName => [
+      static::$fieldName => [
           [
             'value' => static::$startDateString,
             'end_value' => static::$endDateString,
           ],
-        ],
-      ];
+      ],
+    ];
   }
 
   /**
@@ -142,6 +144,7 @@ class EntityTestDateRangeTestBase extends EntityTestResourceTestBase {
    *   URL to request.
    * @param array $request_options
    *   Request options to apply.
+   *
    * @var mixed $value
    *   The test start date value.
    * @var mixed $end_value

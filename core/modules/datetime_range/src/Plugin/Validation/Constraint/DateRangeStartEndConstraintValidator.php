@@ -18,7 +18,7 @@ class DateRangeStartEndConstraintValidator extends ConstraintValidator {
       return;
     }
 
-    /** @var $item \Drupal\datetime_range\Plugin\Field\FieldType\DateRangeItem */
+    /** @var \Drupal\datetime_range\Plugin\Field\FieldType\DateRangeItem $item */
     $value = $item->getValue()['value'];
     $end_value = $item->getValue()['end_value'];
 

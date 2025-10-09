@@ -21,7 +21,7 @@ class DateRangeFormatConstraintValidator extends ConstraintValidator {
   public function validate($item, Constraint $constraint) {
     $stop = FALSE;
 
-    /** @var $item \Drupal\datetime_range\Plugin\Field\FieldType\DateRangeItem */
+    /** @var \Drupal\datetime_range\Plugin\Field\FieldType\DateRangeItem $item */
     if (!isset($item)) {
       return;
     }
@@ -54,14 +54,14 @@ class DateRangeFormatConstraintValidator extends ConstraintValidator {
     try {
       $start_date = DateTimePlus::createFromFormat($format, $value, new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE));
     }
-    catch (\InvalidArgumentException $e) {
+    catch (\InvalidArgumentException) {
       $this->context->addViolation($constraint->badStartFormat, [
         '@value' => $value,
         '@format' => $format,
       ]);
       $stop = TRUE;
     }
-    catch (\UnexpectedValueException $e) {
+    catch (\UnexpectedValueException) {
       $this->context->addViolation($constraint->badStartValue, [
         '@value' => $value,
         '@format' => $format,
@@ -73,14 +73,14 @@ class DateRangeFormatConstraintValidator extends ConstraintValidator {
     try {
       $end_date = DateTimePlus::createFromFormat($format, $end_value, new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE));
     }
-    catch (\InvalidArgumentException $e) {
+    catch (\InvalidArgumentException) {
       $this->context->addViolation($constraint->badEndFormat, [
         '@end_value' => $end_value,
         '@format' => $format,
       ]);
       $stop = TRUE;
     }
-    catch (\UnexpectedValueException $e) {
+    catch (\UnexpectedValueException) {
       $this->context->addViolation($constraint->badEndValue, [
         '@end_value' => $end_value,
         '@format' => $format,
