@@ -26,7 +26,7 @@ class IsExternalProcessed extends TypedData {
   /**
    * {@inheritdoc}
    */
-  public function setValue($value, $notify = TRUE) {
+  public function setValue($value, $notify = TRUE): void {
     $item = $this->getParent();
     $this->isExternal = FALSE;
     if (!$item->isEmpty()) {
