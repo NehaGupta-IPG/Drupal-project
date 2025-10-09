@@ -46,9 +46,11 @@ class LinkSeparateFormatter extends LinkFormatter {
     $settings = $this->getSettings();
 
     foreach ($items as $delta => $item) {
+      $url = $this->buildUrl($item);
+
       // Run access check if specified.
       if (!empty($settings['access_check'])) {
-        $access = $this->checkAccess($item);
+        $access = $this->checkUrlAccess($url);
         CacheableMetadata::createFromRenderArray($element)
           ->merge(CacheableMetadata::createFromObject($access))
           ->applyTo($element);
@@ -60,8 +62,6 @@ class LinkSeparateFormatter extends LinkFormatter {
       }
 
       // By default use the full URL as the link text.
-      /** @var \Drupal\Core\Url $url */
-      $url = $item->_url;
       $link_title = $url->toString();
 
       // If the link text field value is available, use it for the text.

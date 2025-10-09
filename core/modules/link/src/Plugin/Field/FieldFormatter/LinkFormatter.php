@@ -155,26 +155,17 @@ class LinkFormatter extends FormatterBase {
    *
    * @phpstan-param \Drupal\Core\Field\FieldItemListInterface<\Drupal\link\LinkItemInterface> $items
    */
-  public function prepareView(array $entities_items): void {
-    foreach ($entities_items as $items) {
-      foreach ($items as $item) {
-        $item->_url = $this->buildUrl($item);
-      }
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
     $entity = $items->getEntity();
     $settings = $this->getSettings();
 
     foreach ($items as $delta => $item) {
+      $url = $this->buildUrl($item);
+
       // Run access check if specified.
       if (!empty($settings['access_check'])) {
-        $access = $this->checkAccess($item);
+        $access = $this->checkUrlAccess($url);
         CacheableMetadata::createFromRenderArray($element)
           ->merge(CacheableMetadata::createFromObject($access))
           ->applyTo($element);
@@ -186,8 +177,6 @@ class LinkFormatter extends FormatterBase {
       }
 
       // By default use the full URL as the link text.
-      /** @var \Drupal\Core\Url $url */
-      $url = $item->_url;
       $link_title = $url->toString();
 
       // If the title field value is available, use it for the link text.
@@ -276,24 +265,12 @@ class LinkFormatter extends FormatterBase {
   }
 
   /**
-   * Checks access to the given link item.
-   *
-   * @param \Drupal\link\LinkItemInterface $item
-   *   The link field item to check.
-   *
-   * @return \Drupal\Core\Access\AccessResultInterface
-   *   A cacheable access result.
+   * Checks access to the given URL.
    */
-  protected function checkAccess(LinkItemInterface $item): AccessResultInterface {
-    $access = AccessResult::allowed();
-
-    /** @var \Drupal\core\Url $url */
-    $url = $item->_url;
-    if ($url->isRouted()) {
-      $access = $this->accessManager->checkNamedRoute($url->getRouteName(), $url->getRouteParameters(), NULL, TRUE);
-    }
-
-    return $access;
+  protected function checkUrlAccess(Url $url): AccessResultInterface {
+    return $url->isRouted()
+      ? $this->accessManager->checkNamedRoute($url->getRouteName(), $url->getRouteParameters(), NULL, TRUE)
+      : AccessResult::allowed();
   }
 
 }

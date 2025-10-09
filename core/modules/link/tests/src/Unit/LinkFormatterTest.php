@@ -32,7 +32,6 @@ class LinkFormatterTest extends UnitTestCase {
    */
   public function testFormatterLinkItemUrlMalformed(): void {
     $entity = $this->createStub(EntityInterface::class);
-    $expectedUrl = Url::fromUri('route:<none>');
 
     $linkItem = $this->createMock(LinkItemInterface::class);
     $linkItem->expects($this->any())
@@ -43,10 +42,8 @@ class LinkFormatterTest extends UnitTestCase {
       ->willThrowException(new \InvalidArgumentException());
     $linkItem->expects($this->any())
       ->method('__get')
-      ->willReturnCallback(fn (string $property) => match (TRUE) {
-        $property === 'options' => [],
-        $property === '_url' => $expectedUrl,
-      });
+      ->with('options')
+      ->willReturn([]);
     $fieldDefinition = $this->createStub(FieldDefinitionInterface::class);
     $fieldList = new FieldItemList($fieldDefinition, '', $linkItem);
 
@@ -68,7 +65,6 @@ class LinkFormatterTest extends UnitTestCase {
     $pathValidator = $this->createStub(PathValidatorInterface::class);
     $accessManager = $this->createStub(AccessManagerInterface::class);
     $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator, $accessManager);
-    $linkFormatter->prepareView([$fieldList]);
     $elements = $linkFormatter->viewElements($fieldList, 'es');
     $this->assertEquals('link', $elements[0]['#type']);
   }
@@ -78,7 +74,6 @@ class LinkFormatterTest extends UnitTestCase {
    */
   public function testFormatterLinkItemUrlUnexpectedException(): void {
     $entity = $this->createStub(EntityInterface::class);
-    $expectedUrl = Url::fromUri('route:<none>');
 
     $linkItem = $this->createMock(LinkItemInterface::class);
     $linkItem->expects($this->any())
@@ -89,10 +84,8 @@ class LinkFormatterTest extends UnitTestCase {
       ->willThrowException(new \Exception('Unexpected!!!'));
     $linkItem->expects($this->any())
       ->method('__get')
-      ->willReturnCallback(fn (string $property) => match (TRUE) {
-        $property === 'options' => [],
-        $property === '_url' => $expectedUrl,
-      });
+      ->with('options')
+      ->willReturn([]);
     $fieldDefinition = $this->createStub(FieldDefinitionInterface::class);
     $fieldList = new FieldItemList($fieldDefinition, '', $linkItem);
 
@@ -110,7 +103,6 @@ class LinkFormatterTest extends UnitTestCase {
     $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator, $accessManager);
     $this->expectException(\Exception::class);
     $this->expectExceptionMessageIs('Unexpected!!!');
-    $linkFormatter->prepareView([$fieldList]);
     $linkFormatter->viewElements($fieldList, 'fr');
   }
 
@@ -130,10 +122,8 @@ class LinkFormatterTest extends UnitTestCase {
       ->willReturn($expectedUrl);
     $linkItem->expects($this->any())
       ->method('__get')
-      ->willReturnCallback(fn (string $property) => match (TRUE) {
-        $property === 'options' => [],
-        $property === '_url' => $expectedUrl,
-      });
+      ->with('options')
+      ->willReturn([]);
     $fieldDefinition = $this->createStub(FieldDefinitionInterface::class);
     $fieldList = new FieldItemList($fieldDefinition, '', $linkItem);
 
@@ -155,7 +145,6 @@ class LinkFormatterTest extends UnitTestCase {
     $pathValidator = $this->createStub(PathValidatorInterface::class);
     $accessManager = $this->createStub(AccessManagerInterface::class);
     $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator, $accessManager);
-    $linkFormatter->prepareView([$fieldList]);
     $elements = $linkFormatter->viewElements($fieldList, 'zh');
     $this->assertEquals([
       [
