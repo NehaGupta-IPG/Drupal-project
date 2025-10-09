@@ -83,11 +83,6 @@
    *   The server-side rendered HTML for this contextual link.
    */
   function initContextual($contextual, html) {
-    if (!$contextual || !$contextual.length) {
-      console.warn('Skipping contextual init: element not found or empty.');
-      return;
-    }
-
     const $region = $contextual.closest('.contextual-region');
     const { contextual } = Drupal;
 
