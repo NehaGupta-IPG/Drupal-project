@@ -43,7 +43,7 @@ class LinkViewsDataTest extends ViewsKernelTestBase {
    *
    * @see \Drupal\link\Hook\LinkViewsHooks::fieldViewsDataAlter()
    */
-  public function testClickSortable() {
+  public function testClickSortable(): void {
     // Add a link field to entity_test.
     FieldStorageConfig::create([
       'entity_type' => 'entity_test',
