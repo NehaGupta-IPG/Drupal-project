@@ -5,6 +5,7 @@ namespace Drupal\link\Plugin\Field\FieldFormatter;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -29,46 +30,18 @@ use Drupal\link\LinkItemInterface;
 )]
 class LinkFormatter extends FormatterBase {
 
-  /**
-   * The path validator service.
-   *
-   * @var \Drupal\Core\Path\PathValidatorInterface
-   */
-  protected $pathValidator;
-
-  /**
-   * The access manager.
-   *
-   * @var \Drupal\Core\Access\AccessManagerInterface
-   */
-  protected $accessManager;
-
-  /**
-   * Constructs a new LinkFormatter.
-   *
-   * @param string $plugin_id
-   *   The plugin ID for the formatter.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
-   *   The definition of the field to which the formatter is associated.
-   * @param array $settings
-   *   The formatter settings.
-   * @param string $label
-   *   The formatter label display setting.
-   * @param string $view_mode
-   *   The view mode.
-   * @param array $third_party_settings
-   *   Third party settings.
-   * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
-   *   The path validator service.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
-   *   The access manager.
-   */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, PathValidatorInterface $path_validator, AccessManagerInterface $access_manager) {
+  public function __construct(
+    $plugin_id,
+    $plugin_definition,
+    FieldDefinitionInterface $field_definition,
+    array $settings,
+    $label,
+    $view_mode,
+    array $third_party_settings,
+    protected PathValidatorInterface $pathValidator,
+    protected AccessManagerInterface $accessManager,
+  ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
-    $this->pathValidator = $path_validator;
-    $this->accessManager = $access_manager;
   }
 
   /**
@@ -81,7 +54,7 @@ class LinkFormatter extends FormatterBase {
       'url_plain' => '',
       'rel' => '',
       'target' => '',
-      'access_check' => '',
+      'access_check' => FALSE,
     ] + parent::defaultSettings();
   }
 
@@ -182,7 +155,7 @@ class LinkFormatter extends FormatterBase {
    *
    * @phpstan-param \Drupal\Core\Field\FieldItemListInterface<\Drupal\link\LinkItemInterface> $items
    */
-  public function prepareView(array $entities_items) {
+  public function prepareView(array $entities_items): void {
     foreach ($entities_items as $items) {
       foreach ($items as $item) {
         $item->_url = $this->buildUrl($item);
@@ -308,10 +281,10 @@ class LinkFormatter extends FormatterBase {
    * @param \Drupal\link\LinkItemInterface $item
    *   The link field item to check.
    *
-   * @return \Drupal\Core\Access\AccessResult
+   * @return \Drupal\Core\Access\AccessResultInterface
    *   A cacheable access result.
    */
-  protected function checkAccess(LinkItemInterface $item) {
+  protected function checkAccess(LinkItemInterface $item): AccessResultInterface {
     $access = AccessResult::allowed();
 
     /** @var \Drupal\core\Url $url */
