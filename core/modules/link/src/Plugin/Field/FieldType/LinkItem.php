@@ -199,30 +199,20 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
   /**
    * {@inheritdoc}
    */
-  public function isEntityLink(): bool {
+  public function getCacheTags(): array {
+    // Get cache tags from any referenced entity.
     $uri_parts = parse_url($this->uri);
-    if ($uri_parts === FALSE) {
-      throw new \InvalidArgumentException("The URI '$this->uri' is malformed.");
+    if ($uri_parts === FALSE || $uri_parts['scheme'] != 'entity') {
+      return [];
     }
-    return !empty($uri_parts['scheme']) && $uri_parts['scheme'] == 'entity';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getLinkedEntity(): EntityInterface {
-    $uri_parts = parse_url($this->uri);
     [$entity_type_id, $entity_id] = explode('/', $uri_parts['path'], 2);
-    if ($uri_parts === FALSE || $uri_parts['scheme'] != 'entity' || $entity_id === '') {
-      throw new \InvalidArgumentException("The URI '$this->uri' does not reference an entity.");
-    }
     try {
       $entity = \Drupal::entityTypeManager()->getStorage($entity_type_id)->load($entity_id);
+      return $entity->getCacheTags();
     }
     catch (\Exception) {
-      throw new \InvalidArgumentException('Could not load a referenced entity.');
+      return [];
     }
-    return $entity;
   }
 
 }

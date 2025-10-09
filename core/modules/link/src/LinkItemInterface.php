@@ -53,25 +53,11 @@ interface LinkItemInterface extends FieldItemInterface {
   public function getTitle(): ?string;
 
   /**
-   * Checks if the link's URI references a Drupal entity.
+   * Gets an array of cache tags for the link.
    *
-   * @return bool
-   *   TRUE if the URI references an entity, FALSE otherwise.
-   *
-   * @throws \InvalidArgumentException
-   *   Thrown if the URI is malformed.
+   * @return array
+   *   The cache tags.
    */
-  public function isEntityLink(): bool;
-
-  /**
-   * Gets the entity referenced by the link, if any.
-   *
-   * @return \Drupal\Core\Entity\EntityInterface
-   *   The referenced entity.
-   *
-   * @throws \InvalidArgumentException
-   *   Thrown if the URI does not reference a Drupal entity.
-   */
-  public function getLinkedEntity(): EntityInterface;
+  public function getCacheTags(): array;
 
 }
