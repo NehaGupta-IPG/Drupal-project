@@ -89,6 +89,13 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
           'size' => 'big',
           'serialize' => TRUE,
         ],
+        'is_external' => [
+          'description' => 'Whether the link is external.',
+          'type' => 'int',
+          'size' => 'tiny',
+          'unsigned' => TRUE,
+          'default' => 0,
+        ],
       ],
       'indexes' => [
         'uri' => [['uri', 30]],
