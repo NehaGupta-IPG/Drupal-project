@@ -219,7 +219,7 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
     try {
       $entity = \Drupal::entityTypeManager()->getStorage($entity_type_id)->load($entity_id);
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       throw new \InvalidArgumentException('Could not load a referenced entity.');
     }
     return $entity;
