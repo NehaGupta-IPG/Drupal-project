@@ -55,16 +55,15 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
 
     $properties['options'] = MapDataDefinition::create()
       ->setLabel(new TranslatableMarkup('Options'));
-    // Add props 'is_external'.
+
     $properties['is_external'] = DataDefinition::create('boolean')
       ->setLabel(t('Is External'))
       ->setDescription(t('Indicates if the link is external.'))
       ->setComputed(TRUE)
       ->setReadOnly(TRUE)
-      ->setClass('\Drupal\link\IsExternalProcessed');
+      ->setClass('\Drupal\link\IsExternalComputed');
 
     return $properties;
-
   }
 
   /**

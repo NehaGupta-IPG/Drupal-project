@@ -5,12 +5,12 @@ namespace Drupal\link;
 use Drupal\Core\TypedData\TypedData;
 
 /**
- * A computed property for processing if link is external.
+ * A computed property for processing if a link field's URL is external.
  */
-class IsExternalProcessed extends TypedData {
+class IsExternalComputed extends TypedData {
 
   /**
-   * Cached is external value.
+   * Cached is_external value.
    *
    * @var bool|null
    */
