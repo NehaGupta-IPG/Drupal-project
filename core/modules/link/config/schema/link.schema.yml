@@ -72,6 +72,7 @@ field.value.link:
         query:
           type: sequence
           label: 'URL query key value pairs'
+          orderby: key
           sequence:
             type: string
         fragment:
@@ -86,5 +87,6 @@ field.value.link:
         attributes:
           type: sequence
           label: 'Link attributes'
+          orderby: key
           sequence:
             type: string

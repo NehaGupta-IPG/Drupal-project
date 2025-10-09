@@ -5,12 +5,14 @@ core.extension:
     module:
       type: sequence
       label: 'Enabled modules'
+      orderby: key
       sequence:
         type: integer
         label: 'Weight'
     theme:
       type: sequence
       label: 'Installed themes'
+      orderby: key
       sequence:
         type: integer
         label: 'Weight'

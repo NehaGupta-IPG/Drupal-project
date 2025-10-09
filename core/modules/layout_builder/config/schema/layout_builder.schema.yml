@@ -10,6 +10,7 @@ core.entity_view_display.*.*.*.third_party.layout_builder:
       label: 'Allow a customized layout'
     sections:
       type: sequence
+      orderby: key
       sequence:
         type: layout_builder.section
 
@@ -30,11 +31,13 @@ layout_builder.section:
     components:
       type: sequence
       label: 'Components'
+      orderby: key
       sequence:
         type: layout_builder.component
     third_party_settings:
       type: sequence
       label: 'Third party settings'
+      orderby: key
       sequence:
         type: '[%parent.%parent.%type].third_party.[%key]'
 

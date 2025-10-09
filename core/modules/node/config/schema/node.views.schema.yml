@@ -120,6 +120,7 @@ views.filter.node_uid_revision:
     value:
       type: sequence
       label: 'Values'
+      orderby: key
       sequence:
         type: string
         label: 'Value'

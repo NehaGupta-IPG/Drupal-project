@@ -3,6 +3,7 @@
 views.argument_validator.none:
   type: sequence
   label: 'Basic validation'
+  orderby: key
   sequence:
     type: string
 
@@ -24,6 +25,7 @@ views.argument_validator_entity:
     bundles:
       type: sequence
       label: 'Bundles'
+      orderby: key
       sequence:
         type: string
         label: 'Bundle'

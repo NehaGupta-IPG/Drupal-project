@@ -13,6 +13,7 @@ responsive_image.styles.*:
     image_style_mappings:
       type: sequence
       label: 'Image style mappings'
+      orderby: key
       sequence:
         type: mapping
         label: 'Image style mapping'
@@ -53,6 +54,7 @@ responsive_image.image_mapping_type.sizes:
     sizes_image_styles:
       type: sequence
       label: 'Image styles to be used when using the ''sizes'' attribute'
+      orderby: key
       sequence:
         type: string
         label: 'Image style'

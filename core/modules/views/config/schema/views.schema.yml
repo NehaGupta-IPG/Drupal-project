@@ -7,6 +7,7 @@ views.settings:
     display_extenders:
       type: sequence
       label: 'Display extenders'
+      orderby: key
       sequence:
         type: string
         label: 'Display extender'
@@ -55,6 +56,7 @@ views.settings:
     field_rewrite_elements:
       type: sequence
       label: 'Field rewrite elements'
+      orderby: key
       sequence:
         type: string
         label: 'Element'
@@ -92,6 +94,7 @@ views.view.*:
     display:
       type: sequence
       label: 'Displays'
+      orderby:key
       sequence:
         type: mapping
         label: 'Display settings'
@@ -123,11 +126,13 @@ views.view.*:
               contexts:
                 type: sequence
                 label: 'Cache contexts'
+                orderby: key
                 sequence:
                   type: string
               tags:
                 type: sequence
                 label: 'Cache tags'
+                orderby: key
                 sequence:
                   type: string
               # Deprecated.

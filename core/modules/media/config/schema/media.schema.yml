@@ -52,6 +52,7 @@ media.type.*:
     field_map:
       type: sequence
       label: 'Field map'
+      orderby: key
       sequence:
         type: string
 
@@ -111,6 +112,7 @@ media.source.oembed:*:
     providers:
       type: sequence
       label: 'Allowed oEmbed providers'
+      orderby: key
       sequence:
         type: string
         label: 'Provider name'
@@ -132,12 +134,14 @@ filter_settings.media_embed:
     allowed_view_modes:
       type: sequence
       label: 'View modes selectable in the "Edit media" dialog'
+      orderby: key
       sequence:
         type: string
         label: 'View mode'
     allowed_media_types:
       type: sequence
       label: 'Media types selectable in the Media Library'
+      orderby: key
       sequence:
         type: string
         label: 'Media type'

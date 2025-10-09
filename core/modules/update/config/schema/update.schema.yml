@@ -47,6 +47,7 @@ update.settings:
         emails:
           type: sequence
           label: 'Email addresses to notify when updates are available'
+          orderby: key
           sequence:
             type: email
             label: 'Email'

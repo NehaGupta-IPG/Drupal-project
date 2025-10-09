@@ -9,5 +9,6 @@ config_schema_deprecated_test.settings:
           type: string
         products:
           type: sequence
+          orderby: key
           sequence:
             type: string

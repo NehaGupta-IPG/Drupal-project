@@ -7,6 +7,7 @@ core.menu.static_menu_link_overrides:
     definitions:
       type: sequence
       label: Definitions
+      orderby: key
       sequence:
         type: mapping
         label: Definition

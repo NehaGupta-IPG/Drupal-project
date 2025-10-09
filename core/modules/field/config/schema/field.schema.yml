@@ -51,9 +51,11 @@ field.storage.*.*:
     indexes:
       type: sequence
       label: 'Indexes'
+      orderby: key
       sequence:
         type: sequence
         label: 'Indexes'
+        orderby: key
         sequence:
           type: ignore
           label: 'Index'

@@ -11,6 +11,7 @@ filter_settings.filter_test_restrict_tags_and_attributes:
         allowed:
           type: sequence
           label: 'Allowed tags and attributes'
+          orderby: key
           sequence:
             type: ignore
             label: 'Tag and optionally list of attributes'

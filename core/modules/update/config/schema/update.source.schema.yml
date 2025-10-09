@@ -7,6 +7,7 @@ migrate.source.update_settings:
     variables:
       type: sequence
       label: 'Variables'
+      orderby: key
       sequence:
         type: string
         label: 'Variable'

@@ -7,15 +7,18 @@ update_test.settings:
     system_info:
       type: sequence
       label: 'System info'
+      orderby: key
       sequence:
         type: sequence
         label: 'Items'
+        orderby: key
         sequence:
           type: string
           label: 'Item'
     update_status:
       type: sequence
       label: 'Update status'
+      orderby: key
       sequence:
         type: mapping
         label: 'Module'
@@ -26,6 +29,7 @@ update_test.settings:
     xml_map:
       type: sequence
       label: 'XML map'
+      orderby: key
       sequence:
         type: string
         label: 'Value'

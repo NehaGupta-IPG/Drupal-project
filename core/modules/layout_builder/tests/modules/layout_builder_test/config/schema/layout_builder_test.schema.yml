@@ -3,5 +3,6 @@ layout_builder_test.test_simple_config.*:
   mapping:
     sections:
       type: sequence
+      orderby: key
       sequence:
         type: layout_builder.section

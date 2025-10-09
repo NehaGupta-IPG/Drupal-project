@@ -19,6 +19,7 @@ views.query.views_query:
     query_tags:
       type: sequence
       label: 'Query Tags'
+      orderby: key
       sequence:
         type: string
         label: 'Tag'

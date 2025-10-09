@@ -54,9 +54,11 @@ config_test.query.*:
     array:
       type: sequence
       label: 'Array level 1'
+      orderby: key
       sequence:
         type: sequence
         label: 'Array level 2'
+        orderby: key
         sequence:
           type: integer
           label: 'Value'
@@ -71,6 +73,7 @@ config_test.types:
     array:
       type: sequence
       label: 'Array'
+      orderby: key
       sequence:
         type: string
         label: 'Item'
@@ -113,6 +116,7 @@ config_test.types:
       type: sequence
       label: 'Nullable array'
       nullable: true
+      orderby: key
       sequence:
         type: string
         label: 'Item'
@@ -290,6 +294,7 @@ config_test.validation:
       constraints:
         Callback:
           callback: [\Drupal\config_test\ConfigValidation, validateSequence]
+      orderby: key
       sequence:
         type: string
         constraints:

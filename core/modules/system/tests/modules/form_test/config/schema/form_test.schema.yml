@@ -8,6 +8,7 @@ form_test.object:
     favorite_fruits:
       type: sequence
       label: 'Favorite fruits'
+      orderby: key
       sequence:
         type: required_label
         label: 'Fruit'

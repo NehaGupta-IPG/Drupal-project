@@ -27,9 +27,11 @@ workflow.type_settings.content_moderation:
     entity_types:
       type: sequence
       label: 'Entity types'
+      orderby: key
       sequence:
         type: sequence
         label: 'Bundles'
+        orderby: key
         sequence:
           type: string
           label: 'Bundle ID'

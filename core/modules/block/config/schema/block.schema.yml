@@ -53,6 +53,7 @@ block.block.*:
     visibility:
       type: sequence
       label: 'Visibility Conditions'
+      orderby: key
       sequence:
         type: condition.plugin.[id]
         label: 'Visibility Condition'

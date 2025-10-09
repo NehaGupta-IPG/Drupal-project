@@ -37,18 +37,21 @@ rest_resource.resource:
     methods:
       type: sequence
       label: 'Supported methods'
+      orderby: key
       sequence:
         type: string
         label: 'HTTP method'
     formats:
       type: sequence
       label: 'Supported formats'
+      orderby: key
       sequence:
         type: string
         label: 'Format'
     authentication:
       type: sequence
       label: 'Supported authentication providers'
+      orderby: key
       sequence:
         type: string
         label: 'Authentication provider'
@@ -59,12 +62,14 @@ rest_request:
     supported_formats:
       type: sequence
       label: 'Supported format'
+      orderby: key
       sequence:
         type: string
         label: 'Format'
     supported_auth:
       type: sequence
       label: 'Supported authentication'
+      orderby: key
       sequence:
         type: string
         label: 'Authentication'

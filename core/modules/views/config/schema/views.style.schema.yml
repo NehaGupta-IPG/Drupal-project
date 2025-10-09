@@ -72,6 +72,7 @@ views.style.table:
     columns:
       type: sequence
       label: 'Columns'
+      orderby: key
       sequence:
         type: string
         label: 'Columns name'
@@ -81,6 +82,7 @@ views.style.table:
     info:
       type: sequence
       label: 'Columns info'
+      orderby: key
       sequence:
         type: mapping
         label:  'Column info'
@@ -171,6 +173,7 @@ views.style.entity_reference:
     search_fields:
       type: sequence
       label: 'Search fields'
+      orderby: key
       sequence:
         type: string
         label: 'Search field'

@@ -29,6 +29,7 @@ field.field_settings.text:
     allowed_formats:
       type: sequence
       label: 'Allowed text formats'
+      orderby: key
       sequence:
         type: string
 
@@ -54,6 +55,7 @@ field.field_settings.text_long:
     allowed_formats:
       type: sequence
       label: 'Allowed text formats'
+      orderby: key
       sequence:
         type: string
 
@@ -83,6 +85,7 @@ field.field_settings.text_with_summary:
     allowed_formats:
       type: sequence
       label: 'Allowed text formats'
+      orderby: key
       sequence:
         type: string
 

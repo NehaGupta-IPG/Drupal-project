@@ -55,6 +55,7 @@ navigation.block_layout:
   mapping:
     sections:
       type: sequence
+      orderby: key
       sequence:
         type: layout_builder.section
 

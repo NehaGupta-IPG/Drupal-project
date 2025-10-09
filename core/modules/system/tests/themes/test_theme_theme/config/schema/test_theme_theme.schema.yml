@@ -7,6 +7,7 @@ test_theme_theme.settings:
     custom_logo:
       type: sequence
       label: 'Custom logo'
+      orderby: key
       sequence:
         type: integer
         label: 'fids'

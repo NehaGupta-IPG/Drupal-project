@@ -7,6 +7,7 @@ views.display.rest_export:
     auth:
       type: sequence
       label: 'Authentication'
+      orderby: key
       sequence:
         type: string
         label: 'Authentication Provider'
@@ -18,6 +19,7 @@ views.row.data_field:
     field_options:
       type: sequence
       label: 'Options'
+      orderby: key
       sequence:
         type: mapping
         label: 'Row'
@@ -36,6 +38,7 @@ views.style.serializer:
     formats:
       type: sequence
       label: 'Formats'
+      orderby: key
       sequence:
         type: string
         label: 'Format'

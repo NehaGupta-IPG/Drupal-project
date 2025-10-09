@@ -115,8 +115,10 @@ config_schema_test.schema_data_types:
       mapping:
         string:
           type: string
+    orderby: key
     sequence:
       type: sequence
+      orderby: key
       sequence:
         type: boolean
 
@@ -146,10 +148,12 @@ config_schema_test.plugin_types:
   mapping:
     tests:
       type: sequence
+      orderby: key
       sequence:
         type: test.plugin_types.[plugin_id]
     test_with_parents:
       type: sequence
+      orderby: key
       sequence:
         type: mapping
         mapping:
@@ -214,6 +218,7 @@ wrapping.config_schema_test.plugin_types:
   mapping:
     tests:
       type: sequence
+      orderby: key
       sequence:
         type: wrapping.test.plugin_types.[plugin_id]
 
@@ -234,6 +239,7 @@ wrapping.config_schema_test.double_brackets:
   mapping:
     tests:
       type: sequence
+      orderby: key
       sequence:
         type: wrapping.test.double_brackets.[another_key]
 
@@ -271,6 +277,7 @@ wrapping.config_schema_test.other_double_brackets:
   mapping:
     tests:
       type: sequence
+      orderby: key
       sequence:
         type: wrapping.test.other_double_brackets.[id]
 
@@ -308,6 +315,7 @@ config_schema_test.schema_sequence_sort:
         type: string
     no_sort:
       type: sequence
+      orderby: key
       sequence:
         type: string
     complex_sort_value:

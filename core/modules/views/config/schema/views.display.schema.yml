@@ -104,6 +104,7 @@ views.display.feed:
     displays:
       type: sequence
       label: 'The feed icon will be available only to the selected displays.'
+      orderby: key
       sequence:
         type: string
         label: 'Display'
@@ -119,6 +120,7 @@ views.display.attachment:
     displays:
       type: sequence
       label: 'Attach to'
+      orderby: key
       sequence:
         type: string
         label: 'Display'

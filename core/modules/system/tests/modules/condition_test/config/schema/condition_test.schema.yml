@@ -5,6 +5,7 @@ condition_test.settings:
     visibility:
       type: sequence
       label: Visibility conditions
+      orderby: key
       sequence:
         type: condition.plugin.[id]
         label: Visibility condition

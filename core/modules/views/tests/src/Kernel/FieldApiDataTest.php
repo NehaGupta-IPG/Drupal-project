@@ -339,12 +339,12 @@ class FieldApiDataTest extends ViewsKernelTestBase {
         'langcode' => 'es',
       ],
       [
-        'nid' => $node1->id(),
-        'langcode' => 'fr',
-      ],
-      [
         'nid' => $node2->id(),
         'langcode' => 'es',
+      ],
+      [
+        'nid' => $node1->id(),
+        'langcode' => 'fr',
       ],
       [
         'nid' => $node2->id(),

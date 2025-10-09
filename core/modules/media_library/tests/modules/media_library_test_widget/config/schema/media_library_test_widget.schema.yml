@@ -5,6 +5,7 @@ field.widget.settings.media_library_inception_widget:
     media_types:
       type: sequence
       label: 'Allowed media types, in display order'
+      orderby: key
       sequence:
         type: string
         label: 'Media type ID'

@@ -7,6 +7,7 @@ field.field.*.*.*.third_party.content_translation:
     translation_sync:
       type: sequence
       label: 'Field properties for which to synchronize translations'
+      orderby: key
       sequence:
         type: string
         label: 'Field column for which to synchronize translations'
@@ -21,6 +22,7 @@ language.content_settings.*.*.third_party.content_translation:
     bundle_settings:
       type: sequence
       label: 'Content translation bundle settings'
+      orderby: key
       sequence:
         type: string
         label: 'Bundle settings values'

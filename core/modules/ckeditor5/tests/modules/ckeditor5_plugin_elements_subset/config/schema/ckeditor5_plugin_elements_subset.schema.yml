@@ -5,6 +5,7 @@ ckeditor5.plugin.ckeditor5_plugin_elements_subset_sneakySuperset:
     configured_subset:
       type: sequence
       label: 'Allowed Tags'
+      orderby: key
       sequence:
         type: ckeditor5.element
         label: 'Allowed Tag'

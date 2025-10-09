@@ -112,6 +112,7 @@ search.page.*:
           interface: 'Drupal\search\Plugin\SearchInterface'
     configuration:
       type: search.plugin.[%parent.plugin]
+      orderby: key
 
 block.settings.search_form_block:
   type: block_settings

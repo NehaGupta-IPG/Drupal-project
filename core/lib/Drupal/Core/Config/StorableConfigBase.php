@@ -289,6 +289,8 @@ abstract class StorableConfigBase extends ConfigBase {
               sort($value);
               break;
 
+            default:
+              @trigger_error("Not specifying orderby for the config sequence {$this->getName()}:$key is deprecated in drupal:11.1.0 and will throw an exception in drupal:12.0.0. See https://www.drupal.org/node/7654321", E_USER_DEPRECATED);
           }
         }
       }

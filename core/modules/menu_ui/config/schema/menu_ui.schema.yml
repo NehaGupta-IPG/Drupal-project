@@ -17,6 +17,7 @@ node.type.*.third_party.menu_ui:
     available_menus:
       type: sequence
       label: 'Available menus'
+      orderby: key
       sequence:
         type: string
         label: 'Menu machine name'

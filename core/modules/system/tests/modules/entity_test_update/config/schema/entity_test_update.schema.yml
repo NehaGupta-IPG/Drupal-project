@@ -4,6 +4,7 @@ field.value.multi_value_test:
   mapping:
     value1:
       type: sequence
+      orderby: key
       sequence:
         type: string
         label: 'First value'

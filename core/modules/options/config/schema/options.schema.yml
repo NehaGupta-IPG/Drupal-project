@@ -9,6 +9,7 @@ field.storage_settings.list_integer:
     allowed_values:
       type: sequence
       label: 'Allowed values list'
+      orderby: key
       sequence:
         type: mapping
         label: 'Allowed value with label'
@@ -40,6 +41,7 @@ field.storage_settings.list_float:
     allowed_values:
       type: sequence
       label: 'Allowed values list'
+      orderby: key
       sequence:
         type: mapping
         label: 'Allowed value with label'
@@ -71,6 +73,7 @@ field.storage_settings.list_string:
     allowed_values:
       type: sequence
       label: 'Allowed values list'
+      orderby: key
       sequence:
         type: mapping
         label: 'Allowed value with label'

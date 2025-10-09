@@ -17,6 +17,7 @@ entity_reference_selection.views:
         arguments:
           type: sequence
           label: 'View arguments'
+          orderby: key
           sequence:
             type: string
             label: 'Argument'

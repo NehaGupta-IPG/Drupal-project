@@ -7,12 +7,14 @@ language_type_negotiation:
     enabled:
       type: sequence
       label: 'Enabled negotiators'
+      orderby: value
       sequence:
         type: integer
         label: Weight
     method_weights:
       type: sequence
       label: 'Negotiator weights'
+      orderby: value
       sequence:
         type: integer
         label: Weight
@@ -24,18 +26,21 @@ language.types:
     all:
       type: sequence
       label: 'All language types'
+      orderby: key
       sequence:
         type: string
         label: 'Language type'
     configurable:
       type: sequence
       label: 'Configurable language types'
+      orderby: key
       sequence:
         type: string
         label: 'Language type'
     negotiation:
       type: sequence
       label: 'Language negotiation per type settings'
+      orderby: key
       sequence:
         type: language_type_negotiation
         label: 'Language negotiation per type setting'
@@ -61,12 +66,14 @@ language.negotiation:
         prefixes:
           type: sequence
           label: 'Path prefix configuration'
+          orderby: key
           sequence:
             type: string
             label: 'Path prefix'
         domains:
           type: sequence
           label: 'Domain configuration'
+          orderby: key
           sequence:
             type: string
             label: 'Domain'
@@ -80,6 +87,7 @@ language.mappings:
   mapping:
     map:
       type: sequence
+      orderby: key
       sequence:
         type: string
         label: 'Language'
@@ -155,5 +163,6 @@ condition.plugin.language:
   mapping:
     langcodes:
       type: sequence
+      orderby: value
       sequence:
         type: langcode

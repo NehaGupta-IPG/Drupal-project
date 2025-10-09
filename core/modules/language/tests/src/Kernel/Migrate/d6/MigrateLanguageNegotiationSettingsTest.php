@@ -47,8 +47,8 @@ class MigrateLanguageNegotiationSettingsTest extends MigrateDrupal6TestBase {
     $this->assertSame(['language-interface' => 0], $config->get('negotiation.language_content.enabled'));
     $this->assertSame(['language-url' => 0, 'language-url-fallback' => 1], $config->get('negotiation.language_url.enabled'));
     $expected_language_interface = [
-      'language-url' => 0,
       'language-selected' => 1,
+      'language-url' => 0,
     ];
     $this->assertSame($expected_language_interface, $config->get('negotiation.language_interface.enabled'));
   }
@@ -118,10 +118,10 @@ class MigrateLanguageNegotiationSettingsTest extends MigrateDrupal6TestBase {
     $this->assertSame(['language-interface' => 0], $config->get('negotiation.language_content.enabled'));
     $this->assertSame(['language-url' => 0, 'language-url-fallback' => 1], $config->get('negotiation.language_url.enabled'));
     $expected_language_interface = [
-      'language-url' => 0,
-      'language-user' => 1,
       'language-browser' => 2,
       'language-selected' => 3,
+      'language-url' => 0,
+      'language-user' => 1,
     ];
     $this->assertSame($expected_language_interface, $config->get('negotiation.language_interface.enabled'));
   }
@@ -160,8 +160,8 @@ class MigrateLanguageNegotiationSettingsTest extends MigrateDrupal6TestBase {
     $this->assertSame(['language-interface' => 0], $config->get('negotiation.language_content.enabled'));
     $this->assertSame(['language-url' => 0, 'language-url-fallback' => 1], $config->get('negotiation.language_url.enabled'));
     $expected_language_interface = [
-      'language-url' => 0,
       'language-selected' => 1,
+      'language-url' => 0,
     ];
     $this->assertSame($expected_language_interface, $config->get('negotiation.language_interface.enabled'));
   }

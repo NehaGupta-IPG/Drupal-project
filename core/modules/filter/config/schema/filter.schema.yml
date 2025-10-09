@@ -40,13 +40,14 @@ filter.format.*:
     roles:
       type: sequence
       label: 'Roles'
+      orderby: key
       sequence:
         type: string
         label: 'Role'
     filters:
       type: sequence
-      orderby: key
       label: 'Enabled filters'
+      orderby: key
       sequence:
         type: filter
 

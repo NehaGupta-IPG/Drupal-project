@@ -15,6 +15,7 @@ views.access.role:
     role:
       type: sequence
       label: 'List of roles'
+      orderby: key
       sequence:
         type: string
         label: 'Role'
@@ -37,6 +38,7 @@ views.argument_validator.entity:user:
     roles:
       type: sequence
       label: 'Restrict to the selected roles'
+      orderby: key
       sequence:
         type: string
         label: 'Role'

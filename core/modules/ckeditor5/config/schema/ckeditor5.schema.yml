@@ -10,8 +10,8 @@ editor.settings.ckeditor5:
       mapping:
         items:
           type: sequence
-          orderby: ~
           label: 'Items'
+          orderby: ~
           sequence:
             type: ckeditor5.toolbar_item
             label: 'Button'
@@ -62,11 +62,11 @@ ckeditor5.plugin.ckeditor5_heading:
   mapping:
     enabled_headings:
       type: sequence
-      orderby: value
       label: 'Enabled Headings'
       constraints:
         NotBlank:
           message: "Enable at least one heading, otherwise disable the Heading plugin."
+      orderby: value
       sequence:
         type: string
         label: 'Heading type'
@@ -96,7 +96,7 @@ ckeditor5.plugin.ckeditor5_sourceEditing:
   mapping:
     allowed_tags:
       type: sequence
-      orderby: ~
+      orderby: value
       label: 'Allowed Tags'
       sequence:
         type: ckeditor5.element
@@ -186,13 +186,13 @@ ckeditor5.plugin.ckeditor5_codeBlock:
   mapping:
     languages:
       type: sequence
-      orderby: ~
       label: 'Languages'
       constraints:
         NotBlank:
           message: "Enable at least one language, otherwise disable the Code Block plugin."
         UniqueLabelInList:
           labelKey: label
+      orderby: value
       sequence:
         type: mapping
         label: 'Language'
@@ -213,7 +213,7 @@ ckeditor5.plugin.ckeditor5_style:
   mapping:
     styles:
       type: sequence
-      orderby: ~
+      orderby: key
       label: 'Styles'
       constraints:
         NotBlank:

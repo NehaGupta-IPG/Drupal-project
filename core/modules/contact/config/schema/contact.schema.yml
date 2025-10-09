@@ -18,6 +18,7 @@ contact.form.*:
     recipients:
       type: sequence
       label: 'Recipients'
+      orderby: key
       sequence:
         type: email
         label: 'Email address'

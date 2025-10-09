@@ -16,6 +16,7 @@ views_display:
     fields:
       type: sequence
       label: 'Fields'
+      orderby: key
       sequence:
         type: views.field.[plugin_id]
     pager:
@@ -62,21 +63,25 @@ views_display:
     empty:
       type: sequence
       label: 'No results behavior'
+      orderby: key
       sequence:
         type: views.area.[plugin_id]
     sorts:
       type: sequence
       label: 'Sorts'
+      orderby: key
       sequence:
         type: views.sort.[plugin_id]
     arguments:
       type: sequence
       label: 'Arguments'
+      orderby: key
       sequence:
         type: views.argument.[plugin_id]
     filters:
       type: sequence
       label: 'Filters'
+      orderby: key
       sequence:
         type: views.filter.[plugin_id]
     filter_groups:
@@ -89,6 +94,7 @@ views_display:
         groups:
           type: sequence
           label: 'Groups'
+          orderby: key
           sequence:
             type: string
             label: 'Operator'
@@ -220,6 +226,7 @@ views_display:
     relationships:
       type: sequence
       label: 'Relationships'
+      orderby: key
       sequence:
         type: views.relationship.[plugin_id]
     css_class:
@@ -255,11 +262,13 @@ views_display:
     header:
       type: sequence
       label: 'Header'
+      orderby: key
       sequence:
         type: views.area.[plugin_id]
     footer:
       type: sequence
       label: 'Footer'
+      orderby: key
       sequence:
         type: views.area.[plugin_id]
     display_comment:
@@ -277,6 +286,7 @@ views_display:
     display_extenders:
       type: sequence
       label: 'Display extenders'
+      orderby: key
       sequence:
         type: views.display_extender.[%key]
 
@@ -712,6 +722,7 @@ views_style:
     grouping:
       type: sequence
       label: 'Grouping field number %i'
+      orderby: key
       sequence:
         type: mapping
         label: 'Field'
@@ -775,6 +786,7 @@ views_filter:
         operator_list:
           type: sequence
           label: 'List of available operators'
+          orderby: key
           sequence:
             type: string
             label: 'Operator'
@@ -793,6 +805,7 @@ views_filter:
         remember_roles:
           type: sequence
           label: 'User roles'
+          orderby: key
           sequence:
             type: string
             label: 'Role'
@@ -830,12 +843,14 @@ views_filter:
         default_group_multiple:
           type: sequence
           label: 'Defaults'
+          orderby: key
           sequence:
             type: integer
             label: 'Default'
         group_items:
           type: sequence
           label: 'Group items'
+          orderby: key
           sequence:
             type: views.filter.group_item.[%parent.%parent.%parent.plugin_id]
             label: 'Group item'
@@ -929,6 +944,7 @@ views_field_bulk_form:
     selected_actions:
       type: sequence
       label: 'Available actions'
+      orderby: key
       sequence:
         type: string
         label: 'Action'

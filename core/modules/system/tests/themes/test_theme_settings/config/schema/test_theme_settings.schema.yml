@@ -7,12 +7,14 @@ test_theme_settings.settings:
     custom_logo:
       type: sequence
       label: 'Custom logo'
+      orderby: key
       sequence:
         type: integer
         label: 'fids'
     multi_file:
       type: sequence
       label: 'Multiple file field with all file extensions'
+      orderby: key
       sequence:
         type: integer
         label: 'fids'

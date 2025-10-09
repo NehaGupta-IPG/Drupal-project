@@ -74,6 +74,7 @@ views.field.links:
     fields:
       type: sequence
       label: 'Fields'
+      orderby: key
       sequence:
         type: string
         label: 'Field'
@@ -229,6 +230,7 @@ views.field.field:
     group_columns:
       type: sequence
       label: 'Group by columns'
+      orderby: key
       sequence:
         type: string
         label: 'Column'

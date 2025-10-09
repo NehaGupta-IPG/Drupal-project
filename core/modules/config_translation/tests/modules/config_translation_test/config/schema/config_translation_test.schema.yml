@@ -16,5 +16,6 @@ config_translation_test.content:
     animals:
       type: sequence
       label: 'Animals'
+      orderby: key
       sequence:
         type: label

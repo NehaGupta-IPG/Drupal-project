@@ -17,6 +17,7 @@ views.row.fields:
     inline:
       type: sequence
       label: 'Inline'
+      orderby: key
       sequence:
         type: string
         label: 'Inline'

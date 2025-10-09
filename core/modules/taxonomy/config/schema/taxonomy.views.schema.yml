@@ -56,6 +56,7 @@ views.argument_validator.taxonomy_term_name:
     vids:
       type: sequence
       label: 'Vocabularies'
+      orderby: key
       sequence:
         type: string
         label: 'Vocabulary'
@@ -79,6 +80,7 @@ views.argument_default.taxonomy_tid:
     vids:
       type: sequence
       label: 'Vocabularies'
+      orderby: key
       sequence:
         type: string
         label: 'Vocabulary'
@@ -112,6 +114,7 @@ views.field.taxonomy_index_tid:
     vids:
       type: sequence
       label: 'Vocabularies'
+      orderby: key
       sequence:
         type: string
         label: 'Vocabulary'
@@ -138,6 +141,7 @@ views.filter.taxonomy_index_tid:
     value:
       type: sequence
       label: 'Values'
+      orderby: key
       sequence:
         type: integer
         label: 'Value'
@@ -157,6 +161,7 @@ views.relationship.node_term_data:
     vids:
       type: sequence
       label: 'Vocabularies'
+      orderby: key
       sequence:
         type: string
         label: 'Vocabulary'

@@ -17,6 +17,7 @@ views.style.mapping_test:
         numeric_field:
           type: sequence
           label: 'Numeric fields'
+          orderby: key
           sequence:
             type: string
             label: 'Numeric field'

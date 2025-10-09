@@ -39,6 +39,7 @@ workflows.transition:
     from:
       type: sequence
       label: 'From state IDs'
+      orderby: key
       sequence:
         type: string
         label: 'From state ID'
