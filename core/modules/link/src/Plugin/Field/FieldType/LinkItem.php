@@ -162,7 +162,13 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
    * {@inheritdoc}
    */
   public function isExternal() {
-    return $this->getUrl()->isExternal();
+    try {
+      return $this->getUrl()->isExternal();
+    }
+    catch (\InvalidArgumentException $e) {
+      // There was an error building the Url object.
+      return FALSE;
+    }
   }
 
   /**
