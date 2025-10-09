@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\claro\FunctionalJavascript;
 
-use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
-use Drupal\Tests\AxeCoreTestTrait;
-use PHPUnit\Framework\Attributes\DataProvider;
+use Drupal\FunctionalJavascriptTests\AccessibilityTestBase;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
@@ -14,85 +12,44 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[Group('claro')]
 #[Group('accessibility')]
-class AccessibilityTest extends WebDriverTestBase {
-
-  use AxeCoreTestTrait;
+class AccessibilityTest extends AccessibilityTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = [];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $profile = 'nightwatch_a11y_testing';
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-
-    // Create an admin user and log in.
-    $this->drupalLogin($this->drupalCreateUser(admin: TRUE));
-  }
-
-  /**
-   * Test some pages.
-   *
-   * @param string $uri
-   *   The path to be tested.
-   * @param array|null $axe_options
-   *   (optional) Associative array of Axe options.
-   * @param array|null $browser_options
-   *   (optional) Associative array of browser options.
-   */
-  #[DataProvider('providerTestAdminPages')]
-  public function testAdminPages(string $uri, array $axe_options = [], ?array $browser_options = NULL): void {
-    $this->drupalGet($uri);
-    if (isset($browser_options['window_size'])) {
-      $this->getSession()->resizeWindow($browser_options['window_size']['width'], $browser_options['window_size']['height']);
-    }
-    $this->executeAxe($axe_options);
-  }
-
-  /**
-   * Data provider for testAdminPages.
-   *
-   * @return array
-   *   Test cases. Each case is a key-value pair. The key is the test name
-   *   and the value is an array containing:
-   *    - Path to be tested.
-   *    - Optional associative array of Axe options.
-   *    - Optional associative array of browser options.
-   */
-  public static function providerTestAdminPages(): array {
-    return [
-      'User Edit' => [
-        '/user/1/edit',
-      ],
-      'Create Article' => [
-        '/node/add/article',
-      ],
-      'Create Page' => [
-        '/node/add/page',
-      ],
-      'Content Page' => [
-        '/admin/content',
-      ],
-      'Structure Page' => [
-        '/admin/structure',
-      ],
-      'Add content type' => [
-        '/admin/structure/types/add',
-      ],
-      'Add vocabulary' => [
-        '/admin/structure/taxonomy/add',
-      ],
+  protected static array $testCases = [
+    'User Edit' => [
+      '/user/1/edit',
+      TRUE,
+    ],
+    'Create Article' => [
+      '/node/add/article',
+      TRUE,
+    ],
+    'Create Page' => [
+      '/node/add/page',
+      TRUE,
+    ],
+    'Content Page' => [
+      '/admin/content',
+      TRUE,
+    ],
+    'Structure Page' => [
+      '/admin/structure',
+      TRUE,
+    ],
+    'Add content type' => [
+      '/admin/structure/types/add',
+      TRUE,
+    ],
+    'Add vocabulary' => [
+      '/admin/structure/taxonomy/add',
+      TRUE,
+    ],
       // @todo remove the skipped rules below in https://drupal.org/i/3318394.
-      'Structure | Block' => [
-        '/admin/structure/block',
+    'Structure | Block' => [
+      '/admin/structure/block',
+      TRUE,
         [
           'rules' => [
             'color-contrast' => ['enabled' => FALSE],
@@ -100,10 +57,11 @@ class AccessibilityTest extends WebDriverTestBase {
             'region' => ['enabled' => FALSE],
           ],
         ],
-      ],
+    ],
       // Tests long breadcrumb for https://drupal.org/i/3223147.
-      'Manage text format, mobile' => [
-        '/admin/config/content/formats/manage/restricted_html',
+    'Manage text format, mobile' => [
+      '/admin/config/content/formats/manage/restricted_html',
+      TRUE,
         [
           // This is the only way to add WCAG 2.2 tags to defaults.
           // See https://github.com/dequelabs/axe-core/issues/4717.
@@ -120,16 +78,15 @@ class AccessibilityTest extends WebDriverTestBase {
             ],
           ],
         ],
-        [
-          'window_size' => [
+      'browser_options' => [
+        'resize_window' => [
             // Minimum window size seems to be 500px.
-            'width' => 500,
+          'width' => 500,
             // Height used by Lighthouse for mobile.
-            'height' => 823,
-          ],
+          'height' => 823,
         ],
       ],
-    ];
-  }
+    ],
+  ];
 
 }

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\olivero\FunctionalJavascript;
 
-use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
-use Drupal\Tests\AxeCoreTestTrait;
-use PHPUnit\Framework\Attributes\DataProvider;
+use Drupal\FunctionalJavascriptTests\AccessibilityTestBase;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
@@ -14,62 +12,35 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[Group('olivero')]
 #[Group('accessibility')]
-class AccessibilityTest extends WebDriverTestBase {
-
-  use AxeCoreTestTrait;
+class AccessibilityTest extends AccessibilityTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = [];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $profile = 'nightwatch_a11y_testing';
-
-  /**
-   * Test some pages.
-   *
-   * @param string $uri
-   *   The path to be tested.
-   * @param array|null $options
-   *   (optional) Associative array of Axe options.
-   */
-  #[DataProvider('providerTestAnonymousPages')]
-  public function testAnonymousPages(string $uri, array $options = []): void {
-    $this->drupalGet($uri);
-    $this->executeAxe($options);
-  }
-
-  /**
-   * Data provider for testAnonymousPages.
-   *
-   * @return array
-   *   Test cases.
-   */
-  public static function providerTestAnonymousPages(): array {
-    return [
-      'Homepage' => [
-        '<front>',
+  protected static array $testCases = [
+    'Homepage' => [
+      '<front>',
+      FALSE,
         // @todo remove the disabled 'region' rule in https://drupal.org/i/3318396.
         [
           'rules' => [
             'region' => ['enabled' => FALSE],
           ],
         ],
-      ],
-      'Login' => [
-        '/user/login',
+    ],
+    'Login' => [
+      '/user/login',
+      FALSE,
         // @todo remove the disabled 'region' rule in https://drupal.org/i/3318396.
         [
           'rules' => [
             'region' => ['enabled' => FALSE],
           ],
         ],
-      ],
-      'Search' => [
-        '/search/node',
+    ],
+    'Search' => [
+      '/search/node',
+      FALSE,
         // @todo remove the heading and duplicate id rules below in
         //   https://drupal.org/i/3318398.
         [
@@ -78,8 +49,7 @@ class AccessibilityTest extends WebDriverTestBase {
             'duplicate-id-aria' => ['enabled' => FALSE],
           ],
         ],
-      ],
-    ];
-  }
+    ],
+  ];
 
 }
