@@ -164,7 +164,7 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
     try {
       return $this->getUrl()->isExternal();
     }
-    catch (\InvalidArgumentException $e) {
+    catch (\InvalidArgumentException) {
       // There was an error building the Url object.
       return FALSE;
     }
