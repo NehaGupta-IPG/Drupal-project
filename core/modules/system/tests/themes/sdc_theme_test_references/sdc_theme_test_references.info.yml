@@ -1,0 +1,6 @@
+name: 'SDC test theme for JSON schema references'
+type: theme
+description: 'Test theme for sdc with JSON schema references to resolve.'
+version: VERSION
+base theme: sdc_theme_test_base
+enforce_prop_schemas: true

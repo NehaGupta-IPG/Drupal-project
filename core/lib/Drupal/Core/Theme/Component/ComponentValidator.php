@@ -95,14 +95,18 @@ class ComponentValidator {
     // that is hard to trace back to the property.
     $non_string_props = [];
     \array_walk($prop_names, function (string $prop) use (&$non_string_props, $schema) {
-      $type = $schema['properties'][$prop]['type'];
+      $type = $schema['properties'][$prop]['type'] ?? NULL;
+      // Not every prop have a type. For example, if a $ref was not resolved
+      // successfully. It is how the schema resolver of justinrainbow works.
+      if (!$type && $schema['properties'][$prop]['$ref']) {
+        return;
+      }
       $types = !\is_array($type) ? [$type] : $type;
       $non_string_types = \array_filter($types, static fn (mixed $type) => !\is_string($type));
       if ($non_string_types) {
         $non_string_props[] = $prop;
       }
     });
-
     if ($non_string_props) {
       throw new InvalidComponentException(\sprintf(
         'The component "%s" uses non-string types for properties: %s.',

@@ -1,0 +1,16 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Foo
+description: A component to test JSON schema references.
+props:
+  type: object
+  properties:
+    image:
+      $ref: module://image/schema.json#image
+    attributes:
+      $ref: module://system/schema.json#attributes
+    links:
+      $ref: module://system/schema.json#links
+    from_theme:
+      $ref: theme://sdc_theme_test_references/bar.json#test
+    unresolvable:
+      $ref: "non-existing-schema://whatever"

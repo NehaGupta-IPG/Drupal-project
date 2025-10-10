@@ -1,0 +1,7 @@
+{
+  "test": {
+    "type": "number",
+    "min": 5,
+    "max": 10
+  }
+}
