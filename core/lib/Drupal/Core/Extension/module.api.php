@@ -546,6 +546,32 @@ function hook_install_tasks_alter(&$tasks, $install_state) {
 // phpcs:disable Drupal.Commenting.DocComment.ParamNotFirst
 
 /**
+ * Perform necessary actions after Drupal being installed.
+ *
+ * It is recommended that you implement this hook if you want to perform some
+ * actions after site is installed.
+ *
+ * This hook is invoked at the end of installation profile. Where multiple
+ * modules implement hooks, they will be executed in order of their module
+ * weight.
+ *
+ * @param $install_state
+ *   An array of information about the current installation state.
+ *
+ * @see install_tasks()
+ */
+function hook_site_install_finished($install_state) {
+  // Example function body for setting state only once installation
+  // has finally completed.
+  if (!empty($install_state['parameters']['profile'])) {
+    $profile = $install_state['parameters']['profile'];
+    if ($profile === 'special_profile') {
+      \Drupal::state()->set('my_module_special_profile_support', TRUE);
+    }
+  }
+}
+
+/**
  * Perform a single update between minor versions.
  *
  * Only procedural implementations are supported for this hook.
