@@ -10,6 +10,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\workspaces\Provider\WorkspaceProviderInterface;
+use Drupal\workspaces\Negotiator\WorkspaceNegotiatorInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -17,17 +18,27 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Provides the workspace manager.
+ *
+ * @property iterable $negotiators
  */
 class WorkspaceManager implements WorkspaceManagerInterface {
 
   use StringTranslationTrait;
 
   /**
-   * The current active workspace or FALSE if there is no active workspace.
+   * The current active workspace.
    *
-   * @var \Drupal\workspaces\WorkspaceInterface|false
+   * The value is either a workspace object, FALSE if there is no active
+   * workspace, or NULL if the active workspace hasn't been determined yet.
    */
-  protected $activeWorkspace;
+  protected WorkspaceInterface|false|null $activeWorkspace = NULL;
+
+  /**
+   * An array of workspace negotiator services.
+   *
+   * @todo Remove in drupal:12.0.0.
+   */
+  private array $collectedNegotiators = [];
 
   public function __construct(
     protected RequestStack $requestStack,
@@ -37,14 +48,18 @@ class WorkspaceManager implements WorkspaceManagerInterface {
     protected StateInterface $state,
     #[Autowire(service: 'logger.channel.workspaces')]
     protected LoggerInterface $logger,
-    protected ClassResolverInterface $classResolver,
+    #[AutowireIterator(tag: 'workspace_negotiator')]
+    protected $negotiators,
     protected WorkspaceAssociationInterface $workspaceAssociation,
     protected WorkspaceInformationInterface $workspaceInfo,
-    #[AutowireIterator(tag: 'workspace_negotiator')]
-    protected iterable $negotiators = [],
     #[AutowireIterator(tag: 'workspace_provider', indexAttribute: 'id')]
     protected iterable $providers = [],
-  ) {}
+  ) {
+    if ($negotiators instanceof ClassResolverInterface) {
+      @trigger_error('Passing the \'class_resolver\' service as the 7th argument to ' . __METHOD__ . ' is deprecated in drupal:11.3.0 and is unsupported in drupal:12.0.0. Use autowiring for the \'workspaces.manager\' service instead. See https://www.drupal.org/node/3532939', E_USER_DEPRECATED);
+      $this->negotiators = $this->collectedNegotiators;
+    }
+  }
 
   /**
    * {@inheritdoc}
@@ -96,15 +111,19 @@ class WorkspaceManager implements WorkspaceManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function setActiveWorkspace(WorkspaceInterface $workspace) {
+  public function setActiveWorkspace(WorkspaceInterface $workspace, /* bool $persist = TRUE */) {
+    $persist = func_num_args() < 2 || func_get_arg(1);
+
     $this->doSwitchWorkspace($workspace);
 
-    // Set the workspace on the proper negotiator.
-    $request = $this->requestStack->getCurrentRequest();
-    foreach ($this->negotiators as $negotiator) {
-      if ($negotiator->applies($request)) {
-        $negotiator->setActiveWorkspace($workspace);
-        break;
+    // Set the workspace on the first applicable negotiator.
+    if ($persist) {
+      $request = $this->requestStack->getCurrentRequest();
+      foreach ($this->negotiators as $negotiator) {
+        if ($negotiator->applies($request)) {
+          $negotiator->setActiveWorkspace($workspace);
+          break;
+        }
       }
     }
 
@@ -155,7 +174,6 @@ class WorkspaceManager implements WorkspaceManagerInterface {
     // Clear the static entity cache for the supported entity types.
     $cache_tags_to_invalidate = [];
     foreach (array_keys($this->workspaceInfo->getSupportedEntityTypes()) as $entity_type_id) {
-      $this->entityTypeManager->getStorage($entity_type_id)->resetCache();
       $cache_tags_to_invalidate[] = 'entity.memory_cache:' . $entity_type_id;
     }
     $this->entityMemoryCache->invalidateTags($cache_tags_to_invalidate);
@@ -179,9 +197,19 @@ class WorkspaceManager implements WorkspaceManagerInterface {
     }
 
     $previous_active_workspace = $this->getActiveWorkspace();
-    $this->doSwitchWorkspace($workspace);
+
+    // Switch to the requested workspace only if we're in Live or in another
+    // workspace.
+    $should_switch_workspace = !$previous_active_workspace || $previous_active_workspace->id() != $workspace_id;
+    if ($should_switch_workspace) {
+      $this->doSwitchWorkspace($workspace);
+    }
     $result = $function();
-    $this->doSwitchWorkspace($previous_active_workspace);
+
+    // Switch back if needed.
+    if ($should_switch_workspace) {
+      $this->doSwitchWorkspace($previous_active_workspace);
+    }
 
     return $result;
   }
@@ -191,9 +219,17 @@ class WorkspaceManager implements WorkspaceManagerInterface {
    */
   public function executeOutsideWorkspace(callable $function) {
     $previous_active_workspace = $this->getActiveWorkspace();
-    $this->doSwitchWorkspace(NULL);
+
+    // Switch to Live if we're in a workspace.
+    if ($previous_active_workspace) {
+      $this->doSwitchWorkspace(NULL);
+    }
     $result = $function();
-    $this->doSwitchWorkspace($previous_active_workspace);
+
+    // Switch back if needed.
+    if ($previous_active_workspace) {
+      $this->doSwitchWorkspace($previous_active_workspace);
+    }
 
     return $result;
   }
@@ -283,6 +319,20 @@ class WorkspaceManager implements WorkspaceManagerInterface {
     }
 
     return $providers[$id];
+  }
+
+  /**
+   * Adds a workspace negotiator service.
+   *
+   * @param \Drupal\workspaces\Negotiator\WorkspaceNegotiatorInterface $negotiator
+   *   The negotiator to be added.
+   *
+   * @todo Remove in drupal:12.0.0.
+   *
+   * @internal
+   */
+  public function addNegotiator(WorkspaceNegotiatorInterface $negotiator): void {
+    $this->collectedNegotiators[] = $negotiator;
   }
 
 }

@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel;
 
-use Drupal\Core\Entity\Entity\EntityViewMode;
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\node\Entity\NodeType;
-use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\config_test\TestInstallStorage;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\TypedConfigManager;
+use Drupal\Core\Entity\Entity\EntityViewMode;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\node\Entity\NodeType;
+use Drupal\taxonomy\Entity\Vocabulary;
+use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that test views provided by all modules match schema.
- *
- * @group config
  */
+#[Group('config')]
 class TestViewsTest extends KernelTestBase {
 
   use SchemaCheckTestTrait;
@@ -32,12 +32,8 @@ class TestViewsTest extends KernelTestBase {
     'views',
     // For NodeType config entities to exist, its module must be installed.
     'node',
-    // The `DRUPAL_OPTIONAL` constant is used by the NodeType config entity type
-    // and only available if the system module is installed.
     // `system.menu.tools` is a config dependency. It is one of the default
     // config of the System module.
-    // @see \DRUPAL_OPTIONAL
-    // @see \Drupal\node\Entity\NodeType::$preview_mode
     // @see core/modules/views/tests/modules/views_test_config/test_views/views.view.test_row_render_cache_none.yml
     'system',
     // There are a number of `field.storage.*.*` config dependencies. For these

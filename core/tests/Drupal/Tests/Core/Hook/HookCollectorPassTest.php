@@ -7,23 +7,28 @@ namespace Drupal\Tests\Core\Hook;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Extension\ProceduralCall;
 use Drupal\Core\Hook\HookCollectorPass;
-use Drupal\Tests\UnitTestCase;
 use Drupal\Tests\Core\GroupIncludesTestTrait;
+use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
- * @coversDefaultClass \Drupal\Core\Hook\HookCollectorPass
- * @group Hook
+ * Tests Drupal\Core\Hook\HookCollectorPass.
  */
+#[CoversClass(HookCollectorPass::class)]
+#[Group('Hook')]
 class HookCollectorPassTest extends UnitTestCase {
 
   use GroupIncludesTestTrait;
 
   /**
-   * @covers ::collectAllHookImplementations
-   * @covers ::filterIterator
+   * Tests collect all hook implementations.
+   *
+   * @legacy-covers ::collectAllHookImplementations
+   * @legacy-covers ::filterIterator
    */
   public function testCollectAllHookImplementations(): void {
     vfsStream::setup('drupal_root');
@@ -71,8 +76,10 @@ __EOF__
   }
 
   /**
-   * @covers ::process
-   * @covers ::collectModuleHookImplementations
+   * Tests group includes.
+   *
+   * @legacy-covers ::process
+   * @legacy-covers ::collectModuleHookImplementations
    */
   public function testGroupIncludes(): void {
     $module_filenames = self::setupGroupIncludes();
@@ -82,6 +89,46 @@ __EOF__
     (new HookCollectorPass())->process($container);
     $argument = $container->getDefinition('module_handler')->getArgument('$groupIncludes');
     $this->assertSame(self::GROUP_INCLUDES, $argument);
+  }
+
+  /**
+   * Tests prefix ownership of procedural hooks.
+   *
+   * @legacy-covers ::process
+   * @legacy-covers ::collectModuleHookImplementations
+   */
+  public function testPrefixOwnership(): void {
+    vfsStream::setup('drupal_root');
+    $files = [
+      'modules/test_module/test_module.info.yml',
+      'modules/test_module_theme/test_module_theme.info.yml',
+    ];
+    $file_data = [];
+    foreach ($files as &$filename) {
+      NestedArray::setValue($file_data, explode('/', $filename), '');
+    }
+    vfsStream::create($file_data);
+    $module_filenames = [
+      'test_module' => ['pathname' => 'vfs://drupal_root/modules/test_module/test_module.info.yml'],
+      'test_module_theme' => ['pathname' => 'vfs://drupal_root/modules/test_module_theme/test_module_theme.info.yml'],
+    ];
+    file_put_contents('vfs://drupal_root/modules/test_module/test_module.module', <<<__EOF__
+<?php
+
+function test_module_theme_suggestions_alter();
+
+__EOF__
+    );
+    $implementations['theme_suggestions_alter'][ProceduralCall::class]['test_module_theme_suggestions_alter'] = 'test_module';
+
+    $container = new ContainerBuilder();
+    $container->setParameter('container.modules', $module_filenames);
+    $container->setDefinition('module_handler', new Definition());
+    (new HookCollectorPass())->process($container);
+    // Ensure that the hook is registered for the module it resides in.
+    // Even though there is a more specific match the current module takes
+    // precedence.
+    $this->assertSame($implementations, $container->getParameter('hook_implementations_map'));
   }
 
 }

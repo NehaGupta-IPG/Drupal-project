@@ -66,8 +66,9 @@ variables:
   CONCURRENCY: 24
   GIT_DEPTH: "50"
   PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  _TARGET_PHP: "8.3-ubuntu"
-  PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: false
+  _TARGET_PHP: "8.4-ubuntu"
+  PHPUNIT_CONFIGURATION_FILE_PATH: $CI_PROJECT_DIR/core
+  PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
 
 #############
 # Stages    #
@@ -114,7 +115,7 @@ default:
     - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
     - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
   script:
-    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --sqlite "./sites/default/files/tests.sqlite" --verbose --non-html --all
+    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --sqlite "./sites/default/files/tests.sqlite" --verbose --non-html --all
   after_script:
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
   artifacts:
@@ -166,6 +167,7 @@ default:
   # job from the target branch. Allow the job to proceed and pass if the file
   # doesn't exist.
   - mkdir core/phpstan-tmp
+  - echo "PHPStan cache URL - https://git.drupalcode.org/api/v4/projects/$CORE_GITLAB_PROJECT_ID/jobs/artifacts/$CACHE_TARGET/raw/core/phpstan-tmp/resultCache.php?job=Lint%20cache%20warming"
   - 'curl --location --output core/phpstan-tmp/resultCache.php "https://git.drupalcode.org/api/v4/projects/{$CORE_GITLAB_PROJECT_ID}/jobs/artifacts/{$CACHE_TARGET}/raw/core/phpstan-tmp/resultCache.php?job=Lint%20cache%20warming" || true'
 
 .cspell-cache: &cspell-cache
@@ -226,12 +228,14 @@ default:
       allow_failure: true
 
 # Default configuration.
-'DEFAULT: PHP 8.3 MySQL 8.0':
+'DEFAULT: PHP 8.4 MySQL 8.4':
   <<: *default-stage
   variables:
-    _TARGET_PHP: "8.3-ubuntu"
-    _TARGET_DB: "mysql-8"
+    _TARGET_DB: "mysql-8.4"
+    _TARGET_DB_DRIVER: "mysql"
+    _TARGET_DB_DRIVER_MODULE: "mysql"
     PERFORMANCE_TEST: $PERFORMANCE_TEST
+    OPENTELEMETRY_COLLECTOR: $OPENTELEMETRY_COLLECTOR
   # Run on MR, schedule, push, parent pipeline and performance test.
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
@@ -243,7 +247,7 @@ default:
     - if: $PERFORMANCE_TEST == "1"
 
 # Re-run the pipeline, but with Composer updates.
-'DEFAULT: Updated dependencies (PHP 8.3 MySQL 8.0)':
+'DEFAULT: Updated dependencies (PHP 8.4 MySQL 8.4)':
   <<: *default-stage
   # Run daily and allow manual runs on MRs.
   rules:
@@ -258,13 +262,14 @@ default:
     include: .gitlab-ci.yml
 
 # Special job for MRs for test-only checks.
-'DEFAULT: Test-only (PHP 8.3 MySQL 8.0)':
+'DEFAULT: Test-only (PHP 8.4 MySQL 8.4)':
   <<: [ *default-stage, *with-composer ]
   when: manual
   allow_failure: true
   variables:
-    _TARGET_PHP: "8.3-ubuntu"
-    _TARGET_DB: "mysql-8"
+    _TARGET_DB: "mysql-8.4"
+    _TARGET_DB_DRIVER: "mysql"
+    _TARGET_DB_DRIVER_MODULE: "mysql"
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   trigger:
@@ -281,18 +286,55 @@ default:
   variables:
     _TARGET_PHP: "8.3-ubuntu"
     _TARGET_DB: "mariadb-10.6"
+    _TARGET_DB_DRIVER: "mysql"
+    _TARGET_DB_DRIVER_MODULE: "mysql"
 
-'PHP 8.3 MySQL 8.4':
+'mysqli - PHP 8.3 MySQL 8.4':
   <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.3-ubuntu"
     _TARGET_DB: "mysql-8.4"
+    _TARGET_DB_DRIVER: "mysqli"
+    _TARGET_DB_DRIVER_MODULE: "mysqli"
 
-'PHP 8.4 MySQL 9.3':
+'mysqli - PHP 8.4 MySQL 9.4':
   <<: [ *default-stage, *run-on-mr ]
   variables:
-    _TARGET_PHP: "8.4-ubuntu"
     _TARGET_DB: "mysql-9"
+    _TARGET_DB_DRIVER: "mysqli"
+    _TARGET_DB_DRIVER_MODULE: "mysqli"
+
+'mysqli - PHP 8.5 MySQL 9.4':
+  <<: [ *default-stage, *run-on-mr ]
+  variables:
+    _TARGET_PHP: "8.5-ubuntu"
+    _TARGET_DB: "mysql-9"
+    _TARGET_DB_DRIVER: "mysqli"
+    _TARGET_DB_DRIVER_MODULE: "mysqli"
+
+'PHP 8.3 MySQL 8.0':
+  <<: [ *default-stage, *run-on-mr ]
+  variables:
+    _TARGET_PHP: "8.3-ubuntu"
+    _TARGET_DB: "mysql-8"
+    _TARGET_DB_DRIVER: "mysql"
+    _TARGET_DB_DRIVER_MODULE: "mysql"
+
+'PHP 8.4 MySQL 9.4':
+  <<: [ *default-stage, *run-on-mr ]
+  variables:
+    _TARGET_DB: "mysql-9"
+    _TARGET_DB_DRIVER: "mysql"
+    _TARGET_DB_DRIVER_MODULE: "mysql"
+
+'PHP 8.5 MySQL 9.3':
+  <<: [ *default-stage, *run-on-mr ]
+  allow_failure: true
+  variables:
+    _TARGET_PHP: "8.5-ubuntu"
+    _TARGET_DB: "mysql-9"
+    _TARGET_DB_DRIVER: "mysql"
+    _TARGET_DB_DRIVER_MODULE: "mysql"
 
 'PHP 8.3 PostgreSQL 16':
   <<: [ *default-stage, *run-on-mr ]
@@ -303,7 +345,12 @@ default:
 'PHP 8.4 PostgreSQL 17':
   <<: [ *default-stage, *run-on-mr ]
   variables:
-    _TARGET_PHP: "8.4-ubuntu"
+    _TARGET_DB: "pgsql-17"
+
+'PHP 8.5 PostgreSQL 17':
+  <<: [ *default-stage, *run-on-mr ]
+  variables:
+    _TARGET_PHP: "8.5-ubuntu"
     _TARGET_DB: "pgsql-17"
 
 'PHP 8.3 SQLite 3.45':
@@ -312,17 +359,27 @@ default:
     _TARGET_PHP: "8.3-ubuntu"
     _TARGET_DB: "sqlite-3"
 
-'PHP 8.4 MySQL 8.4':
+'PHP 8.4 SQLite 3.45':
   <<: [ *default-stage, *run-on-mr ]
   variables:
-    _TARGET_PHP: "8.4-ubuntu"
-    _TARGET_DB: "mysql-8.4"
+    _TARGET_DB: "sqlite-3"
+
+'PHP 8.5 SQLite 3.45':
+  <<: [ *default-stage, *run-on-mr ]
+  variables:
+    _TARGET_PHP: "8.5-ubuntu"
+    _TARGET_DB: "sqlite-3"
+
+'PHP 8.4 MySQL 8.0':
+  <<: [ *default-stage, *run-on-mr ]
+  variables:
+    _TARGET_DB: "mysql-8"
 
 # Jobs running on commits.
 # The value set in the "needs" property will determine the order in the sequence.
 '[Commit] PHP 8.3 PostgreSQL 16':
   extends: 'PHP 8.3 PostgreSQL 16'
-  needs: [ 'DEFAULT: PHP 8.3 MySQL 8.0' ]
+  needs: [ 'DEFAULT: PHP 8.4 MySQL 8.4' ]
   <<: [ *run-on-commit ]
 
 '[Commit] PHP 8.3 SQLite 3.45':
@@ -334,7 +391,7 @@ default:
 # The value set in the "needs" property will determine the order in the sequence.
 '[Daily] PHP 8.3 PostgreSQL 16':
   extends: 'PHP 8.3 PostgreSQL 16'
-  needs: [ 'DEFAULT: PHP 8.3 MySQL 8.0' ]
+  needs: [ 'DEFAULT: PHP 8.4 MySQL 8.4' ]
   <<: [ *run-daily ]
 
 '[Daily] PHP 8.3 SQLite 3.45':
@@ -347,14 +404,14 @@ default:
   needs: [ '[Daily] PHP 8.3 SQLite 3.45' ]
   <<: [ *run-daily ]
 
-'[Daily] PHP 8.4 MySQL 8.4':
-  extends: 'PHP 8.4 MySQL 8.4'
+'[Daily] PHP 8.4 MySQL 8.0':
+  extends: 'PHP 8.4 MySQL 8.0'
   needs: [ '[Daily] PHP 8.3 MariaDB 10.6' ]
   <<: [ *run-daily ]
 
 '[Daily] PHP 8.4 PostgreSQL 17':
   extends: 'PHP 8.4 PostgreSQL 17'
-  needs: [ '[Daily] PHP 8.4 MySQL 8.4' ]
+  needs: [ '[Daily] PHP 8.4 MySQL 8.0' ]
   <<: [ *run-daily ]
 
 ################
@@ -391,9 +448,13 @@ default:
   stage: 🪄 Lint
   variables:
     KUBERNETES_CPU_REQUEST: "4"
-  script:
+    _ARTIFACTS_DIR: "test-artifacts/phpstan"
+    _PHPSTAN_NEON: "core/phpstan.neon.dist"
+    _PHPSTAN_BASELINE: "core/.phpstan-baseline.php"
+  before_script:
     - *prepare-lint-directory
     - *phpstan-cache
+    - mkdir -p $_ARTIFACTS_DIR
     - composer validate
     - composer install --optimize-autoloader
     - composer run-script drupal-phpunit-upgrade-check
@@ -401,11 +462,12 @@ default:
         composer update --optimize-autoloader;
         composer outdated;
       fi
+  script:
     - vendor/bin/phpstan --version
     # Rely on PHPStan caching to execute analysis multiple times without performance drawback.
     # Output a copy in junit.
-    - php vendor/bin/phpstan -vvv analyze --configuration=./core/phpstan.neon.dist --error-format=gitlab > $CI_PROJECT_DIR/phpstan-quality-report.json || EXIT_CODE=$?
-    - php vendor/bin/phpstan -vvv analyze --configuration=./core/phpstan.neon.dist --no-progress --error-format=junit > $CI_PROJECT_DIR/phpstan-junit.xml || true
+    - php vendor/bin/phpstan -vvv analyze --configuration=$_PHPSTAN_NEON --error-format=gitlab > $_ARTIFACTS_DIR/phpstan-quality-report.json || EXIT_CODE=$?
+    - php vendor/bin/phpstan -vvv analyze --configuration=$_PHPSTAN_NEON --no-progress --error-format=junit > $_ARTIFACTS_DIR/phpstan-junit.xml || true
     # When the PHPStan scan fails, output a human readable copy of the errors,
     # and regenerate a full baseline.
     # In order to regenerate a baseline artifact that can be copied and pasted
@@ -415,35 +477,40 @@ default:
     - |
       if [ -n "$EXIT_CODE" ]; then
         # Output a copy in plain text for human logs.
-        php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --no-progress || true
+        php vendor/bin/phpstan analyze --configuration=$_PHPSTAN_NEON --no-progress || true
         # Generate a new baseline.
-        echo "Generating an PHPStan baseline file (available as job artifact)."
-        cp $CI_PROJECT_DIR/.gitlab-ci/scripts/.empty-phpstan-baseline.php ./core/.phpstan-baseline.php
-        php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --no-progress --generate-baseline=$CI_PROJECT_DIR/core/.phpstan-baseline.php || true
-        sed -i "s/ '\\/\\/build\\/core/ '/g" $CI_PROJECT_DIR/core/.phpstan-baseline.php
-        sed -i "s/ '\\/\\/build/ '\\/../g" $CI_PROJECT_DIR/core/.phpstan-baseline.php
-        php $CI_PROJECT_DIR/.gitlab-ci/scripts/phpstan-baseline-statistics.php
+        echo "Generating a PHPStan baseline file (available as job artifact)."
+        cp $CI_PROJECT_DIR/.gitlab-ci/scripts/.empty-phpstan-baseline.php $_PHPSTAN_BASELINE
+        php vendor/bin/phpstan analyze --configuration=$_PHPSTAN_NEON --no-progress --generate-baseline=$_PHPSTAN_BASELINE || true
+        sed -i "s/ '\\/\\/build\\/core/ '/g" $_PHPSTAN_BASELINE
+        sed -i "s/ '\\/\\/build/ '\\/../g" $_PHPSTAN_BASELINE
+        # Report statistics on the new baseline.
+        php $CI_PROJECT_DIR/.gitlab-ci/scripts/phpstan-baseline-statistics.php $_PHPSTAN_BASELINE $_ARTIFACTS_DIR/phpstan-metrics.txt
+        # Copy the new baseline to the artifacts directory.
+        cp $_PHPSTAN_BASELINE $_ARTIFACTS_DIR/phpstan-baseline.php
         exit $EXIT_CODE
       fi
     # Generate baseline statistics.
-    - php $CI_PROJECT_DIR/.gitlab-ci/scripts/phpstan-baseline-statistics.php
-
+    - php $CI_PROJECT_DIR/.gitlab-ci/scripts/phpstan-baseline-statistics.php $_PHPSTAN_BASELINE $_ARTIFACTS_DIR/phpstan-metrics.txt
+  after_script:
+    - mkdir -p $_ARTIFACTS_DIR
+    - cp -r /build/$_ARTIFACTS_DIR/* $_ARTIFACTS_DIR/
   artifacts:
-    # Only store the baseline if the job fails.
-    when: on_failure
     reports:
-      codequality: phpstan-quality-report.json
-      junit: phpstan-junit.xml
-      metrics: phpstan-metrics.txt
+      codequality: $_ARTIFACTS_DIR/phpstan-quality-report.json
+      junit: $_ARTIFACTS_DIR/phpstan-junit.xml
+      metrics: $_ARTIFACTS_DIR/phpstan-metrics.txt
+    when: always
     paths:
-      - $CI_PROJECT_DIR/core/.phpstan-baseline.php
+      - $_ARTIFACTS_DIR
 
 '🧹 PHP Coding standards (PHPCS)':
   <<: [ *default-job-settings-lint ]
   stage: 🪄 Lint
   variables:
     KUBERNETES_CPU_REQUEST: "16"
-  script:
+    _ARTIFACTS_DIR: "test-artifacts/phpcs"
+  before_script:
     - composer validate
     - composer install --optimize-autoloader
     - composer run-script drupal-phpunit-upgrade-check
@@ -451,15 +518,20 @@ default:
         composer update --optimize-autoloader;
         composer outdated;
       fi
+    - mkdir -p $_ARTIFACTS_DIR
+  script:
     - vendor/bin/phpcs --version
-    - composer phpcs -- -s --report-full --report-summary --report-\\Micheh\\PhpCodeSniffer\\Report\\Gitlab=phpcs-quality-report.json
+    - composer phpcs -- -s --report-full --report-summary --report-\\Micheh\\PhpCodeSniffer\\Report\\Gitlab=$_ARTIFACTS_DIR/phpcs-quality-report.json
   artifacts:
+    reports:
+      codequality: $_ARTIFACTS_DIR/phpcs-quality-report.json
     expire_in: 1 week
     expose_as: 'web-vendor'
     paths:
       - vendor/
-    reports:
-      codequality: phpcs-quality-report.json
+      - composer.lock
+      - composer/Metapackage/
+      - $_ARTIFACTS_DIR
 
 '🧹 JavaScript linting (eslint)':
   stage: 🪄 Lint
@@ -522,7 +594,7 @@ default:
   <<: [ *default-job-settings-lint, *default-phpunit-job-settings ]
   variables:
     TESTSUITE: PHPUnit-Unit
-    KUBERNETES_CPU_REQUEST: "8"
+    KUBERNETES_CPU_REQUEST: "4"
     CONCURRENCY: 24
     _TARGET_PHP: "8.3-ubuntu"
 
@@ -530,16 +602,15 @@ default:
   <<: [ *default-job-settings-lint, *default-phpunit-job-settings ]
   variables:
     TESTSUITE: PHPUnit-Unit
-    KUBERNETES_CPU_REQUEST: "8"
+    KUBERNETES_CPU_REQUEST: "4"
     CONCURRENCY: 24
-    _TARGET_PHP: "8.4-ubuntu"
 
 '⚡️ PHPUnit Unit tests on PHP 8.5':
   <<: [ *default-job-settings-lint, *default-phpunit-job-settings ]
   allow_failure: true
   variables:
     TESTSUITE: PHPUnit-Unit
-    KUBERNETES_CPU_REQUEST: "8"
+    KUBERNETES_CPU_REQUEST: "4"
     CONCURRENCY: 24
     _TARGET_PHP: "8.5-ubuntu"
 
@@ -553,7 +624,6 @@ default:
   <<: [ *default-job-settings-lint, *default-component-unit-test-job-settings ]
   variables:
     KUBERNETES_CPU_REQUEST: "2"
-    _TARGET_PHP: "8.4-ubuntu"
 
 '⚡️ Component unit tests on PHP 8.5':
   <<: [ *default-job-settings-lint, *default-component-unit-test-job-settings ]
@@ -593,7 +663,6 @@ default:
   stage: 🪄 Lint
   variables:
     KUBERNETES_CPU_REQUEST: "2"
-    _TARGET_PHP: "8.3-ubuntu"
   # Run on MRs if config schema files have changed, or manually.
   rules:
     - if: $PERFORMANCE_TEST != "1"
@@ -602,6 +671,7 @@ default:
         - "**/config/schema/*.schema.yml"
         # Modules may alter config schema using hook_config_schema_info_alter().
         - "**/*.module"
+        - "**/src/Hook/*.php"
     - when: manual
       allow_failure: true
   artifacts:
@@ -658,23 +728,29 @@ default:
   variables:
     KUBERNETES_CPU_REQUEST: "4"
   script:
+    # Prepare a directory to run lint checks that require specifying absolute
+    # paths (/build), and change the working directory to it.
     - *prepare-lint-directory
     - *phpstan-cache
     - *cspell-cache
     - *eslint-cache
     - *stylelint-cache
-    - composer install
+    - composer install --optimize-autoloader
+    - composer run-script drupal-phpunit-upgrade-check
     - vendor/bin/phpstan --version
     - php vendor/bin/phpstan -vvv analyze --configuration=./core/phpstan.neon.dist
     - *core-spellcheck
     - yarn run lint:core-js-passing --cache --cache-strategy content
     - yarn run build:css --check
     - yarn run lint:css --cache --cache-location .stylelintcache --cache-strategy content
+    # Move the cache files from the build directory to the $CI_PROJECT_DIR one,
+    # as the artifacts will be stowed from there.
     - mv -f /build/core/phpstan-tmp $CI_PROJECT_DIR/core
     - mv -f /build/core/.cspellcache $CI_PROJECT_DIR/core
-    - mv -f  /build/core/.eslintcache $CI_PROJECT_DIR/core
-    - mv -f  /build/core/.stylelintcache $CI_PROJECT_DIR/core
+    - mv -f /build/core/.eslintcache $CI_PROJECT_DIR/core
+    - mv -f /build/core/.stylelintcache $CI_PROJECT_DIR/core
   artifacts:
+    when: always
     paths:
       - core/phpstan-tmp/resultCache.php
       - core/.cspellcache

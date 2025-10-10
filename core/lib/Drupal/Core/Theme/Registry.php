@@ -40,6 +40,11 @@ class Registry implements DestructableInterface {
   private const string PREPROCESS_INVOKES = 'preprocess invokes';
 
   /**
+   * A common key for storing preprocess callbacks used by every theme hook.
+   */
+  private const string GLOBAL_PREPROCESS = 'global preprocess';
+
+  /**
    * The theme object representing the active theme for this registry.
    *
    * @var \Drupal\Core\Theme\ActiveTheme
@@ -410,10 +415,6 @@ class Registry implements DestructableInterface {
    * @see hook_theme_registry_alter()
    */
   protected function build() {
-    $cache = [
-      static::PREPROCESS_INVOKES => [],
-    ];
-    $fixed_preprocess_functions = $this->collectModulePreprocess($cache, 'preprocess');
     // First, preprocess the theme hooks advertised by modules. This will
     // serve as the basic registry. Since the list of enabled modules is the
     // same regardless of the theme used, this is cached in its own entry to
@@ -422,6 +423,10 @@ class Registry implements DestructableInterface {
       $cache = $cached->data;
     }
     else {
+      $cache = [
+        self::PREPROCESS_INVOKES => [],
+      ];
+      $cache[self::GLOBAL_PREPROCESS] = $this->collectModulePreprocess($cache, 'preprocess');
       if (defined('MAINTENANCE_MODE') && constant('MAINTENANCE_MODE') === 'install') {
         // System is still set here so preprocess can be updated in install.
         $this->processExtension($cache, 'system', 'install', 'system', $this->moduleList->getPath('system'));
@@ -431,15 +436,12 @@ class Registry implements DestructableInterface {
           $this->processExtension($cache, $module, 'module', $module, $this->moduleList->getPath($module));
         });
       }
-      $this->addFixedPreprocessFunctions($cache, $fixed_preprocess_functions);
 
       // Only cache this registry if all modules are loaded.
       if ($this->moduleHandler->isLoaded()) {
         $this->cache->set("theme_registry:build:modules", $cache);
       }
     }
-
-    $old_cache = $cache;
 
     // Process each base theme.
     // Ensure that we start with the root of the parents, so that both CSS files
@@ -460,10 +462,6 @@ class Registry implements DestructableInterface {
 
     // Hooks provided by the theme itself.
     $this->processExtension($cache, $this->theme->getName(), 'theme', $this->theme->getName(), $this->theme->getPath());
-
-    // Add the fixed preprocess functions to hooks defined by themes. They
-    // were already added to hooks defined by modules and potentially cached.
-    $this->addFixedPreprocessFunctions($cache, $fixed_preprocess_functions, $old_cache);
 
     // Discover and add all preprocess functions for theme hook suggestions.
     $this->postProcessExtension($cache, $this->theme);
@@ -674,7 +672,7 @@ class Registry implements DestructableInterface {
     // template.
     if ($type == 'theme' || $type == 'base_theme') {
       foreach ($cache as $hook => $info) {
-        if ($hook == static::PREPROCESS_INVOKES) {
+        if ($hook == self::PREPROCESS_INVOKES) {
           continue;
         }
         // Check only if not registered by the theme or engine.
@@ -826,7 +824,7 @@ class Registry implements DestructableInterface {
           // Add missing preprocessor to existing hook.
           $cache[$hook]['preprocess functions'][] = $preprocessor;
           if (isset($invokes[$preprocessor])) {
-            $cache[static::PREPROCESS_INVOKES][$preprocessor] = $invokes[$preprocessor];
+            $cache[self::PREPROCESS_INVOKES][$preprocessor] = $invokes[$preprocessor];
           }
         }
         elseif (!isset($cache[$hook]) && strpos($hook, '__')) {
@@ -836,7 +834,7 @@ class Registry implements DestructableInterface {
           $this->completeSuggestion($hook, $cache);
           $cache[$hook]['preprocess functions'][] = $preprocessor;
           if (isset($invokes[$preprocessor])) {
-            $cache[static::PREPROCESS_INVOKES][$preprocessor] = $invokes[$preprocessor];
+            $cache[self::PREPROCESS_INVOKES][$preprocessor] = $invokes[$preprocessor];
           }
         }
       }
@@ -845,7 +843,7 @@ class Registry implements DestructableInterface {
     // hooks. This ensures that derivative hooks have a complete set of variable
     // preprocess functions.
     foreach ($cache as $hook => $info) {
-      if ($hook == static::PREPROCESS_INVOKES) {
+      if ($hook == self::PREPROCESS_INVOKES) {
         continue;
       }
       // The 'base hook' is only applied to derivative hooks already registered
@@ -941,35 +939,6 @@ class Registry implements DestructableInterface {
   }
 
   /**
-   * Adds $prefix_preprocess functions to every hook.
-   *
-   * @param array $cache
-   *   The theme registry, as documented in
-   *   \Drupal\Core\Theme\Registry::processExtension().
-   * @param array $fixed_preprocess_functions
-   *   A list of preprocess functions.
-   * @param array $old_cache
-   *   An already processed theme registry.
-   */
-  protected function addFixedPreprocessFunctions(array &$cache, array $fixed_preprocess_functions, array $old_cache = []): void {
-    foreach (array_keys(array_diff_key($cache, $old_cache)) as $hook) {
-      if ($hook == static::PREPROCESS_INVOKES) {
-        continue;
-      }
-      if (!isset($cache[$hook]['preprocess functions'])) {
-        $cache[$hook]['preprocess functions'] = $fixed_preprocess_functions;
-      }
-      else {
-        $offset = 0;
-        while (isset($cache[$hook]['preprocess functions'][$offset]) && is_string($cache[$hook]['preprocess functions'][$offset]) && str_starts_with($cache[$hook]['preprocess functions'][$offset], 'template_')) {
-          $offset++;
-        }
-        array_splice($cache[$hook]['preprocess functions'], $offset, 0, $fixed_preprocess_functions);
-      }
-    }
-  }
-
-  /**
    * Collect module implementations of a single hook.
    *
    * @param array $cache
@@ -990,7 +959,7 @@ class Registry implements DestructableInterface {
     // implementations are not executed.
     $this->moduleHandler->invokeAllWith($hook, function (callable $callable, string $module) use ($hook, &$cache, &$preprocess_functions) {
       $function = $module . '_' . $hook;
-      $cache[static::PREPROCESS_INVOKES][$function] = ['module' => $module, 'hook' => $hook];
+      $cache[self::PREPROCESS_INVOKES][$function] = ['module' => $module, 'hook' => $hook];
       $preprocess_functions[] = $function;
     });
     return $preprocess_functions;

@@ -362,19 +362,35 @@ class HookCollectorPass implements CompilerPassInterface {
    */
   public static function collectAllHookImplementations(array $module_list, array $skipProceduralModules = []): static {
     $modules = array_keys($module_list);
-    $modules_by_length = $modules;
-    usort($modules_by_length, static fn ($a, $b) => strlen($b) - strlen($a));
-    $known_modules_pattern = implode('|', array_map(
-      static fn ($x) => preg_quote($x, '/'),
-      $modules_by_length,
-    ));
-    $module_preg = '/^(?<function>(?<module>' . $known_modules_pattern . ')_(?!update_\d)(?<hook>[a-zA-Z0-9_\x80-\xff]+$))/';
+    $all_modules_preg = static::getModuleListPattern($modules);
     $collector = new static($modules);
     foreach ($module_list as $module => $info) {
       $skip_procedural = in_array($module, $skipProceduralModules);
-      $collector->collectModuleHookImplementations(dirname($info['pathname']), $module, $module_preg, $skip_procedural);
+      $current_module_preg = static::getModuleListPattern([$module]);
+      $collector->collectModuleHookImplementations(dirname($info['pathname']), $module, $current_module_preg, $all_modules_preg, $skip_procedural);
     }
     return $collector;
+  }
+
+  /**
+   * Get a pattern used to match hooks for the given module list.
+   *
+   * The supplied module list will be sorted by length in descending order so
+   * that longer names are matched first.
+   *
+   * @param list<string> $module_list
+   *   A list of module names.
+   *
+   * @return string
+   *   The pattern used to match hooks for the given module list.
+   */
+  protected static function getModuleListPattern(array $module_list): string {
+    usort($module_list, static fn ($a, $b) => strlen($b) - strlen($a));
+    $module_pattern = implode('|', array_map(
+      static fn ($x) => preg_quote($x, '/'),
+      $module_list,
+    ));
+    return '/^(?<function>(?<module>' . $module_pattern . ')_(?!update_\d)(?<hook>[a-zA-Z0-9_\x80-\xff]+$))/';
   }
 
   /**
@@ -384,15 +400,17 @@ class HookCollectorPass implements CompilerPassInterface {
    *   The directory in which the module resides.
    * @param string $module
    *   The name of the module.
-   * @param string $module_preg
+   * @param string $current_module_preg
+   *   A regular expression matching only the module being scanned.
+   * @param string $all_modules_preg
    *   A regular expression matching every module, longer module names are
    *   matched first.
    * @param bool $skip_procedural
    *   Skip the procedural check for the current module.
    */
-  protected function collectModuleHookImplementations($dir, $module, $module_preg, bool $skip_procedural): void {
+  protected function collectModuleHookImplementations($dir, $module, $current_module_preg, $all_modules_preg, bool $skip_procedural): void {
     $hook_file_cache = FileCacheFactory::get('hook_implementations');
-    $procedural_hook_file_cache = FileCacheFactory::get('procedural_hook_implementations:' . $module_preg);
+    $procedural_hook_file_cache = FileCacheFactory::get('procedural_hook_implementations:' . $all_modules_preg);
 
     $iterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS | \FilesystemIterator::FOLLOW_SYMLINKS);
     $iterator = new \RecursiveCallbackFilterIterator($iterator, static::filterIterator(...));
@@ -403,12 +421,6 @@ class HookCollectorPass implements CompilerPassInterface {
       $extension = $fileinfo->getExtension();
       $filename = $fileinfo->getPathname();
 
-      if (($extension === 'module' || $extension === 'profile') && !$iterator->getDepth() && !$skip_procedural) {
-        // There is an expectation for all modules and profiles to be loaded.
-        // .module and .profile files are not supposed to be in subdirectories.
-        // These need to be loaded even if the module has no procedural hooks.
-        include_once $filename;
-      }
       if ($extension === 'php') {
         $cached = $hook_file_cache->get($filename);
         if ($cached) {
@@ -458,7 +470,29 @@ class HookCollectorPass implements CompilerPassInterface {
             if (StaticReflectionParser::hasAttribute($attributes, ProceduralHookScanStop::class)) {
               break;
             }
-            if (!StaticReflectionParser::hasAttribute($attributes, LegacyHook::class) && preg_match($module_preg, $function, $matches) && !StaticReflectionParser::hasAttribute($attributes, LegacyModuleImplementsAlter::class)) {
+
+            if (!StaticReflectionParser::hasAttribute($attributes, LegacyHook::class) && (preg_match($current_module_preg, $function, $matches) || preg_match($all_modules_preg, $function, $matches)) && !StaticReflectionParser::hasAttribute($attributes, LegacyModuleImplementsAlter::class)) {
+              // Skip hooks that are not supported by the new hook system, they
+              // do not need to be added to the BC layer. Note that is different
+              // from static::checkForProceduralOnlyHooks(). hook_requirements
+              // is allowed and only update hooks are considered as dynamic
+              // exclusion, since post updates are not expected to be parsed.
+              // Also, update hooks are checked as ends with, since the regular
+              // expression sometimes attributes them to the wrong module,
+              // resulting in a prefix.
+              $staticDenyHooks = [
+                'install',
+                'install_tasks',
+                'install_tasks_alter',
+                'schema',
+                'uninstall',
+                'update_last_removed',
+                'update_dependencies',
+              ];
+              if (in_array($matches['hook'], $staticDenyHooks) || preg_match('/update_\d+$/', $function)) {
+                continue;
+              }
+
               assert($function === $matches['module'] . '_' . $matches['hook']);
               $implementations[] = ['module' => $matches['module'], 'hook' => $matches['hook']];
             }
@@ -512,11 +546,13 @@ class HookCollectorPass implements CompilerPassInterface {
     $function = $module . '_' . $hook;
     if ($hook === 'hook_info') {
       $this->hookInfo[] = $function;
+      include_once $fileinfo->getPathname();
     }
     elseif ($hook === 'module_implements_alter') {
       $message = "$function without a #[LegacyModuleImplementsAlter] attribute is deprecated in drupal:11.2.0 and removed in drupal:12.0.0. See https://www.drupal.org/node/3496788";
       @trigger_error($message, E_USER_DEPRECATED);
       $this->moduleImplementsAlters[] = $function;
+      include_once $fileinfo->getPathname();
     }
     $this->proceduralImplementations[$hook][] = $module;
     if ($fileinfo->getExtension() !== 'module') {
@@ -577,13 +613,15 @@ class HookCollectorPass implements CompilerPassInterface {
     $staticDenyHooks = [
       'hook_info',
       'install',
+      'install_tasks',
+      'install_tasks_alter',
       'module_implements_alter',
+      'removed_post_updates',
       'requirements',
       'schema',
       'uninstall',
+      'update_dependencies',
       'update_last_removed',
-      'install_tasks',
-      'install_tasks_alter',
     ];
 
     if (in_array($hookAttribute->hook, $staticDenyHooks) || preg_match('/^(post_update_|update_\d+$)/', $hookAttribute->hook)) {

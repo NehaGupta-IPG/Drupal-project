@@ -15,7 +15,6 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\ReorderHook;
 use Drupal\Core\Hook\Order\Order;
 use Drupal\Core\Hook\Order\OrderBefore;
-use Drupal\Core\Render\Element;
 use Drupal\content_moderation\Hook\ContentModerationHooks;
 use Drupal\workspaces\WorkspaceAssociationInterface;
 use Drupal\workspaces\WorkspaceInformationInterface;

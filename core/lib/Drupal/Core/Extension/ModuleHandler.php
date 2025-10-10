@@ -19,16 +19,16 @@ class ModuleHandler implements ModuleHandlerInterface {
   /**
    * List of loaded files.
    *
-   * @var array
+   * @var array<string, true>
    *   An associative array whose keys are file paths of loaded files, relative
    *   to the application's root directory.
    */
   protected $loadedFiles;
 
   /**
-   * List of installed modules.
+   * Installed modules, as extension objects keyed by module name.
    *
-   * @var \Drupal\Core\Extension\Extension[]
+   * @var array<string, \Drupal\Core\Extension\Extension>
    */
   protected $moduleList;
 
@@ -40,9 +40,9 @@ class ModuleHandler implements ModuleHandlerInterface {
   protected $loaded = FALSE;
 
   /**
-   * List of events which implement an alter hook keyed by hook name(s).
+   * Lists of callbacks which implement an alter hook, keyed by hook name(s).
    *
-   * @var array
+   * @var array<string, list<callable>>
    */
   protected array $alterEventListeners = [];
 
@@ -56,7 +56,11 @@ class ModuleHandler implements ModuleHandlerInterface {
   /**
    * A list of module include file keys.
    *
-   * @var array
+   * The array keys are generated from the arguments to ->loadInclude().
+   * Each value is either the path of a file that was successfully included, or
+   * FALSE if the given file did not exist.
+   *
+   * @var array<string, string|false>
    */
   protected $includeFileKeys = [];
 
@@ -230,7 +234,9 @@ class ModuleHandler implements ModuleHandlerInterface {
   protected function add($type, $name, $path) {
     $pathname = "$path/$name.info.yml";
     $php_file_path = $this->root . "/$path/$name.$type";
-    $filename = file_exists($php_file_path) ? "$name.$type" : NULL;
+    if ($filename = file_exists($php_file_path) ? "$name.$type" : NULL) {
+      include_once $php_file_path;
+    }
     $this->moduleList[$name] = new Extension($this->root, $type, $pathname, $filename);
     $this->resetImplementations();
     $hook_collector = HookCollectorPass::collectAllHookImplementations([$name => ['pathname' => $pathname]]);
@@ -288,6 +294,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function loadAllIncludes($type, $name = NULL) {
+    @trigger_error("ModuleHandler::loadAllIncludes() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3536432", E_USER_DEPRECATED);
     foreach ($this->moduleList as $module => $filename) {
       $this->loadInclude($module, $type, $name);
     }
@@ -333,6 +340,9 @@ class ModuleHandler implements ModuleHandlerInterface {
    */
   public function resetImplementations() {
     $this->alterEventListeners = [];
+    $this->invokeMap = [];
+    $this->listenersByHook = [];
+    $this->modulesByHook = [];
   }
 
   /**
@@ -619,12 +629,12 @@ class ModuleHandler implements ModuleHandlerInterface {
   /**
    * Reorder modules for alters.
    *
-   * @param array $modules
-   *   A list of modules.
+   * @param list<string> $modules
+   *   A list of module names.
    * @param string $hook
    *   The hook being worked on, for example form_alter.
    *
-   * @return array
+   * @return list<string>
    *   The list, potentially reordered and changed by
    *   hook_module_implements_alter().
    */
@@ -730,6 +740,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    */
   protected function getFlatHookListeners(string $hook): array {
     if (!isset($this->listenersByHook[$hook])) {
+      $this->listenersByHook[$hook] = [];
       foreach ($this->eventDispatcher->getListeners("drupal_hook.$hook") as $listener) {
         if (is_array($listener) && is_object($listener[0])) {
           $module = $this->hookImplementationsMap[$hook][get_class($listener[0])][$listener[1]];
@@ -755,7 +766,7 @@ class ModuleHandler implements ModuleHandlerInterface {
       }
     }
 
-    return $this->listenersByHook[$hook] ?? [];
+    return $this->listenersByHook[$hook];
   }
 
 }

@@ -7,12 +7,12 @@ namespace Drupal\Tests\locale\Kernel;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\locale\StringInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the locale string storage, string objects and data API.
- *
- * @group locale
  */
+#[Group('locale')]
 class LocaleStringTest extends KernelTestBase {
 
   /**
@@ -256,6 +256,29 @@ class LocaleStringTest extends KernelTestBase {
       'language' => $langcode,
       'translation' => $this->randomMachineName(100),
     ])->save();
+  }
+
+  /**
+   * Tests that strings are correctly deleted.
+   */
+  public function testDeleteStrings(): void {
+    $source = $this->storage->createString([
+      'source' => 'Revision ID',
+    ])->save();
+
+    $this->storage->createTranslation([
+      'lid' => $source->lid,
+      'language' => 'fr',
+      'translation' => 'Translated Revision ID',
+    ])->save();
+
+    // Confirm that the string has been created.
+    $this->assertNotEmpty($this->storage->findString(['lid' => $source->lid]));
+
+    $this->storage->deleteStrings(['lid' => $source->lid]);
+
+    // Confirm that the string has been deleted.
+    $this->assertEmpty($this->storage->findString(['lid' => $source->lid]));
   }
 
 }

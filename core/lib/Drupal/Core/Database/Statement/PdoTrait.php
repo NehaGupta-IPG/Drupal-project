@@ -49,23 +49,17 @@ trait PdoTrait {
   }
 
   /**
-   * Returns the client-level database PDO statement object.
+   * Returns the client-level database statement object.
    *
    * This method should normally be used only within database driver code.
    *
-   * @return \PDOStatement
-   *   The client-level database PDO statement.
+   * @return object
+   *   The client-level database statement.
    *
    * @throws \RuntimeException
    *   If the client-level statement is not set.
    */
-  public function getClientStatement(): \PDOStatement {
-    if (isset($this->clientStatement)) {
-      assert($this->clientStatement instanceof \PDOStatement);
-      return $this->clientStatement;
-    }
-    throw new \LogicException('\\PDOStatement not initialized');
-  }
+  abstract public function getClientStatement(): object;
 
   /**
    * Sets the default fetch mode for the PDO statement.
@@ -188,7 +182,6 @@ trait PdoTrait {
    * @return array<array<scalar|null>|object|scalar|null>
    *   An array of results.
    */
-  // phpcs:ignore Drupal.Commenting.FunctionComment.InvalidReturn, Drupal.Commenting.FunctionComment.Missing
   protected function clientFetchAll(?FetchAs $mode = NULL, int|string|null $columnOrClass = NULL, array|null $constructorArguments = NULL): array {
     return match ($mode) {
       FetchAs::Column => $this->getClientStatement()->fetchAll(

@@ -8,25 +8,33 @@ use ColinODell\PsrTestLogger\TestLogger;
 use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\package_manager\DirectWritePreconditionBypass;
 use Drupal\package_manager\Event\PostRequireEvent;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\PreRequireEvent;
 use Drupal\package_manager\Event\SandboxEvent;
+use Drupal\package_manager\EventSubscriber\DirectWriteSubscriber;
 use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\StatusCheckTrait;
 use Drupal\package_manager\ValidationResult;
 use PhpTuf\ComposerStager\API\Core\BeginnerInterface;
 use PhpTuf\ComposerStager\API\Core\CommitterInterface;
+use PhpTuf\ComposerStager\API\Path\Factory\PathFactoryInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
- * @covers \Drupal\package_manager\EventSubscriber\DirectWriteSubscriber
- * @covers \Drupal\package_manager\SandboxManagerBase::isDirectWrite
+ * Tests Direct Write.
  *
- * @group package_manager
+ * @legacy-covers \Drupal\package_manager\SandboxManagerBase::isDirectWrite
  */
+#[Group('package_manager')]
+#[CoversClass(DirectWriteSubscriber::class)]
+#[CoversClass(DirectWritePreconditionBypass::class)]
 class DirectWriteTest extends PackageManagerKernelTestBase implements EventSubscriberInterface {
 
   use StatusCheckTrait;
@@ -229,6 +237,39 @@ class DirectWriteTest extends PackageManagerKernelTestBase implements EventSubsc
     // changed setting.
     $sandbox_manager->destroy();
     $this->assertFalse($sandbox_manager->isDirectWrite());
+  }
+
+  /**
+   * Tests that direct-write bypasses certain Composer Stager preconditions.
+   *
+   * @param class-string $service_class
+   *   The class name of the precondition service.
+   */
+  #[TestWith(["PhpTuf\\ComposerStager\\API\\Precondition\\Service\\ActiveAndStagingDirsAreDifferentInterface"])]
+  #[TestWith(["PhpTuf\\ComposerStager\\API\\Precondition\\Service\\RsyncIsAvailableInterface"])]
+  public function testPreconditionBypass(string $service_class): void {
+    // Set up conditions where the active and sandbox directories are the same,
+    // and the path to rsync isn't valid.
+    $path = $this->container->get(PathFactoryInterface::class)
+      ->create('/the/absolute/apex');
+    $this->setSetting('package_manager_rsync_path', "C:\Not Rsync.exe");
+
+    /** @var \PhpTuf\ComposerStager\API\Precondition\Service\PreconditionInterface $precondition */
+    $precondition = $this->container->get($service_class);
+    // The precondition should be unfulfilled.
+    $this->assertFalse($precondition->isFulfilled($path, $path));
+
+    // Initializing a sandbox manager with direct-write support should bypass
+    // the precondition.
+    $this->setSetting('package_manager_allow_direct_write', TRUE);
+    $sandbox_manager = $this->createStage(TestDirectWriteSandboxManager::class);
+    $sandbox_manager->create();
+    $this->assertTrue($sandbox_manager->isDirectWrite());
+
+    // The precondition should be fulfilled, and clear that it's because we're
+    // in direct-write mode.
+    $this->assertTrue($precondition->isFulfilled($path, $path));
+    $this->assertSame('This precondition has been skipped because it is not needed in direct-write mode.', (string) $precondition->getStatusMessage($path, $path));
   }
 
 }

@@ -10,14 +10,15 @@ use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\file_test\FileTestHelper;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cSpell:ignore TÉXT Pácê
-
 /**
  * Tests the file_save_upload() function.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class SaveUploadTest extends FileManagedTestBase {
 
   use TestFileCreationTrait {
@@ -163,7 +164,7 @@ class SaveUploadTest extends FileManagedTestBase {
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains("You WIN!");
-    $this->assertFileExists('temporary://' . $dir . '/' . trim(\Drupal::service('file_system')->basename($image3_realpath)));
+    $this->assertFileExists('temporary://' . $dir . '/' . trim(basename($image3_realpath)));
   }
 
   /**
@@ -278,7 +279,7 @@ class SaveUploadTest extends FileManagedTestBase {
     $this->drupalGet('file-test/upload');
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->responseContains('For security reasons, your upload has been renamed to <em class="placeholder">' . $this->phpFile->filename . '_.txt' . '</em>');
+    $this->assertSession()->responseContains('For security reasons, your upload has been renamed to <em class="placeholder">' . $this->phpFile->filename . '_.txt</em>');
     $this->assertSession()->pageTextContains('File name is php-2.php_.txt.');
     $this->assertSession()->pageTextContains('File MIME type is text/plain.');
     $this->assertSession()->pageTextContains("You WIN!");
@@ -303,7 +304,7 @@ class SaveUploadTest extends FileManagedTestBase {
     $this->drupalGet('file-test/upload');
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->responseContains('For security reasons, your upload has been renamed to <em class="placeholder">' . $this->phpFile->filename . '_.txt' . '</em>');
+    $this->assertSession()->responseContains('For security reasons, your upload has been renamed to <em class="placeholder">' . $this->phpFile->filename . '_.txt</em>');
     $this->assertSession()->pageTextContains('File name is php-2.php_.txt.');
     $this->assertSession()->pageTextContains('File MIME type is text/plain.');
     $this->assertSession()->pageTextContains("You WIN!");
