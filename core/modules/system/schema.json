@@ -1,0 +1,57 @@
+{
+  "attributes": {
+    "type": "object",
+    "patternProperties": {
+      ".+": {
+        "anyOf": [
+          {
+            "type": ["string", "number"]
+          },
+          {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "links": {
+    "type": "array",
+    "items": {
+      "$ref": "#link"
+    }
+  },
+  "link": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string"
+      },
+      "url": {
+        "type": "string",
+        "format": "iri-reference"
+      },
+      "attributes": {
+        "$ref": "#attributes"
+      },
+      "link_attributes": {
+        "$ref": "#attributes"
+      },
+      "below": {
+        "type": "array",
+        "items": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}

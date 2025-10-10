@@ -21,6 +21,9 @@ use Drupal\Core\Plugin\Component;
 use Drupal\Core\Render\Component\Exception\ComponentNotFoundException;
 use Drupal\Core\Render\Component\Exception\IncompatibleComponentSchema;
 use Drupal\Core\Plugin\Discovery\DirectoryWithMetadataPluginDiscovery;
+use JsonSchema\Constraints\BaseConstraint;
+use JsonSchema\Exception\RuntimeException;
+use JsonSchema\SchemaStorage;
 
 /**
  * Defines a plugin manager to deal with components.
@@ -33,6 +36,13 @@ use Drupal\Core\Plugin\Discovery\DirectoryWithMetadataPluginDiscovery;
 class ComponentPluginManager extends DefaultPluginManager implements CategorizingPluginManagerInterface {
 
   use CategorizingPluginManagerTrait;
+
+  const MAXIMUM_RECURSION_LEVEL = 10;
+
+  /**
+   * JSON schema storage utility used for resolving references.
+   */
+  protected SchemaStorage $schemaStorage;
 
   /**
    * {@inheritdoc}
@@ -84,6 +94,7 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     $this->moduleHandler = $module_handler;
     $this->factory = new ContainerFactory($this);
     $this->setCacheBackend($cacheBackend, 'component_plugins');
+    $this->schemaStorage = new SchemaStorage();
     // Note that we are intentionally skipping
     // $this->alterInfo('component_info'); We want to ensure that everything
     // related to a component is in the single directory. If the alteration of a
@@ -357,6 +368,9 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     if (file_exists($documentation_path)) {
       $definition['documentation'] = file_get_contents($documentation_path);
     }
+    if (isset($definition['props']['properties']) && is_array($definition['props']['properties']) && !empty($definition['props']['properties'])) {
+      $definition['props'] = $this->resolveJsonSchemaReferences($definition['props'], 0);
+    }
     return $definition;
   }
 
@@ -523,6 +537,49 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     // The library owner is in <root>/core, so we need to go one level up to
     // find the app root.
     return '../' . $path_from_root;
+  }
+
+  /**
+   * Resolve schema references recursively.
+   *
+   * @param array $schema
+   *   JSON schema of a component.
+   * @param int $depth
+   *   Depth index to avoid infinite recursion.
+   *
+   * @return array
+   *   JSON schema of a component, with references resolved.
+   */
+  private function resolveJsonSchemaReferences(array $schema, int $depth = 0): array {
+    if ($depth > self::MAXIMUM_RECURSION_LEVEL) {
+      return $schema;
+    }
+
+    $depth++;
+
+    try {
+      $schema = BaseConstraint::arrayToObjectRecursive($schema);
+      $refSchema = (array) $this->schemaStorage->resolveRefSchema($schema);
+      $schema = (array) $schema;
+      unset($schema['$ref']);
+
+      // Merge referenced schema into the current schema.
+      $schema += $refSchema;
+    }
+    catch (RuntimeException) {
+      $schema = (array) $schema;
+    }
+
+    // Recursively resolve nested objects.
+    foreach ($schema as $key => $value) {
+      if (is_object($value)) {
+        $schema[$key] = $this->resolveJsonSchemaReferences((array) $value, $depth);
+      }
+    }
+
+    // It looks heavy as a solution to convert objects to array recursively,
+    // but it is exactly what BaseConstraint::arrayToObjectRecursive() is doing.
+    return json_decode(json_encode($schema), TRUE);
   }
 
 }
