@@ -27,6 +27,7 @@ use Drupal\field\FieldStorageConfigStorage;
   label_singular: new TranslatableMarkup('field storage'),
   label_plural: new TranslatableMarkup('field storages'),
   config_prefix: 'storage',
+  static_cache: TRUE,
   entity_keys: [
     'id' => 'id',
     'label' => 'id',

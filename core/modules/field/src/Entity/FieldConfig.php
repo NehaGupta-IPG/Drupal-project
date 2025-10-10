@@ -23,6 +23,7 @@ use Drupal\field\FieldConfigInterface;
   label_singular: new TranslatableMarkup('field'),
   label_plural: new TranslatableMarkup('fields'),
   config_prefix: 'field',
+  static_cache: TRUE,
   entity_keys: [
     'id' => 'id',
     'label' => 'label',
@@ -78,11 +79,11 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
   protected $deleted = FALSE;
 
   /**
-   * The associated FieldStorageConfig entity.
+   * The associated FieldStorageConfig entity ID.
    *
-   * @var \Drupal\field\Entity\FieldStorageConfig
+   * @var string
    */
-  protected $fieldStorage;
+  protected $fieldStorageId;
 
   /**
    * Constructs a FieldConfig object.
@@ -296,7 +297,7 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
    * {@inheritdoc}
    */
   public function getFieldStorageDefinition() {
-    if (!$this->fieldStorage) {
+    if (!$this->fieldStorageId) {
       $field_storage_definition = NULL;
 
       $field_storage_definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions($this->entity_type);
@@ -320,10 +321,10 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
       if (!$field_storage_definition instanceof FieldStorageConfigInterface) {
         throw new FieldException("Attempted to create, modify or delete a configurable field of non-configurable field storage {$this->field_name}.");
       }
-      $this->fieldStorage = $field_storage_definition;
+      $this->fieldStorageId = $field_storage_definition->id();
     }
 
-    return $this->fieldStorage;
+    return  \Drupal::entityTypeManager()->getStorage('field_storage_config')->load($this->fieldStorageId);
   }
 
   /**
