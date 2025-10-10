@@ -93,7 +93,7 @@
     static get DEFAULT_SETTINGS() {
       return {
         minLength: 2,
-        searchStart: false,
+        searchStartOfWords: false,
         announceSingular: null,
         announcePlural: null,
         announceFull: Drupal.t('All available items are listed.'),
@@ -146,7 +146,7 @@
       this.announcePlural = consolidateSettings.announcePlural;
       this.announceFull = consolidateSettings.announceFull;
       this.minLength = consolidateSettings.minLength;
-      this.searchStart = consolidateSettings.searchStart;
+      this.searchStartOfWords = consolidateSettings.searchStartOfWords;
       this.hideElement =
         consolidateSettings.hideElement || ListFilter._hideElementImpl;
       this.showElement =
@@ -231,7 +231,7 @@
 
       if (query.length >= this.minLength) {
         allItems.forEach((item) => {
-          if (this.searchMethod(item.textContent, query, this.searchStart)) {
+          if (this.searchMethod(item.textContent, query, this.searchStartOfWords)) {
             toShow.push(item.node);
             const group = item.node.dataset.filterParentGroup;
             if (group) {
