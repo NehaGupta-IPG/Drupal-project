@@ -67,7 +67,7 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
     $form['themes'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Themes'),
-      // @todo $this->configuration['theme'] won't be supported in Drupal 12.0.0.
+      // @todo $this->configuration['theme'] won't be supported in Drupal 13.0.0.
       // remove it:
       // @see https://www.drupal.org/node/3523553
       '#default_value' => isset($this->configuration['theme']) ? [$this->configuration['theme']] : $this->configuration['themes'],
@@ -82,7 +82,7 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     $this->configuration['themes'] = array_filter($form_state->getValue('themes', []));
-    // @todo $this->configuration['theme'] won't be supported in Drupal 12.0.0.
+    // @todo $this->configuration['theme'] won't be supported in Drupal 13.0.0.
     // remove it:
     // @see https://www.drupal.org/node/3523553
     unset($this->configuration['theme']);
@@ -125,7 +125,7 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
 
     // Handle deprecated 'theme' configuration option.
     if (empty($configuredThemes) && !empty($this->configuration['theme'])) {
-      @trigger_error('The "theme" configuration key is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. Use "themes" instead. See https://www.drupal.org/node/3523553', E_USER_DEPRECATED);
+      @trigger_error('The "theme" configuration key is deprecated in drupal:11.3.0 and will be removed in drupal:13.0.0. Use "themes" instead. See https://www.drupal.org/node/3523553', E_USER_DEPRECATED);
       $configuredThemes = [$this->configuration['theme']];
     }
 
