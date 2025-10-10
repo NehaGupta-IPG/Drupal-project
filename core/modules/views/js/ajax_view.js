@@ -63,12 +63,7 @@
   Drupal.views.ajaxView = function (settings) {
     const selector = `.js-view-dom-id-${settings.view_dom_id}`;
     this.$view = $(selector);
-    this.$exposed_form = $(
-      `form#views-exposed-form-${settings.view_name.replace(
-        /_/g,
-        '-',
-      )}-${settings.view_display_id.replace(/_/g, '-')}`,
-    );
+    this.$exposed_form = $('form[data-dom-id="' + settings.view_dom_id + '"]');
 
     // Retrieve the path to use for views' ajax.
     let ajaxPath = drupalSettings.views.ajax_path;
