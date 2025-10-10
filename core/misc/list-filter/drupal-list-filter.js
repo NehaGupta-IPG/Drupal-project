@@ -7,24 +7,14 @@
  * initializing ListFilter with the appropriate options and wiring up the filtering UI.
  *
  * To customize ListFilter options from another module, listen for the
- * 'listFilter:options-override' event on the input element **before** ListFilter is instantiated.
+ * 'listFilter:settings' event on the input element **before** ListFilter is instantiated.
  *
  * @example <caption>Customizing ListFilter options from another module</caption>
  *   // Attach your event listener BEFORE ListFilter is instantiated:
- *   input.addEventListener('listFilter:options-override', (event) => {
+ *   input.addEventListener('listFilter:settings', (event) => {
  *     event.detail.options.minLength = 5;
  *     event.detail.options.hideElement = (el) => { el.style.display = 'none'; };
  *   });
- *
- *   // Then instantiate ListFilter (typically done by this behavior):
- *   const filter = new Drupal.ListFilter({
- *     input: document.querySelector('#my-input'),
- *     containerSelector: '#my-table',
- *     itemsSelector: 'tr',
- *     singular: 'item found',
- *     plural: 'items found',
- *   });
- *   filter.filter();
  *
  * @example <caption>Listening for search completion</caption>
  *   // Listen for the 'listFilter:searchingFinished' event to react to filtering results:

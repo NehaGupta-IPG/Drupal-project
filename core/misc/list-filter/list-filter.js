@@ -49,7 +49,8 @@
    *     singular: 'item found',
    *     plural: 'items found',
    *   });
-   *   filter.filter();
+   *   // Make sure to add the in the instances list.
+   *   ListFilter.instances.set(input, filter);
    *
    */
   class ListFilter {
