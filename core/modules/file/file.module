@@ -359,9 +359,10 @@ function file_get_file_references(FileInterface $file, ?FieldDefinitionInterface
           // We also iterate over all translations because a file can be linked
           // to a language other than the default.
           foreach ($entity->getTranslationLanguages() as $langcode => $language) {
-            foreach ($entity->getTranslation($langcode)->get($field_name) as $item) {
+            $translation = $entity->getTranslation($langcode);
+            foreach ($translation->get($field_name) as $item) {
               if ($file->id() == $item->{$field_column}) {
-                $references[$file->id()][$age][$field_name][$entity_type_id][$entity->id()] = $entity->hasTranslation($langcode) ? $entity->getTranslation($langcode) : $entity;
+                $references[$file->id()][$age][$field_name][$entity_type_id][$entity->id()] = $translation;
                 break;
               }
             }
