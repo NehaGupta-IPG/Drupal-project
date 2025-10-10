@@ -688,6 +688,7 @@ class ConnectionTest extends UnitTestCase {
     Database::addConnectionInfo('default', 'default', [
       'driver' => 'test',
       'namespace' => 'Drupal\Tests\Core\Database\Stub',
+      'autoload' => __DIR__ . '/Stub/',
     ]);
     $connection = new StubConnection($this->createMock(StubPDO::class), []);
     $result = $connection->findCallerFromDebugBacktrace();
