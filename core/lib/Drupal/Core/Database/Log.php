@@ -14,6 +14,8 @@ use Drupal\Core\Database\Event\StatementExecutionEndEvent;
  *
  * Every connection has one and only one logging object on it for all targets
  * and logging keys.
+ *
+ * @phpstan-type DatabaseLogEntry array{'query': string, 'args': list<mixed>, 'caller': string, 'target': string, 'time': float, 'start': float}
  */
 class Log {
 
@@ -22,7 +24,7 @@ class Log {
    *
    * This will only be used if the query logger is enabled.
    *
-   * @var array<string,list<array{query: string, args: list<mixed>, caller: string, target: string, time: float, start:float}>>
+   * @var array<string,list<DatabaseLogEntry>>
    *   The structure for the logging array is as follows:
    *
    * @code
@@ -75,7 +77,7 @@ class Log {
    * @param string $logging_key
    *   The logging key to fetch.
    *
-   * @return list<array{query: string, args: list<mixed>, caller: string, target: string, time: float, start:float}>
+   * @return list<DatabaseLogEntry>
    *   An indexed array of all query records for this logging key.
    */
   public function get($logging_key) {

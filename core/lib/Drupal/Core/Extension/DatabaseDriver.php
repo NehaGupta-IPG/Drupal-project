@@ -156,9 +156,9 @@ class DatabaseDriver extends Extension {
    * @endcode
    *
    * @return array{
-   *     autoload: string,
-   *     namespace: string,
-   *     dependencies?: array<string, array{autoload: string, namespace: string}>,
+   *     'autoload': string,
+   *     'namespace': string,
+   *     'dependencies'?: array<string, array{'autoload': string, 'namespace': string}>,
    *   }
    */
   // phpcs:enable

@@ -16,8 +16,9 @@ use Drupal\Core\Cache\NullBackend;
  * shepherding of database connections into a single location without the use of
  * globals.
  *
- * @phpstan-type UnprocessedConnectionInfoArray array{driver: string, autoload?: string, namespace?: string, database: string, username?: string, password?: string, host?: string, port?: string|int, prefix?: string, collation?: string, pdo?: array<mixed>, isolation_level?: int|string, init_commands?: list<string>, dependencies?: array<string,array{autoload?: string, namespace?: string}>}
- * @phpstan-type ConnectionInfoArray array{driver: string, autoload?: string, namespace?: string, database: string, username?: string, password?: string, host?: string, port?: string|int, prefix: string, collation?: string, pdo?: array<mixed>, isolation_level?: int|string, init_commands?: list<string>, dependencies?: array<string,array{autoload?: string, namespace?: string}>}
+ * @phpstan-type UnprocessedConnectionInfoArray array{'driver': string, 'autoload'?: string, 'namespace'?: string, 'database': string, 'username'?: string, 'password'?: string, 'host'?: string, 'port'?: string|int, 'prefix'?: string, 'collation'?: string, 'pdo'?: array<mixed>, 'isolation_level'?: int|string, 'init_commands'?: list<string>, 'dependencies'?: array<string,array{'autoload'?: string, 'namespace'?: string}>}
+ * @phpstan-type ConnectionInfoArray array{'driver': string, 'autoload': string, 'namespace': string, 'database': string, 'username'?: string, 'password'?: string, 'host'?: string, 'port'?: string|int, 'prefix': string, 'collation'?: string, 'pdo'?: array<mixed>, 'isolation_level'?: int|string, 'init_commands'?: list<string>, 'dependencies'?: array<string,array{'autoload': string, 'namespace': string}>}
+ * @phpstan-import-type DatabaseLogEntry from \Drupal\Core\Database\Log
  *
  * @final
  */
@@ -105,7 +106,7 @@ abstract class Database {
    * @param string $key
    *   The database connection key for which we want to log.
    *
-   * @return list<array{query: string, args: list<mixed>, caller: string, target: string, time: float, start:float}>
+   * @return list<DatabaseLogEntry>
    *   The query log for the specified logging key and connection.
    *
    * @see \Drupal\Core\Database\Log
@@ -280,7 +281,6 @@ abstract class Database {
    */
   final public static function addConnectionInfo(string $key, string $target, array $info, ?ClassLoader $class_loader = NULL, ?string $app_root = NULL): void {
     if (empty(self::$databaseInfo[$key][$target])) {
-      /** @var ConnectionInfoArray $connection_info */
       $connection_info = self::parseConnectionInfo($info);
       self::$databaseInfo[$key][$target] = $connection_info;
 
@@ -290,7 +290,7 @@ abstract class Database {
       // initialization but the container definition is likely in the database.
       // Therefore, allow the connection info to specify an autoload directory
       // for the driver.
-      if (isset($connection_info['namespace']) && isset($connection_info['autoload']) && $class_loader && $app_root) {
+      if ($class_loader && $app_root) {
         $class_loader->addPsr4($connection_info['namespace'] . '\\', $app_root . '/' . $connection_info['autoload']);
 
         // When the database driver is extending from other database drivers,
@@ -298,9 +298,7 @@ abstract class Database {
         // as well.
         if (!empty($connection_info['dependencies'])) {
           foreach ($connection_info['dependencies'] as $dependency) {
-            if (isset($dependency['namespace']) && isset($dependency['autoload'])) {
-              $class_loader->addPsr4($dependency['namespace'] . '\\', $app_root . '/' . $dependency['autoload']);
-            }
+            $class_loader->addPsr4($dependency['namespace'] . '\\', $app_root . '/' . $dependency['autoload']);
           }
         }
       }
@@ -426,7 +424,6 @@ abstract class Database {
       throw new DriverNotSpecifiedException('Driver not specified for this database connection: ' . $key);
     }
 
-    assert(isset(self::$databaseInfo[$key][$target]['namespace']));
     $driver_class = self::$databaseInfo[$key][$target]['namespace'] . '\\Connection';
     $client_connection = $driver_class::open(self::$databaseInfo[$key][$target]);
     $new_connection = new $driver_class($client_connection, self::$databaseInfo[$key][$target]);
@@ -622,7 +619,6 @@ abstract class Database {
     if (empty($db_info) || empty($db_info['default'])) {
       throw new \RuntimeException("Database connection $key not defined or missing the 'default' settings");
     }
-    assert(isset($db_info['default']['namespace']));
     $namespace = $db_info['default']['namespace'];
     // Add the module name to the connection options to make it easy for the
     // connection class's createUrlFromConnectionOptions() method to add it to
