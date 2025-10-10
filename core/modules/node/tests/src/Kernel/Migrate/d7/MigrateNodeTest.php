@@ -197,7 +197,7 @@ class MigrateNodeTest extends MigrateDrupal7TestBase {
     $this->assertEquals("...is that it's the absolute best show ever. Trust me, I would know.", $node->body->value);
     $this->assertEquals('The thing about Deep Space 9', $node->label());
     $this->assertEquals('internal:/', $node->field_link->uri);
-    $this->assertEquals('Home', $node->field_link->title);
+    $this->assertEquals(NULL, $node->field_link->title);
     $this->assertEquals(CommentItemInterface::OPEN, $node->comment_node_article->status);
     $term_ref = $node->get('field_vocab_localize')->target_id;
     $this->assertSame('20', $term_ref);
@@ -217,7 +217,7 @@ class MigrateNodeTest extends MigrateDrupal7TestBase {
     $this->assertEquals('is - The thing about Deep Space 9', $translation->label());
     $this->assertEquals('internal:/', $translation->field_link->uri);
     $this->assertEquals(CommentItemInterface::OPEN, $translation->comment_node_article->status);
-    $this->assertEquals('Home', $translation->field_link->title);
+    $this->assertEquals(NULL, $translation->field_link->title);
     $term_ref = $translation->get('field_vocab_localize')->target_id;
     $this->assertSame('20', $term_ref);
     $this->assertSame('DS9', Term::load($term_ref)->getName());
