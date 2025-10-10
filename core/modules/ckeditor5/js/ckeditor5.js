@@ -382,7 +382,7 @@
            *
            * @param {number} - the number of rows.
            *
-           * @returns {number} - the height of a div in pixels.
+           * @return {number} - the height of a div in pixels.
            */
           function calculateLineHeight(rows) {
             const element = document.createElement('p');
