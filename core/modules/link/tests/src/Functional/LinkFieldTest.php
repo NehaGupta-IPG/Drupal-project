@@ -401,6 +401,22 @@ class LinkFieldTest extends BrowserTestBase {
     $output = $this->renderTestEntity($id);
     $expected_link = (string) Link::fromTextAndUrl($title, Url::fromUri($value))->toString();
     $this->assertStringContainsString($expected_link, $output);
+
+    // Verify that if the title field is disabled, the link field with correct
+    // text is rendered.
+    $this->field->setSetting('title', LinkTitleVisibility::Disabled->value)
+      ->save();
+
+    $value = 'http://www.example.net/';
+    $edit = [
+      "{$field_name}[0][uri]" => $value,
+    ];
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been updated.');
+
+    $output = $this->renderTestEntity($id);
+    $expected_link = (string) Link::fromTextAndUrl($value, Url::fromUri($value))->toString();
+    $this->assertStringContainsString($expected_link, $output);
   }
 
   /**
