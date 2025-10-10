@@ -231,7 +231,9 @@
 
       if (query.length >= this.minLength) {
         allItems.forEach((item) => {
-          if (this.searchMethod(item.textContent, query, this.searchStartOfWords)) {
+          if (
+            this.searchMethod(item.textContent, query, this.searchStartOfWords)
+          ) {
             toShow.push(item.node);
             const group = item.node.dataset.filterParentGroup;
             if (group) {
