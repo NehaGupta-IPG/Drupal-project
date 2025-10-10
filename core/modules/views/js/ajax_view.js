@@ -100,12 +100,7 @@
     this.settings = settings;
 
     // Add the ajax to exposed forms.
-    this.$exposed_form = $(
-      `form#views-exposed-form-${settings.view_name.replace(
-        /_/g,
-        '-',
-      )}-${settings.view_display_id.replace(/_/g, '-')}`,
-    );
+    this.$exposed_form = $('form[data-dom-id="' + settings.view_dom_id + '"]');
     once('exposed-form', this.$exposed_form).forEach(
       this.attachExposedFormAjax.bind(this),
     );
