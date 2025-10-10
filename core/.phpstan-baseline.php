@@ -16002,6 +16002,30 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field/tests/src/Unit/FieldStorageConfigEntityUnitTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to method __construct\\(\\) of deprecated class Drupal\\\\field\\\\Plugin\\\\migrate\\\\process\\\\ProcessField\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+replacement\\.$#',
+	'identifier' => 'method.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/field/tests/src/Unit/Plugin/migrate/process/ProcessFieldTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to method transform\\(\\) of deprecated class Drupal\\\\field\\\\Plugin\\\\migrate\\\\process\\\\ProcessField\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+replacement\\.$#',
+	'identifier' => 'method.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/field/tests/src/Unit/Plugin/migrate/process/ProcessFieldTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Instantiation of deprecated class Drupal\\\\field\\\\Plugin\\\\migrate\\\\process\\\\ProcessField\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+replacement\\.$#',
+	'identifier' => 'new.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/field/tests/src/Unit/Plugin/migrate/process/ProcessFieldTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Unit\\\\Plugin\\\\migrate\\\\process\\\\d6\\\\FieldInstanceSettingsTest\\:\\:getSettingsProvider\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -21304,12 +21328,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/layout_builder/tests/src/Kernel/OverridesSectionStorageTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Abstract test class Drupal\\\\Tests\\\\layout_builder\\\\Kernel\\\\SectionListTestBase must not add annotation @coversDefaultClass\\.$#',
-	'identifier' => 'abstractTestClass.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Kernel/SectionListTestBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Kernel\\\\SectionListTestBase\\:\\:assertSections\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -24701,6 +24719,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/migrate_drupal/src/Plugin/MigrateFieldPluginManager.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Missing cache backend declaration for performance\\.$#',
+	'identifier' => 'pluginManagerSetsCacheBackend.missingCacheBackend',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate_drupal/src/Plugin/MigrateFieldPluginManager.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Constructor of class Drupal\\\\migrate_drupal\\\\Plugin\\\\migrate\\\\EntityReferenceTranslationDeriver has an unused parameter \\$base_plugin_id\\.$#',
 	'identifier' => 'constructor.unusedParameter',
 	'count' => 1,
@@ -25127,6 +25151,30 @@ $ignoreErrors[] = [
 	'identifier' => 'variable.undefined',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/migrate_drupal/tests/src/Kernel/d7/ValidateMigrationStateTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to method __construct\\(\\) of deprecated class Drupal\\\\migrate_drupal\\\\Plugin\\\\MigrateFieldPluginManager\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+replacement\\.$#',
+	'identifier' => 'method.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate_drupal/tests/src/Unit/MigrateFieldPluginManagerTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to method getPluginIdFromFieldType\\(\\) of deprecated class Drupal\\\\migrate_drupal\\\\Plugin\\\\MigrateFieldPluginManager\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+replacement\\.$#',
+	'identifier' => 'method.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate_drupal/tests/src/Unit/MigrateFieldPluginManagerTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Class Drupal\\\\Tests\\\\migrate_drupal\\\\Unit\\\\MigrateFieldPluginManagerTestClass extends deprecated class Drupal\\\\migrate_drupal\\\\Plugin\\\\MigrateFieldPluginManager\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+replacement\\.$#',
+	'identifier' => 'class.extendsDeprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate_drupal/tests/src/Unit/MigrateFieldPluginManagerTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Missing cache backend declaration for performance\\.$#',
@@ -27249,12 +27297,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/path/tests/src/Kernel/Migrate/d6/MigrateUrlAliasTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Abstract test class Drupal\\\\Tests\\\\path\\\\Kernel\\\\Migrate\\\\d7\\\\MigrateUrlAliasTestBase must not add annotation @group\\.$#',
-	'identifier' => 'abstractTestClass.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path/tests/src/Kernel/Migrate/d7/MigrateUrlAliasTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\path\\\\Kernel\\\\Migrate\\\\d7\\\\MigrateUrlAliasTestBase\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
@@ -43643,12 +43685,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Plugin/CacheTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Abstract test class Drupal\\\\Tests\\\\views\\\\Kernel\\\\Plugin\\\\CastedIntFieldJoinTestBase must not add annotation @group\\.$#',
-	'identifier' => 'abstractTestClass.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Plugin/CastedIntFieldJoinTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Plugin\\\\CastedIntFieldJoinTestBase\\:\\:setUpFixtures\\(\\) has no return type specified\\.$#',
