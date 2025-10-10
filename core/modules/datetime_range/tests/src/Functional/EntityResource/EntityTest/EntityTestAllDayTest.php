@@ -41,7 +41,6 @@ class EntityTestAllDayTest extends EntityTestDateRangeTestBase {
       $fieldFormat = DateTimeItemInterface::DATETIME_STORAGE_FORMAT;
 
       // DX: 422 when date type is incorrect.
-
       $value = ['2017', '03', '01', '21', '53', '00'];
       $end_value = static::$endDateString;
       $message = "Unprocessable Entity: validation failed.\n{$fieldName}.0: The date range start value must be a string.\n{$fieldName}.0.value: This value should be of the correct primitive type.\n";
@@ -58,7 +57,6 @@ class EntityTestAllDayTest extends EntityTestDateRangeTestBase {
       $this->doEdgeCaseCall($method, $url, $request_options, $value, $end_value, $message);
 
       // DX: 422 when date format is incorrect.
-
       $value = '2017-03-01';
       $end_value = static::$endDateString;
       $message = "Unprocessable Entity: validation failed.\n{$fieldName}.0: The date range start value '{$value}' is invalid for the format '{$fieldFormat}'\n";
@@ -75,7 +73,6 @@ class EntityTestAllDayTest extends EntityTestDateRangeTestBase {
       $this->doEdgeCaseCall($method, $url, $request_options, $value, $end_value, $message);
 
       // DX: 422 when date format is incorrect.
-
       $value = '2016-13-55T20:02:00';
       $end_value = static::$endDateString;
       $message = "Unprocessable Entity: validation failed.\n{$fieldName}.0: The date range start value '{$value}' did not parse properly for the format '{$fieldFormat}'\n{$fieldName}.0.value: This value should be of the correct primitive type.\n";
@@ -92,7 +89,6 @@ class EntityTestAllDayTest extends EntityTestDateRangeTestBase {
       $this->doEdgeCaseCall($method, $url, $request_options, $value, $end_value, $message);
 
       // DX: 422 when the end date is before the start date.
-
       $value = static::$endDateString;
       $end_value = static::$startDateString;
       $message = "Unprocessable Entity: validation failed.\n{$fieldName}.0: The date range end value '{$end_value}' must be equal to or after the start value '{$value}'\n";
