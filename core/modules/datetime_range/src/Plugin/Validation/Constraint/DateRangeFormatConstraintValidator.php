@@ -21,11 +21,6 @@ class DateRangeFormatConstraintValidator extends ConstraintValidator {
   public function validate($item, Constraint $constraint) {
     $stop = FALSE;
 
-    /** @var \Drupal\datetime_range\Plugin\Field\FieldType\DateRangeItem $item */
-    if (!isset($item)) {
-      return;
-    }
-
     $value = $item->getValue()['value'];
     $end_value = $item->getValue()['end_value'];
 
