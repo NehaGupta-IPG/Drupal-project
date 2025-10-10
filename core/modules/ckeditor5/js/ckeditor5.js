@@ -512,10 +512,17 @@
             editorFitInTable();
             window.addEventListener('resize', debounce(editorFitInTable, 100));
             // Adapt code to tabbing in field group.
-            if (document.querySelectorAll('.field-group-tabs-wrapper').length > 0) {
-              document.querySelectorAll('.field-group-tabs-wrapper li').forEach((tab) => {
-                tab.addEventListener('click', debounce(editorFitInTable, 100));
-              });
+            if (
+              document.querySelectorAll('.field-group-tabs-wrapper').length > 0
+            ) {
+              document
+                .querySelectorAll('.field-group-tabs-wrapper li')
+                .forEach((tab) => {
+                  tab.addEventListener(
+                    'click',
+                    debounce(editorFitInTable, 100),
+                  );
+                });
             }
           }
         })
