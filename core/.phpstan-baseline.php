@@ -50400,12 +50400,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Theme/RegistryTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\UnroutedUrlTest\\:\\:providerFromInvalidUri\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/UnroutedUrlTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Function Drupal\\\\Tests\\\\Core\\\\Update\\\\bad_3\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
