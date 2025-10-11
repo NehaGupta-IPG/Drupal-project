@@ -166,7 +166,7 @@ class EntityController implements ContainerInjectionInterface {
       // Build the message shown when there are no bundles.
       $link_text = $this->t('Add a new @entity_type.', ['@entity_type' => $bundle_entity_type_label]);
       $link_route_name = 'entity.' . $bundle_entity_type->id() . '.add_form';
-      $build['#add_bundle_message'] = $this->t('There is no @entity_type yet. @add_link', [
+      $build['#add_bundle_message'] = $this->t('There are no @bundle_entity_type_label_plural yet. @add_link', [
         '@entity_type' => $bundle_entity_type_label,
         '@add_link' => Link::createFromRoute($link_text, $link_route_name)->toString(),
       ]);

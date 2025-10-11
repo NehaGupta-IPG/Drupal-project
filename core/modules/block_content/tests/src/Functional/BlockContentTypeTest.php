@@ -92,7 +92,7 @@ class BlockContentTypeTest extends BlockContentTestBase {
     // Test the page with no block-types.
     $this->drupalGet('block/add');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextContains('You have not created any block types yet');
+    $this->assertSession()->pageTextContains('There are no block types yet');
     $this->clickLink('block type creation page');
 
     // Create a block type via the user interface.
