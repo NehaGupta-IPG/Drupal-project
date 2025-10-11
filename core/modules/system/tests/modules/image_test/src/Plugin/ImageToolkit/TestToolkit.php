@@ -138,8 +138,8 @@ class TestToolkit extends ImageToolkitBase {
     $data = @getimagesize($this->getSource());
     if ($data && in_array($data[2], static::supportedTypes())) {
       $this->setType($data[2]);
-      $this->width = $data[0];
-      $this->height = $data[1];
+      $this->width = (int) $data[0];
+      $this->height = (int) $data[1];
       return TRUE;
     }
     return FALSE;
@@ -182,14 +182,14 @@ class TestToolkit extends ImageToolkitBase {
   /**
    * {@inheritdoc}
    */
-  public function getWidth() {
+  public function getWidth(): ?int {
     return $this->width;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getHeight() {
+  public function getHeight(): ?int {
     return $this->height;
   }
 

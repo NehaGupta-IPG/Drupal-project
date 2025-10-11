@@ -357,9 +357,9 @@ class GDToolkit extends ImageToolkitBase {
   /**
    * {@inheritdoc}
    */
-  public function getWidth() {
+  public function getWidth(): ?int {
     if ($this->preLoadInfo) {
-      return $this->preLoadInfo[0];
+      return (int) $this->preLoadInfo[0];
     }
     elseif ($res = $this->getImage()) {
       return imagesx($res);
@@ -372,9 +372,9 @@ class GDToolkit extends ImageToolkitBase {
   /**
    * {@inheritdoc}
    */
-  public function getHeight() {
+  public function getHeight(): ?int {
     if ($this->preLoadInfo) {
-      return $this->preLoadInfo[1];
+      return (int) $this->preLoadInfo[1];
     }
     elseif ($res = $this->getImage()) {
       return imagesy($res);

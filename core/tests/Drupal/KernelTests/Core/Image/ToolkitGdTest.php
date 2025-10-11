@@ -301,6 +301,8 @@ class ToolkitGdTest extends KernelTestBase {
     $image_original_type = $image->getToolkit()->getType();
 
     $this->assertTrue(imageistruecolor($toolkit->getImage()), "Image '$file_name' after load should be a truecolor image, but it is not.");
+    $this->assertSame(40, $toolkit->getWidth());
+    $this->assertSame(20, $toolkit->getHeight());
 
     // Perform our operation.
     $image->apply($operation, $arguments);

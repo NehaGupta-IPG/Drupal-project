@@ -66,14 +66,14 @@ class Image implements ImageInterface {
   /**
    * {@inheritdoc}
    */
-  public function getHeight() {
+  public function getHeight(): ?int {
     return $this->getToolkit()->getHeight();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getWidth() {
+  public function getWidth(): ?int {
     return $this->getToolkit()->getWidth();
   }
 
