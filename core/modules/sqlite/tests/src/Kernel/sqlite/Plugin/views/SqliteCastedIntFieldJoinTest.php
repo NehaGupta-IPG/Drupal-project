@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Drupal\Tests\sqlite\Kernel\sqlite\Plugin\views;
 
 use Drupal\Tests\views\Kernel\Plugin\CastedIntFieldJoinTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests SQLite specific cast handling.
- *
- * @group Database
  */
+#[Group('Database')]
+#[Group('views')]
 class SqliteCastedIntFieldJoinTest extends CastedIntFieldJoinTestBase {
 
   /**

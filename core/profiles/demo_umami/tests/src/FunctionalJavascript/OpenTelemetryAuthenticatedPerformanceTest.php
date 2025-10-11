@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\demo_umami\FunctionalJavascript;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\FunctionalJavascriptTests\PerformanceTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests demo_umami profile performance.
@@ -14,6 +16,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 #[Group('OpenTelemetry')]
 #[Group('#slow')]
 #[RequiresPhpExtension('apcu')]
+#[RunTestsInSeparateProcesses]
 class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
 
   /**
@@ -26,14 +29,14 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $user = $this->drupalCreateUser();
-    $this->drupalLogin($user);
   }
 
   /**
    * Logs front page tracing data with an authenticated user and warm cache.
    */
   public function testFrontPageAuthenticatedWarmCache(): void {
+    $user = $this->drupalCreateUser();
+    $this->drupalLogin($user);
     $this->drupalGet('<front>');
     $this->drupalGet('<front>');
 
@@ -51,10 +54,10 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 3,
-      'CacheGetCount' => 42,
+      'CacheGetCount' => 43,
       'CacheGetCountByBin' => [
         'config' => 22,
-        'bootstrap' => 5,
+        'bootstrap' => 6,
         'discovery' => 5,
         'data' => 5,
         'dynamic_page_cache' => 2,
@@ -71,6 +74,60 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
       'StylesheetBytes' => 39163,
     ];
     $this->assertMetrics($expected, $performance_data);
+  }
+
+  /**
+   * Logs node page performance with an administrator.
+   */
+  public function testNodePageAdministrator(): void {
+    $user = $this->drupalCreateUser([], NULL, TRUE);
+    $this->drupalLogin($user);
+    sleep(2);
+
+    $this->drupalGet('node/1');
+    sleep(2);
+    $this->drupalGet('node/1');
+    sleep(2);
+
+    $this->clearCaches();
+
+    $performance_data = $this->collectPerformanceData(function () {
+      $this->drupalGet('node/1');
+    }, 'administratorNodePage');
+
+    $expected = [
+      'QueryCount' => 545,
+      'CacheGetCount' => 568,
+      'CacheGetCountByBin' => [
+        'config' => 221,
+        'bootstrap' => 26,
+        'discovery' => 113,
+        'data' => 71,
+        'dynamic_page_cache' => 2,
+        'default' => 45,
+        'entity' => 23,
+        'render' => 39,
+        'menu' => 28,
+      ],
+      'CacheSetCount' => 475,
+      'CacheDeleteCount' => 0,
+      'CacheTagInvalidationCount' => 0,
+      'CacheTagLookupQueryCount' => 47,
+      'ScriptCount' => 3,
+      'ScriptBytes' => 263500,
+      'StylesheetCount' => 6,
+      'StylesheetBytes' => 106000,
+    ];
+    $this->assertMetrics($expected, $performance_data);
+  }
+
+  /**
+   * Clear caches.
+   */
+  protected function clearCaches(): void {
+    foreach (Cache::getBins() as $bin) {
+      $bin->deleteAll();
+    }
   }
 
 }

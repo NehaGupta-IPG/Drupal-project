@@ -97,21 +97,6 @@ class CommentHooks {
   }
 
   /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return [
-      'comment' => [
-        'render element' => 'elements',
-      ],
-      'field__comment' => [
-        'base hook' => 'field',
-      ],
-    ];
-  }
-
-  /**
    * Implements hook_ENTITY_TYPE_create() for 'field_config'.
    */
   #[Hook('field_config_create')]
@@ -442,9 +427,9 @@ class CommentHooks {
   }
 
   /**
-   * Implements hook_ranking().
+   * Implements hook_node_search_ranking().
    */
-  #[Hook('ranking')]
+  #[Hook('node_search_ranking')]
   public function ranking(): array {
     return \Drupal::service('comment.statistics')->getRankingInfo();
   }

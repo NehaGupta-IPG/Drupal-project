@@ -6,12 +6,14 @@ namespace Drupal\Tests\user\Kernel;
 
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
 use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests validation of user_role entities.
- *
- * @group user
  */
+#[Group('user')]
+#[Group('config')]
+#[Group('Validation')]
 class RoleValidationTest extends ConfigEntityValidationTestBase {
 
   /**

@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\editor\Kernel;
 
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\editor\Entity\Editor;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
-use Drupal\node\Entity\Node;
-use Drupal\file\Entity\File;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\file\Entity\File;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\node\Entity\Node;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests tracking of file usage by the Text Editor module.
- *
- * @group editor
  */
+#[Group('editor')]
 class EditorFileUsageTest extends EntityKernelTestBase {
 
   use ContentTypeCreationTrait;
@@ -47,11 +47,6 @@ class EditorFileUsageTest extends EntityKernelTestBase {
     ]);
     $filtered_html_format->save();
 
-    // Set cardinality for body field.
-    FieldStorageConfig::loadByName('node', 'body')
-      ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
-      ->save();
-
     // Set up text editor.
     $editor = Editor::create([
       'format' => 'filtered_html',
@@ -64,6 +59,11 @@ class EditorFileUsageTest extends EntityKernelTestBase {
 
     // Create a node type for testing.
     $this->createContentType(['type' => 'page', 'name' => 'page']);
+    // Set cardinality for body field.
+    FieldStorageConfig::loadByName('node', 'body')
+      ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
+      ->save();
+
     FieldStorageConfig::create([
       'field_name' => 'description',
       'entity_type' => 'node',
@@ -131,7 +131,7 @@ class EditorFileUsageTest extends EntityKernelTestBase {
     foreach ($image_paths as $key => $image_path) {
       $image = File::create();
       $image->setFileUri($image_path);
-      $image->setFilename(\Drupal::service('file_system')->basename($image->getFileUri()));
+      $image->setFilename(basename($image->getFileUri()));
       $image->save();
 
       $file_usage = $this->container->get('file.usage');
@@ -241,37 +241,8 @@ class EditorFileUsageTest extends EntityKernelTestBase {
       $this->assertSame(['editor' => ['node' => [1 => '2']]], $file_usage->listUsage($image_entity), 'The image ' . $image_paths[$key] . ' has 2 usages.');
     }
 
-    // Populate both the body and summary. Because this will be the same
-    // revision of the same node, it will record only one usage.
-    foreach ($original_values as $key => $original_value) {
-      $node->body[$key]->value = $original_value;
-      $node->body[$key]->summary = $original_value;
-    }
-    $node->save();
     foreach ($image_entities as $key => $image_entity) {
-      $this->assertSame(['editor' => ['node' => [1 => '2']]], $file_usage->listUsage($image_entity), 'The image ' . $image_paths[$key] . ' has 2 usages.');
-    }
-
-    // Empty out the body value, but keep the summary. The number of usages
-    // should not change.
-    foreach ($original_values as $key => $original_value) {
-      $node->body[$key]->value = '';
-      $node->body[$key]->summary = $original_value;
-    }
-    $node->save();
-    foreach ($image_entities as $key => $image_entity) {
-      $this->assertSame(['editor' => ['node' => [1 => '2']]], $file_usage->listUsage($image_entity), 'The image ' . $image_paths[$key] . ' has 2 usages.');
-    }
-
-    // Empty out the body and summary. The number of usages should decrease by
-    // one.
-    foreach ($original_values as $key => $original_value) {
-      $node->body[$key]->value = '';
-      $node->body[$key]->summary = '';
-    }
-    $node->save();
-    foreach ($image_entities as $key => $image_entity) {
-      $this->assertSame(['editor' => ['node' => [1 => '1']]], $file_usage->listUsage($image_entity), 'The image ' . $image_paths[$key] . ' has 1 usage.');
+      $this->assertSame(['editor' => ['node' => [1 => '2']]], $file_usage->listUsage($image_entity), 'The image ' . $image_paths[$key] . ' has 2 usage.');
     }
 
     // Set the field of a custom field type that is a subclass of
@@ -282,7 +253,7 @@ class EditorFileUsageTest extends EntityKernelTestBase {
     }
     $node->save();
     foreach ($image_entities as $key => $image_entity) {
-      $this->assertSame(['editor' => ['node' => [1 => '2']]], $file_usage->listUsage($image_entity), 'The image ' . $image_paths[$key] . ' has 2 usages.');
+      $this->assertSame(['editor' => ['node' => [1 => '3']]], $file_usage->listUsage($image_entity), 'The image ' . $image_paths[$key] . ' has 3 usages.');
     }
 
     // Test editor_entity_delete().

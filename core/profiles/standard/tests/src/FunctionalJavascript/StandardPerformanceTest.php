@@ -11,6 +11,7 @@ use Drupal\Tests\PerformanceData;
 use Drupal\user\UserInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cSpell:ignore mlid
 /**
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 #[Group('Common')]
 #[Group('#slow')]
 #[RequiresPhpExtension('apcu')]
+#[RunTestsInSeparateProcesses]
 class StandardPerformanceTest extends PerformanceTestBase {
 
   /**
@@ -57,6 +59,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
    */
   public function testStandardPerformance(): void {
     $this->testAnonymous();
+    $this->testCacheInvalidation();
     $this->testLogin();
     $this->testLoginBlock();
   }
@@ -134,13 +137,13 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 41,
-      'CacheGetCount' => 98,
+      'CacheGetCount' => 99,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 20,
         'data' => 8,
         'discovery' => 37,
-        'bootstrap' => 8,
+        'bootstrap' => 9,
         'dynamic_page_cache' => 1,
         'render' => 13,
         'default' => 5,
@@ -233,7 +236,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 10,
-      'CacheGetCount' => 69,
+      'CacheGetCount' => 70,
       'CacheSetCount' => 16,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
@@ -314,7 +317,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 14,
-      'CacheGetCount' => 56,
+      'CacheGetCount' => 57,
       'CacheSetCount' => 17,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
@@ -323,6 +326,122 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'StylesheetBytes' => 1150,
     ];
     $this->assertMetrics($expected, $performance_data);
+  }
+
+  /**
+   * Tests the impact of a cache tag based invalidation.
+   */
+  protected function testCacheInvalidation(): void {
+
+    // Crate a new page, this invalidates the node_list cache tag. Need to reset
+    // the cache tag checksum service as it did not register a need to
+    // invalidate that again. Repeat this twice as some routing caches are not
+    // yet properly populated due to directly emptying the caches before.
+    \Drupal::service('cache_tags.invalidator.checksum')->reset();
+    $this->drupalCreateNode(['type' => 'page', 'title' => 'new page']);
+
+    $this->drupalGet('');
+    // Ensure everything finishes before we collect performance data.
+    $this->drupalGet('');
+    sleep(2);
+
+    \Drupal::service('cache_tags.invalidator.checksum')->reset();
+    $this->drupalCreateNode(['type' => 'page', 'title' => 'new page']);
+
+    // Visit the frontpage again.
+    $performance_data = $this->collectPerformanceData(function () {
+      $this->drupalGet('');
+    }, 'standardFrontPageAfterInvalidation');
+
+    $expected_queries = [
+      'SELECT COUNT(*) AS "expression" FROM (SELECT 1 AS "expression" FROM "node_field_data" "node_field_data" WHERE ("node_field_data"."promote" = 1) AND ("node_field_data"."status" = 1)) "subquery"',
+      'SELECT "node_field_data"."sticky" AS "node_field_data_sticky", "node_field_data"."created" AS "node_field_data_created", "node_field_data"."nid" AS "nid" FROM "node_field_data" "node_field_data" WHERE ("node_field_data"."promote" = 1) AND ("node_field_data"."status" = 1) ORDER BY "node_field_data_sticky" DESC, "node_field_data_created" DESC LIMIT 10 OFFSET 0',
+      'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "theme:stark" ) AND "collection" = "config.entity.key_store.block"',
+    ];
+    $recorded_queries = $performance_data->getQueries();
+    $this->assertSame($expected_queries, $recorded_queries);
+    $expected = [
+      'QueryCount' => 3,
+      'CacheGetCount' => 69,
+      'CacheGetCountByBin' => [
+        'page' => 1,
+        'config' => 11,
+        'data' => 8,
+        'discovery' => 21,
+        'bootstrap' => 7,
+        'dynamic_page_cache' => 2,
+        'render' => 14,
+        'default' => 3,
+        'entity' => 1,
+        'menu' => 1,
+      ],
+      'CacheSetCount' => 5,
+      'CacheSetCountByBin' => [
+        'data' => 1,
+        'render' => 2,
+        'dynamic_page_cache' => 1,
+        'page' => 1,
+      ],
+      'CacheDeleteCount' => 0,
+      'CacheTagInvalidationCount' => 0,
+      'CacheTagLookupQueryCount' => 3,
+      'CacheTagGroupedLookups' => [
+        [
+          'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form',
+          'block_view',
+          'config:block.block.stark_account_menu',
+          'config:block.block.stark_breadcrumbs',
+          'config:block.block.stark_content',
+          'config:block.block.stark_help',
+          'config:block.block.stark_main_menu',
+          'config:block.block.stark_messages',
+          'config:block.block.stark_page_title',
+          'config:block.block.stark_powered',
+          'config:block.block.stark_primary_admin_actions',
+          'config:block.block.stark_primary_local_tasks',
+          'config:block.block.stark_search_form_narrow',
+          'config:block.block.stark_search_form_wide',
+          'config:block.block.stark_secondary_local_tasks',
+          'config:block.block.stark_site_branding',
+          'config:block_list',
+          'config:filter.format.restricted_html',
+          'config:search.settings',
+          'config:system.menu.account',
+          'config:system.menu.main',
+          'config:system.site',
+          'config:user.role.anonymous',
+          'config:views.view.frontpage',
+          'http_response',
+          'local_task',
+          'node:1',
+          'node_list',
+          'node_view',
+          'rendered',
+          'user:0',
+          'user_view',
+        ],
+        [
+          'route_match',
+          'access_policies',
+          'routes',
+          'router',
+          'entity_types',
+          'entity_field_info',
+          'entity_bundles',
+          'library_info',
+        ],
+        ['config:core.extension', 'views_data'],
+      ],
+      'StylesheetCount' => 1,
+      'StylesheetBytes' => 1300,
+    ];
+    $this->assertMetrics($expected, $performance_data);
+    $expected_default_cache_cids = [
+      'views_data:node_field_data:en',
+      'views_data:views:en',
+      'views_data:node:en',
+    ];
+    $this->assertSame($expected_default_cache_cids, $performance_data->getCacheOperations()['get']['default']);
   }
 
   /**
@@ -373,7 +492,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'StylesheetBytes' => 1429,
       'StylesheetCount' => 1,
       'QueryCount' => 17,
-      'CacheGetCount' => 68,
+      'CacheGetCount' => 70,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
@@ -482,7 +601,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 18,
-      'CacheGetCount' => 103,
+      'CacheGetCount' => 105,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,

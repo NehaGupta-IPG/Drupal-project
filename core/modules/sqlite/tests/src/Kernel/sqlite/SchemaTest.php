@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Tests\sqlite\Kernel\sqlite;
 
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
+use Drupal\sqlite\Driver\Database\sqlite\Schema;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests schema API for the SQLite driver.
- *
- * @group Database
  */
+#[Group('Database')]
+#[CoversClass(Schema::class)]
 class SchemaTest extends DriverSpecificSchemaTestBase {
 
   /**
@@ -47,7 +50,9 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   }
 
   /**
-   * @covers \Drupal\sqlite\Driver\Database\sqlite\Schema::introspectIndexSchema
+   * Tests introspect index schema.
+   *
+   * @legacy-covers \Drupal\sqlite\Driver\Database\sqlite\Schema::introspectIndexSchema
    */
   public function testIntrospectIndexSchema(): void {
     $table_specification = [

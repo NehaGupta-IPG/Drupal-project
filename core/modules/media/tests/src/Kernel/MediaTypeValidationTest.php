@@ -6,12 +6,14 @@ namespace Drupal\Tests\media\Kernel;
 
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests validation of media_type entities.
- *
- * @group media
  */
+#[Group('media')]
+#[Group('config')]
+#[Group('Validation')]
 class MediaTypeValidationTest extends ConfigEntityValidationTestBase {
 
   use MediaTypeCreationTrait;
