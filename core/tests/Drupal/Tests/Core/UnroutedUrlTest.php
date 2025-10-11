@@ -73,7 +73,7 @@ class UnroutedUrlTest extends UnitTestCase {
    * @legacy-covers ::fromUri
    */
   #[DataProvider('providerFromUri')]
-  public function testFromUri($uri, $is_external): void {
+  public function testFromUri(string $uri, bool $is_external): void {
     $url = Url::fromUri($uri);
 
     $this->assertInstanceOf('Drupal\Core\Url', $url);
@@ -108,7 +108,7 @@ class UnroutedUrlTest extends UnitTestCase {
    * @legacy-covers ::fromUri
    */
   #[DataProvider('providerFromInvalidUri')]
-  public function testFromInvalidUri($uri): void {
+  public function testFromInvalidUri(string $uri): void {
     $this->expectException(\InvalidArgumentException::class);
     Url::fromUri($uri);
   }
@@ -116,7 +116,7 @@ class UnroutedUrlTest extends UnitTestCase {
   /**
    * Data provider for testFromInvalidUri().
    */
-  public static function providerFromInvalidUri() {
+  public static function providerFromInvalidUri(): array {
     return [
       // Schemeless paths.
       ['test'],
