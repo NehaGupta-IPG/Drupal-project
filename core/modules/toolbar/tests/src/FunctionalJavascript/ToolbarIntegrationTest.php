@@ -19,7 +19,7 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['toolbar', 'node', 'shortcut'];
+  protected static $modules = ['toolbar', 'node', 'toolbar_test'];
 
   /**
    * {@inheritdoc}
@@ -106,7 +106,6 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
   public function testSwitchBetweenMultipleTabs(): void {
     $user = $this->drupalCreateUser([
       'access toolbar',
-      'access shortcuts',
     ]);
     $this->drupalLogin($user);
 
@@ -122,11 +121,11 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
     // Grab three tabs.
     $admin_tab = $page->find('css', '#toolbar-item-administration');
     $user_tab = $page->find('css', '#toolbar-item-user');
-    $shortcuts_tab = $page->find('css', '#toolbar-item-shortcuts');
+    $toolbar_item_test = $page->find('css', '#toolbar-tab-testing');
 
     $this->assertNotNull($admin_tab, 'Administration tab present.');
     $this->assertNotNull($user_tab, 'User tab present.');
-    $this->assertNotNull($shortcuts_tab, 'Shortcuts tab present.');
+    $this->assertNotNull($toolbar_item_test, 'Test tab present.');
 
     // Normalize start: ensure Administration is active.
     if ($admin_tab->getAttribute('aria-pressed') !== 'true') {
@@ -143,9 +142,9 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
     $this->waitExactlyOne('.toolbar-bar .trigger[aria-pressed="true"]');
     $this->waitExactlyOne('.toolbar-bar .trigger.is-active');
 
-    // Step 2: Switching from User to Shortcuts tabs (this is where the bug shows without the patch).
-    $shortcuts_tab->click();
-    $this->waitAndAssertAriaPressedState($shortcuts_tab, TRUE);
+    // Step 2: Switching from User to Test tab tabs (this is where the bug shows without the patch).
+    $toolbar_item_test->click();
+    $this->waitAndAssertAriaPressedState($toolbar_item_test, TRUE);
     $this->waitAndAssertAriaPressedState($user_tab, FALSE);
 
     // If the bug exists, one (or both) of these will fail (2 pressed/active).
@@ -155,7 +154,7 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
     // Sanity: back to Administration, still only one active.
     $admin_tab->click();
     $this->waitAndAssertAriaPressedState($admin_tab, TRUE);
-    $this->waitAndAssertAriaPressedState($shortcuts_tab, FALSE);
+    $this->waitAndAssertAriaPressedState($toolbar_item_test, FALSE);
     $this->waitExactlyOne('.toolbar-bar .trigger[aria-pressed="true"]');
     $this->waitExactlyOne('.toolbar-bar .trigger.is-active');
   }
@@ -203,7 +202,7 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
    * @param int $timeout
    *   Maximum time in seconds to wait for the condition. Defaults to 3.
    *
-   * @throws ExpectationFailedException
+   * @throws \PHPUnit\Framework\ExpectationFailedException
    *   Thrown if, after the timeout, there is not exactly one matching element.
    *
    * @see \Behat\Mink\Element\DocumentElement::waitFor()
