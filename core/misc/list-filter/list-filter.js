@@ -200,7 +200,7 @@
         this.containers.forEach((c) =>
           this._dispatchFilterEventByContainer(c, event.target.value),
         );
-      }, 200);
+      }, 100);
 
       this._keyDownHandler = (event) => {
         if (event.key === 'Enter') {

@@ -95,7 +95,7 @@ class BlockFilterTest extends WebDriverTestBase {
 
     // Test block filter reduces the number of visible rows.
     $filter->setValue('ad');
-    usleep(200000);
+    usleep(150000);
     $fewer_blocks_message = ' blocks are available in the modified list';
     $this->assertAnnounceContains($fewer_blocks_message);
     $visible_rows = $this->filterVisibleElements($blocks);
@@ -109,7 +109,7 @@ class BlockFilterTest extends WebDriverTestBase {
 
     // Test 3 letter search.
     $filter->setValue('adm');
-    usleep(200000);
+    usleep(150000);
     $visible_rows = $this->filterVisibleElements($blocks);
     $this->assertCount(2, $visible_rows);
     $visible_categories = $this->filterVisibleElements($categories);
@@ -117,7 +117,7 @@ class BlockFilterTest extends WebDriverTestBase {
 
     // Retest that blocks appear when reducing letters.
     $filter->setValue('ad');
-    usleep(200000);
+    usleep(150000);
     $visible_rows = $this->filterVisibleElements($blocks);
     $this->assertCount(3, $visible_rows);
     $visible_categories = $this->filterVisibleElements($categories);
@@ -125,12 +125,12 @@ class BlockFilterTest extends WebDriverTestBase {
 
     // Test blocks reappear after being filtered by repeating search for "a".
     $filter->setValue('a');
-    usleep(200000);
+    usleep(150000);
     $this->assertAnnounceContains('All available blocks are listed.');
 
     // Test Drupal.announce() message when only one match is present.
     $filter->setValue('Powered by');
-    usleep(200000);
+    usleep(150000);
     $this->assertAnnounceContains(' block is available');
     $visible_rows = $this->filterVisibleElements($blocks);
     $this->assertCount(1, $visible_rows);
@@ -140,7 +140,7 @@ class BlockFilterTest extends WebDriverTestBase {
 
     // Test Drupal.announce() message when no matches are present.
     $filter->setValue('Pan-Galactic Gargle Blaster');
-    usleep(200000);
+    usleep(150000);
     $visible_rows = $this->filterVisibleElements($blocks);
     $this->assertCount(0, $visible_rows);
     $visible_categories = $this->filterVisibleElements($categories);
@@ -152,7 +152,7 @@ class BlockFilterTest extends WebDriverTestBase {
 
     // Test Drupal.announce() message when all blocks are listed.
     $filter->setValue('');
-    usleep(200000);
+    usleep(150000);
     $this->assertAnnounceContains('All available blocks are listed.');
     // Confirm the Content Fields category remains collapsed after filtering.
     $this->assertFalse($promoteToFrontPageLink->isVisible());

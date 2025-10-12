@@ -10,22 +10,21 @@ use Drupal\Core\Render\Attribute\RenderElement;
 /**
  * Provides a search element for filtering a list with JavaScript.
  *
- * - #input: TRUE
  * - #size: (optional) The size of the input field. Defaults to 60.
  * - #maxlength: (optional) The maximum length of the input field. Defaults to
  *   128.
- * - theme_wrappers: ['form_element'].
+ * - #theme_wrappers: ['form_element'].
  * - #list_container_selector: The CSS selector(s) of the container to search
  *   in. To use multiple selectors, separate them with commas, like
  *   '.selector-a, .selector-b'.
  * - #list_item: (optional) The CSS selector, relative to the container, for the
- *   items to search for. If omitted, defaults to 'tbody tr'.
+ *   items to search for. By default, it points to the list items (such as table rows).
  * - #list_text: (optional) The CSS selector, relative to a list item, of
  *   elements containing text to search for. This may produce multiple elements.
  *   Defaults to an empty string, which indicates that the whole of the list
  *   item should be considered searchable text.
  * - #minimum_filter_length: (optional) The minimum length of the typed string
- *   before a filter is triggered. Defaults to 2.
+ *   before a filter is triggered. By default, is triggered after 2 chars.
  * - #search_start_of_words: (optional) Whether the entered filter text will
  *   search anywhere within words, or only from the start of words. For example,
  *   if TRUE, typing 'ke' will not filter the word 'cake'. Defaults to FALSE.
