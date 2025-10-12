@@ -133,10 +133,7 @@
       this.input.dispatchEvent(event);
 
       // Use the (possibly modified) settings from event.detail.settings
-      const consolidateSettings = {
-        ...merged,
-        ...(event.detail?.settings || {}),
-      };
+      const consolidateSettings = event.detail.settings;
 
       // Assignment
       this.containerSelector = consolidateSettings.containerSelector;

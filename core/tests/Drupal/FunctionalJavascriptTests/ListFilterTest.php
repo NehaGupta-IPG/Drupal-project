@@ -122,7 +122,7 @@ class ListFilterTest extends WebDriverTestBase {
   /**
    * Helper function to wait for the search to be filtered.
    */
-  protected function waitSearchFiltered($timeout = 300000): void {
+  protected function waitSearchFiltered($timeout = 250000): void {
     usleep($timeout);
   }
 

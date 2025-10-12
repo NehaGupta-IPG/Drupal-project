@@ -82,19 +82,19 @@ class ListFilter extends Search {
     static::setAttributes($element, ['form-search']);
     $element['#attributes']['class'][] = 'table-filter-text';
 
-    $listFilterAttrs = [];
-    $listFilterAttrs['containerSelector'] = $element['#list_container_selector'];
-    $listFilterAttrs['itemsSelector'] = $element['#list_item'];
+    $list_filter_attrs = [];
+    $list_filter_attrs['containerSelector'] = $element['#list_container_selector'];
+    $list_filter_attrs['itemsSelector'] = $element['#list_item'];
     if ($element['#list_text']) {
-      $listFilterAttrs['targetsSelector'] = $element['#list_text'];
+      $list_filter_attrs['targetsSelector'] = $element['#list_text'];
     }
-    $listFilterAttrs['minLength'] = $element['#minimum_filter_length'];
-    $listFilterAttrs['searchStart'] = (bool) $element['#search_start_of_words'];
-    $listFilterAttrs['announceSingular'] = $element['#announce']['singular'] ?? t('1 item is available in the modified list.');
-    $listFilterAttrs['announcePlural'] = $element['#announce']['plural'] ?? t('@count items are available in the modified list.');
-    $listFilterAttrs['announceFull'] = $element['#announce']['all'] ?? t('All available items are listed.');
+    $list_filter_attrs['minLength'] = $element['#minimum_filter_length'];
+    $list_filter_attrs['searchStart'] = (bool) $element['#search_start_of_words'];
+    $list_filter_attrs['announceSingular'] = $element['#announce']['singular'];
+    $list_filter_attrs['announcePlural'] = $element['#announce']['plural'];
+    $list_filter_attrs['announceFull'] = $element['#announce']['all'];
 
-    $element['#attributes']['data-list-filter'] = json_encode($listFilterAttrs);
+    $element['#attributes']['data-list-filter'] = json_encode($list_filter_attrs);
     $element['#attached']['library'][] = 'core/drupal.list-filter';
     return $element;
   }
