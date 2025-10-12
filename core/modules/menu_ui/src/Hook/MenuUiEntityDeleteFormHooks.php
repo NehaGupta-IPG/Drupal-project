@@ -4,14 +4,10 @@ namespace Drupal\menu_ui\Hook;
 
 use Drupal\Core\Entity\ContentEntityFormInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityRepositoryInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
-use Drupal\Core\Messenger\MessengerInterface;
-use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
@@ -27,25 +23,13 @@ class MenuUiEntityDeleteFormHooks {
   /**
    * Constructs a new MenuUiHooks object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
    * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menuLinkTree
    *   The menu link tree service.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
-   *   The entity repository service.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $stringTranslation
    *   The string translation service.
    */
   public function __construct(
-    protected EntityTypeManagerInterface $entityTypeManager,
-    private readonly MenuLinkTreeInterface $menuLinkTree,
-    private readonly EntityRepositoryInterface $entityRepository,
-    private readonly MessengerInterface $messenger,
-    private readonly RendererInterface $renderer,
+    protected readonly MenuLinkTreeInterface $menuLinkTree,
     TranslationInterface $stringTranslation,
   ) {
     $this->setStringTranslation($stringTranslation);
@@ -97,16 +81,16 @@ class MenuUiEntityDeleteFormHooks {
     // opportunity to get the menu items before the menu is modified.
     array_unshift(
       $form['actions']['submit']['#submit'],
-      [$this, 'submitCallback'],
+      static::class . '::submitCallback',
     );
   }
 
   /**
    * Callback for the submit handler.
    */
-  public function submitCallback(array $form, FormStateInterface $form_state): void {
+  public static function submitCallback(array $form, FormStateInterface $form_state): void {
     $entity = $form_state->getFormObject()->getEntity();
-    $tree = $this->getDescendantTree($entity);
+    $tree = static::getDescendantTree($entity);
     if (count($tree) === 0) {
       return;
     }
@@ -116,17 +100,17 @@ class MenuUiEntityDeleteFormHooks {
       '#template' => '<p>{{ message }}</p>{{ menu }}',
       '#context' => [
         'message' => [
-          '#markup' => $this->formatPlural(
+          '#markup' => \Drupal::translation()->formatPlural(
             count($tree),
             'The menu item for @entity had @count child menu item. This child menu item moved to the same level as the now-deleted menu item. The affected menu item is:',
             'The menu items for @entity had @count children menu items. These children menu items moved to the same level as the now-deleted menu item. Affected menu items include:',
             ['@entity' => $entity->label()]),
         ],
-        'menu' => $this->menuLinkTree->build($tree),
+        'menu' => \Drupal::service('menu.link_tree')->build($tree),
       ],
     ];
-    $message = $this->renderer->render($message);
-    $this->messenger->addWarning($message);
+    $message = \Drupal::service('renderer')->render($message);
+    \Drupal::messenger()->addWarning($message);
   }
 
   /**
@@ -141,13 +125,13 @@ class MenuUiEntityDeleteFormHooks {
    * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
    *   The descendant menu link tree.
    */
-  protected function getDescendantTree(EntityInterface $entity): array {
+  protected static function getDescendantTree(EntityInterface $entity): array {
     if ($entity instanceof MenuLinkContentInterface) {
       // Deleting a menu link content entity directly.
       $menuLink = $entity;
     }
     else {
-      $menuLinkContentStorage = $this->entityTypeManager->getStorage('menu_link_content');
+      $menuLinkContentStorage = \Drupal::entityTypeManager()->getStorage('menu_link_content');
       $query = $menuLinkContentStorage
         ->getQuery()
         ->accessCheck(TRUE)
@@ -162,7 +146,7 @@ class MenuUiEntityDeleteFormHooks {
         return [];
       }
 
-      $menuLink = $this->entityRepository->getTranslationFromContext($menuLink);
+      $menuLink = \Drupal::service('entity.repository')->getTranslationFromContext($menuLink);
     }
 
     $parameters = (new MenuTreeParameters())
@@ -170,8 +154,9 @@ class MenuUiEntityDeleteFormHooks {
       ->excludeRoot()
       ->setMinDepth(1)
       ->setMaxDepth(1);
-    return $this->menuLinkTree->transform(
-      tree: $this->menuLinkTree->load($menuLink->getMenuName(), $parameters),
+    $menuLinkTree = \Drupal::service('menu.link_tree');
+    return $menuLinkTree->transform(
+      tree: $menuLinkTree->load($menuLink->getMenuName(), $parameters),
       manipulators: [
         ['callable' => 'menu.default_tree_manipulators:checkAccess'],
       ],
