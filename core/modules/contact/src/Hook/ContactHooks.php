@@ -117,13 +117,13 @@ class ContactHooks {
     $language = \Drupal::languageManager()->getLanguage($message['langcode']);
     $variables = [
       '@site-name' => \Drupal::config('system.site')->get('name'),
-      '@subject' => $contact_message->getSubject(),
+      '@subject' => $contact_message->getSubject() ?? '',
       '@form' => !empty($params['contact_form']) ? $params['contact_form']->label() : '',
       '@form-url' => Url::fromRoute('<current>', [], [
         'absolute' => TRUE,
         'language' => $language,
       ])->toString(),
-      '@sender-name' => $sender->getDisplayName(),
+      '@sender-name' => $sender->isAuthenticated() ? $sender->getDisplayName() : 'anonymous',
     ];
     if ($sender->isAuthenticated()) {
       $variables['@sender-url'] = $sender->toUrl('canonical', ['absolute' => TRUE, 'language' => $language])->toString();
