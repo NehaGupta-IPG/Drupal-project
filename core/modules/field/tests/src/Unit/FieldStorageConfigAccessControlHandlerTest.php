@@ -138,8 +138,10 @@ class FieldStorageConfigAccessControlHandlerTest extends UnitTestCase {
         ['field_storage_config', $storage_access_control_handler],
       ]);
 
+    $entity_field_manager = $this->createMock(EntityTypeManagerInterface::class);
     $container = new Container();
     $container->set('entity_type.manager', $entity_type_manager);
+    $container->set('entity_field.manager', $entity_field_manager);
     $container->set('uuid', $this->createMock(UuidInterface::class));
     $container->set('cache_contexts_manager', $this->prophesize(CacheContextsManager::class));
     \Drupal::setContainer($container);

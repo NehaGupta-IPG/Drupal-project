@@ -324,7 +324,7 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
       $this->fieldStorageId = $field_storage_definition->id();
     }
 
-    return  \Drupal::entityTypeManager()->getStorage('field_storage_config')->load($this->fieldStorageId);
+    return \Drupal::entityTypeManager()->getStorage('field_storage_config')->load($this->fieldStorageId);
   }
 
   /**
