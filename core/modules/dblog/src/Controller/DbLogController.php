@@ -430,6 +430,7 @@ class DbLogController extends ControllerBase {
   public function topLogMessages($type) {
     $header = [
       ['data' => $this->t('Count'), 'field' => 'count', 'sort' => 'desc'],
+      ['data' => $this->t('Most recent'), 'field' => 'latest'],
       ['data' => $this->t('Message'), 'field' => 'message'],
     ];
 
@@ -441,6 +442,7 @@ class DbLogController extends ControllerBase {
       ->extend(PagerSelectExtender::class)
       ->extend(TableSortExtender::class);
     $query->addExpression('COUNT([wid])', 'count');
+    $query->addExpression('MAX(timestamp)', 'latest');
     $query = $query
       ->fields('w', ['message', 'variables'])
       ->condition('w.type', $type)
@@ -454,7 +456,7 @@ class DbLogController extends ControllerBase {
     $rows = [];
     foreach ($result as $dblog) {
       if ($message = $this->formatMessage($dblog)) {
-        $rows[] = [$dblog->count, $message];
+        $rows[] = [$dblog->count, $this->dateFormatter->format($dblog->latest), $message];
       }
     }
 
