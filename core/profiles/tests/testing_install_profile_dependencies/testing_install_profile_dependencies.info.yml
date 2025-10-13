@@ -6,6 +6,6 @@ hidden: true
 dependencies:
   - drupal:dblog
 install:
-  - dependency_foo_test
+  - drupal:dependency_foo_test
 themes:
   - starterkit_theme

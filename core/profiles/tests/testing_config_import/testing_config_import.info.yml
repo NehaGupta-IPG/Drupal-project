@@ -4,7 +4,7 @@ description: 'Tests install profiles in the config importer.'
 version: VERSION
 hidden: true
 install:
-  - syslog
-  - testing_config_import_module
+  - drupal:syslog
+  - drupal:testing_config_import_module
 themes:
   - stark

@@ -4,9 +4,9 @@ description: 'Minimal profile for running a test when dependencies are listed bu
 version: VERSION
 hidden: true
 install:
-  - block
+  - drupal:block
   - drupal:node
   - drupal:fictional
-  - missing_module1
-  - missing_module2
+  - drupal:missing_module1
+  - drupal:missing_module2
 keep_english: true

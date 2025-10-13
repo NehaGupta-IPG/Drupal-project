@@ -4,15 +4,15 @@ description: 'Minimal profile for running A11y Nightwatch tests. Includes absolu
 version: VERSION
 hidden: true
 install:
-  - block
-  - comment
-  - contact
-  - image
-  - node
-  - path
-  - search
-  - taxonomy
-  - nightwatch_theme_install_utility
+  - drupal:block
+  - drupal:comment
+  - drupal:contact
+  - drupal:image
+  - drupal:node
+  - drupal:path
+  - drupal:search
+  - drupal:taxonomy
+  - drupal:nightwatch_theme_install_utility
 themes:
   - claro
   - olivero
