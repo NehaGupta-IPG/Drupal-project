@@ -45,7 +45,7 @@ class SaveActionTest extends KernelTestBase implements ServiceModifierInterface 
   /**
    * {@inheritdoc}
    */
-  public function alter(ContainerBuilder $container) {
+  public function alter(ContainerBuilder $container): void {
     $service_definition = $container->getDefinition('datetime.time');
     $service_definition->setClass(TestMockedTime::class);
   }

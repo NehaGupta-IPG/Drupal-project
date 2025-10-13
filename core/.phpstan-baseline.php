@@ -46387,12 +46387,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Action/EmailActionTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Action\\\\SaveActionTest\\:\\:alter\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Action/SaveActionTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Archiver\\\\ArchiverTestBase\\:\\:assertArchiveContainsFile\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -46621,12 +46615,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Element/PathElementFormTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\ContentEntityChangedTest\\:\\:alter\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/ContentEntityChangedTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Variable \\$title might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 2,
@@ -46727,18 +46715,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityTypedDataDefinitionTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityValidationTest\\:\\:alter\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityValidationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityViewBuilderTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityViewBuilderTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$e might not be defined\\.$#',

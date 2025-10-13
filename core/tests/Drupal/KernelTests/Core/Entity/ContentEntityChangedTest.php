@@ -74,7 +74,7 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
   /**
    * {@inheritdoc}
    */
-  public function alter(ContainerBuilder $container) {
+  public function alter(ContainerBuilder $container): void {
     $service_definition = $container->getDefinition('datetime.time');
     $service_definition->setClass(TestMockedTime::class);
   }
