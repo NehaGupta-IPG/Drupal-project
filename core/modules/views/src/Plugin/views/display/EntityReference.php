@@ -5,6 +5,7 @@ namespace Drupal\views\Plugin\views\display;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsDisplay;
+use Drupal\views\Views;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -210,6 +211,13 @@ class EntityReference extends DisplayPluginBase {
       $this->view->query->addWhere(0, $id_table . '.' . $id_field, $options['ids'], 'IN');
     }
 
+    // Override the pager plugin if it is not 'some' to limit the results,
+    // since other plugins such as 'none' may not support setting the number
+    // of items and the user will receive the entire selection of the view.
+    if ($this->view->getPager()->getPluginId() !== 'some') {
+      $this->view->pager = Views::pluginManager('pager')->createInstance('some');
+      $this->view->pager->init($this->view, $this->view->getDisplay());
+    }
     $this->view->setItemsPerPage($options['limit']);
   }
 
