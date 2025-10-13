@@ -31,12 +31,22 @@ interface AttachmentsResponseProcessorInterface {
    * @endcode
    *
    * The available keys are:
-   * - 'library' (asset libraries)
-   * - 'drupalSettings' (JavaScript settings)
-   * - 'feed' (RSS feeds)
-   * - 'html_head' (tags in HTML <head>)
-   * - 'html_head_link' (<link> tags in HTML <head>)
-   * - 'http_header' (HTTP headers and status code)
+   * - 'library': Asset library definitions. Each item is an array of
+   *   library names, e.g. ['core/drupal'].
+   * - 'drupalSettings': JavaScript settings passed to Drupal behaviours.
+   *   Must be an associative array, e.g. ['myModule' => ['key' => 'value']].
+   * - 'feed': RSS or Atom feed links. Each item is an array of two values:
+   *   the URL and an associative array of attributes, e.g.
+   *   ['url' => 'example.xml', 'attributes' => ['title' => 'Feed']].
+   * - 'html_head': Items for the HTML <head> section. Each item is a numeric
+   *   array [$data, $key], where $data is a render array for an 'html_tag'
+   *   element and $key is a unique identifier.
+   * - 'html_head_link': <link> tags to add to the HTML <head>. Each item is
+   *   an associative array of attributes, e.g. ['rel' => 'canonical',
+   *   'href' => 'https://example.com'].
+   * - 'http_header': HTTP headers to add to the response. Each item is a
+   *   numeric array [$header_name, $header_value]. Can also include
+   *   ['status', $code] to override the response status.
    *
    * Placeholders need to be rendered first in order to have all attachments
    * available for processing. For an example, see
@@ -50,8 +60,7 @@ interface AttachmentsResponseProcessorInterface {
    *   final values.
    *
    * @throws \InvalidArgumentException
-   *   Thrown when the $response parameter is not the type of response object
-   *   the processor expects.
+   *    Thrown when the $response parameter is not the expected response type.
    */
   public function processAttachments(AttachmentsInterface $response);
 
