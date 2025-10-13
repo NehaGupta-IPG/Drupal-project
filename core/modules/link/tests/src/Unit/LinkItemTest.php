@@ -12,8 +12,8 @@ use Drupal\link\Plugin\Field\FieldType\LinkItem;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests LinkItem.
@@ -30,22 +30,13 @@ class LinkItemTest extends UnitTestCase {
    *
    * @legacy-covers ::getCacheTags
    */
-  #[DataProvider('providerGetCacheTagsForNonEntityUris')]
+  #[TestWith(['route:<front>'])]
+  #[TestWith(['https://example.com'])]
+  #[TestWith(['this is a malformed uri'])]
   public function testGetCacheTagsForNonEntityUris(string $uri): void {
     $link_item = $this->createPartialMock(LinkItem::class, []);
     $link_item->uri = $uri;
     $this->assertSame([], $link_item->getCacheTags());
-  }
-
-  /**
-   * Provider for testGetCacheTagsForNonEntityUris().
-   */
-  public static function providerGetCacheTagsForNonEntityUris(): array {
-    return [
-      ['route:<front>'],
-      ['https://example.com'],
-      ['this is a malformed uri'],
-    ];
   }
 
   /**
