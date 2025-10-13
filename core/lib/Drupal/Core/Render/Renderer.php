@@ -137,6 +137,9 @@ class Renderer implements RendererInterface {
    * {@inheritdoc}
    */
   public function renderInIsolation(&$elements) {
+    if (!is_array($elements)) {
+      return '';
+    }
     $context = new RenderContext();
     return Markup::create($this->executeInRenderContext($context, function () use (&$elements, $context) {
       return $this->doRenderRoot($elements, $context);
