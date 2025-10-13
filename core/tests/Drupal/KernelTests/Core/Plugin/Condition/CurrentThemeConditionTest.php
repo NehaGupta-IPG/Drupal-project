@@ -59,7 +59,7 @@ class CurrentThemeConditionTest extends KernelTestBase {
     // Check whether the deprecated config functions as expected, but throws a
     // deprecation notice:
     $this->assertFalse($condition_deprecated_config->execute());
-    $this->expectDeprecation('The "theme" configuration key is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. Use "themes" instead. See https://www.drupal.org/node/3523553');
+    $this->expectDeprecation('The "theme" configuration key is deprecated in drupal:11.3.0 and will be removed in drupal:13.0.0. Use "themes" instead. See https://www.drupal.org/node/3523553');
 
     // Set the expected theme to be used.
     $this->config('system.theme')->set('default', 'test_theme')->save();
@@ -83,7 +83,7 @@ class CurrentThemeConditionTest extends KernelTestBase {
     // Check whether the deprecated config functions as expected, but throws a
     // deprecation notice:
     $this->assertTrue($condition_deprecated_config->execute());
-    $this->expectDeprecation('The "theme" configuration key is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. Use "themes" instead. See https://www.drupal.org/node/3523553');
+    $this->expectDeprecation('The "theme" configuration key is deprecated in drupal:11.3.0 and will be removed in drupal:13.0.0. Use "themes" instead. See https://www.drupal.org/node/3523553');
 
     // Also when setting the other expected theme:
     $this->config('system.theme')->set('default', 'test_subtheme')->save();
