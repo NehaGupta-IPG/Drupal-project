@@ -7,14 +7,16 @@ namespace Drupal\Tests\image\Kernel;
 use Drupal\Core\Form\FormState;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\image\Form\ImageEffectEditForm;
-use Drupal\Tests\Traits\Core\Image\ToolkitTestTrait;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\Traits\Core\Image\ToolkitTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests image effects.
- *
- * @group image
  */
+#[Group('image')]
+#[RunTestsInSeparateProcesses]
 class ImageEffectsTest extends KernelTestBase {
 
   use ToolkitTestTrait;
@@ -33,7 +35,6 @@ class ImageEffectsTest extends KernelTestBase {
     'image',
     'image_module_test',
     'image_test',
-    'system',
   ];
 
   /**

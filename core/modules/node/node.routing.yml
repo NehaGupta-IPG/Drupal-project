@@ -68,7 +68,6 @@ entity.node.revision:
   path: '/node/{node}/revisions/{node_revision}/view'
   defaults:
     _controller: '\Drupal\node\Controller\NodeController::revisionShow'
-    _title_callback: '\Drupal\node\Controller\NodeController::revisionPageTitle'
   requirements:
     _entity_access: 'node_revision.view revision'
     node: \d+
@@ -164,4 +163,4 @@ node.configure_rebuild_confirm:
   defaults:
     _form: '\Drupal\node\Form\RebuildPermissionsForm'
   requirements:
-    _permission: 'administer nodes'
+    _permission: 'rebuild node access permissions'

@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\ckeditor5\Kernel;
 
+use Drupal\ckeditor5\Plugin\Validation\Constraint\CKEditor5MediaAndFilterSettingsInSyncConstraintValidator;
+use Drupal\ckeditor5\Plugin\Validation\Constraint\EnabledConfigurablePluginsConstraintValidator;
+use Drupal\ckeditor5\Plugin\Validation\Constraint\FundamentalCompatibilityConstraintValidator;
+use Drupal\ckeditor5\Plugin\Validation\Constraint\ToolbarItemConstraintValidator;
+use Drupal\ckeditor5\Plugin\Validation\Constraint\ToolbarItemDependencyConstraintValidator;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\editor\EditorInterface;
@@ -12,19 +17,25 @@ use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\FilterFormatInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\SchemaCheckTestTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Yaml\Yaml;
 
 // cspell:ignore onhover baguette
-
 /**
- * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\ToolbarItemConstraintValidator
- * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\ToolbarItemDependencyConstraintValidator
- * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\EnabledConfigurablePluginsConstraintValidator
- * @covers \Drupal\ckeditor5\Plugin\Editor\CKEditor5::validatePair
- * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\FundamentalCompatibilityConstraintValidator
- * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\CKEditor5MediaAndFilterSettingsInSyncConstraintValidator
- * @group ckeditor5
+ * Tests Validators.
+ *
+ * @legacy-covers \Drupal\ckeditor5\Plugin\Editor\CKEditor5::validatePair
  */
+#[Group('ckeditor5')]
+#[CoversClass(ToolbarItemConstraintValidator::class)]
+#[CoversClass(ToolbarItemDependencyConstraintValidator::class)]
+#[CoversClass(EnabledConfigurablePluginsConstraintValidator::class)]
+#[CoversClass(FundamentalCompatibilityConstraintValidator::class)]
+#[CoversClass(CKEditor5MediaAndFilterSettingsInSyncConstraintValidator::class)]
+#[RunTestsInSeparateProcesses]
 class ValidatorsTest extends KernelTestBase {
 
   use SchemaCheckTestTrait;
@@ -48,6 +59,7 @@ class ValidatorsTest extends KernelTestBase {
     'filter_test',
     'media',
     'media_library',
+    'user',
     'views',
   ];
 
@@ -60,17 +72,19 @@ class ValidatorsTest extends KernelTestBase {
   }
 
   /**
-   * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\CKEditor5ElementConstraintValidator
-   * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\StyleSensibleElementConstraintValidator
-   * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\UniqueLabelInListConstraintValidator
-   * @dataProvider provider
+   * Tests .
    *
    * @param array $ckeditor5_settings
    *   The CKEditor 5 settings to test.
    * @param array $expected_violations
    *   All expected violations for the given CKEditor 5 settings, with property
    *   path as keys and message as values.
+   *
+   * @legacy-covers \Drupal\ckeditor5\Plugin\Validation\Constraint\CKEditor5ElementConstraintValidator
+   * @legacy-covers \Drupal\ckeditor5\Plugin\Validation\Constraint\StyleSensibleElementConstraintValidator
+   * @legacy-covers \Drupal\ckeditor5\Plugin\Validation\Constraint\UniqueLabelInListConstraintValidator
    */
+  #[DataProvider('provider')]
   public function test(array $ckeditor5_settings, array $expected_violations): void {
     // The data provider is unable to access services, so the test scenario of
     // testing with CKEditor 5's default settings is partially provided here.
@@ -135,6 +149,7 @@ class ValidatorsTest extends KernelTestBase {
             'properties' => [
               'reversed' => FALSE,
               'startIndex' => FALSE,
+              'styles' => TRUE,
             ],
             'multiBlock' => TRUE,
           ],
@@ -582,7 +597,7 @@ class ValidatorsTest extends KernelTestBase {
       ],
       'expected_violations' => [],
     ];
-    $data['INVALID: SourceEditing plugin configuration: <ol start type> must not be allowed because List can generate <ol reversed start>'] = [
+    $data['INVALID: SourceEditing plugin configuration: <ol start type> must not be allowed because List can generate <ol reversed start type>'] = [
       'ckeditor5_settings' => [
         'toolbar' => [
           'items' => [
@@ -595,6 +610,7 @@ class ValidatorsTest extends KernelTestBase {
             'properties' => [
               'reversed' => TRUE,
               'startIndex' => TRUE,
+              'styles' => FALSE,
             ],
             'multiBlock' => TRUE,
           ],
@@ -606,10 +622,13 @@ class ValidatorsTest extends KernelTestBase {
         ],
       ],
       'expected_violations' => [
-        'settings.plugins.ckeditor5_sourceEditing.allowed_tags.0' => 'The following attribute(s) are already supported by enabled plugins and should not be added to the Source Editing "Manually editable HTML tags" field: <em class="placeholder">List (&lt;ol start&gt;)</em>.',
+        'settings.plugins.ckeditor5_sourceEditing.allowed_tags.0' => [
+          'The following attribute(s) are already supported by enabled plugins and should not be added to the Source Editing "Manually editable HTML tags" field: <em class="placeholder">List (&lt;ol start&gt;)</em>.',
+          'The following attribute(s) can optionally be supported by enabled plugins and should not be added to the Source Editing "Manually editable HTML tags" field: <em class="placeholder">List (&lt;ol type&gt;)</em>.',
+        ],
       ],
     ];
-    $data['INVALID: SourceEditing plugin configuration: <ol start type> must not be allowed because List can generate <ol start>'] = [
+    $data['INVALID: SourceEditing plugin configuration: <ol start type> must not be allowed because List can generate <ol start type>'] = [
       'ckeditor5_settings' => [
         'toolbar' => [
           'items' => [
@@ -622,6 +641,7 @@ class ValidatorsTest extends KernelTestBase {
             'properties' => [
               'reversed' => FALSE,
               'startIndex' => FALSE,
+              'styles' => FALSE,
             ],
             'multiBlock' => TRUE,
           ],
@@ -633,7 +653,7 @@ class ValidatorsTest extends KernelTestBase {
         ],
       ],
       'expected_violations' => [
-        'settings.plugins.ckeditor5_sourceEditing.allowed_tags.0' => 'The following attribute(s) can optionally be supported by enabled plugins and should not be added to the Source Editing "Manually editable HTML tags" field: <em class="placeholder">List (&lt;ol start&gt;)</em>.',
+        'settings.plugins.ckeditor5_sourceEditing.allowed_tags.0' => 'The following attribute(s) can optionally be supported by enabled plugins and should not be added to the Source Editing "Manually editable HTML tags" field: <em class="placeholder">List (&lt;ol start type&gt;)</em>.',
       ],
     ];
 
@@ -641,8 +661,7 @@ class ValidatorsTest extends KernelTestBase {
   }
 
   /**
-   * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\SourceEditingPreventSelfXssConstraintValidator
-   * @dataProvider providerPair
+   * Tests pair.
    *
    * @param array $ckeditor5_settings
    *   The paired text editor's CKEditor 5 settings to test.
@@ -652,7 +671,10 @@ class ValidatorsTest extends KernelTestBase {
    *   The paired text format's filters and filter settings.
    * @param array $expected_violations
    *   All expected violations for the pair.
+   *
+   * @legacy-covers \Drupal\ckeditor5\Plugin\Validation\Constraint\SourceEditingPreventSelfXssConstraintValidator
    */
+  #[DataProvider('providerPair')]
   public function testPair(array $ckeditor5_settings, array $editor_image_upload_settings, array $filters, array $expected_violations): void {
     $text_editor = Editor::create([
       'format' => 'dummy',
@@ -1581,7 +1603,7 @@ class ValidatorsTest extends KernelTestBase {
   /**
    * Tests that validation works with >1 enabled HTML restrictor filters.
    *
-   * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\FundamentalCompatibilityConstraintValidator::checkHtmlRestrictionsMatch
+   * @legacy-covers \Drupal\ckeditor5\Plugin\Validation\Constraint\FundamentalCompatibilityConstraintValidator::checkHtmlRestrictionsMatch
    */
   public function testMultipleHtmlRestrictingFilters(): void {
     $this->container->get('module_installer')->install(['filter_test']);

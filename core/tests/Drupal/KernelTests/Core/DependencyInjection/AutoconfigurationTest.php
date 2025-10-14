@@ -7,12 +7,14 @@ namespace Drupal\KernelTests\Core\DependencyInjection;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\KernelTests\FileSystemModuleDiscoveryDataProviderTrait;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests autoconfiguration of services.
- *
- * @group DependencyInjection
  */
+#[Group('DependencyInjection')]
+#[RunTestsInSeparateProcesses]
 class AutoconfigurationTest extends KernelTestBase {
 
   use FileSystemModuleDiscoveryDataProviderTrait;

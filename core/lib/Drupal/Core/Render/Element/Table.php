@@ -14,27 +14,19 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  * context of a form.
  *
  * Properties:
- *
- * @property $header
- *   An array of table header labels.
- * @property $rows
- *   An array of the rows to be displayed. Each row is either an array
+ * - #header: An array of table header labels.
+ * - #rows: An array of the rows to be displayed. Each row is either an array
  *   of cell contents or an array of properties as described in table.html.twig
  *   Alternatively specify the data for the table as child elements of the table
  *   element. Table elements would contain rows elements that would in turn
  *   contain column elements.
- * @property $empty
- *   Text to display when no rows are present.
- * @property $responsive
- *   Indicates whether to add the drupal.tableresponsive library
+ * - #empty: Text to display when no rows are present.
+ * - #responsive: Indicates whether to add the drupal.tableresponsive library
  *   providing responsive tables.  Defaults to TRUE.
- * @property $sticky
- *   Indicates whether to make the table headers sticky at
+ * - #sticky: Indicates whether to make the table headers sticky at
  *   the top of the page. Defaults to FALSE.
- * @property $footer
- *   Table footer rows, in the same format as the #rows property.
- * @property $caption
- *   A localized string for the <caption> tag.
+ * - #footer: Table footer rows, in the same format as the #rows property.
+ * - #caption: A localized string for the <caption> tag.
  *
  * Usage example 1: A simple form with an additional information table which
  * doesn't include any other form field.
@@ -402,7 +394,7 @@ class Table extends FormElementBase {
    * @return array
    *   Associative array of rendered child elements for a table.
    *
-   * @see template_preprocess_table()
+   * @see \Drupal\Core\Theme\ThemePreprocess::preprocessTable()
    * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface::processAttachments()
    * @see drupal_attach_tabledrag()
    */
