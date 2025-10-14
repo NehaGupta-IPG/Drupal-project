@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Mocks;
+namespace Drupal\TestTools\Mocks;
 
 use Drupal\Component\Datetime\Time;
 

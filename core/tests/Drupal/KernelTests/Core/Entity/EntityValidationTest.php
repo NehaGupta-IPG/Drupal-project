@@ -10,7 +10,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Plugin\Validation\Constraint\CompositeConstraintBase;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\Mocks\TestMockedTime;
+use Drupal\TestTools\Mocks\TestMockedTime;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 

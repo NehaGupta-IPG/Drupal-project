@@ -9,7 +9,7 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\entity_test\Entity\EntityTestMulChanged;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\Mocks\TestMockedTime;
+use Drupal\TestTools\Mocks\TestMockedTime;
 use Drupal\system\Entity\Action;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -29,7 +29,7 @@ class SaveActionTest extends KernelTestBase implements ServiceModifierInterface 
   /**
    * The mocked time service.
    *
-   * @var \Drupal\Mocks\TestMockedTime
+   * @var \Drupal\TestTools\Mocks\TestMockedTime
    */
   protected TestMockedTime $time;
 
