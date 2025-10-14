@@ -48,6 +48,18 @@ function olivero_preprocess_html(&$variables): void {
 }
 
 /**
+ * Implements hook_preprocess_HOOK() for HTML document templates.
+ *
+ * Adds body classes if certain regions have content.
+ */
+function olivero_preprocess_page(&$variables): void {
+  $variables['is_admin_page'] = FALSE;
+  if (\Drupal::service('router.admin_context')->isAdminRoute()) {
+    $variables['is_admin_page'] = TRUE;
+  }
+}
+
+/**
  * Implements hook_preprocess_HOOK() for page title templates.
  */
 function olivero_preprocess_page_title(&$variables): void {

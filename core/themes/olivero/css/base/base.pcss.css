@@ -17,6 +17,10 @@ html {
   font-weight: normal;
   font-style: normal;
   line-height: var(--line-height-base);
+
+  @media (prefers-reduced-motion: no-preference) {
+    scroll-behavior: smooth;
+  }
 }
 
 body {

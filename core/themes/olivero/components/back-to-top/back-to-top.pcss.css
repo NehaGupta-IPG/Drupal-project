@@ -1,0 +1,132 @@
+/**
+ * @file
+ * Styles and interactions for "Back to Top" button.
+ */
+
+@property --back-to-top-scroll-progress {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+.back-to-top {
+  position: sticky;
+  inset-block-end: var(--drupal-displace-offset-bottom, 0);
+  z-index: 3; /* Appear above `.layout-main-wrapper`. */
+  width: min(100%, var(--max-bg-color));
+  height: 0;
+  margin-inline-end: auto;
+
+  &:focus-within {
+    animation-name: none;
+    pointer-events: auto;
+    opacity: 1;
+  }
+
+  /* If browser doesn't support native CSS scrolling and JS is enabled, then
+     hide the button, and wait for JS to tell us when to show it. */
+  @supports not (animation-timeline: scroll()) {
+    @media (scripting: enabled) {
+      pointer-events: none;
+      opacity: 0;
+
+      &.is-visible {
+        pointer-events: auto;
+        opacity: 1;
+      }
+    }
+  }
+
+  @supports (animation-timeline: scroll()) {
+    transition: opacity 0.2s;
+    animation-timeline: scroll();
+    animation-name: show-on-scroll;
+    animation-duration: auto;
+    animation-timing-function: linear;
+    pointer-events: none;
+    opacity: 0;
+  }
+}
+
+.back-to-top__progress {
+  position: absolute;
+  width: fit-content;
+  height: fit-content;
+  margin-block-end: 30px;
+  padding: 6px;
+  border-radius: 50%;
+  inset-block-end: 0;
+  inset-inline-end: 0;
+  margin-inline: auto 30px;
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation-timeline: scroll();
+    animation-name: show-progress;
+    animation-duration: auto;
+    animation-timing-function: linear;
+    background: conic-gradient(var(--color--primary-50) 0% var(--back-to-top-scroll-progress), transparent 0);
+  }
+}
+
+.back-to-top__button {
+  display: block;
+  width: 50px;
+  height: 50px;
+  transition: background-color 0.2s;
+  border: solid 2px var(--color--white);
+  border-radius: 50%;
+  background-color: var(--color--gray-20);
+
+  &:hover {
+    background-color: var(--color--gray-45);
+  }
+
+  &:focus {
+    @supports (animation-timeline: scroll()) {
+      /* Room for the circular progress bar. */
+      outline-offset: 8px;
+    }
+  }
+
+  svg {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    scale: -1;
+  }
+
+  path {
+    fill: var(--color--white);
+
+    @media (forced-colors: active) {
+      fill: linkText;
+    }
+  }
+}
+
+@keyframes show-on-scroll {
+  10% {
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  15% {
+    pointer-events: auto;
+    opacity: 1;
+  }
+
+  100% {
+    pointer-events: auto;
+    opacity: 1;
+  }
+}
+
+@keyframes show-progress {
+  0% {
+    --back-to-top-scroll-progress: 0%;
+  }
+
+  100% {
+    --back-to-top-scroll-progress: 100%;
+  }
+}

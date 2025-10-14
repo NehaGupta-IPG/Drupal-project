@@ -121,8 +121,10 @@
         </div>
       </div>
     </div>
-
-    <footer class="site-footer">
+    {% if not is_admin_page %}
+      {{ include('olivero:back-to-top') }}
+    {% endif %}
+    <footer class="site-footer {{is_admin_page}}">
       <div class="site-footer__inner container">
         {{ page.footer_top }}
         {{ page.footer_bottom }}
