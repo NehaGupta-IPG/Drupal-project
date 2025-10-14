@@ -144,6 +144,9 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
     if (!$is_in_preview) {
       /** @var \Drupal\comment\CommentInterface $entity */
       $entity = $this->entityTypeManager->getStorage('comment')->load($comment_entity_id);
+      if ($entity->hasTranslation($langcode)) {
+        $entity = $entity->getTranslation($langcode);
+      }
       if ($commented_entity = $entity->getCommentedEntity()) {
         $links['comment'] = $this->buildLinks($entity, $commented_entity);
       }
@@ -181,6 +184,7 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
         $links['comment-delete'] = [
           'title' => $this->t('Delete'),
           'url' => $entity->toUrl('delete-form'),
+          'language' => $entity->language(),
         ];
       }
 
@@ -188,6 +192,7 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
         $links['comment-edit'] = [
           'title' => $this->t('Edit'),
           'url' => $entity->toUrl('edit-form'),
+          'language' => $entity->language(),
         ];
       }
       $field_definition = $commented_entity->getFieldDefinition($entity->getFieldName());

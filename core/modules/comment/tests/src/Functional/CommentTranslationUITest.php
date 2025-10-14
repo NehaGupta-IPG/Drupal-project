@@ -6,6 +6,7 @@ namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Tests\CommentTestTrait;
+use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -236,6 +237,49 @@ class CommentTranslationUITest extends ContentTranslationUITestBase {
         $url = $entity->toUrl('edit-form', $options);
         $this->drupalGet($url);
         $this->assertSession()->pageTextContains("Edit {$this->entityTypeId} {$entity->getTranslation($langcode)->label()} [{$languages[$langcode]->getName()} translation]");
+      }
+    }
+  }
+
+  /**
+   * Tests that translations are rendered properly.
+   */
+  public function testTranslationRendering(): void {
+    $default_langcode = $this->langcodes[0];
+    $values[$default_langcode] = $this->getNewEntityValues($default_langcode);
+    $this->entityId = $this->createEntity($values[$default_langcode], $default_langcode);
+    $comment = \Drupal::entityTypeManager()->getStorage($this->entityTypeId)->load($this->entityId);
+
+    // Create translations.
+    $not_translated_langcode = $this->langcodes[1];
+    foreach (array_diff($this->langcodes, [$default_langcode, $not_translated_langcode]) as $langcode) {
+      $values[$langcode] = $this->getNewEntityValues($langcode);
+      $comment->addTranslation($langcode, $values[$langcode]);
+    }
+    $comment->save();
+
+    // Check that each local task links to the correct translation.
+    $comment_id = $comment->id();
+    foreach ($this->langcodes as $langcode) {
+      $options = ['language' => \Drupal::languageManager()->getLanguage($langcode)];
+      $this->drupalGet("comment/$comment_id", $options);
+      $links = [
+        'Approve' => Url::fromRoute('comment.approve', ['comment' => $comment_id], $options)->toString(),
+      ];
+      // Non existing translations links to default language.
+      if (!$comment->hasTranslation($langcode)) {
+        $options = ['language' => \Drupal::languageManager()->getLanguage($default_langcode)];
+      }
+      $links['Edit'] = $comment->toUrl('edit-form', $options)->toString();
+      $links['Delete'] = $comment->toUrl('delete-form', $options)->toString();
+      $links['Translate'] = $comment->toUrl('drupal:content-translation-overview', $options)->toString();
+      // Strip the CSRF token as it is individual for current user and session.
+      $links['Approve'] = substr($links['Approve'], 0, strpos($links['Approve'], 'token='));
+      foreach ($links as $label => $expected_href) {
+        $links = $this->assertSession()->elementExists('xpath', "//article[@id='comment-$comment_id']")
+          ->findAll('xpath', "//a[text()='$label']");
+        $this->assertCount(1, $links);
+        $this->assertMatchesRegularExpression('|^' . $expected_href . '.*$|', $links[0]->getAttribute('href'));
       }
     }
   }
