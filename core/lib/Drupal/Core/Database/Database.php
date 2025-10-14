@@ -17,7 +17,6 @@ use Drupal\Core\Cache\NullBackend;
  * globals.
  *
  * @phpstan-type UnprocessedConnectionInfoArray array{'driver': string, 'autoload'?: string, 'namespace'?: string, 'database': string, 'username'?: string, 'password'?: string, 'host'?: string, 'port'?: string|int, 'prefix'?: string, 'collation'?: string, 'pdo'?: array<mixed>, 'isolation_level'?: int|string, 'init_commands'?: list<string>, 'dependencies'?: array<string,array{'autoload': string, 'namespace': string}>}
- * @phpstan-type ConnectionInfoArray array{'driver': string, 'autoload': string, 'namespace': string, 'database': string, 'username'?: string, 'password'?: string, 'host'?: string, 'port'?: string|int, 'prefix': string, 'collation'?: string, 'pdo'?: array<mixed>, 'isolation_level'?: int|string, 'init_commands'?: list<string>, 'dependencies'?: array<string,array{'autoload': string, 'namespace': string}>}
  * @phpstan-import-type DatabaseLogEntry from \Drupal\Core\Database\Log
  *
  * @final
@@ -34,7 +33,7 @@ abstract class Database {
   /**
    * A processed copy of the database connection information from settings.php.
    *
-   * @var array<string,array<string,ConnectionInfoArray>>
+   * @var array<string,array<string,ConnectionParametersInterface>>
    */
   protected static array $databaseInfo = [];
 
@@ -191,10 +190,10 @@ abstract class Database {
    *   structure of this array depends on the database driver it is connecting
    *   to.
    *
-   * @return \Drupal\Core\Database\ConnectionParameters
+   * @return \Drupal\Core\Database\ConnectionParametersInterface
    *   A validated connection info array.
    */
-  final public static function parseConnectionInfo(array $info): ConnectionParameters {
+  final public static function parseConnectionInfo(array $info): ConnectionParametersInterface {
     // If there is no "driver" property, then we assume it's an array of
     // possible connections for this target. Pick one at random. That allows
     // us to have, for example, multiple replica servers.
@@ -280,12 +279,12 @@ abstract class Database {
    * @param \Composer\Autoload\ClassLoader|null $class_loader
    *   (optional) The class loader. Used for adding the database driver to the
    *   autoloader if $info['autoload'] is set.
-   * @param string $app_root
+   * @param string|null $app_root
    *   (optional) The app root.
    *
    * @see \Drupal\Core\Database\Database::setActiveConnection
    */
-  final public static function addConnectionInfo($key, $target, ConnectionParameters|array $info, $class_loader = NULL, $app_root = NULL) {
+  final public static function addConnectionInfo($key, $target, ConnectionParametersInterface|array $info, ?ClassLoader $class_loader = NULL, ?string $app_root = NULL): void {
     if (empty(self::$databaseInfo[$key][$target])) {
       if (is_array($info)) {
         $info = self::parseConnectionInfo($info);
@@ -319,7 +318,7 @@ abstract class Database {
    * @param string $key
    *   (optional) The connection key for which to return information.
    *
-   * @return array<string,ConnectionInfoArray>
+   * @return array<string,ConnectionParametersInterface>
    *   An associative array of database information, keyed by target. Defaults
    *   to an empty array.
    */
@@ -333,7 +332,7 @@ abstract class Database {
   /**
    * Gets connection information for all available databases.
    *
-   * @return array<string,array<string,ConnectionInfoArray>>
+   * @return array<string,array<string,ConnectionParametersInterface>>
    *   An associative array of database information for all available database,
    *   keyed by the database key and target. Defaults to an empty array.
    */
@@ -516,7 +515,7 @@ abstract class Database {
    *   directories are excluded in the search. When NULL will be determined by
    *   the extension_discovery_scan_tests setting.
    *
-   * @return ConnectionInfoArray
+   * @return ConnectionParametersInterface
    *   The database connection info.
    *
    * @throws \InvalidArgumentException
@@ -525,7 +524,7 @@ abstract class Database {
    * @throws \RuntimeException
    *   Exception thrown when a module provided database driver does not exist.
    */
-  public static function convertDbUrlToConnectionInfo(string $url, $root = NULL, ?bool $include_test_drivers = NULL): ConnectionParameters {
+  public static function convertDbUrlToConnectionInfo(string $url, $root = NULL, ?bool $include_test_drivers = NULL): ConnectionParametersInterface {
     if ($root !== NULL) {
       if (is_bool($root)) {
         $include_test_drivers = $root;
@@ -583,7 +582,6 @@ abstract class Database {
 
     $additional_class_loader->register(TRUE);
 
-    /** @var ConnectionInfoArray $options */
     $options = $connection_class::createConnectionOptionsFromUrl($url, NULL);
 
     // Add the necessary information to autoload code.

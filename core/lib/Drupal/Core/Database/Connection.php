@@ -88,7 +88,7 @@ abstract class Connection {
   /**
    * The connection information for this connection object.
    */
-  protected ConnectionParameters $connectionOptions;
+  protected ConnectionParametersInterface $connectionOptions;
 
   /**
    * The schema object for this connection.
@@ -175,7 +175,7 @@ abstract class Connection {
    *   - namespace
    *   - Other driver-specific options.
    */
-  public function __construct(object $connection, ConnectionParameters $connection_options) {
+  public function __construct(object $connection, ConnectionParametersInterface $connection_options) {
     assert(count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
 
     // Manage the table prefix.
@@ -194,7 +194,7 @@ abstract class Connection {
    * @return object
    *   A client connection object.
    */
-  abstract public static function open(ConnectionParameters $connection_options);
+  abstract public static function open(ConnectionParametersInterface $connection_options);
 
   /**
    * Ensures that the client connection can be garbage collected.

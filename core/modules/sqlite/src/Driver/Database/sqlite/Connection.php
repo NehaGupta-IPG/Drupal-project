@@ -5,7 +5,7 @@ namespace Drupal\sqlite\Driver\Database\sqlite;
 use Drupal\Component\Utility\FilterArray;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Connection as DatabaseConnection;
-use Drupal\Core\Database\ConnectionParameters as ConnectionParametersBase;
+use Drupal\Core\Database\ConnectionParametersInterface;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\ExceptionHandler;
 use Drupal\Core\Database\StatementInterface;
@@ -99,7 +99,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function open(ConnectionParametersBase $connection_options) {
+  public static function open(ConnectionParametersInterface $connection_options) {
     // Allow PDO options to be overridden.
     $connection_options->pdo += [
       \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,

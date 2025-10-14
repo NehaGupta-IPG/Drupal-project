@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Database;
 
-abstract class ConnectionParameters {
+abstract class ConnectionParametersBase implements ConnectionParametersInterface {
 
   public string $prefix = '';
+  public array $pdo = [];
+  public array $initCommands = [];
+  public string $collation;
+  public int|string $isolationLevel;
 
   public function __construct(
     public readonly string $driver,
