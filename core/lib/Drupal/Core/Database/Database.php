@@ -244,13 +244,13 @@ abstract class Database {
       }
     }
 
-    $connectionParametersClass = $info['namespace'] . '\\ConnectionParameters';
+    $connectionParametersClass = $connection_info['namespace'] . '\\ConnectionParameters';
     return new $connectionParametersClass(
-      $info['driver'],
-      $info['namespace'],
-      $info['autoload'],
-      $info['database'],
-      $info['prefix'],
+      $connection_info['driver'],
+      $connection_info['namespace'],
+      $connection_info['autoload'],
+      $connection_info['database'],
+      $connection_info['prefix'],
     );
   }
 
