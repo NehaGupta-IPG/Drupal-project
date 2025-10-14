@@ -137,7 +137,7 @@ class Renderer implements RendererInterface {
    * {@inheritdoc}
    */
   public function renderInIsolation(&$elements) {
-    if (!is_array($elements)) {
+    if (!$elements) {
       return '';
     }
     $context = new RenderContext();
