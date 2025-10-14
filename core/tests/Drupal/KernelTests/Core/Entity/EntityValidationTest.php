@@ -12,11 +12,13 @@ use Drupal\entity_test\EntityTestHelper;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Mocks\TestMockedTime;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Entity Validation API.
  */
 #[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityValidationTest extends EntityKernelTestBase implements ServiceModifierInterface {
 
   /**

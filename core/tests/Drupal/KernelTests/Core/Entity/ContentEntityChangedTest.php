@@ -11,11 +11,13 @@ use Drupal\entity_test\Entity\EntityTestMulRevChanged;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Mocks\TestMockedTime;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests basic EntityChangedInterface functionality.
  */
 #[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceModifierInterface {
 
   /**

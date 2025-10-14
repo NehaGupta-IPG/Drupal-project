@@ -12,11 +12,13 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\Mocks\TestMockedTime;
 use Drupal\system\Entity\Action;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Save Action.
  */
 #[Group('Action')]
+#[RunTestsInSeparateProcesses]
 class SaveActionTest extends KernelTestBase implements ServiceModifierInterface {
 
   /**
