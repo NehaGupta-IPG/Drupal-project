@@ -172,6 +172,14 @@ class Tasks extends InstallTasks {
       ]),
     ];
 
+    // Add unix_socket as a hidden field to preserve it during form processing.
+    if (isset($database['unix_socket'])) {
+      $form['advanced_options']['unix_socket'] = [
+        '#type' => 'hidden',
+        '#default_value' => $database['unix_socket'],
+      ];
+    }
+
     return $form;
   }
 
