@@ -3,10 +3,11 @@
 namespace Drupal\node\Form;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -32,12 +33,20 @@ class NodePreviewForm extends FormBase {
   protected $configFactory;
 
   /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity_display.repository'),
-      $container->get('config.factory')
+      $container->get('config.factory'),
+      $container->get('language_manager')
     );
   }
 
@@ -48,10 +57,13 @@ class NodePreviewForm extends FormBase {
    *   The entity display repository.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.   *.
    */
-  public function __construct(EntityDisplayRepositoryInterface $entity_display_repository, ConfigFactoryInterface $config_factory) {
+  public function __construct(EntityDisplayRepositoryInterface $entity_display_repository, ConfigFactoryInterface $config_factory, LanguageManagerInterface $language_manager) {
     $this->entityDisplayRepository = $entity_display_repository;
     $this->configFactory = $config_factory;
+    $this->languageManager = $language_manager;
   }
 
   /**
@@ -83,10 +95,12 @@ class NodePreviewForm extends FormBase {
       $query_options['query']['destination'] = $query->get('destination');
     }
 
+    $language = $this->languageManager->getCurrentLanguage();
+
     $form['backlink'] = [
       '#type' => 'link',
       '#title' => $this->t('Back to content editing'),
-      '#url' => $node->isNew() ? Url::fromRoute('node.add', ['node_type' => $node->bundle()]) : $node->toUrl('edit-form'),
+      '#url' => $node->isNew() ? Url::fromRoute('node.add', ['node_type' => $node->bundle()]) : $node->toUrl('edit-form', ['language' => $language]),
       '#options' => ['attributes' => ['class' => ['node-preview-backlink']]] + $query_options,
     ];
 

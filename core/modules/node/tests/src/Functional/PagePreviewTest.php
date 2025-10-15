@@ -350,10 +350,11 @@ class PagePreviewTest extends NodeTestBase {
     // back to the edit form and clicking save, we should go back to the
     // original destination, if set.
     $destination = 'node';
-    $this->drupalGet($node->toUrl('edit-form'), ['query' => ['destination' => $destination]]);
+    $language = \Drupal::languageManager()->getCurrentLanguage();
+    $this->drupalGet($node->toUrl('edit-form'), ['query' => ['destination' => $destination],'language' => $language]);
     $this->submitForm([], 'Preview');
     $parameters = ['node_preview' => $node->uuid(), 'view_mode_id' => 'full'];
-    $options = ['absolute' => TRUE, 'query' => ['destination' => $destination]];
+    $options = ['absolute' => TRUE, 'query' => ['destination' => $destination],'language' => $language];
     $this->assertSession()->addressEquals(Url::fromRoute('entity.node.preview', $parameters, $options));
     $this->submitForm(['view_mode' => 'teaser'], 'Switch');
     $this->clickLink('Back to content editing');
