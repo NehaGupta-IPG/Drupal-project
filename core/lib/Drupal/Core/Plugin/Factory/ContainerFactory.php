@@ -7,6 +7,8 @@ use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -32,7 +34,17 @@ class ContainerFactory extends DefaultFactory {
       }
       if (is_array($args)) {
         $container = \Drupal::getContainer();
-        $args = array_map(fn (Reference $arg) => $container->get((string) $arg, $arg->getInvalidBehavior()), $args);
+        $args = array_map(function (Reference $arg, int $pos) use ($container, $plugin_class) {
+          $service = (string) $arg;
+          try {
+            return $container->get($service, $arg->getInvalidBehavior());
+          }
+          catch (ServiceNotFoundException) {
+            $constructor = new \ReflectionMethod($plugin_class, '__construct');
+            $argument = $constructor->getParameters()[$pos]->getName();
+            throw new AutowiringFailedException($service, sprintf('Cannot autowire service "%s": argument "$%s" of method "%s::__construct()", you should configure its value explicitly.', $service, $argument, $plugin_class));
+          }
+        }, $args, array_keys($args));
         return new $plugin_class($configuration, $plugin_id, $plugin_definition, ...$args);
       }
       else {
@@ -59,6 +71,10 @@ class ContainerFactory extends DefaultFactory {
         continue;
       }
 
+      if (!is_subclass_of($class, 'Drupal\Core\Plugin\ContainerFactoryPluginInterface')) {
+        continue;
+      }
+
       if (method_exists($class, 'create')) {
         $factory = new \ReflectionMethod($class, 'create');
         if ($factory->getDeclaringClass()->getName() !== 'Drupal\Core\Plugin\PluginBase') {
@@ -70,7 +86,7 @@ class ContainerFactory extends DefaultFactory {
       $args = [];
       if (method_exists($class, '__construct')) {
         $constructor = new \ReflectionMethod($class, '__construct');
-        foreach (array_slice($constructor->getParameters(), 3) as $pos => $parameter) {
+        foreach (array_slice($constructor->getParameters(), 3, NULL, TRUE) as $pos => $parameter) {
           $service = ltrim((string) $parameter->getType(), '?');
           foreach ($parameter->getAttributes(Autowire::class) as $attribute) {
             $service = (string) $attribute->newInstance()->value;
