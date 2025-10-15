@@ -4,6 +4,7 @@ namespace Drupal\Core\Plugin\Factory;
 
 use Drupal\Component\DependencyInjection\ContainerInterface;
 use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
+use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Reference;
@@ -51,7 +52,13 @@ class ContainerFactory extends DefaultFactory {
    */
   public function alterDefinitions(&$definitions): void {
     foreach ($definitions as $id => $definition) {
-      $class = static::getPluginClass($id, $definition);
+      try {
+        $class = static::getPluginClass($id, $definition);
+      }
+      catch (PluginException) {
+        continue;
+      }
+
       if (method_exists($class, 'create')) {
         $factory = new \ReflectionMethod($class, 'create');
         if ($factory->getDeclaringClass()->getName() !== 'Drupal\Core\Plugin\PluginBase') {
