@@ -4,6 +4,7 @@ namespace Drupal\views;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Tags;
+use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -746,7 +747,7 @@ class ViewExecutable {
 
       $this->exposed_input = $this->request->query->all();
       // Unset items that are definitely not our input:
-      foreach (['page', 'q'] as $key) {
+      foreach (['page', 'q', MainContentViewSubscriber::WRAPPER_FORMAT, 'ajax_page_state'] as $key) {
         if (isset($this->exposed_input[$key])) {
           unset($this->exposed_input[$key]);
         }

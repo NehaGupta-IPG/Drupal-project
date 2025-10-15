@@ -2,6 +2,8 @@
 
 namespace Drupal\views\Element;
 
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\views\Exception\ViewRenderElementException;
@@ -97,6 +99,11 @@ class View extends RenderElementBase {
         $element['#theme_wrappers'] = ['container'];
       }
     }
+
+    $element['#attributes']['id'] = $element['#attributes']['id'] ?? Html::getId('view-dom-id-' . $element['#name'] . '-' . $element['#display_id'] . '-wrapper');
+    (new Htmx())
+      ->swapOob(TRUE)
+      ->applyTo($element);
 
     return $element;
   }

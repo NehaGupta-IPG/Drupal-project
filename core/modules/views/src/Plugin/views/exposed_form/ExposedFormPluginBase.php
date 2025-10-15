@@ -2,10 +2,12 @@
 
 namespace Drupal\views\Plugin\views\exposed_form;
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Htmx\Htmx;
 use Drupal\views\Plugin\views\PluginBase;
 
 /**
@@ -262,6 +264,13 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
       }
       $all_exposed = array_merge($exposed_sorts, $exposed_filters);
 
+      (new Htmx())
+        ->boost()
+        ->swapOob(TRUE)
+        ->swap('none')
+        ->params(array_merge(array_keys($all_exposed), ['op']))
+        ->applyTo($form);
+
       // Set the access to FALSE if there is no exposed input.
       if (!array_intersect_key($all_exposed, $this->view->getExposedInput())) {
         $form['actions']['reset']['#access'] = FALSE;
@@ -339,6 +348,12 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
     }
 
     $form_state->setRedirect('<current>');
+    if (\Drupal::request()->headers->get('HX-Request')) {
+      $form_state->setRedirect('<current>', [], [
+        // Keep _wrapper_format and ajax_page_state in the query string.
+        'query' => UrlHelper::filterQueryParameters(\Drupal::request()->query->all(), array_keys($this->view->exposed_data)),
+      ]);
+    }
     $form_state->setValues([]);
   }
 

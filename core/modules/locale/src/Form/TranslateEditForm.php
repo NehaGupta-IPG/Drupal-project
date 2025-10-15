@@ -4,6 +4,7 @@ namespace Drupal\locale\Form;
 
 use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Render\Element;
 use Drupal\locale\SourceString;
 
@@ -34,6 +35,19 @@ class TranslateEditForm extends TranslateFormBase {
     $language_name = isset($langcode) ? $languages[$langcode]->getName() : "- None -";
 
     $form['#attached']['library'][] = 'locale/drupal.locale.admin';
+
+    // We need the values from TranslateFilterForm and the pager when
+    // submitting the translations.
+    $query = $filter_values;
+    if ($page = \Drupal::request()->query->get('page')) {
+      $query['page'] = $page;
+    }
+
+    (new Htmx())
+      ->boost()
+      ->swap('none')
+      ->swapOob(TRUE)
+      ->applyTo($form);
 
     $form['langcode'] = [
       '#type' => 'value',
@@ -148,6 +162,11 @@ class TranslateEditForm extends TranslateFormBase {
       }
     }
     $form['pager']['#type'] = 'pager';
+    (new Htmx())
+      ->boost()
+      ->swap('none')
+      ->applyTo($form['pager']);
+
     return $form;
   }
 
