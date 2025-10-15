@@ -88,4 +88,17 @@ class TaxonomyTestHooks {
     }
   }
 
+  /**
+   * Implements hook_entity_type_alter().
+   */
+  #[Hook('entity_type_alter')]
+  public function entityTypeAlter(&$entity_types) : void {
+    if (\Drupal::state()->get('taxonomy_test_route_alter', FALSE)) {
+      /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+      $taxonomy = $entity_types['taxonomy_vocabulary'];
+      $taxonomy->setLinkTemplate('reset-form', '/admin/structure/taxonomy/manage/{taxonomy_vocabulary}/route_alter_reset');
+      $taxonomy->setLinkTemplate('overview-form', '/admin/structure/taxonomy/manage/{taxonomy_vocabulary}/route_alter_overview');
+    }
+  }
+
 }

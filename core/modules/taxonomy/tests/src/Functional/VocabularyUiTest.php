@@ -27,6 +27,11 @@ class VocabularyUiTest extends TaxonomyTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $modules = ['taxonomy', 'block', 'taxonomy_test'];
+
+  /**
+   * {@inheritdoc}
+   */
   protected $defaultTheme = 'stark';
 
   /**
@@ -187,6 +192,38 @@ class VocabularyUiTest extends TaxonomyTestBase {
     $this->assertSession()->pageTextContains("Deleted vocabulary {$vocabulary->label()}.");
     $this->container->get('entity_type.manager')->getStorage('taxonomy_vocabulary')->resetCache();
     $this->assertNull(Vocabulary::load($vid), 'Vocabulary not found.');
+  }
+
+  /**
+   * Tests altering the entity type changes the route path.
+   */
+  public function testTaxonomyVocabularyRouteAlter(): void {
+
+    $this->drupalGet('admin/structure/taxonomy');
+
+    // Verify default route path.
+    $this->assertSession()->linkByHrefExists('/admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/overview');
+    $this->drupalGet('/admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/reset');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Are you sure you want to reset the vocabulary ' . $this->vocabulary->label() . ' to alphabetical order?');
+
+    // Trigger hook entity_type_alter taxonomy route change.
+    $this->container->get('state')->set('taxonomy_test_route_alter', TRUE);
+
+    // Clear the entity type manager cache so that
+    // the altered definition is picked up.
+    $this->container->get('entity_type.manager')->clearCachedDefinitions();
+    $this->container->get('router.builder')->rebuild();
+    $this->container->get('cache.render')->deleteAll();
+
+    $this->drupalGet('admin/structure/taxonomy');
+
+    // Verify changed route path.
+    $this->assertSession()->linkByHrefExists('/admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/route_alter_overview');
+    $this->drupalGet('/admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/route_alter_reset');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Are you sure you want to reset the vocabulary ' . $this->vocabulary->label() . ' to alphabetical order?');
+
   }
 
 }

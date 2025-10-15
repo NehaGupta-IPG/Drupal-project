@@ -39,7 +39,7 @@ class VocabularyRouteProvider extends AdminHtmlRouteProvider {
    *   The generated route, if available.
    */
   protected function getResetPageRoute(EntityTypeInterface $entity_type) {
-    $route = new Route('/admin/structure/taxonomy/manage/{taxonomy_vocabulary}/reset');
+    $route = new Route($entity_type->getLinkTemplate('reset-form'));
     $route->setDefault('_entity_form', 'taxonomy_vocabulary.reset');
     $route->setDefault('_title', 'Reset');
     $route->setRequirement('_entity_access', 'taxonomy_vocabulary.reset all weights');
@@ -63,7 +63,7 @@ class VocabularyRouteProvider extends AdminHtmlRouteProvider {
    *   The generated route, if available.
    */
   protected function getOverviewPageRoute(EntityTypeInterface $entity_type) {
-    $route = new Route('/admin/structure/taxonomy/manage/{taxonomy_vocabulary}/overview');
+    $route = new Route($entity_type->getLinkTemplate('overview-form'));
     $route->setDefault('_title_callback', '\Drupal\Core\Entity\Controller\EntityController::title');
     $route->setDefault('_form', 'Drupal\taxonomy\Form\OverviewTerms');
     $route->setRequirement('_entity_access', 'taxonomy_vocabulary.access taxonomy overview');

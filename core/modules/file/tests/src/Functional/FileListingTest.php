@@ -23,7 +23,7 @@ class FileListingTest extends FileFieldTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['views', 'file', 'image', 'entity_test'];
+  protected static $modules = ['views', 'file', 'image', 'entity_test', 'file_test'];
 
   /**
    * {@inheritdoc}
@@ -280,6 +280,36 @@ class FileListingTest extends FileFieldTestBase {
     $file->save();
 
     return $file;
+  }
+
+  /**
+   * Tests altering the entity type changes the route path.
+   */
+  public function testFileRouteAlter(): void {
+    // Login with user with right permissions and test listing.
+    $this->drupalLogin($this->adminUser);
+
+    // Create a file with no usage.
+    $file = $this->createFile();
+    $this->drupalGet('admin/content/files');
+
+    // Verify default route path.
+    $this->assertSession()->linkByHrefExists('/file/' . $file->id() . '/delete');
+
+    // Trigger hook entity_type_alter file delete route change.
+    $this->container->get('state')->set('file_test_route_alter', TRUE);
+
+    // Clear the entity type manager cache so that
+    // the altered definition is picked up.
+    $this->container->get('entity_type.manager')->clearCachedDefinitions();
+    $this->container->get('router.builder')->rebuild();
+    $this->container->get('cache.render')->deleteAll();
+
+    $this->drupalGet('admin/content/files');
+
+    // Verify new route path.
+    $this->assertSession()->linkByHrefExists('/route_alter/' . $file->id() . '/cancel');
+
   }
 
 }

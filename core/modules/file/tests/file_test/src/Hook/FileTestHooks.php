@@ -175,6 +175,12 @@ class FileTestHooks {
       /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
       $entity_types['file']->setAccessClass('Drupal\file_test\FileTestAccessControlHandler');
     }
+
+    if (\Drupal::state()->get('file_test_route_alter', FALSE)) {
+      /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+      $file = $entity_types['file'];
+      $file->setLinkTemplate('delete-form', '/route_alter/{file}/cancel');
+    }
   }
 
   /**

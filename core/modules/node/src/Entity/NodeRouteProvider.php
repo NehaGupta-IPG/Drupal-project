@@ -17,7 +17,7 @@ class NodeRouteProvider implements EntityRouteProviderInterface {
    */
   public function getRoutes(EntityTypeInterface $entity_type) {
     $route_collection = new RouteCollection();
-    $route = (new Route('/node/{node}'))
+    $route = (new Route($entity_type->getLinkTemplate('canonical')))
       ->addDefaults([
         '_controller' => '\Drupal\node\Controller\NodeViewController::view',
         '_title_callback' => '\Drupal\node\Controller\NodeViewController::title',
@@ -26,7 +26,7 @@ class NodeRouteProvider implements EntityRouteProviderInterface {
       ->setRequirement('_entity_access', 'node.view');
     $route_collection->add('entity.node.canonical', $route);
 
-    $route = (new Route('/node/{node}/delete'))
+    $route = (new Route($entity_type->getLinkTemplate('delete-form')))
       ->addDefaults([
         '_entity_form' => 'node.delete',
         '_title' => 'Delete',
@@ -36,7 +36,7 @@ class NodeRouteProvider implements EntityRouteProviderInterface {
       ->setOption('_node_operation_route', TRUE);
     $route_collection->add('entity.node.delete_form', $route);
 
-    $route = (new Route('/node/{node}/edit'))
+    $route = (new Route($entity_type->getLinkTemplate('edit-form')))
       ->setDefault('_entity_form', 'node.edit')
       ->setRequirement('_entity_access', 'node.update')
       ->setRequirement('node', '\d+')

@@ -18,7 +18,7 @@ class FileRouteProvider implements EntityRouteProviderInterface {
   public function getRoutes(EntityTypeInterface $entity_type) {
     $route_collection = new RouteCollection();
 
-    $route = (new Route('/file/{file}/delete'))
+    $route = (new Route($entity_type->getLinkTemplate('delete-form')))
       ->addDefaults([
         '_entity_form' => 'file.delete',
         '_title' => 'Delete',

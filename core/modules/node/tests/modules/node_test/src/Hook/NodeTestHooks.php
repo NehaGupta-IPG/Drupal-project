@@ -199,4 +199,18 @@ class NodeTestHooks {
     }
   }
 
+  /**
+   * Implements hook_entity_type_alter().
+   */
+  #[Hook('entity_type_alter')]
+  public function entityTypeAlter(&$entity_types) : void {
+    if (\Drupal::state()->get('node_test_route_alter', FALSE)) {
+      /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+      $node = $entity_types['node'];
+      $node->setLinkTemplate('canonical', '/route_alter/{node}');
+      $node->setLinkTemplate('edit-form', '/route_alter/{node}/edit');
+      $node->setLinkTemplate('delete-form', '/route_alter/{node}/delete');
+    }
+  }
+
 }

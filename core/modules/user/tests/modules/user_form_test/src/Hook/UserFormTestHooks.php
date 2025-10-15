@@ -31,4 +31,18 @@ class UserFormTestHooks {
     }
   }
 
+  /**
+   * Implements hook_entity_type_alter().
+   */
+  #[Hook('entity_type_alter')]
+  public function entityTypeAlter(&$entity_types) : void {
+    if (\Drupal::state()->get('user_form_test_route_alter', FALSE)) {
+      /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+      $user = $entity_types['user'];
+      $user->setLinkTemplate('canonical', '/route_alter/{user}');
+      $user->setLinkTemplate('edit-form', '/route_alter/{user}/edit');
+      $user->setLinkTemplate('cancel-form', '/route_alter/{user}/cancel');
+    }
+  }
+
 }

@@ -18,7 +18,7 @@ class UserAccountLinksTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['menu_ui', 'block', 'test_page_test'];
+  protected static $modules = ['menu_ui', 'block', 'test_page_test', 'user_form_test'];
 
   /**
    * {@inheritdoc}
@@ -130,6 +130,44 @@ class UserAccountLinksTest extends BrowserTestBase {
     $this->drupalGet('admin');
     $this->assertSession()->addressEquals('/admin');
     $this->assertSession()->statusCodeEquals(403);
+  }
+
+  /**
+   * Tests altering the entity type changes the route path.
+   */
+  public function testUserRouteAlter(): void {
+    // Create an admin user and log in.
+    $this->drupalLogin($this->drupalCreateUser([
+      'access administration pages',
+      'administer users',
+    ]));
+    // Create a regular user.
+    $user = $this->drupalCreateUser([]);
+    $this->drupalGet('admin/people');
+
+    // Verify default route path.
+    $this->assertSession()->linkByHrefExists('/user/' . $user->id());
+    $this->assertSession()->linkByHrefExists('/user/' . $user->id() . '/edit');
+    $this->drupalGet('/user/' . $user->id() . '/edit');
+    $this->assertSession()->linkByHrefExists('/user/' . $user->id() . '/cancel');
+
+    // Trigger hook entity_type_alter user route change.
+    $this->container->get('state')->set('user_form_test_route_alter', TRUE);
+
+    // Clear the entity type manager cache so that
+    // the altered definition is picked up.
+    $this->container->get('entity_type.manager')->clearCachedDefinitions();
+    $this->container->get('router.builder')->rebuild();
+    $this->container->get('cache.render')->deleteAll();
+
+    $this->drupalGet('admin/people');
+
+    // Verify new route path.
+    $this->assertSession()->linkByHrefExists('/route_alter/' . $user->id());
+    $this->assertSession()->linkByHrefExists('/route_alter/' . $user->id() . '/edit');
+    $this->drupalGet('/route_alter/' . $user->id() . '/edit');
+    $this->assertSession()->linkByHrefExists('/route_alter/' . $user->id() . '/cancel');
+
   }
 
 }
