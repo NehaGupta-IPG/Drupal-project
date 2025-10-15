@@ -41,8 +41,8 @@ final class GenerateAutoloadRuntimeReferenceFile {
    */
   public static function generateAutoloadRuntime(IOInterface $io, $package_name, $web_root, $vendor) {
     $autoload_runtime_path = static::autoloadRuntimePath($package_name, $web_root);
-    // Calculate the relative path from the webroot (location of the project
-    // autoload_runtime.php) to the vendor directory.
+    // Calculate the relative path from the webroot to the vendor directory.
+    // The autoload_runtime.php must know the path to the vendor directory.
     $fs = new Filesystem();
     $relative_autoload_path = $fs->findShortestPath($autoload_runtime_path->fullPath(), "$vendor/autoload_runtime.php");
     file_put_contents($autoload_runtime_path->fullPath(), static::autoLoadRuntimeContents($relative_autoload_path));
