@@ -646,8 +646,9 @@ class ModuleHandler implements ModuleHandlerInterface {
               $listeners[] = $this->callableResolver->getCallableFromDefinition($identifier);
               $modules[] = $module;
             }
-            catch (\Exception $e) {
-
+            catch (\Exception) {
+              // Ignore callbacks that can't be resolved, code might have been
+              // changed or possibly a module is being installed.
             }
           }
         }
