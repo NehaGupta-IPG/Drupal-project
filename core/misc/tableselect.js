@@ -67,35 +67,34 @@
     };
 
     // Find all <th> with class select-all, and insert the check all checkbox.
-    $table
-      .find('th.select-all')
-      .prepend($(Drupal.theme('checkbox')).attr('title', strings.selectAll))
-      .on('click', (event) => {
-        if (event.target.matches('input[type="checkbox"]')) {
-          // Loop through all checkboxes and set their state to the select all
-          // checkbox' state.
-          checkboxes.each(function () {
-            const $checkbox = $(this);
-            const stateChanged =
-              $checkbox.prop('checked') !== event.target.checked;
-
-            /**
-             * @checkbox {HTMLElement}
-             */
-            if (stateChanged) {
-              $checkbox.prop('checked', event.target.checked).trigger('change');
-            }
-            // Either add or remove the selected class based on the state of the
-            // check all checkbox.
-
-            /**
-             * @checkbox {HTMLElement}
-             */
-            $checkbox.closest('tr').toggleClass('selected', this.checked);
-          });
-          // Update the title and the state of the check all box.
-          updateSelectAll(event.target.checked);
-        }
+    $table.find('th.select-all').each(function () {
+      const $this = $(this);
+      const $selectAllCheckbox = $(
+        '<input type="checkbox" class="form-checkbox" />',
+      ).attr('id', Math.random().toString(16).slice(2, 10));
+      const $selectAllLabel = $('<label>')
+        .attr('for', $selectAllCheckbox.attr('id'))
+        .attr('hidden', true)
+        .html(`<span>${strings.selectAll}</span>`);
+      $this
+        .prepend($selectAllCheckbox)
+        .append($selectAllLabel)
+        .on('click', function (event) {
+          if ($(event.target).is('input[type="checkbox"]')) {
+            checkboxes.each(function () {
+              const $checkbox = $(this);
+              const stateChanged =
+                $checkbox.prop('checked') !== event.target.checked;
+              if (stateChanged) {
+                $checkbox
+                  .prop('checked', event.target.checked)
+                  .trigger('change');
+              }
+              $checkbox.closest('tr').toggleClass('selected', this.checked);
+            });
+            updateSelectAll(event.target.checked);
+          }
+        });
       });
 
     // For each of the checkboxes within the table that are not disabled.
