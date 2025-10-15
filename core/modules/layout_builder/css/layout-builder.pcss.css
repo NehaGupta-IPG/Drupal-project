@@ -88,7 +88,7 @@
   background-color: #fff;
 
   & [tabindex="-1"] {
-    pointer-events: none;
+    pointer-events: auto !important;
   }
 
   .layout-builder--content-preview-disabled & {
