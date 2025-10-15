@@ -106,6 +106,14 @@ class LayoutBuilderViewModeTest extends LayoutBuilderTestBase {
     $this->drupalGet("{$field_ui_prefix}/display/default");
     $this->submitForm(['layout[allow_custom]' => TRUE], 'Save');
 
+    // Login as a user with permission to revert the node layout.
+    $this->drupalLogin($this->drupalCreateUser([
+      'configure any layout',
+      'administer node display',
+      'administer node fields',
+      'revert bundle_with_section_field node to default layout',
+    ]));
+
     // Customize the default view mode.
     $this->drupalGet("$field_ui_prefix/display/default/layout");
     $this->clickLink('Add block');

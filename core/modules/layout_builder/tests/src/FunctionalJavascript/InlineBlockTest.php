@@ -6,6 +6,7 @@ namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\node\Entity\Node;
+use Drupal\Tests\layout_builder\Traits\EnableLayoutBuilderTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class InlineBlockTest extends InlineBlockTestBase {
+
+  use EnableLayoutBuilderTrait;
 
   /**
    * {@inheritdoc}
@@ -38,6 +41,10 @@ class InlineBlockTest extends InlineBlockTestBase {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
+    // Enable layout builder.
+    $display = LayoutBuilderEntityViewDisplay::load('node.bundle_with_section_field.default');
+    $this->enableLayoutBuilder($display);
+
     $this->drupalLogin($this->drupalCreateUser([
       'access contextual links',
       'configure any layout',
@@ -46,9 +53,7 @@ class InlineBlockTest extends InlineBlockTestBase {
       'create and edit custom blocks',
     ]));
 
-    // Enable layout builder.
     $this->drupalGet(static::FIELD_UI_PREFIX . '/display/default');
-    $this->submitForm(['layout[enabled]' => TRUE], 'Save');
     $this->clickLink('Manage layout');
     $assert_session->addressEquals(static::FIELD_UI_PREFIX . '/display/default/layout');
     // Add a basic block with the body field set.
@@ -119,21 +124,21 @@ class InlineBlockTest extends InlineBlockTestBase {
    */
   #[DataProvider('layoutNoSaveProvider')]
   public function testNoLayoutSave($operation, $no_save_button_text, $confirm_button_text): void {
+
+    // Enable layout builder.
+    $display = LayoutBuilderEntityViewDisplay::load('node.bundle_with_section_field.default');
+    $this->enableLayoutBuilder($display);
+
     $this->drupalLogin($this->drupalCreateUser([
       'access contextual links',
       'configure any layout',
       'administer node display',
       'create and edit custom blocks',
+      'revert bundle_with_section_field node to default layout',
     ]));
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $this->assertEmpty($this->blockStorage->loadMultiple(), 'No entity blocks exist');
-    // Enable layout builder and overrides.
-    $this->drupalGet(static::FIELD_UI_PREFIX . '/display/default');
-    $this->submitForm([
-      'layout[enabled]' => TRUE,
-      'layout[allow_custom]' => TRUE,
-    ], 'Save');
 
     $this->drupalGet('node/1/layout');
     $this->addInlineBlockToLayout('Block title', 'The block body');
