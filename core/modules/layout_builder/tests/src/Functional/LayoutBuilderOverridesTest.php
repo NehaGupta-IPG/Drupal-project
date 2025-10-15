@@ -270,4 +270,33 @@ class LayoutBuilderOverridesTest extends LayoutBuilderTestBase {
     $assert_session->pageTextNotContains('The first node body');
   }
 
+  /**
+   * Tests the permission to revert overrides to the default.
+   */
+  public function testRevertPermission(): void {
+    // Enable overrides.
+    $display = LayoutBuilderEntityViewDisplay::load('node.bundle_with_section_field.default');
+    $this->enableLayoutBuilder($display);
+
+    // Login as a user without the revert permission.
+    $this->drupalLogin($this->drupalCreateUser([
+      'configure any layout',
+      'administer node display',
+    ]));
+    $this->drupalGet('node/1/layout');
+    $this->assertSession()->elementExists('css', '.layout-builder__add-section');
+    $this->assertSession()->buttonNotExists('Revert to defaults');
+
+    // Login as a user with the revert permission.
+    $this->drupalLogin($this->drupalCreateUser([
+      'configure any layout',
+      'administer node display',
+      'revert bundle_with_section_field node to default layout',
+    ]));
+    $this->drupalGet('node/1/layout');
+    $this->assertSession()->elementExists('css', '.layout-builder__add-section');
+    $this->assertSession()->buttonExists('Revert to defaults');
+
+  }
+
 }
