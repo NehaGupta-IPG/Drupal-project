@@ -282,7 +282,7 @@ class DefaultTableMappingTest extends UnitTestCase {
    * @legacy-covers ::getFieldColumnName
    */
   #[DataProvider('providerTestGetFieldColumnName')]
-  public function testGetFieldColumnName($base_field, $columns, $column, $expected): void {
+  public function testGetFieldColumnName(bool $base_field, array $columns, string $column, string $expected): void {
     $definitions['test'] = $this->setUpDefinition('test', $columns, $base_field);
     $table_mapping = new TestDefaultTableMapping($this->entityType, $definitions);
     $result = $table_mapping->getFieldColumnName($definitions['test'], $column);
@@ -299,11 +299,13 @@ class DefaultTableMappingTest extends UnitTestCase {
    *   An array of available field column names.
    * @param string $column
    *   The name of the column to be processed.
+   * @param string $expected
+   *   The expected result.
    *
    * @legacy-covers ::getFieldColumnName
    */
   #[DataProvider('providerTestGetFieldColumnName')]
-  public function testGetFieldColumnNameInvalid($base_field, $columns, $column): void {
+  public function testGetFieldColumnNameInvalid(bool $base_field, array $columns, string $column, string $expected): void {
     $definitions['test'] = $this->setUpDefinition('test', $columns, $base_field);
 
     // Mark field storage definition as custom storage.
@@ -325,7 +327,7 @@ class DefaultTableMappingTest extends UnitTestCase {
    *   field name, base field status, list of field columns, name of the column
    *   to be retrieved, expected result, whether an exception is expected.
    */
-  public static function providerTestGetFieldColumnName() {
+  public static function providerTestGetFieldColumnName(): array {
     $data = [];
     // Base field with single column.
     $data[] = [TRUE, ['foo'], 'foo', 'test'];

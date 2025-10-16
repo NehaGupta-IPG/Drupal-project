@@ -11980,12 +11980,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/block_content/tests/src/Kernel/Migrate/MigrateBlockContentStubTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Unit\\\\Menu\\\\BlockContentLocalTasksTest\\:\\:getBlockContentListingRoutes\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Unit/Menu/BlockContentLocalTasksTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\breakpoint\\\\BreakpointManager\\:\\:clearCachedDefinitions\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -21248,12 +21242,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/layout_builder/tests/src/Unit/LayoutBuilderIsActiveCacheContextTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Unit\\\\LayoutEntityHelperTraitTest\\:\\:providerSectionsWithInlineComponents\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Unit/LayoutEntityHelperTraitTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Unit\\\\OverridesSectionStorageTest\\:\\:providerTestExtractEntityFromRoute\\(\\) has no return type specified\\.$#',
@@ -48601,12 +48589,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Config/ConfigTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Config\\\\ConfigTest\\:\\:overrideDataProvider\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Config/ConfigTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Config\\\\ConfigTest\\:\\:setNameProvider\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -49353,12 +49335,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Form/FormStateDecoratorBaseTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Form\\\\FormStateDecoratorBaseTest\\:\\:providerGetTemporaryValue\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Form/FormStateDecoratorBaseTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Form\\\\FormStateDecoratorBaseTest\\:\\:providerHasTemporaryValue\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -49599,18 +49575,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Menu/LocalTaskDefaultTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Menu\\\\LocalTaskIntegrationTestBase\\:\\:assertLocalTasks\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Menu/LocalTaskIntegrationTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Menu\\\\LocalTaskIntegrationTestBase\\:\\:getLocalTaskManager\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Menu/LocalTaskIntegrationTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Menu\\\\MenuTreeParametersTest\\:\\:providerTestSetMinDepth\\(\\) has no return type specified\\.$#',
@@ -50392,18 +50356,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Theme/RegistryTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\UnroutedUrlTest\\:\\:providerFromInvalidUri\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/UnroutedUrlTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\UnroutedUrlTest\\:\\:providerFromUri\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/UnroutedUrlTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Function Drupal\\\\Tests\\\\Core\\\\Update\\\\bad_3\\(\\) has no return type specified\\.$#',

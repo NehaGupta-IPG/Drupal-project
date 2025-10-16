@@ -845,7 +845,6 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
     return [
       [
         $cacheable_metadata(['contexts' => ['languages:language_interface']]),
-        ['node--article' => 'body'],
       ],
     ];
   }
