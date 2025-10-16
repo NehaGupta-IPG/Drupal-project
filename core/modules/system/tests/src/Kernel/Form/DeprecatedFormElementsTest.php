@@ -11,11 +11,13 @@ use Drupal\Core\Form\SubformState;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests deprecations of form elements.
  */
 #[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class DeprecatedFormElementsTest extends KernelTestBase implements FormInterface {
 
   /**
