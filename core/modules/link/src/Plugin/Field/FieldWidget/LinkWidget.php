@@ -120,7 +120,8 @@ class LinkWidget extends WidgetBase {
       $uri = 'route:' . $string;
     }
     // Detect a schemeless string, map to 'internal:' URI.
-    elseif (!empty($string) && parse_url($string, PHP_URL_SCHEME) === NULL) {
+    // Exclude protocol-relative URLs (//example.com).
+    elseif (!empty($string) && !(str_starts_with($string, '//')) && parse_url($string, PHP_URL_SCHEME) === NULL) {
       // @todo '<front>' is valid input for BC reasons, may be removed by
       //   https://www.drupal.org/node/2421941
       // - '<front>' -> '/'

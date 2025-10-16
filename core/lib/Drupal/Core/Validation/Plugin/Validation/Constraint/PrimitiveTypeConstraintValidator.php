@@ -57,8 +57,12 @@ class PrimitiveTypeConstraintValidator extends ConstraintValidator {
     // - That it is well formed (parse_url() returns FALSE if not).
     // - That it contains a scheme (parse_url(, PHP_URL_SCHEME) returns NULL if
     //   not).
-    if ($typed_data instanceof UriInterface && in_array(parse_url($value, PHP_URL_SCHEME), [NULL, FALSE], TRUE)) {
-      $valid = FALSE;
+    // Exclude protocol relative URLs (start with "//").
+    if ($typed_data instanceof UriInterface) {
+      $url_parts = parse_url($value);
+      if ($url_parts === FALSE || (!str_starts_with($value, '//') && empty($url_parts['scheme']))) {
+        $valid = FALSE;
+      }
     }
     // @todo Move those to separate constraint validators.
     try {

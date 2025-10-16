@@ -83,6 +83,7 @@ class PrimitiveTypeConstraintValidatorTest extends UnitTestCase {
     $data[] = [new Uri(DataDefinition::create('uri')), 'private://', FALSE];
     $data[] = [new Uri(DataDefinition::create('uri')), 'private://foo.png', TRUE];
     $data[] = [new Uri(DataDefinition::create('uri')), 'example.com', FALSE];
+    $data[] = [new Uri(DataDefinition::create('uri')), '//www.example.com', TRUE];
 
     return $data;
   }

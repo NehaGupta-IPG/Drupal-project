@@ -69,6 +69,8 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
 
     // Invalid protocols.
     $data[] = ['ftp://ftp.funet.fi/pub/standards/RFC/rfc959.txt', FALSE];
+    // Protocol relative URL.
+    $data[] = ['//www.example.com', TRUE];
 
     return $data;
   }
