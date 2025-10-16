@@ -638,13 +638,20 @@ class FieldPluginBaseTest extends UnitTestCase {
       '#type' => 'inline_template',
       '#template' => 'test-path/' . explode('/', $path)[1],
       '#context' => ['foo' => 123],
-      '#post_render' => [function () {}],
     ];
 
     $this->renderer->expects($this->once())
       ->method('renderInIsolation')
-      ->with($build)
-      ->willReturn('base:test-path/123');
+      ->willReturnCallback(
+        function (array $arg) use ($build): string {
+          $tmp = $arg;
+          unset($tmp['#post_render']);
+          if ($tmp == $build) {
+            return 'base:test-path/123';
+          }
+          throw new \InvalidArgumentException('Unexpected argument value for renderInIsolation: ' . var_export($arg, TRUE));
+        }
+      );
 
     $result = $field->advancedRender($row);
     $this->assertEquals($link_html, $result);
@@ -702,13 +709,20 @@ class FieldPluginBaseTest extends UnitTestCase {
       '#type' => 'inline_template',
       '#template' => $path,
       '#context' => ['foo' => $context['context_path']],
-      '#post_render' => [function () {}],
     ];
 
     $this->renderer->expects($this->once())
       ->method('renderInIsolation')
-      ->with($build)
-      ->willReturn($context['context_path']);
+      ->willReturnCallback(
+        function (array $arg) use ($build, $context): string {
+          $tmp = $arg;
+          unset($tmp['#post_render']);
+          if ($tmp == $build) {
+            return $context['context_path'];
+          }
+          throw new \InvalidArgumentException('Unexpected argument value for renderInIsolation: ' . var_export($arg, TRUE));
+        }
+      );
 
     $result = $field->advancedRender($row);
     $this->assertEquals($link_html, $result);
@@ -956,7 +970,6 @@ class FieldPluginBaseTest extends UnitTestCase {
       '#type' => 'inline_template',
       '#template' => $test_class,
       '#context' => $tokens,
-      '#post_render' => [function () {}],
     ];
 
     // We're not testing the token rendering itself, just that the function
@@ -964,8 +977,16 @@ class FieldPluginBaseTest extends UnitTestCase {
     // attribute.
     $this->renderer->expects($this->any())
       ->method('renderInIsolation')
-      ->with($build)
-      ->willReturn($expected_result);
+      ->willReturnCallback(
+        function (array $arg) use ($build, $expected_result): string {
+          $tmp = $arg;
+          unset($tmp['#post_render']);
+          if ($tmp == $build) {
+            return $expected_result;
+          }
+          throw new \InvalidArgumentException('Unexpected argument value for renderInIsolation: ' . var_export($arg, TRUE));
+        }
+      );
 
     foreach ($functions as $callable => $option_name) {
       $field = $this->setupTestField([$option_name => $test_class]);
