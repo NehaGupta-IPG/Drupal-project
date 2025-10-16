@@ -132,4 +132,19 @@ trait RecipeTestTrait {
     file_put_contents($file, Yaml::encode($contents));
   }
 
+  /**
+   * Returns the path of the recipe under test.
+   *
+   * @return string
+   *   The path to the recipe directory.
+   */
+  protected function getRecipePath(): string {
+    $rc = new \ReflectionObject($this);
+    if (str_starts_with($rc->getNamespaceName(), 'Drupal\FunctionalTests\Recipe\Core')) {
+      return dirname((new \ReflectionObject($this))->getFileName(), 4);
+    }
+    [, , $recipe_name] = explode('\\', $rc->getNamespaceName());
+    return dirname(\Drupal::root()) . '/recipes/' . $recipe_name;
+  }
+
 }
