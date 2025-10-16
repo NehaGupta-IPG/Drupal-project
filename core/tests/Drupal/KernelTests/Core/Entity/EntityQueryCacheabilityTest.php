@@ -7,11 +7,13 @@ namespace Drupal\KernelTests\Core\Entity;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\EntityTestHelper;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test cacheability of entity queries.
  */
 #[Group('Entity')]
+#[RunTestsInSeparateProcesses];
 class EntityQueryCacheabilityTest extends EntityKernelTestBase {
 
   /**
