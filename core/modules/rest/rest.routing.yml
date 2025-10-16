@@ -1,0 +1,11 @@
+rest.pass.http:
+  alias: user.pass.http
+
+rest.login.http:
+  alias: user.login.http
+
+rest.login_status.http:
+  alias: user.login_status.http
+
+rest.logout.http:
+  alias: user.logout.http
