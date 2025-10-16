@@ -10,6 +10,8 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Installer\Form\SelectProfileForm;
 
+@trigger_error('\Drupal\FunctionalTests\Installer\InstallerExistingConfigTestBase is deprecated in drupal:10.4.0 and is removed from drupal:12.0.0. Use \Drupal\FunctionalTests\Installer\InstallerConfigDirectoryTestBase instead. See https://www.drupal.org/node/3460001');
+
 /**
  * Provides a base class for testing installing from existing configuration.
  *
@@ -30,14 +32,6 @@ abstract class InstallerExistingConfigTestBase extends InstallerTestBase {
    * @var bool
    */
   protected $existingSyncDirectory = FALSE;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct(string $name) {
-    @trigger_error(__CLASS__ . ' is deprecated in drupal:10.4.0 and is removed from drupal:12.0.0. Use \Drupal\FunctionalTests\Installer\InstallerConfigDirectoryTestBase instead. See https://www.drupal.org/node/3460001');
-    parent::__construct($name);
-  }
 
   /**
    * {@inheritdoc}
