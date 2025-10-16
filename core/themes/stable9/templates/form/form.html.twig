@@ -11,5 +11,10 @@
  */
 #}
 <form{{ attributes }}>
+  {% if show_required_legend %}
+    <p class="form-required-legend">
+      {{ 'Fields marked with * are required.'|t }}
+    </p>
+  {% endif %}
   {{ children }}
 </form>
