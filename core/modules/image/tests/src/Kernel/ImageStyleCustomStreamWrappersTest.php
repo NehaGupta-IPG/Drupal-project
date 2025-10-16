@@ -5,12 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\image\Kernel;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\StreamWrapper\PrivateStream;
-use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
-use Drupal\file_test\StreamWrapper\DummyReadOnlyStreamWrapper;
-use Drupal\file_test\StreamWrapper\DummyRemoteReadOnlyStreamWrapper;
-use Drupal\file_test\StreamWrapper\DummyStreamWrapper;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -110,11 +105,11 @@ class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
    */
   public static function providerTestCustomStreamWrappers() {
     return [
-      ['public', 'public', PublicStream::class],
-      ['private', 'private', PrivateStream::class],
-      ['dummy', 'dummy', DummyStreamWrapper::class],
-      ['dummy-readonly', 'public', DummyReadOnlyStreamWrapper::class],
-      ['dummy-remote-readonly', 'public', DummyRemoteReadOnlyStreamWrapper::class],
+      ['public', 'public'],
+      ['private', 'private'],
+      ['dummy', 'dummy'],
+      ['dummy-readonly', 'public'],
+      ['dummy-remote-readonly', 'public'],
     ];
   }
 
