@@ -1106,7 +1106,7 @@ class FormBuilderTest extends FormTestBase {
   }
 
   /**
-   * @covers ::addAsteriskExplanation
+   * Tests adding an explanation of the asterisk in forms to indicate required fields.
    */
   public function testAddAsteriskExplanation(): void {
     $form_id = 'test_form_id';
