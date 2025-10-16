@@ -2,12 +2,40 @@
 
 namespace Drupal\locale\Controller;
 
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Controller\ControllerBase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Return response for manual check translations.
  */
 class LocaleController extends ControllerBase {
+
+  /**
+   * Constructs a new LocaleController.
+   *
+   * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
+   *   Batch processor.
+   *
+   * @see https://www.drupal.org/node/3229844
+   */
+  public function __construct(
+    protected /*readonly*/ ?BatchProcessorInterface $batchProcessor = NULL,
+  ) {
+    if ($this->batchProcessor === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $batchProcessor argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+      $this->batchProcessor = \Drupal::service(BatchProcessorInterface::class);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('batch.processor')
+    );
+  }
 
   /**
    * Checks for translation updates and displays the translations status.
@@ -28,8 +56,8 @@ class LocaleController extends ControllerBase {
 
     // Execute a batch if required. A batch is only used when remote files
     // are checked.
-    if (batch_get()) {
-      return batch_process('admin/reports/translations');
+    if ($this->batchProcessor->getCurrentBatch()) {
+      return $this->batchProcessor->process('admin/reports/translations');
     }
 
     return $this->redirect('locale.translate_status');

@@ -4,6 +4,7 @@ namespace Drupal\system\Controller;
 
 use Drupal\Core\Asset\AssetQueryStringInterface;
 use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -101,6 +102,10 @@ class DbUpdateController extends ControllerBase {
    *   The post update registry.
    * @param \Drupal\Core\Asset\AssetQueryStringInterface $assetQueryString
    *   The asset query string.
+   * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
+   *    Batch processor.
+   *
+   * @see https://www.drupal.org/node/3229844
    */
   public function __construct(
     $root,
@@ -112,6 +117,7 @@ class DbUpdateController extends ControllerBase {
     BareHtmlPageRendererInterface $bare_html_page_renderer,
     UpdateRegistry $post_update_registry,
     protected AssetQueryStringInterface $assetQueryString,
+    protected /*readonly*/ ?BatchProcessorInterface $batchProcessor = NULL,
   ) {
     $this->root = $root;
     $this->keyValueExpirableFactory = $key_value_expirable_factory;
@@ -121,6 +127,10 @@ class DbUpdateController extends ControllerBase {
     $this->account = $account;
     $this->bareHtmlPageRenderer = $bare_html_page_renderer;
     $this->postUpdateRegistry = $post_update_registry;
+    if ($this->batchProcessor === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $batchProcessor argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+      $this->batchProcessor = \Drupal::service(BatchProcessorInterface::class);
+    }
   }
 
   /**
@@ -136,7 +146,8 @@ class DbUpdateController extends ControllerBase {
       $container->get('current_user'),
       $container->get('bare_html_page_renderer'),
       $container->get('update.post_update_registry'),
-      $container->get('asset.query_string')
+      $container->get('asset.query_string'),
+      $container->get('batch.processor'),
     );
   }
 
@@ -651,10 +662,10 @@ class DbUpdateController extends ControllerBase {
       }
     }
 
-    batch_set($batch_builder->toArray());
+    $this->batchProcessor->queue($batch_builder->toArray());
 
     // @todo Revisit once https://www.drupal.org/node/2548095 is in.
-    return batch_process(Url::fromUri('base://results'), Url::fromUri('base://start'));
+    return $this->batchProcessor->process(Url::fromUri('base://results'), Url::fromUri('base://start'));
   }
 
   /**

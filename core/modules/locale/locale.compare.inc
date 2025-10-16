@@ -5,6 +5,7 @@
  */
 
 use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Utility\ProjectInfo;
 
 /**
@@ -201,7 +202,10 @@ function locale_translation_check_projects($projects = [], $langcodes = []): voi
 function locale_translation_check_projects_batch($projects = [], $langcodes = []): void {
   // Build and set the batch process.
   $batch = locale_translation_batch_status_build($projects, $langcodes);
-  batch_set($batch);
+
+  /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+  $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+  $batch_processor->queue($batch);
 }
 
 /**

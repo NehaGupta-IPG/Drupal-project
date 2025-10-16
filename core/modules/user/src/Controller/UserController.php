@@ -5,6 +5,7 @@ namespace Drupal\user\Controller;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Flood\FloodInterface;
@@ -72,8 +73,12 @@ class UserController extends ControllerBase {
    *   A logger instance.
    * @param \Drupal\Core\Flood\FloodInterface $flood
    *   The flood service.
-   * @param \Drupal\Component\Datetime\TimeInterface|null $time
+   * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
+   * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
+   *    Batch processor.
+   *
+   * @see https://www.drupal.org/node/3229844
    */
   public function __construct(
     DateFormatterInterface $date_formatter,
@@ -82,12 +87,17 @@ class UserController extends ControllerBase {
     LoggerInterface $logger,
     FloodInterface $flood,
     protected TimeInterface $time,
+    protected /*readonly*/ ?BatchProcessorInterface $batchProcessor = NULL,
   ) {
     $this->dateFormatter = $date_formatter;
     $this->userStorage = $user_storage;
     $this->userData = $user_data;
     $this->logger = $logger;
     $this->flood = $flood;
+    if ($this->batchProcessor === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $batchProcessor argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+      $this->batchProcessor = \Drupal::service(BatchProcessorInterface::class);
+    }
   }
 
   /**
@@ -101,6 +111,7 @@ class UserController extends ControllerBase {
       $container->get('logger.factory')->get('user'),
       $container->get('flood'),
       $container->get('datetime.time'),
+      $container->get('batch.processor'),
     );
   }
 
@@ -432,7 +443,7 @@ class UserController extends ControllerBase {
         // Since user_cancel() is not invoked via Form API, batch processing
         // needs to be invoked manually and should redirect to the front page
         // after completion.
-        return batch_process('<front>');
+        return $this->batchProcessor->process('<front>');
       }
       else {
         $this->messenger()->addError($this->t('You have tried to use an account cancellation link that has expired. Request a new one using the form below.'));

@@ -5,6 +5,7 @@ namespace Drupal\config\Form;
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\config\StorageReplaceDataWrapper;
 use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Config\ConfigImporterException;
 use Drupal\Core\Config\ConfigImporterFactory;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
@@ -51,13 +52,22 @@ class ConfigSingleImportForm extends ConfirmFormBase {
    *   The renderer service.
    * @param \Drupal\Core\Config\ConfigImporterFactory $configImporterFactory
    *   The config importer factory.
+   * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
+   *    Batch processor.
+   *
+   * @see https://www.drupal.org/node/3229844
    */
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
     protected StorageInterface $configStorage,
     protected RendererInterface $renderer,
     protected ConfigImporterFactory $configImporterFactory,
+    protected /*readonly*/ ?BatchProcessorInterface $batchProcessor = NULL,
   ) {
+    if ($this->batchProcessor === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $batchProcessor argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+      $this->batchProcessor = \Drupal::service(BatchProcessorInterface::class);
+    }
   }
 
   /**
@@ -69,6 +79,7 @@ class ConfigSingleImportForm extends ConfirmFormBase {
       $container->get('config.storage'),
       $container->get('renderer'),
       $container->get(ConfigImporterFactory::class),
+      $container->get('batch.processor'),
     );
   }
 
@@ -299,7 +310,7 @@ class ConfigSingleImportForm extends ConfirmFormBase {
         foreach ($sync_steps as $sync_step) {
           $batch_builder->addOperation([ConfigImporterBatch::class, 'process'], [$config_importer, $sync_step]);
         }
-        batch_set($batch_builder->toArray());
+        $this->batchProcessor->queue($batch_builder->toArray());
       }
       catch (ConfigImporterException) {
         // There are validation errors.

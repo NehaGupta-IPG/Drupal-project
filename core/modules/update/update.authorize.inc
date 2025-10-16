@@ -10,6 +10,7 @@
  */
 
 use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Updater\UpdaterException;
 use Drupal\Core\Url;
 
@@ -54,10 +55,13 @@ function update_authorize_run_update($filetransfer, $projects) {
     ]);
   }
 
-  batch_set($batch_builder->toArray());
+  /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_process */
+  $batch_process = \Drupal::service(BatchProcessorInterface::class);
+  $batch_process->queue($batch_builder->toArray());
 
   // Since authorize.php has its own method for setting the page title, set it
-  // manually here rather than passing it in to batch_set() as would normally
+  // manually here rather than passing it in to
+  // \Drupal\Core\Batch\BatchProcessorInterface::queue() as would normally
   // be done.
   \Drupal::request()->getSession()->set('authorize_page_title', t('Downloading updates'));
 

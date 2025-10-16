@@ -9,6 +9,7 @@ use Drupal\batch_test\BatchTestCallbacks;
 use Drupal\batch_test\BatchTestDefinitions;
 use Drupal\batch_test\BatchTestHelper;
 use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Form\FormState;
 
 /**
@@ -42,8 +43,10 @@ class BatchTestController {
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);
 
-    batch_set($batch_test_definitions->batch5());
-    return batch_process('batch-test/redirect');
+    /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+    $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+    $batch_processor->queue($batch_test_definitions->batch5());
+    return $batch_processor->process('batch-test/redirect');
   }
 
   /**
@@ -61,8 +64,10 @@ class BatchTestController {
     // Set the batch and process it.
     $batch_builder = (new BatchBuilder())
       ->addOperation([$batch_test_helper, 'nestedDrupalFormSubmitCallback'], [$value]);
-    batch_set($batch_builder->toArray());
-    return batch_process('batch-test/redirect');
+    /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+    $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+    $batch_processor->queue($batch_builder->toArray());
+    return $batch_processor->process('batch-test/redirect');
   }
 
   /**
@@ -76,8 +81,10 @@ class BatchTestController {
     $batch_test_definitions = new BatchTestDefinitions();
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);
-    batch_set($batch_test_definitions->batch1());
-    return batch_process('batch-test/redirect');
+    /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+    $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+    $batch_processor->queue($batch_test_definitions->batch1());
+    return $batch_processor->process('batch-test/redirect');
 
   }
 
@@ -94,8 +101,10 @@ class BatchTestController {
     $batch_test_helper->stack(NULL, TRUE);
     $batch = $batch_test_definitions->batch1();
     $batch['finished'] = BatchTestCallbacks::class . ':finished1Finished';
-    batch_set($batch);
-    return batch_process('batch-test/redirect');
+    /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+    $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+    $batch_processor->queue($batch);
+    return $batch_processor->process('batch-test/redirect');
   }
 
   /**
@@ -135,8 +144,10 @@ class BatchTestController {
     $batch = [
       'operations' => [[BatchInjectionCallbacks::class . ':themeCallback', []]],
     ];
-    batch_set($batch);
-    return batch_process('batch-test/redirect');
+    /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+    $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+    $batch_processor->queue($batch);
+    return $batch_processor->process('batch-test/redirect');
   }
 
   /**
@@ -153,8 +164,10 @@ class BatchTestController {
       'title' => 'Batch Test',
       'operations' => [[BatchInjectionCallbacks::class . ':titleCallback', []]],
     ];
-    batch_set($batch);
-    return batch_process('batch-test/redirect');
+    /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+    $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+    $batch_processor->queue($batch);
+    return $batch_processor->process('batch-test/redirect');
   }
 
 }

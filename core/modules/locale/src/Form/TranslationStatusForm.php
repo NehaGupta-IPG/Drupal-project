@@ -3,6 +3,7 @@
 namespace Drupal\locale\Form;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -25,6 +26,7 @@ class TranslationStatusForm extends FormBase {
       $container->get('module_handler'),
       $container->get('state'),
       $container->get('datetime.time'),
+      $container->get('batch.processor'),
     );
   }
 
@@ -37,12 +39,22 @@ class TranslationStatusForm extends FormBase {
    *   The state service.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
+   *    Time component instance.
+   * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
+   *    Batch processor.
+   *
+   * @see https://www.drupal.org/node/3229844
    */
   public function __construct(
     protected ModuleHandlerInterface $moduleHandler,
     protected StateInterface $state,
     protected TimeInterface $time,
+    protected /*readonly*/ ?BatchProcessorInterface $batchProcessor = NULL,
   ) {
+    if ($this->batchProcessor === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $batchProcessor argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+      $this->batchProcessor = \Drupal::service(BatchProcessorInterface::class);
+    }
   }
 
   /**
@@ -275,15 +287,15 @@ class TranslationStatusForm extends FormBase {
     if ($last_checked < $this->time->getRequestTime() - LOCALE_TRANSLATION_STATUS_TTL) {
       locale_translation_clear_status();
       $batch = locale_translation_batch_update_build([], $langcodes, $options);
-      batch_set($batch);
+      $this->batchProcessor->queue($batch);
     }
     else {
       // Set a batch to download and import translations.
       $batch = locale_translation_batch_fetch_build($projects, $langcodes, $options);
-      batch_set($batch);
+      $this->batchProcessor->queue($batch);
       // Set a batch to update configuration as well.
       if ($batch = locale_config_batch_update_components($options, $langcodes)) {
-        batch_set($batch);
+        $this->batchProcessor->queue($batch);
       }
     }
   }

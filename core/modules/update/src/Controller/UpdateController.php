@@ -3,10 +3,12 @@
 namespace Drupal\update\Controller;
 
 use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\update\UpdateFetcherInterface;
 use Drupal\update\UpdateManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Controller routines for update routes.
@@ -34,10 +36,33 @@ class UpdateController extends ControllerBase {
    *   Update Manager Service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
+   * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
+   *    Batch processor.
+   *
+   * @see https://www.drupal.org/node/3229844
    */
-  public function __construct(UpdateManagerInterface $update_manager, RendererInterface $renderer) {
+  public function __construct(
+    UpdateManagerInterface $update_manager,
+    RendererInterface $renderer,
+    protected /*readonly*/ ?BatchProcessorInterface $batchProcessor = NULL,
+  ) {
     $this->updateManager = $update_manager;
     $this->renderer = $renderer;
+    if ($this->batchProcessor === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $batchProcessor argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+      $this->batchProcessor = \Drupal::service(BatchProcessorInterface::class);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('update.manager'),
+      $container->get('renderer'),
+      $container->get('batch.processor')
+    );
   }
 
   /**
@@ -82,8 +107,8 @@ class UpdateController extends ControllerBase {
       ->setProgressMessage($this->t('Trying to check available update data ...'))
       ->setErrorMessage($this->t('Error checking available update data.'))
       ->setFinishCallback('update_fetch_data_finished');
-    batch_set($batch_builder->toArray());
-    return batch_process('admin/reports/updates');
+    $this->batchProcessor->queue($batch_builder->toArray());
+    return $this->batchProcessor->process('admin/reports/updates');
   }
 
 }

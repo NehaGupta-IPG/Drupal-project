@@ -5,6 +5,7 @@ namespace Drupal\jsonapi\Controller;
 use Drupal\Component\Assertion\Inspector;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
@@ -187,8 +188,12 @@ class EntityResource {
    *   The current user account.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
+   * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
+   *    Batch processor.
+   *
+   * @see https://www.drupal.org/node/3229844
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $field_manager, ResourceTypeRepositoryInterface $resource_type_repository, RendererInterface $renderer, EntityRepositoryInterface $entity_repository, IncludeResolver $include_resolver, EntityAccessChecker $entity_access_checker, FieldResolver $field_resolver, SerializerInterface $serializer, TimeInterface $time, AccountInterface $user, ?EventDispatcherInterface $event_dispatcher = NULL) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $field_manager, ResourceTypeRepositoryInterface $resource_type_repository, RendererInterface $renderer, EntityRepositoryInterface $entity_repository, IncludeResolver $include_resolver, EntityAccessChecker $entity_access_checker, FieldResolver $field_resolver, SerializerInterface $serializer, TimeInterface $time, AccountInterface $user, ?EventDispatcherInterface $event_dispatcher = NULL, protected /*readonly*/ ?BatchProcessorInterface $batchProcessor = NULL) {
     $this->entityTypeManager = $entity_type_manager;
     $this->fieldManager = $field_manager;
     $this->resourceTypeRepository = $resource_type_repository;
@@ -206,6 +211,10 @@ class EntityResource {
       $event_dispatcher = \Drupal::service('event_dispatcher');
     }
     $this->eventDispatcher = $event_dispatcher;
+    if ($this->batchProcessor === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $batchProcessor argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+      $this->batchProcessor = \Drupal::service(BatchProcessorInterface::class);
+    }
   }
 
   /**
@@ -395,11 +404,11 @@ class EntityResource {
       user_cancel([], $entity->id(), $cancel_method);
       // Since user_cancel() is not invoked via Form API, batch processing
       // needs to be invoked manually.
-      $batch =& batch_get();
+      $batch =& $this->batchProcessor->getCurrentBatch();
       // Mark this batch as non-progressive to bypass the progress bar and
       // redirect.
       $batch['progressive'] = FALSE;
-      batch_process();
+      $this->batchProcessor->process();
     }
     else {
       $entity->delete();

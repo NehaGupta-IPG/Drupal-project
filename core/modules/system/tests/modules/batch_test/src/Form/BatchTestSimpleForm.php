@@ -6,8 +6,10 @@ namespace Drupal\batch_test\Form;
 
 use Drupal\batch_test\BatchTestDefinitions;
 use Drupal\batch_test\BatchTestHelper;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Generate form of id batch_test_simple_form.
@@ -15,6 +17,22 @@ use Drupal\Core\Form\FormStateInterface;
  * @internal
  */
 class BatchTestSimpleForm extends FormBase {
+
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('batch.processor'),
+    );
+  }
+
+  /**
+   * Constructs a new BatchTestSimpleForm object.
+   *
+   * @param \Drupal\Core\Batch\BatchProcessorInterface $batchProcessor
+   *   The batch processor.
+   */
+  public function __construct(
+    protected readonly BatchProcessorInterface $batchProcessor,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -59,7 +77,7 @@ class BatchTestSimpleForm extends FormBase {
     $batch_test_helper->stack(NULL, TRUE);
 
     foreach ($form_state->getValue('batch') as $batch) {
-      batch_set($batch_test_definitions->$batch());
+      $this->batchProcessor->queue($batch_test_definitions->$batch());
     }
 
     $form_state->setRedirect('batch_test.redirect');

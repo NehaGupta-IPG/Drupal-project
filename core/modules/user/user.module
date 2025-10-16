@@ -6,6 +6,7 @@
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Site\Settings;
@@ -257,8 +258,9 @@ function user_pass_rehash(UserInterface $account, $timestamp) {
  * Cancel a user account.
  *
  * Since the user cancellation process needs to be run in a batch, either
- * Form API will invoke it, or batch_process() needs to be invoked after calling
- * this function and should define the path to redirect to.
+ * Form API will invoke it, or BatchProcessorInterface::process() needs
+ * to be invoked after calling this function and should define the path
+ * to redirect to.
  *
  * @param array $edit
  *   An array of submitted form values.
@@ -268,6 +270,7 @@ function user_pass_rehash(UserInterface $account, $timestamp) {
  *   The account cancellation method to use.
  *
  * @see _user_cancel()
+ * @see \Drupal\Core\Batch\BatchProcessorInterface::process()
  */
 function user_cancel($edit, $uid, $method): void {
   $account = User::load($uid);
@@ -279,9 +282,11 @@ function user_cancel($edit, $uid, $method): void {
   }
 
   // Initialize batch (to set title).
+  ///** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+  $batch_processor = \Drupal::service(BatchProcessorInterface::class);
   $batch_builder = (new BatchBuilder())
     ->setTitle(t('Cancelling account'));
-  batch_set($batch_builder->toArray());
+  $batch_processor->queue($batch_builder->toArray());
 
   // When the 'user_cancel_delete' method is used, user_delete() is called,
   // which invokes hook_ENTITY_TYPE_predelete() and hook_ENTITY_TYPE_delete()
@@ -304,7 +309,7 @@ function user_cancel($edit, $uid, $method): void {
     $batch_builder->setFinishCallback('_user_cancel_session_regenerate');
   }
 
-  batch_set($batch_builder->toArray());
+  $batch_processor->queue($batch_builder->toArray());
 
   // Batch processing is either handled via Form API or has to be invoked
   // manually.

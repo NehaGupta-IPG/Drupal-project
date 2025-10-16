@@ -5,6 +5,8 @@
  * Functions for form and batch generation and processing.
  */
 
+use Drupal\Core\Batch\BatchProcessor;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Batch\BatchStorageInterface;
 use Drupal\Core\Form\FormPreprocess;
 use Drupal\Core\Url;
@@ -615,7 +617,9 @@ function template_preprocess_form_element_label(&$variables): void {
  */
 function batch_set($batch_definition): void {
   if ($batch_definition) {
-    $batch =& batch_get();
+    /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+    $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+    $batch =& $batch_processor->getCurrentBatch();
 
     // Initialize the batch if needed.
     if (empty($batch)) {
@@ -657,7 +661,7 @@ function batch_set($batch_definition): void {
     }
     else {
       // The set is being added while the batch is running.
-      _batch_append_set($batch, $batch_set);
+      $batch_processor->appendSet($batch, $batch_set);
     }
   }
 }
@@ -708,6 +712,7 @@ function _batch_append_set(&$batch, $batch_set): void {
   // queued in the queue of a previous batch set.
   // @see _batch_populate_queue().
   $new_sets = [];
+  $new_set_index = NULL;
   foreach ($batch['sets'] as $index => &$set) {
     $new_sets[$index] = &$set;
     if ($index == $append_after_index) {
@@ -717,7 +722,9 @@ function _batch_append_set(&$batch, $batch_set): void {
   }
 
   $batch['sets'] = $new_sets;
-  _batch_populate_queue($batch, $new_set_index);
+  /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+  $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+  $batch_processor->queuePopulate($batch, $new_set_index);
 }
 
 /**
@@ -750,7 +757,9 @@ function _batch_append_set(&$batch, $batch_set): void {
  *   A redirect response if the batch is progressive. No return value otherwise.
  */
 function batch_process($redirect = NULL, ?Url $url = NULL, $redirect_callback = NULL) {
-  $batch =& batch_get();
+  /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+  $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+  $batch =& $batch_processor->getCurrentBatch();
 
   if (isset($batch)) {
     // Add process information.
@@ -777,7 +786,7 @@ function batch_process($redirect = NULL, ?Url $url = NULL, $redirect_callback = 
     // Move operations to a job queue. Non-progressive batches will use a
     // memory-based queue.
     foreach ($batch['sets'] as $key => $batch_set) {
-      _batch_populate_queue($batch, $key);
+      $batch_processor->queuePopulate($batch, $key);
     }
 
     // Initiate processing.
@@ -829,9 +838,7 @@ function batch_process($redirect = NULL, ?Url $url = NULL, $redirect_callback = 
     }
     else {
       // Non-progressive execution: bypass the whole progressbar workflow
-      // and execute the batch in one pass.
-      require_once __DIR__ . '/batch.inc';
-      _batch_process();
+      $batch_processor->process();
     }
   }
 }
@@ -874,7 +881,9 @@ function _batch_populate_queue(&$batch, $set_id): void {
       ],
     ];
 
-    $queue = _batch_queue($batch_set);
+    /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+    $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+    $queue = $batch_processor->getQueue($batch_set);
     $queue->createQueue();
     foreach ($batch_set['operations'] as $operation) {
       $queue->createItem($operation);

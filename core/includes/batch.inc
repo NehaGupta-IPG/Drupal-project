@@ -9,13 +9,14 @@
  * form.inc.
  *
  * @see form.inc
- * @see batch_set()
- * @see batch_process()
- * @see batch_get()
+ * @see \Drupal\Core\Batch\BatchProcessorInterface::queue()
+ * @see \Drupal\Core\Batch\BatchProcessorInterface::process()
+ * @see \Drupal\Core\Batch\BatchProcessorInterface::getCurrentBatch()
  */
 
 use Drupal\Component\Utility\Timer;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Batch\Percentage;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Url;
@@ -31,10 +32,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * @param \Symfony\Component\HttpFoundation\Request $request
  *   The current request object.
  *
- * @see _batch_shutdown()
+ * @see \Drupal\Core\Batch\BatchProcessorInterface::shutdown()
  */
 function _batch_page(Request $request) {
-  $batch = &batch_get();
+  /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+  $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+  $batch = &$batch_processor->getCurrentBatch();
 
   if (!($request_id = $request->query->get('id'))) {
     return FALSE;
@@ -61,10 +64,10 @@ function _batch_page(Request $request) {
   // However, we must ensure to only update in the shutdown phase in this
   // particular case we track whether the batch information still needs to be
   // updated.
-  // @see _batch_shutdown()
+  // @see \Drupal\Core\Batch\BatchProcessorInterface::shutdown()
   // @see \Symfony\Component\HttpFoundation\Response::send()
-  drupal_register_shutdown_function('_batch_shutdown');
-  _batch_needs_update(TRUE);
+  drupal_register_shutdown_function([$batch_processor, 'shutdown']);
+  $batch_processor->needsUpdate(TRUE);
 
   $build = [];
 
@@ -84,7 +87,7 @@ function _batch_page(Request $request) {
     case 'do_nojs':
       // Display the full progress page on startup and on each additional
       // non-JavaScript iteration.
-      $current_set = _batch_current_set();
+      $current_set = $batch_processor->getCurrentSet();
       $build['#title'] = $current_set['title'];
       $build['content'] = _batch_progress_page();
 
@@ -97,15 +100,16 @@ function _batch_page(Request $request) {
       break;
 
     case 'finished':
-      // _batch_finished() returns a RedirectResponse.
-      $response = _batch_finished();
+      // \Drupal\Core\Batch\BatchProcessorInterface::finishedProcessing()
+      // returns a RedirectResponse.
+      $response = $batch_processor->finishedProcessing();
       break;
   }
 
   if ($batch) {
     \Drupal::service('batch.storage')->update($batch);
   }
-  _batch_needs_update(FALSE);
+  $batch_processor->needsUpdate(FALSE);
 
   return $response;
 }
@@ -132,11 +136,13 @@ function _batch_needs_update($new_value = NULL) {
 /**
  * Does one execution pass with JavaScript and returns progress to the browser.
  *
- * @see _batch_process()
+ * @see \Drupal\Core\Batch\BatchProcessorInterface::processQueue()
  */
 function _batch_do() {
+  /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+  $batch_processor = \Drupal::service(BatchProcessorInterface::class);
   // Perform actual processing.
-  [$percentage, $message, $label] = _batch_process();
+  [$percentage, $message, $label] = $batch_processor->processQueue();
 
   return new JsonResponse(['status' => TRUE, 'percentage' => $percentage, 'message' => $message, 'label' => $label]);
 }
@@ -144,12 +150,15 @@ function _batch_do() {
 /**
  * Outputs a batch processing page.
  *
- * @see _batch_process()
+ * @see \Drupal\Core\Batch\BatchProcessorInterface::processQueue()
  */
 function _batch_progress_page(): array {
-  $batch = &batch_get();
+  /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+  $batch_processor = \Drupal::service(BatchProcessorInterface::class);
 
-  $current_set = _batch_current_set();
+  $batch = &$batch_processor->getCurrentBatch();
+
+  $current_set = $batch_processor->getCurrentSet();
 
   $new_op = 'do_nojs';
 
@@ -185,7 +194,7 @@ function _batch_progress_page(): array {
     print $fallback;
 
     // Perform actual processing.
-    [$percentage, $message, $label] = _batch_process();
+    [$percentage, $message, $label] = $batch_processor->processQueue();
     if ($percentage == 100) {
       $new_op = 'finished';
     }
@@ -248,12 +257,14 @@ function _batch_progress_page(): array {
  * exceeded. It will continue with the next operation of the same batch set in
  * the next request.
  *
- * @return array
+ * @return array|RedirectResponse
  *   An array containing a completion value (in percent) and a status message.
  */
 function _batch_process() {
-  $batch       = &batch_get();
-  $current_set = &_batch_current_set();
+  /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+  $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+  $batch       = &$batch_processor->getCurrentBatch();
+  $current_set = &$batch_processor->getCurrentSet();
   // Indicate that this batch set needs to be initialized.
   $set_changed = TRUE;
   $task_message = '';
@@ -270,7 +281,7 @@ function _batch_process() {
     $current_set['start'] = microtime(TRUE);
   }
 
-  $queue = _batch_queue($current_set);
+  $queue = $batch_processor->getQueue($current_set);
 
   while (!$current_set['success']) {
     // If this is the first time we iterate this batch set in the current
@@ -317,15 +328,15 @@ function _batch_process() {
     // sets to the batch.
     $set_changed = FALSE;
     $old_set = $current_set;
-    while (empty($current_set['count']) && ($current_set['success'] = TRUE) && _batch_next_set()) {
-      $current_set = &_batch_current_set();
+    while (empty($current_set['count']) && ($current_set['success'] = TRUE) && $batch_processor->nextSet()) {
+      $current_set = &$batch_processor->getCurrentSet();
       $current_set['start'] = microtime(TRUE);
       $set_changed = TRUE;
     }
 
     // At this point, either $current_set contains operations that need to be
     // processed or all sets have been completed.
-    $queue = _batch_queue($current_set);
+    $queue = $batch_processor->getQueue($current_set);
 
     // If we are in progressive mode, break processing after 1 second.
     if ($batch['progressive'] && Timer::read('batch_processing') > 1000) {
@@ -358,7 +369,7 @@ function _batch_process() {
     // Total progress is the number of operations that have fully run plus the
     // completion level of the current operation.
     $current    = $total - $remaining + ($finished ?? 0);
-    $percentage = _batch_api_percentage($total, $current);
+    $percentage = Percentage::format($total, $current);
     $elapsed    = $current_set['elapsed'] ?? 0;
     $values     = [
       '@remaining'  => $remaining,
@@ -373,10 +384,8 @@ function _batch_process() {
 
     return [$percentage, $message, $task_message];
   }
-  else {
-    // If we are not in progressive mode, the entire batch has been processed.
-    return _batch_finished();
-  }
+  // If we are not in progressive mode, the entire batch has been processed.
+  return $batch_processor->finishedProcessing();
 }
 
 /**
@@ -396,7 +405,7 @@ function _batch_process() {
  *   until we are finished, but we also never print more decimal places than
  *   are meaningful.
  *
- * @see _batch_process()
+ * @see \Drupal\Core\Batch\BatchProcessorInterface::processQueue()
  */
 function _batch_api_percentage($total, $current) {
   return Percentage::format($total, $current);
@@ -406,7 +415,9 @@ function _batch_api_percentage($total, $current) {
  * Returns the batch set being currently processed.
  */
 function &_batch_current_set() {
-  $batch = &batch_get();
+  /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+  $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+  $batch = &$batch_processor->getCurrentBatch();
   return $batch['sets'][$batch['current_set']];
 }
 
@@ -422,12 +433,14 @@ function &_batch_current_set() {
  *   if no subsequent set was found.
  */
 function _batch_next_set() {
-  $batch = &batch_get();
+  /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+  $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+  $batch = &$batch_processor->getCurrentBatch();
   $set_indexes = array_keys($batch['sets']);
   $current_set_index_key = array_search($batch['current_set'], $set_indexes);
   if (isset($set_indexes[$current_set_index_key + 1])) {
     $batch['current_set'] = $set_indexes[$current_set_index_key + 1];
-    $current_set = &_batch_current_set();
+    $current_set = &$batch_processor->getCurrentSet();;
     if (isset($current_set['form_submit']) && ($callback = $current_set['form_submit']) && is_callable($callback)) {
       // We use our stored copies of $form and $form_state to account for
       // possible alterations by previous form submit handlers.
@@ -447,7 +460,9 @@ function _batch_next_set() {
  * the results and resolve page redirection.
  */
 function _batch_finished() {
-  $batch = &batch_get();
+  /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+  $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+  $batch = &$batch_processor->getCurrentBatch();
   $batch_finished_redirect = NULL;
 
   // Execute the 'finished' callbacks for each batch set, if defined.
@@ -458,7 +473,7 @@ function _batch_finished() {
         include_once \Drupal::root() . '/' . $batch_set['file'];
       }
 
-      $queue = _batch_queue($batch_set);
+      $queue = $batch_processor->getQueue($batch_set);
       $operations = $queue->getAllItems();
       $callable_resolver = \Drupal::service(CallableResolver::class);
       $callable = $callable_resolver->getCallableFromDefinition($batch_set['finished']);
@@ -476,7 +491,7 @@ function _batch_finished() {
   if ($batch['progressive']) {
     \Drupal::service('batch.storage')->delete($batch['id']);
     foreach ($batch['sets'] as $batch_set) {
-      if ($queue = _batch_queue($batch_set)) {
+      if ($queue = $batch_processor->getQueue($batch_set)) {
         $queue->deleteQueue();
       }
     }
@@ -563,7 +578,9 @@ function _batch_finished() {
  * @see drupal_register_shutdown_function()
  */
 function _batch_shutdown(): void {
-  if (($batch = batch_get()) && _batch_needs_update()) {
+  /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+  $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+  if (($batch = $batch_processor->getCurrentBatch()) && $batch_processor->needsUpdate()) {
     \Drupal::service('batch.storage')->update($batch);
   }
 }

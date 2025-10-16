@@ -452,7 +452,7 @@ function hook_uninstall($is_syncing): void {
  *     two different tasks.
  *
  * @see install_state_defaults()
- * @see batch_set()
+ * @see \Drupal\Core\Batch\BatchProcessorInterface::queue()
  * @see hook_install_tasks_alter()
  * @see install_tasks()
  */
