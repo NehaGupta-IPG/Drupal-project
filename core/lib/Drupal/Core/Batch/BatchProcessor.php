@@ -15,6 +15,13 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class BatchProcessor implements BatchProcessorInterface {
 
   /**
+   * Checks whether the batch information needs to be updated in the storage.
+   *
+   * @var bool
+   */
+  protected static bool $needsUpdate = FALSE;
+
+  /**
    * Creates a new BatchProcessor.
    *
    * @param string $root
@@ -116,7 +123,10 @@ class BatchProcessor implements BatchProcessorInterface {
    * {@inheritdoc}
    */
   public function needsUpdate(?bool $new_value = NULL): bool {
-    return _batch_needs_update($new_value);
+    if (isset($new_value)) {
+      static::$needsUpdate = $new_value;
+    }
+    return static::$needsUpdate;
   }
 
 }

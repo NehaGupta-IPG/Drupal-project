@@ -122,15 +122,17 @@ function _batch_page(Request $request) {
  *
  * @return bool
  *   TRUE if the batch information needs to be updated; FALSE otherwise.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+ *    Use \Drupal\Core\Batch\BatchProcessorInterface::needsUpdate() instead.
+ *
+ * @see https://www.drupal.org/node/3229844
  */
 function _batch_needs_update($new_value = NULL) {
-  $needs_update = &drupal_static(__FUNCTION__, FALSE);
-
-  if (isset($new_value)) {
-    $needs_update = $new_value;
-  }
-
-  return $needs_update;
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::needsUpdate() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+  /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+  $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+  return $batch_processor->needsUpdate($new_value);
 }
 
 /**

@@ -17,6 +17,26 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class BatchKernelTest extends KernelTestBase {
 
   /**
+   * Tests _batch_needs_update().
+   */
+  #[Group('legacy')]
+  public function testLegacyNeedsUpdate(): void {
+    require_once $this->root . '/core/includes/batch.inc';
+    $this->expectDeprecation('_batch_needs_update() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::needsUpdate() instead. See https://www.drupal.org/node/3229844');
+    // Before ever being called, the return value should be FALSE.
+    $this->assertFalse(_batch_needs_update());
+
+    // Set the value to TRUE.
+    $this->assertTrue(_batch_needs_update(TRUE));
+    // Check that without a parameter TRUE is returned.
+    $this->assertTrue(_batch_needs_update());
+
+    // Set the value to FALSE.
+    $this->assertFalse(_batch_needs_update(FALSE));
+    $this->assertFalse(_batch_needs_update());
+  }
+
+  /**
    * Tests BatchProcessorInterface::needsUpdate().
    *
    * @see \Drupal\Core\Batch\BatchProcessorInterface::needsUpdate()
