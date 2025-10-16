@@ -80,12 +80,8 @@ class RestLoginHttpTest extends BrowserTestBase {
       ->setAbsolute();
 
     $request_body = [];
-    if (isset($name)) {
-      $request_body['name'] = $name;
-    }
-    if (isset($pass)) {
-      $request_body['pass'] = $pass;
-    }
+    $request_body['name'] = $name;
+    $request_body['pass'] = $pass;
 
     $result = \Drupal::httpClient()->post($user_login_url->toString(), [
       'body' => $this->serializer->encode($request_body, $format),
