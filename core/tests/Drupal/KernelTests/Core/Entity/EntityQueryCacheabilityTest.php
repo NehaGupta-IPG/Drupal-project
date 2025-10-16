@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Test cacheability of entity queries.
  */
 #[Group('Entity')]
-#[RunTestsInSeparateProcesses];
+#[RunTestsInSeparateProcesses]
 class EntityQueryCacheabilityTest extends EntityKernelTestBase {
 
   /**
