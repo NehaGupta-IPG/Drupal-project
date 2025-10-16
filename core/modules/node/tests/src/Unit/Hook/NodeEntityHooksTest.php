@@ -11,6 +11,7 @@ use Drupal\node\Hook\NodeEntityHooks;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
 #[CoversClass(NodeEntityHooks::class)]
@@ -31,10 +32,7 @@ final class NodeEntityHooksTest extends UnitTestCase {
     $this->sut = new NodeEntityHooks();
   }
 
-  /**
-   * @dataProvider providerNodeAccess
-   * @covers ::nodeAccess
-   */
+  #[DataProvider('providerNodeAccess')]
   public function testNodeAccess(
     string $op,
     string $bundle,
