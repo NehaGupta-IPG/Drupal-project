@@ -315,7 +315,7 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
       }
       $expected_results[$result_index] = ValidationResult::createError($messages, $result->summary);
     }
-    $this->testErrorDuringPreApply($in_active, $in_stage, $expected_results);
+    $this->testErrorDuringPreApply($in_active, $in_stage, $expected_results, $help_page_sections);
   }
 
 }
