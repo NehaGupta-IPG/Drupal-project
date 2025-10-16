@@ -96,7 +96,7 @@ class ModerationInformationTest extends UnitTestCase {
    * @legacy-covers ::isModeratedEntity
    */
   #[DataProvider('providerWorkflow')]
-  public function testIsModeratedEntity($workflow, $expected): void {
+  public function testIsModeratedEntity(?string $workflow, bool $expected): void {
     $moderation_information = new ModerationInformation($this->getEntityTypeManager(), $this->setupModerationBundleInfo('test_bundle', $workflow));
 
     $entity_type = new ContentEntityType([
@@ -118,7 +118,7 @@ class ModerationInformationTest extends UnitTestCase {
    * @legacy-covers ::getWorkflowForEntity
    */
   #[DataProvider('providerWorkflow')]
-  public function testGetWorkflowForEntity($workflow): void {
+  public function testGetWorkflowForEntity(?string $workflow, bool $expected): void {
     $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
     if ($workflow) {
       $workflow_entity = $this->prophesize(WorkflowInterface::class)->reveal();
@@ -143,7 +143,7 @@ class ModerationInformationTest extends UnitTestCase {
    * @legacy-covers ::shouldModerateEntitiesOfBundle
    */
   #[DataProvider('providerWorkflow')]
-  public function testShouldModerateEntities($workflow, $expected): void {
+  public function testShouldModerateEntities(?string $workflow, bool $expected): void {
     $entity_type = new ContentEntityType([
       'id' => 'test_entity_type',
       'bundle_entity_type' => 'entity_test_bundle',
@@ -158,7 +158,7 @@ class ModerationInformationTest extends UnitTestCase {
   /**
    * Data provider for several tests.
    */
-  public static function providerWorkflow() {
+  public static function providerWorkflow(): array {
     return [
       [NULL, FALSE],
       ['workflow', TRUE],
