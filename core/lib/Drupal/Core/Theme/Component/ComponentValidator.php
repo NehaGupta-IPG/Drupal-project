@@ -179,16 +179,13 @@ class ComponentValidator {
     }
 
     // Add null type to all non-required properties.
-    $required_props = $schema['required'] ?? [];
-    $optional_props = array_diff(array_keys($schema['properties']), $required_props);
-    foreach ($optional_props as $prop_id) {
-      $prop = &$schema['properties'][$prop_id];
-
-      if (!is_array($prop['type'])) {
-        $prop['type'] = [$prop['type']];
-      }
-      $prop['type'][] = 'null';
-    }
+    // In Twig, not declaring the value of a prop is different than actually
+    // setting it to NULL. We want the same treatment for DX, because if not
+    // twig developers need to be checking if something is NULL before
+    // assigning it, which would make their experience pretty worse and their
+    // components templates less readable, specially when reusing other
+    // components.
+    $this->makeNonRequiredPropertiesNullable($schema);
 
     $prop_names = array_keys($schema['properties']);
     $props_raw = array_intersect_key($context, array_flip($prop_names));
@@ -245,6 +242,35 @@ class ComponentValidator {
     );
     $message = implode("\n", $message_parts);
     throw new InvalidComponentException($message);
+  }
+
+  /**
+   * This methods allows non-required props to be nullable.
+   *
+   * This improves the DX of writing component templates, as developers
+   * can avoid checking for NULL values when embedding other components.
+   *
+   * @param $schema
+   *   The schema of this prop.
+   * @return void
+   */
+  private function makeNonRequiredPropertiesNullable(&$schema): void {
+    $required_props = $schema['required'] ?? [];
+    $optional_props = array_diff(array_keys($schema['properties']), $required_props);
+    foreach ($optional_props as $prop_id) {
+      $prop = &$schema['properties'][$prop_id];
+
+      if (!is_array($prop['type'])) {
+        $prop['type'] = [$prop['type']];
+      }
+      $prop['type'][] = 'null';
+
+      // If there are sub-properties for an object, it means that they need
+      // the same treatment.
+      if (in_array('object', $prop['type']) && isset($prop['properties'])) {
+        $this->makeNonRequiredPropertiesNullable($prop);
+      }
+    }
   }
 
   /**
