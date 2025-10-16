@@ -66,9 +66,9 @@ class RestLoginHttpTest extends BrowserTestBase {
   /**
    * Executes a login HTTP request for a given serialization format.
    *
-   * @param string $name
+   * @param string|null $name
    *   The username.
-   * @param string $pass
+   * @param string|null $pass
    *   The user password.
    * @param string $format
    *   The format to use to make the request.
@@ -82,8 +82,12 @@ class RestLoginHttpTest extends BrowserTestBase {
       ->setAbsolute();
 
     $request_body = [];
-    $request_body['name'] = $name;
-    $request_body['pass'] = $pass;
+    if (isset($name)) {
+      $request_body['name'] = $name;
+    }
+    if (isset($pass)) {
+      $request_body['pass'] = $pass;
+    }
 
     $result = \Drupal::httpClient()->post($user_login_url->toString(), [
       'body' => $this->serializer->encode($request_body, $format),
