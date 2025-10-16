@@ -38,8 +38,10 @@ class IconPackManagerTest extends UnitTestCase {
       'valid name with underscore' => ['my_theme/my_library', TRUE],
       'valid name with hyphen' => ['my_theme/my-library', TRUE],
       'valid name with hyphen and numbers' => ['my_theme/my-long-library_with_mixed-hyphens123', TRUE],
+      'valid name with hyphen and dot' => ['core/component.my_theme--component', TRUE],
       'invalid theme name case 1' => ['my-theme/my-library', FALSE],
       'invalid theme name case 2' => ['my-theme/my_library', FALSE],
+      'invalid theme name case 3' => ['my-theme./my_library', FALSE],
       'Invalid library name case 1' => ['my_theme/my library', FALSE],
       'Invalid library name special characters' => ['my-theme/$#random!', FALSE],
     ];
