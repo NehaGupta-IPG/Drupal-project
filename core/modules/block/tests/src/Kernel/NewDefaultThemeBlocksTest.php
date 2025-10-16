@@ -24,7 +24,6 @@ class NewDefaultThemeBlocksTest extends KernelTestBase {
   protected static $modules = [
     'block',
     'system',
-    'user',
   ];
 
   /**
@@ -64,15 +63,15 @@ class NewDefaultThemeBlocksTest extends KernelTestBase {
     $theme_installer->install([$default_theme]);
 
     // Add two instances of the user login block.
-    $this->placeBlock('user_login_block', [
+    $this->placeBlock($this->randomString(8), [
       'id' => $default_theme . '_' . $this->randomMachineName(8),
     ]);
-    $this->placeBlock('user_login_block', [
+    $this->placeBlock($this->randomString(8), [
       'id' => $default_theme . '_' . $this->randomMachineName(8),
     ]);
 
     // Add an instance of a different block.
-    $this->placeBlock('system_powered_by_block', [
+    $this->placeBlock($this->randomString(8), [
       'id' => $default_theme . '_' . $this->randomMachineName(8),
     ]);
 
@@ -128,15 +127,15 @@ class NewDefaultThemeBlocksTest extends KernelTestBase {
 
     // Add two instances of the user login block with machine
     // names that will collide.
-    $this->placeBlock('user_login_block', [
+    $this->placeBlock($this->randomString(8), [
       'id' => 'user_login_block',
     ]);
-    $this->placeBlock('user_login_block', [
+    $this->placeBlock($this->randomString(8), [
       'id' => $default_theme . '_user_login_block',
     ]);
 
     // Add an instance of a different block.
-    $this->placeBlock('system_powered_by_block', [
+    $this->placeBlock($this->randomString(8), [
       'id' => $default_theme . '_' . strtolower($this->randomMachineName(8)),
     ]);
 
