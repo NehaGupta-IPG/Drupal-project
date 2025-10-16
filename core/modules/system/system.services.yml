@@ -85,3 +85,6 @@ services:
     arguments: ['@datetime.time']
   system.access_route_alter_subscriber:
     class: Drupal\system\EventSubscriber\AccessRouteAlterSubscriber
+  system.twig_render_template_debug_subscriber:
+    class: Drupal\system\EventSubscriber\TwigDebugSubscriber
+    arguments: ['@twig']
