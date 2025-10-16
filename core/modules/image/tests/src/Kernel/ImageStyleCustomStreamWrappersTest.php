@@ -85,7 +85,7 @@ class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
    *   The stream wrapper service class.
    */
   #[DataProvider('providerTestCustomStreamWrappers')]
-  public function testCustomStreamWrappers($source_scheme, $expected_scheme): void {
+  public function testCustomStreamWrappers(string $source_scheme, string $expected_scheme, string $class): void {
     $derivative_uri = $this->imageStyle->buildUri("$source_scheme://some/path/image.png");
     $derivative_scheme = StreamWrapperManager::getScheme($derivative_uri);
 
