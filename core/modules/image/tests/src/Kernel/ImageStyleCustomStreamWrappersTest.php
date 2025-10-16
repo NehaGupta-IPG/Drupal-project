@@ -5,7 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\image\Kernel;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\StreamWrapper\PrivateStream;
+use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
+use Drupal\file_test\StreamWrapper\DummyReadOnlyStreamWrapper;
+use Drupal\file_test\StreamWrapper\DummyRemoteReadOnlyStreamWrapper;
+use Drupal\file_test\StreamWrapper\DummyStreamWrapper;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -61,7 +66,7 @@ class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
    */
   public function register(ContainerBuilder $container): void {
     parent::register($container);
-    foreach ($this->providerTestCustomStreamWrappers() as $stream_wrapper) {
+    foreach (static::providerTestCustomStreamWrappers() as $stream_wrapper) {
       $scheme = $stream_wrapper[0];
       $class = $stream_wrapper[2];
       $container->register("stream_wrapper.$scheme", $class)
@@ -76,6 +81,8 @@ class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
    *   The source stream wrapper scheme.
    * @param string $expected_scheme
    *   The derivative expected stream wrapper scheme.
+   * @param class-string $class
+   *   The stream wrapper service class.
    */
   #[DataProvider('providerTestCustomStreamWrappers')]
   public function testCustomStreamWrappers($source_scheme, $expected_scheme): void {
@@ -105,11 +112,11 @@ class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
    */
   public static function providerTestCustomStreamWrappers() {
     return [
-      ['public', 'public'],
-      ['private', 'private'],
-      ['dummy', 'dummy'],
-      ['dummy-readonly', 'public'],
-      ['dummy-remote-readonly', 'public'],
+      ['public', 'public', PublicStream::class],
+      ['private', 'private', PrivateStream::class],
+      ['dummy', 'dummy', DummyStreamWrapper::class],
+      ['dummy-readonly', 'public', DummyReadOnlyStreamWrapper::class],
+      ['dummy-remote-readonly', 'public', DummyRemoteReadOnlyStreamWrapper::class],
     ];
   }
 
