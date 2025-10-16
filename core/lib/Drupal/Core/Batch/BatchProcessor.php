@@ -15,6 +15,21 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class BatchProcessor implements BatchProcessorInterface {
 
   /**
+   * In memory batch cache.
+   *
+   * Not drupal_static(), because Batch API operates at a lower level than most
+   * use-cases for resetting static variables, and we specifically do not want
+   * a global drupal_static_reset() resetting the batch information. Functions
+   * that are part of the Batch API and need to reset the batch information may
+   * call BatchProcessorInterface::getCurrentBatch() and manipulate the result
+   * by reference. Functions that are not part of the Batch API can also do
+   * this, but shouldn't.
+   *
+   * @var array|null|false
+   */
+  protected static null|array|false $batch = [];
+
+  /**
    * Checks whether the batch information needs to be updated in the storage.
    *
    * @var bool
@@ -79,7 +94,7 @@ class BatchProcessor implements BatchProcessorInterface {
    * {@inheritdoc}
    */
   public function &getCurrentBatch(): null|array|false {
-    return batch_get();
+    return static::$batch;
   }
 
   /**

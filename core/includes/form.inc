@@ -845,16 +845,17 @@ function batch_process($redirect = NULL, ?Url $url = NULL, $redirect_callback = 
 
 /**
  * Retrieves the current batch.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+ *    Use \Drupal\Core\Batch\BatchProcessorInterface::getCurrentBatch() instead.
+ *
+ * @see https://www.drupal.org/node/3229844
  */
 function &batch_get() {
-  // Not drupal_static(), because Batch API operates at a lower level than most
-  // use-cases for resetting static variables, and we specifically do not want a
-  // global drupal_static_reset() resetting the batch information. Functions
-  // that are part of the Batch API and need to reset the batch information may
-  // call batch_get() and manipulate the result by reference. Functions that are
-  // not part of the Batch API can also do this, but shouldn't.
-  static $batch = [];
-  return $batch;
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::getCurrentBatch() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+  /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+  $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+  return $batch_processor->getCurrentBatch();
 }
 
 /**
