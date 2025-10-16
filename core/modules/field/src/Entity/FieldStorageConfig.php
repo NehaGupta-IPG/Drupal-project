@@ -143,6 +143,9 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
    * Flag indicating whether the field is translatable.
    *
    * Defaults to TRUE.
+   * When TRUE, each translation can have different values.
+   *
+   * When FALSE, the field has the same value across all translations of an entity.
    *
    * @var bool
    */
