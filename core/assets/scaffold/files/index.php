@@ -12,7 +12,7 @@ use Drupal\Core\DrupalKernel;
 use Drupal\Core\Runtime\DrupalRuntime;
 
 // @todo Replace once https://github.com/symfony/symfony/issues/60249 is fixed.
-$_ENV['APP_RUNTIME'] ??= DrupalRuntime::class;
+$_ENV['APP_RUNTIME'] ??= $_SERVER['APP_RUNTIME'] ?? DrupalRuntime::class;
 require_once 'autoload_runtime.php';
 
 return static function () {
