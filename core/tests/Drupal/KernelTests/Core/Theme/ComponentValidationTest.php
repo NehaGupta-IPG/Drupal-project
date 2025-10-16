@@ -10,11 +10,13 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Theme\ComponentPluginManager;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation of single-directory components.
  */
 #[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class ComponentValidationTest extends KernelTestBase {
 
   /**
