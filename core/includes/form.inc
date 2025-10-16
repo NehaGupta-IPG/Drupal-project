@@ -902,23 +902,17 @@ function _batch_populate_queue(&$batch, $set_id): void {
  *
  * @return \Drupal\Core\Queue\QueueInterface|null
  *   The queue object.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+ *    Use \Drupal\Core\Batch\BatchProcessorInterface::getQueue() instead.
+ *
+ * @see https://www.drupal.org/node/3229844
  */
 function _batch_queue($batch_set) {
-  static $queues;
-
-  if (!isset($queues)) {
-    $queues = [];
-  }
-
-  if (isset($batch_set['queue'])) {
-    $name = $batch_set['queue']['name'];
-    $class = $batch_set['queue']['class'];
-
-    if (!isset($queues[$class][$name])) {
-      $queues[$class][$name] = new $class($name, \Drupal::database());
-    }
-    return $queues[$class][$name];
-  }
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::getQueue() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+  /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+  $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+  return $batch_processor->getQueue($batch_set);
 }
 
 /**

@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Batch;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Queue\QueueInterface;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -30,6 +31,13 @@ class BatchProcessor implements BatchProcessorInterface {
   protected static null|array|false $batch = [];
 
   /**
+   * Queue list storage.
+   *
+   * @var \Drupal\Core\Queue\QueueInterface[]
+   */
+  protected static array $queues = [];
+
+  /**
    * Checks whether the batch information needs to be updated in the storage.
    *
    * @var bool
@@ -44,6 +52,7 @@ class BatchProcessor implements BatchProcessorInterface {
    */
   public function __construct(
     protected readonly string $root,
+    protected readonly \Closure $connection,
   ) {
     require_once $root . '/core/includes/batch.inc';
     require_once $root . '/core/includes/form.inc';
@@ -75,12 +84,32 @@ class BatchProcessor implements BatchProcessorInterface {
   }
 
   /**
+   * Gets the database connection.
+   *
+   * @return \Drupal\Core\Database\Connection
+   *   The database connection.
+   */
+  protected function getConnection(): Connection {
+    return ($this->connection)();
+  }
+
+  /**
    * {@inheritdoc}
    *
    * @internal
    */
   public function getQueue(array $batch_set): ?QueueInterface {
-    return _batch_queue($batch_set);
+    if (!isset($batch_set['queue'])) {
+      return NULL;
+    }
+    $name = $batch_set['queue']['name'];
+    $class = $batch_set['queue']['class'];
+
+    if (!isset(static::$queues[$class][$name])) {
+      static::$queues[$class][$name] = new $class($name, $this->getConnection());
+    }
+    return static::$queues[$class][$name];
+
   }
 
   /**
