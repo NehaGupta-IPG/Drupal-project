@@ -1112,12 +1112,12 @@ class FormBuilderTest extends FormTestBase {
     $form_id = 'test_form_id';
 
     // Tests without a required field.
-    $form = $form_id();
+    $form = self::buildTestFormStructure();
     $this->formBuilder->addAsteriskExplanation($form_id, $form);
     $this->assertArrayNotHasKey('test_form_id_required_fields_note', $form);
 
     // Tests with a required field.
-    $form = $form_id();
+    $form = self::buildTestFormStructure();
     $form['test']['#required'] = TRUE;
     $this->formBuilder->addAsteriskExplanation($form_id, $form);
     $this->assertEquals('container', $form['test_form_id_required_fields_note']['#type']);
