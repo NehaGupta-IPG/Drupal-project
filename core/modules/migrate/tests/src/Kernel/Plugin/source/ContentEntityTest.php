@@ -19,13 +19,16 @@ use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the entity content source plugin.
- *
- * @group migrate
- * @group #slow
  */
+#[Group('migrate')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class ContentEntityTest extends KernelTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -212,9 +215,8 @@ class ContentEntityTest extends KernelTestBase {
 
   /**
    * Tests user source plugin.
-   *
-   * @dataProvider migrationConfigurationProvider
    */
+  #[DataProvider('migrationConfigurationProvider')]
   public function testUserSource(array $configuration): void {
     $migration = $this->migrationPluginManager
       ->createStubMigration($this->migrationDefinition('content_entity:user', $configuration));
@@ -243,9 +245,8 @@ class ContentEntityTest extends KernelTestBase {
 
   /**
    * Tests file source plugin.
-   *
-   * @dataProvider migrationConfigurationProvider
    */
+  #[DataProvider('migrationConfigurationProvider')]
   public function testFileSource(array $configuration): void {
     $file = File::create([
       'filename' => 'foo.txt',
@@ -278,9 +279,8 @@ class ContentEntityTest extends KernelTestBase {
 
   /**
    * Tests node source plugin.
-   *
-   * @dataProvider migrationConfigurationProvider
    */
+  #[DataProvider('migrationConfigurationProvider')]
   public function testNodeSource(array $configuration): void {
     $configuration += ['bundle' => $this->bundle];
     $migration = $this->migrationPluginManager
@@ -330,9 +330,8 @@ class ContentEntityTest extends KernelTestBase {
 
   /**
    * Tests media source plugin.
-   *
-   * @dataProvider migrationConfigurationProvider
    */
+  #[DataProvider('migrationConfigurationProvider')]
   public function testMediaSource(array $configuration): void {
     $values = [
       'id' => 'image',
@@ -382,9 +381,8 @@ class ContentEntityTest extends KernelTestBase {
 
   /**
    * Tests term source plugin.
-   *
-   * @dataProvider migrationConfigurationProvider
    */
+  #[DataProvider('migrationConfigurationProvider')]
   public function testTermSource(array $configuration): void {
     $term2 = Term::create([
       'vid' => $this->vocabulary,

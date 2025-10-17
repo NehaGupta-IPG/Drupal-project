@@ -7,17 +7,18 @@ namespace Drupal\Tests\views\Functional\Handler;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Entity\View;
-use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\HandlerBase;
+use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore wõrd
-
 /**
  * Tests abstract handler definitions.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class HandlerTest extends ViewTestBase {
 
   use CommentTestTrait;
@@ -27,7 +28,13 @@ class HandlerTest extends ViewTestBase {
    *
    * @var array
    */
-  public static $testViews = ['test_view', 'test_view_handler_weight', 'test_handler_relationships', 'test_handler_test_access', 'test_filter_in_operator_ui'];
+  public static $testViews = [
+    'test_view',
+    'test_view_handler_weight',
+    'test_handler_relationships',
+    'test_handler_test_access',
+    'test_filter_in_operator_ui',
+  ];
 
   /**
    * {@inheritdoc}

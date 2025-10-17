@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\CommentInterface;
+use Drupal\comment\Entity\Comment;
 use Drupal\Component\Utility\Html;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\user\RoleInterface;
-use Drupal\comment\Entity\Comment;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests comment approval functionality.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentAdminTest extends CommentTestBase {
 
   /**
@@ -224,7 +226,12 @@ class CommentAdminTest extends CommentTestBase {
     // Post comment with contact info (required).
     $author_name = $this->randomMachineName();
     $author_mail = $this->randomMachineName() . '@example.com';
-    $anonymous_comment = $this->postComment($this->node, $this->randomMachineName(), $this->randomMachineName(), ['name' => $author_name, 'mail' => $author_mail]);
+    $anonymous_comment = $this->postComment(
+      $this->node,
+      $this->randomMachineName(),
+      $this->randomMachineName(),
+      ['name' => $author_name, 'mail' => $author_mail],
+    );
 
     // Log in as an admin user.
     $this->drupalLogin($this->adminUser);

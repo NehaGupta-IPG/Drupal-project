@@ -223,6 +223,10 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    if ($this->valueObjectForEvents()->metadata()->isRunTestsInSeparateProcesses()->isEmpty()) {
+      @trigger_error('Kernel test classes must specify the #[RunTestsInSeparateProcesses] attribute, not doing so is deprecated in drupal:11.3.0 and will throw an exception in drupal:12.0.0. See https://www.drupal.org/node/3548485', E_USER_DEPRECATED);
+    }
+
     parent::setUp();
 
     // Allow tests to compare MarkupInterface objects via assertEquals().
@@ -675,7 +679,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     }
 
     // If the test used the regular file system, remove any files created.
-    if (!str_starts_with($this->siteDirectory, 'vfs://')) {
+    if ($this->siteDirectory && !str_starts_with($this->siteDirectory, 'vfs://')) {
       // Delete test site directory.
       $callback = function (string $path) {
         @chmod($path, 0700);
@@ -987,7 +991,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * @return array
    *   An array of modules to install.
    */
-  private static function getModulesToEnable($class) {
+  protected static function getModulesToEnable($class) {
     $modules = [];
     while ($class) {
       if (property_exists($class, 'modules')) {
