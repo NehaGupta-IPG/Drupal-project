@@ -6,12 +6,14 @@ namespace Drupal\FunctionalJavascriptTests\TableDrag;
 
 use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests draggable table with subgroups.
- *
- * @group javascript
  */
+#[Group('javascript')]
+#[RunTestsInSeparateProcesses]
 class TableDragSubgroupTest extends WebDriverTestBase {
 
   /**
