@@ -98,7 +98,52 @@ class BatchProcessor implements BatchProcessorInterface {
    * {@inheritdoc}
    */
   public function queue(array $batch_definition): void {
-    batch_set($batch_definition);
+    if ($batch_definition) {
+      $batch =& $this->getCurrentBatch();
+
+      // Initialize the batch if needed.
+      if (empty($batch)) {
+        $batch = [
+          'sets' => [],
+          'has_form_submits' => FALSE,
+        ];
+      }
+
+      // Base and default properties for the batch set.
+      $init = [
+        'sandbox' => [],
+        'results' => [],
+        'success' => FALSE,
+        'start' => 0,
+        'elapsed' => 0,
+      ];
+      $defaults = [
+        'title' => t('Processing'),
+        'init_message' => t('Initializing.'),
+        'progress_message' => t('Completed @current of @total.'),
+        'error_message' => t('An error has occurred.'),
+      ];
+      $batch_set = $init + $batch_definition + $defaults;
+
+      // Tweak init_message to avoid the bottom of the page flickering down after
+      // init phase.
+      $batch_set['init_message'] .= '<br/>&nbsp;';
+
+      // The non-concurrent workflow of batch execution allows us to save
+      // numberOfItems() queries by handling our own counter.
+      $batch_set['total'] = count($batch_set['operations']);
+      $batch_set['count'] = $batch_set['total'];
+
+      // Add the set to the batch.
+      if (empty($batch['id'])) {
+        // The batch is not running yet. Simply add the new set.
+        $batch['sets'][] = $batch_set;
+      }
+      else {
+        // The set is being added while the batch is running.
+        $this->appendSet($batch, $batch_set);
+      }
+    }
   }
 
   /**
