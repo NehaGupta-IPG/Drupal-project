@@ -160,7 +160,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
    */
   public function invalidate($cid) {
     if (isset($this->cache[$cid])) {
-      $this->cache[$cid]->expire = $this->time->getCurrentTime() - 1;
+      $this->cache[$cid]->expire = 1;
     }
   }
 
@@ -170,7 +170,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
   public function invalidateMultiple(array $cids) {
     $items = array_intersect_key($this->cache, array_flip($cids));
     foreach ($items as $cid => $item) {
-      $this->cache[$cid]->expire = $this->time->getCurrentTime() - 1;
+      $this->invalidate($cid);
     }
   }
 
@@ -180,7 +180,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
   public function invalidateTags(array $tags) {
     foreach ($this->cache as $cid => $item) {
       if (array_intersect($tags, $item->tags)) {
-        $this->cache[$cid]->expire = $this->time->getCurrentTime() - 1;
+        $this->invalidate($cid);
       }
     }
   }
