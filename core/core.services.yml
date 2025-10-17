@@ -1602,6 +1602,7 @@ services:
     arguments:
       - '%app.root%'
       - '@>database'
+      - '@>batch.storage'
   Drupal\Core\Batch\BatchProcessorInterface: '@batch.processor'
   batch.storage:
     class: Drupal\Core\Batch\BatchStorage

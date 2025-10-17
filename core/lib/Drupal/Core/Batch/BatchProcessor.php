@@ -49,10 +49,15 @@ class BatchProcessor implements BatchProcessorInterface {
    *
    * @param string $root
    *   The app root.
+   * @param \Closure $connection
+   *   The database connection.
+   * @param \Closure $batchStorage
+   *   The batch storage.
    */
   public function __construct(
     protected readonly string $root,
     protected readonly \Closure $connection,
+    protected readonly \Closure $batchStorage
   ) {
     require_once $root . '/core/includes/batch.inc';
     require_once $root . '/core/includes/form.inc';
@@ -160,7 +165,19 @@ class BatchProcessor implements BatchProcessorInterface {
    * {@inheritdoc}
    */
   public function shutdown(): void {
-    _batch_shutdown();
+    if (($batch = $this->getCurrentBatch()) && $this->needsUpdate()) {
+      $this->getBatchStorage()->update($batch);
+    }
+  }
+
+  /**
+   * Retrieves the batch storage instance.
+   *
+   * @return BatchStorageInterface
+   *   The batch storage instance.
+   */
+  protected function getBatchStorage(): BatchStorageInterface {
+    return ($this->batchStorage)();
   }
 
   /**
@@ -172,5 +189,6 @@ class BatchProcessor implements BatchProcessorInterface {
     }
     return static::$needsUpdate;
   }
+
 
 }

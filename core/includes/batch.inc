@@ -576,13 +576,16 @@ function _batch_finished() {
 /**
  * Shutdown function: Stores the current batch data for the next request.
  *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+ *    Use \Drupal\Core\Batch\BatchProcessorInterface::shutdown() instead.
+ *
+ * @see https://www.drupal.org/node/3229844
  * @see _batch_page()
  * @see drupal_register_shutdown_function()
  */
 function _batch_shutdown(): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::shutdown() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
   /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
   $batch_processor = \Drupal::service(BatchProcessorInterface::class);
-  if (($batch = $batch_processor->getCurrentBatch()) && $batch_processor->needsUpdate()) {
-    \Drupal::service('batch.storage')->update($batch);
-  }
+  $batch_processor->shutdown();
 }
