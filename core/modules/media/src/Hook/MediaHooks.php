@@ -75,35 +75,6 @@ class MediaHooks {
   }
 
   /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return [
-      'media' => [
-        'render element' => 'elements',
-      ],
-      'media_reference_help' => [
-        'render element' => 'element',
-        'base hook' => 'field_multiple_value_form',
-      ],
-      'media_oembed_iframe' => [
-        'variables' => [
-          'resource' => NULL,
-          'media' => NULL,
-          'placeholder_token' => '',
-        ],
-      ],
-      'media_embed_error' => [
-        'variables' => [
-          'message' => NULL,
-          'attributes' => [],
-        ],
-      ],
-    ];
-  }
-
-  /**
    * Implements hook_entity_access().
    */
   #[Hook('entity_access')]
@@ -227,10 +198,7 @@ class MediaHooks {
       if ($overview_url->access()) {
         $elements['#media_help']['#media_list_link'] = $this->t('See the <a href=":list_url" target="_blank">media list</a> (opens a new window) to help locate media.', [':list_url' => $overview_url->toString()]);
       }
-      $all_bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo('media');
-      $bundle_labels = array_map(function ($bundle) use ($all_bundles) {
-          return $all_bundles[$bundle]['label'];
-      }, $allowed_bundles);
+      $bundle_labels = array_intersect_key(\Drupal::service('entity_type.bundle.info')->getBundleLabels('media'), $allowed_bundles);
       $elements['#media_help']['#allowed_types_help'] = $this->t('Allowed media types: %types', ['%types' => implode(", ", $bundle_labels)]);
     }
   }

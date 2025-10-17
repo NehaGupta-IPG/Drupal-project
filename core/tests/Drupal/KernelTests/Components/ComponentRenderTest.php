@@ -10,11 +10,13 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Theme\ComponentPluginManager;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the correct rendering of components.
  */
 #[Group('sdc')]
+#[RunTestsInSeparateProcesses]
 class ComponentRenderTest extends ComponentKernelTestBase {
 
   use StringTranslationTrait;
@@ -233,6 +235,133 @@ class ComponentRenderTest extends ComponentKernelTestBase {
     $crawler = $this->renderComponentRenderArray($build);
     // The default data attribute should not be missing.
     $this->assertNotEmpty($crawler->filter('#sdc-wrapper [data-component-id="sdc_theme_test_base:my-card-no-schema"]'), $crawler->outerHtml());
+  }
+
+  /**
+   * Ensures the element and prop attributes are merged properly.
+   */
+  public function testCheckElementAttributesAndPropAttributesMerging(): void {
+    // Test no attributes.
+    $build = [
+      '#type' => 'component',
+      '#component' => 'sdc_theme_test:my-card',
+      '#props' => [
+        'header' => 'Drupal.org',
+      ],
+    ];
+    $crawler = $this->renderComponentRenderArray($build);
+    $this->assertEmpty($crawler->filter('#sdc-wrapper [data-component-id="sdc_theme_test:my-card"][foo="bar"]'), $crawler->outerHtml());
+    $this->assertEmpty($crawler->filter('#sdc-wrapper [data-component-id="sdc_theme_test:my-card"][bar="fpo"]'), $crawler->outerHtml());
+
+    // Test for just prop attributes.
+    $build = [
+      '#type' => 'component',
+      '#component' => 'sdc_theme_test:my-card',
+      '#props' => [
+        'header' => 'Drupal.org',
+        'attributes' => new Attribute([
+          'foo' => 'bar',
+        ]),
+      ],
+    ];
+    $crawler = $this->renderComponentRenderArray($build);
+    $this->assertNotEmpty($crawler->filter('#sdc-wrapper [data-component-id="sdc_theme_test:my-card"][foo="bar"]'), $crawler->outerHtml());
+
+    // Test for prop attributes and element attributes as Attribute object.
+    $build = [
+      '#type' => 'component',
+      '#component' => 'sdc_theme_test:my-card',
+      '#props' => [
+        'header' => 'Drupal.org',
+        'attributes' => new Attribute([
+          'foo' => 'bar',
+        ]),
+      ],
+      '#attributes' => new Attribute([
+        'bar' => 'foo',
+      ]),
+    ];
+    $crawler = $this->renderComponentRenderArray($build);
+    $this->assertNotEmpty($crawler->filter('#sdc-wrapper [data-component-id="sdc_theme_test:my-card"][foo="bar"][bar="foo"]'), $crawler->outerHtml());
+
+    // Test for no prop attributes and element attributes as Attribute object.
+    $build = [
+      '#type' => 'component',
+      '#component' => 'sdc_theme_test:my-card',
+      '#props' => [
+        'header' => 'Drupal.org',
+      ],
+      '#attributes' => new Attribute([
+        'bar' => 'foo',
+      ]),
+    ];
+    $crawler = $this->renderComponentRenderArray($build);
+    $this->assertNotEmpty($crawler->filter('#sdc-wrapper [data-component-id="sdc_theme_test:my-card"][bar="foo"]'), $crawler->outerHtml());
+
+    // Test for prop attributes and element attributes as Attribute array.
+    $build = [
+      '#type' => 'component',
+      '#component' => 'sdc_theme_test:my-card',
+      '#props' => [
+        'header' => 'Drupal.org',
+        'attributes' => new Attribute([
+          'foo' => 'bar',
+        ]),
+      ],
+      '#attributes' => [
+        'bar' => 'foo',
+      ],
+    ];
+    $crawler = $this->renderComponentRenderArray($build);
+    $this->assertNotEmpty($crawler->filter('#sdc-wrapper [data-component-id="sdc_theme_test:my-card"][foo="bar"][bar="foo"]'), $crawler->outerHtml());
+
+    // Test for no prop attributes and element attributes as Attribute array.
+    $build = [
+      '#type' => 'component',
+      '#component' => 'sdc_theme_test:my-card',
+      '#props' => [
+        'header' => 'Drupal.org',
+      ],
+      '#attributes' => [
+        'bar' => 'foo',
+      ],
+    ];
+    $crawler = $this->renderComponentRenderArray($build);
+    $this->assertNotEmpty($crawler->filter('#sdc-wrapper [data-component-id="sdc_theme_test:my-card"][bar="foo"]'), $crawler->outerHtml());
+
+    // Test overlapping attributes.
+    $build = [
+      '#type' => 'component',
+      '#component' => 'sdc_theme_test:my-card',
+      '#props' => [
+        'header' => 'Drupal.org',
+        'attributes' => new Attribute([
+          'foo' => 'bar',
+        ]),
+      ],
+      '#attributes' => [
+        'foo' => 'baz',
+      ],
+    ];
+    $crawler = $this->renderComponentRenderArray($build);
+    $this->assertNotEmpty($crawler->filter('#sdc-wrapper [data-component-id="sdc_theme_test:my-card"][foo="bar"]'), $crawler->outerHtml());
+
+    // Test array properties attributes.
+    $build = [
+      '#type' => 'component',
+      '#component' => 'sdc_theme_test:my-card',
+      '#props' => [
+        'header' => 'Drupal.org',
+        'attributes' => new Attribute([
+          'class' => ['foo', 'bar'],
+        ]),
+      ],
+      '#attributes' => [
+        'class' => ['baz'],
+      ],
+    ];
+    $crawler = $this->renderComponentRenderArray($build);
+    $this->assertNotEmpty($crawler->filter('#sdc-wrapper [data-component-id="sdc_theme_test:my-card"][class="baz foo bar"]'), $crawler->outerHtml());
   }
 
   /**

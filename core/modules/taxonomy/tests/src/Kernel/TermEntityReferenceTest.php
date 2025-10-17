@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace Drupal\Tests\taxonomy\Kernel;
 
 use Drupal\entity_test\EntityTestHelper;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the settings of restricting term selection to a single vocabulary.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class TermEntityReferenceTest extends KernelTestBase {
 
   /**

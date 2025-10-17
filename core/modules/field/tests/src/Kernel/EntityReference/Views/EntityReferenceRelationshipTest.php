@@ -4,22 +4,24 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Kernel\EntityReference\Views;
 
-use Drupal\entity_test\Entity\EntityTestMulChanged;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestMul;
+use Drupal\entity_test\Entity\EntityTestMulChanged;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests entity reference relationship data.
  *
- * @group entity_reference
- *
  * @see \Drupal\views\Hook\ViewsViewsHooks::fieldViewsData()
  */
+#[Group('entity_reference')]
+#[RunTestsInSeparateProcesses]
 class EntityReferenceRelationshipTest extends ViewsKernelTestBase {
 
   use EntityReferenceFieldCreationTrait;

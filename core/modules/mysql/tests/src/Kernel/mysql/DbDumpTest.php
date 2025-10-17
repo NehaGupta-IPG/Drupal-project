@@ -12,14 +12,16 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\Core\Database\DriverSpecificKernelTestBase;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Tests for the database dump commands.
- *
- * @group Update
  */
+#[Group('Update')]
+#[RunTestsInSeparateProcesses]
 class DbDumpTest extends DriverSpecificKernelTestBase {
 
   use PathAliasTestTrait;
