@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Components;
 
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the JSON schema reference of the component plugin manager.
  */
 #[Group('sdc')]
+#[RunTestsInSeparateProcesses]
 class SchemaReferenceResolverTest extends ComponentKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system', 'sdc_test', 'sdc_test_replacements', 'image'];
+  protected static $modules = ['sdc_test', 'sdc_test_replacements'];
 
   /**
    * {@inheritdoc}
@@ -38,13 +40,13 @@ class SchemaReferenceResolverTest extends ComponentKernelTestBase {
    */
   protected function getExpectations(): array {
     $expectations = [];
-    // $ref: module://image/schema.json#image
-    $expectations['image'] = $this->getDataFromJson('module', 'image', 'schema.json')['image'];
-    $system = $this->getDataFromJson('module', 'system', 'schema.json');
-    // $ref: module://system/schema.json#attributes
+    // $ref: theme://image/schema.json#image
+    $expectations['image'] = $this->getDataFromJson('theme', 'sdc_theme_test_references', 'schema.json')['image'];
+    $system = $this->getDataFromJson('theme', 'sdc_theme_test_references', 'schema.json');
+    // $ref: theme://system/schema.json#attributes
     $expectations['attributes'] = $system['attributes'];
     // Test with nested references.
-    // $ref: module://system/schema.json#links.
+    // $ref: theme://system/schema.json#links.
     $expectations['links'] = $system['links'];
     $expectations['links']['items'] = $system['link'];
     $expectations['links']['items']['properties']['attributes'] = $system['attributes'];

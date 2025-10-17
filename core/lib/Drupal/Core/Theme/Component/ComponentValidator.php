@@ -98,7 +98,8 @@ class ComponentValidator {
       $type = $schema['properties'][$prop]['type'] ?? NULL;
       // Not every prop have a type. For example, if a $ref was not resolved
       // successfully. It is how the schema resolver of justinrainbow works.
-      if (!$type && $schema['properties'][$prop]['$ref']) {
+      $ref = $schema['properties'][$prop]['$ref'] ?? NULL;
+      if (!$type && $ref) {
         return;
       }
       $types = !\is_array($type) ? [$type] : $type;
