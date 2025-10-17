@@ -28,7 +28,7 @@ class ThemeUiTest extends BrowserTestBase {
    * @var array
    */
   protected $testModules = [
-    'drupal:help' => 'Help',
+    'help' => 'Help',
     'test_module_required_by_theme' => 'Test Module Required by Theme',
     'test_another_module_required_by_theme' => 'Test Another Module Required by Theme',
   ];
@@ -233,7 +233,7 @@ class ThemeUiTest extends BrowserTestBase {
           'test_another_module_required_by_theme',
         ],
         'second_modules' => [
-          'drupal:help',
+          'help',
         ],
         'required_by_messages' => [
           '[data-drupal-selector="edit-test-another-module-required-by-theme"] .item-list' => 'Required by the theme: Test Theme Depending on Modules',
