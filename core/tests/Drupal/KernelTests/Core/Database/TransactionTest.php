@@ -15,6 +15,7 @@ use Drupal\Core\Database\TransactionNameNonUniqueException;
 use Drupal\Core\Database\TransactionOutOfOrderException;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore Tinky Winky Dipsy
 
@@ -44,6 +45,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
  * active.
  */
 #[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class TransactionTest extends DatabaseTestBase {
 
   /**
