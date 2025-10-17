@@ -158,7 +158,7 @@ class TableDragSubgroupTest extends WebDriverTestBase {
    * @param string $direction
    *   Pass 'up' if the child row is being dragged up; 'down' otherwise.
    */
-  protected function dragToChild($child, $parent, $direction): void {
+  protected function dragToChild(NodeElement $child, NodeElement $parent, string $direction): void {
     $child_handle = $this->findDragHandle($child);
     $parent_target = $parent->find('css', "[data-drop-target-child-$direction]");
     $child_handle->dragTo($parent_target);
@@ -180,7 +180,7 @@ class TableDragSubgroupTest extends WebDriverTestBase {
    * @return \Behat\Mink\Element\NodeElement
    *   The row element.
    */
-  protected function findRowById($id) {
+  protected function findRowById(string $id): NodeElement {
     $xpath = "//table[@id='tabledrag-test-table']/tbody/tr[.//input[@name='table[$id][id]']]";
     $row = $this->getSession()->getPage()->find('xpath', $xpath);
     $this->assertNotEmpty($row);
@@ -196,7 +196,7 @@ class TableDragSubgroupTest extends WebDriverTestBase {
    * @return \Behat\Mink\Element\NodeElement
    *   The drag handle element.
    */
-  protected function findDragHandle($element) {
+  protected function findDragHandle(NodeElement $element): NodeElement {
     $handle = $element->find('css', 'a.tabledrag-handle');
     $this->assertNotEmpty($handle);
     return $handle;
@@ -225,7 +225,7 @@ class TableDragSubgroupTest extends WebDriverTestBase {
       $indent = $expected['indent'] ?? 0;
       $changed = $expected['changed'] ?? FALSE;
       $weight = $expected['weight'] ?? NULL;
-      $this->assertTableRow($rows[$delta], (string) $expected['id'], $expected['group'], $parent, $indent, $changed, $weight);
+      $this->assertTableRow($rows[$delta], (string) $expected['id'], $expected['group'], (string) $parent, $indent, $changed, $weight);
     }
   }
 
@@ -248,7 +248,7 @@ class TableDragSubgroupTest extends WebDriverTestBase {
    *   (optional) The expected weight of the row or NULL to not test the weight;
    *   defaults to NULL.
    */
-  protected function assertTableRow(NodeElement $row, $id, $group, $parent = '', $indent = 0, $changed = FALSE, $weight = NULL): void {
+  protected function assertTableRow(NodeElement $row, string $id, string $group, string $parent = '', int $indent = 0, bool $changed = FALSE, ?int $weight = NULL): void {
     // Assert that the row position is correct by checking that the id
     // corresponds.
     $this->assertSession()->hiddenFieldValueEquals("table[$id][id]", $id, $row);
