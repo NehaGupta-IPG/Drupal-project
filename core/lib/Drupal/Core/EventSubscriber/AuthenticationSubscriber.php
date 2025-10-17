@@ -21,13 +21,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class AuthenticationSubscriber implements EventSubscriberInterface {
 
   /**
-   * Authentication provider.
-   *
-   * @var \Drupal\Core\Authentication\AuthenticationProviderInterface
-   */
-  protected $authenticationProvider;
-
-  /**
    * Authentication provider filter.
    *
    * @var \Drupal\Core\Authentication\AuthenticationProviderFilterInterface|null
@@ -42,35 +35,22 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
   protected $challengeProvider;
 
   /**
-   * Account proxy.
-   *
-   * @var \Drupal\Core\Session\AccountProxyInterface
-   */
-  protected $accountProxy;
-
-  /**
-   * Authentication collector.
-   *
-   * @var \Drupal\Core\Authentication\AuthenticationCollectorInterface
-   */
-  protected $authenticationCollector;
-
-  /**
    * Constructs an authentication subscriber.
    *
-   * @param \Drupal\Core\Authentication\AuthenticationProviderInterface $authentication_provider
+   * @param \Drupal\Core\Authentication\AuthenticationProviderInterface $authenticationProvider
    *   An authentication provider.
-   * @param \Drupal\Core\Session\AccountProxyInterface $account_proxy
+   * @param \Drupal\Core\Session\AccountProxyInterface $accountProxy
    *   Account proxy.
-   * @param \Drupal\Core\Authentication\AuthenticationCollectorInterface $authentication_collector
+   * @param \Drupal\Core\Authentication\AuthenticationCollectorInterface $authenticationCollector
    *   Authentication collector.
    */
-  public function __construct(AuthenticationProviderInterface $authentication_provider, AccountProxyInterface $account_proxy, AuthenticationCollectorInterface $authentication_collector) {
-    $this->authenticationProvider = $authentication_provider;
+  public function __construct(
+    protected AuthenticationProviderInterface $authenticationProvider,
+    protected AccountProxyInterface $accountProxy,
+    protected AuthenticationCollectorInterface $authenticationCollector,
+  ) {
     $this->filter = ($authentication_provider instanceof AuthenticationProviderFilterInterface) ? $authentication_provider : NULL;
     $this->challengeProvider = ($authentication_provider instanceof AuthenticationProviderChallengeInterface) ? $authentication_provider : NULL;
-    $this->accountProxy = $account_proxy;
-    $this->authenticationCollector = $authentication_collector;
   }
 
   /**
