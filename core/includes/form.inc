@@ -719,92 +719,17 @@ function _batch_append_set(&$batch, $batch_set): void {
  *
  * @return \Symfony\Component\HttpFoundation\RedirectResponse|null
  *   A redirect response if the batch is progressive. No return value otherwise.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+ *    Use \Drupal\Core\Batch\BatchProcessorInterface::process() instead.
+ *
+ * @see https://www.drupal.org/node/3229844
  */
 function batch_process($redirect = NULL, ?Url $url = NULL, $redirect_callback = NULL) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::process() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
   /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
   $batch_processor = \Drupal::service(BatchProcessorInterface::class);
-  $batch =& $batch_processor->getCurrentBatch();
-
-  if (isset($batch)) {
-    // Add process information.
-    $process_info = [
-      'current_set' => 0,
-      'progressive' => TRUE,
-      'url' => $url ?? Url::fromRoute('system.batch_page.html'),
-      'source_url' => Url::fromRouteMatch(\Drupal::routeMatch())->mergeOptions(['query' => \Drupal::request()->query->all()]),
-      'batch_redirect' => $redirect,
-      'theme' => \Drupal::theme()->getActiveTheme()->getName(),
-      'redirect_callback' => $redirect_callback,
-    ];
-    $batch += $process_info;
-
-    // The batch is now completely built. Allow other modules to make changes
-    // to the batch so that it is easier to reuse batch processes in other
-    // environments.
-    \Drupal::moduleHandler()->alter('batch', $batch);
-
-    // Assign an id to progressive batches. Non-progressive batches skip
-    // database storage completely.
-    $batch['id'] = $batch['progressive'] ? \Drupal::service(BatchStorageInterface::class)->getId() : 'non-progressive';
-
-    // Move operations to a job queue. Non-progressive batches will use a
-    // memory-based queue.
-    foreach ($batch['sets'] as $key => $batch_set) {
-      $batch_processor->queuePopulate($batch, $key);
-    }
-
-    // Initiate processing.
-    if ($batch['progressive']) {
-      // Now that we have a batch id, we can generate the redirection link in
-      // the generic error message.
-      /** @var \Drupal\Core\Url $batch_url */
-      $batch_url = $batch['url'];
-      /** @var \Drupal\Core\Url $error_url */
-      $error_url = clone $batch_url;
-      $query_options = $error_url->getOption('query');
-      $query_options['id'] = $batch['id'];
-      $query_options['op'] = 'finished';
-      $error_url->setOption('query', $query_options);
-
-      $batch['error_message'] = t('Continue to <a href=":error_url">the error page</a>', [':error_url' => $error_url->toString(TRUE)->getGeneratedUrl()]);
-
-      // Clear the way for the redirection to the batch processing page, by
-      // saving and unsetting the 'destination', if there is any.
-      $request = \Drupal::request();
-      if ($request->query->has('destination')) {
-        $batch['destination'] = $request->query->get('destination');
-        $request->query->remove('destination');
-      }
-
-      // Store the batch.
-      \Drupal::service(BatchStorageInterface::class)->create($batch);
-
-      // Set the batch number in the session to guarantee that it will stay
-      // alive.
-      $session = \Drupal::request()->getSession();
-      $batches = $session->get('batches', []);
-      $batches[$batch['id']] = TRUE;
-      $session->set('batches', $batches);
-
-      // Redirect for processing.
-      $query_options = $error_url->getOption('query');
-      $query_options['op'] = 'start';
-      $query_options['id'] = $batch['id'];
-      $batch_url->setOption('query', $query_options);
-      if (($callback = $batch['redirect_callback'])) {
-        $callable_resolver = \Drupal::service(CallableResolver::class);
-        $callable = $callable_resolver->getCallableFromDefinition($callback);
-        $callable($batch_url->toString(), ['query' => $query_options]);
-      }
-      else {
-        return new RedirectResponse($batch_url->setAbsolute()->toString(TRUE)->getGeneratedUrl());
-      }
-    }
-    else {
-      // Non-progressive execution: bypass the whole progressbar workflow
-      $batch_processor->process();
-    }
-  }
+  return $batch_processor->process($redirect, $url, $redirect_callback);
 }
 
 /**

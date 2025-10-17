@@ -6,10 +6,13 @@ use Drupal\Component\Utility\Timer;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Datetime\DateFormatterInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormSubmitterInterface;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Queue\QueueInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -60,6 +63,12 @@ class BatchProcessor implements BatchProcessorInterface {
    *   The date formatter.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   The module handler.
+   * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
+   *   The theme manager.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
+   *   The route match.
    * @param \Closure $connection
    *   The database connection.
    * @param \Closure $batchStorage
@@ -73,6 +82,9 @@ class BatchProcessor implements BatchProcessorInterface {
     protected readonly string $root,
     protected readonly DateFormatterInterface $dateFormatter,
     protected readonly RequestStack $requestStack,
+    protected readonly ModuleHandlerInterface $moduleHandler,
+    protected readonly ThemeManagerInterface $themeManager,
+    protected readonly RouteMatchInterface $routeMatch,
     protected readonly \Closure $connection,
     protected readonly \Closure $batchStorage,
     protected readonly \Closure $pathValidator,
@@ -200,7 +212,87 @@ class BatchProcessor implements BatchProcessorInterface {
    * {@inheritdoc}
    */
   public function process(Url|string|null $redirect = NULL, ?Url $url = NULL, ?string $redirect_callback = NULL): ?RedirectResponse {
-    return batch_process($redirect, $url, $redirect_callback);
+    $batch =& $this->getCurrentBatch();
+
+    if (isset($batch)) {
+      // Add process information.
+      $process_info = [
+        'current_set' => 0,
+        'progressive' => TRUE,
+        'url' => $url ?? Url::fromRoute('system.batch_page.html'),
+        'source_url' => Url::fromRouteMatch($this->routeMatch)->mergeOptions(['query' => $this->requestStack->getCurrentRequest()->query->all()]),
+        'batch_redirect' => $redirect,
+        'theme' => $this->themeManager->getActiveTheme()->getName(),
+        'redirect_callback' => $redirect_callback,
+      ];
+      $batch += $process_info;
+
+      // The batch is now completely built. Allow other modules to make changes
+      // to the batch so that it is easier to reuse batch processes in other
+      // environments.
+      $this->moduleHandler->alter('batch', $batch);
+
+      // Assign an id to progressive batches. Non-progressive batches skip
+      // database storage completely.
+      $batch['id'] = $batch['progressive'] ? $this->getBatchStorage()->getId() : 'non-progressive';
+
+      // Move operations to a job queue. Non-progressive batches will use a
+      // memory-based queue.
+      foreach ($batch['sets'] as $key => $batch_set) {
+        $this->queuePopulate($batch, $key);
+      }
+
+      // Initiate processing.
+      if ($batch['progressive']) {
+        // Now that we have a batch id, we can generate the redirection link in
+        // the generic error message.
+        /** @var \Drupal\Core\Url $batch_url */
+        $batch_url = $batch['url'];
+        /** @var \Drupal\Core\Url $error_url */
+        $error_url = clone $batch_url;
+        $query_options = $error_url->getOption('query');
+        $query_options['id'] = $batch['id'];
+        $query_options['op'] = 'finished';
+        $error_url->setOption('query', $query_options);
+
+        $batch['error_message'] = t('Continue to <a href=":error_url">the error page</a>', [':error_url' => $error_url->toString(TRUE)->getGeneratedUrl()]);
+
+        // Clear the way for the redirection to the batch processing page, by
+        // saving and unsetting the 'destination', if there is any.
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request->query->has('destination')) {
+          $batch['destination'] = $request->query->get('destination');
+          $request->query->remove('destination');
+        }
+
+        // Store the batch.
+        $this->getBatchStorage()->create($batch);
+
+        // Set the batch number in the session to guarantee that it will stay
+        // alive.
+        $session = $this->requestStack->getSession();
+        $batches = $session->get('batches', []);
+        $batches[$batch['id']] = TRUE;
+        $session->set('batches', $batches);
+
+        // Redirect for processing.
+        $query_options = $error_url->getOption('query');
+        $query_options['op'] = 'start';
+        $query_options['id'] = $batch['id'];
+        $batch_url->setOption('query', $query_options);
+        if (($function = $batch['redirect_callback']) && function_exists($function)) {
+          $function($batch_url->toString(), ['query' => $query_options]);
+        }
+        else {
+          return new RedirectResponse($batch_url->setAbsolute()->toString(TRUE)->getGeneratedUrl());
+        }
+      }
+      else {
+        // Non-progressive execution: bypass the whole progressbar workflow
+        $this->process();
+      }
+    }
+    return NULL;
   }
 
   /**
