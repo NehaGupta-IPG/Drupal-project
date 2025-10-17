@@ -56,8 +56,8 @@ class TableDragSubgroupTest extends WebDriverTestBase {
     ]);
 
     // Drag the first row into group B.
-    $row1 = $this->findRowById(1);
-    $row3 = $this->findRowById(3);
+    $row1 = $this->findRowById('1');
+    $row3 = $this->findRowById('3');
     $handle1 = $this->findDragHandle($row1);
     $handle3 = $this->findDragHandle($row3);
 
@@ -73,8 +73,8 @@ class TableDragSubgroupTest extends WebDriverTestBase {
     ]);
 
     // Drag row 4 from group B to the top of the table in group A.
-    $row2 = $this->findRowById(2);
-    $row4 = $this->findRowById(4);
+    $row2 = $this->findRowById('2');
+    $row4 = $this->findRowById('4');
     $handle2 = $this->findDragHandle($row2);
     $handle4 = $this->findDragHandle($row4);
 
@@ -105,8 +105,8 @@ class TableDragSubgroupTest extends WebDriverTestBase {
     ]);
 
     // Make row 1 a child of row 2.
-    $row1 = $this->findRowById(1);
-    $row2 = $this->findRowById(2);
+    $row1 = $this->findRowById('1');
+    $row2 = $this->findRowById('2');
 
     $this->dragToChild($row1, $row2, 'down');
     $this->assertSession()->waitForText('You have unsaved changes');
@@ -120,7 +120,7 @@ class TableDragSubgroupTest extends WebDriverTestBase {
     ]);
 
     // Make a deeper hierarchy by moving 5 under 1.
-    $row5 = $this->findRowById(5);
+    $row5 = $this->findRowById('5');
     $this->dragToChild($row5, $row1, 'up');
     $this->waitForDragging();
 
