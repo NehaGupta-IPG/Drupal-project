@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 /**
  * Decorates the plain language switcher.
  */
-class MultilingualSubstitutionDecorator {
+class MultilingualSubstitutionDecorator implements SubstitutionInterface {
 
   /**
    * The multilingual language switcher.
@@ -27,7 +27,7 @@ class MultilingualSubstitutionDecorator {
     protected readonly SubstitutionInterface $monolingual,
     protected readonly LanguageManagerInterface $languageManager,
     protected readonly LanguageDefault $languageDefault,
-    #[Autowire('string_translation')]
+    #[Autowire(service: 'string_translation')]
     protected readonly TranslationManager $translationManager,
   ) {
     $this->multilingual = new MultilingualSubstitution($languageManager, $languageDefault, $translationManager);
