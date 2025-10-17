@@ -3,4 +3,4 @@ description: 'Provides API endpoints for doing stage operations in functional te
 type: module
 package: Testing
 dependencies:
-  - auto_updates:package_manager
+  - drupal:package_manager
