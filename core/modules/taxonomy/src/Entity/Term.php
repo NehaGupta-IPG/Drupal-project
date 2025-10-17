@@ -40,6 +40,7 @@ use Drupal\user\StatusItem;
     'langcode' => 'langcode',
     'uuid' => 'uuid',
     'published' => 'status',
+    'changed' => 'changed',
   ],
   handlers: [
     'storage' => TermStorage::class,

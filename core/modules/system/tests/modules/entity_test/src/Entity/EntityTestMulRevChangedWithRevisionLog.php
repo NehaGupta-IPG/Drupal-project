@@ -23,6 +23,7 @@ use Drupal\Core\Entity\RevisionLogInterface;
     'revision' => 'revision_id',
     'label' => 'name',
     'langcode' => 'langcode',
+    'changed' => 'changed',
   ],
   base_table: 'entity_test_mulrev_changed_revlog',
   revision_table: 'entity_test_mulrev_changed_revlog_revision',

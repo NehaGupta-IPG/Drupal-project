@@ -42,6 +42,7 @@ use Drupal\user\EntityOwnerTrait;
     'published' => 'status',
     'uid' => 'uid',
     'owner' => 'uid',
+    'changed' => 'changed',
   ],
   handlers: [
     'storage' => NodeStorage::class,

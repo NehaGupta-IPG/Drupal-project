@@ -41,6 +41,7 @@ use Drupal\user\UserViewsData;
     'id' => 'uid',
     'langcode' => 'langcode',
     'uuid' => 'uuid',
+    'changed' => 'changed',
   ],
   handlers: [
     'storage' => UserStorage::class,

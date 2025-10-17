@@ -37,6 +37,7 @@ use Drupal\workspaces\WorkspaceViewBuilder;
     'label' => 'label',
     'uid' => 'uid',
     'owner' => 'uid',
+    'changed' => 'changed',
   ],
   handlers: [
     'list_builder' => WorkspaceListBuilder::class,

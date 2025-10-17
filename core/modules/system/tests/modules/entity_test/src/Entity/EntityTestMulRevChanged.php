@@ -28,6 +28,7 @@ use Drupal\views\EntityViewsData;
     'revision' => 'revision_id',
     'label' => 'name',
     'langcode' => 'langcode',
+    'changed' => 'changed',
   ],
   handlers: [
     'view_builder' => TestViewBuilder::class,

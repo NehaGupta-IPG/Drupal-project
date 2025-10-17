@@ -29,6 +29,7 @@ use Drupal\views\EntityViewsData;
     'bundle' => 'type',
     'label' => 'name',
     'langcode' => 'langcode',
+    'changed' => 'changed',
   ],
   handlers: [
     'view_builder' => TestViewBuilder::class,

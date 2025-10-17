@@ -23,6 +23,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
     'uuid' => 'uuid',
     'bundle' => 'type',
     'label' => 'name',
+    'changed' => 'changed',
   ],
   base_table: 'entity_test_constraints',
   constraints: [

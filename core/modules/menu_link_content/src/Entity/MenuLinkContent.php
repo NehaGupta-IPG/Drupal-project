@@ -40,6 +40,7 @@ use Drupal\menu_link_content\MenuLinkListBuilder;
     'uuid' => 'uuid',
     'bundle' => 'bundle',
     'published' => 'enabled',
+    'changed' => 'changed',
   ],
   handlers: [
     'storage' => MenuLinkContentStorage::class,

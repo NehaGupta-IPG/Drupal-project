@@ -37,6 +37,7 @@ use Drupal\user\EntityOwnerTrait;
     'langcode' => 'langcode',
     'uuid' => 'uuid',
     'owner' => 'uid',
+    'changed' => 'changed',
   ],
   handlers: [
     'storage' => FileStorage::class,
