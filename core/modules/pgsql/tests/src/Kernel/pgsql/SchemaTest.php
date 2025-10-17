@@ -7,6 +7,7 @@ namespace Drupal\Tests\pgsql\Kernel\pgsql;
 use Drupal\Core\Database\Schema\Index;
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
 use Drupal\pgsql\Driver\Database\pgsql\Schema;
+use Drupal\pgsql\Schema\IndexType;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
