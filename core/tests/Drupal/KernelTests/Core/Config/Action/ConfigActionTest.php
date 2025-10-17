@@ -357,9 +357,7 @@ class ConfigActionTest extends KernelTestBase {
    * Tests that simpleConfigArray append and prepend require an array of values.
    *
    * @testWith ["append", null]
-   *   ["append", "nope"]
    *   ["prepend", null]
-   *   ["prepend", "nope"]
    */
   public function testSimpleConfigArrayPrependAndAppendRequireArrayOfValues(string $derivative_id, mixed $values): void {
     $this->installConfig('config_test');
@@ -404,6 +402,23 @@ class ConfigActionTest extends KernelTestBase {
    *    ["splice", {"offset": 1}, ["itemA"]]
    */
   public function testSimpleConfigArray(string $derivative_id, array $value, array $expected_value): void {
+    $this->installConfig('config_test');
+
+    $this->container->get('plugin.manager.config_action')->applyAction(
+      "simpleConfigArray:$derivative_id",
+      'config_test.system',
+      ['property' => 'array'] + $value,
+    );
+    $this->assertSame($expected_value, $this->config('config_test.system')->get('array'));
+  }
+
+  /**
+   * @testWith ["append", {"values": "single"}, ["itemA", "itemB", "single"]]
+   *   ["prepend", {"values": "single"}, ["single", "itemA", "itemB"]]
+   *   ["splice", {"offset": 1, "replacement": "single"}, ["itemA", "single"]]
+   *   ["splice", {"offset": 1, "length": 0, "replacement": "single"}, ["itemA", "single", "itemB"]]
+   */
+  public function testSimpleConfigArrayWithStringValues(string $derivative_id, array $value, array $expected_value): void {
     $this->installConfig('config_test');
 
     $this->container->get('plugin.manager.config_action')->applyAction(
