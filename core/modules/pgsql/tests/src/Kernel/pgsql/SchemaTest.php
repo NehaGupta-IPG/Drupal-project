@@ -9,6 +9,7 @@ use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
 use Drupal\pgsql\Driver\Database\pgsql\Schema;
 use Drupal\pgsql\Schema\IndexType;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -519,9 +520,8 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
 
   /**
    * Test CRUD of GIN and GIST indexes.
-   *
-   * @dataProvider ginGistIndexDefinitionProvider
    */
+  #[DataProvider('ginGistIndexDefinitionProvider')]
   public function testGinGistIndexCrud(string $index_type, array $specification): void {
     $table_name = 'index_with_object';
     $this->schema->createTable($table_name, $specification);
