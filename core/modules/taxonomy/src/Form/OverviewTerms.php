@@ -752,11 +752,9 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
         $taxonomy_term = $term_storage->load($term->tid);
         if ($taxonomy_term instanceof TermInterface && $taxonomy_term->hasTranslation($langcode)) {
           $taxonomy_term = $taxonomy_term->getTranslation($langcode);
-
-          return stripos($taxonomy_term->label(), $searchString) !== FALSE;
         }
 
-        return FALSE;
+        return stripos($taxonomy_term->label(), $searchString) !== FALSE;
       }
 
       return stripos($term->name, $searchString) !== FALSE;
