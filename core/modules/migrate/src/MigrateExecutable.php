@@ -414,6 +414,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
    */
   protected function processPipeline(Row $row, string $destination, array $plugins, $value) {
     $multiple = FALSE;
+    $break = FALSE;
     /** @var \Drupal\migrate\Plugin\MigrateProcessInterface $plugin */
     foreach ($plugins as $plugin) {
       $definition = $plugin->getPluginDefinition();
@@ -465,13 +466,14 @@ class MigrateExecutable implements MigrateExecutableInterface {
           throw new MigrateException($message);
         }
         if ($plugin->isPipelineStopped()) {
+          $break = TRUE;
           break;
         }
         $multiple = $plugin->multiple();
       }
     }
     // Ensure all values, including nulls, are migrated.
-    if ($plugins) {
+    if ($plugins && !$break) {
       if (isset($value)) {
         $row->setDestinationProperty($destination, $value);
       }
