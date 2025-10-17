@@ -157,7 +157,7 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
    *   The authentication provider name if it can be determined,
    *   'unidentified' otherwise.
    */
-  protected function getAuthenticationProviderName($request): string {
+  protected function getAuthenticationProviderName(Request $request): string {
     // Loop through all registered authentication providers to find the one
     // that applies to this request.
     foreach ($this->authenticationCollector->getSortedProviders() as $provider_id => $provider) {
