@@ -103,6 +103,7 @@ class UserLoginHttpTest extends BrowserTestBase {
   /**
    * Tests user session life cycle.
    */
+  #[IgnoreDeprecations]
   public function testLogin(): void {
     $this->expectDeprecation('Drupal\user\Controller\UserAuthenticationController is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\rest\Controller\RestAuthenticationController instead. See https://www.drupal.org/node/3552724');
 
@@ -239,6 +240,7 @@ class UserLoginHttpTest extends BrowserTestBase {
   /**
    * Tests user password reset.
    */
+  #[IgnoreDeprecations]
   public function testPasswordReset(): void {
     $this->expectDeprecation('Drupal\user\Controller\UserAuthenticationController is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\rest\Controller\RestAuthenticationController instead. See https://www.drupal.org/node/3552724');
 
