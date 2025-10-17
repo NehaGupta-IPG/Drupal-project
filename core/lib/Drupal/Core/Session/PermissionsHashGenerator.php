@@ -3,10 +3,8 @@
 namespace Drupal\Core\Session;
 
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\PrivateKey;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Site\Settings;
 
 /**
  * Generates and caches the permissions hash for a user.
@@ -16,15 +14,12 @@ class PermissionsHashGenerator implements PermissionsHashGeneratorInterface {
   /**
    * Constructs a PermissionsHashGenerator object.
    *
-   * @param \Drupal\Core\PrivateKey $privateKey
-   *   The private key service.
    * @param \Drupal\Core\Cache\CacheBackendInterface $static
    *   The cache backend interface to use for the static cache.
    * @param \Drupal\Core\Session\AccessPolicyProcessorInterface $processor
    *   The access policy processor.
    */
   public function __construct(
-    protected PrivateKey $privateKey,
     protected CacheBackendInterface $static,
     protected AccessPolicyProcessorInterface $processor,
   ) {
@@ -91,7 +86,7 @@ class PermissionsHashGenerator implements PermissionsHashGeneratorInterface {
    *   The hash.
    */
   protected function hash($identifier) {
-    return hash('sha256', $this->privateKey->get() . Settings::getHashSalt() . $identifier);
+    return hash('xxh3', $identifier);
   }
 
 }

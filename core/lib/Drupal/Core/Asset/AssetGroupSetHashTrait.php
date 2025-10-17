@@ -40,7 +40,7 @@ trait AssetGroupSetHashTrait {
       // library definition. To ensure unique hashes when unversioned files
       // change, replace the version with a hash of the file contents.
       if ($asset['version'] === -1) {
-        $normalized['asset_group']['items'][$key]['version'] = hash('xxh64', file_get_contents($asset['data']));
+        $normalized['asset_group']['items'][$key]['version'] = hash('xxh3', file_get_contents($asset['data']));
       }
     }
     // The asset array ensures that a valid hash can only be generated via the

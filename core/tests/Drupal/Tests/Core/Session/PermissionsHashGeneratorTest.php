@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Session;
 
-use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\PrivateKey;
 use Drupal\Core\Session\AccessPolicyProcessorInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\CalculatedPermissions;
@@ -78,9 +76,6 @@ class PermissionsHashGeneratorTest extends UnitTestCase {
     $this->account2->id()->willReturn(2);
     $this->account2 = $this->account2->reveal();
 
-    $private_key = $this->prophesize(PrivateKey::class);
-    $private_key->get()->willReturn(Crypt::randomBytesBase64(55));
-
     $this->staticCache = $this->prophesize(CacheBackendInterface::class);
     $this->staticCache->get(Argument::any())->willReturn(FALSE);
     $this->staticCache->set(Argument::cetera())->shouldBeCalled();
@@ -88,7 +83,6 @@ class PermissionsHashGeneratorTest extends UnitTestCase {
     $this->processor = $this->prophesize(AccessPolicyProcessorInterface::class);
 
     $this->permissionsHash = new PermissionsHashGenerator(
-      $private_key->reveal(),
       $this->staticCache->reveal(),
       $this->processor->reveal()
     );

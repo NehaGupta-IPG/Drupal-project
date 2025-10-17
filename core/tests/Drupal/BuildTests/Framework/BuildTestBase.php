@@ -166,7 +166,7 @@ abstract class BuildTestBase extends TestCase {
     // Set up the workspace directory.
     // @todo Glean working directory from env vars, etc.
     $fs = new SymfonyFilesystem();
-    $this->workspaceDir = $fs->tempnam(DrupalFilesystem::getOsTemporaryDirectory(), '/build_workspace_' . md5($this->name() . microtime(TRUE)));
+    $this->workspaceDir = $fs->tempnam(DrupalFilesystem::getOsTemporaryDirectory(), '/build_workspace_' . hash('xxh3', $this->name()) . microtime(TRUE));
     $fs->remove($this->workspaceDir);
     $fs->mkdir($this->workspaceDir);
     $this->initMink();

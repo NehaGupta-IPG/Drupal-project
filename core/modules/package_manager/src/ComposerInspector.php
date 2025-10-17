@@ -441,7 +441,7 @@ class ComposerInspector implements LoggerAwareInterface {
     foreach (['composer.json', 'composer.lock'] as $filename) {
       $known_hash = $known_hashes[$working_dir][$filename] ?? '';
       // If the file doesn't exist, hash_file() will return FALSE.
-      $current_hash = @hash_file('xxh64', $working_dir . DIRECTORY_SEPARATOR . $filename);
+      $current_hash = @hash_file('xxh3', $working_dir . DIRECTORY_SEPARATOR . $filename);
 
       if ($known_hash && $current_hash && hash_equals($known_hash, $current_hash)) {
         continue;
