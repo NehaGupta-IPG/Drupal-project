@@ -54,7 +54,7 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
   protected const REVISION_OPERATION_MAP = [
     'view all revisions' => ['view', 'view'],
     'view revision' => ['view', 'view'],
-    'revert revision' => ['revert', 'update'],
+    'revert' => ['revert', 'update'],
     'delete revision' => ['delete', 'delete'],
   ];
 

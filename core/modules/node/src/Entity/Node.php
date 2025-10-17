@@ -3,12 +3,15 @@
 namespace Drupal\node\Entity;
 
 use Drupal\Core\Entity\Attribute\ContentEntityType;
+use Drupal\Core\Entity\Form\RevisionDeleteForm;
+use Drupal\Core\Entity\Form\RevisionRevertForm;
 use Drupal\Core\Entity\EditorialContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\node\Entity\NodeRevisionRouteProvider;
 use Drupal\node\Form\DeleteMultiple;
 use Drupal\node\Form\NodeDeleteForm;
 use Drupal\node\Form\NodeForm;
@@ -53,10 +56,13 @@ use Drupal\user\EntityOwnerTrait;
       'default' => NodeForm::class,
       'delete' => NodeDeleteForm::class,
       'edit' => NodeForm::class,
+      'revision-delete' => RevisionDeleteForm::class,
+      'revision-revert' => RevisionRevertForm::class,
       'delete-multiple-confirm' => DeleteMultiple::class,
     ],
     'route_provider' => [
       'html' => NodeRouteProvider::class,
+      'revision' => NodeRevisionRouteProvider::class,
     ],
     'list_builder' => NodeListBuilder::class,
     'translation' => NodeTranslationHandler::class,
@@ -70,6 +76,8 @@ use Drupal\user\EntityOwnerTrait;
     'delete-multiple-form' => '/admin/content/node/delete',
     'version-history' => '/node/{node}/revisions',
     'revision' => '/node/{node}/revisions/{node_revision}/view',
+    'revision-delete-form' => '/node/{node}/revisions/{node_revision}/delete',
+    'revision-revert-form' => '/node/{node}/revisions/{node_revision}/revert',
     'create' => '/node',
   ],
   collection_permission: 'access content overview',

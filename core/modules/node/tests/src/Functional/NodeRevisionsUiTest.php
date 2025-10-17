@@ -128,7 +128,14 @@ class NodeRevisionsUiTest extends NodeTestBase {
 
     // Assert the old revision message.
     $date = $this->container->get('date.formatter')->format($nodes[0]->revision_timestamp->value, 'short');
-    $url = new Url('entity.node.revision', ['node' => $nodes[0]->id(), 'node_revision' => $nodes[0]->getRevisionId()]);
+    $url = Url::fromRoute('entity.node.revision', [
+      'node' => $nodes[0]->id(),
+      'node_revision' => $nodes[0]->getRevisionId(),
+    ], [
+      'attributes' => [
+        'hreflang' => 'en',
+      ],
+    ]);
     $this->assertSession()->responseContains(Link::fromTextAndUrl($date, $url)->toString() . ' by ' . $editor);
 
     // Assert the current revision message.
@@ -192,29 +199,6 @@ class NodeRevisionsUiTest extends NodeTestBase {
     $this->assertSession()->linkByHrefNotExists('/node/' . $node_id . '/revisions/2/revert');
     $this->assertSession()->linkByHrefNotExists('/node/' . $node_id . '/revisions/3/revert');
     $this->assertSession()->linkByHrefNotExists('/node/' . $node_id . '/revisions/5/revert');
-  }
-
-  /**
-   * Checks the Revisions tab.
-   *
-   * Tests two 'Revisions' local tasks are not added by both Node and
-   * VersionHistoryLocalTasks.
-   *
-   * This can be removed after 'entity.node.version_history' local task is
-   * removed by https://www.drupal.org/project/drupal/issues/3153559.
-   *
-   * @legacy-covers \Drupal\node\Hook\NodeMenuHooks::localTasksAlter
-   */
-  public function testNodeDuplicateRevisionsTab(): void {
-    $this->drupalPlaceBlock('local_tasks_block');
-    $this->drupalLogin($this->editor);
-
-    $node = $this->drupalCreateNode();
-    $this->drupalGet($node->toUrl('edit-form'));
-
-    // There must be exactly one 'Revisions' local task.
-    $xpath = $this->assertSession()->buildXPathQuery('//a[contains(@href, :href)]', [':href' => $node->toUrl('version-history')->toString()]);
-    $this->assertSession()->elementsCount('xpath', $xpath, 1);
   }
 
 }

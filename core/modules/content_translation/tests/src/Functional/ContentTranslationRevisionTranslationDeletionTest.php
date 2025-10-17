@@ -192,15 +192,11 @@ class ContentTranslationRevisionTranslationDeletionTest extends ContentTranslati
     // again, since the active revision is now a default revision.
     $this->drupalLogin($this->editor);
     $this->drupalGet($it_revision->toUrl('version-history'));
-    $revision_deletion_url = Url::fromRoute('node.revision_delete_confirm',
+    $revision_deletion_url = Url::fromRoute('entity.node.revision_delete_form',
       [
         'node' => $id,
         'node_revision' => $it_revision->getRevisionId(),
       ],
-      [
-        'language' => ConfigurableLanguage::load('it'),
-        'absolute' => FALSE,
-      ]
     );
     $revision_deletion_href = $revision_deletion_url->toString();
     $this->getSession()->getDriver()->click("//a[@href='$revision_deletion_href']");
