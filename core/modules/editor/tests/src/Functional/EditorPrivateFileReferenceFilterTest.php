@@ -6,7 +6,6 @@ namespace Drupal\Tests\editor\Functional;
 
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\file\Entity\File;
-use Drupal\node\NodeInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
