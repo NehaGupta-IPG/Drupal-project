@@ -4,3 +4,6 @@ string: ''
 array:
   - itemA
   - itemB
+other_array:
+  - itemX
+  - itemY

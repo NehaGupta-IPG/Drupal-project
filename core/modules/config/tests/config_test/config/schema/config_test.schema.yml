@@ -219,6 +219,12 @@ config_test.system:
       sequence:
         type: string
         label: 'Item'
+    other_array:
+      type: sequence
+      label: 'Other array'
+      sequence:
+        type: string
+        label: 'Item'
 
 config_test.new:
   type: config_object

@@ -434,7 +434,7 @@ class ConfigActionTest extends KernelTestBase {
    *   ["prepend", [{"values": ["undo", "redo"]}, {"values": ["bold", "italic"]}], ["bold", "italic", "undo", "redo", "itemA", "itemB"]]
    *   ["splice", [{"offset": 1, "length": 1, "replacement": ["itemC"]}, {"offset": 2, "length": null, "replacement": ["itemD", "itemE"]}], ["itemA", "itemC", "itemD", "itemE"]]
    */
-  public function testSimpleConfigArrayMultipleInvocations(string $derivative_id, array $values, array $expected_value): void {
+  public function testSimpleConfigArrayMultipleInvocationsOfSameProperty(string $derivative_id, array $values, array $expected_value): void {
     $this->installConfig('config_test');
 
     foreach ($values as &$value) {
@@ -447,6 +447,23 @@ class ConfigActionTest extends KernelTestBase {
       $values,
     );
     $this->assertSame($expected_value, $this->config('config_test.system')->get('array'));
+  }
+
+  /**
+   * @testWith ["append", {"property": "array", "values": ["one", "three"]}, {"property": "other_array", "values": ["four", "six"]}, ["itemA", "itemB", "one", "three"], ["itemX", "itemY", "four", "six"]]
+   *   ["prepend", {"property": "array", "values": ["undo", "redo"]}, {"property": "other_array", "values": ["bold", "italic"]}, ["undo", "redo", "itemA", "itemB"], ["bold", "italic", "itemX", "itemY"]]
+   *   ["splice", {"property": "array", "offset": 1, "length": 1, "replacement": ["itemC"]}, {"property": "other_array", "offset": 2, "length": null, "replacement": ["itemD", "itemE"]}, ["itemA", "itemC"], ["itemX", "itemY", "itemD", "itemE"]]
+   */
+  public function testSimpleConfigArrayMultipleInvocationsOfDifferentProperty(string $derivative_id, array $array_values, array $other_array_values, array $expected_array_value, array $expected_other_array_value): void {
+    $this->installConfig('config_test');
+
+    $this->container->get('plugin.manager.config_action')->applyAction(
+      "simpleConfigArray:$derivative_id",
+      'config_test.system',
+      [$array_values, $other_array_values]
+    );
+    $this->assertSame($expected_array_value, $this->config('config_test.system')->get('array'));
+    $this->assertSame($expected_other_array_value, $this->config('config_test.system')->get('other_array'));
   }
 
   /**
