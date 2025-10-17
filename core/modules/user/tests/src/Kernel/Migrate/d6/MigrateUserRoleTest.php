@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Kernel\Migrate\d6;
 
+use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
+use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
-use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
-use Drupal\migrate\Plugin\MigrateIdMapInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Upgrade user roles to user.role.*.yml.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateUserRoleTest extends MigrateDrupal6TestBase {
 
   /**
@@ -280,9 +283,8 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
    *   An array of role data keyed by the destination role id. The role data
    *   contains the source role id, an array of valid permissions and an array
    *   of invalid permissions.
-   *
-   * @dataProvider providerTestUserRole
    */
+  #[DataProvider('providerTestUserRole')]
   public function testUserRole(array $modules, array $migrations, array $role_data): void {
     if ($modules) {
       // Install modules that have migrations that may provide permissions.

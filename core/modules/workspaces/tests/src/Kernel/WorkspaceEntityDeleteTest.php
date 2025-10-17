@@ -9,12 +9,14 @@ use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\workspaces\Entity\Workspace;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests entity deletions with workspaces.
- *
- * @group workspaces
  */
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceEntityDeleteTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -55,7 +57,7 @@ class WorkspaceEntityDeleteTest extends KernelTestBase {
     $this->installEntitySchema('workspace');
 
     $this->installSchema('node', ['node_access']);
-    $this->installSchema('workspaces', ['workspace_association']);
+    $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
 
     $this->installConfig(['filter', 'node', 'system']);
 

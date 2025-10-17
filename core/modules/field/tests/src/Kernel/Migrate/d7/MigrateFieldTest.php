@@ -7,12 +7,14 @@ namespace Drupal\Tests\field\Kernel\Migrate\d7;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Migrates Drupal 7 fields.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class MigrateFieldTest extends MigrateDrupal7TestBase {
 
   /**
@@ -27,7 +29,6 @@ class MigrateFieldTest extends MigrateDrupal7TestBase {
     'image',
     'link',
     'node',
-    'system',
     'taxonomy',
     'telephone',
     'text',

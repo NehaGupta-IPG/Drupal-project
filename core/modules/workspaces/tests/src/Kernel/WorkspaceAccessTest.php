@@ -8,12 +8,15 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\workspaces\Entity\Workspace;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests access on workspaces.
- *
- * @group workspaces
  */
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceAccessTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -34,7 +37,7 @@ class WorkspaceAccessTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->installSchema('workspaces', ['workspace_association']);
+    $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
 
     $this->installEntitySchema('workspace');
     $this->installEntitySchema('user');
@@ -72,9 +75,8 @@ class WorkspaceAccessTest extends KernelTestBase {
    *   The operation to test with.
    * @param string $permission
    *   The permission to test with.
-   *
-   * @dataProvider operationCases
    */
+  #[DataProvider('operationCases')]
   public function testWorkspaceAccess($operation, $permission): void {
     $user = $this->createUser();
     $this->setCurrentUser($user);
@@ -113,7 +115,9 @@ class WorkspaceAccessTest extends KernelTestBase {
   }
 
   /**
-   * @covers \Drupal\workspaces\Plugin\EntityReferenceSelection\WorkspaceSelection::getReferenceableEntities
+   * Tests workspace selection.
+   *
+   * @legacy-covers \Drupal\workspaces\Plugin\EntityReferenceSelection\WorkspaceSelection::getReferenceableEntities
    */
   public function testWorkspaceSelection(): void {
     $own_permission_user = $this->createUser(['view own workspace']);
@@ -224,7 +228,9 @@ class WorkspaceAccessTest extends KernelTestBase {
   }
 
   /**
-   * @covers \Drupal\workspaces\Plugin\Block\WorkspaceSwitcherBlock::blockAccess
+   * Tests workspace switcher block.
+   *
+   * @legacy-covers \Drupal\workspaces\Plugin\Block\WorkspaceSwitcherBlock::blockAccess
    */
   public function testWorkspaceSwitcherBlock(): void {
     $own_permission_user = $this->createUser(['view own workspace']);

@@ -11,12 +11,14 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Core\Form\FormState;
 use Drupal\Component\Serialization\PhpSerialize;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the entity display configuration entities.
- *
- * @group field_ui
  */
+#[Group('field_ui')]
+#[RunTestsInSeparateProcesses]
 class EntityFormDisplayTest extends KernelTestBase {
 
   /**
@@ -44,7 +46,9 @@ class EntityFormDisplayTest extends KernelTestBase {
   }
 
   /**
-   * @covers \Drupal\Core\Entity\EntityDisplayRepository::getFormDisplay
+   * Tests entity get from display.
+   *
+   * @legacy-covers \Drupal\Core\Entity\EntityDisplayRepository::getFormDisplay
    */
   public function testEntityGetFromDisplay(): void {
     /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */

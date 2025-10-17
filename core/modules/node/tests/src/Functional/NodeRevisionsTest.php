@@ -12,11 +12,13 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests per-content-type node CRUD operation permissions.
  */
 #[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeRevisionsTest extends NodeTestBase {
 
   /**
@@ -215,7 +217,8 @@ class NodeRevisionsTest extends NodeTestBase {
 
     // Confirm user is redirected depending on the remaining revisions,
     // when a revision is deleted.
-    $existing_revision_ids = $node_storage->revisionIds($node);
+    $query = \Drupal::entityQuery('node')->allRevisions()->condition('nid', $node->id())->accessCheck(FALSE);
+    $existing_revision_ids = array_keys($query->execute());
     // Delete all revision except last 3.
     $remaining_revision_ids = array_slice($existing_revision_ids, -3, 3);
     foreach ($existing_revision_ids as $revision_id) {
