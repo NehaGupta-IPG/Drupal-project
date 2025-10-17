@@ -80,7 +80,7 @@
         .prepend($selectAllCheckbox)
         .append($selectAllLabel)
         .on('click', function (event) {
-          if ($(event.target).is('input[type="checkbox"]')) {
+          if (event.target.matches('input[type="checkbox"]')) {
             checkboxes.each(function () {
               const $checkbox = $(this);
               const stateChanged =
@@ -95,7 +95,7 @@
             updateSelectAll(event.target.checked);
           }
         });
-      });
+    });
 
     // For each of the checkboxes within the table that are not disabled.
     checkboxes = $table
