@@ -3,4 +3,4 @@ type: theme
 base theme: stark
 version: VERSION
 dependencies:
-  - test_module_non_existing
+  - drupal:test_module_non_existing
