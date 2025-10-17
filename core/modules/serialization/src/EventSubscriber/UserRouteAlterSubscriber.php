@@ -48,6 +48,10 @@ class UserRouteAlterSubscriber implements EventSubscriberInterface {
       'user.login.http',
       'user.logout.http',
       'user.pass.http',
+      'rest.login_status.http',
+      'rest.login.http',
+      'rest.logout.http',
+      'rest.pass.http',
     ];
     $routes = $event->getRouteCollection();
     foreach ($route_names as $route_name) {
