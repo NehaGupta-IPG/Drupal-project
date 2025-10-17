@@ -5,11 +5,11 @@ props:
   type: object
   properties:
     image:
-      $ref: module://image/schema.json#image
+      $ref: theme://sdc_theme_test_references/schema.json#image
     attributes:
-      $ref: module://system/schema.json#attributes
+      $ref: theme://sdc_theme_test_references/schema.json#attributes
     links:
-      $ref: module://system/schema.json#links
+      $ref: theme://sdc_theme_test_references/schema.json#links
     from_theme:
       $ref: theme://sdc_theme_test_references/bar.json#test
     unresolvable:

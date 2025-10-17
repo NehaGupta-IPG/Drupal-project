@@ -53,5 +53,24 @@
         }
       }
     }
+  },
+  "image": {
+    "type": "object",
+    "required": ["src"],
+    "properties": {
+      "src": {
+        "type": "string",
+        "format": "uri-reference"
+      },
+      "alt": {
+        "type": "string"
+      },
+      "width": {
+        "type": "integer"
+      },
+      "height": {
+        "type": "integer"
+      }
+    }
   }
 }
