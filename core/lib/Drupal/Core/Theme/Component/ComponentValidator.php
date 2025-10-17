@@ -245,16 +245,15 @@ class ComponentValidator {
   }
 
   /**
-   * This methods allows non-required props to be nullable.
+   * This method allows non-required properties to be nullable.
    *
    * This improves the DX of writing component templates, as developers
    * can avoid checking for NULL values when embedding other components.
    *
-   * @param $schema
+   * @param array $schema
    *   The schema of this prop.
-   * @return void
    */
-  private function makeNonRequiredPropertiesNullable(&$schema): void {
+  private function makeNonRequiredPropertiesNullable(array &$schema): void {
     $required_props = $schema['required'] ?? [];
     $optional_props = array_diff(array_keys($schema['properties']), $required_props);
     foreach ($optional_props as $prop_id) {
