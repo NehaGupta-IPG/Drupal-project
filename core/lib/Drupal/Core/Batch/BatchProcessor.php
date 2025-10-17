@@ -167,7 +167,21 @@ class BatchProcessor implements BatchProcessorInterface {
    * {@inheritdoc}
    */
   public function nextSet(): bool {
-    return _batch_next_set();
+    $batch = &$this->getCurrentBatch();
+    $set_indexes = array_keys($batch['sets']);
+    $current_set_index_key = array_search($batch['current_set'], $set_indexes);
+    if (isset($set_indexes[$current_set_index_key + 1])) {
+      $batch['current_set'] = $set_indexes[$current_set_index_key + 1];
+      $current_set = &$this->getCurrentSet();
+      if (isset($current_set['form_submit']) && ($callback = $current_set['form_submit']) && is_callable($callback)) {
+        // We use our stored copies of $form and $form_state to account for
+        // possible alterations by previous form submit handlers.
+        $complete_form = &$batch['form_state']->getCompleteForm();
+        call_user_func_array($callback, [&$complete_form, &$batch['form_state']]);
+      }
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**

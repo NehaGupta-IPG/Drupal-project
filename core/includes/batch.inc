@@ -433,26 +433,17 @@ function &_batch_current_set() {
  * @return true|null
  *   TRUE if a subsequent set was found in the batch; no value will be returned
  *   if no subsequent set was found.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+ *    Use \Drupal\Core\Batch\BatchProcessorInterface::nextSet() instead.
+ *
+ * @see https://www.drupal.org/node/3229844
  */
 function _batch_next_set() {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::nextSet() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
   /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
   $batch_processor = \Drupal::service(BatchProcessorInterface::class);
-  $batch = &$batch_processor->getCurrentBatch();
-  $set_indexes = array_keys($batch['sets']);
-  $current_set_index_key = array_search($batch['current_set'], $set_indexes);
-  if (isset($set_indexes[$current_set_index_key + 1])) {
-    $batch['current_set'] = $set_indexes[$current_set_index_key + 1];
-    $current_set = &$batch_processor->getCurrentSet();;
-    if (isset($current_set['form_submit']) && ($callback = $current_set['form_submit']) && is_callable($callback)) {
-      // We use our stored copies of $form and $form_state to account for
-      // possible alterations by previous form submit handlers.
-      $complete_form = &$batch['form_state']->getCompleteForm();
-      $callable_resolver = \Drupal::service(CallableResolver::class);
-      $callable = $callable_resolver->getCallableFromDefinition($callback);
-      $callable(...[&$complete_form, &$batch['form_state']]);
-    }
-    return TRUE;
-  }
+  return $batch_processor->nextSet() ?: NULL;
 }
 
 /**
