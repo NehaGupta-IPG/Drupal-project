@@ -460,117 +460,18 @@ function _batch_next_set() {
  *
  * Call the 'finished' callback of each batch set to allow custom handling of
  * the results and resolve page redirection.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+ *    Use \Drupal\Core\Batch\BatchProcessorInterface::finishedProcessing()
+ *    instead.
+ *
+ * @see https://www.drupal.org/node/3229844
  */
 function _batch_finished() {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::finishedProcessing() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
   /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
   $batch_processor = \Drupal::service(BatchProcessorInterface::class);
-  $batch = &$batch_processor->getCurrentBatch();
-  $batch_finished_redirect = NULL;
-
-  // Execute the 'finished' callbacks for each batch set, if defined.
-  foreach ($batch['sets'] as $batch_set) {
-    if (isset($batch_set['finished'])) {
-      // Check if the set requires an additional file for function definitions.
-      if (isset($batch_set['file']) && is_file($batch_set['file'])) {
-        include_once \Drupal::root() . '/' . $batch_set['file'];
-      }
-
-      $queue = $batch_processor->getQueue($batch_set);
-      $operations = $queue->getAllItems();
-      $callable_resolver = \Drupal::service(CallableResolver::class);
-      $callable = $callable_resolver->getCallableFromDefinition($batch_set['finished']);
-      $batch_set_result = $callable(...array_merge([$batch_set['success'], $batch_set['results'], $operations, \Drupal::service('date.formatter')->formatInterval((int) ($batch_set['elapsed'] / 1000))]));
-      // If a batch 'finished' callback requested a redirect after the batch
-      // is complete, save that for later use. If more than one batch set
-      // returned a redirect, the last one is used.
-      if ($batch_set_result instanceof RedirectResponse) {
-        $batch_finished_redirect = $batch_set_result;
-      }
-    }
-  }
-
-  // Clean up the batch table and unset the static $batch variable.
-  if ($batch['progressive']) {
-    \Drupal::service('batch.storage')->delete($batch['id']);
-    foreach ($batch['sets'] as $batch_set) {
-      if ($queue = $batch_processor->getQueue($batch_set)) {
-        $queue->deleteQueue();
-      }
-    }
-    // Clean-up the session. Not needed for CLI updates.
-    $session = \Drupal::request()->getSession();
-    $batches = $session->get('batches', []);
-    unset($batches[$batch['id']]);
-    if (empty($batches)) {
-      $session->remove('batches');
-    }
-    else {
-      $session->set('batches', $batches);
-    }
-  }
-  $_batch = $batch;
-  $batch = NULL;
-
-  // Redirect if needed.
-  if ($_batch['progressive']) {
-    // Revert the 'destination' that was saved in batch_process().
-    if (isset($_batch['destination'])) {
-      \Drupal::request()->query->set('destination', $_batch['destination']);
-    }
-
-    // Determine the target path to redirect to. If a batch 'finished' callback
-    // returned a redirect response object, use that. Otherwise, fall back on
-    // the form redirection.
-    if (isset($batch_finished_redirect)) {
-      return $batch_finished_redirect;
-    }
-    elseif (!isset($_batch['form_state'])) {
-      $_batch['form_state'] = new FormState();
-    }
-    if ($_batch['form_state']->getRedirect() === NULL) {
-      $redirect = $_batch['batch_redirect'] ?: $_batch['source_url'];
-      // Any path with a scheme does not correspond to a route.
-      if (!$redirect instanceof Url) {
-        $options = UrlHelper::parse($redirect);
-        if (parse_url($options['path'], PHP_URL_SCHEME)) {
-          $redirect = Url::fromUri($options['path'], $options);
-        }
-        else {
-          $redirect = \Drupal::pathValidator()->getUrlIfValid($options['path']);
-          if (!$redirect) {
-            // Stay on the same page if the redirect was invalid.
-            $redirect = Url::fromRoute('<current>');
-          }
-          $redirect->setOptions($options);
-        }
-      }
-      $_batch['form_state']->setRedirectUrl($redirect);
-    }
-
-    // Use \Drupal\Core\Form\FormSubmitterInterface::redirectForm() to handle
-    // the redirection logic.
-    $redirect = \Drupal::service('form_submitter')->redirectForm($_batch['form_state']);
-    if (is_object($redirect)) {
-      return $redirect;
-    }
-
-    // If no redirection happened, redirect to the originating page. In case the
-    // form needs to be rebuilt, save the final $form_state for
-    // \Drupal\Core\Form\FormBuilderInterface::buildForm().
-    if ($_batch['form_state']->isRebuilding()) {
-      $session = \Drupal::request()->getSession();
-      $session->set('batch_form_state', $_batch['form_state']);
-    }
-    $callback = $_batch['redirect_callback'];
-    $_batch['source_url']->mergeOptions(['query' => ['op' => 'finish', 'id' => $_batch['id']]]);
-    if (is_callable($callback)) {
-      $callback($_batch['source_url'], $_batch['source_url']->getOption('query'));
-    }
-    elseif ($callback === NULL) {
-      // Default to RedirectResponse objects when nothing specified.
-      return new RedirectResponse($_batch['source_url']->setAbsolute()->toString());
-    }
-  }
+  return $batch_processor->finishedProcessing();
 }
 
 /**

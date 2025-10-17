@@ -1601,8 +1601,12 @@ services:
     class: Drupal\Core\Batch\BatchProcessor
     arguments:
       - '%app.root%'
+      - '@date.formatter'
+      - '@request_stack'
       - '@>database'
       - '@>batch.storage'
+      - '@>path.validator'
+      - '@>form_submitter'
   Drupal\Core\Batch\BatchProcessorInterface: '@batch.processor'
   batch.storage:
     class: Drupal\Core\Batch\BatchStorage

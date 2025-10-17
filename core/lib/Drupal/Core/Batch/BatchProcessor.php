@@ -2,11 +2,17 @@
 
 namespace Drupal\Core\Batch;
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Datetime\DateFormatterInterface;
+use Drupal\Core\Form\FormState;
+use Drupal\Core\Form\FormSubmitterInterface;
+use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Queue\QueueInterface;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Implements the default batch processor.
@@ -49,15 +55,27 @@ class BatchProcessor implements BatchProcessorInterface {
    *
    * @param string $root
    *   The app root.
+   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
+   *   The date formatter.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack.
    * @param \Closure $connection
    *   The database connection.
    * @param \Closure $batchStorage
    *   The batch storage.
+   * @param \Closure $pathValidator
+   *   The path validator.
+   * @param \Closure $formSubmitter
+   *   The form submitter.
    */
   public function __construct(
     protected readonly string $root,
+    protected readonly DateFormatterInterface $dateFormatter,
+    protected readonly RequestStack $requestStack,
     protected readonly \Closure $connection,
-    protected readonly \Closure $batchStorage
+    protected readonly \Closure $batchStorage,
+    protected readonly \Closure $pathValidator,
+    protected readonly \Closure $formSubmitter,
   ) {
     require_once $root . '/core/includes/batch.inc';
     require_once $root . '/core/includes/form.inc';
@@ -158,7 +176,133 @@ class BatchProcessor implements BatchProcessorInterface {
    * @see \Drupal\Core\Form\FormSubmitter::submitForm()
    */
   public function finishedProcessing(): ?RedirectResponse {
-    return _batch_finished();
+    $batch = &$this->getCurrentBatch();
+    $batch_finished_redirect = NULL;
+
+    // Execute the 'finished' callbacks for each batch set, if defined.
+    foreach ($batch['sets'] as $batch_set) {
+      if (isset($batch_set['finished'])) {
+        // Check if the set requires an additional file for function definitions.
+        if (isset($batch_set['file']) && is_file($batch_set['file'])) {
+          include_once $this->root . '/' . $batch_set['file'];
+        }
+        if (is_callable($batch_set['finished'])) {
+          $queue = $this->getQueue($batch_set);
+          $operations = $queue->getAllItems();
+          $batch_set_result = call_user_func_array($batch_set['finished'], [$batch_set['success'], $batch_set['results'], $operations, $this->dateFormatter->formatInterval((int) ($batch_set['elapsed'] / 1000))]);
+          // If a batch 'finished' callback requested a redirect after the batch
+          // is complete, save that for later use. If more than one batch set
+          // returned a redirect, the last one is used.
+          if ($batch_set_result instanceof RedirectResponse) {
+            $batch_finished_redirect = $batch_set_result;
+          }
+        }
+      }
+    }
+
+    // Clean up the batch table and unset the static $batch variable.
+    if ($batch['progressive']) {
+      $this->getBatchStorage()->delete($batch['id']);
+      foreach ($batch['sets'] as $batch_set) {
+        if ($queue = $this->getQueue($batch_set)) {
+          $queue->deleteQueue();
+        }
+      }
+      // Clean-up the session. Not needed for CLI updates.
+      $session = $this->requestStack->getSession();
+      $batches = $session->get('batches', []);
+      unset($batches[$batch['id']]);
+      if (empty($batches)) {
+        $session->remove('batches');
+      }
+      else {
+        $session->set('batches', $batches);
+      }
+    }
+    $_batch = $batch;
+    $batch = NULL;
+
+    // Redirect if needed.
+    if ($_batch['progressive']) {
+      // Revert the 'destination' that was saved in batch_process().
+      if (isset($_batch['destination'])) {
+        $this->requestStack->getCurrentRequest()->query->set('destination', $_batch['destination']);
+      }
+
+      // Determine the target path to redirect to. If a batch 'finished' callback
+      // returned a redirect response object, use that. Otherwise, fall back on
+      // the form redirection.
+      if (isset($batch_finished_redirect)) {
+        return $batch_finished_redirect;
+      }
+      if (!isset($_batch['form_state'])) {
+        $_batch['form_state'] = new FormState();
+      }
+      if ($_batch['form_state']->getRedirect() === NULL) {
+        $redirect = $_batch['batch_redirect'] ?: $_batch['source_url'];
+        // Any path with a scheme does not correspond to a route.
+        if (!$redirect instanceof Url) {
+          $options = UrlHelper::parse($redirect);
+          if (parse_url($options['path'], PHP_URL_SCHEME)) {
+            $redirect = Url::fromUri($options['path'], $options);
+          }
+          else {
+            $redirect = $this->getPathValidator()->getUrlIfValid($options['path']);
+            if (!$redirect) {
+              // Stay on the same page if the redirect was invalid.
+              $redirect = Url::fromRoute('<current>');
+            }
+            $redirect->setOptions($options);
+          }
+        }
+        $_batch['form_state']->setRedirectUrl($redirect);
+      }
+
+      // Use \Drupal\Core\Form\FormSubmitterInterface::redirectForm() to handle
+      // the redirection logic.
+      $redirect = $this->getFormSubmiter()->redirectForm($_batch['form_state']);
+      if (is_object($redirect)) {
+        return $redirect;
+      }
+
+      // If no redirection happened, redirect to the originating page. In case the
+      // form needs to be rebuilt, save the final $form_state for
+      // \Drupal\Core\Form\FormBuilderInterface::buildForm().
+      if ($_batch['form_state']->isRebuilding()) {
+        $session = $this->requestStack->getSession();
+        $session->set('batch_form_state', $_batch['form_state']);
+      }
+      $callback = $_batch['redirect_callback'];
+      $_batch['source_url']->mergeOptions(['query' => ['op' => 'finish', 'id' => $_batch['id']]]);
+      if (is_callable($callback)) {
+        $callback($_batch['source_url'], $_batch['source_url']->getOption('query'));
+      }
+      elseif ($callback === NULL) {
+        // Default to RedirectResponse objects when nothing specified.
+        return new RedirectResponse($_batch['source_url']->setAbsolute()->toString());
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * Gets the form submitter.
+   *
+   * @return \Drupal\Core\Form\FormSubmitterInterface
+   *   The form submitter.
+   */
+  protected function getFormSubmiter(): FormSubmitterInterface {
+    return ($this->formSubmitter)();
+  }
+
+  /**
+   * Gets the path validator.
+   *
+   * @return \Drupal\Core\Path\PathValidatorInterface
+   *   The path validator.
+   */
+  protected function getPathValidator(): PathValidatorInterface {
+    return ($this->pathValidator)();
   }
 
   /**
