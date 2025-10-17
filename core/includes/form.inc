@@ -678,53 +678,17 @@ function batch_set($batch_definition): void {
  *   The batch array.
  * @param array $batch_set
  *   The batch set.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+ *    Use \Drupal\Core\Batch\BatchProcessorInterface::appendSet() instead.
+ *
+ * @see https://www.drupal.org/node/3229844
  */
 function _batch_append_set(&$batch, $batch_set): void {
-  $append_after_index = $batch['current_set'];
-  $reached_current_set = FALSE;
-  foreach ($batch['sets'] as $index => $set) {
-    // As the indexes are not ordered numerically we need to first reach the
-    // index of the current set and then search for the proper place to append
-    // the new batch set.
-    if (!$reached_current_set) {
-      if ($index == $batch['current_set']) {
-        $reached_current_set = TRUE;
-      }
-      continue;
-    }
-    if ($index > $append_after_index) {
-      if (isset($set['appended_after_index'])) {
-        $append_after_index = $index;
-      }
-      else {
-        break;
-      }
-    }
-  }
-  $batch_set['appended_after_index'] = $append_after_index;
-
-  // Iterate by reference over the existing batch sets and assign them by
-  // reference in the new batch sets array in order not to break a retrieved
-  // reference to the current set. Among other places a reference to the current
-  // set is being retrieved in _batch_process(). Additionally, we have to
-  // preserve the original indexes, as they are used to generate the queue name
-  // of each batch set, otherwise the operations of the new batch set will be
-  // queued in the queue of a previous batch set.
-  // @see _batch_populate_queue().
-  $new_sets = [];
-  $new_set_index = NULL;
-  foreach ($batch['sets'] as $index => &$set) {
-    $new_sets[$index] = &$set;
-    if ($index == $append_after_index) {
-      $new_set_index = count($batch['sets']);
-      $new_sets[$new_set_index] = $batch_set;
-    }
-  }
-
-  $batch['sets'] = $new_sets;
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::queue() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
   /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
   $batch_processor = \Drupal::service(BatchProcessorInterface::class);
-  $batch_processor->queuePopulate($batch, $new_set_index);
+  $batch_processor->appendSet($batch, $batch_set);
 }
 
 /**
