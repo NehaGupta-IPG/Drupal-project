@@ -204,19 +204,19 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
         }
         else {
           $links = [];
-          if ($revision->access('revert revision')) {
+          if ($revision->access('revert')) {
             $links['revert'] = [
               'title' => $vid < $node->getRevisionId() ? $this->t('Revert') : $this->t('Set as current revision'),
               'url' => $has_translations ?
               Url::fromRoute('node.revision_revert_translation_confirm', ['node' => $node->id(), 'node_revision' => $vid, 'langcode' => $langcode]) :
-              Url::fromRoute('node.revision_revert_confirm', ['node' => $node->id(), 'node_revision' => $vid]),
+              Url::fromRoute('entity.node.revision_revert_form', ['node' => $node->id(), 'node_revision' => $vid]),
             ];
           }
 
           if ($revision->access('delete revision')) {
             $links['delete'] = [
               'title' => $this->t('Delete'),
-              'url' => Url::fromRoute('node.revision_delete_confirm', ['node' => $node->id(), 'node_revision' => $vid]),
+              'url' => Url::fromRoute('entity.node.revision_delete_form', ['node' => $node->id(), 'node_revision' => $vid]),
             ];
           }
 

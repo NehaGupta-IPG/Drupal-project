@@ -63,7 +63,7 @@ class NodeRevisionsAuthorTest extends NodeTestBase {
     self::assertEquals($node->getRevisionUserId(), $initialRevisionUser->id());
 
     // Revert to the original node revision.
-    $this->drupalGet(Url::fromRoute('node.revision_revert_confirm', [
+    $this->drupalGet(Url::fromRoute('entity.node.revision_revert_form', [
       'node' => $node->id(),
       'node_revision' => $originalRevisionId,
     ]));
@@ -82,7 +82,7 @@ class NodeRevisionsAuthorTest extends NodeTestBase {
     // Revert again to the revised version and check that node author and
     // revision author fields are correct.
     // Revert to the original node.
-    $this->drupalGet(Url::fromRoute('node.revision_revert_confirm', [
+    $this->drupalGet(Url::fromRoute('entity.node.revision_revert_form', [
       'node' => $revertedNode->id(),
       'node_revision' => $revisedRevisionId,
     ]));

@@ -440,7 +440,7 @@ class NodeRevisionsTest extends NodeTestBase {
 
     // Now revert the entity revision to the initial one where the translation
     // didn't exist.
-    $revert_url = Url::fromRoute('node.revision_revert_confirm', [
+    $revert_url = Url::fromRoute('entity.node.revision_revert_form', [
       'node' => $node->id(),
       'node_revision' => $initial_revision_id,
     ]);

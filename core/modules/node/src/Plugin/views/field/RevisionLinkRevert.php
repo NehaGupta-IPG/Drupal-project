@@ -23,7 +23,7 @@ class RevisionLinkRevert extends RevisionLink {
     if (!$node) {
       return NULL;
     }
-    return Url::fromRoute('node.revision_revert_confirm', [
+    return Url::fromRoute('entity.node.revision_revert_form', [
       'node' => $node->id(),
       'node_revision' => $node->getRevisionId(),
     ]);
