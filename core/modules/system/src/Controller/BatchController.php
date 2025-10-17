@@ -22,11 +22,11 @@ class BatchController implements ContainerInjectionInterface {
    * Constructs a new BatchController.
    *
    * @param string $root
-   *    The app root.
+   *   The app root.
    * @param \Drupal\Core\Batch\BatchStorageInterface $batchStorage
-   *    Batch storage.
+   *   Batch storage.
    * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
-   *    Batch processor.
+   *   Batch processor.
    *
    * @see https://www.drupal.org/node/3229844
    */

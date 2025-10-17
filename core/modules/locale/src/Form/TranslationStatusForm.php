@@ -41,7 +41,7 @@ class TranslationStatusForm extends FormBase {
    *   The time service.
    *    Time component instance.
    * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
-   *    Batch processor.
+   *   Batch processor.
    *
    * @see https://www.drupal.org/node/3229844
    */

@@ -38,6 +38,8 @@ class ConfigSync extends FormBase {
    *   The import transformer service.
    * @param \Drupal\Core\Config\ConfigImporterFactory $configImporterFactory
    *   The config importer factory.
+   * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
+   *   Batch processor.
    */
   public function __construct(
     protected StorageInterface $syncStorage,

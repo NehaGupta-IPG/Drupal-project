@@ -18,7 +18,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class BatchTestSimpleForm extends FormBase {
 
-  public static function create(ContainerInterface $container) {
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('batch.processor'),
     );

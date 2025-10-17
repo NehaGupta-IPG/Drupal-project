@@ -5,6 +5,7 @@
  */
 
 use Drupal\Component\FileSecurity\FileSecurity;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;

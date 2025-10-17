@@ -42,7 +42,7 @@ class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
-   *    Batch processor.
+   *   Batch processor.
    *
    * @see https://www.drupal.org/node/3229844
    */

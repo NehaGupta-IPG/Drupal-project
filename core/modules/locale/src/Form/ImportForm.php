@@ -58,7 +58,7 @@ class ImportForm extends FormBase {
    * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
    *   The configurable language manager.
    * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
-   *    Batch processor.
+   *   Batch processor.
    *
    * @see https://www.drupal.org/node/3229844
    */

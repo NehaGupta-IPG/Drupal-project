@@ -14,8 +14,6 @@
  * @see \Drupal\Core\Batch\BatchProcessorInterface::getCurrentBatch()
  */
 
-use Drupal\Component\Utility\Timer;
-use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Batch\Percentage;
 use Drupal\Core\Form\FormState;
@@ -23,7 +21,6 @@ use Drupal\Core\Url;
 use Drupal\Core\Utility\CallableResolver;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -205,8 +202,9 @@ function _batch_progress_page(): array {
     ob_end_clean();
   }
 
-  // Merge required query parameters for batch processing into those provided by
-  // batch_set() or hook_batch_alter().
+  // Merge required query parameters for batch processing into those provided
+  // by \Drupal\Core\Batch\BatchProcessorInterface::queue() or
+  // hook_batch_alter().
   $query_options = $batch['url']->getOption('query');
   $query_options['id'] = $batch['id'];
   $query_options['op'] = $new_op;

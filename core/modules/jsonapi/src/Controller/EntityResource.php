@@ -189,7 +189,7 @@ class EntityResource {
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
-   *    Batch processor.
+   *   Batch processor.
    *
    * @see https://www.drupal.org/node/3229844
    */

@@ -21,7 +21,7 @@ class BatchTestMultiStepForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('batch.processor'),
     );

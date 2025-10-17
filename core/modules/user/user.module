@@ -282,7 +282,7 @@ function user_cancel($edit, $uid, $method): void {
   }
 
   // Initialize batch (to set title).
-  ///** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+  /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
   $batch_processor = \Drupal::service(BatchProcessorInterface::class);
   $batch_builder = (new BatchBuilder())
     ->setTitle(t('Cancelling account'));

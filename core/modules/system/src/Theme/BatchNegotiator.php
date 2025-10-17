@@ -35,7 +35,7 @@ class BatchNegotiator implements ThemeNegotiatorInterface {
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack used to retrieve the current request.
    * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
-   *    Batch processor.
+   *   Batch processor.
    *
    * @see https://www.drupal.org/node/3229844
    */

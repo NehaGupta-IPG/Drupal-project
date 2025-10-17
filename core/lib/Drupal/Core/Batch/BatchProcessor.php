@@ -12,6 +12,7 @@ use Drupal\Core\Form\FormSubmitterInterface;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Queue\QueueInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -24,6 +25,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @internal
  */
 class BatchProcessor implements BatchProcessorInterface {
+
+  use StringTranslationTrait;
 
   /**
    * In memory batch cache.
@@ -89,10 +92,7 @@ class BatchProcessor implements BatchProcessorInterface {
     protected readonly \Closure $batchStorage,
     protected readonly \Closure $pathValidator,
     protected readonly \Closure $formSubmitter,
-  ) {
-    require_once $root . '/core/includes/batch.inc';
-    require_once $root . '/core/includes/form.inc';
-  }
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -118,15 +118,15 @@ class BatchProcessor implements BatchProcessorInterface {
         'elapsed' => 0,
       ];
       $defaults = [
-        'title' => t('Processing'),
-        'init_message' => t('Initializing.'),
-        'progress_message' => t('Completed @current of @total.'),
-        'error_message' => t('An error has occurred.'),
+        'title' => $this->t('Processing'),
+        'init_message' => $this->t('Initializing.'),
+        'progress_message' => $this->t('Completed @current of @total.'),
+        'error_message' => $this->t('An error has occurred.'),
       ];
       $batch_set = $init + $batch_definition + $defaults;
 
-      // Tweak init_message to avoid the bottom of the page flickering down after
-      // init phase.
+      // Tweak init_message to avoid the bottom of the page flickering down
+      // after init phase.
       $batch_set['init_message'] .= '<br/>&nbsp;';
 
       // The non-concurrent workflow of batch execution allows us to save
@@ -300,7 +300,7 @@ class BatchProcessor implements BatchProcessorInterface {
         $query_options['op'] = 'finished';
         $error_url->setOption('query', $query_options);
 
-        $batch['error_message'] = t('Continue to <a href=":error_url">the error page</a>', [':error_url' => $error_url->toString(TRUE)->getGeneratedUrl()]);
+        $batch['error_message'] = $this->t('Continue to <a href=":error_url">the error page</a>', [':error_url' => $error_url->toString(TRUE)->getGeneratedUrl()]);
 
         // Clear the way for the redirection to the batch processing page, by
         // saving and unsetting the 'destination', if there is any.
@@ -333,7 +333,7 @@ class BatchProcessor implements BatchProcessorInterface {
         }
       }
       else {
-        // Non-progressive execution: bypass the whole progressbar workflow
+        // Non-progressive execution: bypass the whole progressbar workflow.
         $this->process();
       }
     }
@@ -357,10 +357,10 @@ class BatchProcessor implements BatchProcessorInterface {
     $set_changed = TRUE;
     $task_message = '';
 
-    // If this batch was marked for progressive execution (e.g. forms submitted by
-    // \Drupal::formBuilder()->submitForm(), initialize a timer to determine
-    // whether we need to proceed with the same batch phase when a processing time
-    // of 1 second has been exceeded.
+    // If this batch was marked for progressive execution (e.g. forms submitted
+    // by \Drupal::formBuilder()->submitForm(), initialize a timer to determine
+    // whether we need to proceed with the same batch phase when a processing
+    // time of 1 second has been exceeded.
     if ($batch['progressive']) {
       Timer::start('batch_processing');
     }
@@ -409,8 +409,9 @@ class BatchProcessor implements BatchProcessorInterface {
       // When all operations in the current batch set are completed, browse
       // through the remaining sets, marking them 'successfully processed'
       // along the way, until we find a set that contains operations.
-      // _batch_next_set() executes form submit handlers stored in 'control'
-      // sets (see \Drupal::service('form_submitter')), which can in turn add new
+      // \Drupal\Core\Batch\BatchProcessorInterface::nextSet() executes form
+      // submit handlers stored in 'control' sets
+      // (see \Drupal::service('form_submitter')), which can in turn add new
       // sets to the batch.
       $set_changed = FALSE;
       $old_set = $current_set;
@@ -452,8 +453,8 @@ class BatchProcessor implements BatchProcessorInterface {
         $progress_message = $old_set['progress_message'] ?? '';
       }
 
-      // Total progress is the number of operations that have fully run plus the
-      // completion level of the current operation.
+      // Total progress is the number of operations that have fully run plus
+      // the completion level of the current operation.
       $current    = $total - $remaining + ($finished ?? 0);
       $percentage = Percentage::format($total, $current);
       $elapsed    = $current_set['elapsed'] ?? 0;
@@ -515,17 +516,26 @@ class BatchProcessor implements BatchProcessorInterface {
     // Execute the 'finished' callbacks for each batch set, if defined.
     foreach ($batch['sets'] as $batch_set) {
       if (isset($batch_set['finished'])) {
-        // Check if the set requires an additional file for function definitions.
+        // Check if the set requires an additional file for function
+        // definitions.
         if (isset($batch_set['file']) && is_file($batch_set['file'])) {
           include_once $this->root . '/' . $batch_set['file'];
         }
         if (is_callable($batch_set['finished'])) {
           $queue = $this->getQueue($batch_set);
           $operations = $queue->getAllItems();
-          $batch_set_result = call_user_func_array($batch_set['finished'], [$batch_set['success'], $batch_set['results'], $operations, $this->dateFormatter->formatInterval((int) ($batch_set['elapsed'] / 1000))]);
-          // If a batch 'finished' callback requested a redirect after the batch
-          // is complete, save that for later use. If more than one batch set
-          // returned a redirect, the last one is used.
+          $batch_set_result = call_user_func_array(
+            $batch_set['finished'],
+            [
+              $batch_set['success'],
+              $batch_set['results'],
+              $operations,
+              $this->dateFormatter->formatInterval((int) ($batch_set['elapsed'] / 1000)),
+            ],
+          );
+          // If a batch 'finished' callback requested a redirect after the
+          // batch is complete, save that for later use. If more than one batch
+          // set returned a redirect, the last one is used.
           if ($batch_set_result instanceof RedirectResponse) {
             $batch_finished_redirect = $batch_set_result;
           }
@@ -557,14 +567,15 @@ class BatchProcessor implements BatchProcessorInterface {
 
     // Redirect if needed.
     if ($_batch['progressive']) {
-      // Revert the 'destination' that was saved in batch_process().
+      // Revert the 'destination' that was saved in
+      // \Drupal\Core\Batch\BatchProcessorInterface::process().
       if (isset($_batch['destination'])) {
         $this->requestStack->getCurrentRequest()->query->set('destination', $_batch['destination']);
       }
 
-      // Determine the target path to redirect to. If a batch 'finished' callback
-      // returned a redirect response object, use that. Otherwise, fall back on
-      // the form redirection.
+      // Determine the target path to redirect to. If a batch 'finished'
+      // callback returned a redirect response object, use that. Otherwise,
+      // fall back on the form redirection.
       if (isset($batch_finished_redirect)) {
         return $batch_finished_redirect;
       }
@@ -593,13 +604,13 @@ class BatchProcessor implements BatchProcessorInterface {
 
       // Use \Drupal\Core\Form\FormSubmitterInterface::redirectForm() to handle
       // the redirection logic.
-      $redirect = $this->getFormSubmiter()->redirectForm($_batch['form_state']);
+      $redirect = $this->getFormSubmitter()->redirectForm($_batch['form_state']);
       if (is_object($redirect)) {
         return $redirect;
       }
 
-      // If no redirection happened, redirect to the originating page. In case the
-      // form needs to be rebuilt, save the final $form_state for
+      // If no redirection happened, redirect to the originating page. In case
+      // the form needs to be rebuilt, save the final $form_state for
       // \Drupal\Core\Form\FormBuilderInterface::buildForm().
       if ($_batch['form_state']->isRebuilding()) {
         $session = $this->requestStack->getSession();
@@ -624,7 +635,7 @@ class BatchProcessor implements BatchProcessorInterface {
    * @return \Drupal\Core\Form\FormSubmitterInterface
    *   The form submitter.
    */
-  protected function getFormSubmiter(): FormSubmitterInterface {
+  protected function getFormSubmitter(): FormSubmitterInterface {
     return ($this->formSubmitter)();
   }
 
@@ -666,6 +677,5 @@ class BatchProcessor implements BatchProcessorInterface {
     }
     return static::$needsUpdate;
   }
-
 
 }

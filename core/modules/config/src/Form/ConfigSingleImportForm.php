@@ -53,7 +53,7 @@ class ConfigSingleImportForm extends ConfirmFormBase {
    * @param \Drupal\Core\Config\ConfigImporterFactory $configImporterFactory
    *   The config importer factory.
    * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
-   *    Batch processor.
+   *   Batch processor.
    *
    * @see https://www.drupal.org/node/3229844
    */

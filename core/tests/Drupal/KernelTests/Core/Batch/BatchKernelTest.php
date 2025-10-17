@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Batch;
 use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -20,6 +21,7 @@ class BatchKernelTest extends KernelTestBase {
    * Tests _batch_needs_update().
    */
   #[Group('legacy')]
+  #[IgnoreDeprecations]
   public function testLegacyNeedsUpdate(): void {
     require_once $this->root . '/core/includes/batch.inc';
     $this->expectDeprecation('_batch_needs_update() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::needsUpdate() instead. See https://www.drupal.org/node/3229844');

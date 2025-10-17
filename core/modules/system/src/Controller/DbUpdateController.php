@@ -103,7 +103,7 @@ class DbUpdateController extends ControllerBase {
    * @param \Drupal\Core\Asset\AssetQueryStringInterface $assetQueryString
    *   The asset query string.
    * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
-   *    Batch processor.
+   *   Batch processor.
    *
    * @see https://www.drupal.org/node/3229844
    */

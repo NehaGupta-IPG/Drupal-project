@@ -158,12 +158,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/includes/form.inc',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$new_set_index might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
-	'path' => __DIR__ . '/includes/form.inc',
-];
-$ignoreErrors[] = [
 	'message' => '#^Function install_check_requirements\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -8016,12 +8010,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Form/FormStateInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Form\\\\FormSubmitter\\:\\:batchGet\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Form/FormSubmitter.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Form\\\\FormSubmitter\\:\\:executeSubmitHandlers\\(\\) has no return type specified\\.$#',

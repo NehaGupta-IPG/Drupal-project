@@ -5,9 +5,7 @@
  * Functions for form and batch generation and processing.
  */
 
-use Drupal\Core\Batch\BatchProcessor;
 use Drupal\Core\Batch\BatchProcessorInterface;
-use Drupal\Core\Batch\BatchStorageInterface;
 use Drupal\Core\Form\FormPreprocess;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\CallableResolver;
@@ -456,15 +454,17 @@ function template_preprocess_form_element_label(&$variables): void {
  *   'finished' => 'my_finished_callback',
  *   'file' => 'path_to_file_containing_my_functions',
  * ];
- * batch_set($batch);
+ * $batch_processor = \Drupal::service('batch.processor');
+ * $batch_processor->queue($batch);
  * // Only needed if not inside a form _submit handler.
  * // Setting redirect in batch_process.
- * batch_process('node/1');
+ * $batch_processor->process('node/1');
  * @endcode
  *
  * Note: if the batch 'title', 'init_message', 'progress_message', or
  * 'error_message' could contain any user input, it is the responsibility of
- * the code calling batch_set() to sanitize them first with a function like
+ * the code calling \Drupal\Core\Batch\BatchProcessorInterface::queue() to
+ * sanitize them first with a function like
  * \Drupal\Component\Utility\Html::escape() or
  * \Drupal\Component\Utility\Xss::filter(). Furthermore, if the batch operation
  * returns any user input in the 'results' or 'message' keys of $context, it
@@ -664,9 +664,10 @@ function _batch_append_set(&$batch, $batch_set): void {
  *   finished processing. For example, to redirect users to the home page, use
  *   '<front>'. If you wish to allow standard form API batch handling to occur
  *   and force the user to be redirected to a custom location after the batch
- *   has finished processing, you do not need to use batch_process() and this
- *   parameter. Instead, make the batch 'finished' callback return an instance
- *   of \Symfony\Component\HttpFoundation\RedirectResponse, which will be used
+ *   has finished processing, you do not need to use
+ *   \Drupal\Core\Batch\BatchProcessorInterface::process() and this parameter.
+ *   Instead, make the batch 'finished' callback return an instance of
+ *   \Symfony\Component\HttpFoundation\RedirectResponse, which will be used
  *   automatically by the standard batch processing pipeline (and which takes
  *   precedence over this parameter). If this parameter is omitted and no
  *   redirect response was returned by the 'finished' callback, the user will

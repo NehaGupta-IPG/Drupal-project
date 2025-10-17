@@ -74,7 +74,7 @@ class ReviewForm extends MigrateUpgradeFormBase {
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
-   *    Batch processor.
+   *   Batch processor.
    *
    * @see https://www.drupal.org/node/3229844
    */

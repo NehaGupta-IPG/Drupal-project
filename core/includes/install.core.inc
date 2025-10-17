@@ -630,7 +630,7 @@ function install_run_task($task, &$install_state) {
         $batches = [$batches];
       }
       foreach ($batches as $batch_definition) {
-        batch_set($batch_definition);
+        $batch_processor->queue($batch_definition);
         // For interactive batches, we need to store the fact that this batch
         // task is currently running. Otherwise, we need to make sure the batch
         // will complete in one page request.
