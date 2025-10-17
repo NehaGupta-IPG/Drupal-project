@@ -22,8 +22,8 @@
 }
 
 .vertical-tabs__menu {
-  position: relative;
-  align-self: flex-start;
+  position: unset;
+  align-self: unset;
   margin: 0;
   margin-inline-start: 0;
   margin-inline-end: 0;
@@ -86,6 +86,13 @@
 :is(.vertical-tabs__menu-item a):hover,
 :is(.vertical-tabs__menu-item a):active {
   background-color: var(--color--gray-100);
+}
+
+.vertical-tabs__menu-item.first.last a {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: var(--sp1);
 }
 
 .vertical-tabs__menu-item.is-selected {
