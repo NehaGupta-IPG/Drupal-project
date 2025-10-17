@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Functional;
 
-use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -238,7 +238,7 @@ class UserCancelTest extends BrowserTestBase {
       'entity_id' => $node->id(),
       'entity_type' => 'node',
       'field_name' => 'comment',
-      'status' => CommentInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
       'uid' => $account->id(),
     ]);
     $comment->save();
@@ -343,7 +343,7 @@ class UserCancelTest extends BrowserTestBase {
       'entity_id' => $node->id(),
       'entity_type' => 'node',
       'field_name' => 'comment',
-      'status' => CommentInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
       'uid' => $account->id(),
     ]);
     $comment->save();
@@ -682,13 +682,13 @@ class UserCancelTest extends BrowserTestBase {
       'entity_id' => $node->id(),
       'entity_type' => 'node',
       'field_name' => 'comment',
-      'status' => CommentInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
       'uid' => $account->id(),
     ]);
     $comment->save();
     $comment->addTranslation('ur', [
       'subject' => 'ur ' . $comment->label(),
-      'status' => CommentInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
     ])->save();
 
     // Attempt to cancel account.

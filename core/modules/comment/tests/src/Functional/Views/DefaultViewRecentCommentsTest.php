@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional\Views;
 
-use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
@@ -90,7 +90,7 @@ class DefaultViewRecentCommentsTest extends ViewTestBase {
     for ($i = 0; $i < $this->defaultDisplayResults; $i++) {
       /** @var \Drupal\comment\CommentInterface $comment */
       $comment = Comment::create([
-        'status' => CommentInterface::PUBLISHED,
+        'status' => EntityPublishedInterface::PUBLISHED,
         'field_name' => 'comment',
         'entity_type' => 'node',
         'entity_id' => $this->node->id(),

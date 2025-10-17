@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\menu_ui\Functional;
 
 use Drupal\block\Entity\Block;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Url;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\node\Entity\Node;
-use Drupal\node\NodeInterface;
 use Drupal\system\Entity\Menu;
 use Drupal\system\MenuStorage;
 use Drupal\Tests\BrowserTestBase;
@@ -736,7 +736,7 @@ class MenuUiTest extends BrowserTestBase {
     // Create an unpublished node.
     $node = $this->drupalCreateNode([
       'type' => 'article',
-      'status' => NodeInterface::NOT_PUBLISHED,
+      'status' => EntityPublishedInterface::NOT_PUBLISHED,
     ]);
 
     $item = $this->addMenuLink('', '/node/' . $node->id());

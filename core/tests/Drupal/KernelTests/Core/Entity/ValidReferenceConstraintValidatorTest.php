@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\node\Entity\Node;
-use Drupal\node\NodeInterface;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\user\Entity\Role;
@@ -120,28 +120,28 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
     $published_node = Node::create([
       'title' => 'Test published node',
       'type' => 'article',
-      'status' => NodeInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
     ]);
     $published_node->save();
 
     $unpublished_node = Node::create([
       'title' => 'Test unpublished node',
       'type' => 'article',
-      'status' => NodeInterface::NOT_PUBLISHED,
+      'status' => EntityPublishedInterface::NOT_PUBLISHED,
     ]);
     $unpublished_node->save();
 
     $different_bundle_node = Node::create([
       'title' => 'Test page node',
       'type' => 'page',
-      'status' => NodeInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
     ]);
     $different_bundle_node->save();
 
     $deleted_node = Node::create([
       'title' => 'Test deleted node',
       'type' => 'article',
-      'status' => NodeInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
     ]);
     $deleted_node->save();
 

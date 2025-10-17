@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Kernel\Views;
 
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
 use Drupal\node\Entity\Node;
-use Drupal\node\NodeInterface;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
@@ -99,7 +99,7 @@ class RelationshipNodeFileDataTest extends ViewsKernelTestBase {
       'title' => $this->randomMachineName(8),
       'created' => 1,
       'changed' => 1,
-      'status' => NodeInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
     ]);
     $node1->save();
 
@@ -108,7 +108,7 @@ class RelationshipNodeFileDataTest extends ViewsKernelTestBase {
       'title' => $this->randomMachineName(8),
       'created' => 1,
       'changed' => 1,
-      'status' => NodeInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
       'node_file' => ['target_id' => $file2->id()],
     ]);
     $node2->save();
@@ -161,7 +161,7 @@ class RelationshipNodeFileDataTest extends ViewsKernelTestBase {
       'title' => $this->randomMachineName(8),
       'created' => 1,
       'changed' => 1,
-      'status' => NodeInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
     ]);
     $node1->save();
 
@@ -170,7 +170,7 @@ class RelationshipNodeFileDataTest extends ViewsKernelTestBase {
       'title' => $this->randomMachineName(8),
       'created' => 1,
       'changed' => 1,
-      'status' => NodeInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
       'node_file' => ['target_id' => $file2->id()],
     ]);
     $node2->save();

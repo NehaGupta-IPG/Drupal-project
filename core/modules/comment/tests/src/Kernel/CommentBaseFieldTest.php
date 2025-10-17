@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Kernel;
 
-use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment_base_field_test\Entity\CommentTestBaseField;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -57,7 +57,7 @@ class CommentBaseFieldTest extends KernelTestBase {
       'field_name' => 'test_comment',
       'pid' => 0,
       'uid' => 0,
-      'status' => CommentInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
       'subject' => $this->randomMachineName(),
       'hostname' => '127.0.0.1',
       'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,

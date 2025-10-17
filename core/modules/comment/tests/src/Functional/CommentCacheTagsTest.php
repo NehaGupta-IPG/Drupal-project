@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\comment\CommentInterface;
 use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\EntityTestHelper;
@@ -95,7 +95,7 @@ class CommentCacheTagsTest extends EntityWithUriCacheTagsTestBase {
       'entity_id' => $this->entityTestCamelid->id(),
       'entity_type' => 'entity_test',
       'field_name' => 'comment',
-      'status' => CommentInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
     ]);
     $comment->save();
 
@@ -128,7 +128,7 @@ class CommentCacheTagsTest extends EntityWithUriCacheTagsTestBase {
       'entity_id' => $this->entityTestHippopotamidae->id(),
       'entity_type' => 'entity_test',
       'field_name' => 'comment',
-      'status' => CommentInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
     ]);
     $hippo_comment->save();
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\history\Functional;
 
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\comment\CommentInterface;
 use Drupal\Tests\comment\Functional\CommentTestBase;
 use Drupal\user\RoleInterface;
 use Drupal\comment\Entity\Comment;
@@ -55,7 +55,7 @@ class CommentCSSTest extends CommentTestBase {
     $parameters = [
       'node_uid' => [0, $this->webUser->id()],
       'comment_uid' => [0, $this->webUser->id(), $this->adminUser->id()],
-      'comment_status' => [CommentInterface::PUBLISHED, CommentInterface::NOT_PUBLISHED],
+      'comment_status' => [EntityPublishedInterface::PUBLISHED, EntityPublishedInterface::NOT_PUBLISHED],
       'user' => ['anonymous', 'authenticated', 'admin'],
     ];
     $permutations = $this->generatePermutations($parameters);
@@ -108,7 +108,7 @@ class CommentCSSTest extends CommentTestBase {
       // drupal.comment-new-indicator library to add a "new" indicator to each
       // comment that was created or changed after the last time the current
       // user read the corresponding node.
-      if ($case['comment_status'] == CommentInterface::PUBLISHED || $case['user'] == 'admin') {
+      if ($case['comment_status'] == EntityPublishedInterface::PUBLISHED || $case['user'] == 'admin') {
         $this->assertSession()->elementsCount('xpath', '//*[contains(@class, "comment")]/*[@data-comment-timestamp="' . $comment->getChangedTime() . '"]', 1);
         $expectedJS = ($case['user'] !== 'anonymous');
         $settings = $this->getDrupalSettings();

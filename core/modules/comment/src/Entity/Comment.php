@@ -18,6 +18,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\comment\CommentInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -549,7 +550,7 @@ class Comment extends ContentEntityBase implements CommentInterface {
    *   TRUE if the comment should be published, FALSE otherwise.
    */
   public static function getDefaultStatus() {
-    return \Drupal::currentUser()->hasPermission('skip comment approval') ? CommentInterface::PUBLISHED : CommentInterface::NOT_PUBLISHED;
+    return \Drupal::currentUser()->hasPermission('skip comment approval') ? EntityPublishedInterface::PUBLISHED : EntityPublishedInterface::NOT_PUBLISHED;
   }
 
   /**
