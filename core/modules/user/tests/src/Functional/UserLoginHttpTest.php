@@ -22,6 +22,7 @@ use Symfony\Component\Serializer\Serializer;
  * Tests login and password reset via direct HTTP.
  */
 #[Group('user')]
+#[Group('legacy')]
 #[RunTestsInSeparateProcesses]
 class UserLoginHttpTest extends BrowserTestBase {
 
@@ -102,6 +103,8 @@ class UserLoginHttpTest extends BrowserTestBase {
    * Tests user session life cycle.
    */
   public function testLogin(): void {
+    $this->expectDeprecation('Drupal\user\Controller\UserAuthenticationController is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\rest\Controller\RestAuthenticationController instead. See https://www.drupal.org/node/3552724');
+
     // Without the serialization module only JSON is supported.
     $this->doTestLogin('json');
 
@@ -236,6 +239,8 @@ class UserLoginHttpTest extends BrowserTestBase {
    * Tests user password reset.
    */
   public function testPasswordReset(): void {
+    $this->expectDeprecation('Drupal\user\Controller\UserAuthenticationController is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\rest\Controller\RestAuthenticationController instead. See https://www.drupal.org/node/3552724');
+
     // Create a user account.
     $account = $this->drupalCreateUser();
 

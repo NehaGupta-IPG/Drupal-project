@@ -1,11 +1,36 @@
 rest.pass.http:
-  alias: user.pass.http
+  path: '/rest/password'
+  defaults:
+    _controller: \Drupal\rest\Controller\RestAuthenticationController::resetPassword
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+    _format: 'json'
 
 rest.login.http:
-  alias: user.login.http
+  path: '/rest/login'
+  defaults:
+    _controller: \Drupal\rest\Controller\RestAuthenticationController::login
+  methods: [POST]
+  requirements:
+    _user_is_logged_in: 'FALSE'
+    _format: 'json'
 
 rest.login_status.http:
-  alias: user.login_status.http
+  path: '/rest/login_status'
+  defaults:
+    _controller: \Drupal\rest\Controller\RestAuthenticationController::loginStatus
+  methods: [GET]
+  requirements:
+    _access: 'TRUE'
+    _format: 'json'
 
 rest.logout.http:
-  alias: user.logout.http
+  path: '/rest/logout'
+  defaults:
+    _controller: \Drupal\rest\Controller\RestAuthenticationController::logout
+  methods: [POST]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _format: 'json'
+    _csrf_token: 'TRUE'

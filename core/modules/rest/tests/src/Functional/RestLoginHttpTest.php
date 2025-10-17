@@ -8,8 +8,8 @@ use Drupal\Core\Flood\DatabaseBackend;
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
+use Drupal\rest\Controller\RestAuthenticationController;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\user\Controller\UserAuthenticationController;
 use GuzzleHttp\Cookie\CookieJar;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -132,7 +132,7 @@ class RestLoginHttpTest extends BrowserTestBase {
 
     $login_status_url = $this->getLoginStatusUrlString($format);
     $response = $client->get($login_status_url);
-    $this->assertHttpResponse($response, 200, UserAuthenticationController::LOGGED_OUT);
+    $this->assertHttpResponse($response, 200, RestAuthenticationController::LOGGED_OUT);
 
     // Flooded.
     $this->config('user.flood')
@@ -197,13 +197,13 @@ class RestLoginHttpTest extends BrowserTestBase {
     $this->assertSame(['message' => 'This route can only be accessed by anonymous users.'], $this->serializer->decode((string) $response->getBody(), $format));
 
     $response = $client->get($login_status_url, ['cookies' => $this->cookies]);
-    $this->assertHttpResponse($response, 200, UserAuthenticationController::LOGGED_IN);
+    $this->assertHttpResponse($response, 200, RestAuthenticationController::LOGGED_IN);
 
     $response = $this->logoutRequest($format, $logout_token);
     $this->assertEquals(204, $response->getStatusCode());
 
     $response = $client->get($login_status_url, ['cookies' => $this->cookies]);
-    $this->assertHttpResponse($response, 200, UserAuthenticationController::LOGGED_OUT);
+    $this->assertHttpResponse($response, 200, RestAuthenticationController::LOGGED_OUT);
 
     $this->resetFlood();
   }
@@ -489,7 +489,7 @@ class RestLoginHttpTest extends BrowserTestBase {
 
     // Ensure still logged in.
     $response = $client->get($login_status_url, ['cookies' => $this->cookies]);
-    $this->assertHttpResponse($response, 200, UserAuthenticationController::LOGGED_IN);
+    $this->assertHttpResponse($response, 200, RestAuthenticationController::LOGGED_IN);
 
     // Try with an incorrect token.
     $response = $this->logoutRequest($format, 'not-the-correct-token');
@@ -497,7 +497,7 @@ class RestLoginHttpTest extends BrowserTestBase {
 
     // Ensure still logged in.
     $response = $client->get($login_status_url, ['cookies' => $this->cookies]);
-    $this->assertHttpResponse($response, 200, UserAuthenticationController::LOGGED_IN);
+    $this->assertHttpResponse($response, 200, RestAuthenticationController::LOGGED_IN);
 
     // Try a logout request with correct token.
     $response = $this->logoutRequest($format, $logout_token);
@@ -505,7 +505,7 @@ class RestLoginHttpTest extends BrowserTestBase {
 
     // Ensure actually logged out.
     $response = $client->get($login_status_url, ['cookies' => $this->cookies]);
-    $this->assertHttpResponse($response, 200, UserAuthenticationController::LOGGED_OUT);
+    $this->assertHttpResponse($response, 200, RestAuthenticationController::LOGGED_OUT);
   }
 
   /**
