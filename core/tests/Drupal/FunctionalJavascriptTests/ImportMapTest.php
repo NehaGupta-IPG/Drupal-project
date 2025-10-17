@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests;
 
 use Drupal\Core\Url;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests importmap and scopes.
- *
- * @group Asset
  */
+#[Group('Asset')]
+#[RunTestsInSeparateProcesses]
 final class ImportMapTest extends WebDriverTestBase {
 
   /**

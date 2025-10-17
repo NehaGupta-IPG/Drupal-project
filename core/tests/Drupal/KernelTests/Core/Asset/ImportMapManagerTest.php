@@ -5,19 +5,23 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Asset;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Asset\ImportMapManager;
 use Drupal\Core\Asset\ImportMapManagerInterface;
 use Drupal\Core\Extension\ExtensionPathResolver;
 use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Symfony\Component\HttpFoundation\RequestStack;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests ImportMapManager.
- *
- * @group Asset
- * @covers \Drupal\Core\Asset\ImportMapManager
  */
+#[Group('Asset')]
+#[RunTestsInSeparateProcesses]
+#[CoversClass(ImportMapManager::class)]
 final class ImportMapManagerTest extends KernelTestBase {
 
   /**
