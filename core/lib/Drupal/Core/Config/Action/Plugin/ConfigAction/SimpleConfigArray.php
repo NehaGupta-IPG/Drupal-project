@@ -92,7 +92,7 @@ final class SimpleConfigArray implements ConfigActionPluginInterface, ContainerF
         if (is_array($value['values'])) {
           $arguments = array_values($value['values']);
         }
-        else if (is_string($value['values'])) {
+        elseif (is_string($value['values'])) {
           $arguments = [$value['values']];
         }
       }
