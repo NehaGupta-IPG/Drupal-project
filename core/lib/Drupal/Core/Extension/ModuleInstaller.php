@@ -232,7 +232,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $extension_config = \Drupal::configFactory()->getEditable('core.extension');
       $installed_modules = $extension_config->get('module') ?: [];
     }
-    if (!InstallerKernel::installationAttempted()) {
+    if (!InstallerKernel::installationAttempted() && !\Drupal::isConfigSyncing()) {
       // If the container was rebuilt during hook_install() it might not have
       // the 'router.route_provider.old' service.
       if (\Drupal::hasService('router.route_provider.old')) {
@@ -319,7 +319,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // Update the kernel to include it.
     $this->updateKernel($module_filenames);
 
-    if (!InstallerKernel::installationAttempted()) {
+    if (!InstallerKernel::installationAttempted() && !\Drupal::isConfigSyncing()) {
       // Replace the route provider service with a version that will rebuild
       // if routes are used during installation. This ensures that a module's
       // routes are available during installation. This has to occur before
@@ -656,7 +656,9 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // \Drupal\Core\Routing\RouteBuilder::destruct to not run into errors on
     // fastCGI which executes ::destruct() after the Module uninstallation page
     // was sent already.
-    \Drupal::service('router.builder')->rebuild();
+    if (!\Drupal::isConfigSyncing()) {
+      \Drupal::service('router.builder')->rebuild();
+    }
 
     // Let other modules react.
     $this->moduleHandler->invokeAll('modules_uninstalled', [$module_list, $sync_status]);
@@ -664,9 +666,11 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // Flush all persistent caches.
     // Any cache entry might implicitly depend on the uninstalled modules,
     // so clear all of them explicitly.
-    $this->moduleHandler->invokeAll('cache_flush');
-    foreach (Cache::getBins() as $cache_backend) {
-      $cache_backend->deleteAll();
+    if (!\Drupal::isConfigSyncing()) {
+      $this->moduleHandler->invokeAll('cache_flush');
+      foreach (Cache::getBins() as $cache_backend) {
+        $cache_backend->deleteAll();
+      }
     }
 
     return TRUE;
