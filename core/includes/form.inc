@@ -870,28 +870,17 @@ function &batch_get() {
  *   The batch array.
  * @param string $set_id
  *   The id of the set to process.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+ *    Use \Drupal\Core\Batch\BatchProcessorInterface::queuePopulate() instead.
+ *
+ * @see https://www.drupal.org/node/3229844
  */
 function _batch_populate_queue(&$batch, $set_id): void {
-  $batch_set = &$batch['sets'][$set_id];
-
-  if (isset($batch_set['operations'])) {
-    $batch_set += [
-      'queue' => [
-        'name' => 'drupal_batch:' . $batch['id'] . ':' . $set_id,
-        'class' => $batch['progressive'] ? 'Drupal\Core\Queue\Batch' : 'Drupal\Core\Queue\BatchMemory',
-      ],
-    ];
-
-    /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
-    $batch_processor = \Drupal::service(BatchProcessorInterface::class);
-    $queue = $batch_processor->getQueue($batch_set);
-    $queue->createQueue();
-    foreach ($batch_set['operations'] as $operation) {
-      $queue->createItem($operation);
-    }
-
-    unset($batch_set['operations']);
-  }
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::queuePopulate() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+  /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+  $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+  $batch_processor->queuePopulate($batch, $set_id);
 }
 
 /**

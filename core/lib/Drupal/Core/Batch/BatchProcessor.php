@@ -104,7 +104,24 @@ class BatchProcessor implements BatchProcessorInterface {
    * @internal
    */
   public function queuePopulate(array &$batch, string $set_id): void {
-    _batch_populate_queue($batch, $set_id);
+    $batch_set = &$batch['sets'][$set_id];
+
+    if (isset($batch_set['operations'])) {
+      $batch_set += [
+        'queue' => [
+          'name' => 'drupal_batch:' . $batch['id'] . ':' . $set_id,
+          'class' => $batch['progressive'] ? 'Drupal\Core\Queue\Batch' : 'Drupal\Core\Queue\BatchMemory',
+        ],
+      ];
+
+      $queue = $this->getQueue($batch_set);
+      $queue->createQueue();
+      foreach ($batch_set['operations'] as $operation) {
+        $queue->createItem($operation);
+      }
+
+      unset($batch_set['operations']);
+    }
   }
 
   /**
