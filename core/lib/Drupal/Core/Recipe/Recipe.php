@@ -125,9 +125,18 @@ final class Recipe {
     // @see ::validateConfigActions()
     $include_path = dirname($file, 2);
 
+    $translatable_string_constraint = new AtLeastOneOf(
+      [
+        new Type('string'),
+        new Type(TranslatableMarkup::class),
+      ],
+      message: 'This value must be a string or a string tagged with !translate.',
+      includeInternalMessages: FALSE
+    );
+
     $constraints = new Collection([
       'name' => new Required([
-        new Type('string'),
+        $translatable_string_constraint,
         new NotBlank(),
         // Matching `type: label` in core.data_types.schema.yml.
         new RegexConstraint(
@@ -192,14 +201,7 @@ final class Recipe {
             fields: [
               // Every input definition must have a description.
               'description' => [
-                new AtLeastOneOf(
-                  [
-                    new Type('string'),
-                    new Type(TranslatableMarkup::class),
-                  ],
-                  message: 'This value must be a string or a string tagged with !translate.',
-                  includeInternalMessages: FALSE
-                ),
+                $translatable_string_constraint,
                 new NotBlank(),
               ],
               // There can be an optional set of constraints, which is an

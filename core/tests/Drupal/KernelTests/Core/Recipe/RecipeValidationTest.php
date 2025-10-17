@@ -40,7 +40,7 @@ class RecipeValidationTest extends KernelTestBase {
     yield 'name is not a string' => [
       'name: 39',
       [
-        '[name]' => ['This value should be of type string.'],
+        '[name]' => ['This value must be a string or a string tagged with !translate.'],
       ],
     ];
     yield 'name is null' => [
