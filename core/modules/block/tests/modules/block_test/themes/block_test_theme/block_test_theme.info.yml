@@ -12,5 +12,5 @@ regions:
   highlighted: Highlighted
   help: Help
 regions_hidden:
-  - drupal:sidebar_first
-  - drupal:sidebar_second
+  - sidebar_first
+  - sidebar_second
