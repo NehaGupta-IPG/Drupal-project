@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\Form;
 
+// cspell:ignore Büikuchen Betreibers Unfug erlauben Rezept anwenden Feld ist
+// cspell:ignore erforderlich finde solltest keine besitzen Revier
+
 use Drupal\Core\Recipe\RecipeInputFormTrait;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\CoversTrait;
