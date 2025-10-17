@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\tabledrag_test\Form;
 
 use Drupal\Core\Form\FormBase;
@@ -37,7 +39,7 @@ class TableDragSubgroupTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): TableDragSubgroupTestForm {
     return new static($container->get('state'));
   }
 
@@ -217,7 +219,7 @@ class TableDragSubgroupTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $test_table = [];
     foreach ($form_state->getValue('table') as $row) {
       $test_table[$row['id']] = $row;

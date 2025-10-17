@@ -42,7 +42,7 @@ class TableDragSubgroupTest extends WebDriverTestBase {
   /**
    * Tests that dragging rows up and down in a sub-grouped table works.
    */
-  public function testVerticalDragAndDrop() {
+  public function testVerticalDragAndDrop(): void {
     $this->drupalGet('tabledrag_subgroup_test');
 
     $this->assertDraggableTable([
@@ -91,7 +91,7 @@ class TableDragSubgroupTest extends WebDriverTestBase {
   /**
    * Tests that dragging rows into a hierarchy in a sub-grouped table works.
    */
-  public function testHierarchicalDragAndDrop() {
+  public function testHierarchicalDragAndDrop(): void {
     $this->drupalGet('tabledrag_subgroup_test');
 
     $this->assertDraggableTable([
@@ -150,13 +150,13 @@ class TableDragSubgroupTest extends WebDriverTestBase {
    * Drag a row to the child of another row.
    *
    * @param \Behat\Mink\Element\NodeElement $child
-   *   The row to drag into the child position;
+   *   The row to drag into the child position.
    * @param \Behat\Mink\Element\NodeElement $parent
-   *   The row that will be parent;
+   *   The row that will be parent.
    * @param string $direction
    *   Pass 'up' if the child row is being dragged up; 'down' otherwise.
    */
-  protected function dragToChild($child, $parent, $direction) {
+  protected function dragToChild($child, $parent, $direction): void {
     $child_handle = $this->findDragHandle($child);
     $parent_target = $parent->find('css', "[data-drop-target-child-$direction]");
     $child_handle->dragTo($parent_target);
@@ -165,7 +165,7 @@ class TableDragSubgroupTest extends WebDriverTestBase {
   /**
    * Waits for tabledrag dragging to finish.
    */
-  protected function waitForDragging() {
+  protected function waitForDragging(): void {
     $this->assertSession()->assertNoElementAfterWait('css', '#tabledrag-test-table tr.drag');
   }
 
@@ -214,7 +214,7 @@ class TableDragSubgroupTest extends WebDriverTestBase {
    *   - changed: whether or not the row should have been marked as changed.
    *   - weight: (optional) the expected row weight.
    */
-  protected function assertDraggableTable(array $structure) {
+  protected function assertDraggableTable(array $structure): void {
     $rows = $this->getSession()->getPage()->findAll('xpath', '//table[@id="tabledrag-test-table"]/tbody/tr[contains(@class, "draggable")]');
     $this->assertCount(count($structure), $rows, "An unexpected number of draggable table rows was found.");
 
@@ -246,7 +246,7 @@ class TableDragSubgroupTest extends WebDriverTestBase {
    *   (optional) The expected weight of the row or NULL to not test the weight;
    *   defaults to NULL.
    */
-  protected function assertTableRow(NodeElement $row, $id, $group, $parent = '', $indent = 0, $changed = FALSE, $weight = NULL) {
+  protected function assertTableRow(NodeElement $row, $id, $group, $parent = '', $indent = 0, $changed = FALSE, $weight = NULL): void {
     // Assert that the row position is correct by checking that the id
     // corresponds.
     $this->assertSession()->hiddenFieldValueEquals("table[$id][id]", $id, $row);
