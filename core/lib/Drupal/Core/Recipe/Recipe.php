@@ -192,7 +192,10 @@ final class Recipe {
             fields: [
               // Every input definition must have a description.
               'description' => [
-                new Type('string'),
+                new AtLeastOneOf([
+                  new Type('string'),
+                  new Type(TranslatableMarkup::class),
+                ]),
                 new NotBlank(),
               ],
               // There can be an optional set of constraints, which is an

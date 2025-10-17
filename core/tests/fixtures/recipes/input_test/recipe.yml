@@ -6,24 +6,24 @@ recipes:
 input:
   owner:
     data_type: string
-    description: 'The name of the site owner.'
+    description: !translate 'The name of the site owner.'
     constraints:
       Regex:
         pattern: '/hack/i'
         match: false
-        message: "I don't think you should be owning sites."
+        message: !translate "I don't think you should be owning sites."
     form:
       '#type': textfield
-      '#title': "Site owner's name"
+      '#title': !translate "Site owner's name"
     default:
       source: value
-      value: 'Dries Buytaert'
+      value: !translate 'Dries Buytaert'
   break_stuff:
     data_type: boolean
-    description: 'Should mischief be allowed on this site? Not recommended.'
+    description: !translate 'Should mischief be allowed on this site? Not recommended.'
     form:
       '#type': checkbox
-      '#title': 'Allow mischief'
+      '#title': !translate 'Allow mischief'
     default:
       source: value
       value: false
@@ -31,4 +31,4 @@ config:
   actions:
     system.site:
       simpleConfigUpdate:
-        name: "${owner}'s Turf"
+        name: !translate "${owner}'s Turf"

@@ -12,6 +12,7 @@ use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\DefaultContent\Existing;
 use Drupal\Core\DefaultContent\Importer;
 use Drupal\Core\DefaultContent\Finder;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -347,8 +348,8 @@ final class RecipeRunner {
    *   The passed data, with placeholders replaced.
    */
   private static function replaceInputValues(mixed $data, array $replace): mixed {
-    if (is_string($data)) {
-      $data = str_replace(array_keys($replace), $replace, $data);
+    if (is_string($data) || $data instanceof TranslatableMarkup) {
+      $data = str_replace(array_keys($replace), $replace, (string) $data);
     }
     elseif (is_array($data)) {
       foreach ($data as $key => $value) {
