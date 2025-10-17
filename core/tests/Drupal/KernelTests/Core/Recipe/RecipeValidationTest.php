@@ -416,7 +416,7 @@ input:
       value: Here be dragons
 YAML,
       [
-        '[input][foo][description]' => ['This value should be of type string.'],
+        '[input][foo][description]' => ['This value should satisfy at least one of the following constraints: [1] This value should be of type string. [2] This value should be of type Drupal\Core\StringTranslation\TranslatableMarkup.'],
       ],
     ];
     yield 'input description is blank' => [
