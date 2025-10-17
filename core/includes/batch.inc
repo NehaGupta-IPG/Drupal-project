@@ -415,12 +415,19 @@ function _batch_api_percentage($total, $current) {
 
 /**
  * Returns the batch set being currently processed.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+ *    Use \Drupal\Core\Batch\BatchProcessorInterface::getCurrentSet() instead.
+ *
+ * @see https://www.drupal.org/node/3229844
  */
 function &_batch_current_set() {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::getCurrentSet() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
   /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
   $batch_processor = \Drupal::service(BatchProcessorInterface::class);
-  $batch = &$batch_processor->getCurrentBatch();
-  return $batch['sets'][$batch['current_set']];
+  // Only variables can be returned by reference.
+  $batch_current_set = $batch_processor->getCurrentSet();
+  return $batch_current_set;
 }
 
 /**

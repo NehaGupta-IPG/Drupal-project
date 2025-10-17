@@ -160,7 +160,8 @@ class BatchProcessor implements BatchProcessorInterface {
    * {@inheritdoc}
    */
   public function &getCurrentSet(): array {
-    return _batch_current_set();
+    $batch = &$this->getCurrentBatch();
+    return $batch['sets'][$batch['current_set']];
   }
 
   /**
