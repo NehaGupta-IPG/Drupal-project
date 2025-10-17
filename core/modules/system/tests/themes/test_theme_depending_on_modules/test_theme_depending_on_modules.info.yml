@@ -2,5 +2,5 @@ name: Test Theme Depending on Modules
 type: theme
 base theme: stark
 dependencies:
-  - drupal:test_module_required_by_theme
-  - drupal:test_another_module_required_by_theme
+  - test_module_required_by_theme
+  - test_another_module_required_by_theme
