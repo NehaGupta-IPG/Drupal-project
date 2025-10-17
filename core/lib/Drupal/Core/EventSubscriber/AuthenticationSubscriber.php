@@ -49,8 +49,8 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
     protected AccountProxyInterface $accountProxy,
     protected AuthenticationCollectorInterface $authenticationCollector,
   ) {
-    $this->filter = ($authentication_provider instanceof AuthenticationProviderFilterInterface) ? $authentication_provider : NULL;
-    $this->challengeProvider = ($authentication_provider instanceof AuthenticationProviderChallengeInterface) ? $authentication_provider : NULL;
+    $this->filter = ($authenticationProvider instanceof AuthenticationProviderFilterInterface) ? $authenticationProvider : NULL;
+    $this->challengeProvider = ($authenticationProvider instanceof AuthenticationProviderChallengeInterface) ? $authenticationProvider : NULL;
   }
 
   /**
