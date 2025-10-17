@@ -19,20 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class TableDragSubgroupTestForm extends FormBase {
 
-  /**
-   * The state service.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
-   * Constructs a TableDragTestForm object.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   */
-  public function __construct(StateInterface $state) {
+  public function __construct(protected StateInterface $state) {
     $this->state = $state;
   }
 

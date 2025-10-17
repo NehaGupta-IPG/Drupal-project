@@ -222,10 +222,10 @@ class TableDragSubgroupTest extends WebDriverTestBase {
 
     foreach ($structure as $delta => $expected) {
       $parent = $expected['parent'] ?? '';
-      $indent = $expected['indent'] ?? '0';
+      $indent = $expected['indent'] ?? 0;
       $changed = $expected['changed'] ?? FALSE;
       $weight = $expected['weight'] ?? NULL;
-      $this->assertTableRow($rows[$delta], $expected['id'], $expected['group'], $parent, $indent, $changed, $weight);
+      $this->assertTableRow($rows[$delta], (string) $expected['id'], $expected['group'], $parent, $indent, $changed, $weight);
     }
   }
 
