@@ -51,10 +51,9 @@
         .each(function () {
           const $checkbox = $(this);
           const stateChanged = $checkbox.prop('checked') !== state;
-
-          $checkbox.attr(
-            'title',
-            state ? strings.selectNone : strings.selectAll,
+          const labelContents = state ? strings.selectNone : strings.selectAll;
+          $(`label[for="${$checkbox.attr('id')}"]`).html(
+            `<span>${labelContents}</span>`
           );
 
           /**
