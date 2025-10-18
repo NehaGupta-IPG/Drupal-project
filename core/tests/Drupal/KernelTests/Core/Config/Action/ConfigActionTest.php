@@ -487,6 +487,61 @@ class ConfigActionTest extends KernelTestBase {
   }
 
   /**
+   * @testWith ["append", {"values": ["one", "three"]}, ["itemA", "itemB", "one", "three", "one", "three"]]
+   *   ["prepend", {"values": ["undo", "redo"]}, ["undo", "redo", "undo", "redo", "itemA", "itemB"]]
+   *   ["splice", {"offset": 1, "replacement": ["c", "d"]}, ["itemA", "c", "d"]]
+   *   ["splice", {"offset": 1, "length": 0, "replacement": ["c", "d"]}, ["itemA", "c", "d", "c", "d", "itemB"]]
+   *   ["splice", {"offset": 1, "length": 0}, ["itemA", "itemB"]]
+   *   ["splice", {"offset": 1}, ["itemA"]]
+   */
+  public function testSimpleConfigArrayAppliedTwiceWithoutUniqueSetting(string $derivative_id, array $value, array $expected_value): void {
+    $this->installConfig('config_test');
+
+    // Apply the action the first time.
+    $this->container->get('plugin.manager.config_action')->applyAction(
+      "simpleConfigArray:$derivative_id",
+      'config_test.system',
+      ['property' => 'array'] + $value,
+    );
+
+    // Apply the action the second time, which should add the same values again.
+    $this->container->get('plugin.manager.config_action')->applyAction(
+      "simpleConfigArray:$derivative_id",
+      'config_test.system',
+      ['property' => 'array'] + $value,
+    );
+    $this->assertSame($expected_value, $this->config('config_test.system')->get('array'));
+  }
+
+  /**
+   * @testWith ["append", {"values": ["one", "three"]}, ["itemA", "itemB", "one", "three"]]
+   *   ["prepend", {"values": ["undo", "redo"]}, ["undo", "redo", "itemA", "itemB"]]
+   *   ["splice", {"offset": 1, "replacement": ["c", "d"]}, ["itemA", "c", "d"]]
+   *   ["splice", {"offset": 1, "length": 0, "replacement": ["c", "d"]}, ["itemA", "c", "d", "itemB"]]
+   *   ["splice", {"offset": 1, "length": 0}, ["itemA", "itemB"]]
+   *   ["splice", {"offset": 1}, ["itemA"]]
+   */
+  public function testSimpleConfigArrayAppliedTwiceWithUniqueSetting(string $derivative_id, array $value, array $expected_value): void {
+    $this->installConfig('config_test');
+
+    // Apply the action the first time.
+    $this->container->get('plugin.manager.config_action')->applyAction(
+      "simpleConfigArray:$derivative_id",
+      'config_test.system',
+      ['property' => 'array', 'unique' => TRUE] + $value,
+    );
+    $this->assertEqualsCanonicalizing($expected_value, $this->config('config_test.system')->get('array'));
+
+    // Apply the action the second time, which should not change the values.
+    $this->container->get('plugin.manager.config_action')->applyAction(
+      "simpleConfigArray:$derivative_id",
+      'config_test.system',
+      ['property' => 'array', 'unique' => TRUE] + $value,
+    );
+    $this->assertEqualsCanonicalizing($expected_value, $this->config('config_test.system')->get('array'));
+  }
+
+  /**
    * @see \Drupal\Core\Config\Action\ConfigActionManager::getShorthandActionIdsForEntityType()
    */
   public function testShorthandActionIds(): void {

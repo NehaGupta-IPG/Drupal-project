@@ -72,6 +72,8 @@ final class SimpleConfigArray implements ConfigActionPluginInterface, ContainerF
    * @param array $value
    *   An associative array containing:
    *   - `property`: The property path to update in the config object.
+   *   - `unique`: Whether to enforce uniqueness of array values. Defaults to
+   *      FALSE if not provided.
    *   - `values`: An array of values to append or prepend to the property, if
    *     this action is appending or prepending.
    *   - ... Named arguments to pass to `array_splice()`, if this action is
@@ -83,6 +85,9 @@ final class SimpleConfigArray implements ConfigActionPluginInterface, ContainerF
     }
     $property_name = $value['property'];
     unset($value['property']);
+
+    $unique = !empty($value['unique']) && (bool) $value['unique'];
+    unset($value['unique']);
 
     // The `array_push()` and `array_unshift()` functions have a similar
     // signature, and need to be given an array of values.
@@ -112,6 +117,11 @@ final class SimpleConfigArray implements ConfigActionPluginInterface, ContainerF
       throw new ConfigActionException("Config " . $config->getName() . " cannot be updated because the property '$property_name' is not an array.");
     }
     ($this->function)($property_value, ...$arguments);
+
+    // Check if the array should be unique.
+    if ($unique) {
+      $property_value = array_unique($property_value);
+    }
     $config->set($property_name, $property_value);
   }
 
