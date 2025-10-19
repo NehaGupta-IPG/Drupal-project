@@ -53,7 +53,7 @@
           const stateChanged = $checkbox.prop('checked') !== state;
           const labelContents = state ? strings.selectNone : strings.selectAll;
           $(`label[for="${$checkbox.attr('id')}"]`).html(
-            `<span>${labelContents}</span>`
+            `<span>${labelContents}</span>`,
           );
 
           /**
