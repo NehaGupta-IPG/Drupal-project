@@ -11,6 +11,8 @@
  * See COPYRIGHT.txt and LICENSE.txt files in the "core" directory.
  */
 
+declare(strict_types=1);
+
 use Drupal\Core\DrupalKernel;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -23,4 +25,3 @@ $response = $kernel->handle($request);
 $response->send();
 
 $kernel->terminate($request, $response);
-
