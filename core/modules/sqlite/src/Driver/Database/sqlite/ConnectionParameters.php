@@ -7,7 +7,7 @@ namespace Drupal\sqlite\Driver\Database\sqlite;
 use Drupal\Core\Database\ConnectionParametersBase;
 
 /**
- * Connection parameters object for an SQLite database connection.
+ * Connection parameters object for an SQLite database.
  */
 class ConnectionParameters extends ConnectionParametersBase {
 }

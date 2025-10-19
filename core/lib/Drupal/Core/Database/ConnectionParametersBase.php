@@ -7,7 +7,7 @@ namespace Drupal\Core\Database;
 /**
  * Base class for connection parameters objects.
  */
-abstract class ConnectionParametersBase implements ConnectionParametersInterface {
+abstract class ConnectionParametersBase implements ConnectionParametersInterface, \ArrayAccess {
 
   /**
    * Tables prefix.
@@ -36,10 +36,10 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
 
   public function __construct(
     public readonly string $driver,
-    public readonly ?string $namespace,
-    public readonly ?string $autoload,
+    public readonly string $namespace,
+    public readonly string $autoload,
     public readonly string $database,
-    string $prefix = '',
+    string $prefix,
     public readonly ?string $username = NULL,
     public readonly ?string $password = NULL,
     public readonly ?string $host = NULL,
@@ -54,6 +54,34 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public function getDriverConnectionClassName(): string {
     return $this->namespace . '\\Connection';
+  }
+
+  /**
+   * This is for BC support only.
+   */
+  public function offsetExists(mixed $offset): bool {
+    return property_exists($this, $offset);
+  }
+
+  /**
+   * This is for BC support only.
+   */
+  public function offsetGet(mixed $offset): mixed {
+    return $this->{$offset};
+  }
+
+  /**
+   * This is for BC support only.
+   */
+  public function offsetSet(mixed $offset, mixed $value): void {
+    $this->{$offset} = $value;
+  }
+
+  /**
+   * This is for BC support only.
+   */
+  public function offsetUnset(mixed $offset): void {
+    $this->{$offset} = NULL;
   }
 
 }
