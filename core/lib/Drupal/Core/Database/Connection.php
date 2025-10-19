@@ -178,45 +178,15 @@ abstract class Connection {
   public function __construct(object $connection, ConnectionParametersInterface|array $connection_options) {
     assert(count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
 
-    // Manage the table prefix.
     if (is_array($connection_options)) {
-      $connection_options = $this->convertConnectionOptionsArrayToConnectionParameters($connection_options);
+      $connection_options = Database::convertConnectionOptionsArrayToConnectionParameters($connection_options);
     }
 
+    // Manage the table prefix.
     $this->setPrefix($connection_options->prefix);
 
     $this->connection = $connection;
     $this->connectionOptions = $connection_options;
-  }
-
-  /**
-   * Converts a connection options array to a ConnectionParameters object.
-   *
-   * @param array $connection_options
-   *   An array of options for the connection.
-   *
-   * @return ConnectionParametersInterface
-   *   A ConnectionParameters object.
-   */
-  public static function convertConnectionOptionsArrayToConnectionParameters(array $connection_options): ConnectionParametersInterface {
-    return new class ($connection_options) extends ConnectionParametersBase {
-
-      public function __construct(array $connection_options) {
-        parent::__construct(
-          $connection_options['driver'],
-          $connection_options['namespace'],
-          $connection_options['autoload'],
-          $connection_options['database'],
-          $connection_options['prefix'],
-          $connection_options['username'] ?? NULL,
-          $connection_options['password'] ?? NULL,
-          $connection_options['host'] ?? NULL,
-          $connection_options['port'] ?? NULL,
-          $connection_options['dependencies'] ?? [],
-        );
-      }
-
-    };
   }
 
   /**

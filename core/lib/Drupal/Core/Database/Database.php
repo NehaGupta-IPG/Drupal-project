@@ -245,13 +245,15 @@ abstract class Database {
     }
 
     $connectionParametersClass = $connection_info['namespace'] . '\\ConnectionParameters';
-    return new $connectionParametersClass(
-      $connection_info['driver'],
-      $connection_info['namespace'],
-      $connection_info['autoload'],
-      $connection_info['database'],
-      $connection_info['prefix'],
-    );
+    return class_exists($connectionParametersClass) ?
+      new $connectionParametersClass(
+        $connection_info['driver'],
+        $connection_info['namespace'],
+        $connection_info['autoload'],
+        $connection_info['database'],
+        $connection_info['prefix'],
+      ) :
+      self::convertConnectionOptionsArrayToConnectionParameters($connection_info);
   }
 
   /**
@@ -679,6 +681,36 @@ abstract class Database {
       $registered = TRUE;
       drupal_register_shutdown_function('\Drupal\Core\Database\Database::commitAllOnShutdown', TRUE);
     }
+  }
+
+  /**
+   * Converts a connection options array to a ConnectionParameters object.
+   *
+   * @param array $connection_options
+   *   An array of options for the connection.
+   *
+   * @return ConnectionParametersInterface
+   *   A ConnectionParameters object.
+   */
+  public static function convertConnectionOptionsArrayToConnectionParameters(array $connection_options): ConnectionParametersInterface {
+    return new class ($connection_options) extends ConnectionParametersBase {
+
+      public function __construct(array $connection_options) {
+        parent::__construct(
+          $connection_options['driver'],
+          $connection_options['namespace'],
+          $connection_options['autoload'],
+          $connection_options['database'],
+          $connection_options['prefix'],
+          $connection_options['username'] ?? NULL,
+          $connection_options['password'] ?? NULL,
+          $connection_options['host'] ?? NULL,
+          $connection_options['port'] ?? NULL,
+          $connection_options['dependencies'] ?? [],
+        );
+      }
+
+    };
   }
 
 }
