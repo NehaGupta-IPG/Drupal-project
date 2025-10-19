@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Site;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Core\Database\ConnectionParametersInterface;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
@@ -332,6 +333,7 @@ class SettingsTest extends UnitTestCase {
   public function testDatabaseInfoInitialization(string $driver, ?string $namespace, ?string $autoload, string $expected_namespace, ?string $expected_autoload): void {
     $databases['mock'][$driver] = [
       'driver' => $driver,
+      'database' => 'test',
       'prefix' => '',
     ];
     if (!is_null($namespace)) {
@@ -361,17 +363,14 @@ class SettingsTest extends UnitTestCase {
 
     Settings::initialize(vfsStream::url('root'), 'sites', $class_loader);
 
-    $expected = [
-      $driver => [
-        'driver' => $driver,
-        'namespace' => $expected_namespace,
-        'prefix' => '',
-      ],
-    ];
+    $mock_connection_parameters = Database::getConnectionInfo('mock')[$driver];
+    $this->assertInstanceOf(ConnectionParametersInterface::class, $mock_connection_parameters);
+    $this->assertSame($driver, $mock_connection_parameters->driver);
+    $this->assertSame($expected_namespace, $mock_connection_parameters->namespace);
+    $this->assertSame('', $mock_connection_parameters->prefix);
     if (!is_null($expected_autoload)) {
-      $expected[$driver]['autoload'] = $expected_autoload;
+      $this->assertSame($expected_autoload, $mock_connection_parameters->autoload);
     }
-    $this->assertEquals($expected, Database::getConnectionInfo('mock'));
   }
 
   /**
