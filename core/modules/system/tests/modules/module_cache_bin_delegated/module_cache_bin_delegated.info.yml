@@ -1,0 +1,6 @@
+name: module cache bin delegation tests
+type: module
+description: Test delegated cache bin backward compatibility.
+package: Testing
+version: VERSION
+hidden: true

@@ -221,11 +221,12 @@ services:
   Drupal\Core\Cache\CacheFactoryInterface: '@cache_factory'
   variation_cache_factory:
     class: Drupal\Core\Cache\VariationCacheFactory
-    arguments: ['@request_stack', '@cache_factory', '@cache_contexts_manager']
+    arguments: ['@request_stack', '@Drupal\Core\Cache\DelegatedCacheFactory', '@cache_contexts_manager']
   Drupal\Core\Cache\VariationCacheFactory: '@variation_cache_factory'
   cache_contexts_manager:
     class: Drupal\Core\Cache\Context\CacheContextsManager
     arguments: ['@service_container', '%cache_contexts%' ]
+  Drupal\Core\Cache\DelegatedCacheFactory: ~
   Drupal\Core\Cache\Context\CacheContextsManager: '@cache_contexts_manager'
   cache_tags.invalidator:
     class: Drupal\Core\Cache\CacheTagsInvalidator
@@ -270,67 +271,67 @@ services:
   cache.static:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
-      - { name: cache.bin, default_backend: cache.backend.memory }
+      - { name: cache.bin, bin: static, default_backend: cache.backend.memory }
     factory: ['@cache_factory', 'get']
     arguments: [static]
   cache.bootstrap:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
-      - { name: cache.bin, default_backend: cache.backend.chainedfast }
+      - { name: cache.bin, bin: bootstrap, default_backend: cache.backend.chainedfast }
     factory: ['@cache_factory', 'get']
     arguments: [bootstrap]
   cache.config:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
-      - { name: cache.bin, default_backend: cache.backend.chainedfast }
+      - { name: cache.bin, bin: config, default_backend: cache.backend.chainedfast }
     factory: ['@cache_factory', 'get']
     arguments: [config]
   cache.default:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
-      - { name: cache.bin }
+      - { name: cache.bin, bin: default }
     factory: ['@cache_factory', 'get']
     arguments: [default]
   cache.entity:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
-      - { name: cache.bin }
+      - { name: cache.bin, bin: entity }
     factory: ['@cache_factory', 'get']
     arguments: [entity]
   cache.menu:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
-      - { name: cache.bin }
+      - { name: cache.bin, bin: menu }
     factory: ['@cache_factory', 'get']
     arguments: [menu]
   cache.render:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
-      - { name: cache.bin }
+      - { name: cache.bin, bin: render }
     factory: ['@cache_factory', 'get']
     arguments: [render]
   cache.access_policy:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
-      - { name: cache.bin }
+      - { name: cache.bin, bin: access_policy }
     factory: ['@cache_factory', 'get']
     arguments: [access_policy]
   cache.access_policy_memory:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
-      - { name: cache.bin.memory, default_backend: cache.backend.memory.memory }
+      - { name: cache.bin.memory, bin: access_policy_memory, default_backend: cache.backend.memory.memory }
     factory: ['@cache_factory', 'get']
     arguments: [access_policy_memory]
   cache.data:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
-      - { name: cache.bin }
+      - { name: cache.bin, bin: data }
     factory: ['@cache_factory', 'get']
     arguments: [data]
   cache.discovery:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
-      - { name: cache.bin, default_backend: cache.backend.chainedfast }
+      - { name: cache.bin, bin: discovery, default_backend: cache.backend.chainedfast }
     factory: ['@cache_factory', 'get']
     arguments: [discovery]
   cache_prewarmer:

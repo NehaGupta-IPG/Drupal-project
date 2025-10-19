@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Controller;
 
+use Drupal\Core\Cache\DelegatedCacheFactory;
 use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Logger\LoggerChannelTrait;
@@ -140,7 +141,7 @@ abstract class ControllerBase implements ContainerInjectionInterface {
    *   The cache object associated with the specified bin.
    */
   protected function cache($bin = 'default') {
-    return $this->container()->get('cache.' . $bin);
+    return $this->container()->get(DelegatedCacheFactory::class)->get($bin);
   }
 
   /**

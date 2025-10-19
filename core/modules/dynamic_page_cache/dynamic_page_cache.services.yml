@@ -7,7 +7,7 @@ services:
   cache.dynamic_page_cache:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
-      - { name: cache.bin }
+      - { name: cache.bin, bin: dynamic_page_cache }
     factory: ['@cache_factory', 'get']
     arguments: [dynamic_page_cache]
   variation_cache.dynamic_page_cache:

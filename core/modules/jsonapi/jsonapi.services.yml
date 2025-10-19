@@ -131,7 +131,7 @@ services:
   cache.jsonapi_memory:
     class: Drupal\Core\Cache\MemoryCache\MemoryCacheInterface
     tags:
-      - { name: cache.bin.memory, default_backend: cache.backend.memory.memory }
+      - { name: cache.bin.memory, bin: jsonapi_memory, default_backend: cache.backend.memory.memory }
     factory: ['@cache_factory', 'get']
     arguments: [jsonapi_memory]
 
@@ -145,11 +145,11 @@ services:
     calls:
       - [appendBackend, ['@cache.jsonapi_memory']]
       - [appendBackend, ['@cache.default']]
-    tags: [{ name: cache.bin.memory }]
+    tags: [{ name: cache.bin.memory, bin: jsonapi_resource_types }]
   cache.jsonapi_normalizations:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
-      - { name: cache.bin }
+      - { name: cache.bin, bin: jsonapi_normalizations }
     factory: ['@cache_factory', 'get']
     arguments: [jsonapi_normalizations]
   variation_cache.jsonapi_normalizations:

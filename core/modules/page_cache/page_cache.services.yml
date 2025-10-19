@@ -13,6 +13,6 @@ services:
   cache.page:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
-      - { name: cache.bin }
+      - { name: cache.bin, bin: page }
     factory: ['@cache_factory', 'get']
     arguments: [page]

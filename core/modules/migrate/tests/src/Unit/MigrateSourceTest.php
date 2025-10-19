@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate\Unit;
 
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\DelegatedCacheFactory;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
@@ -95,7 +96,9 @@ class MigrateSourceTest extends MigrateTestCase {
       ->willReturn($key_value);
     $container->set('keyvalue', $key_value_factory);
 
-    $container->set('cache.migrate', $this->createMock(CacheBackendInterface::class));
+    $cache_factory_delegated = $this->prophesize(DelegatedCacheFactory::class);
+    $cache_factory_delegated->get('migrate')->willReturn($this->createMock(CacheBackendInterface::class));
+    $container->set(DelegatedCacheFactory::class, $cache_factory_delegated->reveal());
 
     $this->migrationConfiguration = $this->defaultMigrationConfiguration + $migrate_config;
     $this->migration = parent::getMigration();

@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\Core\Cache\DelegatedCacheFactory;
 use Drupal\Core\DependencyInjection\ContainerNotInitializedException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -350,7 +351,7 @@ class Drupal {
    * @ingroup cache
    */
   public static function cache($bin = 'default') {
-    return static::getContainer()->get('cache.' . $bin);
+    return static::getContainer()->get(DelegatedCacheFactory::class)->get($bin);
   }
 
   /**

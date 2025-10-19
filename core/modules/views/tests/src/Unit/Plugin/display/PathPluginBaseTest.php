@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Unit\Plugin\display;
 
+use Drupal\Core\Cache\DelegatedCacheFactory;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Plugin\views\display\PathPluginBase;
@@ -100,6 +101,15 @@ class PathPluginBaseTest extends UnitTestCase {
       ->method('get')
       ->willReturn([]);
     $container->set('cache.data', $cache);
+
+    $delegatedCacheFactory = $this->getMockBuilder(DelegatedCacheFactory::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+    $delegatedCacheFactory->expects($this->any())
+      ->method('get')
+      ->with('data')
+      ->willReturn($cache);
+    $container->set(DelegatedCacheFactory::class, $delegatedCacheFactory);
 
     \Drupal::setContainer($container);
   }
