@@ -43,7 +43,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
     public readonly ?string $username = NULL,
     public readonly ?string $password = NULL,
     public readonly ?string $host = NULL,
-    public readonly ?string $port = NULL,
+    public readonly string|int|null $port = NULL,
     public readonly array $dependencies = [],
   ) {
     $this->prefix = $prefix;

@@ -252,6 +252,11 @@ abstract class Database {
         $connection_info['autoload'],
         $connection_info['database'],
         $connection_info['prefix'],
+        $connection_info['username'] ?? NULL,
+        $connection_info['password'] ?? NULL,
+        $connection_info['host'] ?? NULL,
+        $connection_info['port'] ?? NULL,
+        $connection_info['dependencies'] ?? [],
       ) :
       self::convertConnectionOptionsArrayToConnectionParameters($connection_info);
   }
@@ -594,13 +599,20 @@ abstract class Database {
     }
 
     $connectionParametersClass = $options['namespace'] . '\\ConnectionParameters';
-    return new $connectionParametersClass(
-      $options['driver'],
-      $options['namespace'],
-      $options['autoload'],
-      $options['database'],
-      $options['prefix'] ?? '',
-    );
+    return class_exists($connectionParametersClass) ?
+      new $connectionParametersClass(
+        $options['driver'],
+        $options['namespace'],
+        $options['autoload'],
+        $options['database'],
+        $options['prefix'] ?? '',
+        $options['username'] ?? NULL,
+        $options['password'] ?? NULL,
+        $options['host'] ?? NULL,
+        $options['port'] ?? NULL,
+        $options['dependencies'] ?? [],
+      ) :
+      self::convertConnectionOptionsArrayToConnectionParameters($options);
   }
 
   /**
@@ -701,7 +713,7 @@ abstract class Database {
           $connection_options['namespace'],
           $connection_options['autoload'],
           $connection_options['database'],
-          $connection_options['prefix'],
+          $connection_options['prefix'] ?? '',
           $connection_options['username'] ?? NULL,
           $connection_options['password'] ?? NULL,
           $connection_options['host'] ?? NULL,

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Database;
 
+use Drupal\Core\Database\ConnectionParametersInterface;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Tests\UnitTestCase;
@@ -35,7 +36,17 @@ class UrlConversionTest extends UnitTestCase {
   #[DataProvider('providerConvertDbUrlToConnectionInfo')]
   public function testDbUrlToConnectionConversion($url, $database_array, $include_test_drivers): void {
     $result = Database::convertDbUrlToConnectionInfo($url, $include_test_drivers);
-    $this->assertEquals($database_array, $result);
+    $this->assertInstanceOf(ConnectionParametersInterface::class, $result);
+    $this->assertSame($database_array['driver'], $result->driver);
+    $this->assertSame($database_array['namespace'], $result->namespace);
+    $this->assertSame($database_array['autoload'], $result->autoload);
+    $this->assertSame($database_array['database'], $result->database);
+    $this->assertSame($database_array['prefix'] ?? '', $result->prefix);
+    $this->assertSame($database_array['username'] ?? NULL, $result->username);
+    $this->assertSame($database_array['password'] ?? NULL, $result->password);
+    $this->assertSame($database_array['host'] ?? NULL, $result->host);
+    $this->assertSame($database_array['port'] ?? NULL, $result->port);
+    $this->assertSame($database_array['dependencies'] ?? [], $result->dependencies);
   }
 
   /**
