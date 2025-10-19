@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_translation\Unit\Menu;
 
-
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Tests\Core\Menu\LocalTaskIntegrationTestBase;

@@ -237,7 +237,6 @@ class NodeRevisionsTest extends NodeTestBase {
     $this->assertSession()->addressEquals($nodes[2]->toUrl('version-history'));
     $this->assertSession()->pageTextNotContains($nodes[2]->body->value);
 
-
     // Make a new revision and set it to not be default.
     // This will create a new revision that is not "front facing".
     $new_node_revision = clone $node;

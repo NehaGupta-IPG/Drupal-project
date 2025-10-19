@@ -11,7 +11,6 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\node\Entity\NodeRevisionRouteProvider;
 use Drupal\node\Form\DeleteMultiple;
 use Drupal\node\Form\NodeDeleteForm;
 use Drupal\node\Form\NodeForm;
