@@ -198,8 +198,9 @@ abstract class Connection {
    * @return ConnectionParametersInterface
    *   A ConnectionParameters object.
    */
-  private function convertConnectionOptionsArrayToConnectionParameters(array $connection_options): ConnectionParametersInterface {
+  public static function convertConnectionOptionsArrayToConnectionParameters(array $connection_options): ConnectionParametersInterface {
     return new class ($connection_options) extends ConnectionParametersBase {
+
       public function __construct(array $connection_options) {
         parent::__construct(
           $connection_options['driver'],
@@ -214,6 +215,7 @@ abstract class Connection {
           $connection_options['dependencies'] ?? [],
         );
       }
+
     };
   }
 
