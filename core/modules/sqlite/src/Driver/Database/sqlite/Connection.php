@@ -99,7 +99,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function open(ConnectionParametersInterface $connection_options) {
+  public static function open(ConnectionParametersInterface|array &$connection_options = []) {
+    assert($connection_options instanceof ConnectionParametersInterface);
+
     // Allow PDO options to be overridden.
     $connection_options->pdo += [
       \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
