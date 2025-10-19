@@ -33,7 +33,7 @@ class MigrateFileConfigsTest extends MigrateDrupal6TestBase {
     $config = $this->config('file.settings');
     $this->assertSame('textfield', $config->get('description.type'));
     $this->assertSame(128, $config->get('description.length'));
-    $this->assertSame('sites/default/files/icons', $config->get('icon.directory'));
+    $this->assertSame('/sites/default/files/icons', $config->get('icon.directory'));
     $this->assertConfigSchema(\Drupal::service('config.typed'), 'file.settings', $config->get());
   }
 

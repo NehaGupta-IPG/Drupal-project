@@ -385,7 +385,7 @@ class ContactSitewideTest extends BrowserTestBase {
     // Test Empty message.
     /** @var \Drupal\contact\ContactFormInterface $form */
     $form = ContactForm::load($contact_form);
-    $form->setMessage('');
+    $form->setMessage(NULL);
     $form->setRedirectPath('/user/' . $admin_user->id());
     $form->save();
     $this->drupalGet('admin/structure/contact/manage/' . $contact_form);

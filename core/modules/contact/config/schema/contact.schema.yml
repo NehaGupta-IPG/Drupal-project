@@ -3,6 +3,8 @@
 contact.form.*:
   type: config_entity
   label: 'Contact form'
+  constraints:
+    FullyValidatable: ~
   mapping:
     id:
       type: machine_name
@@ -24,15 +26,28 @@ contact.form.*:
     reply:
       type: text
       label: 'Auto-reply'
+      nullable: true
+      constraints:
+        NotBlank:
+          allowNull: true
     weight:
       type: weight
       label: 'Weight'
     message:
       type: text
       label: 'Message displayed to user on submission'
+      nullable: true
+      constraints:
+        NotBlank:
+          allowNull: true
     redirect:
       type: path
       label: 'Redirect path on submission'
+      nullable: true
+      constraints:
+        Regex:
+          pattern: '/^\//'
+          message: "The path %value has to start with a slash."
 
 contact.settings:
   type: config_object

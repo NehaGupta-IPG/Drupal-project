@@ -46,7 +46,7 @@ class MigrateContactCategoryTest extends MigrateDrupal6TestBase {
    *
    * @internal
    */
-  protected function assertEntity(string $id, string $expected_label, array $expected_recipients, string $expected_reply, int $expected_weight): void {
+  protected function assertEntity(string $id, string $expected_label, array $expected_recipients, ?string $expected_reply, int $expected_weight): void {
     /** @var \Drupal\contact\ContactFormInterface $entity */
     $entity = ContactForm::load($id);
     $this->assertInstanceOf(ContactFormInterface::class, $entity);
@@ -60,9 +60,9 @@ class MigrateContactCategoryTest extends MigrateDrupal6TestBase {
    * The Drupal 6 and 7 contact categories to Drupal 8 migration.
    */
   public function testContactCategory(): void {
-    $this->assertEntity('website_feedback', 'Website feedback', ['admin@example.com'], '', 0);
+    $this->assertEntity('website_feedback', 'Website feedback', ['admin@example.com'], NULL, 0);
     $this->assertEntity('some_other_category', 'Some other category', ['test@example.com'], 'Thanks for contacting us, we will reply ASAP!', 1);
-    $this->assertEntity('a_category_much_longer_than_th', 'A category much longer than thirty two characters', ['fortyninechars@example.com'], '', 2);
+    $this->assertEntity('a_category_much_longer_than_th', 'A category much longer than thirty two characters', ['fortyninechars@example.com'], NULL, 2);
 
     // Test there are no duplicated roles.
     $contact_forms = [
@@ -81,7 +81,7 @@ class MigrateContactCategoryTest extends MigrateDrupal6TestBase {
     $this->executeMigration('contact_category');
 
     // Test there is a duplicate Website feedback form.
-    $this->assertEntity('website_feedback1', 'Website feedback', ['admin@example.com'], '', 0);
+    $this->assertEntity('website_feedback1', 'Website feedback', ['admin@example.com'], NULL, 0);
   }
 
 }

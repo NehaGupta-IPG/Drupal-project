@@ -27,6 +27,7 @@ use Drupal\Core\Installer\Form\SiteSettingsForm;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManager;
+use Drupal\Core\Recipe\InputCollectorInterface;
 use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\Core\Site\Settings;
@@ -34,6 +35,7 @@ use Drupal\Core\StringTranslation\Translator\FileTranslation;
 use Drupal\Core\StackMiddleware\ReverseProxyMiddleware;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\Url;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -2651,6 +2653,42 @@ function install_recipe_batch(&$install_state) {
     ->setErrorMessage(t('Recipe installation has encountered an error.'));
 
   $recipe = Recipe::createFromDirectory($install_state['parameters']['recipe']);
+
+  // In order to set default value for recipes that depend on some config, for
+  // example system.site.mail, we need to set the value from the values in
+  // $install_state.
+  $recipe->input->collectAll(new class ($install_state['forms']['install_configure_form']) implements InputCollectorInterface {
+
+    /**
+     * A map of known configuration values in the install_state.
+     *
+     * @var array<string, array<string, string>>
+     */
+    protected array $knownConfig = [
+      'system.site' => [
+        'name' => 'site_name',
+        'mail' => 'site_mail',
+      ],
+    ];
+
+    public function __construct(protected $installState) {}
+
+    public function collectValue(string $name, DataDefinitionInterface $definition, mixed $default_value): mixed {
+      $settings = $definition->getSetting('default');
+
+      if ($settings['source'] === 'config') {
+        [$name, $key] = $settings['config'];
+        $formKey = $this->knownConfig[$name][$key] ?? FALSE;
+        if ($formKey) {
+          return $this->installState[$formKey] ?? $default_value;
+        }
+      }
+
+      return $default_value;
+    }
+
+  });
+
   foreach (RecipeRunner::toBatchOperations($recipe) as $step) {
     $batch_builder->addOperation(...$step);
   }

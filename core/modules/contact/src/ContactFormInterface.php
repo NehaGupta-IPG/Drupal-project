@@ -12,7 +12,7 @@ interface ContactFormInterface extends ConfigEntityInterface {
   /**
    * Returns the message to be displayed to user.
    *
-   * @return string
+   * @return ?string
    *   A user message.
    */
   public function getMessage();
@@ -28,7 +28,7 @@ interface ContactFormInterface extends ConfigEntityInterface {
   /**
    * Returns the path for redirect.
    *
-   * @return string
+   * @return ?string
    *   The redirect path.
    */
   public function getRedirectPath();
@@ -46,7 +46,7 @@ interface ContactFormInterface extends ConfigEntityInterface {
   /**
    * Returns an auto-reply message to send to the message author.
    *
-   * @return string
+   * @return ?string
    *   An auto-reply message
    */
   public function getReply();

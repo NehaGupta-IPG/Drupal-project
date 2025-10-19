@@ -4,7 +4,7 @@ dependencies: {  }
 id: personal
 label: 'Personal contact form'
 recipients: {  }
-reply: ''
+reply: null
 weight: 0
 message: 'Your message has been sent.'
-redirect: ''
+redirect: null

@@ -3,7 +3,7 @@ status: true
 id: feedback
 label: 'Website feedback'
 recipients: {  }
-reply: ''
+reply: null
 weight: 0
 message: 'Your message has been sent.'
-redirect: ''
+redirect: null
