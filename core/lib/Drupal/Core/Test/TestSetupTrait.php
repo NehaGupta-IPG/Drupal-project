@@ -166,10 +166,12 @@ trait TestSetupTrait {
     else {
       Database::renameConnection('default', 'simpletest_original_default');
       foreach ($connection_info as $target => $value) {
-        dump([$connection_info, $value->toArray()]);
+        $class = get_class($value);
+        $parameters = $value->toArray();
         // Replace the full table prefix definition to ensure that no table
         // prefixes of the test runner leak into the test.
-        $connection_info[$target]['prefix'] = $value['prefix'] . $this->databasePrefix;
+        $parameters['prefix'] .= $this->databasePrefix;
+        $connection_info[$target] = new $class(...$parameters);
       }
       Database::removeConnection('default');
       Database::addConnectionInfo('default', 'default', $connection_info['default']);
