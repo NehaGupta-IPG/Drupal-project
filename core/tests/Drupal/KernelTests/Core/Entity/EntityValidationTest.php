@@ -245,9 +245,7 @@ class EntityValidationTest extends EntityKernelTestBase implements ServiceModifi
     $this->assertEquals(1, $violations->count());
     $this->assertEquals('The content has either been modified by another user, or you have already submitted modifications. As a result, your changes cannot be saved.', $violations[0]->getMessage());
 
-    // Advance the request time.
-    $time = $this->container->get('datetime.time');
-    $time->incrementRequestTime();
+    $this->container->get('datetime.time')->incrementRequestTime();
 
     $entity = $storage->loadUnchanged($entity->id());
     $translation = $entity->addTranslation('de');

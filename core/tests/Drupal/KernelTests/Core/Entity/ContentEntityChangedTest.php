@@ -70,7 +70,6 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
     $this->mulRevChangedStorage = $this->entityTypeManager->getStorage('entity_test_mulrev_changed');
 
     $this->time = $this->container->get('datetime.time');
-    $this->time->setRequestTime(10_000);
   }
 
   /**
@@ -104,7 +103,6 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
 
     $changed_en = $entity->getChangedTime();
 
-    // Advance the request time.
     $this->time->incrementRequestTime();
     /** @var \Drupal\entity_test\Entity\EntityTestMulRevChanged $german */
     $german = $entity->addTranslation('de');
@@ -122,7 +120,6 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
 
     $changed_de = $german->getChangedTime();
 
-    // Advance the request time.
     $this->time->incrementRequestTime();
     $entity->save();
 
@@ -149,7 +146,6 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
     $changed_en = $entity->getChangedTime();
     $changed_de = $german->getChangedTime();
 
-    // Advance the request time.
     $this->time->incrementRequestTime();
     $entity->setOwner($user2);
     $entity->save();
@@ -170,7 +166,6 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
 
     $changed_en = $entity->getChangedTime();
 
-    // Advance the request time.
     $this->time->incrementRequestTime();
     // Save entity without any changes.
     $entity->save();
@@ -288,7 +283,6 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
 
     $changed_en = $entity->getChangedTime();
 
-    // Advance the request time.
     $this->time->incrementRequestTime();
 
     $entity->setNewRevision();
@@ -302,7 +296,6 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
       'Changed flag of original language is not set for new revision without changes.'
     );
 
-    // Advance the request time.
     $this->time->incrementRequestTime();
 
     $entity->setNewRevision();
@@ -321,7 +314,6 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
 
     $changed_en = $entity->getChangedTime();
 
-    // Advance the request time.
     $this->time->incrementRequestTime();
 
     /** @var \Drupal\entity_test\Entity\EntityTestMulRevChanged $german */
@@ -350,7 +342,6 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
 
     $changed_de = $german->getChangedTime();
 
-    // Advance the request time.
     $this->time->incrementRequestTime();
 
     $entity->setNewRevision();
@@ -371,7 +362,6 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
       'Changed flag of the German translation is not set for new revision without changes.'
     );
 
-    // Advance the request time.
     $this->time->incrementRequestTime();
 
     $entity->setNewRevision();
@@ -397,7 +387,6 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
       'Changed flag of German translation is set when changing the German translation.'
     );
 
-    // Advance the request time.
     $this->time->incrementRequestTime();
 
     $french = $entity->addTranslation('fr');
@@ -434,7 +423,6 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
       'Changed flag of French translation is set when adding the translation and a new revision.'
     );
 
-    // Advance the request time.
     $this->time->incrementRequestTime();
 
     $entity->removeTranslation('fr');
@@ -469,7 +457,6 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
       'Changed flag of French translation is set when adding the translation and a new revision.'
     );
 
-    // Advance the request time.
     $this->time->incrementRequestTime();
 
     // Since above a clone of the entity was saved and then this entity is saved
@@ -485,7 +472,6 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
       'German translation changed but the changed flag is reset manually.'
     );
 
-    // Advance the request time.
     $this->time->incrementRequestTime();
 
     $entity->setNewRevision();
@@ -497,7 +483,6 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
       'German translation is not changed and a new revision is created but the changed flag is set manually.'
     );
 
-    // Advance the request time.
     $this->time->incrementRequestTime();
 
     $german->setOwner($user2);
@@ -520,7 +505,6 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
     $entity->save();
     $changed_time_1 = $entity->getChangedTime();
 
-    // Advance the request time.
     $this->time->incrementRequestTime();
 
     // Without the syncing flag the changed time will increment when content is
@@ -530,7 +514,6 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
     $changed_time_2 = $entity->getChangedTime();
     $this->assertTrue($changed_time_2 > $changed_time_1);
 
-    // Advance the request time.
     $this->time->incrementRequestTime();
 
     // With the syncing flag, the changed time will not change.

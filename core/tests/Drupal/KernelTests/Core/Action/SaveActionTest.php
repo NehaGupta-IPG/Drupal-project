@@ -79,7 +79,6 @@ class SaveActionTest extends KernelTestBase implements ServiceModifierInterface 
     $entity->save();
     $saved_time = $entity->getChangedTime();
 
-    // Advance the request time.
     $this->time->incrementRequestTime();
 
     $action = Action::create([
