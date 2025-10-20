@@ -281,7 +281,7 @@ class ViewsConfigUpdater {
    */
   protected function processFieldDropbuttonUpdate(array &$handler, string $handler_type): bool {
     // Force view re-save if dropbutton fields exist.
-    if ($handler_type === 'field' && isset($handler['dropdown'])) {
+    if ($handler_type === 'field' && isset($handler['dropbutton'])) {
       // Add options type form field to allow selection of various button sizes
       return TRUE;
     }
