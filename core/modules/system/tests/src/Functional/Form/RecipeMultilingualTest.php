@@ -14,12 +14,12 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests Recipe Form Input.
+ * Tests multilingual recipes.
  */
 #[Group('system')]
 #[CoversTrait(RecipeInputFormTrait::class)]
 #[RunTestsInSeparateProcesses]
-class RecipeFormMultilingualInputTest extends BrowserTestBase {
+class RecipeMultilingualTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
@@ -61,6 +61,8 @@ class RecipeFormMultilingualInputTest extends BrowserTestBase {
     // Submit the form with a valid value and apply the recipe, to prove that
     // it was passed through correctly.
     $this->submitForm(['input_test[owner]' => 'Legitimate Human'], 'Rezept anwenden');
+    // This also tests that config actions are run using the correct language
+    // and can be translated.
     $this->assertSame("Legitimate Human's Revier", $this->config('system.site')->get('name'));
   }
 
