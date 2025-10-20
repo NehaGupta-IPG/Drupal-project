@@ -57,35 +57,41 @@ class NodeAccessCacheabilityTest extends NodeTestBase {
    * @see node_query_node_access_alter()
    */
   public function testNodeAccessCacheabilitySafeguard(): void {
-    // The node grants cache context should be added automatically.
+    // The node grants cache context should be added when a user without bypass
+    // access views the page,
     $this->drupalGet(new Url('node_access_test_auto_bubbling'));
     $this->assertCacheContext('user.node_grants:view');
-    $context = new RenderContext();
 
-    // Test that cache context is added when rendering without context from
-    // early render.
+    // For the same user, test that cache context is added to the render array
+    // when the query is run outside the render context from early render.
     $build = NodeAccessTestAutoBubblingController::create(\Drupal::getContainer())->latest();
     // The 'has_render_context' flag should be false to indicate that the query
     // ran outside a render context.
     $this->assertFalse(\Drupal::keyValue('node_access_test')->get('has_render_context'));
+    // Now confirm that when rendering the build array, the node grants cache
+    // context is present.
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
-    $renderer->executeInRenderContext($context, fn () => $renderer->render($build));
+    $context = new RenderContext();
+    $renderer->executeInRenderContext($context, static fn () => $renderer->render($build));
     /** @var \Drupal\Core\Render\BubbleableMetadata $metadata */
     $metadata = $context->pop();
     $this->assertEquals(['user.node_grants:view'], $metadata->getCacheContexts());
 
-    // The user has the 'bypass node access' permission, which means the
-    // node grants cache context is not necessary.
+    // The node grants cache context should not be added when the page is viewed
+    // as a user with the 'bypass node access' permission.
     $this->drupalLogin($this->drupalCreateUser(['bypass node access']));
     $this->drupalGet(new Url('node_access_test_auto_bubbling'));
     $this->assertNoCacheContext('user.node_grants:view');
-
+    // For the same user with bypass access, confirm that cache context is not
+    // added to the render array when the query is run outside the render
+    // context from early render.
     $build = NodeAccessTestAutoBubblingController::create(\Drupal::getContainer())->latest();
     $this->assertFalse(\Drupal::keyValue('node_access_test')->get('has_render_context'));
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
-    $renderer->executeInRenderContext($context, fn () => $renderer->render($build));
+    $context = new RenderContext();
+    $renderer->executeInRenderContext($context, static fn () => $renderer->render($build));
     /** @var \Drupal\Core\Render\BubbleableMetadata $metadata */
     $metadata = $context->pop();
     $this->assertEmpty($metadata->getCacheContexts());
@@ -95,15 +101,16 @@ class NodeAccessCacheabilityTest extends NodeTestBase {
     \Drupal::service('module_installer')->uninstall(['node_access_test']);
     $this->rebuildContainer();
 
-    // Because there are no node grants defined, there also is no need for the
-    // node grants cache context to be bubbled.
+    // Because there are no node grants defined, the node grants cache context
+    // should not be added.
     $this->drupalGet(new Url('node_access_test_auto_bubbling'));
     $this->assertNoCacheContext('user.node_grants:view');
     $build = NodeAccessTestAutoBubblingController::create(\Drupal::getContainer())->latest();
     $this->assertFalse(\Drupal::keyValue('node_access_test')->get('has_render_context'));
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
-    $renderer->executeInRenderContext($context, fn () => $renderer->render($build));
+    $context = new RenderContext();
+    $renderer->executeInRenderContext($context, static fn () => $renderer->render($build));
     /** @var \Drupal\Core\Render\BubbleableMetadata $metadata */
     $metadata = $context->pop();
     $this->assertEmpty($metadata->getCacheContexts());
