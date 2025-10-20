@@ -680,7 +680,7 @@ abstract class Database {
     if (!$class || !class_exists($class)) {
       $class = new class () extends ConnectionParametersBase {}; 
     }
-    return new $class::create($connection_options);
+    return $class::create($connection_options);
   }
 
 }
