@@ -58,29 +58,27 @@ class Yaml implements SerializationInterface {
    * Tag objects will be replaced by their raw value or, if a class exists for
    * that tag it will be used.
    *
-   * @param mixed $data
+   * @param array $data
    *   Parsed YAML data.
    * @param class-string[] $tag_classes
    *   Optional classes to use to construct from tag values, indexed by tag.
    *
-   * @return mixed
+   * @return array
    *   Parsed data with parsed tag values.
    */
-  public static function decodeTags(mixed $data, array $tag_classes = []): mixed {
-    if (is_array($data)) {
-      foreach ($data as $key => $value) {
-        if ($value instanceof TaggedValue) {
-          if (isset($tag_classes[$value->getTag()])) {
-            $data_value = (array) $value->getValue();
-            $data[$key] = new ($tag_classes[$value->getTag()])(...$data_value);
-          }
-          else {
-            $data[$key] = $value->getValue();
-          }
+  public static function decodeTags(array $data, array $tag_classes = []): array {
+    foreach ($data as $key => $value) {
+      if ($value instanceof TaggedValue) {
+        if (isset($tag_classes[$value->getTag()])) {
+          $data_value = (array) $value->getValue();
+          $data[$key] = new ($tag_classes[$value->getTag()])(...$data_value);
         }
-        elseif (is_array($value)) {
-          $data[$key] = static::decodeTags($value, $tag_classes);
+        else {
+          $data[$key] = $value->getValue();
         }
+      }
+      elseif (is_array($value)) {
+        $data[$key] = static::decodeTags($value, $tag_classes);
       }
     }
     return $data;
