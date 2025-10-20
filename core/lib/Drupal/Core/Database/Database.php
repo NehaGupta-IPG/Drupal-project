@@ -678,7 +678,7 @@ abstract class Database {
    */
   public static function getConnectionParametersFromArray(?string $class, array $connection_options): ConnectionParametersInterface {
     if (!$class || !class_exists($class)) {
-      $class = new class () extends ConnectionParametersBase; 
+      $class = new class () extends ConnectionParametersBase {}; 
     }
     return new $class::create($connection_options);
   }
