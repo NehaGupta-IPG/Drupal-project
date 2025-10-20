@@ -346,10 +346,6 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
     ] + $field_definition->getSetting('handler_settings') ?: [];
 
     $entity_type = \Drupal::entityTypeManager()->getDefinition($options['target_type']);
-    $options['sort'] = [
-      'field' => $entity_type->getKey('id'),
-      'direction' => 'DESC',
-    ];
     $selection_handler = $manager->getInstance($options);
 
     // Select a random number of references between the last 50 referenceable
