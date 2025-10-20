@@ -761,9 +761,9 @@ function _locale_parse_js_file($filepath): void {
   $parsed_url = UrlHelper::parse($filepath);
   $filepath = $parsed_url['path'];
 
-  // If there is still a protocol component in the path, reject that.
-  if (strpos($filepath, ':')) {
-    throw new Exception('Only local files should be passed to _locale_parse_js_file().');
+  // If path is remote (http(s) or protocol-relative), reject it.
+  if (preg_match('~^https?://|^//~i', $filepath)) {
+    throw new \Exception(sprintf('Only local files should be passed to _locale_parse_js_file(). Given: %s', $filepath));
   }
 
   // Load the JavaScript file.
