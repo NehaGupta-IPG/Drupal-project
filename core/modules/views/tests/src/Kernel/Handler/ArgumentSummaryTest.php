@@ -17,11 +17,13 @@ use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Hook\ViewsThemeHooks;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the summary of results when an argument is not provided.
  */
 #[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ArgumentSummaryTest extends ViewsKernelTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -92,7 +94,7 @@ class ArgumentSummaryTest extends ViewsKernelTestBase {
       'node',
       $this->nodeType->id(),
       'field_tags',
-      NULL,
+      'Tags',
       'taxonomy_term',
       'default',
       $handler_settings,

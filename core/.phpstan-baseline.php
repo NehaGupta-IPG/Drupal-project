@@ -12820,12 +12820,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/comment/tests/src/Functional/CommentCacheTagsTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\CommentEntityReferenceTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Functional/CommentEntityReferenceTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\CommentLanguageTest\\:\\:addDefaultCommentField\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -13157,12 +13151,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Kernel\\\\CommentValidationTest\\:\\:addDefaultCommentField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Kernel/CommentValidationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Kernel\\\\CommentValidationTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/comment/tests/src/Kernel/CommentValidationTest.php',
@@ -15756,12 +15744,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field/tests/src/Functional/EntityReference/EntityReferenceAdminTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\EntityReference\\\\EntityReferenceAutoCreateTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/EntityReference/EntityReferenceAutoCreateTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\EntityReference\\\\EntityReferenceFieldTranslatedReferenceViewTest\\:\\:createNotTranslatedReferencedEntity\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -15784,24 +15766,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/field/tests/src/Functional/EntityReference/EntityReferenceIntegrationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\EntityReference\\\\EntityReferenceIntegrationTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/EntityReference/EntityReferenceIntegrationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\EntityReference\\\\EntityReferenceXSSTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/EntityReference/EntityReferenceXSSTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\EntityReference\\\\Views\\\\SelectionTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/EntityReference/Views/SelectionTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\FieldTestBase\\:\\:assertFieldValues\\(\\) has no return type specified\\.$#',
@@ -15972,36 +15936,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field/tests/src/FunctionalJavascript/EntityReference/EntityReferenceAdminTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Kernel\\\\EntityReference\\\\EntityReferenceFormatterTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/EntityReference/EntityReferenceFormatterTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Kernel\\\\EntityReference\\\\EntityReferenceItemTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/EntityReference/EntityReferenceItemTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Kernel\\\\EntityReference\\\\EntityReferenceSettingsTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/EntityReference/EntityReferenceSettingsTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Kernel\\\\EntityReference\\\\Views\\\\EntityReferenceRelationshipTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/EntityReference/Views/EntityReferenceRelationshipTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Kernel\\\\EntityReference\\\\Views\\\\SelectionTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/EntityReference/Views/SelectionTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Variable \\$values might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 1,
@@ -16042,6 +15976,30 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/field/tests/src/Unit/FieldStorageConfigEntityUnitTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to method __construct\\(\\) of deprecated class Drupal\\\\field\\\\Plugin\\\\migrate\\\\process\\\\ProcessField\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+replacement\\.$#',
+	'identifier' => 'method.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/field/tests/src/Unit/Plugin/migrate/process/ProcessFieldTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to method transform\\(\\) of deprecated class Drupal\\\\field\\\\Plugin\\\\migrate\\\\process\\\\ProcessField\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+replacement\\.$#',
+	'identifier' => 'method.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/field/tests/src/Unit/Plugin/migrate/process/ProcessFieldTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Instantiation of deprecated class Drupal\\\\field\\\\Plugin\\\\migrate\\\\process\\\\ProcessField\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+replacement\\.$#',
+	'identifier' => 'new.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/field/tests/src/Unit/Plugin/migrate/process/ProcessFieldTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Unit\\\\Plugin\\\\migrate\\\\process\\\\d6\\\\FieldInstanceSettingsTest\\:\\:getSettingsProvider\\(\\) has no return type specified\\.$#',
@@ -16549,12 +16507,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\field_ui\\\\Functional\\\\ManageFieldsFunctionalTestBase\\:\\:assertFieldExistsOnOverview\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/tests/src/Functional/ManageFieldsFunctionalTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field_ui\\\\Functional\\\\ManageFieldsFunctionalTestBase\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/field_ui/tests/src/Functional/ManageFieldsFunctionalTestBase.php',
@@ -19164,34 +19116,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/jsonapi/tests/modules/jsonapi_test_resource_type_building/src/EventSubscriber/ResourceTypeBuildEventSubscriber.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\BlockContentTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/BlockContentTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\CommentTest\\:\\:addDefaultCommentField\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/CommentTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\CommentTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/CommentTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\FileTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/FileTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\InternalEntitiesTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/InternalEntitiesTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\InternalEntitiesTest\\:\\:jsonapiGet\\(\\) has no return type specified\\.$#',
@@ -19207,12 +19135,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\JsonApiFunctionalTestBase\\:\\:createDefaultContent\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/JsonApiFunctionalTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\JsonApiFunctionalTestBase\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/JsonApiFunctionalTestBase.php',
@@ -19234,24 +19156,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/JsonApiRegressionTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\MediaTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/MediaTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\MenuLinkContentTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/MenuLinkContentTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\NodeTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/NodeTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\ResourceTestBase\\:\\:addOmittedObject\\(\\) has no return type specified\\.$#',
@@ -19398,18 +19302,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/RestJsonApiUnsupportedTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\ShortcutTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ShortcutTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\TermTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/TermTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\TermTest\\:\\:providerTestGetIndividualTermWithParent\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -19438,12 +19330,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/jsonapi/tests/src/Kernel/Context/FieldResolverTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Kernel\\\\JsonapiKernelTestBase\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Kernel/JsonapiKernelTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Kernel\\\\JsonapiKernelTestBase\\:\\:createTextField\\(\\) has no return type specified\\.$#',
@@ -20956,12 +20842,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/layout_builder/tests/src/Functional/LayoutBuilderDefaultValuesTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Functional\\\\LayoutBuilderFieldBlockEntityReferenceCacheTagsTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Functional/LayoutBuilderFieldBlockEntityReferenceCacheTagsTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Functional\\\\LayoutBuilderTestBase\\:\\:assertFieldDoesNotExistOnOverview\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -21344,12 +21224,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/layout_builder/tests/src/Kernel/OverridesSectionStorageTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Abstract test class Drupal\\\\Tests\\\\layout_builder\\\\Kernel\\\\SectionListTestBase must not add annotation @coversDefaultClass\\.$#',
-	'identifier' => 'abstractTestClass.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Kernel/SectionListTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Kernel\\\\SectionListTestBase\\:\\:assertSections\\(\\) has no return type specified\\.$#',
@@ -22924,12 +22798,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/media/tests/src/Kernel/MediaEmbedFilterTranslationTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Kernel\\\\MediaThumbnailFormatterTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Kernel/MediaThumbnailFormatterTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Unit\\\\ResourceTest\\:\\:setDimensionsTestCases\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -23116,12 +22984,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/media_library/tests/modules/media_library_test_widget/src/Plugin/Field/FieldWidget/MediaLibraryInceptionWidget.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media_library\\\\FunctionalJavascript\\\\ContentModerationTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media_library/tests/src/FunctionalJavascript/ContentModerationTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Variable \\$jpg_image might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 1,
@@ -23240,12 +23102,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/media_library/tests/src/FunctionalJavascript/MediaLibraryTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media_library\\\\FunctionalJavascript\\\\TranslationsTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media_library/tests/src/FunctionalJavascript/TranslationsTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\media_library\\\\FunctionalJavascript\\\\WidgetOEmbedTest\\:\\:hijackProviderEndpoints\\(\\) has no return type specified\\.$#',
@@ -24328,12 +24184,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/migrate/tests/src/Kernel/Plugin/MigrationPluginConfigurationTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\migrate\\\\Kernel\\\\Plugin\\\\MigrationPluginListTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/tests/src/Kernel/Plugin/MigrationPluginListTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\migrate\\\\Kernel\\\\Plugin\\\\id_map\\\\SqlTest\\:\\:providerTestEnsureTables\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -24344,12 +24194,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/migrate/tests/src/Kernel/Plugin/id_map/SqlTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\migrate\\\\Kernel\\\\Plugin\\\\source\\\\ContentEntityTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/tests/src/Kernel/Plugin/source/ContentEntityTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\migrate\\\\Kernel\\\\QueryBatchTest\\:\\:queryDataProvider\\(\\) has no return type specified\\.$#',
@@ -24739,6 +24583,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\migrate_drupal\\\\Plugin\\\\MigrateFieldPluginManager\\:\\:sortDefinitions\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate_drupal/src/Plugin/MigrateFieldPluginManager.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Missing cache backend declaration for performance\\.$#',
+	'identifier' => 'pluginManagerSetsCacheBackend.missingCacheBackend',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/migrate_drupal/src/Plugin/MigrateFieldPluginManager.php',
 ];
@@ -25169,6 +25019,30 @@ $ignoreErrors[] = [
 	'identifier' => 'variable.undefined',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/migrate_drupal/tests/src/Kernel/d7/ValidateMigrationStateTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to method __construct\\(\\) of deprecated class Drupal\\\\migrate_drupal\\\\Plugin\\\\MigrateFieldPluginManager\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+replacement\\.$#',
+	'identifier' => 'method.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate_drupal/tests/src/Unit/MigrateFieldPluginManagerTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to method getPluginIdFromFieldType\\(\\) of deprecated class Drupal\\\\migrate_drupal\\\\Plugin\\\\MigrateFieldPluginManager\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+replacement\\.$#',
+	'identifier' => 'method.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate_drupal/tests/src/Unit/MigrateFieldPluginManagerTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Class Drupal\\\\Tests\\\\migrate_drupal\\\\Unit\\\\MigrateFieldPluginManagerTestClass extends deprecated class Drupal\\\\migrate_drupal\\\\Plugin\\\\MigrateFieldPluginManager\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+replacement\\.$#',
+	'identifier' => 'class.extendsDeprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate_drupal/tests/src/Unit/MigrateFieldPluginManagerTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Missing cache backend declaration for performance\\.$#',
@@ -26469,12 +26343,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/src/Routing/RouteSubscriber.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\NodeAccessBaseTableTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeAccessBaseTableTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\NodeAccessCacheabilityTest\\:\\:assertCacheContext\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -26509,12 +26377,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeAccessCacheabilityTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\NodeAccessCacheabilityWithNodeGrantsTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeAccessCacheabilityWithNodeGrantsTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\NodeAccessPagerTest\\:\\:addDefaultCommentField\\(\\) has no return type specified\\.$#',
@@ -26662,12 +26524,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\PagePreviewTest\\:\\:addDefaultCommentField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/PagePreviewTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\PagePreviewTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/node/tests/src/Functional/PagePreviewTest.php',
@@ -27291,12 +27147,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/path/tests/src/Kernel/Migrate/d6/MigrateUrlAliasTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Abstract test class Drupal\\\\Tests\\\\path\\\\Kernel\\\\Migrate\\\\d7\\\\MigrateUrlAliasTestBase must not add annotation @group\\.$#',
-	'identifier' => 'abstractTestClass.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path/tests/src/Kernel/Migrate/d7/MigrateUrlAliasTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\path\\\\Kernel\\\\Migrate\\\\d7\\\\MigrateUrlAliasTestBase\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
@@ -33201,12 +33051,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/src/Functional/Entity/EntityReferenceFieldCreationTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Entity\\\\EntityReferenceFieldCreationTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Entity/EntityReferenceFieldCreationTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Entity\\\\EntityReferenceFieldCreationTest\\:\\:fieldUIAddExistingField\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -33867,12 +33711,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/src/Kernel/Entity/EntityReferenceSelection/EntityReferenceSelectionAccessTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Kernel\\\\Entity\\\\EntityReferenceSelectionReferenceableTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Kernel/Entity/EntityReferenceSelectionReferenceableTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Kernel\\\\Form\\\\ElementsFieldsetTest\\:\\:submitForm\\(\\) has no return type specified\\.$#',
@@ -34545,12 +34383,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/VocabularyXmlBasicAuthTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TaxonomyTestBase\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TaxonomyTestBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermAccessTest\\:\\:assertCacheContext\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34605,12 +34437,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationFieldViewTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationFieldViewTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationFieldViewTest\\:\\:enableTranslation\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34647,12 +34473,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationTest\\:\\:enableTranslation\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34683,28 +34503,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationUITest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Views\\\\TaxonomyIndexTidUiTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Views/TaxonomyIndexTidUiTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Views\\\\TaxonomyTestBase\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Views/TaxonomyTestBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Views\\\\TaxonomyTestBase\\:\\:mockStandardInstall\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Views/TaxonomyTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Views\\\\TermTranslationViewsTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Views/TermTranslationViewsTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Views\\\\TermTranslationViewsTest\\:\\:enableTranslation\\(\\) has no return type specified\\.$#',
@@ -34735,18 +34537,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/PendingRevisionTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TokenReplaceTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TokenReplaceTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\Views\\\\TaxonomyTestBase\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/Views/TaxonomyTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\Views\\\\TaxonomyTestBase\\:\\:mockStandardInstall\\(\\) has no return type specified\\.$#',
@@ -34989,12 +34779,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/update/tests/src/Functional/UpdateSemverCoreTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Abstract test class Drupal\\\\Tests\\\\update\\\\Functional\\\\UpdateSemverTestBase must not add attribute PHPUnit\\\\Framework\\\\Attributes\\\\Group\\.$#',
-	'identifier' => 'abstractTestClass.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/update/tests/src/Functional/UpdateSemverTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\update\\\\Functional\\\\UpdateSemverTestBase\\:\\:cronRun\\(\\) has no return type specified\\.$#',
@@ -36251,12 +36035,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/tests/src/Kernel/Migrate/d6/MigrateUserTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Kernel\\\\UserEntityReferenceTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Kernel/UserEntityReferenceTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Kernel\\\\UserMailNotifyTest\\:\\:assertMailPattern\\(\\) has no return type specified\\.$#',
@@ -42991,12 +42769,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/src/Functional/DefaultViewsTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\DefaultViewsTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/DefaultViewsTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\DefaultViewsTest\\:\\:createTerm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -43171,12 +42943,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/src/Functional/Plugin/ContextualFiltersBlockContextTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\Plugin\\\\DisplayEntityReferenceTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/Plugin/DisplayEntityReferenceTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\Plugin\\\\DisplayFeedTest\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -43235,12 +43001,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/src/Functional/Plugin/DisplayPageWebTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\Plugin\\\\ExposedFormCheckboxesTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/Plugin/ExposedFormCheckboxesTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\Plugin\\\\ExposedFormTest\\:\\:assertCacheContext\\(\\) has no return type specified\\.$#',
@@ -43441,12 +43201,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/src/Functional/ViewsFormMultipleTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\Wizard\\\\TaggedWithTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/Wizard/TaggedWithTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Entity\\\\FieldEntityTest\\:\\:addDefaultCommentField\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -43475,12 +43229,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/ArgumentNullTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Handler\\\\ArgumentSummaryTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/ArgumentSummaryTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Handler\\\\FieldBooleanTest\\:\\:dataSet\\(\\) has no return type specified\\.$#',
@@ -43615,12 +43363,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/FilterCombineTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Handler\\\\FilterEntityReferenceTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/FilterEntityReferenceTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Handler\\\\FilterEqualityTest\\:\\:viewsData\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -43685,12 +43427,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Plugin/CacheTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Abstract test class Drupal\\\\Tests\\\\views\\\\Kernel\\\\Plugin\\\\CastedIntFieldJoinTestBase must not add annotation @group\\.$#',
-	'identifier' => 'abstractTestClass.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Plugin/CastedIntFieldJoinTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Plugin\\\\CastedIntFieldJoinTestBase\\:\\:setUpFixtures\\(\\) has no return type specified\\.$#',
@@ -45709,22 +45445,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/workspaces/tests/src/FunctionalJavascript/WorkspacesLayoutBuilderIntegrationTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Kernel\\\\WorkspaceIntegrationTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/tests/src/Kernel/WorkspaceIntegrationTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Kernel\\\\WorkspaceIntegrationTest\\:\\:providerTestAllowedEntityCrudInNonDefaultWorkspace\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/tests/src/Kernel/WorkspaceIntegrationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Kernel\\\\WorkspaceViewsIntegrationTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/tests/src/Kernel/WorkspaceViewsIntegrationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\demo_umami_content\\\\InstallHelper\\:\\:create\\(\\) has no return type specified\\.$#',
@@ -45827,12 +45551,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/scripts/run-tests.sh',
-];
-$ignoreErrors[] = [
-	'message' => '#^Abstract test class Drupal\\\\BuildTests\\\\Composer\\\\ComposerBuildTestBase must not add attribute PHPUnit\\\\Framework\\\\Attributes\\\\CoversNothing\\.$#',
-	'identifier' => 'abstractTestClass.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/BuildTests/Composer/ComposerBuildTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\BuildTests\\\\Composer\\\\ComposerValidateTest\\:\\:provideComposerJson\\(\\) has no return type specified\\.$#',
@@ -45967,12 +45685,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/FunctionalJavascriptTests/Ajax/FormValuesTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalJavascriptTests\\\\EntityReference\\\\EntityReferenceAutocompleteWidgetTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalJavascriptTests/EntityReference/EntityReferenceAutocompleteWidgetTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\FunctionalJavascriptTests\\\\JSWebAssert\\:\\:assertEscaped\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -46091,12 +45803,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\DefaultContent\\\\ContentExportTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/DefaultContent/ContentExportTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Entity\\\\EntityBundleListCacheTest\\:\\:assertCacheContext\\(\\) has no return type specified\\.$#',
@@ -46723,12 +46429,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/ConfigDependencyTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Abstract test class Drupal\\\\KernelTests\\\\Core\\\\Config\\\\ConfigEntityValidationTestBase must not add attribute PHPUnit\\\\Framework\\\\Attributes\\\\Group\\.$#',
-	'identifier' => 'abstractTestClass.metadataForbidden',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/ConfigEntityValidationTestBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Config\\\\Storage\\\\CachedStorageTest\\:\\:read\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -46801,12 +46501,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/DriverSpecificKernelTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Abstract test class Drupal\\\\KernelTests\\\\Core\\\\Database\\\\DriverSpecificSchemaTestBase must not add attribute PHPUnit\\\\Framework\\\\Attributes\\\\CoversClass\\.$#',
-	'identifier' => 'abstractTestClass.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/DriverSpecificSchemaTestBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Database\\\\DriverSpecificSchemaTestBase\\:\\:assertIndexOnColumns\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -46849,12 +46543,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/DriverSpecificTransactionTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Abstract test class Drupal\\\\KernelTests\\\\Core\\\\Database\\\\SchemaUniquePrefixedKeysIndexTestBase must not add attribute PHPUnit\\\\Framework\\\\Attributes\\\\Group\\.$#',
-	'identifier' => 'abstractTestClass.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SchemaUniquePrefixedKeysIndexTestBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Database\\\\SelectLeastTest\\:\\:selectLeastProvider\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -46865,12 +46553,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SelectTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Abstract test class Drupal\\\\KernelTests\\\\Core\\\\Database\\\\TemporaryQueryTestBase must not add attribute PHPUnit\\\\Framework\\\\Attributes\\\\Group\\.$#',
-	'identifier' => 'abstractTestClass.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/TemporaryQueryTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Database\\\\TemporaryQueryTestBase\\:\\:countTableRows\\(\\) has no return type specified\\.$#',
@@ -47029,34 +46711,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityLanguageTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityQueryRelationshipTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityQueryRelationshipTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityQueryTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityQueryTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityReferenceFieldTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityReferenceFieldTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityTypedDataDefinitionTest\\:\\:entityDefinitionIsInternalProvider\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityTypedDataDefinitionTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\EntityViewBuilderTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityViewBuilderTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$e might not be defined\\.$#',
@@ -47075,12 +46733,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/RouteProviderTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\ValidReferenceConstraintValidatorTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/ValidReferenceConstraintValidatorTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Extension\\\\ModuleInstallerTest\\:\\:providerTestInvalidCoreInstall\\(\\) has no return type specified\\.$#',
@@ -47369,12 +47021,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Test/AssertMailTraitTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Abstract test class Drupal\\\\KernelTests\\\\Core\\\\Theme\\\\StableLibraryOverrideTestBase must not add attribute PHPUnit\\\\Framework\\\\Attributes\\\\Group\\.$#',
-	'identifier' => 'abstractTestClass.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Theme/StableLibraryOverrideTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Theme\\\\ThemeInstallerTest\\:\\:providerTestInstallThemeWithUnmetModuleDependencies\\(\\) has no return type specified\\.$#',
@@ -49971,12 +49617,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Menu/LocalTaskIntegrationTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Menu\\\\MenuLinkMock\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Menu/MenuLinkMock.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Menu\\\\MenuTreeParametersTest\\:\\:providerTestSetMinDepth\\(\\) has no return type specified\\.$#',

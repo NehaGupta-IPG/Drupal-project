@@ -8,12 +8,14 @@ use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Theme\Registry;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Stable 9's template overrides.
  */
 #[Group('Theme')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class Stable9TemplateOverrideTest extends KernelTestBase {
 
   /**
@@ -93,7 +95,7 @@ class Stable9TemplateOverrideTest extends KernelTestBase {
    * Ensures that Stable 9 overrides all relevant core templates.
    */
   public function testStable9TemplateOverrides(): void {
-    $registry = new Registry($this->root, \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $this->themeHandler, \Drupal::service('theme.initialization'), \Drupal::service('cache.bootstrap'), \Drupal::service('extension.list.module'), \Drupal::service('kernel'), 'stable9');
+    $registry = new Registry($this->root, \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $this->themeHandler, \Drupal::service('theme.initialization'), \Drupal::service('cache.bootstrap'), \Drupal::service('extension.list.module'), \Drupal::service('kernel'), 'stable9', \Drupal::service('keyvalue'));
     $registry->setThemeManager(\Drupal::theme());
 
     $registry_full = $registry->get();
