@@ -41,7 +41,6 @@ class SaveActionTest extends KernelTestBase implements ServiceModifierInterface 
     $this->installEntitySchema('entity_test_mul_changed');
 
     $this->time = $this->container->get('datetime.time');
-    $this->time->setRequestTime(10_000);
   }
 
   /**
