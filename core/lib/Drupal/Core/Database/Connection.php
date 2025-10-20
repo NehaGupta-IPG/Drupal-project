@@ -179,7 +179,7 @@ abstract class Connection {
     assert(count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
 
     if (is_array($connection_options)) {
-      $connection_options = Database::convertConnectionOptionsArrayToConnectionParameters($connection_options);
+      $connection_options = Database::getConnectionParametersFromArray(NULL, $connection_options);
     }
 
     // Manage the table prefix.

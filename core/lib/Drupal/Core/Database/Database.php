@@ -244,21 +244,7 @@ abstract class Database {
       }
     }
 
-    $connectionParametersClass = $connection_info['namespace'] . '\\ConnectionParameters';
-    return class_exists($connectionParametersClass) ?
-      new $connectionParametersClass(
-        $connection_info['driver'],
-        $connection_info['namespace'],
-        $connection_info['autoload'],
-        $connection_info['database'],
-        $connection_info['prefix'],
-        $connection_info['username'] ?? NULL,
-        $connection_info['password'] ?? NULL,
-        $connection_info['host'] ?? NULL,
-        $connection_info['port'] ?? NULL,
-        $connection_info['dependencies'] ?? [],
-      ) :
-      self::convertConnectionOptionsArrayToConnectionParameters($connection_info);
+    return self::getConnectionParametersFromArray($connection_info['namespace'] . '\\ConnectionParameters', $connection_info);
   }
 
   /**
@@ -598,21 +584,7 @@ abstract class Database {
       $options['dependencies'] = $autoloadInfo['dependencies'];
     }
 
-    $connectionParametersClass = $options['namespace'] . '\\ConnectionParameters';
-    return class_exists($connectionParametersClass) ?
-      new $connectionParametersClass(
-        $options['driver'],
-        $options['namespace'],
-        $options['autoload'],
-        $options['database'],
-        $options['prefix'] ?? '',
-        $options['username'] ?? NULL,
-        $options['password'] ?? NULL,
-        $options['host'] ?? NULL,
-        $options['port'] ?? NULL,
-        $options['dependencies'] ?? [],
-      ) :
-      self::convertConnectionOptionsArrayToConnectionParameters($options);
+    return self::getConnectionParametersFromArray($options['namespace'] . '\\ConnectionParameters', $options);
   }
 
   /**
@@ -704,7 +676,23 @@ abstract class Database {
    * @return ConnectionParametersInterface
    *   A ConnectionParameters object.
    */
-  public static function convertConnectionOptionsArrayToConnectionParameters(array $connection_options): ConnectionParametersInterface {
+  public static function getConnectionParametersFromArray(?string $class, array $connection_options): ConnectionParametersInterface {
+
+    if ($class && class_exists($class)) {
+      return new $class(
+        $connection_info['driver'],
+        $connection_info['namespace'],
+        $connection_info['autoload'],
+        $connection_info['database'],
+        $connection_info['prefix'],
+        $connection_info['username'] ?? NULL,
+        $connection_info['password'] ?? NULL,
+        $connection_info['host'] ?? NULL,
+        $connection_info['port'] ?? NULL,
+        $connection_info['dependencies'] ?? [],
+      )
+    }
+
     return new class ($connection_options) extends ConnectionParametersBase {
 
       public function __construct(array $connection_options) {
