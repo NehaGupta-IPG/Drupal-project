@@ -204,9 +204,6 @@ abstract class Database {
     /** @var UnprocessedConnectionInfoArray $connection_info */
     $connection_info = $info_pick ?? $info;
 
-    // Prefix information, default to an empty prefix.
-    $connection_info['prefix'] = $connection_info['prefix'] ?? '';
-
     // Backwards compatibility layer for Drupal 8 style database connection
     // arrays. Those have the wrong 'namespace' key set, or not set at all
     // for core supported database drivers.
@@ -242,6 +239,14 @@ abstract class Database {
           $connection_info['autoload'] = "core/modules/sqlite/src/Driver/Database/sqlite/";
           break;
       }
+    }
+
+    // Prefix, default to an empty prefix.
+    $connection_info['prefix'] ??= '';
+
+    // Force port to an int if it exists.
+    if (isset($connection_info['port'])) {
+      $connection_info['port'] = (int) $connection_info['port'];
     }
 
     return self::getConnectionParametersFromArray($connection_info['namespace'] . '\\ConnectionParameters', $connection_info);
@@ -678,7 +683,24 @@ abstract class Database {
    */
   public static function getConnectionParametersFromArray(?string $class, array $connection_options): ConnectionParametersInterface {
     if (!$class || !class_exists($class)) {
-      $class = new class () extends ConnectionParametersBase {}; 
+      return new class ($connection_options) extends ConnectionParametersBase {
+
+        public function __construct(array $connection_options) {
+          parent::__construct(
+            $connection_options['driver'],
+            $connection_options['namespace'],
+            $connection_options['autoload'],
+            $connection_options['database'],
+            $connection_options['prefix'] ?? '',
+            $connection_options['username'] ?? NULL,
+            $connection_options['password'] ?? NULL,
+            $connection_options['host'] ?? NULL,
+            $connection_options['port'] ?? NULL,
+            $connection_options['dependencies'] ?? [],
+          );
+        }
+
+      };
     }
     return $class::create($connection_options);
   }

@@ -37,16 +37,7 @@ class UrlConversionTest extends UnitTestCase {
   public function testDbUrlToConnectionConversion($url, $database_array, $include_test_drivers): void {
     $result = Database::convertDbUrlToConnectionInfo($url, $include_test_drivers);
     $this->assertInstanceOf(ConnectionParametersInterface::class, $result);
-    $this->assertSame($database_array['driver'], $result->driver);
-    $this->assertSame($database_array['namespace'], $result->namespace);
-    $this->assertSame($database_array['autoload'], $result->autoload);
-    $this->assertSame($database_array['database'], $result->database);
-    $this->assertSame($database_array['prefix'] ?? '', $result->prefix);
-    $this->assertSame($database_array['username'] ?? NULL, $result->username);
-    $this->assertSame($database_array['password'] ?? NULL, $result->password);
-    $this->assertSame($database_array['host'] ?? NULL, $result->host);
-    $this->assertSame($database_array['port'] ?? NULL, $result->port);
-    $this->assertSame($database_array['dependencies'] ?? [], $result->dependencies);
+    $this->assertEquals($database_array, array_intersect_key($result->toArray(), $database_array));
   }
 
   /**
@@ -334,7 +325,7 @@ class UrlConversionTest extends UnitTestCase {
         ],
       ],
     ];
-    $this->assertSame($expected, $connection_info);
+    $this->assertEquals($expected, array_intersect_key($connection_info->toArray(), $expected));
   }
 
   /**

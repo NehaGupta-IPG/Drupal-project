@@ -9,26 +9,6 @@ namespace Drupal\Core\Database;
  */
 abstract class ConnectionParametersBase implements ConnectionParametersInterface, \ArrayAccess {
 
-  /**
-   * PDO options.
-   */
-  public array $pdo = [];
-
-  /**
-   * Connection initialization commands.
-   */
-  public array $initCommands = [];
-
-  /**
-   * Tables collation.
-   */
-  public string $collation;
-
-  /**
-   * Transaction isolation level.
-   */
-  public int|string $isolationLevel;
-
   public function __construct(
     public readonly string $driver,
     public readonly string $namespace,
@@ -49,7 +29,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
       $connection_info['namespace'],
       $connection_info['autoload'],
       $connection_info['database'],
-      $connection_info['prefix'],
+      $connection_info['prefix'] ?? '',
       $connection_info['username'] ?? NULL,
       $connection_info['password'] ?? NULL,
       $connection_info['host'] ?? NULL,
