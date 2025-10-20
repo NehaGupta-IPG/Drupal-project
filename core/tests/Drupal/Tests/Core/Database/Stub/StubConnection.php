@@ -46,7 +46,6 @@ class StubConnection extends Connection {
     $connection_options['namespace'] ??= __NAMESPACE__;
     $connection_options['autoload'] ??= __DIR__;
     $connection_options['database'] ??= 'stub';
-    $connection_options['prefix'] ??= '';
     parent::__construct($connection, $connection_options);
   }
 

@@ -241,9 +241,6 @@ abstract class Database {
       }
     }
 
-    // Prefix, default to an empty prefix.
-    $connection_info['prefix'] ??= '';
-
     // Force port to an int if it exists.
     if (isset($connection_info['port'])) {
       $connection_info['port'] = (int) $connection_info['port'];
@@ -683,26 +680,9 @@ abstract class Database {
    */
   public static function getConnectionParametersFromArray(?string $class, array $connection_options): ConnectionParametersInterface {
     if (!$class || !class_exists($class)) {
-      return new class ($connection_options) extends ConnectionParametersBase {
-
-        public function __construct(array $connection_options) {
-          parent::__construct(
-            $connection_options['driver'],
-            $connection_options['namespace'],
-            $connection_options['autoload'],
-            $connection_options['database'],
-            $connection_options['prefix'] ?? '',
-            $connection_options['username'] ?? NULL,
-            $connection_options['password'] ?? NULL,
-            $connection_options['host'] ?? NULL,
-            $connection_options['port'] ?? NULL,
-            $connection_options['dependencies'] ?? [],
-          );
-        }
-
-      };
+      return new class (...$connection_options) extends ConnectionParametersBase {};
     }
-    return $class::create($connection_options);
+    return new $class(...$connection_options);
   }
 
 }

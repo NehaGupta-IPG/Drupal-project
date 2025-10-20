@@ -119,7 +119,6 @@ abstract class MigrateTestCase extends UnitTestCase {
         $connection_options['namespace'] ?? '',
         $connection_options['autoload'] ?? '',
         ':memory:',
-        $connection_options['prefix'] ?? '',
       );
       $pdo = Connection::open($connection_parameters);
       $connection = new Connection($pdo, $connection_parameters);
