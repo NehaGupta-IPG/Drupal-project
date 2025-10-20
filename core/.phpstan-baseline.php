@@ -43111,6 +43111,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/src/Functional/SearchMultilingualTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Variable \\$link might not be defined\\.$#',
+	'identifier' => 'variable.undefined',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/tests/src/Functional/TaxonomyGlossaryTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\ViewTestBase\\:\\:dataSet\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
