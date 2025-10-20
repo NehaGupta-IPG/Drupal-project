@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\mysql\Unit;
 
+use Drupal\Core\Database\ConnectionParametersBase;
 use Drupal\mysql\Driver\Database\mysql\Connection;
 use Drupal\Tests\UnitTestCase;
 use Pdo\Mysql;
@@ -31,9 +32,10 @@ class ConnectionTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $connectionParameters = new class ('mysql', __NAMESPACE__, __DIR__, 'test') extends ConnectionParametersBase {};
     $this->connection = $this->getMockBuilder(Connection::class)
       // @phpstan-ignore class.notFound
-      ->setConstructorArgs([$this->createMock(\PHP_VERSION_ID >= 80400 ? Mysql::class : \PDO::class), []])
+      ->setConstructorArgs([$this->createMock(\PHP_VERSION_ID >= 80400 ? Mysql::class : \PDO::class), $connectionParameters])
       ->onlyMethods(['getServerVersion'])
       ->getMock();
   }

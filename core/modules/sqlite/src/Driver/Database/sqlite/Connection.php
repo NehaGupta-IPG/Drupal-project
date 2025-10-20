@@ -503,8 +503,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function createUrlFromConnectionOptions(ConnectionParametersInterface|array $connection_options) {
-    assert($connection_options instanceof ConnectionParametersInterface);
+  public static function createUrlFromConnectionOptions(array $connection_options) {
     if (!isset($connection_options['driver'], $connection_options['database'])) {
       throw new \InvalidArgumentException("As a minimum, the connection options array must contain at least the 'driver' and 'database' keys");
     }

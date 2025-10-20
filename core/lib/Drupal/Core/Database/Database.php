@@ -621,13 +621,15 @@ abstract class Database {
     if (empty($db_info) || empty($db_info['default'])) {
       throw new \RuntimeException("Database connection $key not defined or missing the 'default' settings");
     }
-    $namespace = $db_info['default']['namespace'];
+    $parameters = $db_info['default']->toArray();
+
     // Add the module name to the connection options to make it easy for the
     // connection class's createUrlFromConnectionOptions() method to add it to
     // the URL.
-    $db_info['default']['module'] = explode('\\', $namespace)[1];
+    $namespace = $parameters['namespace'];
+    $parameters['module'] = explode('\\', $namespace)[1];
     $connection_class = $namespace . '\\Connection';
-    $url = $connection_class::createUrlFromConnectionOptions($db_info['default']);
+    $url = $connection_class::createUrlFromConnectionOptions($parameters);
     assert(is_string($url));
     return $url;
   }
@@ -672,13 +674,15 @@ abstract class Database {
   /**
    * Converts a connection options array to a ConnectionParameters object.
    *
+   * @param class-string|null $class
+   *   The PHP class managing the parameters.
    * @param array $connection_options
    *   An array of options for the connection.
    *
    * @return ConnectionParametersInterface
    *   A ConnectionParameters object.
    */
-  public static function getConnectionParametersFromArray(?string $class, array $connection_options): ConnectionParametersInterface {
+  final public static function getConnectionParametersFromArray(?string $class, array $connection_options): ConnectionParametersInterface {
     if (!$class || !class_exists($class)) {
       return new class (...$connection_options) extends ConnectionParametersBase {};
     }

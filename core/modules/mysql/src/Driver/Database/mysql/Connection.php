@@ -3,6 +3,7 @@
 namespace Drupal\mysql\Driver\Database\mysql;
 
 use Drupal\Core\Database\Connection as DatabaseConnection;
+use Drupal\Core\Database\ConnectionParametersInterface;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseAccessDeniedException;
 use Drupal\Core\Database\DatabaseConnectionRefusedException;
@@ -69,7 +70,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function __construct(\PDO $connection, array $connection_options) {
+  public function __construct(\PDO $connection, ConnectionParametersInterface|array $connection_options) {
     // @phpstan-ignore class.notFound
     assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof Mysql : TRUE);
     // If the SQL mode doesn't include 'ANSI_QUOTES' (explicitly or via a

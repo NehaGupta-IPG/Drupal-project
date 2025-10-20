@@ -14,6 +14,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
     public readonly string $namespace,
     public readonly string $autoload,
     public readonly string $database,
+    public readonly ?string $module = NULL,
     public readonly string $prefix = '',
     public readonly ?string $username = NULL,
     public readonly ?string $password = NULL,
