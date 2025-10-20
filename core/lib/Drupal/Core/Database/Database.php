@@ -677,40 +677,10 @@ abstract class Database {
    *   A ConnectionParameters object.
    */
   public static function getConnectionParametersFromArray(?string $class, array $connection_options): ConnectionParametersInterface {
-
-    if ($class && class_exists($class)) {
-      return new $class(
-        $connection_info['driver'],
-        $connection_info['namespace'],
-        $connection_info['autoload'],
-        $connection_info['database'],
-        $connection_info['prefix'],
-        $connection_info['username'] ?? NULL,
-        $connection_info['password'] ?? NULL,
-        $connection_info['host'] ?? NULL,
-        $connection_info['port'] ?? NULL,
-        $connection_info['dependencies'] ?? [],
-      )
+    if (!$class || !class_exists($class)) {
+      $class = new class () extends ConnectionParametersBase; 
     }
-
-    return new class ($connection_options) extends ConnectionParametersBase {
-
-      public function __construct(array $connection_options) {
-        parent::__construct(
-          $connection_options['driver'],
-          $connection_options['namespace'],
-          $connection_options['autoload'],
-          $connection_options['database'],
-          $connection_options['prefix'] ?? '',
-          $connection_options['username'] ?? NULL,
-          $connection_options['password'] ?? NULL,
-          $connection_options['host'] ?? NULL,
-          $connection_options['port'] ?? NULL,
-          $connection_options['dependencies'] ?? [],
-        );
-      }
-
-    };
+    return new $class::create($connection_options);
   }
 
 }

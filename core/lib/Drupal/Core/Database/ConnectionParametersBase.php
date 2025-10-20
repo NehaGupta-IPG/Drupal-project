@@ -43,6 +43,21 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   ) {
   }
 
+  public static function create($connection_info): static {
+    return new static(
+      $connection_info['driver'],
+      $connection_info['namespace'],
+      $connection_info['autoload'],
+      $connection_info['database'],
+      $connection_info['prefix'],
+      $connection_info['username'] ?? NULL,
+      $connection_info['password'] ?? NULL,
+      $connection_info['host'] ?? NULL,
+      $connection_info['port'] ?? NULL,
+      $connection_info['dependencies'] ?? [],
+    );
+  }
+
   /**
    * {@inheritdoc}
    */
