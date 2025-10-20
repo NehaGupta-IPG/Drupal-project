@@ -10,11 +10,6 @@ namespace Drupal\Core\Database;
 abstract class ConnectionParametersBase implements ConnectionParametersInterface, \ArrayAccess {
 
   /**
-   * Tables prefix.
-   */
-  public string $prefix = '';
-
-  /**
    * PDO options.
    */
   public array $pdo = [];
@@ -39,14 +34,13 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
     public readonly string $namespace,
     public readonly string $autoload,
     public readonly string $database,
-    string $prefix,
+    public readonly string $prefix,
     public readonly ?string $username = NULL,
     public readonly ?string $password = NULL,
     public readonly ?string $host = NULL,
-    public readonly string|int|null $port = NULL,
+    public readonly ?int $port = NULL,
     public readonly array $dependencies = [],
   ) {
-    $this->prefix = $prefix;
   }
 
   /**
