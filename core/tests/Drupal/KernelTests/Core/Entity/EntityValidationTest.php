@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Plugin\Validation\Constraint\CompositeConstraintBase;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Tests\Traits\Core\MockedTimeTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -16,7 +18,9 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Entity')]
 #[RunTestsInSeparateProcesses]
-class EntityValidationTest extends EntityKernelTestBase {
+class EntityValidationTest extends EntityKernelTestBase implements ServiceModifierInterface {
+
+  use MockedTimeTrait;
 
   /**
    * {@inheritdoc}
@@ -233,6 +237,8 @@ class EntityValidationTest extends EntityKernelTestBase {
     $violations = $entity->validate();
     $this->assertEquals(1, $violations->count());
     $this->assertEquals('The content has either been modified by another user, or you have already submitted modifications. As a result, your changes cannot be saved.', $violations[0]->getMessage());
+
+    $this->container->get('datetime.time')->incrementRequestTime();
 
     $entity = $storage->loadUnchanged($entity->id());
     $translation = $entity->addTranslation('de');
