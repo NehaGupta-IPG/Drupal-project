@@ -51,6 +51,13 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function toArray(): array {
+    return get_object_vars($this);
+  }
+
+  /**
    * This is for BC support only.
    */
   public function offsetExists(mixed $offset): bool {

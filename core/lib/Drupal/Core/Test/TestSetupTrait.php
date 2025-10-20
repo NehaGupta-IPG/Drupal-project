@@ -164,7 +164,7 @@ trait TestSetupTrait {
       throw new \InvalidArgumentException('There is no database connection so no tests can be run. You must provide a SIMPLETEST_DB environment variable to run PHPUnit based functional tests outside of run-tests.sh.');
     }
     else {
-      dump( $connection_info);
+      dump([$connection_info, $connection_info[$target]->toArray()]);
       Database::renameConnection('default', 'simpletest_original_default');
       foreach ($connection_info as $target => $value) {
         // Replace the full table prefix definition to ensure that no table

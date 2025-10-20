@@ -17,4 +17,12 @@ interface ConnectionParametersInterface {
    */
   public function getDriverConnectionClassName(): string;
 
+  /**
+   * Returns the connection parameters as an associative array.
+   *
+   * @return array<string, mixed>
+   *   The connection parameters as an associative array.
+   */
+  public function toArray(): array;
+
 }
