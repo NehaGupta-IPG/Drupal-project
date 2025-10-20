@@ -10,7 +10,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Plugin\Validation\Constraint\CompositeConstraintBase;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\TestTools\Mocks\TestMockedTime;
+use Drupal\TestTools\Mocks\MockedTime;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -76,7 +76,7 @@ class EntityValidationTest extends EntityKernelTestBase implements ServiceModifi
    */
   public function alter(ContainerBuilder $container): void {
     $service_definition = $container->getDefinition('datetime.time');
-    $service_definition->setClass(TestMockedTime::class);
+    $service_definition->setClass(MockedTime::class);
   }
 
   /**

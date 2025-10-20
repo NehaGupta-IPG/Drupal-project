@@ -12,7 +12,7 @@ use Drupal\Component\Datetime\Time;
  * Use either setRequestTime() or incrementRequestTime() to mock the request
  * time.
  */
-class TestMockedTime extends Time {
+class MockedTime extends Time {
 
   /**
    * The mocked request time.

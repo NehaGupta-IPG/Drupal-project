@@ -17,7 +17,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  * @see \Drupal\Core\Entity\EntityChangedInterface
  *
  * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
- * \Drupal\TestTools\Mocks\TestMockedTime or \Drupal\update_test\Datetime\TestTime
+ * \Drupal\TestTools\Mocks\MockedTime or \Drupal\update_test\Datetime\TestTime
  * instead.
  * @see https://www.drupal.org/node/3549944
  */
@@ -36,7 +36,7 @@ class ChangedTestItem extends ChangedItem {
   public function preSave() {
     parent::preSave();
 
-    @trigger_error('The changed_test field type is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\TestTools\Mocks\TestMockedTime or \Drupal\update_test\Datetime\TestTime instead. See https://www.drupal.org/node/3549944', E_USER_DEPRECATED);
+    @trigger_error('The changed_test field type is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\TestTools\Mocks\MockedTime or \Drupal\update_test\Datetime\TestTime instead. See https://www.drupal.org/node/3549944', E_USER_DEPRECATED);
 
     if ($this->value == \Drupal::time()->getRequestTime()) {
       // During a test the request time is immutable. To allow tests of the

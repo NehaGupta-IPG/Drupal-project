@@ -9,7 +9,7 @@ use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\entity_test\Entity\EntityTestMulChanged;
 use Drupal\entity_test\Entity\EntityTestMulRevChanged;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\TestTools\Mocks\TestMockedTime;
+use Drupal\TestTools\Mocks\MockedTime;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -49,9 +49,9 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
   /**
    * The mocked time service.
    *
-   * @var \Drupal\TestTools\Mocks\TestMockedTime
+   * @var \Drupal\TestTools\Mocks\MockedTime
    */
-  protected TestMockedTime $time;
+  protected MockedTime $time;
 
   /**
    * {@inheritdoc}
@@ -77,7 +77,7 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
    */
   public function alter(ContainerBuilder $container): void {
     $service_definition = $container->getDefinition('datetime.time');
-    $service_definition->setClass(TestMockedTime::class);
+    $service_definition->setClass(MockedTime::class);
   }
 
   /**
