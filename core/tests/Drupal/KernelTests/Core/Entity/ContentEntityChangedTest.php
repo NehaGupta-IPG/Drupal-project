@@ -9,6 +9,7 @@ use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\entity_test\Entity\EntityTestMulChanged;
 use Drupal\entity_test\Entity\EntityTestMulRevChanged;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Tests\Traits\Core\MockedTimeTrait;
 use Drupal\TestTools\Mocks\MockedTime;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -19,6 +20,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Entity')]
 #[RunTestsInSeparateProcesses]
 class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceModifierInterface {
+
+  use MockedTimeTrait;
 
   /**
    * {@inheritdoc}
@@ -70,14 +73,6 @@ class ContentEntityChangedTest extends EntityKernelTestBase implements ServiceMo
     $this->mulRevChangedStorage = $this->entityTypeManager->getStorage('entity_test_mulrev_changed');
 
     $this->time = $this->container->get('datetime.time');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function alter(ContainerBuilder $container): void {
-    $service_definition = $container->getDefinition('datetime.time');
-    $service_definition->setClass(MockedTime::class);
   }
 
   /**

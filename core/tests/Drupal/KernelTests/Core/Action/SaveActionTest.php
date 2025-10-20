@@ -9,6 +9,7 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\entity_test\Entity\EntityTestMulChanged;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\Traits\Core\MockedTimeTrait;
 use Drupal\TestTools\Mocks\MockedTime;
 use Drupal\system\Entity\Action;
 use PHPUnit\Framework\Attributes\Group;
@@ -20,6 +21,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Action')]
 #[RunTestsInSeparateProcesses]
 class SaveActionTest extends KernelTestBase implements ServiceModifierInterface {
+
+  use MockedTimeTrait;
 
   /**
    * {@inheritdoc}
@@ -41,14 +44,6 @@ class SaveActionTest extends KernelTestBase implements ServiceModifierInterface 
     $this->installEntitySchema('entity_test_mul_changed');
 
     $this->time = $this->container->get('datetime.time');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function alter(ContainerBuilder $container): void {
-    $service_definition = $container->getDefinition('datetime.time');
-    $service_definition->setClass(MockedTime::class);
   }
 
   /**

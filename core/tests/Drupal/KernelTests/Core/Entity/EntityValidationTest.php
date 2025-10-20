@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Plugin\Validation\Constraint\CompositeConstraintBase;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Tests\Traits\Core\MockedTimeTrait;
 use Drupal\TestTools\Mocks\MockedTime;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,6 +21,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Entity')]
 #[RunTestsInSeparateProcesses]
 class EntityValidationTest extends EntityKernelTestBase implements ServiceModifierInterface {
+
+  use MockedTimeTrait;
 
   /**
    * {@inheritdoc}
@@ -69,14 +72,6 @@ class EntityValidationTest extends EntityKernelTestBase implements ServiceModifi
 
     // Install required default configuration for filter module.
     $this->installConfig(['system', 'filter']);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function alter(ContainerBuilder $container): void {
-    $service_definition = $container->getDefinition('datetime.time');
-    $service_definition->setClass(MockedTime::class);
   }
 
   /**

@@ -43,7 +43,7 @@ class MockedTime extends Time {
   /**
    * {@inheritdoc}
    */
-  public function getRequestTime() {
+  public function getRequestTime(): int {
     return $this->requestTime;
   }
 
