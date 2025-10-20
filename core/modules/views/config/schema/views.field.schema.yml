@@ -88,6 +88,7 @@ views.field.dropbutton:
     dropbutton_type:
       type: string
       label: 'Dropbutton type'
+      nullable: true
 
 views.field.machine_name:
   type: views_field
