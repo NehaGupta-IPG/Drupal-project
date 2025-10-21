@@ -419,7 +419,7 @@ class Html {
    * output of Html::escape() to '#markup' is not recommended. Use the
    * '#plain_text' key instead and the renderer will autoescape the text.
    *
-   * @param string $text
+   * @param string|null $text
    *   The input text.
    *
    * @return string
@@ -430,8 +430,8 @@ class Html {
    *
    * @ingroup sanitization
    */
-  public static function escape(string $text): string {
-    return htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+  public static function escape(string | null $text ): string {
+    return ($text === '0' || !empty($text)) ? htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : '';
   }
 
   /**
