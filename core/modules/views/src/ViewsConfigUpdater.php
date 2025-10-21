@@ -254,41 +254,6 @@ class ViewsConfigUpdater {
   }
 
   /**
-   * Checks for dropbutton fields.
-   *
-   * @param \Drupal\views\ViewEntityInterface $view
-   *   The View to update.
-   *
-   * @return bool
-   *   TRUE if view has dropbutton field(s).
-   */
-  public function needsDropbuttonFieldUpdate(ViewEntityInterface $view): bool {
-    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type) {
-      return $this->processFieldDropbuttonUpdate($handler, $handler_type);
-    });
-  }
-
-  /**
-   * Updates dropbutton fields.
-   *
-   * @param array $handler
-   *   A display handler.
-   * @param string $handler_type
-   *   The handler type.
-   *
-   * @return bool
-   *   Whether the handler was updated.
-   */
-  protected function processFieldHandlerDropbutton(array &$handler, string $handler_type): bool {
-    // Force view re-save if dropbutton fields exist.
-    if ($handler_type === 'field' && isset($handler['dropdown'])) {
-      // Add options type form field to allow selection of various button sizes
-      return TRUE;
-    }
-    return FALSE;
-  }
-
-  /**
    * Checks if 'remember_roles' setting of an exposed filter has disabled roles.
    *
    * @param \Drupal\views\ViewEntityInterface $view
