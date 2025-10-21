@@ -11,29 +11,27 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\link\Plugin\Field\FieldType\LinkItem;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests LinkItem.
  */
-#[CoversClass(LinkItem::class)]
+#[CoversMethod(LinkItem::class, 'getCacheTags')]
 #[Group('link')]
-class LinkItemTest extends UnitTestCase {
+class LinkItemGetCacheTagsTest extends UnitTestCase {
 
   /**
    * Verify no cache tags are returned for non-entity URIs.
    *
    * @param string $uri
    *   The URI to test.
-   *
-   * @legacy-covers ::getCacheTags
    */
   #[TestWith(['route:<front>'])]
   #[TestWith(['https://example.com'])]
   #[TestWith(['this is a malformed uri'])]
-  public function testGetCacheTagsForNonEntityUris(string $uri): void {
+  public function testNonEntityUris(string $uri): void {
     $link_item = $this->createPartialMock(LinkItem::class, []);
     $link_item->uri = $uri;
     $this->assertSame([], $link_item->getCacheTags());
@@ -41,10 +39,8 @@ class LinkItemTest extends UnitTestCase {
 
   /**
    * Verify no cache tags are returned if the entity storage can't be loaded.
-   *
-   * @legacy-covers ::getCacheTags
    */
-  public function testGetCacheTagsWithBadEntityType(): void {
+  public function testBadEntityType(): void {
     $entity_type_name = 'bad_entity_type';
     $manager = $this->createMock(EntityTypeManagerInterface::class);
     $manager->expects($this->once())
@@ -62,10 +58,8 @@ class LinkItemTest extends UnitTestCase {
 
   /**
    * Verify cache tags are returned for a referenced entity.
-   *
-   * @legacy-covers ::getCacheTags
    */
-  public function testGetCacheTags(): void {
+  public function testGoodReference(): void {
     $tags = ['node:1'];
     $node = $this->createMock(Node::class);
     $node->expects($this->once())
