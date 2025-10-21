@@ -9,22 +9,20 @@ use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\Url;
 use Drupal\link\Plugin\Field\FieldType\LinkItem;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
- * Tests the LinkItem class.
+ * Tests LinkItem::toLink().
  */
+#[CoversMethod(LinkItem::class, 'toLink')]
 #[Group('link')]
-#[CoversClass(LinkItem::class)]
-class LinkItemTest extends UnitTestCase {
+class LinkItemToLinkTest extends UnitTestCase {
 
   /**
-   * Test toLink().
-   *
-   * @legacy-covers ::toLink
+   * Test with a good URL.
    */
-  public function testToLink(): void {
+  public function testGoodUrl(): void {
     $title_string = 'example';
     $url = Url::fromUri('https://example.com');
 
@@ -51,11 +49,9 @@ class LinkItemTest extends UnitTestCase {
   }
 
   /**
-   * Test toLink() with an empty field.
-   *
-   * @legacy-covers ::toLink
+   * Test with an empty field.
    */
-  public function testToLinkWithEmptyField(): void {
+  public function testEmptyField(): void {
     $link_item = $this->createPartialMock(LinkItem::class, ['isEmpty']);
     $link_item->method('isEmpty')
       ->willReturn(TRUE);
@@ -65,11 +61,9 @@ class LinkItemTest extends UnitTestCase {
   }
 
   /**
-   * Test toLink() with a bad URL.
-   *
-   * @legacy-covers ::toLink
+   * Test with a bad URL.
    */
-  public function testToLinkWithBadUrl(): void {
+  public function testBadUrl(): void {
     $link_item = $this->createPartialMock(LinkItem::class, [
       'isEmpty',
       'get',
