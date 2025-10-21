@@ -69,7 +69,7 @@ class RecipeConfiguratorTest extends KernelTestBase {
   #[TestWith(["recipe_include", "Recipe include"])]
   public function testIncludedRecipeLoader(string $recipe, string $name): void {
     $recipe = RecipeConfigurator::getIncludedRecipe('core/tests/fixtures/recipes', $recipe);
-    $this->assertSame($name, $recipe->name);
+    $this->assertSame($name, (string) $recipe->name);
   }
 
   /**

@@ -23,6 +23,7 @@ use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\IdenticalTo;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotIdenticalTo;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Required;
@@ -128,17 +129,30 @@ final class Recipe {
 
     $translatable_string_constraint = new AtLeastOneOf(
       [
-        new Type('string'),
-        new Type(TranslatableMarkup::class),
+        new Sequentially([
+          new NotNull(),
+          new Type('string'),
+          new NotBlank(),
+        ]),
+        new Sequentially([
+          new NotNull(),
+          new Type(TranslatableMarkup::class),
+          new Callback(
+            callback: function (TranslatableMarkup $value, ExecutionContextInterface $context) {
+              if ($value->getUntranslatedString() === '') {
+                $context->addViolation('This value should not be blank.');
+              }
+            },
+          ),
+        ]),
       ],
-      message: 'This value must be a string or a string tagged with !translate.',
+      message: 'This value must not be blank and be a string or a string tagged with !translate.',
       includeInternalMessages: FALSE,
     );
 
     $constraints = new Collection([
       'name' => new Required([
         $translatable_string_constraint,
-        new NotBlank(),
         // Matching `type: label` in core.data_types.schema.yml.
         new RegexConstraint(
           pattern: '/([^\PC])/u',
@@ -148,7 +162,6 @@ final class Recipe {
       ]),
       'description' => new Optional([
         $translatable_string_constraint,
-        new NotBlank(),
         // Matching `type: text` in core.data_types.schema.yml.
         new RegexConstraint(
           pattern: '/([^\PC\x09\x0a\x0d])/u',
@@ -204,7 +217,6 @@ final class Recipe {
               // Every input definition must have a description.
               'description' => [
                 $translatable_string_constraint,
-                new NotBlank(),
               ],
               // There can be an optional set of constraints, which is an
               // associative array of arrays, as in config schema.
