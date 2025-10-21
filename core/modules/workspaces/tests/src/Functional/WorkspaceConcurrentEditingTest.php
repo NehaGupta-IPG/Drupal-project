@@ -41,6 +41,7 @@ class WorkspaceConcurrentEditingTest extends BrowserTestBase {
       'view own workspace',
       'create test content',
       'edit own test content',
+      'publish to live workspace',
     ];
     $mayer = $this->drupalCreateUser($permissions);
     $this->drupalLogin($mayer);

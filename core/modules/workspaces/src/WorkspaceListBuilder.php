@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
 use Drupal\user\UserInterface;
+use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -44,6 +45,13 @@ class WorkspaceListBuilder extends EntityListBuilder {
   protected $renderer;
 
   /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $currentUser;
+
+  /**
    * Constructs a new EntityListBuilder object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -56,12 +64,15 @@ class WorkspaceListBuilder extends EntityListBuilder {
    *   The workspace repository service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The current user.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, WorkspaceManagerInterface $workspace_manager, WorkspaceRepositoryInterface $workspace_repository, RendererInterface $renderer) {
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, WorkspaceManagerInterface $workspace_manager, WorkspaceRepositoryInterface $workspace_repository, RendererInterface $renderer, AccountInterface $account) {
     parent::__construct($entity_type, $storage);
     $this->workspaceManager = $workspace_manager;
     $this->workspaceRepository = $workspace_repository;
     $this->renderer = $renderer;
+    $this->currentUser = $account;
   }
 
   /**
@@ -73,7 +84,8 @@ class WorkspaceListBuilder extends EntityListBuilder {
       $container->get('entity_type.manager')->getStorage($entity_type->id()),
       $container->get('workspaces.manager'),
       $container->get('workspaces.repository'),
-      $container->get('renderer')
+      $container->get('renderer'),
+      $container->get('current_user')
     );
   }
 
@@ -157,35 +169,39 @@ class WorkspaceListBuilder extends EntityListBuilder {
     }
 
     if (!$entity->hasParent()) {
-      $operations['publish'] = [
-        'title' => $this->t('Publish content'),
-        // The 'Publish' operation should be the default one for the currently
-        // active workspace.
-        'weight' => ($active_workspace && $entity->id() == $active_workspace->id()) ? 0 : 20,
-        'url' => Url::fromRoute('entity.workspace.publish_form',
-          ['workspace' => $entity->id()],
-          ['query' => ['destination' => $entity->toUrl('collection')->toString()]]
-        ),
-      ];
+      if ($this->currentUser->hasPermission('publish to live workspace')) {
+        $operations['publish'] = [
+          'title' => $this->t('Publish content'),
+          // The 'Publish' operation should be the default one for the currently
+          // active workspace.
+          'weight' => ($active_workspace && $entity->id() == $active_workspace->id()) ? 0 : 20,
+          'url' => Url::fromRoute('entity.workspace.publish_form',
+            ['workspace' => $entity->id()],
+            ['query' => ['destination' => $entity->toUrl('collection')->toString()]]
+          ),
+        ];
+      }
     }
     else {
-      /** @var \Drupal\workspaces\WorkspaceInterface $parent */
-      $parent = $entity->parent->entity;
-      $operations['merge'] = [
-        'title' => $this->t('Merge into @target_label', [
-          '@target_label' => $parent->label(),
-        ]),
-        'weight' => 5,
-        'url' => Url::fromRoute('entity.workspace.merge_form',
-          [
-            'source_workspace' => $entity->id(),
-            'target_workspace' => $parent->id(),
-          ],
-          [
-            'query' => ['destination' => $entity->toUrl('collection')->toString()],
-          ]
-        ),
-      ];
+      if ($this->currentUser->hasPermission('edit any workspace')) {
+        /** @var \Drupal\workspaces\WorkspaceInterface $parent */
+        $parent = $entity->parent->entity;
+        $operations['merge'] = [
+          'title' => $this->t('Merge into @target_label', [
+            '@target_label' => $parent->label(),
+          ]),
+          'weight' => 5,
+          'url' => Url::fromRoute('entity.workspace.merge_form',
+            [
+              'source_workspace' => $entity->id(),
+              'target_workspace' => $parent->id(),
+            ],
+            [
+              'query' => ['destination' => $entity->toUrl('collection')->toString()],
+            ]
+          ),
+        ];
+      }
     }
 
     $operations['manage'] = [
@@ -311,35 +327,39 @@ class WorkspaceListBuilder extends EntityListBuilder {
         ],
       ];
       if (!$active_workspace->hasParent()) {
-        $build['active_workspace']['actions']['publish'] = [
-          '#type' => 'link',
-          '#title' => $this->t('Publish content'),
-          '#url' => Url::fromRoute('entity.workspace.publish_form',
-            ['workspace' => $active_workspace->id()],
-            ['query' => ['destination' => $active_workspace->toUrl('collection')->toString()]]
-          ),
-          '#attributes' => [
-            'class' => ['button', 'button--primary', 'active-workspace__button'],
-          ],
-        ];
+        if ($this->currentUser->hasPermission('publish to live workspace')) {
+          $build['active_workspace']['actions']['publish'] = [
+            '#type' => 'link',
+            '#title' => $this->t('Publish content'),
+            '#url' => Url::fromRoute('entity.workspace.publish_form',
+              ['workspace' => $active_workspace->id()],
+              ['query' => ['destination' => $active_workspace->toUrl('collection')->toString()]]
+            ),
+            '#attributes' => [
+              'class' => ['button', 'button--primary', 'active-workspace__button'],
+            ],
+          ];
+        }
       }
       else {
-        $build['active_workspace']['actions']['merge'] = [
-          '#type' => 'link',
-          '#title' => $this->t('Merge content'),
-          '#url' => Url::fromRoute('entity.workspace.merge_form',
-            [
-              'source_workspace' => $active_workspace->id(),
-              'target_workspace' => $active_workspace->parent->target_id,
+        if ($this->currentUser->hasPermission('edit any workspace')) {
+          $build['active_workspace']['actions']['merge'] = [
+            '#type' => 'link',
+            '#title' => $this->t('Merge content'),
+            '#url' => Url::fromRoute('entity.workspace.merge_form',
+              [
+                'source_workspace' => $active_workspace->id(),
+                'target_workspace' => $active_workspace->parent->target_id,
+              ],
+              [
+                'query' => ['destination' => $active_workspace->toUrl('collection')->toString()],
+              ]
+            ),
+            '#attributes' => [
+              'class' => ['button', 'button--primary', 'active-workspace__button'],
             ],
-            [
-              'query' => ['destination' => $active_workspace->toUrl('collection')->toString()],
-            ]
-          ),
-          '#attributes' => [
-            'class' => ['button', 'button--primary', 'active-workspace__button'],
-          ],
-        ];
+          ];
+        }
       }
     }
 

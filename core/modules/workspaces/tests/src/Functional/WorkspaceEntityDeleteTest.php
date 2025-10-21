@@ -52,6 +52,7 @@ class WorkspaceEntityDeleteTest extends BrowserTestBase {
       'edit own article content',
       'delete own article content',
       'view own unpublished content',
+      'publish to live workspace',
     ];
     $editor = $this->drupalCreateUser($permissions);
     $this->drupalLogin($editor);

@@ -16,6 +16,9 @@ edit own workspace:
 edit any workspace:
   title: Edit any workspace
 
+publish to live workspace:
+  title: Publish to live workspace
+
 delete own workspace:
   title: Delete own workspace
 

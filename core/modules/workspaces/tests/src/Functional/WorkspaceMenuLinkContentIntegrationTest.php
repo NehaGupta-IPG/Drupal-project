@@ -53,6 +53,7 @@ class WorkspaceMenuLinkContentIntegrationTest extends BrowserTestBase {
       'administer menu',
       'administer site configuration',
       'administer workspaces',
+      'publish to live workspace',
     ];
     $this->drupalLogin($this->drupalCreateUser($permissions));
     $this->drupalPlaceBlock('system_menu_block:main');
