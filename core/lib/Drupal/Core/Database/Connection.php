@@ -179,6 +179,12 @@ abstract class Connection {
     assert(count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
 
     if (is_array($connection_options)) {
+      $connection_options = array_merge([
+        'driver' => 'und',
+        'namespace' => 'und',
+        'autoload' => 'und',
+        'database' => 'und',
+      ], $connection_options);
       $connection_options = Database::getConnectionParametersFromArray(NULL, $connection_options);
     }
 
