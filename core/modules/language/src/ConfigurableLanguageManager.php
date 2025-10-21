@@ -430,23 +430,26 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
             // Allow modules to provide translations for specific links.
             $this->moduleHandler->alter('language_switch_links', $result, $type, $url);
 
-            $result = array_filter($result, function (array $link): bool {
-              $url = $link['url'] ?? NULL;
-              $language = $link['language'] ?? NULL;
-              if ($language instanceof LanguageInterface) {
-                $this->negotiatedLanguages[LanguageInterface::TYPE_CONTENT] = $language;
-                $this->negotiatedLanguages[LanguageInterface::TYPE_INTERFACE] = $language;
-              }
-              try {
-                return $url instanceof Url && $url->access();
-              }
-              catch (\Exception) {
-                return FALSE;
-              }
-            });
-            $this->negotiatedLanguages = $original_languages;
+            if (is_array($result)) {
 
-            $links = (object) ['links' => $result, 'method_id' => $method_id];
+              $result = array_filter($result, function (array $link): bool {
+                $url = $link['url'] ?? NULL;
+                $language = $link['language'] ?? NULL;
+                if ($language instanceof LanguageInterface) {
+                  $this->negotiatedLanguages[LanguageInterface::TYPE_CONTENT] = $language;
+                  $this->negotiatedLanguages[LanguageInterface::TYPE_INTERFACE] = $language;
+                }
+                try {
+                  return $url instanceof Url && $url->access();
+                }
+                catch (\Exception) {
+                  return FALSE;
+                }
+              });
+              $this->negotiatedLanguages = $original_languages;
+
+              $links = (object) ['links' => $result, 'method_id' => $method_id];
+            }
             break;
           }
         }

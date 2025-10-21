@@ -89,6 +89,21 @@ class LanguageSwitchingTest extends BrowserTestBase {
     $this->doTestLanguageBlockAnonymous($block->label());
     $this->doTestLanguageBlock404($block->label(), 'system/404');
 
+    // Test Issue #3362713.
+    \Drupal::service('module_installer')->uninstall(['language_test']);
+    \Drupal::service('module_installer')->install(['language_switcher_test']);
+    $this->rebuildAll();
+    // Go to home page.
+    $this->DrupalGet('<front>');
+    // Check Status.
+    $this->assertSession()->statusCodeEquals(200);
+    // The language switcher block should not display.
+    $this->assertSession()->pageTextNotContains($block->label());
+    // Deactivate module.
+    \Drupal::service('module_installer')->uninstall(['language_switcher_test']);
+    \Drupal::service('module_installer')->install(['language_test']);
+    $this->rebuildAll();
+
     // Test 404s with big_pipe where the behavior is different for logged-in
     // users.
     \Drupal::service('module_installer')->install(['big_pipe']);

@@ -1,0 +1,5 @@
+name: 'Language Switcher test'
+type: module
+description: 'Support module for the language switcher tests issue #3362713.'
+package: Testing
+version: VERSION
