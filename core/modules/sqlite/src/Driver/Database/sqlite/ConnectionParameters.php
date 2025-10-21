@@ -39,9 +39,13 @@ class ConnectionParameters extends ConnectionParametersBase {
     parent::__construct($driver, $namespace, $autoload, $database, $prefix, $module, $username, $password, $host, $port, $dependencies);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public static function processConnectionOptionsArray(array $options): array {
+    $options = array_merge(['pdo' => [], 'init_commands' => []], $options);
+
     // Allow PDO options to be overridden.
-    $options['pdo'] ??= [];
     $options['pdo'] += [
       \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
       // Convert numeric values to strings when fetching.
@@ -51,7 +55,6 @@ class ConnectionParameters extends ConnectionParametersBase {
     // Set SQLite init_commands if not already defined. Enable the Write-Ahead
     // Logging (WAL) for SQLite. See https://www.drupal.org/node/2348137 and
     // https://www.sqlite.org/wal.html.
-    $options['init_commands'] ??= [];
     $options['init_commands'] += [
       'wal' => "PRAGMA journal_mode=WAL",
     ];

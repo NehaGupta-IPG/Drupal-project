@@ -39,6 +39,13 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public static function processConnectionOptionsArray(array $options): array {
+    return $options;
+  }
+
+  /**
    * This is for BC support only.
    */
   public function offsetExists(mixed $offset): bool {

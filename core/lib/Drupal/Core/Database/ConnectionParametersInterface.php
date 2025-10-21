@@ -25,4 +25,15 @@ interface ConnectionParametersInterface {
    */
   public function toArray(): array;
 
+  /**
+   * Processes an array of connection options for driver specific defaults.
+   *
+   * @param array<string, mixed> $options
+   *   An array of connection options.
+   *
+   * @return array<string, mixed>
+   *   The processed options as an associative array.
+   */
+  public static function processConnectionOptionsArray(array $options): array;
+
 }
