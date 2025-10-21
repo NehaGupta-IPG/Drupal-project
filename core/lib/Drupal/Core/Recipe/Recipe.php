@@ -132,7 +132,7 @@ final class Recipe {
         new Type(TranslatableMarkup::class),
       ],
       message: 'This value must be a string or a string tagged with !translate.',
-      includeInternalMessages: FALSE
+      includeInternalMessages: FALSE,
     );
 
     $constraints = new Collection([

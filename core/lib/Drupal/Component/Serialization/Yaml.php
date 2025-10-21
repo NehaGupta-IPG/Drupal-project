@@ -53,10 +53,16 @@ class Yaml implements SerializationInterface {
   }
 
   /**
-   * Parses custom YAML tags and convert values to primitive types.
+   * Decodes custom YAML tags.
    *
    * Tag objects will be replaced by their raw value or, if a class exists for
-   * that tag it will be used.
+   * that tag, it will be used to construct an object from the value. For
+   * example:
+   * @code
+   *   Yaml::decodeTags($data, ['translate' => TranslatableMarkup::class]);
+   * @endcode
+   * will replace any values tagged with 'translate' with a TranslatableMarkup
+   * object.
    *
    * @param array $data
    *   Parsed YAML data.
@@ -64,7 +70,7 @@ class Yaml implements SerializationInterface {
    *   Optional classes to use to construct from tag values, indexed by tag.
    *
    * @return array
-   *   Parsed data with parsed tag values.
+   *   Parsed data with decoded tag values.
    */
   public static function decodeTags(array $data, array $tag_classes = []): array {
     foreach ($data as $key => $value) {

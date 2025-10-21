@@ -38,7 +38,6 @@ class RecipeMultilingualTest extends BrowserTestBase {
    * Tests collecting recipe input via a form.
    */
   public function testRecipeInputViaForm(): void {
-
     $this->drupalGet('/form-test/recipe-input');
 
     $assert_session = $this->assertSession();
@@ -46,7 +45,7 @@ class RecipeMultilingualTest extends BrowserTestBase {
     // defined by the input_test recipe and the other defined by its dependency,
     // the create_node_type recipe.
     $assert_session->elementsCount('css', 'input[name*="["]', 2);
-    // The default value and description should be visible.
+    // The default value and description should be visible and translated.
     $assert_session->fieldValueEquals('input_test[owner]', 'Dries Büikuchen');
     $assert_session->pageTextContains('Der Name des Website-Betreibers.');
     $this->assertSame('checkbox', $assert_session->fieldExists('Unfug erlauben')->getAttribute('type'));
