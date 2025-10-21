@@ -103,7 +103,7 @@ class TestSiteApplicationTest extends KernelTestBase {
     $process->setTimeout(500);
     $process->run();
     // @todo debug.
-    dump([$process->getOutput(),$process->getErrorOutput()]);
+    dump([$process->getOutput(), $process->getErrorOutput()]);
 
     $this->assertSame(0, $process->getExitCode());
     $result = json_decode($process->getOutput(), TRUE);
@@ -199,7 +199,7 @@ class TestSiteApplicationTest extends KernelTestBase {
     $process->setTimeout(500);
     $process->run();
     // @todo debug.
-    dump([$process->getOutput(),$process->getErrorOutput()]);
+    dump([$process->getOutput(), $process->getErrorOutput()]);
     $this->assertEquals(0, $process->getExitCode());
 
     $result = json_decode($process->getOutput(), TRUE);
