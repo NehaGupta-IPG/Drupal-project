@@ -4,6 +4,7 @@ namespace Drupal\node\Hook;
 
 use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\user\Entity\User;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Render\BubbleableMetadata;
@@ -45,11 +46,18 @@ class NodeTokensHooks {
       'description' => $this->t("The human-readable name of the node type."),
     ];
     $node['title'] = ['name' => $this->t("Title")];
-    $node['body'] = ['name' => $this->t("Body"), 'description' => $this->t("The main body text of the node.")];
-    $node['summary'] = [
-      'name' => $this->t("Summary"),
-      'description' => $this->t("The summary of the node's main body text."),
-    ];
+    $nodeBodyField = FieldStorageConfig::loadByName('node', 'body');
+    if ($nodeBodyField instanceof FieldStorageConfig) {
+      $node['body'] = ['name' => $this->t("Body"), 'description' => $this->t("The main body text of the node.")];
+
+      // Only provide the summary token if the field type is text_with_summary.
+      if ($nodeBodyField->getType() === 'text_with_summary') {
+        $node['summary'] = [
+          'name' => $this->t("Summary"),
+          'description' => $this->t("The summary of the node's main body text."),
+        ];
+      }
+    }
     $node['langcode'] = [
       'name' => $this->t('Language code'),
       'description' => $this->t('The language code of the language the node is written in.'),
@@ -120,34 +128,43 @@ class NodeTokensHooks {
           case 'body':
           case 'summary':
             $translation = \Drupal::service('entity.repository')->getTranslationFromContext($node, $langcode, ['operation' => 'node_tokens']);
-            if ($translation->hasField('body') && ($items = $translation->get('body')) && !$items->isEmpty()) {
-              $item = $items[0];
-              // If the summary was requested and is not empty, use it.
-              if ($name == 'summary' && !empty($item->summary)) {
-                $output = $item->summary_processed;
-              }
-              else {
-                $output = $item->processed;
-                // A summary was requested.
-                if ($name == 'summary') {
-                  // Generate an optionally trimmed summary of the body field.
-                  // Get the 'trim_length' size used for the 'teaser' mode, if
-                  // present, or use the default trim_length size.
-                  $display_options = \Drupal::service('entity_display.repository')->getViewDisplay('node', $node->getType(), 'teaser')->getComponent('body');
-                  if (isset($display_options['settings']['trim_length'])) {
-                    $length = $display_options['settings']['trim_length'];
-                  }
-                  else {
-                    $settings = \Drupal::service('plugin.manager.field.formatter')->getDefaultSettings('text_summary_or_trimmed');
-                    $length = $settings['trim_length'];
-                  }
-                  $output = text_summary($output, $item->format, $length);
-                }
-              }
-              // "processed" returns a \Drupal\Component\Render\MarkupInterface
-              // via check_markup().
-              $replacements[$original] = $output;
+            if (!$translation->hasField('body')) {
+              break;
             }
+            $items = $translation->get('body');
+            if ($items->isEmpty()) {
+              break;
+            }
+            if ($name == 'summary' && $items->getFieldDefinition()->getType() !== 'text_with_summary') {
+              $replacements[$original] = '';
+              break;
+            }
+            $item = $items[0];
+            // If the summary was requested and is not empty, use it.
+            if ($name == 'summary' && !empty($item->summary)) {
+              $output = $item->summary_processed;
+            }
+            else {
+              $output = $item->processed;
+              // A summary was requested.
+              if ($name == 'summary') {
+                // Generate an optionally trimmed summary of the body field.
+                // Get the 'trim_length' size used for the 'teaser' mode, if
+                // present, or use the default trim_length size.
+                $display_options = \Drupal::service('entity_display.repository')->getViewDisplay('node', $node->getType(), 'teaser')->getComponent('body');
+                if (isset($display_options['settings']['trim_length'])) {
+                  $length = $display_options['settings']['trim_length'];
+                }
+                else {
+                  $settings = \Drupal::service('plugin.manager.field.formatter')->getDefaultSettings('text_summary_or_trimmed');
+                  $length = $settings['trim_length'];
+                }
+                $output = text_summary($output, $item->format, $length);
+              }
+            }
+            // "processed" returns a \Drupal\Component\Render\MarkupInterface
+            // via check_markup().
+            $replacements[$original] = $output;
             break;
 
           case 'langcode':
