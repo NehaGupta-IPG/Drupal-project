@@ -8,6 +8,8 @@
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\workspaces\WorkspaceAssociation;
 
 /**
@@ -304,4 +306,35 @@ function workspaces_update_11302(): void {
     $transaction->rollBack();
     throw $e;
   }
+}
+
+/**
+ * @todo
+ */
+function workspaces_update_11303(): void {
+  $entity_definition_update = \Drupal::entityDefinitionUpdateManager();
+
+  $storage_definition = BaseFieldDefinition::create('string')
+    ->setLabel(new TranslatableMarkup('Managed'))
+    ->setDescription(new TranslatableMarkup('Whether the workspace can only be managed in code.'))
+    ->setSetting('max_length', 128)
+    ->setRequired(TRUE)
+    ->setReadOnly(TRUE)
+    ->setDefaultValue('default')
+    ->setInitialValue('default');
+  $entity_definition_update->installFieldStorageDefinition('provider', 'workspace', 'workspaces', $storage_definition);
+
+  $storage_definition = BaseFieldDefinition::create('boolean')
+    ->setLabel(new TranslatableMarkup('Managed'))
+    ->setDescription(new TranslatableMarkup('Whether the workspace can only be managed in code.'))
+    ->setDefaultValue(FALSE)
+    ->setInitialValue(FALSE);
+  $entity_definition_update->installFieldStorageDefinition('managed', 'workspace', 'workspaces', $storage_definition);
+
+  $storage_definition = BaseFieldDefinition::create('boolean')
+    ->setLabel(new TranslatableMarkup('Temporary'))
+    ->setDescription(new TranslatableMarkup('Whether the workspace can be purged automatically.'))
+    ->setDefaultValue(FALSE)
+    ->setInitialValue(FALSE);
+  $entity_definition_update->installFieldStorageDefinition('temporary', 'workspace', 'workspaces', $storage_definition);
 }

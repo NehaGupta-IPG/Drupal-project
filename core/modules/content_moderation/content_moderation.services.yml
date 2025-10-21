@@ -28,3 +28,15 @@ services:
     arguments: ['@entity_type.manager', '@?workspaces.association']
   Drupal\content_moderation\EventSubscriber\DefaultContentSubscriber:
     autowire: true
+
+  content_moderation.paramconverter.entity:
+    decorates: paramconverter.entity
+    class: Drupal\content_moderation\ContentModerationEntityConverter
+    arguments: ['@.inner', '@entity_type.manager', '@workspaces.manager']
+    public: false
+
+  content_moderation.workspace_provider:
+    class: Drupal\content_moderation\ContentModerationWorkspaceProvider
+    autowire: true
+    tags:
+      - { name: workspace_provider, id: content_moderation }

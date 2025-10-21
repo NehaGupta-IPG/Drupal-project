@@ -22,6 +22,9 @@ use Drupal\content_moderation\Entity\Handler\ModerationHandler;
 use Drupal\content_moderation\Entity\Handler\NodeModerationHandler;
 use Drupal\content_moderation\Entity\Handler\TaxonomyTermModerationHandler;
 use Drupal\content_moderation\Entity\Routing\EntityModerationRouteProvider;
+use Drupal\workspaces\Entity\Workspace;
+use Drupal\workspaces\WorkspaceInformationInterface;
+use Drupal\workspaces\WorkspaceManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -72,6 +75,16 @@ class EntityTypeInfo implements ContainerInjectionInterface {
   protected $validator;
 
   /**
+   * The workspace manager.
+   */
+  protected WorkspaceManagerInterface $workspaceManager;
+
+  /**
+   * The workspace information service.
+   */
+  protected WorkspaceInformationInterface $workspaceInfo;
+
+  /**
    * A keyed array of custom moderation handlers for given entity types.
    *
    * Any entity not specified will use a common default.
@@ -100,13 +113,15 @@ class EntityTypeInfo implements ContainerInjectionInterface {
    * @param \Drupal\content_moderation\StateTransitionValidationInterface $validator
    *   State transition validator.
    */
-  public function __construct(TranslationInterface $translation, ModerationInformationInterface $moderation_information, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $bundle_info, AccountInterface $current_user, StateTransitionValidationInterface $validator) {
+  public function __construct(TranslationInterface $translation, ModerationInformationInterface $moderation_information, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $bundle_info, AccountInterface $current_user, StateTransitionValidationInterface $validator, WorkspaceManagerInterface $workspace_manager, WorkspaceInformationInterface $workspace_info) {
     $this->stringTranslation = $translation;
     $this->moderationInfo = $moderation_information;
     $this->entityTypeManager = $entity_type_manager;
     $this->bundleInfo = $bundle_info;
     $this->currentUser = $current_user;
     $this->validator = $validator;
+    $this->workspaceManager = $workspace_manager;
+    $this->workspaceInfo = $workspace_info;
   }
 
   /**
@@ -119,7 +134,9 @@ class EntityTypeInfo implements ContainerInjectionInterface {
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info'),
       $container->get('current_user'),
-      $container->get('content_moderation.state_transition_validation')
+      $container->get('content_moderation.state_transition_validation'),
+      $container->get('workspaces.manager'),
+      $container->get('workspaces.information'),
     );
   }
 
@@ -317,6 +334,25 @@ class EntityTypeInfo implements ContainerInjectionInterface {
       $revision_key = $new_revision->getEntityType()->getKey('revision');
       $new_revision->set($revision_key, $new_revision->getLoadedRevisionId());
       $form_object->setEntity($new_revision);
+    }
+
+    if ($entity->isNew()
+      && $form_object instanceof ContentEntityFormInterface
+      && $this->moderationInfo->isModeratedEntity($entity)
+      && $this->workspaceInfo->isEntitySupported($entity)
+      && !$this->workspaceManager->hasActiveWorkspace()
+    ) {
+      $id = implode('.', ['cm', $entity->getEntityTypeId(), $entity->uuid()]);
+      $workspace = Workspace::create([
+        'id' => $id,
+        'label' => "Temporary ($id)",
+        'provider' => 'content_moderation',
+        'managed' => TRUE,
+        'temporary' => TRUE,
+      ]);
+      $workspace->save();
+
+      $this->workspaceManager->setActiveWorkspace($workspace, FALSE);
     }
   }
 

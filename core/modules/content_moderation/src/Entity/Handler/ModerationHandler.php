@@ -40,16 +40,6 @@ class ModerationHandler implements ModerationHandlerInterface, EntityHandlerInte
    * {@inheritdoc}
    */
   public function onPresave(ContentEntityInterface $entity, $default_revision, $published_state) {
-    // When entities are syncing, content moderation should not force a new
-    // revision to be created and should not update the default status of a
-    // revision. This is useful if changes are being made to entities or
-    // revisions which are not part of editorial updates triggered by normal
-    // content changes.
-    if (!$entity->isSyncing()) {
-      $entity->setNewRevision(TRUE);
-      $entity->isDefaultRevision($default_revision);
-    }
-
     // Update publishing status if it can be updated and if it needs updating.
     if (($entity instanceof EntityPublishedInterface) && $entity->isPublished() !== $published_state) {
       $published_state ? $entity->setPublished() : $entity->setUnpublished();

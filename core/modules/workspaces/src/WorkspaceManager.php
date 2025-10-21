@@ -9,6 +9,7 @@ use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\workspaces\Provider\WorkspaceProviderInterface;
 use Drupal\workspaces\Negotiator\WorkspaceNegotiatorInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -51,6 +52,8 @@ class WorkspaceManager implements WorkspaceManagerInterface {
     protected $negotiators,
     protected WorkspaceAssociationInterface $workspaceAssociation,
     protected WorkspaceInformationInterface $workspaceInfo,
+    #[AutowireIterator(tag: 'workspace_provider', indexAttribute: 'id')]
+    protected iterable $providers = [],
   ) {
     if ($negotiators instanceof ClassResolverInterface) {
       @trigger_error('Passing the \'class_resolver\' service as the 7th argument to ' . __METHOD__ . ' is deprecated in drupal:11.3.0 and is unsupported in drupal:12.0.0. Use autowiring for the \'workspaces.manager\' service instead. See https://www.drupal.org/node/3532939', E_USER_DEPRECATED);
@@ -72,6 +75,7 @@ class WorkspaceManager implements WorkspaceManagerInterface {
     if (!isset($this->activeWorkspace)) {
       $request = $this->requestStack->getCurrentRequest();
 
+      /** @var \Drupal\workspaces\Negotiator\WorkspaceIdNegotiatorInterface $negotiator */
       foreach ($this->negotiators as $negotiator) {
         if ($negotiator->applies($request)) {
           if ($workspace_id = $negotiator->getActiveWorkspaceId($request)) {
@@ -84,7 +88,9 @@ class WorkspaceManager implements WorkspaceManagerInterface {
           // By default, 'view' access is checked when a workspace is activated,
           // but it should also be checked when retrieving the currently active
           // workspace.
-          if (isset($negotiated_workspace) && $negotiated_workspace->access('view')) {
+          // @todo Is the access model ok for managed workspaces? Can they
+          //   always be set as active regardless of user permissions?
+          if (isset($negotiated_workspace) && ($negotiated_workspace->isManaged() || $negotiated_workspace->access('view'))) {
             // Notify the negotiator that its workspace has been selected.
             $negotiator->setActiveWorkspace($negotiated_workspace);
 
@@ -151,7 +157,11 @@ class WorkspaceManager implements WorkspaceManagerInterface {
   protected function doSwitchWorkspace($workspace) {
     // If the current user doesn't have access to view the workspace, they
     // shouldn't be allowed to switch to it, except in CLI processes.
-    if ($workspace && PHP_SAPI !== 'cli' && !$workspace->access('view')) {
+    // @todo Should 'view' access be allowed by the workspace provider somehow?
+    //   This most likely means we need workspace providers to be more than a
+    //   string in the database, probably tagged services? Lots of implications
+    //   here.
+    if ($workspace && PHP_SAPI !== 'cli' && !$workspace->isManaged() && !$workspace->access('view')) {
       $this->logger->error('Denied access to view workspace %workspace_label for user %uid', [
         '%workspace_label' => $workspace->label(),
         '%uid' => $this->currentUser->id(),
@@ -296,6 +306,19 @@ class WorkspaceManager implements WorkspaceManagerInterface {
       // Delete any possible leftover association entries.
       $this->workspaceAssociation->deleteAssociations($workspace_id);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getProvider(WorkspaceInterface $workspace): WorkspaceProviderInterface {
+    $providers = iterator_to_array($this->providers);
+    $id = $workspace->get('provider')->value;
+    if (!isset($providers[$id])) {
+      throw new \DomainException("Workspace provider '$id' not found.");
+    }
+
+    return $providers[$id];
   }
 
   /**

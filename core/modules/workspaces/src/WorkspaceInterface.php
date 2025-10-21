@@ -42,4 +42,34 @@ interface WorkspaceInterface extends ContentEntityInterface, EntityChangedInterf
    */
   public function hasParent();
 
+  /**
+   * Determines whether the workspace is managed only in code.
+   */
+  public function isManaged(): bool;
+
+  /**
+   * Sets the workspace as managed.
+   */
+  public function setManaged(): static;
+
+  /**
+   * Sets the workspace as unmanaged.
+   */
+  public function setUnmanaged(): static;
+
+  /**
+   * Determines whether the workspace is temporary.
+   */
+  public function isTemporary(): bool;
+
+  /**
+   * Sets the workspace as temporary.
+   */
+  public function setTemporary(): static;
+
+  /**
+   * Sets the workspace as permanent.
+   */
+  public function setPermanent(): static;
+
 }

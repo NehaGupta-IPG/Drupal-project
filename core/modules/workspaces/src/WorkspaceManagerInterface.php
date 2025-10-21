@@ -2,6 +2,8 @@
 
 namespace Drupal\workspaces;
 
+use Drupal\workspaces\Provider\WorkspaceProviderInterface;
+
 /**
  * Provides an interface for managing Workspaces.
  */
@@ -75,5 +77,12 @@ interface WorkspaceManagerInterface {
    * Deletes the revisions associated with deleted workspaces.
    */
   public function purgeDeletedWorkspacesBatch();
+
+  /**
+   * Gets the provider of this workspace.
+   *
+   * @param \Drupal\workspaces\WorkspaceInterface $workspace
+   */
+  public function getProvider(WorkspaceInterface $workspace): WorkspaceProviderInterface;
 
 }
