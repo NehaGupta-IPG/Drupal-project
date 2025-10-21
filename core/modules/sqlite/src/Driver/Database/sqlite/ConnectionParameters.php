@@ -12,16 +12,6 @@ use Drupal\Core\Database\ConnectionParametersBase;
 class ConnectionParameters extends ConnectionParametersBase {
 
   /**
-   * PDO options.
-   */
-  public array $pdo = [];
-
-  /**
-   * Connection initialization commands.
-   */
-  public array $initCommands = [];
-
-  /**
    * Tables collation.
    */
   public string $collation;
@@ -30,5 +20,43 @@ class ConnectionParameters extends ConnectionParametersBase {
    * Transaction isolation level.
    */
   public int|string $isolationLevel;
+
+  public function __construct(
+    string $driver,
+    string $namespace,
+    string $autoload,
+    string $database,
+    string $prefix = '',
+    ?string $module = NULL,
+    ?string $username = NULL,
+    ?string $password = NULL,
+    ?string $host = NULL,
+    ?int $port = NULL,
+    array $dependencies = [],
+    public readonly array $init_commands = [],
+    public readonly array $pdo = [],
+  ) {
+    parent::__construct($driver, $namespace, $autoload, $database, $prefix, $module, $username, $password, $host, $port, $dependencies);
+  }
+
+  public static function processConnectionOptionsArray(array $options): array {
+    // Allow PDO options to be overridden.
+    $options['pdo'] ??= [];
+    $options['pdo'] += [
+      \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+      // Convert numeric values to strings when fetching.
+      \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
+    ];
+
+    // Set SQLite init_commands if not already defined. Enable the Write-Ahead
+    // Logging (WAL) for SQLite. See https://www.drupal.org/node/2348137 and
+    // https://www.sqlite.org/wal.html.
+    $options['init_commands'] ??= [];
+    $options['init_commands'] += [
+      'wal' => "PRAGMA journal_mode=WAL",
+    ];
+
+    return $options;
+  }
 
 }

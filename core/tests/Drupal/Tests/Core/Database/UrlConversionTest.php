@@ -486,7 +486,7 @@ class UrlConversionTest extends UnitTestCase {
   #[DataProvider('providerInvalidArgumentGetConnectionInfoAsUrl')]
   public function testGetInvalidArgumentGetConnectionInfoAsUrl(array $connection_options, $expected_exception_message): void {
     $this->expectException(\ArgumentCountError::class);
-    $this->expectExceptionMessage($expected_exception_message);
+    $this->expectExceptionMessageMatches($expected_exception_message);
     Database::addConnectionInfo('default', 'default', $connection_options);
     Database::getConnectionInfoAsUrl();
   }
@@ -508,7 +508,7 @@ class UrlConversionTest extends UnitTestCase {
           'host' => 'localhost',
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
         ],
-        'Drupal\Core\Database\ConnectionParametersBase::__construct(): Argument #4 ($database) not passed',
+        '/__construct\(\): Argument #4 \(\$database\) not passed/',
       ],
     ];
   }

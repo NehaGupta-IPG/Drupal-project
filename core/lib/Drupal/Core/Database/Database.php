@@ -246,7 +246,12 @@ abstract class Database {
       $connection_info['port'] = (int) $connection_info['port'];
     }
 
-    return self::getConnectionParametersFromArray($connection_info['namespace'] . '\\ConnectionParameters', $connection_info);
+    $parameters_class = $connection_info['namespace'] . '\\ConnectionParameters';
+    if (class_exists($parameters_class)) {
+      $connection_info = $parameters_class::processConnectionOptionsArray($connection_info);
+    }
+
+    return self::getConnectionParametersFromArray($parameters_class, $connection_info);
   }
 
   /**
@@ -586,7 +591,12 @@ abstract class Database {
       $options['dependencies'] = $autoloadInfo['dependencies'];
     }
 
-    return self::getConnectionParametersFromArray($options['namespace'] . '\\ConnectionParameters', $options);
+    $parameters_class = $driverNamespace . '\\ConnectionParameters';
+    if (class_exists($parameters_class)) {
+      $options = $parameters_class::processConnectionOptionsArray($options);
+    }
+
+    return self::getConnectionParametersFromArray($parameters_class, $options);
   }
 
   /**

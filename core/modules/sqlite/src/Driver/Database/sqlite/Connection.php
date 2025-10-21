@@ -102,13 +102,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   public static function open(ConnectionParametersInterface|array &$connection_options = []) {
     assert($connection_options instanceof ConnectionParametersInterface);
 
-    // Allow PDO options to be overridden.
-    $connection_options->pdo += [
-      \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-      // Convert numeric values to strings when fetching.
-      \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
-    ];
-
     try {
       if (\PHP_VERSION_ID >= 80400) {
         // @phpstan-ignore class.notFound
@@ -179,16 +172,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       $sqlite->sqliteCreateCollation('NOCASE_UTF8', ['Drupal\Component\Utility\Unicode', 'strcasecmp']);
     }
 
-    // Set SQLite init_commands if not already defined. Enable the Write-Ahead
-    // Logging (WAL) for SQLite. See https://www.drupal.org/node/2348137 and
-    // https://www.sqlite.org/wal.html.
-    $connection_options->initCommands += [
-      'wal' => "PRAGMA journal_mode=WAL",
-    ];
-
     // Execute sqlite init_commands.
-    if (isset($connection_options->initCommands)) {
-      $sqlite->exec(implode('; ', $connection_options->initCommands));
+    if (!empty($connection_options->init_commands)) {
+      $sqlite->exec(implode('; ', $connection_options->init_commands));
     }
 
     return $sqlite;

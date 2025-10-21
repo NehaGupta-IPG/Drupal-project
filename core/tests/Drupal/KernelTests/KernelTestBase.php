@@ -448,9 +448,12 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     if (!empty($connection_info)) {
       Database::renameConnection('default', 'simpletest_original_default');
       foreach ($connection_info as $target => $value) {
+        $class = get_class($value);
+        $parameters = $value->toArray();
         // Replace the full table prefix definition to ensure that no table
         // prefixes of the test runner leak into the test.
-        $connection_info[$target]->prefix = $this->databasePrefix ?? '';
+        $parameters['prefix'] = $this->databasePrefix ?? '';
+        $connection_info[$target] = new $class(...$parameters);
       }
     }
     return $connection_info;
