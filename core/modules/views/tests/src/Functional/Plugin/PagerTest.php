@@ -315,6 +315,29 @@ class PagerTest extends ViewTestBase {
   }
 
   /**
+   * Tests the pager items_per_page setting.
+   */
+  public function testItemsPerPageSameAsNumberOfNodes(): void {
+    // Create 10 nodes as we are setting the pager to show 10 items per page.
+    $this->drupalCreateContentType(['type' => 'page']);
+    for ($i = 0; $i < 10; $i++) {
+      $this->drupalCreateNode();
+    }
+
+    $view = Views::getView('test_pager_some');
+    $view->setDisplay();
+    $pager = [
+      'type' => 'none',
+      'options' => [
+        'offset' => 0,
+        'items_per_page' => 10,
+      ],
+    ];
+    $this->executeView($view);
+    $this->assertSession()->pageTextNotContains('TypeError: Drupal\Component\Utility\Html::escape(): Argument #1 ($text)');
+  }
+
+  /**
    * Tests the normal pager.
    */
   public function testNormalPager(): void {
