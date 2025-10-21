@@ -29,7 +29,7 @@ class KernelTestBaseDatabaseDriverModuleTest extends KernelTestBase {
       throw new \Exception('There is no database connection so no tests can be run. You must provide a SIMPLETEST_DB environment variable to run PHPUnit based functional tests outside of run-tests.sh. See https://www.drupal.org/node/2116263#skipped-tests for more information.');
     }
     else {
-      $database = Database::convertDbUrlToConnectionInfo($db_url);
+      $database = Database::convertDbUrlToConnectionInfo($db_url)->toArray();
 
       if (in_array($database['driver'], ['mysql', 'pgsql'])) {
         // Change the used database driver to the one provided by the module
@@ -48,9 +48,12 @@ class KernelTestBaseDatabaseDriverModuleTest extends KernelTestBase {
     if (!empty($connection_info)) {
       Database::renameConnection('default', 'simpletest_original_default');
       foreach ($connection_info as $target => $value) {
+        $class = get_class($value);
+        $options = $value->toArray();
         // Replace the table prefix definition to ensure that no table of the
         // test runner leak into the test.
-        $connection_info[$target]['prefix'] = $this->databasePrefix;
+        $options['prefix'] = $this->databasePrefix ?? '';
+        $connection_info[$target] = new $class(...$options);
       }
     }
     return $connection_info;

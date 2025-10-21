@@ -40,8 +40,10 @@ class MigrateMissingDatabaseTest extends KernelTestBase {
 
     // Set the 'migrate' database connection to use a missing database.
     $info = Database::getConnectionInfo('default')['default'];
-    $info['database'] = 'godot';
-    Database::addConnectionInfo('migrate', 'default', $info);
+    $class = get_class($info);
+    $options = $info->toArray();
+    $options['database'] = 'godot';
+    Database::addConnectionInfo('migrate', 'default', new $class(...$options));
   }
 
   /**

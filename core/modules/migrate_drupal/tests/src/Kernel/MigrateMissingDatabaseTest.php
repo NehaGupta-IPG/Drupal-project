@@ -39,8 +39,10 @@ class MigrateMissingDatabaseTest extends KernelTestBase {
 
     // Set the 'migrate' database connection to use a missing host.
     $info = Database::getConnectionInfo('default')['default'];
-    $info['host'] = 'does_not_exist';
-    Database::addConnectionInfo('migrate', 'default', $info);
+    $class = get_class($info);
+    $options = $info->toArray();
+    $options['host'] = 'does_not_exist';
+    Database::addConnectionInfo('migrate', 'default', new $class(...$options));
   }
 
   /**
