@@ -16,7 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestWith;
 
 /**
- * Tests LinkItem.
+ * Tests LinkItem::getCacheTags().
  */
 #[CoversMethod(LinkItem::class, 'getCacheTags')]
 #[Group('link')]
