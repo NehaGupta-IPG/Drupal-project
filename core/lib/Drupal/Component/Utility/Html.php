@@ -430,7 +430,7 @@ class Html {
    *
    * @ingroup sanitization
    */
-  public static function escape(string | null $text ): string {
+  public static function escape(string | null $text): string {
     return ($text === '0' || !empty($text)) ? htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : '';
   }
 

@@ -333,6 +333,7 @@ class PagerTest extends ViewTestBase {
         'items_per_page' => 10,
       ],
     ];
+    $view->display_handler->setOption('pager', $pager);
     $this->executeView($view);
     $this->assertSession()->pageTextNotContains('TypeError: Drupal\Component\Utility\Html::escape(): Argument #1 ($text)');
   }
