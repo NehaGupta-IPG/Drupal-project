@@ -50,17 +50,17 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
     $manage_link = $page->find('css', '#toolbar-item-administration');
 
     // Start with open tray.
-    $this->waitAndAssertAriaPressedState($manage_link, TRUE);
+    $this->waitAndAssertAriaExpandedState($manage_link, TRUE);
     $this->assertTrue($content_link->isVisible(), 'Toolbar tray is open by default.');
 
     // Click to close.
     $manage_link->click();
-    $this->waitAndAssertAriaPressedState($manage_link, FALSE);
+    $this->waitAndAssertAriaExpandedState($manage_link, FALSE);
     $this->assertFalse($content_link->isVisible(), 'Toolbar tray is closed after clicking the "Manage" link.');
 
     // Click to open.
     $manage_link->click();
-    $this->waitAndAssertAriaPressedState($manage_link, TRUE);
+    $this->waitAndAssertAriaExpandedState($manage_link, TRUE);
     $this->assertTrue($content_link->isVisible(), 'Toolbar tray is visible again after clicking the "Manage" button a second time.');
 
     // Test toggling the toolbar tray between horizontal and vertical.
@@ -101,7 +101,7 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
   }
 
   /**
-   * Asserts that an element's `aria-pressed` attribute matches expected state.
+   * Asserts that an element's `aria-expanded` attribute matches expected state.
    *
    * Uses `waitFor()` to pause until either the condition is met or the timeout
    * of `1` second has passed.
@@ -109,19 +109,19 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
    * @param \Behat\Mink\Element\NodeElement $element
    *   The element to be tested.
    * @param bool $expected
-   *   The expected value of `aria-pressed`, as a boolean.
+   *   The expected value of `aria-expanded`, as a boolean.
    *
    * @throws ExpectationFailedException
    */
-  private function waitAndAssertAriaPressedState(NodeElement $element, bool $expected): void {
+  private function waitAndAssertAriaExpandedState(NodeElement $element, bool $expected): void {
     $this->assertTrue(
       $this
         ->getSession()
         ->getPage()
         ->waitFor(1, function () use ($element, $expected): bool {
-          // Get boolean representation of `aria-pressed`.
-          // TRUE if `aria-pressed="true"`, FALSE otherwise.
-          $actual = $element->getAttribute('aria-pressed') == 'true';
+          // Get boolean representation of `aria-expanded`.
+          // TRUE if `aria-expanded="true"`, FALSE otherwise.
+          $actual = $element->getAttribute('aria-expanded') == 'true';
 
           // Exit `waitFor()` when $actual == $expected.
           return $actual == $expected;

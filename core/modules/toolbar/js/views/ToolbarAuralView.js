@@ -44,37 +44,6 @@
           }),
         );
       },
-
-      /**
-       * Announces a changed active tray.
-       *
-       * @param {Drupal.toolbar.ToolbarModel} model
-       *   The toolbar model in question.
-       * @param {HTMLElement} tray
-       *   The new value of the tray attribute in the model.
-       */
-      onActiveTrayChange(model, tray) {
-        const relevantTray =
-          tray === null ? model.previous('activeTray') : tray;
-        // Current activeTray and previous activeTray are empty, no state change
-        // to announce.
-        if (!relevantTray) {
-          return;
-        }
-        const action = tray === null ? Drupal.t('closed') : Drupal.t('opened');
-        const trayNameElement =
-          relevantTray.querySelector('.toolbar-tray-name');
-        let text;
-        if (trayNameElement !== null) {
-          text = Drupal.t('Tray "@tray" @action.', {
-            '@tray': trayNameElement.textContent,
-            '@action': action,
-          });
-        } else {
-          text = Drupal.t('Tray @action.', { '@action': action });
-        }
-        Drupal.announce(text);
-      },
     },
   );
 })(Backbone, Drupal);

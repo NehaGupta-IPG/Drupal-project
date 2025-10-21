@@ -215,34 +215,6 @@ module.exports = {
       },
     );
   },
-  'Aural view test: tray toggle': (browser) => {
-    browser.executeAsync(
-      function (done) {
-        Drupal.announce = done;
-        const $adminButton = jQuery('#toolbar-item-administration');
-        $adminButton.trigger('click');
-      },
-      (result) => {
-        browser.assert.equal(
-          result.value,
-          'Tray "Administration menu" closed.',
-        );
-      },
-    );
-    browser.executeAsync(
-      function (done) {
-        Drupal.announce = done;
-        const $adminButton = jQuery('#toolbar-item-administration');
-        $adminButton.trigger('click');
-      },
-      (result) => {
-        browser.assert.equal(
-          result.value,
-          'Tray "Administration menu" opened.',
-        );
-      },
-    );
-  },
   'Toolbar event: drupalToolbarOrientationChange': (browser) => {
     browser.executeAsync(
       function (done) {

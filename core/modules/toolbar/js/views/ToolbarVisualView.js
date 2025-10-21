@@ -62,6 +62,18 @@
           .has('.toolbar-menu')
           .append(Drupal.theme('toolbarOrientationToggle'));
 
+        // Add accessibility attributes to tray trigger "buttons".
+        this.$el
+          .find('.toolbar-bar .toolbar-tab .trigger')
+          .each((_, element) => {
+            // Initialize to 'false'. Opening the tray will set to 'true'.
+            element.setAttribute('aria-expanded', 'false');
+
+            if (element.tagName === 'A' && element.href) {
+              element.setAttribute('role', 'button');
+            }
+          });
+
         // Trigger an activeTab change so that listening scripts can respond on
         // page load. This will call render.
         this.model.trigger('change:activeTab');
@@ -210,7 +222,7 @@
         // Deactivate the previous tab.
         $(this.model.previous('activeTab'))
           .removeClass('is-active')
-          .attr('aria-pressed', false);
+          .attr('aria-expanded', false);
         // Deactivate the previous tray.
         $(this.model.previous('activeTray')).removeClass('is-active');
 
@@ -221,8 +233,8 @@
         if ($tab.length > 0) {
           $tab
             .addClass('is-active')
-            // Mark the tab as pressed.
-            .attr('aria-pressed', true);
+            // Mark the tab as expanded.
+            .attr('aria-expanded', true);
           const name = $tab.attr('data-toolbar-tray');
           // Store the active tab name or remove the setting.
           const id = $tab.get(0).id;

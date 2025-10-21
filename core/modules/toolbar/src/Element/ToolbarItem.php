@@ -55,8 +55,6 @@ class ToolbarItem extends RenderElementBase {
       // Provide attributes necessary for trays.
       $attributes += [
         'data-toolbar-tray' => $id . '-tray',
-        'role' => 'button',
-        'aria-pressed' => 'false',
       ];
 
       // Merge in module-provided attributes.
