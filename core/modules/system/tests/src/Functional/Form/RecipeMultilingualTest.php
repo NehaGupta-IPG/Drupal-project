@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Form;
 
 // cspell:ignore Büikuchen Betreibers Unfug erlauben Rezept anwenden Feld ist
-// cspell:ignore erforderlich finde solltest keine besitzen Revier
+// cspell:ignore erforderlich finde solltest keine besitzen Revier Eingabetest
+// cspell:ignore Eingabetestrezept
 
+use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeInputFormTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -64,6 +67,12 @@ class RecipeMultilingualTest extends BrowserTestBase {
     // This also tests that config actions are run using the correct language
     // and can be translated.
     $this->assertSame("Legitimate Human's Revier", $this->config('system.site')->get('name'));
+
+    $recipe = Recipe::createFromDirectory($this->root . '/core/tests/fixtures/recipes/input_test');
+    $this->assertInstanceOf(TranslatableMarkup::class, $recipe->name);
+    $this->assertSame('Eingabetest', (string) $recipe->name);
+    $this->assertInstanceOf(TranslatableMarkup::class, $recipe->description);
+    $this->assertSame('Eingabetestrezept', (string) $recipe->description);
   }
 
   /**
@@ -107,6 +116,12 @@ msgstr "\${owner}'s Revier"
 
 msgid "@name field is required."
 msgstr "Das Feld @name ist erforderlich."
+
+msgid "Input Test"
+msgstr "Eingabetest"
+
+msgid "Input test recipe"
+msgstr "Eingabetestrezept"
 
 PO;
     $version = explode('.', \Drupal::VERSION)[0] . '.0.0';

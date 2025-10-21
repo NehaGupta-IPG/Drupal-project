@@ -1,4 +1,5 @@
 name: Input Test
+description: Input test recipe
 recipes:
   # Depend on another recipe in order to prove that we can collect input
   # from dependent recipes as well.

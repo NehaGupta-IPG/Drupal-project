@@ -30,6 +30,7 @@ use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\Yaml\Tag\TaggedValue;
 
 /**
  * @internal
@@ -40,9 +41,9 @@ final class Recipe {
   const COMPOSER_PROJECT_TYPE = 'drupal-recipe';
 
   /**
-   * @param string $name
+   * @param string|\Drupal\Core\StringTranslation\TranslatableMarkup $name
    *   The human-readable name of the recipe.
-   * @param string $description
+   * @param string|\Drupal\Core\StringTranslation\TranslatableMarkup $description
    *   A short description of the recipe.
    * @param string $type
    *   The recipe type.
@@ -66,8 +67,8 @@ final class Recipe {
    *   Any extra information to expose to specific modules.
    */
   public function __construct(
-    public readonly string $name,
-    public readonly string $description,
+    public readonly string|TranslatableMarkup $name,
+    public readonly string|TranslatableMarkup $description,
     public readonly string $type,
     public readonly RecipeConfigurator $recipes,
     public readonly InstallConfigurator $install,
@@ -146,6 +147,7 @@ final class Recipe {
         ),
       ]),
       'description' => new Optional([
+        $translatable_string_constraint,
         new NotBlank(),
         // Matching `type: text` in core.data_types.schema.yml.
         new RegexConstraint(
@@ -326,6 +328,15 @@ final class Recipe {
     ]);
 
     $recipe_data = Yaml::decode($recipe_contents);
+
+    // Description and name can be extracted by POTX without a !translate tag so
+    // we need to convert them to tagged values so that can be translated.
+    if (isset($recipe_data['description']) && is_string($recipe_data['description'])) {
+      $recipe_data['description'] = new TaggedValue('translate', $recipe_data['description']);
+    }
+    if (isset($recipe_data['name']) && is_string($recipe_data['name'])) {
+      $recipe_data['name'] = new TaggedValue('translate', $recipe_data['name']);
+    }
 
     // Replace 'translate' tags with proper translations.
     $recipe_data = Yaml::decodeTags($recipe_data, ['translate' => TranslatableMarkup::class]);
