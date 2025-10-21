@@ -114,7 +114,7 @@ final class InputConfigurator {
     }
     foreach ($this->data as $data) {
       $name = $data->getName();
-      $descriptions[$name] = $data->getDataDefinition()->getDescription();
+      $descriptions[$name] = (string) $data->getDataDefinition()->getDescription();
     }
     return $descriptions;
   }
