@@ -665,9 +665,9 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
 
     // Remove all prefixed tables.
     $original_connection_info = Database::getConnectionInfo('simpletest_original_default');
-    $original_prefix = $original_connection_info['default']->prefix;
+    $original_prefix = $original_connection_info['default']?->prefix ?? NULL;
     $test_connection_info = Database::getConnectionInfo('default');
-    $test_prefix = $test_connection_info['default']->prefix;
+    $test_prefix = $test_connection_info['default']?->prefix ?? NULL;
     if ($original_prefix != $test_prefix) {
       $tables = Database::getConnection()->schema()->findTables('%');
       foreach ($tables as $table) {

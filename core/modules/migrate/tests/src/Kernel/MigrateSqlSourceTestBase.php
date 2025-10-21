@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate\Kernel;
 
 use Drupal\Core\Cache\MemoryCounterBackendFactory;
+use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
+use Drupal\sqlite\Driver\Database\sqlite\ConnectionParameters;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\DependencyInjection\Reference;
@@ -40,9 +42,17 @@ abstract class MigrateSqlSourceTestBase extends MigrateSourceTestBase {
     // Create an in-memory SQLite database. Plugins can interact with it like
     // any other database, and it will cease to exist when the connection is
     // closed.
-    $connection_options = ['database' => ':memory:'];
-    $pdo = Connection::open($connection_options);
-    $connection = new Connection($pdo, $connection_options);
+    $connectionParameters = Database::getConnectionParametersFromArray(
+      ConnectionParameters::class,
+      ConnectionParameters::processConnectionOptionsArray([
+        'driver' => 'sqlite',
+        'namespace' => 'und',
+        'autoload' => 'und',
+        'database' => ':memory:'
+      ]),
+    );
+    $pdo = Connection::open($connectionParameters);
+    $connection = new Connection($pdo, $connectionParameters);
 
     // Create the tables and fill them with data.
     foreach ($source_data as $table => $rows) {
