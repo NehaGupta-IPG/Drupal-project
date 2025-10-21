@@ -48,7 +48,7 @@ abstract class MigrateSqlSourceTestBase extends MigrateSourceTestBase {
         'driver' => 'sqlite',
         'namespace' => 'und',
         'autoload' => 'und',
-        'database' => ':memory:'
+        'database' => ':memory:',
       ]),
     );
     $pdo = Connection::open($connectionParameters);
