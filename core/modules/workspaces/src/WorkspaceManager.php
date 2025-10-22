@@ -42,6 +42,7 @@ class WorkspaceManager implements WorkspaceManagerInterface {
   public function __construct(
     protected RequestStack $requestStack,
     protected EntityTypeManagerInterface $entityTypeManager,
+    #[Autowire(service: 'entity.memory_cache')]
     protected MemoryCacheInterface $entityMemoryCache,
     protected AccountProxyInterface $currentUser,
     protected StateInterface $state,
@@ -62,7 +63,7 @@ class WorkspaceManager implements WorkspaceManagerInterface {
    * {@inheritdoc}
    */
   public function hasActiveWorkspace() {
-    return $this->getActiveWorkspace() !== FALSE;
+    return $this->getActiveWorkspace() !== NULL;
   }
 
   /**
@@ -99,7 +100,7 @@ class WorkspaceManager implements WorkspaceManagerInterface {
       $this->activeWorkspace = $active_workspace ?? FALSE;
     }
 
-    return $this->activeWorkspace;
+    return $this->activeWorkspace ?: NULL;
   }
 
   /**
@@ -164,7 +165,6 @@ class WorkspaceManager implements WorkspaceManagerInterface {
     // Clear the static entity cache for the supported entity types.
     $cache_tags_to_invalidate = [];
     foreach (array_keys($this->workspaceInfo->getSupportedEntityTypes()) as $entity_type_id) {
-      $this->entityTypeManager->getStorage($entity_type_id)->resetCache();
       $cache_tags_to_invalidate[] = 'entity.memory_cache:' . $entity_type_id;
     }
     $this->entityMemoryCache->invalidateTags($cache_tags_to_invalidate);
@@ -188,9 +188,19 @@ class WorkspaceManager implements WorkspaceManagerInterface {
     }
 
     $previous_active_workspace = $this->getActiveWorkspace();
-    $this->doSwitchWorkspace($workspace);
+
+    // Switch to the requested workspace only if we're in Live or in another
+    // workspace.
+    $should_switch_workspace = !$previous_active_workspace || $previous_active_workspace->id() != $workspace_id;
+    if ($should_switch_workspace) {
+      $this->doSwitchWorkspace($workspace);
+    }
     $result = $function();
-    $this->doSwitchWorkspace($previous_active_workspace);
+
+    // Switch back if needed.
+    if ($should_switch_workspace) {
+      $this->doSwitchWorkspace($previous_active_workspace);
+    }
 
     return $result;
   }
@@ -200,9 +210,17 @@ class WorkspaceManager implements WorkspaceManagerInterface {
    */
   public function executeOutsideWorkspace(callable $function) {
     $previous_active_workspace = $this->getActiveWorkspace();
-    $this->doSwitchWorkspace(NULL);
+
+    // Switch to Live if we're in a workspace.
+    if ($previous_active_workspace) {
+      $this->doSwitchWorkspace(NULL);
+    }
     $result = $function();
-    $this->doSwitchWorkspace($previous_active_workspace);
+
+    // Switch back if needed.
+    if ($previous_active_workspace) {
+      $this->doSwitchWorkspace($previous_active_workspace);
+    }
 
     return $result;
   }

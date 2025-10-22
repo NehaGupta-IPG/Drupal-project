@@ -10,12 +10,14 @@ use Drupal\file\Entity\File;
 use Drupal\filter\FilterPluginCollection;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Editor module's file reference filter.
- *
- * @group editor
  */
+#[Group('editor')]
+#[RunTestsInSeparateProcesses]
 class EditorFileReferenceFilterTest extends KernelTestBase {
 
   use TestFileCreationTrait;

@@ -12,15 +12,16 @@ use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\FilterPluginCollection;
 use Drupal\filter\Plugin\FilterInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore outro
 // cspell:ignore toolongdomainexampledomainexampledomainexampledomainexampledomain
-
 /**
  * Tests Filter module filters individually.
- *
- * @group filter
  */
+#[Group('filter')]
+#[RunTestsInSeparateProcesses]
 class FilterKernelTest extends KernelTestBase {
 
   /**
