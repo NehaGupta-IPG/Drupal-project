@@ -13,6 +13,7 @@ use Drupal\system\MenuInterface;
 use Drupal\system\Menu\LanguageMenuLinkTreeManipulator;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests \Drupal\system\Plugin\Block\SystemMenuBlock translation.
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see \Drupal\system\Menu\LanguageMenuLinkTreeManipulator
  */
 #[Group('system')]
+#[RunTestsInSeparateProcesses]
 #[CoversMethod(LanguageMenuLinkTreeManipulator::class, "process")]
 class SystemMenuBlockTranslationTest extends KernelTestBase {
 
