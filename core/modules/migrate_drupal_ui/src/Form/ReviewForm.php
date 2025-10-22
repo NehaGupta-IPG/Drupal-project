@@ -108,6 +108,7 @@ class ReviewForm extends MigrateUpgradeFormBase {
       $container->get('config.factory'),
       $container->get('extension.list.module'),
       $container->get('datetime.time'),
+      $container->get('batch.processor'),
     );
   }
 
