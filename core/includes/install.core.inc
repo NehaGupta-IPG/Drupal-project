@@ -1192,13 +1192,13 @@ function install_verify_database_ready(): void {
 /**
  * Checks a database connection and returns any errors.
  */
-function install_database_errors($database, $settings_file) {
+function install_database_errors(ConnectionParametersInterface $database, $settings_file) {
   $errors = [];
 
   try {
     $driverExtension = Database::getDriverList()->get($database['namespace']);
     // Run driver specific validation.
-    $errors = $driverExtension->getInstallTasks()->validateDatabaseSettings($database);
+    $errors = $driverExtension->getInstallTasks()->validateDatabaseSettings($database->toArray());
     if (!empty($errors)) {
       // No point to try further.
       return $errors;
