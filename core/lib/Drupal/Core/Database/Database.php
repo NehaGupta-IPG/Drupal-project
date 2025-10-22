@@ -437,8 +437,9 @@ abstract class Database {
 
     $driver_class = self::$databaseInfo[$key][$target]->getDriverConnectionClassName();
 
-    $client_connection = $driver_class::open(self::$databaseInfo[$key][$target]);
-    $new_connection = new $driver_class($client_connection, self::$databaseInfo[$key][$target]);
+    $connection_parameters = property_exists(self::$databaseInfo[$key][$target], 'optionsBackfill') ? self::$databaseInfo[$key][$target]->optionsBackfill : self::$databaseInfo[$key][$target];
+    $client_connection = $driver_class::open($connection_parameters);
+    $new_connection = new $driver_class($client_connection, $connection_parameters);
     assert($new_connection instanceof Connection);
     $new_connection->setTarget($target);
     $new_connection->setKey($key);
@@ -698,7 +699,28 @@ abstract class Database {
    */
   final public static function getConnectionParametersFromArray(?string $class, array $connection_options): ConnectionParametersInterface {
     if (!$class || !class_exists($class)) {
-      return new class (...$connection_options) extends ConnectionParametersBase {};
+      return new class ($connection_options) extends ConnectionParametersBase {
+
+        public function __construct(
+          public readonly array $optionsBackfill,
+        ) {
+          parent::__construct(
+            $optionsBackfill['driver'] ?? 'und',
+            $optionsBackfill['namespace'] ?? 'und',
+            $optionsBackfill['autoload'] ?? 'und',
+            $optionsBackfill['database'] ?? 'und',
+            $optionsBackfill['prefix'] ?? '',
+            $optionsBackfill['module'] ?? NULL,
+            $optionsBackfill['username'] ?? NULL,
+            $optionsBackfill['password'] ?? NULL,
+            $optionsBackfill['host'] ?? NULL,
+            $optionsBackfill['port'] ?? NULL,
+            $optionsBackfill['dependencies'] ?? [],
+            $optionsBackfill['init_commands'] ?? [],
+          );
+        }
+
+      };
     }
     return new $class(...$connection_options);
   }
