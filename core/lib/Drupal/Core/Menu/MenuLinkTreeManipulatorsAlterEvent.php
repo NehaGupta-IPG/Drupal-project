@@ -11,16 +11,6 @@ use Drupal\Component\EventDispatcher\Event;
  */
 class MenuLinkTreeManipulatorsAlterEvent extends Event {
 
-  /**
-   * MenuLinkTreeManipulatorsAlterEvent constructor.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
-   *   The menu tree to manipulate.
-   * @param array $manipulators
-   *   The menu link tree manipulators.
-   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menuLinkTree
-   *   The menu link tree.
-   */
   public function __construct(
     protected array $tree,
     protected array $manipulators,
