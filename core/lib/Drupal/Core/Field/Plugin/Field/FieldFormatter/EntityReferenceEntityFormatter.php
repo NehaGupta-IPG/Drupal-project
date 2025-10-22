@@ -34,27 +34,6 @@ class EntityReferenceEntityFormatter extends EntityReferenceFormatterBase {
   const RECURSIVE_RENDER_LIMIT = 20;
 
   /**
-   * The logger factory.
-   *
-   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface
-   */
-  protected $loggerFactory;
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The entity display repository.
-   *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
-   */
-  protected $entityDisplayRepository;
-
-  /**
    * An array of counters for the recursive rendering protection.
    *
    * Each counter takes into account all the relevant information about the
@@ -66,11 +45,8 @@ class EntityReferenceEntityFormatter extends EntityReferenceFormatterBase {
    */
   protected static $recursiveRenderDepth = [];
 
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, LoggerChannelFactoryInterface $logger_factory, EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entity_display_repository, protected ?EntityRepositoryInterface $entityRepository = NULL) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, protected LoggerChannelFactoryInterface $loggerFactory, protected EntityTypeManagerInterface $entityTypeManager, protected EntityDisplayRepositoryInterface $entityDisplayRepository, protected ?EntityRepositoryInterface $entityRepository = NULL) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $entityRepository);
-    $this->loggerFactory = $logger_factory;
-    $this->entityTypeManager = $entity_type_manager;
-    $this->entityDisplayRepository = $entity_display_repository;
   }
 
   /**

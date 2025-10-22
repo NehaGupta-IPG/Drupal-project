@@ -3,7 +3,6 @@
 namespace Drupal\image\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Entity\EntityRepositoryInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -13,6 +12,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\image\Entity\ImageStyle;
+use Drupal\image\ImageStyleStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Cache\Cache;
@@ -29,32 +29,8 @@ use Drupal\Core\Cache\Cache;
 )]
 class ImageFormatter extends ImageFormatterBase {
 
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
-   * The image style entity storage.
-   *
-   * @var \Drupal\image\ImageStyleStorageInterface
-   */
-  protected $imageStyleStorage;
-
-  /**
-   * The file URL generator.
-   *
-   * @var \Drupal\Core\File\FileUrlGeneratorInterface
-   */
-  protected $fileUrlGenerator;
-
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AccountInterface $current_user, EntityStorageInterface $image_style_storage, FileUrlGeneratorInterface $file_url_generator, protected ?EntityRepositoryInterface $entityRepository = NULL) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, protected AccountInterface $currentUser, protected ImageStyleStorageInterface $imageStyleStorage, protected FileUrlGeneratorInterface $fileUrlGenerator, protected ?EntityRepositoryInterface $entityRepository = NULL) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $entityRepository);
-    $this->currentUser = $current_user;
-    $this->imageStyleStorage = $image_style_storage;
-    $this->fileUrlGenerator = $file_url_generator;
   }
 
   /**

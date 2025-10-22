@@ -26,16 +26,8 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 )]
 class ImageWidget extends FileWidget {
 
-  /**
-   * The image factory service.
-   *
-   * @var \Drupal\Core\Image\ImageFactory
-   */
-  protected $imageFactory;
-
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ElementInfoManagerInterface $element_info, ?ImageFactory $image_factory = NULL, protected ?EntityRepositoryInterface $entityRepository = NULL) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ElementInfoManagerInterface $element_info, protected ?ImageFactory $imageFactory = NULL, protected ?EntityRepositoryInterface $entityRepository = NULL) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $element_info);
-    $this->imageFactory = $image_factory ?: \Drupal::service('image.factory');
     if ($this->entityRepository === NULL) {
       @trigger_error('Calling ' . __METHOD__ . ' without the $entityRepository argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3486475', E_USER_DEPRECATED);
       $this->entityRepository = \Drupal::service('entity.repository');

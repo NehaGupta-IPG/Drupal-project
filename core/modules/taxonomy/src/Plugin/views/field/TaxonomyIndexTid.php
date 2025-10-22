@@ -19,16 +19,8 @@ use Drupal\taxonomy\VocabularyStorageInterface;
 #[ViewsField("taxonomy_index_tid")]
 class TaxonomyIndexTid extends PrerenderList {
 
-  /**
-   * The vocabulary storage.
-   *
-   * @var \Drupal\taxonomy\VocabularyStorageInterface
-   */
-  protected $vocabularyStorage;
-
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, VocabularyStorageInterface $vocabulary_storage, protected ?EntityRepositoryInterface $entityRepository = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected VocabularyStorageInterface $vocabularyStorage, protected ?EntityRepositoryInterface $entityRepository = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->vocabularyStorage = $vocabulary_storage;
   }
 
   /**

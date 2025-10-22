@@ -4,7 +4,6 @@ namespace Drupal\image\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityRepositoryInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -13,6 +12,7 @@ use Drupal\Core\Link;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\image\ImageStyleStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -27,24 +27,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 )]
 class ImageUrlFormatter extends ImageFormatterBase {
 
-  /**
-   * The image style entity storage.
-   *
-   * @var \Drupal\image\ImageStyleStorageInterface
-   */
-  protected $imageStyleStorage;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityStorageInterface $image_style_storage, AccountInterface $current_user, protected ?EntityRepositoryInterface $entityRepository = NULL) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, protected ImageStyleStorageInterface $imageStyleStorage, protected AccountInterface $currentUser, protected ?EntityRepositoryInterface $entityRepository = NULL) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $entityRepository);
-    $this->imageStyleStorage = $image_style_storage;
-    $this->currentUser = $current_user;
   }
 
   /**

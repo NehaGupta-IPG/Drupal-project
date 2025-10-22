@@ -30,39 +30,8 @@ use Drupal\Core\Utility\LinkGeneratorInterface;
 )]
 class ResponsiveImageFormatter extends ImageFormatterBase {
 
-  /**
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $responsiveImageStyleStorage;
-
-  /**
-   * The image style entity storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $imageStyleStorage;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
-   * The link generator.
-   *
-   * @var \Drupal\Core\Utility\LinkGeneratorInterface
-   */
-  protected $linkGenerator;
-
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityStorageInterface $responsive_image_style_storage, EntityStorageInterface $image_style_storage, LinkGeneratorInterface $link_generator, AccountInterface $current_user, protected ?EntityRepositoryInterface $entityRepository = NULL) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, protected EntityStorageInterface $responsiveImageStyleStorage, protected EntityStorageInterface $imageStyleStorage, protected LinkGeneratorInterface $linkGenerator, protected AccountInterface $currentUser, protected ?EntityRepositoryInterface $entityRepository = NULL) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $entityRepository);
-
-    $this->responsiveImageStyleStorage = $responsive_image_style_storage;
-    $this->imageStyleStorage = $image_style_storage;
-    $this->linkGenerator = $link_generator;
-    $this->currentUser = $current_user;
   }
 
   /**
