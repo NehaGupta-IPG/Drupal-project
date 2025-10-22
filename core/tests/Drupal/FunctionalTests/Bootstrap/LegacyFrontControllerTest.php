@@ -34,9 +34,7 @@ class LegacyFrontControllerTest extends BrowserTestBase {
    * Tests that a simple request is routed by the front-controller correctly.
    */
   public function testSuccessfulFrontControllerRequest() : void {
-    $module_path = $this->getModulePath('legacy_front_controller_test');
-
-    $this->drupalGet("$module_path/test_index.php/test");
+    $this->drupalGet("{$this->baseUrl}/core/modules/system/tests/modules/legacy_front_controller_test/test_index.php/test");
     $this->assertSession()->pageTextContains('Hello World');
   }
 
