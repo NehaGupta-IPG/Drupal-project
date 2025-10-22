@@ -102,8 +102,6 @@ class TestSiteApplicationTest extends KernelTestBase {
     // Set the timeout to a value that allows debugging.
     $process->setTimeout(500);
     $process->run();
-    // @todo debug.
-    dump([$process->getOutput(), $process->getErrorOutput()]);
 
     $this->assertSame(0, $process->getExitCode());
     $result = json_decode($process->getOutput(), TRUE);
@@ -198,8 +196,6 @@ class TestSiteApplicationTest extends KernelTestBase {
     $process = Process::fromShellCommandline($command_line, $this->root);
     $process->setTimeout(500);
     $process->run();
-    // @todo debug.
-    dump([$process->getOutput(), $process->getErrorOutput()]);
     $this->assertEquals(0, $process->getExitCode());
 
     $result = json_decode($process->getOutput(), TRUE);
@@ -218,8 +214,6 @@ class TestSiteApplicationTest extends KernelTestBase {
     $process = Process::fromShellCommandline($command_line, $this->root);
     $process->setTimeout(500);
     $process->run();
-    // @todo debug.
-    dump([$process->getOutput(), $process->getErrorOutput()]);
     $this->assertSame(0, $process->getExitCode());
 
     // Ensure that all the tables for this DB prefix are gone.

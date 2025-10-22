@@ -16,9 +16,13 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
     public readonly string $database,
     public readonly string $prefix = '',
     public readonly ?string $module = NULL,
+    #[\SensitiveParameter]
     public readonly ?string $username = NULL,
+    #[\SensitiveParameter]
     public readonly ?string $password = NULL,
+    #[\SensitiveParameter]
     public readonly ?string $host = NULL,
+    #[\SensitiveParameter]
     public readonly ?int $port = NULL,
     public readonly array $dependencies = [],
     public readonly array $init_commands = [],
@@ -44,6 +48,15 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public static function processConnectionOptionsArray(array $options): array {
     return $options;
+  }
+
+  /**
+   * Prevents the connection parameters from being serialized.
+   *
+   * @throws \LogicException
+   */
+  public function __serialize(): array {
+    throw new \LogicException(get_class($this) . ' is not serializable. This probably means you are serializing an object that has an indirect reference to the database connection parameters. Adjust your code so that is not necessary. Alternatively, look at DependencySerializationTrait as a temporary solution.');
   }
 
   /**
