@@ -39,12 +39,12 @@ class InstallerExistingSettingsNoProfileTest extends InstallerTestBase {
     ];
 
     // Pre-configure database credentials.
-    $connection_info = Database::getConnectionInfo();
-    unset($connection_info['default']['pdo']);
-    unset($connection_info['default']['init_commands']);
+    $connection_info = Database::getConnectionInfo()['default']->toArray();
+    unset($connection_info['pdo']);
+    unset($connection_info['init_commands']);
 
     $this->settings['databases']['default'] = (object) [
-      'value' => $connection_info,
+      'value' => ['default' => $connection_info],
       'required' => TRUE,
     ];
 
