@@ -11,6 +11,10 @@ administer users:
   restrict access: true
 access user profiles:
   title: 'View user information'
+  description: 'Allows access to user profiles. Username and email address values also require extra permissions to be viewed.'
+view usernames:
+  title: 'View usernames'
+  description: 'Users without this permission will not have access to usernames on user pages or other places where they might be shown, such as JSON:API responses. Users can always view their own username.'
 view user email addresses:
   title: 'View user email addresses'
   description: 'Users without this permission will not have access to email addresses on user pages or other places where they might be shown, such as Views and JSON:API responses.'

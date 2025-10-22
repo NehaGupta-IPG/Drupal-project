@@ -43,6 +43,13 @@ class UserAccessControlHandlerTest extends UnitTestCase {
   protected $emailViewer;
 
   /**
+   * The mock user account with 'view usernames' permission.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $usernameViewer;
+
+  /**
    * The mock user account that is able to change their own account name.
    *
    * @var \Drupal\user\UserInterface
@@ -118,6 +125,19 @@ class UserAccessControlHandlerTest extends UnitTestCase {
       ->method('id')
       ->willReturn(3);
 
+    $this->usernameViewer = $this->createMock('\Drupal\user\UserInterface');
+    $this->usernameViewer
+      ->expects($this->any())
+      ->method('hasPermission')
+      ->willReturnMap([
+        ['view usernames', TRUE],
+        ['access user profiles', TRUE],
+      ]);
+    $this->usernameViewer
+      ->expects($this->any())
+      ->method('id')
+      ->willReturn(4);
+
     $entity_type = $this->createMock('Drupal\Core\Entity\EntityTypeInterface');
 
     $this->accessControlHandler = new UserAccessControlHandler($entity_type);
@@ -169,15 +189,10 @@ class UserAccessControlHandlerTest extends UnitTestCase {
    */
   public static function userNameProvider() {
     $name_access = [
-      // The viewer user is allowed to see user names on all accounts.
+      // The viewer user (without 'view usernames' permission) cannot see other
+      // users' names, but can see their own.
       [
         'viewer' => 'viewer',
-        'target' => 'viewer',
-        'view' => TRUE,
-        'edit' => FALSE,
-      ],
-      [
-        'viewer' => 'owner',
         'target' => 'viewer',
         'view' => TRUE,
         'edit' => FALSE,
@@ -185,15 +200,35 @@ class UserAccessControlHandlerTest extends UnitTestCase {
       [
         'viewer' => 'viewer',
         'target' => 'owner',
-        'view' => TRUE,
+        'view' => FALSE,
         'edit' => FALSE,
       ],
-      // The owner user is allowed to change its own user name.
+      // The owner user can see their own name and change it (with permission).
       [
         'viewer' => 'owner',
         'target' => 'owner',
         'view' => TRUE,
         'edit' => TRUE,
+      ],
+      [
+        'viewer' => 'owner',
+        'target' => 'viewer',
+        'view' => FALSE,
+        'edit' => FALSE,
+      ],
+      // The usernameViewer user has 'view usernames' permission and can see
+      // all usernames.
+      [
+        'viewer' => 'usernameViewer',
+        'target' => 'owner',
+        'view' => TRUE,
+        'edit' => FALSE,
+      ],
+      [
+        'viewer' => 'usernameViewer',
+        'target' => 'viewer',
+        'view' => TRUE,
+        'edit' => FALSE,
       ],
       // The users-administrator user has full access.
       [
