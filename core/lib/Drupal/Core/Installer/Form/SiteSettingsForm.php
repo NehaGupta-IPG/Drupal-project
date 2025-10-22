@@ -80,7 +80,11 @@ class SiteSettingsForm extends FormBase {
     // connection already, since the submit handler of this form is responsible
     // for writing all $settings to settings.php (not limited to $databases).
     $input = &$form_state->getUserInput();
-    if (!isset($input['driver']) && $database = Database::getConnectionInfo()) {
+    $database = [];
+    foreach (Database::getConnectionInfo() as $target => $parameters) {
+      $database[$target] = $parameters->toArray();
+    }
+    if (!isset($input['driver']) && !empty($database)) {
       $input['driver'] = $database['default']['namespace'];
       $input[$database['default']['namespace']] = $database['default'];
     }
