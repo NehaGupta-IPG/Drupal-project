@@ -8,6 +8,7 @@ parameters:
   # function properly before that runs.
   cache_default_bin_backends: []
   memory_cache_default_bin_backends: []
+  memory_cache.slots: 1000
   entity.memory_cache.slots: 1000
   security.enable_super_user: true
   core.moved_classes:
@@ -722,10 +723,13 @@ services:
     class: Drupal\Core\Extension\ThemeInstaller
     arguments: ['@theme_handler', '@config.factory', '@config.installer', '@module_handler', '@config.manager', '@asset.css.collection_optimizer', '@router.builder', '@logger.channel.default', '@state', '@extension.list.module', '@theme.registry', '@extension.list.theme', '@plugin.manager.sdc']
   Drupal\Core\Extension\ThemeInstallerInterface: '@theme_installer'
+  memory_cache:
+    class: Drupal\Core\Cache\MemoryCache\LruMemoryCache
+    arguments: ['@datetime.time', '%memory_cache.slots%']
+  Drupal\Core\Cache\MemoryCache\MemoryCacheInterface: '@memory_cache'
   entity.memory_cache:
     class: Drupal\Core\Cache\MemoryCache\LruMemoryCache
     arguments: ['@datetime.time', '%entity.memory_cache.slots%']
-  Drupal\Core\Cache\MemoryCache\MemoryCacheInterface: '@entity.memory_cache'
   entity_type.manager:
     class: Drupal\Core\Entity\EntityTypeManager
     arguments: ['@container.namespaces', '@module_handler', '@cache.discovery', '@string_translation', '@class_resolver', '@entity.last_installed_schema.repository', '@service_container']
