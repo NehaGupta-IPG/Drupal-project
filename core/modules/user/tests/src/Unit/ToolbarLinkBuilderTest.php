@@ -8,19 +8,20 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\ToolbarLinkBuilder;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests user's ToolbarLinkBuilder.
- *
- * @coversDefaultClass \Drupal\user\ToolbarLinkBuilder
- * @group user
  */
+#[CoversClass(ToolbarLinkBuilder::class)]
+#[Group('user')]
 class ToolbarLinkBuilderTest extends UnitTestCase {
 
   /**
    * Tests structure of display name render array.
    *
-   * @covers ::renderDisplayName
+   * @legacy-covers ::renderDisplayName
    */
   public function testRenderDisplayName(): void {
     $account = $this->prophesize(AccountProxyInterface::class);

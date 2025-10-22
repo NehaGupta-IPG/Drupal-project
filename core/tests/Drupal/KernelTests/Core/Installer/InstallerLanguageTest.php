@@ -7,12 +7,14 @@ namespace Drupal\KernelTests\Core\Installer;
 use Drupal\Core\Extension\ProfileExtensionList;
 use Drupal\Core\StringTranslation\Translator\FileTranslation;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests for installer language support.
- *
- * @group Installer
  */
+#[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class InstallerLanguageTest extends KernelTestBase {
 
   /**

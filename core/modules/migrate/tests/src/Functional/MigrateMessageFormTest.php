@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate\Functional;
 
 use Drupal\migrate\Plugin\MigrationInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests for the MessageForm class.
- *
- * @group migrate
  */
+#[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class MigrateMessageFormTest extends MigrateMessageTestBase {
 
   /**
