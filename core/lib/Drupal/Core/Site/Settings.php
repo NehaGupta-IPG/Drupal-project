@@ -144,8 +144,6 @@ final class Settings {
     $databases = [];
 
     if (is_readable($app_root . '/' . $site_path . '/settings.php')) {
-      // @todo debug.
-      dump(file_get_contents($app_root . '/' . $site_path . '/settings.php'));
       require $app_root . '/' . $site_path . '/settings.php';
     }
 
