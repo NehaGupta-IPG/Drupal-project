@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\file\Functional\Formatter;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the upgrade path for video formatters.
  *
  * @see file_post_update_add_playsinline()
- *
- * @group Update
- * @group legacy
  */
+#[Group('Update')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class FileVideoFormatterUpdateTest extends UpdatePathTestBase {
 
   /**
@@ -32,7 +35,9 @@ class FileVideoFormatterUpdateTest extends UpdatePathTestBase {
   }
 
   /**
-   * @covers \file_post_update_add_playsinline
+   * Tests plays inline update.
+   *
+   * @legacy-covers \file_post_update_add_playsinline
    */
   public function testPlaysInlineUpdate(): void {
     $display = $this->config('core.entity_view_display.node.article.default');

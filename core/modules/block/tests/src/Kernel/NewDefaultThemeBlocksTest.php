@@ -6,12 +6,14 @@ namespace Drupal\Tests\block\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that a new default theme gets blocks.
- *
- * @group block
  */
+#[Group('block')]
+#[RunTestsInSeparateProcesses]
 class NewDefaultThemeBlocksTest extends KernelTestBase {
 
   use BlockCreationTrait;
@@ -51,7 +53,10 @@ class NewDefaultThemeBlocksTest extends KernelTestBase {
   }
 
   /**
-   * Check the blocks are correctly copied by block_themes_installed().
+   * Check the blocks are correctly copied.
+   *
+   * This tests that blocks are correctly copied by
+   * \Drupal\block\Hook\BlockHooks::themesInstalled().
    */
   public function testNewDefaultThemeBlocks(): void {
     $default_theme = $this->defaultTheme;

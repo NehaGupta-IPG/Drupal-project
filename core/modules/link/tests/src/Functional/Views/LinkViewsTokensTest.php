@@ -7,12 +7,14 @@ namespace Drupal\Tests\link\Functional\Views;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\views\Functional\ViewTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the views integration for link tokens.
- *
- * @group link
  */
+#[Group('link')]
+#[RunTestsInSeparateProcesses]
 class LinkViewsTokensTest extends ViewTestBase {
 
   /**
@@ -79,7 +81,11 @@ class LinkViewsTokensTest extends ViewTestBase {
     // Add nodes with the URI's and titles.
     foreach ($uris as $uri => $title) {
       $values = ['type' => 'page'];
-      $values[$this->fieldName][] = ['uri' => $uri, 'title' => $title, 'options' => ['attributes' => ['class' => 'test-link-class']]];
+      $values[$this->fieldName][] = [
+        'uri' => $uri,
+        'title' => $title,
+        'options' => ['attributes' => ['class' => 'test-link-class']],
+      ];
       $this->drupalCreateNode($values);
     }
 
