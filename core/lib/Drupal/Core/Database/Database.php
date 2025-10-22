@@ -189,6 +189,11 @@ abstract class Database {
    *   The database connection information, as defined in settings.php. The
    *   structure of this array depends on the database driver it is connecting
    *   to.
+   * @param \Composer\Autoload\ClassLoader|null $class_loader
+   *   (optional) The class loader. Used for adding the database driver to the
+   *   autoloader if $info['autoload'] is set.
+   * @param string|null $app_root
+   *   (optional) The app root.
    *
    * @return \Drupal\Core\Database\ConnectionParametersInterface
    *   A validated connection info array.
@@ -254,14 +259,14 @@ abstract class Database {
     // Therefore, allow the connection info to specify an autoload directory
     // for the driver.
     if ($class_loader && $app_root) {
-      $class_loader->addPsr4($options['namespace'] . '\\', $app_root . '/' . $options['autoload']);
+      $class_loader->setPsr4($options['namespace'] . '\\', $app_root . DIRECTORY_SEPARATOR . $options['autoload']);
 
       // When the database driver is extending from other database drivers,
       // then add autoload directory for the parent database driver modules
       // as well.
       if (!empty($options['dependencies'])) {
         foreach ($options['dependencies'] as $dependency) {
-          $class_loader->addPsr4($dependency['namespace'] . '\\', $app_root . '/' . $dependency['autoload']);
+          $class_loader->setPsr4($dependency['namespace'] . '\\', $app_root . DIRECTORY_SEPARATOR . $dependency['autoload']);
         }
       }
     }

@@ -353,12 +353,12 @@ class SettingsTest extends UnitTestCase {
     $class_loader = $this->createMock(ClassLoader::class);
     if (!empty($expected_autoload)) {
       $class_loader->expects($this->once())
-        ->method('addPsr4')
+        ->method('setPsr4')
         ->with($expected_namespace . '\\', vfsStream::url('root') . '/' . $expected_autoload);
     }
     else {
       $class_loader->expects($this->never())
-        ->method('addPsr4');
+        ->method('setPsr4');
     }
 
     Settings::initialize(vfsStream::url('root'), 'sites', $class_loader);
