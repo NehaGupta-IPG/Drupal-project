@@ -218,6 +218,8 @@ class TestSiteApplicationTest extends KernelTestBase {
     $process = Process::fromShellCommandline($command_line, $this->root);
     $process->setTimeout(500);
     $process->run();
+    // @todo debug.
+    dump([$process->getOutput(), $process->getErrorOutput()]);
     $this->assertSame(0, $process->getExitCode());
 
     // Ensure that all the tables for this DB prefix are gone.
@@ -300,10 +302,10 @@ class TestSiteApplicationTest extends KernelTestBase {
    *   The database key of the added connection.
    */
   protected function addTestDatabase($db_prefix): string {
-    $database = Database::convertDbUrlToConnectionInfo(getenv('SIMPLETEST_DB'));
-    $database['prefix'] = $db_prefix;
+    $connectionArray = Database::convertDbUrlToConnectionInfo(getenv('SIMPLETEST_DB'))->toArray();
+    $connectionArray['prefix'] = $db_prefix;
     $target = __CLASS__ . $db_prefix;
-    Database::addConnectionInfo($target, 'default', $database);
+    Database::addConnectionInfo($target, 'default', $connectionArray);
     return $target;
   }
 
