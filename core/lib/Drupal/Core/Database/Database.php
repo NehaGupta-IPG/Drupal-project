@@ -193,7 +193,7 @@ abstract class Database {
    * @return \Drupal\Core\Database\ConnectionParametersInterface
    *   A validated connection info array.
    */
-  final public static function parseConnectionInfo(array $info): ConnectionParametersInterface {
+  final public static function parseConnectionInfo(array $info, ?ClassLoader $class_loader = NULL, ?string $app_root = NULL): ConnectionParametersInterface {
     // If there is no "driver" property, then we assume it's an array of
     // possible connections for this target. Pick one at random. That allows
     // us to have, for example, multiple replica servers.
@@ -201,57 +201,77 @@ abstract class Database {
       $info_pick = $info[mt_rand(0, count($info) - 1)];
     }
 
-    /** @var UnprocessedConnectionInfoArray $connection_info */
-    $connection_info = $info_pick ?? $info;
+    /** @var UnprocessedConnectionInfoArray $options */
+    $options = $info_pick ?? $info;
+
+    // Force port to an int if it exists.
+    if (isset($options['port'])) {
+      $options['port'] = (int) $options['port'];
+    }
 
     // Backwards compatibility layer for Drupal 8 style database connection
     // arrays. Those have the wrong 'namespace' key set, or not set at all
     // for core supported database drivers.
-    if (empty($connection_info['namespace']) || str_starts_with($connection_info['namespace'], 'Drupal\\Core\\Database\\Driver\\')) {
-      switch (strtolower($connection_info['driver'])) {
+    if (empty($options['namespace']) || str_starts_with($options['namespace'], 'Drupal\\Core\\Database\\Driver\\')) {
+      switch (strtolower($options['driver'])) {
         case 'mysql':
-          $connection_info['namespace'] = 'Drupal\\mysql\\Driver\\Database\\mysql';
+          $options['namespace'] = 'Drupal\\mysql\\Driver\\Database\\mysql';
           break;
 
         case 'pgsql':
-          $connection_info['namespace'] = 'Drupal\\pgsql\\Driver\\Database\\pgsql';
+          $options['namespace'] = 'Drupal\\pgsql\\Driver\\Database\\pgsql';
           break;
 
         case 'sqlite':
-          $connection_info['namespace'] = 'Drupal\\sqlite\\Driver\\Database\\sqlite';
+          $options['namespace'] = 'Drupal\\sqlite\\Driver\\Database\\sqlite';
           break;
       }
     }
+
     // Backwards compatibility layer for Drupal 8 style database connection
     // arrays. Those do not have the 'autoload' key set for core database
     // drivers.
-    if (empty($connection_info['autoload']) && isset($connection_info['namespace'])) {
-      switch (trim($connection_info['namespace'], '\\')) {
+    if (empty($options['autoload']) && isset($options['namespace'])) {
+      switch (trim($options['namespace'], '\\')) {
         case "Drupal\\mysql\\Driver\\Database\\mysql":
-          $connection_info['autoload'] = "core/modules/mysql/src/Driver/Database/mysql/";
+          $options['autoload'] = "core/modules/mysql/src/Driver/Database/mysql/";
           break;
 
         case "Drupal\\pgsql\\Driver\\Database\\pgsql":
-          $connection_info['autoload'] = "core/modules/pgsql/src/Driver/Database/pgsql/";
+          $options['autoload'] = "core/modules/pgsql/src/Driver/Database/pgsql/";
           break;
 
         case "Drupal\\sqlite\\Driver\\Database\\sqlite":
-          $connection_info['autoload'] = "core/modules/sqlite/src/Driver/Database/sqlite/";
+          $options['autoload'] = "core/modules/sqlite/src/Driver/Database/sqlite/";
           break;
       }
     }
 
-    // Force port to an int if it exists.
-    if (isset($connection_info['port'])) {
-      $connection_info['port'] = (int) $connection_info['port'];
+    // If the database driver is provided by a module, then its code may need
+    // to be instantiated prior to when the module's root namespace is added
+    // to the autoloader, because that happens during service container
+    // initialization but the container definition is likely in the database.
+    // Therefore, allow the connection info to specify an autoload directory
+    // for the driver.
+    if ($class_loader && $app_root) {
+      $class_loader->addPsr4($options['namespace'] . '\\', $app_root . '/' . $options['autoload']);
+
+      // When the database driver is extending from other database drivers,
+      // then add autoload directory for the parent database driver modules
+      // as well.
+      if (!empty($options['dependencies'])) {
+        foreach ($options['dependencies'] as $dependency) {
+          $class_loader->addPsr4($dependency['namespace'] . '\\', $app_root . '/' . $dependency['autoload']);
+        }
+      }
     }
 
-    $parameters_class = $connection_info['namespace'] . '\\ConnectionParameters';
+    $parameters_class = $options['namespace'] . '\\ConnectionParameters';
     if (class_exists($parameters_class)) {
-      $connection_info = $parameters_class::processConnectionOptionsArray($connection_info);
+      $options = $parameters_class::processConnectionOptionsArray($options);
     }
 
-    return self::getConnectionParametersFromArray($parameters_class, $connection_info);
+    return self::getConnectionParametersFromArray($parameters_class, $options);
   }
 
   /**
@@ -288,42 +308,7 @@ abstract class Database {
     if (!empty(self::$databaseInfo[$key][$target])) {
       return;
     }
-
-    if (is_array($info)) {
-      $namespace = $info['namespace'];
-      $autoload = $info['autoload'];
-      $dependencies = $info['dependencies'];
-    }
-    else {
-      $namespace = $info->namespace;
-      $autoload = $info->autoload;
-      $dependencies = $info->dependencies;
-    }
-
-    // If the database driver is provided by a module, then its code may need
-    // to be instantiated prior to when the module's root namespace is added
-    // to the autoloader, because that happens during service container
-    // initialization but the container definition is likely in the database.
-    // Therefore, allow the connection info to specify an autoload directory
-    // for the driver.
-    if ($class_loader && $app_root) {
-      $class_loader->addPsr4($namespace . '\\', $app_root . '/' . $autoload);
-
-      // When the database driver is extending from other database drivers,
-      // then add autoload directory for the parent database driver modules
-      // as well.
-      if (!empty($dependencies)) {
-        foreach ($dependencies as $dependency) {
-          $class_loader->addPsr4($dependency['namespace'] . '\\', $app_root . '/' . $dependency['autoload']);
-        }
-      }
-    }
-
-    if (is_array($info)) {
-      $info = self::parseConnectionInfo($info);
-    }
-
-    self::$databaseInfo[$key][$target] = $info;
+    self::$databaseInfo[$key][$target] = is_array($info) ? self::parseConnectionInfo($info, $class_loader, $app_root) : $info;
   }
 
   /**
