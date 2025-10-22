@@ -41,7 +41,7 @@ class MenuLinkTree implements MenuLinkTreeInterface {
     protected ?EventDispatcherInterface $eventDispatcher = NULL,
   ) {
     if ($eventDispatcher === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $eventDispatcher argument is deprecated in drupal:11.1.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3463907', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $eventDispatcher argument is deprecated in drupal:11.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3463907', E_USER_DEPRECATED);
       $this->eventDispatcher = \Drupal::service('event_dispatcher');
     }
   }
