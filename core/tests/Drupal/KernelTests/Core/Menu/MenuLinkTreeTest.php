@@ -181,19 +181,19 @@ class MenuLinkTreeTest extends KernelTestBase {
    */
   public function testMenuManipulatorAlter(): void {
     $links = [
-      1 => MenuLinkMock::create([
+      1 => MenuLinkMock::createMock([
         'id' => 'test.link1',
         'route_name' => 'menu_test.manipulator1',
         'title' => 'Link 1',
         'parent' => '',
       ]),
-      2 => MenuLinkMock::create([
+      2 => MenuLinkMock::createMock([
         'id' => 'test.link2',
         'route_name' => 'menu_test.manipulator2',
         'title' => 'Link 2',
         'parent' => '',
       ]),
-      3 => MenuLinkMock::create([
+      3 => MenuLinkMock::createMock([
         'id' => 'test.link3',
         'route_name' => 'menu_test.manipulator3',
         'title' => 'Link 3',
