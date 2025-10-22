@@ -214,7 +214,6 @@ class MenuLinkTreeTest extends KernelTestBase {
 
   /**
    * Tests transforming a link tree.
-   *
    */
   #[Group('legacy')]
   public function testTransformWithoutContext(): void {
