@@ -42,6 +42,7 @@ class WorkspaceManager implements WorkspaceManagerInterface {
   public function __construct(
     protected RequestStack $requestStack,
     protected EntityTypeManagerInterface $entityTypeManager,
+    #[Autowire(service: 'entity.memory_cache')]
     protected MemoryCacheInterface $entityMemoryCache,
     protected AccountProxyInterface $currentUser,
     protected StateInterface $state,
@@ -62,7 +63,7 @@ class WorkspaceManager implements WorkspaceManagerInterface {
    * {@inheritdoc}
    */
   public function hasActiveWorkspace() {
-    return $this->getActiveWorkspace() !== FALSE;
+    return $this->getActiveWorkspace() !== NULL;
   }
 
   /**
@@ -99,7 +100,7 @@ class WorkspaceManager implements WorkspaceManagerInterface {
       $this->activeWorkspace = $active_workspace ?? FALSE;
     }
 
-    return $this->activeWorkspace;
+    return $this->activeWorkspace ?: NULL;
   }
 
   /**
