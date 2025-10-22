@@ -215,8 +215,8 @@ class MenuLinkTreeTest extends KernelTestBase {
   /**
    * Tests transforming a link tree.
    *
-   * @group legacy
    */
+  #[Group('legacy')]
   public function testTransformWithoutContext(): void {
     /** @var \Drupal\system\MenuStorage $storage */
     $storage = \Drupal::entityTypeManager()->getStorage('menu');

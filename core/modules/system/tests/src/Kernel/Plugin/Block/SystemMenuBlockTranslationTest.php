@@ -10,15 +10,17 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\system\MenuInterface;
+use Drupal\system\Menu\LanguageMenuLinkTreeManipulator;
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests \Drupal\system\Plugin\Block\SystemMenuBlock translation.
  *
- * @group system
- *
  * @see \Drupal\system\Plugin\Block\SystemMenuBlock
  * @see \Drupal\system\Menu\LanguageMenuLinkTreeManipulator
  */
+#[Group('system')]
 class SystemMenuBlockTranslationTest extends KernelTestBase {
 
   /**
@@ -69,9 +71,8 @@ class SystemMenuBlockTranslationTest extends KernelTestBase {
 
   /**
    * Tests that menu blocks display links in proper language.
-   *
-   * @covers \Drupal\system\Menu\LanguageMenuLinkTreeManipulator::process
    */
+  #[CoversMethod(LanguageMenuLinkTreeManipulator::class, "process")]
   public function testMenuBlockTranslation(): void {
     $fr_language = ConfigurableLanguage::createFromLangcode('fr');
     $fr_language->save();
