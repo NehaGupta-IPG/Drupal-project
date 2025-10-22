@@ -329,21 +329,33 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
         $field->setValue($values);
       }
     }
-    foreach ($empty_destinations as $field_name) {
-      // $field_name can be something like field_name/property.
-      $parts = explode(Row::PROPERTY_SEPARATOR, $field_name);
-      $mainFieldName = array_shift($parts);
 
-      $field = $entity->$mainFieldName;
-      if ($field instanceof TypedDataInterface) {
-        $values = $field->getValue();
+    foreach ($empty_destinations as $destination) {
+      // $destination can be either a field name, [field name]/[property]
+      // or [field name]/[delta]/[property].
+      $parts = explode(Row::PROPERTY_SEPARATOR, $destination);
+      $field_name = array_shift($parts);
 
-        // For multivalued fields, empty the property on each existing value.
-        foreach (array_keys($values) as $delta) {
-          NestedArray::setValue($values, array_merge([$delta], $parts), NULL);
-        }
-        $field->setValue($values);
+      if (empty($parts)) {
+        $entity->$field_name = NULL;
+        continue;
       }
+
+      // Get the field.
+      $field = $entity->$field_name;
+      if (!$field instanceof TypedDataInterface) {
+        continue;
+      }
+
+      // Assume 0 if the delta ain't specified in the destination.
+      if (!ctype_digit(reset($parts))) {
+        array_unshift($parts, 0);
+      }
+
+      // Set the field value.
+      $values = $field->getValue();
+      NestedArray::setValue($values, $parts, NULL);
+      $field->setValue($values);
     }
 
     $this->setRollbackAction($row->getIdMap(), $rollback_action);
