@@ -39,11 +39,9 @@ class MigrateMissingDatabaseTest extends KernelTestBase {
     $this->migrationPluginManager = \Drupal::service('plugin.manager.migration');
 
     // Set the 'migrate' database connection to use a missing database.
-    $info = Database::getConnectionInfo('default')['default'];
-    $class = get_class($info);
-    $options = $info->toArray();
-    $options['database'] = 'godot';
-    Database::addConnectionInfo('migrate', 'default', new $class(...$options));
+    $info = Database::getConnectionInfo('default')['default']->toArray();
+    $info['database'] = 'godot';
+    Database::addConnectionInfo('migrate', 'default', $info);
   }
 
   /**
