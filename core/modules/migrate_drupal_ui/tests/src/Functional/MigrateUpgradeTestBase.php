@@ -294,7 +294,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
    * @see \Drupal\migrate_drupal_ui\Form\CredentialForm
    */
   protected function getCredentials() {
-    $connection_options = $this->sourceDatabase->getConnectionOptions();
+    $connection_options = $this->sourceDatabase->getConnectionOptions()->toArray();
     $version = $this->getLegacyDrupalVersion($this->sourceDatabase);
     $driver = $connection_options['driver'];
 
