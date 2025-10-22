@@ -122,7 +122,7 @@ class FilePathTest extends MigrateUpgradeTestBase {
       ->condition('name', 'file_temporary_path')
       ->execute();
 
-    $connection_options = $this->sourceDatabase->getConnectionOptions();
+    $connection_options = $this->sourceDatabase->getConnectionOptions()->toArray();
     $driver = $connection_options['driver'];
 
     // Use the driver connection form to get the correct options out of the
