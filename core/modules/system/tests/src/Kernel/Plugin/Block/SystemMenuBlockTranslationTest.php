@@ -11,7 +11,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\system\MenuInterface;
 use Drupal\system\Menu\LanguageMenuLinkTreeManipulator;
-use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
@@ -21,7 +21,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see \Drupal\system\Menu\LanguageMenuLinkTreeManipulator
  */
 #[Group('system')]
-#[CoversFunction(LanguageMenuLinkTreeManipulator::class, "process")]
+#[CoversMethod(LanguageMenuLinkTreeManipulator::class, "process")]
 class SystemMenuBlockTranslationTest extends KernelTestBase {
 
   /**
