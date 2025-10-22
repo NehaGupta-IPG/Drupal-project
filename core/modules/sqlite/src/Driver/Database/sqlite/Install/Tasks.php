@@ -75,17 +75,17 @@ class Tasks extends InstallTasks {
       // Attempt to create the database if it is not found.
       if ($e->getCode() == Connection::DATABASE_NOT_FOUND) {
         // Remove the database string from connection info.
-        $connection_info = Database::getConnectionInfo();
-        $database = $connection_info['default']['database'];
+        $connection_info = Database::getConnectionInfo()['default']->toArray();
+        $database = $connection_info['database'];
 
         // We cannot use \Drupal::service('file_system')->getTempDirectory()
         // here because we haven't yet successfully connected to the database.
-        $connection_info['default']['database'] = \Drupal::service('file_system')->tempnam(sys_get_temp_dir(), 'sqlite');
+        $connection_info['database'] = \Drupal::service('file_system')->tempnam(sys_get_temp_dir(), 'sqlite');
 
         // In order to change the Database::$databaseInfo array, need to remove
         // the active connection, then re-add it with the new info.
         Database::removeConnection('default');
-        Database::addConnectionInfo('default', 'default', $connection_info['default']);
+        Database::addConnectionInfo('default', 'default', $connection_info);
 
         try {
           Database::getConnection()->createDatabase($database);
@@ -93,8 +93,8 @@ class Tasks extends InstallTasks {
 
           // Now, restore the database config.
           Database::removeConnection('default');
-          $connection_info['default']['database'] = $database;
-          Database::addConnectionInfo('default', 'default', $connection_info['default']);
+          $connection_info['database'] = $database;
+          Database::addConnectionInfo('default', 'default', $connection_info);
 
           // Check the database connection.
           Database::getConnection();
