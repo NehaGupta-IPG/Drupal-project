@@ -1613,7 +1613,7 @@ services:
   Drupal\Core\Batch\BatchProcessorInterface: '@batch.processor'
   batch.storage:
     class: Drupal\Core\Batch\BatchStorage
-    arguments: ['@database', '@session', '@csrf_token', '@datetime.time']
+    arguments: ['@database', '@request_stack', '@csrf_token', '@datetime.time']
     tags:
       - { name: backend_overridable }
     lazy: true
