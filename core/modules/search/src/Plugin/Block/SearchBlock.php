@@ -27,11 +27,11 @@ class SearchBlock extends BlockBase implements ContainerFactoryPluginInterface {
   public function __construct(array $configuration, string $plugin_id, array|object $plugin_definition, protected \Closure|FormBuilderInterface $formBuilder, protected \Closure|SearchPageRepositoryInterface $searchPageRepository) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     if ($formBuilder instanceof FormBuilderInterface) {
-      @trigger_error('Passing a FormBuilderInterface object as the form builder argument in ' . __METHOD__ . 'is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. Pass a closure that returns the form builder instead. See https://www.drupal.org/project/drupal/issues/3544405', E_USER_DEPRECATED);
+      @trigger_error('Passing a FormBuilderInterface object as the form builder argument in ' . __METHOD__ . 'is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. Pass a closure that returns the form builder instead. See https://www.drupal.org/node/3553889', E_USER_DEPRECATED);
       $this->formBuilder = static fn(): FormBuilderInterface => \Drupal::service('form_builder');
     }
     if ($searchPageRepository instanceof SearchPageRepositoryInterface) {
-      @trigger_error('Passing a SearchPageRepositoryInterface object as the search page repository argument in ' . __METHOD__ . 'is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. Pass a closure that returns the search page repository instead. See https://www.drupal.org/project/drupal/issues/3544405', E_USER_DEPRECATED);
+      @trigger_error('Passing a SearchPageRepositoryInterface object as the search page repository argument in ' . __METHOD__ . 'is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. Pass a closure that returns the search page repository instead. See https://www.drupal.org/node/3553889', E_USER_DEPRECATED);
       $this->searchPageRepository = static fn(): SearchPageRepositoryInterface => \Drupal::service('search.search_page_repository');
     }
   }
