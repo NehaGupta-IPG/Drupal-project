@@ -285,31 +285,45 @@ abstract class Database {
    * @see \Drupal\Core\Database\Database::setActiveConnection
    */
   final public static function addConnectionInfo($key, $target, ConnectionParametersInterface|array $info, ?ClassLoader $class_loader = NULL, ?string $app_root = NULL): void {
-    if (empty(self::$databaseInfo[$key][$target])) {
-      if (is_array($info)) {
-        $info = self::parseConnectionInfo($info);
-      }
-      self::$databaseInfo[$key][$target] = $info;
+    if (!empty(self::$databaseInfo[$key][$target])) {
+      return;
+    }
 
-      // If the database driver is provided by a module, then its code may need
-      // to be instantiated prior to when the module's root namespace is added
-      // to the autoloader, because that happens during service container
-      // initialization but the container definition is likely in the database.
-      // Therefore, allow the connection info to specify an autoload directory
-      // for the driver.
-      if ($class_loader && $app_root) {
-        $class_loader->addPsr4($info->namespace . '\\', $app_root . '/' . $info->autoload);
+    if (is_array($info)) {
+      $namespace = $info['namespace'];
+      $autoload = $info['autoload'];
+      $dependencies = $info['dependencies'];
+    }
+    else {
+      $namespace = $info->namespace;
+      $autoload = $info->autoload;
+      $dependencies = $info->dependencies;
+    }
 
-        // When the database driver is extending from other database drivers,
-        // then add autoload directory for the parent database driver modules
-        // as well.
-        if (!empty($info->dependencies)) {
-          foreach ($info->dependencies as $dependency) {
-            $class_loader->addPsr4($dependency['namespace'] . '\\', $app_root . '/' . $dependency['autoload']);
-          }
+    // If the database driver is provided by a module, then its code may need
+    // to be instantiated prior to when the module's root namespace is added
+    // to the autoloader, because that happens during service container
+    // initialization but the container definition is likely in the database.
+    // Therefore, allow the connection info to specify an autoload directory
+    // for the driver.
+    if ($class_loader && $app_root) {
+      $class_loader->addPsr4($namespace . '\\', $app_root . '/' . $autoload);
+
+      // When the database driver is extending from other database drivers,
+      // then add autoload directory for the parent database driver modules
+      // as well.
+      if (!empty($dependencies)) {
+        foreach ($dependencies as $dependency) {
+          $class_loader->addPsr4($dependency['namespace'] . '\\', $app_root . '/' . $dependency['autoload']);
         }
       }
     }
+
+    if (is_array($info)) {
+      $info = self::parseConnectionInfo($info);
+    }
+
+    self::$databaseInfo[$key][$target] = $info;
   }
 
   /**

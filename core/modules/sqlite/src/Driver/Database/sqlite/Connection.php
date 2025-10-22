@@ -5,7 +5,6 @@ namespace Drupal\sqlite\Driver\Database\sqlite;
 use Drupal\Component\Utility\FilterArray;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Connection as DatabaseConnection;
-use Drupal\Core\Database\ConnectionParametersInterface;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\ExceptionHandler;
 use Drupal\Core\Database\StatementInterface;
@@ -99,8 +98,8 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function open(ConnectionParametersInterface|array &$connection_options = []) {
-    assert($connection_options instanceof ConnectionParametersInterface);
+  public static function open(ConnectionParameters|array &$connection_options = []) {
+    assert($connection_options instanceof ConnectionParameters);
 
     try {
       if (\PHP_VERSION_ID >= 80400) {
