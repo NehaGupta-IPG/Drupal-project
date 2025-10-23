@@ -146,7 +146,7 @@ final class Recipe {
           ),
         ]),
       ],
-      message: 'This value must not be blank and be a string or a string tagged with !translate.',
+      message: 'This value must be a string or a string tagged with !translate and cannot be blank.',
       includeInternalMessages: FALSE,
     );
 

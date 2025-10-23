@@ -44,25 +44,25 @@ class RecipeValidationTest extends KernelTestBase {
     yield 'name is not a string' => [
       'name: 39',
       [
-        '[name]' => ['This value must not be blank and be a string or a string tagged with !translate.'],
+        '[name]' => ['This value must be a string or a string tagged with !translate and cannot be blank.'],
       ],
     ];
     yield 'name is null' => [
       'name: ~',
       [
-        '[name]' => ['This value must not be blank and be a string or a string tagged with !translate.'],
+        '[name]' => ['This value must be a string or a string tagged with !translate and cannot be blank.'],
       ],
     ];
     yield 'name is blank' => [
       "name: ''",
       [
-        '[name]' => ['This value must not be blank and be a string or a string tagged with !translate.'],
+        '[name]' => ['This value must be a string or a string tagged with !translate and cannot be blank.'],
       ],
     ];
     yield 'name is translatable and blank' => [
       'name: !translate ""',
       [
-        '[name]' => ['This value must not be blank and be a string or a string tagged with !translate.'],
+        '[name]' => ['This value must be a string or a string tagged with !translate and cannot be blank.'],
       ],
     ];
     yield 'name has invalid characters' => [
@@ -88,7 +88,7 @@ name: Bad description
 description: 29
 YAML,
       [
-        '[description]' => ['This value must not be blank and be a string or a string tagged with !translate.'],
+        '[description]' => ['This value must be a string or a string tagged with !translate and cannot be blank.'],
       ],
     ];
     yield 'description is blank' => [
@@ -97,7 +97,7 @@ name: Blank description
 description: ''
 YAML,
       [
-        '[description]' => ['This value must not be blank and be a string or a string tagged with !translate.'],
+        '[description]' => ['This value must be a string or a string tagged with !translate and cannot be blank.'],
       ],
     ];
     yield 'description is null' => [
@@ -106,7 +106,7 @@ name: Null description
 description: ~
 YAML,
       [
-        '[description]' => ['This value must not be blank and be a string or a string tagged with !translate.'],
+        '[description]' => ['This value must be a string or a string tagged with !translate and cannot be blank.'],
       ],
     ];
     yield 'description contains control characters' => [
@@ -426,7 +426,7 @@ input:
       value: Here be dragons
 YAML,
       [
-        '[input][foo][description]' => ['This value must not be blank and be a string or a string tagged with !translate.'],
+        '[input][foo][description]' => ['This value must be a string or a string tagged with !translate and cannot be blank.'],
       ],
     ];
     yield 'input description is blank' => [
@@ -441,7 +441,7 @@ input:
       value: Here be dragons
 YAML,
       [
-        '[input][foo][description]' => ['This value must not be blank and be a string or a string tagged with !translate.'],
+        '[input][foo][description]' => ['This value must be a string or a string tagged with !translate and cannot be blank.'],
       ],
     ];
     yield 'input constraints are an indexed array' => [
