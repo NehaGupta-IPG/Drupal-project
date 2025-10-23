@@ -436,9 +436,9 @@ abstract class Database {
     }
 
     $driver_class = self::$databaseInfo[$key][$target]->getConnectionClass();
-
-    $client_connection = $driver_class::open(self::$databaseInfo[$key][$target]->getParameters());
-    $new_connection = new $driver_class($client_connection, self::$databaseInfo[$key][$target]->getParameters());
+    $parameters = self::$databaseInfo[$key][$target]->getParameters();
+    $client_connection = $driver_class::open($parameters);
+    $new_connection = new $driver_class($client_connection, $parameters);
     assert($new_connection instanceof Connection);
     $new_connection->setTarget($target);
     $new_connection->setKey($key);
