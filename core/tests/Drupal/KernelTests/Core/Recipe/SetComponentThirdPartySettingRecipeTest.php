@@ -10,12 +10,14 @@ use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Ensures the setComponentThirdPartySetting action works via recipes.
  */
 #[Group('Recipe')]
+#[RunTestsInSeparateProcesses]
 class SetComponentThirdPartySettingRecipeTest extends KernelTestBase {
 
   use RecipeTestTrait;
