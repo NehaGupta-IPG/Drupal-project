@@ -139,7 +139,7 @@ final class Recipe {
           new Type(TranslatableMarkup::class),
           new Callback(
             callback: function (TranslatableMarkup $value, ExecutionContextInterface $context) {
-              if ($value->getUntranslatedString() === '') {
+              if (trim($value->getUntranslatedString()) === '') {
                 $context->addViolation('This value should not be blank.');
               }
             },

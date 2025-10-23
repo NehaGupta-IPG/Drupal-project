@@ -77,7 +77,7 @@ class RecipeMultilingualTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function installParameters() {
+  protected function installParameters(): array {
     $parameters = parent::installParameters();
     // Install in German. This will ensure the language and locale modules are
     // installed.
