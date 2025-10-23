@@ -720,6 +720,15 @@ abstract class Database {
           );
         }
 
+        /**
+         * {@inheritdoc}
+         */
+        public function toArray(): array {
+          $return = parent::toArray();
+          unset($return['optionsBackfill']);
+          return $return;
+        }
+
       };
     }
     return new $class(...$connection_options);
