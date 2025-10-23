@@ -66,7 +66,8 @@ class FieldDropButtonTest extends ViewTestBase {
       $this->assertSession()->elementsCount('xpath', "//ul[contains(@class, dropbutton)]/li/a[contains(@href, '/node/{$node->id()}') and text()='Custom Text']", 1);
     }
 
-    // Test that a dropbutton with the configured dropbutton_type was found, one for each node.
+    // Test that a dropbutton with the configured dropbutton_type was found,
+    // one for each node.
     $this->assertSession()->elementsCount(
       'xpath',
       "//ul[contains(@class, 'dropbutton') and contains(@class, 'dropbutton--extrasmall')]",

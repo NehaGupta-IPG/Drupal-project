@@ -84,6 +84,9 @@ class ViewsConfigUpdater {
       if ($this->processRssViewModeUpdate($view)) {
         $changed = TRUE;
       }
+      if ($this->processFieldHandlerDropbutton($handler, $handler_type)) {
+        $changed = TRUE;
+      }
       return $changed;
     });
   }
@@ -470,6 +473,41 @@ class ViewsConfigUpdater {
     }
 
     return $changed;
+  }
+
+  /**
+   * Checks for dropbutton fields.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The View to update.
+   *
+   * @return bool
+   *   TRUE if view has dropbutton field(s).
+   */
+  public function needsDropbuttonFieldUpdate(ViewEntityInterface $view): bool {
+    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type) {
+      return $this->processFieldHandlerDropbutton($handler, $handler_type);
+    });
+  }
+
+  /**
+   * Updates dropbutton fields.
+   *
+   * @param array $handler
+   *   A display handler.
+   * @param string $handler_type
+   *   The handler type.
+   *
+   * @return bool
+   *   Whether the handler was updated.
+   */
+  protected function processFieldHandlerDropbutton(array &$handler, string $handler_type): bool {
+    if ($handler_type === 'field' && $handler['id'] === 'dropbutton') {
+      // Set default dropbutton_type key value.
+      $handler['dropbutton_type'] = '';
+      return TRUE;
+    }
+    return FALSE;
   }
 
 }
