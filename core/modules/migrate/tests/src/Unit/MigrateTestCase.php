@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit;
 
-use Drupal\sqlite\Driver\Database\sqlite\Connection;
-use Drupal\sqlite\Driver\Database\sqlite\ConnectionParameters;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
@@ -114,14 +112,11 @@ abstract class MigrateTestCase extends UnitTestCase {
    */
   protected function getDatabase(array $database_contents, $connection_options = []) {
     if (extension_loaded('pdo_sqlite')) {
-      $connection_parameters = new ConnectionParameters(
-        $connection_options['driver'] ?? 'sqlite',
-        $connection_options['namespace'] ?? '',
-        $connection_options['autoload'] ?? '',
-        ':memory:',
-      );
-      $pdo = Connection::open($connection_parameters);
-      $connection = new Connection($pdo, $connection_parameters);
+      Database::addConnectionInfo('migrate-test', 'default', [
+        'driver' => 'sqlite',
+        'database' => ':memory:',
+      ]);
+      $connection = Database::getConnection('default', 'migrate-test');
     }
     else {
       $this->markTestSkipped('The pdo_sqlite extension is not available.');

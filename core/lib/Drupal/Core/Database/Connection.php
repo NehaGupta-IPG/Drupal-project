@@ -204,7 +204,7 @@ abstract class Connection {
    * @return object
    *   A client connection object.
    */
-  abstract public static function open(/* ConnectionParametersInterface */ array &$connection_options = []);
+  abstract public static function open(/* ConnectionParametersInterface|array $parameters */ array &$connection_options = []);
 
   /**
    * Ensures that the client connection can be garbage collected.

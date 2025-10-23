@@ -98,26 +98,26 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
    * @todo Remove when we don't use global. https://www.drupal.org/node/2552791
    */
   protected function createMigrationConnection() {
-    $connectionArray = Database::getConnectionInfo('default')['default']->toArray();
-    if ($connectionArray['driver'] === 'sqlite') {
+    $connection_info = Database::getConnectionInfo('default')['default']->toArray();
+    if ($connection_info['driver'] === 'sqlite') {
       // Create database file in the test site's public file directory so that
       // \Drupal\Tests\BrowserTestBase::cleanupEnvironment() will delete this
       // once the test is complete.
       $file = $this->publicFilesDirectory . '/' . $this->testId . '-migrate.db.sqlite';
       touch($file);
-      $connectionArray['database'] = $file;
-      $connectionArray['prefix'] = '';
+      $connection_info['database'] = $file;
+      $connection_info['prefix'] = '';
     }
     else {
-      $prefix = $connectionArray['prefix'];
+      $prefix = $connection_info['prefix'];
       // Test databases use fixed length prefixes. Create a new prefix for the
       // source database. Adding to the end of the prefix ensures that
       // \Drupal\Tests\BrowserTestBase::cleanupEnvironment() will remove the
       // additional tables.
-      $connectionArray['prefix'] = $prefix . '0';
+      $connection_info['prefix'] = $prefix . '0';
     }
 
-    Database::addConnectionInfo('migrate_drupal_ui', 'default', $connectionArray);
+    Database::addConnectionInfo('migrate_drupal_ui', 'default', $connection_info);
   }
 
   /**

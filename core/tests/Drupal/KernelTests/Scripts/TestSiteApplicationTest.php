@@ -296,10 +296,10 @@ class TestSiteApplicationTest extends KernelTestBase {
    *   The database key of the added connection.
    */
   protected function addTestDatabase($db_prefix): string {
-    $connectionArray = Database::convertDbUrlToConnectionInfo(getenv('SIMPLETEST_DB'))->toArray();
-    $connectionArray['prefix'] = $db_prefix;
+    $database = Database::convertDbUrlToConnectionInfo(getenv('SIMPLETEST_DB'))->toArray();
+    $database['prefix'] = $db_prefix;
     $target = __CLASS__ . $db_prefix;
-    Database::addConnectionInfo($target, 'default', $connectionArray);
+    Database::addConnectionInfo($target, 'default', $database);
     return $target;
   }
 
