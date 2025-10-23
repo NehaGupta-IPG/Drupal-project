@@ -39,6 +39,13 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   /**
    * {@inheritdoc}
    */
+  public function getParameters(): static|array {
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getConnectionClass(): string {
     return $this->namespace . '\\Connection';
   }

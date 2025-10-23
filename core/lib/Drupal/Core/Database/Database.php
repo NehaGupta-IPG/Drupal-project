@@ -437,9 +437,8 @@ abstract class Database {
 
     $driver_class = self::$databaseInfo[$key][$target]->getConnectionClass();
 
-    $connection_parameters = property_exists(self::$databaseInfo[$key][$target], 'optionsBackfill') ? self::$databaseInfo[$key][$target]->optionsBackfill : self::$databaseInfo[$key][$target];
-    $client_connection = $driver_class::open($connection_parameters);
-    $new_connection = new $driver_class($client_connection, $connection_parameters);
+    $client_connection = $driver_class::open(self::$databaseInfo[$key][$target]->getParameters());
+    $new_connection = new $driver_class($client_connection, self::$databaseInfo[$key][$target]->getParameters());
     assert($new_connection instanceof Connection);
     $new_connection->setTarget($target);
     $new_connection->setKey($key);
@@ -729,6 +728,13 @@ abstract class Database {
          */
         public static function createFromOptionsArray(array $options): static {
           return new static($options);
+        }
+
+        /**
+         * {@inheritdoc}
+         */
+        public function getParameters(): array {
+          return $this->optionsBackfill;
         }
 
         /**
