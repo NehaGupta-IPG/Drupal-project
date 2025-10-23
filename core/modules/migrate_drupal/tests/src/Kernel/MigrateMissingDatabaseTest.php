@@ -38,11 +38,9 @@ class MigrateMissingDatabaseTest extends KernelTestBase {
     $this->migrationPluginManager = \Drupal::service('plugin.manager.migration');
 
     // Set the 'migrate' database connection to use a missing host.
-    $info = Database::getConnectionInfo('default')['default'];
-    $class = get_class($info);
-    $options = $info->toArray();
-    $options['host'] = 'does_not_exist';
-    Database::addConnectionInfo('migrate', 'default', new $class(...$options));
+    $info = Database::getConnectionInfo('default')['default']->toArray();
+    $info['host'] = 'does_not_exist';
+    Database::addConnectionInfo('migrate', 'default', $info);
   }
 
   /**

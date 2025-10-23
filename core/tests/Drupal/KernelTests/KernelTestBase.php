@@ -457,7 +457,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
         // Replace the full table prefix definition to ensure that no table
         // prefixes of the test runner leak into the test.
         $parameters['prefix'] = $this->databasePrefix ?? '';
-        $connection_info[$target] = new $class(...$parameters);
+        $connection_info[$target] = $class::createFromOptionsArray($parameters);
       }
     }
     return $connection_info;

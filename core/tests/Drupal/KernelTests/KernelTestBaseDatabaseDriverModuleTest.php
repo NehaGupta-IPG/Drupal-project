@@ -53,7 +53,7 @@ class KernelTestBaseDatabaseDriverModuleTest extends KernelTestBase {
         // Replace the table prefix definition to ensure that no table of the
         // test runner leak into the test.
         $options['prefix'] = $this->databasePrefix ?? '';
-        $connection_info[$target] = new $class(...$options);
+        $connection_info[$target] = $class::createFromOptionsArray($options);
       }
     }
     return $connection_info;

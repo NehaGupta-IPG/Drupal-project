@@ -32,7 +32,7 @@ class ConnectionParameters extends ConnectionParametersBase {
   /**
    * {@inheritdoc}
    */
-  public static function processConnectionOptionsArray(array $options): array {
+  public static function processOptionsArray(array $options): array {
     $options = array_merge(['init_commands' => [], 'pdo' => []], $options);
 
     // Allow PDO options to be overridden.

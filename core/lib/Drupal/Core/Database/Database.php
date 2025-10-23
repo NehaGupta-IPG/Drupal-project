@@ -273,7 +273,7 @@ abstract class Database {
 
     $parameters_class = $options['namespace'] . '\\ConnectionParameters';
     if (class_exists($parameters_class)) {
-      $options = $parameters_class::processConnectionOptionsArray($options);
+      $options = $parameters_class::processOptionsArray($options);
     }
 
     return self::getConnectionParametersFromArray($parameters_class, $options);
@@ -435,7 +435,7 @@ abstract class Database {
       throw new DriverNotSpecifiedException('Driver not specified for this database connection: ' . $key);
     }
 
-    $driver_class = self::$databaseInfo[$key][$target]->getDriverConnectionClassName();
+    $driver_class = self::$databaseInfo[$key][$target]->getConnectionClass();
 
     $connection_parameters = property_exists(self::$databaseInfo[$key][$target], 'optionsBackfill') ? self::$databaseInfo[$key][$target]->optionsBackfill : self::$databaseInfo[$key][$target];
     $client_connection = $driver_class::open($connection_parameters);
@@ -598,7 +598,7 @@ abstract class Database {
 
     $parameters_class = $driverNamespace . '\\ConnectionParameters';
     if (class_exists($parameters_class)) {
-      $options = $parameters_class::processConnectionOptionsArray($options);
+      $options = $parameters_class::processOptionsArray($options);
     }
 
     return self::getConnectionParametersFromArray($parameters_class, $options);
@@ -718,6 +718,13 @@ abstract class Database {
             $optionsBackfill['dependencies'] ?? [],
             $optionsBackfill['init_commands'] ?? [],
           );
+        }
+
+        /**
+         * {@inheritdoc}
+         */
+        public static function createFromOptionsArray(array $options): static {
+          return new static($options);
         }
 
         /**

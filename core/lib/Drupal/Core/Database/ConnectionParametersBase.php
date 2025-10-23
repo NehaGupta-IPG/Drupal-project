@@ -32,7 +32,14 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   /**
    * {@inheritdoc}
    */
-  public function getDriverConnectionClassName(): string {
+  public static function createFromOptionsArray(array $options): static {
+    return new static(...$options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConnectionClass(): string {
     return $this->namespace . '\\Connection';
   }
 
@@ -46,7 +53,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   /**
    * {@inheritdoc}
    */
-  public static function processConnectionOptionsArray(array $options): array {
+  public static function processOptionsArray(array $options): array {
     return $options;
   }
 

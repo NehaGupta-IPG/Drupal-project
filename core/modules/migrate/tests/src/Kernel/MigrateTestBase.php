@@ -102,7 +102,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
       $parameters = $value->toArray();
       // Tests use 7 character prefixes at most so this can't cause collisions.
       $parameters['prefix'] = $value->prefix . '0';
-      $connection_info[$target] = new $class(...$parameters);
+      $connection_info[$target] = $class::createFromOptionsArray($parameters);
     }
     Database::addConnectionInfo('migrate', 'default', $connection_info['default']);
   }
