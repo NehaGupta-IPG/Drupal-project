@@ -213,9 +213,9 @@ abstract class DriverSpecificConnectionUnitTestBase extends DriverSpecificKernel
     // Ensure the default error mode is set to exception.
     $this->assertSame(\PDO::ERRMODE_EXCEPTION, $error_mode);
 
-    $connection_info = Database::getConnectionInfo();
-    $connection_info['default']['pdo'][\PDO::ATTR_ERRMODE] = \PDO::ERRMODE_SILENT;
-    Database::addConnectionInfo('test', 'default', $connection_info['default']);
+    $connection_info = Database::getConnectionInfo()['default']->toArray();
+    $connection_info['pdo'][\PDO::ATTR_ERRMODE] = \PDO::ERRMODE_SILENT;
+    Database::addConnectionInfo('test', 'default', $connection_info);
     $test_connection = Database::getConnection('default', 'test');
 
     $reflection = new \ReflectionObject($test_connection);
