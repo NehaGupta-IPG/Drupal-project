@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\editor\Functional;
 
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\file\Entity\File;
-use Drupal\node\NodeInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
@@ -98,7 +98,7 @@ class EditorPrivateFileReferenceFilterTest extends BrowserTestBase {
     // just-created file.
     $unpublished_node = $this->drupalCreateNode([
       'type' => 'page',
-      'status' => NodeInterface::NOT_PUBLISHED,
+      'status' => EntityPublishedInterface::NOT_PUBLISHED,
       'body' => [
         'value' => '<img alt="alt" data-entity-type="file" data-entity-uuid="' . $file->uuid() . '" src="' . $src . '" />',
         'format' => 'private_images',

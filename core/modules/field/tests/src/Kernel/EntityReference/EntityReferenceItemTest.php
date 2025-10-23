@@ -7,6 +7,7 @@ namespace Drupal\Tests\field\Kernel\EntityReference;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Entity\CommentType;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -19,7 +20,6 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
-use Drupal\node\NodeInterface;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\TermInterface;
@@ -460,7 +460,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $node = Node::create([
       'title' => $title,
       'type' => 'node',
-      'status' => NodeInterface::NOT_PUBLISHED,
+      'status' => EntityPublishedInterface::NOT_PUBLISHED,
     ]);
 
     $entity = EntityTest::create([
@@ -484,14 +484,14 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $unsaved_unpublished_node = Node::create([
       'title' => $unsaved_unpublished_node_title,
       'type' => 'node',
-      'status' => NodeInterface::NOT_PUBLISHED,
+      'status' => EntityPublishedInterface::NOT_PUBLISHED,
     ]);
 
     $saved_unpublished_node_title = $this->randomString();
     $saved_unpublished_node = Node::create([
       'title' => $saved_unpublished_node_title,
       'type' => 'node',
-      'status' => NodeInterface::NOT_PUBLISHED,
+      'status' => EntityPublishedInterface::NOT_PUBLISHED,
     ]);
     $saved_unpublished_node->save();
 
@@ -499,7 +499,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $saved_published_node = Node::create([
       'title' => $saved_published_node_title,
       'type' => 'node',
-      'status' => NodeInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
     ]);
     $saved_published_node->save();
 

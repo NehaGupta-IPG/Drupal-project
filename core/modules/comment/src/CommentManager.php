@@ -7,6 +7,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -226,7 +227,7 @@ class CommentManager implements CommentManagerInterface {
         ->condition('entity_type', $entity->getEntityTypeId())
         ->condition('entity_id', $entity->id())
         ->condition('created', $timestamp, '>')
-        ->condition('status', CommentInterface::PUBLISHED);
+        ->condition('status', EntityPublishedInterface::PUBLISHED);
       if ($field_name) {
         // Limit to a particular field.
         $query->condition('field_name', $field_name);

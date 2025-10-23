@@ -2,9 +2,9 @@
 
 namespace Drupal\comment\Form;
 
-use Drupal\comment\CommentInterface;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Datetime\DateFormatterInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormBase;
@@ -137,7 +137,7 @@ class CommentAdminOverview extends FormBase {
     ];
 
     // Load the comments that need to be displayed.
-    $status = ($type == 'approval') ? CommentInterface::NOT_PUBLISHED : CommentInterface::PUBLISHED;
+    $status = ($type == 'approval') ? EntityPublishedInterface::NOT_PUBLISHED : EntityPublishedInterface::PUBLISHED;
     $header = [
       'subject' => [
         'data' => $this->t('Subject'),

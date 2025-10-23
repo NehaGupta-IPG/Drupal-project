@@ -4,10 +4,10 @@ namespace Drupal\Core\Menu;
 
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\node\NodeInterface;
 
 /**
  * Provides a couple of menu link tree manipulators.
@@ -134,7 +134,7 @@ class DefaultMenuLinkTreeManipulators {
       else {
         $access_result->addCacheContexts(['user.node_grants:view']);
         if (!$this->moduleHandler->hasImplementations('node_grants') && !$this->account->hasPermission('view any unpublished content')) {
-          $query->condition('status', NodeInterface::PUBLISHED);
+          $query->condition('status', EntityPublishedInterface::PUBLISHED);
         }
       }
 

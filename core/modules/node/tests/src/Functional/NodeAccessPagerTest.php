@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional;
 
-use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
@@ -71,7 +71,7 @@ class NodeAccessPagerTest extends BrowserTestBase {
         'comment_body' => [
           ['value' => $this->randomMachineName()],
         ],
-        'status' => CommentInterface::PUBLISHED,
+        'status' => EntityPublishedInterface::PUBLISHED,
       ]);
       $comment->save();
     }

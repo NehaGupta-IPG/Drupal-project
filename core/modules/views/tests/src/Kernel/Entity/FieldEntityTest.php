@@ -6,11 +6,11 @@ namespace Drupal\Tests\views\Kernel\Entity;
 
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
-use Drupal\node\NodeInterface;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\user\Entity\User;
@@ -132,13 +132,13 @@ class FieldEntityTest extends ViewsKernelTestBase {
     $nodeReference = Node::create([
       'type' => 'page',
       'title' => $this->randomString(),
-      'status' => NodeInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
     ]);
     $nodeReference->save();
     $node = Node::create([
       'type' => 'page',
       'title' => $this->randomString(),
-      'status' => NodeInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
       'field_test_reference' => [
         'target_id' => $nodeReference->id(),
       ],

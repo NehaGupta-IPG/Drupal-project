@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel\Entity\EntityReferenceSelection;
 
-use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\media\Entity\Media;
 use Drupal\node\Entity\Node;
-use Drupal\node\NodeInterface;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
@@ -134,19 +133,19 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
     $node_values = [
       'published1' => [
         'type' => 'article',
-        'status' => NodeInterface::PUBLISHED,
+        'status' => EntityPublishedInterface::PUBLISHED,
         'title' => 'Node published1 (<&>)',
         'uid' => 1,
       ],
       'published2' => [
         'type' => 'article',
-        'status' => NodeInterface::PUBLISHED,
+        'status' => EntityPublishedInterface::PUBLISHED,
         'title' => 'Node published2 (<&>)',
         'uid' => 1,
       ],
       'unpublished' => [
         'type' => 'article',
-        'status' => NodeInterface::NOT_PUBLISHED,
+        'status' => EntityPublishedInterface::NOT_PUBLISHED,
         'title' => 'Node unpublished (<&>)',
         'uid' => 1,
       ],
@@ -446,7 +445,7 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
         'uid' => 1,
         'cid' => NULL,
         'pid' => 0,
-        'status' => CommentInterface::PUBLISHED,
+        'status' => EntityPublishedInterface::PUBLISHED,
         'subject' => 'Comment Published <&>',
         'language' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
       ],
@@ -457,7 +456,7 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
         'uid' => 1,
         'cid' => NULL,
         'pid' => 0,
-        'status' => CommentInterface::NOT_PUBLISHED,
+        'status' => EntityPublishedInterface::NOT_PUBLISHED,
         'subject' => 'Comment Unpublished <&>',
         'language' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
       ],
@@ -468,7 +467,7 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
         'uid' => 1,
         'cid' => NULL,
         'pid' => 0,
-        'status' => CommentInterface::NOT_PUBLISHED,
+        'status' => EntityPublishedInterface::NOT_PUBLISHED,
         'subject' => 'Comment Published on Unpublished node <&>',
         'language' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
       ],

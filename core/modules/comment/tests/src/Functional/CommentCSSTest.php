@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\Traits\Core\GeneratePermutationsTrait;
 use Drupal\user\RoleInterface;
@@ -49,7 +49,7 @@ class CommentCSSTest extends CommentTestBase {
     $parameters = [
       'node_uid' => [0, $this->webUser->id()],
       'comment_uid' => [0, $this->webUser->id(), $this->adminUser->id()],
-      'comment_status' => [CommentInterface::PUBLISHED, CommentInterface::NOT_PUBLISHED],
+      'comment_status' => [EntityPublishedInterface::PUBLISHED, EntityPublishedInterface::NOT_PUBLISHED],
       'user' => ['anonymous', 'authenticated', 'admin'],
     ];
     $permutations = $this->generatePermutations($parameters);
@@ -95,7 +95,7 @@ class CommentCSSTest extends CommentTestBase {
       $this->drupalGet('node/' . $node->id());
 
       // Verify classes if the comment is visible for the current user.
-      if ($case['comment_status'] == CommentInterface::PUBLISHED || $case['user'] == 'admin') {
+      if ($case['comment_status'] == EntityPublishedInterface::PUBLISHED || $case['user'] == 'admin') {
         // Verify the by-anonymous class.
         $comments = '//*[contains(@class, "comment") and contains(@class, "by-anonymous")]';
         if ($case['comment_uid'] == 0) {
@@ -124,7 +124,7 @@ class CommentCSSTest extends CommentTestBase {
 
       // Verify the unpublished class.
       $comments = '//*[contains(@class, "comment") and contains(@class, "unpublished")]';
-      if ($case['comment_status'] == CommentInterface::NOT_PUBLISHED && $case['user'] == 'admin') {
+      if ($case['comment_status'] == EntityPublishedInterface::NOT_PUBLISHED && $case['user'] == 'admin') {
         $this->assertSession()->elementsCount('xpath', $comments, 1);
       }
       else {

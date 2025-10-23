@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional;
 
-use Drupal\node\NodeInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -42,7 +42,7 @@ class NodeAccessUnpublishedCacheabilityTest extends NodeTestBase {
     $unpublished_node_by_test_user1 = $this->createNode([
       'type' => 'page',
       'uid' => $test_user1->id(),
-      'status' => NodeInterface::NOT_PUBLISHED,
+      'status' => EntityPublishedInterface::NOT_PUBLISHED,
     ]);
 
     $this->drupalLogin($test_user2);

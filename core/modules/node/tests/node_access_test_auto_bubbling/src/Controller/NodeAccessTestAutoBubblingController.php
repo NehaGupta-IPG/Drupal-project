@@ -7,6 +7,7 @@ namespace Drupal\node_access_test_auto_bubbling\Controller;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\node\NodeInterface;
 
 /**
@@ -23,7 +24,7 @@ class NodeAccessTestAutoBubblingController extends ControllerBase implements Con
   public function latest() {
     $nids = $this->entityTypeManager()->getStorage('node')->getQuery()
       ->accessCheck(TRUE)
-      ->condition('status', NodeInterface::PUBLISHED)
+      ->condition('status', EntityPublishedInterface::PUBLISHED)
       ->sort('created', 'DESC')
       ->range(0, 3)
       ->execute();

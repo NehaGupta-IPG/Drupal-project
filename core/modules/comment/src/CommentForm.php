@@ -10,6 +10,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityConstraintViolationListInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -146,7 +147,7 @@ class CommentForm extends ContentEntityForm {
       if (!$comment->getOwnerId()) {
         $author = $comment->getAuthorName();
       }
-      $status = $comment->isPublished() ? CommentInterface::PUBLISHED : CommentInterface::NOT_PUBLISHED;
+      $status = $comment->isPublished() ? EntityPublishedInterface::PUBLISHED : EntityPublishedInterface::NOT_PUBLISHED;
       if (empty($comment_preview)) {
         $form['#title'] = $this->t('Edit comment %title', [
           '%title' => $comment->getSubject(),
@@ -154,7 +155,7 @@ class CommentForm extends ContentEntityForm {
       }
     }
     else {
-      $status = ($this->currentUser->hasPermission('skip comment approval') ? CommentInterface::PUBLISHED : CommentInterface::NOT_PUBLISHED);
+      $status = ($this->currentUser->hasPermission('skip comment approval') ? EntityPublishedInterface::PUBLISHED : EntityPublishedInterface::NOT_PUBLISHED);
     }
 
     $date = '';
@@ -236,8 +237,8 @@ class CommentForm extends ContentEntityForm {
       '#title' => $this->t('Status'),
       '#default_value' => $status,
       '#options' => [
-        CommentInterface::PUBLISHED => $this->t('Published'),
-        CommentInterface::NOT_PUBLISHED => $this->t('Not published'),
+        EntityPublishedInterface::PUBLISHED => $this->t('Published'),
+        EntityPublishedInterface::NOT_PUBLISHED => $this->t('Not published'),
       ],
       '#access' => $is_admin,
     ];

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Functional;
 
-use Drupal\node\NodeInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Tests\language\Traits\LanguageTestTrait;
 use Drupal\Tests\Traits\Core\CronRunTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -61,7 +61,7 @@ class SearchMultilingualTest extends ViewTestBase {
     $node = $this->drupalCreateNode($values);
 
     // "Translate" this node into Spanish, with title "pizza".
-    $node->addTranslation('es', ['title' => 'pizza', 'status' => NodeInterface::PUBLISHED]);
+    $node->addTranslation('es', ['title' => 'pizza', 'status' => EntityPublishedInterface::PUBLISHED]);
     $node->save();
 
     // Run cron so that the search index tables are updated.

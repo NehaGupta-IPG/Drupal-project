@@ -6,9 +6,9 @@ namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\node\NodeInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -76,19 +76,19 @@ class JsonApiFunctionalDateFieldTest extends JsonApiFunctionalTestBase {
     $node_1 = $this->createNode([
       'type' => 'article',
       'uuid' => 'es_test_1',
-      'status' => NodeInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
       'field_datetime' => $date_formatter->format($timestamp_1, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT),
     ]);
     $node_2 = $this->createNode([
       'type' => 'article',
       'uuid' => 'es_test_2',
-      'status' => NodeInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
       'field_datetime' => $date_formatter->format($timestamp_2, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT),
     ]);
     $node_3 = $this->createNode([
       'type' => 'article',
       'uuid' => 'es_test_3',
-      'status' => NodeInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
       'field_datetime' => $date_formatter->format($timestamp_3, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT),
     ]);
 

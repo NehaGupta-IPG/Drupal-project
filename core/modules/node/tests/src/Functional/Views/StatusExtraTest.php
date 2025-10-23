@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional\Views;
 
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\node\Entity\NodeType;
-use Drupal\node\NodeInterface;
 use Drupal\Tests\node\Traits\NodeAccessTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -50,16 +50,22 @@ class StatusExtraTest extends NodeTestBase {
 
     // Create one published and one unpublished node by the admin.
     $node_published = $this->drupalCreateNode(['uid' => $admin_user->id()]);
-    $node_unpublished = $this->drupalCreateNode(['uid' => $admin_user->id(), 'status' => NodeInterface::NOT_PUBLISHED]);
+    $node_unpublished = $this->drupalCreateNode([
+      'uid' => $admin_user->id(),
+      'status' => EntityPublishedInterface::NOT_PUBLISHED,
+    ]);
 
     // Create one unpublished node by a certain author user.
-    $node_unpublished2 = $this->drupalCreateNode(['uid' => $node_author->id(), 'status' => NodeInterface::NOT_PUBLISHED]);
+    $node_unpublished2 = $this->drupalCreateNode([
+      'uid' => $node_author->id(),
+      'status' => EntityPublishedInterface::NOT_PUBLISHED,
+    ]);
 
     // Create one unpublished node by a user who does not have the `view own
     // unpublished content` permission.
     $node_unpublished3 = $this->drupalCreateNode([
       'uid' => $node_author_not_unpublished->id(),
-      'status' => NodeInterface::NOT_PUBLISHED,
+      'status' => EntityPublishedInterface::NOT_PUBLISHED,
     ]);
 
     // The administrator should simply see all nodes.
@@ -110,7 +116,7 @@ class StatusExtraTest extends NodeTestBase {
     $node_published_private = $this->drupalCreateNode(['uid' => $admin_user->id(), 'private' => ['value' => 1]]);
     $node_unpublished_private = $this->drupalCreateNode([
       'uid' => $admin_user->id(),
-      'status' => NodeInterface::NOT_PUBLISHED,
+      'status' => EntityPublishedInterface::NOT_PUBLISHED,
       'private' => ['value' => 1],
     ]);
 

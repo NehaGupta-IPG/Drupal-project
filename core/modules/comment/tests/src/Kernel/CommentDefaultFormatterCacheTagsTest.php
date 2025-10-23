@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Kernel;
 
-use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -110,7 +110,7 @@ class CommentDefaultFormatterCacheTagsTest extends EntityKernelTestBase {
       'entity_type' => 'entity_test',
       'field_name' => 'comment',
       'comment_type' => 'comment',
-      'status' => CommentInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
       'uid' => $user->id(),
     ]);
     $comment->save();

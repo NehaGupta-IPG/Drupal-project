@@ -7,12 +7,12 @@ namespace Drupal\Tests\Core\Menu;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\Container;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Menu\DefaultMenuLinkTreeManipulators;
 use Drupal\Core\Menu\MenuLinkTreeElement;
-use Drupal\node\NodeInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -319,7 +319,7 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
     $query = $this->prophesize('Drupal\Core\Entity\Query\QueryInterface');
     $query->accessCheck(TRUE)->shouldBeCalled();
     $query->condition('nid', [1, 2, 3, 4], 'IN')->shouldBeCalled();
-    $query->condition('status', NodeInterface::PUBLISHED)->shouldBeCalled();
+    $query->condition('status', EntityPublishedInterface::PUBLISHED)->shouldBeCalled();
     $query->execute()->willReturn([1, 2, 4]);
 
     $storage = $this->createMock(EntityStorageInterface::class);

@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -203,7 +204,7 @@ class CommentStatistics implements CommentStatisticsInterface {
   /**
    * {@inheritdoc}
    */
-  public function update(CommentInterface $comment) {
+  public function update(EntityPublishedInterface $comment) {
     // Allow bulk updates and inserts to temporarily disable the maintenance of
     // the {comment_entity_statistics} table.
     if (!$this->state->get('comment.maintain_entity_statistics')) {
@@ -215,7 +216,7 @@ class CommentStatistics implements CommentStatisticsInterface {
     $count = $query->condition('c.entity_id', $comment->getCommentedEntityId())
       ->condition('c.entity_type', $comment->getCommentedEntityTypeId())
       ->condition('c.field_name', $comment->getFieldName())
-      ->condition('c.status', CommentInterface::PUBLISHED)
+      ->condition('c.status', EntityPublishedInterface::PUBLISHED)
       ->condition('default_langcode', 1)
       ->execute()
       ->fetchField();
@@ -227,7 +228,7 @@ class CommentStatistics implements CommentStatisticsInterface {
         ->condition('c.entity_id', $comment->getCommentedEntityId())
         ->condition('c.entity_type', $comment->getCommentedEntityTypeId())
         ->condition('c.field_name', $comment->getFieldName())
-        ->condition('c.status', CommentInterface::PUBLISHED)
+        ->condition('c.status', EntityPublishedInterface::PUBLISHED)
         ->condition('default_langcode', 1)
         ->orderBy('c.created', 'DESC')
         ->range(0, 1)

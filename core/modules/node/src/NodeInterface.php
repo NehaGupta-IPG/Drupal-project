@@ -15,11 +15,19 @@ interface NodeInterface extends ContentEntityInterface, EntityChangedInterface, 
 
   /**
    * Denotes that the node is not published.
+   *
+   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+   *   Use \Drupal\Core\Entity\EntityPublishedInterface::NOT_PUBLISHED instead.
+   * @see https://www.drupal.org/node/3426517
    */
   const NOT_PUBLISHED = 0;
 
   /**
    * Denotes that the node is published.
+   *
+   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+   *   Use \Drupal\Core\Entity\EntityPublishedInterface::PUBLISHED instead.
+   * @see https://www.drupal.org/node/3426517
    */
   const PUBLISHED = 1;
 

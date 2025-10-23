@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\NodeType;
-use Drupal\node\NodeInterface;
 use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
@@ -295,20 +295,20 @@ class NodeAdminTest extends NodeTestBase {
       'type' => 'page',
       'uid' => $viewer_user->id(),
       'title' => 'Unpublished own page',
-      'status' => NodeInterface::NOT_PUBLISHED,
+      'status' => EntityPublishedInterface::NOT_PUBLISHED,
     ]);
     $nodes_visible[] = $this->drupalCreateNode([
       'type' => 'page',
       'uid' => $viewer_user->id(),
       'title' => 'Unpublished own private page',
-      'status' => NodeInterface::NOT_PUBLISHED,
+      'status' => EntityPublishedInterface::NOT_PUBLISHED,
       'private' => ['value' => 1],
     ]);
     $nodes_visible[] = $this->drupalCreateNode([
       'type' => 'page',
       'uid' => $this->adminUser->id(),
       'title' => 'Unpublished private page by admin',
-      'status' => NodeInterface::NOT_PUBLISHED,
+      'status' => EntityPublishedInterface::NOT_PUBLISHED,
       'private' => ['value' => 1],
     ]);
 

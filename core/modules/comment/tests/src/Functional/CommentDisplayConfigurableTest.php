@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
@@ -49,7 +49,7 @@ class CommentDisplayConfigurableTest extends CommentTestBase {
       'entity_type' => 'node',
       'field_name' => 'comment',
       'uid' => $this->webUser->id(),
-      'status' => CommentInterface::PUBLISHED,
+      'status' => EntityPublishedInterface::PUBLISHED,
       'subject' => $this->randomMachineName(),
       'language' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
       'comment_body' => [LanguageInterface::LANGCODE_NOT_SPECIFIED => [$this->randomMachineName()]],

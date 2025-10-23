@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\link\Functional;
 
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
@@ -11,7 +12,6 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\link\LinkItemInterface;
 use Drupal\link\LinkTitleVisibility;
-use Drupal\node\NodeInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -127,7 +127,7 @@ class LinkFieldTest extends BrowserTestBase {
     // Create a node to test the link widget.
     $node = $this->drupalCreateNode();
 
-    $restricted_node = $this->drupalCreateNode(['status' => NodeInterface::NOT_PUBLISHED]);
+    $restricted_node = $this->drupalCreateNode(['status' => EntityPublishedInterface::NOT_PUBLISHED]);
 
     // Define some valid URLs (keys are the entered values, values are the
     // strings displayed to the user).
