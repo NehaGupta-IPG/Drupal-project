@@ -8,6 +8,7 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use Drupal\system\EventSubscriber\UpdateEmptyAdminTheme;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\system\EventSubscriber\UpdateEmptyAdminTheme.
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\Group;
 #[Group('system')]
 #[Group('Update')]
 #[Group('legacy')]
+#[RunTestsInSeparateProcesses]
 class ThemeAdminUpdateTest extends UpdatePathTestBase {
 
   /**
