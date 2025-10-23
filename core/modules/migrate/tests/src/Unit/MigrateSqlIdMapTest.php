@@ -9,6 +9,8 @@ use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
+use Drupal\sqlite\Driver\Database\sqlite\Connection;
+use Drupal\sqlite\Driver\Database\sqlite\ConnectionParameters;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
@@ -1012,12 +1014,9 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    * Tests the getQualifiedMapTable method with a prefixed database.
    */
   public function testGetQualifiedMapTablePrefix(): void {
-    Database::addConnectionInfo('migrate-sql-id-map', 'default', [
-      'driver' => 'sqlite',
-      'database' => ':memory:',
-      'prefix' => 'prefix',
-    ]);
-    $this->database = Database::getConnection('default', 'migrate-sql-id-map');
+    $connection_parameters = new ConnectionParameters('sqlite', __NAMESPACE__, __DIR__, ':memory:', 'prefix');
+    $pdo = Connection::open($connection_parameters);
+    $this->database = new Connection($pdo, $connection_parameters);
     $qualified_map_table = $this->getIdMap()->getQualifiedMapTableName();
     // The SQLite driver is a special flower. It will prefix tables with
     // PREFIX.TABLE, instead of the standard PREFIXTABLE.
