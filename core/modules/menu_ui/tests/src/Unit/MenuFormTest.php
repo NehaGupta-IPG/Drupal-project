@@ -9,11 +9,14 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\menu_ui\MenuForm;
 use Drupal\system\MenuInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\menu_ui\MenuForm
- * @group menu_ui
+ * Test for the MenuForm class.
  */
+#[CoversClass(MenuForm::class)]
+#[Group('menu_ui')]
 class MenuFormTest extends UnitTestCase {
 
   /**
