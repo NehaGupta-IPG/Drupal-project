@@ -6,11 +6,13 @@ namespace Drupal\Tests\olivero\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the update path for Olivero.
  */
 #[Group('update')]
+#[RunTestsInSeparateProcesses]
 class OliveroPostUpdateTest extends UpdatePathTestBase {
 
   /**
