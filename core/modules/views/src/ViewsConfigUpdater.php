@@ -491,7 +491,7 @@ class ViewsConfigUpdater {
   }
 
   /**
-   * Updates dropbutton fields.
+   * Updates dropbutton fields to set the default dropbutton_type.
    *
    * @param array $handler
    *   A display handler.
@@ -502,10 +502,12 @@ class ViewsConfigUpdater {
    *   Whether the handler was updated.
    */
   protected function processFieldHandlerDropbutton(array &$handler, string $handler_type): bool {
-    if ($handler_type === 'field' && $handler['id'] === 'dropbutton') {
-      // Set default dropbutton_type key value.
-      $handler['dropbutton_type'] = '';
-      return TRUE;
+    if ($handler_type === 'field' && isset($handler['id']) && $handler['id'] === 'dropbutton') {
+      // Set default dropbutton_type key value, if not set.
+      if (!isset($handler['dropbutton_type'])) {
+        $handler['dropbutton_type'] = '';
+        return TRUE;
+      }
     }
     return FALSE;
   }
