@@ -704,7 +704,7 @@ abstract class Database {
         /**
          * Backfill connection options.
          */
-        public readonly array $optionsBackfill;
+        private array $optionsBackfill;
 
         public function __construct(array $options) {
           parent::__construct(
