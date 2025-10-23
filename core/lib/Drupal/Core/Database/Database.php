@@ -701,23 +701,27 @@ abstract class Database {
     if (!$class || !class_exists($class)) {
       return new class ($connection_options) extends ConnectionParametersBase {
 
-        public function __construct(
-          public readonly array $optionsBackfill,
-        ) {
+        /**
+         * Backfill connection options.
+         */
+        public readonly array $optionsBackfill;
+
+        public function __construct(array $options) {
           parent::__construct(
-            $optionsBackfill['driver'] ?? 'und',
-            $optionsBackfill['namespace'] ?? 'und',
-            $optionsBackfill['autoload'] ?? 'und',
-            $optionsBackfill['database'] ?? 'und',
-            $optionsBackfill['prefix'] ?? '',
-            $optionsBackfill['module'] ?? NULL,
-            $optionsBackfill['username'] ?? NULL,
-            $optionsBackfill['password'] ?? NULL,
-            $optionsBackfill['host'] ?? NULL,
-            $optionsBackfill['port'] ?? NULL,
-            $optionsBackfill['dependencies'] ?? [],
-            $optionsBackfill['init_commands'] ?? [],
+            $options['driver'] ?? 'und',
+            $options['namespace'] ?? 'und',
+            $options['autoload'] ?? 'und',
+            $options['database'] ?? 'und',
+            $options['prefix'] ?? '',
+            $options['module'] ?? NULL,
+            $options['username'] ?? NULL,
+            $options['password'] ?? NULL,
+            $options['host'] ?? NULL,
+            $options['port'] ?? NULL,
+            $options['dependencies'] ?? [],
+            $options['init_commands'] ?? [],
           );
+          $this->optionsBackfill = array_merge($options, get_object_vars($this));
         }
 
         /**
@@ -731,9 +735,35 @@ abstract class Database {
          * {@inheritdoc}
          */
         public function toArray(): array {
-          $return = parent::toArray();
-          unset($return['optionsBackfill']);
-          return $return;
+          return $this->optionsBackfill;
+        }
+
+        /**
+         * This is for BC support only.
+         */
+        public function offsetExists(mixed $offset): bool {
+          return array_key_exists($offset, $this->optionsBackfill);
+        }
+
+        /**
+         * This is for BC support only.
+         */
+        public function offsetGet(mixed $offset): mixed {
+          return $this->optionsBackfill[$offset];
+        }
+
+        /**
+         * This is for BC support only.
+         */
+        public function offsetSet(mixed $offset, mixed $value): void {
+          $this->optionsBackfill[$offset] = $value;
+        }
+
+        /**
+         * This is for BC support only.
+         */
+        public function offsetUnset(mixed $offset): void {
+          unset($this->optionsBackfill[$offset]);
         }
 
       };
