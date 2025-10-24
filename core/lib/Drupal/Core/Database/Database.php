@@ -689,13 +689,12 @@ abstract class Database {
       'driver' => 'und',
       'namespace' => '',
       'autoload' => '',
-      'database' => 'und',
     ], $connection_options);
 
     $class = $connection_options['namespace'] . '\\ConnectionParameters';
 
     if (class_exists($class)) {
-      $connection_options = $parameters_class::processOptionsArray($connection_options);
+      $connection_options = $class::processOptionsArray($connection_options);
       return new $class(...$connection_options);
     }
 
