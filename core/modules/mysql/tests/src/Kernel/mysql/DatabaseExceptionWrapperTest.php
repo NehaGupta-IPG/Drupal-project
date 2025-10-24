@@ -27,9 +27,9 @@ class DatabaseExceptionWrapperTest extends DriverSpecificKernelTestBase {
    * for the MySql driver.
    */
   public function testPrepareStatementFailOnPreparation(): void {
-    $connection_info = Database::getConnectionInfo('default')['default']->toArray();
-    $connection_info['pdo'][\PDO::ATTR_EMULATE_PREPARES] = FALSE;
-    Database::addConnectionInfo('default', 'foo', $connection_info);
+    $connection_info = Database::getConnectionInfo('default');
+    $connection_info['default']['pdo'][\PDO::ATTR_EMULATE_PREPARES] = FALSE;
+    Database::addConnectionInfo('default', 'foo', $connection_info['default']);
     $foo_connection = Database::getConnection('foo', 'default');
     $this->expectException(DatabaseExceptionWrapper::class);
     $foo_connection->prepareStatement('bananas', []);

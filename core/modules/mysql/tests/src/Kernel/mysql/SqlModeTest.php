@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\mysql\Kernel\mysql;
 
-use Drupal\Core\Database\Database;
 use Drupal\KernelTests\Core\Database\DriverSpecificDatabaseTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -36,11 +35,8 @@ class SqlModeTest extends DriverSpecificDatabaseTestBase {
     // We defer skipping the test to later in setUp(), so that that can be
     // based on databaseType() rather than 'driver', but here all we have to go
     // on is 'driver'.
-    if ($info['default']->driver === 'mysql') {
-      $adjusted_info = $info['default']->toArray();
-      $adjusted_info['init_commands']['sql_mode'] = "SET sql_mode = ''";
-      $class = $info['default']->namespace . '\\ConnectionParameters';
-      $info['default'] = Database::getConnectionParametersFromArray($class, $adjusted_info);
+    if ($info['default']['driver'] === 'mysql') {
+      $info['default']['init_commands']['sql_mode'] = "SET sql_mode = ''";
     }
 
     return $info;

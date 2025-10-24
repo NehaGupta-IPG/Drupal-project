@@ -754,7 +754,7 @@ abstract class Database {
         /**
          * This is for BC support only.
          */
-        public function offsetGet(mixed $offset): mixed {
+        public function &offsetGet(mixed $offset): mixed {
           return $this->optionsBackfill[$offset];
         }
 
