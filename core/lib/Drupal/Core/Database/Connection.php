@@ -172,11 +172,14 @@ abstract class Connection {
    *
    * @param object $connection
    *   An object of the client class representing a database connection.
-   * @param array $connection_options
-   *   An array of options for the connection. May include the following:
+   * @param \Drupal\Core\Database\ConnectionParametersInterface|array $connection_options
+   *   The database connection settings. May include the following:
    *   - prefix
    *   - namespace
    *   - Other driver-specific options.
+   *
+   * @todo adjust type of the $connection_options parameter to
+   *   ConnectionParametersInterface once all drivers implement it.
    */
   public function __construct(object $connection, ConnectionParametersInterface|array $connection_options) {
     assert(count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
@@ -195,13 +198,16 @@ abstract class Connection {
   /**
    * Opens a client connection.
    *
-   * @param array $connection_options
-   *   The database connection settings array.
+   * @param \Drupal\Core\Database\ConnectionParametersInterface|array $connection_options
+   *   The database connection settings.
    *
    * @return object
    *   A client connection object.
+   *
+   * @todo adjust type of the $connection_options parameter to
+   *   ConnectionParametersInterface once all drivers implement it.
    */
-  abstract public static function open(/* ConnectionParametersInterface|array $parameters */ array &$connection_options = []);
+  abstract public static function open(array &$connection_options = []);
 
   /**
    * Ensures that the client connection can be garbage collected.
