@@ -10,11 +10,13 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\locale\StringStorageInterface;
 use Drupal\user\UserInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests contextual link translation.
  */
 #[Group('contextual')]
+#[RunTestsInSeparateProcesses]
 class ContextualTranslationTest extends WebDriverTestBase {
 
   use ContextualLinkClickTrait;
