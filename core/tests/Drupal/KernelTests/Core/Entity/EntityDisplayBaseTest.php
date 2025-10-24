@@ -13,12 +13,14 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\Core\Entity\EntityDisplayBase.
  */
 #[CoversClass(EntityDisplayBase::class)]
 #[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityDisplayBaseTest extends KernelTestBase {
 
   /**
@@ -29,7 +31,6 @@ class EntityDisplayBaseTest extends KernelTestBase {
     'entity_test_third_party',
     'field',
     'field_test',
-    'system',
     'comment',
     'user',
   ];

@@ -12,6 +12,7 @@ use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the timezone handling of datetime and datelist element types.
@@ -21,12 +22,8 @@ use PHPUnit\Framework\Attributes\Group;
  * tested in various ways for both element types.
  */
 #[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class TimezoneTest extends EntityKernelTestBase implements FormInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * The date used in tests.

@@ -9,12 +9,14 @@ use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\Core\StreamWrapper\StreamWrapperManager.
  */
 #[CoversClass(StreamWrapperManager::class)]
 #[Group('File')]
+#[RunTestsInSeparateProcesses]
 class StreamWrapperManagerTest extends KernelTestBase {
 
   /**
@@ -23,11 +25,6 @@ class StreamWrapperManagerTest extends KernelTestBase {
    * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
    */
   protected $streamWrapperManager;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * {@inheritdoc}

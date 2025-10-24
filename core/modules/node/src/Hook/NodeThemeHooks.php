@@ -15,6 +15,7 @@ use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Drupal\node\Form\NodePreviewForm;
 use Drupal\node\NodeInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 
 /**
  * Theme hook implementations for the node module.
@@ -25,7 +26,8 @@ class NodeThemeHooks {
     protected readonly RouteMatchInterface $routeMatch,
     protected readonly RendererInterface $renderer,
     protected readonly EntityTypeManagerInterface $entityTypeManager,
-    protected readonly FormBuilderInterface $formBuilder,
+    #[AutowireServiceClosure('form_builder')]
+    protected readonly \Closure $formBuilderClosure,
   ) {
 
   }
@@ -228,7 +230,7 @@ class NodeThemeHooks {
       foreach ($variables['content'] as $type) {
         $variables['types'][$type->id()] = [
           'type' => $type->id(),
-          'add_link' => Link::fromTextAndUrl($type->label(), Url::fromRoute('node.add', ['node_type' => $type->id()]))->toString(),
+          'add_link' => Link::fromTextAndUrl($type->label(), Url::fromRoute('entity.node.add_form', ['node_type' => $type->id()]))->toString(),
           'description' => [
             '#markup' => $type->getDescription(),
           ],
@@ -272,6 +274,8 @@ class NodeThemeHooks {
   public function pageTop(array &$page_top): void {
     // Add 'Back to content editing' link on preview page.
     if ($this->routeMatch->getRouteName() == 'entity.node.preview') {
+      $form_builder = ($this->formBuilderClosure)();
+      assert($form_builder instanceof FormBuilderInterface);
       $page_top['node_preview'] = [
         '#type' => 'container',
         '#attributes' => [
@@ -280,7 +284,7 @@ class NodeThemeHooks {
             'container-inline',
           ],
         ],
-        'view_mode' => $this->formBuilder->getForm(NodePreviewForm::class, $this->routeMatch->getParameter('node_preview')),
+        'view_mode' => $form_builder->getForm(NodePreviewForm::class, $this->routeMatch->getParameter('node_preview')),
       ];
     }
   }

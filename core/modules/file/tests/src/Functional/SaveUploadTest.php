@@ -11,12 +11,14 @@ use Drupal\file\Entity\File;
 use Drupal\file_test\FileTestHelper;
 use Drupal\Tests\TestFileCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cSpell:ignore TÉXT Pácê
 /**
  * Tests the file_save_upload() function.
  */
 #[Group('file')]
+#[RunTestsInSeparateProcesses]
 class SaveUploadTest extends FileManagedTestBase {
 
   use TestFileCreationTrait {
@@ -162,7 +164,7 @@ class SaveUploadTest extends FileManagedTestBase {
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains("You WIN!");
-    $this->assertFileExists('temporary://' . $dir . '/' . trim(\Drupal::service('file_system')->basename($image3_realpath)));
+    $this->assertFileExists('temporary://' . $dir . '/' . trim(basename($image3_realpath)));
   }
 
   /**
