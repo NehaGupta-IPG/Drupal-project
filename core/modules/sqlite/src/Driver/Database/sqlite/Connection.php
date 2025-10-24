@@ -195,11 +195,11 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
           $count = $this->query('SELECT COUNT(*) FROM ' . $prefix . '.sqlite_master WHERE type = :type AND name NOT LIKE :pattern', [':type' => 'table', ':pattern' => 'sqlite_%'])->fetchField();
 
           // We can prune the database file if it doesn't have any tables.
-          if ($count == 0 && $this->connectionOptions['database'] != ':memory:' && file_exists($this->connectionOptions['database'] . '-' . $prefix)) {
+          if ($count == 0 && $this->connectionOptions->database != ':memory:' && file_exists($this->connectionOptions->database . '-' . $prefix)) {
             // Detach the database.
             $this->query('DETACH DATABASE :schema', [':schema' => $prefix]);
             // Destroy the database file.
-            unlink($this->connectionOptions['database'] . '-' . $prefix);
+            unlink($this->connectionOptions->database . '-' . $prefix);
           }
         }
         catch (\Exception) {

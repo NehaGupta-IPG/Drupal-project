@@ -87,8 +87,11 @@ abstract class Connection {
 
   /**
    * The connection information for this connection object.
+   *
+   * @todo remove the array type once all drivers have moved to OO
+   *   ConnectionParameters.
    */
-  protected ConnectionParametersInterface $connectionOptions;
+  protected ConnectionParametersInterface|array $connectionOptions;
 
   /**
    * The schema object for this connection.
