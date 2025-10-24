@@ -4,6 +4,13 @@
  */
 
 .ui-dialog {
+  & .ui-dialog-titlebar {
+    padding: 0.4em;
+  }
+  & .ui-dialog-title {
+    white-space: normal;
+    text-overflow: initial;
+  }
   & .ui-dialog-buttonpane {
     padding-inline-start: 0.2em;
     padding-inline-end: 0.2em;

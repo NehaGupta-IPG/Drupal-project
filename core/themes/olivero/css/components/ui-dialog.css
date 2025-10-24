@@ -10,6 +10,15 @@
  * Styles for jQuery UI dialog.
  */
 
+.ui-dialog .ui-dialog-titlebar {
+  padding: 0.4em;
+}
+
+.ui-dialog .ui-dialog-title {
+  white-space: normal;
+  text-overflow: initial;
+}
+
 .ui-dialog .ui-dialog-buttonpane {
   padding-inline-start: 0.2em;
   padding-inline-end: 0.2em;
