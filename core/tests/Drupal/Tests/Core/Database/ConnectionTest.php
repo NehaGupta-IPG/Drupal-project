@@ -137,7 +137,7 @@ class ConnectionTest extends UnitTestCase {
       ],
       [
         'Drupal\Tests\Core\Database\Stub\Select',
-        NULL,
+        '',
         'Select',
       ],
       // Tests with the CoreFake database driver. This driver has no custom

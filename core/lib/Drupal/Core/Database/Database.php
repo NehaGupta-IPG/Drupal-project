@@ -689,6 +689,7 @@ abstract class Database {
       'driver' => 'und',
       'namespace' => '',
       'autoload' => '',
+      'database' => 'und',
     ], $connection_options);
 
     $class = $connection_options['namespace'] . '\\ConnectionParameters';
