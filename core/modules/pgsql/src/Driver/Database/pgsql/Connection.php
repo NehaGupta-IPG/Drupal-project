@@ -111,7 +111,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     $this->connection->exec("SET NAMES 'UTF8'");
 
     // Execute PostgreSQL init_commands.
-    if (!empty($connection_options['init_commands'])) {
+    if (isset($connection_options['init_commands'])) {
       $this->connection->exec(implode('; ', $connection_options['init_commands']));
     }
   }

@@ -24,8 +24,8 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
     public readonly ?string $host = NULL,
     #[\SensitiveParameter]
     public readonly ?int $port = NULL,
-    public readonly array $dependencies = [],
-    public readonly array $init_commands = [],
+    public readonly ?array $dependencies = NULL,
+    public readonly ?array $init_commands = NULL,
   ) {
   }
 

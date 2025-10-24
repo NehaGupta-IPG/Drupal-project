@@ -717,8 +717,8 @@ abstract class Database {
             $options['password'] ?? NULL,
             $options['host'] ?? NULL,
             $options['port'] ?? NULL,
-            $options['dependencies'] ?? [],
-            $options['init_commands'] ?? [],
+            $options['dependencies'] ?? NULL,
+            $options['init_commands'] ?? NULL,
           );
           $this->optionsBackfill = array_merge($options, get_object_vars($this));
         }

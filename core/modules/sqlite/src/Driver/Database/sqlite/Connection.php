@@ -172,7 +172,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     }
 
     // Execute sqlite init_commands.
-    if (!empty($connection_options->init_commands)) {
+    if (isset($connection_options->init_commands)) {
       $sqlite->exec(implode('; ', $connection_options->init_commands));
     }
 
