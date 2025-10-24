@@ -567,7 +567,6 @@ default:
   stage: 🪄 Lint
   variables:
     KUBERNETES_CPU_REQUEST: "2"
-  # Run on push, or on MRs if CSS files have changed, or manually.
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -580,13 +579,12 @@ default:
     - when: manual
       allow_failure: true
   script:
-    - *prepare-lint-directory
-    - *stylelint-cache
     - corepack enable
     - cd core
     - yarn install
+    - npx update-browserslist-db@latest || true
     - yarn run build:css --check
-    - yarn run lint:css --cache --cache-location .stylelintcache --cache-strategy content --color  --custom-formatter=@gitlab-formatters/stylelint-formatter-gitlab --output-file=$CI_PROJECT_DIR/gl-codequality.json
+    - yarn run lint:css --cache --cache-location .stylelintcache --cache-strategy content --color --custom-formatter=@gitlab-formatters/stylelint-formatter-gitlab --output-file=$CI_PROJECT_DIR/gl-codequality.json
   artifacts:
     reports:
       codequality: gl-codequality.json

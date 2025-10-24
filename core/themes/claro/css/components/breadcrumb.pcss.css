@@ -25,24 +25,31 @@
   line-height: 1.5rem;
 }
 
+.breadcrumb__item + .breadcrumb__item {
+  position: relative;
+  padding-left: 1rem;
+}
+
 .breadcrumb__item + .breadcrumb__item::before {
-  display: inline-block;
-  padding: 0 0.75rem;
-  content: url(../../images/icons/currentColor/arrow-breadcrumb.svg);
+  position: absolute;
+  top: 50%;
+  left: 0.3rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  content: "";
+  transform: translateY(-50%);
+  vertical-align: middle;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 8'%3e%3cpath fill='currentColor' d='m1.2.6-.7.8L3.1 4 .5 6.6l.7.8L4.6 4z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-size: contain;
 
   [dir="rtl"] & {
-    transform: scaleX(-1);
+    transform: rotate(-45deg);
   }
 
   @media (forced-colors: active) {
-    width: 5px; /* Width and height of the SVG. */
-    height: 8px;
-    content: "";
-    background-color: canvastext;
-    mask-image: url(../../images/icons/currentColor/arrow-breadcrumb.svg);
-    mask-size: contain;
-    mask-repeat: no-repeat;
-    mask-position: center;
+    border-block-start-color: CanvasText;
+    border-inline-end-color: CanvasText;
   }
 }
 
