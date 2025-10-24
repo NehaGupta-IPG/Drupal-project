@@ -101,7 +101,7 @@ class ContextualUnitTest extends KernelTestBase {
       'node:node=14031991:langcode=en&admin_langcode=en|foo:0=bar&key=baz&1=qux:langcode=en&admin_langcode=en|edge:0=20011988:langcode=en&admin_langcode=en',
       'claro',
     ];
-    $tests['one group, one dynamic path argument, no metadata, no admin_langcode'] = [
+    $tests['no admin_langcode, one group, one dynamic path argument, no metadata'] = [
       [
         'node' => [
           'route_parameters' => [
@@ -110,7 +110,7 @@ class ContextualUnitTest extends KernelTestBase {
           'metadata' => ['langcode' => 'en'],
         ],
       ],
-      'node:node=14031991:langcode=en',
+      'node:node=14031991:langcode=en&admin_langcode=en',
       'olivero',
     ];
 
