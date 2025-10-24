@@ -53,9 +53,9 @@ class SearchBlock extends BlockBase implements ContainerFactoryPluginInterface {
     // Drupal 12 using property hooks, but until then, provide backwards
     // compatibility for the properties for any subclasses by invoking the
     // respective closures.
-    $closure = $name . 'Closure';
-    if (property_exists($this, $closure)) {
-      return ($this->$closure)();
+    $closureName = $name . 'Closure';
+    if (property_exists($this, $closureName)) {
+      return ($this->$closureName)();
     }
 
     return NULL;
