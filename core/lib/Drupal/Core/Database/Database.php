@@ -619,8 +619,14 @@ abstract class Database {
    *
    * @throws \RuntimeException
    *   When the database connection is not defined.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   *   Database::getConnectionInfo()['default']->asUrl() instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   public static function getConnectionInfoAsUrl(string $key = 'default'): string {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use Database::getConnectionInfo()[\'default\']->asUrl() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     $db_info = static::getConnectionInfo($key);
     if (empty($db_info) || empty($db_info['default'])) {
       throw new \RuntimeException("Database connection $key not defined or missing the 'default' settings");

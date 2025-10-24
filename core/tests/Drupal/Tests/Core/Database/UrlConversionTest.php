@@ -334,10 +334,20 @@ class UrlConversionTest extends UnitTestCase {
    * @legacy-covers ::getConnectionInfoAsUrl
    */
   #[DataProvider('providerGetConnectionInfoAsUrl')]
+  #[IgnoreDeprecations]
   public function testGetConnectionInfoAsUrl(array $info, $expected_url): void {
     Database::addConnectionInfo('default', 'default', $info);
     $url = Database::getConnectionInfoAsUrl();
     $this->assertEquals($expected_url, $url);
+  }
+
+  /**
+   * Tests ConnectionParameters::asUrl() to get connection info as a URL.
+   */
+  #[DataProvider('providerGetConnectionInfoAsUrl')]
+  public function testConnectionParametersAsUrl(array $info, string $expectedUrl): void {
+    Database::addConnectionInfo('default', 'default', $info);
+    $this->assertEquals($expectedUrl, Database::getConnectionInfo()['default']->asUrl());
   }
 
   /**

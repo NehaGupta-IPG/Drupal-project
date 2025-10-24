@@ -1398,8 +1398,14 @@ abstract class Connection {
    *   \Drupal\Core\Database\Database::getConnectionInfoAsUrl().
    *
    * @see \Drupal\Core\Database\Database::getConnectionInfoAsUrl()
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   *   ConnectionParameters::asUrl() instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   public static function createUrlFromConnectionOptions(array $connection_options) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ConnectionParameters::asUrl() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     return Database::getConnectionParametersFromOptionsArray($connection_options)->asUrl();
   }
 

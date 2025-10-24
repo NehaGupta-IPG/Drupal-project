@@ -144,7 +144,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     // Setup an environment variable containing the database connection if
     // available, so that non-unit tests can connect to the database.
     try {
-      $process_environment_variables['SIMPLETEST_DB'] = Database::getConnectionInfoAsUrl();
+      $process_environment_variables['SIMPLETEST_DB'] = Database::getConnectionInfo()['default']->asUrl();
     }
     catch (\RuntimeException) {
       // Just continue with no variable set.
