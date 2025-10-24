@@ -717,7 +717,6 @@ abstract class Database {
           $options['host'] ?? NULL,
           $options['port'] ?? NULL,
           $options['dependencies'] ?? NULL,
-          $options['init_commands'] ?? NULL,
         );
         $this->optionsBackfill = array_merge($options, get_object_vars($this));
       }
@@ -732,7 +731,7 @@ abstract class Database {
       /**
        * {@inheritdoc}
        */
-      public function &getParameters(): array {
+      public function getParameters(): array {
         return $this->optionsBackfill;
       }
 

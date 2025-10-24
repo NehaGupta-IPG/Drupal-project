@@ -23,7 +23,7 @@ class ConnectionParameters extends ConnectionParametersBase {
     ?string $host = NULL,
     ?int $port = NULL,
     ?array $dependencies = NULL,
-    ?array $init_commands = NULL,
+    public readonly array $init_commands = [],
     public readonly array $pdo = [],
   ) {
     parent::__construct($driver, $namespace, $autoload, $database, $prefix, $module, $username, $password, $host, $port, $dependencies, $init_commands);
