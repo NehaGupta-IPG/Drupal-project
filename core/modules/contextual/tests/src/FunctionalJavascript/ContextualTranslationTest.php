@@ -9,12 +9,12 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\locale\StringStorageInterface;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests contextual link translation.
- *
- * @group contextual
  */
+#[Group('contextual')]
 class ContextualTranslationTest extends WebDriverTestBase {
 
   use ContextualLinkClickTrait;

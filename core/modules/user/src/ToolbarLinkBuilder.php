@@ -29,7 +29,7 @@ class ToolbarLinkBuilder implements TrustedCallbackInterface {
     protected ?ModuleHandlerInterface $moduleHandler = NULL,
   ) {
     if ($this->moduleHandler === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $moduleHandler argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3455774', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $moduleHandler argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3455774', E_USER_DEPRECATED);
       $this->moduleHandler = \Drupal::service('module_handler');
     }
   }
