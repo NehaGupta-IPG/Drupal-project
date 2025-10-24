@@ -31,13 +31,6 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   /**
    * {@inheritdoc}
    */
-  public static function createFromOptionsArray(array $options): static {
-    return new static(...$options);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getParameters(): static|array {
     return $this;
   }

@@ -724,13 +724,6 @@ abstract class Database {
       /**
        * {@inheritdoc}
        */
-      public static function createFromOptionsArray(array $options): static {
-        return new static($options);
-      }
-
-      /**
-       * {@inheritdoc}
-       */
       public function getParameters(): array {
         return $this->optionsBackfill;
       }

@@ -98,11 +98,10 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
     }
     $connection_info = Database::getConnectionInfo('default');
     foreach ($connection_info as $target => $value) {
-      $class = get_class($value);
-      $parameters = $value->toArray();
+      $options = $value->toArray();
       // Tests use 7 character prefixes at most so this can't cause collisions.
-      $parameters['prefix'] = $value->prefix . '0';
-      $connection_info[$target] = $class::createFromOptionsArray($parameters);
+      $options['prefix'] = $value->prefix . '0';
+      $connection_info[$target] = Database::getConnectionParametersFromOptionsArray($options);
     }
     Database::addConnectionInfo('migrate', 'default', $connection_info['default']);
   }

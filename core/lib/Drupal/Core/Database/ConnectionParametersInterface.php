@@ -10,17 +10,6 @@ namespace Drupal\Core\Database;
 interface ConnectionParametersInterface {
 
   /**
-   * Returns a new instance of connection parameters.
-   *
-   * @param array<string, mixed> $options
-   *   An array of connection options.
-   *
-   * @return static
-   *   A new instance of connection parameters.
-   */
-  public static function createFromOptionsArray(array $options): static;
-
-  /**
    * Returns the parameters.
    *
    * For BC reasons, we may need to return the parameters as an array and

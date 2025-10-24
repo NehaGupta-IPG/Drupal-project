@@ -139,11 +139,10 @@ class MigrationPluginListTest extends KernelTestBase {
     }
     $connection_info = Database::getConnectionInfo('default');
     foreach ($connection_info as $target => $value) {
-      $class = get_class($value);
       $options = $value->toArray();
       // Tests use 7 character prefixes at most so this can't cause collisions.
       $options['prefix'] = $value->prefix . '0';
-      $connection_info[$target] = $class::createFromOptionsArray($options);
+      $connection_info[$target] = Database::getConnectionParametersFromOptionsArray($options);
     }
     Database::addConnectionInfo('migrate', 'default', $connection_info['default']);
 

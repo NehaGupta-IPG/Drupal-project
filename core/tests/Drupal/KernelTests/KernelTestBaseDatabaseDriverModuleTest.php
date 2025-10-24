@@ -48,12 +48,11 @@ class KernelTestBaseDatabaseDriverModuleTest extends KernelTestBase {
     if (!empty($connection_info)) {
       Database::renameConnection('default', 'simpletest_original_default');
       foreach ($connection_info as $target => $value) {
-        $class = get_class($value);
         $options = $value->toArray();
         // Replace the table prefix definition to ensure that no table of the
         // test runner leak into the test.
         $options['prefix'] = $this->databasePrefix ?? '';
-        $connection_info[$target] = $class::createFromOptionsArray($options);
+        $connection_info[$target] = Database::getConnectionParametersFromOptionsArray($options);
       }
     }
     return $connection_info;
