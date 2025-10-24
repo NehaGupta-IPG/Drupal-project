@@ -488,23 +488,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function createUrlFromConnectionOptions(array $connection_options) {
-    if (!isset($connection_options['driver'], $connection_options['database'])) {
-      throw new \InvalidArgumentException("As a minimum, the connection options array must contain at least the 'driver' and 'database' keys");
-    }
-
-    $db_url = 'sqlite://localhost/' . $connection_options['database'] . '?module=sqlite';
-
-    if (isset($connection_options['prefix']) && $connection_options['prefix'] !== '') {
-      $db_url .= '#' . $connection_options['prefix'];
-    }
-
-    return $db_url;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function exceptionHandler() {
     return new ExceptionHandler();
   }

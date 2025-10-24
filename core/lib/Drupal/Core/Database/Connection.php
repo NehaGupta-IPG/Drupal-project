@@ -1400,39 +1400,7 @@ abstract class Connection {
    * @see \Drupal\Core\Database\Database::getConnectionInfoAsUrl()
    */
   public static function createUrlFromConnectionOptions(array $connection_options) {
-    if (!isset($connection_options['driver'], $connection_options['database'])) {
-      throw new \InvalidArgumentException("As a minimum, the connection options array must contain at least the 'driver' and 'database' keys");
-    }
-
-    $user = '';
-    if (isset($connection_options['username'])) {
-      $user = $connection_options['username'];
-      if (isset($connection_options['password'])) {
-        $user .= ':' . $connection_options['password'];
-      }
-      $user .= '@';
-    }
-
-    $host = empty($connection_options['host']) ? 'localhost' : $connection_options['host'];
-
-    $db_url = $connection_options['driver'] . '://' . $user . $host;
-
-    if (isset($connection_options['port'])) {
-      $db_url .= ':' . $connection_options['port'];
-    }
-
-    $db_url .= '/' . $connection_options['database'];
-
-    // Add the module when the driver is provided by a module.
-    if (isset($connection_options['module'])) {
-      $db_url .= '?module=' . $connection_options['module'];
-    }
-
-    if (isset($connection_options['prefix']) && $connection_options['prefix'] !== '') {
-      $db_url .= '#' . $connection_options['prefix'];
-    }
-
-    return $db_url;
+    return Database::getConnectionParametersFromOptionsArray($connection_options)->asUrl();
   }
 
   /**

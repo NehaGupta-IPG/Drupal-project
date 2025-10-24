@@ -625,17 +625,7 @@ abstract class Database {
     if (empty($db_info) || empty($db_info['default'])) {
       throw new \RuntimeException("Database connection $key not defined or missing the 'default' settings");
     }
-    $parameters = $db_info['default']->toArray();
-
-    // Add the module name to the connection options to make it easy for the
-    // connection class's createUrlFromConnectionOptions() method to add it to
-    // the URL.
-    $namespace = $parameters['namespace'];
-    $parameters['module'] = explode('\\', $namespace)[1];
-    $connection_class = $namespace . '\\Connection';
-    $url = $connection_class::createUrlFromConnectionOptions($parameters);
-    assert(is_string($url));
-    return $url;
+    return $db_info['default']->asUrl();
   }
 
   /**

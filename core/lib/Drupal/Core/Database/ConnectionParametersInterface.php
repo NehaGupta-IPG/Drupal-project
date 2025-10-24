@@ -37,6 +37,14 @@ interface ConnectionParametersInterface {
   public function toArray(): array;
 
   /**
+   * Returns the connection parameters as a URL.
+   *
+   * @return string
+   *   The connection parameters as as a URL.
+   */
+  public function asUrl(): string;
+
+  /**
    * Processes an array of connection options for driver specific defaults.
    *
    * This is used internally by the database layer, should not be called

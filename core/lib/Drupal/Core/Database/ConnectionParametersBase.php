@@ -52,6 +52,40 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   /**
    * {@inheritdoc}
    */
+  public function asUrl(): string {
+    $user = '';
+    if (isset($this->username)) {
+      $user = $this->username;
+      if (isset($this->password)) {
+        $user .= ':' . $this->password;
+      }
+      $user .= '@';
+    }
+
+    $host = empty($this->host) ? 'localhost' : $this->host;
+
+    $url = $this->driver . '://' . $user . $host;
+
+    if (isset($this->port)) {
+      $url .= ':' . $this->port;
+    }
+
+    $url .= '/' . $this->database;
+
+    // Add the module.
+    $module = $this->module ?? explode('\\', $this->namespace)[1];
+    $url .= '?module=' . $module;
+
+    if ($this->prefix !== '') {
+      $url .= '#' . $this->prefix;
+    }
+
+    return $url;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function processOptionsArray(array $options): array {
     return $options;
   }
