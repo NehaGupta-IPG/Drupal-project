@@ -76,23 +76,24 @@ abstract class TextItemBase extends FieldItemBase {
    * {@inheritdoc}
    */
   public static function onDependencyRemoval(FieldDefinitionInterface $field_definition, array $dependencies) {
-    if ((parent::onDependencyRemoval($field_definition, $dependencies))) {
-      return TRUE;
-    }
+    $changed = parent::onDependencyRemoval($field_definition, $dependencies);
 
     if (!($field_definition instanceof FieldConfigInterface) || !isset($dependencies['config'])) {
-      return FALSE;
+      return $changed;
     }
 
-    $changed = FALSE;
     foreach ($dependencies['config'] as $config) {
       // Remove deleted filter formats from allowed_formats so that the field
       // configuration entity is not deleted.
       if ($config instanceof FilterFormatInterface) {
         $settings = $field_definition->getSettings();
-        $settings['allowed_formats'] = array_diff($settings['allowed_formats'] ?? [], [$config->id()]);
-        $field_definition->set('settings', $settings);
-        $changed = TRUE;
+        $allowed_formats = $settings['allowed_formats'] ?? [];
+        $updated_allowed_formats = array_diff($allowed_formats, [$config->id()]);
+        if ($updated_allowed_formats !== $allowed_formats) {
+          $settings['allowed_formats'] = $updated_allowed_formats;
+          $field_definition->set('settings', $settings);
+          $changed = TRUE;
+        }
       }
     }
 
