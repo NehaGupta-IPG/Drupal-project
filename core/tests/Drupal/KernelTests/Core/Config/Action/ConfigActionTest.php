@@ -451,9 +451,9 @@ class ConfigActionTest extends KernelTestBase {
   /**
    * Test if simpleConfigArray works with multiple invocations (diff property).
    */
-  #[TestWith(["append", [["property" => "array", "values" => ["one", "three"]], ["property" => "other_array", "values" => ["four", "six"]]], ["itemA", "itemB", "one", "three"], ["itemX", "itemY", "four", "six"]])]
-  #[TestWith(["prepend", [["property" => "array", "values" => ["undo", "redo"]], ["property" => "other_array", "values" => ["bold", "italic"]]], ["undo", "redo", "itemA", "itemB"], ["bold", "italic", "itemX", "itemY"]])]
-  #[TestWith(["splice", [["property" => "array", "offset" => 1, "length" => 1, "replacement" => ["itemC"]], ["property" => "other_array", "offset" => 2, "length" => NULL, "replacement" => ["itemD", "itemE"]]], ["itemA", "itemC"], ["itemX", "itemY", "itemD", "itemE"]])]
+  #[TestWith(["append", ["property" => "array", "values" => ["one", "three"]], ["property" => "other_array", "values" => ["four", "six"]], ["itemA", "itemB", "one", "three"], ["itemX", "itemY", "four", "six"]])]
+  #[TestWith(["prepend", ["property" => "array", "values" => ["undo", "redo"]], ["property" => "other_array", "values" => ["bold", "italic"]], ["undo", "redo", "itemA", "itemB"], ["bold", "italic", "itemX", "itemY"]])]
+  #[TestWith(["splice", ["property" => "array", "offset" => 1, "length" => 1, "replacement" => ["itemC"]], ["property" => "other_array", "offset" => 2, "length" => NULL, "replacement" => ["itemD", "itemE"]], ["itemA", "itemC"], ["itemX", "itemY", "itemD", "itemE"]])]
   public function testSimpleConfigArrayMultipleInvocationsOfDifferentProperty(string $derivative_id, array $array_values, array $other_array_values, array $expected_array_value, array $expected_other_array_value): void {
     $this->installConfig('config_test');
 
