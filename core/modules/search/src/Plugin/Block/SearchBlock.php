@@ -16,6 +16,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a 'Search form' block.
+ *
+ * @property \Drupal\Core\Form\FormBuilderInterface $formBuilder
+ * @property \Drupal\search\SearchPageRepositoryInterface $searchPageRepository
  */
 #[Block(
   id: "search_form_block",
@@ -24,16 +27,38 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 )]
 class SearchBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
-  public function __construct(array $configuration, string $plugin_id, array|object $plugin_definition, protected \Closure|FormBuilderInterface $formBuilder, protected \Closure|SearchPageRepositoryInterface $searchPageRepository) {
+  public function __construct(
+    array $configuration,
+    string $plugin_id,
+    array|object $plugin_definition,
+    protected \Closure|FormBuilderInterface $formBuilderClosure,
+    protected \Closure|SearchPageRepositoryInterface $searchPageRepositoryClosure,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    if ($formBuilder instanceof FormBuilderInterface) {
-      @trigger_error('Passing a FormBuilderInterface object as the form builder argument in ' . __METHOD__ . 'is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. Pass a closure that returns the form builder instead. See https://www.drupal.org/node/3553889', E_USER_DEPRECATED);
-      $this->formBuilder = static fn(): FormBuilderInterface => \Drupal::service('form_builder');
+    if ($formBuilderClosure instanceof FormBuilderInterface) {
+      @trigger_error('Passing a FormBuilderInterface object as the form builder argument in ' . __METHOD__ . 'is deprecated in drupal:11.3.0 and will not be supported in drupal:12.0.0. Pass a closure that returns the form builder instead. See https://www.drupal.org/node/3553889', E_USER_DEPRECATED);
+      $this->formBuilderClosure = static fn(): FormBuilderInterface => \Drupal::service('form_builder');
     }
-    if ($searchPageRepository instanceof SearchPageRepositoryInterface) {
-      @trigger_error('Passing a SearchPageRepositoryInterface object as the search page repository argument in ' . __METHOD__ . 'is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. Pass a closure that returns the search page repository instead. See https://www.drupal.org/node/3553889', E_USER_DEPRECATED);
-      $this->searchPageRepository = static fn(): SearchPageRepositoryInterface => \Drupal::service('search.search_page_repository');
+    if ($searchPageRepositoryClosure instanceof SearchPageRepositoryInterface) {
+      @trigger_error('Passing a SearchPageRepositoryInterface object as the search page repository argument in ' . __METHOD__ . 'is deprecated in drupal:11.3.0 and will not be supported in drupal:12.0.0. Pass a closure that returns the search page repository instead. See https://www.drupal.org/node/3553889', E_USER_DEPRECATED);
+      $this->searchPageRepositoryClosure = static fn(): SearchPageRepositoryInterface => \Drupal::service('search.search_page_repository');
     }
+  }
+
+  /**
+   * Maintains backwards compatibility to service properties.
+   */
+  public function __get(string $name): mixed {
+    // The $formBuilder and $searchPageRepository properties will be restored in
+    // Drupal 12 using property hooks, but until then, provide backwards
+    // compatibility for the properties for any subclasses by invoking the
+    // respective closures.
+    $closure = $name . 'Closure';
+    if (property_exists($this, $closure)) {
+      return ($this->$closure)();
+    }
+
+    return NULL;
   }
 
   /**
@@ -58,7 +83,7 @@ class SearchBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public function build() {
     $page = $this->configuration['page_id'] ?? NULL;
-    return ($this->formBuilder)()->getForm(SearchBlockForm::class, $page);
+    return $this->formBuilder->getForm(SearchBlockForm::class, $page);
   }
 
   /**
@@ -77,9 +102,8 @@ class SearchBlock extends BlockBase implements ContainerFactoryPluginInterface {
     // The configuration for this block is which search page to connect the
     // form to. Options are all configured/active search pages.
     $options = [];
-    $searchRepository = ($this->searchPageRepository)();
-    $active_search_pages = $searchRepository->getActiveSearchPages();
-    foreach ($searchRepository->sortSearchPages($active_search_pages) as $entity_id => $entity) {
+    $active_search_pages = $this->searchPageRepository->getActiveSearchPages();
+    foreach ($this->searchPageRepository->sortSearchPages($active_search_pages) as $entity_id => $entity) {
       $options[$entity_id] = $entity->label();
     }
 
