@@ -271,7 +271,7 @@ abstract class Database {
       }
     }
 
-    return self::getConnectionParametersFromArray($options);
+    return self::getConnectionParametersFromOptionsArray($options);
   }
 
   /**
@@ -590,7 +590,7 @@ abstract class Database {
       $options['dependencies'] = $autoloadInfo['dependencies'];
     }
 
-    return self::getConnectionParametersFromArray($options);
+    return self::getConnectionParametersFromOptionsArray($options);
   }
 
   /**
@@ -684,12 +684,10 @@ abstract class Database {
    * @return ConnectionParametersInterface
    *   A ConnectionParameters object.
    */
-  final public static function getConnectionParametersFromArray(array $connection_options): ConnectionParametersInterface {
+  final public static function getConnectionParametersFromOptionsArray(array $connection_options): ConnectionParametersInterface {
     $connection_options = array_merge([
-      'driver' => 'und',
       'namespace' => '',
       'autoload' => '',
-      'database' => 'und',
     ], $connection_options);
 
     $class = $connection_options['namespace'] . '\\ConnectionParameters';

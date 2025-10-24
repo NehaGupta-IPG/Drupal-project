@@ -182,7 +182,7 @@ abstract class Connection {
     assert(count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
 
     if (is_array($connection_options)) {
-      $connection_options = Database::getConnectionParametersFromArray($connection_options);
+      $connection_options = Database::getConnectionParametersFromOptionsArray($connection_options);
     }
 
     // Manage the table prefix.
