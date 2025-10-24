@@ -111,7 +111,6 @@ class TextItemBaseTest extends KernelTestBase {
   /**
    * Tests onDependencyRemoval method when a filter format is deleted.
    */
-  
   public function testOnDependencyRemoval(): void {
     $this->installEntitySchema('user');
     $this->installEntitySchema('entity_test');
