@@ -732,7 +732,7 @@ abstract class Database {
       /**
        * {@inheritdoc}
        */
-      public function getParameters(): array {
+      public function &getParameters(): array {
         return $this->optionsBackfill;
       }
 
