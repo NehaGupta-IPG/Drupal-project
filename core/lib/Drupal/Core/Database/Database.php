@@ -271,12 +271,7 @@ abstract class Database {
       }
     }
 
-    $parameters_class = $options['namespace'] . '\\ConnectionParameters';
-    if (class_exists($parameters_class)) {
-      $options = $parameters_class::processOptionsArray($options);
-    }
-
-    return self::getConnectionParametersFromArray($parameters_class, $options);
+    return self::getConnectionParametersFromArray($options);
   }
 
   /**
@@ -595,12 +590,7 @@ abstract class Database {
       $options['dependencies'] = $autoloadInfo['dependencies'];
     }
 
-    $parameters_class = $driverNamespace . '\\ConnectionParameters';
-    if (class_exists($parameters_class)) {
-      $options = $parameters_class::processOptionsArray($options);
-    }
-
-    return self::getConnectionParametersFromArray($parameters_class, $options);
+    return self::getConnectionParametersFromArray($options);
   }
 
   /**
@@ -688,93 +678,102 @@ abstract class Database {
   /**
    * Converts a connection options array to a ConnectionParameters object.
    *
-   * @param class-string|null $class
-   *   The PHP class managing the parameters.
    * @param array $connection_options
    *   An array of options for the connection.
    *
    * @return ConnectionParametersInterface
    *   A ConnectionParameters object.
    */
-  final public static function getConnectionParametersFromArray(?string $class, array $connection_options): ConnectionParametersInterface {
-    if (!$class || !class_exists($class)) {
-      return new class ($connection_options) extends ConnectionParametersBase {
+  final public static function getConnectionParametersFromArray(array $connection_options): ConnectionParametersInterface {
+    $connection_options = array_merge([
+      'driver' => 'und',
+      'namespace' => '',
+      'autoload' => '',
+      'database' => 'und',
+    ], $connection_options);
 
-        /**
-         * Backfill connection options.
-         */
-        private array $optionsBackfill;
+    $class = $connection_options['namespace'] . '\\ConnectionParameters';
 
-        public function __construct(array $options) {
-          parent::__construct(
-            $options['driver'] ?? 'und',
-            $options['namespace'] ?? 'und',
-            $options['autoload'] ?? 'und',
-            $options['database'] ?? 'und',
-            $options['prefix'] ?? '',
-            $options['module'] ?? NULL,
-            $options['username'] ?? NULL,
-            $options['password'] ?? NULL,
-            $options['host'] ?? NULL,
-            $options['port'] ?? NULL,
-            $options['dependencies'] ?? NULL,
-            $options['init_commands'] ?? NULL,
-          );
-          $this->optionsBackfill = array_merge($options, get_object_vars($this));
-        }
-
-        /**
-         * {@inheritdoc}
-         */
-        public static function createFromOptionsArray(array $options): static {
-          return new static($options);
-        }
-
-        /**
-         * {@inheritdoc}
-         */
-        public function getParameters(): array {
-          return $this->optionsBackfill;
-        }
-
-        /**
-         * {@inheritdoc}
-         */
-        public function toArray(): array {
-          return $this->optionsBackfill;
-        }
-
-        /**
-         * This is for BC support only.
-         */
-        public function offsetExists(mixed $offset): bool {
-          return array_key_exists($offset, $this->optionsBackfill);
-        }
-
-        /**
-         * This is for BC support only.
-         */
-        public function &offsetGet(mixed $offset): mixed {
-          return $this->optionsBackfill[$offset];
-        }
-
-        /**
-         * This is for BC support only.
-         */
-        public function offsetSet(mixed $offset, mixed $value): void {
-          $this->optionsBackfill[$offset] = $value;
-        }
-
-        /**
-         * This is for BC support only.
-         */
-        public function offsetUnset(mixed $offset): void {
-          unset($this->optionsBackfill[$offset]);
-        }
-
-      };
+    if (class_exists($class)) {
+      $connection_options = $parameters_class::processOptionsArray($connection_options);
+      return new $class(...$connection_options);
     }
-    return new $class(...$connection_options);
+
+    return new class ($connection_options) extends ConnectionParametersBase {
+
+      /**
+       * Backfill connection options.
+       */
+      private array $optionsBackfill;
+
+      public function __construct(array $options) {
+        parent::__construct(
+          $options['driver'],
+          $options['namespace'],
+          $options['autoload'],
+          $options['database'],
+          $options['prefix'] ?? '',
+          $options['module'] ?? NULL,
+          $options['username'] ?? NULL,
+          $options['password'] ?? NULL,
+          $options['host'] ?? NULL,
+          $options['port'] ?? NULL,
+          $options['dependencies'] ?? NULL,
+          $options['init_commands'] ?? NULL,
+        );
+        $this->optionsBackfill = array_merge($options, get_object_vars($this));
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public static function createFromOptionsArray(array $options): static {
+        return new static($options);
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public function getParameters(): array {
+        return $this->optionsBackfill;
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public function toArray(): array {
+        return $this->optionsBackfill;
+      }
+
+      /**
+       * This is for BC support only.
+       */
+      public function offsetExists(mixed $offset): bool {
+        return array_key_exists($offset, $this->optionsBackfill);
+      }
+
+      /**
+       * This is for BC support only.
+       */
+      public function &offsetGet(mixed $offset): mixed {
+        return $this->optionsBackfill[$offset];
+      }
+
+      /**
+       * This is for BC support only.
+       */
+      public function offsetSet(mixed $offset, mixed $value): void {
+        $this->optionsBackfill[$offset] = $value;
+      }
+
+      /**
+       * This is for BC support only.
+       */
+      public function offsetUnset(mixed $offset): void {
+        unset($this->optionsBackfill[$offset]);
+      }
+
+    };
   }
 
 }

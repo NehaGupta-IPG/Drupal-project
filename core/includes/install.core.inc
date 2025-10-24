@@ -1195,23 +1195,23 @@ function install_verify_database_ready(): void {
  */
 function install_database_errors(ConnectionParametersInterface|array $database, $settings_file) {
   $errors = [];
-  $connection_options = is_array($database) ? $database : $database->toArray();
+  $database = is_array($database) ? $database : $database->toArray();
 
   try {
-    $driverExtension = Database::getDriverList()->get($connection_options['namespace']);
+    $driverExtension = Database::getDriverList()->get($database['namespace']);
     // Run driver specific validation.
-    $errors = $driverExtension->getInstallTasks()->validateDatabaseSettings($connection_options);
+    $errors = $driverExtension->getInstallTasks()->validateDatabaseSettings($database);
     if (!empty($errors)) {
       // No point to try further.
       return $errors;
     }
     // Run tasks associated with the database type. Any errors are caught in the
     // calling function.
-    Database::addConnectionInfo('default', 'default', $connection_options);
+    Database::addConnectionInfo('default', 'default', $database);
     $errors = $driverExtension->getInstallTasks()->runTasks();
   }
   catch (UnknownExtensionException) {
-    $errors['driver'] = t("In your %settings_file file you have configured @drupal to use a %driver server, however your PHP installation currently does not support this database type.", ['%settings_file' => $settings_file, '@drupal' => drupal_install_profile_distribution_name(), '%driver' => $connection_options['driver']]);
+    $errors['driver'] = t("In your %settings_file file you have configured @drupal to use a %driver server, however your PHP installation currently does not support this database type.", ['%settings_file' => $settings_file, '@drupal' => drupal_install_profile_distribution_name(), '%driver' => $database['driver']]);
   }
   return $errors;
 }
