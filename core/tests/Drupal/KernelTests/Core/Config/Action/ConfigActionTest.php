@@ -15,6 +15,7 @@ use Drupal\KernelTests\KernelTestBase;
 // cspell:ignore inflector
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests the config action system.
@@ -292,11 +293,10 @@ class ConfigActionTest extends KernelTestBase {
 
   /**
    * Tests that the simpleConfigArray actions cannot be used on config entities.
-   *
-   * @testWith ["append"]
-   *   ["prepend"]
-   *   ["splice"]
    */
+  #[TestWith(["append"])]
+  #[TestWith(["prepend"])]
+  #[TestWith(["splice"])]
   public function testSimpleConfigArrayFailsOnEntities(string $derivative_id): void {
     $this->installConfig('config_test');
 
@@ -311,11 +311,10 @@ class ConfigActionTest extends KernelTestBase {
 
   /**
    * Tests that the simpleConfigArray actions fail on non-existent config.
-   *
-   * @testWith ["append"]
-   *    ["prepend"]
-   *    ["splice"]
    */
+  #[TestWith(["append"])]
+  #[TestWith(["prepend"])]
+  #[TestWith(["splice"])]
   public function testSimpleConfigArrayFailsOnNewConfig(string $derivative_id): void {
     $this->expectException(ConfigActionException::class);
     $this->expectExceptionMessage("Config block.block.anything cannot be updated because it does not exist.");
@@ -328,14 +327,13 @@ class ConfigActionTest extends KernelTestBase {
 
   /**
    * Tests that the simpleConfigArray actions require a property path.
-   *
-   * @testWith ["append", null]
-   *   ["append", ""]
-   *   ["prepend", null]
-   *   ["prepend", ""]
-   *   ["splice", null]
-   *   ["splice", ""]
    */
+  #[TestWith(["append", NULL])]
+  #[TestWith(["append", ""])]
+  #[TestWith(["prepend", NULL])]
+  #[TestWith(["prepend", ""])]
+  #[TestWith(["splice", NULL])]
+  #[TestWith(["splice", ""])]
   public function testSimpleConfigArrayFailsOnEmptyOrMissingPropertyPath(string $derivative_id, ?string $property_path): void {
     $this->installConfig('config_test');
 
@@ -355,10 +353,9 @@ class ConfigActionTest extends KernelTestBase {
 
   /**
    * Tests that simpleConfigArray append and prepend require an array of values.
-   *
-   * @testWith ["append", null]
-   *   ["prepend", null]
    */
+  #[TestWith(["append", NULL])]
+  #[TestWith(["prepend", NULL])]
   public function testSimpleConfigArrayPrependAndAppendRequireArrayOfValues(string $derivative_id, mixed $values): void {
     $this->installConfig('config_test');
 
@@ -376,11 +373,10 @@ class ConfigActionTest extends KernelTestBase {
 
   /**
    * Tests that the simpleConfigArray actions fail on non-array properties.
-   *
-   * @testWith ["append", {"values": [1, 2, 3]}]
-   *   ["prepend", {"values": [1, 2, 3]}]
-   *   ["splice", {"offset": 0}]
    */
+  #[TestWith(["append", ["values" => [1, 2, 3]]])]
+  #[TestWith(["prepend", ["values" => [1, 2, 3]]])]
+  #[TestWith(["splice", ["offset" => 0]])]
   public function testSimpleConfigArrayOnlyWorksOnArrays(string $derivative_id, array $value): void {
     $this->installConfig('config_test');
 
@@ -394,13 +390,14 @@ class ConfigActionTest extends KernelTestBase {
   }
 
   /**
-   * @testWith ["append", {"values": ["one", "three"]}, ["itemA", "itemB", "one", "three"]]
-   *   ["prepend", {"values": ["undo", "redo"]}, ["undo", "redo", "itemA", "itemB"]]
-   *    ["splice", {"offset": 1, "replacement": ["c", "d"]}, ["itemA", "c", "d"]]
-   *    ["splice", {"offset": 1, "length": 0, "replacement": ["c", "d"]}, ["itemA", "c", "d", "itemB"]]
-   *    ["splice", {"offset": 1, "length": 0}, ["itemA", "itemB"]]
-   *    ["splice", {"offset": 1}, ["itemA"]]
+   * Test that the simpleConfigArray actions produce expected results.
    */
+  #[TestWith(["append", ["values" => ["one", "three"]], ["itemA", "itemB", "one", "three"]])]
+  #[TestWith(["prepend", ["values" => ["undo", "redo"]], ["undo", "redo", "itemA", "itemB"]])]
+  #[TestWith(["splice", ["offset" => 1, "replacement" => ["c", "d"]], ["itemA", "c", "d"]])]
+  #[TestWith(["splice", ["offset" => 1, "length" => 0, "replacement" => ["c", "d"]], ["itemA", "c", "d", "itemB"]])]
+  #[TestWith(["splice", ["offset" => 1, "length" => 0], ["itemA", "itemB"]])]
+  #[TestWith(["splice", ["offset" => 1], ["itemA"]])]
   public function testSimpleConfigArray(string $derivative_id, array $value, array $expected_value): void {
     $this->installConfig('config_test');
 
@@ -413,11 +410,12 @@ class ConfigActionTest extends KernelTestBase {
   }
 
   /**
-   * @testWith ["append", {"values": "single"}, ["itemA", "itemB", "single"]]
-   *   ["prepend", {"values": "single"}, ["single", "itemA", "itemB"]]
-   *   ["splice", {"offset": 1, "replacement": "single"}, ["itemA", "single"]]
-   *   ["splice", {"offset": 1, "length": 0, "replacement": "single"}, ["itemA", "single", "itemB"]]
+   * Test that the simpleConfigArray actions work with string value input.
    */
+  #[TestWith(["append", ["values" => "single"], ["itemA", "itemB", "single"]])]
+  #[TestWith(["prepend", ["values" => "single"], ["single", "itemA", "itemB"]])]
+  #[TestWith(["splice", ["offset" => 1, "replacement" => "single"], ["itemA", "single"]])]
+  #[TestWith(["splice", ["offset" => 1, "length" => 0, "replacement" => "single"], ["itemA", "single", "itemB"]])]
   public function testSimpleConfigArrayWithStringValues(string $derivative_id, array $value, array $expected_value): void {
     $this->installConfig('config_test');
 
@@ -430,10 +428,11 @@ class ConfigActionTest extends KernelTestBase {
   }
 
   /**
-   * @testWith ["append", [{"values": ["one", "three"]}, {"values": ["four", "six"]}], ["itemA", "itemB", "one", "three", "four", "six"]]
-   *   ["prepend", [{"values": ["undo", "redo"]}, {"values": ["bold", "italic"]}], ["bold", "italic", "undo", "redo", "itemA", "itemB"]]
-   *   ["splice", [{"offset": 1, "length": 1, "replacement": ["itemC"]}, {"offset": 2, "length": null, "replacement": ["itemD", "itemE"]}], ["itemA", "itemC", "itemD", "itemE"]]
+   * Test if simpleConfigArray works with multiple invocations (same property).
    */
+  #[TestWith(["append", [["values" => ["one", "three"]], ["values" => ["four", "six"]]], ["itemA", "itemB", "one", "three", "four", "six"]])]
+  #[TestWith(["prepend", [["values" => ["undo", "redo"]], ["values" => ["bold", "italic"]]], ["bold", "italic", "undo", "redo", "itemA", "itemB"]])]
+  #[TestWith(["splice", [["offset" => 1, "length" => 1, "replacement" => ["itemC"]], ["offset" => 2, "length" => NULL, "replacement" => ["itemD", "itemE"]]], ["itemA", "itemC", "itemD", "itemE"]])]
   public function testSimpleConfigArrayMultipleInvocationsOfSameProperty(string $derivative_id, array $values, array $expected_value): void {
     $this->installConfig('config_test');
 
@@ -450,10 +449,11 @@ class ConfigActionTest extends KernelTestBase {
   }
 
   /**
-   * @testWith ["append", {"property": "array", "values": ["one", "three"]}, {"property": "other_array", "values": ["four", "six"]}, ["itemA", "itemB", "one", "three"], ["itemX", "itemY", "four", "six"]]
-   *   ["prepend", {"property": "array", "values": ["undo", "redo"]}, {"property": "other_array", "values": ["bold", "italic"]}, ["undo", "redo", "itemA", "itemB"], ["bold", "italic", "itemX", "itemY"]]
-   *   ["splice", {"property": "array", "offset": 1, "length": 1, "replacement": ["itemC"]}, {"property": "other_array", "offset": 2, "length": null, "replacement": ["itemD", "itemE"]}, ["itemA", "itemC"], ["itemX", "itemY", "itemD", "itemE"]]
+   * Test if simpleConfigArray works with multiple invocations (diff property).
    */
+  #[TestWith(["append", [["property" => "array", "values" => ["one", "three"]], ["property" => "other_array", "values" => ["four", "six"]]], ["itemA", "itemB", "one", "three"], ["itemX", "itemY", "four", "six"]])]
+  #[TestWith(["prepend", [["property" => "array", "values" => ["undo", "redo"]], ["property" => "other_array", "values" => ["bold", "italic"]]], ["undo", "redo", "itemA", "itemB"], ["bold", "italic", "itemX", "itemY"]])]
+  #[TestWith(["splice", [["property" => "array", "offset" => 1, "length" => 1, "replacement" => ["itemC"]], ["property" => "other_array", "offset" => 2, "length" => NULL, "replacement" => ["itemD", "itemE"]]], ["itemA", "itemC"], ["itemX", "itemY", "itemD", "itemE"]])]
   public function testSimpleConfigArrayMultipleInvocationsOfDifferentProperty(string $derivative_id, array $array_values, array $other_array_values, array $expected_array_value, array $expected_other_array_value): void {
     $this->installConfig('config_test');
 
@@ -487,13 +487,14 @@ class ConfigActionTest extends KernelTestBase {
   }
 
   /**
-   * @testWith ["append", {"values": ["one", "three"]}, ["itemA", "itemB", "one", "three", "one", "three"]]
-   *   ["prepend", {"values": ["undo", "redo"]}, ["undo", "redo", "undo", "redo", "itemA", "itemB"]]
-   *   ["splice", {"offset": 1, "replacement": ["c", "d"]}, ["itemA", "c", "d"]]
-   *   ["splice", {"offset": 1, "length": 0, "replacement": ["c", "d"]}, ["itemA", "c", "d", "c", "d", "itemB"]]
-   *   ["splice", {"offset": 1, "length": 0}, ["itemA", "itemB"]]
-   *   ["splice", {"offset": 1}, ["itemA"]]
+   * Test simpleConfigArray actions without 'unique' setting, applied twice.
    */
+  #[TestWith(["append", ["values" => ["one", "three"]], ["itemA", "itemB", "one", "three", "one", "three"]])]
+  #[TestWith(["prepend", ["values" => ["undo", "redo"]], ["undo", "redo", "undo", "redo", "itemA", "itemB"]])]
+  #[TestWith(["splice", ["offset" => 1, "replacement" => ["c", "d"]], ["itemA", "c", "d"]])]
+  #[TestWith(["splice", ["offset" => 1, "length" => 0, "replacement" => ["c", "d"]], ["itemA", "c", "d", "c", "d", "itemB"]])]
+  #[TestWith(["splice", ["offset" => 1, "length" => 0], ["itemA", "itemB"]])]
+  #[TestWith(["splice", ["offset" => 1], ["itemA"]])]
   public function testSimpleConfigArrayAppliedTwiceWithoutUniqueSetting(string $derivative_id, array $value, array $expected_value): void {
     $this->installConfig('config_test');
 
@@ -514,13 +515,14 @@ class ConfigActionTest extends KernelTestBase {
   }
 
   /**
-   * @testWith ["append", {"values": ["one", "three"]}, ["itemA", "itemB", "one", "three"]]
-   *   ["prepend", {"values": ["undo", "redo"]}, ["undo", "redo", "itemA", "itemB"]]
-   *   ["splice", {"offset": 1, "replacement": ["c", "d"]}, ["itemA", "c", "d"]]
-   *   ["splice", {"offset": 1, "length": 0, "replacement": ["c", "d"]}, ["itemA", "c", "d", "itemB"]]
-   *   ["splice", {"offset": 1, "length": 0}, ["itemA", "itemB"]]
-   *   ["splice", {"offset": 1}, ["itemA"]]
+   * Test simpleConfigArray actions with 'unique' setting, applied twice.
    */
+  #[TestWith(["append", ["values" => ["one", "three"]], ["itemA", "itemB", "one", "three"]])]
+  #[TestWith(["prepend", ["values" => ["undo", "redo"]], ["undo", "redo", "itemA", "itemB"]])]
+  #[TestWith(["splice", ["offset" => 1, "replacement" => ["c", "d"]], ["itemA", "c", "d"]])]
+  #[TestWith(["splice", ["offset" => 1, "length" => 0, "replacement" => ["c", "d"]], ["itemA", "c", "d", "itemB"]])]
+  #[TestWith(["splice", ["offset" => 1, "length" => 0], ["itemA", "itemB"]])]
+  #[TestWith(["splice", ["offset" => 1], ["itemA"]])]
   public function testSimpleConfigArrayAppliedTwiceWithUniqueSetting(string $derivative_id, array $value, array $expected_value): void {
     $this->installConfig('config_test');
 
