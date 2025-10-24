@@ -57,6 +57,7 @@ class Datetime extends DateElementBase {
         [$class, 'processGroup'],
       ],
       '#pre_render' => [
+        [static::class, 'preRenderDate'],
         [$class, 'preRenderGroup'],
       ],
       '#theme' => 'datetime_form',
