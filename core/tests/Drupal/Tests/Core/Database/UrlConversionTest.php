@@ -494,6 +494,7 @@ class UrlConversionTest extends UnitTestCase {
    * @legacy-covers ::getConnectionInfoAsUrl
    */
   #[DataProvider('providerInvalidArgumentGetConnectionInfoAsUrl')]
+  #[IgnoreDeprecations]
   public function testGetInvalidArgumentGetConnectionInfoAsUrl(array $connection_options, $expected_exception_message): void {
     $this->expectException(\ArgumentCountError::class);
     $this->expectExceptionMessageMatches($expected_exception_message);
