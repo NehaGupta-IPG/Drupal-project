@@ -8,6 +8,9 @@ use Composer\Json\JsonFile;
 use Composer\Semver\VersionParser;
 use Drupal\BuildTests\Composer\ComposerBuildTestBase;
 use Drupal\Composer\Composer;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Demonstrate that Composer project templates can be built as patched.
@@ -21,9 +24,9 @@ use Drupal\Composer\Composer;
  *
  * This is because Composer only uses the packages.json file to resolve the
  * project template and not any other dependencies.
- *
- * @group Template
  */
+#[CoversNothing]
+#[Group('Template')]
 class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
 
   /**
@@ -31,7 +34,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
    *
    * @see https://getcomposer.org/doc/04-schema.md#minimum-stability
    */
-  protected const MINIMUM_STABILITY = 'beta';
+  protected const MINIMUM_STABILITY = 'stable';
 
   /**
    * The order of stability strings from least stable to most stable.
@@ -109,6 +112,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
 
     $exclude = [
       'drupal/core',
+      'drupal/core-composer-scaffold',
       'drupal/core-recipe-unpack',
       'drupal/core-project-message',
       'drupal/core-vendor-hardening',
@@ -171,11 +175,9 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
     }
   }
 
-  /**
-   * @dataProvider provideTemplateCreateProject
-   */
+  #[DataProvider('provideTemplateCreateProject')]
   public function testTemplateCreateProject($project, $package_dir, $docroot_dir): void {
-    // Make a working COMPOSER_HOME directory for setting global composer config
+    // Make a working COMPOSER_HOME directory for setting global composer config.
     $composer_home = $this->getWorkspaceDirectory() . '/composer-home';
     mkdir($composer_home);
     // Create an empty global composer.json file, just to avoid warnings.
@@ -431,7 +433,7 @@ JSON;
     }
     $stability = VersionParser::parseStability($version);
     if ($stability === 'dev') {
-      // Strip off "-dev";
+      // Strip off "-dev".
       $version_towards = substr($version, 0, -4);
 
       if (!str_ends_with($version_towards, '.0')) {

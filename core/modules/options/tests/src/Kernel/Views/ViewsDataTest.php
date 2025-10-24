@@ -6,12 +6,14 @@ namespace Drupal\Tests\options\Kernel\Views;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test to ensure views data is properly created for the Options module.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ViewsDataTest extends OptionsTestBase {
 
   /**

@@ -419,6 +419,8 @@ restrictor
 restripe
 restriped
 restui
+reswap
+retarget
 revisionable
 revisioned
 revisionid
@@ -427,6 +429,8 @@ rowspans
 rtsp
 ruleset
 sameorigin
+sandboxed
+sandboxing
 savepoints
 sayre
 schemaapi

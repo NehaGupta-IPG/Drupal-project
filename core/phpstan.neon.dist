@@ -36,6 +36,8 @@ parameters:
     # Skip Drupal 6 & 7 code.
     - scripts/dump-database-d?.sh
     - scripts/generate-d?-content.sh
+    # Skip update countries script for fake t() declaration.
+    - scripts/update-countries.sh
     # Skip data files.
     - lib/Drupal/Component/Transliteration/data/*.php
     # The following classes deliberately extend non-existent classes for testing.
@@ -54,5 +56,8 @@ parameters:
 
 rules:
   - Drupal\PHPStan\Rules\ComponentTestDoesNotExtendCoreTest
+  - Drupal\PHPStan\Rules\NoClassMetadataOnAbstractTestClasses
   - PHPStan\Rules\Functions\MissingFunctionReturnTypehintRule
   - PHPStan\Rules\Methods\MissingMethodReturnTypehintRule
+  # The rule below can be removed when we increase level to 2.
+  - PHPStan\Rules\Classes\AccessPrivateConstantThroughStaticRule
