@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalJavascriptTests\Ajax;
 
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Url;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\taxonomy\Entity\Vocabulary;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -19,7 +23,7 @@ class AjaxFormCacheTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['ajax_test', 'ajax_forms_test'];
+  protected static $modules = ['ajax_test', 'ajax_forms_test', 'node', 'taxonomy'];
 
   /**
    * {@inheritdoc}
@@ -107,6 +111,90 @@ class AjaxFormCacheTest extends WebDriverTestBase {
       'foo' => 'bar',
     ]);
     $this->assertSession()->addressEquals($url);
+  }
+
+  /**
+   * Tests form behavior when cache expires.
+   */
+  public function testExpiredCache(): void {
+    // Ensure required modules are installed and available in this process.
+    $this->rebuildContainer();
+
+    // Create a vocabulary to reference.
+    $vocab = Vocabulary::create([
+      'name' => 'Tags',
+      'vid' => 'tags',
+    ]);
+    $vocab->save();
+
+    // Create a content type.
+    $type = $this->createContentType([
+      'type' => 'ajax_ref_test',
+      'name' => 'AJAX Ref Test',
+    ]);
+    $bundle = $type->id();
+
+    // Create an unlimited entity reference field targeting taxonomy terms.
+    $field_name = 'field_terms';
+    FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'node',
+      'type' => 'entity_reference',
+      'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
+      'settings' => [
+        'target_type' => 'taxonomy_term',
+      ],
+    ])->save();
+
+    FieldConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'node',
+      'bundle' => $bundle,
+      'label' => 'Terms',
+      'settings' => [
+        'handler' => 'default:taxonomy_term',
+        'handler_settings' => [
+          'target_bundles' => ['tags' => 'tags'],
+        ],
+      ],
+    ])->save();
+
+    // Ensure form display uses the standard autocomplete widget.
+    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
+    $display_repository = \Drupal::service('entity_display.repository');
+    $form_display = $display_repository->getFormDisplay('node', $bundle);
+    $form_display->setComponent($field_name, [
+      'type' => 'entity_reference_autocomplete',
+    ])->save();
+
+    // Set the form_cache_expiry global setting to 0.
+    $settings['settings']['form_cache_expiry'] = (object) [
+      'value' => 0,
+      'required' => TRUE,
+    ];
+    $this->writeSettings($settings);
+
+    // Open the content type add form with a user who can create this content.
+    $user = $this->drupalCreateUser([
+      'access content',
+      'create ' . $bundle . ' content',
+    ]);
+    $this->drupalLogin($user);
+    $this->drupalGet('node/add/' . $bundle);
+
+    $assert = $this->assertSession();
+    // Wait for the initial autocomplete input to be present.
+    $assert->waitForElement('css', sprintf('[name="%s[0][target_id]"]', $field_name));
+
+    // Click the "Add another item" button twice to add two empty items.
+    $add_more_selector = sprintf('[data-drupal-selector="edit-%s-add-more"]', str_replace('_', '-', $field_name));
+    $this->getSession()->getPage()->find('css', $add_more_selector)->click();
+    $assert->waitForElement('css', sprintf('[name="%s[1][target_id]"]', $field_name));
+    $this->getSession()->getPage()->find('css', $add_more_selector)->click();
+    $assert->waitForElement('css', sprintf('[name="%s[2][target_id]"]', $field_name));
+
+    // Count how many item inputs there are for that field.
+    $assert->elementsCount('css', sprintf('input.ui-autocomplete-input[name^="%s"][name$="[target_id]"]', $field_name), 3);
   }
 
 }
