@@ -22,6 +22,7 @@ class Uri extends StringData implements UriInterface {
    * {@inheritdoc}
    */
   #[JsonSchema(['type' => 'string', 'format' => 'uri'])]
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function getCastedValue() {
     return parent::getCastedValue();
   }

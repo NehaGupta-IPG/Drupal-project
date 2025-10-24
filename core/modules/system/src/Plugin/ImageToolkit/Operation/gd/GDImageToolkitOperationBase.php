@@ -15,6 +15,7 @@ abstract class GDImageToolkitOperationBase extends ImageToolkitOperationBase {
    * @return \Drupal\system\Plugin\ImageToolkit\GDToolkit
    *   The GD toolkit instance for image operations.
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   protected function getToolkit() {
     return parent::getToolkit();
   }

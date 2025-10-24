@@ -19,6 +19,7 @@ abstract class NodeTestBase extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   protected function setUp($import_test_views = TRUE, $modules = ['node_test_views']): void {
     parent::setUp($import_test_views, $modules);
   }

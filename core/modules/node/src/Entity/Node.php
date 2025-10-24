@@ -208,6 +208,7 @@ class Node extends EditorialContentEntityBase implements NodeInterface {
   /**
    * {@inheritdoc}
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function access($operation = 'view', ?AccountInterface $account = NULL, $return_as_object = FALSE) {
     // This override exists to set the operation to the default value "view".
     return parent::access($operation, $account, $return_as_object);

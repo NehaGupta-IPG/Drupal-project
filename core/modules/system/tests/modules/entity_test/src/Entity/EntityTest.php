@@ -175,6 +175,7 @@ class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
   /**
    * {@inheritdoc}
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function getEntityKey($key) {
     // Typically this protected method is used internally by entity classes and
     // exposed publicly through more specific getter methods. So that test cases

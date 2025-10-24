@@ -179,6 +179,7 @@ class PhpassHashedPasswordLog2BoundariesDouble extends PhpassHashedPassword {
   /**
    * Exposes this method as public for tests.
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function enforceLog2Boundaries($count_log2) {
     return parent::enforceLog2Boundaries($count_log2);
   }

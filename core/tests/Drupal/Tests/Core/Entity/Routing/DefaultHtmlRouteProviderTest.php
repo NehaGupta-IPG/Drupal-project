@@ -420,6 +420,7 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
  */
 class TestDefaultHtmlRouteProvider extends DefaultHtmlRouteProvider {
 
+  // phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod
   public function getEntityTypeIdKeyType(EntityTypeInterface $entity_type) {
     return parent::getEntityTypeIdKeyType($entity_type);
   }

@@ -74,6 +74,7 @@ class LayoutDefault extends ConfigurablePluginBase implements LayoutInterface, P
    * @return \Drupal\Core\Layout\LayoutDefinition
    *   The layout plugin definition for this plugin.
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function getPluginDefinition() {
     return parent::getPluginDefinition();
   }

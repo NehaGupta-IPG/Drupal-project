@@ -383,6 +383,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
    * @return \Drupal\migrate\Plugin\MigrateIdMapInterface
    *   The ID map.
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   protected function getIdMap() {
     return $this->migration->getIdMap();
   }

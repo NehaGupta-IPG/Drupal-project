@@ -45,6 +45,7 @@ class InstallerKernel extends DrupalKernel {
    * @return \Drupal\Core\Config\StorageInterface
    *   The config storage.
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function getConfigStorage() {
     return parent::getConfigStorage();
   }

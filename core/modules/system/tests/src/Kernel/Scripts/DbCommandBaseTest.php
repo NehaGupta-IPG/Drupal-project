@@ -121,6 +121,7 @@ class DbCommandBaseTester extends DbCommandBase {
   /**
    * {@inheritdoc}
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function getDatabaseConnection(InputInterface $input) {
     return parent::getDatabaseConnection($input);
   }

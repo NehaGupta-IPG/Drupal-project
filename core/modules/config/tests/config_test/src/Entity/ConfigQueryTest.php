@@ -56,6 +56,7 @@ class ConfigQueryTest extends ConfigTest {
   /**
    * {@inheritdoc}
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function concatProtectedProperty(string $value1, string $value2): static {
     // This method intentionally does not have the config action attribute to
     // ensure it is still discovered.

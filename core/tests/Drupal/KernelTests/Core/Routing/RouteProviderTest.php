@@ -786,6 +786,7 @@ class TestRouteProvider extends RouteProvider {
   /**
    * {@inheritdoc}
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function getCandidateOutlines(array $parts) {
     return parent::getCandidateOutlines($parts);
   }

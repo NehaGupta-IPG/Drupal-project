@@ -55,6 +55,7 @@ class EntityTestMul extends EntityTest {
   /**
    * {@inheritdoc}
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     return parent::baseFieldDefinitions($entity_type);
   }

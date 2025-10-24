@@ -15,6 +15,7 @@ class ActionPluginCollection extends DefaultSingleLazyPluginCollection {
    * @return \Drupal\Core\Action\ActionInterface
    *   The action plugin instance.
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function &get($instance_id) {
     return parent::get($instance_id);
   }

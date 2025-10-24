@@ -42,6 +42,7 @@ class BlockPluginCollection extends DefaultSingleLazyPluginCollection {
    * @return \Drupal\Core\Block\BlockPluginInterface
    *   The block plugin instance.
    */
+  // phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod
   public function &get($instance_id) {
     return parent::get($instance_id);
   }

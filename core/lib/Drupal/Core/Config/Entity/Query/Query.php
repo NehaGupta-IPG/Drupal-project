@@ -70,6 +70,7 @@ class Query extends QueryBase implements QueryInterface {
    * @endcode
    * Then you can filter out via $query->condition('level1.*.level3', 1).
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function condition($property, $value = NULL, $operator = NULL, $langcode = NULL) {
     return parent::condition($property, $value, $operator, $langcode);
   }

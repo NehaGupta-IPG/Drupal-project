@@ -74,6 +74,7 @@ class TestMigrateExecutable extends MigrateExecutable {
    * @return bool
    *   The memoryExceeded value.
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function memoryExceeded() {
     return parent::memoryExceeded();
   }
