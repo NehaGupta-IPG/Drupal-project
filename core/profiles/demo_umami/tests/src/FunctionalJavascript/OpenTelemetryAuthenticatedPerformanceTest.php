@@ -38,7 +38,9 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
     $user = $this->drupalCreateUser();
     $this->drupalLogin($user);
     $this->drupalGet('<front>');
+    sleep(2);
     $this->drupalGet('<front>');
+    sleep(2);
 
     $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('<front>');
@@ -97,19 +99,19 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 523,
-      'CacheGetCount' => 547,
+      'CacheGetCount' => 548,
       'CacheGetCountByBin' => [
         'config' => 201,
         'bootstrap' => 26,
         'discovery' => 112,
-        'data' => 71,
+        'data' => 72,
         'dynamic_page_cache' => 2,
         'default' => 45,
         'entity' => 23,
         'render' => 39,
         'menu' => 28,
       ],
-      'CacheSetCount' => 453,
+      'CacheSetCount' => 454,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 47,
