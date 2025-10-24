@@ -9,12 +9,14 @@ use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the theme administration user interface.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class ThemeTest extends BrowserTestBase {
 
   use TestFileCreationTrait {

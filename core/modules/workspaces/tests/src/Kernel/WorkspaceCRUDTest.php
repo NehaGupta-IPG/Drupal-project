@@ -10,12 +10,14 @@ use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\workspaces\Entity\Workspace;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests CRUD operations for workspaces.
- *
- * @group workspaces
  */
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceCRUDTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -68,7 +70,7 @@ class WorkspaceCRUDTest extends KernelTestBase {
     $this->installSchema('node', ['node_access']);
 
     $this->installEntitySchema('workspace');
-    $this->installSchema('workspaces', ['workspace_association']);
+    $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
     $this->installEntitySchema('node');
 
     $this->installConfig(['filter', 'node', 'system']);
@@ -231,7 +233,7 @@ class WorkspaceCRUDTest extends KernelTestBase {
     $workspace->save();
     $this->workspaceManager->setActiveWorkspace($workspace);
 
-    // Create a new node in the 'stage' workspace
+    // Create a new node in the 'stage' workspace.
     $node = $this->createNode(['status' => TRUE]);
 
     // Create an additional workspace-specific revision for the node.

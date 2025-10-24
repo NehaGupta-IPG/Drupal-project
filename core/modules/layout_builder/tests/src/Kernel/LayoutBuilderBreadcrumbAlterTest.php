@@ -8,12 +8,14 @@ use Drupal\Core\Breadcrumb\Breadcrumb;
 use Drupal\Core\Routing\NullRouteMatch;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\layout_builder\Hook\LayoutBuilderHooks;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests layout_builder_system_breadcrumb_alter().
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderBreadcrumbAlterTest extends EntityKernelTestBase {
 
   /**

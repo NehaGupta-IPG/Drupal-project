@@ -9,6 +9,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\TestTools\PhpUnitCompatibility\RunnerVersion;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Process\Process;
 
 /**
@@ -27,6 +28,7 @@ use Symfony\Component\Process\Process;
 #[Group('Test')]
 #[Group('#slow')]
 #[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class PhpUnitTestDiscoveryTest extends KernelTestBase {
 
   private const TEST_LIST_MISMATCH_MESSAGE =
@@ -80,8 +82,8 @@ class PhpUnitTestDiscoveryTest extends KernelTestBase {
     $configurationFilePath = $this->root . \DIRECTORY_SEPARATOR . 'core';
     // @todo once PHPUnit 10 is no longer used, remove the condition.
     // @see https://www.drupal.org/project/drupal/issues/3497116
-    if (RunnerVersion::getMajor() >= 11) {
-      $configurationFilePath .= \DIRECTORY_SEPARATOR . '.phpunit-next.xml';
+    if (RunnerVersion::getMajor() < 11) {
+      $configurationFilePath .= \DIRECTORY_SEPARATOR . '.phpunit-10.xml';
     }
 
     // PHPUnit's test discovery - via CLI execution.

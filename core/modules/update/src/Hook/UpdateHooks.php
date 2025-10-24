@@ -78,14 +78,6 @@ class UpdateHooks {
           $verbose = TRUE;
           break;
       }
-      // This loadInclude() is to ensure that the install API is available.
-      // Since we're loading an include of type 'install', this will also
-      // include core/includes/install.inc for us, which is where the
-      // REQUIREMENTS* constants are currently defined.
-      // @todo Remove this once those constants live in a better place.
-      // @see https://www.drupal.org/project/drupal/issues/2909480
-      // @see https://www.drupal.org/project/drupal/issues/3410938
-      \Drupal::moduleHandler()->loadInclude('update', 'install');
       $status = \Drupal::moduleHandler()->invoke('update', 'runtime_requirements');
       foreach (['core', 'contrib'] as $report_type) {
         $type = 'update_' . $report_type;
@@ -112,49 +104,6 @@ class UpdateHooks {
         }
       }
     }
-  }
-
-  /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return [
-      'update_last_check' => [
-        'variables' => [
-          'last' => 0,
-        ],
-      ],
-      'update_report' => [
-        'variables' => [
-          'data' => NULL,
-        ],
-        'file' => 'update.report.inc',
-      ],
-      'update_project_status' => [
-        'variables' => [
-          'project' => [],
-        ],
-        'file' => 'update.report.inc',
-      ],
-      // We are using template instead of '#type' => 'table' here to keep markup
-      // out of preprocess and allow for easier changes to markup.
-      'update_version' => [
-        'variables' => [
-          'version' => NULL,
-          'title' => NULL,
-          'attributes' => [],
-        ],
-        'file' => 'update.report.inc',
-      ],
-      'update_fetch_error_message' => [
-        'file' => 'update.report.inc',
-        'render element' => 'element',
-        'variables' => [
-          'error_message' => [],
-        ],
-      ],
-    ];
   }
 
   /**
@@ -311,12 +260,12 @@ class UpdateHooks {
       }
     }
     if (empty($files)) {
-      $errors[] = $this->t('%archive_file does not contain any .info.yml files.', ['%archive_file' => $file_system->basename($archive_file)]);
+      $errors[] = $this->t('%archive_file does not contain any .info.yml files.', ['%archive_file' => basename($archive_file)]);
     }
     elseif (!$compatible_project) {
       $errors[] = \Drupal::translation()->formatPlural(count($incompatible), '%archive_file contains a version of %names that is not compatible with Drupal @version.', '%archive_file contains versions of modules or themes that are not compatible with Drupal @version: %names', [
         '@version' => \Drupal::VERSION,
-        '%archive_file' => $file_system->basename($archive_file),
+        '%archive_file' => basename($archive_file),
         '%names' => implode(', ', $incompatible),
       ]);
     }
