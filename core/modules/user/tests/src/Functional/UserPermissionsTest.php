@@ -215,8 +215,11 @@ class UserPermissionsTest extends BrowserTestBase {
     $this->assertNotEquals($previous_permissions_hash, $current_permissions_hash, 'Permissions hash has changed.');
 
     // Verify passing an invalid role ID is handled.
+    $this->expectException('UnexpectedValueException');
     user_role_change_permissions('non_existing_role', $permissions);
+    $this->expectException('UnexpectedValueException');
     user_role_grant_permissions('non_existing_role', $permissions);
+    $this->expectException('UnexpectedValueException');
     user_role_revoke_permissions('non_existing_role', $permissions);
   }
 
