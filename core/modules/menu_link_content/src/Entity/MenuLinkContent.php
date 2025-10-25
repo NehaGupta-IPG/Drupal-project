@@ -2,6 +2,7 @@
 
 namespace Drupal\menu_link_content\Entity;
 
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\EditorialContentEntityBase;
@@ -105,7 +106,7 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
     $url = $this->link->first()->getUrl();
     assert($url instanceof Url);
     if ($attributes = $url->getOption('attributes')) {
-      $url->setOption('attributes', AttributeXss::sanitizeAttributes($attributes));
+      $url->setOption('attributes', Xss::sanitizeAttributes($attributes));
     }
     return $url;
   }

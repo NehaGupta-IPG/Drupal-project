@@ -3,6 +3,7 @@
 namespace Drupal\link\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\Unicode;
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -258,7 +259,7 @@ class LinkFormatter extends FormatterBase {
     }
 
     if (!empty($options['attributes'])) {
-      $options['attributes'] = AttributeXss::sanitizeAttributes($options['attributes']);
+      $options['attributes'] = Xss::sanitizeAttributes($options['attributes']);
     }
 
     $url->setOptions($options);

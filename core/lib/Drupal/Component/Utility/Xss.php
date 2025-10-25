@@ -3,6 +3,7 @@
 namespace Drupal\Component\Utility;
 
 // cspell:ignore ckers kses harnhammar
+use Drupal\Core\Template\Attribute;
 
 /**
  * Provides helper to filter for cross-site scripting.
@@ -438,6 +439,93 @@ class Xss {
    */
   public static function getHtmlTagList() {
     return static::$htmlTags;
+  }
+
+  /**
+   * Sanitizes attributes.
+   *
+   * @param array $attributes
+   *   Attribute values as name => value format. Value may be a string or in the
+   *   case of the 'class' attribute, an array.
+   *
+   * @return array
+   *   Sanitized attributes.
+   */
+  public static function sanitizeAttributes(array $attributes): array {
+    $new_attributes = [];
+    foreach ($attributes as $name => $value) {
+      // The attribute name should be a single attribute, but there is the
+      // possibility that the name is corrupt. Core's XSS::attributes can
+      // cleanly handle sanitizing 'selected href="http://example.com" so we
+      // provide an allowance for cases where the attribute array is malformed.
+      // For example given a name of 'selected href' and a value of
+      // http://example.com we split this into two separate attributes, with the
+      // value assigned to the last attribute name.
+      // Explode the attribute name if a space exists.
+      $names = \array_filter(\explode(' ', $name));
+      if (\count($names) === 0) {
+        // Empty attribute names.
+        continue;
+      }
+      // Valueless attributes set the name to the value when processed by the
+      // Attributes object.
+      $with_values = \array_combine($names, $names);
+      // Create a new Attribute object with the value applied to the last
+      // attribute name. If there is only one attribute this simply creates a
+      // new attribute with a single key-value pair.
+      $last_name = \end($names);
+      $with_values[$last_name] = $value;
+      $attribute_object = new Attribute($with_values);
+      // Filter the attributes.
+      $safe = static::attributes((string) $attribute_object);
+      $safe = \array_map([Html::class, 'decodeEntities'], $safe);
+      $safe = static::formatSanitizedAttributes($safe);
+      // Add the safe attributes to the new list.
+      $new_attributes += \array_intersect_key($safe, $with_values);
+    }
+
+    return $new_attributes;
+  }
+
+  /**
+   * Formats the output of static::attributes().
+   *
+   * The output of static::attributes() is formatted like:
+   * [
+   *   0 => 'href="https://example.com"',
+   *   1 => 'class="foo bar"',
+   *   2 => 'data-valueless-attribute',
+   * ]
+   * This function reformats the array into the same name => value format
+   * expected as the input to static::sanitizeAttributes(). The example array
+   * given above would result in an output like:
+   * [
+   *   'href' => 'https://example.com',
+   *   'class' => [
+   *     0 => 'foo',
+   *     1 => 'bar',
+   *   ],
+   *   'data-valueless-attribute' => TRUE,
+   * ]
+   *
+   * @param array $sanitized_attributes
+   *   An array of attributes output by static::attributes().
+   *
+   * @return array
+   *   The formatted array.
+   */
+  protected static function formatSanitizedAttributes(array $sanitized_attributes): array {
+    $attributes = [];
+    foreach ($sanitized_attributes as $attribute_string) {
+      $attribute = \explode('=', $attribute_string, 2);
+      $attributes[$attribute[0]] = isset($attribute[1]) ? trim($attribute[1], '"') : TRUE;
+
+      if (\array_key_exists('class', $attributes)) {
+        // The class attribute is expected to be an array.
+        $attributes['class'] = \explode(' ', $attributes['class']);
+      }
+    }
+    return $attributes;
   }
 
 }
