@@ -1329,7 +1329,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           is_dir($pathname . '/Entity') ||
           is_dir($pathname . '/Element')
         )) {
-          $namespaces[$parent_namespace . '\\' . $component->getFilename()] = $path . '/' . $component->getFilename();
+          $namespaces[$parent_namespace . '\\' . $component->getFilename()] = $this->root . '/' . $path . '/' . $component->getFilename();
         }
       }
     }
@@ -1537,7 +1537,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   protected function getModuleNamespacesPsr4($module_file_names) {
     $namespaces = [];
     foreach ($module_file_names as $module => $filename) {
-      $namespaces["Drupal\\$module"] = dirname($filename) . '/src';
+      $namespaces["Drupal\\$module"] = $this->root . '/' . dirname($filename) . '/src';
     }
     return $namespaces;
   }
