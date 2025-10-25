@@ -6,13 +6,17 @@ namespace Drupal\Tests\layout_builder\Kernel;
 
 use Drupal\Core\Config\Schema\SchemaIncompleteException;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay
- *
- * @group layout_builder
- * @group #slow
+ * Tests Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay.
  */
+#[CoversClass(LayoutBuilderEntityViewDisplay::class)]
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderEntityViewDisplayTest extends SectionListTestBase {
 
   /**
@@ -40,13 +44,16 @@ class LayoutBuilderEntityViewDisplayTest extends SectionListTestBase {
    */
   public function testInvalidConfiguration(): void {
     $this->expectException(SchemaIncompleteException::class);
-    $this->sectionList->getSection(0)->getComponent('10000000-0000-1000-a000-000000000000')->setConfiguration(['id' => 'foo', 'bar' => 'baz']);
+    $this->sectionList->getSection(0)
+      ->getComponent('10000000-0000-1000-a000-000000000000')
+      ->setConfiguration(['id' => 'foo', 'bar' => 'baz']);
     $this->sectionList->save();
   }
 
   /**
-   * @dataProvider providerTestIsLayoutBuilderEnabled
-   */
+ * Tests is layout builder enabled.
+ */
+  #[DataProvider('providerTestIsLayoutBuilderEnabled')]
   public function testIsLayoutBuilderEnabled($expected, $view_mode, $enabled): void {
     $display = LayoutBuilderEntityViewDisplay::create([
       'targetEntityType' => 'entity_test',
@@ -88,9 +95,28 @@ class LayoutBuilderEntityViewDisplayTest extends SectionListTestBase {
     $this->sectionList->setOverridable();
     $this->assertTrue($this->sectionList->isLayoutBuilderEnabled());
 
-    // Ensure Layout Builder is still enabled after setting Overridable to FALSE.
+    // Ensure Layout Builder is still enabled after setting Overridable to
+    // FALSE.
     $this->sectionList->setOverridable(FALSE);
     $this->assertTrue($this->sectionList->isLayoutBuilderEnabled());
+  }
+
+  /**
+   * Tests that enabling Layout Builder moves fields to hidden.
+   */
+  public function testFieldsMovedToHiddenOnEnable(): void {
+    $display = LayoutBuilderEntityViewDisplay::load('entity_test.entity_test.default');
+    $display->disableLayoutBuilder()->save();
+    $display->trustData();
+    $this->assertNotEmpty($display->get('content'));
+    $this->assertNotContains('langcode', $display->get('hidden'));
+    $this->assertNotContains('name', $display->get('hidden'));
+    $display->enableLayoutBuilder()->save();
+    $this->assertEmpty($display->get('content'));
+    $this->assertEquals([
+      'langcode' => TRUE,
+      'name' => TRUE,
+    ], $display->get('hidden'));
   }
 
 }

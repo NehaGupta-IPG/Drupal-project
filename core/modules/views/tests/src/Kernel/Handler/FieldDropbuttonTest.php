@@ -11,12 +11,14 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the core Drupal\views\Plugin\views\field\Dropbutton handler.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class FieldDropbuttonTest extends ViewsKernelTestBase {
 
   use ContentTypeCreationTrait;
@@ -32,8 +34,6 @@ class FieldDropbuttonTest extends ViewsKernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
-    'user',
     'node',
     'field',
     'text',
@@ -137,7 +137,7 @@ class FieldDropbuttonTest extends ViewsKernelTestBase {
 
     // Render each row and field in turn - the dropbutton plugin relies on
     // output being set in previous versions.
-    foreach ($view->result as $index => $row) {
+    foreach ($view->result as $row) {
       foreach (array_keys($view->field) as $field) {
         $output = $renderer->executeInRenderContext(new RenderContext(), function () use ($view, $row, $field) {
           return $view->field[$field]->advancedRender($row);

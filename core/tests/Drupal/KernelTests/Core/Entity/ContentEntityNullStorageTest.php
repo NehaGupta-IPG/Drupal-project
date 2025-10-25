@@ -8,21 +8,21 @@ use Drupal\contact\Entity\ContactForm;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests ContentEntityNullStorage entity query support.
  *
  * @see \Drupal\Core\Entity\ContentEntityNullStorage
  * @see \Drupal\Core\Entity\Query\Null\Query
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class ContentEntityNullStorageTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'contact', 'user'];
 

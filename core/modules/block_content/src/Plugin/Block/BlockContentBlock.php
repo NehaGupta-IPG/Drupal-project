@@ -15,7 +15,6 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines a generic block type.
@@ -99,7 +98,17 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
    * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
    *   The entity display repository.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, BlockManagerInterface $block_manager, EntityTypeManagerInterface $entity_type_manager, AccountInterface $account, UrlGeneratorInterface $url_generator, BlockContentUuidLookup $uuid_lookup, EntityDisplayRepositoryInterface $entity_display_repository) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    BlockManagerInterface $block_manager,
+    EntityTypeManagerInterface $entity_type_manager,
+    AccountInterface $account,
+    UrlGeneratorInterface $url_generator,
+    BlockContentUuidLookup $uuid_lookup,
+    EntityDisplayRepositoryInterface $entity_display_repository,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->blockManager = $block_manager;
@@ -113,35 +122,14 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('plugin.manager.block'),
-      $container->get('entity_type.manager'),
-      $container->get('current_user'),
-      $container->get('url_generator'),
-      $container->get('block_content.uuid_lookup'),
-      $container->get('entity_display.repository')
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function defaultConfiguration() {
     return [
-      'status' => TRUE,
-      'info' => '',
       'view_mode' => 'full',
     ];
   }
 
   /**
-   * Overrides \Drupal\Core\Block\BlockBase::blockForm().
-   *
-   * Adds body and description fields to the block configuration form.
+   * {@inheritdoc}
    */
   public function blockForm($form, FormStateInterface $form_state) {
     $block = $this->getEntity();
@@ -158,7 +146,6 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
       '#default_value' => $this->configuration['view_mode'],
       '#access' => (count($options) > 1),
     ];
-    $form['title']['#description'] = $this->t('The title of the block as shown to the user.');
     return $form;
   }
 
@@ -197,6 +184,13 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
         '#access' => $this->account->hasPermission('administer blocks'),
       ];
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createPlaceholder(): bool {
+    return TRUE;
   }
 
   /**

@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\locale\Functional;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Locale update functions.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocalesLocationAddIndexUpdateTest extends UpdatePathTestBase {
 
   /**
@@ -21,7 +23,7 @@ class LocalesLocationAddIndexUpdateTest extends UpdatePathTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setDatabaseDumpFiles() {
+  protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles[] = $this->root . '/core/modules/system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz';
   }
 
@@ -102,13 +104,10 @@ class LocalesLocationAddIndexUpdateTest extends UpdatePathTestBase {
     // Run updates and test them.
     $this->runUpdates();
 
+    // Ensure the update runs successfully even if an index existed prior to
+    // the update.
     $schema = \Drupal::database()->schema();
     $this->assertTrue($schema->indexExists('locales_location', 'type_name'));
-
-    // Ensure that index specification matches our expectations.
-    $introspect_index_schema = new \ReflectionMethod(get_class($schema), 'introspectIndexSchema');
-    $index_schema = $introspect_index_schema->invoke($schema, 'locales_location');
-    $this->assertSame(['type', 'name'], $index_schema['indexes']['type_name']);
   }
 
 }

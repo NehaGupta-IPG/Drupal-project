@@ -8,13 +8,19 @@ use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\KernelTests\KernelTestBase;
-use Symfony\Component\Validator\ConstraintViolation;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
- * @covers \Drupal\ckeditor5\Plugin\CKEditor5PluginManager::getCKEditor5PluginConfig
- * @group ckeditor5
+ * Tests Wildcard Html Support.
+ *
  * @internal
+ * @legacy-covers \Drupal\ckeditor5\Plugin\CKEditor5PluginManager::getCKEditor5PluginConfig
  */
+#[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
 class WildcardHtmlSupportTest extends KernelTestBase {
 
   /**
@@ -42,9 +48,11 @@ class WildcardHtmlSupportTest extends KernelTestBase {
   }
 
   /**
-   * @covers \Drupal\ckeditor5\Plugin\CKEditor5Plugin\SourceEditing::getDynamicPluginConfig
-   * @dataProvider providerGhsConfiguration
+   * Tests ghs configuration.
+   *
+   * @legacy-covers \Drupal\ckeditor5\Plugin\CKEditor5Plugin\SourceEditing::getDynamicPluginConfig
    */
+  #[DataProvider('providerGhsConfiguration')]
   public function testGhsConfiguration(string $filter_html_allowed, array $source_editing_tags, array $expected_ghs_configuration, ?array $additional_toolbar_items = []): void {
     FilterFormat::create([
       'format' => 'test_format',
@@ -84,7 +92,7 @@ class WildcardHtmlSupportTest extends KernelTestBase {
     $editor = Editor::create($editor_config);
     $editor->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolation $v) {
+      function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -101,6 +109,9 @@ class WildcardHtmlSupportTest extends KernelTestBase {
     $this->assertEquals($expected_ghs_configuration, $ghs_configuration);
   }
 
+  /**
+   * Provides test cases for CKEditor 5 General HTML Support (GHS) configuration.
+   */
   public static function providerGhsConfiguration(): array {
     return [
       'empty source editing' => [

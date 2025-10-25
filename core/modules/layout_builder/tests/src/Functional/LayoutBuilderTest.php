@@ -8,13 +8,14 @@ use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\layout_builder\Section;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\layout_builder\Traits\EnableLayoutBuilderTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Layout Builder UI.
- *
- * @group layout_builder
- * @group #slow
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderTest extends LayoutBuilderTestBase {
 
   use EnableLayoutBuilderTrait;
@@ -297,23 +298,6 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
       $labels[] = $element->getAttribute('aria-label');
     }
     $this->assertSame($expected_labels, $labels);
-  }
-
-  /**
-   * Test decorating controller.entity_form while layout_builder is installed.
-   */
-  public function testHtmlEntityFormControllerDecoration(): void {
-    $assert_session = $this->assertSession();
-
-    $this->drupalLogin($this->drupalCreateUser([
-      'configure any layout',
-      'administer node display',
-    ]));
-
-    // Install module that decorates controller.entity_form.
-    \Drupal::service('module_installer')->install(['layout_builder_decoration_test']);
-    $this->drupalGet('admin/structure/types/manage/bundle_with_section_field/display/default');
-    $assert_session->pageTextContains('Manage Display');
   }
 
   /**

@@ -5,15 +5,19 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Theme;
 
 use Drupal\Core\Extension\ModuleExtensionList;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
+use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\Theme\ActiveTheme;
 use Drupal\Core\Theme\Registry;
 use Drupal\Tests\UnitTestCase;
+use Drupal\theme_test\Hook\ThemeTestHooks;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
- * @coversDefaultClass \Drupal\Core\Theme\Registry
- * @group Theme
+ * Tests Drupal\Core\Theme\Registry.
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Drupal\Core\Theme\Registry::class)]
+#[\PHPUnit\Framework\Attributes\Group('Theme')]
 class RegistryTest extends UnitTestCase {
 
   /**
@@ -87,6 +91,13 @@ class RegistryTest extends UnitTestCase {
   protected $kernel;
 
   /**
+   * They key value factory.
+   *
+   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface
+   */
+  protected KeyValueFactoryInterface $keyValueFactory;
+
+  /**
    * The list of functions that get_defined_functions() should provide.
    *
    * @var array
@@ -108,7 +119,9 @@ class RegistryTest extends UnitTestCase {
     $this->themeManager = $this->createMock('Drupal\Core\Theme\ThemeManagerInterface');
     $this->moduleList = $this->createMock(ModuleExtensionList::class);
     $this->kernel = $this->createMock(HttpKernelInterface::class);
-    $this->registry = new Registry($this->root, $this->cache, $this->lock, $this->moduleHandler, $this->themeHandler, $this->themeInitialization, $this->runtimeCache, $this->moduleList, $this->kernel);
+    $this->keyValueFactory = new KeyValueMemoryFactory();
+
+    $this->registry = new Registry($this->root, $this->cache, $this->lock, $this->moduleHandler, $this->themeHandler, $this->themeInitialization, $this->runtimeCache, $this->moduleList, $this->kernel, NULL, $this->keyValueFactory);
     $this->registry->setThemeManager($this->themeManager);
   }
 
@@ -152,18 +165,24 @@ class RegistryTest extends UnitTestCase {
       ->method('getActiveTheme')
       ->willReturnOnConsecutiveCalls($test_theme, $test_stable);
 
-    // Include the module and theme files so that hook_theme can be called.
-    include_once $this->root . '/core/modules/system/tests/modules/theme_test/theme_test.module';
+    // Include the theme file so that hook_theme can be called.
     include_once $this->root . '/core/tests/fixtures/test_stable/test_stable.theme';
-    $this->moduleHandler->expects($this->atLeastOnce())
+    $themeTestTheme = new ThemeTestHooks();
+    $this->moduleHandler->expects($this->exactly(2))
+      ->method('invoke')
+      ->with('theme_test', 'theme')
+      ->willReturn($themeTestTheme->theme(NULL, NULL, NULL, NULL));
+    $this->moduleHandler->expects($this->atMost(50))
       ->method('invokeAllWith')
-      ->with('theme')
-      ->willReturnCallback(function (string $hook, callable $callback) {
-        $callback(function () {}, 'theme_test');
-      });
-    $this->moduleHandler->expects($this->atLeastOnce())
+      // $callback is documented on ModuleHandlerInterface::invokeAllWith().
+      // The first argument expects a callable, but it doesn't matter what it
+      // is, use pi() as a canary in case code changes, and it begins to use it.
+      // The second argument is the module name and for that theme_test is
+      // always correct here.
+      ->willReturnCallback(fn (string $hook, callable $callback) => $callback('pi', 'theme_test'));
+    $this->moduleHandler->expects($this->exactly(2))
       ->method('getModuleList')
-      ->willReturn([]);
+      ->willReturn(['theme_test' => NULL]);
     $this->moduleList->expects($this->exactly(2))
       ->method('getPath')
       ->with('theme_test')
@@ -181,7 +200,7 @@ class RegistryTest extends UnitTestCase {
     $this->assertArrayHasKey('theme_test_foo', $registry);
     $this->assertArrayHasKey('theme_test_render_element', $registry);
 
-    $this->assertNotContains('test_stable_preprocess_theme_test_render_element', $registry['theme_test_render_element']['preprocess functions']);
+    $this->assertEquals('Drupal\theme_test\Hook\ThemeTestHooks:preprocessThemeTestRenderElement', $registry['theme_test_render_element']['initial preprocess']);
 
     // The second call will initialize with the second theme. Ensure that this
     // returns a different object and the discovery for the second theme's
@@ -192,11 +211,7 @@ class RegistryTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::postProcessExtension
-   * @covers ::completeSuggestion
-   * @covers ::mergePreprocessFunctions
-   *
-   * @dataProvider providerTestPostProcessExtension
+   * Tests post process extension.
    *
    * @param array $defined_functions
    *   An array of functions to be used in place of get_defined_functions().
@@ -204,7 +219,12 @@ class RegistryTest extends UnitTestCase {
    *   An array of theme hooks to process.
    * @param array $expected
    *   The expected results.
+   *
+   * @legacy-covers ::postProcessExtension
+   * @legacy-covers ::completeSuggestion
+   * @legacy-covers ::mergePreprocessFunctions
    */
+  #[\PHPUnit\Framework\Attributes\DataProvider('providerTestPostProcessExtension')]
   public function testPostProcessExtension($defined_functions, $hooks, $expected): void {
     static::$functions['user'] = $defined_functions;
 

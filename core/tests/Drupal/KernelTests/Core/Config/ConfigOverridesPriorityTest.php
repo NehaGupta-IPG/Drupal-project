@@ -6,6 +6,8 @@ namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\Core\Language\Language;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that config overrides are applied in the correct order.
@@ -15,15 +17,13 @@ use Drupal\KernelTests\KernelTestBase;
  * - Language overrides.
  * - Module overrides.
  * - settings.php overrides.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigOverridesPriorityTest extends KernelTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
@@ -32,6 +32,9 @@ class ConfigOverridesPriorityTest extends KernelTestBase {
     'language',
   ];
 
+  /**
+   * Tests the order of config overrides.
+   */
   public function testOverridePriorities(): void {
     $GLOBALS['config_test_run_module_overrides'] = FALSE;
 

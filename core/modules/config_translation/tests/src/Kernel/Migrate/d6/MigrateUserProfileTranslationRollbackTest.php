@@ -6,12 +6,14 @@ namespace Drupal\Tests\config_translation\Kernel\Migrate\d6;
 
 use Drupal\migrate\MigrateExecutable;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests rollback of user profile translations.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateUserProfileTranslationRollbackTest extends MigrateDrupal6TestBase {
 
   /**
@@ -61,7 +63,7 @@ class MigrateUserProfileTranslationRollbackTest extends MigrateDrupal6TestBase {
         (new MigrateExecutable($migration, $this))->rollback();
       }
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
     }
   }
 

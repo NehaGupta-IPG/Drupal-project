@@ -12,13 +12,16 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation of entity_form_display entities.
- *
- * @group Entity
- * @group Validation
  */
+#[Group('Entity')]
+#[Group('Validation')]
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class EntityFormDisplayValidationTest extends ConfigEntityValidationTestBase {
 
   use ContentTypeCreationTrait;
@@ -39,6 +42,8 @@ class EntityFormDisplayValidationTest extends ConfigEntityValidationTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installEntitySchema('node');
+    $this->installEntitySchema('user');
     $this->installConfig('node');
     $this->createContentType(['type' => 'one']);
     $this->createContentType(['type' => 'two']);
@@ -113,6 +118,7 @@ class EntityFormDisplayValidationTest extends ConfigEntityValidationTestBase {
    */
   public function testImmutableProperties(array $valid_values = []): void {
     parent::testImmutableProperties([
+      'id' => 'entity_test_with_bundle.two.default',
       'targetEntityType' => 'entity_test_with_bundle',
       'bundle' => 'two',
     ]);

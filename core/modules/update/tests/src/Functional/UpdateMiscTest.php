@@ -6,12 +6,14 @@ namespace Drupal\Tests\update\Functional;
 
 use Drupal\Core\Url;
 use Drupal\Tests\Traits\Core\CronRunTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests general functionality of the Update module.
- *
- * @group update
+ * Tests general functionality of the Update Status module.
  */
+#[Group('update')]
+#[RunTestsInSeparateProcesses]
 class UpdateMiscTest extends UpdateTestBase {
 
   use CronRunTrait;
@@ -41,49 +43,7 @@ class UpdateMiscTest extends UpdateTestBase {
   }
 
   /**
-   * Ensures that the local actions appear.
-   */
-  public function testLocalActions(): void {
-    $admin_user = $this->drupalCreateUser([
-      'administer site configuration',
-      'administer modules',
-      'administer software updates',
-      'administer themes',
-    ]);
-    $this->drupalLogin($admin_user);
-
-    $this->drupalGet('admin/modules');
-    $this->clickLink('Add new module');
-    $this->assertSession()->addressEquals('admin/modules/install');
-
-    $this->drupalGet('admin/appearance');
-    $this->clickLink('Add new theme');
-    $this->assertSession()->addressEquals('admin/theme/install');
-
-    $this->drupalGet('admin/reports/updates');
-    $this->clickLink('Add new module or theme');
-    $this->assertSession()->addressEquals('admin/reports/updates/install');
-  }
-
-  /**
-   * Checks that clearing the disk cache works.
-   */
-  public function testClearDiskCache(): void {
-    $directories = [
-      _update_manager_cache_directory(FALSE),
-      _update_manager_extract_directory(FALSE),
-    ];
-    // Check that update directories does not exists.
-    foreach ($directories as $directory) {
-      $this->assertDirectoryDoesNotExist($directory);
-    }
-
-    // Method must not fail if update directories do not exists.
-    update_clear_update_disk_cache();
-  }
-
-  /**
-   * Tests the Update Manager module when the update server returns 503 errors.
+   * Tests the Update Status module when the update server returns 503 errors.
    */
   public function testServiceUnavailable(): void {
     $admin_user = $this->drupalCreateUser([
