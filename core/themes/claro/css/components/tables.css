@@ -45,8 +45,10 @@ th {
   display: block;
   padding-block: var(--space-xs);
   padding-inline: 0 1.5rem;
+  overflow: hidden;
   -webkit-text-decoration: none;
   text-decoration: none;
+  text-overflow: ellipsis;
   color: inherit;
 }
 
