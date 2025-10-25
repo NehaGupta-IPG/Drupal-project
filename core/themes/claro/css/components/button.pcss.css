@@ -91,6 +91,29 @@
   }
 }
 
+/* Remove button styles. */
+.button--remove {
+  padding: 0 4px;
+  background-color: transparent;
+  background-image: url(../../images/icons/545560/trash.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 1rem;
+  inline-size: 1rem;
+  box-shadow: none;
+
+  &:not(:focus) {
+    box-shadow: none;
+  }
+
+  &:hover,
+  &:focus,
+  &:active,
+  &:is(:disabled, .is-disabled) {
+    background-color: transparent;
+  }
+}
+
 /* Primary button style.s */
 .button--primary {
   color: var(--button-fg-color--primary);

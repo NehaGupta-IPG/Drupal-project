@@ -421,6 +421,26 @@ function claro_form_alter(array &$form, FormStateInterface $form_state, $form_id
   $build_info = $form_state->getBuildInfo();
   $form_object = $form_state->getFormObject();
 
+  // Recursive function to traverse the form array and update delete button value.
+  if (!function_exists('update_delete_button')) {
+    function update_delete_button(&$element) {
+      // Check if the element is an array.
+      if (is_array($element)) {
+        // Check if the element has a '#type' key and it is a button.
+        if (isset($element['#type']) && $element['#type'] === 'submit') {
+          if (isset($element['#name']) && strpos($element['#name'], 'remove_button') !== false) {
+            $element['#value'] = '';
+            $element['#attributes']['class'][] = 'button--remove';
+          }
+        }
+        // Recursively call the function for nested elements.
+        foreach ($element as &$sub_element) {
+          update_delete_button($sub_element);
+        }
+      }
+    }
+  }
+
   // Make entity forms delete link use the action-link component.
   if (isset($form['actions']['delete']['#type']) && $form['actions']['delete']['#type'] === 'link' && !empty($build_info['callback_object']) && $build_info['callback_object'] instanceof EntityForm) {
     $form['actions']['delete'] = _claro_convert_link_to_action_link($form['actions']['delete'], 'trash', 'default', 'danger');
@@ -525,6 +545,7 @@ function claro_form_alter(array &$form, FormStateInterface $form_state, $form_id
       }
     }
   }
+  update_delete_button($form);
 }
 
 /**
