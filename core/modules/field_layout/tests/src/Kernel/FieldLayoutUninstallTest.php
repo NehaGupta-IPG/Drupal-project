@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\field_layout\Kernel;
 
 use Drupal\Tests\layout_builder\Kernel\LayoutBuilderCompatibilityTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @group field_layout
+ * Tests Field Layout Uninstall.
  */
+#[Group('field_layout')]
+#[RunTestsInSeparateProcesses]
 class FieldLayoutUninstallTest extends LayoutBuilderCompatibilityTestBase {
 
   /**

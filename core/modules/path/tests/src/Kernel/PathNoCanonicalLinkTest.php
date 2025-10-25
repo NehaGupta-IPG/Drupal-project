@@ -7,12 +7,14 @@ namespace Drupal\Tests\path\Kernel;
 use Drupal\content_translation_test\Entity\EntityTestTranslatableUISkip;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests path alias deletion when there is no canonical link template.
- *
- * @group path
  */
+#[Group('path')]
+#[RunTestsInSeparateProcesses]
 class PathNoCanonicalLinkTest extends KernelTestBase {
 
   /**
@@ -24,7 +26,6 @@ class PathNoCanonicalLinkTest extends KernelTestBase {
     'language',
     'entity_test',
     'user',
-    'system',
   ];
 
   /**

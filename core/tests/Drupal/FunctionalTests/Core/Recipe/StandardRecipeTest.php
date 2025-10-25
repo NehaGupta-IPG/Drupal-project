@@ -8,13 +8,15 @@ use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\shortcut\Entity\Shortcut;
 use Drupal\Tests\standard\Functional\StandardTest;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Standard recipe installation expectations.
- *
- * @group #slow
- * @group Recipe
  */
+#[Group('#slow')]
+#[Group('Recipe')]
+#[RunTestsInSeparateProcesses]
 class StandardRecipeTest extends StandardTest {
 
   use RecipeTestTrait;
@@ -121,7 +123,7 @@ class StandardRecipeTest extends StandardTest {
 
     // Ensure we have truly rebuilt the standard profile using recipes.
     // Uncomment the code below to see the differences in a single file.
-    // phpcs:ignore Drupal.Files.LineLength
+    // phpcs:ignore Drupal.Commenting.InlineComment.InvalidEndChar, Drupal.Files.LineLength
     // $this->assertSame($sync->read('node.settings'), $active->read('node.settings'));
     $comparer = $this->configImporter()->getStorageComparer();
     $expected_list = $comparer->getEmptyChangelist();

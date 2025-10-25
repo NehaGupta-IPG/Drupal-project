@@ -150,6 +150,15 @@
     border-radius: var(--tabs-border-radius-size);
     box-shadow: none;
   }
+
+  .hamburger-icon,
+  .close-icon {
+    line-height: normal;
+  }
+
+  .close-icon {
+    display: none;
+  }
 }
 
 .position-container {
@@ -267,5 +276,11 @@
         }
       }
     }
+  }
+}
+
+@media (forced-colors: active) {
+  .tabs__trigger svg path {
+    fill: currentColor;
   }
 }

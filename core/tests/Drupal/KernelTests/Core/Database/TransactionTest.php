@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Database;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Transaction;
 use Drupal\Core\Database\Transaction\ClientConnectionTransactionState;
@@ -12,9 +13,10 @@ use Drupal\Core\Database\Transaction\StackItemType;
 use Drupal\Core\Database\Transaction\TransactionManagerBase;
 use Drupal\Core\Database\TransactionNameNonUniqueException;
 use Drupal\Core\Database\TransactionOutOfOrderException;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore Tinky Winky Dipsy
-
 /**
  * Tests the transactions, using the explicit ::commitOrRelease method.
  *
@@ -39,9 +41,9 @@ use Drupal\Core\Database\TransactionOutOfOrderException;
  * and mysqli (MySql) clients do not have a solution to check if a transaction
  * is active, and mysqli does not fail when rolling back and no transaction
  * active.
- *
- * @group Database
  */
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class TransactionTest extends DatabaseTestBase {
 
   /**
@@ -742,7 +744,7 @@ class TransactionTest extends DatabaseTestBase {
    * @internal
    */
   public function assertRowPresent(string $name, ?string $message = NULL): void {
-    $present = (boolean) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
+    $present = (bool) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
     $this->assertTrue($present, $message ?? "Row '{$name}' should be present, but it actually does not exist.");
   }
 
@@ -757,7 +759,7 @@ class TransactionTest extends DatabaseTestBase {
    * @internal
    */
   public function assertRowAbsent(string $name, ?string $message = NULL): void {
-    $present = (boolean) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
+    $present = (bool) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
     $this->assertFalse($present, $message ?? "Row '{$name}' should be absent, but it actually exists.");
   }
 
@@ -1273,6 +1275,19 @@ class TransactionTest extends DatabaseTestBase {
     $reflectionProperty->setValue($manager, []);
     unset($testConnection);
     Database::closeConnection('test_fail');
+  }
+
+  /**
+   * Tests that mocking transactions works fine.
+   */
+  public function testMockTransaction(): void {
+    $connection = $this->getMockBuilder(Connection::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->getMockBuilder(Transaction::class)
+      ->setConstructorArgs([$connection, '', ''])
+      ->getMock();
+    $this->assertTrue(TRUE);
   }
 
 }

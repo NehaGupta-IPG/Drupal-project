@@ -12,6 +12,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests ::getTestClasses() between TestDiscovery and PhpPUnitTestDiscovery.
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 #[Group('TestSuites')]
 #[Group('Test')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class PhpUnitApiGetTestClassesTest extends KernelTestBase {
 
   /**
@@ -35,8 +37,8 @@ class PhpUnitApiGetTestClassesTest extends KernelTestBase {
     $configurationFilePath = $this->container->getParameter('app.root') . \DIRECTORY_SEPARATOR . 'core';
     // @todo once PHPUnit 10 is no longer used, remove the condition.
     // @see https://www.drupal.org/project/drupal/issues/3497116
-    if (RunnerVersion::getMajor() >= 11) {
-      $configurationFilePath .= \DIRECTORY_SEPARATOR . '.phpunit-next.xml';
+    if (RunnerVersion::getMajor() < 11) {
+      $configurationFilePath .= \DIRECTORY_SEPARATOR . '.phpunit-10.xml';
     }
     $phpUnitTestDiscovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath($configurationFilePath);
     $phpUnitList = $phpUnitTestDiscovery->getTestClasses($extension, $suites, $directory);
