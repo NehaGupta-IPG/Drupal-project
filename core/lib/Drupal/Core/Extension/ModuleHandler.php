@@ -468,6 +468,14 @@ class ModuleHandler implements ModuleHandlerInterface {
     // the array is a generic type, and additional items in the array are more
     // specific variants of it, as in the case of ['form', 'form_FORM_ID'].
     if (is_array($type)) {
+      $original_type = $type;
+      $type = array_unique($type);
+      if ($original_type !== $type) {
+        trigger_error(sprintf(
+          'The list of alter types passed to ->alter() is not unique: %s.',
+          "['" . implode("', '", $original_type) . "']",
+        ), E_USER_NOTICE);
+      }
       $cid = implode(',', $type);
     }
     else {

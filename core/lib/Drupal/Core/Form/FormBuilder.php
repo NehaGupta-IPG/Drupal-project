@@ -886,7 +886,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // Invoke hook_form_alter(), hook_form_BASE_FORM_ID_alter(), and
     // hook_form_FORM_ID_alter() implementations.
     $hooks = ['form'];
-    if (isset($build_info['base_form_id'])) {
+    // Avoid non-unique alter types, if form id and base form id are the same.
+    if (isset($build_info['base_form_id']) && $build_info['base_form_id'] !== $form_id) {
       $hooks[] = 'form_' . $build_info['base_form_id'];
     }
     $hooks[] = 'form_' . $form_id;
