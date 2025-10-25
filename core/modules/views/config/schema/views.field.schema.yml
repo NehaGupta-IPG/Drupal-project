@@ -89,6 +89,10 @@ views.field.dropbutton:
       type: string
       label: 'Dropbutton type'
       nullable: true
+      constraints:
+        Choice:
+          - small
+          - extrasmall
 
 views.field.machine_name:
   type: views_field
