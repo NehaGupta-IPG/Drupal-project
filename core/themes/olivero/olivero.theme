@@ -278,6 +278,23 @@ function olivero_preprocess_form_element_label(&$variables): void {
 }
 
 /**
+ * Implements hook_preprocess_links__media_library_menu().
+ *
+ * This targets the menu of available media types in the media library's modal
+ * dialog.
+ *
+ * @todo Do this in the relevant template once
+ *   https://www.drupal.org/project/drupal/issues/3088856 is resolved.
+ */
+function olivero_preprocess_links__media_library_menu(array &$variables) {
+  foreach ($variables['links'] as &$link) {
+    // Add a class to the Media Library menu items.
+    $link['attributes']->addClass('media-library-menu__item');
+    $link['link']['#options']['attributes']['class'][] = 'media-library-menu__link';
+  }
+}
+
+/**
  * Implements hook_preprocess_HOOK().
  */
 function olivero_preprocess_input(&$variables): void {

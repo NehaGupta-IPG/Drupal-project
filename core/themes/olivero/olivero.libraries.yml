@@ -56,6 +56,9 @@ global-styling:
     - core/once
     - core/tabbable
     - olivero/navigation-base
+    - claro/global-styling
+    - claro/media_library.theme
+    - claro/media_library.ui
 
 cke-dialog:
   version: VERSION
