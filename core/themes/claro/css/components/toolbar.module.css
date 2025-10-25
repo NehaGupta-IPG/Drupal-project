@@ -54,7 +54,8 @@
 .hidden:is(:is(.toolbar .toolbar-bar) .toolbar-tab) {
   display: none;
 }
-.toolbar a {
+.toolbar a,
+.toolbar span[class*="toolbar-icon-menu-link-content:"] {
   display: block;
   line-height: 1;
 }

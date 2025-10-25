@@ -86,7 +86,9 @@
   background-color: #f5f5f5;
 }
 .toolbar-tray a,
-.toolbar-tray a:visited {
+.toolbar-tray a:visited,
+.toolbar-tray span[class*="toolbar-icon-menu-link-content:"],
+.toolbar-tray span[class*="toolbar-icon-menu-link-content:"]:visited {
   padding: 1em 1.3333em;
   cursor: pointer;
   text-decoration: none;
@@ -95,7 +97,11 @@
 .toolbar-tray a:hover,
 .toolbar-tray a:active,
 .toolbar-tray a:focus,
-.toolbar-tray a.is-active {
+.toolbar-tray a.is-active,
+.toolbar-tray span[class*="toolbar-icon-menu-link-content:"]:hover,
+.toolbar-tray span[class*="toolbar-icon-menu-link-content:"]:active,
+.toolbar-tray span[class*="toolbar-icon-menu-link-content:"]:focus,
+.toolbar-tray span[class*="toolbar-icon-menu-link-content:"].is-active {
   text-decoration: underline;
   color: #000;
 }
