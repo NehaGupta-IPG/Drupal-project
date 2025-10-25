@@ -425,10 +425,12 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       'link_display' => ['link_display', 'link_url'],
 
       // Force these to cascade properly.
-      'style' => ['style', 'row'],
-      'row' => ['style', 'row'],
+      'style' => ['style', 'row', 'style_options'],
+      'row' => ['style', 'row', 'style_options'],
+      'style_options' => ['style', 'row', 'style_options'],
 
-      'pager' => ['pager'],
+      'pager' => ['pager', 'pager_options'],
+      'pager_options' => ['pager', 'pager_options'],
 
       'exposed_form' => ['exposed_form'],
 
@@ -481,6 +483,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
           'hide_attachment_summary' => TRUE,
           'show_admin_links' => TRUE,
           'pager' => TRUE,
+          'pager_options' => TRUE,
           'use_more' => TRUE,
           'use_more_always' => TRUE,
           'use_more_text' => TRUE,
@@ -491,6 +494,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
           'group_by' => TRUE,
 
           'style' => TRUE,
+          'style_options' => TRUE,
           'row' => TRUE,
 
           'header' => TRUE,
@@ -651,6 +655,9 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     ];
 
     if (!$this->usesPager()) {
+      $options['defaults']['default']['use_pager'] = FALSE;
+      $options['defaults']['default']['items_per_page'] = FALSE;
+      $options['defaults']['default']['offset'] = FALSE;
       $options['defaults']['default']['pager'] = FALSE;
       $options['pager']['contains']['type']['default'] = 'some';
     }

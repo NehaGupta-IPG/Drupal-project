@@ -200,12 +200,12 @@ class PagerTest extends ViewTestBase {
     $this->drupalGet('admin/structure/views/view/test_store_pager_settings/edit/page_1');
     $this->assertSession()->pageTextContains('20 items');
 
-    // Test that the override element is only displayed on pager plugin
-    // selection form.
+    // Test that the override element is displayed on pager plugin selection and
+    // pager settings form.
     $this->drupalGet('admin/structure/views/nojs/display/test_store_pager_settings/page_1/pager');
     $this->assertSession()->fieldValueEquals('override[dropdown]', 'page_1');
     $this->drupalGet('admin/structure/views/nojs/display/test_store_pager_settings/page_1/pager_options');
-    $this->assertSession()->fieldNotExists('override[dropdown]');
+    $this->assertSession()->fieldExists('override[dropdown]');
 
     $items_per_page = $this->assertSession()->fieldExists("pager_options[items_per_page]");
     $this->assertSession()->fieldValueEquals("pager_options[items_per_page]", 20);

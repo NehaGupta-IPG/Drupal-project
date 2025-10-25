@@ -166,6 +166,9 @@ views_display:
         pager:
           type: boolean
           label: 'Use pager'
+        pager_options:
+          type: boolean
+          label: 'Pager options'
         use_more:
           type: boolean
           label: 'Create more link'
@@ -190,6 +193,9 @@ views_display:
         style:
           type: boolean
           label: 'Style'
+        style_options:
+          type: boolean
+          label: 'Style options'
         row:
           type: boolean
           label: 'Row'
@@ -252,6 +258,12 @@ views_display:
     link_url:
       type: text
       label: 'Link URL'
+    pager_options:
+      type: boolean
+      label: 'Pager options'
+    style_options:
+      type: boolean
+      label: 'Style options'
     header:
       type: sequence
       label: 'Header'

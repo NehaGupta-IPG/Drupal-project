@@ -122,3 +122,65 @@ function views_post_update_block_items_per_page(?array &$sandbox = NULL): void {
       return FALSE;
     });
 }
+
+/**
+ * Adds 'style_options' and 'pager_options' to existing views.
+ *
+ * @param array &$sandbox
+ *   A sandbox array used for batch processing.
+ *
+ * @return string|null
+ *   A message indicating the result of the update, or null if the batch is
+ *   still processing.
+ */
+function views_post_update_add_style_and_pager_display_options(?array &$sandbox = NULL): ?string {
+  if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $views_storage = \Drupal::entityTypeManager()->getStorage('view');
+    $sandbox['view_ids'] = $views_storage->getQuery()->execute();
+    $sandbox['max'] = count($sandbox['view_ids']);
+  }
+
+  $limit = 5;
+  $views_storage = \Drupal::entityTypeManager()->getStorage('view');
+  $view_ids_chunk = array_slice($sandbox['view_ids'], $sandbox['progress'], $limit);
+  $views = $views_storage->loadMultiple($view_ids_chunk);
+
+  foreach ($views as $view) {
+    $changed = FALSE;
+    foreach ($view->get('display') as $display_id => $display) {
+      // Check and add 'style_options' if 'style' is set.
+      if (isset($display['display_options']['style'])) {
+        // Check for 'style_options'. Add if not set, preserve 'false'.
+        if (!array_key_exists('style_options', $display['display_options'])) {
+          $view->set("display.$display_id.display_options.style_options", TRUE);
+          $changed = TRUE;
+        }
+      }
+      // Check and add 'pager_options' if 'pager' is set.
+      if (isset($display['display_options']['pager'])) {
+        // Check for 'pager_options'. Add if not set, preserve 'false'.
+        if (!array_key_exists('pager_options', $display['display_options'])) {
+          $view->set("display.$display_id.display_options.pager_options", TRUE);
+          $changed = TRUE;
+        }
+      }
+    }
+    if ($changed) {
+      $view->save();
+      \Drupal::logger('views')->notice('Updated view @id with new pager and style options.', ['@id' => $view->id()]);
+    }
+  }
+
+  $sandbox['progress'] += count($view_ids_chunk);
+
+  if ($sandbox['progress'] >= $sandbox['max']) {
+    // Clear caches once after all batches are processed.
+    drupal_flush_all_caches();
+    return t('All views have been updated with new pager and style options.');
+  }
+  else {
+    $sandbox['#finished'] = $sandbox['progress'] / $sandbox['max'];
+    return t('Processed @current out of @total views.', ['@current' => $sandbox['progress'], '@total' => $sandbox['max']]);
+  }
+}
