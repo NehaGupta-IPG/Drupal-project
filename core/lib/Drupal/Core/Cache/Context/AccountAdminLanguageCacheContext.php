@@ -31,7 +31,7 @@ class AccountAdminLanguageCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public function getContext(): string {
-    return $this->currentUser->getPreferredAdminLangcode();
+    return $this->currentUser->getPreferredAdminLangcode(FALSE);
   }
 
   /**
