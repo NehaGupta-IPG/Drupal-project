@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Drupal\Tests\link\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the update path for link module.
- *
- * @group Update
  */
+#[Group('Update')]
+#[RunTestsInSeparateProcesses]
 class LinkPostUpdateTest extends UpdatePathTestBase {
 
   /**

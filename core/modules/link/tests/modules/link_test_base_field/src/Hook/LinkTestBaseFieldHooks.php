@@ -26,6 +26,8 @@ class LinkTestBaseFieldHooks {
       $fields['links'] = BaseFieldDefinition::create('link')->setLabel('Links')->setRevisionable(TRUE)->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)->setDescription('Add links to the entity.')->setRequired(FALSE)->setSettings([
         'link_type' => LinkItemInterface::LINK_GENERIC,
         'title' => LinkTitleVisibility::Required->value,
+        'handler' => 'default',
+        'handler_settings' => [],
       ])->setDisplayOptions('form', ['type' => 'link_default', 'weight' => 49]);
     }
     return $fields;

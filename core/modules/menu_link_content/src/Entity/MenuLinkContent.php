@@ -345,6 +345,8 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
       ->setSettings([
         'link_type' => LinkItemInterface::LINK_GENERIC,
         'title' => LinkTitleVisibility::Disabled->value,
+        'handler' => 'default',
+        'handler_settings' => [],
       ])
       ->setDisplayOptions('form', [
         'type' => 'link_default',
