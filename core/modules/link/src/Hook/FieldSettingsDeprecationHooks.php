@@ -19,7 +19,7 @@ class FieldSettingsDeprecationHooks {
    * Implements hook_ENTITY_TYPE_presave() for field_config entities.
    */
   #[Hook('ENTITY_TYPE_presave')]
-  function presaveFieldConfig(FieldConfigInterface $field): void {
+  public function presaveFieldConfig(FieldConfigInterface $field): void {
     if ($field->getType() !== 'link') {
       return;
     }
@@ -34,7 +34,7 @@ class FieldSettingsDeprecationHooks {
    * Implements hook_ENTITY_TYPE_presave() for entity_form_display entities.
    */
   #[Hook('ENTITY_TYPE_presave')]
-  function presaveEntityFormDisplay(EntityFormDisplayInterface $display): void {
+  public function presaveEntityFormDisplay(EntityFormDisplayInterface $display): void {
     /** @var \Drupal\Core\Field\WidgetPluginManager $field_widget_manager */
     $field_widget_manager = \Drupal::service('plugin.manager.field.widget');
 
