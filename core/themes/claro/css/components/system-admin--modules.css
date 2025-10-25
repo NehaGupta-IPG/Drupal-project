@@ -117,6 +117,10 @@ td.module-list__description {
   padding-bottom: 0;
 }
 
+.tableresponsive-toggle-columns {
+  margin-inline-start: 1.5rem;
+}
+
 .claro-details.module-list__module-details {
   margin: 0;
 }

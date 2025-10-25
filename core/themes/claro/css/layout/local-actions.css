@@ -15,7 +15,7 @@
  */
 
 .local-actions {
-  margin: var(--space-m) 0;
+  margin: var(--space-m) var(--space-l);
   padding: 0;
   list-style: none;
 }

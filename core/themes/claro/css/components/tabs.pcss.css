@@ -23,6 +23,11 @@
     width: 100%;
   }
 }
+
+.block-system-main-block {
+  margin-inline-start: var(--space-l);
+}
+
 .tabs {
   display: flex;
   flex-direction: column;
@@ -172,6 +177,7 @@
 
   .tabs-wrapper--secondary {
     position: relative;
+    margin-inline-start: 2rem;
   }
 
   .is-horizontal {
@@ -185,8 +191,8 @@
     }
     & .tabs--secondary {
       overflow: hidden;
-      margin: calc(calc(var(--tabs--focus-height) + 3px) * -1) calc(calc(var(--tabs--focus-height) + 3px) * -1) 0;
-      padding: calc(var(--tabs--focus-height) + 3px) calc(var(--tabs--focus-height) + 3px) 0;
+      margin: calc(calc(var(--tabs--focus-height) + 3px) * -1) calc(calc(var(--tabs--focus-height) + 3px) * -1) 0 calc(calc(var(--tabs--focus-height) + 3px) * -2);
+      padding: calc(var(--tabs--focus-height) + 3px) calc(var(--tabs--focus-height) + 3px) 0 0;
       border-radius: 0;
       &::after {
         position: absolute;

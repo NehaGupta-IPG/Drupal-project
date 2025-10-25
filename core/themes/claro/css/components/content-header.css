@@ -12,6 +12,6 @@
 .content-header {
   overflow: hidden;
   margin-bottom: var(--space-s);
-  padding: var(--space-l) 0 0;
+  padding: var(--space-l) 0 0 var(--space-l);
   background-color: var(--color-gray-050);
 }

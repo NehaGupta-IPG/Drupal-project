@@ -21,7 +21,7 @@ th {
   position: relative;
   box-sizing: border-box;
   height: var(--space-xl);
-  padding: var(--space-xs) var(--space-m);
+  padding: var(--space-xs) var(--space-l);
   text-align: start;
   color: var(--color-text);
   background: var(--color-gray-050);
@@ -30,7 +30,7 @@ th {
 
 /* The actual sort link. */
 .sortable-heading {
-  padding: 0 var(--space-m);
+  padding: 0 var(--space-m) 0 var(--space-l);
   & > a {
     display: block;
     padding-block: var(--space-xs);

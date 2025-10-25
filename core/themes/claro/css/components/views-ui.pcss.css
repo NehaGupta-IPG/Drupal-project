@@ -16,6 +16,14 @@ details.fieldset-no-legend {
   padding-top: 0;
 }
 
+/* @group View table
+ *
+ * Fixes checkbox alignment with respect to other elements.
+ */
+.views-table .form-checkbox {
+  margin-inline-start: 0.5rem;
+}
+
 /**
  * Being extra safe here and scoping this to the add view wizard form (where
  * a layout problem occurs for the Display format details if we don't fix its

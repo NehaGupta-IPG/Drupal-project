@@ -29,6 +29,10 @@
   width: 100%;
 }
 
+.block-system-main-block {
+  margin-inline-start: var(--space-l);
+}
+
 .tabs {
   display: flex;
   flex-direction: column;
@@ -192,6 +196,7 @@
 
   .tabs-wrapper--secondary {
     position: relative;
+    margin-inline-start: 2rem;
   }
   .is-horizontal .tabs {
     flex-direction: row;
@@ -203,8 +208,8 @@
   }
   .is-horizontal .tabs--secondary {
     overflow: hidden;
-    margin: calc(calc(var(--tabs--focus-height) + 0.1875rem) * -1) calc(calc(var(--tabs--focus-height) + 0.1875rem) * -1) 0;
-    padding: calc(var(--tabs--focus-height) + 0.1875rem) calc(var(--tabs--focus-height) + 0.1875rem) 0;
+    margin: calc(calc(var(--tabs--focus-height) + 0.1875rem) * -1) calc(calc(var(--tabs--focus-height) + 0.1875rem) * -1) 0 calc(calc(var(--tabs--focus-height) + 0.1875rem) * -2);
+    padding: calc(var(--tabs--focus-height) + 0.1875rem) calc(var(--tabs--focus-height) + 0.1875rem) 0 0;
     border-radius: 0;
   }
   :is(.is-horizontal .tabs--secondary)::after {

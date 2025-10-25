@@ -34,6 +34,11 @@ tr .form-item,
   margin-block: var(--space-s);
 }
 
+.views-form .form-item,
+.views-form .form-actions {
+  margin-inline-start: var(--space-l);
+}
+
 /**
  * Form element label.
  */
