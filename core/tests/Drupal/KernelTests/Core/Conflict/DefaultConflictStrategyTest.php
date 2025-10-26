@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Conflict;
 
 use Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface;
@@ -74,7 +76,7 @@ class DefaultConflictStrategyTest extends KernelTestBase {
 
     $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
     $this->assertEquals([
-      'name' => ConflictTypes::CONFLICT_TYPE_REMOTE
+      'name' => ConflictTypes::CONFLICT_TYPE_REMOTE,
     ], $conflicts);
   }
 
@@ -91,7 +93,7 @@ class DefaultConflictStrategyTest extends KernelTestBase {
 
     $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
     $this->assertEquals([
-      'name' => ConflictTypes::CONFLICT_TYPE_LOCAL_REMOTE
+      'name' => ConflictTypes::CONFLICT_TYPE_LOCAL_REMOTE,
     ], $conflicts);
   }
 
@@ -126,7 +128,7 @@ class DefaultConflictStrategyTest extends KernelTestBase {
 
     $conflicts = $conflict_resolver->resolveConflicts($local, $remote, $base, $result);
     $this->assertEquals([
-      'name' => ConflictTypes::CONFLICT_TYPE_LOCAL_REMOTE
+      'name' => ConflictTypes::CONFLICT_TYPE_LOCAL_REMOTE,
     ], $conflicts);
   }
 

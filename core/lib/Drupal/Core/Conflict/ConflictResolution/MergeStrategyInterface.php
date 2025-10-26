@@ -38,4 +38,3 @@ interface MergeStrategyInterface extends EventSubscriberInterface {
   public function isEnabled(EntityConflictResolutionEvent $event) : bool;
 
 }
-

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Conflict;
 
 use Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface;
@@ -60,7 +62,6 @@ class ConflictFrameworkTest extends KernelTestBase {
     parent::setUp();
     $this->installEntitySchema('entity_test');
   }
-
 
   /**
    * {@inheritdoc}
@@ -159,8 +160,8 @@ class ConflictFrameworkTest extends KernelTestBase {
       ->method('discoverConflictsContentEntity')
       ->with($expectedEvent)
       ->willReturnCallback(function (EntityConflictDiscoveryEvent $event) {
-      // Don't add a conflict.
-    });
+        // Don't add a conflict.
+      });
 
     $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
     $this->assertEmpty($conflicts);

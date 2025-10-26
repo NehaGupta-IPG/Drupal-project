@@ -39,11 +39,12 @@ interface ConflictResolverManagerInterface {
    *   An associative array keyed by the conflicting properties, having as
    *   values the corresponding conflict type.
    */
-  public function resolveConflicts(EntityInterface $local, EntityInterface $remote, EntityInterface $base, EntityInterface $result = NULL, ParameterBag $context = NULL, array $conflicts = NULL) : array;
+  public function resolveConflicts(EntityInterface $local, EntityInterface $remote, EntityInterface $base, ?EntityInterface $result = NULL, ?ParameterBag $context = NULL, ?array $conflicts = NULL) : array;
 
   /**
    * Returns the conflicts between two entities based on their common parent.
    *    *
+   *
    * @param \Drupal\Core\Entity\EntityInterface $local
    *   The local part of the comparision - for example the entity built of the
    *   user input on an entity form submission. This is basically the active
@@ -61,6 +62,6 @@ interface ConflictResolverManagerInterface {
    *   An associative array keyed by the conflicting properties, having as
    *   values the corresponding conflict type.
    */
-  public function getConflicts(EntityInterface $local, EntityInterface $remote, EntityInterface $base, ParameterBag $context = NULL) : array;
+  public function getConflicts(EntityInterface $local, EntityInterface $remote, EntityInterface $base, ?ParameterBag $context = NULL) : array;
 
 }

@@ -64,7 +64,7 @@ class EntityConflictDiscoveryEvent extends Event {
    * @param \Symfony\Component\HttpFoundation\ParameterBag $context
    *   (optional) The context parameter bag.
    */
-  public function __construct(EntityInterface $local, EntityInterface $remote, EntityInterface $base, ParameterBag $context = NULL) {
+  public function __construct(EntityInterface $local, EntityInterface $remote, EntityInterface $base, ?ParameterBag $context = NULL) {
     $this->LocalEntity = $local;
     $this->RemoteEntity = $remote;
     $this->baseEntity = $base;
