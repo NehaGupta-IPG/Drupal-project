@@ -496,9 +496,9 @@ class Xss {
    *   1 => 'class="foo bar"',
    *   2 => 'data-valueless-attribute',
    * ]
-   * This function reformats the array into the same name => value format
-   * expected as the input to static::sanitizeAttributes(). The example array
-   * given above would result in an output like:
+   * This function reformats the array into the same associative array format
+   * expected by \Drupal\Core\Template\Attributes::__construct(). The example
+   * array given above would result in an output like:
    * [
    *   'href' => 'https://example.com',
    *   'class' => [
