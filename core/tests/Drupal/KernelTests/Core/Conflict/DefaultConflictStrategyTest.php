@@ -2,6 +2,7 @@
 
 namespace Drupal\KernelTests\Core\Conflict;
 
+use Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface;
 use Drupal\Core\Conflict\ConflictTypes;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
@@ -39,7 +40,7 @@ class DefaultConflictStrategyTest extends KernelTestBase {
     $remote = EntityTest::create(['name' => 'A']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
-    $conflict_resolver = $this->container->get('conflict.resolver.manager');
+    $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
     $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
     $this->assertEquals([], $conflicts);
@@ -54,7 +55,7 @@ class DefaultConflictStrategyTest extends KernelTestBase {
     $remote = EntityTest::create(['name' => 'A']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
-    $conflict_resolver = $this->container->get('conflict.resolver.manager');
+    $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
     $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
     $this->assertEquals([], $conflicts);
@@ -69,7 +70,7 @@ class DefaultConflictStrategyTest extends KernelTestBase {
     $remote = EntityTest::create(['name' => 'B']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
-    $conflict_resolver = $this->container->get('conflict.resolver.manager');
+    $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
     $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
     $this->assertEquals([
@@ -86,7 +87,7 @@ class DefaultConflictStrategyTest extends KernelTestBase {
     $remote = EntityTest::create(['name' => 'C']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
-    $conflict_resolver = $this->container->get('conflict.resolver.manager');
+    $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
     $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
     $this->assertEquals([
@@ -104,7 +105,7 @@ class DefaultConflictStrategyTest extends KernelTestBase {
     $result = EntityTest::create();
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
-    $conflict_resolver = $this->container->get('conflict.resolver.manager');
+    $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
     $conflicts = $conflict_resolver->resolveConflicts($local, $remote, $base, $result);
     $this->assertEquals([], $conflicts);
@@ -121,7 +122,7 @@ class DefaultConflictStrategyTest extends KernelTestBase {
     $result = EntityTest::create();
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
-    $conflict_resolver = $this->container->get('conflict.resolver.manager');
+    $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
     $conflicts = $conflict_resolver->resolveConflicts($local, $remote, $base, $result);
     $this->assertEquals([

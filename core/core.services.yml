@@ -460,17 +460,11 @@ services:
     calls:
       - [setValidationConstraintManager, ['@validation.constraint']]
   Drupal\Core\Config\TypedConfigManagerInterface: '@config.typed'
-  conflict.resolver.manager:
+  Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface:
+    autowire: true
     class: Drupal\Core\Conflict\ConflictResolver\ConflictResolverManager
-    arguments: ['@event_dispatcher']
-  conflict.discovery.default:
-    class: Drupal\Core\Conflict\ConflictDiscovery\DefaultConflictDiscovery
-    tags:
-      - { name: event_subscriber }
-  conflict.resolution.merge_remote_only_changes:
-    class: Drupal\Core\Conflict\ConflictResolution\MergeRemoteOnlyChanges
-    tags:
-      - { name: event_subscriber }
+  Drupal\Core\Conflict\ConflictDiscovery\DefaultConflictDiscovery: ~
+  Drupal\Core\Conflict\ConflictResolution\MergeRemoteOnlyChanges: ~
   context.handler:
     class: Drupal\Core\Plugin\Context\ContextHandler
   Drupal\Core\Plugin\Context\ContextHandlerInterface: '@context.handler'

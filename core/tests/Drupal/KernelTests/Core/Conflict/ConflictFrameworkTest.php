@@ -2,6 +2,9 @@
 
 namespace Drupal\KernelTests\Core\Conflict;
 
+use Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface;
+use Drupal\Core\Conflict\ConflictResolution\MergeRemoteOnlyChanges;
+use Drupal\Core\Conflict\ConflictDiscovery\DefaultConflictDiscovery;
 use Drupal\Core\Conflict\ConflictDiscovery\ConflictDiscoveryBase;
 use Drupal\Core\Conflict\ConflictResolution\MergeStrategyBase;
 use Drupal\Core\Conflict\Event\EntityConflictDiscoveryEvent;
@@ -98,8 +101,8 @@ class ConflictFrameworkTest extends KernelTestBase {
     $container->setDefinition('conflict_test.resolution_b', $resolution_b);
 
     // Remove the default implementations for the sake of this test.
-    $container->removeDefinition('conflict.discovery.default');
-    $container->removeDefinition('conflict.resolution.merge_remote_only_changes');
+    $container->removeDefinition(DefaultConflictDiscovery::class);
+    $container->removeDefinition(MergeRemoteOnlyChanges::class);
   }
 
   /**
@@ -147,7 +150,7 @@ class ConflictFrameworkTest extends KernelTestBase {
     $remote = EntityTest::create(['name' => 'C']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
-    $conflict_resolver = $this->container->get('conflict.resolver.manager');
+    $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
     $expectedEvent = new EntityConflictDiscoveryEvent($local, $remote, $base, NULL);
 
@@ -172,7 +175,7 @@ class ConflictFrameworkTest extends KernelTestBase {
     $remote = EntityTest::create(['name' => 'C']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
-    $conflict_resolver = $this->container->get('conflict.resolver.manager');
+    $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
     $this->conflict_discovery_a
       ->expects($this->once())
@@ -194,7 +197,7 @@ class ConflictFrameworkTest extends KernelTestBase {
     $remote = EntityTest::create(['name' => 'C']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
-    $conflict_resolver = $this->container->get('conflict.resolver.manager');
+    $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
     $this->conflict_discovery_a
       ->expects($this->once())
@@ -223,7 +226,7 @@ class ConflictFrameworkTest extends KernelTestBase {
     $remote = EntityTest::create(['name' => 'C']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
-    $conflict_resolver = $this->container->get('conflict.resolver.manager');
+    $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
     $this->conflict_discovery_a
       ->expects($this->once())
@@ -253,7 +256,7 @@ class ConflictFrameworkTest extends KernelTestBase {
     $result = EntityTest::create(['name' => 'X']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
-    $conflict_resolver = $this->container->get('conflict.resolver.manager');
+    $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
     $this->conflict_discovery_a
       ->expects($this->once())
@@ -285,7 +288,7 @@ class ConflictFrameworkTest extends KernelTestBase {
     $result = EntityTest::create(['name' => 'X']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
-    $conflict_resolver = $this->container->get('conflict.resolver.manager');
+    $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
     $this->conflict_discovery_a
       ->expects($this->once())
@@ -325,7 +328,7 @@ class ConflictFrameworkTest extends KernelTestBase {
     $result = EntityTest::create(['name' => 'X']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
-    $conflict_resolver = $this->container->get('conflict.resolver.manager');
+    $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
     $this->conflict_discovery_a
       ->expects($this->once())
