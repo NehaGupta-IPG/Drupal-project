@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\path\Functional;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\Tests\WaitTerminateTestTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -330,7 +331,7 @@ class PathAliasTest extends PathTestBase {
 
     // Delete the node and check that the path alias is also deleted.
     $node5->delete();
-    $path_alias = \Drupal::service('path_alias.repository')->lookUpBySystemPath('/node/' . $node5->id(), $node5->language()->getId());
+    $path_alias = \Drupal::service('path_alias.repository')->lookUpBySystemPath('/node/' . $node5->id(), LanguageInterface::LANGCODE_NOT_SPECIFIED);
     $this->assertNull($path_alias, 'Alias was successfully deleted when the referenced node was deleted.');
 
     // Create sixth test node.

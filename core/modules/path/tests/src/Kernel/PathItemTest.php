@@ -91,6 +91,11 @@ class PathItemTest extends KernelTestBase {
     $values = $loaded_node->get('path')->getValue();
     $this->assertEquals('/foo', $values[0]['alias']);
 
+    // Ensure that the bundle is translatable, using the same technique
+    // as enableTranslation() in Drupal\Tests\content_translation\Functional
+    \Drupal::service('content_translation.manager')->setEnabled('node', 'foo', TRUE);
+    \Drupal::service('router.builder')->rebuild();
+
     $node_storage->resetCache();
     $loaded_node = $node_storage->load($node->id());
     $this->assertEquals('/foo', $loaded_node->path->alias);

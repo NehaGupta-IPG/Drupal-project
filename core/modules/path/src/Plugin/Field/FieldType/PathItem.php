@@ -7,6 +7,7 @@ use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
 
@@ -79,6 +80,14 @@ class PathItem extends FieldItemBase {
     // existing language of an alias can be kept. That could for example be
     // unspecified even if the field/entity has a specific langcode.
     $alias_langcode = ($langcode && $pid) ? $langcode : $this->getLangcode();
+
+    $moduleHandler = \Drupal::service('module_handler');
+    if ($moduleHandler->moduleExists('content_translation') && !$moduleHandler->moduleExists('workspaces')) {
+      // If either entity or the path field is non-translatable, use 'und'.
+      if (!$entity->isTranslatable() || !$this->getFieldDefinition()->isTranslatable()) {
+        $alias_langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED;
+      }
+    }
 
     // If we have an alias, we need to create or update a path alias entity.
     if ($alias) {

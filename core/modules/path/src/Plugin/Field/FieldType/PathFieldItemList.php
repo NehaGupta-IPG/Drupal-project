@@ -3,7 +3,9 @@
 namespace Drupal\path\Plugin\Field\FieldType;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Field\FieldItemList;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\ComputedItemListTrait;
 
@@ -17,11 +19,9 @@ class PathFieldItemList extends FieldItemList {
   /**
    * {@inheritdoc}
    */
-  protected function computeValue() {
+  protected function computeValue(): void {
     // Default the langcode to the current language if this is a new entity or
     // there is no alias for an existent entity.
-    // @todo Set the langcode to not specified for untranslatable fields
-    //   in https://www.drupal.org/node/2689459.
     $value = ['langcode' => $this->getLangcode()];
 
     $entity = $this->getEntity();
@@ -35,6 +35,11 @@ class PathFieldItemList extends FieldItemList {
           'pid' => $path_alias['id'],
           'langcode' => $path_alias['langcode'],
         ];
+
+        // Set the langcode to not specified for untranslatable fields.
+        if (!$entity->isTranslatable() || !$this->getFieldDefinition()->isTranslatable()) {
+          $value['langcode'] = LanguageInterface::LANGCODE_NOT_SPECIFIED;
+        }
       }
     }
 
@@ -44,7 +49,7 @@ class PathFieldItemList extends FieldItemList {
   /**
    * {@inheritdoc}
    */
-  public function defaultAccess($operation = 'view', ?AccountInterface $account = NULL) {
+  public function defaultAccess($operation = 'view', ?AccountInterface $account = NULL): AccessResultInterface {
     if ($operation == 'view') {
       return AccessResult::allowed();
     }
@@ -54,14 +59,32 @@ class PathFieldItemList extends FieldItemList {
   /**
    * {@inheritdoc}
    */
-  public function delete() {
+  public function delete(): void {
     // Delete all aliases associated with this entity in the current language.
     $entity = $this->getEntity();
+
+    // If neither the path field nor entity being deleted is translatable,
+    // delete alias with LANGCODE_NOT_SPECIFIED.
+    if (!$entity->isTranslatable() || !$this->getFieldDefinition()->isTranslatable()) {
+      $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED;
+    }
+    else {
+      $langcode = $entity->language()->getId();
+    }
+
     $path_alias_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
-    $entities = $path_alias_storage->loadByProperties([
+    $conditions = [
       'path' => '/' . $entity->toUrl()->getInternalPath(),
-      'langcode' => $entity->language()->getId(),
-    ]);
+      'langcode' => $langcode,
+    ];
+    $entity_langcode = $entity->language()->getId();
+    $original_entity_langcode = $entity->getUntranslated()->language()->getId();
+    // If the entity being deleted is not translated, delete the path alias
+    // with the langcode LANGCODE_NOT_SPECIFIED.
+    if ($entity_langcode == $original_entity_langcode) {
+      $conditions['langcode'] = LanguageInterface::LANGCODE_NOT_SPECIFIED;
+    }
+    $entities = $path_alias_storage->loadByProperties($conditions);
     $path_alias_storage->delete($entities);
   }
 
