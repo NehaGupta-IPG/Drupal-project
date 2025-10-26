@@ -167,9 +167,9 @@ class AjaxFormCacheTest extends WebDriverTestBase {
       'type' => 'entity_reference_autocomplete',
     ])->save();
 
-    // Set the form_cache_expiry global setting to 0.
-    $settings['settings']['form_cache_expiry'] = (object) [
-      'value' => 0,
+    // Set the form_cache_expiry global setting to 1s.
+    $settings['settings']['form_cache_expiration'] = (object) [
+      'value' => 1,
       'required' => TRUE,
     ];
     $this->writeSettings($settings);
@@ -190,6 +190,7 @@ class AjaxFormCacheTest extends WebDriverTestBase {
     $add_more_selector = sprintf('[data-drupal-selector="edit-%s-add-more"]', str_replace('_', '-', $field_name));
     $this->getSession()->getPage()->find('css', $add_more_selector)->click();
     $assert->waitForElement('css', sprintf('[name="%s[1][target_id]"]', $field_name));
+    sleep(1);
     $this->getSession()->getPage()->find('css', $add_more_selector)->click();
     $assert->waitForElement('css', sprintf('[name="%s[2][target_id]"]', $field_name));
 
