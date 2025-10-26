@@ -438,7 +438,7 @@ class BlockTest extends BlockTestBase {
     $config->save();
 
     // Place the "Powered by Drupal" block.
-    $block = $this->drupalPlaceBlock('system_powered_by_block', ['id' => 'powered']);
+    $block = $this->drupalPlaceBlock('system_branding_block', ['id' => 'branding']);
 
     // Prime the page cache.
     $this->drupalGet('<front>');
@@ -454,7 +454,8 @@ class BlockTest extends BlockTestBase {
     $expected_cache_tags = [
       'config:block_list',
       'block_view',
-      'config:block.block.powered',
+      'config:block.block.branding',
+      'config:system.site',
       'config:user.role.anonymous',
       'http_response',
       'rendered',
@@ -464,10 +465,11 @@ class BlockTest extends BlockTestBase {
       ->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])
       ->getKeys();
     $this->assertSame($expected_cache_tags, $cache_entry->tags);
-    $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered:' . implode(':', $keys));
+    $cache_entry = \Drupal::cache('render')->get('entity_view:block:branding:' . implode(':', $keys));
     $expected_cache_tags = [
       'block_view',
-      'config:block.block.powered',
+      'config:block.block.branding',
+      'config:system.site',
       'rendered',
     ];
     sort($expected_cache_tags);
@@ -484,7 +486,7 @@ class BlockTest extends BlockTestBase {
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'HIT');
 
     // Place the "Powered by Drupal" block another time; verify a cache miss.
-    $this->drupalPlaceBlock('system_powered_by_block', ['id' => 'powered_2']);
+    $this->drupalPlaceBlock('system_branding_block', ['id' => 'branding_2']);
     $this->drupalGet('<front>');
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'MISS');
 
@@ -497,8 +499,9 @@ class BlockTest extends BlockTestBase {
     $expected_cache_tags = [
       'config:block_list',
       'block_view',
-      'config:block.block.powered',
-      'config:block.block.powered_2',
+      'config:block.block.branding',
+      'config:block.block.branding_2',
+      'config:system.site',
       'config:user.role.anonymous',
       'http_response',
       'rendered',
@@ -507,25 +510,27 @@ class BlockTest extends BlockTestBase {
     $this->assertEquals($expected_cache_tags, $cache_entry->tags);
     $expected_cache_tags = [
       'block_view',
-      'config:block.block.powered',
+      'config:block.block.branding',
+      'config:system.site',
       'rendered',
     ];
     sort($expected_cache_tags);
     $keys = \Drupal::service('cache_contexts_manager')
       ->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])
       ->getKeys();
-    $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered:' . implode(':', $keys));
+    $cache_entry = \Drupal::cache('render')->get('entity_view:block:branding:' . implode(':', $keys));
     $this->assertSame($expected_cache_tags, $cache_entry->tags);
     $expected_cache_tags = [
       'block_view',
-      'config:block.block.powered_2',
+      'config:block.block.branding_2',
+      'config:system.site',
       'rendered',
     ];
     sort($expected_cache_tags);
     $keys = \Drupal::service('cache_contexts_manager')
       ->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])
       ->getKeys();
-    $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered_2:' . implode(':', $keys));
+    $cache_entry = \Drupal::cache('render')->get('entity_view:block:branding_2:' . implode(':', $keys));
     $this->assertSame($expected_cache_tags, $cache_entry->tags);
 
     // Now we should have a cache hit again.
@@ -534,8 +539,8 @@ class BlockTest extends BlockTestBase {
 
     // Delete the "Powered by Drupal" blocks; verify a cache miss.
     $block_storage = \Drupal::entityTypeManager()->getStorage('block');
-    $block_storage->load('powered')->delete();
-    $block_storage->load('powered_2')->delete();
+    $block_storage->load('branding')->delete();
+    $block_storage->load('branding_2')->delete();
     $this->drupalGet('<front>');
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'MISS');
   }
