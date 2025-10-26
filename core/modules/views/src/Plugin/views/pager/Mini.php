@@ -37,10 +37,22 @@ class Mini extends SqlBase {
    * {@inheritdoc}
    */
   public function summaryTitle() {
-    if (!empty($this->options['offset'])) {
-      return $this->formatPlural($this->options['items_per_page'], 'Mini pager, @count item, skip @skip', 'Mini pager, @count items, skip @skip', ['@count' => $this->options['items_per_page'], '@skip' => $this->options['offset']]);
+    if ($this->options['items_per_page'] == 0) {
+      if (!empty($this->options['offset'])) {
+        return $this->t('All items except first @skip', ['@skip' => $this->options['offset']]);
+      }
+      else {
+        return $this->t('All items');
+      }
     }
-    return $this->formatPlural($this->options['items_per_page'], 'Mini pager, @count item', 'Mini pager, @count items', ['@count' => $this->options['items_per_page']]);
+    else {
+      if (!empty($this->options['offset'])) {
+        return $this->formatPlural($this->options['items_per_page'], '@count item, skip @skip', '@count items, skip @skip', ['@count' => $this->options['items_per_page'], '@skip' => $this->options['offset']]);
+      }
+      else {
+        return $this->formatPlural($this->options['items_per_page'], '@count item', '@count items', ['@count' => $this->options['items_per_page']]);
+      }
+    }
   }
 
   /**
