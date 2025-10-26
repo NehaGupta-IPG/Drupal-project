@@ -16,15 +16,18 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FormatterInterface;
 use Drupal\Core\Field\FormatterPluginManager;
 use Drupal\Core\Form\EnforcedResponseException;
+use Drupal\Core\Form\FormAjaxException;
 use Drupal\Core\Form\FormHelper;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Utility\Error;
 use Drupal\field\FieldConfigInterface;
 use Drupal\layout_builder\Plugin\Derivative\FieldBlockDeriver;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\field\FieldLabelOptionsTrait;
 
@@ -173,9 +176,14 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
     catch (EnforcedResponseException $e) {
       throw $e;
     }
+    // We must pass this exception
+    // to submit AJAX forms that are provided by the field.
+    catch (FormAjaxException $e) {
+      throw $e;
+    }
     catch (\Exception $e) {
       $build = [];
-      $this->logger->warning('The field "%field" failed to render with the error of "%error".', ['%field' => $this->fieldName, '%error' => $e->getMessage()]);
+      Error::logException($this->logger, $e, 'The field "%field" failed to render. ' . Error::DEFAULT_ERROR_MESSAGE . ' @backtrace_string', ['%field' => $this->fieldName], LogLevel::WARNING);
     }
     CacheableMetadata::createFromRenderArray($build)->addCacheableDependency($this)->applyTo($build);
     return $build;

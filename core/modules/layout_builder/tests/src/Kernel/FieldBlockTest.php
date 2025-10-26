@@ -16,6 +16,7 @@ use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Utility\Error;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\layout_builder\Plugin\Block\FieldBlock;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -28,6 +29,7 @@ use Prophecy\Promise\ReturnPromise;
 use Prophecy\Promise\ThrowPromise;
 use Prophecy\Prophecy\ProphecyInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -267,10 +269,10 @@ class FieldBlockTest extends EntityKernelTestBase {
     $this->entityFieldManager->getFieldDefinitions('entity_test', 'entity_test')->willReturn(['the_field_name' => $field_definition]);
 
     if ($log_message) {
-      $this->logger->warning($log_message, $log_arguments)->shouldBeCalled();
+      $this->logger->log(LogLevel::WARNING, $log_message, $log_arguments)->shouldBeCalled();
     }
     else {
-      $this->logger->warning(Argument::cetera())->shouldNotBeCalled();
+      $this->logger->log(Argument::cetera())->shouldNotBeCalled();
     }
 
     $block = $this->getTestBlock($entity);
@@ -313,12 +315,15 @@ class FieldBlockTest extends EntityKernelTestBase {
   public function testBuildException(): void {
     // In PHP 7.4 ReflectionClass cannot be serialized so this cannot be part of
     // providerTestBuild().
-    $promise = new ThrowPromise(new \Exception('The exception message'));
+    $exception = new \Exception('The exception message');
+    $promise = new ThrowPromise($exception);
+    $log_arguments = Error::decodeException($exception);
+    $log_arguments['%field'] = 'the_field_name';
     $this->testBuild(
       $promise,
       '',
-      'The field "%field" failed to render with the error of "%error".',
-      ['%field' => 'the_field_name', '%error' => 'The exception message']
+      'The field "%field" failed to render. ' . Error::DEFAULT_ERROR_MESSAGE . ' @backtrace_string',
+      $log_arguments,
     );
   }
 
