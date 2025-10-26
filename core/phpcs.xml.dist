@@ -68,16 +68,6 @@
   <rule ref="Drupal.Commenting.FileComment"/>
   <rule ref="Drupal.Commenting.FunctionComment"/>
   <rule ref="Drupal.Commenting.FunctionComment.Missing">
-    <include-pattern>core/*/src/Plugin/*</include-pattern>
-    <include-pattern>*/Database/*</include-pattern>
-    <include-pattern>*/FunctionalJavascript/*</include-pattern>
-    <include-pattern>*/Kernel/*</include-pattern>
-    <include-pattern>*/KernelTests/*</include-pattern>
-    <include-pattern>*/Functional/*</include-pattern>
-    <include-pattern>*/Unit/*</include-pattern>
-    <include-pattern>core/lib/*</include-pattern>
-    <exclude-pattern>core/*/src/Plugin/*</exclude-pattern>
-    <exclude-pattern>core/modules/*/</exclude-pattern>
     <exclude-pattern>*/tests/*</exclude-pattern>
   </rule>
   <rule ref="Drupal.Commenting.FunctionComment.MissingParamType"/>
