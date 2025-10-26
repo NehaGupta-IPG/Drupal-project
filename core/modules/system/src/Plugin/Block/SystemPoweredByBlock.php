@@ -4,6 +4,7 @@ namespace Drupal\system\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Block\Attribute\Block;
+use Drupal\Core\Cache\CacheOptionalInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
@@ -13,7 +14,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   id: "system_powered_by_block",
   admin_label: new TranslatableMarkup("Powered by Drupal")
 )]
-class SystemPoweredByBlock extends BlockBase {
+class SystemPoweredByBlock extends BlockBase implements CacheOptionalInterface {
 
   /**
    * {@inheritdoc}

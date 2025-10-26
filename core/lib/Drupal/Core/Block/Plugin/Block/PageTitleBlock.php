@@ -5,6 +5,7 @@ namespace Drupal\Core\Block\Plugin\Block;
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Block\TitleBlockPluginInterface;
+use Drupal\Core\Cache\CacheOptionalInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
@@ -17,7 +18,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
     'settings_tray' => FALSE,
   ]
 )]
-class PageTitleBlock extends BlockBase implements TitleBlockPluginInterface {
+class PageTitleBlock extends BlockBase implements TitleBlockPluginInterface, CacheOptionalInterface {
 
   /**
    * The page title: a string (plain title) or a render array (formatted title).
