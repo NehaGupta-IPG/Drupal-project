@@ -217,8 +217,7 @@ class UrlHelper {
         // ::buildQuery() incorrectly appends a '=' to the end. Replacing
         // empty string values with NULL solves that problem.
         foreach ($options['query'] as $key => &$value) {
-          $escaped_key = preg_quote($key, '/');
-          if ($value === '' && preg_match('/(^|&)' . $escaped_key . '=(&|$)/', $parts[1]) === 0) {
+          if ($value === '' && preg_match('/(^|&)' . preg_quote($key, '/') . '=(&|$)/', $parts[1]) === 0) {
             $value = NULL;
           }
         }
