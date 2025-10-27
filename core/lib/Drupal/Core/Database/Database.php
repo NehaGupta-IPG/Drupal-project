@@ -292,13 +292,10 @@ abstract class Database {
    *   The database key.
    * @param string $target
    *   The database target name.
-   * @param UnprocessedConnectionInfoArray $info
-   *   The database connection information, as defined in settings.php. The
-   *   structure of this array depends on the database driver it is connecting
-   *   to.
+   * @param \Drupal\Core\Database\ConnectionParametersInterface|UnprocessedConnectionInfoArray|list<UnprocessedConnectionInfoArray> $info
+   *   The database connection information.
    * @param \Composer\Autoload\ClassLoader|null $class_loader
-   *   (optional) The class loader. Used for adding the database driver to the
-   *   autoloader if $info['autoload'] is set.
+   *   (optional) The class loader.
    * @param string|null $app_root
    *   (optional) The app root.
    *
@@ -674,7 +671,7 @@ abstract class Database {
   /**
    * Converts a connection options array to a ConnectionParameters object.
    *
-   * @param array $connection_options
+   * @param UnprocessedConnectionInfoArray $connection_options
    *   An array of options for the connection.
    *
    * @return ConnectionParametersInterface
