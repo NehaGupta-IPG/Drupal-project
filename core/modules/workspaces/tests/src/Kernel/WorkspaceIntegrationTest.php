@@ -22,11 +22,13 @@ use Drupal\workspaces\WorkspacePublishException;
 use PHPUnit\Framework\Attributes\DataProvider;
 // cspell:ignore differring
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests a complete publishing scenario across different workspaces.
  */
 #[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceIntegrationTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;
@@ -859,7 +861,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
     // Check that the 'stage' workspace was not persisted by the workspace
     // manager.
-    $this->assertFalse($this->workspaceManager->getActiveWorkspace());
+    $this->assertNull($this->workspaceManager->getActiveWorkspace());
   }
 
   /**
