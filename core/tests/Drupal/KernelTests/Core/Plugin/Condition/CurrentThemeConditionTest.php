@@ -65,13 +65,13 @@ class CurrentThemeConditionTest extends KernelTestBase {
     $this->config('system.theme')->set('default', 'test_theme')->save();
     \Drupal::theme()->resetActiveTheme();
 
-    $this->assertEquals('The current theme is one of the enabled themes.', $condition->summary());
-    $this->assertEquals('The current theme is not one of the enabled themes.', $condition_negated->summary());
-    $this->assertEquals('The current theme is one of the enabled themes.', $condition_multiple->summary());
-    $this->assertEquals('The current theme is not one of the enabled themes.', $condition_multiple_negated->summary());
-    $this->assertEquals('The current theme is one of the enabled themes.', $condition_any->summary());
-    $this->assertEquals('The current theme is not one of the enabled themes.', $condition_any_negated->summary());
-    $this->assertEquals('The current theme is one of the enabled themes.', $condition_deprecated_config->summary());
+    $this->assertEquals('The current theme is: <strong>Test theme</strong>', $condition->summary());
+    $this->assertEquals('The current theme is not: <strong>Test theme</strong>', $condition_negated->summary());
+    $this->assertEquals('The current theme is one of the following: <strong>Test theme, Test subtheme</strong>', $condition_multiple->summary());
+    $this->assertEquals('The current theme is not one of the following: <strong>Test theme, Test subtheme</strong>', $condition_multiple_negated->summary());
+    $this->assertEquals('The current theme is one of the following: <strong>Test theme</strong>', $condition_any->summary());
+    $this->assertEquals('The current theme is not one of the following: <strong>Test theme</strong>', $condition_any_negated->summary());
+    $this->assertEquals('The current theme is one of the following: <strong>Test theme</strong>', $condition_deprecated_config->summary());
 
     $this->assertTrue($condition->execute());
     $this->assertFalse($condition_negated->execute());
