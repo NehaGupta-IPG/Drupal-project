@@ -48,13 +48,4 @@ class MediaTest extends MediaKernelTestBase {
     $this->assertSame(['config' => [$this->testMediaType->getConfigDependencyName()]], $permissions[$name]['dependencies']);
   }
 
-  /**
-   * @covers \Drupal\media\Entity\Media::getRequestTime
-   * @group legacy
-   */
-  public function testGetRequestTime() {
-    $this->expectDeprecation('Drupal\media\Entity\Media::getRequestTime is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. No replacement provided. See https://www.drupal.org/node/3349765');
-    Media::getRequestTime();
-  }
-
 }
