@@ -26,12 +26,14 @@ use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Entity Field API.
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityFieldTest extends EntityKernelTestBase {
 
   /**

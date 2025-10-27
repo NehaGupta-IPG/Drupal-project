@@ -5,7 +5,6 @@
  */
 
 use Drupal\Core\Batch\BatchBuilder;
-use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\Core\Utility\ProjectInfo;
 
 /**
@@ -18,7 +17,6 @@ require_once __DIR__ . '/locale.translation.inc';
 /**
  * Clear the project data table.
  */
-#[ProceduralHookScanStop]
 function locale_translation_flush_projects(): void {
   \Drupal::service('locale.project')->deleteAll();
 }
@@ -173,8 +171,6 @@ function locale_translation_default_translation_server() {
  *   Array of project names to check. Defaults to all translatable projects.
  * @param array $langcodes
  *   Array of language codes. Defaults to all translatable languages.
- *
- * @todo Return batch or NULL.
  */
 function locale_translation_check_projects($projects = [], $langcodes = []): void {
   if (locale_translation_use_remote_source()) {

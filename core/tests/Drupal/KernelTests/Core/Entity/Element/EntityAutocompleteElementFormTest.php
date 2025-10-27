@@ -14,12 +14,14 @@ use Drupal\entity_test\Entity\EntityTestStringId;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the EntityAutocomplete Form API element.
- *
- * @group Form
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements FormInterface {
 
   /**

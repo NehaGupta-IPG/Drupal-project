@@ -34,6 +34,36 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SystemRequirements implements InstallRequirementsInterface {
 
+  // cspell:ignore quickedit
+
+  /**
+   * An array of machine names of modules that were removed from Drupal core.
+   */
+  public const DRUPAL_CORE_REMOVED_MODULE_LIST = [
+    'action' => 'Action UI',
+    'book' => 'Book',
+    'aggregator' => 'Aggregator',
+    'ckeditor' => 'CKEditor',
+    'color' => 'Color',
+    'forum' => 'Forum',
+    'hal' => 'HAL',
+    'quickedit' => 'Quick Edit',
+    'rdf' => 'RDF',
+    'statistics' => 'Statistics',
+    'tour' => 'Tour',
+    'tracker' => 'Tracker',
+  ];
+
+  /**
+   * An array of machine names of themes that were removed from Drupal core.
+   */
+  public const DRUPAL_CORE_REMOVED_THEME_LIST = [
+    'bartik' => 'Bartik',
+    'classy' => 'Classy',
+    'seven' => 'Seven',
+    'stable' => 'Stable',
+  ];
+
   /**
    * {@inheritdoc}
    */
@@ -397,11 +427,15 @@ class SystemRequirements implements InstallRequirementsInterface {
       $requirements['php_apcu_enabled']['title'] = t('PHP APCu caching');
       $requirements['php_apcu_available']['title'] = t('PHP APCu available caching');
       if (extension_loaded('apcu') && filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN)) {
+        // The apc.shm_segments ini option was removed in APCu 5.1.25, so fall
+        // back to 1 if ini_get('apc.shm_segments') is empty.
+        // @see https://pecl.php.net/package/APCu/5.1.25
+        $apcu_shm_segments = ini_get('apc.shm_segments') ?: 1;
         $memory_info = apcu_sma_info(TRUE);
-        $apcu_actual_size = ByteSizeMarkup::create($memory_info['seg_size'] * $memory_info['num_seg']);
+        $apcu_actual_size = ByteSizeMarkup::create($memory_info['seg_size'] * $apcu_shm_segments);
         $apcu_recommended_size = '32 MB';
         $requirements['php_apcu_enabled']['value'] = t('Enabled (@size)', ['@size' => $apcu_actual_size]);
-        if (Bytes::toNumber(ini_get('apc.shm_size')) * ini_get('apc.shm_segments') < Bytes::toNumber($apcu_recommended_size)) {
+        if ((Bytes::toNumber(ini_get('apc.shm_size')) * $apcu_shm_segments) < Bytes::toNumber($apcu_recommended_size)) {
           $requirements['php_apcu_enabled']['severity'] = RequirementSeverity::Warning;
           $requirements['php_apcu_enabled']['description'] = t('Depending on your configuration, Drupal can run with a @apcu_size APCu limit. However, a @apcu_default_size APCu limit (the default) or above is recommended, especially if your site uses additional custom or contributed modules.', [
             '@apcu_size' => $apcu_actual_size,
@@ -409,7 +443,7 @@ class SystemRequirements implements InstallRequirementsInterface {
           ]);
         }
         else {
-          $memory_available = $memory_info['avail_mem'] / ($memory_info['seg_size'] * $memory_info['num_seg']);
+          $memory_available = $memory_info['avail_mem'] / ($memory_info['seg_size'] * $apcu_shm_segments);
           if ($memory_available < 0.1) {
             $requirements['php_apcu_available']['severity'] = RequirementSeverity::Error;
             $requirements['php_apcu_available']['description'] = t('APCu is using over 90% of its allotted memory (@apcu_actual_size). To improve APCu performance, consider increasing this limit.', [
@@ -1138,7 +1172,7 @@ class SystemRequirements implements InstallRequirementsInterface {
       // Look for removed core modules.
       $is_removed_module = function ($extension_name) use ($module_extension_list) {
         return !$module_extension_list->exists($extension_name)
-            && array_key_exists($extension_name, DRUPAL_CORE_REMOVED_MODULE_LIST);
+            && array_key_exists($extension_name, static::DRUPAL_CORE_REMOVED_MODULE_LIST);
       };
       $removed_modules = array_filter(array_keys($extension_config->get('module')), $is_removed_module);
       if (!empty($removed_modules)) {
@@ -1146,7 +1180,7 @@ class SystemRequirements implements InstallRequirementsInterface {
         foreach ($removed_modules as $removed_module) {
           $list[] = t('<a href=":url">@module</a>', [
             ':url' => "https://www.drupal.org/project/$removed_module",
-            '@module' => DRUPAL_CORE_REMOVED_MODULE_LIST[$removed_module],
+            '@module' => static::DRUPAL_CORE_REMOVED_MODULE_LIST[$removed_module],
           ]);
         }
         $requirements['removed_module'] = $create_extension_incompatibility_list(
@@ -1176,7 +1210,7 @@ class SystemRequirements implements InstallRequirementsInterface {
       // Look for removed core themes.
       $is_removed_theme = function ($extension_name) use ($theme_extension_list) {
         return !$theme_extension_list->exists($extension_name)
-            && array_key_exists($extension_name, DRUPAL_CORE_REMOVED_THEME_LIST);
+            && array_key_exists($extension_name, static::DRUPAL_CORE_REMOVED_THEME_LIST);
       };
       $removed_themes = array_filter(array_keys($extension_config->get('theme')), $is_removed_theme);
       if (!empty($removed_themes)) {
@@ -1184,7 +1218,7 @@ class SystemRequirements implements InstallRequirementsInterface {
         foreach ($removed_themes as $removed_theme) {
           $list[] = t('<a href=":url">@theme</a>', [
             ':url' => "https://www.drupal.org/project/$removed_theme",
-            '@theme' => DRUPAL_CORE_REMOVED_THEME_LIST[$removed_theme],
+            '@theme' => static::DRUPAL_CORE_REMOVED_THEME_LIST[$removed_theme],
           ]);
         }
         $requirements['removed_theme'] = $create_extension_incompatibility_list(
@@ -1212,9 +1246,9 @@ class SystemRequirements implements InstallRequirementsInterface {
       }
 
       // Look for missing modules.
-      $is_missing_module = function ($extension_name) use ($module_extension_list) {
-        return !$module_extension_list->exists($extension_name) && !in_array($extension_name, array_keys(DRUPAL_CORE_REMOVED_MODULE_LIST), TRUE);
-      };
+      $is_missing_module = fn ($extension_name) => !$module_extension_list->exists($extension_name)
+        && !array_key_exists($extension_name, static::DRUPAL_CORE_REMOVED_MODULE_LIST);
+
       $invalid_modules = array_filter(array_keys($extension_config->get('module')), $is_missing_module);
 
       if (!empty($invalid_modules)) {
@@ -1234,9 +1268,9 @@ class SystemRequirements implements InstallRequirementsInterface {
       }
 
       // Look for invalid themes.
-      $is_missing_theme = function ($extension_name) use (&$theme_extension_list) {
-        return !$theme_extension_list->exists($extension_name) && !in_array($extension_name, array_keys(DRUPAL_CORE_REMOVED_THEME_LIST), TRUE);
-      };
+      $is_missing_theme = fn ($extension_name) => !$theme_extension_list->exists($extension_name)
+        && !array_key_exists($extension_name, static::DRUPAL_CORE_REMOVED_THEME_LIST);
+
       $invalid_themes = array_filter(array_keys($extension_config->get('theme')), $is_missing_theme);
       if (!empty($invalid_themes)) {
         $requirements['invalid_theme'] = $create_extension_incompatibility_list(
