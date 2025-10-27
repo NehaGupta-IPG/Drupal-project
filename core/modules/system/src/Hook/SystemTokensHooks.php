@@ -3,6 +3,7 @@
 namespace Drupal\system\Hook;
 
 use Drupal\Core\Datetime\Entity\DateFormat;
+use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Render\BubbleableMetadata;
@@ -361,7 +362,7 @@ class SystemTokensHooks {
     $bubbleable_metadata->addCacheableDependency($global_theme_config);
     $bubbleable_metadata->addCacheableDependency($theme_config);
 
-    return theme_get_setting('logo.url', $theme);
+    return \Drupal::service(ThemeSettingsProvider::class)->getSetting('logo.url', $theme);
   }
 
   /**
