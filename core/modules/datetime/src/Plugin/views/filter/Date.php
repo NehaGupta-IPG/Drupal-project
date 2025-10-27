@@ -160,11 +160,20 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
     // value as UNIX timestamp 0.
     $min = (!empty($this->value['min'])) ? $this->value['min'] : '@0';
 
+    if (!empty($this->value['max']) && !strpos($this->value['max'], ':')) {
+      // No time was specified, so make the date range inclusive.
+      $this->value['max'] .= ' +1 day';
+    }
+
+    // Although both 'min' and 'max' values are required, default empty 'max'
+    // value as PHP_INT_MAX.
+    $max = (!empty($this->value['max'])) ? $this->value['max'] : DateTimePlus::createFromTimestamp(PHP_INT_MAX)->format('Y-m-d');
+
     // Convert to ISO format and format for query. UTC timezone is used since
     // dates are stored in UTC.
     $a = new DateTimePlus($min, new \DateTimeZone($timezone));
     $a = $this->query->getDateFormat($this->query->getDateField("'" . $this->dateFormatter->format($a->getTimestamp() + $origin_offset, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, DateTimeItemInterface::STORAGE_TIMEZONE) . "'", TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
-    $b = new DateTimePlus($this->value['max'], new \DateTimeZone($timezone));
+    $b = new DateTimePlus($max, new \DateTimeZone($timezone));
     $b = $this->query->getDateFormat($this->query->getDateField("'" . $this->dateFormatter->format($b->getTimestamp() + $origin_offset, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, DateTimeItemInterface::STORAGE_TIMEZONE) . "'", TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
 
     // This is safe because we are manually scrubbing the values.
