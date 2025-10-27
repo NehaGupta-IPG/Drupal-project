@@ -72,7 +72,7 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
       // @see https://www.drupal.org/node/3523553
       '#default_value' => isset($this->configuration['theme']) ? [$this->configuration['theme']] : $this->configuration['themes'],
       '#options' => $this->getAllAvailableThemeOptions(),
-      '#description' => $this->t('Select the themes this condition should evaluate TRUE on.'),
+      '#description' => $this->t('Select the themes to enforce. If none are selected, all languages will be allowed.'),
     ];
     return parent::buildConfigurationForm($form, $form_state);
   }
