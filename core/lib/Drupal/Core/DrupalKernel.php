@@ -636,8 +636,14 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       // database settings are available. None of this is required when the
       // installer is running because the installer has its own kernel and
       // manages the addition of its own service providers.
+      // If an external request is made to the website during the installer,
+      // we also need to put the kernel into pre-installer mode to prevent
+      // the container from being dumped otherwise the installer would fail.
       // @see install_begin_request()
-      if ($extensions === FALSE && !InstallerKernel::installationAttempted()) {
+      if (
+        ($extensions === FALSE && !InstallerKernel::installationAttempted()) ||
+        ($extensions !== FALSE && InstallerKernel::installationAttempted() && empty($GLOBALS['conf']['container_service_providers']['InstallerServiceProvider']))
+      ) {
         $this->allowDumping = FALSE;
         $this->containerNeedsDumping = FALSE;
         $GLOBALS['conf']['container_service_providers']['InstallerServiceProvider'] = 'Drupal\Core\Installer\InstallerServiceProvider';
@@ -1005,7 +1011,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // Override PHP settings required for Drupal to work properly.
     // sites/default/default.settings.php contains more runtime settings.
     // The .htaccess file contains settings that cannot be changed at runtime.
-
     if (PHP_SAPI !== 'cli') {
       // Use session cookies, not transparent sessions that puts the session id
       // in the query string.

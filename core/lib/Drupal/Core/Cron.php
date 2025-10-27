@@ -6,6 +6,7 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\Timer;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Queue\DelayableQueueInterface;
 use Drupal\Core\Queue\DelayedRequeueException;
@@ -76,6 +77,12 @@ class Cron implements CronInterface {
    * {@inheritdoc}
    */
   public function run() {
+    // We can only run cron if the installation is not running.
+    if (InstallerKernel::installationAttempted()) {
+      $this->logger->warning('Attempting to run cron while the website is not fully installed.');
+      return FALSE;
+    }
+
     // Allow execution to continue even if the request gets cancelled.
     @ignore_user_abort(TRUE);
 

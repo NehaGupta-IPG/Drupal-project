@@ -165,6 +165,10 @@ system.diff:
             # @see \Drupal\Component\Diff\DiffFormatter
             PositiveOrZero: ~
 
+system.installer:
+  type: config_object
+  label: 'Installer config'
+
 system.logging:
   type: config_object
   label: 'Logging settings'

@@ -615,6 +615,10 @@ function install_run_task($task, &$install_state) {
     // already.
     $current_batch = \Drupal::state()->get('install_current_batch');
     if (!$install_state['interactive'] || !$current_batch) {
+      // Create a new config storage for the installer
+      // during the batch start.
+      \Drupal::configFactory()->getEditable('system.installer')->save();
+
       $batches = $function($install_state);
       if (empty($batches)) {
         // If the task did some processing and decided no batch was necessary,
@@ -1922,6 +1926,9 @@ function install_finished(&$install_state): void {
     '@drupal' => drupal_install_profile_distribution_name(),
   ]);
   \Drupal::messenger()->addStatus($success_message);
+
+  // Remove the installer config.
+  \Drupal::configFactory()->getEditable('system.installer')->delete();
 
   // Record when this install ran.
   \Drupal::state()->set('install_time', \Drupal::time()->getRequestTime());

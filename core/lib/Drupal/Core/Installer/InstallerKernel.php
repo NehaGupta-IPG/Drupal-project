@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Installer;
 
+use Drupal\Core\Config\BootstrapConfigStorageFactory;
 use Drupal\Core\DrupalKernel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -75,13 +76,27 @@ class InstallerKernel extends DrupalKernel {
    * @return bool
    *   TRUE if the installation is currently being attempted.
    */
-  public static function installationAttempted() {
+  public static function installationAttempted(): bool {
     // This cannot rely on the MAINTENANCE_MODE constant, since that would
     // prevent tests from using the non-interactive installer, in which case
     // Drupal only happens to be installed within the same request, but
     // subsequently executed code does not involve the installer at all.
     // @see install_drupal()
-    return isset($GLOBALS['install_state']) && empty($GLOBALS['install_state']['installation_finished']);
+    $is_installer_request = isset($GLOBALS['install_state']) && empty($GLOBALS['install_state']['installation_finished']);
+    if ($is_installer_request) {
+      return TRUE;
+    }
+
+    // The $GLOBALS['install_state'] variable is not available in all cases,
+    // so we need to check the config storage directly.
+    try {
+      $config_storage = BootstrapConfigStorageFactory::get();
+      return $config_storage->exists('system.installer');
+    }
+    catch (\Exception) {
+      // If the config storage is not available, we are not installing.
+      return FALSE;
+    }
   }
 
   /**
