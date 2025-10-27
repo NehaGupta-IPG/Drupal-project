@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Implements custom alterations and additions to Views bulk operations forms.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_alter().
+ */
+function claro_bulk_view_operation_test_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  if ($form_id == 'views_form_content_page_1') {
+    $form['actions']['custom_action'] = [
+      '#type' => 'submit',
+      '#value' => t('Custom button'),
+    ];
+  }
+}

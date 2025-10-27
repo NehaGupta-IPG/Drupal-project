@@ -103,4 +103,27 @@ class ClaroViewsBulkOperationsTest extends WebDriverTestBase {
     $assert_session->pageTextNotContains($vbo_available_message);
   }
 
+  /**
+   * Tests the presence of a custom button added by the view bulk operation alteration.
+   */
+  public function testViewBulkOperationAlter(): void {
+    $this->drupalGet('admin/content');
+
+    $page = $this->getSession()->getPage();
+    $assert_session = $this->assertSession();
+    $select_all = $page->find('css', '.select-all > input');
+    $select_all->check();
+    // Assert that the button does not exist.
+    $custom_button = $page->find('css', '#edit-custom-action');
+    $this->assertEmpty($custom_button);
+
+    \Drupal::service('module_installer')->install(['claro_bulk_view_operation_test']);
+    drupal_flush_all_caches();
+    $this->drupalGet('admin/content');
+    $select_all = $page->find('css', '.select-all > input');
+    $select_all->check();
+    // Confirm the button exists after the module is installed.
+    $assert_session->buttonExists('Custom button');
+  }
+
 }

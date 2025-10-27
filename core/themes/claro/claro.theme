@@ -457,6 +457,8 @@ function claro_form_alter(array &$form, FormStateInterface $form_state, $form_id
         $form['bulk_actions_container'] = $form['header'][$key];
         unset($form['header'][$key]);
 
+        $form['bulk_actions_container']['actions'] = $form['actions'];
+
         // Remove the supplementary bulk operations submit button as it appears
         // in the same location the form was moved to.
         unset($form['actions']);

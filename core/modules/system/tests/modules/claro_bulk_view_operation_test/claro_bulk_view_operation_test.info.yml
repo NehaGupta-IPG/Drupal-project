@@ -1,0 +1,5 @@
+name: 'Custom Views Alterations'
+type: module
+description: 'Custom module for testing Claro theme compatibility with Views alterations.'
+core_version_requirement: '*'
+package: Testing
