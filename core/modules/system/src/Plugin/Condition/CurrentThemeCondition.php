@@ -7,6 +7,7 @@ use Drupal\Core\Condition\ConditionPluginBase;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Theme\ThemeManagerInterface;
 
@@ -99,10 +100,16 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
   /**
    * {@inheritdoc}
    */
-  public function summary() {
-    return $this->currentThemeAllowed() && !$this->isNegated()
-      ? $this->t('The current theme is one of the enabled themes.')
-      : $this->t('The current theme is not one of the enabled themes.');
+  public function summary(): PluralTranslatableMarkup {
+    $allowed_themes = $this->configuration['themes'];
+    $all_themes = $this->getAllAvailableThemeOptions();
+    $result = empty($allowed_themes) ? array_keys($all_themes) : $allowed_themes;
+    $count = count($result);
+    $themes = implode(', ', array_intersect_key($all_themes, array_flip($result)));
+    if (!empty($this->configuration['negate'])) {
+      return $this->formatPlural($count, 'The current theme is not: @themes', 'The current theme is not one of the following: @themes', ['@themes' => $themes]);
+    }
+    return $this->formatPlural($count, 'The current theme is: @themes', 'The current theme is one of the following: @themes', ['@themes' => $themes]);
   }
 
   /**
