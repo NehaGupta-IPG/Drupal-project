@@ -405,7 +405,7 @@ class WebAssert extends MinkWebAssert {
    *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
    *   a string. If left blank, a default message will be displayed.
    * @param \Behat\Mink\Element\TraversableElement|null $container
-   *    (optional) The document to check against. Defaults to the current page.
+   *   (optional) The document to check against. Defaults to the current page.
    *
    * @throws \Behat\Mink\Exception\ExpectationException
    *   Thrown when element doesn't exist, or the link label is a different one.
