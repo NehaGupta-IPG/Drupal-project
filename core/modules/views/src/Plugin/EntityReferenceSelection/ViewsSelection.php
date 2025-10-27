@@ -390,7 +390,7 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
 
     foreach ($results as $entity_id => $result) {
       $label = Html::decodeEntities(
-        strip_tags($this->renderer->renderPlain($result)));
+        strip_tags($this->renderer->renderInIsolation($result)));
 
       $entity_labels[] = [
         'id' => $entity_id,
