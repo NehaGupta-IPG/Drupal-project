@@ -11,11 +11,13 @@ use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Upgrade user roles to user.role.*.yml.
  */
 #[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateUserRoleTest extends MigrateDrupal6TestBase {
 
   /**
@@ -29,7 +31,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
   /**
    * Assert the logged migrate messages.
    *
-   * @param string[][] $role_data
+   * @param array{string, array{'rid': int, 'valid': string[], 'invalid': string[]}} $role_data
    *   An array of role data keyed by the destination role id. The role data
    *   contains the source role id, an array of valid permissions and an array
    *   of invalid permissions.
@@ -277,7 +279,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
    *   A list of modules to install.
    * @param string[] $migrations
    *   A list of migrations to execute.
-   * @param string[][] $role_data
+   * @param array{string, array{'rid': int, 'valid': string[], 'invalid': string[]}} $role_data
    *   An array of role data keyed by the destination role id. The role data
    *   contains the source role id, an array of valid permissions and an array
    *   of invalid permissions.

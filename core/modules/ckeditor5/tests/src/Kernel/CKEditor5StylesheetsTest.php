@@ -7,11 +7,13 @@ namespace Drupal\Tests\ckeditor5\Kernel;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test the ckeditor5-stylesheets theme config property.
  */
 #[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
 class CKEditor5StylesheetsTest extends KernelTestBase {
 
   /**
@@ -19,7 +21,6 @@ class CKEditor5StylesheetsTest extends KernelTestBase {
    */
   protected static $modules = [
     'system',
-    'user',
     'ckeditor5',
     'editor',
     'filter',
