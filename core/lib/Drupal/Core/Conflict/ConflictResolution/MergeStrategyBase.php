@@ -6,11 +6,12 @@ namespace Drupal\Core\Conflict\ConflictResolution;
 
 use Drupal\Core\Conflict\Event\EntityConflictResolutionEvent;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Defines a base class for conflict merge strategies.
  */
-abstract class MergeStrategyBase implements MergeStrategyInterface {
+abstract class MergeStrategyBase implements EventSubscriberInterface {
 
   /**
    * Returns the merge strategy ID.

@@ -6,11 +6,12 @@ namespace Drupal\Core\Conflict\ConflictDiscovery;
 
 use Drupal\Core\Conflict\Event\EntityConflictDiscoveryEvent;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Defines a default class for conflict discovery.
  */
-abstract class ConflictDiscoveryBase implements ConflictDiscoveryInterface {
+abstract class ConflictDiscoveryBase implements EventSubscriberInterface {
 
   /**
    * Discovers conflicts on content entities.

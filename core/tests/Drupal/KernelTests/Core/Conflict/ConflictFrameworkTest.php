@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Conflict;
 
 use Drupal\Core\Conflict\ConflictDiscovery\ConflictDiscoveryBase;
-use Drupal\Core\Conflict\ConflictDiscovery\ConflictDiscoveryInterface;
 use Drupal\Core\Conflict\ConflictDiscovery\DefaultConflictDiscovery;
 use Drupal\Core\Conflict\ConflictResolution\MergeRemoteOnlyChanges;
 use Drupal\Core\Conflict\ConflictResolution\MergeStrategyBase;
-use Drupal\Core\Conflict\ConflictResolution\MergeStrategyInterface;
 use Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface;
 use Drupal\Core\Conflict\ConflictTypeInterface;
 use Drupal\Core\Conflict\Event\EntityConflictDiscoveryEvent;
@@ -42,22 +40,22 @@ class ConflictFrameworkTest extends KernelTestBase implements EventSubscriberInt
   /**
    * Test conflict discovery A.
    */
-  protected ConflictDiscoveryInterface $conflictDiscoveryA;
+  protected ConflictDiscoveryBase $conflictDiscoveryA;
 
   /**
    * Test conflict discovery B.
    */
-  protected ConflictDiscoveryInterface $conflictDiscoveryB;
+  protected ConflictDiscoveryBase $conflictDiscoveryB;
 
   /**
    * Test conflict resolution A.
    */
-  protected MergeStrategyInterface $conflictResolutionA;
+  protected MergeStrategyBase $conflictResolutionA;
 
   /**
    * Test conflict resolution A.
    */
-  protected MergeStrategyInterface $conflictResolutionB;
+  protected MergeStrategyBase $conflictResolutionB;
 
   /**
    * {@inheritdoc}
