@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Conflict;
 
-use Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface;
-use Drupal\Core\Conflict\ConflictResolution\MergeRemoteOnlyChanges;
-use Drupal\Core\Conflict\ConflictDiscovery\DefaultConflictDiscovery;
 use Drupal\Core\Conflict\ConflictDiscovery\ConflictDiscoveryBase;
+use Drupal\Core\Conflict\ConflictDiscovery\ConflictDiscoveryInterface;
+use Drupal\Core\Conflict\ConflictDiscovery\DefaultConflictDiscovery;
+use Drupal\Core\Conflict\ConflictResolution\MergeRemoteOnlyChanges;
 use Drupal\Core\Conflict\ConflictResolution\MergeStrategyBase;
+use Drupal\Core\Conflict\ConflictResolution\MergeStrategyInterface;
+use Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface;
+use Drupal\Core\Conflict\ConflictTypeInterface;
 use Drupal\Core\Conflict\Event\EntityConflictDiscoveryEvent;
 use Drupal\Core\Conflict\Event\EntityConflictResolutionEvent;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
-use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
@@ -24,41 +28,49 @@ use Symfony\Component\HttpFoundation\ParameterBag;
  *
  * @group Conflict
  */
-class ConflictFrameworkTest extends KernelTestBase {
+class ConflictFrameworkTest extends KernelTestBase implements EventSubscriberInterface {
 
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'system',
     'entity_test',
     'user',
   ];
 
   /**
-   * @var \PHPUnit\Framework\MockObject\MockObject
+   * Test conflict discovery A.
+   *
+   * @var \Drupal\Core\Conflict\ConflictDiscovery\ConflictDiscoveryInterface
    */
-  protected $conflict_discovery_a;
+  protected ConflictDiscoveryInterface $conflictDiscoveryA;
 
   /**
-   * @var \PHPUnit\Framework\MockObject\MockObject
+   * Test conflict discovery B.
+   *
+   * @var \Drupal\Core\Conflict\ConflictDiscovery\ConflictDiscoveryInterface
    */
-  protected $conflict_discovery_b;
+  protected ConflictDiscoveryInterface $conflictDiscoveryB;
 
   /**
-   * @var \PHPUnit\Framework\MockObject\MockObject
+   * Test conflict resolution A.
+   *
+   * @var \Drupal\Core\Conflict\ConflictResolution\MergeStrategyInterface
    */
-  protected $conflict_resolution_a;
+  protected MergeStrategyInterface $conflictResolutionA;
 
   /**
-   * @var \PHPUnit\Framework\MockObject\MockObject
+   * Test conflict resolution A.
+   *
+   * @var \Drupal\Core\Conflict\ConflictResolution\MergeStrategyInterface
    */
-  protected $conflict_resolution_b;
+  protected MergeStrategyInterface $conflictResolutionB;
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('entity_test');
   }
@@ -66,111 +78,36 @@ class ConflictFrameworkTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
 
-    $this->conflict_discovery_a = $this->getMockForAbstractClass(ConflictDiscoveryBase::class);
-    $discovery_a = new Definition();
-    $discovery_a->setClass(ConflictDiscoveryBase::class);
-    $discovery_a->setFactory([$this, 'discoveryFactory']);
-    $discovery_a->setArguments(['a']);
-    $discovery_a->addTag('event_subscriber');
-    $container->setDefinition('conflict_test.discovery_a', $discovery_a);
-
-    $this->conflict_discovery_b = $this->getMockForAbstractClass(ConflictDiscoveryBase::class);
-    $discovery_b = new Definition();
-    $discovery_b->setClass(ConflictDiscoveryBase::class);
-    $discovery_b->setFactory([$this, 'discoveryFactory']);
-    $discovery_b->setArguments(['b']);
-    $discovery_b->addTag('event_subscriber');
-    $container->setDefinition('conflict_test.discovery_b', $discovery_b);
-
-    $this->conflict_resolution_a = $this->getMockForAbstractClass(MergeStrategyBase::class);
-    $resolution_a = new Definition();
-    $resolution_a->setClass(MergeStrategyBase::class);
-    $resolution_a->setFactory([$this, 'resolutionFactory']);
-    $resolution_a->setArguments(['a']);
-    $resolution_a->addTag('event_subscriber');
-    $container->setDefinition('conflict_test.resolution_a', $resolution_a);
-
-    $this->conflict_resolution_b = $this->getMockForAbstractClass(MergeStrategyBase::class);
-    $resolution_b = new Definition();
-    $resolution_b->setClass(MergeStrategyBase::class);
-    $resolution_b->setFactory([$this, 'resolutionFactory']);
-    $resolution_b->setArguments(['b']);
-    $resolution_b->addTag('event_subscriber');
-    $container->setDefinition('conflict_test.resolution_b', $resolution_b);
-
+    $container->get(EventDispatcherInterface::class)->addSubscriber($this);
     // Remove the default implementations for the sake of this test.
     $container->removeDefinition(DefaultConflictDiscovery::class);
     $container->removeDefinition(MergeRemoteOnlyChanges::class);
   }
 
   /**
-   * Container factory method to retrieve a mocked conflict discovery.
-   *
-   * @param string $id
-   *   The mock id ('a' or 'b')
-   *
-   * @return \PHPUnit\Framework\MockObject\MockObject
-   */
-  public function discoveryFactory($id) {
-    if ($id === 'a') {
-      return $this->conflict_discovery_a;
-    }
-
-    if ($id === 'b') {
-      return $this->conflict_discovery_b;
-    }
-  }
-
-  /**
-   * Container factory method to retrieve a mocked conflict resolution.
-   *
-   * @param string $id
-   *   The mock id ('a' or 'b')
-   *
-   * @return \PHPUnit\Framework\MockObject\MockObject
-   */
-  public function resolutionFactory($id) {
-    if ($id === 'a') {
-      return $this->conflict_resolution_a;
-    }
-
-    if ($id === 'b') {
-      return $this->conflict_resolution_b;
-    }
-  }
-
-  /**
    * Test no conflicts detected.
    */
-  public function testDiscoverNoConflicts() {
+  public function testDiscoverNoConflicts(): void {
     $base = EntityTest::create(['name' => 'A']);
     $local = EntityTest::create(['name' => 'B']);
     $remote = EntityTest::create(['name' => 'C']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
     $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
-
-    $expectedEvent = new EntityConflictDiscoveryEvent($local, $remote, $base, NULL);
-
-    $this->conflict_discovery_a
-      ->expects($this->once())
-      ->method('discoverConflictsContentEntity')
-      ->with($expectedEvent)
-      ->willReturnCallback(function (EntityConflictDiscoveryEvent $event) {
-        // Don't add a conflict.
-      });
+    $this->conflictDiscoveryA = new NoConflict();
+    $this->conflictDiscoveryB = new NoConflict();
 
     $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
-    $this->assertEmpty($conflicts);
+    self::assertCount(0, $conflicts);
   }
 
   /**
    * Test a simple conflict detection.
    */
-  public function testDiscoverOneConflict() {
+  public function testDiscoverOneConflict(): void {
     $base = EntityTest::create(['name' => 'A']);
     $local = EntityTest::create(['name' => 'B']);
     $remote = EntityTest::create(['name' => 'C']);
@@ -178,21 +115,17 @@ class ConflictFrameworkTest extends KernelTestBase {
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
     $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
-    $this->conflict_discovery_a
-      ->expects($this->once())
-      ->method('discoverConflictsContentEntity')
-      ->willReturnCallback(function (EntityConflictDiscoveryEvent $event) {
-        $event->addConflict('name', 'custom');
-      });
+    $this->conflictDiscoveryA = new CustomConflict();
+    $this->conflictDiscoveryB = new NoConflict();
 
     $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
-    $this->assertEquals(['name' => 'custom'], $conflicts);
+    self::assertEquals(['name' => CustomFooBarConflictType::Custom], $conflicts);
   }
 
   /**
    * Test multiple conflicts by multiple discoveries.
    */
-  public function testDiscoverMultipleConflicts() {
+  public function testDiscoverMultipleConflicts(): void {
     $base = EntityTest::create(['name' => 'A']);
     $local = EntityTest::create(['name' => 'B']);
     $remote = EntityTest::create(['name' => 'C']);
@@ -200,28 +133,20 @@ class ConflictFrameworkTest extends KernelTestBase {
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
     $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
-    $this->conflict_discovery_a
-      ->expects($this->once())
-      ->method('discoverConflictsContentEntity')
-      ->willReturnCallback(function (EntityConflictDiscoveryEvent $event) {
-        $event->addConflict('a', 'foo');
-      });
-
-    $this->conflict_discovery_b
-      ->expects($this->once())
-      ->method('discoverConflictsContentEntity')
-      ->willReturnCallback(function (EntityConflictDiscoveryEvent $event) {
-        $event->addConflict('b', 'bar');
-      });
+    $this->conflictDiscoveryA = new FooConflict();
+    $this->conflictDiscoveryB = new BarConflict();
 
     $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
-    $this->assertEquals(['a' => 'foo', 'b' => 'bar'], $conflicts);
+    self::assertEquals([
+      'foo' => CustomFooBarConflictType::Foo,
+      'bar' => CustomFooBarConflictType::Bar,
+    ], $conflicts);
   }
 
   /**
    * Test a conflict without a resolution strategy.
    */
-  public function testNoResolution() {
+  public function testNoResolution(): void {
     $base = EntityTest::create(['name' => 'A']);
     $local = EntityTest::create(['name' => 'B']);
     $remote = EntityTest::create(['name' => 'C']);
@@ -229,28 +154,22 @@ class ConflictFrameworkTest extends KernelTestBase {
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
     $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
-    $this->conflict_discovery_a
-      ->expects($this->once())
-      ->method('discoverConflictsContentEntity')
-      ->willReturnCallback(function (EntityConflictDiscoveryEvent $event) {
-        $event->addConflict('name', 'foo');
-      });
+    $this->conflictDiscoveryA = new FooConflict();
+    $this->conflictDiscoveryB = new NoConflict();
 
-    $this->conflict_resolution_a
-      ->expects($this->once())
-      ->method('resolveConflictsContentEntity')
-      ->willReturnCallback(function (EntityConflictResolutionEvent $event) {
-        // No resolution in this case.
-      });
+    $this->conflictResolutionA = new NoResolution();
+    $this->conflictResolutionB = new NoResolution();
 
     $conflicts = $conflict_resolver->resolveConflicts($local, $remote, $base);
-    $this->assertEquals(['name' => 'foo'], $conflicts);
+    self::assertEquals([
+      'foo' => CustomFooBarConflictType::Foo,
+    ], $conflicts);
   }
 
   /**
    * Test a conflict with a matching resolution strategy.
    */
-  public function testSimpleResolution() {
+  public function testSimpleResolution(): void {
     $base = EntityTest::create(['name' => 'A']);
     $local = EntityTest::create(['name' => 'B']);
     $remote = EntityTest::create(['name' => 'C']);
@@ -259,30 +178,21 @@ class ConflictFrameworkTest extends KernelTestBase {
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
     $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
-    $this->conflict_discovery_a
-      ->expects($this->once())
-      ->method('discoverConflictsContentEntity')
-      ->willReturnCallback(function (EntityConflictDiscoveryEvent $event) {
-        $event->addConflict('name', 'foo');
-      });
+    $this->conflictDiscoveryA = new FooConflict();
+    $this->conflictDiscoveryB = new NoConflict();
 
-    $this->conflict_resolution_a
-      ->expects($this->once())
-      ->method('resolveConflictsContentEntity')
-      ->willReturnCallback(function (EntityConflictResolutionEvent $event) {
-        $event->removeConflict('name');
-        $event->getResultEntity()->set('name', 'bar');
-      });
+    $this->conflictResolutionA = new ResolveNameAsBar();
+    $this->conflictResolutionB = new NoResolution();
 
     $conflicts = $conflict_resolver->resolveConflicts($local, $remote, $base, $result);
-    $this->assertEquals([], $conflicts);
-    $this->assertEquals('bar', $result->get('name')->value);
+    self::assertEquals([], $conflicts);
+    self::assertEquals('bar', $result->get('name')->value);
   }
 
   /**
    * Test multiple conflicts with multiple resolution strategies.
    */
-  public function testMultipleResolutions() {
+  public function testMultipleResolutions(): void {
     $base = EntityTest::create(['name' => 'A']);
     $local = EntityTest::create(['name' => 'B']);
     $remote = EntityTest::create(['name' => 'C']);
@@ -291,30 +201,16 @@ class ConflictFrameworkTest extends KernelTestBase {
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
     $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
-    $this->conflict_discovery_a
-      ->expects($this->once())
-      ->method('discoverConflictsContentEntity')
-      ->willReturnCallback(function (EntityConflictDiscoveryEvent $event) {
-        $event->addConflict('a', 'foo');
-        $event->addConflict('b', 'bar');
-      });
+    $this->conflictDiscoveryA = new FooConflict();
+    $this->conflictDiscoveryB = new BarConflict();
 
-    $this->conflict_resolution_a
-      ->expects($this->once())
-      ->method('resolveConflictsContentEntity')
-      ->willReturnCallback(function (EntityConflictResolutionEvent $event) {
-        $event->removeConflict('a');
-      });
-
-    $this->conflict_resolution_b
-      ->expects($this->once())
-      ->method('resolveConflictsContentEntity')
-      ->willReturnCallback(function (EntityConflictResolutionEvent $event) {
-        $event->removeConflict('b');
-      });
+    $this->conflictResolutionA = new ResolveFoo();
+    $this->conflictResolutionB = new ResolveBar();
+    $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
+    self::assertCount(2, $conflicts);
 
     $conflicts = $conflict_resolver->resolveConflicts($local, $remote, $base, $result);
-    $this->assertEquals([], $conflicts);
+    self::assertEquals([], $conflicts);
   }
 
   /**
@@ -322,7 +218,7 @@ class ConflictFrameworkTest extends KernelTestBase {
    *
    * Simultaneously tests context parameters.
    */
-  public function testDisabledResolution() {
+  public function testDisabledResolution(): void {
     $base = EntityTest::create(['name' => 'A']);
     $local = EntityTest::create(['name' => 'B']);
     $remote = EntityTest::create(['name' => 'C']);
@@ -331,43 +227,141 @@ class ConflictFrameworkTest extends KernelTestBase {
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
     $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
-    $this->conflict_discovery_a
-      ->expects($this->once())
-      ->method('discoverConflictsContentEntity')
-      ->willReturnCallback(function (EntityConflictDiscoveryEvent $event) {
-        $event->addConflict('a', 'foo');
-        $event->addConflict('b', 'bar');
-      });
+    $this->conflictDiscoveryA = new FooConflict();
+    $this->conflictDiscoveryB = new BarConflict();
 
-    $this->conflict_resolution_a
-      ->expects($this->once())
-      ->method('resolveConflictsContentEntity')
-      ->willReturnCallback(function (EntityConflictResolutionEvent $event) {
-        $event->removeConflict('a');
-      });
-
-    $this->conflict_resolution_a
-      ->expects($this->once())
-      ->method('getMergeStrategyId')
-      ->willReturn('a');
-
-    $this->conflict_resolution_b
-      ->expects($this->once())
-      ->method('resolveConflictsContentEntity')
-      ->willReturnCallback(function (EntityConflictResolutionEvent $event) {
-        // Do nothing in this test.
-      });
-
-    $this->conflict_resolution_b
-      ->expects($this->once())
-      ->method('getMergeStrategyId')
-      ->willReturn('b');
+    $this->conflictResolutionA = new ResolveFoo();
+    $this->conflictResolutionB = new ResolveBar();
 
     $parameters = new ParameterBag();
-    $parameters->set('merge_strategy.disabled', ['b']);
+    $parameters->set('merge_strategy.disabled', ['bar']);
 
-    $conflicts = $conflict_resolver->resolveConflicts($local, $remote, $base, $result);
-    $this->assertEquals(['b' => 'bar'], $conflicts);
+    $conflicts = $conflict_resolver->resolveConflicts($local, $remote, $base, $result, $parameters);
+    $this->assertEquals([
+      'bar' => CustomFooBarConflictType::Bar,
+    ], $conflicts);
+  }
+
+  /**
+   * Event listener.
+   */
+  public function discoverConflicts(EntityConflictDiscoveryEvent $event): void {
+    $this->conflictDiscoveryA->discoverConflicts($event);
+    $this->conflictDiscoveryB->discoverConflicts($event);
+  }
+
+  /**
+   * Event listener.
+   */
+  public function resolveConflicts(EntityConflictResolutionEvent $event): void {
+    $this->conflictResolutionA->resolveConflicts($event);
+    $this->conflictResolutionB->resolveConflicts($event);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getSubscribedEvents(): array {
+    return [
+      EntityConflictResolutionEvent::class => [['resolveConflicts']],
+      EntityConflictDiscoveryEvent::class => [['discoverConflicts']],
+    ];
+
+  }
+
+}
+// @phpcs:disable
+class NoConflict extends ConflictDiscoveryBase {
+
+  protected function discoverContentEntityConflicts(EntityConflictDiscoveryEvent $event): void {
+  }
+
+}
+
+enum CustomFooBarConflictType: string implements ConflictTypeInterface {
+  case Foo = 'foo';
+  case Bar = 'bar';
+  case Custom = 'custom';
+}
+
+class CustomConflict extends ConflictDiscoveryBase {
+
+  protected function discoverContentEntityConflicts(EntityConflictDiscoveryEvent $event): void {
+    $event->addConflict('name', CustomFooBarConflictType::Custom);
+  }
+
+}
+
+
+class FooConflict extends ConflictDiscoveryBase {
+
+  protected function discoverContentEntityConflicts(EntityConflictDiscoveryEvent $event): void {
+    $event->addConflict('foo', CustomFooBarConflictType::Foo);
+  }
+
+}
+
+class BarConflict extends ConflictDiscoveryBase {
+
+  protected function discoverContentEntityConflicts(EntityConflictDiscoveryEvent $event): void {
+    $event->addConflict('bar', CustomFooBarConflictType::Bar);
+  }
+
+}
+
+class FooBarConflict extends ConflictDiscoveryBase {
+
+  protected function discoverContentEntityConflicts(EntityConflictDiscoveryEvent $event): void {
+    $event->addConflict('foo', CustomFooBarConflictType::Foo);
+    $event->addConflict('bar', CustomFooBarConflictType::Bar);
+  }
+
+}
+
+class NoResolution extends MergeStrategyBase {
+
+  protected function getMergeStrategyId(): string {
+    return 'no-op';
+  }
+
+  protected function resolveContentEntityConflicts(EntityConflictResolutionEvent $event): void {
+  }
+
+}
+
+class ResolveFoo extends MergeStrategyBase {
+
+  protected function getMergeStrategyId(): string {
+    return 'foo';
+  }
+
+  protected function resolveContentEntityConflicts(EntityConflictResolutionEvent $event): void {
+    $event->removeConflict('foo');
+  }
+
+}
+
+class ResolveBar extends MergeStrategyBase {
+
+  protected function getMergeStrategyId(): string {
+    return 'bar';
+  }
+
+  protected function resolveContentEntityConflicts(EntityConflictResolutionEvent $event): void {
+    $event->removeConflict('bar');
+  }
+
+}
+
+class ResolveNameAsBar extends MergeStrategyBase {
+
+  protected function getMergeStrategyId(): string {
+    return 'foo-as-bar';
+  }
+
+  protected function resolveContentEntityConflicts(EntityConflictResolutionEvent $event): void {
+    $event->removeConflict('foo');
+    $event->getResultEntity()->set('name', 'bar');
   }
 
 }

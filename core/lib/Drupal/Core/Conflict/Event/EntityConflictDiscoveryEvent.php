@@ -2,41 +2,15 @@
 
 namespace Drupal\Core\Conflict\Event;
 
+use Drupal\Core\Conflict\ConflictTypeInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Drupal\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
+/**
+ * Defines an event to discover conflicts.
+ */
 class EntityConflictDiscoveryEvent extends Event {
-
-  /**
-   * The local entity.
-   *
-   * @var \Drupal\Core\Entity\EntityInterface
-   */
-  protected $LocalEntity;
-
-  /**
-   * The remote entity.
-   *
-   * @var \Drupal\Core\Entity\EntityInterface
-   */
-  protected $RemoteEntity;
-
-  /**
-   * The base entity.
-   *
-   * @var \Drupal\Core\Entity\EntityInterface
-   */
-  protected $baseEntity;
-
-  /**
-   * A context parameter bag.
-   *
-   * It might contain configuration and/or form data during concurrent editing.
-   *
-   * @var \Symfony\Component\HttpFoundation\ParameterBag
-   */
-  protected $context;
 
   /**
    * An array containing the conflicting properties.
@@ -44,55 +18,43 @@ class EntityConflictDiscoveryEvent extends Event {
    * The keys are the property names and the values the respective conflict
    * type.
    *
-   * @var array
+   * @var array<string, \Drupal\Core\Conflict\ConflictTypeInterface>
    */
-  protected $conflicts = [];
+  protected array $conflicts = [];
 
-  /**
-   * Constructs a conflict discovery event object.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $local
-   *   The local part of the comparision - for example the entity built of the
-   *   user input on an entity form submission. This is basically the active
-   *   entity object.
-   * @param \Drupal\Core\Entity\EntityInterface $remote
-   *   The remote part of the comparision - for example the current version of
-   *   the entity from the storage.
-   * @param \Drupal\Core\Entity\EntityInterface $base
-   *   The initial entity version in concurrent editing or the lowest common
-   *   ancestor in a revision tree scenario.
-   * @param \Symfony\Component\HttpFoundation\ParameterBag $context
-   *   (optional) The context parameter bag.
-   */
-  public function __construct(EntityInterface $local, EntityInterface $remote, EntityInterface $base, ?ParameterBag $context = NULL) {
-    $this->LocalEntity = $local;
-    $this->RemoteEntity = $remote;
-    $this->baseEntity = $base;
-    $this->context = $context ?? new ParameterBag();
+  public function __construct(
+    protected EntityInterface $localEntity,
+    protected EntityInterface $remoteEntity,
+    protected EntityInterface $baseEntity,
+    protected ParameterBag $context = new ParameterBag(),
+  ) {
   }
 
   /**
    * Return the local entity.
    *
    * @return \Drupal\Core\Entity\EntityInterface
+   *   Local entity.
    */
   public function getLocalEntity() : EntityInterface {
-    return $this->LocalEntity;
+    return $this->localEntity;
   }
 
   /**
    * Returns the remote entity.
    *
    * @return \Drupal\Core\Entity\EntityInterface
+   *   Remote entity.
    */
   public function getRemoteEntity() : EntityInterface {
-    return $this->RemoteEntity;
+    return $this->remoteEntity;
   }
 
   /**
    * Returns the base entity.
    *
    * @return \Drupal\Core\Entity\EntityInterface
+   *   Base entity.
    */
   public function getBaseEntity() : EntityInterface {
     return $this->baseEntity;
@@ -103,17 +65,19 @@ class EntityConflictDiscoveryEvent extends Event {
    *
    * @param string $property
    *   The property name.
-   * @param string $type
+   * @param \Drupal\Core\Conflict\ConflictTypeInterface $type
    *   The conflict type.
    */
-  public function addConflict($property, $type) {
+  public function addConflict(string $property, ConflictTypeInterface $type): static {
     $this->conflicts[$property] = $type;
+    return $this;
   }
 
   /**
    * Returns the conflicts.
    *
-   * @return array
+   * @return array<string, \Drupal\Core\Conflict\ConflictTypeInterface>
+   *   Array of conflict types keyed by property name.
    */
   public function getConflicts() : array {
     return $this->conflicts;
@@ -122,14 +86,15 @@ class EntityConflictDiscoveryEvent extends Event {
   /**
    * Returns a parameter value from the context bag.
    *
-   * @param $parameter
+   * @param string $parameter
    *   The parameter key.
    * @param mixed $default
-   *   The default value if the parameter key does not exist
+   *   The default value if the parameter key does not exist.
    *
-   * @return mixed|null
+   * @return mixed
+   *   Context value if it exists, otherwise the default.
    */
-  public function getContextParameter($parameter, $default = NULL) {
+  public function getContextParameter(string $parameter, mixed $default = NULL): mixed {
     return $this->context->get($parameter, $default);
   }
 

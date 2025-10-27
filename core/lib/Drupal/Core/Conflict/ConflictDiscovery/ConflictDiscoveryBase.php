@@ -3,30 +3,36 @@
 namespace Drupal\Core\Conflict\ConflictDiscovery;
 
 use Drupal\Core\Conflict\Event\EntityConflictDiscoveryEvent;
-use Drupal\Core\Conflict\Event\EntityConflictEvents;
 use Drupal\Core\Entity\ContentEntityInterface;
 
+/**
+ * Defines a default class for conflict discovery.
+ */
 abstract class ConflictDiscoveryBase implements ConflictDiscoveryInterface {
 
   /**
-   * Discovers conflicts on entities.
+   * Discovers conflicts on content entities.
    *
-   * @param \Drupal\Core\Conflict\Event\EntityConflictDiscoveryEvent
+   * @param \Drupal\Core\Conflict\Event\EntityConflictDiscoveryEvent $event
    *   The entity conflict discovery event.
    */
-  public function discoverConflicts(EntityConflictDiscoveryEvent $event) {
+  abstract protected function discoverContentEntityConflicts(EntityConflictDiscoveryEvent $event): void;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function discoverConflicts(EntityConflictDiscoveryEvent $event): void {
     $local_entity = $event->getLocalEntity();
     if ($local_entity instanceof ContentEntityInterface) {
-      $this->discoverConflictsContentEntity($event);
+      $this->discoverContentEntityConflicts($event);
     }
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
-    $events[EntityConflictEvents::ENTITY_CONFLICT_DISCOVERY][] = ['discoverConflicts'];
-    return $events;
+  public static function getSubscribedEvents(): array {
+    return [EntityConflictDiscoveryEvent::class => [['discoverConflicts']]];
   }
 
 }

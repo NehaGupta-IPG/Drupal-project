@@ -3,7 +3,6 @@
 namespace Drupal\Core\Conflict\ConflictResolver;
 
 use Drupal\Core\Conflict\Event\EntityConflictDiscoveryEvent;
-use Drupal\Core\Conflict\Event\EntityConflictEvents;
 use Drupal\Core\Conflict\Event\EntityConflictResolutionEvent;
 use Drupal\Core\Entity\EntityInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -14,35 +13,30 @@ use Symfony\Component\HttpFoundation\ParameterBag;
  */
 class ConflictResolverManager implements ConflictResolverManagerInterface {
 
-  /**
-   * The event dispatcher used to notify subscribers.
-   *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-   */
-  protected $eventDispatcher;
-
-  /**
-   * Constructs a new Conflict Resolver Manager.
-   *
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   The event dispatcher used to notify subscribers of config import events.
-   */
-  public function __construct(EventDispatcherInterface $event_dispatcher) {
-    $this->eventDispatcher = $event_dispatcher;
+  public function __construct(
+    protected EventDispatcherInterface $eventDispatcher,
+  ) {
   }
 
   /**
    * {@inheritdoc}
    */
-  public function resolveConflicts(EntityInterface $local, EntityInterface $remote, EntityInterface $base, ?EntityInterface $result = NULL, ?ParameterBag $context = NULL, ?array $conflicts = NULL) : array {
-    // If none conflicts are given, then explicitly discover the conflicts.
+  public function resolveConflicts(
+    EntityInterface $local,
+    EntityInterface $remote,
+    EntityInterface $base,
+    ?EntityInterface $result = NULL,
+    ParameterBag $context = new ParameterBag(),
+    ?array $conflicts = NULL,
+  ) : array {
+    // If there are no passed conflicts given, attempt to discover them.
     $conflicts = $conflicts ?? $this->getConflicts($local, $remote, $base, $context);
 
-    if ($conflicts) {
+    if (\count($conflicts) > 0) {
       $result = $result ?? $local;
       $event = new EntityConflictResolutionEvent($local, $remote, $base, $result, $conflicts, $context);
       // Fire an event to allow listeners to automatically resolve conflicts.
-      $this->eventDispatcher->dispatch(EntityConflictEvents::ENTITY_CONFLICT_RESOLVE, $event);
+      $this->eventDispatcher->dispatch($event);
       $conflicts = $event->getConflicts();
     }
 
@@ -52,12 +46,16 @@ class ConflictResolverManager implements ConflictResolverManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getConflicts(EntityInterface $local, EntityInterface $remote, EntityInterface $base, ?ParameterBag $context = NULL) : array {
+  public function getConflicts(
+    EntityInterface $local,
+    EntityInterface $remote,
+    EntityInterface $base,
+    ParameterBag $context = new ParameterBag(),
+  ) : array {
     $event = new EntityConflictDiscoveryEvent($local, $remote, $base, $context);
     // Fire an event to allow listeners to build a list of conflicting
     // properties.
-    $this->eventDispatcher->dispatch(EntityConflictEvents::ENTITY_CONFLICT_DISCOVERY, $event);
-
+    $this->eventDispatcher->dispatch($event);
     return $event->getConflicts();
   }
 

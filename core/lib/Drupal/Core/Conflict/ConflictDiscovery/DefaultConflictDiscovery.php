@@ -5,12 +5,15 @@ namespace Drupal\Core\Conflict\ConflictDiscovery;
 use Drupal\Core\Conflict\ConflictTypes;
 use Drupal\Core\Conflict\Event\EntityConflictDiscoveryEvent;
 
+/**
+ * Defines a default implementation of conflict discovery.
+ */
 class DefaultConflictDiscovery extends ConflictDiscoveryBase {
 
   /**
    * {@inheritdoc}
    */
-  public function discoverConflictsContentEntity(EntityConflictDiscoveryEvent $event) {
+  public function discoverContentEntityConflicts(EntityConflictDiscoveryEvent $event): void {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $local_entity */
     $local_entity = $event->getLocalEntity();
     /** @var \Drupal\Core\Entity\ContentEntityInterface $remote_entity */
@@ -22,7 +25,7 @@ class DefaultConflictDiscovery extends ConflictDiscoveryBase {
     $remote_entity = $remote_entity->getTranslation($langcode);
     $base_entity = $base_entity->getTranslation($langcode);
 
-    // The revision metadata fields are updated constantly and they will always
+    // The revision metadata fields are updated constantly, and they will always
     // cause conflicts, therefore we skip them here.
     // @see \Drupal\Core\Entity\ContentEntityForm::buildEntity().
     $skip_fields = array_flip($local_entity->getEntityType()->getRevisionMetadataKeys());
@@ -34,7 +37,7 @@ class DefaultConflictDiscovery extends ConflictDiscoveryBase {
       }
 
       $field_definition = $field_items_local->getFieldDefinition();
-      // There could be no conflicts on read only fields.
+      // There cannot be conflicts on read only fields.
       if ($field_definition->isReadOnly()) {
         continue;
       }
@@ -47,7 +50,7 @@ class DefaultConflictDiscovery extends ConflictDiscoveryBase {
         // Check for changes between the remote and the base entity versions.
         if (!$field_items_remote->equals($field_items_base)) {
           // Check for changes between the local and the base entity versions.
-          $conflict_type = $field_items_local->equals($field_items_base) ? ConflictTypes::CONFLICT_TYPE_REMOTE : ConflictTypes::CONFLICT_TYPE_LOCAL_REMOTE;
+          $conflict_type = $field_items_local->equals($field_items_base) ? ConflictTypes::ConflictTypeRemote : ConflictTypes::ConflictTypeLocalRemote;
           $event->addConflict($field_name, $conflict_type);
         }
       }

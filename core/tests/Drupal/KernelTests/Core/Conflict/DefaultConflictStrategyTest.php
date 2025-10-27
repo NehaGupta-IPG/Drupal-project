@@ -19,7 +19,7 @@ class DefaultConflictStrategyTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'system',
     'entity_test',
     'user',
@@ -28,7 +28,7 @@ class DefaultConflictStrategyTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('entity_test');
   }
@@ -36,7 +36,7 @@ class DefaultConflictStrategyTest extends KernelTestBase {
   /**
    * No changes.
    */
-  public function testNoChange() {
+  public function testNoChange(): void {
     $base = EntityTest::create(['name' => 'A']);
     $local = EntityTest::create(['name' => 'A']);
     $remote = EntityTest::create(['name' => 'A']);
@@ -51,7 +51,7 @@ class DefaultConflictStrategyTest extends KernelTestBase {
   /**
    * Only the local entity changed.
    */
-  public function testLocalChange() {
+  public function testLocalChange(): void {
     $base = EntityTest::create(['name' => 'A']);
     $local = EntityTest::create(['name' => 'B']);
     $remote = EntityTest::create(['name' => 'A']);
@@ -66,7 +66,7 @@ class DefaultConflictStrategyTest extends KernelTestBase {
   /**
    * Remote entity changed.
    */
-  public function testRemoteChange() {
+  public function testRemoteChange(): void {
     $base = EntityTest::create(['name' => 'A']);
     $local = EntityTest::create(['name' => 'A']);
     $remote = EntityTest::create(['name' => 'B']);
@@ -76,14 +76,14 @@ class DefaultConflictStrategyTest extends KernelTestBase {
 
     $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
     $this->assertEquals([
-      'name' => ConflictTypes::CONFLICT_TYPE_REMOTE,
+      'name' => ConflictTypes::ConflictTypeRemote,
     ], $conflicts);
   }
 
   /**
    * Both entities changed.
    */
-  public function testBothChanged() {
+  public function testBothChanged(): void {
     $base = EntityTest::create(['name' => 'B']);
     $local = EntityTest::create(['name' => 'A']);
     $remote = EntityTest::create(['name' => 'C']);
@@ -93,14 +93,14 @@ class DefaultConflictStrategyTest extends KernelTestBase {
 
     $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
     $this->assertEquals([
-      'name' => ConflictTypes::CONFLICT_TYPE_LOCAL_REMOTE,
+      'name' => ConflictTypes::ConflictTypeLocalRemote,
     ], $conflicts);
   }
 
   /**
    * If only the remote changed, auto-resolve the conflict.
    */
-  public function testResolveRemoteOnlyChange() {
+  public function testResolveRemoteOnlyChange(): void {
     $base = EntityTest::create(['name' => 'A']);
     $local = EntityTest::create(['name' => 'A']);
     $remote = EntityTest::create(['name' => 'C']);
@@ -117,7 +117,7 @@ class DefaultConflictStrategyTest extends KernelTestBase {
   /**
    * If both entities changed, don't auto-resolve the conflict.
    */
-  public function testResolveLocalRemoteChange() {
+  public function testResolveLocalRemoteChange(): void {
     $base = EntityTest::create(['name' => 'A']);
     $local = EntityTest::create(['name' => 'B']);
     $remote = EntityTest::create(['name' => 'C']);
@@ -128,7 +128,7 @@ class DefaultConflictStrategyTest extends KernelTestBase {
 
     $conflicts = $conflict_resolver->resolveConflicts($local, $remote, $base, $result);
     $this->assertEquals([
-      'name' => ConflictTypes::CONFLICT_TYPE_LOCAL_REMOTE,
+      'name' => ConflictTypes::ConflictTypeLocalRemote,
     ], $conflicts);
   }
 

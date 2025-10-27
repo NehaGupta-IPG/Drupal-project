@@ -5,36 +5,17 @@ namespace Drupal\Core\Conflict\ConflictResolution;
 use Drupal\Core\Conflict\Event\EntityConflictResolutionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Defines an interface for event subscribers that can resolve conflicts.
+ */
 interface MergeStrategyInterface extends EventSubscriberInterface {
 
   /**
-   * Returns the merge strategy ID.
-   *
-   * To prevent conflicts the merge strategy ID should be prefixed by the
-   * provider's name.
-   *
-   * @return string
-   *   The merge strategy ID.
-   */
-  public function getMergeStrategyId() : string;
-
-  /**
-   * Resolves conflicts on content entities.
-   *
-   * @param \Drupal\Core\Conflict\Event\EntityConflictResolutionEvent
-   *   The entity conflict discovery event.
-   */
-  public function resolveConflictsContentEntity(EntityConflictResolutionEvent $event);
-
-  /**
-   * Checks whether this merge strategy is active for the conflict resolution.
+   * Resolves conflicts on an entity.
    *
    * @param \Drupal\Core\Conflict\Event\EntityConflictResolutionEvent $event
-   *   The conflict resolution event.
-   *
-   * @return bool
-   *   TRUE, if the merge strategy is enabled. FALSE, if it is disabled.
+   *   The entity conflict resolution event.
    */
-  public function isEnabled(EntityConflictResolutionEvent $event) : bool;
+  public function resolveConflicts(EntityConflictResolutionEvent $event): void;
 
 }

@@ -2,23 +2,41 @@
 
 namespace Drupal\Core\Conflict\ConflictResolution;
 
-use Drupal\Core\Conflict\Event\EntityConflictEvents;
 use Drupal\Core\Conflict\Event\EntityConflictResolutionEvent;
 use Drupal\Core\Entity\ContentEntityInterface;
 
+/**
+ * Defines a base class for conflict merge strategies.
+ */
 abstract class MergeStrategyBase implements MergeStrategyInterface {
 
   /**
-   * Discovers conflicts on entities.
+   * Returns the merge strategy ID.
    *
-   * @param \Drupal\Core\Conflict\Event\EntityConflictResolutionEvent
-   *   The entity conflict resolution event.
+   * To prevent conflicts the merge strategy ID should be prefixed by the
+   * provider's name.
+   *
+   * @return string
+   *   The merge strategy ID.
    */
-  public function resolveConflicts(EntityConflictResolutionEvent $event) {
+  abstract protected function getMergeStrategyId() : string;
+
+  /**
+   * Resolves conflicts on content entities.
+   *
+   * @param \Drupal\Core\Conflict\Event\EntityConflictResolutionEvent $event
+   *   The entity conflict discovery event.
+   */
+  abstract protected function resolveContentEntityConflicts(EntityConflictResolutionEvent $event): void;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function resolveConflicts(EntityConflictResolutionEvent $event): void {
     if ($this->isEnabled($event)) {
       $local_entity = $event->getLocalEntity();
       if ($local_entity instanceof ContentEntityInterface) {
-        $this->resolveConflictsContentEntity($event);
+        $this->resolveContentEntityConflicts($event);
       }
     }
   }
@@ -26,7 +44,7 @@ abstract class MergeStrategyBase implements MergeStrategyInterface {
   /**
    * {@inheritdoc}
    */
-  public function isEnabled(EntityConflictResolutionEvent $event) : bool {
+  protected function isEnabled(EntityConflictResolutionEvent $event): bool {
     $disabled_merge_strategies = $event->getContextParameter('merge_strategy.disabled', []);
     return !in_array($this->getMergeStrategyId(), $disabled_merge_strategies, TRUE);
   }
@@ -35,8 +53,7 @@ abstract class MergeStrategyBase implements MergeStrategyInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    $events[EntityConflictEvents::ENTITY_CONFLICT_RESOLVE][] = ['resolveConflicts'];
-    return $events;
+    return [EntityConflictResolutionEvent::class => [['resolveConflicts']]];
   }
 
 }

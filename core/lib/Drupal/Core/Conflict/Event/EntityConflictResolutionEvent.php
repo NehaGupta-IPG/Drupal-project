@@ -5,60 +5,42 @@ namespace Drupal\Core\Conflict\Event;
 use Drupal\Core\Entity\EntityInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
+/**
+ * Defines an event to resolve entity conflicts.
+ */
 class EntityConflictResolutionEvent extends EntityConflictDiscoveryEvent {
 
-  /**
-   * The result entity.
-   *
-   * @var \Drupal\Core\Entity\EntityInterface
-   */
-  protected $resultEntity;
-
-  /**
-   * Constructs a conflict discovery event object.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $local
-   *   The local part of the comparision - for example the entity built of the
-   *   user input on an entity form submission. This is basically the active
-   *   entity object.
-   * @param \Drupal\Core\Entity\EntityInterface $remote
-   *   The remote part of the comparision - for example the current version of
-   *   the entity from the storage.
-   * @param \Drupal\Core\Entity\EntityInterface $base
-   *   The initial entity version in concurrent editing or the lowest common
-   *   ancestor in a revision tree scenario.
-   * @param \Drupal\Core\Entity\EntityInterface $result
-   *   The result entity, on which to apply the result. Usually this will be the
-   *   active entity object - the local entity.
-   * @param array $conflicts
-   *   The conflicts.
-   * @param \Symfony\Component\HttpFoundation\ParameterBag $context
-   *   (optional) The context parameter bag.
-   */
-  public function __construct(EntityInterface $local, EntityInterface $remote, EntityInterface $base, EntityInterface $result, array $conflicts, ?ParameterBag $context = NULL) {
-    parent::__construct($local, $remote, $base, $context);
+  public function __construct(
+    EntityInterface $localEntity,
+    EntityInterface $remoteEntity,
+    EntityInterface $baseEntity,
+    protected EntityInterface $resultEntity,
+    array $conflicts,
+    ParameterBag $context = new ParameterBag(),
+  ) {
+    parent::__construct($localEntity, $remoteEntity, $baseEntity, $context);
     $this->conflicts = $conflicts;
-    $this->resultEntity = $result;
   }
 
   /**
    * Creates a conflict resolution event object from a conflict discovery event.
    *
-   * @param \Drupal\Core\Conflict\Event\EntityConflictDiscoveryEvent
+   * @param \Drupal\Core\Conflict\Event\EntityConflictDiscoveryEvent $event
    *   The conflict discovery event.
    * @param \Drupal\Core\Entity\EntityInterface $result
    *   The result entity, on which to apply the result.
    *
    * @return static
    */
-  public static function createFromConflictDiscoveryEvent(EntityConflictDiscoveryEvent $event, EntityInterface $result) {
-    return new static($event->LocalEntity, $event->RemoteEntity, $event->baseEntity, $result, $event->conflicts, $event->context);
+  public static function createFromConflictDiscoveryEvent(EntityConflictDiscoveryEvent $event, EntityInterface $result): static {
+    return new static($event->localEntity, $event->remoteEntity, $event->baseEntity, $result, $event->conflicts, $event->context);
   }
 
   /**
    * Returns the result entity.
    *
    * @return \Drupal\Core\Entity\EntityInterface
+   *   The result entity.
    */
   public function getResultEntity() : EntityInterface {
     return $this->resultEntity;
@@ -67,14 +49,15 @@ class EntityConflictResolutionEvent extends EntityConflictDiscoveryEvent {
   /**
    * Removes a conflict.
    *
-   * This method should called when a conflict has been resolved or the property
-   * value on the resulting entity satisfies the merge strategy.
+   * This method should be called when a conflict has been resolved or the
+   * property value on the resulting entity satisfies the merge strategy.
    *
    * @param string $property
    *   The conflicting property.
    */
-  public function removeConflict($property) {
+  public function removeConflict(string $property): static {
     unset($this->conflicts[$property]);
+    return $this;
   }
 
 }
