@@ -8,12 +8,12 @@ use Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface;
 use Drupal\Core\Conflict\ConflictTypes;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Test cases for conflict resolution default implementations.
- *
- * @group Conflict
  */
+#[Group('Conflict')]
 class DefaultConflictStrategyTest extends KernelTestBase {
 
   /**
