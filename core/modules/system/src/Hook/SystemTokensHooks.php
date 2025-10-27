@@ -386,7 +386,6 @@ class SystemTokensHooks {
     $build = [
       '#theme' => 'image',
       '#uri' => $logo_path,
-      '#alt' => $this->t('The site logo'),
     ];
     return \Drupal::service('renderer')->renderInIsolation($build);
   }
