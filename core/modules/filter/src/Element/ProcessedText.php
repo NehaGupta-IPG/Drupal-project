@@ -68,6 +68,12 @@ class ProcessedText extends RenderElementBase {
     $text = $element['#text'];
     $langcode = $element['#langcode'];
 
+    // If the string is blank there's no point in spending time processing it.
+    if ($element['#text'] === '') {
+      $element['#markup'] = '';
+      return $element;
+    }
+
     if (!isset($format_id)) {
       $filter_settings = static::configFactory()->get('filter.settings');
       $format_id = $filter_settings->get('fallback_format');
