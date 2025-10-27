@@ -13,10 +13,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  */
 trait DependencySerializationTrait {
 
-  use ServiceClosureTrait {
-    getServiceClosure as originalGetServiceClosure;
-  }
-
   /**
    * An array of service IDs keyed by property name used for serialization.
    *
@@ -138,10 +134,24 @@ trait DependencySerializationTrait {
   }
 
   /**
-   * {@inheritdoc}
+   * Gets a closure that returns the service associated with ID.
+   *
+   * @param string $serviceId
+   *   The service ID.
+   * @param \Drupal\Component\DependencyInjection\ContainerInterface|null $container
+   *   The container.
+   *
+   * @return \Closure
+   *   The service closure.
    */
   public static function getServiceClosure(string $serviceId, ?ContainerInterface $container = NULL): \Closure {
-    $closure = static::originalGetServiceClosure($serviceId, $container);
+    $container ??= \Drupal::getContainer();
+    if (!$container->has($serviceId)) {
+      throw new \InvalidArgumentException("$serviceId is not a valid service ID.");
+    }
+    // Apply ServiceClosure attribute to the closure to make it identifiable as
+    // a service closure.
+    $closure = #[ServiceClosure] fn () => $container->get($serviceId);
     // Track the service ID associated with the closure, so that the closure
     // will not need to be invoked during serialization in order to determine
     // which service the closure returns.
