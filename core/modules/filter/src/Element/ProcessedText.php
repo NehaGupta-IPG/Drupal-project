@@ -69,7 +69,7 @@ class ProcessedText extends RenderElementBase {
     $langcode = $element['#langcode'];
 
     // If the string is blank there's no point in spending time processing it.
-    if ($element['#text'] === '') {
+    if ($element['#text'] == '') {
       $element['#markup'] = '';
       return $element;
     }
