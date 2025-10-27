@@ -89,7 +89,8 @@ class MediaCreationTest extends MediaKernelTestBase {
     // the revision user.
     $new_user = $this->setUpCurrentUser();
     $media->setNewRevision(TRUE);
-    $media->setName('a new revision')
+    $media->setRevisionUserId(NULL)
+      ->setName('a new revision')
       ->save();
     $this->assertSame($new_user->id(), $media->getRevisionUserId());
   }
