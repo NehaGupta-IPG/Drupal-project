@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Conflict\Event;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -19,6 +21,7 @@ class EntityConflictResolutionEvent extends EntityConflictDiscoveryEvent {
     ParameterBag $context = new ParameterBag(),
   ) {
     parent::__construct($localEntity, $remoteEntity, $baseEntity, $context);
+    \assert($resultEntity->getEntityTypeId() === $localEntity->getEntityTypeId());
     $this->conflicts = $conflicts;
   }
 

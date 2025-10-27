@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Conflict\ConflictResolution;
 
 use Drupal\Core\Conflict\Event\EntityConflictResolutionEvent;

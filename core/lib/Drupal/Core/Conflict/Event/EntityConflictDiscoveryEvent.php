@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Conflict\Event;
 
 use Drupal\Core\Conflict\ConflictTypeInterface;
@@ -28,6 +30,7 @@ class EntityConflictDiscoveryEvent extends Event {
     protected EntityInterface $baseEntity,
     protected ParameterBag $context = new ParameterBag(),
   ) {
+    \assert($localEntity->getEntityTypeId() === $remoteEntity->getEntityTypeId() && $remoteEntity->getEntityTypeId() === $baseEntity->getEntityTypeId());
   }
 
   /**
@@ -89,7 +92,7 @@ class EntityConflictDiscoveryEvent extends Event {
    * @param string $parameter
    *   The parameter key.
    * @param mixed $default
-   *   The default value if the parameter key does not exist.
+   *   (optional) The default value if the parameter key does not exist.
    *
    * @return mixed
    *   Context value if it exists, otherwise the default.

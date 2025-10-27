@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Conflict\ConflictResolver;
 
 use Drupal\Core\Conflict\Event\EntityConflictDiscoveryEvent;
@@ -30,10 +32,10 @@ class ConflictResolverManager implements ConflictResolverManagerInterface {
     ?array $conflicts = NULL,
   ) : array {
     // If there are no passed conflicts given, attempt to discover them.
-    $conflicts = $conflicts ?? $this->getConflicts($local, $remote, $base, $context);
+    $conflicts ??= $this->getConflicts($local, $remote, $base, $context);
 
     if (\count($conflicts) > 0) {
-      $result = $result ?? $local;
+      $result ??= $local;
       $event = new EntityConflictResolutionEvent($local, $remote, $base, $result, $conflicts, $context);
       // Fire an event to allow listeners to automatically resolve conflicts.
       $this->eventDispatcher->dispatch($event);

@@ -18,6 +18,7 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -26,6 +27,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
  * Test cases for the event based conflict resolution system.
  */
 #[Group('Conflict')]
+#[RunTestsInSeparateProcesses()]
 class ConflictFrameworkTest extends KernelTestBase implements EventSubscriberInterface {
 
   /**
@@ -39,29 +41,21 @@ class ConflictFrameworkTest extends KernelTestBase implements EventSubscriberInt
 
   /**
    * Test conflict discovery A.
-   *
-   * @var \Drupal\Core\Conflict\ConflictDiscovery\ConflictDiscoveryInterface
    */
   protected ConflictDiscoveryInterface $conflictDiscoveryA;
 
   /**
    * Test conflict discovery B.
-   *
-   * @var \Drupal\Core\Conflict\ConflictDiscovery\ConflictDiscoveryInterface
    */
   protected ConflictDiscoveryInterface $conflictDiscoveryB;
 
   /**
    * Test conflict resolution A.
-   *
-   * @var \Drupal\Core\Conflict\ConflictResolution\MergeStrategyInterface
    */
   protected MergeStrategyInterface $conflictResolutionA;
 
   /**
    * Test conflict resolution A.
-   *
-   * @var \Drupal\Core\Conflict\ConflictResolution\MergeStrategyInterface
    */
   protected MergeStrategyInterface $conflictResolutionB;
 

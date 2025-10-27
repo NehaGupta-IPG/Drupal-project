@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Conflict\ConflictResolver;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -32,9 +34,11 @@ interface ConflictResolverManagerInterface {
    * @param null|array<string, \Drupal\Core\Conflict\ConflictTypeInterface> $conflicts
    *   (optional) The conflicts as returned by ::getConflicts() or a sub-set of
    *   them in order to limit the conflict resolution only to certain conflicts.
-   *   If no conflicts are provided then a conflict detection will be performed.
+   *   If a null value is passed then a conflict detection will be performed.
+   *   Passing an empty array signals will not discover any conflicts or perform
+   *   any resolution.
    *
-   * @return array
+   * @return array<string, \Drupal\Core\Conflict\ConflictTypeInterface>
    *   An associative array keyed by the conflicting properties, having as
    *   values the corresponding conflict type.
    */

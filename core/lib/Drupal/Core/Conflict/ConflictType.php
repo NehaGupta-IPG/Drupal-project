@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Conflict;
 
 /**
  * Defines an enum for conflict types.
  */
-enum ConflictTypes: string implements ConflictTypeInterface {
+enum ConflictType: string implements ConflictTypeInterface {
 
   /* Indicates a change only on the remote version. */
-  case ConflictTypeRemote = 'conflict_remote';
+  case Remote = 'conflict_remote';
 
   /* Indicates a different change both on the local and remote version. */
-  case ConflictTypeLocalRemote = 'conflict_local_remote';
+  case LocalRemote = 'conflict_local_remote';
 
 }

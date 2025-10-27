@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Conflict\ConflictDiscovery;
 
-use Drupal\Core\Conflict\ConflictTypes;
+use Drupal\Core\Conflict\ConflictType;
 use Drupal\Core\Conflict\Event\EntityConflictDiscoveryEvent;
+use Drupal\Core\Entity\ContentEntityInterface;
 
 /**
  * Defines a default implementation of conflict discovery.
@@ -14,12 +17,14 @@ class DefaultConflictDiscovery extends ConflictDiscoveryBase {
    * {@inheritdoc}
    */
   public function discoverContentEntityConflicts(EntityConflictDiscoveryEvent $event): void {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $local_entity */
     $local_entity = $event->getLocalEntity();
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $remote_entity */
+    if (!$local_entity instanceof ContentEntityInterface) {
+      return;
+    }
     $remote_entity = $event->getRemoteEntity();
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $base_entity */
     $base_entity = $event->getBaseEntity();
+    // This is enforced by the event constructor.
+    \assert($remote_entity instanceof ContentEntityInterface && $base_entity instanceof ContentEntityInterface);
 
     $langcode = $local_entity->language()->getId();
     $remote_entity = $remote_entity->getTranslation($langcode);
@@ -50,7 +55,7 @@ class DefaultConflictDiscovery extends ConflictDiscoveryBase {
         // Check for changes between the remote and the base entity versions.
         if (!$field_items_remote->equals($field_items_base)) {
           // Check for changes between the local and the base entity versions.
-          $conflict_type = $field_items_local->equals($field_items_base) ? ConflictTypes::ConflictTypeRemote : ConflictTypes::ConflictTypeLocalRemote;
+          $conflict_type = $field_items_local->equals($field_items_base) ? ConflictType::Remote : ConflictType::LocalRemote;
           $event->addConflict($field_name, $conflict_type);
         }
       }
