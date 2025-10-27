@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\DependencyInjection;
 
 use Drupal\Component\DependencyInjection\ReverseContainer;
+use Drupal\Core\DependencyInjection\Attribute\ServiceClosure;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Test\TestKernel;
 use Drupal\Tests\UnitTestCase;
@@ -37,7 +38,7 @@ class DependencySerializationTest extends UnitTestCase {
     // Set property to be different from first service.
     $service2->serviceId = 'test_service2';
     $container->set($service2->serviceId, $service2);
-    $service2Closure = static fn() => $service2;
+    $service2Closure = DependencySerializationTestDummy::getServiceClosure($service2->serviceId, $container);
     $this->assertSame($container, $container->get('service_container'));
     $dependencySerialization = new DependencySerializationTestDummy($service, $service2Closure);
     $dependencySerialization->setContainer($container);
@@ -59,14 +60,11 @@ class DependencySerializationTest extends UnitTestCase {
     // properties that are closures that DependencySerializationTrait does not
     // handle.
     $closures = [
-      // Closure with at least one argument.
-      static fn(int $test) => $service2,
-      // Closure that returns an empty value.
-      static fn() => FALSE,
-      // Closure that does not return an object.
-      static fn() => 'test',
+      // Closure without the
+      // Drupal\Core\DependencyInjection\Attribute\ServiceClosure attribute.
+      static fn() => $service2,
       // Closure that returns an object that is not a registered service object.
-      static fn() => new \stdClass(),
+      #[ServiceClosure] static fn() => \stdClass(),
     ];
     $countThrown = 0;
     foreach ($closures as $closure) {
