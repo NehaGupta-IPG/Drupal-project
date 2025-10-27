@@ -64,7 +64,7 @@ class DependencySerializationTest extends UnitTestCase {
       // Drupal\Core\DependencyInjection\Attribute\ServiceClosure attribute.
       static fn() => $service2,
       // Closure that returns an object that is not a registered service object.
-      #[ServiceClosure] static fn() => \stdClass(),
+      #[ServiceClosure] static fn() => new \stdClass(),
     ];
     $countThrown = 0;
     foreach ($closures as $closure) {
