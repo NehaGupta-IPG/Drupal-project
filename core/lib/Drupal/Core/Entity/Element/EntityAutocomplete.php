@@ -375,7 +375,7 @@ class EntityAutocomplete extends Textfield {
    * @return string
    *   A string of entity labels separated by commas.
    */
-  public static function getEntityLabels(array $entities, array $element = NULL) {
+  public static function getEntityLabels(array $entities, ?array $element = NULL) {
     /** @var \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository */
     $entity_repository = \Drupal::service('entity.repository');
     $labels_data = NULL;
