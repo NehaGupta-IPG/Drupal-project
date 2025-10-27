@@ -7,7 +7,6 @@ use Drupal\Core\Condition\ConditionPluginBase;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Theme\ThemeManagerInterface;
 
@@ -73,7 +72,7 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
       // @see https://www.drupal.org/node/3523553
       '#default_value' => isset($this->configuration['theme']) ? [$this->configuration['theme']] : $this->configuration['themes'],
       '#options' => $this->getAllAvailableThemeOptions(),
-      '#description' => $this->t('Select the themes to enforce. If none are selected, all languages will be allowed.'),
+      '#description' => $this->t('Select the themes to enforce. If none are selected, all themes will be allowed.'),
     ];
     return parent::buildConfigurationForm($form, $form_state);
   }
@@ -100,7 +99,7 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
   /**
    * {@inheritdoc}
    */
-  public function summary(): PluralTranslatableMarkup {
+  public function summary() {
     $allowed_themes = $this->configuration['themes'];
     $all_themes = $this->getAllAvailableThemeOptions();
     $result = empty($allowed_themes) ? array_keys($all_themes) : $allowed_themes;
