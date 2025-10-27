@@ -648,25 +648,22 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // Retrieve enabled modules and register their namespaces.
     if (!isset($this->moduleList) || !isset($this->themeList)) {
       $extensions = $this->getExtensions();
-      // The module list is manipulated in the TestRunnerKernel, so we should
-      // only set it if it is not set.
-      if (!isset($this->moduleList)) {
-        // If core.extension configuration does not exist and we're not in the
-        // installer itself, then we need to put the kernel into a pre-installer
-        // mode. The container should not be dumped because Drupal is yet to be
-        // installed. The installer service provider is registered to ensure
-        // that cache and other automatically created tables are not created if
-        // database settings are available. None of this is required when the
-        // installer is running because the installer has its own kernel and
-        // manages the addition of its own service providers.
-        // @see install_begin_request()
-        if ($extensions === FALSE && !InstallerKernel::installationAttempted()) {
-          $this->allowDumping = FALSE;
-          $this->containerNeedsDumping = FALSE;
-          $GLOBALS['conf']['container_service_providers']['InstallerServiceProvider'] = 'Drupal\Core\Installer\InstallerServiceProvider';
-        }
-        $this->moduleList = $extensions['module'] ?? [];
+
+      // If core.extension configuration does not exist and we're not in the
+      // installer itself, then we need to put the kernel into a pre-installer
+      // mode. The container should not be dumped because Drupal is yet to be
+      // installed. The installer service provider is registered to ensure
+      // that cache and other automatically created tables are not created if
+      // database settings are available. None of this is required when the
+      // installer is running because the installer has its own kernel and
+      // manages the addition of its own service providers.
+      // @see install_begin_request()
+      if ($extensions === FALSE && !InstallerKernel::installationAttempted()) {
+        $this->allowDumping = FALSE;
+        $this->containerNeedsDumping = FALSE;
+        $GLOBALS['conf']['container_service_providers']['InstallerServiceProvider'] = 'Drupal\Core\Installer\InstallerServiceProvider';
       }
+      $this->moduleList = $extensions['module'] ?? [];
 
       $this->themeList = $extensions['theme'] ?? [];
     }
