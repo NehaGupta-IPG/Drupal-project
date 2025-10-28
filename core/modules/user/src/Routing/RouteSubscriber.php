@@ -13,15 +13,14 @@ use Symfony\Component\Routing\RouteCollection;
 class RouteSubscriber extends RouteSubscriberBase {
 
   /**
-   * Helper function for check if modern login is enabled.
+   * Checks if admin theme should be used for login.
    */
   public static function isUserLoginAdminThemeEnabled(): bool {
-    // @todo After #Gin-merge-into-Core set class to "\Drupal\admin\Helper".
     return class_exists('\Drupal\gin\Helper') && Settings::get('user_login_admin_theme', TRUE);
   }
 
   /**
-   * Helper function for check if modern login is enabled.
+   * Checks if current route is login related and should use the admin theme.
    */
   public static function useAdminThemeForLogin(): bool {
     return self::isUserLoginAdminThemeEnabled() && array_key_exists(\Drupal::routeMatch()->getRouteName(), Helper::getLoginRouteDefinitions());
