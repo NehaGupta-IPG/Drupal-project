@@ -31,7 +31,7 @@ class VocabularyCrudTest extends KernelTestBase {
     'taxonomy_crud',
     'text',
     'user',
-    'system'
+    'system',
   ];
 
   /**
