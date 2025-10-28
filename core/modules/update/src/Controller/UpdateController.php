@@ -61,7 +61,7 @@ class UpdateController extends ControllerBase {
     return new static(
       $container->get('update.manager'),
       $container->get('renderer'),
-      $container->get('batch.processor')
+      $container->get(BatchProcessorInterface::class)
     );
   }
 

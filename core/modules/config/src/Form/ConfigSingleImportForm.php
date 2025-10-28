@@ -79,7 +79,7 @@ class ConfigSingleImportForm extends ConfirmFormBase {
       $container->get('config.storage'),
       $container->get('renderer'),
       $container->get(ConfigImporterFactory::class),
-      $container->get('batch.processor'),
+      $container->get(BatchProcessorInterface::class),
     );
   }
 

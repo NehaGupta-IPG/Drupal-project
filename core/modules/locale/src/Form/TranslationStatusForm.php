@@ -26,7 +26,7 @@ class TranslationStatusForm extends FormBase {
       $container->get('module_handler'),
       $container->get('state'),
       $container->get('datetime.time'),
-      $container->get('batch.processor'),
+      $container->get(BatchProcessorInterface::class),
     );
   }
 

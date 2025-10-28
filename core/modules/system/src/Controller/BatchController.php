@@ -49,7 +49,7 @@ class BatchController implements ContainerInjectionInterface {
     return new static(
       $container->getParameter('app.root'),
       $container->get('batch.storage'),
-      $container->get('batch.processor'),
+      $container->get(BatchProcessorInterface::class),
     );
   }
 

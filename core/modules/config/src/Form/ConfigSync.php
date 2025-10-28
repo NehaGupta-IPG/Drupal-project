@@ -67,7 +67,7 @@ class ConfigSync extends FormBase {
       $container->get('renderer'),
       $container->get('config.import_transformer'),
       $container->get(ConfigImporterFactory::class),
-      $container->get('batch.processor'),
+      $container->get(BatchProcessorInterface::class),
     );
   }
 

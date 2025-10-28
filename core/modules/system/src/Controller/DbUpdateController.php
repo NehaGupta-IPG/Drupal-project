@@ -147,7 +147,7 @@ class DbUpdateController extends ControllerBase {
       $container->get('bare_html_page_renderer'),
       $container->get('update.post_update_registry'),
       $container->get('asset.query_string'),
-      $container->get('batch.processor'),
+      $container->get(BatchProcessorInterface::class),
     );
   }
 

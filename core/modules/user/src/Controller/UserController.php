@@ -111,7 +111,7 @@ class UserController extends ControllerBase {
       $container->get('logger.factory')->get('user'),
       $container->get('flood'),
       $container->get('datetime.time'),
-      $container->get('batch.processor'),
+      $container->get(BatchProcessorInterface::class),
     );
   }
 

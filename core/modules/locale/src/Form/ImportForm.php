@@ -46,7 +46,7 @@ class ImportForm extends FormBase {
     return new static(
       $container->get('module_handler'),
       $container->get('language_manager'),
-      $container->get('batch.processor'),
+      $container->get(BatchProcessorInterface::class),
     );
   }
 

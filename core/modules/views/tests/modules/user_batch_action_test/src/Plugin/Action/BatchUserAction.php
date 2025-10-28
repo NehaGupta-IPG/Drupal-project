@@ -8,9 +8,9 @@ use Drupal\Core\Action\ActionBase;
 use Drupal\Core\Action\Attribute\Action;
 use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides action that sets batch precessing.
@@ -20,19 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   label: new TranslatableMarkup('Process user in batch'),
   type: 'user'
 )]
-class BatchUserAction extends ActionBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('batch.processor'),
-    );
-  }
+class BatchUserAction extends ActionBase implements ContainerFactoryPluginInterface {
 
   /**
    * Constructs a new BatchUserAction object.
@@ -50,8 +38,12 @@ class BatchUserAction extends ActionBase {
     array $configuration,
     $plugin_id,
     $plugin_definition,
-    protected readonly ?BatchProcessorInterface $batchProcessor = NULL,
+    protected /*readonly*/ ?BatchProcessorInterface $batchProcessor = NULL,
   ) {
+    if ($this->batchProcessor === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $batchProcessor argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+      $this->batchProcessor = \Drupal::service(BatchProcessorInterface::class);
+    }
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
