@@ -16,14 +16,15 @@ class RouteSubscriber extends RouteSubscriberBase {
    * Helper function for check if modern login is enabled.
    */
   public static function isUserLoginAdminThemeEnabled(): bool {
-    return Settings::get('user_login_admin_theme', TRUE);
+    // @todo After #Gin-merge-into-Core set class to "\Drupal\admin\Helper".
+    return class_exists('\Drupal\gin\Helper') && Settings::get('user_login_admin_theme', TRUE);
   }
 
   /**
    * Helper function for check if modern login is enabled.
    */
   public static function useAdminThemeForLogin(): bool {
-    return self::isUserLoginAdminThemeEnabled() && in_array(\Drupal::routeMatch()->getRouteName(), array_keys(Helper::getLoginRouteDefinitions()));
+    return self::isUserLoginAdminThemeEnabled() && array_key_exists(\Drupal::routeMatch()->getRouteName(), Helper::getLoginRouteDefinitions());
   }
 
   /**
