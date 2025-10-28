@@ -427,7 +427,7 @@ class WorkspaceAssociation implements WorkspaceAssociationInterface, EventSubscr
       Error::logException($this->logger, $e);
       throw $e;
     }
-    unset($transaction);
+    $transaction->commitOrRelease();
   }
 
   /**
