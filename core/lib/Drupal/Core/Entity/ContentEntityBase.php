@@ -909,6 +909,12 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
       $translation = $this->initializeTranslation($langcode);
       $this->translations[$langcode]['entity'] = $translation;
     }
+    // If we don't have a translation object for the switched language
+    // language field in entity we can use default active translation.
+    elseif (isset($this->translations[$this->activeLangcode])) {
+      $translation = $this->initializeTranslation($this->activeLangcode);
+      $this->translations[$this->activeLangcode]['entity'] = $translation;
+    }
 
     if (empty($translation)) {
       throw new \InvalidArgumentException("Invalid translation language ($langcode) specified.");
