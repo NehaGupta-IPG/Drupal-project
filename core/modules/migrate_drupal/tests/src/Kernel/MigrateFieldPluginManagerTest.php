@@ -9,12 +9,16 @@ use Drupal\migrate_drupal\Plugin\MigrateFieldPluginManager;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the field plugin manager.
  */
 #[CoversClass(MigrateFieldPluginManager::class)]
 #[Group('migrate_drupal')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class MigrateFieldPluginManagerTest extends MigrateDrupalTestBase {
 
   /**
@@ -29,7 +33,6 @@ class MigrateFieldPluginManagerTest extends MigrateDrupalTestBase {
    */
   protected static $modules = [
     'datetime',
-    'user',
     'field',
     'migrate_drupal',
     'options',

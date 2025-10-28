@@ -5,47 +5,13 @@
  * Functions to support theming in the Olivero theme.
  */
 
+use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\olivero\OliveroPreRender;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Render\Element;
 use Drupal\user\UserInterface;
-
-/**
- * Implements hook_preprocess_HOOK() for HTML document templates.
- *
- * Adds body classes if certain regions have content.
- */
-function olivero_preprocess_html(&$variables): void {
-  if (theme_get_setting('mobile_menu_all_widths') === 1) {
-    $variables['attributes']['class'][] = 'is-always-mobile-nav';
-  }
-
-  // Convert custom hex to hsl so we can use the hue value.
-  $brand_color_hex = theme_get_setting('base_primary_color') ?? '#1b9ae4';
-  [$h, $s, $l] = _olivero_hex_to_hsl($brand_color_hex);
-
-  $variables['html_attributes']->setAttribute('style', "--color--primary-hue:$h;--color--primary-saturation:$s%;--color--primary-lightness:$l");
-
-  // So fonts can be preloaded from base theme in the event Olivero is used as a
-  // subtheme.
-  $variables['olivero_path'] = \Drupal::request()->getBasePath() . '/' . \Drupal::service('extension.list.theme')->getPath('olivero');
-
-  $query_string = \Drupal::service('asset.query_string')->get();
-
-  // Create render array with noscript tag to output non-JavaScript
-  // stylesheet for primary menu.
-  $variables['noscript_styles'] = [
-    '#type' => 'html_tag',
-    '#noscript' => TRUE,
-    '#tag' => 'link',
-    '#attributes' => [
-      'rel' => 'stylesheet',
-      'href' => $variables['olivero_path'] . '/css/components/navigation/nav-primary-no-js.css?' . $query_string,
-    ],
-  ];
-}
 
 /**
  * Implements hook_preprocess_HOOK() for page title templates.
@@ -148,7 +114,7 @@ function olivero_preprocess_block(&$variables): void {
   }
 
   if ($variables['plugin_id'] === 'system_branding_block') {
-    $site_branding_color = theme_get_setting('site_branding_bg_color');
+    $site_branding_color = \Drupal::service(ThemeSettingsProvider::class)->getSetting('site_branding_bg_color');
     if ($site_branding_color && $site_branding_color !== 'default') {
       $variables['attributes']['class'][] = 'site-branding--bg-' . $site_branding_color;
     }

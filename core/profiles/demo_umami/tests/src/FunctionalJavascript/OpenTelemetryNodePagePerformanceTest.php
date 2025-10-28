@@ -55,8 +55,8 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
     $this->assertSession()->pageTextContains('quiche');
 
     $expected = [
-      'QueryCount' => 457,
-      'CacheSetCount' => 440,
+      'QueryCount' => 439,
+      'CacheSetCount' => 420,
       'CacheDeleteCount' => 0,
       'CacheTagLookupQueryCount' => 43,
       'CacheTagInvalidationCount' => 0,
@@ -118,11 +118,11 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 189,
-      'CacheGetCount' => 209,
+      'CacheGetCount' => 211,
       'CacheSetCount' => 64,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 22,
+      'CacheTagLookupQueryCount' => 23,
       'ScriptCount' => 1,
       'ScriptBytes' => 12000,
       'StylesheetCount' => 2,
@@ -328,11 +328,11 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 169,
-      'CacheGetCount' => 201,
+      'CacheGetCount' => 203,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 66,
-        'bootstrap' => 10,
+        'bootstrap' => 12,
         'discovery' => 67,
         'data' => 12,
         'entity' => 18,
@@ -344,7 +344,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'CacheSetCount' => 40,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 22,
+      'CacheTagLookupQueryCount' => 23,
       'CacheTagGroupedLookups' => [
         [
           'entity_types',
@@ -423,9 +423,9 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
           'config:configurable_language_list',
           'http_response',
         ],
+        ['config:system.menu.footer'],
         [
           'config:system.menu.account',
-          'config:system.menu.footer',
           'block_content_view',
           'config:core.entity_view_display.block_content.footer_promo_block.default',
           'config:core.entity_view_display.media.image.medium_8_7',
@@ -457,7 +457,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'ScriptCount' => 1,
       'ScriptBytes' => 12000,
       'StylesheetCount' => 2,
-      'StylesheetBytes' => 41000,
+      'StylesheetBytes' => 40500,
     ];
     $this->assertMetrics($expected, $performance_data);
   }

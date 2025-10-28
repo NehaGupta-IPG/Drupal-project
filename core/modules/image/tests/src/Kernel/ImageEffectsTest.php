@@ -10,11 +10,13 @@ use Drupal\image\Form\ImageEffectEditForm;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Traits\Core\Image\ToolkitTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests image effects.
  */
 #[Group('image')]
+#[RunTestsInSeparateProcesses]
 class ImageEffectsTest extends KernelTestBase {
 
   use ToolkitTestTrait;
@@ -266,6 +268,30 @@ class ImageEffectsTest extends KernelTestBase {
     $this->assertCount(1, $errors);
     $error = reset($errors);
     $this->assertEquals('Width and height can not both be blank.', $error);
+  }
+
+  /**
+   * Tests uninstalling the module of an effect in a style.
+   */
+  public function testImageStyleEffectDependencyRemoval(): void {
+    /** @var \Drupal\image\ImageStyleInterface $image_style */
+    $image_style = ImageStyle::create([
+      'name' => 'foo',
+      'label' => 'Foo',
+    ]);
+    $image_style->addImageEffect(['id' => 'image_module_test_null', 'weight' => 0]);
+    $image_style->addImageEffect(['id' => 'image_scale', 'weight' => 1]);
+    $image_style->save();
+    $this->assertCount(2, $image_style->getEffects());
+
+    // Uninstall the module that provides the 'image_module_test_null' effect.
+    \Drupal::service('module_installer')->uninstall(['image_module_test']);
+    // Confirm that image style was not deleted and the dependency on the
+    // 'image_module_test' module was handled by removing the
+    // 'image_module_test_null' effect.
+    $image_style = ImageStyle::load('foo');
+    $this->assertNotNull($image_style);
+    $this->assertCount(1, $image_style->getEffects());
   }
 
 }
