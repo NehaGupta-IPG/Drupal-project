@@ -28,8 +28,8 @@ class SchemaReferenceResolverTest extends ComponentKernelTestBase {
    * Test that components props schemas are resolved correctly.
    */
   public function testReferenceResolver(): void {
-    $component = $this->manager->find('sdc_theme_test_references:foo');
-    $this->assertEquals($this->getExpectations(), $component->metadata->schema['properties']);
+    $definition = $this->manager->getDefinitions()['sdc_theme_test_references:foo'];
+    $this->assertEquals($this->getExpectations(), $definition['props']['properties']);
   }
 
   /**
