@@ -1127,7 +1127,7 @@ EOD;
   }
 
   /**
-   * Retrieves a sequence name that is owned by the table and column..
+   * Retrieves a sequence name that is owned by the table and column.
    *
    * @param string $table
    *   A table name that is not prefixed or quoted.
