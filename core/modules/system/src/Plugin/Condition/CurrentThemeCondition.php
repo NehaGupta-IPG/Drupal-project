@@ -101,6 +101,12 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
    */
   public function summary() {
     $allowed_themes = $this->configuration['themes'];
+    // @todo $this->configuration['theme'] won't be supported in Drupal 13.0.0.
+    // remove it:
+    // @see https://www.drupal.org/node/3523553
+    if (empty($allowed_themes) && !empty($this->configuration['theme'])) {
+      $allowed_themes = [$this->configuration['theme']];
+    }
     $all_themes = $this->getAllAvailableThemeOptions();
     $result = empty($allowed_themes) ? array_keys($all_themes) : $allowed_themes;
     $count = count($result);
