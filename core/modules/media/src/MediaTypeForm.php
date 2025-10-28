@@ -18,45 +18,43 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Form controller for media type forms.
  *
+ * @property \Drupal\Component\Plugin\PluginManagerInterface $sourceManager
+ * @property \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
+ * @property \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
+ *
  * @internal
  */
 class MediaTypeForm extends EntityForm {
 
-  /**
-   * Media source plugin manager.
-   *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
-   */
-  protected $sourceManager;
+  public function __construct(
+    protected PluginManagerInterface|\Closure $sourceManagerClosure,
+    protected EntityFieldManagerInterface|\Closure $entityFieldManagerClosure,
+    protected EntityDisplayRepositoryInterface|\Closure $entityDisplayRepositoryClosure,
+  ) {
+    if ($this->sourceManagerClosure instanceof PluginManagerInterface) {
+      @trigger_error('Passing the media source plugin manager service object to ' . __METHOD__ . ' is deprecated in drupal:11.3.0 and will not be supported in drupal:12.0.0. Pass a service closure instead. See https://www.drupal.org/node/3547683');
+      $this->sourceManagerClosure = static::getSerializableServiceClosure('plugin.manager.media.source');
+    }
+    if ($this->entityFieldManagerClosure instanceof EntityFieldManagerInterface) {
+      @trigger_error('Passing the entity field manager service object to ' . __METHOD__ . ' is deprecated in drupal:11.3.0 and will not be supported in drupal:12.0.0. Pass a service closure instead. See https://www.drupal.org/node/3547683');
+      $this->entityFieldManagerClosure = static::getSerializableServiceClosure('entity_field.manager');
+    }
+    if ($this->entityDisplayRepositoryClosure instanceof EntityDisplayRepositoryInterface) {
+      @trigger_error('Passing the entity display manager service object to ' . __METHOD__ . ' is deprecated in drupal:11.3.0 and will not be supported in drupal:12.0.0. Pass a service closure instead. See https://www.drupal.org/node/3547683');
+      $this->entityDisplayRepositoryClosure = static::getSerializableServiceClosure('entity_display.repository');
+    }
+  }
 
   /**
-   * Entity field manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * Magic getter for properties populated by closure return values.
    */
-  protected $entityFieldManager;
+  public function __get(string $name): mixed {
+    $closureName = $name . 'Closure';
+    if (property_exists($this, $closureName) && $this->$closureName instanceof \Closure) {
+      return ($this->$closureName)();
+    }
 
-  /**
-   * Entity display repository service.
-   *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
-   */
-  protected $entityDisplayRepository;
-
-  /**
-   * Constructs a new class instance.
-   *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $source_manager
-   *   Media source plugin manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   Entity field manager service.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
-   *   Entity display repository service.
-   */
-  public function __construct(PluginManagerInterface $source_manager, EntityFieldManagerInterface $entity_field_manager, EntityDisplayRepositoryInterface $entityDisplayRepository) {
-    $this->sourceManager = $source_manager;
-    $this->entityFieldManager = $entity_field_manager;
-    $this->entityDisplayRepository = $entityDisplayRepository;
+    return NULL;
   }
 
   /**
@@ -64,9 +62,9 @@ class MediaTypeForm extends EntityForm {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('plugin.manager.media.source'),
-      $container->get('entity_field.manager'),
-      $container->get('entity_display.repository')
+      static::getSerializableServiceClosure('plugin.manager.media.source', $container),
+      static::getSerializableServiceClosure('entity_field.manager', $container),
+      static::getSerializableServiceClosure('entity_display.repository', $container),
     );
   }
 
