@@ -52,13 +52,13 @@ class ConditionFormTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Bundle: article');
     $this->assertSession()->pageTextContains('Executed successfully.');
 
-    $this->assertSession()->pageTextContains('The current theme is one of the enabled themes.');
+    $this->assertSession()->pageTextContains('The current theme is stark.');
     /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
     $theme_installer = $this->container->get('theme_installer');
     $theme_installer->install(['olivero']);
     $this->drupalGet('condition_test');
     $this->submitForm(['current_theme[themes][olivero]' => 'olivero', 'current_theme[negate]' => TRUE], 'Submit');
-    $this->assertSession()->pageTextContains('The current theme is not one of the enabled themes.');
+    $this->assertSession()->pageTextContains('The current theme is not olivero.');
   }
 
 }
