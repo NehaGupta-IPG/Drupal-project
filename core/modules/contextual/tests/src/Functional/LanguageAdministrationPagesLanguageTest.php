@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests adminstration pages language.
+ * Tests administration pages language.
  */
 #[Group('language')]
 #[RunTestsInSeparateProcesses]
@@ -122,7 +122,7 @@ class LanguageAdministrationPagesLanguageTest extends BrowserTestBase {
   }
 
   /**
-   * Tests adminstration pages language.
+   * Tests administration pages language.
    */
   public function testLanguageAdministrationPagesLanguage(): void {
     $local_tasks_block_prefix = '//div[contains(@data-contextual-id, "block:block=' . $this->blockId['local_tasks_block'];
