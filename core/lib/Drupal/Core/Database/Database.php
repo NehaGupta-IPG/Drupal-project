@@ -16,7 +16,7 @@ use Drupal\Core\Cache\NullBackend;
  * shepherding of database connections into a single location without the use of
  * globals.
  *
- * @phpstan-type UnprocessedConnectionInfoArray array{'driver': string, 'autoload'?: string, 'namespace'?: string, 'database': string, 'username'?: string, 'password'?: string, 'host'?: string, 'port'?: string|int, 'prefix'?: string, 'collation'?: string, 'pdo'?: array<mixed>, 'isolation_level'?: int|string, 'init_commands'?: list<string>, 'dependencies'?: array<string,array{'autoload': string, 'namespace': string}>}
+ * @phpstan-type ConnectionInfoArray array{'driver': string, 'autoload'?: string, 'namespace'?: string, 'database': string, 'username'?: string, 'password'?: string, 'host'?: string, 'port'?: string|int, 'prefix'?: string, 'collation'?: string, 'pdo'?: array<mixed>, 'isolation_level'?: int|string, 'init_commands'?: list<string>, 'dependencies'?: array<string,array{'autoload': string, 'namespace': string}>}
  * @phpstan-import-type DatabaseLogEntry from \Drupal\Core\Database\Log
  *
  * @final
@@ -185,7 +185,7 @@ abstract class Database {
   /**
    * Process the configuration file for database information.
    *
-   * @param UnprocessedConnectionInfoArray|list<UnprocessedConnectionInfoArray> $info
+   * @param ConnectionInfoArray|list<ConnectionInfoArray> $info
    *   The database connection information, as defined in settings.php. The
    *   structure of this array depends on the database driver it is connecting
    *   to.
@@ -206,7 +206,7 @@ abstract class Database {
       $info_pick = $info[mt_rand(0, count($info) - 1)];
     }
 
-    /** @var UnprocessedConnectionInfoArray $options */
+    /** @var ConnectionInfoArray $options */
     $options = $info_pick ?? $info;
 
     // Force port to an int if it exists.
@@ -292,7 +292,7 @@ abstract class Database {
    *   The database key.
    * @param string $target
    *   The database target name.
-   * @param \Drupal\Core\Database\ConnectionParametersInterface|UnprocessedConnectionInfoArray|list<UnprocessedConnectionInfoArray> $info
+   * @param \Drupal\Core\Database\ConnectionParametersInterface|ConnectionInfoArray|list<ConnectionInfoArray> $info
    *   The database connection information.
    * @param \Composer\Autoload\ClassLoader|null $class_loader
    *   (optional) The class loader.
@@ -339,7 +339,7 @@ abstract class Database {
   /**
    * Sets connection information for multiple databases.
    *
-   * @param array<string,array<string,UnprocessedConnectionInfoArray>> $databases
+   * @param array<string,array<string,ConnectionInfoArray>> $databases
    *   A multi-dimensional array specifying database connection parameters, as
    *   defined in settings.php.
    * @param \Composer\Autoload\ClassLoader|null $class_loader
@@ -671,7 +671,7 @@ abstract class Database {
   /**
    * Converts a connection options array to a ConnectionParameters object.
    *
-   * @param UnprocessedConnectionInfoArray $connection_options
+   * @param ConnectionInfoArray $connection_options
    *   An array of options for the connection.
    *
    * @return ConnectionParametersInterface

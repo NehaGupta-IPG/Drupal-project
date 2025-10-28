@@ -6,6 +6,8 @@ namespace Drupal\Core\Database;
 
 /**
  * Interface for a database connection parameters object.
+ *
+ * @phpstan-import-type ConnectionInfoArray from \Drupal\Core\Database\Database
  */
 interface ConnectionParametersInterface {
 
@@ -15,7 +17,7 @@ interface ConnectionParametersInterface {
    * For BC reasons, we may need to return the parameters as an array and
    * not as an object.
    *
-   * @return static|array<string, mixed>
+   * @return static|ConnectionInfoArray
    *   The connection parameters.
    */
   public function getParameters(): static|array;
@@ -31,7 +33,7 @@ interface ConnectionParametersInterface {
   /**
    * Returns the connection parameters as an associative array.
    *
-   * @return array<string, mixed>
+   * @return ConnectionInfoArray
    *   The connection parameters as an associative array.
    */
   public function toArray(): array;
@@ -50,11 +52,11 @@ interface ConnectionParametersInterface {
    * This is used internally by the database layer, should not be called
    * otherwise.
    *
-   * @param array<string, mixed> $options
+   * @param ConnectionInfoArray $options
    *   An array of connection options.
    *
-   * @return array<string, mixed>
-   *   The processed options as an associative array.
+   * @return ConnectionInfoArray
+   *   The processed options.
    *
    * @internal
    */
