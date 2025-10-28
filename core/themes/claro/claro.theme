@@ -1815,6 +1815,11 @@ function claro_system_module_invoked_library_info_alter(&$libraries, $extension)
         unset($libraries['toolbar.menu']['css'][$concern][$key]);
       }
     }
+    // Claro's CSS relies on toolbar.menu.js from the core toolbar module, so
+    // insist on that version of the file.
+    $config = $libraries['toolbar.menu']['js']['js/toolbar.menu.js'];
+    $libraries['toolbar.menu']['js']['/core/modules/toolbar/js/toolbar.menu.js'] = $config;
+    unset($libraries['toolbar.menu']['js']['js/toolbar.menu.js']);
   }
 }
 
