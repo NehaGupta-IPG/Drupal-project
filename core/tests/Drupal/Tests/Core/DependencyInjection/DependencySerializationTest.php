@@ -38,7 +38,8 @@ class DependencySerializationTest extends UnitTestCase {
     // Set property to be different from first service.
     $service2->serviceId = 'test_service2';
     $container->set($service2->serviceId, $service2);
-    $service2Closure = DependencySerializationTestDummy::getServiceClosure($service2->serviceId, $container);
+    $service2Closure = DependencySerializationTestDummy::getSerializableServiceClosure($service2->serviceId, $container);
+    $this->assertSame([spl_object_id($service2Closure) => $service2->serviceId], DependencySerializationTestDummy::getServiceIdsForClosureObjects());
     $this->assertSame($container, $container->get('service_container'));
     $dependencySerialization = new DependencySerializationTestDummy($service, $service2Closure);
     $dependencySerialization->setContainer($container);
@@ -54,7 +55,8 @@ class DependencySerializationTest extends UnitTestCase {
     $this->assertNotEquals($service, ($dependencySerialization->closure)());
     $this->assertSame($container, $dependencySerialization->container);
     $this->assertEmpty($dependencySerialization->getServiceIds());
-    $this->assertEmpty($dependencySerialization->getServiceClosureIds());
+    $this->assertEmpty($dependencySerialization->getServiceIdsForClosurePropertyNames());
+    $this->assertSame([spl_object_id($dependencySerialization->closure) => $service2->serviceId], DependencySerializationTestDummy::getServiceIdsForClosureObjects());
 
     // Test that exceptions are thrown when attempting to serialize class
     // properties that are closures that DependencySerializationTrait does not
@@ -116,8 +118,15 @@ class DependencySerializationTestDummy {
   /**
    * Gets the stored service IDs for closure properties.
    */
-  public function getServiceClosureIds(): array {
-    return $this->_serviceClosureIds;
+  public function getServiceIdsForClosurePropertyNames(): array {
+    return $this->_serviceIdsForClosurePropertyNames;
+  }
+
+  /**
+   * Gets the stored services keyed by closure object spl_object_id() value.
+   */
+  public static function getServiceIdsForClosureObjects(): array {
+    return static::$_serviceIdsForClosureObjects;
   }
 
 }
