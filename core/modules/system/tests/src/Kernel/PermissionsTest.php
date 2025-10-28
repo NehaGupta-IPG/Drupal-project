@@ -28,6 +28,7 @@ class PermissionsTest extends KernelTestBase {
    */
   public function testAccessContentPermission(): void {
     // Uninstalling modules requires the users_data table to exist.
+    $this->installConfig('user');
     $this->installSchema('user', ['users_data']);
 
     $permissions = $this->container->get('user.permissions')->getPermissions();

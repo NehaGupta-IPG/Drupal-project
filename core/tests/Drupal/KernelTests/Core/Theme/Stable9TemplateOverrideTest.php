@@ -85,10 +85,10 @@ class Stable9TemplateOverrideTest extends KernelTestBase {
     $this->allModules = array_keys($all_modules);
     sort($this->allModules);
 
+    $this->installConfig(['system', 'user']);
+
     $module_installer = $this->container->get('module_installer');
     $module_installer->install($this->allModules);
-
-    $this->installConfig(['system', 'user']);
   }
 
   /**

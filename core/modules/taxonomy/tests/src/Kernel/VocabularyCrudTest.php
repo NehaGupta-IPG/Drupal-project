@@ -31,6 +31,7 @@ class VocabularyCrudTest extends KernelTestBase {
     'taxonomy_crud',
     'text',
     'user',
+    'system'
   ];
 
   /**
@@ -38,6 +39,7 @@ class VocabularyCrudTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installConfig('user');
     $this->installSchema('user', ['users_data']);
     $this->installEntitySchema('taxonomy_term');
   }
