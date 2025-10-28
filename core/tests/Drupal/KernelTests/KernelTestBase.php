@@ -7,6 +7,7 @@ namespace Drupal\KernelTests;
 use Drupal\Component\FileCache\ApcuFileCacheBackend;
 use Drupal\Component\FileCache\FileCache;
 use Drupal\Component\FileCache\FileCacheFactory;
+use Drupal\Core\Config\DatabaseStorage;
 use Drupal\Core\Config\Development\ConfigSchemaChecker;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -30,7 +31,6 @@ use Drupal\TestTools\Extension\Dump\DebugDump;
 use Drupal\TestTools\Extension\SchemaInspector;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\BeforeClass;
-use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\DependencyInjection\Definition;
@@ -348,11 +348,15 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     // Bootstrap the kernel. Do not use createFromRequest() to retain Settings.
     $kernel = new DrupalKernel('testing', $this->classLoader, FALSE);
     $kernel->setSitePath($this->siteDirectory);
-    // Boot a new one-time container from scratch. Set the module list upfront
-    // to avoid a subsequent rebuild or setting the kernel into the
-    // pre-installer mode.
-    $extensions = $modules ? $this->getExtensionsForModules($modules) : [];
-    $kernel->updateModules($extensions, $extensions);
+    // Write the module list to config upfront to avoid a subsequent rebuilds or
+    // setting the kernel into the pre-installer mode.
+    $config_storage = new DatabaseStorage(Database::getConnection(), 'config');
+    // Write the core.extension configuration.
+    // Required for ConfigInstaller::installDefaultConfig() to work.
+    $config_storage->write('core.extension', [
+      'module' => array_fill_keys($modules, 0),
+      'theme' => [],
+    ]);
 
     // DrupalKernel::boot() is not sufficient as it does not invoke preHandle(),
     // which is required to initialize legacy global variables.
@@ -373,13 +377,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
 
     // Setup the destination to the be frontpage by default.
     \Drupal::destination()->set('/');
-
-    // Write the core.extension configuration.
-    // Required for ConfigInstaller::installDefaultConfig() to work.
-    $this->container->get('config.storage')->write('core.extension', [
-      'module' => array_fill_keys($modules, 0),
-      'theme' => [],
-    ]);
 
     $settings = Settings::getAll();
     $settings['php_storage']['default'] = [
@@ -479,35 +476,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     }
     FileCacheFactory::setConfiguration($configuration);
     FileCacheFactory::setPrefix(Settings::getApcuPrefix('file_cache', $this->root));
-  }
-
-  /**
-   * Returns Extension objects for $modules to install.
-   *
-   * @param string[] $modules
-   *   The list of modules to install.
-   *
-   * @return \Drupal\Core\Extension\Extension[]
-   *   Extension objects for $modules, keyed by module name.
-   *
-   * @throws \PHPUnit\Framework\Exception
-   *   If a module is not available.
-   *
-   * @see \Drupal\KernelTests\KernelTestBase::enableModules()
-   * @see \Drupal\Core\Extension\ModuleHandler::add()
-   */
-  private function getExtensionsForModules(array $modules): array {
-    $extensions = [];
-    $discovery = new ExtensionDiscovery($this->root);
-    $discovery->setProfileDirectories([]);
-    $list = $discovery->scan('module');
-    foreach ($modules as $name) {
-      if (!isset($list[$name])) {
-        throw new Exception("Unavailable module: '$name'. If this module needs to be downloaded for testing, include it in the 'require-dev' section of your composer.json file.");
-      }
-      $extensions[$name] = $list[$name];
-    }
-    return $extensions;
   }
 
   /**
