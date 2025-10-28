@@ -80,3 +80,7 @@ services:
     class: Drupal\user\UserNameValidator
     arguments: ['@validation.basic_recursive_validator_factory', '@validation.constraint']
   Drupal\user\UserNameValidator: '@user.name_validator'
+  user.route_subscriber:
+    class: Drupal\user\Routing\RouteSubscriber
+    tags:
+      - { name: event_subscriber }

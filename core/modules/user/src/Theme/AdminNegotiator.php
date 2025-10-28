@@ -71,7 +71,7 @@ class AdminNegotiator implements ThemeNegotiatorInterface {
    */
   public function applies(RouteMatchInterface $route_match) {
     $is_admin_route = $this->adminContext->isAdminRoute($route_match->getRouteObject());
-    return $is_admin_route && $this->user->hasPermission('view the administration theme');
+    return $is_admin_route && ($this->user->hasPermission('view the administration theme') || RouteSubscriber::useAdminThemeForLogin());
   }
 
   /**
