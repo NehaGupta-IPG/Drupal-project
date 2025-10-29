@@ -136,7 +136,7 @@ trait DependencySerializationTrait {
   /**
    * Gets a closure that returns the service associated with ID.
    *
-   * @param string $serviceId
+   * @param string $service_id
    *   The service ID.
    * @param \Drupal\Component\DependencyInjection\ContainerInterface|null $container
    *   The container.
@@ -144,18 +144,18 @@ trait DependencySerializationTrait {
    * @return \Closure
    *   The service closure.
    */
-  public static function getSerializableServiceClosure(string $serviceId, ?ContainerInterface $container = NULL): \Closure {
+  public static function getSerializableServiceClosure(string $service_id, ?ContainerInterface $container = NULL): \Closure {
     $container ??= \Drupal::getContainer();
-    if (!$container->has($serviceId)) {
-      throw new \InvalidArgumentException("$serviceId is not a valid service ID.");
+    if (!$container->has($service_id)) {
+      throw new \InvalidArgumentException("$service_id is not a valid service ID.");
     }
     // Apply ServiceClosure attribute to the closure to make it identifiable as
     // a service closure.
-    $closure = #[ServiceClosure] fn () => $container->get($serviceId);
+    $closure = #[ServiceClosure] fn () => $container->get($service_id);
     // Track the service ID associated with the closure, so that the closure
     // will not need to be invoked during serialization in order to determine
     // which service the closure returns.
-    static::$_serviceIdsForClosureObjects[spl_object_id($closure)] = $serviceId;
+    static::$_serviceIdsForClosureObjects[spl_object_id($closure)] = $service_id;
     return $closure;
   }
 
