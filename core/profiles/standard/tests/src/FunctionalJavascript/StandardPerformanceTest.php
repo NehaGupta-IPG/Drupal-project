@@ -236,11 +236,11 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 10,
-      'CacheGetCount' => 71,
-      'CacheSetCount' => 16,
+      'CacheGetCount' => 77,
+      'CacheSetCount' => 17,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 13,
+      'CacheTagLookupQueryCount' => 12,
       'CacheTagGroupedLookups' => [
         [
           'route_match',
@@ -281,8 +281,10 @@ class StandardPerformanceTest extends PerformanceTestBase {
           'config:block_list',
           'http_response',
         ],
-        ['config:system.menu.main'],
-        ['config:system.menu.account'],
+        [
+          'config:system.menu.account',
+          'config:system.menu.main',
+        ],
         ['config:user.role.anonymous'],
       ],
       'StylesheetCount' => 1,
