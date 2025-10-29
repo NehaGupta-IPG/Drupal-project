@@ -11,6 +11,7 @@ use Drupal\Core\Url;
 use Drupal\jsonapi\JsonApiSpec;
 use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
 use Drupal\Tests\jsonapi\Traits\CommonCollectionFilterAccessTestPatternsTrait;
+use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -139,6 +140,7 @@ class BlockContentTest extends ResourceTestBase {
     $version_identifier = 'id:' . $this->entity->getRevisionId();
     $self_url = $self_url->setOption('query', ['resourceVersion' => $version_identifier]);
     $version_query_string = '?resourceVersion=' . urlencode($version_identifier);
+    $rev_author = User::load($this->entity->getRevisionUserId());
     return [
       'jsonapi' => [
         'meta' => [
@@ -189,7 +191,13 @@ class BlockContentTest extends ResourceTestBase {
             ],
           ],
           'revision_user' => [
-            'data' => NULL,
+            'data' => [
+              'id' => $rev_author->uuid(),
+              'meta' => [
+                'drupal_internal__target_id' => (int) $rev_author->id(),
+              ],
+              'type' => 'user--user',
+            ],
             'links' => [
               'related' => ['href' => $base_url->toString() . '/revision_user' . $version_query_string],
               'self' => ['href' => $base_url->toString() . '/relationships/revision_user' . $version_query_string],

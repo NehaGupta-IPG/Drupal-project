@@ -141,11 +141,14 @@ class ContentExportTest extends BrowserTestBase {
       // This specific node is special -- it is always reassigned to the current
       // user during import, because its owner does not exist. Therefore, the
       // current user is who it should be referring to when exported.
+      $new_owner = $this->adminUser->uuid();
       if ($uuid === '7f1dd75a-0be2-4d3b-be5d-9d1a868b9267') {
-        $new_owner = $this->adminUser->uuid();
-        $exported_data['_meta']['depends'] = $imported_data['_meta']['depends'] = [$new_owner => 'user'];
         $exported_data['default']['uid'][0]['entity'] = $imported_data['default']['uid'][0]['entity'] = $new_owner;
       }
+
+      // The revision user is always set to the current user.
+      $exported_data['_meta']['depends'] = $imported_data['_meta']['depends'] = [$new_owner => 'user'];
+      $exported_data['default']['revision_user'][0]['entity'] = $imported_data['default']['revision_user'][0]['entity'] = $new_owner;
 
       self::recursiveSortByKey($exported_data);
       self::recursiveSortByKey($imported_data);

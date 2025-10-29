@@ -13,6 +13,7 @@ use Drupal\jsonapi\JsonApiSpec;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\jsonapi\Traits\CommonCollectionFilterAccessTestPatternsTrait;
+use Drupal\user\Entity\User;
 use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -135,6 +136,7 @@ class TermTest extends ResourceTestBase {
     $version_identifier = 'id:' . $this->entity->getRevisionId();
     $self_url = $self_url->setOption('query', ['resourceVersion' => $version_identifier]);
     $version_query_string = '?resourceVersion=' . urlencode($version_identifier);
+    $rev_author = User::load($this->entity->getRevisionUserId());
 
     // We test with multiple parent terms, and combinations thereof.
     // @see ::createEntity()
@@ -306,7 +308,13 @@ class TermTest extends ResourceTestBase {
             ],
           ],
           'revision_user' => [
-            'data' => NULL,
+            'data' => [
+              'id' => $rev_author->uuid(),
+              'meta' => [
+                'drupal_internal__target_id' => (int) $rev_author->id(),
+              ],
+              'type' => 'user--user',
+            ],
             'links' => [
               'related' => [
                 'href' => $base_url->toString() . '/revision_user' . $version_query_string,
