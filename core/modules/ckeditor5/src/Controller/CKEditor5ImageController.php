@@ -102,13 +102,25 @@ class CKEditor5ImageController extends ControllerBase {
     $validators = $this->getImageUploadValidators($settings);
 
     $file_uri = "{$destination}/{$filename}";
-    $file_uri = $this->fileSystem->getDestinationFilename($file_uri, FileExists::Rename);
 
-    // Lock based on the prepared file URI.
+    // Acquire a lock before retrieving a destination filename to avoid race
+    // condition when multiple uploads with the same filename occur
+    // simultaneously.
+    // In our case, the getDestinationFilename() method checks for existing
+    // files and returns the next should-be-available filename, e.g.,
+    // 'image_1.png'.
+    // However, the file is not actually created until handleFileUpload(),
+    // meaning that two parallel requests could both get the same 'destination'
+    // filename if they run at the same time.
     $lock_id = $this->generateLockIdFromFileUri($file_uri);
 
-    if (!$this->lock->acquire($lock_id)) {
-      throw new HttpException(503, sprintf('File "%s" is already locked for writing.', $file_uri), NULL, ['Retry-After' => 1]);
+    // Spend up to 15 seconds trying to acquire the lock.
+    $retries = 0;
+    while (!$this->lock->acquire($lock_id)) {
+      if ($retries++ > 3) {
+        throw new HttpException(503, sprintf('File "%s" is already locked for writing.', $file_uri), NULL, ['Retry-After' => 1]);
+      }
+      $this->lock->wait($lock_id, 5);
     }
 
     try {
