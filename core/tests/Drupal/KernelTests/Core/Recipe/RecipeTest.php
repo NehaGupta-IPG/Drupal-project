@@ -31,6 +31,14 @@ class RecipeTest extends KernelTestBase {
   protected static $modules = ['system', 'user', 'field'];
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    $this->installConfig(['user']);
+  }
+
+  /**
  * Tests create from directory 2.
  */
   #[TestWith(["no_extensions", "No extensions", "Testing", [], "A recipe description"])]

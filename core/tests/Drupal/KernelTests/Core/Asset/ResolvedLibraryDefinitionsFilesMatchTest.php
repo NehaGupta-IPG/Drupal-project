@@ -139,6 +139,7 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
     // on the workspace which will fail because the user table is not present.
     // @todo Remove this in https://www.drupal.org/node/3039217.
     $this->installEntitySchema('user');
+    $this->installConfig(['user']);
 
     // Install the 'path_alias' entity schema because the path alias path
     // processor requires it.
@@ -171,6 +172,7 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
   public function testCoreLibraryCompletenessDeprecated(): void {
     // Find and install deprecated modules to test.
     $all_modules = $this->container->get('extension.list.module')->getList();
+    $this->installConfig(['user']);
     $deprecated_modules_to_test = array_filter($all_modules, function ($module) {
       if ($module->origin == 'core'
         && $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
