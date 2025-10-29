@@ -492,11 +492,11 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'StylesheetBytes' => 1429,
       'StylesheetCount' => 1,
       'QueryCount' => 17,
-      'CacheGetCount' => 72,
+      'CacheGetCount' => 78,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 13,
+      'CacheTagLookupQueryCount' => 12,
       'CacheTagGroupedLookups' => [
         // Form submission and login.
         [
@@ -542,6 +542,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
         [
           'config:block.block.stark_account_menu',
           'config:block.block.stark_breadcrumbs',
+          'config:block.block.stark_main_menu',
           'config:block.block.stark_primary_admin_actions',
         ],
         [
