@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Drupal\Core\Test;
 
 use Drupal\Core\Test\Exception\MissingGroupException;
+use Drupal\TestTools\PhpUnitCompatibility\RunnerVersion;
 use PHPUnit\Event\EventFacadeIsSealedException;
 use PHPUnit\Event\Facade as EventFacade;
 use PHPUnit\Framework\DataProviderTestSuite;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestSuite;
-use Drupal\TestTools\PhpUnitCompatibility\RunnerVersion;
 use PHPUnit\TextUI\Configuration\Builder;
 use PHPUnit\TextUI\Configuration\TestSuiteBuilder;
 
