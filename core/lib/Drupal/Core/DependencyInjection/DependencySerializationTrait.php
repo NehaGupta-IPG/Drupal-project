@@ -94,6 +94,12 @@ trait DependencySerializationTrait {
             $this->_serviceIdsForClosurePropertyNames[$key] = $service_closure_id;
             unset($vars[$key]);
           }
+          // If somehow the closure is not registered in the map, invoke it and
+          // get the service ID from the reverse container.
+          elseif ($service_closure_id = $reverse_container->getId(($value)())) {
+            $this->_serviceIdsForClosurePropertyNames[$key] = $service_closure_id;
+            unset($vars[$key]);
+          }
         }
       }
     }
@@ -143,6 +149,9 @@ trait DependencySerializationTrait {
    *
    * @return \Closure
    *   The service closure.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown if an invalid service ID is passed.
    */
   public static function getSerializableServiceClosure(string $service_id, ?ContainerInterface $container = NULL): \Closure {
     $container ??= \Drupal::getContainer();
