@@ -58,6 +58,28 @@ class DependencySerializationTest extends UnitTestCase {
     $this->assertEmpty($dependencySerialization->getServiceIdsForClosurePropertyNames());
     $this->assertSame([spl_object_id($dependencySerialization->closure) => $service2->serviceId], DependencySerializationTestDummy::getServiceIdsForClosureObjects());
 
+    // Test that the correct exception is thrown when trying to create a service
+    // closure from an invalid service ID.
+    $nonexistent_service_closure = NULL;
+    try {
+      $nonexistent_service_closure = DependencySerializationTestDummy::getSerializableServiceClosure('nonexistent_service_id', $container);
+    }
+    catch (\Throwable $t) {
+    }
+    finally {
+      $this->assertInstanceOf(\InvalidArgumentException::class, $t);
+      $this->assertSame("nonexistent_service_id is not a valid service ID.", $t->getMessage());
+      $this->assertNull($nonexistent_service_closure);
+    }
+
+    // Test that a service closure with the ServiceClosure attribute also can be
+    // serialized even if it was not generated with
+    // getSerializableServiceClosure().
+    $dependencySerialization->closure = #[ServiceClosure] fn () => $container->get($service2->serviceId);
+    $serialized = serialize($dependencySerialization);
+    $unserialized = unserialize($serialized);
+    $this->assertSame($service2, ($unserialized->closure)());
+
     // Test that exceptions are thrown when attempting to serialize class
     // properties that are closures that DependencySerializationTrait does not
     // handle.
