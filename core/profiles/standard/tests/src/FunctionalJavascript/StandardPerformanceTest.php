@@ -538,7 +538,6 @@ class StandardPerformanceTest extends PerformanceTestBase {
         ['config:block.block.stark_messages'],
         ['config:block.block.stark_help'],
         ['config:block.block.stark_powered'],
-        ['config:block.block.stark_main_menu'],
         [
           'config:block.block.stark_account_menu',
           'config:block.block.stark_breadcrumbs',
