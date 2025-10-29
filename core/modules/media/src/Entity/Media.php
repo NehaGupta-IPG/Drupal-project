@@ -569,7 +569,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
    * {@inheritdoc}
    */
   public static function getRequestTime() {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. No replacement provided. See https://www.drupal.org/node/3349765', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. No replacement provided. See https://www.drupal.org/node/3349765', E_USER_DEPRECATED);
     return \Drupal::time()->getRequestTime();
   }
 
