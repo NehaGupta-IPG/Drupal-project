@@ -478,8 +478,9 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
 
     // If no revision author has been set explicitly, make the current user the
     // revision author.
-    if ($this instanceof RevisionLogInterface && !$this->getRevisionUser()) {
-      $this->setRevisionUserId(\Drupal::currentUser()->id());
+    $currentUser = \Drupal::currentUser();
+    if ($this instanceof RevisionLogInterface && !$this->getRevisionUser() && $currentUser->isAuthenticated()) {
+      $this->setRevisionUserId($currentUser->id());
     }
 
     parent::preSave($storage);
