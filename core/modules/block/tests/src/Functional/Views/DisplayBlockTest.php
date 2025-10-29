@@ -411,7 +411,7 @@ class DisplayBlockTest extends ViewTestBase {
       'http_response',
       'rendered',
     ]));
-    $this->assertCacheContexts(['url.query_args:_wrapper_format']);
+    $this->assertCacheContexts(['url.query_args:_wrapper_format', 'user.admin_language']);
   }
 
   /**
