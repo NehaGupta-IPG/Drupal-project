@@ -142,6 +142,7 @@ trait AssertPageCacheContextsAndTagsTrait {
           // the HtmlRenderer, so check the Content-Type header.
           // @see \Drupal\Core\Render\MainContent\HtmlRenderer::invokePageAttachmentHooks()
           if ($this->getSession()->getResponseHeader('Content-Type') === 'text/html; charset=UTF-8') {
+            $default_contexts[] = 'user.admin_language';
             $default_contexts[] = 'user.roles:authenticated';
           }
         }
