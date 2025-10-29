@@ -178,13 +178,12 @@ class ComponentValidator {
       return TRUE;
     }
 
-    // Add null type to all non-required properties.
-    // In Twig, not declaring the value of a prop is different than actually
-    // setting it to NULL. We want the same treatment for DX, because if not
-    // twig developers need to be checking if something is NULL before
-    // assigning it, which would make their experience pretty worse and their
-    // components templates less readable, specially when reusing other
-    // components.
+    // Add null type to all non-required properties. In Twig, not declaring
+    // the value of a prop is different than actually setting it to NULL. For
+    // DX, we want to do the same thing because otherwise, Twig developers will
+    // need to check if something is NULL before assigning it, which would
+    // worsen their experience and make their components' templates less
+    // readable, especially when reusing other components.
     $this->makeNonRequiredPropertiesNullable($schema);
 
     $prop_names = array_keys($schema['properties']);
@@ -266,7 +265,7 @@ class ComponentValidator {
 
       // If there are sub-properties for an object, it means that they need
       // the same treatment.
-      if (in_array('object', $prop['type']) && isset($prop['properties'])) {
+      if (in_array('object', $prop['type'], TRUE) && isset($prop['properties'])) {
         $this->makeNonRequiredPropertiesNullable($prop);
       }
     }

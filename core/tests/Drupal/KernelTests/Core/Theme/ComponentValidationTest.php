@@ -20,7 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class ComponentValidationTest extends KernelTestBase {
 
   /**
-   * Tests that optional SDC props with no value are still valid.
+   * Tests that optional SDC props with a NULL value are still valid.
    */
   public function testOptionalProps(): void {
     $this->container->get(ThemeInstallerInterface::class)->install([
