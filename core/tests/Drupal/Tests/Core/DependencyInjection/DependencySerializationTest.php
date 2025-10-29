@@ -61,14 +61,15 @@ class DependencySerializationTest extends UnitTestCase {
     // Test that the correct exception is thrown when trying to create a service
     // closure from an invalid service ID.
     $nonexistent_service_closure = NULL;
+    $throwable = NULL;
     try {
       $nonexistent_service_closure = DependencySerializationTestDummy::getSerializableServiceClosure('nonexistent_service_id', $container);
     }
-    catch (\Throwable $t) {
+    catch (\Throwable $throwable) {
     }
     finally {
-      $this->assertInstanceOf(\InvalidArgumentException::class, $t);
-      $this->assertSame("nonexistent_service_id is not a valid service ID.", $t->getMessage());
+      $this->assertInstanceOf(\InvalidArgumentException::class, $throwable);
+      $this->assertSame("nonexistent_service_id is not a valid service ID.", $throwable->getMessage());
       $this->assertNull($nonexistent_service_closure);
     }
 
