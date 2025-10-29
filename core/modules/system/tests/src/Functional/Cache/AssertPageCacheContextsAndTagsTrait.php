@@ -145,6 +145,9 @@ trait AssertPageCacheContextsAndTagsTrait {
           }
         }
       }
+      else {
+        $default_contexts[] = 'user.admin_language';
+      }
       $expected_contexts = Cache::mergeContexts($expected_contexts, $default_contexts);
     }
 
