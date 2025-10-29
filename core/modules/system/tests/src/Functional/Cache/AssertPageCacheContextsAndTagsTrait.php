@@ -136,6 +136,7 @@ trait AssertPageCacheContextsAndTagsTrait {
       // user is already there.
       if (!in_array('user', $expected_contexts)) {
         $default_contexts[] = 'user.permissions';
+
         if (!in_array('user.roles', $expected_contexts)) {
           // The system_page_attachments() hook is only called when dealing with
           // the HtmlRenderer, so check the Content-Type header.
