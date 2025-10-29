@@ -9,6 +9,7 @@ use Drupal\Core\Routing\AdminContext;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Theme\ThemeNegotiatorInterface;
+use Drupal\user\Routing\RouteSubscriber;
 
 /**
  * Sets the active theme on admin pages.
