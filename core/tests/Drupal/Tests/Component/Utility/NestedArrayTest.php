@@ -291,9 +291,9 @@ class NestedArrayTest extends TestCase {
   }
 
   /**
-   * @covers ::arrayWalkNested
+   * @legacy-covers ::arrayWalkNested
    */
-  public function testArrayWalkNested() {
+  public function testArrayWalkNested(): void {
     $firstArray = [
       'one' => 1,
       'nest' => [
