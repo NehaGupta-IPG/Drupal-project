@@ -111,6 +111,8 @@ class ContextualUnitTest extends KernelTestBase {
    *   The #contextual_links property value array.
    * @param string $id
    *   The serialized representation of the passed links.
+   * @param string $theme
+   *   The name of the theme the placeholder should pass to the controller.
    *
    * @legacy-covers ::_contextual_links_to_id
    */
@@ -126,6 +128,8 @@ class ContextualUnitTest extends KernelTestBase {
    *   The #contextual_links property value array.
    * @param string $id
    *   The serialized representation of the passed links.
+   * @param string $theme
+   *   The name of the theme the placeholder should pass to the controller.
    *
    * @legacy-covers ::_contextual_id_to_links
    */
