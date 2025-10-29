@@ -320,14 +320,13 @@ class FrontPageTest extends ViewTestBase {
       $do_assert_views_caches,
       $first_page_output_cache_tags
     );
+    $cache_contexts = Cache::mergeContexts($cache_contexts, [
+      'user.admin_language',
+    ]);
     $this->assertPageCacheContextsAndTags(
       Url::fromRoute('view.frontpage.page_1'),
       $cache_contexts,
-      Cache::mergeTags($first_page_output_cache_tags, [
-        'http_response', 'rendered',
-        'config:user.role.anonymous',
-        'user.admin_language',
-      ])
+      Cache::mergeTags($first_page_output_cache_tags, ['http_response', 'rendered', 'config:user.role.anonymous'])
     );
 
     // Second page.
