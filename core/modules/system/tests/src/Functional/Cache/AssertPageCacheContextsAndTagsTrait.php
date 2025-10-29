@@ -131,12 +131,11 @@ trait AssertPageCacheContextsAndTagsTrait {
    */
   protected function assertCacheContexts(array $expected_contexts, $message = NULL, $include_default_contexts = TRUE): bool {
     if ($include_default_contexts) {
-      $default_contexts = ['languages:language_interface', 'theme'];
+      $default_contexts = ['languages:language_interface', 'theme', 'user.admin_language'];
       // Add the user based contexts to the list of default contexts except when
       // user is already there.
       if (!in_array('user', $expected_contexts)) {
         $default_contexts[] = 'user.permissions';
-        $default_contexts[] = 'user.admin_language';
         if (!in_array('user.roles', $expected_contexts)) {
           // The system_page_attachments() hook is only called when dealing with
           // the HtmlRenderer, so check the Content-Type header.
