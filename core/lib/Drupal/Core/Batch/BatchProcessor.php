@@ -556,6 +556,7 @@ class BatchProcessor implements BatchProcessorInterface {
       }
     }
     $_batch = static::$batch;
+    static::$batch = [];
 
     // Redirect if needed.
     if ($_batch['progressive']) {
