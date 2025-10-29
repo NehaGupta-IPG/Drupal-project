@@ -710,6 +710,9 @@ class ModuleHandler implements ModuleHandlerInterface {
     return \Drupal::service('extension.list.module')->getName($module);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function writeCache() {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no need to call this method so there is no replacement. See https://www.drupal.org/node/3442349', E_USER_DEPRECATED);
   }
@@ -760,7 +763,9 @@ class ModuleHandler implements ModuleHandlerInterface {
           // Remove implementations from "other" modules.
           // This is relevant on the update page, when only the implementations
           // from system module should be used.
-          if (isset($this->moduleList[$module])) {
+          // 'core' is a special protected module name. This is used by the test
+          // system to allow kernel tests to implement hooks.
+          if (isset($this->moduleList[$module]) || $module === 'core') {
             $listeners[] = $this->callableResolver->getCallableFromDefinition($identifier);
             $modules[] = $module;
           }
