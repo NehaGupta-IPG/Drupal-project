@@ -732,7 +732,7 @@ function _batch_populate_queue(&$batch, $set_id): void {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::queuePopulate() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
   /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
   $batch_processor = \Drupal::service(BatchProcessorInterface::class);
-  $batch_processor->queuePopulate($batch, $set_id);
+  $batch_processor->queuePopulate($batch, (int) $set_id);
 }
 
 /**

@@ -73,12 +73,12 @@ interface BatchProcessorInterface {
    *
    * @param array $batch
    *   The batch array.
-   * @param string $set_id
+   * @param int $set_id
    *   The id of the set to process.
    *
    * @internal
    */
-  public function queuePopulate(array &$batch, string $set_id): void;
+  public function queuePopulate(array &$batch, int $set_id): void;
 
   /**
    * Processes the batch.

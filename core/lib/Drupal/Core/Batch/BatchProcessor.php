@@ -203,7 +203,7 @@ class BatchProcessor implements BatchProcessorInterface {
    *
    * @internal
    */
-  public function queuePopulate(array &$batch, string $set_id): void {
+  public function queuePopulate(array &$batch, int $set_id): void {
     $batch_set = &$batch['sets'][$set_id];
 
     if (isset($batch_set['operations'])) {
