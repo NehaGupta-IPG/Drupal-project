@@ -12,6 +12,7 @@ use Drupal\Core\Site\MaintenanceModeEvents;
 use Drupal\Core\Site\MaintenanceModeInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -75,6 +76,13 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
   protected $eventDispatcher;
 
   /**
+   * An event dispatcher instance to use for configuration events.
+   *
+   * @var \Psr\Log\LoggerInterface
+   */
+  protected $logger;
+
+  /**
    * Constructs a new MaintenanceModeSubscriber.
    *
    * @param \Drupal\Core\Site\MaintenanceModeInterface $maintenance_mode
@@ -93,8 +101,10 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
    *   The messenger.
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
+   * @param \Psr\Log\LoggerInterface $logger
+   *   The logger interface.
    */
-  public function __construct(MaintenanceModeInterface $maintenance_mode, ConfigFactoryInterface $config_factory, TranslationInterface $translation, UrlGeneratorInterface $url_generator, AccountInterface $account, BareHtmlPageRendererInterface $bare_html_page_renderer, MessengerInterface $messenger, EventDispatcherInterface $event_dispatcher) {
+  public function __construct(MaintenanceModeInterface $maintenance_mode, ConfigFactoryInterface $config_factory, TranslationInterface $translation, UrlGeneratorInterface $url_generator, AccountInterface $account, BareHtmlPageRendererInterface $bare_html_page_renderer, MessengerInterface $messenger, EventDispatcherInterface $event_dispatcher, LoggerInterface $logger) {
     $this->maintenanceMode = $maintenance_mode;
     $this->config = $config_factory;
     $this->stringTranslation = $translation;
@@ -103,6 +113,7 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
     $this->bareHtmlPageRenderer = $bare_html_page_renderer;
     $this->messenger = $messenger;
     $this->eventDispatcher = $event_dispatcher;
+    $this->logger = $logger;
   }
 
   /**
@@ -158,12 +169,14 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
       $response = new Response($this->maintenanceMode->getSiteMaintenanceMessage(), 503, ['Content-Type' => 'text/plain']);
       // Calling RequestEvent::setResponse() also stops propagation of event.
       $event->setResponse($response);
+      $this->logger->warning("Request has been made while site is in maintenance mode.");
       return;
     }
     drupal_maintenance_theme();
     $response = $this->bareHtmlPageRenderer->renderBarePage(['#markup' => $this->maintenanceMode->getSiteMaintenanceMessage()], $this->t('Site under maintenance'), 'maintenance_page');
     $response->setStatusCode(503);
     // Calling RequestEvent::setResponse() also stops propagation of the event.
+    $this->logger->warning("Request has been made while site is in maintenance mode.");
     $event->setResponse($response);
   }
 
