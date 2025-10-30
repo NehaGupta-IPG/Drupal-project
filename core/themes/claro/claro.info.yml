@@ -137,8 +137,6 @@ libraries-extend:
     - claro/filter
   system/admin:
     - claro/system.admin
-  core/drupal.autocomplete:
-    - claro/autocomplete
   shortcut/drupal.shortcut:
     - claro/drupal.shortcut
   core/drupal.ajax:

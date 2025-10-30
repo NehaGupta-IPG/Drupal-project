@@ -186,14 +186,6 @@ dropbutton:
   dependencies:
     - core/drupal
 
-autocomplete:
-  version: VERSION
-  js:
-    js/autocomplete.js: {}
-  dependencies:
-    - core/once
-    - claro/claro.jquery.ui
-
 drupal.shortcut:
   version: VERSION
   css:

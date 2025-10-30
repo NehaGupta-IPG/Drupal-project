@@ -1,4 +1,4 @@
-// cspell:ignore is-autocompleting
+// cspell:ignore ui-autocomplete-loading
 
 module.exports = {
   '@tags': ['core'],
@@ -35,7 +35,7 @@ module.exports = {
     browser
       .setValue('[name="autocomplete_4"]', '/')
       .pause(1000)
-      .waitForElementNotPresent('.is-autocompleting');
+      .waitForElementNotPresent('.ui-autocomplete-loading');
 
     // Tests both the autocomplete-message nor the autocomplete dropdown are
     // present when nothing has been entered in autocomplete-3.
