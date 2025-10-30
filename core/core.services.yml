@@ -409,6 +409,10 @@ services:
       - { name: service_collector, tag: 'config.factory.override', call: addOverride }
     arguments: ['@config.storage', '@event_dispatcher', '@config.typed']
   Drupal\Core\Config\ConfigFactoryInterface: '@config.factory'
+  config.factory.lazy:
+    class: Drupal\Core\Config\LazyConfigFactory
+    arguments: ['@config.factory']
+    lazy: true
   config.importer_subscriber:
     class: Drupal\Core\Config\Importer\FinalMissingContentSubscriber
   config.installer:

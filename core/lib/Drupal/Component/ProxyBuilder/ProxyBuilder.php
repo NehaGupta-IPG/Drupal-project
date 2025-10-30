@@ -236,7 +236,7 @@ EOS;
       if ($return_type->allowsNull()) {
         $signature_line .= '?';
       }
-      if (!$return_type->isBuiltin()) {
+      if (!$return_type->isBuiltin() && $return_type->getName() !== 'static') {
         // The parameter is a class or interface.
         $signature_line .= '\\';
       }
@@ -312,7 +312,7 @@ EOS;
     $function_name = $reflection_method->getName();
 
     if (!$reflection_method->isStatic()) {
-      if ($reflection_method->getReturnType() && $reflection_method->getReturnType()->getName() === 'void') {
+      if ($reflection_method->getReturnType() && ($reflection_method->getReturnType()->getName() === 'void' || $reflection_method->getReturnType()->getName() === 'static')) {
         $output .= '    $this->lazyLoadItself()->' . $function_name . '(';
       }
       else {
@@ -331,6 +331,10 @@ EOS;
     }
 
     $output .= implode(', ', $parameters) . ');';
+
+    if (!$reflection_method->isStatic() && $reflection_method->getReturnType() && $reflection_method->getReturnType()->getName() === 'static') {
+      $output .= "\n    return \$this;";
+    }
 
     return $output;
   }
