@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Batch;
 
 use Drupal\Core\Queue\QueueInterface;
