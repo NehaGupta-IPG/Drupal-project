@@ -120,13 +120,13 @@ function _batch_page(Request $request) {
  * @return bool
  *   TRUE if the batch information needs to be updated; FALSE otherwise.
  *
- * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0.
  *    Use \Drupal\Core\Batch\BatchProcessorInterface::needsUpdate() instead.
  *
  * @see https://www.drupal.org/node/3229844
  */
 function _batch_needs_update($new_value = NULL) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::needsUpdate() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::needsUpdate() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
   /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
   $batch_processor = \Drupal::service(BatchProcessorInterface::class);
   return $batch_processor->needsUpdate($new_value);
@@ -260,13 +260,13 @@ function _batch_progress_page(): array {
  * @return array|RedirectResponse
  *   An array containing a completion value (in percent) and a status message.
  *
- * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0.
  *    Use \Drupal\Core\Batch\BatchProcessorInterface::process() instead.
  *
  * @see https://www.drupal.org/node/3229844
  */
 function _batch_process() {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::processQueue() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::processQueue() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
   /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
   $batch_processor = \Drupal::service(BatchProcessorInterface::class);
   return $batch_processor->processQueue();
@@ -303,13 +303,13 @@ function _batch_api_percentage($total, $current) {
 /**
  * Returns the batch set being currently processed.
  *
- * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0.
  *    Use \Drupal\Core\Batch\BatchProcessorInterface::getCurrentSet() instead.
  *
  * @see https://www.drupal.org/node/3229844
  */
 function &_batch_current_set() {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::getCurrentSet() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::getCurrentSet() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
   /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
   $batch_processor = \Drupal::service(BatchProcessorInterface::class);
   // Only variables can be returned by reference.
@@ -328,13 +328,13 @@ function &_batch_current_set() {
  *   TRUE if a subsequent set was found in the batch; no value will be returned
  *   if no subsequent set was found.
  *
- * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0.
  *    Use \Drupal\Core\Batch\BatchProcessorInterface::nextSet() instead.
  *
  * @see https://www.drupal.org/node/3229844
  */
 function _batch_next_set() {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::nextSet() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::nextSet() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
   /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
   $batch_processor = \Drupal::service(BatchProcessorInterface::class);
   return $batch_processor->nextSet() ?: NULL;
@@ -346,14 +346,14 @@ function _batch_next_set() {
  * Call the 'finished' callback of each batch set to allow custom handling of
  * the results and resolve page redirection.
  *
- * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0.
  *    Use \Drupal\Core\Batch\BatchProcessorInterface::finishedProcessing()
  *    instead.
  *
  * @see https://www.drupal.org/node/3229844
  */
 function _batch_finished() {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::finishedProcessing() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::finishedProcessing() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
   /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
   $batch_processor = \Drupal::service(BatchProcessorInterface::class);
   return $batch_processor->finishedProcessing();
@@ -362,7 +362,7 @@ function _batch_finished() {
 /**
  * Shutdown function: Stores the current batch data for the next request.
  *
- * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0.
  *    Use \Drupal\Core\Batch\BatchProcessorInterface::shutdown() instead.
  *
  * @see https://www.drupal.org/node/3229844
@@ -370,7 +370,7 @@ function _batch_finished() {
  * @see drupal_register_shutdown_function()
  */
 function _batch_shutdown(): void {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::shutdown() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::shutdown() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
   /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
   $batch_processor = \Drupal::service(BatchProcessorInterface::class);
   $batch_processor->shutdown();

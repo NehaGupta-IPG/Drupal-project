@@ -24,7 +24,7 @@ class BatchKernelTest extends KernelTestBase {
   #[IgnoreDeprecations]
   public function testLegacyNeedsUpdate(): void {
     require_once $this->root . '/core/includes/batch.inc';
-    $this->expectDeprecation('_batch_needs_update() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::needsUpdate() instead. See https://www.drupal.org/node/3229844');
+    $this->expectDeprecation('_batch_needs_update() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Batch\BatchProcessorInterface::needsUpdate() instead. See https://www.drupal.org/node/3229844');
     // Before ever being called, the return value should be FALSE.
     $this->assertFalse(_batch_needs_update());
 
