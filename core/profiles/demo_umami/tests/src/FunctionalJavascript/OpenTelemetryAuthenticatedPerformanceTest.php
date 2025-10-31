@@ -25,20 +25,15 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
   protected $profile = 'demo_umami';
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-  }
-
-  /**
    * Logs front page tracing data with an authenticated user and warm cache.
    */
   public function testFrontPageAuthenticatedWarmCache(): void {
     $user = $this->drupalCreateUser();
     $this->drupalLogin($user);
     $this->drupalGet('<front>');
+    sleep(2);
     $this->drupalGet('<front>');
+    sleep(2);
 
     $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('<front>');
@@ -54,10 +49,10 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 3,
-      'CacheGetCount' => 43,
+      'CacheGetCount' => 44,
       'CacheGetCountByBin' => [
         'config' => 22,
-        'bootstrap' => 6,
+        'bootstrap' => 7,
         'discovery' => 5,
         'data' => 5,
         'dynamic_page_cache' => 2,
@@ -80,14 +75,39 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
    * Logs node page performance with an administrator.
    */
   public function testNodePageAdministrator(): void {
-    $user = $this->drupalCreateUser([], NULL, TRUE);
+
+    // Create a user with most important admin permissions, but not access to
+    // contextual links. This is because contextual module makes an AJAX request
+    // dependent on the content of browser local storage, which can make
+    // performance testing indeterminate.
+    $user = $this->drupalCreateUser([
+      'administer nodes',
+      'bypass node access',
+      'access administration pages',
+      'administer site configuration',
+      'administer modules',
+      'administer themes',
+      'administer users',
+      'access toolbar',
+      'administer shortcuts',
+      'administer media',
+      'access files overview',
+      'administer blocks',
+      'administer block content',
+      'administer taxonomy',
+      'access site reports',
+      'administer menu',
+      'access announcements',
+    ]);
     $this->drupalLogin($user);
-    sleep(2);
+    // This is a very heavy request so allow extra time for asset, image
+    // derivative requests and post response tasks to finish.
+    sleep(5);
 
     $this->drupalGet('node/1');
     sleep(2);
     $this->drupalGet('node/1');
-    sleep(2);
+    sleep(1);
 
     $this->clearCaches();
 
@@ -96,27 +116,27 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
     }, 'administratorNodePage');
 
     $expected = [
-      'QueryCount' => 527,
-      'CacheGetCount' => 550,
+      'QueryCount' => 524,
+      'CacheGetCount' => 546,
       'CacheGetCountByBin' => [
-        'config' => 203,
-        'bootstrap' => 26,
-        'discovery' => 113,
-        'data' => 71,
+        'config' => 201,
+        'bootstrap' => 28,
+        'discovery' => 112,
+        'data' => 70,
         'dynamic_page_cache' => 2,
-        'default' => 45,
+        'default' => 43,
         'entity' => 23,
         'render' => 39,
         'menu' => 28,
       ],
-      'CacheSetCount' => 457,
+      'CacheSetCount' => 454,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 47,
       'ScriptCount' => 3,
-      'ScriptBytes' => 263500,
+      'ScriptBytes' => 249750,
       'StylesheetCount' => 6,
-      'StylesheetBytes' => 106000,
+      'StylesheetBytes' => 101000,
     ];
     $this->assertMetrics($expected, $performance_data);
   }

@@ -41,7 +41,6 @@ class ArgumentSummaryTest extends ViewsKernelTestBase {
     'node',
     'taxonomy',
     'text',
-    'user',
     'views',
   ];
 
@@ -94,7 +93,7 @@ class ArgumentSummaryTest extends ViewsKernelTestBase {
       'node',
       $this->nodeType->id(),
       'field_tags',
-      NULL,
+      'Tags',
       'taxonomy_term',
       'default',
       $handler_settings,
