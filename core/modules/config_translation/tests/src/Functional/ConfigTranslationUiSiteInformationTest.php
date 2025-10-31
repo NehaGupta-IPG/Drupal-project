@@ -24,11 +24,11 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     $site_name = 'Name of the site for testing configuration translation';
     $site_slogan = 'Site slogan for testing configuration translation';
     $site_name_label = 'Site name';
-    $site_frontpage = '/node/1';
+    $site_frontpage = '/node';
     $fr_site_name = 'Nom du site pour tester la configuration traduction';
     $fr_site_slogan = 'Slogan du site pour tester la traduction de configuration';
     $fr_site_name_label = 'Libellé du champ "Nom du site"';
-    $fr_site_frontpage = '/node/2';
+    $fr_site_frontpage = '/admin/config';
     $translation_base_url = 'admin/config/system/site-information/translate';
 
     // Set site name and slogan for default language.
@@ -135,7 +135,7 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
 
     $site_name = 'Site name for testing configuration translation';
     $site_slogan = 'Site slogan for testing configuration translation';
-    $site_frontpage = '/node/1';
+    $site_frontpage = '/node';
     $translation_base_url = 'admin/config/system/site-information/translate';
     $this->setSiteInformation($site_name, $site_slogan, $site_frontpage);
 
