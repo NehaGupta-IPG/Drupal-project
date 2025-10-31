@@ -22,7 +22,7 @@
 
 .dropbutton-widget {
   position: relative;
-  width: max-content;
+  width: 100%;
   height: var(--dropbutton--height);
   padding-inline-end: var(--dropbutton--height);
   border-radius: var(--dropbutton--border-radius);
@@ -155,5 +155,6 @@
 
   .dropbutton-wrapper.open & {
     visibility: visible;
+    padding: 0 9px;
   }
 }
