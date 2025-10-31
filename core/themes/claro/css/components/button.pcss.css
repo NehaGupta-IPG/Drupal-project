@@ -86,7 +86,7 @@
   &::before {
     margin-inline: -0.25em 0;
     padding-inline: 0 0.25em;
-    content: "+";
+    content: "";
     font-weight: 900;
   }
 }
@@ -104,12 +104,53 @@
 
 /* Danger button styles */
 .button--danger {
-  color: var(--button-fg-color--danger);
-  background-color: var(--button-bg-color--danger);
+  &:not(:focus) {
+    color: var(--color-maximumred);
+    background: transparent;
+    box-shadow: none;
+  }
 
-  &:is(:hover, :active) {
-    color: var(--button-fg-color--danger);
-    background-color: var(--button--hover-bg-color--danger);
+  &:hover {
+    color: var(--color-maximumred-hover);
+    background-color: var(--color-bgred-hover);
+
+    &:focus {
+      background-color: var(--color-bgred-hover);
+    }
+
+    &::before {
+      background-image: url(../../images/icons/c11f1f/trash.svg);
+    }
+  }
+
+  &:focus {
+    color: var(--color-maximumred);
+    background-color: transparent;
+  }
+
+  &:active {
+    color: var(--color-maximumred-active);
+    background-color: var(--color-bgred-active);
+    &::before {
+      background-image: url(../../images/icons/ab1b1b/trash.svg);
+    }
+  }
+
+  &::before {
+    background-image: url(../../images/icons/d72222/trash.svg);
+  }
+
+  &::before {
+    position: relative;
+    top: 0.125rem; /* Set the proper vertical alignment */
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-inline: -0.25rem 0.5em;
+    content: "";
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
   }
 }
 
@@ -144,3 +185,4 @@
   background: none;
   appearance: none;
 }
+
