@@ -83,7 +83,7 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
 
     // Check French translation of site name and slogan are in place.
     $this->drupalGet('fr');
-    $this->assertSession()->addressEquals("fr/$fr_site_frontpage");
+    $this->assertSession()->addressEquals("fr$fr_site_frontpage");
     $this->assertSession()->pageTextContains($fr_site_name);
     $this->assertSession()->pageTextContains($fr_site_slogan);
 
@@ -136,6 +136,7 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     $site_name = 'Site name for testing configuration translation';
     $site_slogan = 'Site slogan for testing configuration translation';
     $site_frontpage = '/node';
+    $fr_site_frontpage = '/admin/config';
     $translation_base_url = 'admin/config/system/site-information/translate';
     $this->setSiteInformation($site_name, $site_slogan, $site_frontpage);
 
@@ -145,6 +146,7 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     $edit = [
       'translation[config_names][system.site][name]' => 'FR ' . $site_name,
       'translation[config_names][system.site][slogan]' => 'FR ' . $site_slogan,
+      'translation[config_names][system.site][page][front]' => $fr_site_frontpage,
     ];
     // First time, no overrides, so just Add link.
     $this->drupalGet("{$translation_base_url}/fr/add");
@@ -157,6 +159,7 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     $expected = [
       'name' => 'FR ' . $site_name,
       'slogan' => 'FR ' . $site_slogan,
+      'front' => $fr_site_frontpage,
     ];
     $this->assertEquals($expected, $override->get());
 
@@ -166,9 +169,11 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     // translation form into the actual site name and slogan.
     $this->assertSession()->pageTextNotContains('FR ' . $site_name);
     $this->assertSession()->pageTextNotContains('FR ' . $site_slogan);
+    $this->assertSession()->pageTextNotContains($fr_site_frontpage);
     $edit = [
       'translation[config_names][system.site][name]' => $site_name,
       'translation[config_names][system.site][slogan]' => 'FR ' . $site_slogan,
+      'translation[config_names][system.site][page][front]' => $site_frontpage,
     ];
     $this->submitForm($edit, 'Save translation');
     $this->assertSession()->pageTextContains('Successfully updated French translation.');
@@ -184,6 +189,7 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     $edit = [
       'translation[config_names][system.site][name]' => $site_name,
       'translation[config_names][system.site][slogan]' => $site_slogan,
+      'translation[config_names][system.site][page][front]' => $site_frontpage,
     ];
     $this->submitForm($edit, 'Save translation');
     $override = \Drupal::languageManager()->getLanguageConfigOverride('fr', 'system.site');
