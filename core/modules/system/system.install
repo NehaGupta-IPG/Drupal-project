@@ -56,10 +56,7 @@ function system_schema(bool $returnArraySchema = TRUE): array {
     primaryKey: new PrimaryKey(['value']),
   );
 
-  return match ($returnArraySchema) {
-    TRUE => ConvertDefinition::schemaToArray($schema),
-    FALSE => $schema,
-  };
+  return $returnArraySchema ? ConvertDefinition::schemaToArray($schema) : $schema;
 }
 
 /**
