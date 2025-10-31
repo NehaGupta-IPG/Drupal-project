@@ -177,7 +177,9 @@
   .is-horizontal {
     & .tabs {
       flex-direction: row;
+      flex-wrap: wrap;
       align-items: flex-end;
+      row-gap: var(--space-xs);
       width: auto;
       margin: 0;
       border: 0;
