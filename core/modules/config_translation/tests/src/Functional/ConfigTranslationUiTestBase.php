@@ -157,11 +157,14 @@ abstract class ConfigTranslationUiTestBase extends BrowserTestBase {
    *   The site name.
    * @param string $site_slogan
    *   The site slogan.
+   * @param string $site_frontpage
+   *   The site front page.
    */
-  protected function setSiteInformation($site_name, $site_slogan) {
+  protected function setSiteInformation($site_name, $site_slogan, $site_frontpage) {
     $edit = [
       'site_name' => $site_name,
       'site_slogan' => $site_slogan,
+      'site_frontpage' => $site_frontpage,
     ];
     $this->drupalGet('admin/config/system/site-information');
     $this->submitForm($edit, 'Save configuration');
