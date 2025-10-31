@@ -159,7 +159,9 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     $expected = [
       'name' => 'FR ' . $site_name,
       'slogan' => 'FR ' . $site_slogan,
-      'front' => $fr_site_frontpage,
+      'page' => [
+        'front' => $fr_site_frontpage,
+      ],
     ];
     $this->assertEquals($expected, $override->get());
 
