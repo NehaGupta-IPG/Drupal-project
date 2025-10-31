@@ -192,7 +192,6 @@ YAML;
    * Ensures merging adds new keys without removing existing ones.
    */
   public function testMergesSettingsAddsNewKeysWithoutAlteringExisting(): void {
-
     // Disable schema check.
     $this->container->get(EventDispatcherInterface::class)
       ->removeSubscriber($this->container->get('testing.config_schema_checker'));
