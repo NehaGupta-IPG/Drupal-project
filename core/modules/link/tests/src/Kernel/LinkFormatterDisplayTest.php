@@ -12,6 +12,7 @@ use Drupal\link\LinkTitleVisibility;
 use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\Tests\link\Traits\LinkInputValuesTraits;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore Fragm
 /**
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\Group;
  * each form is tested with different display settings.
  */
 #[Group('link')]
+#[RunTestsInSeparateProcesses]
 class LinkFormatterDisplayTest extends FieldKernelTestBase {
 
   use LinkInputValuesTraits;
@@ -263,6 +265,23 @@ class LinkFormatterDisplayTest extends FieldKernelTestBase {
         15 => '<div></div>',
       ],
     ];
+  }
+
+  /**
+   * Tests that links with NULL options are rendered correctly.
+   */
+  public function testNullLinkOptions(): void {
+    $entity = EntityTest::create();
+    $entity->field_test->setValue([
+      'uri' => 'https://www.example.com',
+      'options' => NULL,
+    ]);
+
+    $render_array = $entity->field_test->view([
+      ['label' => 'hidden', 'settings' => []],
+    ]);
+    $output = (string) \Drupal::service('renderer')->renderRoot($render_array);
+    $this->assertStringContainsString('<div><a href="https://www.example.com">https://www.example.com</a></div>', $output);
   }
 
 }

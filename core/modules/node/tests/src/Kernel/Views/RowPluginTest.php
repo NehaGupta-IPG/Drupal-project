@@ -11,6 +11,7 @@ use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the node row plugin.
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see \Drupal\node\Plugin\views\row\NodeRow
  */
 #[Group('node')]
+#[RunTestsInSeparateProcesses]
 class RowPluginTest extends ViewsKernelTestBase {
 
   use ContentTypeCreationTrait;
@@ -40,7 +42,6 @@ class RowPluginTest extends ViewsKernelTestBase {
     'node',
     'node_test_views',
     'text',
-    'user',
   ];
 
   /**
@@ -69,6 +70,13 @@ class RowPluginTest extends ViewsKernelTestBase {
       'name' => 'Article',
     ]);
 
+    $display = \Drupal::service('entity_display.repository')
+      ->getViewDisplay('node', 'article', 'teaser');
+    $display_options = $display->getComponent('body');
+    $display_options['settings']['trim_length'] = 25;
+    $display->setComponent('body', $display_options)
+      ->save();
+
     // Create two nodes.
     for ($i = 0; $i < 2; $i++) {
       $this->nodes[] = $this->createNode(
@@ -78,7 +86,6 @@ class RowPluginTest extends ViewsKernelTestBase {
             [
               'value' => $this->randomMachineName(42),
               'format' => filter_default_format(),
-              'summary' => $this->randomMachineName(),
             ],
           ],
         ]
@@ -102,7 +109,6 @@ class RowPluginTest extends ViewsKernelTestBase {
     $output = $view->preview();
     $output = (string) $renderer->renderRoot($output);
     foreach ($this->nodes as $node) {
-      $this->assertStringNotContainsString($node->body->summary, $output, 'Make sure the teaser appears in the output of the view.');
       $this->assertStringContainsString($node->body->value, $output, 'Make sure the full text appears in the output of the view.');
     }
 
@@ -111,8 +117,8 @@ class RowPluginTest extends ViewsKernelTestBase {
     $output = $view->preview();
     $output = (string) $renderer->renderRoot($output);
     foreach ($this->nodes as $node) {
-      $this->assertStringContainsString($node->body->summary, $output, 'Make sure the teaser appears in the output of the view.');
-      $this->assertStringNotContainsString($node->body->value, $output);
+      // Using 22 because <p> is being included.
+      $this->assertStringNotContainsString(substr($node->body->value, 22), $output);
     }
   }
 

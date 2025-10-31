@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\Sql\DefaultTableMapping;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the default table mapping class for content entities stored in SQL.
@@ -21,6 +24,7 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[CoversClass(DefaultTableMapping::class)]
 #[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
 
   use EntityDefinitionTestTrait;
@@ -31,11 +35,6 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
    * @var \Drupal\Core\Entity\Sql\DefaultTableMapping
    */
   protected $tableMapping;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['entity_test_extra'];
 
   /**
    * The entity field manager.
@@ -56,18 +55,6 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    // Setup some fields for entity_test_extra to create.
-    $definitions['multivalued_base_field'] = BaseFieldDefinition::create('string')
-      ->setName('multivalued_base_field')
-      ->setTargetEntityTypeId('entity_test_mulrev')
-      ->setTargetBundle('entity_test_mulrev')
-      ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
-      // Base fields are non-translatable and non-revisionable by default, but
-      // we explicitly set these values here for extra clarity.
-      ->setTranslatable(FALSE)
-      ->setRevisionable(FALSE);
-    $this->state->set('entity_test_mulrev.additional_base_field_definitions', $definitions);
 
     $this->tableMapping = $this->entityTypeManager->getStorage('entity_test_mulrev')->getTableMapping();
 
@@ -163,6 +150,26 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
       $dedicated_revision_table,
     ];
     $this->assertEquals($expected, $this->tableMapping->getTableNames());
+  }
+
+  /**
+   * Implements hook_entity_base_field_info().
+   */
+  #[Hook('entity_base_field_info')]
+  public function entityBaseFieldInfo(EntityTypeInterface $entity_type): array {
+    $definitions = [];
+    if ($entity_type->id() === 'entity_test_mulrev') {
+      $definitions['multivalued_base_field'] = BaseFieldDefinition::create('string')
+        ->setName('multivalued_base_field')
+        ->setTargetEntityTypeId('entity_test_mulrev')
+        ->setTargetBundle('entity_test_mulrev')
+        ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
+        // Base fields are non-translatable and non-revisionable by default, but
+        // we explicitly set these values here for extra clarity.
+        ->setTranslatable(FALSE)
+        ->setRevisionable(FALSE);
+    }
+    return $definitions;
   }
 
 }
