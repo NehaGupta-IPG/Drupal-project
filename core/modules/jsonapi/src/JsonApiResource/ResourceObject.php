@@ -318,7 +318,7 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
     if ($entity_type->id() == 'user' && $resource_type->isFieldEnabled('display_name')) {
       assert($entity instanceof UserInterface);
       // Check if the current user has access to view the username.
-      // The display_name is based on the 'name' field, so we check access to it.
+      // The display_name is based on the 'name' field.
       $name_field = $entity->get('name');
       if ($name_field->access('view')) {
         $display_name = $resource_type->getPublicName('display_name');

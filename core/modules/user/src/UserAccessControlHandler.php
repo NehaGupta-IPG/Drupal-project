@@ -30,30 +30,6 @@ class UserAccessControlHandler extends EntityAccessControlHandler {
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     /** @var \Drupal\user\UserInterface $entity*/
 
-    // User labels (usernames) are now protected by the 'view usernames'
-    // permission. Both 'access user profiles' and 'view usernames' are required
-    // to view other users' labels.
-    if ($operation === 'view label') {
-      // Allow for the special anonymous user.
-      // Normally this user profile can't be seen, but it is exposed in JSON:API
-      // by default.
-      if ($entity->isAnonymous()) {
-        return AccessResult::allowed();
-      }
-      // Administrators can view all user labels.
-      if ($account->hasPermission('administer users')) {
-        return AccessResult::allowed()->cachePerPermissions();
-      }
-      // Allow users to view their own label.
-      if ($account->id() == $entity->id()) {
-        return AccessResult::allowed()->cachePerUser();
-      }
-      // Require both 'access user profiles' AND 'view usernames' permissions.
-      $access_result = AccessResult::allowedIfHasPermission($account, 'access user profiles')
-        ->andIf(AccessResult::allowedIfHasPermission($account, 'view usernames'));
-      return $access_result;
-    }
-
     // The anonymous user's profile can neither be viewed, updated nor deleted.
     if ($entity->isAnonymous()) {
       return AccessResult::forbidden();
@@ -65,6 +41,14 @@ class UserAccessControlHandler extends EntityAccessControlHandler {
     }
 
     switch ($operation) {
+      case 'view label':
+        // User labels (usernames) are now protected by the 'view usernames'
+        // permission. Both 'access user profiles' and 'view usernames' are required
+        // to view other users' labels.
+        $access_result = AccessResult::allowedIfHasPermission($account, 'access user profiles')
+          ->andIf(AccessResult::allowedIfHasPermission($account, 'view usernames'));
+        return $access_result;
+
       case 'view':
       case 'view linked label':
         // Only allow view access if the account is active.
@@ -131,18 +115,13 @@ class UserAccessControlHandler extends EntityAccessControlHandler {
     $is_own_account = $items ? $items->getEntity()->id() == $account->id() : FALSE;
     switch ($field_definition->getName()) {
       case 'name':
-        // For viewing usernames, both 'access user profiles' and 'view usernames'
-        // permissions are required (similar to email addresses).
-        if ($operation == 'view' && $account->hasPermission('access user profiles') && $account->hasPermission('view usernames')) {
-          return AccessResult::allowed()->cachePerPermissions();
-        }
         // The username field is editable during the registration process.
-        if ($operation == 'view' && $items && $items->getEntity()->isNew()) {
+        if ($items && $items->getEntity()->isNew()) {
           return AccessResult::allowed()->cachePerPermissions();
         }
-        // Allow view access to own username.
-        if ($operation == 'view') {
-          return AccessResult::allowedIf($is_own_account)->cachePerUser();
+        // Allow view access to anyone with permission to view usernames.
+        if ($operation == 'view' || $operation == 'view label') {
+          return AccessResult::allowedIfHasPermission($account, 'view usernames')->cachePerPermissions();
         }
         // Allow edit access for the own user name if the permission is
         // satisfied.
