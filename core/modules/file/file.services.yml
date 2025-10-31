@@ -1,3 +1,6 @@
+parameters:
+  file.skip_procedural_hook_scan: true
+
 services:
   _defaults:
     autoconfigure: true
@@ -36,3 +39,6 @@ services:
     class: Drupal\file\Upload\InputStreamFileWriter
     arguments: ['@file_system']
   Drupal\file\Upload\InputStreamFileWriterInterface: '@file.input_stream_file_writer'
+  Drupal\file\EventSubscriber\DefaultContentSubscriber:
+    calls:
+      - [setLogger, ['@logger.channel.file']]

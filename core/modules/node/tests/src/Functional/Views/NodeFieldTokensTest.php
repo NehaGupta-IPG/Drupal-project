@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Functional\Views;
 
 use Drupal\node\Entity\Node;
-use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests replacement of Views tokens supplied by the Node module.
  *
- * @group node
  * @see \Drupal\node\Tests\NodeTokenReplaceTest
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeFieldTokensTest extends NodeTestBase {
 
   /**
@@ -32,10 +34,7 @@ class NodeFieldTokensTest extends NodeTestBase {
    */
   public function testViewsTokenReplacement(): void {
     // Create the Article content type with a standard body field.
-    /** @var \Drupal\node\NodeTypeInterface $node_type */
-    $node_type = NodeType::create(['type' => 'article', 'name' => 'Article']);
-    $node_type->save();
-    node_add_body_field($node_type);
+    $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
 
     // Create a user and a node.
     $account = $this->createUser();
@@ -53,16 +52,16 @@ class NodeFieldTokensTest extends NodeTestBase {
 
     $this->drupalGet('test_node_tokens');
 
-    // Body: {{ body }}<br />
+    // Body: "{{ body }}<br />".
     $this->assertSession()->responseContains("Body: <p>$body</p>");
 
-    // Raw value: {{ body__value }}<br />
+    // Raw value: "{{ body__value }}<br />".
     $this->assertSession()->responseContains("Raw value: $body");
 
-    // Raw summary: {{ body__summary }}<br />
+    // Raw summary: "{{ body__summary }}<br />".
     $this->assertSession()->responseContains("Raw summary: $summary");
 
-    // Raw format: {{ body__format }}<br />
+    // Raw format: "{{ body__format }}<br />".
     $this->assertSession()->responseContains("Raw format: plain_text");
   }
 

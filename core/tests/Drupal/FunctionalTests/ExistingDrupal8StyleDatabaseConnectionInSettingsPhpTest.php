@@ -7,10 +7,14 @@ namespace Drupal\FunctionalTests;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @group Database
+ * Tests Existing Drupal8Style Database Connection In Settings Php.
  */
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class ExistingDrupal8StyleDatabaseConnectionInSettingsPhpTest extends BrowserTestBase {
 
   /**
