@@ -38,7 +38,54 @@
  *
  * @namespace
  */
-window.Drupal = { behaviors: {}, locale: {} };
+window.Drupal = { 
+  behaviors: typeof Proxy !== 'undefined' ? new Proxy({}, {
+    set(target, property, value) {
+      // Store the new behavior
+      target[property] = value;
+      
+      // Auto-attach if behavior has attach method and DOM is ready
+      if (value && typeof value.attach === 'function') {
+        if (document.readyState !== 'loading' && window.Drupal.attachBehaviors) {
+          setTimeout(() => {
+            window.Drupal._autoAttachBehavior(value);
+          }, 0);
+        }
+      }
+      
+      return true;
+    }
+  }) : {},
+  locale: {},
+  
+  /**
+   * Auto-attach a single behavior when it's registered.
+   *
+   * @param {object} behavior
+   *   The behavior object to attach.
+   */
+  _autoAttachBehavior: function (behavior) {
+    // Track attached behaviors to prevent double attachment
+    if (!window.Drupal._attachedBehaviors) {
+      window.Drupal._attachedBehaviors = new WeakSet();
+    }
+    
+    // Only attach if not already attached
+    if (!window.Drupal._attachedBehaviors.has(behavior)) {
+      window.Drupal._attachedBehaviors.add(behavior);
+      try {
+        behavior.attach(document, window.drupalSettings);
+      } catch (e) {
+        if (window.Drupal.throwError) {
+          window.Drupal.throwError(e);
+        } else {
+          console.error(e);
+        }
+      }
+    }
+  }
+};
+
 
 // JavaScript should be made compatible with libraries other than jQuery by
 // wrapping it in an anonymous closure.

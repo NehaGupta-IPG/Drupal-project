@@ -29,6 +29,20 @@ document.documentElement.className += ' js';
 
   // Attach all behaviors.
   domReady(() => {
+    // Initialize the attached behaviors tracking
+    if (!Drupal._attachedBehaviors) {
+      Drupal._attachedBehaviors = new WeakSet();
+    }
+    
+    // Mark all existing behaviors as attached
+    Object.keys(Drupal.behaviors || {}).forEach((key) => {
+      const behavior = Drupal.behaviors[key];
+      if (behavior && typeof behavior.attach === 'function') {
+        Drupal._attachedBehaviors.add(behavior);
+      }
+    });
+    
+    // Call attachBehaviors
     Drupal.attachBehaviors(document, drupalSettings);
   });
 })(Drupal, window.drupalSettings);
