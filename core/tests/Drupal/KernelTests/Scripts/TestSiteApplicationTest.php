@@ -103,7 +103,6 @@ class TestSiteApplicationTest extends KernelTestBase {
     $process->setTimeout(500);
     $process->run();
 
-    dump([$process->getOutput(), $process->getErrorOutput()]);
     $this->assertSame(0, $process->getExitCode());
     $result = json_decode($process->getOutput(), TRUE);
     $db_prefix = $result['db_prefix'];
@@ -197,7 +196,6 @@ class TestSiteApplicationTest extends KernelTestBase {
     $process = Process::fromShellCommandline($command_line, $this->root);
     $process->setTimeout(500);
     $process->run();
-    dump([$process->getOutput(), $process->getErrorOutput()]);
     $this->assertEquals(0, $process->getExitCode());
 
     $result = json_decode($process->getOutput(), TRUE);
