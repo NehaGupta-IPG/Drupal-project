@@ -24,9 +24,6 @@ file.settings:
     make_unused_managed_files_temporary:
       type: boolean
       label: 'Controls if unused files should be marked temporary'
-    langcode:
-      requiredKey: false
-      type: langcode
     filename_sanitization:
       type: mapping
       label: 'Uploaded filename sanitization options'

@@ -11,3 +11,4 @@ filename_sanitization:
   deduplicate_separators: false
   lowercase: false
   replacement_character: '-'
+langcode: en
