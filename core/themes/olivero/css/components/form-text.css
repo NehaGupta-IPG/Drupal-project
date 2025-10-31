@@ -90,7 +90,7 @@ textarea {
   [type="url"],
   [type="week"],
   textarea {
-    width: auto;
+    width: 100%;
   }
 }
 
