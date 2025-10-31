@@ -3,5 +3,5 @@ logo:
   path: ''
   max:
     filesize: 1048576
-    height: 40
-    width: 40
+    height: 200
+    width: 200
