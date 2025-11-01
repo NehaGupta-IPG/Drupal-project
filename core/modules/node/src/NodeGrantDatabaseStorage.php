@@ -10,6 +10,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 
 /**
  * Defines a storage handler class that handles the node grants system.
@@ -26,7 +27,8 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
   protected readonly bool $hasNodeGrantsImplementations;
 
   public function __construct(
-    protected readonly Connection $database,
+    #[AutowireServiceClosure('database')]
+    protected readonly \Closure $databaseClosure,
     protected readonly ModuleHandlerInterface $moduleHandler,
     protected readonly LanguageManagerInterface $languageManager,
     #[Autowire(service: 'node.view_all_nodes_memory_cache')]
@@ -66,7 +68,7 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
     }
 
     // Check the database for potential access grants.
-    $query = $this->database->select('node_access');
+    $query =  ($this->databaseClosure)()->select('node_access');
     $query->addExpression('1');
     // Only interested for granting in the current operation.
     $query->condition('grant_' . $operation, 1, '>=');
@@ -130,7 +132,7 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
       return $cacheItem->data;
     }
 
-    $query = $this->database->select('node_access');
+    $query =  ($this->databaseClosure)()->select('node_access');
     $query->addExpression('COUNT(*)');
     $query
       ->condition('nid', 0)
@@ -168,7 +170,7 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
       $table = $tableinfo['table'];
       if (!($table instanceof SelectInterface) && $table == $base_table) {
         // Set the subquery.
-        $subquery = $this->database->select('node_access', 'na')
+        $subquery =  ($this->databaseClosure)()->select('node_access', 'na')
           ->fields('na', ['nid']);
 
         // Attach conditions to the sub-query for nodes.
@@ -217,7 +219,7 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
    */
   public function write(NodeInterface $node, array $grants, $realm = NULL, $delete = TRUE) {
     if ($delete) {
-      $query = $this->database->delete('node_access')->condition('nid', $node->id());
+      $query =  ($this->databaseClosure)()->delete('node_access')->condition('nid', $node->id());
       if ($realm) {
         $query->condition('realm', [$realm, 'all'], 'IN');
       }
@@ -225,7 +227,7 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
     }
     // Only perform work when node_access modules are active.
     if (!empty($grants) && $this->hasNodeGrantsImplementations) {
-      $query = $this->database->insert('node_access')->fields(['nid', 'langcode', 'fallback', 'realm', 'gid', 'grant_view', 'grant_update', 'grant_delete']);
+      $query =  ($this->databaseClosure)()->insert('node_access')->fields(['nid', 'langcode', 'fallback', 'realm', 'gid', 'grant_view', 'grant_update', 'grant_delete']);
       // If we have defined a granted langcode, use it. But if not, add a grant
       // for every language this node is translated to.
       $fallback_langcode = $node->getUntranslated()->language()->getId();
@@ -263,7 +265,7 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
    * {@inheritdoc}
    */
   public function delete() {
-    $this->database->truncate('node_access')->execute();
+     ($this->databaseClosure)()->truncate('node_access')->execute();
     $this->memoryCache->deleteAll();
   }
 
@@ -271,7 +273,7 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
    * {@inheritdoc}
    */
   public function writeDefault() {
-    $this->database->insert('node_access')
+     ($this->databaseClosure)()->insert('node_access')
       ->fields([
         'nid' => 0,
         'realm' => 'all',
@@ -287,14 +289,14 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
    * {@inheritdoc}
    */
   public function count() {
-    return $this->database->query('SELECT COUNT(*) FROM {node_access}')->fetchField();
+    return  ($this->databaseClosure)()->query('SELECT COUNT(*) FROM {node_access}')->fetchField();
   }
 
   /**
    * {@inheritdoc}
    */
   public function deleteNodeRecords(array $nids) {
-    $this->database->delete('node_access')
+     ($this->databaseClosure)()->delete('node_access')
       ->condition('nid', $nids, 'IN')
       ->execute();
   }
@@ -311,10 +313,10 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
    * @see node_access_grants()
    */
   protected function buildGrantsQueryCondition(array $node_access_grants) {
-    $grants = $this->database->condition('OR');
+    $grants =  ($this->databaseClosure)()->condition('OR');
     foreach ($node_access_grants as $realm => $gids) {
       if (!empty($gids)) {
-        $and = $this->database->condition('AND');
+        $and =  ($this->databaseClosure)()->condition('AND');
         $grants->condition($and
           ->condition('gid', $gids, 'IN')
           ->condition('realm', $realm)

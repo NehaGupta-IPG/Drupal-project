@@ -24,25 +24,17 @@ class State extends CacheCollector implements StateInterface {
   private static array $deprecatedState = [];
 
   /**
-   * The key value store to use.
-   *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
-   */
-  protected $keyValueStore;
-
-  /**
    * Constructs a State object.
    *
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
+   * @param \Closure $keyValueFactoryClosure
    *   The key value store to use.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
    * @param \Drupal\Core\Lock\LockBackendInterface $lock
    *   The lock backend.
    */
-  public function __construct(KeyValueFactoryInterface $key_value_factory, CacheBackendInterface $cache, LockBackendInterface $lock) {
+  public function __construct(protected \Closure $keyValueFactoryClosure, CacheBackendInterface $cache, LockBackendInterface $lock) {
     parent::__construct('state', $cache, $lock);
-    $this->keyValueStore = $key_value_factory->get('state');
   }
 
   /**
@@ -63,7 +55,7 @@ class State extends CacheCollector implements StateInterface {
    * {@inheritdoc}
    */
   protected function resolveCacheMiss($key) {
-    $value = $this->keyValueStore->get($key);
+    $value = ($this->keyValueFactoryClosure)()->get('state')->get($key);
     $this->storage[$key] = $value;
     $this->persist($key);
     return $value;
@@ -90,7 +82,7 @@ class State extends CacheCollector implements StateInterface {
       @trigger_error(self::$deprecatedState[$key]['message'], E_USER_DEPRECATED);
       $key = self::$deprecatedState[$key]['replacement'];
     }
-    $this->keyValueStore->set($key, $value);
+    ($this->keyValueFactoryClosure)()->get('state')->set($key, $value);
     // If another request had a cache miss before this request, and also hasn't
     // written to cache yet, then it may already have read this value from the
     // database and could write that value to the cache to the end of the
@@ -106,7 +98,7 @@ class State extends CacheCollector implements StateInterface {
    * {@inheritdoc}
    */
   public function setMultiple(array $data) {
-    $this->keyValueStore->setMultiple($data);
+    ($this->keyValueFactoryClosure)()->get('state')->setMultiple($data);
     foreach ($data as $key => $value) {
       parent::set($key, $value);
       $this->persist($key);
@@ -117,7 +109,7 @@ class State extends CacheCollector implements StateInterface {
    * {@inheritdoc}
    */
   public function delete($key) {
-    $this->keyValueStore->delete($key);
+    ($this->keyValueFactoryClosure)()->get('state')->delete($key);
     parent::delete($key);
   }
 
@@ -125,7 +117,7 @@ class State extends CacheCollector implements StateInterface {
    * {@inheritdoc}
    */
   public function deleteMultiple(array $keys) {
-    $this->keyValueStore->deleteMultiple($keys);
+    ($this->keyValueFactoryClosure)()->get('state')->deleteMultiple($keys);
     foreach ($keys as $key) {
       parent::delete($key);
     }
