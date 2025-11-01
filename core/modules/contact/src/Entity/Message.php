@@ -92,7 +92,7 @@ class Message extends ContentEntityBase implements MessageInterface {
   public function getSubject() {
     $subject = $this->get('subject')->value;
 
-    if(empty($subject)) {
+    if (empty($subject)) {
       return '';
     }
 
