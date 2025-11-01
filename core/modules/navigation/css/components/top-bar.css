@@ -10,7 +10,6 @@
 .top-bar {
   position: relative;
   z-index: var(--admin-toolbar-z-index-top-bar);
-  display: flex;
   display: none;
   background-color: white;
   box-shadow: 0 0 8px 0 var(--admin-toolbar-color-shadow-15);
@@ -36,11 +35,16 @@
     padding-inline: calc(var(--drupal-displace-offset-right, var(--admin-toolbar-sidebar-width)) + var(--admin-toolbar-space-32)) var(--admin-toolbar-space-32);
   }
 }
-.top-bar:has(.top-bar__tools:not(:empty), .top-bar__context:not(:empty), .top-bar__actions:not(:empty)) {
+/*
+   Ensure .top-bar is visible if any of its child elements
+   (.top-bar__tools, .top-bar__context, .top-bar__actions)
+   contain at least one child without the [hidden] attribute.
+*/
+:is(.top-bar:has(.top-bar__tools > *:not([hidden])), .top-bar:has(.top-bar__context > *:not([hidden])), .top-bar:has(.top-bar__actions:has(*:not([hidden])))) {
   display: block;
 }
 @media (min-width: 64rem) {
-  .top-bar:has(.top-bar__tools:not(:empty), .top-bar__context:not(:empty), .top-bar__actions:not(:empty)) ~ .dialog-off-canvas-main-canvas {
+  :is(.top-bar:has(.top-bar__tools > *:not([hidden])), .top-bar:has(.top-bar__context > *:not([hidden])), .top-bar:has(.top-bar__actions:has(*:not([hidden])))) ~ .dialog-off-canvas-main-canvas {
     margin-block-start: var(--admin-toolbar-top-bar-height);
   }
 }
