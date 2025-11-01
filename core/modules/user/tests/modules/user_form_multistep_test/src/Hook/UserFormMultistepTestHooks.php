@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\user_form_multiple_test\Hook;
+namespace Drupal\user_form_multistep_test\Hook;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
