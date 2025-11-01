@@ -90,7 +90,7 @@ class Message extends ContentEntityBase implements MessageInterface {
    * {@inheritdoc}
    */
   public function getSubject() {
-    return (string) $this->get('subject')->value;
+    return (string) $this->get('subject')->value ?? '';
   }
 
   /**
