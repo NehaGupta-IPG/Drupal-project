@@ -1351,7 +1351,7 @@ services:
     arguments: ['@router', '@request_stack', '@router.request_context', NULL]
   options_request_listener:
     class: Drupal\Core\EventSubscriber\OptionsRequestSubscriber
-    arguments: ['@router.route_provider']
+    arguments: ['@>router.route_provider']
   bare_html_page_renderer:
     class: Drupal\Core\Render\BareHtmlPageRenderer
     arguments: ['@renderer', '@html_response.attachments_processor', '@Drupal\Core\Extension\ThemeSettingsProvider']
@@ -1426,7 +1426,7 @@ services:
   Drupal\Core\Site\MaintenanceModeInterface: '@maintenance_mode'
   maintenance_mode_subscriber:
     class: Drupal\Core\EventSubscriber\MaintenanceModeSubscriber
-    arguments: ['@maintenance_mode', '@config.factory', '@string_translation', '@url_generator', '@current_user', '@bare_html_page_renderer', '@messenger', '@event_dispatcher']
+    arguments: ['@maintenance_mode', '@config.factory', '@string_translation', '@>url_generator', '@current_user', '@bare_html_page_renderer', '@messenger', '@event_dispatcher']
   route_access_response_subscriber:
     class: Drupal\Core\EventSubscriber\RouteAccessResponseSubscriber
   client_error_response_subscriber:
