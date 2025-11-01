@@ -20,4 +20,5 @@ class UserFormMultipleTestHooks {
     // Change the value of 'roles' to null
     unset($form['account']['roles']);
   }
+
 }
