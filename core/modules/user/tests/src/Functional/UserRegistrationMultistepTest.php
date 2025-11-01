@@ -14,12 +14,12 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
-class UserRegistrationMultipleTest extends BrowserTestBase {
+class UserRegistrationMultistepTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['user_form_multiple_test'];
+  protected static $modules = ['user_form_multistep_test'];
 
   /**
    * {@inheritdoc}

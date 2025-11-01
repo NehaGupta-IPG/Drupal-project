@@ -1,4 +1,4 @@
-name: 'User module multiple form tests'
+name: 'User module multistep form tests'
 type: module
 description: 'Support module for user form testing.'
 package: Testing

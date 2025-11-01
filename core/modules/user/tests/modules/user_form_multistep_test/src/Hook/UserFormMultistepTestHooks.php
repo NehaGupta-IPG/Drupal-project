@@ -8,9 +8,9 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 
 /**
- * Hook implementations for user_form_multiple_test.
+ * Hook implementations for user_form_multistep_test.
  */
-class UserFormMultipleTestHooks {
+class UserFormMultistepTestHooks {
 
   /**
    * Implements hook_form_FORM_ID_alter() for the registration form.
