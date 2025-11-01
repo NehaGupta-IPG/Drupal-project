@@ -9,6 +9,7 @@ use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -76,6 +77,19 @@ class BytesTest extends TestCase {
       ['', 0.0],
       ['9223372036854775807', 9223372036854775807.0],
     ];
+  }
+
+  /**
+   * Tests Bytes::toNumber() with invalid input.
+   *
+   * @param mixed $input
+   *   The input for ::toNumber().
+   */
+  #[TestWith(['This is bad input'])]
+  #[TestWith(['KB'])]
+  public function testToNumberInvalid($input): void {
+    $this->expectException(\UnexpectedValueException::class);
+    Bytes::toNumber($input);
   }
 
   /**

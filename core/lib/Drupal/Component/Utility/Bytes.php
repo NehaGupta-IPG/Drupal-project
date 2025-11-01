@@ -70,12 +70,24 @@ class Bytes {
    *
    * @return float
    *   The floating point value of the size in bytes.
+   *
+   * @throws \UnexpectedValueException
+   *   Thrown if the parsed size value is not numeric.
    */
   public static function toNumber($size): float {
+    // Before processing return 0 in the case of an empty string for backward
+    // compatibility.
+    if ($size === '') {
+      return 0;
+    }
+
     // Remove the non-unit characters from the size.
     $unit = preg_replace('/[^bkmgtpezy]/i', '', $size);
     // Remove the non-numeric characters from the size.
     $size = preg_replace('/[^0-9\.]/', '', $size);
+    if (!is_numeric($size)) {
+      throw new \UnexpectedValueException('The size value could not be converted to a number.');
+    }
     if ($unit) {
       // Find the position of the unit in the ordered string which is the power
       // of magnitude to multiply a kilobyte by.
