@@ -11,7 +11,6 @@ use Drupal\Core\Routing\RouteCompiler;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Url;
 use Drupal\views\Views;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Route;
@@ -276,7 +275,7 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
    *   TRUE, when the view should override the given route.
    */
   protected function overrideAppliesPathAndMethod($view_path, Route $view_route, Route $route) {
-    // Find all paths which match the path of the current display..
+    // Find all paths which match the path of the current display.
     $route_path = RouteCompiler::getPathWithoutDefaults($route);
     $route_path = RouteCompiler::getPatternOutline($route_path);
 

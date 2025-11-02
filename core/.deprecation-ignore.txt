@@ -2,11 +2,11 @@
 # deprecated code.
 # See https://www.drupal.org/node/3285162 for more details.
 
-# @todo Remove when we no longer support PHPUnit 10.
+# @todo Remove when we no longer support PHPUnit 11.
 %The "PHPUnit\\Framework\\TestCase::__construct\(\)" method is considered internal.* You should not extend it from "Drupal\\[^"]+"%
+%The "PHPUnit\\Framework\\TestCase::__construct\(\)" method is considered final.* You should not extend it from "Drupal\\[^"]+"%
 
 # Internal code that we cannot avoid extending.
-%The "PHPUnit\\Framework\\TestCase::__construct\(\)" method is considered final.* You should not extend it from "Drupal\\[^"]+"%
 %The "Twig\\Environment::getTemplateClass\(\)" method is considered internal\. It may change without further notice\. You should not extend it from "Drupal\\Core\\Template\\TwigEnvironment"\.%
 
 # Skip some dependencies' DebugClassLoader forward compatibility warnings, in
@@ -42,6 +42,16 @@
 %The "Drupal\\workspaces\\WorkspaceManager::setActiveWorkspace\(\)" method will require a new "bool \$persist" argument in the next major version of its interface%
 %.*::getDefaultOperations\(\) will require a new "\Drupal\Core\Cache\CacheableMetadata|null \$cacheability" argument in the next major version of its parent class%
 %.*::getOperations\(\) will require a new "\Drupal\Core\Cache\CacheableMetadata|null \$cacheability" argument in the next major version of its interface%
+%Class "Drupal\\migrate_drupal\\Plugin\\migrate\\source\\DrupalSqlBase" as extended by "Drupal\\(ban|block|block_content|comment|config_translation|contact|content_translation|field|file|filter|image|language|menu_link_content|migrate_drupal|node|path|responsive_image|search|shortcut|system|taxonomy|update|user)\\[^"]+" is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0%
+%Class "Drupal\\migrate_drupal\\Plugin\\migrate\\source\\DrupalSqlBase" as extended by "Drupal\\Tests\\migrate_drupal\\[^"]+" is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0%
+%Migrate source plugin "md_empty" used in migration "(d6_upload_field|user_picture_field)" is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0%
+%Trait "Drupal\\migrate_drupal\\Plugin\\migrate\\source\\I18nQueryTrait" used by "Drupal\\(block_content|menu_link_content|taxonomy)\\[^"]+" is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0%
+%Class "Drupal\\migrate_drupal\\Plugin\\Plugin\\MigrateFieldPluginManager" is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3533566%
+%Drupal\\migrate_drupal\\Plugin\\MigrateFieldPluginManager\(\) is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3533566%
+%The "plugin.manager.migrate.field" service is deprecated in drupal:11.3 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3533566%
+%Drupal\\field\\Plugin\\migrate\\process\\ProcessField\(\) is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement.%
+%Drupal\\field\\Plugin\\migrate\\process\\FieldType\(\) is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement.%
 
-# Symfony 7.3.
-%Since symfony/validator 7.3: Passing an array of options to configure the "[^"]+" constraint is deprecated, use named arguments instead.%
+# Drupal 13.
+%The "cache.backend.memory" service is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use cache.backend.memory.memory instead. See https://www.drupal.org/node/3546856%
+%The "cache.static" service is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use the cache.memory bin instead. See https://www.drupal.org/node/3546856%

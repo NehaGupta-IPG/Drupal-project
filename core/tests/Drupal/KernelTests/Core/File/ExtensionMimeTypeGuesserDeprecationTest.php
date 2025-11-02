@@ -6,17 +6,20 @@ namespace Drupal\KernelTests\Core\File;
 
 use Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that deprecation messages are raised for deprecations.
  *
  * @todo Remove this class once deprecations are removed.
- * @legacy-covers \Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser
  */
 #[Group('file')]
 #[IgnoreDeprecations]
+#[CoversClass(ExtensionMimeTypeGuesser::class)]
+#[RunTestsInSeparateProcesses]
 class ExtensionMimeTypeGuesserDeprecationTest extends KernelTestBase {
 
   /**
