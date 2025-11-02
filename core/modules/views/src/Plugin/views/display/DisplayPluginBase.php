@@ -7,6 +7,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableDependencyInterface;
@@ -1512,10 +1513,45 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
             ],
           ],
         ];
+
+        $options = [];
+        $optgroup_arguments = (string) t('Arguments');
+        foreach ($this->view->display_handler->getHandlers('argument') as $arg => $handler) {
+          $options[$optgroup_arguments]["{{ arguments.$arg }}"] = $this->t('@argument title',
+            ['@argument' => $handler->adminLabel()]);
+          $options[$optgroup_arguments]["{{ raw_arguments.$arg }}"] = $this->t('@argument input',
+            ['@argument' => $handler->adminLabel()]);
+        }
+
+        // Default text.
+        // We have some options, so make a list.
+        $description = [];
+        $description[] = $this->t('The text to display for the more link.');
+        if (!empty($options)) {
+          $description[] = [
+            '#prefix' => '<p>',
+            '#markup' => $this->t('The following tokens are available. You may use Twig syntax in this field.'),
+            '#suffix' => '</p>',
+          ];
+          foreach (array_keys($options) as $type) {
+            if (!empty($options[$type])) {
+              $items = [];
+              foreach ($options[$type] as $key => $value) {
+                $items[] = $key . ' == ' . $value;
+              }
+              $item_list = [
+                '#theme' => 'item_list',
+                '#items' => $items,
+              ];
+              $description[] = $item_list;
+            }
+          }
+        }
+
         $form['use_more_text'] = [
           '#type' => 'textfield',
           '#title' => $this->t('More link text'),
-          '#description' => $this->t('The text to display for the more link.'),
+          '#description' => $description,
           '#default_value' => $this->getOption('use_more_text'),
           '#states' => [
             'visible' => [
@@ -2122,10 +2158,16 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       $url = $this->getMoreUrl();
       $access = $url->access(return_as_object: TRUE);
 
+      $tokens = $this->getArgumentsTokens();
+      $more_text = $this->viewsTokenReplace($this->useMoreText(), $tokens);
+
       $more_link = [
         '#type' => 'more_link',
         '#url' => $url,
-        '#title' => $this->useMoreText(),
+        '#title' => [
+          '#markup' => $more_text,
+          '#allowed_tags' => Xss::getHtmlTagList(),
+        ],
         '#view' => $this->view,
         '#access' => $access->isAllowed(),
       ];
