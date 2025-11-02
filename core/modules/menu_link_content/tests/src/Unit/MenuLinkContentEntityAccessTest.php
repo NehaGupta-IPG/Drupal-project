@@ -10,6 +10,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\menu_link_content\MenuLinkContentAccessControlHandler;
 use Drupal\Tests\UnitTestCase;
@@ -47,8 +48,9 @@ class MenuLinkContentEntityAccessTest extends UnitTestCase {
       ->willReturn($language);
 
     $account = $this->createMock(AccountInterface::class);
+    $routeMatch = $this->createMock(RouteMatchInterface::class);
 
-    $accessControl = new MenuLinkContentAccessControlHandler($entityType, $accessManager);
+    $accessControl = new MenuLinkContentAccessControlHandler($entityType, $accessManager, $routeMatch);
     $accessControl->setModuleHandler($moduleHandler);
     $access = $accessControl->access($entity, 'not-an-op', $account, TRUE);
     $this->assertInstanceOf(AccessResultInterface::class, $access);

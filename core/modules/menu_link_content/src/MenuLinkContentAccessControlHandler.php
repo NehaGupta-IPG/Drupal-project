@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityHandlerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -24,24 +25,34 @@ class MenuLinkContentAccessControlHandler extends EntityAccessControlHandler imp
   protected $accessManager;
 
   /**
+   * The current route match.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected $routeMatch;
+
+  /**
    * Creates a new MenuLinkContentAccessControlHandler.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
    * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
    *   The access manager to check routes by name.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   The current route match.
    */
-  public function __construct(EntityTypeInterface $entity_type, AccessManagerInterface $access_manager) {
+  public function __construct(EntityTypeInterface $entity_type, AccessManagerInterface $access_manager, RouteMatchInterface $route_match) {
     parent::__construct($entity_type);
 
     $this->accessManager = $access_manager;
+    $this->routeMatch = $route_match;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
-    return new static($entity_type, $container->get('access_manager'));
+    return new static($entity_type, $container->get('access_manager'), $container->get('current_route_match'));
   }
 
   /**
@@ -78,6 +89,14 @@ class MenuLinkContentAccessControlHandler extends EntityAccessControlHandler imp
       default:
         return parent::checkAccess($entity, $operation, $account);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createAccess($entity_bundle = NULL, ?AccountInterface $account = NULL, array $context = [], $return_as_object = FALSE) {
+    $context['menu_name'] = $this->routeMatch->getRawParameter('menu');
+    return parent::createAccess($entity_bundle, $account, $context, $return_as_object);
   }
 
 }
