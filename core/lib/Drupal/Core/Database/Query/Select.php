@@ -106,6 +106,19 @@ class Select extends Query implements SelectInterface {
   protected $union = [];
 
   /**
+   * The Common Table Expressions (CTEs) for this query.
+   *
+   * @var array
+   *   Each entry is an array representing a single CTE. The structure is:
+   *   [
+   *     'name' => $cte_name,
+   *     'query' => $select_query_object,
+   *     'recursive' => bool,
+   *   ]
+   */
+  protected $ctes = [];
+
+  /**
    * Indicates if preExecute() has already been called.
    *
    * @var bool
@@ -229,6 +242,11 @@ class Select extends Query implements SelectInterface {
       $args += $union['query']->arguments();
     }
 
+    // If there are any CTEs, incorporate their arguments recursively.
+    foreach ($this->ctes as $cte) {
+      $args += $cte['query']->arguments();
+    }
+
     return $args;
   }
 
@@ -254,6 +272,12 @@ class Select extends Query implements SelectInterface {
     foreach ($this->union as $union) {
       $union['query']->compile($connection, $queryPlaceholder);
     }
+
+    // If there are any CTEs, compile them recursively.
+    foreach ($this->ctes as $cte) {
+      $cte['query']->compile($connection, $queryPlaceholder);
+    }
+
   }
 
   /**
@@ -280,6 +304,13 @@ class Select extends Query implements SelectInterface {
 
     foreach ($this->union as $union) {
       if (!$union['query']->compiled()) {
+        return FALSE;
+      }
+    }
+
+    // Check compilation status of CTEs recursively.
+    foreach ($this->ctes as $cte) {
+      if (!$cte['query']->compiled()) {
         return FALSE;
       }
     }
@@ -424,6 +455,13 @@ class Select extends Query implements SelectInterface {
   /**
    * {@inheritdoc}
    */
+  public function &getCTEs() {
+    return $this->ctes;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function escapeLike($string) {
     return $this->connection->escapeLike($string);
   }
@@ -502,6 +540,11 @@ class Select extends Query implements SelectInterface {
 
     foreach ($this->union as $union) {
       $union['query']->preExecute();
+    }
+
+    // Now also prepare any CTEs.
+    foreach ($this->ctes as $cte) {
+      $cte['query']->preExecute();
     }
 
     return $this->prepared;
@@ -601,6 +644,18 @@ class Select extends Query implements SelectInterface {
     ];
 
     return $alias;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function with($name, SelectInterface $query, $recursive = FALSE) {
+    $this->ctes[$name] = [
+      'name' => $name,
+      'query' => $query,
+      'recursive' => $recursive,
+    ];
+    return $this;
   }
 
   /**
@@ -808,10 +863,28 @@ class Select extends Query implements SelectInterface {
     }
 
     // Create a sanitized comment string to prepend to the query.
-    $comments = $this->connection->makeComment($this->comments);
+    $query = $this->connection->makeComment($this->comments);
+
+    // CTEs.
+    $cte_statements = [];
+    foreach ($this->ctes as $cte) {
+      // Run preparation steps on this CTE query before converting to string.
+      $cte_query = $cte['query'];
+      $cte_query->preExecute();
+      $cte_statements[] = $this->connection->escapeTable($cte['name']) . ' AS (' . (string) $cte_query . ')';
+      $has_recursive_cte = $cte['recursive'] ?? FALSE;
+    }
+
+    if (!empty($cte_statements)) {
+      $query .= 'WITH ';
+      if ($has_recursive_cte) {
+        $query .= 'RECURSIVE ';
+      }
+      $query .= implode(', ', $cte_statements) . "\n";
+    }
 
     // SELECT.
-    $query = $comments . 'SELECT ';
+    $query .= 'SELECT ';
     if ($this->distinct) {
       $query .= 'DISTINCT ';
     }
@@ -943,6 +1016,11 @@ class Select extends Query implements SelectInterface {
       if ($table['table'] instanceof SelectInterface) {
         $this->tables[$alias]['table'] = clone $table['table'];
       }
+    }
+
+    // Clone CTE subqueries.
+    foreach ($this->ctes as $name => $cte) {
+      $this->ctes[$name]['query'] = clone $cte['query'];
     }
   }
 
