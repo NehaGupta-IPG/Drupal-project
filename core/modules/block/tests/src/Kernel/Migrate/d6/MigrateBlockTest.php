@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\block\Kernel\Migrate\d6;
 
 use Drupal\block\Entity\Block;
-use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
 use Drupal\block\Hook\BlockHooks;
+use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests migration of blocks to configuration entities.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateBlockTest extends MigrateDrupal6TestBase {
 
   /**
@@ -51,6 +53,8 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'd6_filter_format',
       'block_content_type',
       'block_content_body_field',
+      'block_content_body_field_storage',
+      'd6_menu',
       'd6_custom_block',
       'd6_user_role',
       'd6_block',
@@ -99,7 +103,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
    */
   public function testBlockMigration(): void {
     $blocks = Block::loadMultiple();
-    $this->assertCount(25, $blocks);
+    $this->assertCount(24, $blocks);
 
     // Check user blocks.
     $visibility = [
@@ -189,10 +193,13 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
 
     // Check menu blocks.
     $settings = [
-      'id' => 'broken',
+      'id' => 'system_menu_block',
       'label' => '',
-      'provider' => 'core',
+      'provider' => 'system',
       'label_display' => '0',
+      'level' => 1,
+      'depth' => NULL,
+      'expand_all_items' => FALSE,
     ];
     $this->assertEntity('menu', [], 'header', 'olivero', -5, $settings);
 
@@ -261,8 +268,6 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => 'Static Block',
       'provider' => 'block_content',
       'label_display' => 'visible',
-      'status' => TRUE,
-      'info' => '',
       'view_mode' => 'full',
     ];
     $this->assertEntity('block', $visibility, 'content', 'olivero', 0, $settings);
@@ -279,8 +284,6 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => 'Another Static Block',
       'provider' => 'block_content',
       'label_display' => 'visible',
-      'status' => TRUE,
-      'info' => '',
       'view_mode' => 'full',
     ];
     // We expect this block to be disabled because '' is not a valid region,
@@ -292,8 +295,6 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => '',
       'provider' => 'block_content',
       'label_display' => '0',
-      'status' => TRUE,
-      'info' => '',
       'view_mode' => 'full',
     ];
     $this->assertEntity('block_2', [], 'right', 'test_theme', -7, $settings);

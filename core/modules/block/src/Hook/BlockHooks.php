@@ -2,6 +2,7 @@
 
 namespace Drupal\block\Hook;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\language\ConfigurableLanguageInterface;
@@ -11,6 +12,7 @@ use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Installer\InstallerKernel;
 
 /**
  * Hook implementations for block.
@@ -62,7 +64,58 @@ class BlockHooks {
    */
   #[Hook('theme')]
   public function theme() : array {
-    return ['block' => ['render element' => 'elements']];
+    return [
+      'block' => [
+        'render element' => 'elements',
+        'initial preprocess' => static::class . ':preprocessBlock',
+      ],
+    ];
+  }
+
+  /**
+   * Prepares variables for block templates.
+   *
+   * Default template: block.html.twig.
+   *
+   * Prepares the values passed to the theme_block function to be passed
+   * into a pluggable template engine. Uses block properties to generate a
+   * series of template file suggestions. If none are found, the default
+   * block.html.twig is used.
+   *
+   * Most themes use their own copy of block.html.twig. The default is located
+   * inside "core/modules/block/templates/block.html.twig". Look in there for
+   * the full list of available variables.
+   *
+   * @param array $variables
+   *   An associative array containing:
+   *   - elements: An associative array containing the properties of the
+   *     element. Properties used: #block, #configuration, #children,
+   *     and #plugin_id.
+   */
+  public function preprocessBlock(&$variables): void {
+    $variables['configuration'] = $variables['elements']['#configuration'];
+    $variables['plugin_id'] = $variables['elements']['#plugin_id'];
+    $variables['base_plugin_id'] = $variables['elements']['#base_plugin_id'];
+    $variables['derivative_plugin_id'] = $variables['elements']['#derivative_plugin_id'];
+    $variables['in_preview'] = $variables['elements']['#in_preview'] ?? FALSE;
+    $variables['label'] = !empty($variables['configuration']['label_display']) ? $variables['configuration']['label'] : '';
+    $variables['content'] = $variables['elements']['content'];
+    // A block's label is configuration: it is static. Allow dynamic labels to
+    // be set in the render array.
+    if (isset($variables['elements']['content']['#title']) && !empty($variables['configuration']['label_display'])) {
+      $variables['label'] = $variables['elements']['content']['#title'];
+    }
+
+    // Create a valid HTML ID and make sure it is unique.
+    if (!empty($variables['elements']['#id'])) {
+      $variables['attributes']['id'] = Html::getUniqueId('block-' . $variables['elements']['#id']);
+    }
+
+    // Proactively add aria-describedby if possible to improve accessibility.
+    if ($variables['label'] && isset($variables['attributes']['role'])) {
+      $variables['title_attributes']['id'] = Html::getUniqueId($variables['label']);
+      $variables['attributes']['aria-describedby'] = $variables['title_attributes']['id'];
+    }
   }
 
   /**
@@ -96,17 +149,55 @@ class BlockHooks {
   /**
    * Implements hook_modules_installed().
    *
-   * @see block_themes_installed()
+   * @see BlockHooks::themesInstalled()
    */
   #[Hook('modules_installed')]
-  public function modulesInstalled($modules): void {
-    // block_themes_installed() does not call block_theme_initialize() during
-    // site installation because block configuration can be optional or provided
-    // by the profile. Now, when the profile is installed, this configuration
-    // exists, call block_theme_initialize() for all installed themes.
+  public function modulesInstalled($modules, bool $is_syncing): void {
+    // Do not create blocks during config sync.
+    if ($is_syncing) {
+      return;
+    }
+
+    // BlockHooks::themesInstalled() does not call block_theme_initialize()
+    // during site installation because block configuration can be optional or
+    // provided by the profile. Now, when the profile is installed, this
+    // configuration exists, call block_theme_initialize() for all installed
+    // themes.
     $profile = \Drupal::installProfile();
     if (in_array($profile, $modules, TRUE)) {
       foreach (\Drupal::service('theme_handler')->listInfo() as $theme => $data) {
+        block_theme_initialize($theme);
+      }
+    }
+  }
+
+  /**
+   * Implements hook_themes_installed().
+   *
+   * Initializes blocks for installed themes.
+   *
+   * @param string[] $theme_list
+   *   An array of theme names.
+   *
+   * @see BlockHooks::modulesInstalled()
+   */
+  #[Hook('themes_installed')]
+  public function themesInstalled($theme_list): void {
+    // Do not create blocks during config sync.
+    if (\Drupal::service('config.installer')->isSyncing()) {
+      return;
+    }
+    // Disable this functionality prior to install profile installation because
+    // block configuration is often optional or provided by the install profile
+    // itself. block_theme_initialize() will be called when the install profile
+    // is installed.
+    if (InstallerKernel::installationAttempted() && \Drupal::config('core.extension')->get('module.' . \Drupal::installProfile()) === NULL) {
+      return;
+    }
+
+    foreach ($theme_list as $theme) {
+      // Don't initialize themes that are not displayed in the UI.
+      if (\Drupal::service('theme_handler')->hasUi($theme)) {
         block_theme_initialize($theme);
       }
     }

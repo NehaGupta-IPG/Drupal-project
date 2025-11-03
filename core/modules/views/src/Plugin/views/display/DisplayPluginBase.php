@@ -36,9 +36,12 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   public $view = NULL;
 
   /**
-   * An array of instantiated handlers used in this display.
+   * A multi-dimensional array of instantiated handlers used in this display.
    *
-   * @var \Drupal\views\Plugin\views\ViewsHandlerInterface[]
+   * The array keys are the handler type, and each value is an array of
+   * handlers for that type.
+   *
+   * @var array<string, \Drupal\views\Plugin\views\ViewsHandlerInterface[]>
    */
   public $handlers = [];
 
@@ -763,7 +766,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       return $this->view->displayHandlers->get($display_id)->getRoutedDisplay();
     }
 
-    // No routed display exists, so return NULL
+    // No routed display exists, so return NULL.
     return NULL;
   }
 
@@ -1700,7 +1703,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         break;
 
       case 'row':
-        $form['#title'] .= $this->t('How should each row in this view be styled');
+        $form['#title'] .= $this->t('How should each row in this view be output');
         $row_plugin_instance = $this->getPlugin('row');
         $form['row'] = [
           '#prefix' => '<div class="clearfix">',
@@ -2117,13 +2120,18 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     $hasMoreRecords = !empty($this->view->pager) && $this->view->pager->hasMoreRecords();
     if ($this->isMoreEnabled() && ($this->useMoreAlways() || $hasMoreRecords)) {
       $url = $this->getMoreUrl();
+      $access = $url->access(return_as_object: TRUE);
 
-      return [
+      $more_link = [
         '#type' => 'more_link',
         '#url' => $url,
         '#title' => $this->useMoreText(),
         '#view' => $this->view,
+        '#access' => $access->isAllowed(),
       ];
+      $accessCacheability = CacheableMetadata::createFromObject($access);
+      $accessCacheability->applyTo($more_link);
+      return $more_link;
     }
   }
 
@@ -2448,7 +2456,9 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       $this->view->element['#cache'] += ['keys' => []];
       // Places like \Drupal\views\ViewExecutable::setCurrentPage() set up an
       // additional cache context.
-      $this->view->element['#cache']['keys'] = array_merge(['views', 'display', $this->view->element['#name'], $this->view->element['#display_id']], $this->view->element['#cache']['keys']);
+      $this->view->element['#cache']['keys'] = array_merge(
+        ['views', 'display', $this->view->element['#name'], $this->view->element['#display_id']],
+        $this->view->element['#cache']['keys']);
 
       // Add arguments to the cache key.
       if ($args) {
@@ -2651,7 +2661,10 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
 
     if ($this->usesExposedFormInBlock()) {
       $delta = '-exp-' . $this->view->storage->id() . '-' . $this->display['id'];
-      $desc = $this->t('Exposed form: @view-@display_id', ['@view' => $this->view->storage->id(), '@display_id' => $this->display['id']]);
+      $desc = $this->t('Exposed form: @view-@display_id', [
+        '@view' => $this->view->storage->id(),
+        '@display_id' => $this->display['id'],
+      ]);
 
       $blocks[$delta] = [
         'info' => $desc,

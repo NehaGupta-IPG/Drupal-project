@@ -10,12 +10,15 @@ use Drupal\Core\Extension\ModuleUninstallValidatorException;
 use Drupal\Core\Extension\ProfileExtensionList;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests ModuleHandler functionality.
- *
- * @group Extension
  */
+#[Group('Extension')]
+#[RunTestsInSeparateProcesses]
 class ModuleHandlerTest extends KernelTestBase {
 
   /**
@@ -362,6 +365,56 @@ class ModuleHandlerTest extends KernelTestBase {
   }
 
   /**
+   * Tests procedural preprocess functions.
+   */
+  public function testProceduralPreprocess(): void {
+    $this->moduleInstaller()->install(['module_test_procedural_preprocess']);
+    $preprocess_function = [];
+    $preprocess_invoke = [];
+    $prefix = 'module_test_procedural_preprocess';
+    $hook = 'test';
+    if ($this->moduleHandler()->hasImplementations('preprocess', [$prefix], TRUE)) {
+      $function = "{$prefix}_preprocess";
+      $preprocess_function[] = $function;
+      $preprocess_invoke[$function] = ['module' => $prefix, 'hook' => 'preprocess'];
+    }
+    if ($this->moduleHandler()->hasImplementations('preprocess_' . $hook, [$prefix], TRUE)) {
+      $function = "{$prefix}_preprocess_{$hook}";
+      $preprocess_function[] = $function;
+      $preprocess_invoke[$function] = ['module' => $prefix, 'hook' => 'preprocess_' . $hook];
+    }
+
+    foreach ($preprocess_function as $function) {
+      $this->assertTrue($this->moduleHandler()->invoke(... $preprocess_invoke[$function], args: [TRUE]), 'Procedural hook_preprocess runs.');
+    }
+  }
+
+  /**
+   * Tests Oop preprocess functions.
+   */
+  public function testOopPreprocess(): void {
+    $this->moduleInstaller()->install(['module_test_oop_preprocess']);
+    $preprocess_function = [];
+    $preprocess_invoke = [];
+    $prefix = 'module_test_oop_preprocess';
+    $hook = 'test';
+    if ($this->moduleHandler()->hasImplementations('preprocess', [$prefix], TRUE)) {
+      $function = "{$prefix}_preprocess";
+      $preprocess_function[] = $function;
+      $preprocess_invoke[$function] = ['module' => $prefix, 'hook' => 'preprocess'];
+    }
+    if ($this->moduleHandler()->hasImplementations('preprocess_' . $hook, [$prefix], TRUE)) {
+      $function = "{$prefix}_preprocess_{$hook}";
+      $preprocess_function[] = $function;
+      $preprocess_invoke[$function] = ['module' => $prefix, 'hook' => 'preprocess_' . $hook];
+    }
+
+    foreach ($preprocess_function as $function) {
+      $this->assertTrue($this->moduleHandler()->invoke(... $preprocess_invoke[$function], args: [TRUE]), 'Procedural hook_preprocess runs.');
+    }
+  }
+
+  /**
    * Returns the ModuleHandler.
    *
    * @return \Drupal\Core\Extension\ModuleHandlerInterface
@@ -379,6 +432,26 @@ class ModuleHandlerTest extends KernelTestBase {
    */
   protected function moduleInstaller() {
     return $this->container->get('module_installer');
+  }
+
+  /**
+   * Tests autoloading .token and .view files.
+   */
+  #[IgnoreDeprecations]
+  public function testAutoloadHookInfoFiles(): void {
+    $this->expectDeprecation('Autoloading hooks in the file (core/modules/system/tests/modules/module_test/module_test.tokens.inc) is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Move the functions in this file to either the .module file or other appropriate location. See https://www.drupal.org/node/3489765');
+    $this->moduleInstaller()->install(['module_test']);
+    $testToken = [];
+    $testToken['types']['token_info_invoked'] = [
+      'name' => 'tokens.inc test',
+      'description' => 'tokens.inc test',
+    ];
+    $testToken['tokens']['token_info_invoked']['token_test_1'] = [
+      'type' => 'text',
+      'name' => 'tokens.inc test 1',
+    ];
+    $this->assertTrue($this->moduleHandler()->hasImplementations('token_info', ['module_test']));
+    $this->assertEquals($testToken, $this->moduleHandler()->invoke('module_test', 'token_info', []));
   }
 
 }

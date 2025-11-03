@@ -134,7 +134,7 @@ final class NavigationRenderer {
     $asset_url = $module_path . '/assets/fonts/inter-var.woff2';
 
     $defaults = [
-      'settings' => ['hide_logo' => $logo_provider === self::LOGO_PROVIDER_HIDE],
+      '#settings' => ['hide_logo' => $logo_provider === self::LOGO_PROVIDER_HIDE],
       '#attached' => [
         'html_head_link' => [
           [
@@ -157,10 +157,10 @@ final class NavigationRenderer {
       if (!empty($logo_path) && is_file($logo_path)) {
         $logo_managed_url = $this->fileUrlGenerator->generateAbsoluteString($logo_path);
         $image = $this->imageFactory->get($logo_path);
-        $build[0]['settings']['logo_path'] = $logo_managed_url;
+        $build[0]['#settings']['logo_path'] = $logo_managed_url;
         if ($image->isValid()) {
-          $build[0]['settings']['logo_width'] = $image->getWidth();
-          $build[0]['settings']['logo_height'] = $image->getHeight();
+          $build[0]['#settings']['logo_width'] = $image->getWidth();
+          $build[0]['#settings']['logo_height'] = $image->getHeight();
         }
       }
     }
@@ -204,13 +204,26 @@ final class NavigationRenderer {
    * @see hook_page_top()
    */
   public function buildTopBar(array &$page_top): void {
-    $page_top['top_bar'] = [
+    $page_top['top_bar']['#cache']['contexts'][] = 'user.permissions';
+    if ($this->currentUser->hasPermission('access navigation')) {
+      $page_top['top_bar'] = [
+        '#cache' => [
+          'keys' => ['navigation', 'top_bar'],
+          'max-age' => CacheBackendInterface::CACHE_PERMANENT,
+        ],
+        '#lazy_builder' => ['navigation.renderer:doBuildTopBar', []],
+        '#create_placeholder' => TRUE,
+      ];
+    }
+  }
+
+  /**
+   * Lazy builder to generate the top bar render array.
+   */
+  #[TrustedCallback]
+  public function doBuildTopBar(): array {
+    return [
       '#type' => 'top_bar',
-      '#access' => $this->currentUser->hasPermission('access navigation'),
-      '#cache' => [
-        'keys' => ['top_bar'],
-        'contexts' => ['user.permissions'],
-      ],
     ];
   }
 

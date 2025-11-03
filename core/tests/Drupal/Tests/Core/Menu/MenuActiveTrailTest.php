@@ -6,10 +6,14 @@ namespace Drupal\Tests\Core\Menu;
 
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Menu\MenuActiveTrail;
+use Drupal\Core\Path\PathMatcherInterface;
 use Drupal\Core\Routing\CurrentRouteMatch;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\TestTools\Random;
-use Drupal\Core\Routing\RouteObjectInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\InputBag;
@@ -19,11 +23,9 @@ use Symfony\Component\Routing\Route;
 
 /**
  * Tests the active menu trail service.
- *
- * @group Menu
- *
- * @coversDefaultClass \Drupal\Core\Menu\MenuActiveTrail
  */
+#[CoversClass(MenuActiveTrail::class)]
+#[Group('Menu')]
 class MenuActiveTrailTest extends UnitTestCase {
 
   /**
@@ -68,6 +70,12 @@ class MenuActiveTrailTest extends UnitTestCase {
    */
   protected $lock;
 
+
+  /**
+   * The mocked path matcher.
+   */
+  protected PathMatcherInterface $pathMatcher;
+
   /**
    * The mocked cache tags invalidator.
    *
@@ -86,9 +94,10 @@ class MenuActiveTrailTest extends UnitTestCase {
     $this->menuLinkManager = $this->createMock('Drupal\Core\Menu\MenuLinkManagerInterface');
     $this->cache = $this->createMock('\Drupal\Core\Cache\CacheBackendInterface');
     $this->lock = $this->createMock('\Drupal\Core\Lock\LockBackendInterface');
+    $this->pathMatcher = $this->createMock('\Drupal\Core\Path\PathMatcherInterface');
     $this->cacheTagsInvalidator = $this->createMock('\Drupal\Core\Cache\CacheTagsInvalidatorInterface');
 
-    $this->menuActiveTrail = new MenuActiveTrail($this->menuLinkManager, $this->currentRouteMatch, $this->cache, $this->lock);
+    $this->menuActiveTrail = new MenuActiveTrail($this->menuLinkManager, $this->currentRouteMatch, $this->cache, $this->lock, $this->pathMatcher);
 
     $container = new Container();
     $container->set('cache_tags.invalidator', $this->cacheTagsInvalidator);
@@ -105,6 +114,7 @@ class MenuActiveTrailTest extends UnitTestCase {
    *     - links: An array of menu links keyed by ID.
    *     - menu_name: The active menu name.
    *     - expected_link: The expected active link for the given menu.
+   *     - expected_trail: The expected active trail for the given menu.
    */
   public static function provider() {
     $data = [];
@@ -116,8 +126,8 @@ class MenuActiveTrailTest extends UnitTestCase {
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, $mock_route);
     $request->attributes->set('_raw_variables', new InputBag([]));
 
-    $link_1 = MenuLinkMock::create(['id' => 'baby_llama_link_1', 'route_name' => 'baby_llama', 'title' => 'Baby llama', 'parent' => 'mama_llama_link']);
-    $link_2 = MenuLinkMock::create(['id' => 'baby_llama_link_2', 'route_name' => 'baby_llama', 'title' => 'Baby llama', 'parent' => 'papa_llama_link']);
+    $link_1 = MenuLinkMock::createMock(['id' => 'baby_llama_link_1', 'route_name' => 'baby_llama', 'title' => 'Baby llama', 'parent' => 'mama_llama_link']);
+    $link_2 = MenuLinkMock::createMock(['id' => 'baby_llama_link_2', 'route_name' => 'baby_llama', 'title' => 'Baby llama', 'parent' => 'papa_llama_link']);
 
     // @see \Drupal\Core\Menu\MenuLinkManagerInterface::getParentIds()
     $link_1_parent_ids = ['baby_llama_link_1', 'mama_llama_link', ''];
@@ -149,9 +159,9 @@ class MenuActiveTrailTest extends UnitTestCase {
   /**
    * Tests getActiveLink().
    *
-   * @covers ::getActiveLink
-   * @dataProvider provider
+   * @legacy-covers ::getActiveLink
    */
+  #[DataProvider('provider')]
   public function testGetActiveLink(Request $request, $links, $menu_name, $expected_link): void {
     $this->requestStack->push($request);
     if ($links !== FALSE) {
@@ -167,11 +177,47 @@ class MenuActiveTrailTest extends UnitTestCase {
   }
 
   /**
+   * Tests that getActiveLink() returns a <front> route link for a route that is the front page and has no other links.
+   *
+   * @legacy-covers ::getActiveLink
+   */
+  public function testGetActiveLinkReturnsFrontPageLinkAtTheFrontPage(): void {
+
+    // Mock the request.
+    $mock_route = new Route('');
+    $request = new Request();
+    $request->attributes->set(RouteObjectInterface::ROUTE_NAME, 'link_1');
+    $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, $mock_route);
+    $request->attributes->set('_raw_variables', new InputBag([]));
+    $this->requestStack->push($request);
+
+    // Pretend that the current path is the front page.
+    $this->pathMatcher
+      ->method('isFrontPage')
+      ->willReturn(TRUE);
+
+    // Make 'link_1' route to have no links and the '<front>' route to have a link.
+    $home_link = MenuLinkMock::createMock(['id' => 'home_link', 'route_name' => 'home_link', 'title' => 'Home', 'parent' => NULL]);
+    $this->menuLinkManager
+      ->method('loadLinksByRoute')
+      ->willReturnCallback(function ($route_name) use ($home_link) {
+        return match ($route_name) {
+          'link_1' => [],
+          '<front>' => [$home_link],
+        };
+      });
+
+    // Test.
+    $this->assertSame($home_link, $this->menuActiveTrail->getActiveLink());
+
+  }
+
+  /**
    * Tests getActiveTrailIds().
    *
-   * @covers ::getActiveTrailIds
-   * @dataProvider provider
+   * @legacy-covers ::getActiveTrailIds
    */
+  #[DataProvider('provider')]
   public function testGetActiveTrailIds(Request $request, $links, $menu_name, $expected_link, $expected_trail): void {
     $expected_trail_ids = array_combine($expected_trail, $expected_trail);
 
@@ -216,7 +262,7 @@ class MenuActiveTrailTest extends UnitTestCase {
   /**
    * Tests getCid()
    *
-   * @covers ::getCid
+   * @legacy-covers ::getCid
    */
   public function testGetCid(): void {
     $data = $this->provider()[1];

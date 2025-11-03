@@ -7,15 +7,19 @@ namespace Drupal\Tests\language\Unit;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Render\BubbleableMetadata;
-use Drupal\Tests\UnitTestCase;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @coversDefaultClass \Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl
- * @group language
+ * Tests Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl.
  */
+#[CoversClass(LanguageNegotiationUrl::class)]
+#[Group('language')]
 class LanguageNegotiationUrlTest extends UnitTestCase {
 
   /**
@@ -81,9 +85,8 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
 
   /**
    * Tests path prefix language negotiation and outbound path processing.
-   *
-   * @dataProvider providerTestPathPrefix
    */
+  #[DataProvider('providerTestPathPrefix')]
   public function testPathPrefix($prefix, $prefixes, $expected_langcode): void {
     $this->languageManager->expects($this->any())
       ->method('getCurrentLanguage')
@@ -173,9 +176,8 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
 
   /**
    * Tests outbound path processing for neutral languages.
-   *
-   * @dataProvider providerNeutralLanguages
    */
+  #[DataProvider('providerNeutralLanguages')]
   public function testNeutralLanguages($langcode, $expected_langcode): void {
     if ($expected_langcode) {
       $this->languageManager->expects($this->once())
@@ -238,9 +240,8 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
 
   /**
    * Tests domain language negotiation and outbound path processing.
-   *
-   * @dataProvider providerTestDomain
    */
+  #[DataProvider('providerTestDomain')]
   public function testDomain($http_host, $domains, $expected_langcode): void {
     $this->languageManager->expects($this->any())
       ->method('getCurrentLanguage')
@@ -336,6 +337,51 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
       'expected_langcode' => 'en',
     ];
     return $domain_configuration;
+  }
+
+  /**
+   * Tests path outbound processing correctly setting relative/absolute paths.
+   */
+  public function testProcessOutboundOutputsRelativePathsForSameDomain(): void {
+    $this->languageManager->expects($this->any())
+      ->method('getCurrentLanguage')
+      ->willReturn($this->languages['en']);
+
+    $config = $this->getConfigFactoryStub([
+      'language.negotiation' => [
+        'url' => [
+          'source' => LanguageNegotiationUrl::CONFIG_DOMAIN,
+          'domains' => [
+            'de' => 'example.de',
+            'en' => 'example.com',
+          ],
+        ],
+      ],
+    ]);
+
+    $request = Request::create('', 'GET', [], [], [], ['HTTP_HOST' => 'example.com']);
+    $method = new LanguageNegotiationUrl();
+    $method->setLanguageManager($this->languageManager);
+    $method->setConfig($config);
+    $method->setCurrentUser($this->user);
+
+    // Check relative paths are used when the language
+    // is the current language.
+    $options = [
+      'language' => $this->languages['en'],
+    ];
+    $method->processOutbound('foo', $options, $request);
+    // $options['absolute'] not set or null equals to FALSE.
+    $this->assertFalse($options['absolute'] ?? FALSE);
+
+    // Check absolute paths are used when the language
+    // is not the current language.
+    $options = [
+      'language' => $this->languages['de'],
+    ];
+    $method->processOutbound('foo', $options, $request);
+    $this->assertTrue($options['absolute']);
+
   }
 
 }

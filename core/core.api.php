@@ -467,6 +467,9 @@
  *   - data: Contains data that can vary by path or similar context.
  *   - discovery: Contains cached discovery data for things such as plugins,
  *     views_data, or YAML discovered data such as library info.
+ *   - memory: An in-memory cache bin, also called static cache. Useful
+ *     alternative to properties when cache invalidation is needed, for example
+ *     through cache tags.
  *
  * A module can define a cache bin by defining a service in its
  * modulename.services.yml file as follows (substituting the desired name for
@@ -479,6 +482,15 @@
  *   factory: ['@cache_factory', 'get']
  *   arguments: [name_of_bin]
  * @endcode
+ *
+ * The tag can also include a default backend, which is useful for example
+ * when defining in-memory (which uses a separate tag) or fast chained bin.
+ *
+ * @code
+ * - { name: cache.bin, default_backend: cache.backend.chainedfast }
+ * - { name: cache.bin.memory, default_backend: cache.backend.memory.memory }
+ * @endcode
+ *
  * See the @link container Services topic @endlink for more on defining
  * services.
  *
@@ -1606,6 +1618,14 @@
  * modules that they interact with. Your modules can also define their own
  * hooks, in order to let other modules interact with them.
  *
+ * Hook implementations will execute in the following order.
+ * order.
+ * - Module weight.
+ * - Alphabetical by module name.
+ * - This order can be modified by using the order parameter on the #[Hook]
+ *   attribute, using the #[ReorderHook] attribute, or implementing the legacy
+ *   hook_module_implements_alter.
+ *
  * @section implementing Implementing a hook
  *
  * There are two ways to implement a hook:
@@ -1657,19 +1677,21 @@
  * Legacy meta hooks:
  * - hook_hook_info()
  * - hook_module_implements_alter()
+ * @see \Drupal\Core\Hook\Attribute\LegacyModuleImplementsAlter
  *
  * Install hooks:
  * - hook_install()
  * - hook_install_tasks()
  * - hook_install_tasks_alter()
  * - hook_post_update_NAME()
+ * - hook_removed_post_updates()
  * - hook_schema()
  * - hook_uninstall()
+ * - hook_update_dependencies()
  * - hook_update_last_removed()
  * - hook_update_N()
  *
- * Theme hooks:
- * - hook_preprocess_HOOK()
+ * Hooks implemented by themes must remain procedural.
  *
  * @subsection procedural-hooks Procedural hook implementation
  *
@@ -1709,6 +1731,90 @@
  * @see \Drupal\Core\Hook\Attribute\Hook
  * @see \Drupal::moduleHandler()
  *
+ * @section ordering_hooks Ordering hook implementations
+ *
+ * The order in which hook implementations are executed can be modified. A hook
+ * can be placed first or last in the order of execution. It can also be placed
+ * before or after the execution of another module's implementation of the same
+ * hook. When changing the order of execution in relation to a specific module
+ * either the module name or the class and method can be used.
+ *
+ * Use the order argument of the Hook attribute to order the execution of
+ * hooks.
+ *
+ * Example of executing 'entity_type_alter' of my_module first:
+ * @code
+ * #[Hook('entity_type_alter', order: Order::First)]
+ * @endcode
+ *
+ * Example of executing 'entity_type_alter' of my_module last:
+ * @code
+ * #[Hook('entity_type_alter', order: Order::Last)]
+ * @endcode
+ *
+ * Example of executing 'entity_type_alter' before the execution of the
+ * implementation in the foo module:
+ * @code
+ * #[Hook('entity_type_alter', order: new OrderBefore(['foo']))]
+ * @endcode
+ *
+ * Example of executing 'entity_type_alter' after the execution of the
+ * implementation in the foo module:
+ * @code
+ * #[Hook('entity_type_alter', order: new OrderAfter(['foo']))]
+ * @endcode
+ *
+ * Example of executing 'entity_type_alter' before two methods. One in the Foo
+ * class and one in the Bar class.
+ * @code
+ * #[Hook('entity_type_alter',
+ *   order: new OrderBefore(
+ *     classesAndMethods: [
+ *       [Foo::class, 'someMethod'],
+ *       [Bar::class, 'someOtherMethod'],
+ *     ]
+ *   )
+ * )]
+ * @endcode
+ *
+ * @see \Drupal\Core\Hook\Attribute\Hook
+ * @see \Drupal\Core\Hook\Order\Order
+ * @see \Drupal\Core\Hook\Order\OrderBefore
+ * @see \Drupal\Core\Hook\Order\OrderAfter
+ *
+ * @section ordering_other_module_hooks Ordering other module hook implementations
+ *
+ * The order in which hooks implemented in other modules are executed can be
+ * reordered. The reordering of the targeted hook is done relative to other
+ * implementations. The reordering process executes after the ordering defined
+ * in the Hook attribute.
+ *
+ * Example of reordering the execution of the 'entity_presave' hook so that
+ * Content Moderation module hook executes before the Workspaces module hook.
+ * @code
+ * #[ReorderHook('entity_presave',
+ *   class: ContentModerationHooks::class,
+ *   method: 'entityPresave',
+ *   order: new OrderBefore(['workspaces'])
+ * )]
+ * @endcode
+ *
+ * @see \Drupal\Core\Hook\Attribute\ReorderHook
+ *
+ * @section removing_hooks Removing hook implementations
+ *
+ * The execution of a hooks implemented by other modules can be skipped. This
+ * is done by removing the targeted hook, use the RemoveHook attribute.
+ *
+ * Example of removing the 'help' hook of the Layout Builder module.
+ * @code
+ * #[RemoveHook('help',
+ *   class: LayoutBuilderHooks::class,
+ *   method: 'help'
+ * )]
+ * @endcode
+ *
+ * @see \Drupal\Core\Hook\Attribute\RemoveHook
  * @}
  */
 
@@ -2187,7 +2293,7 @@ function hook_mail($key, &$message, $params): void {
     $variables += [
       '%uid' => $node->getOwnerId(),
       '%url' => $node->toUrl('canonical', ['absolute' => TRUE])->toString(),
-      '%node_type' => node_get_type_label($node),
+      '%node_type' => $node->getBundleEntity()->label(),
       '%title' => $node->getTitle(),
       '%teaser' => $node->teaser,
       '%body' => $node->body,
@@ -2615,9 +2721,10 @@ function hook_validation_constraint_alter(array &$definitions) {
  * the proxy service, and not on all the dependencies of the lazy service.
  *
  * To define a service as lazy, add "lazy: true" to the service definition, and
- * use the "core/scripts/generate-proxy.sh" script to generate the proxy class.
+ * use the "core/scripts/generate-proxy-class.php" script to generate the proxy
+ * class.
  *
- * @see core/scripts/generate-proxy.sh
+ * @see core/scripts/generate-proxy-class.php
  */
 
 /**
