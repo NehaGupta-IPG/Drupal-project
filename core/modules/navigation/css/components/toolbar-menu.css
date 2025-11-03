@@ -4,11 +4,12 @@
  * https://www.drupal.org/node/3084859
  * @preserve
  */
-/* cspell:ignore csvg cpath wght */
+
 /**
  * @file
  * Admin Toolbar menus styles.
  */
+
 .toolbar-menu {
   display: grid;
   margin: 0;
@@ -16,28 +17,36 @@
   list-style-type: none;
   gap: var(--admin-toolbar-space-4);
 }
+
 [class*="toolbar-menu--level-"] {
   display: none;
 }
+
 [data-toolbar-menu-trigger][aria-expanded="true"] + [class*="toolbar-menu--level-"] {
   display: grid;
 }
+
 .toolbar-menu__item {
   display: grid;
 }
+
 .toolbar-menu__item--level-1 {
   border-radius: var(--admin-toolbar-space-8);
 }
+
 .toolbar-menu__item--level-1:has(> [data-toolbar-menu-trigger][aria-expanded="true"]) {
   background: var(--admin-toolbar-color-gray-050);
 }
+
 .toolbar-menu--level-2 {
   padding-block-end: var(--admin-toolbar-space-12);
   box-shadow: inset var(--admin-toolbar-space-4) 0 0 0 var(--admin-toolbar-color-gray-100);
 }
+
 [dir="rtl"] .toolbar-menu--level-2 {
   box-shadow: inset calc(-1 * var(--admin-toolbar-space-4)) 0 0 0 var(--admin-toolbar-color-gray-100);
 }
+
 .toolbar-menu__link {
   position: relative;
   display: flex;
@@ -62,12 +71,15 @@
   inline-size: 100%;
   gap: var(--admin-toolbar-space-8);
 }
+
 .toolbar-menu__link:has(+ .toolbar-menu .is-active) {
   color: var(--admin-toolbar-color-gray-950);
 }
+
 .toolbar-menu__link.current {
   color: var(--admin-toolbar-color-gray-990);
 }
+
 .toolbar-menu__link.current::after {
   position: absolute;
   z-index: 1;
@@ -79,15 +91,18 @@
   inline-size: var(--admin-toolbar-space-8);
   block-size: var(--admin-toolbar-space-8);
 }
+
 .toolbar-menu__link:focus {
   color: var(--admin-toolbar-color-gray-990);
   outline-offset: -2px;
   background-color: transparent;
 }
+
 .toolbar-menu__link:hover {
   color: var(--admin-toolbar-color-blue-700);
   background-color: transparent;
 }
+
 .toolbar-menu__link:hover::before {
   position: absolute;
   z-index: 1;
@@ -98,12 +113,14 @@
   inline-size: var(--admin-toolbar-space-8);
   block-size: 100%;
 }
+
 .toolbar-menu__link--3 {
   padding-inline-start: var(--admin-toolbar-space-32);
   font-size: var(--admin-toolbar-font-size-info-xs);
   line-height: var(--admin-toolbar-line-height-info-xs);
   font-variation-settings: "wght" 500;
 }
+
 .toolbar-menu__link--3::after {
   position: absolute;
   z-index: 1;
@@ -114,9 +131,11 @@
   inline-size: var(--admin-toolbar-space-20);
   block-size: 1px;
 }
+
 .toolbar-menu__link--3:hover::after {
   background-color: currentColor;
 }
+
 .toolbar-menu__chevron {
   flex-shrink: 0;
   margin-inline-start: auto;
@@ -126,12 +145,15 @@
   block-size: var(--admin-toolbar-space-16);
   inline-size: var(--admin-toolbar-space-16);
 }
+
 [dir="rtl"] .toolbar-menu__chevron {
   rotate: 90deg;
 }
+
 [aria-expanded="true"] .toolbar-menu__chevron {
   rotate: -90deg;
 }
+
 [dir="rtl"] :is([aria-expanded="true"] .toolbar-menu__chevron) {
   rotate: none;
 }

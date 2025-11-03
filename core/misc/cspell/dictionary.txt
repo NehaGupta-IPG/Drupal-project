@@ -242,6 +242,7 @@ introspectable
 invalidators
 invokable
 isam
+ital
 javascripts
 jessebeach
 jqueryui
@@ -591,6 +592,7 @@ webmention
 webmozart
 webroot
 webservers
+wght
 widthx
 wordsafe
 writeln
