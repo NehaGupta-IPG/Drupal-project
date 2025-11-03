@@ -34,7 +34,7 @@
   --summary-accordion-line-height: var(--space-l);
 }
 
-.claro-details {
+.claro-details:not(.hidden, [hidden]) {
   display: block;
   margin-block: var(--space-m);
   color: var(--color-text);
