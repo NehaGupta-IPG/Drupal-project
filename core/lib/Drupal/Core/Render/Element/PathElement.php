@@ -11,6 +11,25 @@ use Drupal\Core\Render\Attribute\FormElement;
  * Provides a form element to enter a path which can be optionally validated and
  * stored as either a \Drupal\Core\Url value object or an array containing a
  * route name and route parameters pair.
+ *
+ * Properties:
+ * - #convert_path: (optional) Indicates if the value is to be converted, and
+ *   if so, how. There are 3 possible values; CONVERT_NONE indicates no
+ *   conversion, CONVERT_ROUTE converts the value to a route name and parameter
+ *   pair and CONVERT_URL converts the\Drupal\Core\Url value object. Defaults to
+ *   CONVERT_ROUTE.
+ * - #validate_path: (optional) A boolean which indicated if the element should
+ *   be validated. Defaults to TRUE.
+ *
+ * Usage example:
+ *
+ * @code
+ * $form['phone'] = [
+ *   '#type' => 'path',
+ *   '#convert_path' => PathElement::CONVERT_NONE,
+ *   '#validate_path' => FALSE,
+ * ];
+ * @endcode
  */
 #[FormElement('path')]
 class PathElement extends Textfield {

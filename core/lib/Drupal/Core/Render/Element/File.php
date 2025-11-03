@@ -19,6 +19,14 @@ use Drupal\Core\Render\Element;
  * The value of this form element will always be an array of
  * \Symfony\Component\HttpFoundation\File\UploadedFile objects, regardless of
  * whether #multiple is TRUE or FALSE
+ *
+ * Usage example:
+ * @code
+ * $form['file'] = [
+ *   '#type' => 'file',
+ *   '#title' => $this->t('File to Upload'),
+ * ];
+ * @endcode
  */
 #[FormElement('file')]
 class File extends FormElementBase {
