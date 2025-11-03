@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\search\Tests\SearchCommentLinkTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\search\Tests;
 
@@ -36,6 +33,9 @@ class SearchCommentLinkTest extends BrowserTestBase {
    */
   protected $adminUser;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -58,10 +58,8 @@ class SearchCommentLinkTest extends BrowserTestBase {
   /**
    * Verify that comments are rendered using proper format in search results.
    */
-  function testSearchResultsComment() {
-    $node_storage = $this->container->get('entity.manager')->getStorage('node');
+  public function testSearchResultsComment() {
     // Create basic_html format that escapes all HTML.
-
     $comment_body = 'Test comment body';
 
     // Make preview optional.
@@ -98,7 +96,6 @@ class SearchCommentLinkTest extends BrowserTestBase {
     $this->drupalGet('search/node');
     $this->submitForm($edit, 'Search');
     $this->assertSession()->pageTextNotContains('Result should not contain operation text like Reply, Login, Delete ...');
-
   }
 
 }
