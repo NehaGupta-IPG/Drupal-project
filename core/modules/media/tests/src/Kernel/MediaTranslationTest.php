@@ -57,8 +57,8 @@ class MediaTranslationTest extends MediaKernelTestBase {
    * Tests media title is not overridden when resaved.
    */
   public function testMediaNameNotOverridden(): void {
-    // Create two test image files: one for the media item in its original
-    // language, and one in its Dutch translation.
+    // Create three test image files: one for the media item in its original
+    // language, and one for each of its two translations.
     $images = $this->getTestFiles('image');
 
     $original_image = File::create([
@@ -66,10 +66,15 @@ class MediaTranslationTest extends MediaKernelTestBase {
     ]);
     $original_image->save();
 
-    $translated_image = File::create([
+    $translated_image_l1 = File::create([
+      'uri' => $images[1]->uri ?? end($images)->uri,
+    ]);
+    $translated_image_l1->save();
+
+    $translated_image_l2 = File::create([
       'uri' => end($images)->uri,
     ]);
-    $translated_image->save();
+    $translated_image_l2->save();
 
     $media_type = $this->createMediaType('image');
 
@@ -85,21 +90,38 @@ class MediaTranslationTest extends MediaKernelTestBase {
     $media->save();
     $this->assertSame($original_image->getFilename(), $media->getName());
 
-    // Create a Dutch translation which uses a different image, but also sets
+    // Create a translation in l1 which uses a different image, but also sets
     // an arbitrary title.
-    $translation = $media->addTranslation('l1');
-    $this->assertNotSame($media->language()->getId(), $translation->language()->getId());
-    $translation->set($source_field_name, $translated_image->id());
-    $translation->setName('Capricious and arbitrary');
-    $translation->save();
+    $translation_l1 = $media->addTranslation('l1');
+    $this->assertNotSame($media->language()->getId(), $translation_l1->language()->getId());
+    $translation_l1->set($source_field_name, $translated_image_l1->id());
+    $translation_l1->setName('Capricious and arbitrary');
+    $translation_l1->save();
     // The arbitrary title should be preserved.
-    $this->assertSame('Capricious and arbitrary', $translation->getName());
+    $this->assertSame('Capricious and arbitrary', $translation_l1->getName());
 
-    // The original version should be unaffected by Dutch shenanigans.
+    // Create a translation in l2 which uses yet another image, and sets
+    // a different arbitrary title.
+    $translation_l2 = $media->addTranslation('l2');
+    $this->assertNotSame($media->language()->getId(), $translation_l2->language()->getId());
+    $this->assertNotSame($translation_l1->language()->getId(), $translation_l2->language()->getId());
+    $translation_l2->set($source_field_name, $translated_image_l2->id());
+    $translation_l2->setName('Another capricious title');
+    $translation_l2->save();
+    // The arbitrary title should be preserved.
+    $this->assertSame('Another capricious title', $translation_l2->getName());
+
+    // Reset cache and verify all three versions maintain their correct names.
     $this->container->get('entity_type.manager')
       ->getStorage('media')
       ->resetCache();
-    $this->assertSame($original_image->getFilename(), Media::load($media->id())->getName());
+    $loaded_media = Media::load($media->id());
+    // The original version should be unaffected by translations.
+    $this->assertSame($original_image->getFilename(), $loaded_media->getName());
+    // The l1 translation should still have its arbitrary title.
+    $this->assertSame('Capricious and arbitrary', $loaded_media->getTranslation('l1')->getName());
+    // The l2 translation should still have its arbitrary title.
+    $this->assertSame('Another capricious title', $loaded_media->getTranslation('l2')->getName());
   }
 
   /**
