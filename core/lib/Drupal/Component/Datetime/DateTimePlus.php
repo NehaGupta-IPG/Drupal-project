@@ -212,8 +212,12 @@ class DateTimePlus {
       // re-creating the date/time formatted string and comparing it to the
       // input. For instance, an input value of '11' using a format of Y (4
       // digits) gets created as '0011' instead of '2011'.
-      if ($settings['validate_format'] && $date->format($format) != $time) {
-        throw new \UnexpectedValueException('The created date does not match the input value.');
+      if (!empty($settings['validate_format'])) {
+        // Strip reset if set since format does not support this.
+        $format = ltrim($format, '!');
+        if ($date->format($format) !== $time) {
+            throw new \UnexpectedValueException('The created date does not match the input value.');
+        }
       }
     }
     return $datetime_plus;
