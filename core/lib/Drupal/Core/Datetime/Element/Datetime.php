@@ -72,12 +72,12 @@ use Drupal\Core\Security\StaticTrustedCallbackHelper;
  *
  * @code
  * $form = [
- * '#type' => 'datetime',
- * '#default_value' => new DrupalDateTime('2000-01-01 00:00:00'),
- * '#date_date_element' => 'date',
- * '#date_time_element' => 'none',
- * '#date_year_range' => '2010:+3',
- * '#date_timezone' => 'Asia/Kolkata',
+ *   '#type' => 'datetime',
+ *   '#default_value' => new DrupalDateTime('2000-01-01 00:00:00'),
+ *   '#date_date_element' => 'date',
+ *   '#date_time_element' => 'none',
+ *   '#date_year_range' => '2010:+3',
+ *   '#date_timezone' => 'Asia/Kolkata',
  * ];
  * @endcode
  *

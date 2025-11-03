@@ -46,13 +46,13 @@ use Drupal\Core\Security\StaticTrustedCallbackHelper;
  *
  * @code
  * $form = [
- * '#type' => 'datelist',
- * '#default_value' => new DrupalDateTime('2000-01-01 00:00:00'),
- * '#date_part_order' => ['month', 'day', 'year', 'hour', 'minute', 'ampm'],
- * '#date_text_parts' => ['year'],
- * '#date_year_range' => '2010:2020',
- * '#date_increment' => 15,
- * '#date_timezone' => 'Asia/Kolkata'
+ *   '#type' => 'datelist',
+ *   '#default_value' => new DrupalDateTime('2000-01-01 00:00:00'),
+ *   '#date_part_order' => ['month', 'day', 'year', 'hour', 'minute', 'ampm'],
+ *   '#date_text_parts' => ['year'],
+ *   '#date_year_range' => '2010:2020',
+ *   '#date_increment' => 15,
+ *   '#date_timezone' => 'Asia/Kolkata'
  * ];
  * @endcode
  *
