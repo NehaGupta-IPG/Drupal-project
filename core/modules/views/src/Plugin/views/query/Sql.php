@@ -111,13 +111,6 @@ class Sql extends QueryPluginBase {
   protected $hasAggregate = FALSE;
 
   /**
-   * Should this query be optimized for counts, for example no sorts.
-   *
-   * @var bool|null
-   */
-  protected $getCountOptimized = NULL;
-
-  /**
    * An array mapping table aliases and field names to field aliases.
    *
    * @var array
@@ -1220,10 +1213,13 @@ class Sql extends QueryPluginBase {
    * an aggregation function applied, or to be in the GROUP BY clause, Views
    * gathers those fields and adds them to the GROUP BY clause.
    *
+   * @param bool $is_count_optimized
+   *   Should this query be optimized for counts, for example no sorts.
+   *
    * @return array
    *   An array of the fieldnames which are non-aggregates.
    */
-  protected function getNonAggregates() {
+  protected function getNonAggregates($is_count_optimized = FALSE) {
     $non_aggregates = [];
     foreach ($this->fields as $field) {
       $string = '';
@@ -1249,7 +1245,7 @@ class Sql extends QueryPluginBase {
         $non_aggregates[] = $fieldname;
       }
 
-      if ($this->getCountOptimized) {
+      if ($is_count_optimized) {
         // We only want the first field in this case.
         break;
       }
@@ -1263,8 +1259,10 @@ class Sql extends QueryPluginBase {
    *
    * @param \Drupal\Core\Database\Query\SelectInterface $query
    *   The drupal query object.
+   * @param bool $is_count_optimized
+   *   Should this query be optimized for counts, for example no sorts.
    */
-  protected function compileFields($query) {
+  protected function compileFields($query, $is_count_optimized = FALSE) {
     foreach ($this->fields as $field) {
       $string = '';
       if (!empty($field['table'])) {
@@ -1300,7 +1298,7 @@ class Sql extends QueryPluginBase {
         $query->addField(!empty($field['table']) ? $field['table'] : $this->view->storage->get('base_table'), $field['field'], $fieldname);
       }
 
-      if ($this->getCountOptimized) {
+      if ($is_count_optimized) {
         // We only want the first field in this case.
         break;
       }
@@ -1343,18 +1341,16 @@ class Sql extends QueryPluginBase {
     // fields. Determine of this query qualifies by checking for a groupby or
     // distinct.
     if ($get_count && !$this->groupby) {
+      $is_count_optimized = TRUE;
       foreach ($this->fields as $field) {
         if (!empty($field['distinct']) || !empty($field['function'])) {
-          $this->getCountOptimized = FALSE;
+          $is_count_optimized = FALSE;
           break;
         }
       }
     }
     else {
-      $this->getCountOptimized = FALSE;
-    }
-    if (!isset($this->getCountOptimized)) {
-      $this->getCountOptimized = TRUE;
+      $is_count_optimized = FALSE;
     }
 
     // Go ahead and build the query.
@@ -1381,7 +1377,7 @@ class Sql extends QueryPluginBase {
 
     // Assemble the groupby clause, if any.
     $this->hasAggregate = FALSE;
-    $non_aggregates = $this->getNonAggregates();
+    $non_aggregates = $this->getNonAggregates($is_count_optimized);
     if (count($this->having)) {
       $this->hasAggregate = TRUE;
     }
@@ -1414,7 +1410,7 @@ class Sql extends QueryPluginBase {
     }
 
     // Add all fields to the query.
-    $this->compileFields($query);
+    $this->compileFields($query, $is_count_optimized);
 
     // Add groupby.
     if ($groupby) {
@@ -1431,7 +1427,7 @@ class Sql extends QueryPluginBase {
       }
     }
 
-    if (!$this->getCountOptimized) {
+    if (!$is_count_optimized) {
       // We only add the orderby if we're not counting.
       if ($this->orderby) {
         foreach ($this->orderby as $order) {
