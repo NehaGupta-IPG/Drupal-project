@@ -1,0 +1,8 @@
+id: comment.search_result
+label: 'Comment search result'
+status: false
+cache: true
+targetEntityType: comment
+dependencies:
+  module:
+    - comment

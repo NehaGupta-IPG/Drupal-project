@@ -321,6 +321,14 @@ class CommentHooks {
         }
       }
     }
+
+    if (isset($build[0])) {
+    foreach ($build[0] as $key => $value) {
+      if (isset($value['#view_mode'])) {
+        $build[0][$key]['#view_mode'] = 'search_index';
+      }
+    }
+  }
     return \Drupal::service('renderer')->renderInIsolation($build);
   }
 
