@@ -55,8 +55,8 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
     $this->assertSession()->pageTextContains('quiche');
 
     $expected = [
-      'QueryCount' => 437,
-      'CacheSetCount' => 419,
+      'QueryCount' => 439,
+      'CacheSetCount' => 420,
       'CacheDeleteCount' => 0,
       'CacheTagLookupQueryCount' => 43,
       'CacheTagInvalidationCount' => 0,
@@ -118,7 +118,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 189,
-      'CacheGetCount' => 210,
+      'CacheGetCount' => 211,
       'CacheSetCount' => 64,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
@@ -236,7 +236,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'SELECT "t".* FROM "node_revision__field_summary" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
       'SELECT "t".* FROM "node_revision__field_tags" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
       'SELECT "t".* FROM "node_revision__layout_builder__layout" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
-      'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node_revision" "base_table" INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE ("base_table"."vid" IN (SELECT MAX(base_table.vid) AS "expression" FROM "node_revision" "base_table" GROUP BY "base_table"."nid")) AND ("node_field_data"."nid" = "1")',
+      'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node_revision" "base_table" INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE ("base_table"."vid" IN (SELECT MAX(subquery_base_table.vid) AS "expression" FROM "node_revision" "subquery_base_table" WHERE (base_table.nid = subquery_base_table.nid))) AND ("node_field_data"."nid" = "1")',
       'SELECT "revision"."vid" AS "vid", "revision"."langcode" AS "langcode", "revision"."revision_uid" AS "revision_uid", "revision"."revision_timestamp" AS "revision_timestamp", "revision"."revision_log" AS "revision_log", "revision"."revision_default" AS "revision_default", "base"."nid" AS "nid", "base"."type" AS "type", "base"."uuid" AS "uuid", CASE "base"."vid" WHEN "revision"."vid" THEN 1 ELSE 0 END AS "isDefaultRevision" FROM "node" "base" INNER JOIN "node_revision" "revision" ON "revision"."nid" = "base"."nid" AND "revision"."vid" IN (75)',
       'SELECT "revision".* FROM "node_field_revision" "revision" WHERE ("revision"."vid" IN (75)) AND ("revision"."vid" IN ("75")) ORDER BY "revision"."vid" ASC',
       'SELECT "t".* FROM "node_revision__field_cooking_time" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
@@ -328,11 +328,11 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 169,
-      'CacheGetCount' => 202,
+      'CacheGetCount' => 203,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 66,
-        'bootstrap' => 11,
+        'bootstrap' => 12,
         'discovery' => 67,
         'data' => 12,
         'entity' => 18,

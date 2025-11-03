@@ -13,6 +13,11 @@ parameters:
   core.moved_classes:
     'Drupal\Core\StringTranslation\TranslationWrapper':
       class: 'Drupal\Core\StringTranslation\TranslatableMarkup'
+    'Doctrine\Common\Annotations\AnnotationException':
+      class: 'Drupal\Component\Annotation\Doctrine\AnnotationException'
+      deprecation_version: drupal:11.3.0
+      removed_version: drupal:12.0.0
+      change_record: https://www.drupal.org/node/3551049
   session.storage.options:
     gc_probability: 1
     gc_divisor: 100
@@ -404,6 +409,8 @@ services:
       - { name: service_collector, tag: 'config.factory.override', call: addOverride }
     arguments: ['@config.storage', '@event_dispatcher', '@config.typed']
   Drupal\Core\Config\ConfigFactoryInterface: '@config.factory'
+  Drupal\Core\Config\ConfigImporterFactory:
+    autowire: true
   config.importer_subscriber:
     class: Drupal\Core\Config\Importer\FinalMissingContentSubscriber
   config.installer:
@@ -728,7 +735,7 @@ services:
   Drupal\Core\Extension\ThemeHandlerInterface: '@theme_handler'
   theme_installer:
     class: Drupal\Core\Extension\ThemeInstaller
-    arguments: ['@theme_handler', '@config.factory', '@config.installer', '@module_handler', '@config.manager', '@asset.css.collection_optimizer', '@router.builder', '@logger.channel.default', '@state', '@extension.list.module', '@theme.registry', '@extension.list.theme', '@plugin.manager.sdc']
+    autowire: true
   Drupal\Core\Extension\ThemeInstallerInterface: '@theme_installer'
   entity.memory_cache:
     class: Drupal\Core\Cache\MemoryCache\LruMemoryCache
@@ -1281,7 +1288,10 @@ services:
   psr_response_view_subscriber:
     class: Drupal\Core\EventSubscriber\PsrResponseSubscriber
     arguments: ['@psr7.http_foundation_factory']
-
+  # HTMX content view subscriber runs before main_content_view subscriber.
+  htmx_content_view_subscriber:
+    class: Drupal\Core\EventSubscriber\HtmxContentViewSubscriber
+    autowire: true
   # Main content view subscriber plus the renderers it uses.
   main_content_view_subscriber:
     class: Drupal\Core\EventSubscriber\MainContentViewSubscriber
@@ -1416,7 +1426,7 @@ services:
   Drupal\Core\Site\MaintenanceModeInterface: '@maintenance_mode'
   maintenance_mode_subscriber:
     class: Drupal\Core\EventSubscriber\MaintenanceModeSubscriber
-    arguments: ['@maintenance_mode', '@config.factory', '@string_translation', '@url_generator', '@current_user', '@bare_html_page_renderer', '@messenger', '@event_dispatcher']
+    autowire: true
   route_access_response_subscriber:
     class: Drupal\Core\EventSubscriber\RouteAccessResponseSubscriber
   client_error_response_subscriber:
@@ -1590,7 +1600,7 @@ services:
   Drupal\Core\Datetime\DateFormatterInterface: '@date.formatter'
   theme.manager:
     class: Drupal\Core\Theme\ThemeManager
-    arguments: ['%app.root%', '@theme.negotiator', '@theme.initialization', '@module_handler', '@callable_resolver']
+    arguments: ['%app.root%', '@theme.negotiator', '@theme.initialization', '@module_handler', '@callable_resolver', '@keyvalue', '@cache.bootstrap']
     calls:
       - [setThemeRegistry, ['@theme.registry']]
   Drupal\Core\Theme\ThemeManagerInterface: '@theme.manager'
