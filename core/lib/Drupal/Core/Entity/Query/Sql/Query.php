@@ -41,8 +41,9 @@ class Query extends QueryBase implements QueryInterface {
   protected $sqlFields = [];
 
   /**
-   * An array of strings added as to the group by, keyed by the string to avoid
-   * duplicates.
+   * An array of strings for the SQL 'group by' operation.
+   *
+   * Array is keyed by the string to avoid duplicates.
    *
    * @var array
    */
@@ -76,6 +77,7 @@ class Query extends QueryBase implements QueryInterface {
    */
   public function execute() {
     return $this
+      ->alter()
       ->prepare()
       ->compile()
       ->addSort()
@@ -129,13 +131,23 @@ class Query extends QueryBase implements QueryInterface {
       $this->sqlFields["base_table.$id_field"] = ['base_table', $id_field];
     }
 
-    // Add a self-join to the base revision table if we're querying only the
-    // latest revisions.
+    // Use a subquery with MAX() to only return the latest revision in the most
+    // optimal way. Note that this query is extremely performance-sensitive and
+    // changes here need to be tested on a database where there are many
+    // revisions and many entities.
     if ($this->latestRevision && $revision_field) {
-      $this->sqlQuery->leftJoin($base_table, 'base_table_2', "[base_table].[$id_field] = [base_table_2].[$id_field] AND [base_table].[$revision_field] < [base_table_2].[$revision_field]");
-      $this->sqlQuery->isNull("base_table_2.$id_field");
+      // Fetch all latest revision ids in a sub-query.
+      $revision_subquery = $this->connection->select($base_table, 'subquery_base_table');
+      $revision_subquery->addExpression("MAX(subquery_base_table.$revision_field)");
+      $revision_subquery->where("base_table.$id_field = subquery_base_table.$id_field");
+
+      // Restrict results only to latest ids.
+      $this->sqlQuery->condition("base_table.$revision_field", $revision_subquery, 'IN');
     }
 
+    if (is_null($this->accessCheck)) {
+      throw new QueryException('Entity queries must explicitly set whether the query should be access checked or not. See Drupal\Core\Entity\Query\QueryInterface::accessCheck().');
+    }
     if ($this->accessCheck) {
       $this->sqlQuery->addTag($this->entityTypeId . '_access');
     }
@@ -246,7 +258,7 @@ class Query extends QueryBase implements QueryInterface {
       $this->sqlQuery->groupBy($field);
     }
     foreach ($this->sqlFields as $field) {
-      $this->sqlQuery->addField($field[0], $field[1], isset($field[2]) ? $field[2] : NULL);
+      $this->sqlQuery->addField($field[0], $field[1], $field[2] ?? NULL);
     }
     return $this;
   }
@@ -259,7 +271,7 @@ class Query extends QueryBase implements QueryInterface {
    */
   protected function result() {
     if ($this->count) {
-      return $this->sqlQuery->countQuery()->execute()->fetchField();
+      return (int) $this->sqlQuery->countQuery()->execute()->fetchField();
     }
     // Return a keyed array of results. The key is either the revision_id or
     // the entity_id depending on whether the entity type supports revisions.
@@ -296,6 +308,8 @@ class Query extends QueryBase implements QueryInterface {
    * Determines whether the query requires GROUP BY and ORDER BY MIN/MAX.
    *
    * @return bool
+   *   TRUE if the query is a simple query which does not require GROUP BY and
+   *   ORDER BY MIN/MAX. Otherwise FALSE.
    */
   protected function isSimpleQuery() {
     return (!$this->pager && !$this->range && !$this->count) || $this->sqlQuery->getMetaData('simple_query');

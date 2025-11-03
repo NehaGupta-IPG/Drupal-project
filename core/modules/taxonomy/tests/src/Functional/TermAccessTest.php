@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Functional;
 
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\TermInterface;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the taxonomy term access permissions.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class TermAccessTest extends TaxonomyTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -21,9 +25,9 @@ class TermAccessTest extends TaxonomyTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Test access control functionality for taxonomy terms.
+   * Tests access control functionality for taxonomy terms.
    */
-  public function testTermAccess() {
+  public function testTermAccess(): void {
     $assert_session = $this->assertSession();
 
     $vocabulary = $this->createVocabulary();
@@ -110,14 +114,16 @@ class TermAccessTest extends TaxonomyTestBase {
    *
    * @param \Drupal\taxonomy\TermInterface $term
    *   A taxonomy term entity.
-   * @param $access_operation
+   * @param string $access_operation
    *   The entity operation, e.g. 'view', 'edit', 'delete', etc.
    * @param bool $access_allowed
    *   Whether the current use has access to the given operation or not.
    * @param string $access_reason
    *   (optional) The reason of the access result.
+   *
+   * @internal
    */
-  protected function assertTermAccess(TermInterface $term, $access_operation, $access_allowed, $access_reason = '') {
+  protected function assertTermAccess(TermInterface $term, string $access_operation, bool $access_allowed, string $access_reason = ''): void {
     $access_result = $term->access($access_operation, NULL, TRUE);
     $this->assertSame($access_allowed, $access_result->isAllowed());
 

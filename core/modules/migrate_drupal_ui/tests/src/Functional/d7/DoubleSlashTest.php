@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal_ui\Functional\d7;
 
-use Drupal\Tests\migrate_drupal_ui\Functional\MigrateUpgradeExecuteTestBase;
 use Drupal\migrate\Plugin\MigrationInterface;
+use Drupal\Tests\migrate_drupal_ui\Functional\MigrateUpgradeExecuteTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that a double slash is not in d7_file file not found migrate messages.
- *
- * @group migrate_drupal_ui
  */
+#[Group('migrate_drupal_ui')]
+#[RunTestsInSeparateProcesses]
 class DoubleSlashTest extends MigrateUpgradeExecuteTestBase {
 
   /**
@@ -36,13 +40,13 @@ class DoubleSlashTest extends MigrateUpgradeExecuteTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->loadFixture(drupal_get_path('module', 'migrate_drupal') . '/tests/fixtures/drupal7.php');
+    $this->loadFixture(\Drupal::service('extension.list.module')->getPath('migrate_drupal') . '/tests/fixtures/drupal7.php');
   }
 
   /**
    * Executes all steps of migrations upgrade.
    */
-  public function testMigrateUpgradeExecute() {
+  public function testMigrateUpgradeExecute(): void {
     // Change fid 1 to a filename that does not exist.
     $this->sourceDatabase
       ->update('file_managed')
@@ -58,10 +62,11 @@ class DoubleSlashTest extends MigrateUpgradeExecuteTestBase {
 
     // Start the upgrade process.
     $this->drupalGet('/upgrade');
-    $this->submitForm([], t('Continue'));
-    $this->submitForm($edits, t('Review upgrade'));
-    $this->submitForm([], t('I acknowledge I may lose data. Continue anyway.'));
-    $this->submitForm([], t('Perform upgrade'));
+    $this->submitForm([], 'Continue');
+    $this->submitForm($edits, 'Review upgrade');
+    $this->submitForm([], 'I acknowledge I may lose data. Continue anyway.');
+    $this->useTestMailCollector();
+    $this->submitForm([], 'Perform upgrade');
 
     // Tests the migration log contains an error message.
     $migration = $this->getMigrationPluginManager()->createInstance('d7_file');
@@ -79,35 +84,35 @@ class DoubleSlashTest extends MigrateUpgradeExecuteTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getSourceBasePath() {
+  protected function getSourceBasePath(): string {
     return __DIR__ . '/files';
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getEntityCounts() {
+  protected function getEntityCounts(): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getEntityCountsIncremental() {
+  protected function getEntityCountsIncremental(): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getAvailablePaths() {
+  protected function getAvailablePaths(): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getMissingPaths() {
+  protected function getMissingPaths(): array {
     return [];
   }
 

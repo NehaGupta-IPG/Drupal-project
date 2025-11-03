@@ -1,14 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Core\Language\LanguageManager;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore xoxo
 /**
- * Verifies that the installer language list combines local and remote languages.
- *
- * @group Installer
+ * Verifies that the installer language list uses local and remote languages.
  */
+#[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class InstallerLanguagePageTest extends InstallerTestBase {
 
   /**
@@ -19,7 +24,7 @@ class InstallerLanguagePageTest extends InstallerTestBase {
   /**
    * Installer step: Select language.
    */
-  protected function setUpLanguage() {
+  protected function setUpLanguage(): void {
     // Place a custom local translation in the translations directory.
     mkdir($this->root . '/' . $this->siteDirectory . '/files/translations', 0777, TRUE);
     touch($this->root . '/' . $this->siteDirectory . '/files/translations/drupal-8.0.0.xoxo.po');
@@ -28,12 +33,12 @@ class InstallerLanguagePageTest extends InstallerTestBase {
     $this->visitInstaller();
     foreach (LanguageManager::getStandardLanguageList() as $langcode => $names) {
       $this->assertSession()->optionExists('edit-langcode', $langcode);
-      $this->assertRaw('>' . $names[1] . '<');
+      $this->assertSession()->responseContains('>' . $names[1] . '<');
     }
 
     // Check that our custom one shows up with the file name indicated language.
     $this->assertSession()->optionExists('edit-langcode', 'xoxo');
-    $this->assertRaw('>xoxo<');
+    $this->assertSession()->responseContains('>xoxo<');
 
     parent::setUpLanguage();
   }
@@ -41,7 +46,7 @@ class InstallerLanguagePageTest extends InstallerTestBase {
   /**
    * Confirms that the installation succeeded.
    */
-  public function testInstalled() {
+  public function testInstalled(): void {
     $this->assertSession()->addressEquals('user/1');
     $this->assertSession()->statusCodeEquals(200);
   }

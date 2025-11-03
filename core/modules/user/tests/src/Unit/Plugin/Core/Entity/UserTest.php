@@ -1,14 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Unit\Plugin\Core\Entity;
 
 use Drupal\Tests\Core\Session\UserSessionTest;
+use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\user\Entity\User
- * @group user
+ * Tests Drupal\user\Entity\User.
  */
+#[CoversClass(User::class)]
+#[Group('user')]
 class UserTest extends UserSessionTest {
 
   /**
@@ -17,12 +23,12 @@ class UserTest extends UserSessionTest {
   protected function createUserSession(array $rids = [], $authenticated = FALSE) {
     $user = $this->getMockBuilder('Drupal\user\Entity\User')
       ->disableOriginalConstructor()
-      ->setMethods(['get', 'id'])
+      ->onlyMethods(['get', 'id'])
       ->getMock();
     $user->expects($this->any())
       ->method('id')
       // @todo Also test the uid = 1 handling.
-      ->will($this->returnValue($authenticated ? 2 : 0));
+      ->willReturn($authenticated ? 2 : 0);
     $roles = [];
     foreach ($rids as $rid) {
       $roles[] = (object) [
@@ -32,7 +38,7 @@ class UserTest extends UserSessionTest {
     $user->expects($this->any())
       ->method('get')
       ->with('roles')
-      ->will($this->returnValue($roles));
+      ->willReturn($roles);
     return $user;
   }
 
@@ -40,9 +46,9 @@ class UserTest extends UserSessionTest {
    * Tests the method getRoles exclude or include locked roles based in param.
    *
    * @see \Drupal\user\Entity\User::getRoles()
-   * @covers ::getRoles
+   * @legacy-covers ::getRoles
    */
-  public function testUserGetRoles() {
+  public function testUserGetRoles(): void {
     // Anonymous user.
     $user = $this->createUserSession([]);
     $this->assertEquals([RoleInterface::ANONYMOUS_ID], $user->getRoles());

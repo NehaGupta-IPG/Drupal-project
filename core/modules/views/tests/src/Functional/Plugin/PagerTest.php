@@ -1,17 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Plugin;
 
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
-use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore eerste laatste volgende vorige
 /**
  * Tests the pluggable pager system.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class PagerTest extends ViewTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -21,12 +26,18 @@ class PagerTest extends ViewTestBase {
    *
    * @var array
    */
-  public static $testViews = ['test_store_pager_settings', 'test_pager_none', 'test_pager_some', 'test_pager_full', 'test_view_pager_full_zero_items_per_page', 'test_view', 'content'];
+  public static $testViews = [
+    'test_store_pager_settings',
+    'test_pager_none',
+    'test_pager_some',
+    'test_pager_full',
+    'test_view_pager_full_zero_items_per_page',
+    'test_view',
+    'content',
+  ];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'views_ui'];
 
@@ -47,7 +58,7 @@ class PagerTest extends ViewTestBase {
    *
    * @see https://www.drupal.org/node/652712
    */
-  public function testStorePagerSettings() {
+  public function testStorePagerSettings(): void {
     // Show the default display so the override selection is shown.
     \Drupal::configFactory()->getEditable('views.settings')->set('ui.show.default_display', TRUE)->save();
 
@@ -57,14 +68,15 @@ class PagerTest extends ViewTestBase {
     ]);
     $this->drupalLogin($admin_user);
     // Test behavior described in
-    //   https://www.drupal.org/node/652712#comment-2354918.
+    // https://www.drupal.org/node/652712#comment-2354918.
 
     $this->drupalGet('admin/structure/views/view/test_view/edit');
 
     $edit = [
       'pager[type]' => 'some',
     ];
-    $this->drupalPostForm('admin/structure/views/nojs/display/test_view/default/pager', $edit, 'Apply');
+    $this->drupalGet('admin/structure/views/nojs/display/test_view/default/pager');
+    $this->submitForm($edit, 'Apply');
 
     $items_per_page = $this->assertSession()->fieldExists("pager_options[items_per_page]");
     $this->assertSession()->fieldValueEquals("pager_options[items_per_page]", 10);
@@ -79,7 +91,8 @@ class PagerTest extends ViewTestBase {
     $edit = [
       'pager[type]' => 'none',
     ];
-    $this->drupalPostForm('admin/structure/views/nojs/display/test_view/default/pager', $edit, 'Apply');
+    $this->drupalGet('admin/structure/views/nojs/display/test_view/default/pager');
+    $this->submitForm($edit, 'Apply');
 
     $offset = $this->assertSession()->fieldExists("pager_options[offset]");
     $this->assertSession()->fieldValueEquals("pager_options[offset]", 0);
@@ -89,7 +102,8 @@ class PagerTest extends ViewTestBase {
     $edit = [
       'pager[type]' => 'full',
     ];
-    $this->drupalPostForm('admin/structure/views/nojs/display/test_view/default/pager', $edit, 'Apply');
+    $this->drupalGet('admin/structure/views/nojs/display/test_view/default/pager');
+    $this->submitForm($edit, 'Apply');
 
     $items_per_page = $this->assertSession()->fieldExists("pager_options[items_per_page]");
     $this->assertSession()->fieldValueEquals("pager_options[items_per_page]", 10);
@@ -100,6 +114,9 @@ class PagerTest extends ViewTestBase {
     $this->assertSession()->fieldValueEquals("pager_options[offset]", 0);
     $this->assertSame('number', $offset->getAttribute('type'));
     $this->assertEquals(0, $offset->getAttribute('min'));
+
+    $this->assertSession()->fieldExists("pager_options[pagination_heading_level]");
+    $this->assertSession()->fieldValueEquals("pager_options[pagination_heading_level]", 'h4');
 
     $id = $this->assertSession()->fieldExists("pager_options[id]");
     $this->assertSession()->fieldValueEquals("pager_options[id]", 0);
@@ -119,19 +136,21 @@ class PagerTest extends ViewTestBase {
     $edit = [
       'pager_options[items_per_page]' => 20,
     ];
-    $this->drupalPostForm('admin/structure/views/nojs/display/test_view/default/pager_options', $edit, 'Apply');
-    $this->assertText('20 items');
+    $this->drupalGet('admin/structure/views/nojs/display/test_view/default/pager_options');
+    $this->submitForm($edit, 'Apply');
+    $this->assertSession()->pageTextContains('20 items');
 
     // Change type and check whether the type is new type is stored.
     $edit = [
       'pager[type]' => 'mini',
     ];
-    $this->drupalPostForm('admin/structure/views/nojs/display/test_view/default/pager', $edit, 'Apply');
+    $this->drupalGet('admin/structure/views/nojs/display/test_view/default/pager');
+    $this->submitForm($edit, 'Apply');
     $this->drupalGet('admin/structure/views/view/test_view/edit');
-    $this->assertText('Mini');
+    $this->assertSession()->pageTextContains('Mini');
 
     // Test behavior described in
-    //   https://www.drupal.org/node/652712#comment-2354400.
+    // https://www.drupal.org/node/652712#comment-2354400.
     $view = Views::getView('test_store_pager_settings');
     // Make it editable in the admin interface.
     $view->save();
@@ -141,41 +160,48 @@ class PagerTest extends ViewTestBase {
     $edit = [
       'pager[type]' => 'full',
     ];
-    $this->drupalPostForm('admin/structure/views/nojs/display/test_store_pager_settings/default/pager', $edit, 'Apply');
+    $this->drupalGet('admin/structure/views/nojs/display/test_store_pager_settings/default/pager');
+    $this->submitForm($edit, 'Apply');
     $this->drupalGet('admin/structure/views/view/test_store_pager_settings/edit');
-    $this->assertText('Full');
+    $this->assertSession()->pageTextContains('Full');
 
     $edit = [
       'pager_options[items_per_page]' => 20,
     ];
-    $this->drupalPostForm('admin/structure/views/nojs/display/test_store_pager_settings/default/pager_options', $edit, 'Apply');
-    $this->assertText('20 items');
+    $this->drupalGet('admin/structure/views/nojs/display/test_store_pager_settings/default/pager_options');
+    $this->submitForm($edit, 'Apply');
+    $this->assertSession()->pageTextContains('20 items');
 
-    // add new display and test the settings again, by override it.
+    // Add new display and test the settings again, by override it.
     $edit = [];
     // Add a display and override the pager settings.
-    $this->drupalPostForm('admin/structure/views/view/test_store_pager_settings/edit', $edit, 'Add Page');
+    $this->drupalGet('admin/structure/views/view/test_store_pager_settings/edit');
+    $this->submitForm($edit, 'Add Page');
     $edit = [
       'override[dropdown]' => 'page_1',
     ];
-    $this->drupalPostForm('admin/structure/views/nojs/display/test_store_pager_settings/page_1/pager', $edit, 'Apply');
+    $this->drupalGet('admin/structure/views/nojs/display/test_store_pager_settings/page_1/pager');
+    $this->submitForm($edit, 'Apply');
 
     $edit = [
       'pager[type]' => 'mini',
     ];
-    $this->drupalPostForm('admin/structure/views/nojs/display/test_store_pager_settings/page_1/pager', $edit, 'Apply');
+    $this->drupalGet('admin/structure/views/nojs/display/test_store_pager_settings/page_1/pager');
+    $this->submitForm($edit, 'Apply');
     $this->drupalGet('admin/structure/views/view/test_store_pager_settings/edit/page_1');
-    $this->assertText('Mini');
+    $this->assertSession()->pageTextContains('Mini');
 
     $edit = [
       'pager_options[items_per_page]' => 10,
     ];
-    $this->drupalPostForm('admin/structure/views/nojs/display/test_store_pager_settings/default/pager_options', $edit, 'Apply');
-    $this->assertText('10 items');
+    $this->drupalGet('admin/structure/views/nojs/display/test_store_pager_settings/default/pager_options');
+    $this->submitForm($edit, 'Apply');
+    $this->assertSession()->pageTextContains('10 items');
     $this->drupalGet('admin/structure/views/view/test_store_pager_settings/edit/page_1');
-    $this->assertText('20 items');
+    $this->assertSession()->pageTextContains('20 items');
 
-    // Test that the override element is only displayed on pager plugin selection form.
+    // Test that the override element is only displayed on pager plugin
+    // selection form.
     $this->drupalGet('admin/structure/views/nojs/display/test_store_pager_settings/page_1/pager');
     $this->assertSession()->fieldValueEquals('override[dropdown]', 'page_1');
     $this->drupalGet('admin/structure/views/nojs/display/test_store_pager_settings/page_1/pager_options');
@@ -205,9 +231,10 @@ class PagerTest extends ViewTestBase {
   /**
    * Tests the none-pager-query.
    */
-  public function testNoLimit() {
+  public function testNoLimit(): void {
     // Create 11 nodes and make sure that everyone is returned.
-    // We create 11 nodes, because the default pager plugin had 10 items per page.
+    // We create 11 nodes, because the default pager plugin had 10 items per
+    // page.
     $this->drupalCreateContentType(['type' => 'page']);
     for ($i = 0; $i < 11; $i++) {
       $this->drupalCreateNode();
@@ -233,10 +260,13 @@ class PagerTest extends ViewTestBase {
     // Check some public functions.
     $this->assertFalse($view->pager->usePager());
     $this->assertFalse($view->pager->useCountQuery());
-    $this->assertEqual(0, $view->pager->getItemsPerPage());
+    $this->assertEquals(0, $view->pager->getItemsPerPage());
   }
 
-  public function testViewTotalRowsWithoutPager() {
+  /**
+   * Tests the total row count in a view without a pager.
+   */
+  public function testViewTotalRowsWithoutPager(): void {
     $this->drupalCreateContentType(['type' => 'page']);
     for ($i = 0; $i < 23; $i++) {
       $this->drupalCreateNode();
@@ -246,15 +276,16 @@ class PagerTest extends ViewTestBase {
     $view->get_total_rows = TRUE;
     $this->executeView($view);
 
-    $this->assertEqual(23, $view->total_rows, "'total_rows' is calculated when pager type is 'none' and 'get_total_rows' is TRUE.");
+    $this->assertEquals(23, $view->total_rows, "'total_rows' is calculated when pager type is 'none' and 'get_total_rows' is TRUE.");
   }
 
   /**
    * Tests the some pager plugin.
    */
-  public function testLimit() {
+  public function testLimit(): void {
     // Create 11 nodes and make sure that everyone is returned.
-    // We create 11 nodes, because the default pager plugin had 10 items per page.
+    // We create 11 nodes, because the default pager plugin had 10 items per
+    // page.
     $this->drupalCreateContentType(['type' => 'page']);
     for ($i = 0; $i < 11; $i++) {
       $this->drupalCreateNode();
@@ -286,9 +317,10 @@ class PagerTest extends ViewTestBase {
   /**
    * Tests the normal pager.
    */
-  public function testNormalPager() {
+  public function testNormalPager(): void {
     // Create 11 nodes and make sure that everyone is returned.
-    // We create 11 nodes, because the default pager plugin had 10 items per page.
+    // We create 11 nodes, because the default pager plugin had 10 items per
+    // page.
     $this->drupalCreateContentType(['type' => 'page']);
     for ($i = 0; $i < 11; $i++) {
       $this->drupalCreateNode();
@@ -312,13 +344,13 @@ class PagerTest extends ViewTestBase {
     $this->executeView($view);
     $this->assertCount(3, $view->result, 'Make sure that only a certain count of items is returned');
 
-    // Test items per page = 0
+    // Test items per page = 0.
     $view = Views::getView('test_view_pager_full_zero_items_per_page');
     $this->executeView($view);
 
     $this->assertCount(11, $view->result, 'All items are return');
 
-    // TODO test number of pages.
+    // @todo Test number of pages.
 
     // Test items per page = 0.
     // Setup and test an offset.
@@ -334,20 +366,80 @@ class PagerTest extends ViewTestBase {
 
     $view->display_handler->setOption('pager', $pager);
     $this->executeView($view);
-    $this->assertEqual(0, $view->pager->getItemsPerPage());
+    $this->assertEquals(0, $view->pager->getItemsPerPage());
     $this->assertCount(11, $view->result);
 
     // Test pager cache contexts.
     $this->drupalGet('test_pager_full');
-    $this->assertCacheContexts(['languages:language_interface', 'theme', 'timezone', 'url.query_args', 'user.node_grants:view']);
+    $this->assertCacheContexts([
+      'languages:language_interface',
+      'theme',
+      'timezone',
+      'url.query_args',
+      'user.node_grants:view',
+    ]);
+
+    // Set "Number of pager links visible" to 1 and check the active page number
+    // on the last page.
+    $view = Views::getView('test_pager_full');
+    $view->setDisplay();
+    $pager = [
+      'type' => 'full',
+      'options' => [
+        'items_per_page' => 5,
+        'quantity' => 1,
+      ],
+    ];
+    $view->display_handler->setOption('pager', $pager);
+    $view->save();
+    $this->drupalGet('test_pager_full', ['query' => ['page' => 2]]);
+    $this->assertEquals('Page 3', $this->assertSession()->elementExists('css', '.pager__items li.is-active')->getText());
+    $link = $this->assertSession()->elementExists('css', '.pager__items li.is-active a');
+    $this->assertSame('page', $link->getAttribute('aria-current'));
+    $this->assertSame('Current page', $link->getAttribute('title'));
+  }
+
+  /**
+   * Tests changing the heading level.
+   */
+  public function testPagerHeadingLevel(): void {
+    // Create 2 nodes and make sure that everyone is returned.
+    $this->drupalCreateContentType(['type' => 'page']);
+    for ($i = 0; $i < 2; $i++) {
+      $this->drupalCreateNode();
+    }
+
+    // Set "Pager Heading" to h2 and check that it is correct.
+    $view = Views::getView('test_pager_full');
+    $view->setDisplay();
+    $pager = [
+      'type' => 'full',
+      'options' => [
+        'pagination_heading_level' => 'h2',
+        'items_per_page' => 1,
+        'quantity' => 1,
+      ],
+    ];
+    $view->display_handler->setOption('pager', $pager);
+    $view->save();
+
+    $themes = ['stark', 'olivero', 'claro', 'starterkit_theme', 'stable9'];
+    $this->container->get('theme_installer')->install($themes);
+
+    foreach ($themes as $theme) {
+      $this->config('system.theme')->set('default', $theme)->save();
+      $this->drupalGet('test_pager_full');
+      $this->assertEquals('h2', $this->assertSession()->elementExists('css', ".pager .visually-hidden")->getTagName());
+    }
   }
 
   /**
    * Tests rendering with NULL pager.
    */
-  public function testRenderNullPager() {
+  public function testRenderNullPager(): void {
     // Create 11 nodes and make sure that everyone is returned.
-    // We create 11 nodes, because the default pager plugin had 10 items per page.
+    // We create 11 nodes, because the default pager plugin had 10 items per
+    // page.
     $this->drupalCreateContentType(['type' => 'page']);
     for ($i = 0; $i < 11; $i++) {
       $this->drupalCreateNode();
@@ -358,14 +450,14 @@ class PagerTest extends ViewTestBase {
     $view->setAjaxEnabled(TRUE);
     $view->pager = NULL;
     $output = $view->render();
-    $output = \Drupal::service('renderer')->renderRoot($output);
-    $this->assertEqual(0, preg_match('/<ul class="pager">/', $output), 'The pager is not rendered.');
+    $output = (string) \Drupal::service('renderer')->renderRoot($output);
+    $this->assertStringNotContainsString('<ul class="pager">', $output);
   }
 
   /**
-   * Test the api functions on the view object.
+   * Tests the api functions on the view object.
    */
-  public function testPagerApi() {
+  public function testPagerApi(): void {
     $view = Views::getView('test_pager_full');
     $view->setDisplay();
     // On the first round don't initialize the pager.
@@ -373,17 +465,17 @@ class PagerTest extends ViewTestBase {
     $this->assertNull($view->getItemsPerPage(), 'If the pager is not initialized and no manual override there is no items per page.');
     $rand_number = rand(1, 5);
     $view->setItemsPerPage($rand_number);
-    $this->assertEqual($rand_number, $view->getItemsPerPage(), 'Make sure getItemsPerPage uses the settings of setItemsPerPage.');
+    $this->assertEquals($rand_number, $view->getItemsPerPage(), 'Make sure getItemsPerPage uses the settings of setItemsPerPage.');
 
     $this->assertNull($view->getOffset(), 'If the pager is not initialized and no manual override there is no offset.');
     $rand_number = rand(1, 5);
     $view->setOffset($rand_number);
-    $this->assertEqual($rand_number, $view->getOffset(), 'Make sure getOffset uses the settings of setOffset.');
+    $this->assertEquals($rand_number, $view->getOffset(), 'Make sure getOffset uses the settings of setOffset.');
 
     $this->assertNull($view->getCurrentPage(), 'If the pager is not initialized and no manual override there is no current page.');
     $rand_number = rand(1, 5);
     $view->setCurrentPage($rand_number);
-    $this->assertEqual($rand_number, $view->getCurrentPage(), 'Make sure getCurrentPage uses the settings of set_current_page.');
+    $this->assertEquals($rand_number, $view->getCurrentPage(), 'Make sure getCurrentPage uses the settings of set_current_page.');
 
     $view->destroy();
 
@@ -392,36 +484,36 @@ class PagerTest extends ViewTestBase {
     $view->initQuery();
     $view->initPager();
 
-    $this->assertEqual(5, $view->getItemsPerPage(), 'Per default the view has 5 items per page.');
+    $this->assertEquals(5, $view->getItemsPerPage(), 'Per default the view has 5 items per page.');
     $rand_number = rand(1, 5);
     $view->setItemsPerPage($rand_number);
     $rand_number = rand(6, 11);
     $view->pager->setItemsPerPage($rand_number);
-    $this->assertEqual($rand_number, $view->getItemsPerPage(), 'Make sure getItemsPerPage uses the settings of setItemsPerPage.');
+    $this->assertEquals($rand_number, $view->getItemsPerPage(), 'Make sure getItemsPerPage uses the settings of setItemsPerPage.');
 
-    $this->assertEqual(0, $view->getOffset(), 'Per default a view has a 0 offset.');
+    $this->assertEquals(0, $view->getOffset(), 'Per default a view has a 0 offset.');
     $rand_number = rand(1, 5);
     $view->setOffset($rand_number);
     $rand_number = rand(6, 11);
     $view->pager->setOffset($rand_number);
-    $this->assertEqual($rand_number, $view->getOffset(), 'Make sure getOffset uses the settings of setOffset.');
+    $this->assertEquals($rand_number, $view->getOffset(), 'Make sure getOffset uses the settings of setOffset.');
 
-    $this->assertEqual(0, $view->getCurrentPage(), 'Per default the current page is 0.');
+    $this->assertEquals(0, $view->getCurrentPage(), 'Per default the current page is 0.');
     $rand_number = rand(1, 5);
     $view->setCurrentPage($rand_number);
     $rand_number = rand(6, 11);
     $view->pager->setCurrentPage($rand_number);
-    $this->assertEqual($rand_number, $view->getCurrentPage(), 'Make sure getCurrentPage uses the settings of set_current_page.');
+    $this->assertEquals($rand_number, $view->getCurrentPage(), 'Make sure getCurrentPage uses the settings of set_current_page.');
 
     // Set an invalid page and make sure the method takes care about it.
     $view->setCurrentPage(-1);
-    $this->assertEqual(0, $view->getCurrentPage(), 'Make sure setCurrentPage always sets a valid page number.');
+    $this->assertEquals(0, $view->getCurrentPage(), 'Make sure setCurrentPage always sets a valid page number.');
   }
 
   /**
    * Tests translating the pager using config_translation.
    */
-  public function testPagerConfigTranslation() {
+  public function testPagerConfigTranslation(): void {
     $view = Views::getView('content');
     $display = &$view->storage->getDisplay('default');
     $display['display_options']['pager']['options']['items_per_page'] = 5;
@@ -453,7 +545,8 @@ class PagerTest extends ViewTestBase {
       'translation[config_names][views.view.content][display][default][display_options][pager][options][tags][next]' => 'Volgende ›',
       'translation[config_names][views.view.content][display][default][display_options][pager][options][tags][last]' => 'Laatste »',
     ];
-    $this->drupalPostForm('admin/structure/views/view/content/translate/nl/edit', $edit, 'Save translation');
+    $this->drupalGet('admin/structure/views/view/content/translate/nl/edit');
+    $this->submitForm($edit, 'Save translation');
 
     // We create 11 nodes, this will give us 3 pages.
     $this->drupalCreateContentType(['type' => 'page']);
@@ -463,23 +556,23 @@ class PagerTest extends ViewTestBase {
 
     // Go to the second page so we see both previous and next buttons.
     $this->drupalGet('nl/admin/content', ['query' => ['page' => 1]]);
-    // Translation mapping..
+    // Translation mapping.
     $labels = [
       '« First' => '« Eerste',
       '‹ Previous' => '‹ Vorige',
       'Next ›' => 'Volgende ›',
       'Last »' => 'Laatste »',
     ];
-    foreach ($labels as $label => $translation) {
+    foreach ($labels as $translation) {
       // Check if we can find the translation.
-      $this->assertRaw($translation);
+      $this->assertSession()->pageTextContains($translation);
     }
   }
 
   /**
    * Tests translating the pager using locale.
    */
-  public function testPagerLocale() {
+  public function testPagerLocale(): void {
     // Enable locale and language module.
     $this->container->get('module_installer')->install(['locale', 'language']);
     $this->resetAll();
@@ -519,7 +612,7 @@ class PagerTest extends ViewTestBase {
     $this->drupalGet('nl/test_pager_full', ['query' => ['page' => 1]]);
     foreach ($labels as $label => $translation) {
       // Check if we can find the translation.
-      $this->assertRaw($translation);
+      $this->assertSession()->pageTextContains($translation);
     }
   }
 

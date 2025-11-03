@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\jqueryui_library_assets_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
@@ -21,7 +23,7 @@ class JqueryUiTestAssetsController extends ControllerBase {
   public function build($library) {
     // If there are pipes in $library, they are separating multiple library
     // names.
-    if (strpos($library, '|') !== FALSE) {
+    if (str_contains($library, '|')) {
       $library = explode('|', $library);
       $library = array_map(function ($item) {
         return "core/$item";

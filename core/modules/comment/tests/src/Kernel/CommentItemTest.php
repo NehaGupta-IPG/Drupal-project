@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Kernel;
 
 use Drupal\comment\Entity\Comment;
@@ -8,23 +10,26 @@ use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\Tests\field\Kernel\FieldKernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the new entity API for the comment field type.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentItemTest extends FieldKernelTestBase {
 
   use CommentTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['comment', 'entity_test', 'user'];
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('comment');
@@ -35,7 +40,7 @@ class CommentItemTest extends FieldKernelTestBase {
   /**
    * Tests using entity fields of the comment field type.
    */
-  public function testCommentItem() {
+  public function testCommentItem(): void {
     $this->addDefaultCommentField('entity_test', 'entity_test', 'comment');
 
     // Verify entity creation.
@@ -63,13 +68,13 @@ class CommentItemTest extends FieldKernelTestBase {
     ], 'Comment status value in defined range');
 
     $mainProperty = $entity->comment[0]->mainPropertyName();
-    $this->assertEqual('status', $mainProperty);
+    $this->assertEquals('status', $mainProperty);
   }
 
   /**
    * Tests comment author name.
    */
-  public function testCommentAuthorName() {
+  public function testCommentAuthorName(): void {
     $this->installEntitySchema('comment');
     $this->addDefaultCommentField('entity_test', 'entity_test', 'comment');
 

@@ -1,18 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
+
+use Drupal\entity_test\EntityTestHelper;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests adding a custom bundle field.
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityBundleFieldTest extends EntityKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_schema_test', 'entity_test_update'];
 
@@ -44,8 +48,8 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
   /**
    * Tests making use of a custom bundle field.
    */
-  public function testCustomBundleFieldUsage() {
-    entity_test_create_bundle('custom', NULL, 'entity_test_update');
+  public function testCustomBundleFieldUsage(): void {
+    EntityTestHelper::createBundle('custom', NULL, 'entity_test_update');
 
     // Check that an entity with bundle entity_test does not have the custom
     // field.
@@ -64,19 +68,19 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
 
     // Ensure that the field exists in the field map.
     $field_map = \Drupal::service('entity_field.manager')->getFieldMap();
-    $this->assertEqual(['type' => 'string', 'bundles' => ['custom' => 'custom']], $field_map['entity_test_update']['custom_bundle_field']);
+    $this->assertEquals(['type' => 'string', 'bundles' => ['custom' => 'custom']], $field_map['entity_test_update']['custom_bundle_field']);
 
     $entity->custom_bundle_field->value = 'swanky';
     $entity->save();
     $storage->resetCache();
     $entity = $storage->load($entity->id());
-    $this->assertEqual('swanky', $entity->custom_bundle_field->value, 'Entity was saved correctly');
+    $this->assertEquals('swanky', $entity->custom_bundle_field->value, 'Entity was saved correctly');
 
     $entity->custom_bundle_field->value = 'cozy';
     $entity->save();
     $storage->resetCache();
     $entity = $storage->load($entity->id());
-    $this->assertEqual('cozy', $entity->custom_bundle_field->value, 'Entity was updated correctly.');
+    $this->assertEquals('cozy', $entity->custom_bundle_field->value, 'Entity was updated correctly.');
 
     $entity->delete();
     /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
@@ -92,7 +96,7 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
     // bundle is deleted.
     $entity = $storage->create(['type' => 'custom', 'custom_bundle_field' => 'new']);
     $entity->save();
-    entity_test_delete_bundle('custom', 'entity_test_update');
+    EntityTestHelper::deleteBundle('custom', 'entity_test_update');
 
     $table = $table_mapping->getDedicatedDataTableName($entity->getFieldDefinition('custom_bundle_field')->getFieldStorageDefinition(), TRUE);
     $result = $this->database->select($table, 'f')
@@ -100,7 +104,7 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
       ->condition('deleted', 1)
       ->countQuery()
       ->execute();
-    $this->assertEqual(1, $result->fetchField(), 'Field data has been deleted');
+    $this->assertEquals(1, $result->fetchField(), 'Field data has been deleted');
 
     // Ensure that the field no longer exists in the field map.
     $field_map = \Drupal::service('entity_field.manager')->getFieldMap();

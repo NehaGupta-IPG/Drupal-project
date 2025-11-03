@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config_translation\Unit;
 
 use Drupal\config_translation\ConfigFieldMapper;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the functionality provided by the configuration field mapper.
- *
- * @group config_translation
- *
- * @coversDefaultClass \Drupal\config_translation\ConfigFieldMapper
  */
+#[CoversClass(ConfigFieldMapper::class)]
+#[Group('config_translation')]
 class ConfigFieldMapperTest extends UnitTestCase {
 
   /**
@@ -38,7 +40,7 @@ class ConfigFieldMapperTest extends UnitTestCase {
   /**
    * The mocked event dispatcher.
    *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $eventDispatcher;
 
@@ -46,6 +48,8 @@ class ConfigFieldMapperTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->entityTypeManager = $this->createMock('Drupal\Core\Entity\EntityTypeManagerInterface');
     $this->entity = $this->createMock('Drupal\field\FieldConfigInterface');
 
@@ -61,7 +65,7 @@ class ConfigFieldMapperTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
 
-    $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+    $this->eventDispatcher = $this->createMock('Symfony\Contracts\EventDispatcher\EventDispatcherInterface');
 
     $this->configFieldMapper = new ConfigFieldMapper(
       'node_fields',
@@ -81,30 +85,30 @@ class ConfigFieldMapperTest extends UnitTestCase {
   /**
    * Tests ConfigFieldMapper::setEntity().
    *
-   * @covers ::setEntity
+   * @legacy-covers ::setEntity
    */
-  public function testSetEntity() {
+  public function testSetEntity(): void {
     $entity_type = $this->createMock('Drupal\Core\Config\Entity\ConfigEntityTypeInterface');
     $entity_type
       ->expects($this->any())
       ->method('getConfigPrefix')
-      ->will($this->returnValue('config_prefix'));
+      ->willReturn('config_prefix');
 
     $this->entityTypeManager
       ->expects($this->any())
       ->method('getDefinition')
-      ->will($this->returnValue($entity_type));
+      ->willReturn($entity_type);
 
     $field_storage = $this->createMock('Drupal\field\FieldStorageConfigInterface');
     $field_storage
       ->expects($this->any())
       ->method('id')
-      ->will($this->returnValue('field_storage_id'));
+      ->willReturn('field_storage_id');
 
     $this->entity
       ->expects($this->any())
       ->method('getFieldStorageDefinition')
-      ->will($this->returnValue($field_storage));
+      ->willReturn($field_storage);
 
     $result = $this->configFieldMapper->setEntity($this->entity);
     $this->assertTrue($result);

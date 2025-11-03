@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Render;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * Tests the TranslatableMarkup class.
- *
- * @coversDefaultClass \Drupal\Component\Render\FormattableMarkup
- * @group utility
  */
+#[CoversClass(FormattableMarkup::class)]
+#[Group('utility')]
 class FormattableMarkupTest extends TestCase {
 
   use ExpectDeprecationTrait;
@@ -31,23 +35,23 @@ class FormattableMarkupTest extends TestCase {
   protected $lastErrorNumber;
 
   /**
-   * @covers ::__toString
-   * @covers ::jsonSerialize
+   * @legacy-covers ::__toString
+   * @legacy-covers ::jsonSerialize
    */
-  public function testToString() {
-    $string = 'Can I please have a @replacement';
+  public function testToString(): void {
+    $string = 'Can I have a @replacement';
     $formattable_string = new FormattableMarkup($string, ['@replacement' => 'kitten']);
     $text = (string) $formattable_string;
-    $this->assertEquals('Can I please have a kitten', $text);
+    $this->assertEquals('Can I have a kitten', $text);
     $text = $formattable_string->jsonSerialize();
-    $this->assertEquals('Can I please have a kitten', $text);
+    $this->assertEquals('Can I have a kitten', $text);
   }
 
   /**
-   * @covers ::count
+   * @legacy-covers ::count
    */
-  public function testCount() {
-    $string = 'Can I please have a @replacement';
+  public function testCount(): void {
+    $string = 'Can I have a @replacement';
     $formattable_string = new FormattableMarkup($string, ['@replacement' => 'kitten']);
     $this->assertEquals(strlen($string), $formattable_string->count());
   }
@@ -64,17 +68,18 @@ class FormattableMarkupTest extends TestCase {
    * @param string $error_message
    *   The error message.
    */
-  public function errorHandler($error_number, $error_message) {
+  public function errorHandler($error_number, $error_message): void {
     $this->lastErrorNumber = $error_number;
     $this->lastErrorMessage = $error_message;
   }
 
   /**
-   * @covers ::__toString
-   * @dataProvider providerTestUnexpectedPlaceholder
+   * @legacy-covers ::__toString
    */
-  public function testUnexpectedPlaceholder($string, $arguments, $error_number, $error_message) {
-    // We set a custom error handler because of https://github.com/sebastianbergmann/phpunit/issues/487
+  #[DataProvider('providerTestUnexpectedPlaceholder')]
+  public function testUnexpectedPlaceholder($string, $arguments, $error_number, $error_message): void {
+    // We set a custom error handler because of
+    // https://github.com/sebastianbergmann/phpunit/issues/487
     set_error_handler([$this, 'errorHandler']);
     // We want this to trigger an error.
     $markup = new FormattableMarkup($string, $arguments);
@@ -91,25 +96,17 @@ class FormattableMarkupTest extends TestCase {
    * Data provider for FormattableMarkupTest::testUnexpectedPlaceholder().
    *
    * @return array
+   *   An array of test cases.
    */
-  public function providerTestUnexpectedPlaceholder() {
+  public static function providerTestUnexpectedPlaceholder() {
     return [
-      ['Non alpha starting character: ~placeholder', ['~placeholder' => 'replaced'], E_USER_WARNING, 'Invalid placeholder (~placeholder) with string: "Non alpha starting character: ~placeholder"'],
-      ['Alpha starting character: placeholder', ['placeholder' => 'replaced'], E_USER_WARNING, 'Invalid placeholder (placeholder) with string: "Alpha starting character: placeholder"'],
+      ['Non alpha, non-allowed starting character: ~placeholder', ['~placeholder' => 'replaced'], E_USER_WARNING, 'Placeholders must begin with one of the following "@", ":" or "%", invalid placeholder (~placeholder) with string: "Non alpha, non-allowed starting character: ~placeholder"'],
+      ['Alpha starting character: placeholder', ['placeholder' => 'replaced'], NULL, ''],
       // Ensure that where the placeholder is located in the string is
       // irrelevant.
-      ['placeholder', ['placeholder' => 'replaced'], E_USER_WARNING, 'Invalid placeholder (placeholder) with string: "placeholder"'],
+      ['placeholder', ['placeholder' => 'replaced'], NULL, ''],
+      ['No replacements', ['foo' => 'bar'], NULL, ''],
     ];
-  }
-
-  /**
-   * @group legacy
-   */
-  public function testNoReplacementUnsupportedVariable() {
-    $this->expectDeprecation('Support for keys without a placeholder prefix is deprecated in Drupal 9.1.0 and will be removed in Drupal 10.0.0. Invalid placeholder (foo) with string: "No replacements"');
-    $markup = new FormattableMarkup('No replacements', ['foo' => 'bar']);
-    // Cast it to a string which will generate the deprecation notice.
-    $output = (string) $markup;
   }
 
 }

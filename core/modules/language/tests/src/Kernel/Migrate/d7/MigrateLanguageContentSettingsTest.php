@@ -1,16 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\language\Kernel\Migrate\d7;
 
 use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests migration of language content setting variables,
- * language_content_type_$type, i18n_node_options_* and i18n_lock_node_*.
+ * Tests the migration of language-related settings.
  *
- * @group migrate_drupal_7
+ * Settings tested include the language content setting variables,
+ * language_content_type_$type, i18n_node_options_* and i18n_lock_node_*.
  */
+#[Group('migrate_drupal_7')]
+#[RunTestsInSeparateProcesses]
 class MigrateLanguageContentSettingsTest extends MigrateDrupal7TestBase {
 
   /**
@@ -31,13 +37,16 @@ class MigrateLanguageContentSettingsTest extends MigrateDrupal7TestBase {
     parent::setUp();
 
     $this->migrateContentTypes();
-    $this->executeMigration('d7_language_content_settings');
+    $this->executeMigrations([
+      'language',
+      'd7_language_content_settings',
+    ]);
   }
 
   /**
    * Tests migration of content language settings.
    */
-  public function testLanguageContent() {
+  public function testLanguageContent(): void {
     // Assert that a translatable content is still translatable.
     $config = $this->config('language.content_settings.node.blog');
     $this->assertSame($config->get('target_entity_type_id'), 'node');
@@ -69,7 +78,7 @@ class MigrateLanguageContentSettingsTest extends MigrateDrupal7TestBase {
     $this->assertSame($config->get('default_langcode'), 'und');
 
     // Assert that a content type without a 'language_content_type' variable is
-    // not translatable
+    // not translatable.
     $config = ContentLanguageSettings::loadByEntityTypeBundle('node', 'book');
     $this->assertTrue($config->isDefaultConfiguration());
     $this->assertFalse($config->isLanguageAlterable());

@@ -1,19 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Database;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the hook_query_alter capabilities of the Select builder.
  *
- * @group Database
  * @see database_test_query_alter()
  */
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class AlterTest extends DatabaseTestBase {
 
   /**
    * Tests that we can do basic alters.
    */
-  public function testSimpleAlter() {
+  public function testSimpleAlter(): void {
     $query = $this->connection->select('test');
     $query->addField('test', 'name');
     $query->addField('test', 'age', 'age');
@@ -27,7 +33,7 @@ class AlterTest extends DatabaseTestBase {
   /**
    * Tests that we can alter the joins on a query.
    */
-  public function testAlterWithJoin() {
+  public function testAlterWithJoin(): void {
     $query = $this->connection->select('test_task');
     $tid_field = $query->addField('test_task', 'tid');
     $task_field = $query->addField('test_task', 'task');
@@ -40,18 +46,18 @@ class AlterTest extends DatabaseTestBase {
 
     $this->assertCount(2, $records, 'Returned the correct number of rows.');
 
-    $this->assertEqual('George', $records[0]->name, 'Correct data retrieved.');
-    $this->assertEqual(4, $records[0]->{$tid_field}, 'Correct data retrieved.');
-    $this->assertEqual('sing', $records[0]->{$task_field}, 'Correct data retrieved.');
-    $this->assertEqual('George', $records[1]->name, 'Correct data retrieved.');
-    $this->assertEqual(5, $records[1]->{$tid_field}, 'Correct data retrieved.');
-    $this->assertEqual('sleep', $records[1]->{$task_field}, 'Correct data retrieved.');
+    $this->assertEquals('George', $records[0]->name, 'Correct data retrieved.');
+    $this->assertEquals(4, $records[0]->{$tid_field}, 'Correct data retrieved.');
+    $this->assertEquals('sing', $records[0]->{$task_field}, 'Correct data retrieved.');
+    $this->assertEquals('George', $records[1]->name, 'Correct data retrieved.');
+    $this->assertEquals(5, $records[1]->{$tid_field}, 'Correct data retrieved.');
+    $this->assertEquals('sleep', $records[1]->{$task_field}, 'Correct data retrieved.');
   }
 
   /**
    * Tests that we can alter a query's conditionals.
    */
-  public function testAlterChangeConditional() {
+  public function testAlterChangeConditional(): void {
     $query = $this->connection->select('test_task');
     $tid_field = $query->addField('test_task', 'tid');
     $pid_field = $query->addField('test_task', 'pid');
@@ -67,16 +73,16 @@ class AlterTest extends DatabaseTestBase {
     $records = $result->fetchAll();
 
     $this->assertCount(1, $records, 'Returned the correct number of rows.');
-    $this->assertEqual('John', $records[0]->{$name_field}, 'Correct data retrieved.');
-    $this->assertEqual(2, $records[0]->{$tid_field}, 'Correct data retrieved.');
-    $this->assertEqual(1, $records[0]->{$pid_field}, 'Correct data retrieved.');
-    $this->assertEqual('sleep', $records[0]->{$task_field}, 'Correct data retrieved.');
+    $this->assertEquals('John', $records[0]->{$name_field}, 'Correct data retrieved.');
+    $this->assertEquals(2, $records[0]->{$tid_field}, 'Correct data retrieved.');
+    $this->assertEquals(1, $records[0]->{$pid_field}, 'Correct data retrieved.');
+    $this->assertEquals('sleep', $records[0]->{$task_field}, 'Correct data retrieved.');
   }
 
   /**
    * Tests that we can alter the fields of a query.
    */
-  public function testAlterChangeFields() {
+  public function testAlterChangeFields(): void {
     $query = $this->connection->select('test');
     $name_field = $query->addField('test', 'name');
     $age_field = $query->addField('test', 'age', 'age');
@@ -84,14 +90,14 @@ class AlterTest extends DatabaseTestBase {
     $query->addTag('database_test_alter_change_fields');
 
     $record = $query->execute()->fetch();
-    $this->assertEqual('George', $record->{$name_field}, 'Correct data retrieved.');
+    $this->assertEquals('George', $record->{$name_field}, 'Correct data retrieved.');
     $this->assertFalse(isset($record->$age_field), 'Age field not found, as intended.');
   }
 
   /**
    * Tests that we can alter expressions in the query.
    */
-  public function testAlterExpression() {
+  public function testAlterExpression(): void {
     $query = $this->connection->select('test');
     $name_field = $query->addField('test', 'name');
     $age_field = $query->addExpression("[age]*2", 'double_age');
@@ -102,8 +108,8 @@ class AlterTest extends DatabaseTestBase {
     // Ensure that we got the right record.
     $record = $result->fetch();
 
-    $this->assertEqual('George', $record->{$name_field}, 'Fetched name is correct.');
-    $this->assertEqual(27 * 3, $record->{$age_field}, 'Fetched age expression is correct.');
+    $this->assertEquals('George', $record->{$name_field}, 'Fetched name is correct.');
+    $this->assertEquals(27 * 3, $record->{$age_field}, 'Fetched age expression is correct.');
   }
 
   /**
@@ -111,7 +117,7 @@ class AlterTest extends DatabaseTestBase {
    *
    * This also tests hook_query_TAG_alter().
    */
-  public function testAlterRemoveRange() {
+  public function testAlterRemoveRange(): void {
     $query = $this->connection->select('test');
     $query->addField('test', 'name');
     $query->addField('test', 'age', 'age');
@@ -120,13 +126,13 @@ class AlterTest extends DatabaseTestBase {
 
     $num_records = count($query->execute()->fetchAll());
 
-    $this->assertEqual(4, $num_records, 'Returned the correct number of rows.');
+    $this->assertEquals(4, $num_records, 'Returned the correct number of rows.');
   }
 
   /**
    * Tests that we can do basic alters on subqueries.
    */
-  public function testSimpleAlterSubquery() {
+  public function testSimpleAlterSubquery(): void {
     // Create a sub-query with an alter tag.
     $subquery = $this->connection->select('test', 'p');
     $subquery->addField('p', 'name');
@@ -144,8 +150,8 @@ class AlterTest extends DatabaseTestBase {
     $name_field = $query->addField('pq', 'name');
 
     $record = $query->execute()->fetch();
-    $this->assertEqual('George', $record->{$name_field}, 'Fetched name is correct.');
-    $this->assertEqual(27 * 3, $record->{$age_field}, 'Fetched age expression is correct.');
+    $this->assertEquals('George', $record->{$name_field}, 'Fetched name is correct.');
+    $this->assertEquals(27 * 3, $record->{$age_field}, 'Fetched age expression is correct.');
   }
 
 }

@@ -5,8 +5,15 @@ namespace Drupal\node\Plugin\migrate\source\d7;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\migrate\Row;
 
+// cspell:ignore tnid
+
 /**
- * Gets all node revisions from the source, including translation revisions.
+ * Drupal 7 all node revisions source, including translation revisions.
+ *
+ * For available configuration keys, refer to the parent classes.
+ *
+ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+ * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
  *
  * @MigrateSource(
  *   id = "d7_node_complete",

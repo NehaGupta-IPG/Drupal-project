@@ -1,15 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal\Kernel\d7;
 
 use Drupal\node\Entity\Node;
 use Drupal\Tests\file\Kernel\Migrate\d7\FileMigrationSetupTrait;
+use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests follow-up migrations.
- *
- * @group migrate_drupal
  */
+#[Group('migrate_drupal')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class FollowUpMigrationsTest extends MigrateDrupal7TestBase {
 
   use FileMigrationSetupTrait;
@@ -21,12 +28,11 @@ class FollowUpMigrationsTest extends MigrateDrupal7TestBase {
     'content_translation',
     'comment',
     'datetime',
+    'datetime_range',
     'image',
     'language',
     'link',
     'menu_ui',
-    // A requirement for translation migrations.
-    'migrate_drupal_multilingual',
     'node',
     'taxonomy',
     'telephone',
@@ -44,37 +50,38 @@ class FollowUpMigrationsTest extends MigrateDrupal7TestBase {
     $this->installEntitySchema('comment');
     $this->installSchema('node', ['node_access']);
 
-    $this->migrateUsers();
     $this->migrateFields();
+    $this->migrateUsers();
     $this->executeMigrations([
       'language',
       'd7_language_content_settings',
       'd7_taxonomy_vocabulary',
-      'd7_node',
-      'd7_node_translation',
     ]);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getFileMigrationInfo() {
+  protected function getFileMigrationInfo(): array {
     return [
       'path' => 'public://sites/default/files/cube.jpeg',
-      'size' => '3620',
+      'size' => 3620,
       'base_path' => 'public://',
       'plugin_id' => 'd7_file',
     ];
   }
 
   /**
-   * Test entity reference translations.
+   * Tests entity reference translations.
    */
-  public function testEntityReferenceTranslations() {
+  #[DataProvider('providerTestEntityReferenceTranslations')]
+  public function testEntityReferenceTranslations($node_migrations): void {
+    $this->executeMigrations($node_migrations);
+
     // Test the entity reference field before the follow-up migrations.
     $node = Node::load(2);
     $this->assertSame('5', $node->get('field_reference')->target_id);
-    $this->assertSame('5', $node->get('field_reference_2')->target_id);
+    $this->assertSame('6', $node->get('field_reference_2')->target_id);
     $translation = $node->getTranslation('is');
     $this->assertSame('4', $translation->get('field_reference')->target_id);
     $this->assertSame('4', $translation->get('field_reference_2')->target_id);
@@ -86,6 +93,9 @@ class FollowUpMigrationsTest extends MigrateDrupal7TestBase {
     $this->assertSame('2', $translation->get('field_reference')->target_id);
     $this->assertSame('2', $translation->get('field_reference_2')->target_id);
 
+    $user = User::load(2);
+    $this->assertSame('3', $user->get('field_reference')->target_id);
+
     // Run the follow-up migrations.
     $migration_plugin_manager = $this->container->get('plugin.manager.migration');
     $migration_plugin_manager->clearCachedDefinitions();
@@ -95,7 +105,7 @@ class FollowUpMigrationsTest extends MigrateDrupal7TestBase {
     // Test the entity reference field after the follow-up migrations.
     $node = Node::load(2);
     $this->assertSame('4', $node->get('field_reference')->target_id);
-    $this->assertSame('4', $node->get('field_reference_2')->target_id);
+    $this->assertSame('6', $node->get('field_reference_2')->target_id);
     $translation = $node->getTranslation('is');
     $this->assertSame('4', $translation->get('field_reference')->target_id);
     $this->assertSame('4', $translation->get('field_reference_2')->target_id);
@@ -106,6 +116,23 @@ class FollowUpMigrationsTest extends MigrateDrupal7TestBase {
     $translation = $node->getTranslation('en');
     $this->assertSame('2', $translation->get('field_reference')->target_id);
     $this->assertSame('2', $translation->get('field_reference_2')->target_id);
+
+    $user = User::load(2);
+    $this->assertSame('2', $user->get('field_reference')->target_id);
+  }
+
+  /**
+   * Data provider for testEntityReferenceTranslations().
+   */
+  public static function providerTestEntityReferenceTranslations() {
+    return [
+      [
+        ['d7_node', 'd7_node_translation'],
+      ],
+      [
+        ['d7_node_complete'],
+      ],
+    ];
   }
 
 }

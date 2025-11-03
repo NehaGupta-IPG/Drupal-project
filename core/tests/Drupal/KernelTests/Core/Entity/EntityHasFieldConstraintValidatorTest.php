@@ -1,15 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Entity\Plugin\Validation\Constraint\EntityHasFieldConstraintValidator;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @covers \Drupal\Core\Entity\Plugin\Validation\Constraint\EntityHasFieldConstraintValidator
- *
- * @group Entity
+ * Tests Entity Has Field Constraint Validator.
  */
+#[Group('Entity')]
+#[CoversClass(EntityHasFieldConstraintValidator::class)]
+#[RunTestsInSeparateProcesses]
 class EntityHasFieldConstraintValidatorTest extends EntityKernelTestBase {
 
   /**
@@ -26,7 +33,10 @@ class EntityHasFieldConstraintValidatorTest extends EntityKernelTestBase {
     $this->createUser();
   }
 
-  public function testValidation() {
+  /**
+   * Tests validation of an entity with a field.
+   */
+  public function testValidation(): void {
     $this->state->set('entity_test_constraints.build', [
       'EntityHasField' => 'body',
     ]);
@@ -47,7 +57,7 @@ class EntityHasFieldConstraintValidatorTest extends EntityKernelTestBase {
     // field has been created.
     $violations = $entity->validate();
     $this->assertCount(1, $violations);
-    $this->assertEquals($violations[0]->getMessage(), 'The entity must have the <em class="placeholder">body</em> field.');
+    $this->assertEquals('The entity must have the body field.', $violations[0]->getMessage());
     $storage->save($entity);
 
     // Create the field.

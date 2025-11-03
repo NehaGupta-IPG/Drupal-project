@@ -1,20 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel\Migrate\d6;
 
+use Drupal\Core\Database\Database;
+use Drupal\file\Entity\File;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\Tests\file\Kernel\Migrate\d6\FileMigrationTestTrait;
-use Drupal\user\Entity\User;
-use Drupal\file\Entity\File;
-use Drupal\Core\Database\Database;
-use Drupal\user\RoleInterface;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use Drupal\user\Entity\User;
+use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Users migration.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateUserTest extends MigrateDrupal6TestBase {
 
   use FileMigrationTestTrait;
@@ -22,7 +26,7 @@ class MigrateUserTest extends MigrateDrupal6TestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['language'];
+  protected static $modules = ['language', 'phpass'];
 
   /**
    * {@inheritdoc}
@@ -45,8 +49,8 @@ class MigrateUserTest extends MigrateDrupal6TestBase {
       'filemime' => 'image/jpeg',
       'created' => 1,
       'changed' => 1,
-      'status' => FILE_STATUS_PERMANENT,
     ]);
+    $file->setPermanent();
     $file->enforceIsNew();
     file_put_contents($file->getFileUri(), file_get_contents('core/tests/fixtures/files/image-1.png'));
     $file->save();
@@ -59,8 +63,8 @@ class MigrateUserTest extends MigrateDrupal6TestBase {
       'filemime' => 'image/png',
       'created' => 1,
       'changed' => 1,
-      'status' => FILE_STATUS_PERMANENT,
     ]);
+    $file->setPermanent();
     $file->enforceIsNew();
     file_put_contents($file->getFileUri(), file_get_contents('core/tests/fixtures/files/image-2.jpg'));
     $file->save();
@@ -72,7 +76,7 @@ class MigrateUserTest extends MigrateDrupal6TestBase {
   /**
    * Tests the Drupal6 user to Drupal 8 migration.
    */
-  public function testUser() {
+  public function testUser(): void {
     $users = Database::getConnection('default', 'migrate')
       ->select('users', 'u')
       ->fields('u')

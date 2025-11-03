@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\Core\UrlTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\Core;
 
@@ -12,19 +9,24 @@ use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\GeneratedUrl;
 use Drupal\Core\Routing\RouteMatch;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Url;
 use Drupal\Tests\UnitTestCase;
-use Drupal\Core\Routing\RouteObjectInterface;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Route;
 
 /**
- * @coversDefaultClass \Drupal\Core\Url
- * @group UrlTest
+ * Tests Drupal\Core\Url.
  */
+#[CoversClass(Url::class)]
+#[Group('UrlTest')]
 class UrlTest extends UnitTestCase {
 
   /**
@@ -99,12 +101,12 @@ class UrlTest extends UnitTestCase {
     $this->urlGenerator = $this->createMock('Drupal\Core\Routing\UrlGeneratorInterface');
     $this->urlGenerator->expects($this->any())
       ->method('generateFromRoute')
-      ->will($this->returnValueMap($generate_from_route_map));
+      ->willReturnMap($generate_from_route_map);
 
     $this->pathAliasManager = $this->createMock('Drupal\path_alias\AliasManagerInterface');
     $this->pathAliasManager->expects($this->any())
       ->method('getPathByAlias')
-      ->will($this->returnValueMap($alias_map));
+      ->willReturnMap($alias_map);
 
     $this->router = $this->createMock('Drupal\Tests\Core\Routing\TestRouterInterface');
     $this->pathValidator = $this->createMock('Drupal\Core\Path\PathValidatorInterface');
@@ -118,30 +120,22 @@ class UrlTest extends UnitTestCase {
   }
 
   /**
-   * Tests creating a Url from a request.
+   * Tests creating a URL from a request.
    */
   public function testUrlFromRequest() {
-    $this->router->expects($this->at(0))
+    $this->router->expects($this->exactly(3))
       ->method('matchRequest')
-      ->with($this->getRequestConstraint('/node'))
-      ->willReturn([
-          RouteObjectInterface::ROUTE_NAME => 'view.frontpage.page_1',
-          '_raw_variables' => new ParameterBag(),
-        ]);
-    $this->router->expects($this->at(1))
-      ->method('matchRequest')
-      ->with($this->getRequestConstraint('/node/1'))
-      ->willReturn([
-        RouteObjectInterface::ROUTE_NAME => 'node_view',
-        '_raw_variables' => new ParameterBag(['node' => '1']),
-      ]);
-    $this->router->expects($this->at(2))
-      ->method('matchRequest')
-      ->with($this->getRequestConstraint('/node/2/edit'))
-      ->willReturn([
-        RouteObjectInterface::ROUTE_NAME => 'node_edit',
-        '_raw_variables' => new ParameterBag(['node' => '2']),
-      ]);
+      ->willReturnCallback(function (Request $request) {
+        [$route_name, $vars] = match($request->getPathInfo()) {
+          '/node' => ['view.frontpage.page_1', []],
+          '/node/1' => ['node_view', ['node' => '1']],
+          '/node/2/edit' => ['node_edit', ['node' => '2']],
+        };
+        return [
+          RouteObjectInterface::ROUTE_NAME => $route_name,
+          '_raw_variables' => new InputBag($vars),
+        ];
+      });
 
     $urls = [];
     foreach ($this->map as $index => $values) {
@@ -155,26 +149,11 @@ class UrlTest extends UnitTestCase {
   }
 
   /**
-   * This constraint checks whether a Request object has the right path.
-   *
-   * @param string $path
-   *   The path.
-   *
-   * @return \PHPUnit\Framework\Constraint\Callback
-   *   The constraint checks whether a Request object has the right path.
-   */
-  protected function getRequestConstraint($path) {
-    return $this->callback(function (Request $request) use ($path) {
-      return $request->getPathInfo() == $path;
-    });
-  }
-
-  /**
    * Tests the fromRoute() method with the special <front> path.
    *
-   * @covers ::fromRoute
+   * @legacy-covers ::fromRoute
    */
-  public function testFromRouteFront() {
+  public function testFromRouteFront(): void {
     $url = Url::fromRoute('<front>');
     $this->assertSame('<front>', $url->getRouteName());
   }
@@ -182,10 +161,10 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the fromUserInput method with valid paths.
    *
-   * @covers ::fromUserInput
-   * @dataProvider providerFromValidInternalUri
+   * @legacy-covers ::fromUserInput
    */
-  public function testFromUserInput($path) {
+  #[DataProvider('providerFromValidInternalUri')]
+  public function testFromUserInput($path): void {
     $url = Url::fromUserInput($path);
     $uri = $url->getUri();
 
@@ -214,20 +193,20 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the fromUserInput method with invalid paths.
    *
-   * @covers ::fromUserInput
-   * @dataProvider providerFromInvalidInternalUri
+   * @legacy-covers ::fromUserInput
    */
-  public function testFromInvalidUserInput($path) {
+  #[DataProvider('providerFromInvalidInternalUri')]
+  public function testFromInvalidUserInput($path): void {
     $this->expectException(\InvalidArgumentException::class);
-    $url = Url::fromUserInput($path);
+    Url::fromUserInput($path);
   }
 
   /**
    * Tests fromUri() method with a user-entered path not matching any route.
    *
-   * @covers ::fromUri
+   * @legacy-covers ::fromUri
    */
-  public function testFromRoutedPathWithInvalidRoute() {
+  public function testFromRoutedPathWithInvalidRoute(): void {
     $this->pathValidator->expects($this->once())
       ->method('getUrlIfValidWithoutAccessCheck')
       ->with('invalid-path')
@@ -240,9 +219,9 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests fromUri() method with user-entered path matching a valid route.
    *
-   * @covers ::fromUri
+   * @legacy-covers ::fromUri
    */
-  public function testFromRoutedPathWithValidRoute() {
+  public function testFromRoutedPathWithValidRoute(): void {
     $url = Url::fromRoute('test_route');
     $this->pathValidator->expects($this->once())
       ->method('getUrlIfValidWithoutAccessCheck')
@@ -255,11 +234,11 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the createFromRequest method.
    *
-   * @covers ::createFromRequest
+   * @legacy-covers ::createFromRequest
    */
-  public function testCreateFromRequest() {
+  public function testCreateFromRequest(): void {
     $attributes = [
-      '_raw_variables' => new ParameterBag([
+      '_raw_variables' => new InputBag([
         'color' => 'chartreuse',
       ]),
       RouteObjectInterface::ROUTE_NAME => 'the_route_name',
@@ -269,7 +248,7 @@ class UrlTest extends UnitTestCase {
     $this->router->expects($this->once())
       ->method('matchRequest')
       ->with($request)
-      ->will($this->returnValue($attributes));
+      ->willReturn($attributes);
 
     $url = Url::createFromRequest($request);
     $expected = new Url('the_route_name', ['color' => 'chartreuse']);
@@ -279,9 +258,9 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests that an invalid request will thrown an exception.
    *
-   * @covers ::createFromRequest
+   * @legacy-covers ::createFromRequest
    */
-  public function testUrlFromRequestInvalid() {
+  public function testUrlFromRequestInvalid(): void {
     $request = Request::create('/test-path');
 
     $this->router->expects($this->once())
@@ -296,11 +275,10 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the isExternal() method.
    *
-   * @depends testUrlFromRequest
-   *
-   * @covers ::isExternal
+   * @legacy-covers ::isExternal
    */
-  public function testIsExternal($urls) {
+  #[Depends('testUrlFromRequest')]
+  public function testIsExternal($urls): void {
     foreach ($urls as $url) {
       $this->assertFalse($url->isExternal());
     }
@@ -312,11 +290,10 @@ class UrlTest extends UnitTestCase {
    * @param \Drupal\Core\Url[] $urls
    *   Array of URL objects.
    *
-   * @depends testUrlFromRequest
-   *
-   * @covers ::getUri
+   * @legacy-covers ::getUri
    */
-  public function testGetUriForInternalUrl($urls) {
+  #[Depends('testUrlFromRequest')]
+  public function testGetUriForInternalUrl($urls): void {
     $this->expectException(\UnexpectedValueException::class);
     foreach ($urls as $url) {
       $url->getUri();
@@ -326,9 +303,9 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the getUri() method for external URLs.
    *
-   * @covers ::getUri
+   * @legacy-covers ::getUri
    */
-  public function testGetUriForExternalUrl() {
+  public function testGetUriForExternalUrl(): void {
     $url = Url::fromUri('http://example.com/test');
     $this->assertEquals('http://example.com/test', $url->getUri());
   }
@@ -336,10 +313,10 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the getUri() and isExternal() methods for protocol-relative URLs.
    *
-   * @covers ::getUri
-   * @covers ::isExternal
+   * @legacy-covers ::getUri
+   * @legacy-covers ::isExternal
    */
-  public function testGetUriForProtocolRelativeUrl() {
+  public function testGetUriForProtocolRelativeUrl(): void {
     $url = Url::fromUri('//example.com/test');
     $this->assertEquals('//example.com/test', $url->getUri());
     $this->assertTrue($url->isExternal());
@@ -351,24 +328,23 @@ class UrlTest extends UnitTestCase {
    * @param \Drupal\Core\Url[] $urls
    *   Array of URL objects.
    *
-   * @covers ::getInternalPath
-   *
-   * @depends testUrlFromRequest
+   * @legacy-covers ::getInternalPath
    */
-  public function testGetInternalPath($urls) {
+  #[Depends('testUrlFromRequest')]
+  public function testGetInternalPath($urls): void {
     $map = [];
     $map[] = ['view.frontpage.page_1', [], '/node'];
     $map[] = ['node_view', ['node' => '1'], '/node/1'];
     $map[] = ['node_edit', ['node' => '2'], '/node/2/edit'];
 
-    foreach ($urls as $index => $url) {
-      // Clone the url so that there is no leak of internal state into the
+    foreach ($urls as $url) {
+      // Clone the URL so that there is no leak of internal state into the
       // other ones.
       $url = clone $url;
       $url_generator = $this->createMock('Drupal\Core\Routing\UrlGeneratorInterface');
       $url_generator->expects($this->once())
         ->method('getPathFromRoute')
-        ->will($this->returnValueMap($map, $index));
+        ->willReturnMap($map);
       $url->setUrlGenerator($url_generator);
 
       $url->getInternalPath();
@@ -382,11 +358,10 @@ class UrlTest extends UnitTestCase {
    * @param \Drupal\Core\Url[] $urls
    *   An array of Url objects.
    *
-   * @depends testUrlFromRequest
-   *
-   * @covers ::toString
+   * @legacy-covers ::toString
    */
-  public function testToString($urls) {
+  #[Depends('testUrlFromRequest')]
+  public function testToString($urls): void {
     foreach ($urls as $index => $url) {
       $path = array_pop($this->map[$index]);
       $this->assertSame($path, $url->toString());
@@ -402,11 +377,10 @@ class UrlTest extends UnitTestCase {
    * @param \Drupal\Core\Url[] $urls
    *   An array of Url objects.
    *
-   * @depends testUrlFromRequest
-   *
-   * @covers ::getRouteName
+   * @legacy-covers ::getRouteName
    */
-  public function testGetRouteName($urls) {
+  #[Depends('testUrlFromRequest')]
+  public function testGetRouteName($urls): void {
     foreach ($urls as $index => $url) {
       $this->assertSame($this->map[$index][0], $url->getRouteName());
     }
@@ -415,9 +389,9 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the getRouteName() with an external URL.
    *
-   * @covers ::getRouteName
+   * @legacy-covers ::getRouteName
    */
-  public function testGetRouteNameWithExternalUrl() {
+  public function testGetRouteNameWithExternalUrl(): void {
     $url = Url::fromUri('http://example.com');
     $this->expectException(\UnexpectedValueException::class);
     $url->getRouteName();
@@ -429,11 +403,10 @@ class UrlTest extends UnitTestCase {
    * @param \Drupal\Core\Url[] $urls
    *   An array of Url objects.
    *
-   * @depends testUrlFromRequest
-   *
-   * @covers ::getRouteParameters
+   * @legacy-covers ::getRouteParameters
    */
-  public function testGetRouteParameters($urls) {
+  #[Depends('testUrlFromRequest')]
+  public function testGetRouteParameters($urls): void {
     foreach ($urls as $index => $url) {
       $this->assertSame($this->map[$index][1], $url->getRouteParameters());
     }
@@ -442,9 +415,9 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the getRouteParameters() with an external URL.
    *
-   * @covers ::getRouteParameters
+   * @legacy-covers ::getRouteParameters
    */
-  public function testGetRouteParametersWithExternalUrl() {
+  public function testGetRouteParametersWithExternalUrl(): void {
     $url = Url::fromUri('http://example.com');
     $this->expectException(\UnexpectedValueException::class);
     $url->getRouteParameters();
@@ -456,11 +429,10 @@ class UrlTest extends UnitTestCase {
    * @param \Drupal\Core\Url[] $urls
    *   An array of Url objects.
    *
-   * @depends testUrlFromRequest
-   *
-   * @covers ::getOptions
+   * @legacy-covers ::getOptions
    */
-  public function testGetOptions($urls) {
+  #[Depends('testUrlFromRequest')]
+  public function testGetOptions($urls): void {
     foreach ($urls as $index => $url) {
       $this->assertSame($this->map[$index][2], $url->getOptions());
     }
@@ -469,9 +441,9 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the setOptions() method.
    *
-   * @covers ::setOptions
+   * @legacy-covers ::setOptions
    */
-  public function testSetOptions() {
+  public function testSetOptions(): void {
     $url = Url::fromRoute('test_route', []);
     $this->assertEquals([], $url->getOptions());
     $url->setOptions(['foo' => 'bar']);
@@ -483,9 +455,9 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the mergeOptions() method.
    *
-   * @covers ::mergeOptions
+   * @legacy-covers ::mergeOptions
    */
-  public function testMergeOptions() {
+  public function testMergeOptions(): void {
     $url = Url::fromRoute('test_route', [], ['foo' => 'bar', 'bar' => ['key' => 'value']]);
     $url->mergeOptions(['bar' => ['key' => 'value1', 'key2' => 'value2']]);
     $this->assertEquals(['foo' => 'bar', 'bar' => ['key' => 'value1', 'key2' => 'value2']], $url->getOptions());
@@ -495,12 +467,13 @@ class UrlTest extends UnitTestCase {
    * Tests the access() method for routed URLs.
    *
    * @param bool $access
+   *   The access value.
    *
-   * @covers ::access
-   * @covers ::accessManager
-   * @dataProvider accessProvider
+   * @legacy-covers ::access
+   * @legacy-covers ::accessManager
    */
-  public function testAccessRouted($access) {
+  #[DataProvider('accessProvider')]
+  public function testAccessRouted($access): void {
     $account = $this->createMock('Drupal\Core\Session\AccountInterface');
     $url = new TestUrl('entity.node.canonical', ['node' => 3]);
     $url->setAccessManager($this->getMockAccessManager($access, $account));
@@ -510,9 +483,9 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the access() method for unrouted URLs (they always have access).
    *
-   * @covers ::access
+   * @legacy-covers ::access
    */
-  public function testAccessUnrouted() {
+  public function testAccessUnrouted(): void {
     $account = $this->createMock('Drupal\Core\Session\AccountInterface');
     $url = TestUrl::fromUri('base:kittens');
     $access_manager = $this->createMock('Drupal\Core\Access\AccessManagerInterface');
@@ -523,26 +496,9 @@ class UrlTest extends UnitTestCase {
   }
 
   /**
-   * Tests the renderAccess() method.
-   *
-   * @param bool $access
-   *
-   * @covers ::renderAccess
-   * @dataProvider accessProvider
-   */
-  public function testRenderAccess($access) {
-    $element = [
-      '#url' => Url::fromRoute('entity.node.canonical', ['node' => 3]),
-    ];
-    $this->container->set('current_user', $this->createMock('Drupal\Core\Session\AccountInterface'));
-    $this->container->set('access_manager', $this->getMockAccessManager($access));
-    $this->assertEquals($access, TestUrl::renderAccess($element));
-  }
-
-  /**
    * Tests the fromRouteMatch() method.
    */
-  public function testFromRouteMatch() {
+  public function testFromRouteMatch(): void {
     $route = new Route('/test-route/{foo}');
     $route_match = new RouteMatch('test_route', $route, ['foo' => (object) [1]], ['foo' => 1]);
     $url = Url::fromRouteMatch($route_match);
@@ -553,7 +509,7 @@ class UrlTest extends UnitTestCase {
   /**
    * Data provider for testing entity URIs.
    */
-  public function providerTestEntityUris() {
+  public static function providerTestEntityUris() {
     return [
       [
         'entity:test_entity/1',
@@ -612,11 +568,10 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the fromUri() method with an entity: URI.
    *
-   * @covers ::fromUri
-   *
-   * @dataProvider providerTestEntityUris
+   * @legacy-covers ::fromUri
    */
-  public function testEntityUris($uri, $options, $route_name, $route_parameters, $query, $fragment) {
+  #[DataProvider('providerTestEntityUris')]
+  public function testEntityUris($uri, $options, $route_name, $route_parameters, $query, $fragment): void {
     $url = Url::fromUri($uri, $options);
     $this->assertSame($route_name, $url->getRouteName());
     $this->assertEquals($route_parameters, $url->getRouteParameters());
@@ -627,9 +582,9 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the fromUri() method with an invalid entity: URI.
    *
-   * @covers ::fromUri
+   * @legacy-covers ::fromUri
    */
-  public function testInvalidEntityUriParameter() {
+  public function testInvalidEntityUriParameter(): void {
     // Make the mocked URL generator behave like the actual one.
     $this->urlGenerator->expects($this->once())
       ->method('generateFromRoute')
@@ -643,11 +598,10 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the toUriString() method with entity: URIs.
    *
-   * @covers ::toUriString
-   *
-   * @dataProvider providerTestToUriStringForEntity
+   * @legacy-covers ::toUriString
    */
-  public function testToUriStringForEntity($uri, $options, $uri_string) {
+  #[DataProvider('providerTestToUriStringForEntity')]
+  public function testToUriStringForEntity($uri, $options, $uri_string): void {
     $url = Url::fromUri($uri, $options);
     $this->assertSame($url->toUriString(), $uri_string);
   }
@@ -655,7 +609,7 @@ class UrlTest extends UnitTestCase {
   /**
    * Data provider for testing string entity URIs.
    */
-  public function providerTestToUriStringForEntity() {
+  public static function providerTestToUriStringForEntity() {
     return [
       ['entity:test_entity/1', [], 'route:entity.test_entity.canonical;test_entity=1'],
       ['entity:test_entity/1', ['fragment' => 'top', 'query' => ['page' => '2']], 'route:entity.test_entity.canonical;test_entity=1?page=2#top'],
@@ -666,11 +620,10 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the toUriString() method with internal: URIs.
    *
-   * @covers ::toUriString
-   *
-   * @dataProvider providerTestToUriStringForInternal
+   * @legacy-covers ::toUriString
    */
-  public function testToUriStringForInternal($uri, $options, $uri_string) {
+  #[DataProvider('providerTestToUriStringForInternal')]
+  public function testToUriStringForInternal($uri, $options, $uri_string): void {
     $url = Url::fromRoute('entity.test_entity.canonical', ['test_entity' => '1']);
     $this->pathValidator->expects($this->any())
       ->method('getUrlIfValidWithoutAccessCheck')
@@ -686,7 +639,7 @@ class UrlTest extends UnitTestCase {
   /**
    * Data provider for testing internal URIs.
    */
-  public function providerTestToUriStringForInternal() {
+  public static function providerTestToUriStringForInternal() {
     return [
       // The four permutations of a regular path.
       ['internal:/test-entity/1', [], 'route:entity.test_entity.canonical;test_entity=1'],
@@ -711,10 +664,10 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the fromUri() method with a valid internal: URI.
    *
-   * @covers ::fromUri
-   * @dataProvider providerFromValidInternalUri
+   * @legacy-covers ::fromUri
    */
-  public function testFromValidInternalUri($path) {
+  #[DataProvider('providerFromValidInternalUri')]
+  public function testFromValidInternalUri($path): void {
     $url = Url::fromUri('internal:' . $path);
     $this->assertInstanceOf('Drupal\Core\Url', $url);
   }
@@ -722,7 +675,7 @@ class UrlTest extends UnitTestCase {
   /**
    * Data provider for testFromValidInternalUri().
    */
-  public function providerFromValidInternalUri() {
+  public static function providerFromValidInternalUri() {
     return [
       // Normal paths with a leading slash.
       ['/kittens'],
@@ -751,10 +704,10 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the fromUri() method with an invalid internal: URI.
    *
-   * @covers ::fromUri
-   * @dataProvider providerFromInvalidInternalUri
+   * @legacy-covers ::fromUri
    */
-  public function testFromInvalidInternalUri($path) {
+  #[DataProvider('providerFromInvalidInternalUri')]
+  public function testFromInvalidInternalUri($path): void {
     $this->expectException(\InvalidArgumentException::class);
     Url::fromUri('internal:' . $path);
   }
@@ -762,7 +715,7 @@ class UrlTest extends UnitTestCase {
   /**
    * Data provider for testFromInvalidInternalUri().
    */
-  public function providerFromInvalidInternalUri() {
+  public static function providerFromInvalidInternalUri() {
     return [
       // Normal paths without a leading slash.
       'normal_path0' => ['kittens'],
@@ -787,9 +740,9 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the fromUri() method with a base: URI starting with a number.
    *
-   * @covers ::fromUri
+   * @legacy-covers ::fromUri
    */
-  public function testFromUriNumber() {
+  public function testFromUriNumber(): void {
     $url = Url::fromUri('base:2015/10/06');
     $this->assertSame($url->toUriString(), 'base:/2015/10/06');
   }
@@ -797,11 +750,10 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the toUriString() method with route: URIs.
    *
-   * @covers ::toUriString
-   *
-   * @dataProvider providerTestToUriStringForRoute
+   * @legacy-covers ::toUriString
    */
-  public function testToUriStringForRoute($uri, $options, $uri_string) {
+  #[DataProvider('providerTestToUriStringForRoute')]
+  public function testToUriStringForRoute($uri, $options, $uri_string): void {
     $url = Url::fromUri($uri, $options);
     $this->assertSame($url->toUriString(), $uri_string);
   }
@@ -809,7 +761,7 @@ class UrlTest extends UnitTestCase {
   /**
    * Data provider for testing route: URIs.
    */
-  public function providerTestToUriStringForRoute() {
+  public static function providerTestToUriStringForRoute() {
     return [
       ['route:entity.test_entity.canonical;test_entity=1', [], 'route:entity.test_entity.canonical;test_entity=1'],
       ['route:entity.test_entity.canonical;test_entity=1', ['fragment' => 'top', 'query' => ['page' => '2']], 'route:entity.test_entity.canonical;test_entity=1?page=2#top'],
@@ -824,9 +776,11 @@ class UrlTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::fromUri
+   * Tests from route uri with missing route name.
+   *
+   * @legacy-covers ::fromUri
    */
-  public function testFromRouteUriWithMissingRouteName() {
+  public function testFromRouteUriWithMissingRouteName(): void {
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage("The route URI 'route:' is invalid.");
     Url::fromUri('route:');
@@ -836,9 +790,12 @@ class UrlTest extends UnitTestCase {
    * Creates a mock access manager for the access tests.
    *
    * @param bool $access
+   *   The access value.
    * @param \Drupal\Core\Session\AccountInterface|null $account
+   *   The account to test.
    *
    * @return \Drupal\Core\Access\AccessManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   *   The mocked access manager.
    */
   protected function getMockAccessManager($access, $account = NULL) {
     $access_manager = $this->createMock('Drupal\Core\Access\AccessManagerInterface');
@@ -852,7 +809,7 @@ class UrlTest extends UnitTestCase {
   /**
    * Data provider for the access test methods.
    */
-  public function accessProvider() {
+  public static function accessProvider() {
     return [
       [TRUE],
       [FALSE],
@@ -861,14 +818,18 @@ class UrlTest extends UnitTestCase {
 
 }
 
+/**
+ * URL information holder with overridden access manager for testing.
+ */
 class TestUrl extends Url {
 
   /**
    * Sets the access manager.
    *
    * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
+   *   The access manager.
    */
-  public function setAccessManager(AccessManagerInterface $access_manager) {
+  public function setAccessManager(AccessManagerInterface $access_manager): void {
     $this->accessManager = $access_manager;
   }
 

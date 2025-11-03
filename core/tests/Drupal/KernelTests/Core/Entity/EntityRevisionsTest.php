@@ -1,26 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the loaded Revision of an entity.
- *
- * @coversDefaultClass \Drupal\Core\Entity\ContentEntityBase
- *
- * @group entity
  */
+#[CoversClass(ContentEntityBase::class)]
+#[Group('entity')]
+#[RunTestsInSeparateProcesses]
 class EntityRevisionsTest extends EntityKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'entity_test',
     'language',
     'content_translation',
@@ -36,9 +38,9 @@ class EntityRevisionsTest extends EntityKernelTestBase {
   }
 
   /**
-   * Test getLoadedRevisionId() returns the correct ID throughout the process.
+   * Tests getLoadedRevisionId() returns the correct ID throughout the process.
    */
-  public function testLoadedRevisionId() {
+  public function testLoadedRevisionId(): void {
     // Create a basic EntityTestMulRev entity and save it.
     $entity = EntityTestMulRev::create();
     $entity->save();
@@ -52,13 +54,13 @@ class EntityRevisionsTest extends EntityKernelTestBase {
     // ID yet).
     $this->assertEquals($entity->getRevisionId(), $loaded->getLoadedRevisionId());
     $this->assertNotEquals($loaded->getRevisionId(), $loaded->getLoadedRevisionId());
-    $this->assertSame(NULL, $loaded->getRevisionId());
+    $this->assertNull($loaded->getRevisionId());
 
     // After updating the loaded Revision ID the result should be the same.
     $loaded->updateLoadedRevisionId();
     $this->assertEquals($entity->getRevisionId(), $loaded->getLoadedRevisionId());
     $this->assertNotEquals($loaded->getRevisionId(), $loaded->getLoadedRevisionId());
-    $this->assertSame(NULL, $loaded->getRevisionId());
+    $this->assertNull($loaded->getRevisionId());
 
     $loaded->save();
 
@@ -80,7 +82,7 @@ class EntityRevisionsTest extends EntityKernelTestBase {
   /**
    * Tests the loaded revision ID after an entity re-save, clone and duplicate.
    */
-  public function testLoadedRevisionIdWithNoNewRevision() {
+  public function testLoadedRevisionIdWithNoNewRevision(): void {
     // Create a basic EntityTestMulRev entity and save it.
     $entity = EntityTestMulRev::create();
     $entity->save();
@@ -112,13 +114,13 @@ class EntityRevisionsTest extends EntityKernelTestBase {
 
     // Creating a duplicate should set a NULL loaded Revision ID.
     $duplicate = $loaded->createDuplicate();
-    $this->assertSame(NULL, $duplicate->getLoadedRevisionId());
+    $this->assertNull($duplicate->getLoadedRevisionId());
   }
 
   /**
    * Tests the loaded revision ID for translatable entities.
    */
-  public function testTranslatedLoadedRevisionId() {
+  public function testTranslatedLoadedRevisionId(): void {
     ConfigurableLanguage::createFromLangcode('fr')->save();
 
     // Create a basic EntityTestMulRev entity and save it.
@@ -159,8 +161,9 @@ class EntityRevisionsTest extends EntityKernelTestBase {
   /**
    * Tests re-saving the entity in entity_test_entity_insert().
    */
-  public function testSaveInHookEntityInsert() {
-    // Create an entity which will be saved again in entity_test_entity_insert().
+  public function testSaveInHookEntityInsert(): void {
+    // Create an entity which will be saved again in
+    // entity_test_entity_insert().
     $entity = EntityTestMulRev::create(['name' => 'EntityLoadedRevisionTest']);
     $entity->save();
     $loadedRevisionId = \Drupal::state()->get('entity_test.loadedRevisionId');
@@ -171,9 +174,9 @@ class EntityRevisionsTest extends EntityKernelTestBase {
   /**
    * Tests that latest revisions are working as expected.
    *
-   * @covers ::isLatestRevision
+   * @legacy-covers ::isLatestRevision
    */
-  public function testIsLatestRevision() {
+  public function testIsLatestRevision(): void {
     // Create a basic EntityTestMulRev entity and save it.
     $entity = EntityTestMulRev::create();
     $entity->save();
@@ -202,11 +205,11 @@ class EntityRevisionsTest extends EntityKernelTestBase {
    * The latest revision affecting a particular translation behaves as the
    * latest revision for monolingual entities.
    *
-   * @covers ::isLatestTranslationAffectedRevision
-   * @covers \Drupal\Core\Entity\ContentEntityStorageBase::getLatestRevisionId
-   * @covers \Drupal\Core\Entity\ContentEntityStorageBase::getLatestTranslationAffectedRevisionId
+   * @legacy-covers ::isLatestTranslationAffectedRevision
+   * @legacy-covers \Drupal\Core\Entity\ContentEntityStorageBase::getLatestRevisionId
+   * @legacy-covers \Drupal\Core\Entity\ContentEntityStorageBase::getLatestTranslationAffectedRevisionId
    */
-  public function testIsLatestAffectedRevisionTranslation() {
+  public function testIsLatestAffectedRevisionTranslation(): void {
     ConfigurableLanguage::createFromLangcode('it')->save();
 
     // Create a basic EntityTestMulRev entity and save it.
@@ -251,14 +254,39 @@ class EntityRevisionsTest extends EntityKernelTestBase {
     $it_revision->setName($this->randomString());
     $it_revision->setNewRevision(TRUE);
     $it_revision->isDefaultRevision(FALSE);
-    // @todo Remove this once the "original" property works with revisions. See
-    //   https://www.drupal.org/project/drupal/issues/2859042.
-    $it_revision->original = $storage->loadRevision($it_revision->getLoadedRevisionId());
     $it_revision->save();
     $this->assertTrue($it_revision->isLatestRevision());
     $this->assertTrue($it_revision->isLatestTranslationAffectedRevision());
     $this->assertFalse($en_revision->isLatestRevision());
     $this->assertTrue($en_revision->isLatestTranslationAffectedRevision());
+  }
+
+  /**
+   * Tests the automatic handling of the "revision_default" flag.
+   *
+   * @legacy-covers \Drupal\Core\Entity\ContentEntityStorageBase::doSave
+   */
+  public function testDefaultRevisionFlag(): void {
+    // Create a basic EntityTestMulRev entity and save it.
+    $entity = EntityTestMulRev::create();
+    $entity->save();
+    $this->assertTrue($entity->wasDefaultRevision());
+
+    // Create a new default revision.
+    $entity->setNewRevision(TRUE);
+    $entity->save();
+    $this->assertTrue($entity->wasDefaultRevision());
+
+    // Create a new non-default revision.
+    $entity->setNewRevision(TRUE);
+    $entity->isDefaultRevision(FALSE);
+    $entity->save();
+    $this->assertFalse($entity->wasDefaultRevision());
+
+    // Turn the previous non-default revision into a default revision.
+    $entity->isDefaultRevision(TRUE);
+    $entity->save();
+    $this->assertTrue($entity->wasDefaultRevision());
   }
 
 }

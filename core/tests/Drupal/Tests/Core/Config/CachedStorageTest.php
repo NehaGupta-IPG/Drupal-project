@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Config;
 
-use Drupal\Tests\UnitTestCase;
-use Drupal\Core\Config\CachedStorage;
 use Drupal\Core\Cache\NullBackend;
+use Drupal\Core\Config\CachedStorage;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the interaction of cache and file storage in CachedStorage.
- *
- * @group Config
  */
+#[Group('Config')]
 class CachedStorageTest extends UnitTestCase {
 
   /**
@@ -19,9 +21,9 @@ class CachedStorageTest extends UnitTestCase {
   protected $cacheFactory;
 
   /**
-   * Test listAll static cache.
+   * Tests listAll static cache.
    */
-  public function testListAllStaticCache() {
+  public function testListAllStaticCache(): void {
     $prefix = __FUNCTION__;
     $storage = $this->createMock('Drupal\Core\Config\StorageInterface');
 
@@ -29,7 +31,7 @@ class CachedStorageTest extends UnitTestCase {
     $storage->expects($this->once())
       ->method('listAll')
       ->with($prefix)
-      ->will($this->returnValue($response));
+      ->willReturn($response);
 
     $cache = new NullBackend(__FUNCTION__);
 

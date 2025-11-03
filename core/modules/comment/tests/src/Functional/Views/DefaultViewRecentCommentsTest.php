@@ -1,27 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Functional\Views;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
-use Drupal\views\Views;
 use Drupal\Tests\views\Functional\ViewTestBase;
+use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests results for the Recent Comments view shipped with the module.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class DefaultViewRecentCommentsTest extends ViewTestBase {
 
   use CommentTestTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'comment', 'block'];
 
@@ -61,14 +62,17 @@ class DefaultViewRecentCommentsTest extends ViewTestBase {
   /**
    * Contains the node object used for comments of this test.
    *
-   * @var \Drupal\node\Node
+   * @var \Drupal\node\NodeInterface
    */
   public $node;
 
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE, $modules = []): void {
+    parent::setUp($import_test_views, $modules);
 
-    // Create a new content type
+    // Create a new content type.
     $content_type = $this->drupalCreateContentType();
 
     // Add a node of the new content type.
@@ -97,7 +101,7 @@ class DefaultViewRecentCommentsTest extends ViewTestBase {
       $comment->comment_body->format = 'full_html';
 
       // Ensure comments are sorted in ascending order.
-      $time = REQUEST_TIME + ($this->defaultDisplayResults - $i);
+      $time = \Drupal::time()->getRequestTime() + ($this->defaultDisplayResults - $i);
       $comment->setCreatedTime($time);
       $comment->changed->value = $time;
 
@@ -114,7 +118,7 @@ class DefaultViewRecentCommentsTest extends ViewTestBase {
   /**
    * Tests the block defined by the comments_recent view.
    */
-  public function testBlockDisplay() {
+  public function testBlockDisplay(): void {
     $user = $this->drupalCreateUser(['access comments']);
     $this->drupalLogin($user);
 
@@ -137,9 +141,7 @@ class DefaultViewRecentCommentsTest extends ViewTestBase {
 
     // Check the number of results given by the display is the expected.
     $this->assertCount($this->blockDisplayResults, $view->result,
-      new FormattableMarkup('There are exactly @results comments. Expected @expected',
-        ['@results' => count($view->result), '@expected' => $this->blockDisplayResults]
-      )
+      'There are exactly ' . count($view->result) . ' comments. Expected ' . $this->blockDisplayResults
     );
   }
 

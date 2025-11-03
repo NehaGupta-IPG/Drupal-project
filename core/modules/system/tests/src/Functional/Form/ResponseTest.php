@@ -1,21 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the form API Response element.
- *
- * @group Form
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class ResponseTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['form_test'];
 
@@ -27,12 +29,13 @@ class ResponseTest extends BrowserTestBase {
   /**
    * Tests that enforced responses propagate through subscribers and middleware.
    */
-  public function testFormResponse() {
+  public function testFormResponse(): void {
     $edit = [
       'content' => $this->randomString(),
       'status' => 200,
     ];
-    $this->drupalPostForm('form-test/response', $edit, 'Submit');
+    $this->drupalGet('form-test/response');
+    $this->submitForm($edit, 'Submit');
     $content = Json::decode($this->getSession()->getPage()->getContent());
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSame($edit['content'], $content, 'Response content matches');
@@ -45,7 +48,8 @@ class ResponseTest extends BrowserTestBase {
       'content' => $this->randomString(),
       'status' => 418,
     ];
-    $this->drupalPostForm('form-test/response', $edit, 'Submit');
+    $this->drupalGet('form-test/response');
+    $this->submitForm($edit, 'Submit');
     $content = Json::decode($this->getSession()->getPage()->getContent());
     $this->assertSession()->statusCodeEquals(418);
     $this->assertSame($edit['content'], $content, 'Response content matches');

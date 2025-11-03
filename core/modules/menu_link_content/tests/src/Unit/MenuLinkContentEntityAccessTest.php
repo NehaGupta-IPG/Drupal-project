@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\menu_link_content\Unit;
 
 use Drupal\Core\Access\AccessManagerInterface;
@@ -11,21 +13,22 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\menu_link_content\MenuLinkContentAccessControlHandler;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests menu link content entity access.
- *
- * @coversDefaultClass \Drupal\menu_link_content\MenuLinkContentAccessControlHandler
- * @group menu_link_content
  */
+#[CoversClass(MenuLinkContentAccessControlHandler::class)]
+#[Group('menu_link_content')]
 class MenuLinkContentEntityAccessTest extends UnitTestCase {
 
   /**
    * Tests an operation not implemented by the access control handler.
    *
-   * @covers ::checkAccess
+   * @legacy-covers ::checkAccess
    */
-  public function testUnrecognizedOperation() {
+  public function testUnrecognizedOperation(): void {
     $entityType = $this->createMock(EntityTypeInterface::class);
     $accessManager = $this->createMock(AccessManagerInterface::class);
     $moduleHandler = $this->createMock(ModuleHandlerInterface::class);
@@ -36,7 +39,7 @@ class MenuLinkContentEntityAccessTest extends UnitTestCase {
     $language = $this->createMock(LanguageInterface::class);
     $language->expects($this->any())
       ->method('getId')
-      ->will($this->returnValue('de'));
+      ->willReturn('de');
 
     $entity = $this->createMock(ContentEntityInterface::class);
     $entity->expects($this->any())

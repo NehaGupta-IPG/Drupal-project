@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Functional;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests moderation state node type integration.
- *
- * @group content_moderation
  */
+#[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class ModerationStateNodeTypeTest extends ModerationStateTestBase {
 
   /**
@@ -17,29 +22,29 @@ class ModerationStateNodeTypeTest extends ModerationStateTestBase {
   /**
    * A node type without moderation state disabled.
    *
-   * @covers \Drupal\content_moderation\EntityTypeInfo::formAlter
-   * @covers \Drupal\content_moderation\Entity\Handler\NodeModerationHandler::enforceRevisionsBundleFormAlter
+   * @legacy-covers \Drupal\content_moderation\EntityTypeInfo::formAlter
+   * @legacy-covers \Drupal\content_moderation\Entity\Handler\NodeModerationHandler::enforceRevisionsBundleFormAlter
    */
-  public function testNotModerated() {
+  public function testNotModerated(): void {
     $this->drupalLogin($this->adminUser);
     $this->createContentTypeFromUi('Not moderated', 'not_moderated');
-    $this->assertText('The content type Not moderated has been added.');
+    $this->assertSession()->pageTextContains('The content type Not moderated has been added.');
     $this->grantUserPermissionToCreateContentOfType($this->adminUser, 'not_moderated');
     $this->drupalGet('node/add/not_moderated');
-    $this->assertRaw('Save');
+    $this->assertSession()->pageTextContains('Save');
     $this->submitForm([
       'title[0][value]' => 'Test',
     ], 'Save');
-    $this->assertText('Not moderated Test has been created.');
+    $this->assertSession()->pageTextContains('Not moderated Test has been created.');
   }
 
   /**
    * Tests enabling moderation on an existing node-type, with content.
    *
-   * @covers \Drupal\content_moderation\EntityTypeInfo::formAlter
-   * @covers \Drupal\content_moderation\Entity\Handler\NodeModerationHandler::enforceRevisionsBundleFormAlter
+   * @legacy-covers \Drupal\content_moderation\EntityTypeInfo::formAlter
+   * @legacy-covers \Drupal\content_moderation\Entity\Handler\NodeModerationHandler::enforceRevisionsBundleFormAlter
    */
-  public function testEnablingOnExistingContent() {
+  public function testEnablingOnExistingContent(): void {
     $editor_permissions = [
       'administer workflows',
       'access administration pages',
@@ -65,7 +70,7 @@ class ModerationStateNodeTypeTest extends ModerationStateTestBase {
     $this->submitForm([
       'title[0][value]' => 'Test',
     ], 'Save');
-    $this->assertText('Not moderated Test has been created.');
+    $this->assertSession()->pageTextContains('Not moderated Test has been created.');
 
     // Check that the 'Create new revision' is not disabled.
     $this->drupalGet('/admin/structure/types/manage/not_moderated');
@@ -103,18 +108,18 @@ class ModerationStateNodeTypeTest extends ModerationStateTestBase {
   }
 
   /**
-   * @covers \Drupal\content_moderation\Entity\Handler\NodeModerationHandler::enforceRevisionsBundleFormAlter
+   * Tests enforce revisions entity form alter.
+   *
+   * @legacy-covers \Drupal\content_moderation\Entity\Handler\NodeModerationHandler::enforceRevisionsBundleFormAlter
    */
-  public function testEnforceRevisionsEntityFormAlter() {
+  public function testEnforceRevisionsEntityFormAlter(): void {
     $this->drupalLogin($this->adminUser);
     $this->createContentTypeFromUi('Moderated', 'moderated');
 
     // Ensure checkboxes in the 'workflow' section can be altered, even when
     // 'revision' is enforced and disabled.
     $this->drupalGet('admin/structure/types/manage/moderated');
-    $this->drupalPostForm('admin/structure/types/manage/moderated', [
-     'options[promote]' => TRUE,
-    ], 'Save content type');
+    $this->submitForm(['options[promote]' => TRUE], 'Save');
     $this->drupalGet('admin/structure/types/manage/moderated');
     $this->assertSession()->checkboxChecked('options[promote]');
   }

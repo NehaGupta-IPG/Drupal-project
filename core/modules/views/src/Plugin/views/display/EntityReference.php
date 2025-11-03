@@ -3,7 +3,8 @@
 namespace Drupal\views\Plugin\views\display;
 
 use Drupal\Core\Database\Connection;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\views\Attribute\ViewsDisplay;
 
 /**
  * The plugin that handles an EntityReference display.
@@ -13,18 +14,17 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * 'Entity Reference' display.
  *
  * @ingroup views_display_plugins
- *
- * @ViewsDisplay(
- *   id = "entity_reference",
- *   title = @Translation("Entity Reference"),
- *   admin = @Translation("Entity Reference Source"),
- *   help = @Translation("Selects referenceable entities for an entity reference field."),
- *   theme = "views_view",
- *   register_theme = FALSE,
- *   uses_menu_links = FALSE,
- *   entity_reference_display = TRUE
- * )
  */
+#[ViewsDisplay(
+  id: "entity_reference",
+  title: new TranslatableMarkup("Entity Reference"),
+  admin: new TranslatableMarkup("Entity Reference Source"),
+  help: new TranslatableMarkup("Selects referenceable entities for an entity reference field."),
+  theme: "views_view",
+  register_theme: FALSE,
+  uses_menu_links: FALSE,
+  entity_reference_display: TRUE
+)]
 class EntityReference extends DisplayPluginBase {
 
   /**
@@ -50,12 +50,18 @@ class EntityReference extends DisplayPluginBase {
   protected $connection;
 
   /**
+   * The id field alias.
+   */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  public string $id_field_alias;
+
+  /**
    * Constructs a new EntityReference object.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Database\Connection $connection
@@ -64,18 +70,6 @@ class EntityReference extends DisplayPluginBase {
   public function __construct(array $configuration, $plugin_id, $plugin_definition, Connection $connection) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->connection = $connection;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('database')
-    );
   }
 
   /**
@@ -155,7 +149,18 @@ class EntityReference extends DisplayPluginBase {
     $id_table = $this->view->storage->get('base_table');
     $this->id_field_alias = $this->view->query->addField($id_table, $id_field);
 
-    $options = $this->getOption('entity_reference_options');
+    $options = $this->getOption('entity_reference_options') ?? [];
+    // The entity_reference_options are typically set during a call to
+    // Drupal\views\Plugin\EntityReferenceSelection\ViewsSelection::initializeView().
+    // If any entity_reference_options are not yet set, we apply the same
+    // default values that would typically be added by that method.
+    $default_options = [
+      'match' => NULL,
+      'match_operator' => 'CONTAINS',
+      'limit' => 0,
+      'ids' => NULL,
+    ];
+    $options += $default_options;
 
     // Restrict the autocomplete options based on what's been typed already.
     if (isset($options['match'])) {
@@ -203,14 +208,17 @@ class EntityReference extends DisplayPluginBase {
     // Verify that search fields are set up.
     $style = $this->getOption('style');
     if (!isset($style['options']['search_fields'])) {
-      $errors[] = $this->t('Display "@display" needs a selected search fields to work properly. See the settings for the Entity Reference list format.', ['@display' => $this->display['display_title']]);
+      $errors[] = $this->t('Display "@display" needs a selected "Search fields" value to work properly. See the settings for the "Entity Reference list" format.', ['@display' => $this->display['display_title']]);
     }
     else {
       // Verify that the search fields used actually exist.
       $fields = array_keys($this->handlers['field']);
       foreach ($style['options']['search_fields'] as $field_alias => $enabled) {
         if ($enabled && !in_array($field_alias, $fields)) {
-          $errors[] = $this->t('Display "@display" uses field %field as search field, but the field is no longer present. See the settings for the Entity Reference list format.', ['@display' => $this->display['display_title'], '%field' => $field_alias]);
+          $errors[] = $this->t('Display "@display" uses field %field as search field, but the field is no longer present. See the settings for the Entity Reference list format.', [
+            '@display' => $this->display['display_title'],
+            '%field' => $field_alias,
+          ]);
         }
       }
     }

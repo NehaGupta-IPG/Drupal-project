@@ -1,18 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\PhpStorage;
 
-use Drupal\Component\PhpStorage\FileStorage;
 use Drupal\Component\PhpStorage\FileReadOnlyStorage;
+use Drupal\Component\PhpStorage\FileStorage;
 use Drupal\Component\Utility\Random;
+use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Component\PhpStorage\FileReadOnlyStorage
- *
- * @group Drupal
- * @group PhpStorage
+ * Tests Drupal\Component\PhpStorage\FileReadOnlyStorage.
  */
+#[CoversClass(FileReadOnlyStorage::class)]
+#[Group('Drupal')]
+#[Group('PhpStorage')]
 class FileStorageReadOnlyTest extends PhpStorageTestBase {
+
+  use ExpectDeprecationTrait;
 
   /**
    * Standard test settings to pass to storage instances.
@@ -48,7 +55,7 @@ class FileStorageReadOnlyTest extends PhpStorageTestBase {
   /**
    * Tests writing with one class and reading with another.
    */
-  public function testReadOnly() {
+  public function testReadOnly(): void {
     // Random generator.
     $random = new Random();
 
@@ -57,11 +64,11 @@ class FileStorageReadOnlyTest extends PhpStorageTestBase {
 
     // Find a global that doesn't exist.
     do {
-      $random = mt_rand(10000, 100000);
+      $random = 'test' . mt_rand(10000, 100000);
     } while (isset($GLOBALS[$random]));
 
     // Write out a PHP file and ensure it's successfully loaded.
-    $code = "<?php\n\$GLOBALS[$random] = TRUE;";
+    $code = "<?php\n\$GLOBALS['$random'] = TRUE;";
     $success = $php->save($name, $code);
     $this->assertTrue($success);
     $php_read = new FileReadOnlyStorage($this->readonlyStorage);
@@ -78,17 +85,9 @@ class FileStorageReadOnlyTest extends PhpStorageTestBase {
   }
 
   /**
-   * @covers ::writeable
+   * @legacy-covers ::deleteAll
    */
-  public function testWriteable() {
-    $php_read = new FileReadOnlyStorage($this->readonlyStorage);
-    $this->assertFalse($php_read->writeable());
-  }
-
-  /**
-   * @covers ::deleteAll
-   */
-  public function testDeleteAll() {
+  public function testDeleteAll(): void {
     // Random generator.
     $random = new Random();
 

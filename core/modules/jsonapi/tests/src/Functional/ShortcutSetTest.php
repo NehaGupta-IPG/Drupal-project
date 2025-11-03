@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Core\Url;
+use Drupal\jsonapi\JsonApiSpec;
 use Drupal\shortcut\Entity\ShortcutSet;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API integration test for the "ShortcutSet" config entity type.
- *
- * @group jsonapi
  */
-class ShortcutSetTest extends ResourceTestBase {
+#[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
+class ShortcutSetTest extends ConfigEntityResourceTestBase {
 
   /**
    * {@inheritdoc}
@@ -42,7 +47,7 @@ class ShortcutSetTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     switch ($method) {
       case 'GET':
         $this->grantPermissionsToTestedRole(['access shortcuts']);
@@ -77,7 +82,7 @@ class ShortcutSetTest extends ResourceTestBase {
    */
   protected function createEntity() {
     $set = ShortcutSet::create([
-      'id' => 'llama_set',
+      'id' => 'llama-set',
       'label' => 'Llama Set',
     ]);
     $set->save();
@@ -87,16 +92,16 @@ class ShortcutSetTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedDocument() {
+  protected function getExpectedDocument(): array {
     $self_url = Url::fromUri('base:/jsonapi/shortcut_set/shortcut_set/' . $this->entity->uuid())->setAbsolute()->toString(TRUE)->getGeneratedUrl();
     return [
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
           ],
         ],
-        'version' => '1.0',
+        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
       ],
       'links' => [
         'self' => ['href' => $self_url],
@@ -112,7 +117,7 @@ class ShortcutSetTest extends ResourceTestBase {
           'status' => TRUE,
           'langcode' => 'en',
           'dependencies' => [],
-          'drupal_internal__id' => 'llama_set',
+          'drupal_internal__id' => 'llama-set',
         ],
       ],
     ];
@@ -121,8 +126,9 @@ class ShortcutSetTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getPostDocument() {
+  protected function getPostDocument(): array {
     // @todo Update in https://www.drupal.org/node/2300677.
+    return [];
   }
 
 }

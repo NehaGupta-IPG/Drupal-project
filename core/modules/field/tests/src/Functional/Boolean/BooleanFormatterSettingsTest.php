@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Functional\Boolean;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Boolean field formatter settings.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class BooleanFormatterSettingsTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field', 'field_ui', 'text', 'node', 'user'];
 
@@ -46,7 +48,7 @@ class BooleanFormatterSettingsTest extends BrowserTestBase {
     parent::setUp();
 
     // Create a content type. Use Node because it has Field UI pages that work.
-    $type_name = mb_strtolower($this->randomMachineName(8)) . '_test';
+    $type_name = $this->randomMachineName(8) . '_test';
     $type = $this->drupalCreateContentType(['name' => $type_name, 'type' => $type_name]);
     $this->bundle = $type->id();
 
@@ -60,7 +62,7 @@ class BooleanFormatterSettingsTest extends BrowserTestBase {
     ]);
     $this->drupalLogin($admin_user);
 
-    $this->fieldName = mb_strtolower($this->randomMachineName(8));
+    $this->fieldName = $this->randomMachineName(8);
 
     $field_storage = FieldStorageConfig::create([
       'field_name' => $this->fieldName,
@@ -88,7 +90,7 @@ class BooleanFormatterSettingsTest extends BrowserTestBase {
   /**
    * Tests the formatter settings page for the Boolean formatter.
    */
-  public function testBooleanFormatterSettings() {
+  public function testBooleanFormatterSettings(): void {
     // List the options we expect to see on the settings form. Omit the one
     // with the Unicode check/x characters, which does not appear to work
     // well in BrowserTestBase.
@@ -126,15 +128,12 @@ class BooleanFormatterSettingsTest extends BrowserTestBase {
       foreach ($options as $string) {
         $assert_session->pageTextContains($string);
       }
-      $assert_session->pageTextContains(t('Field settings (@on_label / @off_label)', ['@on_label' => $values[0], '@off_label' => $values[1]]));
+      $assert_session->pageTextContains("Field settings ({$values[0]} / {$values[1]})");
 
       // Test that the settings summary are present in the correct format.
       $this->drupalGet('admin/structure/types/manage/' . $this->bundle . '/display');
-      $result = $this->xpath('//div[contains(@class, :class) and contains(text(), :text)]', [
-        ':class' => 'field-plugin-summary',
-        ':text' => (string) t('Display: @true_label / @false_label', ['@true_label' => $values[0], '@false_label' => $values[1]]),
-      ]);
-      $this->assertCount(1, $result, "Boolean formatter settings summary exist.");
+      $this->assertSession()->elementExists('xpath', "//div[contains(@class, 'field-plugin-summary')]");
+      $this->assertSession()->elementTextEquals('xpath', "//div[contains(@class, 'field-plugin-summary')]", "Display: {$values[0]} / {$values[1]}");
     }
   }
 

@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\menu_ui\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Reorder menu items.
- *
- * @group menu_ui
  */
+#[Group('menu_ui')]
+#[RunTestsInSeparateProcesses]
 class MenuLinkReorderTest extends BrowserTestBase {
 
   /**
@@ -19,9 +23,7 @@ class MenuLinkReorderTest extends BrowserTestBase {
   protected $administrator;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['menu_ui', 'test_page_test', 'node', 'block'];
 
@@ -31,9 +33,9 @@ class MenuLinkReorderTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Test creating, editing, deleting menu links via node form widget.
+   * Tests creating, editing, deleting menu links via node form widget.
    */
-  public function testDefaultMenuLinkReorder() {
+  public function testDefaultMenuLinkReorder(): void {
 
     // Add the main menu block.
     $this->drupalPlaceBlock('system_menu_block:main');
@@ -54,14 +56,16 @@ class MenuLinkReorderTest extends BrowserTestBase {
     $edit = [
       'links[menu_plugin_id:test_page_test.front_page][weight]' => -10,
     ];
-    $this->drupalPostForm('admin/structure/menu/manage/main', $edit, 'Save');
+    $this->drupalGet('admin/structure/menu/manage/main');
+    $this->submitForm($edit, 'Save');
 
     // The link is still there.
     $this->drupalGet('test-page');
     $this->assertSession()->linkExists('Home');
 
     // Clear all caches.
-    $this->drupalPostForm('admin/config/development/performance', [], 'Clear all caches');
+    $this->drupalGet('admin/config/development/performance');
+    $this->submitForm([], 'Clear all caches');
 
     // Clearing all caches should not affect the state of the menu link.
     $this->drupalGet('test-page');

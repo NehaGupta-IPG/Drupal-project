@@ -6,17 +6,14 @@
  */
 
 use Drupal\Core\Config\Entity\ConfigEntityUpdater;
-use Drupal\Core\Entity\Display\EntityDisplayInterface;
-use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
-use Drupal\Core\Entity\ContentEntityType;
-use Drupal\Core\Entity\ContentEntityTypeInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Extension\Exception\UnknownExtensionException;
+use Drupal\Core\Entity\EntityFormModeInterface;
+use Drupal\views\ViewEntityInterface;
+use Drupal\views\ViewsConfigUpdater;
 
 /**
  * Implements hook_removed_post_updates().
  */
-function system_removed_post_updates() {
+function system_removed_post_updates(): array {
   return [
     'system_post_update_recalculate_configuration_entity_dependencies' => '9.0.0',
     'system_post_update_add_region_to_entity_displays' => '9.0.0',
@@ -35,147 +32,119 @@ function system_removed_post_updates() {
     'system_post_update_clear_menu_cache' => '9.0.0',
     'system_post_update_layout_plugin_schema_change' => '9.0.0',
     'system_post_update_entity_reference_autocomplete_match_limit' => '9.0.0',
+    'system_post_update_extra_fields_form_display' => '10.0.0',
+    'system_post_update_uninstall_simpletest' => '10.0.0',
+    'system_post_update_uninstall_entity_reference_module' => '10.0.0',
+    'system_post_update_entity_revision_metadata_bc_cleanup' => '10.0.0',
+    'system_post_update_uninstall_classy' => '10.0.0',
+    'system_post_update_uninstall_stable' => '10.0.0',
+    'system_post_update_claro_dropbutton_variants' => '10.0.0',
+    'system_post_update_schema_version_int' => '10.0.0',
+    'system_post_update_delete_rss_settings' => '10.0.0',
+    'system_post_update_remove_key_value_expire_all_index' => '10.0.0',
+    'system_post_update_service_advisory_settings' => '10.0.0',
+    'system_post_update_delete_authorize_settings' => '10.0.0',
+    'system_post_update_sort_all_config' => '10.0.0',
+    'system_post_update_enable_provider_database_driver' => '10.0.0',
+    'system_post_update_linkset_settings' => '11.0.0',
+    'system_post_update_enable_password_compatibility' => '11.0.0',
+    'system_post_update_remove_asset_entries' => '11.0.0',
+    'system_post_update_remove_asset_query_string' => '11.0.0',
+    'system_post_update_add_description_to_entity_view_mode' => '11.0.0',
+    'system_post_update_add_description_to_entity_form_mode' => '11.0.0',
+    'system_post_update_set_blank_log_url_to_null' => '11.0.0',
+    'system_post_update_mailer_dsn_settings' => '11.0.0',
+    'system_post_update_mailer_structured_dsn_settings' => '11.0.0',
+    'system_post_update_amend_config_sync_readme_url' => '11.0.0',
+    'system_post_update_mail_notification_setting' => '11.0.0',
+    'system_post_update_set_cron_logging_setting_to_boolean' => '11.0.0',
+    'system_post_update_move_development_settings_to_keyvalue' => '11.0.0',
+    'system_post_update_add_langcode_to_all_translatable_config' => '11.0.0',
   ];
 }
 
 /**
- * Update all entity form displays that contain extra fields.
+ * Updates system.date config to NULL for empty country and timezone defaults.
  */
-function system_post_update_extra_fields_form_display(&$sandbox = NULL) {
-  $config_entity_updater = \Drupal::classResolver(ConfigEntityUpdater::class);
-  $entity_field_manager = \Drupal::service('entity_field.manager');
+function system_post_update_convert_empty_country_and_timezone_settings_to_null(): void {
+  $system_date_settings = \Drupal::configFactory()->getEditable('system.date');
+  $changed = FALSE;
+  if ($system_date_settings->get('country.default') === '') {
+    $system_date_settings->set('country.default', NULL);
+    $changed = TRUE;
+  }
+  if ($system_date_settings->get('timezone.default') === '') {
+    $system_date_settings->set('timezone.default', NULL);
+    $changed = TRUE;
+  }
+  if ($changed) {
+    $system_date_settings->save();
+  }
+}
 
-  $callback = function (EntityDisplayInterface $display) use ($entity_field_manager) {
-    $display_context = $display instanceof EntityViewDisplayInterface ? 'display' : 'form';
-    $extra_fields = $entity_field_manager->getExtraFields($display->getTargetEntityTypeId(), $display->getTargetBundle());
+/**
+ * Uninstall the sdc module if installed.
+ */
+function system_post_update_sdc_uninstall(): void {
+  if (\Drupal::moduleHandler()->moduleExists('sdc')) {
+    \Drupal::service('module_installer')->uninstall(['sdc'], FALSE);
+  }
+}
 
-    // If any extra fields are used as a component, resave the display with the
-    // updated component information.
-    $needs_save = FALSE;
-    if (!empty($extra_fields[$display_context])) {
-      foreach ($extra_fields[$display_context] as $name => $extra_field) {
-        if ($component = $display->getComponent($name)) {
-          $display->setComponent($name, $component);
-          $needs_save = TRUE;
-        }
+/**
+ * Rebuild the container to fix HTML in RSS feeds.
+ */
+function system_post_update_remove_rss_cdata_subscriber(): void {
+  // Empty update to trigger container rebuild.
+}
+
+/**
+ * Remove path key in system.file.
+ */
+function system_post_update_remove_path_key(): void {
+  if (\Drupal::config('system.file')->get('path') !== NULL) {
+    \Drupal::configFactory()->getEditable('system.file')
+      ->clear('path')
+      ->save();
+  }
+}
+
+/**
+ * Updates entity_form_mode descriptions from empty string to null.
+ */
+function system_post_update_convert_empty_description_entity_form_modes_to_null(array &$sandbox): void {
+  \Drupal::classResolver(ConfigEntityUpdater::class)
+    ->update($sandbox, 'entity_form_mode', function (EntityFormModeInterface $form_mode): bool {
+      // Entity form mode's `description` field must be stored as NULL at the
+      // config level if they are empty.
+      if ($form_mode->get('description') !== NULL && trim($form_mode->get('description')) === '') {
+        $form_mode->set('description', NULL);
+        return TRUE;
       }
-    }
-    return $needs_save;
-  };
+      return FALSE;
+    });
 
-  $config_entity_updater->update($sandbox, 'entity_form_display', $callback);
 }
 
 /**
- * Uninstall SimpleTest.
- *
- * @see https://www.drupal.org/project/drupal/issues/3110862
+ * Delete obsolete system.rss configuration.
  */
-function system_post_update_uninstall_simpletest() {
-  \Drupal::service('module_installer')->uninstall(['simpletest']);
-}
-
-/**
- * Uninstall entity_reference.
- *
- * @see https://www.drupal.org/project/drupal/issues/3111645
- */
-function system_post_update_uninstall_entity_reference_module() {
-  \Drupal::service('module_installer')->uninstall(['entity_reference']);
-}
-
-/**
- * Remove backwards-compatibility leftovers from entity type definitions.
- */
-function system_post_update_entity_revision_metadata_bc_cleanup() {
-  /** @var \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $last_installed_schema_repository */
-  $last_installed_schema_repository = \Drupal::service('entity.last_installed_schema.repository');
-
-  // Get a list of content entity types.
-  /** @var \Drupal\Core\Entity\EntityTypeInterface[] $last_installed_definitions */
-  $last_installed_definitions = array_filter($last_installed_schema_repository->getLastInstalledDefinitions(), function (EntityTypeInterface $entity_type) {
-    return $entity_type instanceof ContentEntityTypeInterface;
-  });
-
-  // Remove the '$requiredRevisionMetadataKeys' property for these entity types.
-  foreach ($last_installed_definitions as $entity_type_id => $entity_type) {
-    $closure = function (ContentEntityTypeInterface $entity_type) {
-      return get_object_vars($entity_type);
-    };
-    $closure = \Closure::bind($closure, NULL, $entity_type);
-
-    $entity_type_definition = $closure($entity_type);
-    unset($entity_type_definition["\x00*\x00requiredRevisionMetadataKeys"]);
-    $entity_type = new ContentEntityType($entity_type_definition);
-
-    $last_installed_schema_repository->setLastInstalledDefinition($entity_type);
+function system_post_update_delete_rss_config(array &$sandbox): void {
+  if (!isset($sandbox['#system_post_update_delete_rss_config__previous_view_mode'])) {
+    $sandbox['#system_post_update_delete_rss_config__previous_view_mode'] = \Drupal::configFactory()->getEditable('system.rss')->get('items.view_mode');
   }
-}
 
-/**
- * Uninstall Classy if it is no longer needed.
- */
-function system_post_update_uninstall_classy() {
-  /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
-  $theme_installer = \Drupal::getContainer()->get('theme_installer');
-  try {
-    $theme_installer->uninstall(['classy']);
+  if (\Drupal::moduleHandler()->moduleExists('views')) {
+    /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+    $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+    $view_config_updater->setDeprecationsEnabled(FALSE);
+    \Drupal::classResolver(ConfigEntityUpdater::class)
+      ->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater, $sandbox): bool {
+        return $view_config_updater->needsRssViewModeUpdate($view, $sandbox['#system_post_update_delete_rss_config__previous_view_mode']);
+      });
   }
-  catch (\InvalidArgumentException | UnknownExtensionException $exception) {
-    // Exception is thrown if Classy wasn't installed or if there are themes
-    // depending on it.
-  }
-}
 
-/**
- * Uninstall Stable if it is no longer needed.
- *
- * This needs to run after system_post_update_uninstall_classy(). This will be
- * the case since getAvailableUpdateFunctions() returns an alphabetically sorted
- * list of post_update hooks to be run.
- *
- * @see Drupal\Core\Update\UpdateRegistry::getAvailableUpdateFunctions()
- */
-function system_post_update_uninstall_stable() {
-  /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
-  $theme_installer = \Drupal::getContainer()->get('theme_installer');
-  try {
-    $theme_installer->uninstall(['stable']);
+  if (!isset($sandbox['#finished']) || $sandbox['#finished'] >= 1) {
+    \Drupal::configFactory()->getEditable('system.rss')->delete();
   }
-  catch (\InvalidArgumentException | UnknownExtensionException $exception) {
-    // Exception is thrown if Stable wasn't installed or if there are themes
-    // depending on it.
-  }
-}
-
-/**
- * Clear caches due to trustedCallbacks changing in ClaroPreRender.
- */
-function system_post_update_claro_dropbutton_variants() {
-  // Empty post-update hook.
-}
-
-/**
- * Update schema version to integers.
- *
- * @see https://www.drupal.org/project/drupal/issues/3143713
- */
-function system_post_update_schema_version_int() {
-  $registry = \Drupal::keyValue('system.schema');
-  foreach ($registry->getAll() as $name => $schema) {
-    if (is_string($schema)) {
-      $registry->set($name, (int) $schema);
-    }
-  }
-}
-
-/**
- * Remove obsolete system.rss configuration.
- */
-function system_post_update_delete_rss_settings() {
-  \Drupal::configFactory()->getEditable('system.rss')
-    ->clear('channel')
-    ->clear('items.limit')
-    ->clear('langcode')
-    ->save();
 }

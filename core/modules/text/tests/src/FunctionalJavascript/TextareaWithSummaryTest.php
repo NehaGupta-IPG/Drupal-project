@@ -1,15 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\text\FunctionalJavascript;
 
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the JavaScript functionality of the text_textarea_with_summary widget.
- *
- * @group text
  */
+#[Group('text')]
+#[RunTestsInSeparateProcesses]
 class TextareaWithSummaryTest extends WebDriverTestBase {
 
   /**
@@ -28,7 +33,41 @@ class TextareaWithSummaryTest extends WebDriverTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->drupalCreateContentType(['type' => 'page']);
+    $this->drupalCreateContentType(['type' => 'page'], FALSE);
+
+    FieldStorageConfig::create([
+      'field_name' => 'body_test',
+      'type' => 'text_with_summary',
+      'entity_type' => 'node',
+      'cardinality' => 1,
+    ])->save();
+
+    $fieldStorage = FieldStorageConfig::loadByName('node', 'body_test');
+    FieldConfig::create([
+      'field_storage' => $fieldStorage,
+      'bundle' => 'page',
+      'label' => 'Body Test',
+      'settings' => [
+        'display_summary' => TRUE,
+        'allowed_formats' => [],
+      ],
+    ])->save();
+
+    $display_repository = \Drupal::service('entity_display.repository');
+    // Assign widget settings for the default form mode.
+    $display_repository->getFormDisplay('node', 'page')
+      ->setComponent('body_test', [
+        'type' => 'text_textarea_with_summary',
+      ])
+      ->save();
+
+    // Assign display settings for the 'default' view mode.
+    $display_repository->getViewDisplay('node', 'page')
+      ->setComponent('body_test', [
+        'label' => 'hidden',
+        'type' => 'text_default',
+      ])
+      ->save();
 
     $account = $this->drupalCreateUser([
       'create page content',
@@ -39,11 +78,13 @@ class TextareaWithSummaryTest extends WebDriverTestBase {
 
   /**
    * Helper to test toggling the summary area.
+   *
+   * @internal
    */
-  protected function assertSummaryToggle() {
+  protected function assertSummaryToggle(): void {
     $this->drupalGet('node/add/page');
-    $widget = $this->getSession()->getPage()->findById('edit-body-wrapper');
-    $summary_field = $widget->findField('edit-body-0-summary');
+    $widget = $this->getSession()->getPage()->findById('edit-body-test-wrapper');
+    $summary_field = $widget->findField('edit-body-test-0-summary');
 
     $this->assertEquals(FALSE, $summary_field->isVisible(), 'Summary field is hidden by default.');
     $this->assertEquals(FALSE, $widget->hasButton('Hide summary'), 'No Hide summary link by default.');
@@ -61,20 +102,27 @@ class TextareaWithSummaryTest extends WebDriverTestBase {
   /**
    * Tests the textSummary javascript behavior.
    */
-  public function testTextSummaryBehavior() {
+  public function testTextSummaryBehavior(): void {
     // Test with field defaults.
     $this->assertSummaryToggle();
 
     // Repeat test with non-empty field description.
-    $body_field = FieldConfig::loadByName('node', 'page', 'body');
+    $body_field = FieldConfig::loadByName('node', 'page', 'body_test');
     $body_field->set('description', 'Text with Summary field description.');
     $body_field->save();
 
     $this->assertSummaryToggle();
 
+    // Repeat test with unlimited cardinality field.
+    $body_field_storage = FieldStorageConfig::loadByName('node', 'body_test');
+    $body_field_storage->setCardinality(-1);
+    $body_field_storage->save();
+
+    $this->assertSummaryToggle();
+
     // Test summary is shown when non-empty.
     $node = $this->createNode([
-      'body' => [
+      'body_test' => [
         [
           'value' => $this->randomMachineName(32),
           'summary' => $this->randomMachineName(32),
@@ -84,10 +132,50 @@ class TextareaWithSummaryTest extends WebDriverTestBase {
     ]);
 
     $this->drupalGet('node/' . $node->id() . '/edit');
-    $page = $this->getSession()->getPage();
-    $summary_field = $page->findField('edit-body-0-summary');
+    $summary_field = $this->getSession()->getPage()->findField('edit-body-test-0-summary');
 
-    $this->assertEquals(TRUE, $summary_field->isVisible(), 'Non-empty summary field is shown by default.');
+    $this->assertEquals(TRUE, $summary_field->isVisible());
+  }
+
+  /**
+   * Tests that the textSummary behavior is not run for required summary fields.
+   */
+  public function testTextSummaryRequiredBehavior(): void {
+    // Test with field defaults.
+    $this->assertSummaryToggle();
+
+    // Create a second field with a required summary.
+    $field_name = $this->randomMachineName();
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'node',
+      'type' => 'text_with_summary',
+    ]);
+    $field_storage->save();
+    FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => 'page',
+      'label' => $this->randomMachineName() . '_label',
+      'settings' => [
+        'display_summary' => TRUE,
+        'required_summary' => TRUE,
+      ],
+    ])->save();
+
+    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
+    $display_repository = \Drupal::service('entity_display.repository');
+
+    $display_repository->getFormDisplay('node', 'page')
+      ->setComponent($field_name, [
+        'type' => 'text_textarea_with_summary',
+      ])
+      ->save();
+
+    $this->drupalGet('node/add/page');
+    $page = $this->getSession()->getPage();
+    $summary_field = $page->findField('edit-' . $field_name . '-0-summary');
+
+    $this->assertEquals(TRUE, $summary_field->isVisible());
   }
 
 }

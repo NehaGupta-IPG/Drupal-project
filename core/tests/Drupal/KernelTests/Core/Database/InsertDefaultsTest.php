@@ -1,33 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Query\NoFieldsException;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Insert query builder with default values.
- *
- * @group Database
  */
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class InsertDefaultsTest extends DatabaseTestBase {
 
   /**
    * Tests that we can run a query that uses default values for everything.
+   *
+   * @see \database_test_schema()
    */
-  public function testDefaultInsert() {
+  public function testDefaultInsert(): void {
     $query = $this->connection->insert('test')->useDefaults(['job']);
     $id = $query->execute();
-
-    $schema = drupal_get_module_schema('database_test', 'test');
-
     $job = $this->connection->query('SELECT [job] FROM {test} WHERE [id] = :id', [':id' => $id])->fetchField();
-    $this->assertEqual($schema['fields']['job']['default'], $job, 'Default field value is set.');
+    $this->assertSame('Undefined', $job, 'Default field value is set.');
   }
 
   /**
    * Tests that no action will be preformed if no fields are specified.
    */
-  public function testDefaultEmptyInsert() {
+  public function testDefaultEmptyInsert(): void {
     $num_records_before = (int) $this->connection->query('SELECT COUNT(*) FROM {test}')->fetchField();
 
     try {
@@ -35,7 +38,7 @@ class InsertDefaultsTest extends DatabaseTestBase {
       // This is only executed if no exception has been thrown.
       $this->fail('Expected exception NoFieldsException has not been thrown.');
     }
-    catch (NoFieldsException $e) {
+    catch (NoFieldsException) {
       // Expected exception; just continue testing.
     }
 
@@ -45,17 +48,16 @@ class InsertDefaultsTest extends DatabaseTestBase {
 
   /**
    * Tests that we can insert fields with values and defaults in the same query.
+   *
+   * @see \database_test_schema()
    */
-  public function testDefaultInsertWithFields() {
+  public function testDefaultInsertWithFields(): void {
     $query = $this->connection->insert('test')
       ->fields(['name' => 'Bob'])
       ->useDefaults(['job']);
     $id = $query->execute();
-
-    $schema = drupal_get_module_schema('database_test', 'test');
-
     $job = $this->connection->query('SELECT [job] FROM {test} WHERE [id] = :id', [':id' => $id])->fetchField();
-    $this->assertEqual($schema['fields']['job']['default'], $job, 'Default field value is set.');
+    $this->assertSame('Undefined', $job, 'Default field value is set.');
   }
 
 }

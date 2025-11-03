@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Entity;
 
 use Drupal\Core\Language\Language;
@@ -7,13 +9,15 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Functional\ViewTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\CssSelector\CssSelectorConverter;
 
 /**
  * Tests the rendering of fields (base fields) and their translations.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class FieldEntityTranslationTest extends ViewTestBase {
 
   /**
@@ -39,12 +43,12 @@ class FieldEntityTranslationTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
+    parent::setUp($import_test_views, $modules);
 
     $node_type = NodeType::create([
       'type' => 'article',
-      'label' => 'Article',
+      'name' => 'Article',
     ]);
     $node_type->save();
 
@@ -65,7 +69,7 @@ class FieldEntityTranslationTest extends ViewTestBase {
   /**
    * Tests that different translation mechanisms can be used for base fields.
    */
-  public function testTranslationRows() {
+  public function testTranslationRows(): void {
     $node = Node::create([
       'type' => 'article',
       'title' => 'example EN',
@@ -168,8 +172,10 @@ class FieldEntityTranslationTest extends ViewTestBase {
    *
    * @param array $expected
    *   The expected rows of the result.
+   *
+   * @internal
    */
-  protected function assertRows($expected = []) {
+  protected function assertRows(array $expected = []): void {
     $actual = [];
     $rows = $this->cssSelect('div.views-row');
     foreach ($rows as $row) {
@@ -178,7 +184,7 @@ class FieldEntityTranslationTest extends ViewTestBase {
         'sticky' => $row->find('xpath', (new CssSelectorConverter())->toXPath('.views-field-sticky span.field-content'))->getText(),
       ];
     }
-    $this->assertEqual($expected, $actual);
+    $this->assertEquals($expected, $actual);
   }
 
 }

@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\entity_test\Functional\Rest;
 
 use Drupal\entity_test\Entity\EntityTestMapField;
-use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
+use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 use Drupal\user\Entity\User;
 
-abstract class EntityTestMapFieldResourceTestBase extends EntityResourceTestBase {
+/**
+ * Resource test base for the EntityTestMapField entity.
+ */
+abstract class EntityTestMapFieldResourceTestBase extends ConfigEntityResourceTestBase {
 
   /**
    * {@inheritdoc}
@@ -120,7 +125,7 @@ abstract class EntityTestMapFieldResourceTestBase extends EntityResourceTestBase
     return [
       'name' => [
         [
-          'value' => 'Dramallama',
+          'value' => 'Drama llama',
         ],
       ],
       'data' => [

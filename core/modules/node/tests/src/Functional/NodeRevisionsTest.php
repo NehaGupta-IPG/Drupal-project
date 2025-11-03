@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\Core\Database\Database;
@@ -9,14 +11,14 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
-use Drupal\Component\Serialization\Json;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Create a node with revisions and test viewing, saving, reverting, and
- * deleting revisions for users with access for this content type.
- *
- * @group node
+ * Tests per-content-type node CRUD operation permissions.
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeRevisionsTest extends NodeTestBase {
 
   /**
@@ -97,9 +99,6 @@ class NodeRevisionsTest extends NodeTestBase {
 
     // Create initial node.
     $node = $this->drupalCreateNode();
-    $settings = get_object_vars($node);
-    $settings['revision'] = 1;
-    $settings['isDefaultRevision'] = TRUE;
 
     $nodes = [];
     $logs = [];
@@ -144,7 +143,12 @@ class NodeRevisionsTest extends NodeTestBase {
   /**
    * Checks node revision related operations.
    */
-  public function testRevisions() {
+  public function testRevisions(): void {
+    // Access to the revision page for a node with 1 revision is allowed.
+    $node = $this->drupalCreateNode();
+    $this->drupalGet("node/" . $node->id() . "/revisions/" . $node->getRevisionId() . "/view");
+    $this->assertSession()->statusCodeEquals(200);
+
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     $nodes = $this->nodes;
     $logs = $this->revisionLogs;
@@ -154,30 +158,26 @@ class NodeRevisionsTest extends NodeTestBase {
 
     // Confirm the correct revision text appears on "view revisions" page.
     $this->drupalGet("node/" . $node->id() . "/revisions/" . $node->getRevisionId() . "/view");
-    $this->assertText($node->body->value);
+    $this->assertSession()->pageTextContains($node->body->value);
 
     // Confirm the correct log message appears on "revisions overview" page.
     $this->drupalGet("node/" . $node->id() . "/revisions");
     foreach ($logs as $revision_log) {
-      $this->assertText($revision_log);
+      $this->assertSession()->pageTextContains($revision_log);
     }
     // Original author, and editor names should appear on revisions overview.
     $web_user = $nodes[0]->revision_uid->entity;
-    $this->assertText('by ' . $web_user->getAccountName());
+    $this->assertSession()->pageTextContains('by ' . $web_user->getAccountName());
     $editor = $nodes[2]->revision_uid->entity;
-    $this->assertText('by ' . $editor->getAccountName());
+    $this->assertSession()->pageTextContains('by ' . $editor->getAccountName());
 
     // Confirm that this is the default revision.
     $this->assertTrue($node->isDefaultRevision(), 'Third node revision is the default one.');
 
     // Confirm that revisions revert properly.
-    $this->drupalPostForm("node/" . $node->id() . "/revisions/" . $nodes[1]->getRevisionid() . "/revert", [], 'Revert');
-    $this->assertRaw(t('@type %title has been reverted to the revision from %revision-date.', [
-      '@type' => 'Basic page',
-      '%title' => $nodes[1]->label(),
-      '%revision-date' => $this->container->get('date.formatter')->format($nodes[1]->getRevisionCreationTime()),
-    ]));
-    $node_storage->resetCache([$node->id()]);
+    $this->drupalGet("node/" . $node->id() . "/revisions/" . $nodes[1]->getRevisionid() . "/revert");
+    $this->submitForm([], 'Revert');
+    $this->assertSession()->pageTextContains("Basic page {$nodes[1]->label()} has been reverted to the revision from {$this->container->get('date.formatter')->format($nodes[1]->getRevisionCreationTime())}.");
     $reverted_node = $node_storage->load($node->id());
     $this->assertSame($nodes[1]->body->value, $reverted_node->body->value, 'Node reverted correctly.');
     // Confirm the revision author is the user performing the revert.
@@ -186,16 +186,13 @@ class NodeRevisionsTest extends NodeTestBase {
     $this->assertNotSame($nodes[1]->getRevisionUserId(), $reverted_node->getRevisionUserId(), 'Node revision author is not original revision author.');
 
     // Confirm that this is not the default version.
-    $node = node_revision_load($node->getRevisionId());
+    $node = $node_storage->loadRevision($node->getRevisionId());
     $this->assertFalse($node->isDefaultRevision(), 'Third node revision is not the default one.');
 
     // Confirm revisions delete properly.
-    $this->drupalPostForm("node/" . $node->id() . "/revisions/" . $nodes[1]->getRevisionId() . "/delete", [], 'Delete');
-    $this->assertRaw(t('Revision from %revision-date of @type %title has been deleted.', [
-      '%revision-date' => $this->container->get('date.formatter')->format($nodes[1]->getRevisionCreationTime()),
-      '@type' => 'Basic page',
-      '%title' => $nodes[1]->label(),
-    ]));
+    $this->drupalGet("node/" . $node->id() . "/revisions/" . $nodes[1]->getRevisionId() . "/delete");
+    $this->submitForm([], 'Delete');
+    $this->assertSession()->pageTextContains("Revision from {$this->container->get('date.formatter')->format($nodes[1]->getRevisionCreationTime())} of Basic page {$nodes[1]->label()} has been deleted.");
     $connection = Database::getConnection();
     $nids = \Drupal::entityQuery('node')
       ->accessCheck(FALSE)
@@ -207,19 +204,40 @@ class NodeRevisionsTest extends NodeTestBase {
 
     // Set the revision timestamp to an older date to make sure that the
     // confirmation message correctly displays the stored revision date.
-    $old_revision_date = REQUEST_TIME - 86400;
+    $old_revision_date = \Drupal::time()->getRequestTime() - 86400;
     $connection->update('node_revision')
       ->condition('vid', $nodes[2]->getRevisionId())
       ->fields([
         'revision_timestamp' => $old_revision_date,
       ])
       ->execute();
-    $this->drupalPostForm("node/" . $node->id() . "/revisions/" . $nodes[2]->getRevisionId() . "/revert", [], 'Revert');
-    $this->assertRaw(t('@type %title has been reverted to the revision from %revision-date.', [
-      '@type' => 'Basic page',
-      '%title' => $nodes[2]->label(),
-      '%revision-date' => $this->container->get('date.formatter')->format($old_revision_date),
-    ]));
+    $this->drupalGet("node/" . $node->id() . "/revisions/" . $nodes[2]->getRevisionId() . "/revert");
+    $this->submitForm([], 'Revert');
+    $this->assertSession()->pageTextContains("Basic page {$nodes[2]->label()} has been reverted to the revision from {$this->container->get('date.formatter')->format($old_revision_date)}.");
+
+    // Confirm user is redirected depending on the remaining revisions,
+    // when a revision is deleted.
+    $query = \Drupal::entityQuery('node')->allRevisions()->condition('nid', $node->id())->accessCheck(FALSE);
+    $existing_revision_ids = array_keys($query->execute());
+    // Delete all revision except last 3.
+    $remaining_revision_ids = array_slice($existing_revision_ids, -3, 3);
+    foreach ($existing_revision_ids as $revision_id) {
+      if (!in_array($revision_id, $remaining_revision_ids)) {
+        $node_storage->deleteRevision($revision_id);
+      }
+    }
+
+    // Confirm user was redirected to revisions history page.
+    $this->drupalGet("node/" . $node->id() . "/revisions/" . $remaining_revision_ids[0] . "/delete");
+    $this->submitForm([], 'Delete');
+    $this->assertSession()->pageTextContains("Revisions for {$nodes[2]->label()}");
+    $this->assertSession()->pageTextNotContains($nodes[2]->body->value);
+
+    // Confirm user was redirected to the node page.
+    $this->drupalGet("node/" . $node->id() . "/revisions/" . $remaining_revision_ids[1] . "/delete");
+    $this->submitForm([], 'Delete');
+    $this->assertSession()->pageTextNotContains("Revisions for {$nodes[2]->label()}");
+    $this->assertSession()->pageTextContains($nodes[2]->body->value);
 
     // Make a new revision and set it to not be default.
     // This will create a new revision that is not "front facing".
@@ -233,11 +251,11 @@ class NodeRevisionsTest extends NodeTestBase {
 
     // Verify that revision body text is not present on default version of node.
     $this->drupalGet('node/' . $node->id());
-    $this->assertNoText($new_body);
+    $this->assertSession()->pageTextNotContains($new_body);
 
     // Verify that the new body text is present on the revision.
     $this->drupalGet("node/" . $node->id() . "/revisions/" . $new_node_revision->getRevisionId() . "/view");
-    $this->assertText($new_body);
+    $this->assertSession()->pageTextContains($new_body);
 
     // Verify that the non-default revision vid is greater than the default
     // revision vid.
@@ -259,7 +277,7 @@ class NodeRevisionsTest extends NodeTestBase {
     // Verify revisions is accessible since the type has revisions enabled.
     $this->assertSession()->statusCodeEquals(200);
     // Check initial revision is shown on the node revisions overview page.
-    $this->assertText('Simple revision message (EN)');
+    $this->assertSession()->pageTextContains('Simple revision message (EN)');
 
     // Verify that delete operation is inaccessible for the default revision.
     $this->drupalGet("node/" . $node->id() . "/revisions/" . $node->getRevisionId() . "/delete");
@@ -278,8 +296,8 @@ class NodeRevisionsTest extends NodeTestBase {
 
     // Check both revisions are shown on the node revisions overview page.
     $this->drupalGet("node/" . $node->id() . "/revisions");
-    $this->assertText('Simple revision message (EN)');
-    $this->assertText('New revision message (EN)');
+    $this->assertSession()->pageTextContains('Simple revision message (EN)');
+    $this->assertSession()->pageTextContains('New revision message (EN)');
 
     // Create an 'EN' node with a revision log message.
     $node = $this->drupalCreateNode();
@@ -292,7 +310,7 @@ class NodeRevisionsTest extends NodeTestBase {
     // Verify revisions is accessible since the type has revisions enabled.
     $this->assertSession()->statusCodeEquals(200);
     // Check initial revision is shown on the node revisions overview page.
-    $this->assertText('Simple revision message (EN)');
+    $this->assertSession()->pageTextContains('Simple revision message (EN)');
 
     // Add a translation in 'DE' and create a new revision and new log message.
     $translation = $node->addTranslation('de');
@@ -304,24 +322,24 @@ class NodeRevisionsTest extends NodeTestBase {
 
     // View the revision UI in 'IT', only the original node revision is shown.
     $this->drupalGet("it/node/" . $node->id() . "/revisions");
-    $this->assertText('Simple revision message (EN)');
-    $this->assertNoText('New revision message (DE)');
+    $this->assertSession()->pageTextContains('Simple revision message (EN)');
+    $this->assertSession()->pageTextNotContains('New revision message (DE)');
 
     // View the revision UI in 'DE', only the translated node revision is shown.
     $this->drupalGet("de/node/" . $node->id() . "/revisions");
-    $this->assertNoText('Simple revision message (EN)');
-    $this->assertText('New revision message (DE)');
+    $this->assertSession()->pageTextNotContains('Simple revision message (EN)');
+    $this->assertSession()->pageTextContains('New revision message (DE)');
 
     // View the revision UI in 'EN', only the original node revision is shown.
     $this->drupalGet("node/" . $node->id() . "/revisions");
-    $this->assertText('Simple revision message (EN)');
-    $this->assertNoText('New revision message (DE)');
+    $this->assertSession()->pageTextContains('Simple revision message (EN)');
+    $this->assertSession()->pageTextNotContains('New revision message (DE)');
   }
 
   /**
    * Checks that revisions are correctly saved without log messages.
    */
-  public function testNodeRevisionWithoutLogMessage() {
+  public function testNodeRevisionWithoutLogMessage(): void {
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     // Create a node with an initial log message.
     $revision_log = $this->randomMachineName(10);
@@ -340,10 +358,9 @@ class NodeRevisionsTest extends NodeTestBase {
 
     $node->save();
     $this->drupalGet('node/' . $node->id());
-    $this->assertText($new_title);
-    $node_storage->resetCache([$node->id()]);
+    $this->assertSession()->pageTextContains($new_title);
     $node_revision = $node_storage->load($node->id());
-    $this->assertEqual($revision_log, $node_revision->revision_log->value, 'After an existing node revision is re-saved without a log message, the original log message is preserved.');
+    $this->assertEquals($revision_log, $node_revision->revision_log->value, 'After an existing node revision is re-saved without a log message, the original log message is preserved.');
 
     // Create another node with an initial revision log message.
     $node = $this->drupalCreateNode(['revision_log' => $revision_log]);
@@ -359,37 +376,15 @@ class NodeRevisionsTest extends NodeTestBase {
 
     $node->save();
     $this->drupalGet('node/' . $node->id());
-    $this->assertText($new_title);
-    $node_storage->resetCache([$node->id()]);
+    $this->assertSession()->pageTextContains($new_title);
     $node_revision = $node_storage->load($node->id());
-    $this->assertTrue(empty($node_revision->revision_log->value), 'After a new node revision is saved with an empty log message, the log message for the node is empty.');
-  }
-
-  /**
-   * Gets server-rendered contextual links for the given contextual links IDs.
-   *
-   * @param string[] $ids
-   *   An array of contextual link IDs.
-   * @param string $current_path
-   *   The Drupal path for the page for which the contextual links are rendered.
-   *
-   * @return string
-   *   The decoded JSON response body.
-   */
-  protected function renderContextualLinks(array $ids, $current_path) {
-    $post = [];
-    for ($i = 0; $i < count($ids); $i++) {
-      $post['ids[' . $i . ']'] = $ids[$i];
-    }
-    $response = $this->drupalPost('contextual/render', 'application/json', $post, ['query' => ['destination' => $current_path]]);
-
-    return Json::decode($response);
+    $this->assertEmpty($node_revision->revision_log->value, 'After a new node revision is saved with an empty log message, the log message for the node is empty.');
   }
 
   /**
    * Tests the revision translations are correctly reverted.
    */
-  public function testRevisionTranslationRevert() {
+  public function testRevisionTranslationRevert(): void {
     // Create a node and a few revisions.
     $node = $this->drupalCreateNode(['langcode' => 'en']);
 
@@ -421,15 +416,15 @@ class NodeRevisionsTest extends NodeTestBase {
       'node_revision' => $revert_id,
       'langcode' => 'it',
     ]);
-    $this->drupalPostForm($revert_translation_url, [], 'Revert');
+    $this->drupalGet($revert_translation_url);
+    $this->submitForm([], 'Revert');
     /** @var \Drupal\node\NodeStorage $node_storage */
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
-    $node_storage->resetCache();
     /** @var \Drupal\node\NodeInterface $node */
     $node = $node_storage->load($node->id());
     $this->assertGreaterThan($translation_revision_id, $node->getRevisionId());
-    $this->assertEqual($default_translation_title, $node->label());
-    $this->assertEqual($translated_title, $node->getTranslation('it')->label());
+    $this->assertEquals($default_translation_title, $node->label());
+    $this->assertEquals($translated_title, $node->getTranslation('it')->label());
     $this->assertNotEquals($untranslatable_string, $node->untranslatable_string_field->value);
 
     $latest_revision_id = $translation->getRevisionId();
@@ -438,14 +433,14 @@ class NodeRevisionsTest extends NodeTestBase {
     // translation revision again, and check that the desired value was reverted
     // but the default translation value was preserved. But in addition the
     // untranslated field will be reverted as well.
-    $this->drupalPostForm($revert_translation_url, ['revert_untranslated_fields' => TRUE], 'Revert');
-    $node_storage->resetCache();
+    $this->drupalGet($revert_translation_url);
+    $this->submitForm(['revert_untranslated_fields' => TRUE], 'Revert');
     /** @var \Drupal\node\NodeInterface $node */
     $node = $node_storage->load($node->id());
     $this->assertGreaterThan($latest_revision_id, $node->getRevisionId());
-    $this->assertEqual($default_translation_title, $node->label());
-    $this->assertEqual($translated_title, $node->getTranslation('it')->label());
-    $this->assertEqual($untranslatable_string, $node->untranslatable_string_field->value);
+    $this->assertEquals($default_translation_title, $node->label());
+    $this->assertEquals($translated_title, $node->getTranslation('it')->label());
+    $this->assertEquals($untranslatable_string, $node->untranslatable_string_field->value);
 
     $latest_revision_id = $translation->getRevisionId();
 
@@ -455,12 +450,12 @@ class NodeRevisionsTest extends NodeTestBase {
       'node' => $node->id(),
       'node_revision' => $initial_revision_id,
     ]);
-    $this->drupalPostForm($revert_url, [], 'Revert');
-    $node_storage->resetCache();
+    $this->drupalGet($revert_url);
+    $this->submitForm([], 'Revert');
     /** @var \Drupal\node\NodeInterface $node */
     $node = $node_storage->load($node->id());
     $this->assertGreaterThan($latest_revision_id, $node->getRevisionId());
-    $this->assertEqual($initial_title, $node->label());
+    $this->assertEquals($initial_title, $node->label());
     $this->assertFalse($node->hasTranslation('it'));
   }
 
@@ -469,10 +464,10 @@ class NodeRevisionsTest extends NodeTestBase {
    *
    * @param \Drupal\node\NodeInterface $node
    *   The node object.
-   * @param $count
+   * @param int $count
    *   The number of revisions to be created.
    */
-  protected function createRevisions(NodeInterface $node, $count) {
+  protected function createRevisions(NodeInterface $node, $count): void {
     for ($i = 0; $i < $count; $i++) {
       $node->title = $this->randomString();
       $node->untranslatable_string_field->value = $this->randomString();

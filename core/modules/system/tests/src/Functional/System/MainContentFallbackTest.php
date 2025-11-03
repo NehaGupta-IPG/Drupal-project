@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test SimplePageVariant main content rendering fallback page display variant.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class MainContentFallbackTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'system_test'];
 
@@ -23,9 +25,23 @@ class MainContentFallbackTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * The administrator user for the test.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
   protected $adminUser;
+
+  /**
+   * The web user for the test.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
   protected $webUser;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -42,15 +58,16 @@ class MainContentFallbackTest extends BrowserTestBase {
   }
 
   /**
-   * Test availability of main content: Drupal falls back to SimplePageVariant.
+   * Tests availability of main content: Drupal falls back to SimplePageVariant.
    */
-  public function testMainContentFallback() {
+  public function testMainContentFallback(): void {
     $edit = [];
     // Uninstall the block module.
     $edit['uninstall[block]'] = 'block';
-    $this->drupalPostForm('admin/modules/uninstall', $edit, 'Uninstall');
+    $this->drupalGet('admin/modules/uninstall');
+    $this->submitForm($edit, 'Uninstall');
     $this->submitForm([], 'Uninstall');
-    $this->assertText('The selected modules have been uninstalled.');
+    $this->assertSession()->pageTextContains('The selected modules have been uninstalled.');
     $this->rebuildContainer();
     $this->assertFalse(\Drupal::moduleHandler()->moduleExists('block'), 'Block module uninstall.');
 
@@ -60,7 +77,7 @@ class MainContentFallbackTest extends BrowserTestBase {
     $this->drupalGet('admin/config/system/site-information');
     $this->assertSession()->fieldExists('site_name');
     $this->drupalGet('system-test/main-content-fallback');
-    $this->assertText('Content to test main content fallback');
+    $this->assertSession()->pageTextContains('Content to test main content fallback');
     // Request a user* page and see if it is displayed.
     $this->drupalLogin($this->webUser);
     $this->drupalGet('user/' . $this->webUser->id() . '/edit');
@@ -70,10 +87,11 @@ class MainContentFallbackTest extends BrowserTestBase {
     $this->drupalLogin($this->adminUser);
     $edit = [];
     $edit['modules[block][enable]'] = 'block';
-    $this->drupalPostForm('admin/modules', $edit, 'Install');
-    $this->assertText('Module Block has been enabled.');
+    $this->drupalGet('admin/modules');
+    $this->submitForm($edit, 'Install');
+    $this->assertSession()->pageTextContains('Module Block has been installed.');
     $this->rebuildContainer();
-    $this->assertTrue(\Drupal::moduleHandler()->moduleExists('block'), 'Block module re-enabled.');
+    $this->assertTrue(\Drupal::moduleHandler()->moduleExists('block'), 'Block module re-installed.');
   }
 
 }

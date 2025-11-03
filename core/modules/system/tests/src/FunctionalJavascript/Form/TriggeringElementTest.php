@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\FunctionalJavascript\Form;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that FAPI correctly determines the triggering element.
- *
- * @group Form
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class TriggeringElementTest extends WebDriverTestBase {
 
   /**
@@ -28,7 +32,7 @@ class TriggeringElementTest extends WebDriverTestBase {
    * information is included in the POST data, as is sometimes the case when
    * the ENTER key is pressed in a textfield in Internet Explorer.
    */
-  public function testNoButtonInfoInPost() {
+  public function testNoButtonInfoInPost(): void {
     $path = '/form-test/clicked-button';
     $form_html_id = 'form-test-clicked-button';
 
@@ -86,7 +90,7 @@ class TriggeringElementTest extends WebDriverTestBase {
    * Test that the triggering element does not get set to a button with
    * #access=FALSE.
    */
-  public function testAttemptAccessControlBypass() {
+  public function testAttemptAccessControlBypass(): void {
     $path = 'form-test/clicked-button';
     $form_html_id = 'form-test-clicked-button';
 
@@ -95,7 +99,7 @@ class TriggeringElementTest extends WebDriverTestBase {
 
     // Submit the form with 'button1=button1' in the POST data, which someone
     // trying to get around security safeguards could easily do. We have to do
-    // a little trickery here, to work around the safeguards in drupalPostForm()
+    // a little trickery here, to work around the safeguards in submitForm()
     // by renaming the text field and value that is in the form to 'button1',
     // we can get the data we want into \Drupal::request()->request.
     $page = $this->getSession()->getPage();

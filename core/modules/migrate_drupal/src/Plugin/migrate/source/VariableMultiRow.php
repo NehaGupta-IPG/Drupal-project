@@ -4,11 +4,35 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source;
 
 use Drupal\migrate\Row;
 
+// cspell:ignore multirow
+
 /**
- * Multiple variables source from database.
+ * Drupal 6/7 multiple variables source from database.
  *
  * Unlike the variable source plugin, this one returns one row per
  * variable.
+ *
+ * Available configuration keys:
+ * - variables: (required) The list of variables to retrieve from the source
+ *   database. Each variable is retrieved in a separate row.
+ *
+ * Example:
+ *
+ * @code
+ * plugin: variable_multirow
+ * variables:
+ *   - date_format_long
+ *   - date_format_medium
+ *   - date_format_short
+ * @endcode
+ *
+ * In this example the specified variables are retrieved from the source
+ * database one row per variable.
+ *
+ * For additional configuration keys, refer to the parent classes.
+ *
+ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+ * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
  *
  * @MigrateSource(
  *   id = "variable_multirow",
@@ -42,7 +66,7 @@ class VariableMultiRow extends DrupalSqlBase {
    */
   public function prepareRow(Row $row) {
     if ($value = $row->getSourceProperty('value')) {
-      $row->setSourceProperty('value', unserialize($value));
+      $row->setSourceProperty('value', unserialize($value, ['allowed_classes' => FALSE]));
     }
     return parent::prepareRow($row);
   }

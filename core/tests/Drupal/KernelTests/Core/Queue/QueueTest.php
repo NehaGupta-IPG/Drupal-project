@@ -1,23 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Queue;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Queue\DatabaseQueue;
 use Drupal\Core\Queue\Memory;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Queues and dequeues a set of items to check the basic queue functionality.
- *
- * @group Queue
+ * Queues and unqueues a set of items to check the basic queue functionality.
  */
+#[Group('Queue')]
+#[RunTestsInSeparateProcesses]
 class QueueTest extends KernelTestBase {
 
   /**
    * Tests the System queue.
    */
-  public function testSystemQueue() {
+  public function testSystemQueue(): void {
     // Create two queues.
     $queue1 = new DatabaseQueue($this->randomMachineName(), Database::getConnection());
     $queue1->createQueue();
@@ -30,7 +34,7 @@ class QueueTest extends KernelTestBase {
   /**
    * Tests the Memory queue.
    */
-  public function testMemoryQueue() {
+  public function testMemoryQueue(): void {
     // Create two queues.
     $queue1 = new Memory($this->randomMachineName());
     $queue1->createQueue();
@@ -41,14 +45,14 @@ class QueueTest extends KernelTestBase {
   }
 
   /**
-   * Queues and dequeues a set of items to check the basic queue functionality.
+   * Queues and unqueues a set of items to check the basic queue functionality.
    *
    * @param \Drupal\Core\Queue\QueueInterface $queue1
    *   An instantiated queue object.
    * @param \Drupal\Core\Queue\QueueInterface $queue2
    *   An instantiated queue object.
    */
-  protected function runQueueTest($queue1, $queue2) {
+  protected function runQueueTest($queue1, $queue2): void {
     // Create four items.
     $data = [];
     for ($i = 0; $i < 4; $i++) {
@@ -70,7 +74,7 @@ class QueueTest extends KernelTestBase {
     $new_items[] = $item->data;
 
     // First two dequeued items should match the first two items we queued.
-    $this->assertEqual(2, $this->queueScore($data, $new_items), 'Two items matched');
+    $this->assertEquals(2, $this->queueScore($data, $new_items), 'Two items matched');
 
     // Add two more items.
     $queue1->createItem($data[2]);
@@ -87,10 +91,10 @@ class QueueTest extends KernelTestBase {
 
     // All dequeued items should match the items we queued exactly once,
     // therefore the score must be exactly 4.
-    $this->assertEqual(4, $this->queueScore($data, $new_items), 'Four items matched');
+    $this->assertEquals(4, $this->queueScore($data, $new_items), 'Four items matched');
 
     // There should be no duplicate items.
-    $this->assertEqual(4, $this->queueScore($new_items, $new_items), 'Four items matched');
+    $this->assertEquals(4, $this->queueScore($new_items, $new_items), 'Four items matched');
 
     // Delete all items from queue1.
     foreach ($items as $item) {

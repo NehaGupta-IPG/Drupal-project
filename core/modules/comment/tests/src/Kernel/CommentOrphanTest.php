@@ -1,17 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Kernel;
 
 use Drupal\Core\Datetime\Entity\DateFormat;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\Tests\EntityViewTrait;
-use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests loading and rendering orphan comments.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentOrphanTest extends EntityKernelTestBase {
 
   use EntityViewTrait;
@@ -19,13 +24,14 @@ class CommentOrphanTest extends EntityKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['comment', 'node'];
+  protected static $modules = ['comment', 'node', 'user'];
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installConfig(['user']);
     $this->installEntitySchema('date_format');
     $this->installEntitySchema('comment');
     $this->installSchema('comment', ['comment_entity_statistics']);
@@ -33,10 +39,9 @@ class CommentOrphanTest extends EntityKernelTestBase {
 
   /**
    * Test loading/deleting/rendering orphaned comments.
-   *
-   * @dataProvider providerTestOrphan
    */
-  public function testOrphan($property) {
+  #[DataProvider('providerTestOrphan')]
+  public function testOrphan($property): void {
 
     DateFormat::create([
       'id' => 'fallback',
@@ -74,7 +79,7 @@ class CommentOrphanTest extends EntityKernelTestBase {
       'label' => 'Comment',
     ])->save();
 
-    // Make two comments
+    // Make two comments.
     $comment1 = $comment_storage->create([
       'field_name' => 'comment',
       'comment_body' => 'test',
@@ -97,7 +102,7 @@ class CommentOrphanTest extends EntityKernelTestBase {
     $comments = $comment_storage->loadMultiple();
     foreach ($comments as $comment) {
       $built = $this->buildEntityView($comment, 'full', NULL);
-      $renderer->renderPlain($built);
+      $renderer->renderInIsolation($built);
     }
 
     // Make comment 2 an orphan by setting the property to an invalid value.
@@ -112,18 +117,18 @@ class CommentOrphanTest extends EntityKernelTestBase {
     $comments = $comment_storage->loadMultiple();
     foreach ($comments as $comment) {
       $built = $this->buildEntityView($comment, 'full', NULL);
-      $renderer->renderPlain($built);
+      $renderer->renderInIsolation($built);
     }
 
     $node = $node_storage->load($node->id());
     $built = $this->buildEntityView($node, 'full', NULL);
-    $renderer->renderPlain($built);
+    $renderer->renderInIsolation($built);
   }
 
   /**
    * Provides test data for testOrphan.
    */
-  public function providerTestOrphan() {
+  public static function providerTestOrphan() {
     return [
       ['entity_id'],
       ['uid'],

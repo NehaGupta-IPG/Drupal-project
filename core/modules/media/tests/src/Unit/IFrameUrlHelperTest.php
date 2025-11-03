@@ -1,17 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\Unit;
 
 use Drupal\Core\PrivateKey;
 use Drupal\Core\Routing\RequestContext;
 use Drupal\media\IFrameUrlHelper;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\media\IFrameUrlHelper
- *
- * @group media
+ * Tests Drupal\media\IFrameUrlHelper.
  */
+#[CoversClass(IFrameUrlHelper::class)]
+#[Group('media')]
 class IFrameUrlHelperTest extends UnitTestCase {
 
   /**
@@ -20,8 +25,9 @@ class IFrameUrlHelperTest extends UnitTestCase {
    * @see ::testIsSecure()
    *
    * @return array
+   *   An array of test data.
    */
-  public function providerIsSecure() {
+  public static function providerIsSecure() {
     return [
       'no domain' => [
         '/path/to/media.php',
@@ -71,16 +77,18 @@ class IFrameUrlHelperTest extends UnitTestCase {
    * @param bool $secure
    *   The expected result of isSecure().
    *
-   * @covers ::isSecure
-   *
-   * @dataProvider providerIsSecure
+   * @legacy-covers ::isSecure
    */
-  public function testIsSecure($url, $base_url, $secure) {
-    $request_context = $this->prophesize(RequestContext::class);
-    $request_context->getCompleteBaseUrl()->willReturn($base_url);
+  #[DataProvider('providerIsSecure')]
+  public function testIsSecure($url, $base_url, $secure): void {
+    $request_context = $this->createMock(RequestContext::class);
+    $request_context->expects($this->any())
+      ->method('getCompleteBaseUrl')
+      ->willReturn($base_url);
+
     $url_helper = new IFrameUrlHelper(
-      $request_context->reveal(),
-      $this->prophesize(PrivateKey::class)->reveal()
+      $request_context,
+      $this->createMock(PrivateKey::class)
     );
 
     $this->assertSame($secure, $url_helper->isSecure($url));

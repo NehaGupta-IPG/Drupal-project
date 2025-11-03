@@ -1,24 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Unit\Plugin\migrate\field;
 
 use Drupal\migrate\Plugin\MigrationInterface;
-use Drupal\Tests\UnitTestCase;
 use Drupal\taxonomy\Plugin\migrate\field\TaxonomyTermReference;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 
 /**
- * @coversDefaultClass \Drupal\taxonomy\Plugin\migrate\field\TaxonomyTermReference
- * @group taxonomy
+ * Tests Drupal\taxonomy\Plugin\migrate\field\TaxonomyTermReference.
  */
+#[CoversClass(TaxonomyTermReference::class)]
+#[Group('taxonomy')]
 class TaxonomyTermReferenceFieldTest extends UnitTestCase {
 
   /**
+   * The migrate field plugin.
+   *
    * @var \Drupal\migrate_drupal\Plugin\MigrateFieldInterface
    */
   protected $plugin;
 
   /**
+   * The migration.
+   *
    * @var \Drupal\migrate\Plugin\MigrationInterface
    */
   protected $migration;
@@ -27,6 +36,8 @@ class TaxonomyTermReferenceFieldTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->plugin = new TaxonomyTermReference([], 'taxonomy', []);
 
     $migration = $this->prophesize(MigrationInterface::class);
@@ -44,14 +55,16 @@ class TaxonomyTermReferenceFieldTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::defineValueProcessPipeline
+   * Tests define value process pipeline.
+   *
+   * @legacy-covers ::defineValueProcessPipeline
    */
-  public function testDefineValueProcessPipeline($method = 'defineValueProcessPipeline') {
-    $this->plugin->$method($this->migration, 'somefieldname', []);
+  public function testDefineValueProcessPipeline($method = 'defineValueProcessPipeline'): void {
+    $this->plugin->$method($this->migration, 'field_name', []);
 
     $expected = [
       'plugin' => 'sub_process',
-      'source' => 'somefieldname',
+      'source' => 'field_name',
       'process' => [
         'target_id' => 'tid',
       ],

@@ -1,15 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Tests\views\Functional\ViewTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the ability to disable and enable view displays.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\display\Feed
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class DisabledDisplayTest extends ViewTestBase {
 
   /**
@@ -20,19 +25,20 @@ class DisabledDisplayTest extends ViewTestBase {
   public static $testViews = ['test_disabled_display'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'node', 'views'];
 
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'starterkit_theme';
 
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
+    parent::setUp($import_test_views, $modules);
 
     $this->enableViewsTestModule();
 
@@ -51,7 +57,7 @@ class DisabledDisplayTest extends ViewTestBase {
    * the .enabled property disappear from the schema both the load and save
    * calls will start failing.
    */
-  public function testDisabledDisplays() {
+  public function testDisabledDisplays(): void {
     // The displays defined in this view.
     $display_ids = ['attachment_1', 'block_1', 'embed_1', 'feed_1', 'page_2'];
 
@@ -64,8 +70,7 @@ class DisabledDisplayTest extends ViewTestBase {
 
     // Enabled page display should return content.
     $this->drupalGet('test-disabled-display');
-    $result = $this->xpath('//h1[@class="page-title"]');
-    $this->assertEqual('test_disabled_display', $result[0]->getText(), 'The enabled page_1 display is accessible.');
+    $this->assertSession()->elementTextEquals('xpath', '//h1[@class="page-title"]', 'test_disabled_display');
 
     // Disabled page view should 404.
     $this->drupalGet('test-disabled-display-2');
@@ -83,8 +88,7 @@ class DisabledDisplayTest extends ViewTestBase {
 
     // Check that the originally disabled page_2 display is now enabled.
     $this->drupalGet('test-disabled-display-2');
-    $result = $this->xpath('//h1[@class="page-title"]');
-    $this->assertEqual('test_disabled_display', $result[0]->getText(), 'The enabled page_2 display is accessible.');
+    $this->assertSession()->elementTextEquals('xpath', '//h1[@class="page-title"]', 'test_disabled_display');
 
     // Disable each disabled display and save the view.
     foreach ($display_ids as $display_id) {

@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core;
 
+use Drupal\Component\Utility\Crypt;
 use Drupal\Core\PrivateKey;
 use Drupal\Tests\UnitTestCase;
-use Drupal\Component\Utility\Crypt;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the PrivateKey class.
- *
- * @group PrivateKeyTest
  */
+#[Group('PrivateKeyTest')]
 class PrivateKeyTest extends UnitTestCase {
 
   /**
@@ -49,11 +51,11 @@ class PrivateKeyTest extends UnitTestCase {
   /**
    * Tests PrivateKey::get().
    */
-  public function testGet() {
+  public function testGet(): void {
     $this->state->expects($this->once())
       ->method('get')
       ->with('system.private_key')
-      ->will($this->returnValue($this->key));
+      ->willReturn($this->key);
 
     $this->assertEquals($this->key, $this->privateKey->get());
   }
@@ -61,20 +63,20 @@ class PrivateKeyTest extends UnitTestCase {
   /**
    * Tests PrivateKey::get() with no private key from state.
    */
-  public function testGetNoState() {
+  public function testGetNoState(): void {
     $this->assertIsString($this->privateKey->get());
   }
 
   /**
    * Tests PrivateKey::setPrivateKey().
    */
-  public function testSet() {
+  public function testSet(): void {
     $random_name = $this->randomMachineName();
 
     $this->state->expects($this->once())
       ->method('set')
       ->with('system.private_key', $random_name)
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
 
     $this->privateKey->set($random_name);
   }

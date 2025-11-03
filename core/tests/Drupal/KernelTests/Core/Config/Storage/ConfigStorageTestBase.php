@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Config\Storage;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -33,11 +35,17 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
    *
    * @todo Coverage: Trigger PDOExceptions / Database exceptions.
    */
-  public function testCRUD() {
+  public function testCRUD(): void {
     $name = 'config_test.storage';
 
     // Checking whether a non-existing name exists returns FALSE.
     $this->assertFalse($this->storage->exists($name));
+
+    // Checking whether readMultiple() works with empty storage.
+    $this->assertEmpty($this->storage->readMultiple([$name]));
+
+    // readMultiple() accepts an empty array.
+    $this->assertSame([], $this->storage->readMultiple([]), 'Empty query should return empty array');
 
     // Reading a non-existing name returns FALSE.
     $data = $this->storage->read($name);
@@ -59,6 +67,7 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
     $this->assertTrue($result);
 
     // Listing all names returns all.
+    $this->storage->write('system.performance', []);
     $names = $this->storage->listAll();
     $this->assertContains('system.performance', $names);
     $this->assertContains($name, $names);
@@ -116,7 +125,7 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
   /**
    * Tests an invalid storage.
    */
-  public function testInvalidStorage() {
+  public function testInvalidStorage(): void {
     $name = 'config_test.storage';
 
     // Write something to the valid storage to prove that the storages do not
@@ -137,7 +146,7 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
       $this->invalidStorage->delete($name);
       $this->fail('Exception not thrown upon deleting from a non-existing storage bin.');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       // An exception occurred as expected; just continue.
     }
 
@@ -158,7 +167,7 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
   /**
    * Tests storage writing and reading data preserving data type.
    */
-  public function testDataTypes() {
+  public function testDataTypes(): void {
     $name = 'config_test.types';
     $data = [
       'array' => [],
@@ -182,7 +191,7 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
   /**
    * Tests that the storage supports collections.
    */
-  public function testCollection() {
+  public function testCollection(): void {
     $name = 'config_test.storage';
     $data = ['foo' => 'bar'];
     $result = $this->storage->write($name, $data);
@@ -192,7 +201,7 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
     // Create configuration in a new collection.
     $new_storage = $this->storage->createCollection('collection.sub.new');
     $this->assertFalse($new_storage->exists($name));
-    $this->assertEqual([], $new_storage->listAll());
+    $this->assertEquals([], $new_storage->listAll());
     $this->assertFalse($new_storage->delete($name));
     $this->assertFalse($new_storage->deleteAll('config_test.'));
     $this->assertFalse($new_storage->deleteAll());
@@ -200,7 +209,7 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
     $new_storage->write($name, $data);
     $this->assertTrue($result);
     $this->assertSame($data, $new_storage->read($name));
-    $this->assertEqual([$name], $new_storage->listAll());
+    $this->assertEquals([$name], $new_storage->listAll());
     $this->assertTrue($new_storage->exists($name));
     $new_data = ['foo' => 'baz'];
     $new_storage->write($name, $new_data);
@@ -210,11 +219,11 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
     // Create configuration in another collection.
     $another_storage = $this->storage->createCollection('collection.sub.another');
     $this->assertFalse($another_storage->exists($name));
-    $this->assertEqual([], $another_storage->listAll());
+    $this->assertEquals([], $another_storage->listAll());
     $another_storage->write($name, $new_data);
     $this->assertTrue($result);
     $this->assertSame($new_data, $another_storage->read($name));
-    $this->assertEqual([$name], $another_storage->listAll());
+    $this->assertEquals([$name], $another_storage->listAll());
     $this->assertTrue($another_storage->exists($name));
 
     // Create configuration in yet another collection.
@@ -239,11 +248,11 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
     // subdirectories.
     $parent_storage = $this->storage->createCollection('collection');
     $this->assertFalse($parent_storage->exists($name));
-    $this->assertEqual([], $parent_storage->listAll());
+    $this->assertEquals([], $parent_storage->listAll());
     $parent_storage->write($name, $new_data);
     $this->assertTrue($result);
     $this->assertSame($new_data, $parent_storage->read($name));
-    $this->assertEqual([$name], $parent_storage->listAll());
+    $this->assertEquals([$name], $parent_storage->listAll());
     $this->assertTrue($parent_storage->exists($name));
     $this->assertSame(['collection', 'collection.sub.another', 'collection.sub.new'], $this->storage->getAllCollectionNames());
     $parent_storage->deleteAll();
@@ -251,7 +260,7 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
 
     // Test operations on a collection emptied through deletion.
     $this->assertFalse($parent_storage->exists($name));
-    $this->assertEqual([], $parent_storage->listAll());
+    $this->assertEquals([], $parent_storage->listAll());
     $this->assertFalse($parent_storage->delete($name));
     $this->assertFalse($parent_storage->deleteAll('config_test.'));
     $this->assertFalse($parent_storage->deleteAll());
@@ -265,12 +274,24 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
     $this->assertSame(['collection.sub.another', 'collection.sub.new'], $this->storage->getAllCollectionNames());
   }
 
+  /**
+   * Reads configuration data from the storage.
+   */
   abstract protected function read($name);
 
+  /**
+   * Inserts configuration data in the storage.
+   */
   abstract protected function insert($name, $data);
 
+  /**
+   * Updates configuration data in the storage.
+   */
   abstract protected function update($name, $data);
 
+  /**
+   * Deletes configuration data from the storage.
+   */
   abstract protected function delete($name);
 
 }

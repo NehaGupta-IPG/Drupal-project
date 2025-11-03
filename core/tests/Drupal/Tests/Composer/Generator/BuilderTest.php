@@ -1,37 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Composer\Generator;
 
+use Drupal\Composer\Composer;
 use Drupal\Composer\Generator\Builder\DrupalCoreRecommendedBuilder;
 use Drupal\Composer\Generator\Builder\DrupalDevDependenciesBuilder;
 use Drupal\Composer\Generator\Builder\DrupalPinnedDevDependenciesBuilder;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use Drupal\Composer\Composer;
 
 /**
  * Test DrupalCoreRecommendedBuilder.
- *
- * @group Metapackage
  */
+#[Group('Metapackage')]
 class BuilderTest extends TestCase {
 
   /**
-   * Test data for testBuilder.
+   * Provides test data for testBuilder.
    */
-  public function builderTestData() {
+  public static function builderTestData() {
     return [
       [
         DrupalCoreRecommendedBuilder::class,
         [
           'name' => 'drupal/core-recommended',
           'type' => 'metapackage',
-          'description' => 'Locked core dependencies; require this project INSTEAD OF drupal/core.',
+          'description' => 'Core and its dependencies with known-compatible minor versions. Require this project INSTEAD OF drupal/core.',
           'license' => 'GPL-2.0-or-later',
           'require' =>
           [
             'drupal/core' => Composer::drupalVersionBranch(),
-            'symfony/polyfill-ctype' => 'v1.12.0',
-            'symfony/yaml' => 'v3.4.32',
+            'symfony/polyfill-ctype' => '~v1.12.0',
+            'symfony/yaml' => '~v3.4.32',
           ],
           'conflict' =>
           [
@@ -82,11 +85,10 @@ class BuilderTest extends TestCase {
   }
 
   /**
-   * Test all of the various kinds of builders.
-   *
-   * @dataProvider builderTestData
+   * Tests all of the various kinds of builders.
    */
-  public function testBuilder($builderClass, $expected) {
+  #[DataProvider('builderTestData')]
+  public function testBuilder($builderClass, $expected): void {
     $fixtures = new Fixtures();
     $drupalCoreInfo = $fixtures->drupalCoreComposerFixture();
 

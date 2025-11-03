@@ -4,9 +4,8 @@ namespace Drupal\Core\Session;
 
 /**
  * An implementation of the user account interface for the global user.
- *
- * @todo: Change all properties to protected.
  */
+#[\AllowDynamicProperties]
 class UserSession implements AccountInterface {
 
   /**
@@ -37,13 +36,14 @@ class UserSession implements AccountInterface {
    *
    * @var string
    */
-  public $name = '';
+  protected $name = '';
 
   /**
    * The preferred language code of the account.
    *
    * @var string
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $preferred_langcode;
 
   /**
@@ -51,6 +51,7 @@ class UserSession implements AccountInterface {
    *
    * @var string
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $preferred_admin_langcode;
 
   /**
@@ -100,15 +101,26 @@ class UserSession implements AccountInterface {
   }
 
   /**
+   * Whether a user has a certain role.
+   *
+   * @param string $rid
+   *   The role ID to check.
+   *
+   * @return bool
+   *   Returns TRUE if the user has the role, otherwise FALSE.
+   *
+   * @todo in Drupal 11, add method to Drupal\Core\Session\AccountInterface.
+   * @see https://www.drupal.org/node/3228209
+   */
+  public function hasRole(string $rid): bool {
+    return in_array($rid, $this->getRoles(), TRUE);
+  }
+
+  /**
    * {@inheritdoc}
    */
-  public function hasPermission($permission) {
-    // User #1 has all privileges.
-    if ((int) $this->id() === 1) {
-      return TRUE;
-    }
-
-    return $this->getRoleStorage()->isPermissionInRoles($permission, $this->getRoles());
+  public function hasPermission(string $permission) {
+    return \Drupal::service('permission_checker')->hasPermission($permission, $this);
   }
 
   /**
@@ -196,6 +208,55 @@ class UserSession implements AccountInterface {
    */
   protected function getRoleStorage() {
     return \Drupal::entityTypeManager()->getStorage('user_role');
+  }
+
+  /**
+   * Implements magic __get() method.
+   */
+  public function __get($name): mixed {
+    if ($name === 'name') {
+      @trigger_error("Getting the name property is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Session\UserSession::getAccountName() instead. See https://www.drupal.org/node/3513856", E_USER_DEPRECATED);
+      return $this->getAccountName();
+    }
+    $class = get_class($this);
+    $properties = get_class_vars($class);
+    if (\array_key_exists($name, $properties)) {
+      throw new \LogicException("Cannot access protected property $name in " . $class);
+    }
+    return $this->$name ?? NULL;
+  }
+
+  /**
+   * Implements magic __isset() method.
+   */
+  public function __isset($name): bool {
+    if ($name === 'name') {
+      @trigger_error("Checking for the name property is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Session\UserSession::getAccountName() instead. See https://www.drupal.org/node/3513856", E_USER_DEPRECATED);
+      return isset($this->name);
+    }
+    $class = get_class($this);
+    $properties = get_class_vars($class);
+    if (\array_key_exists($name, $properties)) {
+      throw new \LogicException("Cannot access protected property $name in " . $class);
+    }
+    return isset($this->$name);
+  }
+
+  /**
+   * Implements magic __set() method.
+   */
+  public function __set($name, $value): void {
+    if ($name === 'name') {
+      @trigger_error("Setting the name property is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Set the name via the constructor when creating the UserSession instance. See https://www.drupal.org/node/3513856", E_USER_DEPRECATED);
+      $this->name = $value;
+      return;
+    }
+    $class = get_class($this);
+    $properties = get_class_vars($class);
+    if (\array_key_exists($name, $properties)) {
+      throw new \LogicException("Cannot set protected property $name in " . $class);
+    }
+    $this->$name = $value;
   }
 
 }

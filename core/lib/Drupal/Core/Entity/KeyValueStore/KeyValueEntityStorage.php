@@ -93,7 +93,8 @@ class KeyValueEntityStorage extends EntityStorageBase {
   public function doCreate(array $values = []) {
     // Set default language to site default if not provided.
     $values += [$this->getEntityType()->getKey('langcode') => $this->languageManager->getDefaultLanguage()->getId()];
-    $entity = new $this->entityClass($values, $this->entityTypeId);
+    $entity_class = $this->getEntityClass();
+    $entity = new $entity_class($values, $this->entityTypeId);
 
     // @todo This is handled by ContentEntityStorageBase, which assumes
     //   FieldableEntityInterface. The current approach in
@@ -117,7 +118,7 @@ class KeyValueEntityStorage extends EntityStorageBase {
   /**
    * {@inheritdoc}
    */
-  public function doLoadMultiple(array $ids = NULL) {
+  public function doLoadMultiple(?array $ids = NULL) {
     if (empty($ids)) {
       $entities = $this->keyValueStore->getAll();
     }
@@ -125,20 +126,6 @@ class KeyValueEntityStorage extends EntityStorageBase {
       $entities = $this->keyValueStore->getMultiple($ids);
     }
     return $this->mapFromStorageRecords($entities);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function loadRevision($revision_id) {
-    return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function deleteRevision($revision_id) {
-    return NULL;
   }
 
   /**

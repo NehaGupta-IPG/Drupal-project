@@ -1,16 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Plugin\Discovery;
 
 use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that plugins are correctly discovered using annotated classes.
- *
- * @group Plugin
  */
+#[Group('Plugin')]
+#[RunTestsInSeparateProcesses]
 class AnnotatedClassDiscoveryTest extends DiscoveryTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
     $this->expectedDefinitions = [
@@ -26,7 +34,7 @@ class AnnotatedClassDiscoveryTest extends DiscoveryTestBase {
         'label' => 'Banana',
         'color' => 'yellow',
         'uses' => [
-          'bread' => t('Banana bread'),
+          'bread' => new TranslatableMarkup('Banana bread'),
           'loaf' => [
             'singular' => '@count loaf',
             'plural' => '@count loaves',

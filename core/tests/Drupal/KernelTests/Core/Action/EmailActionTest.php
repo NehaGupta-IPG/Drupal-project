@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Action;
 
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests for the EmailAction plugin.
- *
- * @group action
  */
+#[Group('action')]
+#[RunTestsInSeparateProcesses]
 class EmailActionTest extends KernelTestBase {
   use AssertMailTrait;
 
@@ -28,9 +32,11 @@ class EmailActionTest extends KernelTestBase {
   }
 
   /**
-   * Test the email action plugin.
+   * Tests the email action plugin.
    */
-  public function testEmailAction() {
+  public function testEmailAction(): void {
+    $this->config('system.site')->set('mail', 'test@example.com')->save();
+
     /** @var \Drupal\Core\Action\ActionManager $plugin_manager */
     $plugin_manager = $this->container->get('plugin.manager.action');
     $configuration = [
@@ -57,9 +63,9 @@ class EmailActionTest extends KernelTestBase {
       ->execute()
       ->fetch();
 
-    $this->assertEquals($log->message, 'Sent email to %recipient');
+    $this->assertEquals('Sent email to %recipient', $log->message);
     $variables = unserialize($log->variables);
-    $this->assertEquals($variables['%recipient'], 'test@example.com');
+    $this->assertEquals('test@example.com', $variables['%recipient']);
   }
 
 }

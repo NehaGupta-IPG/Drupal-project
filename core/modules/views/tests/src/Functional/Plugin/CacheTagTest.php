@@ -1,18 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests tag cache plugin.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\cache\Tag
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class CacheTagTest extends ViewTestBase {
 
   /**
@@ -76,8 +81,11 @@ class CacheTagTest extends ViewTestBase {
    */
   protected $user;
 
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
+    parent::setUp($import_test_views, $modules);
 
     $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);
     $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
@@ -119,12 +127,12 @@ class CacheTagTest extends ViewTestBase {
   /**
    * Tests the tag cache plugin.
    */
-  public function testTagCaching() {
+  public function testTagCaching(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
     $view = Views::getView('test_tag_cache');
     $build = $view->buildRenderable();
-    $renderer->renderPlain($build);
+    $renderer->renderInIsolation($build);
 
     // Saving the view should invalidate the tags.
     $cache_plugin = $view->display_handler->getPlugin('cache');
@@ -138,7 +146,7 @@ class CacheTagTest extends ViewTestBase {
 
     $view->destroy();
     $build = $view->buildRenderable();
-    $renderer->renderPlain($build);
+    $renderer->renderInIsolation($build);
 
     // Test invalidating the nodes in this view invalidates the cache.
     $cache_plugin = $view->display_handler->getPlugin('cache');
@@ -152,7 +160,7 @@ class CacheTagTest extends ViewTestBase {
 
     $view->destroy();
     $build = $view->buildRenderable();
-    $renderer->renderPlain($build);
+    $renderer->renderInIsolation($build);
 
     // Test saving a node in this view invalidates the cache.
     $cache_plugin = $view->display_handler->getPlugin('cache');
@@ -167,7 +175,7 @@ class CacheTagTest extends ViewTestBase {
 
     $view->destroy();
     $build = $view->buildRenderable();
-    $renderer->renderPlain($build);
+    $renderer->renderInIsolation($build);
 
     // Test saving a node not in this view invalidates the cache too.
     $cache_plugin = $view->display_handler->getPlugin('cache');
@@ -181,7 +189,7 @@ class CacheTagTest extends ViewTestBase {
 
     $view->destroy();
     $build = $view->buildRenderable();
-    $renderer->renderPlain($build);
+    $renderer->renderInIsolation($build);
 
     // Test that invalidating a tag for a user, does not invalidate the cache,
     // as the user entity type will not be contained in the views cache tags.
@@ -200,7 +208,7 @@ class CacheTagTest extends ViewTestBase {
     // caching.
     \Drupal::service('cache_tags.invalidator')->invalidateTags($view->storage->getCacheTagsToInvalidate());
     $build = $view->buildRenderable();
-    $renderer->renderPlain($build);
+    $renderer->renderInIsolation($build);
 
     // Test the cacheFlush method invalidates the cache.
     $cache_plugin = $view->display_handler->getPlugin('cache');

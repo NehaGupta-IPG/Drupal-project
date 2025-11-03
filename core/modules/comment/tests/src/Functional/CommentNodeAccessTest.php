@@ -1,31 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\CommentManagerInterface;
+use Drupal\comment\CommentPreviewMode;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests comments with node access.
  *
  * Verifies there is no PostgreSQL error when viewing a node with threaded
  * comments (a comment and a reply), if a node access module is in use.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentNodeAccessTest extends CommentTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node_access_test'];
 
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -46,16 +52,14 @@ class CommentNodeAccessTest extends CommentTestBase {
   }
 
   /**
-   * Test that threaded comments can be viewed.
+   * Tests that threaded comments can be viewed.
    */
-  public function testThreadedCommentView() {
+  public function testThreadedCommentView(): void {
     // Set comments to have subject required and preview disabled.
-    $this->drupalLogin($this->adminUser);
-    $this->setCommentPreview(DRUPAL_DISABLED);
+    $this->setCommentPreview(CommentPreviewMode::Disabled);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
-    $this->drupalLogout();
 
     // Post comment.
     $this->drupalLogin($this->webUser);
@@ -66,8 +70,8 @@ class CommentNodeAccessTest extends CommentTestBase {
 
     // Check comment display.
     $this->drupalGet('node/' . $this->node->id());
-    $this->assertText($comment_subject);
-    $this->assertText($comment_text);
+    $this->assertSession()->pageTextContains($comment_subject);
+    $this->assertSession()->pageTextContains($comment_text);
 
     // Reply to comment, creating second comment.
     $this->drupalGet('comment/reply/node/' . $this->node->id() . '/comment/' . $comment->id());
@@ -78,10 +82,10 @@ class CommentNodeAccessTest extends CommentTestBase {
 
     // Go to the node page and verify comment and reply are visible.
     $this->drupalGet('node/' . $this->node->id());
-    $this->assertText($comment_text);
-    $this->assertText($comment_subject);
-    $this->assertText($reply_text);
-    $this->assertText($reply_subject);
+    $this->assertSession()->pageTextContains($comment_text);
+    $this->assertSession()->pageTextContains($comment_subject);
+    $this->assertSession()->pageTextContains($reply_text);
+    $this->assertSession()->pageTextContains($reply_subject);
   }
 
 }

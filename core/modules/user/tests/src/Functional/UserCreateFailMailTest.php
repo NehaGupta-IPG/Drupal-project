@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the create user administration page.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserCreateFailMailTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system_mail_failure_test'];
 
@@ -26,7 +28,7 @@ class UserCreateFailMailTest extends BrowserTestBase {
   /**
    * Tests the create user administration page.
    */
-  public function testUserAdd() {
+  public function testUserAdd(): void {
     $user = $this->drupalCreateUser(['administer users']);
     $this->drupalLogin($user);
 
@@ -41,10 +43,11 @@ class UserCreateFailMailTest extends BrowserTestBase {
       'pass[pass2]' => $pass,
       'notify' => TRUE,
     ];
-    $this->drupalPostForm('admin/people/create', $edit, 'Create new account');
+    $this->drupalGet('admin/people/create');
+    $this->submitForm($edit, 'Create new account');
 
-    $this->assertText('Unable to send email. Contact the site administrator if the problem persists.');
-    $this->assertNoText('A welcome message with further instructions has been emailed to the new user ' . $edit['name'] . '.');
+    $this->assertSession()->pageTextContains('Unable to send email. Contact the site administrator if the problem persists.');
+    $this->assertSession()->pageTextNotContains('A welcome message with further instructions has been emailed to the new user ' . $edit['name'] . '.');
   }
 
 }

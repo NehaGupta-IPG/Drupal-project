@@ -2,18 +2,20 @@
 
 namespace Drupal\Core\Extension;
 
+use Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Asset\AssetCollectionOptimizerInterface;
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ConfigInstallerInterface;
 use Drupal\Core\Config\ConfigManagerInterface;
+use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Routing\RouteBuilderInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\system\ModuleDependencyMessageTrait;
+use Drupal\Core\Theme\Registry;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Manages theme installation/uninstallation.
@@ -23,100 +25,28 @@ class ThemeInstaller implements ThemeInstallerInterface {
   use ModuleDependencyMessageTrait;
   use StringTranslationTrait;
 
-  /**
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
-   */
-  protected $themeHandler;
-
-  /**
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * @var \Drupal\Core\Config\ConfigInstallerInterface
-   */
-  protected $configInstaller;
-
-  /**
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
-   * @var \Drupal\Core\Config\ConfigManagerInterface
-   */
-  protected $configManager;
-
-  /**
-   * @var \Drupal\Core\Asset\AssetCollectionOptimizerInterface
-   */
-  protected $cssCollectionOptimizer;
-
-  /**
-   * @var \Drupal\Core\Routing\RouteBuilderInterface
-   */
-  protected $routeBuilder;
-
-  /**
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
-   * The module extension list.
-   *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
-   */
-  protected $moduleExtensionList;
-
-  /**
-   * Constructs a new ThemeInstaller.
-   *
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory to get the installed themes.
-   * @param \Drupal\Core\Config\ConfigInstallerInterface $config_installer
-   *   (optional) The config installer to install configuration. This optional
-   *   to allow the theme handler to work before Drupal is installed and has a
-   *   database.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler to fire themes_installed/themes_uninstalled hooks.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
-   *   The config manager used to uninstall a theme.
-   * @param \Drupal\Core\Asset\AssetCollectionOptimizerInterface $css_collection_optimizer
-   *   The CSS asset collection optimizer service.
-   * @param \Drupal\Core\Routing\RouteBuilderInterface $route_builder
-   *   (optional) The route builder service to rebuild the routes if a theme is
-   *   installed.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state store.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
-   *   The module extension list.
-   */
-  public function __construct(ThemeHandlerInterface $theme_handler, ConfigFactoryInterface $config_factory, ConfigInstallerInterface $config_installer, ModuleHandlerInterface $module_handler, ConfigManagerInterface $config_manager, AssetCollectionOptimizerInterface $css_collection_optimizer, RouteBuilderInterface $route_builder, LoggerInterface $logger, StateInterface $state, ModuleExtensionList $module_extension_list = NULL) {
-    $this->themeHandler = $theme_handler;
-    $this->configFactory = $config_factory;
-    $this->configInstaller = $config_installer;
-    $this->moduleHandler = $module_handler;
-    $this->configManager = $config_manager;
-    $this->cssCollectionOptimizer = $css_collection_optimizer;
-    $this->routeBuilder = $route_builder;
-    $this->logger = $logger;
-    $this->state = $state;
-    if ($module_extension_list === NULL) {
-      @trigger_error('The extension.list.module service must be passed to ' . __NAMESPACE__ . '\ThemeInstaller::__construct(). It was added in drupal:8.9.0 and will be required before drupal:10.0.0.', E_USER_DEPRECATED);
-      $module_extension_list = \Drupal::service('extension.list.module');
+  public function __construct(
+    protected ThemeHandlerInterface $themeHandler,
+    protected ConfigFactoryInterface $configFactory,
+    protected ConfigInstallerInterface $configInstaller,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ConfigManagerInterface $configManager,
+    #[Autowire(service: 'asset.css.collection_optimizer')]
+    protected AssetCollectionOptimizerInterface $cssCollectionOptimizer,
+    protected RouteBuilderInterface $routeBuilder,
+    #[Autowire(service: 'logger.channel.default')]
+    protected LoggerInterface $logger,
+    protected StateInterface $state,
+    protected ModuleExtensionList $moduleExtensionList,
+    protected Registry $themeRegistry,
+    protected ThemeExtensionList $themeExtensionList,
+    #[Autowire(service: 'kernel')]
+    protected DrupalKernelInterface|CachedDiscoveryInterface|null $kernel = NULL,
+  ) {
+    if (!$this->kernel instanceof DrupalKernelInterface) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $kernel argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
+      $this->kernel = \Drupal::service('kernel');
     }
-    $this->moduleExtensionList = $module_extension_list;
   }
 
   /**
@@ -125,7 +55,7 @@ class ThemeInstaller implements ThemeInstallerInterface {
   public function install(array $theme_list, $install_dependencies = TRUE) {
     $extension_config = $this->configFactory->getEditable('core.extension');
 
-    $theme_data = $this->themeHandler->rebuildThemeData();
+    $theme_data = $this->themeExtensionList->reset()->getList();
     $installed_themes = $extension_config->get('theme') ?: [];
     $installed_modules = $extension_config->get('module') ?: [];
 
@@ -147,15 +77,20 @@ class ThemeInstaller implements ThemeInstallerInterface {
       foreach ($theme_list as $theme => $value) {
         $module_dependencies = $theme_data[$theme]->module_dependencies;
         // $theme_data[$theme]->requires contains both theme and module
-        // dependencies keyed by the extension machine names and
-        // $theme_data[$theme]->module_dependencies contains only modules keyed
-        // by the module extension machine name. Therefore we can find the theme
-        // dependencies by finding array keys for 'requires' that are not in
-        // $module_dependencies.
+        // dependencies keyed by the extension machine names.
+        // $theme_data[$theme]->module_dependencies contains only the module
+        // dependencies keyed by the module extension machine name. Therefore,
+        // we can find the theme dependencies by finding array keys for
+        // 'requires' that are not in $module_dependencies.
         $theme_dependencies = array_diff_key($theme_data[$theme]->requires, $module_dependencies);
         // We can find the unmet module dependencies by finding the module
         // machine names keys that are not in $installed_modules keys.
         $unmet_module_dependencies = array_diff_key($module_dependencies, $installed_modules);
+
+        if ($theme_data[$theme]->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
+          // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+          @trigger_error("The theme '$theme' is deprecated. See " . $theme_data[$theme]->info['lifecycle_link'], E_USER_DEPRECATED);
+        }
 
         // Prevent themes with unmet module dependencies from being installed.
         if (!empty($unmet_module_dependencies)) {
@@ -208,6 +143,12 @@ class ThemeInstaller implements ThemeInstallerInterface {
         throw new ExtensionNameLengthException("Theme name $key is over the maximum allowed length of " . DRUPAL_EXTENSION_NAME_MAX_LENGTH . ' characters.');
       }
 
+      // Throw an exception if a module with the same name is enabled.
+      $installed_modules = $extension_config->get('module') ?: [];
+      if (isset($installed_modules[$key])) {
+        throw new ExtensionNameReservedException("Theme name $key is already in use by an installed module.");
+      }
+
       // Validate default configuration of the theme. If there is existing
       // configuration then stop installing.
       $this->configInstaller->checkConfigurationToInstall('theme', $key);
@@ -217,10 +158,6 @@ class ThemeInstaller implements ThemeInstallerInterface {
       $extension_config
         ->set("theme.$key", 0)
         ->save(TRUE);
-
-      // Reset theme settings.
-      $theme_settings = &drupal_static('theme_get_setting');
-      unset($theme_settings[$key]);
 
       // Reset theme listing.
       $this->themeHandler->reset();
@@ -233,13 +170,16 @@ class ThemeInstaller implements ThemeInstallerInterface {
       }
 
       $themes_installed[] = $key;
-
       // Record the fact that it was installed.
       $this->logger->info('%theme theme installed.', ['%theme' => $key]);
     }
 
     $this->cssCollectionOptimizer->deleteAll();
-    $this->resetSystem();
+    // Add new themes to the list of installed themes.
+    $register_themes = array_merge(array_keys($installed_themes), $themes_installed);
+    // Get list of extensions for the new list of themes.
+    $register_themes = array_intersect_key($theme_data, array_flip($register_themes));
+    $this->resetSystem($register_themes);
 
     // Invoke hook_themes_installed() after the themes have been installed.
     $this->moduleHandler->invokeAll('themes_installed', [$themes_installed]);
@@ -254,8 +194,10 @@ class ThemeInstaller implements ThemeInstallerInterface {
     $extension_config = $this->configFactory->getEditable('core.extension');
     $theme_config = $this->configFactory->getEditable('system.theme');
     $list = $this->themeHandler->listInfo();
+    $installed_themes = $extension_config->get('theme') ?: [];
+    $theme_data = $this->themeExtensionList->reset()->getList();
     foreach ($theme_list as $key) {
-      if (!isset($list[$key])) {
+      if ($extension_config->get("theme.$key") === NULL) {
         throw new UnknownExtensionException("Unknown theme: $key.");
       }
       if ($key === $theme_config->get('default')) {
@@ -266,7 +208,7 @@ class ThemeInstaller implements ThemeInstallerInterface {
       }
       // Base themes cannot be uninstalled if sub themes are installed, and if
       // they are not uninstalled at the same time.
-      if (!empty($list[$key]->sub_themes)) {
+      if (isset($list[$key]) && !empty($list[$key]->sub_themes)) {
         foreach ($list[$key]->sub_themes as $sub_key => $sub_label) {
           if (isset($list[$sub_key]) && !in_array($sub_key, $theme_list, TRUE)) {
             throw new \InvalidArgumentException("The base theme $key cannot be uninstalled, because theme $sub_key depends on it.");
@@ -280,44 +222,51 @@ class ThemeInstaller implements ThemeInstallerInterface {
       // The value is not used; the weight is ignored for themes currently.
       $extension_config->clear("theme.$key");
 
-      // Reset theme settings.
-      $theme_settings = &drupal_static('theme_get_setting');
-      unset($theme_settings[$key]);
-
       // Remove all configuration belonging to the theme.
       $this->configManager->uninstall('theme', $key);
-
     }
     // Don't check schema when uninstalling a theme since we are only clearing
     // keys.
     $extension_config->save(TRUE);
 
     // Refresh theme info.
-    $this->resetSystem();
     $this->themeHandler->reset();
+    // Remove themes that were uninstalled from the list.
+    $register_themes = array_diff(array_keys($installed_themes), $theme_list);
+    // Get list of extensions for the new list of themes.
+    $register_themes = array_intersect_key($theme_data, array_flip($register_themes));
+    $this->resetSystem($register_themes);
 
     $this->moduleHandler->invokeAll('themes_uninstalled', [$theme_list]);
   }
 
   /**
    * Resets some other systems like rebuilding the route information or caches.
+   *
+   * @param array<string, \Drupal\Core\Extension\Extension> $register_themes
+   *   Extension data for themes that should be registered, keyed by name.
    */
-  protected function resetSystem() {
-    if ($this->routeBuilder) {
-      $this->routeBuilder->setRebuildNeeded();
-    }
+  protected function resetSystem(array $register_themes) {
+    $this->themeRegistry->reset();
+    $this->kernel->updateThemes($register_themes);
+    $container = $this->kernel->getContainer();
+    $this->themeHandler = $container->get('theme_handler');
+    $this->configFactory = $container->get('config.factory');
+    $this->configInstaller = $container->get('config.installer');
+    $this->moduleHandler = $container->get('module_handler');
+    $this->configManager = $container->get('config.manager');
+    $this->cssCollectionOptimizer = $container->get('asset.css.collection_optimizer');
+    $this->routeBuilder = $container->get('router.builder');
+    $this->logger = $container->get('logger.channel.default');
+    $this->state = $container->get('state');
+    $this->moduleExtensionList = $container->get('extension.list.module');
+    $this->themeRegistry = $container->get('theme.registry');
+    $this->themeExtensionList = $container->get('extension.list.theme');
 
-    // @todo It feels wrong to have the requirement to clear the local tasks
-    //   cache here.
-    Cache::invalidateTags(['local_task']);
-    $this->themeRegistryRebuild();
-  }
-
-  /**
-   * Wraps drupal_theme_rebuild().
-   */
-  protected function themeRegistryRebuild() {
-    drupal_theme_rebuild();
+    $container->get('stream_wrapper_manager')->register();
+    // Clear all plugin caches.
+    $container->get('plugin.cache_clearer')->clearCachedDefinitions();
+    $this->routeBuilder->setRebuildNeeded();
   }
 
 }

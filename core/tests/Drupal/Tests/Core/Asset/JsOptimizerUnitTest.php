@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Asset;
 
 use Drupal\Core\Asset\JsOptimizer;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the JS asset optimizer.
- *
- * @group Asset
  */
+#[Group('Asset')]
 class JsOptimizerUnitTest extends UnitTestCase {
 
   /**
@@ -24,8 +27,8 @@ class JsOptimizerUnitTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $this->optimizer = new JsOptimizer();
+    $logger = $this->createMock('\Psr\Log\LoggerInterface');
+    $this->optimizer = new JsOptimizer($logger);
   }
 
   /**
@@ -33,10 +36,10 @@ class JsOptimizerUnitTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Asset\JsOptimizer::clean()
    *
-   * @returns array
+   * @return array
    *   An array of test data.
    */
-  public function providerTestClean() {
+  public static function providerTestClean() {
     $path = dirname(__FILE__) . '/js_test_files/';
     return [
       // File. Tests:
@@ -68,10 +71,9 @@ class JsOptimizerUnitTest extends UnitTestCase {
 
   /**
    * Tests cleaning of a JS asset group containing 'type' => 'file'.
-   *
-   * @dataProvider providerTestClean
    */
-  public function testClean($js_asset, $expected) {
+  #[DataProvider('providerTestClean')]
+  public function testClean($js_asset, $expected): void {
     $this->assertEquals($expected, $this->optimizer->clean($js_asset));
   }
 
@@ -80,10 +82,10 @@ class JsOptimizerUnitTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Asset\JsOptimizer::optimize()
    *
-   * @returns array
+   * @return array
    *   An array of test data.
    */
-  public function providerTestOptimize() {
+  public static function providerTestOptimize() {
     $path = dirname(__FILE__) . '/js_test_files/';
     return [
       0 => [
@@ -111,15 +113,32 @@ class JsOptimizerUnitTest extends UnitTestCase {
         ],
         file_get_contents($path . 'latin_9.js.optimized.js'),
       ],
+      3 => [
+        [
+          'type' => 'file',
+          'preprocess' => TRUE,
+          'data' => $path . 'to_be_minified.js',
+        ],
+        file_get_contents($path . 'to_be_minified.js.optimized.js'),
+      ],
+      4 => [
+        [
+          'type' => 'file',
+          'preprocess' => TRUE,
+          'data' => $path . 'syntax_error.js',
+        ],
+        // When there is a syntax error, the 'optimized' contents are the
+        // contents of the original file.
+        file_get_contents($path . 'syntax_error.js'),
+      ],
     ];
   }
 
   /**
    * Tests cleaning of a JS asset group containing 'type' => 'file'.
-   *
-   * @dataProvider providerTestOptimize
    */
-  public function testOptimize($js_asset, $expected) {
+  #[DataProvider('providerTestOptimize')]
+  public function testOptimize($js_asset, $expected): void {
     $this->assertEquals($expected, $this->optimizer->optimize($js_asset));
   }
 

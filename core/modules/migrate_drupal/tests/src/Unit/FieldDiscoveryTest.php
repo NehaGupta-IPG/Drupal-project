@@ -1,21 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal\Unit;
 
 use Drupal\Core\Logger\LoggerChannelInterface;
+use Drupal\field_discovery_test\FieldDiscoveryTestClass;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\MigrationPluginManagerInterface;
-use Drupal\field_discovery_test\FieldDiscoveryTestClass;
+use Drupal\migrate_drupal\FieldDiscovery;
 use Drupal\migrate_drupal\FieldDiscoveryInterface;
 use Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the FieldDiscovery Class.
- *
- * @group migrate_drupal
- * @coversDefaultClass \Drupal\migrate_drupal\FieldDiscovery
  */
+#[CoversClass(FieldDiscovery::class)]
+#[Group('migrate_drupal')]
 class FieldDiscoveryTest extends UnitTestCase {
 
   /**
@@ -42,7 +47,7 @@ class FieldDiscoveryTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
     $this->fieldPluginManager = $this->prophesize(MigrateFieldPluginManagerInterface::class);
     $this->migrationPluginManager = $this->prophesize(MigrationPluginManagerInterface::class);
@@ -57,10 +62,10 @@ class FieldDiscoveryTest extends UnitTestCase {
    * @param array $expected_fields
    *   The expected fields.
    *
-   * @covers ::getEntityFields
-   * @dataProvider getEntityFieldsData
+   * @legacy-covers ::getEntityFields
    */
-  public function testGetEntityFields($entity_type_id, array $expected_fields) {
+  #[DataProvider('getEntityFieldsData')]
+  public function testGetEntityFields($entity_type_id, array $expected_fields): void {
     $test_data = [
       'getAllFields' => [
         '7' => $this->getAllFieldData(),
@@ -77,7 +82,7 @@ class FieldDiscoveryTest extends UnitTestCase {
    * @return array
    *   The data.
    */
-  public function getEntityFieldsData() {
+  public static function getEntityFieldsData() {
     return [
       'Node' => [
         'entity_type_id' => 'node',
@@ -106,14 +111,14 @@ class FieldDiscoveryTest extends UnitTestCase {
         'entity_type_id' => 'comment',
         'expected_fields' => [
           'comment_node_content_type_1' => [
-            'cfield_1' => ['field_info_key' => 'field_1_data'],
-            'cfield_2' => ['field_info_key' => 'field_2_data'],
-            'cfield_3' => ['field_info_key' => 'field_3_data'],
+            'comment_field_1' => ['field_info_key' => 'field_1_data'],
+            'comment_field_2' => ['field_info_key' => 'field_2_data'],
+            'comment_field_3' => ['field_info_key' => 'field_3_data'],
           ],
           'comment_node_content_type_2' => [
-            'cfield_1' => ['field_info_key' => 'field_1_data'],
-            'cfield_4' => ['field_info_key' => 'field_4_data'],
-            'cfield_5' => ['field_info_key' => 'field_5_data'],
+            'comment_field_1' => ['field_info_key' => 'field_1_data'],
+            'comment_field_4' => ['field_info_key' => 'field_4_data'],
+            'comment_field_5' => ['field_info_key' => 'field_5_data'],
           ],
         ],
       ],
@@ -134,10 +139,10 @@ class FieldDiscoveryTest extends UnitTestCase {
    * @param array $expected_fields
    *   The expected fields.
    *
-   * @covers ::getBundleFields
-   * @dataProvider getBundleFieldsData
+   * @legacy-covers ::getBundleFields
    */
-  public function testGetBundleFields($entity_type_id, $bundle, array $expected_fields) {
+  #[DataProvider('getBundleFieldsData')]
+  public function testGetBundleFields($entity_type_id, $bundle, array $expected_fields): void {
     $test_data = [
       'getAllFields' => [
         '7' => $this->getAllFieldData(),
@@ -154,7 +159,7 @@ class FieldDiscoveryTest extends UnitTestCase {
    * @return array
    *   The data.
    */
-  public function getBundleFieldsData() {
+  public static function getBundleFieldsData() {
     return [
       'Node - Content Type 1' => [
         'entity_type_id' => 'node',
@@ -178,25 +183,25 @@ class FieldDiscoveryTest extends UnitTestCase {
         'entity_type_id' => 'user',
         'bundle' => 'user',
         'expected_fields' => [
-            'user_field_1' => ['field_info_key' => 'user_field_1_data'],
+          'user_field_1' => ['field_info_key' => 'user_field_1_data'],
         ],
       ],
       'Comment - Content Type 1' => [
         'entity_type_id' => 'comment',
         'bundle' => 'comment_node_content_type_1',
         'expected_fields' => [
-          'cfield_1' => ['field_info_key' => 'field_1_data'],
-          'cfield_2' => ['field_info_key' => 'field_2_data'],
-          'cfield_3' => ['field_info_key' => 'field_3_data'],
+          'comment_field_1' => ['field_info_key' => 'field_1_data'],
+          'comment_field_2' => ['field_info_key' => 'field_2_data'],
+          'comment_field_3' => ['field_info_key' => 'field_3_data'],
         ],
       ],
       'Comment - Content Type 2' => [
         'entity_type_id' => 'comment',
         'bundle' => 'comment_node_content_type_2',
         'expected_fields' => [
-          'cfield_1' => ['field_info_key' => 'field_1_data'],
-          'cfield_4' => ['field_info_key' => 'field_4_data'],
-          'cfield_5' => ['field_info_key' => 'field_5_data'],
+          'comment_field_1' => ['field_info_key' => 'field_1_data'],
+          'comment_field_4' => ['field_info_key' => 'field_4_data'],
+          'comment_field_5' => ['field_info_key' => 'field_5_data'],
         ],
       ],
       'Non-existent Entity Type' => [
@@ -213,17 +218,17 @@ class FieldDiscoveryTest extends UnitTestCase {
   }
 
   /**
-   * Test the protected getCoreVersion method.
+   * Tests the protected getCoreVersion method.
    *
    * @param string[] $tags
    *   The migration tags.
    * @param string|bool $expected_result
    *   The expected return value of the method.
    *
-   * @covers ::getCoreVersion
-   * @dataProvider getCoreVersionData
+   * @legacy-covers ::getCoreVersion
    */
-  public function testGetCoreVersion(array $tags, $expected_result) {
+  #[DataProvider('getCoreVersionData')]
+  public function testGetCoreVersion(array $tags, $expected_result): void {
     $migration = $this->prophesize(MigrationInterface::class);
     $migration->getMigrationTags()->willReturn($tags);
     $field_discovery = new FieldDiscoveryTestClass($this->fieldPluginManager->reveal(), $this->migrationPluginManager->reveal(), $this->logger->reveal());
@@ -240,27 +245,27 @@ class FieldDiscoveryTest extends UnitTestCase {
    * @return array
    *   The test data.
    */
-  public function getCoreVersionData() {
+  public static function getCoreVersionData() {
     return [
       'Drupal 7' => [
         'tags' => ['Drupal 7'],
-        'result' => '7',
+        'expected_result' => '7',
       ],
       'Drupal 6' => [
         'tags' => ['Drupal 6'],
-        'result' => '6',
+        'expected_result' => '6',
       ],
       'D7 with others' => [
         'tags' => ['Drupal 7', 'Translation', 'Other Tag'],
-        'result' => '7',
+        'expected_result' => '7',
       ],
       'Both (d7 has priority)' => [
         'tags' => ['Drupal 6', 'Drupal 7'],
-        'result' => '7',
+        'expected_result' => '7',
       ],
       'Neither' => [
         'tags' => ['drupal 6', 'Drupal_6', 'This contains Drupal 7 but is not'],
-        'result' => FALSE,
+        'expected_result' => FALSE,
       ],
     ];
   }
@@ -268,7 +273,7 @@ class FieldDiscoveryTest extends UnitTestCase {
   /**
    * Returns dummy data to test the field getters.
    */
-  protected function getAllFieldData() {
+  protected function getAllFieldData(): array {
     return [
       'node' => [
         'content_type_1' => [
@@ -289,14 +294,14 @@ class FieldDiscoveryTest extends UnitTestCase {
       ],
       'comment' => [
         'comment_node_content_type_1' => [
-          'cfield_1' => ['field_info_key' => 'field_1_data'],
-          'cfield_2' => ['field_info_key' => 'field_2_data'],
-          'cfield_3' => ['field_info_key' => 'field_3_data'],
+          'comment_field_1' => ['field_info_key' => 'field_1_data'],
+          'comment_field_2' => ['field_info_key' => 'field_2_data'],
+          'comment_field_3' => ['field_info_key' => 'field_3_data'],
         ],
         'comment_node_content_type_2' => [
-          'cfield_1' => ['field_info_key' => 'field_1_data'],
-          'cfield_4' => ['field_info_key' => 'field_4_data'],
-          'cfield_5' => ['field_info_key' => 'field_5_data'],
+          'comment_field_1' => ['field_info_key' => 'field_1_data'],
+          'comment_field_4' => ['field_info_key' => 'field_4_data'],
+          'comment_field_5' => ['field_info_key' => 'field_5_data'],
         ],
       ],
     ];
@@ -310,10 +315,10 @@ class FieldDiscoveryTest extends UnitTestCase {
    * @param array|bool $expected_definition
    *   The expected migration definition, or false if an exception is expected.
    *
-   * @covers ::getFieldInstanceStubMigrationDefinition
-   * @dataProvider getFieldInstanceStubMigrationDefinition
+   * @legacy-covers ::getFieldInstanceStubMigrationDefinition
    */
-  public function testGetFieldInstanceStubMigrationDefinition($core, $expected_definition) {
+  #[DataProvider('getFieldInstanceStubMigrationDefinition')]
+  public function testGetFieldInstanceStubMigrationDefinition($core, $expected_definition): void {
     $field_discovery = new FieldDiscoveryTestClass($this->fieldPluginManager->reveal(), $this->migrationPluginManager->reveal(), $this->logger->reveal());
     if (!$expected_definition) {
       $this->expectException(\InvalidArgumentException::class);
@@ -329,7 +334,7 @@ class FieldDiscoveryTest extends UnitTestCase {
    * @return array
    *   The data.
    */
-  public function getFieldInstanceStubMigrationDefinition() {
+  public static function getFieldInstanceStubMigrationDefinition() {
     return [
       'Drupal 6' => [
         'core' => FieldDiscoveryInterface::DRUPAL_6,

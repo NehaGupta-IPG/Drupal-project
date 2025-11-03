@@ -1,21 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\RouteProcessor;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\GeneratedUrl;
 use Drupal\Core\Render\BubbleableMetadata;
-use Drupal\KernelTests\KernelTestBase;
 use Drupal\Core\Routing\RouteObjectInterface;
+use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Routing\Route;
 
 /**
  * Tests the <current> route processor.
  *
  * @see \Drupal\Core\RouteProcessor\RouteProcessorCurrent
- * @group route_processor
  */
+#[Group('route_processor')]
+#[RunTestsInSeparateProcesses]
 class RouteProcessorCurrentIntegrationTest extends KernelTestBase {
 
   /**
@@ -42,7 +49,7 @@ class RouteProcessorCurrentIntegrationTest extends KernelTestBase {
   /**
    * Tests the output process.
    */
-  public function testProcessOutbound() {
+  public function testProcessOutbound(): void {
     $expected_cacheability = (new BubbleableMetadata())
       ->addCacheContexts(['route'])
       ->setCacheMaxAge(Cache::PERMANENT);
@@ -60,11 +67,12 @@ class RouteProcessorCurrentIntegrationTest extends KernelTestBase {
     $request = Request::create('/subdir/', 'GET', [], [], [], $server);
     $request->attributes->set(RouteObjectInterface::ROUTE_NAME, '<front>');
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route('/'));
+    $request->setSession(new Session(new MockArraySessionStorage()));
 
     $request_stack->push($request);
     $request_context->fromRequest($request);
     $url = GeneratedUrl::createFromObject($expected_cacheability)->setGeneratedUrl('/subdir/');
-    $this->assertEqual($this->urlGenerator->generateFromRoute('<current>', [], [], TRUE), $url);
+    $this->assertEquals($this->urlGenerator->generateFromRoute('<current>', [], [], TRUE), $url);
 
     // Test request with subdir on other page.
     $server = [
@@ -73,13 +81,14 @@ class RouteProcessorCurrentIntegrationTest extends KernelTestBase {
       'SERVER_NAME' => 'http://www.example.com',
     ];
     $request = Request::create('/subdir/node/add', 'GET', [], [], [], $server);
-    $request->attributes->set(RouteObjectInterface::ROUTE_NAME, 'node.add');
+    $request->attributes->set(RouteObjectInterface::ROUTE_NAME, 'entity.node.add_form');
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route('/node/add'));
+    $request->setSession(new Session(new MockArraySessionStorage()));
 
     $request_stack->push($request);
     $request_context->fromRequest($request);
     $url = GeneratedUrl::createFromObject($expected_cacheability)->setGeneratedUrl('/subdir/node/add');
-    $this->assertEqual($this->urlGenerator->generateFromRoute('<current>', [], [], TRUE), $url);
+    $this->assertEquals($this->urlGenerator->generateFromRoute('<current>', [], [], TRUE), $url);
 
     // Test request without subdir on the homepage.
     $server = [
@@ -90,11 +99,12 @@ class RouteProcessorCurrentIntegrationTest extends KernelTestBase {
     $request = Request::create('/', 'GET', [], [], [], $server);
     $request->attributes->set(RouteObjectInterface::ROUTE_NAME, '<front>');
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route('/'));
+    $request->setSession(new Session(new MockArraySessionStorage()));
 
     $request_stack->push($request);
     $request_context->fromRequest($request);
     $url = GeneratedUrl::createFromObject($expected_cacheability)->setGeneratedUrl('/');
-    $this->assertEqual($this->urlGenerator->generateFromRoute('<current>', [], [], TRUE), $url);
+    $this->assertEquals($this->urlGenerator->generateFromRoute('<current>', [], [], TRUE), $url);
 
     // Test request without subdir on other page.
     $server = [
@@ -103,13 +113,14 @@ class RouteProcessorCurrentIntegrationTest extends KernelTestBase {
       'SERVER_NAME' => 'http://www.example.com',
     ];
     $request = Request::create('/node/add', 'GET', [], [], [], $server);
-    $request->attributes->set(RouteObjectInterface::ROUTE_NAME, 'node.add');
+    $request->attributes->set(RouteObjectInterface::ROUTE_NAME, 'entity.node.add_form');
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route('/node/add'));
+    $request->setSession(new Session(new MockArraySessionStorage()));
 
     $request_stack->push($request);
     $request_context->fromRequest($request);
     $url = GeneratedUrl::createFromObject($expected_cacheability)->setGeneratedUrl('/node/add');
-    $this->assertEqual($this->urlGenerator->generateFromRoute('<current>', [], [], TRUE), $url);
+    $this->assertEquals($this->urlGenerator->generateFromRoute('<current>', [], [], TRUE), $url);
 
     // Test request without a found route. This happens for example on an
     // not found exception page.
@@ -119,6 +130,7 @@ class RouteProcessorCurrentIntegrationTest extends KernelTestBase {
       'SERVER_NAME' => 'http://www.example.com',
     ];
     $request = Request::create('/invalid-path', 'GET', [], [], [], $server);
+    $request->setSession(new Session(new MockArraySessionStorage()));
 
     $request_stack->push($request);
     $request_context->fromRequest($request);
@@ -126,7 +138,7 @@ class RouteProcessorCurrentIntegrationTest extends KernelTestBase {
     // and the cacheability does not depend on the 'route' cache context, since
     // no route was involved at all: this is fallback behavior.
     $url = GeneratedUrl::createFromObject((new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT))->setGeneratedUrl('/');
-    $this->assertEqual($this->urlGenerator->generateFromRoute('<current>', [], [], TRUE), $url);
+    $this->assertEquals($this->urlGenerator->generateFromRoute('<current>', [], [], TRUE), $url);
   }
 
 }

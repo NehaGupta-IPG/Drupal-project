@@ -1,39 +1,157 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel;
 
 use Drupal\Core\Config\FileStorage;
 use Drupal\views\ViewsConfigUpdater;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\views\ViewsConfigUpdater
- *
- * @group Views
- * @group legacy
+ * Tests Drupal\views\ViewsConfigUpdater.
  */
+#[CoversClass(ViewsConfigUpdater::class)]
+#[Group('Views')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
 
   /**
-   * The views config updater.
-   *
-   * @var \Drupal\views\ViewsConfigUpdater
-   */
-  protected $configUpdater;
-
-  /**
    * {@inheritdoc}
    */
-  protected static $modules = ['views_config_entity_test'];
+  protected static $modules = [
+    'views_config_entity_test',
+    'entity_test',
+    'text',
+    'field',
+    'node',
+  ];
 
   /**
-   * {@inheritdoc}
+   * Tests ViewsConfigUpdater.
    */
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp();
+  public function testViewsConfigUpdater(): void {
+    // ViewsConfigUpdater currently contains no actual configuration update
+    // logic. Replace this method with a real test when it does.
+    $this->markTestSkipped();
+  }
 
-    $this->configUpdater = $this->container
-      ->get('class_resolver')
-      ->getInstanceFromDefinition(ViewsConfigUpdater::class);
+  /**
+   * Tests the `needsRssViewModeUpdate` method.
+   */
+  public function testUpdateRssViewMode(): void {
+    $this->strictConfigSchema = FALSE;
+
+    /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+    $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+
+    // Load the test view.
+    $view_id = 'views.view.test_display_feed';
+    $test_view = $this->loadTestView($view_id);
+    $display = $test_view->getDisplay('feed_1');
+
+    // Check the initial view mode.
+    $rowViewMode = $display['display_options']['row']['options']['view_mode'] ?? FALSE;
+    $this->assertEquals('default', $rowViewMode);
+
+    // Update the view mode using the method under test.
+    $view_config_updater->needsRssViewModeUpdate($test_view, 'old_view_mode');
+
+    // Assert if the view mode was updated correctly.
+    $display = $test_view->getDisplay('feed_1');
+    $updatedRowViewMode = $display['display_options']['row']['options']['view_mode'] ?? FALSE;
+    $this->assertEquals('old_view_mode', $updatedRowViewMode);
+  }
+
+  /**
+   * Tests the `needsRssViewModeUpdate` method.
+   */
+  public function testUpdateRssViewModeWithoutKnownPreviousMode(): void {
+    $this->installEntitySchema('node');
+    $this->installConfig(['text', 'field', 'node']);
+
+    $this->strictConfigSchema = FALSE;
+
+    /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+    $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+
+    // Load the test view.
+    $view_id = 'views.view.test_display_feed';
+    $test_view = $this->loadTestView($view_id);
+    $display = $test_view->getDisplay('feed_1');
+
+    // Check the initial view mode.
+    $rowViewMode = $display['display_options']['row']['options']['view_mode'] ?? FALSE;
+    $this->assertEquals('default', $rowViewMode);
+
+    // Update the view mode using the method under test.
+    $view_config_updater->needsRssViewModeUpdate($test_view);
+
+    // Assert if the view mode was updated correctly.
+    $display = $test_view->getDisplay('feed_1');
+    $updatedRowViewMode = $display['display_options']['row']['options']['view_mode'] ?? FALSE;
+
+    // This should be the first node view mode since we have nothing else
+    $this->assertEquals('rss', $updatedRowViewMode);
+  }
+
+  /**
+   * Tests if onSave also updates the view.
+   */
+  public function testUpdateRssViewModeWithoutKnownPreviousModeOnSaveHandler(): void {
+    $this->installEntitySchema('node');
+    $this->installConfig(['text', 'field', 'node']);
+
+    $this->strictConfigSchema = FALSE;
+
+    // Load the test view.
+    $view_id = 'views.view.test_display_feed';
+    $test_view = $this->loadTestView($view_id);
+    $display = $test_view->getDisplay('feed_1');
+
+    // Check the initial view mode.
+    $rowViewMode = $display['display_options']['row']['options']['view_mode'] ?? FALSE;
+    $this->assertEquals('default', $rowViewMode);
+
+    $test_view->save();
+
+    // Assert if the view mode was updated correctly onSave.
+    $display = $test_view->getDisplay('feed_1');
+    $updatedRowViewMode = $display['display_options']['row']['options']['view_mode'] ?? FALSE;
+
+    // This should be the first node view mode since we have nothing else
+    $this->assertEquals('rss', $updatedRowViewMode);
+  }
+
+  /**
+   * Tests the `needsRssViewModeUpdate` method.
+   */
+  public function testUpdateRssViewModeSkipsOtherType(): void {
+    $this->strictConfigSchema = FALSE;
+
+    /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+    $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+
+    // Load the test view.
+    $view_id = 'views.view.test_display_feed_no_update';
+    $test_view = $this->loadTestView($view_id);
+    $display = $test_view->getDisplay('feed_1');
+
+    // Check the initial view mode.
+    $rowViewMode = $display['display_options']['row']['options']['view_mode'] ?? FALSE;
+    $this->assertEquals('default', $rowViewMode);
+
+    // Update the view mode using the method under test.
+    $view_config_updater->needsRssViewModeUpdate($test_view, 'old_view_mode');
+
+    // Assert if the view mode was updated correctly.
+    $display = $test_view->getDisplay('feed_1');
+    $updatedRowViewMode = $display['display_options']['row']['options']['view_mode'] ?? FALSE;
+    $this->assertEquals('default', $updatedRowViewMode);
   }
 
   /**
@@ -48,7 +166,7 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
   protected function loadTestView($view_id) {
     // We just instantiate the test view from the raw configuration, as it may
     // not be possible to save it, due to its faulty schema.
-    $config_dir = drupal_get_path('module', 'views') . '/tests/fixtures/update';
+    $config_dir = $this->getModulePath('views') . '/tests/fixtures/update';
     $file_storage = new FileStorage($config_dir);
     $values = $file_storage->read($view_id);
     /** @var \Drupal\views\ViewEntityInterface $test_view */
@@ -57,87 +175,6 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
       ->getStorage('view')
       ->create($values);
     return $test_view;
-  }
-
-  /**
-   * @covers ::needsEntityLinkUrlUpdate
-   */
-  public function testNeedsEntityLinkUrlUpdate() {
-    $test_view = $this->loadTestView('views.view.node_link_update_test');
-    $this->configUpdater->setDeprecationsEnabled(FALSE);
-    $needs_update = $this->configUpdater->needsEntityLinkUrlUpdate($test_view);
-    $this->assertTrue($needs_update);
-  }
-
-  /**
-   * @covers ::needsEntityLinkUrlUpdate
-   */
-  public function testNeedsEntityLinkUrlUpdateDeprecation() {
-    $this->expectDeprecation('The entity link url update for the "node_link_update_test" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2857891.');
-    $test_view = $this->loadTestView('views.view.node_link_update_test');
-    $needs_update = $this->configUpdater->needsEntityLinkUrlUpdate($test_view);
-    $this->assertTrue($needs_update);
-  }
-
-  /**
-   * @covers ::needsOperatorDefaultsUpdate
-   */
-  public function testNeedsOperatorUpdateDefaults() {
-    $test_view = $this->loadTestView('views.view.test_exposed_filters');
-    $this->configUpdater->setDeprecationsEnabled(FALSE);
-    $needs_update = $this->configUpdater->needsOperatorDefaultsUpdate($test_view);
-    $this->assertTrue($needs_update);
-  }
-
-  /**
-   * @covers ::needsOperatorDefaultsUpdate
-   */
-  public function testNeedsOperatorDefaultsUpdateDeprecation() {
-    $this->expectDeprecation('The operator defaults update for the "test_exposed_filters" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2869168.');
-    $test_view = $this->loadTestView('views.view.test_exposed_filters');
-    $needs_update = $this->configUpdater->needsOperatorDefaultsUpdate($test_view);
-    $this->assertTrue($needs_update);
-  }
-
-  /**
-   * @covers ::needsMultivalueBaseFieldUpdate
-   */
-  public function testNeedsFieldNamesForMultivalueBaseFieldsUpdate() {
-    $test_view = $this->loadTestView('views.view.test_user_multi_value');
-    $this->configUpdater->setDeprecationsEnabled(FALSE);
-    $needs_update = $this->configUpdater->needsMultivalueBaseFieldUpdate($test_view);
-    $this->assertTrue($needs_update);
-  }
-
-  /**
-   * @covers ::needsMultivalueBaseFieldUpdate
-   */
-  public function testNeedsFieldNamesForMultivalueBaseUpdateFieldsDeprecation() {
-    $this->expectDeprecation('The multivalue base field update for the "test_user_multi_value" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2900684.');
-    $test_view = $this->loadTestView('views.view.test_user_multi_value');
-    $needs_update = $this->configUpdater->needsMultivalueBaseFieldUpdate($test_view);
-    $this->assertTrue($needs_update);
-  }
-
-  /**
-   * @covers ::updateAll
-   */
-  public function testUpdateAll() {
-    $this->expectDeprecation('The entity link url update for the "node_link_update_test" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2857891.');
-    $this->expectDeprecation('The operator defaults update for the "test_exposed_filters" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2869168.');
-    $this->expectDeprecation('The multivalue base field update for the "test_user_multi_value" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2900684.');
-    $view_ids = [
-      'views.view.node_link_update_test',
-      'views.view.test_exposed_filters',
-      'views.view.test_user_multi_value',
-    ];
-
-    foreach ($view_ids as $view_id) {
-      $test_view = $this->loadTestView($view_id);
-      $this->assertTrue($this->configUpdater->updateAll($test_view), "View $view_id should be updated.");
-    }
-
-    // @todo Improve this in https://www.drupal.org/node/3121008.
   }
 
 }

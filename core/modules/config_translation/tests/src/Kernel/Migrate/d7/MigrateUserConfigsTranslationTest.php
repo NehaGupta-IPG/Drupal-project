@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config_translation\Kernel\Migrate\d7;
 
-use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use Drupal\Tests\SchemaCheckTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test migration of i18n user variables.
- *
- * @group migrate_drupal_7
  */
+#[Group('migrate_drupal_7')]
+#[RunTestsInSeparateProcesses]
 class MigrateUserConfigsTranslationTest extends MigrateDrupal7TestBase {
 
   use SchemaCheckTestTrait;
@@ -34,6 +38,9 @@ class MigrateUserConfigsTranslationTest extends MigrateDrupal7TestBase {
       'locales_location',
     ]);
     $this->executeMigrations([
+      'language',
+      'd7_user_mail',
+      'd7_user_settings',
       'd7_user_mail_translation',
       'd7_user_settings_translation',
     ]);
@@ -42,7 +49,7 @@ class MigrateUserConfigsTranslationTest extends MigrateDrupal7TestBase {
   /**
    * Tests migration of i18n user variables to user.mail and user.settings.
    */
-  public function testUserConfig() {
+  public function testUserConfig(): void {
     // Tests migration of i18n user variables to user.mail.yml.
     $language_manager = \Drupal::service('language_manager');
     $config = $language_manager->getLanguageConfigOverride('is', 'user.mail');

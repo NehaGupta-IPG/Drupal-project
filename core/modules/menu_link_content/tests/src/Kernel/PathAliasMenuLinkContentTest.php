@@ -1,19 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\menu_link_content\Kernel;
 
-use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Menu\MenuTreeParameters;
-use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensures that the menu tree adapts to path alias changes.
- *
- * @group menu_link_content
- * @group path
  */
+#[Group('menu_link_content')]
+#[Group('path')]
+#[RunTestsInSeparateProcesses]
 class PathAliasMenuLinkContentTest extends KernelTestBase {
 
   use PathAliasTestTrait;
@@ -23,7 +26,6 @@ class PathAliasMenuLinkContentTest extends KernelTestBase {
    */
   protected static $modules = [
     'menu_link_content',
-    'system',
     'link',
     'path_alias',
     'test_page_test',
@@ -46,20 +48,9 @@ class PathAliasMenuLinkContentTest extends KernelTestBase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function register(ContainerBuilder $container) {
-    parent::register($container);
-
-    $definition = $container->getDefinition('path_alias.path_processor');
-    $definition
-      ->addTag('path_processor_inbound', ['priority' => 100]);
-  }
-
-  /**
    * Tests the path aliasing changing.
    */
-  public function testPathAliasChange() {
+  public function testPathAliasChange(): void {
     $path_alias = $this->createPathAlias('/test-page', '/my-blog');
     $menu_link_content = MenuLinkContent::create([
       'title' => 'Menu title',
@@ -69,7 +60,7 @@ class PathAliasMenuLinkContentTest extends KernelTestBase {
     $menu_link_content->save();
 
     $tree = \Drupal::menuTree()->load('tools', new MenuTreeParameters());
-    $this->assertEqual('test_page_test.test_page', $tree[$menu_link_content->getPluginId()]->link->getPluginDefinition()['route_name']);
+    $this->assertEquals('test_page_test.test_page', $tree[$menu_link_content->getPluginId()]->link->getPluginDefinition()['route_name']);
 
     // Saving an alias should clear the alias manager cache.
     $path_alias->setPath('/test-render-title');
@@ -77,15 +68,15 @@ class PathAliasMenuLinkContentTest extends KernelTestBase {
     $path_alias->save();
 
     $tree = \Drupal::menuTree()->load('tools', new MenuTreeParameters());
-    $this->assertEqual('test_page_test.render_title', $tree[$menu_link_content->getPluginId()]->link->getPluginDefinition()['route_name']);
+    $this->assertEquals('test_page_test.render_title', $tree[$menu_link_content->getPluginId()]->link->getPluginDefinition()['route_name']);
 
     // Delete the alias.
     $path_alias->delete();
     $tree = \Drupal::menuTree()->load('tools', new MenuTreeParameters());
     $this->assertTrue(isset($tree[$menu_link_content->getPluginId()]));
-    $this->assertEqual('', $tree[$menu_link_content->getPluginId()]->link->getRouteName());
+    $this->assertEquals('', $tree[$menu_link_content->getPluginId()]->link->getRouteName());
     // Verify the plugin now references a path that does not match any route.
-    $this->assertEqual('base:my-blog', $tree[$menu_link_content->getPluginId()]->link->getUrlObject()->getUri());
+    $this->assertEquals('base:my-blog', $tree[$menu_link_content->getPluginId()]->link->getUrlObject()->getUri());
   }
 
 }

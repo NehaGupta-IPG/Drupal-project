@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Module;
 
 use Drupal\module_autoload_test\SomeClass;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests class loading for modules.
- *
- * @group Module
  */
+#[Group('Module')]
+#[RunTestsInSeparateProcesses]
 class ClassLoaderTest extends BrowserTestBase {
 
   /**
@@ -34,7 +38,7 @@ class ClassLoaderTest extends BrowserTestBase {
    *
    * @see \Drupal\module_autoload_test\SomeClass
    */
-  public function testClassLoading() {
+  public function testClassLoading(): void {
     // Enable the module_test and module_autoload_test modules.
     \Drupal::service('module_installer')->install(['module_test', 'module_autoload_test'], FALSE);
     $this->resetAll();
@@ -42,7 +46,7 @@ class ClassLoaderTest extends BrowserTestBase {
     for ($i = 0; $i < 2; $i++) {
       $this->drupalGet('module-test/class-loading');
       $this->assertSession()->statusCodeEquals(200);
-      $this->assertText($this->expected);
+      $this->assertSession()->pageTextContains($this->expected);
     }
   }
 
@@ -51,7 +55,7 @@ class ClassLoaderTest extends BrowserTestBase {
    *
    * @see \Drupal\module_autoload_test\SomeClass
    */
-  public function testClassLoadingNotInstalledModules() {
+  public function testClassLoadingNotInstalledModules(): void {
     // Enable the module_test module.
     \Drupal::service('module_installer')->install(['module_test'], FALSE);
     $this->resetAll();
@@ -59,7 +63,7 @@ class ClassLoaderTest extends BrowserTestBase {
     for ($i = 0; $i < 2; $i++) {
       $this->drupalGet('module-test/class-loading');
       $this->assertSession()->statusCodeEquals(200);
-      $this->assertNoText($this->expected);
+      $this->assertSession()->pageTextNotContains($this->expected);
     }
   }
 
@@ -68,7 +72,7 @@ class ClassLoaderTest extends BrowserTestBase {
    *
    * @see \Drupal\module_autoload_test\SomeClass
    */
-  public function testClassLoadingDisabledModules() {
+  public function testClassLoadingDisabledModules(): void {
     // Enable the module_test and module_autoload_test modules.
     \Drupal::service('module_installer')->install(['module_test', 'module_autoload_test'], FALSE);
     $this->resetAll();
@@ -79,20 +83,22 @@ class ClassLoaderTest extends BrowserTestBase {
     for ($i = 0; $i < 2; $i++) {
       $this->drupalGet('module-test/class-loading');
       $this->assertSession()->statusCodeEquals(200);
-      $this->assertNoText($this->expected);
+      $this->assertSession()->pageTextNotContains($this->expected);
     }
   }
 
   /**
    * Ensures the negative caches in the class loader don't result in crashes.
    */
-  public function testMultipleModules() {
-    $this->drupalLogin($this->rootUser);
+  public function testMultipleModules(): void {
+    $this->drupalLogin($this->drupalCreateUser(['administer modules']));
+
     $edit = [
       "modules[module_install_class_loader_test1][enable]" => TRUE,
       "modules[module_install_class_loader_test2][enable]" => TRUE,
     ];
-    $this->drupalPostForm('admin/modules', $edit, 'Install');
+    $this->drupalGet('admin/modules');
+    $this->submitForm($edit, 'Install');
     $this->rebuildContainer();
     $this->assertTrue(\Drupal::moduleHandler()->moduleExists('module_install_class_loader_test2'), 'The module_install_class_loader_test2 module has been installed.');
   }
@@ -100,13 +106,16 @@ class ClassLoaderTest extends BrowserTestBase {
   /**
    * Tests that .module files can use class constants in main section.
    */
-  public function testAutoloadFromModuleFile() {
+  public function testAutoloadFromModuleFile(): void {
     $this->assertFalse(defined('MODULE_AUTOLOAD_TEST_CONSTANT'));
-    $this->drupalLogin($this->rootUser);
+    // Create use with required permissions.
+    $this->drupalLogin($this->drupalCreateUser(['administer modules']));
+
     $edit = [
       "modules[module_autoload_test][enable]" => TRUE,
     ];
-    $this->drupalPostForm('admin/modules', $edit, 'Install');
+    $this->drupalGet('admin/modules');
+    $this->submitForm($edit, 'Install');
     $this->assertSession()->statusCodeEquals(200);
     $this->resetAll();
     $this->assertSame(SomeClass::TEST, MODULE_AUTOLOAD_TEST_CONSTANT);

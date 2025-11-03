@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests a page with multiple Views forms.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ViewsFormMultipleTest extends ViewTestBase {
 
   /**
@@ -24,8 +29,8 @@ class ViewsFormMultipleTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
+    parent::setUp($import_test_views, $modules);
 
     $this->enableViewsTestModule();
   }
@@ -36,8 +41,8 @@ class ViewsFormMultipleTest extends ViewTestBase {
   protected function viewsData() {
     $data = parent::viewsData();
     $data['views_test_data']['field_form_button_test']['field'] = [
-      'title' => t('Button test'),
-      'help' => t('Adds a test form button.'),
+      'title' => 'Button test',
+      'help' => 'Adds a test form button.',
       'id' => 'field_form_button_test',
     ];
     return $data;
@@ -46,19 +51,19 @@ class ViewsFormMultipleTest extends ViewTestBase {
   /**
    * Tests the a page with multiple View forms in it.
    */
-  public function testViewsFormMultiple() {
+  public function testViewsFormMultiple(): void {
     // Get the test page.
     $this->drupalGet('views_test_form_multiple');
 
-    $this->assertText('Test base form ID with Views forms and arguments.');
+    $this->assertSession()->pageTextContains('Test base form ID with Views forms and arguments.');
 
     // Submit the forms, validate argument returned in message set by handler.
     // @note There is not a way to specify a specific index for a submit button. So
     // the row index returned is always the last occurrence.
     $this->getSession()->getPage()->pressButton('edit-field-form-button-test-4--2');
-    $this->assertText('The test button at row 4 for test_form_multiple (default) View with args: arg2 was submitted.');
+    $this->assertSession()->pageTextContains('The test button at row 4 for test_form_multiple (default) View with args: arg2 was submitted.');
     $this->getSession()->getPage()->pressButton('edit-field-form-button-test-4');
-    $this->assertText('The test button at row 4 for test_form_multiple (default) View with args: arg1 was submitted.');
+    $this->assertSession()->pageTextContains('The test button at row 4 for test_form_multiple (default) View with args: arg1 was submitted.');
   }
 
 }

@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\search\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests searching with date filters that exclude some translations.
- *
- * @group search
  */
+#[Group('search')]
+#[RunTestsInSeparateProcesses]
 class SearchDateIntervalTest extends BrowserTestBase {
 
   /**
@@ -27,6 +31,9 @@ class SearchDateIntervalTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -79,10 +86,11 @@ class SearchDateIntervalTest extends BrowserTestBase {
   /**
    * Tests searching with date filters that exclude some translations.
    */
-  public function testDateIntervalQueryAlter() {
+  public function testDateIntervalQueryAlter(): void {
     // Search for keyword node.
     $edit = ['keys' => 'node'];
-    $this->drupalPostForm('search/node', $edit, 'Search');
+    $this->drupalGet('search/node');
+    $this->submitForm($edit, 'Search');
 
     // The nodes must have the same node ID but the created date is different.
     // So only the Spanish translation must appear.

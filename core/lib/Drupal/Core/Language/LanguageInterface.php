@@ -3,7 +3,9 @@
 namespace Drupal\Core\Language;
 
 /**
- * Defines a language.
+ * Defines an interface for languages.
+ *
+ * @ingroup i18n
  */
 interface LanguageInterface {
 
@@ -24,7 +26,7 @@ interface LanguageInterface {
    * determined. This special language code is useful when we know the data
    * might have linguistic information, but we don't know the language.
    *
-   * See http://www.w3.org/International/questions/qa-no-language#undetermined.
+   * See https://www.w3.org/International/questions/qa-no-language#undetermined.
    */
   const LANGCODE_NOT_SPECIFIED = 'und';
 
@@ -34,7 +36,7 @@ interface LanguageInterface {
    * Should be used when we explicitly know that the data referred has no
    * linguistic content.
    *
-   * See http://www.w3.org/International/questions/qa-no-language#nonlinguistic.
+   * @see https://www.w3.org/International/questions/qa-no-language#nonlinguistic
    */
   const LANGCODE_NOT_APPLICABLE = 'zxx';
 

@@ -1,18 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Kernel;
 
 use Drupal\Core\Session\AccountInterface;
 use Drupal\file\Entity\File;
+use Drupal\file\FileInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests access to managed files.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileManagedAccessTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -29,8 +34,7 @@ class FileManagedAccessTest extends KernelTestBase {
   /**
    * Tests if public file is always accessible.
    */
-  public function testFileAccess() {
-    $this->installSchema('system', ['sequences']);
+  public function testFileAccess(): void {
     $this->installEntitySchema('user');
     $this->installEntitySchema('file');
     $this->installSchema('file', ['file_usage']);
@@ -48,7 +52,7 @@ class FileManagedAccessTest extends KernelTestBase {
       'uid' => 1,
       'filename' => 'drupal.txt',
       'uri' => 'public://drupal.txt',
-      'status' => FILE_STATUS_PERMANENT,
+      'status' => FileInterface::STATUS_PERMANENT,
     ]);
     $file_public->save();
 
@@ -63,7 +67,7 @@ class FileManagedAccessTest extends KernelTestBase {
       'uid' => 1,
       'filename' => 'drupal.txt',
       'uri' => 'private://drupal.txt',
-      'status' => FILE_STATUS_PERMANENT,
+      'status' => FileInterface::STATUS_PERMANENT,
     ]);
     $file_private->save();
 

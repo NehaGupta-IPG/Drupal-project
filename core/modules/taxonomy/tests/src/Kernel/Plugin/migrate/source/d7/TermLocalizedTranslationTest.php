@@ -1,13 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Kernel\Plugin\migrate\source\d7;
 
+use Drupal\taxonomy\Plugin\migrate\source\d7\TermLocalizedTranslation;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
+// cspell:ignore ltlanguage objectid objectindex plid tdlanguage tsid
 /**
  * Tests D7 i18n term localized source plugin.
- *
- * @covers \Drupal\taxonomy\Plugin\migrate\source\d7\TermLocalizedTranslation
- * @group taxonomy
  */
+#[CoversClass(TermLocalizedTranslation::class)]
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class TermLocalizedTranslationTest extends TermTest {
 
   /**
@@ -18,7 +26,7 @@ class TermLocalizedTranslationTest extends TermTest {
   /**
    * {@inheritdoc}
    */
-  public function providerSource() {
+  public static function providerSource() {
     $tests = parent::providerSource();
 
     for ($i = 1; $i < 4; $i++) {
@@ -99,7 +107,6 @@ class TermLocalizedTranslationTest extends TermTest {
         'name' => 'name value 1 (name_field)',
         'description' => 'description value 1 (description_field)',
         'weight' => 0,
-        'is_container' => '',
         'language' => 'fr',
         'i18n_tsid' => '0',
         'machine_name' => 'tags',
@@ -117,7 +124,6 @@ class TermLocalizedTranslationTest extends TermTest {
         'name' => 'name value 1 (name_field)',
         'description' => 'description value 1 (description_field)',
         'weight' => 0,
-        'is_container' => '',
         'language' => 'fr',
         'i18n_tsid' => '0',
         'machine_name' => 'tags',
@@ -153,7 +159,7 @@ class TermLocalizedTranslationTest extends TermTest {
         'property' => 'description',
         'objectindex' => '5',
         'format' => 0,
-       ]);
+      ]);
     array_push($tests[1]['source_data']['locales_target'],
       [
         'lid' => 10,
@@ -170,7 +176,7 @@ class TermLocalizedTranslationTest extends TermTest {
         'plid' => 0,
         'plural' => 0,
         'i18n_status' => 0,
-    ]);
+      ]);
 
     // The expected results.
     array_push($tests[1]['expected_data'],
@@ -180,7 +186,6 @@ class TermLocalizedTranslationTest extends TermTest {
         'name' => 'name value 3',
         'description' => 'description value 3',
         'weight' => 0,
-        'is_container' => '',
         'language' => 'zu',
         'i18n_tsid' => '0',
         'machine_name' => 'categories',
@@ -196,7 +201,6 @@ class TermLocalizedTranslationTest extends TermTest {
         'name' => 'name value 5',
         'description' => 'description value 5',
         'weight' => 1,
-        'is_container' => '1',
         'language' => 'fr',
         'i18n_tsid' => '0',
         'machine_name' => 'categories',
@@ -214,7 +218,6 @@ class TermLocalizedTranslationTest extends TermTest {
         'name' => 'name value 5',
         'description' => 'description value 5',
         'weight' => 1,
-        'is_container' => '1',
         'language' => 'fr',
         'i18n_tsid' => '0',
         'machine_name' => 'categories',
@@ -225,7 +228,7 @@ class TermLocalizedTranslationTest extends TermTest {
         'translation' => 'fr - description value 5',
         'name_translated' => 'fr - name value 5',
         'description_translated' => 'fr - description value 5',
-    ]);
+      ]);
 
     $tests[1]['expected_count'] = NULL;
     // Empty configuration will return terms for all vocabularies.

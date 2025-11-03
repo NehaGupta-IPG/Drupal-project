@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests updating the changed time after API and FORM entity save.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeFormSaveChangedTimeTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node',
@@ -58,25 +60,23 @@ class NodeFormSaveChangedTimeTest extends BrowserTestBase {
   }
 
   /**
-   * Test the changed time after API and FORM save without changes.
+   * Tests the changed time after API and FORM save without changes.
    */
-  public function testChangedTimeAfterSaveWithoutChanges() {
+  public function testChangedTimeAfterSaveWithoutChanges(): void {
     $storage = $this->container->get('entity_type.manager')->getStorage('node');
-    $storage->resetCache([1]);
     $node = $storage->load(1);
     $changed_timestamp = $node->getChangedTime();
     $node->save();
-    $storage->resetCache([1]);
     $node = $storage->load(1);
-    $this->assertEqual($changed_timestamp, $node->getChangedTime(), "The entity's changed time wasn't updated after API save without changes.");
+    $this->assertEquals($changed_timestamp, $node->getChangedTime(), "The entity's changed time wasn't updated after API save without changes.");
 
     // Ensure different save timestamps.
     sleep(1);
 
     // Save the node on the regular node edit form.
-    $this->drupalPostForm('node/1/edit', [], 'Save');
+    $this->drupalGet('node/1/edit');
+    $this->submitForm([], 'Save');
 
-    $storage->resetCache([1]);
     $node = $storage->load(1);
     $this->assertNotEquals($node->getChangedTime(), $changed_timestamp, "The entity's changed time was updated after form save without changes.");
   }

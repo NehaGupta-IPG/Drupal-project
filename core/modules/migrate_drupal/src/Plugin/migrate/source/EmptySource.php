@@ -13,10 +13,21 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 /**
  * Source returning an empty row with Drupal specific config dependencies.
  *
+ * For more information and available configuration keys, refer to the parent
+ * classes.
+ *
+ * @see \Drupal\migrate\Plugin\migrate\source\EmptySource
+ * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
+ *
  * @MigrateSource(
  *   id = "md_empty",
  *   source_module = "system",
  * )
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no
+ *   replacement.
+ *
+ * @see https://www.drupal.org/node/3533564
  */
 class EmptySource extends BaseEmptySource implements ContainerFactoryPluginInterface, DependentPluginInterface {
 
@@ -33,6 +44,7 @@ class EmptySource extends BaseEmptySource implements ContainerFactoryPluginInter
    * {@inheritdoc}
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityTypeManagerInterface $entity_type_manager) {
+    @trigger_error('Migrate source plugin "md_empty" used in migration "' . $migration->id() . '" is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3533564', E_USER_DEPRECATED);
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     $this->entityTypeManager = $entity_type_manager;
   }
@@ -40,7 +52,7 @@ class EmptySource extends BaseEmptySource implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
     return new static(
       $configuration,
       $plugin_id,

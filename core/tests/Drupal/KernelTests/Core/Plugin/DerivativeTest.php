@@ -1,29 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Plugin;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that derivative plugins are correctly discovered.
- *
- * @group Plugin
  */
+#[Group('Plugin')]
+#[RunTestsInSeparateProcesses]
 class DerivativeTest extends PluginTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['node', 'user'];
 
   /**
    * Tests getDefinitions() and getDefinition() with a derivativeDecorator.
    */
-  public function testDerivativeDecorator() {
+  public function testDerivativeDecorator(): void {
     // Ensure that getDefinitions() returns the expected definitions.
-    $this->assertEqual($this->mockBlockExpectedDefinitions, $this->mockBlockManager->getDefinitions());
+    $this->assertEquals($this->mockBlockExpectedDefinitions, $this->mockBlockManager->getDefinitions());
 
     // Ensure that getDefinition() returns the expected definition.
     foreach ($this->mockBlockExpectedDefinitions as $id => $definition) {
-      $this->assertEqual($definition, $this->mockBlockManager->getDefinition($id));
+      $this->assertEquals($definition, $this->mockBlockManager->getDefinition($id));
     }
 
     // Ensure that NULL is returned as the definition of a non-existing base

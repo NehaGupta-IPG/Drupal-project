@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests field validation.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldValidationTest extends FieldKernelTestBase {
 
   /**
@@ -24,6 +29,9 @@ class FieldValidationTest extends FieldKernelTestBase {
    */
   private $entity;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -42,7 +50,7 @@ class FieldValidationTest extends FieldKernelTestBase {
   /**
    * Tests that the number of values is validated against the field cardinality.
    */
-  public function testCardinalityConstraint() {
+  public function testCardinalityConstraint(): void {
     $cardinality = $this->fieldTestData->field_storage->getCardinality();
     $entity = $this->entity;
 
@@ -55,14 +63,14 @@ class FieldValidationTest extends FieldKernelTestBase {
 
     // Check that the expected constraint violations are reported.
     $this->assertCount(1, $violations);
-    $this->assertEqual('', $violations[0]->getPropertyPath());
-    $this->assertEqual(t('%name: this field cannot hold more than @count values.', ['%name' => $this->fieldTestData->field->getLabel(), '@count' => $cardinality]), $violations[0]->getMessage());
+    $this->assertEquals('', $violations[0]->getPropertyPath());
+    $this->assertEquals(sprintf('%s: this field cannot hold more than %s values.', $this->fieldTestData->field->getLabel(), $cardinality), $violations[0]->getMessage());
   }
 
   /**
    * Tests that constraints defined by the field type are validated.
    */
-  public function testFieldConstraints() {
+  public function testFieldConstraints(): void {
     $cardinality = $this->fieldTestData->field_storage->getCardinality();
     $entity = $this->entity;
 
@@ -78,7 +86,7 @@ class FieldValidationTest extends FieldKernelTestBase {
       }
       else {
         $value = -1;
-        $expected_violations[$delta . '.value'][] = t('%name does not accept the value -1.', ['%name' => $this->fieldTestData->field->getLabel()]);
+        $expected_violations[$delta . '.value'][] = $this->fieldTestData->field->getLabel() . ' does not accept the value -1.';
       }
       $entity->{$this->fieldTestData->field_name}[] = $value;
     }
@@ -91,7 +99,7 @@ class FieldValidationTest extends FieldKernelTestBase {
     foreach ($violations as $violation) {
       $violations_by_path[$violation->getPropertyPath()][] = $violation->getMessage();
     }
-    $this->assertEqual($expected_violations, $violations_by_path);
+    $this->assertEquals($expected_violations, $violations_by_path);
   }
 
 }

@@ -1,12 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Functional\Rest;
 
 use Drupal\Tests\rest\Functional\CookieResourceTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @group rest
+ * Tests Block Json Cookie.
  */
+#[Group('rest')]
+#[RunTestsInSeparateProcesses]
 class BlockJsonCookieTest extends BlockResourceTestBase {
 
   use CookieResourceTestTrait;
@@ -29,6 +35,6 @@ class BlockJsonCookieTest extends BlockResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'stark';
 
 }

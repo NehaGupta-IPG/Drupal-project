@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\File;
 
 use Drupal\Core\File\Exception\FileException;
@@ -8,12 +10,16 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
- * @coversDefaultClass \Drupal\Core\File\FileSystem
- *
- * @group File
+ * Tests Drupal\Core\File\FileSystem.
  */
+#[CoversClass(FileSystem::class)]
+#[Group('File')]
 class FileSystemTest extends UnitTestCase {
 
   /**
@@ -31,7 +37,7 @@ class FileSystemTest extends UnitTestCase {
   /**
    * The stream wrapper manager.
    *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $streamWrapperManager;
 
@@ -43,14 +49,15 @@ class FileSystemTest extends UnitTestCase {
 
     $settings = new Settings([]);
     $this->streamWrapperManager = $this->createMock(StreamWrapperManagerInterface::class);
-    $this->logger = $this->createMock('Psr\Log\LoggerInterface');
-    $this->fileSystem = new FileSystem($this->streamWrapperManager, $settings, $this->logger);
+    $this->fileSystem = new FileSystem($this->streamWrapperManager, $settings);
   }
 
   /**
-   * @covers ::chmod
+   * Tests chmod file.
+   *
+   * @legacy-covers ::chmod
    */
-  public function testChmodFile() {
+  public function testChmodFile(): void {
     vfsStream::setup('dir');
     vfsStream::create(['test.txt' => 'asdf']);
     $uri = 'vfs://dir/test.txt';
@@ -62,9 +69,11 @@ class FileSystemTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::chmod
+   * Tests chmod dir.
+   *
+   * @legacy-covers ::chmod
    */
-  public function testChmodDir() {
+  public function testChmodDir(): void {
     vfsStream::setup('dir');
     vfsStream::create(['nested_dir' => []]);
     $uri = 'vfs://dir/nested_dir';
@@ -76,19 +85,21 @@ class FileSystemTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::chmod
+   * Tests chmod unsuccessful.
+   *
+   * @legacy-covers ::chmod
    */
-  public function testChmodUnsuccessful() {
+  public function testChmodUnsuccessful(): void {
     vfsStream::setup('dir');
-    $this->logger->expects($this->once())
-      ->method('error');
     $this->assertFalse($this->fileSystem->chmod('vfs://dir/test.txt'));
   }
 
   /**
-   * @covers ::unlink
+   * Tests unlink.
+   *
+   * @legacy-covers ::unlink
    */
-  public function testUnlink() {
+  public function testUnlink(): void {
     vfsStream::setup('dir');
     vfsStream::create(['test.txt' => 'asdf']);
     $uri = 'vfs://dir/test.txt';
@@ -99,19 +110,22 @@ class FileSystemTest extends UnitTestCase {
 
     $this->assertFileExists($uri);
     $this->fileSystem->unlink($uri);
-    $this->assertFileNotExists($uri);
+    $this->assertFileDoesNotExist($uri);
   }
 
   /**
-   * @covers ::basename
+   * Tests basename.
    *
-   * @dataProvider providerTestBasename
+   * @legacy-covers ::basename
    */
-  public function testBasename($uri, $expected, $suffix = NULL) {
+  #[IgnoreDeprecations]
+  #[DataProvider('providerTestBasename')]
+  public function testBasename($uri, $expected, $suffix = NULL): void {
+    $this->expectDeprecation("Calling FileSystem::basename() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use PHP native basename() instead. See https://www.drupal.org/node/3530869");
     $this->assertSame($expected, $this->fileSystem->basename($uri, $suffix));
   }
 
-  public function providerTestBasename() {
+  public static function providerTestBasename() {
     $data = [];
     $data[] = [
       'public://nested/dir',
@@ -133,34 +147,28 @@ class FileSystemTest extends UnitTestCase {
    * Asserts that the file permissions of a given URI matches.
    *
    * @param int $expected_mode
+   *   The expected file mode.
    * @param string $uri
+   *   The URI to test.
    * @param string $message
+   *   An optional error message.
+   *
+   * @internal
    */
-  protected function assertFilePermissions($expected_mode, $uri, $message = '') {
+  protected function assertFilePermissions(int $expected_mode, string $uri, string $message = ''): void {
     // Mask out all but the last three octets.
     $actual_mode = fileperms($uri) & 0777;
-
-    // PHP on Windows has limited support for file permissions. Usually each of
-    // "user", "group" and "other" use one octal digit (3 bits) to represent the
-    // read/write/execute bits. On Windows, chmod() ignores the "group" and
-    // "other" bits, and fileperms() returns the "user" bits in all three
-    // positions. $expected_mode is updated to reflect this.
-    if (substr(PHP_OS, 0, 3) == 'WIN') {
-      // Reset the "group" and "other" bits.
-      $expected_mode = $expected_mode & 0700;
-      // Shift the "user" bits to the "group" and "other" positions also.
-      $expected_mode = $expected_mode | $expected_mode >> 3 | $expected_mode >> 6;
-    }
     $this->assertSame($expected_mode, $actual_mode, $message);
   }
 
   /**
    * Tests that invalid UTF-8 results in an exception.
    *
-   * @covers ::createFilename
+   * @legacy-covers ::createFilename
    */
-  public function testInvalidUTF8() {
+  public function testInvalidUTF8(): void {
     vfsStream::setup('dir');
+    // cspell:disable-next-line
     $filename = "a\xFFsdf\x80€" . '.txt';
     $this->expectException(FileException::class);
     $this->expectExceptionMessage("Invalid filename '$filename'");

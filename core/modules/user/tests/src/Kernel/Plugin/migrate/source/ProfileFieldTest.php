@@ -1,15 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel\Plugin\migrate\source;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
+use Drupal\user\Plugin\migrate\source\ProfileField;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the profile_field source plugin.
- *
- * @covers \Drupal\user\Plugin\migrate\source\ProfileField
- * @group user
  */
+#[CoversClass(ProfileField::class)]
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class ProfileFieldTest extends MigrateSqlSourceTestBase {
 
   /**
@@ -20,12 +26,12 @@ class ProfileFieldTest extends MigrateSqlSourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function providerSource() {
+  public static function providerSource() {
     $tests = [
       [
         'source_data' => [],
         'expected_data' => [],
-       ],
+      ],
     ];
 
     $profile_fields = [
@@ -103,8 +109,8 @@ class ProfileFieldTest extends MigrateSqlSourceTestBase {
     ];
 
     // Expected options are:
-    //  for "checkbox" fields - array with NULL options
-    //  for "selection" fields - options in both keys and values
+    // - for "checkbox" fields - array with NULL options.
+    // - for "selection" fields - options in both keys and values.
     $expected_field_options = [
       '',
       '',

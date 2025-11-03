@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the title area handler.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\area\Title
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class AreaTitleTest extends ViewsKernelTestBase {
 
   /**
@@ -23,7 +28,7 @@ class AreaTitleTest extends ViewsKernelTestBase {
   /**
    * Tests the title area handler.
    */
-  public function testTitleText() {
+  public function testTitleText(): void {
     $view = Views::getView('test_area_title');
 
     $view->setDisplay('default');
@@ -36,20 +41,20 @@ class AreaTitleTest extends ViewsKernelTestBase {
     $this->executeView($view);
     $view->result = [];
     $view->render();
-    $this->assertEqual('test_title_empty', $view->getTitle(), 'The title area should override the title if the result is empty.');
+    $this->assertEquals('test_title_empty', $view->getTitle(), 'The title area should override the title if the result is empty.');
     $view->destroy();
 
     $view->setDisplay('page_1');
     $this->executeView($view);
     $view->render();
-    $this->assertEqual('test_title_header', $view->getTitle(), 'The title area on the header should override the title if the result is not empty.');
+    $this->assertEquals('test_title_header', $view->getTitle(), 'The title area on the header should override the title if the result is not empty.');
     $view->destroy();
 
     $view->setDisplay('page_1');
     $this->executeView($view);
     $view->result = [];
     $view->render();
-    $this->assertEqual('test_title_empty', $view->getTitle(), 'The title area should override the title if the result is empty.');
+    $this->assertEquals('test_title_empty', $view->getTitle(), 'The title area should override the title if the result is empty.');
     $view->destroy();
   }
 

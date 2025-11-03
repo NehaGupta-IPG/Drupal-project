@@ -10,7 +10,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface FilterFormatInterface extends ConfigEntityInterface {
 
   /**
-   * Returns the ordered collection of filter plugin instances or an individual plugin instance.
+   * Returns a sorted collection of filter plugins or an individual instance.
    *
    * @param string $instance_id
    *   (optional) The ID of a filter plugin instance to return.
@@ -47,7 +47,7 @@ interface FilterFormatInterface extends ConfigEntityInterface {
   /**
    * Returns the machine-readable permission name for the text format.
    *
-   * @return string|bool
+   * @return string|false
    *   The machine-readable permission name, or FALSE if the text format is
    *   malformed or is the fallback format (which is available to all users).
    */
@@ -72,10 +72,8 @@ interface FilterFormatInterface extends ConfigEntityInterface {
    *
    * @return array|false
    *   A structured array as returned by FilterInterface::getHTMLRestrictions(),
-   *   but with the intersection of all filters in this text format. The
-   *   restrictions will either forbid or allow a list of tags. In the latter
-   *   case, it's possible that restrictions on attributes are also stored.
-   *   FALSE means there are no HTML restrictions.
+   *   but with the intersection of all filters in this text format. FALSE means
+   *   there are no HTML restrictions.
    */
   public function getHtmlRestrictions();
 

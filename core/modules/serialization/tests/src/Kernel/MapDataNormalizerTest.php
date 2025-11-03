@@ -1,14 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\serialization\Kernel;
 
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\MapDataDefinition;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @group typedData
+ * Tests Map Data Normalizer.
  */
+#[Group('TypedData')]
+#[RunTestsInSeparateProcesses]
 class MapDataNormalizerTest extends KernelTestBase {
 
   /**
@@ -42,7 +48,7 @@ class MapDataNormalizerTest extends KernelTestBase {
   /**
    * Tests whether map data can be normalized.
    */
-  public function testMapNormalize() {
+  public function testMapNormalize(): void {
     $typed_data = $this->buildExampleTypedData();
     $data = $this->serializer->normalize($typed_data, 'json');
     $expect_value = [
@@ -59,9 +65,9 @@ class MapDataNormalizerTest extends KernelTestBase {
   }
 
   /**
-   * Test whether map data with properties can be normalized.
+   * Tests whether map data with properties can be normalized.
    */
-  public function testMapWithPropertiesNormalize() {
+  public function testMapWithPropertiesNormalize(): void {
     $typed_data = $this->buildExampleTypedDataWithProperties();
     $data = $this->serializer->normalize($typed_data, 'json');
     $expect_value = [

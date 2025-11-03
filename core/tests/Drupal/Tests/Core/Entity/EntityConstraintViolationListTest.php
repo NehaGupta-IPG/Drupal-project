@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\Entity\EntityConstraintViolationList;
@@ -7,18 +9,23 @@ use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\entity_test\Plugin\Validation\Constraint\EntityTestCompositeConstraint;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Validator\ConstraintViolation;
 
 /**
- * @coversDefaultClass \Drupal\Core\Entity\EntityConstraintViolationList
- * @group entity
+ * Tests Drupal\Core\Entity\EntityConstraintViolationList.
  */
+#[CoversClass(EntityConstraintViolationList::class)]
+#[Group('entity')]
 class EntityConstraintViolationListTest extends UnitTestCase {
 
   /**
-   * @covers ::filterByFields
+   * Tests filter by fields.
+   *
+   * @legacy-covers ::filterByFields
    */
-  public function testFilterByFields() {
+  public function testFilterByFields(): void {
     $account = $this->prophesize('\Drupal\Core\Session\AccountInterface')->reveal();
     $entity = $this->setupEntity($account);
 
@@ -31,9 +38,11 @@ class EntityConstraintViolationListTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::filterByFields
+   * Tests filter by fields with composite constraints.
+   *
+   * @legacy-covers ::filterByFields
    */
-  public function testFilterByFieldsWithCompositeConstraints() {
+  public function testFilterByFieldsWithCompositeConstraints(): void {
     $account = $this->prophesize('\Drupal\Core\Session\AccountInterface')->reveal();
     $entity = $this->setupEntity($account);
 
@@ -46,9 +55,11 @@ class EntityConstraintViolationListTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::filterByFieldAccess
+   * Tests filter by field access.
+   *
+   * @legacy-covers ::filterByFieldAccess
    */
-  public function testFilterByFieldAccess() {
+  public function testFilterByFieldAccess(): void {
     $account = $this->prophesize('\Drupal\Core\Session\AccountInterface')->reveal();
     $entity = $this->setupEntity($account);
 
@@ -61,9 +72,11 @@ class EntityConstraintViolationListTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::filterByFieldAccess
+   * Tests filter by field access with composite constraint.
+   *
+   * @legacy-covers ::filterByFieldAccess
    */
-  public function testFilterByFieldAccessWithCompositeConstraint() {
+  public function testFilterByFieldAccessWithCompositeConstraint(): void {
     $account = $this->prophesize('\Drupal\Core\Session\AccountInterface')->reveal();
     $entity = $this->setupEntity($account);
 
@@ -73,6 +86,24 @@ class EntityConstraintViolationListTest extends UnitTestCase {
     $this->assertSame($constraint_list->filterByFieldAccess($account), $constraint_list);
     $this->assertCount(4, $constraint_list);
     $this->assertEquals(array_values(iterator_to_array($constraint_list)), [$violations[2], $violations[3], $violations[4], $violations[5]]);
+  }
+
+  /**
+   * Tests find by codes.
+   *
+   * @legacy-covers ::findByCodes
+   */
+  public function testFindByCodes(): void {
+    $account = $this->prophesize('\Drupal\Core\Session\AccountInterface')->reveal();
+    $entity = $this->setupEntity($account);
+
+    $constraint_list = $this->setupConstraintListWithoutCompositeConstraint($entity);
+    $violations = iterator_to_array($constraint_list);
+
+    $codes = ['test-code-violation-name', 'test-code-violation2-name'];
+    $actual = $constraint_list->findByCodes($codes);
+    $this->assertCount(2, $actual);
+    $this->assertEquals(iterator_to_array($actual), [$violations[0], $violations[1]]);
   }
 
   /**
@@ -121,11 +152,11 @@ class EntityConstraintViolationListTest extends UnitTestCase {
     $violations = [];
 
     // Add two violations to two specific fields.
-    $violations[] = new ConstraintViolation('test name violation', '', [], '', 'name', 'invalid');
-    $violations[] = new ConstraintViolation('test name violation2', '', [], '', 'name', 'invalid');
+    $violations[] = new ConstraintViolation('test name violation', '', [], '', 'name', 'invalid', NULL, 'test-code-violation-name');
+    $violations[] = new ConstraintViolation('test name violation2', '', [], '', 'name', 'invalid', NULL, 'test-code-violation2-name');
 
-    $violations[] = new ConstraintViolation('test type violation', '', [], '', 'type', 'invalid');
-    $violations[] = new ConstraintViolation('test type violation2', '', [], '', 'type', 'invalid');
+    $violations[] = new ConstraintViolation('test type violation', '', [], '', 'type', 'invalid', NULL, 'test-code-violation-type');
+    $violations[] = new ConstraintViolation('test type violation2', '', [], '', 'type', 'invalid', NULL, 'test-code-violation2-type');
 
     // Add two entity level specific violations.
     $violations[] = new ConstraintViolation('test entity violation', '', [], '', '', 'invalid');

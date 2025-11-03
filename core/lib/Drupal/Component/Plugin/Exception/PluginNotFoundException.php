@@ -10,14 +10,18 @@ class PluginNotFoundException extends PluginException {
   /**
    * Construct a PluginNotFoundException exception.
    *
-   * For the remaining parameters see \Exception.
-   *
    * @param string $plugin_id
    *   The plugin ID that was not found.
+   * @param string $message
+   *   The exception message.
+   * @param int $code
+   *   The exception code.
+   * @param \Throwable|null $previous
+   *   The previous throwable used for exception chaining.
    *
    * @see \Exception
    */
-  public function __construct($plugin_id, $message = '', $code = 0, \Exception $previous = NULL) {
+  public function __construct($plugin_id, $message = '', $code = 0, ?\Throwable $previous = NULL) {
     if (empty($message)) {
       $message = sprintf("Plugin ID '%s' was not found.", $plugin_id);
     }

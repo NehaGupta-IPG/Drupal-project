@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal_ui\Functional;
 
+use Drupal\Core\Entity\ContentEntityStorageInterface;
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Tests\migrate_drupal\Traits\CreateTestContentEntitiesTrait;
 
 /**
@@ -12,9 +16,30 @@ abstract class MigrateUpgradeExecuteTestBase extends MigrateUpgradeTestBase {
   use CreateTestContentEntitiesTrait;
 
   /**
+   * Indicates if the watchdog logs should be output.
+   *
+   * @var bool
+   */
+  protected bool $outputLogs = FALSE;
+
+  /**
+   * The admin username after the migration.
+   *
+   * @var string
+   */
+  protected string $migratedAdminUserName = 'admin';
+
+  /**
+   * The number of expected logged errors of type migrate_drupal_ui.
+   *
+   * @var int
+   */
+  protected int $expectedLoggedErrors = 0;
+
+  /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create content.
@@ -23,63 +48,32 @@ abstract class MigrateUpgradeExecuteTestBase extends MigrateUpgradeTestBase {
   }
 
   /**
-   * Executes all steps of migrations upgrade.
-   *
-   * The upgrade is started three times. The first time is to test that
-   * providing incorrect database credentials fails as expected. The second
-   * time is to run the migration and assert the results. The third time is
-   * to test an incremental migration, by installing the aggregator module,
-   * and assert the results.
+   * {@inheritdoc}
    */
-  public function testMigrateUpgradeExecute() {
-    $this->drupalGet('/upgrade');
+  protected function tearDown(): void {
+    if ($this->outputLogs) {
+      $this->outputLogs($this->migratedAdminUserName);
+    }
+    parent::tearDown();
+  }
+
+  /**
+   * Executes an upgrade and then an incremental upgrade.
+   */
+  public function doUpgradeAndIncremental() {
+    // Start the upgrade process.
+    $this->submitCredentialForm();
     $session = $this->assertSession();
-    $session->responseContains("Upgrade a site by importing its files and the data from its database into a clean and empty new install of Drupal $this->destinationSiteVersion.");
-
-    $this->submitForm([], 'Continue');
-    $session->pageTextContains('Provide credentials for the database of the Drupal site you want to upgrade.');
-    $session->fieldExists('mysql[host]');
-
-    // Get valid credentials.
-    $edits = $this->translatePostValues($this->getCredentials());
-
-    $this->submitForm($edits, 'Review upgrade');
-
-    // Restart the upgrade process.
-    $this->drupalGet('/upgrade');
-    $session->responseContains("Upgrade a site by importing its files and the data from its database into a clean and empty new install of Drupal $this->destinationSiteVersion.");
-
-    $this->submitForm([], 'Continue');
-    $session->pageTextContains('Provide credentials for the database of the Drupal site you want to upgrade.');
-    $session->fieldExists('mysql[host]');
-
-    $this->submitForm($edits, 'Review upgrade');
-    $entity_types = [
-      'block_content',
-      'menu_link_content',
-      'file',
-      'taxonomy_term',
-      'user',
-    ];
-    $this->assertIdConflictForm($entity_types);
 
     $this->submitForm([], 'I acknowledge I may lose data. Continue anyway.');
     $session->statusCodeEquals(200);
 
-    // Ensure there are no errors about missing modules from the test module.
-    $session->pageTextNotContains(t('Source module not found for migration_provider_no_annotation.'));
-    $session->pageTextNotContains(t('Source module not found for migration_provider_test.'));
-    // Ensure there are no errors about any other missing migration providers.
-    $session->pageTextNotContains(t('module not found'));
-
     // Test the review form.
     $this->assertReviewForm();
 
+    $this->useTestMailCollector();
     $this->submitForm([], 'Perform upgrade');
     $this->assertUpgrade($this->getEntityCounts());
-
-    \Drupal::service('module_installer')->install(['forum']);
-    \Drupal::service('module_installer')->install(['book']);
 
     // Test incremental migration.
     $this->createContentPostUpgrade();
@@ -87,19 +81,96 @@ abstract class MigrateUpgradeExecuteTestBase extends MigrateUpgradeTestBase {
     $this->drupalGet('/upgrade');
     $session->pageTextContains("An upgrade has already been performed on this site. To perform a new migration, create a clean and empty new install of Drupal $this->destinationSiteVersion. Rollbacks are not yet supported through the user interface.");
     $this->submitForm([], 'Import new configuration and content from old site');
-    $this->submitForm($edits, 'Review upgrade');
-    $session->pageTextContains('WARNING: Content may be overwritten on your new site.');
-    $session->pageTextContains('There is conflicting content of these types:');
-    $session->pageTextContains('files');
-    $session->pageTextContains('There is translated content of these types:');
-    $session->pageTextContainsOnce('content items');
-
+    $this->submitForm($this->edits, 'Review upgrade');
     $this->submitForm([], 'I acknowledge I may lose data. Continue anyway.');
     $session->statusCodeEquals(200);
 
     // Run the incremental migration and check the results.
     $this->submitForm([], 'Perform upgrade');
     $this->assertUpgrade($this->getEntityCountsIncremental());
+  }
+
+  /**
+   * Helper to set the test mail collector in settings.php.
+   */
+  public function useTestMailCollector() {
+    // Set up an override.
+    $settings['config']['system.mail']['interface']['default'] = (object) [
+      'value' => 'test_mail_collector',
+      'required' => TRUE,
+    ];
+    $settings['config']['system.mail']['mailer_dsn']['scheme'] = (object) [
+      'value' => 'null',
+      'required' => TRUE,
+    ];
+    $settings['config']['system.mail']['mailer_dsn']['host'] = (object) [
+      'value' => 'null',
+      'required' => TRUE,
+    ];
+    $this->writeSettings($settings);
+  }
+
+  /**
+   * Checks the number of the specified entity's revisions.
+   *
+   * Revision translations are excluded.
+   *
+   * @param string $content_entity_type_id
+   *   The entity type ID of the content entity, e.g. 'node', 'media',
+   *   'block_content'.
+   * @param int $expected_revision_count
+   *   The expected number of the revisions.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  protected function assertEntityRevisionsCount(string $content_entity_type_id, int $expected_revision_count) {
+    $entity_storage = \Drupal::entityTypeManager()->getStorage($content_entity_type_id);
+    assert($entity_storage instanceof ContentEntityStorageInterface);
+    $revision_ids = $entity_storage
+      ->getQuery()
+      ->allRevisions()
+      ->accessCheck(FALSE)
+      ->execute();
+    $this->assertCount(
+      $expected_revision_count,
+      $revision_ids,
+      sprintf(
+        "The number of %s revisions is different than expected",
+        $content_entity_type_id
+      )
+    );
+  }
+
+  /**
+   * Asserts log errors.
+   */
+  public function assertLogError(): void {
+    $db = \Drupal::service('database');
+    $num_errors = $db->select('watchdog', 'w')
+      ->fields('w')
+      ->condition('type', 'migrate_drupal_ui')
+      ->condition('severity', RfcLogLevel::ERROR)
+      ->countQuery()
+      ->execute()
+      ->fetchField();
+    $this->assertSame($this->expectedLoggedErrors, (int) $num_errors);
+  }
+
+  /**
+   * Preserve the logs pages.
+   */
+  public function outputLogs(string $username): void {
+    // Ensure user 1 is accessing the admin log. Change the username because
+    // the migration changes the username of user 1 but not the password.
+    if (\Drupal::currentUser()->id() != 1) {
+      $this->rootUser->name = $username;
+      $this->drupalLogin($this->rootUser);
+    }
+    $this->drupalGet('/admin/reports/dblog');
+    while ($next_link = $this->getSession()->getPage()->findLink('Next page')) {
+      $next_link->click();
+    }
   }
 
 }

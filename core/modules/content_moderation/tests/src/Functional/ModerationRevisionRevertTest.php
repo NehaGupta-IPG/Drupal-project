@@ -1,25 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test revision revert.
- *
- * @group content_moderation
  */
+#[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class ModerationRevisionRevertTest extends BrowserTestBase {
 
   use ContentTypeCreationTrait;
   use ContentModerationTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'content_moderation',
@@ -34,7 +36,7 @@ class ModerationRevisionRevertTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
 
     $moderated_bundle = $this->createContentType(['type' => 'moderated_bundle']);
@@ -60,17 +62,19 @@ class ModerationRevisionRevertTest extends BrowserTestBase {
   }
 
   /**
-   * Test that reverting a revision works.
+   * Tests that reverting a revision works.
    */
-  public function testEditingAfterRevertRevision() {
+  public function testEditingAfterRevertRevision(): void {
     // Create a draft.
-    $this->drupalPostForm('node/add/moderated_bundle', [
+    $this->drupalGet('node/add/moderated_bundle');
+    $this->submitForm([
       'title[0][value]' => 'First draft node',
       'moderation_state[0][state]' => 'draft',
     ], 'Save');
 
     // Now make it published.
-    $this->drupalPostForm('node/1/edit', [
+    $this->drupalGet('node/1/edit');
+    $this->submitForm([
       'title[0][value]' => 'Published node',
       'moderation_state[0][state]' => 'published',
     ], 'Save');
@@ -91,9 +95,8 @@ class ModerationRevisionRevertTest extends BrowserTestBase {
     $this->assertSession()
       ->pageTextContains('First draft node');
     // Try to save the node.
-    $this->drupalPostForm('node/1/edit', [
-      'moderation_state[0][state]' => 'draft',
-    ], 'Save');
+    $this->drupalGet('node/1/edit');
+    $this->submitForm(['moderation_state[0][state]' => 'draft'], 'Save');
 
     // Check if the submission passed the EntityChangedConstraintValidator.
     $this->assertSession()

@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Theme;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the layout builder with the Claro theme.
- *
- * @group claro
  */
+#[Group('claro')]
+#[RunTestsInSeparateProcesses]
 class ClaroLayoutBuilderTest extends BrowserTestBase {
 
   /**
@@ -24,6 +28,7 @@ class ClaroLayoutBuilderTest extends BrowserTestBase {
     'layout_builder',
     'layout_builder_views_test',
     'layout_test',
+    'field_ui',
     'block',
     'block_test',
     'node',
@@ -68,7 +73,7 @@ class ClaroLayoutBuilderTest extends BrowserTestBase {
    *
    * @see claro.theme
    */
-  public function testContextualLinks() {
+  public function testContextualLinks(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

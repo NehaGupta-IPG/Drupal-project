@@ -1,18 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Kernel;
 
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests loading, saving and deleting vocabularies.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class VocabularyCrudTest extends KernelTestBase {
 
   use TaxonomyTestTrait;
@@ -23,7 +27,6 @@ class VocabularyCrudTest extends KernelTestBase {
   protected static $modules = [
     'field',
     'filter',
-    'system',
     'taxonomy',
     'taxonomy_crud',
     'text',
@@ -40,11 +43,11 @@ class VocabularyCrudTest extends KernelTestBase {
   }
 
   /**
-   * Test deleting a taxonomy that contains terms.
+   * Tests deleting a taxonomy that contains terms.
    */
-  public function testTaxonomyVocabularyDeleteWithTerms() {
+  public function testTaxonomyVocabularyDeleteWithTerms(): void {
     $vocabulary = $this->createVocabulary();
-    $query = \Drupal::entityQuery('taxonomy_term')->count();
+    $query = \Drupal::entityQuery('taxonomy_term')->accessCheck(FALSE)->count();
 
     // Assert that there are no terms left.
     $this->assertEquals(0, $query->execute());
@@ -72,7 +75,7 @@ class VocabularyCrudTest extends KernelTestBase {
   /**
    * Tests for loading multiple vocabularies.
    */
-  public function testTaxonomyVocabularyLoadMultiple() {
+  public function testTaxonomyVocabularyLoadMultiple(): void {
     // Ensure there are no vocabularies.
     $this->assertEmpty(Vocabulary::loadMultiple());
 
@@ -91,11 +94,6 @@ class VocabularyCrudTest extends KernelTestBase {
     $this->assertEquals('bar', $vocabulary1->getThirdPartySetting('taxonomy_crud', 'foo'));
     $this->assertEquals('bar', $vocabulary2->getThirdPartySetting('taxonomy_crud', 'foo'));
     $this->assertEquals('bar', $vocabulary3->getThirdPartySetting('taxonomy_crud', 'foo'));
-
-    // Fetch the names for all vocabularies, confirm that they are keyed by
-    // machine name.
-    $names = taxonomy_vocabulary_get_names();
-    $this->assertEquals($vocabulary1->id(), $names[$vocabulary1->id()]);
 
     // Fetch the vocabularies with Vocabulary::loadMultiple(), specifying IDs.
     // Ensure they are returned in the same order as the original array.
@@ -127,13 +125,13 @@ class VocabularyCrudTest extends KernelTestBase {
   }
 
   /**
-   * Test uninstall and reinstall of the taxonomy module.
+   * Tests uninstall and reinstall of the taxonomy module.
    */
-  public function testUninstallReinstall() {
+  public function testUninstallReinstall(): void {
     $vocabulary = $this->createVocabulary();
     // Field storages and fields attached to taxonomy term bundles should be
     // removed when the module is uninstalled.
-    $field_name = mb_strtolower($this->randomMachineName() . '_field_name');
+    $field_name = $this->randomMachineName() . '_field_name';
     $storage_definition = [
       'field_name' => $field_name,
       'entity_type' => 'taxonomy_term',

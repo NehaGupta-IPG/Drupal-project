@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Installer;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the interactive installer installing the standard profile.
- *
- * @group Installer
  */
+#[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class StandardInstallerTest extends ConfigAfterInstallerTestBase {
 
   /**
@@ -17,49 +22,31 @@ class StandardInstallerTest extends ConfigAfterInstallerTestBase {
   /**
    * Ensures that the user page is available after installation.
    */
-  public function testInstaller() {
-    // Verify that the Standard install profile's default frontpage appears.
-    $this->assertRaw('No front page content has been created yet.');
-    // Ensure that the contact link enabled in standard_install() works as
-    // expected.
-    $this->clickLink('Contact');
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->addressEquals('contact');
+  public function testInstaller(): void {
+    // Verify that Olivero's default frontpage appears.
+    $this->assertSession()->pageTextContains('Congratulations and welcome to the Drupal community.');
+    $this->assertSession()->elementTextContains('css', '#block-olivero-powered', 'Powered by Drupal');
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function setUpSite() {
+  protected function setUpSite(): void {
     // Test that the correct theme is being used.
-    $this->assertNoRaw('bartik');
-    $this->assertRaw('themes/seven/css/theme/install-page.css');
+    $this->assertSession()->responseNotContains('olivero');
+    $this->assertSession()->responseContains('css/theme/install-page.css');
     parent::setUpSite();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function curlExec($curl_options, $redirect = FALSE) {
-    // Ensure that we see the classy progress CSS on the batch page.
-    // Batch processing happens as part of HTTP redirects, so we can access the
-    // HTML of the batch page.
-    if (strpos($curl_options[CURLOPT_URL], '&id=1&op=do_nojs') !== FALSE) {
-      $this->assertRaw('themes/classy/css/components/progress.css');
-    }
-    return parent::curlExec($curl_options, $redirect);
   }
 
   /**
    * Ensures that the exported standard configuration is up to date.
    */
-  public function testStandardConfig() {
+  public function testStandardConfig(): void {
     $skipped_config = [];
     // FunctionalTestSetupTrait::installParameters() uses Drupal as site name
     // and simpletest@example.com as mail address.
     $skipped_config['system.site'][] = 'name: Drupal';
     $skipped_config['system.site'][] = 'mail: simpletest@example.com';
-    $skipped_config['contact.form.feedback'][] = '- simpletest@example.com';
     // \Drupal\filter\Entity\FilterFormat::toArray() drops the roles of filter
     // formats.
     $skipped_config['filter.format.basic_html'][] = 'roles:';

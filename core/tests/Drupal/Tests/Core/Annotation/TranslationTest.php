@@ -1,15 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Annotation;
 
 use Drupal\Core\Annotation\Translation;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
+use Drupal\TestTools\Random;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Annotation\Translation
- * @group Annotation
+ * Tests Drupal\Core\Annotation\Translation.
  */
+#[CoversClass(Translation::class)]
+#[Group('Annotation')]
 class TranslationTest extends UnitTestCase {
 
   /**
@@ -23,15 +30,18 @@ class TranslationTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->translationManager = $this->getStringTranslationStub();
   }
 
   /**
-   * @covers ::get
+   * Tests get.
    *
-   * @dataProvider providerTestGet
+   * @legacy-covers ::get
    */
-  public function testGet(array $values, $expected) {
+  #[DataProvider('providerTestGet')]
+  public function testGet(array $values, $expected): void {
     $container = new ContainerBuilder();
     $container->set('string_translation', $this->translationManager);
     \Drupal::setContainer($container);
@@ -44,7 +54,7 @@ class TranslationTest extends UnitTestCase {
   /**
    * Provides data to self::testGet().
    */
-  public function providerTestGet() {
+  public static function providerTestGet() {
     $data = [];
     $data[] = [
       [
@@ -52,7 +62,7 @@ class TranslationTest extends UnitTestCase {
       ],
       'Foo',
     ];
-    $random = $this->randomMachineName();
+    $random = Random::machineName();
     $random_html_entity = '&' . $random;
     $data[] = [
       [
@@ -62,7 +72,7 @@ class TranslationTest extends UnitTestCase {
           '@baz' => $random_html_entity,
           '%qux' => $random_html_entity,
         ],
-        'context' => $this->randomMachineName(),
+        'context' => Random::machineName(),
       ],
       'Foo ' . $random . ' &amp;' . $random . ' <em class="placeholder">&amp;' . $random . '</em>',
     ];

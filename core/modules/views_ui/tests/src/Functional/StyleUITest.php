@@ -1,15 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the UI of style plugins.
  *
- * @group views_ui
  * @see \Drupal\views_test_data\Plugin\views\style\StyleTest.
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class StyleUITest extends UITestBase {
 
   /**
@@ -27,7 +32,7 @@ class StyleUITest extends UITestBase {
   /**
    * Tests changing the style plugin and changing some options of a style.
    */
-  public function testStyleUI() {
+  public function testStyleUI(): void {
     $view_name = 'test_view';
     $view_edit_url = "admin/structure/views/view/$view_name/edit";
 
@@ -50,21 +55,24 @@ class StyleUITest extends UITestBase {
     $this->drupalGet($style_options_url);
     $this->assertSession()->fieldValueEquals('style_options[test_option]', $random_name);
 
-    $this->drupalPostForm($view_edit_url, [], 'Save');
+    $this->drupalGet($view_edit_url);
+    $this->submitForm([], 'Save');
     $this->assertSession()->linkExists('Test style plugin', 0, 'Make sure the test style plugin is shown in the UI');
 
     $view = Views::getView($view_name);
     $view->initDisplay();
     $style = $view->display_handler->getOption('style');
-    $this->assertEqual('test_style', $style['type'], 'Make sure that the test_style got saved as used style plugin.');
-    $this->assertEqual($random_name, $style['options']['test_option'], 'Make sure that the custom settings field got saved as expected.');
+    $this->assertEquals('test_style', $style['type'], 'Make sure that the test_style got saved as used style plugin.');
+    $this->assertEquals($random_name, $style['options']['test_option'], 'Make sure that the custom settings field got saved as expected.');
 
     // Test that fields are working correctly in the UI for style plugins when
     // a field row plugin is selected.
-    $this->drupalPostForm("admin/structure/views/view/$view_name/edit", [], 'Add Page');
-    $this->drupalPostForm("admin/structure/views/nojs/display/$view_name/page_1/row", ['row[type]' => 'fields'], 'Apply');
+    $this->drupalGet("admin/structure/views/view/{$view_name}/edit");
+    $this->submitForm([], 'Add Page');
+    $this->drupalGet("admin/structure/views/nojs/display/{$view_name}/page_1/row");
+    $this->submitForm(['row[type]' => 'fields'], 'Apply');
     // If fields are being used this text will not be shown.
-    $this->assertNoText('The selected style or row format does not use fields.');
+    $this->assertSession()->pageTextNotContains('The selected style or row format does not use fields.');
   }
 
 }

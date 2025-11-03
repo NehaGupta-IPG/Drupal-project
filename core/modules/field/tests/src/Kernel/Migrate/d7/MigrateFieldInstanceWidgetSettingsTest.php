@@ -1,26 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\Migrate\d7;
 
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Migrate field widget settings.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class MigrateFieldInstanceWidgetSettingsTest extends MigrateDrupal7TestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'comment',
     'datetime',
+    'datetime_range',
     'image',
     'link',
     'menu_ui',
@@ -48,8 +51,10 @@ class MigrateFieldInstanceWidgetSettingsTest extends MigrateDrupal7TestBase {
    *   The expected entity type to which the display settings are attached.
    * @param string $expected_bundle
    *   The expected bundle to which the display settings are attached.
+   *
+   * @internal
    */
-  protected function assertEntity($id, $expected_entity_type, $expected_bundle) {
+  protected function assertEntity(string $id, string $expected_entity_type, string $expected_bundle): void {
     /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity */
     $entity = EntityFormDisplay::load($id);
     $this->assertInstanceOf(EntityFormDisplayInterface::class, $entity);
@@ -66,10 +71,12 @@ class MigrateFieldInstanceWidgetSettingsTest extends MigrateDrupal7TestBase {
    *   The component ID.
    * @param string $widget_type
    *   The expected widget type.
-   * @param string $weight
+   * @param int $weight
    *   The expected weight of the component.
+   *
+   * @internal
    */
-  protected function assertComponent($display_id, $component_id, $widget_type, $weight) {
+  protected function assertComponent(string $display_id, string $component_id, string $widget_type, int $weight): void {
     $component = EntityFormDisplay::load($display_id)->getComponent($component_id);
     $this->assertIsArray($component);
     $this->assertSame($widget_type, $component['type']);
@@ -77,9 +84,9 @@ class MigrateFieldInstanceWidgetSettingsTest extends MigrateDrupal7TestBase {
   }
 
   /**
-   * Test that migrated view modes can be loaded using D8 APIs.
+   * Tests that migrated view modes can be loaded using D8 APIs.
    */
-  public function testWidgetSettings() {
+  public function testWidgetSettings(): void {
     $this->assertEntity('node.page.default', 'node', 'page');
     $this->assertComponent('node.page.default', 'body', 'text_textarea_with_summary', -4);
     $this->assertComponent('node.page.default', 'field_text_plain', 'string_textfield', -2);
@@ -128,6 +135,7 @@ class MigrateFieldInstanceWidgetSettingsTest extends MigrateDrupal7TestBase {
     $this->assertComponent('node.test_content_type.default', 'field_text', 'string_textfield', 15);
     $this->assertComponent('node.test_content_type.default', 'field_text_list', 'options_select', 11);
     $this->assertComponent('node.test_content_type.default', 'field_float_list', 'options_select', 20);
+    $this->assertComponent('node.test_content_type.default', 'field_telephone', 'telephone_default', 21);
 
     $this->assertEntity('user.user.default', 'user', 'user');
     $this->assertComponent('user.user.default', 'field_file', 'file_generic', 8);
@@ -141,6 +149,10 @@ class MigrateFieldInstanceWidgetSettingsTest extends MigrateDrupal7TestBase {
 
     $this->assertEntity('taxonomy_term.test_vocabulary.default', 'taxonomy_term', 'test_vocabulary');
     $this->assertComponent('comment.comment_node_test_content_type.default', 'field_integer', 'number', 2);
+
+    $this->assertEntity('node.blog.default', 'node', 'blog');
+    $this->assertComponent('node.blog.default', 'field_file_mfw', 'file_generic', 17);
+    $this->assertComponent('node.blog.default', 'field_image_miw', 'image_image', 18);
   }
 
 }

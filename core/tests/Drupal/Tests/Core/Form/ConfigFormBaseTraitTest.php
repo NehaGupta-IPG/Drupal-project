@@ -1,21 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Form;
 
+use Drupal\Core\Form\ConfigFormBaseTrait;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Form\ConfigFormBaseTrait
- * @group Form
+ * Tests Drupal\Core\Form\ConfigFormBaseTrait.
  */
+#[CoversClass(ConfigFormBaseTrait::class)]
+#[Group('Form')]
 class ConfigFormBaseTraitTest extends UnitTestCase {
 
   /**
-   * @covers ::config
+   * Tests config.
+   *
+   * @legacy-covers ::config
    */
-  public function testConfig() {
+  public function testConfig(): void {
 
-    $trait = $this->getMockForTrait('Drupal\Core\Form\ConfigFormBaseTrait');
+    $trait = $this->createPartialMock(ConfiguredTrait::class, ['getEditableConfigNames']);
     // Set up some configuration in a mocked config factory.
     $trait->configFactory = $this->getConfigFactoryStub([
       'editable.config' => [],
@@ -27,7 +35,6 @@ class ConfigFormBaseTraitTest extends UnitTestCase {
       ->willReturn(['editable.config']);
 
     $config_method = new \ReflectionMethod($trait, 'config');
-    $config_method->setAccessible(TRUE);
 
     // Ensure that configuration that is expected to be mutable is.
     $result = $config_method->invoke($trait, 'editable.config');
@@ -40,32 +47,50 @@ class ConfigFormBaseTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::config
+   * Tests config factory exception.
+   *
+   * @legacy-covers ::config
    */
-  public function testConfigFactoryException() {
-    $trait = $this->getMockForTrait('Drupal\Core\Form\ConfigFormBaseTrait');
-    $config_method = new \ReflectionMethod($trait, 'config');
-    $config_method->setAccessible(TRUE);
+  public function testConfigFactoryException(): void {
+    $testObject = new ConfiguredTrait();
 
     // There is no config factory available this should result in an exception.
     $this->expectException(\LogicException::class);
     $this->expectExceptionMessage('No config factory available for ConfigFormBaseTrait');
-    $config_method->invoke($trait, 'editable.config');
+    $config_method = new \ReflectionMethod($testObject, 'config');
+    $config_method->invoke($testObject, 'editable.config');
   }
 
   /**
-   * @covers ::config
+   * Tests config factory exception invalid property.
+   *
+   * @legacy-covers ::config
    */
-  public function testConfigFactoryExceptionInvalidProperty() {
-    $trait = $this->getMockForTrait('Drupal\Core\Form\ConfigFormBaseTrait');
-    $trait->configFactory = TRUE;
-    $config_method = new \ReflectionMethod($trait, 'config');
-    $config_method->setAccessible(TRUE);
+  public function testConfigFactoryExceptionInvalidProperty(): void {
+    $testObject = new ConfiguredTrait();
 
     // There is no config factory available this should result in an exception.
     $this->expectException(\LogicException::class);
     $this->expectExceptionMessage('No config factory available for ConfigFormBaseTrait');
-    $config_method->invoke($trait, 'editable.config');
+    $config_method = new \ReflectionMethod($testObject, 'config');
+    $config_method->invoke($testObject, 'editable.config');
   }
+
+}
+
+/**
+ * Test class for testing ConfigFormBaseTrait.
+ */
+class ConfiguredTrait {
+  use ConfigFormBaseTrait;
+
+  /**
+   * The configuration factory.
+   *
+   * @var null
+   */
+  public $configFactory;
+
+  protected function getEditableConfigNames() {}
 
 }

@@ -21,7 +21,7 @@ abstract class MigrateUpgradeFormBase extends FormBase {
   /**
    * Private temporary storage.
    *
-   * @var \Drupal\Core\TempStore\PrivateTempStoreFactory
+   * @var \Drupal\Core\TempStore\PrivateTempStore
    */
   protected $store;
 
@@ -68,7 +68,7 @@ abstract class MigrateUpgradeFormBase extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     // Get the current major version.
-    list($this->destinationSiteVersion) = explode('.', \Drupal::VERSION, 2);
+    [$this->destinationSiteVersion] = explode('.', \Drupal::VERSION, 2);
     $form = [];
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [

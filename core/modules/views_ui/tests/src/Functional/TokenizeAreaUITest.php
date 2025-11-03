@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\views\Entity\View;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the token display for the TokenizeAreaPluginBase UI.
  *
  * @see \Drupal\views\Plugin\views\area\Entity
- * @group views_ui
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class TokenizeAreaUITest extends UITestBase {
 
   /**
@@ -24,9 +29,9 @@ class TokenizeAreaUITest extends UITestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Test that the right tokens are shown as available for replacement.
+   * Tests that the right tokens are shown as available for replacement.
    */
-  public function testTokenUI() {
+  public function testTokenUI(): void {
     $entity_test = EntityTest::create(['bundle' => 'entity_test']);
     $entity_test->save();
 
@@ -37,14 +42,16 @@ class TokenizeAreaUITest extends UITestBase {
     $this->drupalGet($view->toUrl('edit-form'));
 
     // Add a global NULL argument to the view for testing argument tokens.
-    $this->drupalPostForm("admin/structure/views/nojs/add-handler/$id/page_1/argument", ['name[views.null]' => 1], 'Add and configure contextual filters');
+    $this->drupalGet("admin/structure/views/nojs/add-handler/{$id}/page_1/argument");
+    $this->submitForm(['name[views.null]' => 1], 'Add and configure contextual filters');
     $this->submitForm([], 'Apply');
 
-    $this->drupalPostForm("admin/structure/views/nojs/add-handler/$id/page_1/header", ['name[views.area]' => 'views.area'], 'Add and configure header');
+    $this->drupalGet("admin/structure/views/nojs/add-handler/{$id}/page_1/header");
+    $this->submitForm(['name[views.area]' => 'views.area'], 'Add and configure header');
     // Test that field tokens are shown.
-    $this->assertText('{{ title }} == Content: Title');
+    $this->assertSession()->pageTextContains('{{ title }} == Content: Title');
     // Test that argument tokens are shown.
-    $this->assertText('{{ arguments.null }} == Global: Null title');
+    $this->assertSession()->pageTextContains('{{ arguments.null }} == Global: Null title');
   }
 
 }

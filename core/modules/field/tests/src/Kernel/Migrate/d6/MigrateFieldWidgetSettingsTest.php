@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\Migrate\d6;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Migrate field widget settings.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateFieldWidgetSettingsTest extends MigrateDrupal6TestBase {
 
   /**
@@ -28,19 +32,25 @@ class MigrateFieldWidgetSettingsTest extends MigrateDrupal6TestBase {
   }
 
   /**
-   * Test that migrated view modes can be loaded using D8 API's.
+   * Tests that migrated view modes can be loaded using D8 API's.
    */
-  public function testWidgetSettings() {
+  public function testWidgetSettings(): void {
     // Test the config can be loaded.
     $form_display = EntityFormDisplay::load('node.story.default');
     $this->assertNotNull($form_display);
 
     // Text field.
     $component = $form_display->getComponent('field_test');
-    $expected = ['weight' => 1, 'type' => 'text_textfield'];
-    $expected['settings'] = ['size' => 60, 'placeholder' => ''];
-    $expected['third_party_settings'] = [];
-    $expected['region'] = 'content';
+    $expected = [
+      'type' => 'text_textfield',
+      'weight' => 1,
+      'region' => 'content',
+      'settings' => [
+        'size' => 60,
+        'placeholder' => '',
+      ],
+      'third_party_settings' => [],
+    ];
     $this->assertSame($expected, $component, 'Text field settings are correct.');
 
     // Integer field.
@@ -121,6 +131,11 @@ class MigrateFieldWidgetSettingsTest extends MigrateDrupal6TestBase {
       ->getComponent('field_company_3');
     $this->assertIsArray($component);
     $this->assertSame('entity_reference_autocomplete_tags', $component['type']);
+
+    $component = $display_repository->getFormDisplay('node', 'employee', 'default')
+      ->getComponent('field_company_4');
+    $this->assertIsArray($component);
+    $this->assertSame('entity_reference_autocomplete', $component['type']);
 
     $component = $display_repository->getFormDisplay('node', 'employee', 'default')
       ->getComponent('field_commander');

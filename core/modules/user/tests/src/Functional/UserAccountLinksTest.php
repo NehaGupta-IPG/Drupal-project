@@ -1,34 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests user-account links.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserAccountLinksTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['menu_ui', 'block', 'test_page_test'];
 
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'stark';
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->drupalPlaceBlock('system_menu_block:account');
+    $this->drupalPlaceBlock('system_menu_block:account', ['id' => 'user_account_links_test_system_menu_block_account']);
     // Make test-page default.
     $this->config('system.site')->set('page.front', '/test-page')->save();
   }
@@ -36,7 +38,7 @@ class UserAccountLinksTest extends BrowserTestBase {
   /**
    * Tests the secondary menu.
    */
-  public function testSecondaryMenu() {
+  public function testSecondaryMenu(): void {
     // Create a regular user.
     $user = $this->drupalCreateUser([]);
 
@@ -46,37 +48,21 @@ class UserAccountLinksTest extends BrowserTestBase {
 
     // For a logged-in user, expect the secondary menu to have links for "My
     // account" and "Log out".
-    $link = $this->xpath('//ul[@class=:menu_class]/li/a[contains(@href, :href) and text()=:text]', [
-      ':menu_class' => 'menu',
-      ':href' => 'user',
-      ':text' => 'My account',
-    ]);
-    $this->assertCount(1, $link, 'My account link is in secondary menu.');
-
-    $link = $this->xpath('//ul[@class=:menu_class]/li/a[contains(@href, :href) and text()=:text]', [
-      ':menu_class' => 'menu',
-      ':href' => 'user/logout',
-      ':text' => 'Log out',
-    ]);
-    $this->assertCount(1, $link, 'Log out link is in secondary menu.');
+    $this->assertSession()->elementsCount('xpath', '//nav[@id="block-user-account-links-test-system-menu-block-account"]/ul/li/a[contains(@href, "user") and text()="My account"]', 1);
+    $this->assertSession()->elementsCount('xpath', '//nav[@id="block-user-account-links-test-system-menu-block-account"]/ul/li/a[contains(@href, "user/logout") and text()="Log out"]', 1);
 
     // Log out and get the homepage.
     $this->drupalLogout();
     $this->drupalGet('<front>');
 
     // For a logged-out user, expect the secondary menu to have a "Log in" link.
-    $link = $this->xpath('//ul[@class=:menu_class]/li/a[contains(@href, :href) and text()=:text]', [
-      ':menu_class' => 'menu',
-      ':href' => 'user/login',
-      ':text' => 'Log in',
-    ]);
-    $this->assertCount(1, $link, 'Log in link is in secondary menu.');
+    $this->assertSession()->elementsCount('xpath', '//nav[@id="block-user-account-links-test-system-menu-block-account"]/ul/li/a[contains(@href, "user/login") and text()="Log in"]', 1);
   }
 
   /**
    * Tests disabling the 'My account' link.
    */
-  public function testDisabledAccountLink() {
+  public function testDisabledAccountLink(): void {
     // Create an admin user and log in.
     $this->drupalLogin($this->drupalCreateUser([
       'access administration pages',
@@ -85,12 +71,7 @@ class UserAccountLinksTest extends BrowserTestBase {
 
     // Verify that the 'My account' link exists before we check for its
     // disappearance.
-    $link = $this->xpath('//ul[@class=:menu_class]/li/a[contains(@href, :href) and text()=:text]', [
-      ':menu_class' => 'menu',
-      ':href' => 'user',
-      ':text' => 'My account',
-    ]);
-    $this->assertCount(1, $link, 'My account link is in the secondary menu.');
+    $this->assertSession()->elementsCount('xpath', '//nav[@id="block-user-account-links-test-system-menu-block-account"]/ul/li/a[contains(@href, "user") and text()="My account"]', 1);
 
     // Verify that the 'My account' link is enabled. Do not assume the value of
     // auto-increment is 1. Use XPath to obtain input element id and name using
@@ -101,24 +82,20 @@ class UserAccountLinksTest extends BrowserTestBase {
 
     // Disable the 'My account' link.
     $edit['links[menu_plugin_id:user.page][enabled]'] = FALSE;
-    $this->drupalPostForm('admin/structure/menu/manage/account', $edit, 'Save');
+    $this->drupalGet('admin/structure/menu/manage/account');
+    $this->submitForm($edit, 'Save');
 
     // Get the homepage.
     $this->drupalGet('<front>');
 
     // Verify that the 'My account' link does not appear when disabled.
-    $link = $this->xpath('//ul[@class=:menu_class]/li/a[contains(@href, :href) and text()=:text]', [
-      ':menu_class' => 'menu',
-      ':href' => 'user',
-      ':text' => 'My account',
-    ]);
-    $this->assertCount(0, $link, 'My account link is not in the secondary menu.');
+    $this->assertSession()->elementNotExists('xpath', '//nav[@id="block-user-account-links-test-system-menu-block-account"]/ul/li/a[contains(@href, "user") and text()="My account"]');
   }
 
   /**
    * Tests page title is set correctly on user account tabs.
    */
-  public function testAccountPageTitles() {
+  public function testAccountPageTitles(): void {
     // Default page titles are suffixed with the site name - Drupal.
     $title_suffix = ' | Drupal';
 
@@ -142,12 +119,17 @@ class UserAccountLinksTest extends BrowserTestBase {
   }
 
   /**
-   * Ensures that logout url redirects an anonymous user to the front page.
+   * Ensures that logout URL redirects an anonymous user to the front page.
    */
-  public function testAnonymousLogout() {
+  public function testAnonymousLogout(): void {
     $this->drupalGet('user/logout');
     $this->assertSession()->addressEquals('/');
     $this->assertSession()->statusCodeEquals(200);
+
+    // The redirection shouldn't affect other pages.
+    $this->drupalGet('admin');
+    $this->assertSession()->addressEquals('/admin');
+    $this->assertSession()->statusCodeEquals(403);
   }
 
 }

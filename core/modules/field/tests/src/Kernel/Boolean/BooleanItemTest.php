@@ -1,19 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\Boolean;
 
-use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Tests\field\Kernel\FieldKernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the new entity API for the boolean field type.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class BooleanItemTest extends FieldKernelTestBase {
 
   /**
@@ -46,7 +50,7 @@ class BooleanItemTest extends FieldKernelTestBase {
   /**
    * Tests using entity fields of the boolean field type.
    */
-  public function testBooleanItem() {
+  public function testBooleanItem(): void {
     // Verify entity creation.
     $entity = EntityTest::create();
     $value = '1';
@@ -59,18 +63,18 @@ class BooleanItemTest extends FieldKernelTestBase {
     $entity = EntityTest::load($id);
     $this->assertInstanceOf(FieldItemListInterface::class, $entity->field_boolean);
     $this->assertInstanceOf(FieldItemInterface::class, $entity->field_boolean[0]);
-    $this->assertEqual($value, $entity->field_boolean->value);
-    $this->assertEqual($value, $entity->field_boolean[0]->value);
+    $this->assertEquals($value, $entity->field_boolean->value);
+    $this->assertEquals($value, $entity->field_boolean[0]->value);
 
     // Verify changing the boolean value.
     $new_value = 0;
     $entity->field_boolean->value = $new_value;
-    $this->assertEqual($new_value, $entity->field_boolean->value);
+    $this->assertEquals($new_value, $entity->field_boolean->value);
 
     // Read changed entity and assert changed values.
     $entity->save();
     $entity = EntityTest::load($id);
-    $this->assertEqual($new_value, $entity->field_boolean->value);
+    $this->assertEquals($new_value, $entity->field_boolean->value);
 
     // Test sample item generation.
     $entity = EntityTest::create();

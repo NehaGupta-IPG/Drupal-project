@@ -17,9 +17,9 @@ class NodeTypeListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['title'] = t('Name');
+    $header['title'] = $this->t('Name');
     $header['description'] = [
-      'data' => t('Description'),
+      'data' => $this->t('Description'),
       'class' => [RESPONSIVE_PRIORITY_MEDIUM],
     ];
     return $header + parent::buildHeader();
@@ -40,7 +40,7 @@ class NodeTypeListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function getDefaultOperations(EntityInterface $entity) {
+  public function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
     $operations = parent::getDefaultOperations($entity);
     // Place the edit operation after the operations added by field_ui.module
     // which have the weights 15, 20, 25.
@@ -56,8 +56,8 @@ class NodeTypeListBuilder extends ConfigEntityListBuilder {
   public function render() {
     $build = parent::render();
     $build['table']['#empty'] = $this->t('No content types available. <a href=":link">Add content type</a>.', [
-        ':link' => Url::fromRoute('node.type_add')->toString(),
-      ]);
+      ':link' => Url::fromRoute('node.type_add')->toString(),
+    ]);
     return $build;
   }
 

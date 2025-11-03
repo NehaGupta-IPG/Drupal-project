@@ -1,23 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\language\Unit;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the ConfigurableLanguage entity class.
  *
- * @group language
- * @coversDefaultClass \Drupal\language\Entity\ConfigurableLanguage
  * @see \Drupal\language\Entity\ConfigurableLanguage.
  */
+#[CoversClass(ConfigurableLanguage::class)]
+#[Group('language')]
 class ConfigurableLanguageUnitTest extends UnitTestCase {
 
   /**
-   * @covers ::getDirection
+   * Tests direction.
+   *
+   * @legacy-covers ::getDirection
    */
-  public function testDirection() {
+  public function testDirection(): void {
     // Direction of language writing, an integer. Usually either
     // ConfigurableLanguage::DIRECTION_LTR or
     // ConfigurableLanguage::DIRECTION_RTL.
@@ -30,15 +36,17 @@ class ConfigurableLanguageUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getWeight
-   * @covers ::setWeight
+   * Tests weight.
+   *
+   * @legacy-covers ::getWeight
+   * @legacy-covers ::setWeight
    */
-  public function testWeight() {
+  public function testWeight(): void {
     // The weight, an integer. Used to order languages with larger positive
     // weights sinking items toward the bottom of lists.
     $configurableLanguage = new ConfigurableLanguage(['weight' => -5], 'configurable_language');
-    $this->assertEquals($configurableLanguage->getWeight(), -5);
-    $this->assertEquals($configurableLanguage->setWeight(13)->getWeight(), 13);
+    $this->assertEquals(-5, $configurableLanguage->getWeight());
+    $this->assertEquals(13, $configurableLanguage->setWeight(13)->getWeight());
   }
 
 }

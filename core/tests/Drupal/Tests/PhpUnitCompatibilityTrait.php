@@ -1,21 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests;
 
+use Drupal\TestTools\PhpUnitCompatibility\PhpUnit11\TestCompatibilityTrait;
 use Drupal\TestTools\PhpUnitCompatibility\RunnerVersion;
 
 // In order to manage different method signatures between PHPUnit versions, we
 // dynamically load a compatibility trait dependent on the PHPUnit runner
 // version.
-if (!trait_exists(PhpunitVersionDependentTestCompatibilityTrait::class, FALSE)) {
-  class_alias("Drupal\TestTools\PhpUnitCompatibility\PhpUnit" . RunnerVersion::getMajor() . "\TestCompatibilityTrait", PhpUnitVersionDependentTestCompatibilityTrait::class);
-}
+class_alias("Drupal\TestTools\PhpUnitCompatibility\PhpUnit" . RunnerVersion::getMajor() . "\TestCompatibilityTrait", 'Drupal\Tests\PhpUnitCompatibilityTrait');
 
-/**
- * Makes Drupal's test API forward compatible with multiple versions of PHPUnit.
- */
-trait PhpUnitCompatibilityTrait {
+// Allow static analysis to find a trait.
+if (FALSE) {
 
-  use PhpUnitVersionDependentTestCompatibilityTrait;
+  /**
+   * Makes Drupal's test API forward compatible with future PHPUnit releases.
+   *
+   * This stub is present here to allow PHPStan identify the methods present
+   * in the version-bound trait.
+   */
+  trait PhpUnitCompatibilityTrait {
+
+    use TestCompatibilityTrait;
+
+  }
 
 }

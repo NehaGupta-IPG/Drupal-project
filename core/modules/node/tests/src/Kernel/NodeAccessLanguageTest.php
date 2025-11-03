@@ -1,20 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\NodeType;
-use Drupal\user\Entity\User;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests node_access and select queries with node_access tag functionality with
- * multiple languages with a test node access module that is not language-aware.
- *
- * @group node
+ * Tests multilingual node access with a module that is not language-aware.
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeAccessLanguageTest extends NodeAccessTestBase {
+
+  use NodeAccessTrait;
 
   /**
    * {@inheritdoc}
@@ -27,7 +32,7 @@ class NodeAccessLanguageTest extends NodeAccessTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    node_access_test_add_field(NodeType::load('page'));
+    $this->addPrivateField(NodeType::load('page'));
 
     // After enabling a node access module, the access table has to be rebuild.
     node_access_rebuild();
@@ -44,7 +49,7 @@ class NodeAccessLanguageTest extends NodeAccessTestBase {
   /**
    * Tests node access with multiple node languages and no private nodes.
    */
-  public function testNodeAccess() {
+  public function testNodeAccess(): void {
     $web_user = $this->drupalCreateUser(['access content']);
 
     $expected_node_access = ['view' => TRUE, 'update' => FALSE, 'delete' => FALSE];
@@ -114,7 +119,7 @@ class NodeAccessLanguageTest extends NodeAccessTestBase {
   /**
    * Tests node access with multiple node languages and private nodes.
    */
-  public function testNodeAccessPrivate() {
+  public function testNodeAccessPrivate(): void {
     $web_user = $this->drupalCreateUser(['access content']);
     $expected_node_access = ['view' => TRUE, 'update' => FALSE, 'delete' => FALSE];
     $expected_node_access_no_access = ['view' => FALSE, 'update' => FALSE, 'delete' => FALSE];
@@ -180,13 +185,15 @@ class NodeAccessLanguageTest extends NodeAccessTestBase {
   /**
    * Tests select queries with a 'node_access' tag and langcode metadata.
    */
-  public function testNodeAccessQueryTag() {
+  public function testNodeAccessQueryTag(): void {
     // Create a normal authenticated user.
     $web_user = $this->drupalCreateUser(['access content']);
 
-    // Load the user 1 user for later use as an admin user with permission to
-    // see everything.
-    $admin_user = User::load(1);
+    // Create a user as an admin user with permission bypass node access
+    // to see everything.
+    $admin_user = $this->drupalCreateUser([
+      'bypass node access',
+    ]);
 
     // Creating a private node with langcode Hungarian, will be saved as
     // the fallback in node access table.
@@ -231,7 +238,7 @@ class NodeAccessLanguageTest extends NodeAccessTestBase {
     $nids = $select->execute()->fetchAllAssoc('nid');
 
     // Because no nodes are created in German, no nodes are returned.
-    $this->assertTrue(empty($nids), 'Query returns an empty result.');
+    $this->assertEmpty($nids, 'Query returns an empty result.');
 
     // Query the nodes table as admin user (full access) with the node access
     // tag and no specific langcode.

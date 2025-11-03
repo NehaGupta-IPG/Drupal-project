@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\shortcut\Kernel\Migrate\d7;
 
 use Drupal\shortcut\Entity\ShortcutSet;
 use Drupal\shortcut\ShortcutSetInterface;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test shortcut_set migration to ShortcutSet entities.
- *
- * @group shortcut
  */
+#[Group('shortcut')]
+#[RunTestsInSeparateProcesses]
 class MigrateShortcutSetTest extends MigrateDrupal7TestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'link',
@@ -34,16 +36,15 @@ class MigrateShortcutSetTest extends MigrateDrupal7TestBase {
     $this->installEntitySchema('menu_link_content');
     $this->executeMigration('d7_shortcut_set');
     $this->executeMigration('d7_menu');
-    $this->executeMigration('d7_menu_links');
     $this->executeMigration('d7_shortcut');
   }
 
   /**
-   * Test the shortcut set migration.
+   * Tests the shortcut set migration.
    */
-  public function testShortcutSetMigration() {
+  public function testShortcutSetMigration(): void {
     $this->assertEntity('default', 'Default', 2);
-    $this->assertEntity('shortcut_set_2', 'Alternative shortcut set', 2);
+    $this->assertEntity('shortcut-set-2', 'Alternative shortcut set', 2);
   }
 
   /**
@@ -55,8 +56,10 @@ class MigrateShortcutSetTest extends MigrateDrupal7TestBase {
    *   The expected shortcut set label.
    * @param int $expected_size
    *   The number of shortcuts expected to be in the set.
+   *
+   * @internal
    */
-  protected function assertEntity($id, $label, $expected_size) {
+  protected function assertEntity(string $id, string $label, int $expected_size): void {
     $shortcut_set = ShortcutSet::load($id);
     $this->assertInstanceOf(ShortcutSetInterface::class, $shortcut_set);
     /** @var \Drupal\shortcut\ShortcutSetInterface $shortcut_set */

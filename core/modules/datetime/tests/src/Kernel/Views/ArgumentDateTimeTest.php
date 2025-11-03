@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\datetime\Kernel\Views;
 
 use Drupal\node\Entity\Node;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Drupal\datetime\Plugin\views\filter\Date handler.
- *
- * @group datetime
  */
+#[Group('datetime')]
+#[RunTestsInSeparateProcesses]
 class ArgumentDateTimeTest extends DateTimeHandlerTestBase {
 
   /**
@@ -46,11 +50,11 @@ class ArgumentDateTimeTest extends DateTimeHandlerTestBase {
   }
 
   /**
-   * Test year argument.
+   * Tests year argument.
    *
    * @see \Drupal\datetime\Plugin\views\argument\YearDate
    */
-  public function testDatetimeArgumentYear() {
+  public function testDatetimeArgumentYear(): void {
     $view = Views::getView('test_argument_datetime');
 
     // The 'default' display has the 'year' argument.
@@ -89,11 +93,11 @@ class ArgumentDateTimeTest extends DateTimeHandlerTestBase {
   }
 
   /**
-   * Test month argument.
+   * Tests month argument.
    *
    * @see \Drupal\datetime\Plugin\views\argument\MonthDate
    */
-  public function testDatetimeArgumentMonth() {
+  public function testDatetimeArgumentMonth(): void {
     $view = Views::getView('test_argument_datetime');
     // The 'embed_1' display has the 'month' argument.
     $view->setDisplay('embed_1');
@@ -115,11 +119,11 @@ class ArgumentDateTimeTest extends DateTimeHandlerTestBase {
   }
 
   /**
-   * Test day argument.
+   * Tests day argument.
    *
    * @see \Drupal\datetime\Plugin\views\argument\DayDate
    */
-  public function testDatetimeArgumentDay() {
+  public function testDatetimeArgumentDay(): void {
     $view = Views::getView('test_argument_datetime');
 
     // The 'embed_2' display has the 'day' argument.
@@ -141,9 +145,9 @@ class ArgumentDateTimeTest extends DateTimeHandlerTestBase {
   }
 
   /**
-   * Test year, month, and day arguments combined.
+   * Tests year, month, and day arguments combined.
    */
-  public function testDatetimeArgumentAll() {
+  public function testDatetimeArgumentAll(): void {
     $view = Views::getView('test_argument_datetime');
     // The 'embed_3' display has year, month, and day arguments.
     $view->setDisplay('embed_3');
@@ -163,9 +167,9 @@ class ArgumentDateTimeTest extends DateTimeHandlerTestBase {
   }
 
   /**
-   * Test week WW argument.
+   * Tests week WW argument.
    */
-  public function testDatetimeArgumentWeek() {
+  public function testDatetimeArgumentWeek(): void {
     $view = Views::getView('test_argument_datetime');
     // The 'embed_4' display has WW argument.
     $view->setDisplay('embed_4');
@@ -187,9 +191,9 @@ class ArgumentDateTimeTest extends DateTimeHandlerTestBase {
   }
 
   /**
-   * Test full_date CCYYMMDD argument.
+   * Tests full_date CCYYMMDD argument.
    */
-  public function testDatetimeArgumentFullDate() {
+  public function testDatetimeArgumentFullDate(): void {
     $view = Views::getView('test_argument_datetime');
     // The 'embed_5' display has CCYYMMDD argument.
     $view->setDisplay('embed_5');
@@ -209,9 +213,9 @@ class ArgumentDateTimeTest extends DateTimeHandlerTestBase {
   }
 
   /**
-   * Test year_month CCYYMM argument.
+   * Tests year_month CCYYMM argument.
    */
-  public function testDatetimeArgumentYearMonth() {
+  public function testDatetimeArgumentYearMonth(): void {
     $view = Views::getView('test_argument_datetime');
     // The 'embed_6' display has CCYYMM argument.
     $view->setDisplay('embed_6');

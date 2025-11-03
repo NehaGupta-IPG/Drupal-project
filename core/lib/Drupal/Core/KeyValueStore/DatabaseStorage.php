@@ -5,6 +5,7 @@ namespace Drupal\Core\KeyValueStore;
 use Drupal\Component\Serialization\SerializationInterface;
 use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
 /**
@@ -79,15 +80,20 @@ class DatabaseStorage extends StorageBase {
   public function getMultiple(array $keys) {
     $values = [];
     try {
-      $result = $this->connection->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [name] IN ( :keys[] ) AND [collection] = :collection', [':keys[]' => $keys, ':collection' => $this->collection])->fetchAllAssoc('name');
+      $result = $this->connection
+        ->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [name] IN ( :keys[] ) AND [collection] = :collection', [
+          ':keys[]' => $keys,
+          ':collection' => $this->collection,
+        ])
+        ->fetchAllAssoc('name');
       foreach ($keys as $key) {
         if (isset($result[$key])) {
           $values[$key] = $this->serializer->decode($result[$key]->value);
         }
       }
     }
-    catch (\Exception $e) {
-      // @todo: Perhaps if the database is never going to be available,
+    catch (\Exception) {
+      // @todo Perhaps if the database is never going to be available,
       // key/value requests should return FALSE in order to allow exception
       // handling to occur but for now, keep it an array, always.
     }
@@ -166,7 +172,7 @@ class DatabaseStorage extends StorageBase {
    * @return bool
    *   TRUE if the data was set, FALSE if it already existed.
    */
-  public function doSetIfNotExists($key, $value) {
+  protected function doSetIfNotExists($key, $value) {
     $result = $this->connection->merge($this->table)
       ->insertFields([
         'collection' => $this->collection,
@@ -254,24 +260,26 @@ class DatabaseStorage extends StorageBase {
   protected function ensureTableExists() {
     try {
       $database_schema = $this->connection->schema();
-      if (!$database_schema->tableExists($this->table)) {
-        $database_schema->createTable($this->table, $this->schemaDefinition());
-        return TRUE;
-      }
+      $database_schema->createTable($this->table, $this->schemaDefinition());
     }
     // If the table already exists, then attempting to recreate it will throw an
     // exception. In this case just catch the exception and do nothing.
-    catch (SchemaObjectExistsException $e) {
-      return TRUE;
+    catch (DatabaseException) {
     }
-    return FALSE;
+    catch (\Exception) {
+      return FALSE;
+    }
+    return TRUE;
   }
 
   /**
    * Act on an exception when the table might not have been created.
    *
    * If the table does not yet exist, that's fine, but if the table exists and
-   * yet the query failed, then the exception needs to propagate.
+   * yet the query failed, then the exception needs to propagate if it is not
+   * a DatabaseException. Due to race conditions it is possible that another
+   * request has created the table in the meantime. Therefore we can not rethrow
+   * for any database exception.
    *
    * @param \Exception $e
    *   The exception.
@@ -279,14 +287,14 @@ class DatabaseStorage extends StorageBase {
    * @throws \Exception
    */
   protected function catchException(\Exception $e) {
-    if ($this->connection->schema()->tableExists($this->table)) {
+    if (!($e instanceof DatabaseException) && $this->connection->schema()->tableExists($this->table)) {
       throw $e;
     }
   }
 
   /**
    * Defines the schema for the key_value table.
-  */
+   */
   public static function schemaDefinition() {
     return [
       'description' => 'Generic key-value storage table. See the state system for an example.',

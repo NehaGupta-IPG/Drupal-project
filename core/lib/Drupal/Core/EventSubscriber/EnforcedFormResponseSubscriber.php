@@ -28,7 +28,7 @@ class EnforcedFormResponseSubscriber implements EventSubscriberInterface {
    */
   public function onKernelResponse(ResponseEvent $event) {
     $response = $event->getResponse();
-    if ($response instanceof EnforcedResponse && $event->isMasterRequest()) {
+    if ($response instanceof EnforcedResponse && $event->isMainRequest()) {
       $event->setResponse($response->getResponse());
     }
   }
@@ -36,7 +36,7 @@ class EnforcedFormResponseSubscriber implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events[KernelEvents::EXCEPTION] = ['onKernelException', 128];
     $events[KernelEvents::RESPONSE] = ['onKernelResponse', 128];
 

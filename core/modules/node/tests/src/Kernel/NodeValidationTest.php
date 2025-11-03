@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel;
 
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests node validation constraints.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeValidationTest extends EntityKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node'];
 
@@ -34,7 +36,7 @@ class NodeValidationTest extends EntityKernelTestBase {
   /**
    * Tests the node validation constraints.
    */
-  public function testValidation() {
+  public function testValidation(): void {
     $this->createUser();
     $node = Node::create(['type' => 'page', 'title' => 'test', 'uid' => 1]);
     $violations = $node->validate();
@@ -43,19 +45,19 @@ class NodeValidationTest extends EntityKernelTestBase {
     $node->set('title', $this->randomString(256));
     $violations = $node->validate();
     $this->assertCount(1, $violations, 'Violation found when title is too long.');
-    $this->assertEqual('title.0.value', $violations[0]->getPropertyPath());
-    $this->assertEqual('<em class="placeholder">Title</em>: may not be longer than 255 characters.', $violations[0]->getMessage());
+    $this->assertEquals('title.0.value', $violations[0]->getPropertyPath());
+    $this->assertEquals('Title: may not be longer than 255 characters.', $violations[0]->getMessage());
 
     $node->set('title', NULL);
     $violations = $node->validate();
     $this->assertCount(1, $violations, 'Violation found when title is not set.');
-    $this->assertEqual('title', $violations[0]->getPropertyPath());
-    $this->assertEqual('This value should not be null.', $violations[0]->getMessage());
+    $this->assertEquals('title', $violations[0]->getPropertyPath());
+    $this->assertEquals('This value should not be null.', $violations[0]->getMessage());
 
     $node->set('title', '');
     $violations = $node->validate();
     $this->assertCount(1, $violations, 'Violation found when title is set to an empty string.');
-    $this->assertEqual('title', $violations[0]->getPropertyPath());
+    $this->assertEquals('title', $violations[0]->getPropertyPath());
 
     // Make the title valid again.
     $node->set('title', $this->randomString());
@@ -65,8 +67,8 @@ class NodeValidationTest extends EntityKernelTestBase {
     $node->set('changed', 433918800);
     $violations = $node->validate();
     $this->assertCount(1, $violations, 'Violation found when changed date is before the last changed date.');
-    $this->assertEqual('', $violations[0]->getPropertyPath());
-    $this->assertEqual('The content has either been modified by another user, or you have already submitted modifications. As a result, your changes cannot be saved.', $violations[0]->getMessage());
+    $this->assertEquals('', $violations[0]->getPropertyPath());
+    $this->assertEquals('The content has either been modified by another user, or you have already submitted modifications. As a result, your changes cannot be saved.', $violations[0]->getMessage());
   }
 
 }

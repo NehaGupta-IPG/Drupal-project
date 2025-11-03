@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Composer\Plugin\Scaffold\Functional;
 
 use Composer\Util\Filesystem;
+use Drupal\Tests\Composer\Plugin\ExecTrait;
 use Drupal\Tests\Composer\Plugin\Scaffold\AssertUtilsTrait;
-use Drupal\Tests\Composer\Plugin\Scaffold\ExecTrait;
 use Drupal\Tests\Composer\Plugin\Scaffold\Fixtures;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -13,14 +16,13 @@ use PHPUnit\Framework\TestCase;
  *
  * Upgrading a Composer plugin can be a dangerous operation. If the plugin
  * instantiates any classes during the activate method, and the plugin code
- * is subsequentially modified by a `composer update` operation, then any
+ * is subsequently modified by a `composer update` operation, then any
  * post-update hook (& etc.) may run with inconsistent code, leading to
  * runtime errors. This test ensures that it is possible to upgrade from the
  * last available stable 8.8.x tag to the current Scaffold plugin code (e.g. in
  * the current patch-under-test).
- *
- * @group Scaffold
  */
+#[Group('Scaffold')]
 class ScaffoldUpgradeTest extends TestCase {
 
   use AssertUtilsTrait;
@@ -34,6 +36,13 @@ class ScaffoldUpgradeTest extends TestCase {
   protected $fixtures;
 
   /**
+   * The Fixtures directory.
+   *
+   * @var string
+   */
+  protected string $fixturesDir;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -42,14 +51,10 @@ class ScaffoldUpgradeTest extends TestCase {
   }
 
   /**
-   * Test upgrading the Composer Scaffold plugin.
+   * Tests upgrading the Composer Scaffold plugin.
    */
-  public function testScaffoldUpgrade() {
-    $composerVersionLine = exec('composer --version');
-    if (strpos($composerVersionLine, 'Composer version 2') !== FALSE) {
-      $this->markTestSkipped('We cannot run the scaffold upgrade test with Composer 2 until we have a stable version of drupal/core-composer-scaffold to start from that we can install with Composer 2.x.');
-    }
-    $this->fixturesDir = $this->fixtures->tmpDir($this->getName());
+  public function testScaffoldUpgrade(): void {
+    $this->fixturesDir = $this->fixtures->tmpDir($this->name());
     $replacements = ['SYMLINK' => 'false', 'PROJECT_ROOT' => $this->fixtures->projectRoot()];
     $this->fixtures->cloneFixtureProjects($this->fixturesDir, $replacements);
     $topLevelProjectDir = 'drupal-drupal';
@@ -64,8 +69,9 @@ class ScaffoldUpgradeTest extends TestCase {
     // Packagist is disabled in the fixture; we bring it back by removing the
     // line that disables it.
     $this->mustExec("composer config --unset repositories.packagist.org", $sut);
-    $stdout = $this->mustExec("composer require --no-ansi drupal/core-composer-scaffold:8.8.0 --no-plugins 2>&1", $sut);
-    $this->assertStringContainsString("  - Installing drupal/core-composer-scaffold (8.8.0):", $stdout);
+    $this->mustExec("composer config --unset repositories.composer-scaffold", $sut);
+    $stdout = $this->mustExec("composer require --no-ansi drupal/core-composer-scaffold:9.5.0 --no-plugins 2>&1", $sut);
+    $this->assertStringContainsString("  - Installing drupal/core-composer-scaffold (9.5.0):", $stdout);
 
     // We can't force the path repo to re-install over the stable version
     // without removing it, and removing it masks the bugs we are testing for.
@@ -105,7 +111,7 @@ class ScaffoldUpgradeTest extends TestCase {
    * @return string
    *   Path to temporary git repository.
    */
-  protected function createTmpRepo($source, $destParent, $version) {
+  protected function createTmpRepo($source, $destParent, $version): string {
     $target = $destParent . '/' . basename($source);
     $filesystem = new Filesystem();
     $filesystem->copy($source, $target);

@@ -1,26 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\TempStore;
 
-use Drupal\Core\KeyValueStore\KeyValueExpirableFactory;
-use Drupal\Core\Session\AccountProxyInterface;
-use Drupal\KernelTests\KernelTestBase;
-use Drupal\Core\TempStore\SharedTempStoreFactory;
-use Drupal\Core\Lock\DatabaseLockBackend;
 use Drupal\Core\Database\Database;
+use Drupal\Core\KeyValueStore\KeyValueExpirableFactory;
+use Drupal\Core\Lock\DatabaseLockBackend;
+use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\Core\TempStore\SharedTempStoreFactory;
+use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the temporary object storage system.
  *
- * @group TempStore
  * @see \Drupal\Core\TempStore\SharedTempStore
  */
+#[Group('TempStore')]
+#[RunTestsInSeparateProcesses]
 class TempStoreDatabaseTest extends KernelTestBase {
 
   /**
    * Tests the SharedTempStore API.
    */
-  public function testSharedTempStore() {
+  public function testSharedTempStore(): void {
     // Create testing objects.
     $objects = [];
     for ($i = 0; $i <= 3; $i++) {
@@ -39,7 +44,8 @@ class TempStoreDatabaseTest extends KernelTestBase {
     );
     $collection = $this->randomMachineName();
 
-    // Create two mock users.
+    // Create two mock user IDs. Note that the user IDs are intentionally
+    // random, which is not what we normally do in tests.
     for ($i = 0; $i <= 1; $i++) {
       $users[$i] = mt_rand(500, 5000000);
 
@@ -56,13 +62,13 @@ class TempStoreDatabaseTest extends KernelTestBase {
     for ($i = 0; $i <= 1; $i++) {
       // setIfNotExists() should be TRUE the first time (when $i is 0) and
       // FALSE the second time (when $i is 1).
-      $this->assertEqual(!$i, $stores[0]->setIfNotExists($key, $objects[$i]));
+      $this->assertEquals(!$i, $stores[0]->setIfNotExists($key, $objects[$i]));
       $metadata = $stores[0]->getMetadata($key);
-      $this->assertEqual($users[0], $metadata->getOwnerId());
+      $this->assertEquals($users[0], $metadata->getOwnerId());
       $this->assertEquals($objects[0], $stores[0]->get($key));
       // Another user should get the same result.
       $metadata = $stores[1]->getMetadata($key);
-      $this->assertEqual($users[0], $metadata->getOwnerId());
+      $this->assertEquals($users[0], $metadata->getOwnerId());
       $this->assertEquals($objects[0], $stores[1]->get($key));
     }
 
@@ -88,11 +94,11 @@ class TempStoreDatabaseTest extends KernelTestBase {
     $this->assertEquals($objects[3], $stores[0]->get($key));
     $this->assertEquals($objects[3], $stores[1]->get($key));
     $metadata = $stores[1]->getMetadata($key);
-    $this->assertEqual($users[1], $metadata->getOwnerId());
+    $this->assertEquals($users[1], $metadata->getOwnerId());
 
     // The first user should be informed that the second now owns the data.
     $metadata = $stores[0]->getMetadata($key);
-    $this->assertEqual($users[1], $metadata->getOwnerId());
+    $this->assertEquals($users[1], $metadata->getOwnerId());
 
     // The first user should no longer be allowed to get, update, delete.
     $this->assertNull($stores[0]->getIfOwner($key));
@@ -102,7 +108,7 @@ class TempStoreDatabaseTest extends KernelTestBase {
     // Now manually expire the item (this is not exposed by the API) and then
     // assert it is no longer accessible.
     $database->update('key_value_expire')
-      ->fields(['expire' => REQUEST_TIME - 1])
+      ->fields(['expire' => \Drupal::time()->getRequestTime() - 1])
       ->condition('collection', "tempstore.shared.$collection")
       ->condition('name', $key)
       ->execute();

@@ -6,7 +6,7 @@ use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
- * Defines a class to build a listing of custom block type entities.
+ * Defines a class to build a listing of block type entities.
  *
  * @see \Drupal\block_content\Entity\BlockContentType
  */
@@ -15,7 +15,7 @@ class BlockContentTypeListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function getDefaultOperations(EntityInterface $entity) {
+  public function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
     $operations = parent::getDefaultOperations($entity);
     // Place the edit operation after the operations added by field_ui.module
     // which have the weights 15, 20, 25.
@@ -47,7 +47,7 @@ class BlockContentTypeListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   protected function getTitle() {
-    return $this->t('Custom block types');
+    return $this->t('Block types');
   }
 
 }

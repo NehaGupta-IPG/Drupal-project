@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\entity_test\Entity\EntityTestAdminRoutes;
@@ -8,14 +10,16 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * Tests route providers for entity types.
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class RouteProviderTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -31,7 +35,11 @@ class RouteProviderTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->setUpCurrentUser(['uid' => 1]);
+    $permissions = [
+      'administer entity_test content',
+      'view test entity',
+    ];
+    $this->setUpCurrentUser(['uid' => 2], $permissions);
 
     $this->installEntitySchema('entity_test_mul');
     $this->installEntitySchema('entity_test_admin_routes');
@@ -39,6 +47,7 @@ class RouteProviderTest extends KernelTestBase {
     /** @var \Drupal\user\RoleInterface $role */
     $role = Role::create([
       'id' => RoleInterface::ANONYMOUS_ID,
+      'label' => 'Anonymous',
     ]);
     $role
       ->grantPermission('administer entity_test content')
@@ -46,6 +55,9 @@ class RouteProviderTest extends KernelTestBase {
     $role->save();
   }
 
+  /**
+   * Returns the handle of the HTTP kernel service.
+   */
   protected function httpKernelHandle($url) {
     $request = Request::create($url);
     /** @var \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel */
@@ -54,9 +66,11 @@ class RouteProviderTest extends KernelTestBase {
   }
 
   /**
-   * @covers \Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider::getRoutes
+   * Tests html routes.
+   *
+   * @legacy-covers \Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider::getRoutes
    */
-  public function testHtmlRoutes() {
+  public function testHtmlRoutes(): void {
     /** @var \Drupal\Core\Routing\RouteProviderInterface $route_provider */
     $route_provider = \Drupal::service('router.route_provider');
 
@@ -94,10 +108,12 @@ class RouteProviderTest extends KernelTestBase {
   }
 
   /**
-   * @covers \Drupal\Core\Entity\Routing\AdminHtmlRouteProvider::getEditFormRoute
-   * @covers \Drupal\Core\Entity\Routing\AdminHtmlRouteProvider::getDeleteFormRoute
+   * Tests admin html routes.
+   *
+   * @legacy-covers \Drupal\Core\Entity\Routing\AdminHtmlRouteProvider::getEditFormRoute
+   * @legacy-covers \Drupal\Core\Entity\Routing\AdminHtmlRouteProvider::getDeleteFormRoute
    */
-  public function testAdminHtmlRoutes() {
+  public function testAdminHtmlRoutes(): void {
     /** @var \Drupal\Core\Routing\RouteProviderInterface $route_provider */
     $route_provider = \Drupal::service('router.route_provider');
 

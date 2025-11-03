@@ -1,17 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Entity\Display\EntityDisplayInterface;
 use Drupal\Core\Form\FormState;
+use Drupal\field_ui\Form\EntityDisplayFormBase;
 use Drupal\field_ui\Form\EntityViewDisplayEditForm;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\field_ui\Form\EntityDisplayFormBase
- *
- * @group Entity
+ * Tests Drupal\field_ui\Form\EntityDisplayFormBase.
  */
+#[CoversClass(EntityDisplayFormBase::class)]
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityDisplayFormBaseTest extends KernelTestBase {
 
   /**
@@ -20,9 +27,11 @@ class EntityDisplayFormBaseTest extends KernelTestBase {
   protected static $modules = ['entity_test'];
 
   /**
-   * @covers ::copyFormValuesToEntity
+   * Tests copy form values to entity.
+   *
+   * @legacy-covers ::copyFormValuesToEntity
    */
-  public function testCopyFormValuesToEntity() {
+  public function testCopyFormValuesToEntity(): void {
     $field_values = [];
     $entity = $this->prophesize(EntityDisplayInterface::class);
     $entity->getPluginCollections()->willReturn([]);
@@ -37,9 +46,9 @@ class EntityDisplayFormBaseTest extends KernelTestBase {
       'region' => 'hidden',
     ];
     $entity->removeComponent('new_field_mismatch_type_visible')
-      ->will(function ($args) {
+      ->will(function (array $args) use ($entity) {
         // On subsequent calls, getComponent() will return an empty array.
-        $this->getComponent($args[0])->willReturn([]);
+        $entity->getComponent($args[0])->willReturn([]);
       })
       ->shouldBeCalled();
 
@@ -76,9 +85,9 @@ class EntityDisplayFormBaseTest extends KernelTestBase {
       'region' => 'hidden',
     ];
     $entity->removeComponent('field_start_visible_change_region')
-      ->will(function ($args) {
+      ->will(function (array $args) use ($entity) {
         // On subsequent calls, getComponent() will return an empty array.
-        $this->getComponent($args[0])->willReturn([]);
+        $entity->getComponent($args[0])->willReturn([]);
       })
       ->shouldBeCalled();
 
@@ -105,16 +114,16 @@ class EntityDisplayFormBaseTest extends KernelTestBase {
         'type' => 'textfield',
         'region' => 'content',
       ])
-      ->will(function ($args) {
+      ->will(function (array $args) use ($entity) {
         // On subsequent calls, getComponent() will return the newly set values.
-        $this->getComponent($args[0])->willReturn($args[1]);
+        $entity->getComponent($args[0])->willReturn($args[1]);
         $args[1] += [
           'settings' => [],
           'third_party_settings' => [
             'foo' => 'bar',
           ],
         ];
-        $this->setComponent($args[0], $args[1])->shouldBeCalled();
+        $entity->setComponent($args[0], $args[1])->shouldBeCalled();
       })
       ->shouldBeCalled();
 

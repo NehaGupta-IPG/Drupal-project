@@ -1,22 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit\process;
 
+use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\migrate\process\Callback;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the callback process plugin.
- *
- * @group migrate
  */
+#[Group('migrate')]
 class CallbackTest extends MigrateProcessTestCase {
 
   /**
-   * Test callback with valid "callable".
-   *
-   * @dataProvider providerCallback
+   * Tests callback with valid "callable".
    */
-  public function testCallback($callable) {
+  #[DataProvider('providerCallback')]
+  public function testCallback($callable): void {
     $configuration = ['callable' => $callable];
     $this->plugin = new Callback($configuration, 'map', []);
     $value = $this->plugin->transform('FooBar', $this->migrateExecutable, $this->row, 'destination_property');
@@ -26,7 +29,7 @@ class CallbackTest extends MigrateProcessTestCase {
   /**
    * Data provider for ::testCallback().
    */
-  public function providerCallback() {
+  public static function providerCallback() {
     return [
       'function' => ['strtolower'],
       'class method' => [[self::class, 'strtolower']],
@@ -34,20 +37,68 @@ class CallbackTest extends MigrateProcessTestCase {
   }
 
   /**
-   * Test callback exceptions.
-   *
-   * @dataProvider providerCallbackExceptions
+   * Test callback with valid "callable" and multiple arguments.
    */
-  public function testCallbackExceptions($message, $configuration) {
-    $this->expectException(\InvalidArgumentException::class);
+  #[DataProvider('providerCallbackArray')]
+  public function testCallbackArray($callable, $args, $result): void {
+    $configuration = ['callable' => $callable, 'unpack_source' => TRUE];
+    $this->plugin = new Callback($configuration, 'map', []);
+    $value = $this->plugin->transform($args, $this->migrateExecutable, $this->row, 'destination_property');
+    $this->assertSame($result, $value);
+  }
+
+  /**
+   * Data provider for ::testCallbackArray().
+   */
+  public static function providerCallbackArray() {
+    return [
+      'date format' => [
+        'date',
+        ['Y-m-d', 995328000],
+        '2001-07-17',
+      ],
+      'rtrim' => [
+        'rtrim',
+        ['https://www.example.com/', '/'],
+        'https://www.example.com',
+      ],
+      'str_replace' => [
+        'str_replace',
+        [['One', 'two'], ['1', '2'], 'One, two, three!'],
+        '1, 2, three!',
+      ],
+      'pi' => [
+        'pi',
+        [],
+        pi(),
+      ],
+    ];
+  }
+
+  /**
+   * Tests callback exceptions.
+   *
+   * @param string $message
+   *   The expected exception message.
+   * @param array $configuration
+   *   The plugin configuration being tested.
+   * @param string $class
+   *   (optional) The expected exception class.
+   * @param mixed $args
+   *   (optional) Arguments to pass to the transform() method.
+   */
+  #[DataProvider('providerCallbackExceptions')]
+  public function testCallbackExceptions($message, array $configuration, $class = 'InvalidArgumentException', $args = NULL): void {
+    $this->expectException($class);
     $this->expectExceptionMessage($message);
     $this->plugin = new Callback($configuration, 'map', []);
+    $this->plugin->transform($args, $this->migrateExecutable, $this->row, 'destination_property');
   }
 
   /**
    * Data provider for ::testCallbackExceptions().
    */
-  public function providerCallbackExceptions() {
+  public static function providerCallbackExceptions() {
     return [
       'not set' => [
         'message' => 'The "callable" must be set.',
@@ -56,6 +107,12 @@ class CallbackTest extends MigrateProcessTestCase {
       'invalid method' => [
         'message' => 'The "callable" must be a valid function or method.',
         'configuration' => ['callable' => 'nonexistent_callable'],
+      ],
+      'array required' => [
+        'message' => "When 'unpack_source' is set, the source must be an array. Instead it was of type 'string'",
+        'configuration' => ['callable' => 'count', 'unpack_source' => TRUE],
+        'class' => MigrateException::class,
+        'args' => 'This string is not an array.',
       ],
     ];
   }

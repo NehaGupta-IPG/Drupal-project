@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\FunctionalJavascript\Plugin\views\Handler;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\node\Entity\NodeType;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the grouped exposed filter admin UI.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class GroupedExposedFilterTest extends WebDriverTestBase {
 
   /**
@@ -61,6 +65,7 @@ class GroupedExposedFilterTest extends WebDriverTestBase {
     // Setup a node type that has the right fields for the test view.
     NodeType::create([
       'type' => 'page',
+      'name' => 'Page',
     ])->save();
 
     FieldConfig::create([
@@ -71,9 +76,9 @@ class GroupedExposedFilterTest extends WebDriverTestBase {
   }
 
   /**
-   * Test if the right fields are shown and the right values set.
+   * Tests if the right fields are shown and the right values set.
    */
-  public function testGroupedFilterValuesUI() {
+  public function testGroupedFilterValuesUI(): void {
     $web_assert = $this->assertSession();
 
     $this->drupalGet('/admin/structure/views/view/test_exposed_admin_ui');
@@ -111,6 +116,23 @@ class GroupedExposedFilterTest extends WebDriverTestBase {
       $this->assertNotEmpty($weight->find('named', ['option', $value]));
     }
     $this->assertEmpty($weight->find('named', ['option', 5]));
+
+    // Set the date value to a zero value and make sure it's stored.
+    $between_from = $page->findField('options[group_info][group_items][1][value][min]');
+    $between_from->setValue('0');
+    $apply_button = $page->find('css', '.views-ui-dialog button.button--primary');
+    $this->assertNotEmpty($apply_button);
+    $apply_button->press();
+    $web_assert->assertWaitOnAjaxRequest();
+
+    // Open the dialog for the grouped filter.
+    $page->clickLink('Content: Authored on (grouped)');
+    $web_assert->assertWaitOnAjaxRequest();
+
+    // Test that the 'min' field is shown and that it contains the right value.
+    $between_from = $page->findField('options[group_info][group_items][1][value][min]');
+    $this->assertNotEmpty($between_from->isVisible());
+    $this->assertEquals('0', $between_from->getValue());
   }
 
 }

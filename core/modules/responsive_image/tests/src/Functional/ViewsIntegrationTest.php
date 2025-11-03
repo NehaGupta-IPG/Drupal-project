@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\responsive_image\Functional;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\responsive_image\Entity\ResponsiveImageStyle;
 use Drupal\Tests\views\Functional\ViewTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the integration of responsive image with Views.
- *
- * @group responsive_image
  */
+#[Group('responsive_image')]
+#[RunTestsInSeparateProcesses]
 class ViewsIntegrationTest extends ViewTestBase {
 
   /**
@@ -41,14 +45,16 @@ class ViewsIntegrationTest extends ViewTestBase {
 
   /**
    * The test views to enable.
+   *
+   * @var string[]
    */
   public static $testViews = ['entity_test_row'];
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
+    parent::setUp($import_test_views, $modules);
 
     $this->enableViewsTestModule();
 
@@ -93,10 +99,11 @@ class ViewsIntegrationTest extends ViewTestBase {
   /**
    * Tests integration with Views.
    */
-  public function testViewsAddResponsiveImageField() {
+  public function testViewsAddResponsiveImageField(): void {
     // Add the image field to the View.
     $this->drupalGet('admin/structure/views/nojs/add-handler/entity_test_row/default/field');
-    $this->drupalPostForm('admin/structure/views/nojs/add-handler/entity_test_row/default/field', ['name[entity_test__bar.bar]' => TRUE], 'Add and configure field');
+    $this->drupalGet('admin/structure/views/nojs/add-handler/entity_test_row/default/field');
+    $this->submitForm(['name[entity_test__bar.bar]' => TRUE], 'Add and configure field');
     // Set the formatter to 'Responsive image'.
     $this->submitForm(['options[type]' => 'responsive_image'], 'Apply');
     $this->assertSession()

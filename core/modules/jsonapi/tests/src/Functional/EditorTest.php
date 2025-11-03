@@ -1,24 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
+use Drupal\ckeditor5\Plugin\CKEditor5Plugin\Heading;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\jsonapi\JsonApiSpec;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API integration test for the "Editor" config entity type.
- *
- * @group jsonapi
  */
-class EditorTest extends ResourceTestBase {
+#[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
+class EditorTest extends ConfigEntityResourceTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['filter', 'editor', 'ckeditor'];
+  protected static $modules = ['filter', 'editor', 'ckeditor5'];
 
   /**
    * {@inheritdoc}
@@ -45,7 +51,7 @@ class EditorTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer filters']);
   }
 
@@ -73,17 +79,20 @@ class EditorTest extends ResourceTestBase {
     // Create a "Camelids" editor.
     $camelids = Editor::create([
       'format' => 'llama',
-      'editor' => 'ckeditor',
+      'editor' => 'ckeditor5',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
     ]);
     $camelids
       ->setImageUploadSettings([
-        'status' => FALSE,
+        'status' => TRUE,
         'scheme' => 'public',
         'directory' => 'inline-images',
-        'max_size' => '',
+        'max_size' => NULL,
         'max_dimensions' => [
-          'width' => '',
-          'height' => '',
+          'width' => NULL,
+          'height' => NULL,
         ],
       ])
       ->save();
@@ -94,16 +103,16 @@ class EditorTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedDocument() {
+  protected function getExpectedDocument(): array {
     $self_url = Url::fromUri('base:/jsonapi/editor/editor/' . $this->entity->uuid())->setAbsolute()->toString(TRUE)->getGeneratedUrl();
     return [
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
           ],
         ],
-        'version' => '1.0',
+        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
       ],
       'links' => [
         'self' => ['href' => $self_url],
@@ -120,15 +129,15 @@ class EditorTest extends ResourceTestBase {
               'filter.format.llama',
             ],
             'module' => [
-              'ckeditor',
+              'ckeditor5',
             ],
           ],
-          'editor' => 'ckeditor',
+          'editor' => 'ckeditor5',
           'image_upload' => [
-            'status' => FALSE,
+            'status' => TRUE,
             'scheme' => 'public',
             'directory' => 'inline-images',
-            'max_size' => '',
+            'max_size' => NULL,
             'max_dimensions' => [
               'width' => NULL,
               'height' => NULL,
@@ -137,49 +146,10 @@ class EditorTest extends ResourceTestBase {
           'langcode' => 'en',
           'settings' => [
             'toolbar' => [
-              'rows' => [
-                [
-                  [
-                    'name' => 'Formatting',
-                    'items' => [
-                      'Bold',
-                      'Italic',
-                    ],
-                  ],
-                  [
-                    'name' => 'Links',
-                    'items' => [
-                      'DrupalLink',
-                      'DrupalUnlink',
-                    ],
-                  ],
-                  [
-                    'name' => 'Lists',
-                    'items' => [
-                      'BulletedList',
-                      'NumberedList',
-                    ],
-                  ],
-                  [
-                    'name' => 'Media',
-                    'items' => [
-                      'Blockquote',
-                      'DrupalImage',
-                    ],
-                  ],
-                  [
-                    'name' => 'Tools',
-                    'items' => [
-                      'Source',
-                    ],
-                  ],
-                ],
-              ],
+              'items' => ['heading', 'bold', 'italic'],
             ],
             'plugins' => [
-              'language' => [
-                'language_list' => 'un',
-              ],
+              'ckeditor5_heading' => Heading::DEFAULT_CONFIGURATION,
             ],
           ],
           'status' => TRUE,
@@ -192,14 +162,15 @@ class EditorTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getPostDocument() {
+  protected function getPostDocument(): array {
     // @todo Update in https://www.drupal.org/node/2300677.
+    return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedUnauthorizedAccessMessage($method) {
+  protected function getExpectedUnauthorizedAccessMessage($method): string {
     return "The 'administer filters' permission is required.";
   }
 
@@ -223,17 +194,20 @@ class EditorTest extends ResourceTestBase {
 
     $entity = Editor::create([
       'format' => 'pachyderm',
-      'editor' => 'ckeditor',
+      'editor' => 'ckeditor5',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
     ]);
 
     $entity->setImageUploadSettings([
-      'status' => FALSE,
+      'status' => TRUE,
       'scheme' => 'public',
       'directory' => 'inline-images',
-      'max_size' => '',
+      'max_size' => NULL,
       'max_dimensions' => [
-        'width' => '',
-        'height' => '',
+        'width' => NULL,
+        'height' => NULL,
       ],
     ])->save();
 

@@ -1,22 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Kernel;
 
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore displaymessage
 /**
  * Tests that the block plugin can work properly without a supporting entity.
- *
- * @group block
  */
+#[Group('block')]
+#[RunTestsInSeparateProcesses]
 class BlockInterfaceTest extends KernelTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['system', 'block', 'block_test', 'user'];
 
   /**
-   * Test configuration and subsequent form() and build() method calls.
+   * Tests configuration and subsequent form() and build() method calls.
    *
    * This test is attempting to test the existing block plugin api and all
    * functionality that is expected to remain consistent. The arrays that are
@@ -29,7 +37,7 @@ class BlockInterfaceTest extends KernelTestBase {
    * subsequent method calls are just attempting to cause a failure if a
    * dependency outside of the plugin configuration is required.
    */
-  public function testBlockInterface() {
+  public function testBlockInterface(): void {
     $manager = $this->container->get('plugin.manager.block');
     $configuration = [
       'label' => 'Custom Display Message',
@@ -37,12 +45,12 @@ class BlockInterfaceTest extends KernelTestBase {
     $expected_configuration = [
       'id' => 'test_block_instantiation',
       'label' => 'Custom Display Message',
-      'provider' => 'block_test',
       'label_display' => BlockPluginInterface::BLOCK_LABEL_VISIBLE,
+      'provider' => 'block_test',
       'display_message' => 'no message set',
     ];
     // Initial configuration of the block at construction time.
-    /** @var $display_block \Drupal\Core\Block\BlockPluginInterface */
+    /** @var \Drupal\Core\Block\BlockPluginInterface $display_block */
     $display_block = $manager->createInstance('test_block_instantiation', $configuration);
     $this->assertSame($expected_configuration, $display_block->getConfiguration(), 'The block was configured correctly.');
 
@@ -59,7 +67,7 @@ class BlockInterfaceTest extends KernelTestBase {
       ],
       'admin_label' => [
         '#type' => 'item',
-        '#title' => t('Block description'),
+        '#title' => 'Block description',
         '#plain_text' => $definition['admin_label'],
       ],
       'label' => [
@@ -78,7 +86,7 @@ class BlockInterfaceTest extends KernelTestBase {
       'context_mapping' => [],
       'display_message' => [
         '#type' => 'textfield',
-        '#title' => t('Display message'),
+        '#title' => 'Display message',
         '#default_value' => 'My custom display message.',
       ],
     ];

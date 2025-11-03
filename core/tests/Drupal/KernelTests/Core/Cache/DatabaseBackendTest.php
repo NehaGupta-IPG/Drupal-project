@@ -1,14 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Cache;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\DatabaseBackend;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Unit test of the database backend using the generic cache unit test base.
- *
- * @group Cache
  */
+#[Group('Cache')]
+#[RunTestsInSeparateProcesses]
 class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
 
   /**
@@ -19,26 +24,26 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
   protected static $maxRows = 100;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  protected static $modules = ['system'];
-
-  /**
    * Creates a new instance of DatabaseBackend.
    *
-   * @return
+   * @return \Drupal\Core\Cache\DatabaseBackend
    *   A new DatabaseBackend object.
    */
   protected function createCacheBackend($bin) {
-    return new DatabaseBackend($this->container->get('database'), $this->container->get('cache_tags.invalidator.checksum'), $bin, static::$maxRows);
+    return new DatabaseBackend(
+      $this->container->get('database'),
+      $this->container->get('cache_tags.invalidator.checksum'),
+      $bin,
+      $this->container->get('serialization.phpserialize'),
+      \Drupal::service(TimeInterface::class),
+      static::$maxRows,
+    );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function testSetGet() {
+  public function testSetGet(): void {
     parent::testSetGet();
     $backend = $this->getCacheBackend();
 
@@ -53,12 +58,21 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
     $cached_value_short = $this->randomMachineName();
     $backend->set($cid_short, $cached_value_short);
     $this->assertSame($cached_value_short, $backend->get($cid_short)->data, "Backend contains the correct value for short, non-ASCII cache id.");
+
+    // Set multiple items to test exceeding the chunk size.
+    $backend->deleteAll();
+    $items = [];
+    for ($i = 0; $i <= DatabaseBackend::MAX_ITEMS_PER_CACHE_SET; $i++) {
+      $items["test$i"]['data'] = $i;
+    }
+    $backend->setMultiple($items);
+    $this->assertSame(DatabaseBackend::MAX_ITEMS_PER_CACHE_SET + 1, $this->getNumRows());
   }
 
   /**
    * Tests the row count limiting of cache bin database tables.
    */
-  public function testGarbageCollection() {
+  public function testGarbageCollection(): void {
     $backend = $this->getCacheBackend();
     $max_rows = static::$maxRows;
 
@@ -95,12 +109,28 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
    * @return int
    *   The number of rows in the test cache bin database table.
    */
-  protected function getNumRows() {
+  protected function getNumRows(): int {
     $table = 'cache_' . $this->testBin;
     $connection = $this->container->get('database');
     $query = $connection->select($table);
     $query->addExpression('COUNT([cid])', 'cid');
     return (int) $query->execute()->fetchField();
+  }
+
+  /**
+   * Tests that "cache_tags.invalidator.checksum" is backend overridable.
+   */
+  public function testCacheTagsInvalidatorChecksumIsBackendOverridable(): void {
+    $definition = $this->container->getDefinition('cache_tags.invalidator.checksum');
+    $this->assertTrue($definition->hasTag('backend_overridable'));
+  }
+
+  /**
+   * Test that the service "cache.backend.database" is backend overridable.
+   */
+  public function testCacheBackendDatabaseIsBackendOverridable(): void {
+    $definition = $this->container->getDefinition('cache.backend.database');
+    $this->assertTrue($definition->hasTag('backend_overridable'));
   }
 
 }

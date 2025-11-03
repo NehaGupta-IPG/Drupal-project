@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\FunctionalJavascript;
 
-use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests user registration forms with additional fields.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class RegistrationWithUserFieldsTest extends WebDriverTestBase {
 
   /**
@@ -50,7 +54,7 @@ class RegistrationWithUserFieldsTest extends WebDriverTestBase {
   /**
    * Tests Field API fields on user registration forms.
    */
-  public function testRegistrationWithUserFields() {
+  public function testRegistrationWithUserFields(): void {
     // Create a field on 'user' entity type.
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'test_user_field',
@@ -94,7 +98,7 @@ class RegistrationWithUserFieldsTest extends WebDriverTestBase {
     $this->page->fillField('edit-mail', $name . '@example.com');
 
     $this->page->pressButton('edit-submit');
-    $this->webAssert->pageTextContains(t('@name field is required.', ['@name' => $field->label()]));
+    $this->webAssert->pageTextContains($field->label() . ' field is required.');
 
     // Invalid input.
     $this->page->fillField('edit-test-user-field-0-value', '-1');
@@ -135,9 +139,9 @@ class RegistrationWithUserFieldsTest extends WebDriverTestBase {
       ->getStorage('user')
       ->loadByProperties(['name' => $name, 'mail' => $name . '@example.com']);
     $new_user = reset($accounts);
-    $this->assertEquals($value, $new_user->test_user_field[0]->value, t('The field value was correctly saved.'));
-    $this->assertEquals($value . '1', $new_user->test_user_field[1]->value, t('The field value was correctly saved.'));
-    $this->assertEquals($value . '2', $new_user->test_user_field[2]->value, t('The field value was correctly saved.'));
+    $this->assertEquals($value, $new_user->test_user_field[0]->value);
+    $this->assertEquals($value . '1', $new_user->test_user_field[1]->value);
+    $this->assertEquals($value . '2', $new_user->test_user_field[2]->value);
   }
 
 }

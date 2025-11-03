@@ -1,13 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views_ui\Functional;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the UI for feed display plugin.
  *
- * @group views_ui
  * @see \Drupal\views\Plugin\views\display\Feed
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class DisplayFeedTest extends UITestBase {
 
   /**
@@ -15,14 +21,12 @@ class DisplayFeedTest extends UITestBase {
    *
    * @var array
    */
-  public static $testViews = ['test_display_feed', 'test_style_opml'];
+  public static $testViews = ['test_display_feed'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  protected static $modules = ['views_ui', 'aggregator'];
+  protected static $modules = ['views_ui'];
 
   /**
    * {@inheritdoc}
@@ -32,8 +36,8 @@ class DisplayFeedTest extends UITestBase {
   /**
    * Tests feed display admin UI.
    */
-  public function testFeedUI() {
-    // Test both RSS and OPML feeds.
+  public function testFeedUI(): void {
+    // Test the RSS feed.
     foreach (self::$testViews as $view_name) {
       $this->checkFeedViewUi($view_name);
     }
@@ -45,13 +49,13 @@ class DisplayFeedTest extends UITestBase {
    * @param string $view_name
    *   The view name to check against.
    */
-  protected function checkFeedViewUi($view_name) {
+  protected function checkFeedViewUi($view_name): void {
     $this->drupalGet('admin/structure/views');
     // Verify that the page lists the $view_name view.
     // Regression test: ViewListBuilder::getDisplayPaths() did not properly
     // check whether a DisplayPluginCollection was returned in iterating over
     // all displays.
-    $this->assertText($view_name);
+    $this->assertSession()->pageTextContains($view_name);
 
     // Check the attach TO interface.
     $this->drupalGet('admin/structure/views/nojs/display/' . $view_name . '/feed_1/displays');
@@ -68,19 +72,21 @@ class DisplayFeedTest extends UITestBase {
       }
     }
 
-    $this->assertEqual(['default', 'page'], $options, 'Make sure all displays appears as expected.');
+    $this->assertEquals(['default', 'page'], $options, 'Make sure all displays appears as expected.');
 
     // Post and save this and check the output.
-    $this->drupalPostForm('admin/structure/views/nojs/display/' . $view_name . '/feed_1/displays', ['displays[page]' => 'page'], 'Apply');
+    $this->drupalGet('admin/structure/views/nojs/display/' . $view_name . '/feed_1/displays');
+    $this->submitForm(['displays[page]' => 'page'], 'Apply');
     // Options summary should be escaped.
     $this->assertSession()->assertEscaped('<em>Page</em>');
-    $this->assertNoRaw('<em>Page</em>');
+    $this->assertSession()->responseNotContains('<em>Page</em>');
 
     $this->drupalGet('admin/structure/views/view/' . $view_name . '/edit/feed_1');
     $this->assertSession()->elementTextContains('xpath', '//*[@id="views-feed-1-displays"]', 'Page');
 
     // Add the default display, so there should now be multiple displays.
-    $this->drupalPostForm('admin/structure/views/nojs/display/' . $view_name . '/feed_1/displays', ['displays[default]' => 'default'], 'Apply');
+    $this->drupalGet('admin/structure/views/nojs/display/' . $view_name . '/feed_1/displays');
+    $this->submitForm(['displays[default]' => 'default'], 'Apply');
     $this->drupalGet('admin/structure/views/view/' . $view_name . '/edit/feed_1');
     $this->assertSession()->elementTextContains('xpath', '//*[@id="views-feed-1-displays"]', 'Multiple displays');
   }

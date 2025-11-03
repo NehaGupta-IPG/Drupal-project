@@ -1,22 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\NodeType;
-use Drupal\user\Entity\User;
-use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests node access functionality with multiple languages and two node access
- * modules.
- *
- * @group node
+ * Tests node access with multiple languages and two node access modules.
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeAccessLanguageAwareCombinationTest extends NodeAccessTestBase {
+
+  use NodeAccessTrait;
 
   /**
    * Enable language and two node access modules.
@@ -50,10 +55,13 @@ class NodeAccessLanguageAwareCombinationTest extends NodeAccessTestBase {
    */
   protected $adminUser;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
-    node_access_test_add_field(NodeType::load('page'));
+    $this->addPrivateField(NodeType::load('page'));
 
     // Create the 'private' field, which allows the node to be marked as private
     // (restricted access) in a given translation.
@@ -87,9 +95,11 @@ class NodeAccessLanguageAwareCombinationTest extends NodeAccessTestBase {
     // Create a normal authenticated user.
     $this->webUser = $this->drupalCreateUser(['access content']);
 
-    // Load the user 1 user for later use as an admin user with permission to
-    // see everything.
-    $this->adminUser = User::load(1);
+    // Create a user as an admin user with permission bypass node access
+    // to see everything.
+    $this->adminUser = $this->drupalCreateUser([
+      'bypass node access',
+    ]);
 
     // The node_access_test_language module allows individual translations of a
     // node to be marked private (not viewable by normal users), and the
@@ -175,7 +185,7 @@ class NodeAccessLanguageAwareCombinationTest extends NodeAccessTestBase {
     $this->nodes['public_no_language_private'] = $this->drupalCreateNode([
       'field_private' => [['value' => 1]],
       'private' => FALSE,
-        'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
     ]);
     $this->nodes['public_no_language_public'] = $this->drupalCreateNode([
       'field_private' => [['value' => 0]],
@@ -197,7 +207,7 @@ class NodeAccessLanguageAwareCombinationTest extends NodeAccessTestBase {
   /**
    * Tests node access and node access queries with multiple node languages.
    */
-  public function testNodeAccessLanguageAwareCombination() {
+  public function testNodeAccessLanguageAwareCombination(): void {
 
     $expected_node_access = ['view' => TRUE, 'update' => FALSE, 'delete' => FALSE];
     $expected_node_access_no_access = ['view' => FALSE, 'update' => FALSE, 'delete' => FALSE];
@@ -309,7 +319,7 @@ class NodeAccessLanguageAwareCombinationTest extends NodeAccessTestBase {
     $nids = $select->execute()->fetchAllAssoc('nid');
 
     // There are no nodes with German translations, so no results are returned.
-    $this->assertTrue(empty($nids), 'Query returns an empty result.');
+    $this->assertEmpty($nids, 'Query returns an empty result.');
 
     // Query the nodes table as admin user (full access) with the node access
     // tag and no specific langcode.

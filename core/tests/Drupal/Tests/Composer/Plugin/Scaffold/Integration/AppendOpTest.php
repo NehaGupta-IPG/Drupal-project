@@ -1,30 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Composer\Plugin\Scaffold\Integration;
 
 use Drupal\Composer\Plugin\Scaffold\Operations\AppendOp;
 use Drupal\Composer\Plugin\Scaffold\ScaffoldOptions;
 use Drupal\Tests\Composer\Plugin\Scaffold\Fixtures;
-use Drupal\Tests\Traits\PhpUnitWarnings;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \Drupal\Composer\Plugin\Scaffold\Operations\AppendOp
- *
- * @group Scaffold
+ * Tests Drupal\Composer\Plugin\Scaffold\Operations\AppendOp.
  */
+#[CoversClass(AppendOp::class)]
+#[Group('Scaffold')]
 class AppendOpTest extends TestCase {
-  use PhpUnitWarnings;
 
   /**
-   * @covers ::process
+   * Tests process.
+   *
+   * @legacy-covers ::process
    */
-  public function testProcess() {
+  public function testProcess(): void {
     $fixtures = new Fixtures();
     $destination = $fixtures->destinationPath('[web-root]/robots.txt');
     $options = ScaffoldOptions::create([]);
     // Assert that there is no target file before we run our test.
-    $this->assertFileNotExists($destination->fullPath());
+    $this->assertFileDoesNotExist($destination->fullPath());
 
     // Create a file.
     file_put_contents($destination->fullPath(), "# This is a test\n");

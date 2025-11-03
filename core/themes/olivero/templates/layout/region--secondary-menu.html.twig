@@ -9,8 +9,19 @@
  * - region: The name of the region variable as defined in the theme's
  *   .info.yml file.
  *
- * @see template_preprocess_region()
+ * @see \Drupal\Core\Theme\ThemePreprocess::preprocessRegion()
  */
 #}
 
-{{ content }}
+{%
+  set classes = [
+    'region',
+    'region--' ~ region|clean_class,
+  ]
+%}
+
+{% if content %}
+  <div{{ attributes.addClass(classes) }}>
+    {{ content }}
+  </div>
+{% endif %}

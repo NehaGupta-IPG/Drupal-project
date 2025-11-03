@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\Component\Utility\Html;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Create a node with dangerous tags in its title and test that they are
- * escaped.
- *
- * @group node
+ * Tests that dangerous tags in the node title are escaped.
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeTitleXSSTest extends NodeTestBase {
 
   /**
@@ -20,7 +23,7 @@ class NodeTitleXSSTest extends NodeTestBase {
   /**
    * Tests XSS functionality with a node entity.
    */
-  public function testNodeTitleXSS() {
+  public function testNodeTitleXSS(): void {
     // Prepare a user to do the stuff.
     $web_user = $this->drupalCreateUser([
       'create page content',
@@ -33,20 +36,21 @@ class NodeTitleXSSTest extends NodeTestBase {
     $edit = [];
     $edit['title[0][value]'] = $title;
 
-    $this->drupalPostForm('node/add/page', $edit, 'Preview');
+    $this->drupalGet('node/add/page');
+    $this->submitForm($edit, 'Preview');
     // Verify that harmful tags are escaped when previewing a node.
-    $this->assertNoRaw($xss);
+    $this->assertSession()->responseNotContains($xss);
 
     $settings = ['title' => $title];
     $node = $this->drupalCreateNode($settings);
 
     $this->drupalGet('node/' . $node->id());
     // Titles should be escaped.
-    $this->assertRaw('<title>' . Html::escape($title) . ' | Drupal</title>');
-    $this->assertNoRaw($xss);
+    $this->assertSession()->responseContains('<title>' . Html::escape($title) . ' | Drupal</title>');
+    $this->assertSession()->responseNotContains($xss);
 
     $this->drupalGet('node/' . $node->id() . '/edit');
-    $this->assertNoRaw($xss);
+    $this->assertSession()->responseNotContains($xss);
   }
 
 }

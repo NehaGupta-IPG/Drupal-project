@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests .htaccess is working correctly.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class HtaccessTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'path'];
 
@@ -31,7 +33,7 @@ class HtaccessTest extends BrowserTestBase {
    *   for example, 200 or 403.
    */
   protected function getProtectedFiles() {
-    $path = drupal_get_path('module', 'system') . '/tests/fixtures/HtaccessTest';
+    $path = $this->getModulePath('system') . '/tests/fixtures/HtaccessTest';
 
     // Tests the FilesMatch directive which denies access to certain file
     // extensions.
@@ -91,9 +93,12 @@ class HtaccessTest extends BrowserTestBase {
     $file_paths["$path/composer.json"] = 403;
     $file_paths["$path/composer.lock"] = 403;
 
+    // Ensure package.json and yarn.lock cannot be accessed.
+    $file_paths["$path/package.json"] = 403;
+    $file_paths["$path/yarn.lock"] = 403;
+
     // Ensure web server configuration files cannot be accessed.
     $file_paths["$path/.htaccess"] = 403;
-    $file_paths["$path/web.config"] = 403;
 
     return $file_paths;
   }
@@ -101,7 +106,7 @@ class HtaccessTest extends BrowserTestBase {
   /**
    * Iterates over protected files and calls assertNoFileAccess().
    */
-  public function testFileAccess() {
+  public function testFileAccess(): void {
     foreach ($this->getProtectedFiles() as $file => $response_code) {
       $this->assertFileAccess($file, $response_code);
     }
@@ -122,14 +127,14 @@ class HtaccessTest extends BrowserTestBase {
     $node->save();
     $this->drupalGet('test.php');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertText('This is a node');
+    $this->assertSession()->pageTextContains('This is a node');
 
     // Update node's alias to test.php/test.
     $node->path = '/test.php/test';
     $node->save();
     $this->drupalGet('test.php/test');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertText('This is a node');
+    $this->assertSession()->pageTextContains('This is a node');
   }
 
   /**
@@ -139,8 +144,10 @@ class HtaccessTest extends BrowserTestBase {
    *   Path to file. Without leading slash.
    * @param int $response_code
    *   The expected response code. For example: 200, 403 or 404.
+   *
+   * @internal
    */
-  protected function assertFileAccess($path, $response_code) {
+  protected function assertFileAccess(string $path, int $response_code): void {
     $this->assertFileExists(\Drupal::root() . '/' . $path);
     $this->drupalGet($path);
     $this->assertEquals($response_code, $this->getSession()->getStatusCode(), "Response code to $path should be $response_code");
@@ -149,7 +156,7 @@ class HtaccessTest extends BrowserTestBase {
   /**
    * Tests that SVGZ files are served with Content-Encoding: gzip.
    */
-  public function testSvgzContentEncoding() {
+  public function testSvgzContentEncoding(): void {
     $this->drupalGet('core/modules/system/tests/logo.svgz');
     $this->assertSession()->statusCodeEquals(200);
 

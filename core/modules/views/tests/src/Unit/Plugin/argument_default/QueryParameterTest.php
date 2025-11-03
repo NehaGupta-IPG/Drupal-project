@@ -1,27 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Unit\Plugin\argument_default;
 
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Plugin\views\argument_default\QueryParameter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @coversDefaultClass \Drupal\views\Plugin\views\argument_default\QueryParameter
- * @group views
+ * Tests Drupal\views\Plugin\views\argument_default\QueryParameter.
  */
+#[CoversClass(QueryParameter::class)]
+#[Group('views')]
 class QueryParameterTest extends UnitTestCase {
 
   /**
-   * Test the getArgument() method.
+   * Tests the getArgument() method.
    *
-   * @covers ::getArgument
-   * @dataProvider providerGetArgument
+   * @legacy-covers ::getArgument
    */
-  public function testGetArgument($options, Request $request, $expected) {
+  #[DataProvider('providerGetArgument')]
+  public function testGetArgument($options, Request $request, $expected): void {
     $view = $this->getMockBuilder('Drupal\views\ViewExecutable')
       ->disableOriginalConstructor()
-      ->setMethods(NULL)
+      ->onlyMethods([])
       ->getMock();
     $view->setRequest($request);
     $display_plugin = $this->getMockBuilder('Drupal\views\Plugin\views\display\DisplayPluginBase')
@@ -42,7 +48,7 @@ class QueryParameterTest extends UnitTestCase {
    *   - second entry: the request object to test with.
    *   - third entry: the expected default argument value.
    */
-  public function providerGetArgument() {
+  public static function providerGetArgument() {
     $data = [];
 
     $data[] = [
@@ -64,9 +70,27 @@ class QueryParameterTest extends UnitTestCase {
     ];
 
     $data[] = [
-      ['query_param' => 'test', 'fallback' => 'blub'],
+      ['query_param' => 'test', 'fallback' => 'foo'],
       new Request([]),
-      'blub',
+      'foo',
+    ];
+
+    $data[] = [
+      ['query_param' => 'test[tier1][tier2][tier3]'],
+      new Request(['test' => ['tier1' => ['tier2' => ['tier3' => 'foo']]]]),
+      'foo',
+    ];
+
+    $data[] = [
+      ['query_param' => 'test[tier1][tier2]'],
+      new Request(['test' => ['tier1' => ['tier2' => ['foo', 'bar']]]]),
+      'foo,bar',
+    ];
+
+    $data[] = [
+      ['query_param' => 'test[tier1][tier2]'],
+      new Request(['test' => 'foo']),
+      NULL,
     ];
 
     return $data;

@@ -1,25 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
+use Drupal\comment\CommentInterface;
+use Drupal\comment\Entity\Comment;
 use Drupal\Component\Utility\Html;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\user\RoleInterface;
-use Drupal\comment\Entity\Comment;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests comment approval functionality.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentAdminTest extends CommentTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -27,9 +34,9 @@ class CommentAdminTest extends CommentTestBase {
   }
 
   /**
-   * Test comment approval functionality through admin/content/comment.
+   * Tests comment approval functionality through admin/content/comment.
    */
-  public function testApprovalAdminInterface() {
+  public function testApprovalAdminInterface(): void {
     // Set anonymous comments to require approval.
     user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments' => TRUE,
@@ -38,11 +45,11 @@ class CommentAdminTest extends CommentTestBase {
     ]);
     $this->drupalLogin($this->adminUser);
     // Ensure that doesn't require contact info.
-    $this->setCommentAnonymous('0');
+    $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
 
-    // Test that the comments page loads correctly when there are no comments
+    // Test that the comments page loads correctly when there are no comments.
     $this->drupalGet('admin/content/comment');
-    $this->assertText('No comments available.');
+    $this->assertSession()->pageTextContains('No comments available.');
 
     $this->drupalLogout();
 
@@ -51,7 +58,7 @@ class CommentAdminTest extends CommentTestBase {
     $body = $this->randomMachineName();
     // Set $contact to true so that it won't check for id and message.
     $this->postComment($this->node, $body, $subject, TRUE);
-    $this->assertText('Your comment has been queued for review by site administrators and will be published after approval.');
+    $this->assertSession()->pageTextContains('Your comment has been queued for review by site administrators and will be published after approval.');
 
     // Get unapproved comment id.
     $this->drupalLogin($this->adminUser);
@@ -83,13 +90,13 @@ class CommentAdminTest extends CommentTestBase {
     // Publish multiple comments in one operation.
     $this->drupalLogin($this->adminUser);
     $this->drupalGet('admin/content/comment/approval');
-    $this->assertText('Unapproved comments (2)');
+    $this->assertSession()->pageTextContains('Unapproved comments (2)');
     $edit = [
       "comments[{$comments[0]->id()}]" => 1,
       "comments[{$comments[1]->id()}]" => 1,
     ];
     $this->submitForm($edit, 'Update');
-    $this->assertText('Unapproved comments (0)');
+    $this->assertSession()->pageTextContains('Unapproved comments (0)');
 
     // Delete multiple comments in one operation.
     $edit = [
@@ -99,47 +106,45 @@ class CommentAdminTest extends CommentTestBase {
       "comments[{$anonymous_comment4->id()}]" => 1,
     ];
     $this->submitForm($edit, 'Update');
-    $this->assertText('Are you sure you want to delete these comments and all their children?');
+    $this->assertSession()->pageTextContains('Are you sure you want to delete these comments and all their children?');
     $this->submitForm([], 'Delete');
-    $this->assertText('No comments available.');
+    $this->assertSession()->pageTextContains('No comments available.');
     // Test message when no comments selected.
     $edit = [
       'operation' => 'delete',
     ];
     $this->submitForm($edit, 'Update');
-    $this->assertText('Select one or more comments to perform the update on.');
+    $this->assertSession()->pageTextContains('Select one or more comments to perform the update on.');
 
     // Make sure the label of unpublished node is not visible on listing page.
     $this->drupalGet('admin/content/comment');
     $this->postComment($this->node, $this->randomMachineName());
     $this->drupalGet('admin/content/comment');
-    $this->assertText(Html::escape($this->node->label()));
+    $this->assertSession()->pageTextContains(Html::escape($this->node->label()));
     $this->node->setUnpublished()->save();
     $this->drupalGet('admin/content/comment');
-    $this->assertNoText(Html::escape($this->node->label()));
+    $this->assertSession()->pageTextNotContains(Html::escape($this->node->label()));
   }
 
   /**
    * Tests comment approval functionality through the node interface.
    */
-  public function testApprovalNodeInterface() {
+  public function testApprovalNodeInterface(): void {
     // Set anonymous comments to require approval.
     user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments' => TRUE,
       'post comments' => TRUE,
       'skip comment approval' => FALSE,
     ]);
-    $this->drupalLogin($this->adminUser);
     // Ensure that doesn't require contact info.
-    $this->setCommentAnonymous('0');
-    $this->drupalLogout();
+    $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
 
     // Post anonymous comment without contact info.
     $subject = $this->randomMachineName();
     $body = $this->randomMachineName();
     // Set $contact to true so that it won't check for id and message.
     $this->postComment($this->node, $body, $subject, TRUE);
-    $this->assertText('Your comment has been queued for review by site administrators and will be published after approval.');
+    $this->assertSession()->pageTextContains('Your comment has been queued for review by site administrators and will be published after approval.');
 
     // Get unapproved comment id.
     $this->drupalLogin($this->adminUser);
@@ -167,7 +172,7 @@ class CommentAdminTest extends CommentTestBase {
     $this->drupalGet('comment/1/edit');
     $this->assertSession()->checkboxChecked('edit-status-0');
     $this->drupalGet('node/' . $this->node->id());
-    $this->clickLink(t('Approve'));
+    $this->clickLink('Approve');
     $this->drupalLogout();
 
     $this->drupalGet('node/' . $this->node->id());
@@ -177,29 +182,29 @@ class CommentAdminTest extends CommentTestBase {
   /**
    * Tests comment bundle admin.
    */
-  public function testCommentAdmin() {
+  public function testCommentAdmin(): void {
     // Login.
     $this->drupalLogin($this->adminUser);
     // Browse to comment bundle overview.
     $this->drupalGet('admin/structure/comment');
     $this->assertSession()->statusCodeEquals(200);
     // Make sure titles visible.
-    $this->assertText('Comment type');
-    $this->assertText('Description');
+    $this->assertSession()->pageTextContains('Comment type');
+    $this->assertSession()->pageTextContains('Description');
     // Make sure the description is present.
-    $this->assertText('Default comment field');
+    $this->assertSession()->pageTextContains('Default comment field');
     // Manage fields.
     $this->clickLink('Manage fields');
     $this->assertSession()->statusCodeEquals(200);
     // Make sure comment_body field is shown.
-    $this->assertText('comment_body');
+    $this->assertSession()->pageTextContains('comment_body');
     // Rest from here on in is field_ui.
   }
 
   /**
    * Tests editing a comment as an admin.
    */
-  public function testEditComment() {
+  public function testEditComment(): void {
     // Enable anonymous user comments.
     user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments',
@@ -215,15 +220,18 @@ class CommentAdminTest extends CommentTestBase {
     $this->drupalLogout();
 
     // Post anonymous comment.
-    $this->drupalLogin($this->adminUser);
     // Ensure that we need email id before posting comment.
-    $this->setCommentAnonymous('2');
-    $this->drupalLogout();
+    $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MUST_CONTACT);
 
     // Post comment with contact info (required).
     $author_name = $this->randomMachineName();
     $author_mail = $this->randomMachineName() . '@example.com';
-    $anonymous_comment = $this->postComment($this->node, $this->randomMachineName(), $this->randomMachineName(), ['name' => $author_name, 'mail' => $author_mail]);
+    $anonymous_comment = $this->postComment(
+      $this->node,
+      $this->randomMachineName(),
+      $this->randomMachineName(),
+      ['name' => $author_name, 'mail' => $author_mail],
+    );
 
     // Log in as an admin user.
     $this->drupalLogin($this->adminUser);
@@ -242,7 +250,7 @@ class CommentAdminTest extends CommentTestBase {
   /**
    * Tests commented translation deletion admin view.
    */
-  public function testCommentedTranslationDeletion() {
+  public function testCommentedTranslationDeletion(): void {
     \Drupal::service('module_installer')->install([
       'language',
       'locale',
@@ -253,11 +261,12 @@ class CommentAdminTest extends CommentTestBase {
     // Rebuild the container to update the default language container variable.
     $this->rebuildContainer();
     // Ensure that doesn't require contact info.
-    $this->setCommentAnonymous('0');
+    $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
     $this->drupalLogin($this->webUser);
     $count_query = \Drupal::entityTypeManager()
       ->getStorage('comment')
       ->getQuery()
+      ->accessCheck(FALSE)
       ->count();
     $before_count = $count_query->execute();
     // Post 2 anonymous comments without contact info.
@@ -276,14 +285,15 @@ class CommentAdminTest extends CommentTestBase {
       "comments[{$comment1->id()}]" => 1,
       "comments[{$comment2->id()}]" => 1,
     ];
-    $this->drupalPostForm('admin/content/comment', $edit, 'Update');
-    $this->assertRaw(new FormattableMarkup('@label (Original translation) - <em>The following comment translations will be deleted:</em>', ['@label' => $comment1->label()]));
-    $this->assertRaw(new FormattableMarkup('@label (Original translation) - <em>The following comment translations will be deleted:</em>', ['@label' => $comment2->label()]));
-    $this->assertText('English');
-    $this->assertText('Urdu');
+    $this->drupalGet('admin/content/comment');
+    $this->submitForm($edit, 'Update');
+    $this->assertSession()->responseContains($comment1->label() . " (Original translation) - <em>The following comment translations will be deleted:</em>");
+    $this->assertSession()->responseContains($comment2->label() . " (Original translation) - <em>The following comment translations will be deleted:</em>");
+    $this->assertSession()->pageTextContains('English');
+    $this->assertSession()->pageTextContains('Urdu');
     $this->submitForm([], 'Delete');
     $after_count = $count_query->execute();
-    $this->assertEqual($before_count, $after_count, 'No comment or translation found.');
+    $this->assertEquals($before_count, $after_count, 'No comment or translation found.');
   }
 
 }

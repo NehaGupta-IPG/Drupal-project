@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Kernel\Normalizer;
 
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -8,20 +10,25 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\jsonapi\Normalizer\FieldItemNormalizer;
 use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
 use Drupal\Tests\jsonapi\Kernel\JsonapiKernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\jsonapi\Normalizer\FieldItemNormalizer
- * @group jsonapi
+ * Tests Drupal\jsonapi\Normalizer\FieldItemNormalizer.
  *
  * @internal
  */
+#[CoversClass(FieldItemNormalizer::class)]
+#[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class FieldItemNormalizerTest extends JsonapiKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
+    'file',
     'user',
     'link',
     'entity_test',
@@ -55,7 +62,7 @@ class FieldItemNormalizerTest extends JsonapiKernelTestBase {
   /**
    * Tests a field item that has no properties.
    *
-   * @covers ::normalize
+   * @legacy-covers ::normalize
    */
   public function testNormalizeFieldItemWithoutProperties(): void {
     $item = $this->prophesize(FieldItemInterface::class);

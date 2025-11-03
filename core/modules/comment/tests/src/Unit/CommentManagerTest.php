@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Unit;
 
 use Drupal\comment\CommentManager;
@@ -9,45 +11,48 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\comment\CommentManager
- * @group comment
+ * Tests Drupal\comment\CommentManager.
  */
+#[CoversClass(CommentManager::class)]
+#[Group('comment')]
 class CommentManagerTest extends UnitTestCase {
 
   /**
    * Tests the getFields method.
    *
-   * @covers ::getFields
+   * @legacy-covers ::getFields
    */
-  public function testGetFields() {
+  public function testGetFields(): void {
     // Set up a content entity type.
     $entity_type = $this->createMock('Drupal\Core\Entity\ContentEntityTypeInterface');
     $entity_type->expects($this->any())
       ->method('getClass')
-      ->will($this->returnValue('Node'));
+      ->willReturn('Node');
     $entity_type->expects($this->any())
       ->method('entityClassImplements')
       ->with(FieldableEntityInterface::class)
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
 
     $entity_field_manager = $this->createMock(EntityFieldManagerInterface::class);
     $entity_type_manager = $this->createMock(EntityTypeManagerInterface::class);
 
     $entity_field_manager->expects($this->once())
       ->method('getFieldMapByFieldType')
-      ->will($this->returnValue([
+      ->willReturn([
         'node' => [
           'field_foobar' => [
             'type' => 'comment',
           ],
         ],
-      ]));
+      ]);
 
     $entity_type_manager->expects($this->any())
       ->method('getDefinition')
-      ->will($this->returnValue($entity_type));
+      ->willReturn($entity_type);
 
     $comment_manager = new CommentManager(
       $entity_type_manager,

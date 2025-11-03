@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Action;
 
 use Drupal\Core\Action\ActionInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Entity\Action;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests action plugins.
- *
- * @group Action
  */
+#[Group('Action')]
+#[RunTestsInSeparateProcesses]
 class ActionTest extends KernelTestBase {
 
   /**
@@ -34,24 +38,24 @@ class ActionTest extends KernelTestBase {
 
     $this->actionManager = $this->container->get('plugin.manager.action');
     $this->installEntitySchema('user');
-    $this->installSchema('system', ['sequences']);
+    $this->installConfig('user');
   }
 
   /**
    * Tests the functionality of test actions.
    */
-  public function testOperations() {
+  public function testOperations(): void {
     // Test that actions can be discovered.
     $definitions = $this->actionManager->getDefinitions();
     // Verify that the action definitions are found.
     $this->assertGreaterThan(1, count($definitions));
-    $this->assertTrue(!empty($definitions['action_test_no_type']), 'The test action is among the definitions found.');
+    $this->assertNotEmpty($definitions['action_test_no_type'], 'The test action is among the definitions found.');
 
     $definition = $this->actionManager->getDefinition('action_test_no_type');
-    $this->assertTrue(!empty($definition), 'The test action definition is found.');
+    $this->assertNotEmpty($definition, 'The test action definition is found.');
 
     $definitions = $this->actionManager->getDefinitionsByType('user');
-    $this->assertTrue(empty($definitions['action_test_no_type']), 'An action with no type is not found.');
+    $this->assertArrayNotHasKey('action_test_no_type', $definitions, 'An action with no type is not found.');
 
     // Create an instance of the 'save entity' action.
     $action = $this->actionManager->createInstance('action_test_save_entity');
@@ -69,18 +73,18 @@ class ActionTest extends KernelTestBase {
     $loaded_accounts = $user_storage->loadMultiple();
     $this->assertCount(1, $loaded_accounts);
     $account = reset($loaded_accounts);
-    $this->assertEqual($name, $account->label());
+    $this->assertEquals($name, $account->label());
   }
 
   /**
    * Tests the dependency calculation of actions.
    */
-  public function testDependencies() {
+  public function testDependencies(): void {
     // Create a new action that depends on a user role.
     $action = Action::create([
       'id' => 'user_add_role_action.' . RoleInterface::ANONYMOUS_ID,
       'type' => 'user',
-      'label' => t('Add the anonymous role to the selected users'),
+      'label' => 'Add the anonymous role to the selected users',
       'configuration' => [
         'rid' => RoleInterface::ANONYMOUS_ID,
       ],
@@ -97,6 +101,28 @@ class ActionTest extends KernelTestBase {
       ],
     ];
     $this->assertSame($expected, $action->calculateDependencies()->getDependencies());
+  }
+
+  /**
+   * Tests no type specified action.
+   */
+  public function testNoTypeAction(): void {
+    // Create an action config entity using the action_test_no_type plugin.
+    $action = Action::create([
+      'id' => 'action_test_no_type_action',
+      'label' => 'Test Action with No Type',
+      'plugin' => 'action_test_no_type',
+    ]);
+    $action->save();
+
+    // Reload the action to ensure it's saved correctly.
+    $action = Action::load('action_test_no_type_action');
+
+    // Assert that the action was saved and loaded correctly.
+    $this->assertNotNull($action, 'The action config entity was saved and loaded correctly.');
+    $this->assertSame('action_test_no_type_action', $action->id(), 'The action ID is correct.');
+    $this->assertSame('Test Action with No Type', $action->label(), 'The action label is correct.');
+    $this->assertNull($action->getType(), 'The action type is correctly set to NULL.');
   }
 
 }

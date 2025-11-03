@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests comment block functionality.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentBlockTest extends CommentTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'views'];
 
@@ -23,6 +25,9 @@ class CommentBlockTest extends CommentTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
     // Update admin user to have the 'administer blocks' permission.
@@ -34,20 +39,20 @@ class CommentBlockTest extends CommentTestBase {
       'access comments',
       'access content',
       'administer blocks',
-     ]);
+    ]);
   }
 
   /**
    * Tests the recent comments block.
    */
-  public function testRecentCommentBlock() {
+  public function testRecentCommentBlock(): void {
     $this->drupalLogin($this->adminUser);
     $this->drupalPlaceBlock('views_block:comments_recent-block_1');
 
     // Add some test comments, with and without subjects. Because the 10 newest
     // comments should be shown by the block, we create 11 to test that behavior
     // below.
-    $timestamp = REQUEST_TIME;
+    $timestamp = \Drupal::time()->getRequestTime();
     for ($i = 0; $i < 11; ++$i) {
       $subject = ($i % 2) ? $this->randomMachineName() : '';
       $comments[$i] = $this->postComment($this->node, $this->randomMachineName(), $subject);
@@ -60,19 +65,19 @@ class CommentBlockTest extends CommentTestBase {
     $this->drupalLogout();
     user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, ['access comments']);
     $this->drupalGet('');
-    $this->assertNoText('Recent comments');
+    $this->assertSession()->pageTextNotContains('Recent comments');
     user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access comments']);
 
     // Test that a user with the 'access comments' permission can see the
     // block.
     $this->drupalLogin($this->webUser);
     $this->drupalGet('');
-    $this->assertText('Recent comments');
+    $this->assertSession()->pageTextContains('Recent comments');
 
     // Test the only the 10 latest comments are shown and in the proper order.
-    $this->assertNoText($comments[10]->getSubject());
+    $this->assertSession()->pageTextNotContains($comments[10]->getSubject());
     for ($i = 0; $i < 10; $i++) {
-      $this->assertText($comments[$i]->getSubject());
+      $this->assertSession()->pageTextContains($comments[$i]->getSubject());
       if ($i > 1) {
         $previous_position = $position;
         $position = strpos($this->getSession()->getPage()->getContent(), $comments[$i]->getSubject());
@@ -86,8 +91,8 @@ class CommentBlockTest extends CommentTestBase {
 
     for ($i = 0; $i < 10; $i++) {
       $this->clickLink($comments[$i]->getSubject());
-      $this->assertText($comments[$i]->getSubject());
-      $this->assertRaw('<link rel="canonical"');
+      $this->assertSession()->pageTextContains($comments[$i]->getSubject());
+      $this->assertSession()->responseContains('<link rel="canonical"');
     }
   }
 

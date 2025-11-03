@@ -1,21 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\language\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests enabling Language if a module exists that calls
- * LanguageManager::getLanguages() during installation.
- *
- * @group language
+ * Tests that the language list is not empty when language is installed.
  */
+#[Group('language')]
+#[RunTestsInSeparateProcesses]
 class LanguageListModuleInstallTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language_test'];
 
@@ -27,7 +28,7 @@ class LanguageListModuleInstallTest extends BrowserTestBase {
   /**
    * Tests enabling Language.
    */
-  public function testModuleInstallLanguageList() {
+  public function testModuleInstallLanguageList(): void {
     // Since LanguageManager::getLanguages() uses static caches we need to do
     // this by enabling the module using the UI.
     $admin_user = $this->drupalCreateUser([
@@ -37,9 +38,10 @@ class LanguageListModuleInstallTest extends BrowserTestBase {
     $this->drupalLogin($admin_user);
     $edit = [];
     $edit['modules[language][enable]'] = 'language';
-    $this->drupalPostForm('admin/modules', $edit, 'Install');
+    $this->drupalGet('admin/modules');
+    $this->submitForm($edit, 'Install');
 
-    $this->assertEqual(1, \Drupal::state()->get('language_test.language_count_preinstall', 0), 'Using LanguageManager::getLanguages() returns 1 language during Language installation.');
+    $this->assertEquals(1, \Drupal::state()->get('language_test.language_count_preinstall', 0), 'Using LanguageManager::getLanguages() returns 1 language during Language installation.');
 
     // Get updated module list by rebuilding container.
     $this->rebuildContainer();

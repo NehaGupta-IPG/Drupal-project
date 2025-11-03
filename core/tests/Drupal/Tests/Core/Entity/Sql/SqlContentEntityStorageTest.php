@@ -1,30 +1,33 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\Core\Entity\Sql\SqlContentEntityStorageTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Entity\Sql;
 
-use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Component\Datetime\Time;
 use Drupal\Core\Cache\MemoryCache\MemoryCache;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityFieldManager;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Entity\Query\QueryFactoryInterface;
 use Drupal\Core\Entity\Sql\DefaultTableMapping;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\Core\Language\Language;
+use Drupal\Tests\Core\Entity\ContentEntityBaseMockableClass;
+use Drupal\Tests\Core\Entity\StubEntityBase;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use Prophecy\Argument;
 
 /**
- * @coversDefaultClass \Drupal\Core\Entity\Sql\SqlContentEntityStorage
- * @group Entity
+ * Tests Drupal\Core\Entity\Sql\SqlContentEntityStorage.
  */
+#[CoversClass(SqlContentEntityStorage::class)]
+#[Group('Entity')]
 class SqlContentEntityStorageTest extends UnitTestCase {
 
   /**
@@ -115,29 +118,31 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->entityType = $this->createMock('Drupal\Core\Entity\ContentEntityTypeInterface');
     $this->entityType->expects($this->any())
       ->method('id')
-      ->will($this->returnValue($this->entityTypeId));
+      ->willReturn($this->entityTypeId);
 
     $this->container = new ContainerBuilder();
     \Drupal::setContainer($this->container);
 
-    $this->entityTypeManager = $this->createMock(EntityTypeManager::class);
+    $this->entityTypeManager = $this->prophesize(EntityTypeManager::class);
     $this->entityTypeBundleInfo = $this->createMock(EntityTypeBundleInfoInterface::class);
-    $this->entityFieldManager = $this->createMock(EntityFieldManager::class);
+    $this->entityFieldManager = $this->prophesize(EntityFieldManager::class);
     $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
     $this->cache = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
     $this->languageManager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
     $this->languageManager->expects($this->any())
       ->method('getDefaultLanguage')
-      ->will($this->returnValue(new Language(['langcode' => 'en'])));
+      ->willReturn(new Language(['langcode' => 'en']));
     $this->connection = $this->getMockBuilder('Drupal\Core\Database\Connection')
       ->disableOriginalConstructor()
       ->getMock();
 
-    $this->container->set('entity_type.manager', $this->entityTypeManager);
-    $this->container->set('entity_field.manager', $this->entityFieldManager);
+    $this->container->set('entity_type.manager', $this->entityTypeManager->reveal());
+    $this->container->set('entity_field.manager', $this->entityFieldManager->reveal());
   }
 
   /**
@@ -149,12 +154,11 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    *   The expected return value of
    *   SqlContentEntityStorage::getBaseTable().
    *
-   * @covers ::__construct
-   * @covers ::getBaseTable
-   *
-   * @dataProvider providerTestGetBaseTable
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getBaseTable
    */
-  public function testGetBaseTable($base_table, $expected) {
+  #[DataProvider('providerTestGetBaseTable')]
+  public function testGetBaseTable($base_table, $expected): void {
     $this->entityType->expects($this->once())
       ->method('getBaseTable')
       ->willReturn($base_table);
@@ -173,7 +177,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    *   value of SqlContentEntityStorage::getBaseTable() as the second
    *   value.
    */
-  public function providerTestGetBaseTable() {
+  public static function providerTestGetBaseTable() {
     return [
       // Test that the entity type's base table is used, if provided.
       ['entity_test', 'entity_test'],
@@ -191,18 +195,17 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    *   The expected return value of
    *   SqlContentEntityStorage::getRevisionTable().
    *
-   * @covers ::__construct
-   * @covers ::getRevisionTable
-   *
-   * @dataProvider providerTestGetRevisionTable
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getRevisionTable
    */
-  public function testGetRevisionTable($revision_table, $expected) {
+  #[DataProvider('providerTestGetRevisionTable')]
+  public function testGetRevisionTable($revision_table, $expected): void {
     $this->entityType->expects($this->any())
       ->method('isRevisionable')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
     $this->entityType->expects($this->once())
       ->method('getRevisionTable')
-      ->will($this->returnValue($revision_table));
+      ->willReturn($revision_table);
     $this->entityType->expects($this->any())
       ->method('getRevisionMetadataKeys')
       ->willReturn([]);
@@ -221,7 +224,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    *   return value of SqlContentEntityStorage::getRevisionTable() as the
    *   second value.
    */
-  public function providerTestGetRevisionTable() {
+  public static function providerTestGetRevisionTable() {
     return [
       // Test that the entity type's revision table is used, if provided.
       ['entity_test_revision', 'entity_test_revision'],
@@ -234,16 +237,16 @@ class SqlContentEntityStorageTest extends UnitTestCase {
   /**
    * Tests SqlContentEntityStorage::getDataTable().
    *
-   * @covers ::__construct
-   * @covers ::getDataTable
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getDataTable
    */
-  public function testGetDataTable() {
+  public function testGetDataTable(): void {
     $this->entityType->expects($this->any())
       ->method('isTranslatable')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
     $this->entityType->expects($this->exactly(1))
       ->method('getDataTable')
-      ->will($this->returnValue('entity_test_field_data'));
+      ->willReturn('entity_test_field_data');
     $this->entityType->expects($this->any())
       ->method('getRevisionMetadataKeys')
       ->willReturn([]);
@@ -262,24 +265,23 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    *   The expected return value of
    *   SqlContentEntityStorage::getRevisionDataTable().
    *
-   * @covers ::__construct
-   * @covers ::getRevisionDataTable
-   *
-   * @dataProvider providerTestGetRevisionDataTable
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getRevisionDataTable
    */
-  public function testGetRevisionDataTable($revision_data_table, $expected) {
+  #[DataProvider('providerTestGetRevisionDataTable')]
+  public function testGetRevisionDataTable($revision_data_table, $expected): void {
     $this->entityType->expects($this->any())
       ->method('isRevisionable')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
     $this->entityType->expects($this->any())
       ->method('isTranslatable')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
     $this->entityType->expects($this->exactly(1))
       ->method('getDataTable')
-      ->will($this->returnValue('entity_test_field_data'));
+      ->willReturn('entity_test_field_data');
     $this->entityType->expects($this->once())
       ->method('getRevisionDataTable')
-      ->will($this->returnValue($revision_data_table));
+      ->willReturn($revision_data_table);
     $this->entityType->expects($this->any())
       ->method('getRevisionMetadataKeys')
       ->willReturn([]);
@@ -299,7 +301,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    *   return value of SqlContentEntityStorage::getRevisionDataTable() as
    *   the second value.
    */
-  public function providerTestGetRevisionDataTable() {
+  public static function providerTestGetRevisionDataTable() {
     return [
       // Test that the entity type's revision data table is used, if provided.
       ['entity_test_field_revision', 'entity_test_field_revision'],
@@ -312,15 +314,15 @@ class SqlContentEntityStorageTest extends UnitTestCase {
   /**
    * Tests that setting a new table mapping also updates the table names.
    *
-   * @covers ::setTableMapping
+   * @legacy-covers ::setTableMapping
    */
-  public function testSetTableMapping() {
+  public function testSetTableMapping(): void {
     $this->entityType->expects($this->any())
       ->method('isRevisionable')
-      ->will($this->returnValue(FALSE));
+      ->willReturn(FALSE);
     $this->entityType->expects($this->any())
       ->method('isTranslatable')
-      ->will($this->returnValue(FALSE));
+      ->willReturn(FALSE);
     $this->entityType->expects($this->any())
       ->method('getRevisionMetadataKeys')
       ->willReturn([]);
@@ -337,13 +339,13 @@ class SqlContentEntityStorageTest extends UnitTestCase {
     $updated_entity_type = $this->createMock('Drupal\Core\Entity\ContentEntityTypeInterface');
     $updated_entity_type->expects($this->any())
       ->method('id')
-      ->will($this->returnValue($this->entityTypeId));
+      ->willReturn($this->entityTypeId);
     $updated_entity_type->expects($this->any())
       ->method('isRevisionable')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
     $updated_entity_type->expects($this->any())
       ->method('isTranslatable')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
 
     $table_mapping = new DefaultTableMapping($updated_entity_type, []);
     $this->entityStorage->setTableMapping($table_mapping);
@@ -357,11 +359,11 @@ class SqlContentEntityStorageTest extends UnitTestCase {
   /**
    * Tests ContentEntityDatabaseStorage::onEntityTypeCreate().
    *
-   * @covers ::__construct
-   * @covers ::onEntityTypeCreate
-   * @covers ::getTableMapping
+   * @legacy-covers ::__construct
+   * @legacy-covers ::onEntityTypeCreate
+   * @legacy-covers ::getTableMapping
    */
-  public function testOnEntityTypeCreate() {
+  public function testOnEntityTypeCreate(): void {
     $columns = [
       'value' => [
         'type' => 'int',
@@ -371,24 +373,24 @@ class SqlContentEntityStorageTest extends UnitTestCase {
     $this->fieldDefinitions = $this->mockFieldDefinitions(['id']);
     $this->fieldDefinitions['id']->expects($this->any())
       ->method('getColumns')
-      ->will($this->returnValue($columns));
+      ->willReturn($columns);
     $this->fieldDefinitions['id']->expects($this->once())
       ->method('getSchema')
-      ->will($this->returnValue(['columns' => $columns]));
+      ->willReturn(['columns' => $columns]);
 
     $this->entityType->expects($this->once())
       ->method('getKeys')
-      ->will($this->returnValue(['id' => 'id']));
+      ->willReturn(['id' => 'id']);
     $this->entityType->expects($this->any())
       ->method('hasKey')
-      ->will($this->returnValueMap([
+      ->willReturnMap([
         // SqlContentEntityStorageSchema::initializeBaseTable()
         ['revision', FALSE],
         ['id', TRUE],
-      ]));
+      ]);
     $this->entityType->expects($this->any())
       ->method('getKey')
-      ->will($this->returnValueMap([
+      ->willReturnMap([
         // EntityStorageBase::__construct()
         ['id', 'id'],
         // ContentEntityStorageBase::__construct()
@@ -397,7 +399,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
         // SqlContentEntityStorageSchema::initializeBaseTable()
         ['id' => 'id'],
         ['id' => 'id'],
-      ]));
+      ]);
 
     $this->setUpEntityStorage();
 
@@ -424,27 +426,27 @@ class SqlContentEntityStorageTest extends UnitTestCase {
 
     $this->connection->expects($this->once())
       ->method('schema')
-      ->will($this->returnValue($schema_handler));
+      ->willReturn($schema_handler);
 
     $storage = $this->getMockBuilder('Drupal\Core\Entity\Sql\SqlContentEntityStorage')
-      ->setConstructorArgs([$this->entityType, $this->connection, $this->entityFieldManager, $this->cache, $this->languageManager, new MemoryCache(), $this->entityTypeBundleInfo, $this->entityTypeManager])
-      ->setMethods(['getStorageSchema'])
+      ->setConstructorArgs([$this->entityType, $this->connection, $this->entityFieldManager->reveal(), $this->cache, $this->languageManager, new MemoryCache(new Time()), $this->entityTypeBundleInfo, $this->entityTypeManager->reveal()])
+      ->onlyMethods(['getStorageSchema'])
       ->getMock();
 
     $key_value = $this->createMock('Drupal\Core\KeyValueStore\KeyValueStoreInterface');
     $schema_handler = $this->getMockBuilder('Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema')
-      ->setConstructorArgs([$this->entityTypeManager, $this->entityType, $storage, $this->connection, $this->entityFieldManager])
-      ->setMethods(['installedStorageSchema', 'createSharedTableSchema'])
+      ->setConstructorArgs([$this->entityTypeManager->reveal(), $this->entityType, $storage, $this->connection, $this->entityFieldManager->reveal()])
+      ->onlyMethods(['installedStorageSchema', 'createSharedTableSchema'])
       ->getMock();
     $schema_handler
       ->expects($this->any())
       ->method('installedStorageSchema')
-      ->will($this->returnValue($key_value));
+      ->willReturn($key_value);
 
     $storage
       ->expects($this->any())
       ->method('getStorageSchema')
-      ->will($this->returnValue($schema_handler));
+      ->willReturn($schema_handler);
 
     $storage->onEntityTypeCreate($this->entityType);
   }
@@ -452,10 +454,10 @@ class SqlContentEntityStorageTest extends UnitTestCase {
   /**
    * Tests getTableMapping() with an empty entity type.
    *
-   * @covers ::__construct
-   * @covers ::getTableMapping
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getTableMapping
    */
-  public function testGetTableMappingEmpty() {
+  public function testGetTableMappingEmpty(): void {
     $this->setUpEntityStorage();
 
     $mapping = $this->entityStorage->getTableMapping();
@@ -470,19 +472,18 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    * @param string[] $entity_keys
    *   A map of entity keys to use for the mocked entity type.
    *
-   * @covers ::__construct
-   * @covers ::getTableMapping
-   *
-   * @dataProvider providerTestGetTableMappingSimple()
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getTableMapping
    */
-  public function testGetTableMappingSimple(array $entity_keys) {
+  #[DataProvider('providerTestGetTableMappingSimple')]
+  public function testGetTableMappingSimple(array $entity_keys): void {
     $this->entityType->expects($this->any())
       ->method('getKey')
-      ->will($this->returnValueMap([
+      ->willReturnMap([
         ['id', $entity_keys['id']],
         ['uuid', $entity_keys['uuid']],
         ['bundle', $entity_keys['bundle']],
-      ]));
+      ]);
 
     $this->setUpEntityStorage();
 
@@ -502,12 +503,11 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    * @param string[] $entity_keys
    *   A map of entity keys to use for the mocked entity type.
    *
-   * @covers ::__construct
-   * @covers ::getTableMapping
-   *
-   * @dataProvider providerTestGetTableMappingSimple()
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getTableMapping
    */
-  public function testGetTableMappingSimpleWithFields(array $entity_keys) {
+  #[DataProvider('providerTestGetTableMappingSimple')]
+  public function testGetTableMappingSimpleWithFields(array $entity_keys): void {
     $base_field_names = ['title', 'description', 'owner'];
     $field_names = array_merge(array_values(array_filter($entity_keys)), $base_field_names);
     $this->fieldDefinitions = $this->mockFieldDefinitions($field_names);
@@ -526,7 +526,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    *   A nested array, where each inner array has a single value being a  map of
    *   entity keys to use for the mocked entity type.
    */
-  public function providerTestGetTableMappingSimple() {
+  public static function providerTestGetTableMappingSimple() {
     return [
       [['id' => 'test_id', 'bundle' => NULL, 'uuid' => NULL]],
       [['id' => 'test_id', 'bundle' => 'test_bundle', 'uuid' => NULL]],
@@ -538,10 +538,10 @@ class SqlContentEntityStorageTest extends UnitTestCase {
   /**
    * Tests getTableMapping() with a base field that requires a dedicated table.
    *
-   * @covers ::__construct
-   * @covers ::getTableMapping
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getTableMapping
    */
-  public function testGetTableMappingSimpleWithDedicatedStorageFields() {
+  public function testGetTableMappingSimpleWithDedicatedStorageFields(): void {
     $base_field_names = ['multi_valued_base_field'];
 
     // Set up one entity key in order to have a base table.
@@ -577,12 +577,11 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    * @param string[] $entity_keys
    *   A map of entity keys to use for the mocked entity type.
    *
-   * @covers ::__construct
-   * @covers ::getTableMapping
-   *
-   * @dataProvider providerTestGetTableMappingSimple()
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getTableMapping
    */
-  public function testGetTableMappingRevisionable(array $entity_keys) {
+  #[DataProvider('providerTestGetTableMappingSimple')]
+  public function testGetTableMappingRevisionable(array $entity_keys): void {
     // This allows to re-use the data provider.
     $entity_keys = [
       'id' => $entity_keys['id'],
@@ -593,18 +592,18 @@ class SqlContentEntityStorageTest extends UnitTestCase {
 
     $this->entityType->expects($this->exactly(4))
       ->method('isRevisionable')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
     $this->entityType->expects($this->any())
       ->method('getKey')
-      ->will($this->returnValueMap([
+      ->willReturnMap([
         ['id', $entity_keys['id']],
         ['uuid', $entity_keys['uuid']],
         ['bundle', $entity_keys['bundle']],
         ['revision', $entity_keys['revision']],
-      ]));
+      ]);
     $this->entityType->expects($this->any())
       ->method('getRevisionMetadataKeys')
-      ->will($this->returnValue([]));
+      ->willReturn([]);
 
     $this->setUpEntityStorage();
 
@@ -628,12 +627,11 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    * @param string[] $entity_keys
    *   A map of entity keys to use for the mocked entity type.
    *
-   * @covers ::__construct
-   * @covers ::getTableMapping
-   *
-   * @dataProvider providerTestGetTableMappingSimple()
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getTableMapping
    */
-  public function testGetTableMappingRevisionableWithFields(array $entity_keys) {
+  #[DataProvider('providerTestGetTableMappingSimple')]
+  public function testGetTableMappingRevisionableWithFields(array $entity_keys): void {
     // This allows to re-use the data provider.
     $entity_keys = [
       'id' => $entity_keys['id'],
@@ -666,19 +664,19 @@ class SqlContentEntityStorageTest extends UnitTestCase {
 
       $this->entityType->expects($this->exactly(4))
         ->method('isRevisionable')
-        ->will($this->returnValue(TRUE));
+        ->willReturn(TRUE);
       $this->entityType->expects($this->any())
         ->method('getKey')
-        ->will($this->returnValueMap([
+        ->willReturnMap([
           ['id', $entity_keys['id']],
           ['uuid', $entity_keys['uuid']],
           ['bundle', $entity_keys['bundle']],
           ['revision', $entity_keys['revision']],
-        ]));
+        ]);
 
       $this->entityType->expects($this->any())
         ->method('getRevisionMetadataKeys')
-        ->will($this->returnValue($revision_metadata_field_names));
+        ->willReturn($revision_metadata_field_names);
 
       $this->setUpEntityStorage();
 
@@ -706,29 +704,28 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    * @param string[] $entity_keys
    *   A map of entity keys to use for the mocked entity type.
    *
-   * @covers ::__construct
-   * @covers ::getTableMapping
-   *
-   * @dataProvider providerTestGetTableMappingSimple()
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getTableMapping
    */
-  public function testGetTableMappingTranslatable(array $entity_keys) {
+  #[DataProvider('providerTestGetTableMappingSimple')]
+  public function testGetTableMappingTranslatable(array $entity_keys): void {
     // This allows to re-use the data provider.
     $entity_keys['langcode'] = 'langcode';
 
     $this->entityType->expects($this->atLeastOnce())
       ->method('isTranslatable')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
     $this->entityType->expects($this->atLeastOnce())
       ->method('getDataTable')
-      ->will($this->returnValue('entity_test_field_data'));
+      ->willReturn('entity_test_field_data');
     $this->entityType->expects($this->any())
       ->method('getKey')
-      ->will($this->returnValueMap([
+      ->willReturnMap([
         ['id', $entity_keys['id']],
         ['uuid', $entity_keys['uuid']],
         ['bundle', $entity_keys['bundle']],
         ['langcode', $entity_keys['langcode']],
-      ]));
+      ]);
 
     $this->setUpEntityStorage();
 
@@ -762,12 +759,11 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    * @param string[] $entity_keys
    *   A map of entity keys to use for the mocked entity type.
    *
-   * @covers ::__construct
-   * @covers ::getTableMapping
-   *
-   * @dataProvider providerTestGetTableMappingSimple()
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getTableMapping
    */
-  public function testGetTableMappingTranslatableWithFields(array $entity_keys) {
+  #[DataProvider('providerTestGetTableMappingSimple')]
+  public function testGetTableMappingTranslatableWithFields(array $entity_keys): void {
     // This allows to re-use the data provider.
     $entity_keys['langcode'] = 'langcode';
 
@@ -777,18 +773,18 @@ class SqlContentEntityStorageTest extends UnitTestCase {
 
     $this->entityType->expects($this->atLeastOnce())
       ->method('isTranslatable')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
     $this->entityType->expects($this->atLeastOnce())
       ->method('getDataTable')
-      ->will($this->returnValue('entity_test_field_data'));
+      ->willReturn('entity_test_field_data');
     $this->entityType->expects($this->any())
       ->method('getKey')
-      ->will($this->returnValueMap([
+      ->willReturnMap([
         ['id', $entity_keys['id']],
         ['uuid', $entity_keys['uuid']],
         ['bundle', $entity_keys['bundle']],
         ['langcode', $entity_keys['langcode']],
-      ]));
+      ]);
 
     $this->setUpEntityStorage();
 
@@ -822,12 +818,11 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    * @param string[] $entity_keys
    *   A map of entity keys to use for the mocked entity type.
    *
-   * @covers ::__construct
-   * @covers ::getTableMapping
-   *
-   * @dataProvider providerTestGetTableMappingSimple()
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getTableMapping
    */
-  public function testGetTableMappingRevisionableTranslatable(array $entity_keys) {
+  #[DataProvider('providerTestGetTableMappingSimple')]
+  public function testGetTableMappingRevisionableTranslatable(array $entity_keys): void {
     // This allows to re-use the data provider.
     $entity_keys = [
       'id' => $entity_keys['id'],
@@ -844,25 +839,25 @@ class SqlContentEntityStorageTest extends UnitTestCase {
 
     $this->entityType->expects($this->atLeastOnce())
       ->method('isRevisionable')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
     $this->entityType->expects($this->atLeastOnce())
       ->method('isTranslatable')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
     $this->entityType->expects($this->atLeastOnce())
       ->method('getDataTable')
-      ->will($this->returnValue('entity_test_field_data'));
+      ->willReturn('entity_test_field_data');
     $this->entityType->expects($this->any())
       ->method('getKey')
-      ->will($this->returnValueMap([
+      ->willReturnMap([
         ['id', $entity_keys['id']],
         ['uuid', $entity_keys['uuid']],
         ['bundle', $entity_keys['bundle']],
         ['revision', $entity_keys['revision']],
         ['langcode', $entity_keys['langcode']],
-      ]));
+      ]);
     $this->entityType->expects($this->any())
       ->method('getRevisionMetadataKeys')
-      ->will($this->returnValue($revision_metadata_keys));
+      ->willReturn($revision_metadata_keys);
 
     $this->fieldDefinitions = $this->mockFieldDefinitions(array_values($revision_metadata_keys), ['isRevisionable' => TRUE]);
 
@@ -933,12 +928,11 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    * @param string[] $entity_keys
    *   A map of entity keys to use for the mocked entity type.
    *
-   * @covers ::__construct
-   * @covers ::getTableMapping
-   *
-   * @dataProvider providerTestGetTableMappingSimple()
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getTableMapping
    */
-  public function testGetTableMappingRevisionableTranslatableWithFields(array $entity_keys) {
+  #[DataProvider('providerTestGetTableMappingSimple')]
+  public function testGetTableMappingRevisionableTranslatableWithFields(array $entity_keys): void {
     // This allows to re-use the data provider.
     $entity_keys = [
       'id' => $entity_keys['id'],
@@ -971,25 +965,25 @@ class SqlContentEntityStorageTest extends UnitTestCase {
 
       $this->entityType->expects($this->atLeastOnce())
         ->method('isRevisionable')
-        ->will($this->returnValue(TRUE));
+        ->willReturn(TRUE);
       $this->entityType->expects($this->atLeastOnce())
         ->method('isTranslatable')
-        ->will($this->returnValue(TRUE));
+        ->willReturn(TRUE);
       $this->entityType->expects($this->atLeastOnce())
         ->method('getDataTable')
-        ->will($this->returnValue('entity_test_field_data'));
+        ->willReturn('entity_test_field_data');
       $this->entityType->expects($this->any())
         ->method('getKey')
-        ->will($this->returnValueMap([
+        ->willReturnMap([
           ['id', $entity_keys['id']],
           ['uuid', $entity_keys['uuid']],
           ['bundle', $entity_keys['bundle']],
           ['revision', $entity_keys['revision']],
           ['langcode', $entity_keys['langcode']],
-        ]));
+        ]);
       $this->entityType->expects($this->any())
         ->method('getRevisionMetadataKeys')
-        ->will($this->returnValue($revision_metadata_field_names));
+        ->willReturn($revision_metadata_field_names);
 
       $this->setUpEntityStorage();
 
@@ -1061,54 +1055,52 @@ class SqlContentEntityStorageTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::create
+   * Tests create.
+   *
+   * @legacy-covers ::create
    */
-  public function testCreate() {
+  public function testCreate(): void {
     $language_manager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
 
     $language = new Language(['id' => 'en']);
     $language_manager->expects($this->any())
       ->method('getCurrentLanguage')
-      ->will($this->returnValue($language));
+      ->willReturn($language);
 
-    $entity = $this->getMockBuilder('Drupal\Core\Entity\ContentEntityBase')
+    $entity = $this->getMockBuilder(ContentEntityBaseMockableClass::class)
       ->disableOriginalConstructor()
-      ->setMethods(['id'])
-      ->getMockForAbstractClass();
+      ->onlyMethods(['id'])
+      ->getMock();
 
     $this->entityType->expects($this->atLeastOnce())
       ->method('id')
-      ->will($this->returnValue($this->entityTypeId));
+      ->willReturn($this->entityTypeId);
     $this->entityType->expects($this->atLeastOnce())
       ->method('getClass')
-      ->will($this->returnValue(get_class($entity)));
+      ->willReturn(get_class($entity));
     $this->entityType->expects($this->atLeastOnce())
       ->method('getKeys')
-      ->will($this->returnValue(['id' => 'id']));
+      ->willReturn(['id' => 'id']);
 
     // ContentEntityStorageBase iterates over the entity which calls this method
     // internally in ContentEntityBase::getProperties().
-    $this->entityFieldManager->expects($this->once())
-      ->method('getFieldDefinitions')
-      ->will($this->returnValue([]));
+    $this->entityFieldManager
+      ->getFieldDefinitions(Argument::type('string'), Argument::type('string'))
+      ->willReturn([])
+      ->shouldBeCalledOnce();
 
     $this->entityType->expects($this->atLeastOnce())
       ->method('isRevisionable')
-      ->will($this->returnValue(FALSE));
-    $this->entityTypeManager->expects($this->atLeastOnce())
-      ->method('getDefinition')
-      ->with($this->entityType->id())
-      ->will($this->returnValue($this->entityType));
+      ->willReturn(FALSE);
+    $this->entityTypeManager
+      ->getDefinition($this->entityType->id())
+      ->willReturn($this->entityType)
+      ->shouldBeCalled();
 
     $this->setUpEntityStorage();
 
     $entity = $this->entityStorage->create();
-    $entity->expects($this->atLeastOnce())
-      ->method('id')
-      ->will($this->returnValue('foo'));
-
-    $this->assertInstanceOf('Drupal\Core\Entity\EntityInterface', $entity);
-    $this->assertSame('foo', $entity->id());
+    $this->assertInstanceOf(EntityInterface::class, $entity);
     $this->assertTrue($entity->isNew());
   }
 
@@ -1124,7 +1116,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    * @return \Drupal\Tests\Core\Field\TestBaseFieldDefinitionInterface[]|\PHPUnit\Framework\MockObject\MockObject[]
    *   An array of mock base field definitions.
    */
-  protected function mockFieldDefinitions(array $field_names, $methods = []) {
+  protected function mockFieldDefinitions(array $field_names, $methods = []): array {
     $field_definitions = [];
     $definition = $this->createMock('Drupal\Tests\Core\Field\TestBaseFieldDefinitionInterface');
 
@@ -1136,7 +1128,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
       $definition
         ->expects($this->any())
         ->method($method)
-        ->will($this->returnValue($result));
+        ->willReturn($result);
     }
 
     // Assign field names to mock definitions.
@@ -1145,7 +1137,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
       $field_definitions[$field_name]
         ->expects($this->any())
         ->method('getName')
-        ->will($this->returnValue($field_name));
+        ->willReturn($field_name);
     }
 
     return $field_definitions;
@@ -1154,61 +1146,62 @@ class SqlContentEntityStorageTest extends UnitTestCase {
   /**
    * Sets up the content entity database storage.
    */
-  protected function setUpEntityStorage() {
+  protected function setUpEntityStorage(): void {
     $this->connection = $this->getMockBuilder('Drupal\Core\Database\Connection')
       ->disableOriginalConstructor()
       ->getMock();
 
-    $this->entityTypeManager->expects($this->any())
-      ->method('getDefinition')
-      ->will($this->returnValue($this->entityType));
+    $this->entityTypeManager
+      ->getDefinition($this->entityType->id())
+      ->willReturn($this->entityType);
 
-    $this->entityTypeManager->expects($this->any())
-      ->method('getActiveDefinition')
-      ->will($this->returnValue($this->entityType));
+    $this->entityTypeManager
+      ->getActiveDefinition($this->entityType->id())
+      ->willReturn($this->entityType);
 
-    $this->entityFieldManager->expects($this->any())
-      ->method('getFieldStorageDefinitions')
-      ->will($this->returnValue($this->fieldDefinitions));
+    $this->entityFieldManager
+      ->getFieldStorageDefinitions($this->entityType->id())
+      ->willReturn($this->fieldDefinitions);
 
-    $this->entityFieldManager->expects($this->any())
-      ->method('getActiveFieldStorageDefinitions')
-      ->will($this->returnValue($this->fieldDefinitions));
+    $this->entityFieldManager
+      ->getActiveFieldStorageDefinitions($this->entityType->id())
+      ->willReturn($this->fieldDefinitions);
 
-    $this->entityStorage = new SqlContentEntityStorage($this->entityType, $this->connection, $this->entityFieldManager, $this->cache, $this->languageManager, new MemoryCache(), $this->entityTypeBundleInfo, $this->entityTypeManager);
+    $this->entityStorage = new SqlContentEntityStorage($this->entityType, $this->connection, $this->entityFieldManager->reveal(), $this->cache, $this->languageManager, new MemoryCache(new Time()), $this->entityTypeBundleInfo, $this->entityTypeManager->reveal());
     $this->entityStorage->setModuleHandler($this->moduleHandler);
   }
 
   /**
-   * @covers ::doLoadMultiple
-   * @covers ::buildCacheId
-   * @covers ::getFromPersistentCache
+   * Tests load multiple persistent cached.
+   *
+   * @legacy-covers ::doLoadMultiple
+   * @legacy-covers ::buildCacheId
+   * @legacy-covers ::getFromPersistentCache
    */
-  public function testLoadMultiplePersistentCached() {
+  public function testLoadMultiplePersistentCached(): void {
     $this->setUpModuleHandlerNoImplementations();
 
     $key = 'values:' . $this->entityTypeId . ':1';
     $id = 1;
-    $entity = $this->getMockBuilder('\Drupal\Tests\Core\Entity\Sql\SqlContentEntityStorageTestEntityInterface')
-      ->getMockForAbstractClass();
+    $entity = $this->getMockBuilder(StubEntityBase::class)
+      ->disableOriginalConstructor()
+      ->onlyMethods(['id'])
+      ->getMock();
     $entity->expects($this->any())
       ->method('id')
-      ->will($this->returnValue($id));
+      ->willReturn($id);
 
     $this->entityType->expects($this->atLeastOnce())
       ->method('isPersistentlyCacheable')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
     $this->entityType->expects($this->atLeastOnce())
       ->method('id')
-      ->will($this->returnValue($this->entityTypeId));
-    $this->entityType->expects($this->atLeastOnce())
-      ->method('getClass')
-      ->will($this->returnValue(get_class($entity)));
+      ->willReturn($this->entityTypeId);
 
     $this->cache->expects($this->once())
       ->method('getMultiple')
       ->with([$key])
-      ->will($this->returnValue([$key => (object) ['data' => $entity]]));
+      ->willReturn([$key => (object) ['data' => $entity]]);
     $this->cache->expects($this->never())
       ->method('set');
 
@@ -1218,30 +1211,31 @@ class SqlContentEntityStorageTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::doLoadMultiple
-   * @covers ::buildCacheId
-   * @covers ::getFromPersistentCache
-   * @covers ::setPersistentCache
+   * Tests load multiple no persistent cache.
+   *
+   * @legacy-covers ::doLoadMultiple
+   * @legacy-covers ::buildCacheId
+   * @legacy-covers ::getFromPersistentCache
+   * @legacy-covers ::setPersistentCache
    */
-  public function testLoadMultipleNoPersistentCache() {
+  public function testLoadMultipleNoPersistentCache(): void {
     $this->setUpModuleHandlerNoImplementations();
 
     $id = 1;
-    $entity = $this->getMockBuilder('\Drupal\Tests\Core\Entity\Sql\SqlContentEntityStorageTestEntityInterface')
-      ->getMockForAbstractClass();
+    $entity = $this->getMockBuilder(StubEntityBase::class)
+      ->disableOriginalConstructor()
+      ->onlyMethods(['id'])
+      ->getMock();
     $entity->expects($this->any())
       ->method('id')
-      ->will($this->returnValue($id));
+      ->willReturn($id);
 
     $this->entityType->expects($this->any())
       ->method('isPersistentlyCacheable')
-      ->will($this->returnValue(FALSE));
+      ->willReturn(FALSE);
     $this->entityType->expects($this->atLeastOnce())
       ->method('id')
-      ->will($this->returnValue($this->entityTypeId));
-    $this->entityType->expects($this->atLeastOnce())
-      ->method('getClass')
-      ->will($this->returnValue(get_class($entity)));
+      ->willReturn($this->entityTypeId);
 
     // There should be no calls to the cache backend for an entity type without
     // persistent caching.
@@ -1250,13 +1244,13 @@ class SqlContentEntityStorageTest extends UnitTestCase {
     $this->cache->expects($this->never())
       ->method('set');
 
-    $this->entityTypeManager->expects($this->any())
-      ->method('getActiveDefinition')
-      ->will($this->returnValue($this->entityType));
+    $this->entityTypeManager
+      ->getActiveDefinition($this->entityType->id())
+      ->willReturn($this->entityType);
 
     $entity_storage = $this->getMockBuilder('Drupal\Core\Entity\Sql\SqlContentEntityStorage')
-      ->setConstructorArgs([$this->entityType, $this->connection, $this->entityFieldManager, $this->cache, $this->languageManager, new MemoryCache(), $this->entityTypeBundleInfo, $this->entityTypeManager])
-      ->setMethods(['getFromStorage', 'invokeStorageLoadHook', 'initTableLayout'])
+      ->setConstructorArgs([$this->entityType, $this->connection, $this->entityFieldManager->reveal(), $this->cache, $this->languageManager, new MemoryCache(new Time()), $this->entityTypeBundleInfo, $this->entityTypeManager->reveal()])
+      ->onlyMethods(['getFromStorage', 'invokeStorageLoadHook', 'initTableLayout'])
       ->getMock();
     $entity_storage->method('invokeStorageLoadHook')
       ->willReturn(NULL);
@@ -1265,37 +1259,38 @@ class SqlContentEntityStorageTest extends UnitTestCase {
     $entity_storage->expects($this->once())
       ->method('getFromStorage')
       ->with([$id])
-      ->will($this->returnValue([$id => $entity]));
+      ->willReturn([$id => $entity]);
 
     $entities = $entity_storage->loadMultiple([$id]);
     $this->assertEquals($entity, $entities[$id]);
   }
 
   /**
-   * @covers ::doLoadMultiple
-   * @covers ::buildCacheId
-   * @covers ::getFromPersistentCache
-   * @covers ::setPersistentCache
+   * Tests load multiple persistent cache miss.
+   *
+   * @legacy-covers ::doLoadMultiple
+   * @legacy-covers ::buildCacheId
+   * @legacy-covers ::getFromPersistentCache
+   * @legacy-covers ::setPersistentCache
    */
-  public function testLoadMultiplePersistentCacheMiss() {
+  public function testLoadMultiplePersistentCacheMiss(): void {
     $this->setUpModuleHandlerNoImplementations();
 
     $id = 1;
-    $entity = $this->getMockBuilder('\Drupal\Tests\Core\Entity\Sql\SqlContentEntityStorageTestEntityInterface')
-      ->getMockForAbstractClass();
+    $entity = $this->getMockBuilder(StubEntityBase::class)
+      ->disableOriginalConstructor()
+      ->onlyMethods(['id'])
+      ->getMock();
     $entity->expects($this->any())
       ->method('id')
-      ->will($this->returnValue($id));
+      ->willReturn($id);
 
     $this->entityType->expects($this->any())
       ->method('isPersistentlyCacheable')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
     $this->entityType->expects($this->atLeastOnce())
       ->method('id')
-      ->will($this->returnValue($this->entityTypeId));
-    $this->entityType->expects($this->atLeastOnce())
-      ->method('getClass')
-      ->will($this->returnValue(get_class($entity)));
+      ->willReturn($this->entityTypeId);
 
     // In case of a cache miss, the entity is loaded from the storage and then
     // set in the cache.
@@ -1303,18 +1298,23 @@ class SqlContentEntityStorageTest extends UnitTestCase {
     $this->cache->expects($this->once())
       ->method('getMultiple')
       ->with([$key])
-      ->will($this->returnValue([]));
+      ->willReturn([]);
     $this->cache->expects($this->once())
-      ->method('set')
-      ->with($key, $entity, CacheBackendInterface::CACHE_PERMANENT, [$this->entityTypeId . '_values', 'entity_field_info']);
+      ->method('setMultiple')
+      ->with([
+        $key => [
+          'data' => $entity,
+          'tags' => ['entity_field_info'],
+        ],
+      ]);
 
-    $this->entityTypeManager->expects($this->any())
-      ->method('getActiveDefinition')
-      ->will($this->returnValue($this->entityType));
+    $this->entityTypeManager
+      ->getActiveDefinition($this->entityType->id())
+      ->willReturn($this->entityType);
 
     $entity_storage = $this->getMockBuilder('Drupal\Core\Entity\Sql\SqlContentEntityStorage')
-      ->setConstructorArgs([$this->entityType, $this->connection, $this->entityFieldManager, $this->cache, $this->languageManager, new MemoryCache(), $this->entityTypeBundleInfo, $this->entityTypeManager])
-      ->setMethods(['getFromStorage', 'invokeStorageLoadHook', 'initTableLayout'])
+      ->setConstructorArgs([$this->entityType, $this->connection, $this->entityFieldManager->reveal(), $this->cache, $this->languageManager, new MemoryCache(new Time()), $this->entityTypeBundleInfo, $this->entityTypeManager->reveal()])
+      ->onlyMethods(['getFromStorage', 'invokeStorageLoadHook', 'initTableLayout'])
       ->getMock();
     $entity_storage->method('invokeStorageLoadHook')
       ->willReturn(NULL);
@@ -1323,16 +1323,18 @@ class SqlContentEntityStorageTest extends UnitTestCase {
     $entity_storage->expects($this->once())
       ->method('getFromStorage')
       ->with([$id])
-      ->will($this->returnValue([$id => $entity]));
+      ->willReturn([$id => $entity]);
 
     $entities = $entity_storage->loadMultiple([$id]);
     $this->assertEquals($entity, $entities[$id]);
   }
 
   /**
-   * @covers ::hasData
+   * Tests has data.
+   *
+   * @legacy-covers ::hasData
    */
-  public function testHasData() {
+  public function testHasData(): void {
     $query = $this->createMock('Drupal\Core\Entity\Query\QueryInterface');
     $query->expects(($this->once()))
       ->method('accessCheck')
@@ -1358,23 +1360,23 @@ class SqlContentEntityStorageTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
 
-    $this->entityTypeManager->expects($this->any())
-      ->method('getDefinition')
-      ->will($this->returnValue($this->entityType));
+    $this->entityTypeManager
+      ->getDefinition($this->entityType->id())
+      ->willReturn($this->entityType);
 
-    $this->entityTypeManager->expects($this->any())
-      ->method('getActiveDefinition')
-      ->will($this->returnValue($this->entityType));
+    $this->entityTypeManager
+      ->getActiveDefinition($this->entityType->id())
+      ->willReturn($this->entityType);
 
-    $this->entityFieldManager->expects($this->any())
-      ->method('getFieldStorageDefinitions')
-      ->will($this->returnValue($this->fieldDefinitions));
+    $this->entityFieldManager
+      ->getFieldStorageDefinitions($this->entityType->id())
+      ->willReturn($this->fieldDefinitions);
 
-    $this->entityFieldManager->expects($this->any())
-      ->method('getActiveFieldStorageDefinitions')
-      ->will($this->returnValue($this->fieldDefinitions));
+    $this->entityFieldManager
+      ->getActiveFieldStorageDefinitions($this->entityType->id())
+      ->willReturn($this->fieldDefinitions);
 
-    $this->entityStorage = new SqlContentEntityStorage($this->entityType, $database, $this->entityFieldManager, $this->cache, $this->languageManager, new MemoryCache(), $this->entityTypeBundleInfo, $this->entityTypeManager);
+    $this->entityStorage = new SqlContentEntityStorage($this->entityType, $database, $this->entityFieldManager->reveal(), $this->cache, $this->languageManager, new MemoryCache(new Time()), $this->entityTypeBundleInfo, $this->entityTypeManager->reveal());
 
     $result = $this->entityStorage->hasData();
 
@@ -1384,7 +1386,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
   /**
    * Tests entity ID sanitization.
    */
-  public function testCleanIds() {
+  public function testCleanIds(): void {
     $valid_ids = [
       -1,
       0,
@@ -1418,18 +1420,15 @@ class SqlContentEntityStorageTest extends UnitTestCase {
     $this->fieldDefinitions = $this->mockFieldDefinitions(['id']);
     $this->fieldDefinitions['id']->expects($this->any())
       ->method('getType')
-      ->will($this->returnValue('integer'));
+      ->willReturn('integer');
 
     $this->setUpEntityStorage();
 
     $this->entityType->expects($this->any())
       ->method('getKey')
-      ->will($this->returnValueMap(
-        [['id', 'id']]
-      ));
+      ->willReturnMap([['id', 'id']]);
 
     $method = new \ReflectionMethod($this->entityStorage, 'cleanIds');
-    $method->setAccessible(TRUE);
     $this->assertEquals($valid_ids, $method->invoke($this->entityStorage, $valid_ids));
 
     $invalid_ids = [
@@ -1453,29 +1452,15 @@ class SqlContentEntityStorageTest extends UnitTestCase {
   /**
    * Sets up the module handler with no implementations.
    */
-  protected function setUpModuleHandlerNoImplementations() {
+  protected function setUpModuleHandlerNoImplementations(): void {
     $this->moduleHandler->expects($this->any())
-      ->method('getImplementations')
-      ->will($this->returnValueMap([
+      ->method('invokeAllWith')
+      ->willReturnMap([
         ['entity_load', []],
         [$this->entityTypeId . '_load', []],
-      ]));
+      ]);
 
     $this->container->set('module_handler', $this->moduleHandler);
-  }
-
-}
-
-/**
- * Provides an entity with dummy implementations of static methods, because
- * those cannot be mocked.
- */
-abstract class SqlContentEntityStorageTestEntityInterface implements EntityInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function postLoad(EntityStorageInterface $storage, array &$entities) {
   }
 
 }

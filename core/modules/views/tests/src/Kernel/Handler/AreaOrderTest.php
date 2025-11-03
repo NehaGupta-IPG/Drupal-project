@@ -1,25 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the view area handler.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\area\View
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class AreaOrderTest extends ViewsKernelTestBase {
 
   use BlockCreationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['user', 'block'];
 
@@ -33,20 +36,20 @@ class AreaOrderTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpFixtures() {
+  protected function setUpFixtures(): void {
     // Install the themes used for this test.
-    $this->container->get('theme_installer')->install(['bartik']);
+    $this->container->get('theme_installer')->install(['olivero']);
 
     $this->placeBlock('system_branding_block', [
-      'id' => 'bartik_branding',
-      'theme' => 'bartik',
+      'id' => 'id_olivero_branding',
+      'theme' => 'olivero',
       'plugin' => 'system_branding_block',
       'weight' => 1,
     ]);
 
     $this->placeBlock('system_powered_by_block', [
-      'id' => 'bartik_powered',
-      'theme' => 'bartik',
+      'id' => 'id_olivero_powered',
+      'theme' => 'olivero',
       'weight' => 2,
     ]);
 
@@ -56,16 +59,16 @@ class AreaOrderTest extends ViewsKernelTestBase {
   /**
    * Tests the order of the handlers.
    */
-  public function testAreaOrder() {
+  public function testAreaOrder(): void {
     $view = Views::getView('test_area_order');
     $renderable = $view->buildRenderable();
     $output = $this->render($renderable);
 
-    $position_powered = strpos($output, 'block-bartik-powered');
-    $position_branding = strpos($output, 'block-bartik-branding');
+    $position_powered = strpos($output, 'block-id-olivero-powered');
+    $position_branding = strpos($output, 'block-id-olivero-branding');
 
-    $this->assertNotEquals(0, $position_powered, 'ID bartik-powered found.');
-    $this->assertNotEquals(0, $position_branding, 'ID bartik-branding found');
+    $this->assertNotEquals(0, $position_powered, 'ID olivero-powered found.');
+    $this->assertNotEquals(0, $position_branding, 'ID olivero-branding found');
 
     // Make sure "powered" is before "branding", so it reflects the position
     // in the configuration, and not the weight of the blocks.

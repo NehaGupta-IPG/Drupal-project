@@ -1,23 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
-use Drupal\Core\Config\Entity\Query\QueryFactory;
 use Drupal\config_test\Entity\ConfigQueryTest;
+use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
+use Drupal\Core\Config\Entity\Query\QueryFactory;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Config Entity Query functionality.
  *
- * @group Entity
  * @see \Drupal\Core\Config\Entity\Query
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class ConfigEntityQueryTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['config_test'];
 
@@ -36,11 +40,9 @@ class ConfigEntityQueryTest extends KernelTestBase {
   protected $factory;
 
   /**
-   * The entity storage used for testing.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * The config entity storage used for testing.
    */
-  protected $entityStorage;
+  protected ConfigEntityStorageInterface $entityStorage;
 
   /**
    * Stores all config entities created for the test.
@@ -49,6 +51,9 @@ class ConfigEntityQueryTest extends KernelTestBase {
    */
   protected $entities;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -140,7 +145,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
   /**
    * Tests basic functionality.
    */
-  public function testConfigEntityQuery() {
+  public function testConfigEntityQuery(): void {
     // Run a test without any condition.
     $this->queryResults = $this->entityStorage->getQuery()
       ->execute();
@@ -370,7 +375,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
   /**
    * Tests ID conditions.
    */
-  public function testStringIdConditions() {
+  public function testStringIdConditions(): void {
     // We need an entity with a non-numeric ID.
     $entity = ConfigQueryTest::create([
       'label' => 'entity_1',
@@ -426,7 +431,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
   /**
    * Tests count query.
    */
-  public function testCount() {
+  public function testCount(): void {
     // Test count on no conditions.
     $count = $this->entityStorage->getQuery()
       ->count()
@@ -452,7 +457,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
   /**
    * Tests sorting and range on config entity queries.
    */
-  public function testSortRange() {
+  public function testSortRange(): void {
     // Sort by simple ascending/descending.
     $this->queryResults = $this->entityStorage->getQuery()
       ->sort('number', 'DESC')
@@ -497,6 +502,40 @@ class ConfigEntityQueryTest extends KernelTestBase {
       ->execute();
     $this->assertSame(['1', '2', '3'], array_values($this->queryResults));
 
+    // Omit optional parameters for the range and sort.
+    $this->queryResults = $this->entityStorage->getQuery()
+      ->range()
+      ->sort('id')
+      ->execute();
+    $this->assertSame(['1', '2', '3', '4', '5', '6', '7'], array_values($this->queryResults));
+
+    // Explicitly pass NULL for the range and sort.
+    $this->queryResults = $this->entityStorage->getQuery()
+      ->range(NULL, NULL)
+      ->sort('id')
+      ->execute();
+    $this->assertSame(['1', '2', '3', '4', '5', '6', '7'], array_values($this->queryResults));
+
+    // Omit the optional start parameter for the range.
+    $this->queryResults = $this->entityStorage->getQuery()
+      ->range(NULL, 1)
+      ->sort('id')
+      ->execute();
+    $this->assertSame(['1'], array_values($this->queryResults));
+
+    // Omit the optional length parameter for the range.
+    $this->queryResults = $this->entityStorage->getQuery()
+      ->range(4)
+      ->sort('id')
+      ->execute();
+    $this->assertSame(['5', '6', '7'], array_values($this->queryResults));
+
+    // Request an empty range.
+    $this->queryResults = $this->entityStorage->getQuery()
+      ->range(0, 0)
+      ->execute();
+    $this->assertEmpty($this->queryResults);
+
     // Apply a pager with limit 4.
     $this->queryResults = $this->entityStorage->getQuery()
       ->pager('4', 0)
@@ -508,35 +547,35 @@ class ConfigEntityQueryTest extends KernelTestBase {
   /**
    * Tests sorting with tableSort on config entity queries.
    */
-  public function testTableSort() {
+  public function testTableSort(): void {
     $header = [
-      ['data' => t('ID'), 'specifier' => 'id'],
-      ['data' => t('Number'), 'specifier' => 'number'],
+      ['data' => 'ID', 'specifier' => 'id'],
+      ['data' => 'Number', 'specifier' => 'number'],
     ];
 
     // Sort key: id
-    // Sorting with 'DESC' upper case
+    // Sorting with 'DESC' upper case.
     $this->queryResults = $this->entityStorage->getQuery()
       ->tableSort($header)
       ->sort('id', 'DESC')
       ->execute();
     $this->assertSame(['7', '6', '5', '4', '3', '2', '1'], array_values($this->queryResults));
 
-    // Sorting with 'ASC' upper case
+    // Sorting with 'ASC' upper case.
     $this->queryResults = $this->entityStorage->getQuery()
       ->tableSort($header)
       ->sort('id', 'ASC')
       ->execute();
     $this->assertSame(['1', '2', '3', '4', '5', '6', '7'], array_values($this->queryResults));
 
-    // Sorting with 'desc' lower case
+    // Sorting with 'desc' lower case.
     $this->queryResults = $this->entityStorage->getQuery()
       ->tableSort($header)
       ->sort('id', 'desc')
       ->execute();
     $this->assertSame(['7', '6', '5', '4', '3', '2', '1'], array_values($this->queryResults));
 
-    // Sorting with 'asc' lower case
+    // Sorting with 'asc' lower case.
     $this->queryResults = $this->entityStorage->getQuery()
       ->tableSort($header)
       ->sort('id', 'asc')
@@ -544,28 +583,28 @@ class ConfigEntityQueryTest extends KernelTestBase {
     $this->assertSame(['1', '2', '3', '4', '5', '6', '7'], array_values($this->queryResults));
 
     // Sort key: number
-    // Sorting with 'DeSc' mixed upper and lower case
+    // Sorting with 'DeSc' mixed upper and lower case.
     $this->queryResults = $this->entityStorage->getQuery()
       ->tableSort($header)
       ->sort('number', 'DeSc')
       ->execute();
     $this->assertSame(['7', '3', '5', '2', '1', '4', '6'], array_values($this->queryResults));
 
-    // Sorting with 'AsC' mixed upper and lower case
+    // Sorting with 'AsC' mixed upper and lower case.
     $this->queryResults = $this->entityStorage->getQuery()
       ->tableSort($header)
       ->sort('number', 'AsC')
       ->execute();
     $this->assertSame(['6', '4', '1', '2', '5', '3', '7'], array_values($this->queryResults));
 
-    // Sorting with 'dEsC' mixed upper and lower case
+    // Sorting with 'dEsC' mixed upper and lower case.
     $this->queryResults = $this->entityStorage->getQuery()
       ->tableSort($header)
       ->sort('number', 'dEsC')
       ->execute();
     $this->assertSame(['7', '3', '5', '2', '1', '4', '6'], array_values($this->queryResults));
 
-    // Sorting with 'aSc' mixed upper and lower case
+    // Sorting with 'aSc' mixed upper and lower case.
     $this->queryResults = $this->entityStorage->getQuery()
       ->tableSort($header)
       ->sort('number', 'aSc')
@@ -576,7 +615,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
   /**
    * Tests dotted path matching.
    */
-  public function testDotted() {
+  public function testDotted(): void {
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('array.level1.*', 1)
       ->execute();
@@ -650,7 +689,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
   /**
    * Tests case sensitivity.
    */
-  public function testCaseSensitivity() {
+  public function testCaseSensitivity(): void {
     // Filter by label with a known containing case-sensitive word.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('label', 'TEST', 'CONTAINS')
@@ -666,7 +705,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
   /**
    * Tests lookup keys are added to the key value store.
    */
-  public function testLookupKeys() {
+  public function testLookupKeys(): void {
     \Drupal::service('state')->set('config_test.lookup_keys', TRUE);
     \Drupal::entityTypeManager()->clearCachedDefinitions();
     $key_value = $this->container->get('keyvalue')->get(QueryFactory::CONFIG_LOOKUP_PREFIX . 'config_test');
@@ -683,7 +722,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
     $entity->save();
 
     $expected[] = $entity->getConfigDependencyName();
-    $this->assertEqual($expected, $key_value->get('style:test'));
+    $this->assertEquals($expected, $key_value->get('style:test'));
 
     $entity = $storage->create([
       'label' => 'entity_2',
@@ -694,7 +733,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
     $entity->enforceIsNew();
     $entity->save();
     $expected[] = $entity->getConfigDependencyName();
-    $this->assertEqual($expected, $key_value->get('style:test'));
+    $this->assertEquals($expected, $key_value->get('style:test'));
 
     $entity = $storage->create([
       'label' => 'entity_3',
@@ -705,8 +744,8 @@ class ConfigEntityQueryTest extends KernelTestBase {
     $entity->save();
     // Do not add this entity to the list of expected result as it has a
     // different value.
-    $this->assertEqual($expected, $key_value->get('style:test'));
-    $this->assertEqual([$entity->getConfigDependencyName()], $key_value->get('style:blah'));
+    $this->assertEquals($expected, $key_value->get('style:test'));
+    $this->assertEquals([$entity->getConfigDependencyName()], $key_value->get('style:blah'));
 
     // Ensure that a delete clears a key.
     $entity->delete();
@@ -715,10 +754,28 @@ class ConfigEntityQueryTest extends KernelTestBase {
     // Ensure that delete only clears one key.
     $entity_id = array_pop($expected);
     $test_entities[$entity_id]->delete();
-    $this->assertEqual($expected, $key_value->get('style:test'));
+    $this->assertEquals($expected, $key_value->get('style:test'));
     $entity_id = array_pop($expected);
     $test_entities[$entity_id]->delete();
     $this->assertNull($key_value->get('style:test'));
+  }
+
+  /**
+   * Test the entity query alter hooks are invoked.
+   *
+   * @see config_test_entity_query_tag__config_query_test__config_entity_query_alter_hook_test_alter()
+   */
+  public function testAlterHook(): void {
+    // Run a test without any condition.
+    $this->queryResults = $this->entityStorage->getQuery()
+      ->execute();
+    $this->assertResults(['1', '2', '3', '4', '5', '6', '7']);
+
+    // config_test alter hook removes the entity with id '7'.
+    $this->queryResults = $this->entityStorage->getQuery()
+      ->addTag('config_entity_query_alter_hook_test')
+      ->execute();
+    $this->assertResults(['1', '2', '3', '4', '5', '6']);
   }
 
   /**
@@ -726,8 +783,10 @@ class ConfigEntityQueryTest extends KernelTestBase {
    *
    * @param array $expected
    *   Array of expected entity IDs.
+   *
+   * @internal
    */
-  protected function assertResults($expected) {
+  protected function assertResults(array $expected): void {
     $expected_count = count($expected);
     $this->assertCount($expected_count, $this->queryResults);
     foreach ($expected as $value) {

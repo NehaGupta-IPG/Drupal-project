@@ -1,18 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\serialization\Unit\Normalizer;
 
 use Drupal\Core\TypedData\DataDefinition;
-use Drupal\Core\TypedData\TypedDataManagerInterface;
-use Drupal\Tests\UnitTestCase;
-use Drupal\serialization\Normalizer\ListNormalizer;
 use Drupal\Core\TypedData\Plugin\DataType\ItemList;
+use Drupal\Core\TypedData\TypedDataManagerInterface;
+use Drupal\serialization\Normalizer\ListNormalizer;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Serializer\Serializer;
 
 /**
- * @coversDefaultClass \Drupal\serialization\Normalizer\ListNormalizer
- * @group serialization
+ * Tests Drupal\serialization\Normalizer\ListNormalizer.
  */
+#[CoversClass(ListNormalizer::class)]
+#[Group('serialization')]
 class ListNormalizerTest extends UnitTestCase {
 
   /**
@@ -43,23 +48,28 @@ class ListNormalizerTest extends UnitTestCase {
    */
   protected $typedData;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
+    parent::setUp();
+
     // Mock the TypedDataManager to return a TypedDataInterface mock.
     $this->typedData = $this->createMock('Drupal\Core\TypedData\TypedDataInterface');
     $typed_data_manager = $this->createMock(TypedDataManagerInterface::class);
     $typed_data_manager->expects($this->any())
       ->method('getPropertyInstance')
-      ->will($this->returnValue($this->typedData));
+      ->willReturn($this->typedData);
 
-    // Set up a mock container as ItemList() will call for the 'typed_data_manager'
-    // service.
+    // Set up a mock container as ItemList() will call for the
+    // 'typed_data_manager' service.
     $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-      ->setMethods(['get'])
+      ->onlyMethods(['get'])
       ->getMock();
     $container->expects($this->any())
       ->method('get')
       ->with($this->equalTo('typed_data_manager'))
-      ->will($this->returnValue($typed_data_manager));
+      ->willReturn($typed_data_manager);
 
     \Drupal::setContainer($container);
 
@@ -72,7 +82,7 @@ class ListNormalizerTest extends UnitTestCase {
   /**
    * Tests the supportsNormalization() method.
    */
-  public function testSupportsNormalization() {
+  public function testSupportsNormalization(): void {
     $this->assertTrue($this->normalizer->supportsNormalization($this->list));
     $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
   }
@@ -80,7 +90,7 @@ class ListNormalizerTest extends UnitTestCase {
   /**
    * Tests the normalize() method.
    */
-  public function testNormalize() {
+  public function testNormalize(): void {
     $serializer = $this->prophesize(Serializer::class);
     $serializer->normalize($this->typedData, 'json', ['mu' => 'nu'])
       ->shouldBeCalledTimes(3)

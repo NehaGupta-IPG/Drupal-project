@@ -1,25 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\DrupalKernel;
 
+use Composer\Autoload\ClassLoader;
 use Drupal\Core\DrupalKernel;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @coversDefaultClass \Drupal\Core\DrupalKernel
- * @group DrupalKernel
+ * Tests Drupal\Core\DrupalKernel.
  */
+#[CoversClass(DrupalKernel::class)]
+#[Group('DrupalKernel')]
 class DrupalKernelTest extends UnitTestCase {
 
   /**
    * Tests hostname validation with settings.
    *
-   * @covers ::setupTrustedHosts
-   * @dataProvider providerTestTrustedHosts
+   * @legacy-covers ::setupTrustedHosts
    */
-  public function testTrustedHosts($host, $server_name, $message, $expected = FALSE) {
+  #[DataProvider('providerTestTrustedHosts')]
+  public function testTrustedHosts($host, $server_name, $message, $expected = FALSE): void {
     $request = new Request();
 
     $trusted_host_patterns = [
@@ -36,7 +45,6 @@ class DrupalKernelTest extends UnitTestCase {
     $request->server->set('SERVER_NAME', $server_name);
 
     $method = new \ReflectionMethod('Drupal\Core\DrupalKernel', 'setupTrustedHosts');
-    $method->setAccessible(TRUE);
     $valid_host = $method->invoke(NULL, $request, $trusted_host_patterns);
 
     $this->assertSame($expected, $valid_host, $message);
@@ -50,7 +58,7 @@ class DrupalKernelTest extends UnitTestCase {
   /**
    * Provides test data for testTrustedHosts().
    */
-  public function providerTestTrustedHosts() {
+  public static function providerTestTrustedHosts() {
     $data = [];
 
     // Tests canonical URL.
@@ -93,7 +101,7 @@ class DrupalKernelTest extends UnitTestCase {
 
     // Tests mismatch.
     $data[] = [
-      'www.blackhat.com',
+      'www.black_hat.com',
       'www.example.com',
       'unspecified host is untrusted',
       FALSE,
@@ -108,10 +116,10 @@ class DrupalKernelTest extends UnitTestCase {
    * This test is run in a separate process since it defines DRUPAL_ROOT. This
    * stops any possible pollution of other tests.
    *
-   * @covers ::findSitePath
-   * @runInSeparateProcess
+   * @legacy-covers ::findSitePath
    */
-  public function testFindSitePath() {
+  #[RunInSeparateProcess]
+  public function testFindSitePath(): void {
     $vfs_root = vfsStream::setup('drupal_root');
     $sites_php = <<<'EOD'
 <?php
@@ -132,8 +140,20 @@ EOD;
     $request->server->set('SERVER_NAME', 'www.example.org');
     $request->server->set('SERVER_PORT', '8888');
     $request->server->set('SCRIPT_NAME', '/index.php');
-    $this->assertEquals('sites/example', DrupalKernel::findSitePath($request, TRUE, $vfs_root->url('drupal_root')));
-    $this->assertEquals('sites/example', DrupalKernel::findSitePath($request, FALSE, $vfs_root->url('drupal_root')));
+    $this->assertEquals('sites/example', DrupalKernel::findSitePath($request, TRUE, $vfs_root->url()));
+    $this->assertEquals('sites/example', DrupalKernel::findSitePath($request, FALSE, $vfs_root->url()));
+  }
+
+  /**
+   * Tests un booted terminate.
+   *
+   * @legacy-covers ::terminate
+   */
+  #[RunInSeparateProcess]
+  public function testUnBootedTerminate(): void {
+    $kernel = new DrupalKernel('test', new ClassLoader());
+    $kernel->terminate(new Request(), new Response());
+    $this->assertTrue(TRUE, "\Drupal\Core\DrupalKernel::terminate() called without error on kernel which has not booted");
   }
 
 }
@@ -147,24 +167,23 @@ class FakeAutoloader {
    * Registers this instance as an autoloader.
    *
    * @param bool $prepend
-   *   Whether to prepend the autoloader or not
+   *   Whether to prepend the autoloader or not.
    */
-  public function register($prepend = FALSE) {
+  public function register($prepend = FALSE): void {
     spl_autoload_register([$this, 'loadClass'], TRUE, $prepend);
   }
 
   /**
-   * Unregisters this instance as an autoloader.
+   * Deregisters this instance as an autoloader.
    */
-  public function unregister() {
+  public function unregister(): void {
     spl_autoload_unregister([$this, 'loadClass']);
   }
 
   /**
    * Loads the given class or interface.
    *
-   * @return null
-   *   This class never loads.
+   * This class never loads.
    */
   public function loadClass() {
     return NULL;
@@ -173,8 +192,7 @@ class FakeAutoloader {
   /**
    * Finds a file by class name while caching lookups to APC.
    *
-   * @return null
-   *   This class never finds.
+   * This class never finds.
    */
   public function findFile() {
     return NULL;

@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests help display for the Field module.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldHelpTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field', 'help'];
 
@@ -23,28 +25,30 @@ class FieldHelpTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  // Tests field help implementation without optional core modules enabled.
-  protected $profile = 'minimal';
-
   /**
    * The admin user that will be created.
+   *
+   * @var \Drupal\user\Entity\User|false
    */
   protected $adminUser;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
     // Create the admin user.
     $this->adminUser = $this->drupalCreateUser([
-      'access administration pages',
+      'access help pages',
       'view the administration theme',
     ]);
   }
 
   /**
-   * Test the Field module's help page.
+   * Tests the Field module's help page.
    */
-  public function testFieldHelp() {
+  public function testFieldHelp(): void {
     // Log in the admin user.
     $this->drupalLogin($this->adminUser);
 
@@ -53,15 +57,12 @@ class FieldHelpTest extends BrowserTestBase {
 
     // Enable the Options, Email and Field API Test modules.
     \Drupal::service('module_installer')->install(['options', 'field_test']);
-    $this->resetAll();
-    \Drupal::service('plugin.manager.field.widget')->clearCachedDefinitions();
-    \Drupal::service('plugin.manager.field.field_type')->clearCachedDefinitions();
 
     $this->drupalGet('admin/help/field');
     $this->assertSession()->linkExists('Options', 0, 'Options module is listed on the Field help page.');
     // Verify that modules with field types that do not implement hook_help are
     // listed.
-    $this->assertText('Field API Test');
+    $this->assertSession()->pageTextContains('Field API Test');
     $this->assertSession()->linkNotExists('Field API Test', 'Modules with field types that do not implement hook_help are not linked.');
     $this->assertSession()->linkNotExists('Link', 'Modules that have not been installed, are not listed.');
   }

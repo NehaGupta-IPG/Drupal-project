@@ -1,20 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Core\Url;
+use Drupal\dynamic_page_cache\EventSubscriber\DynamicPageCacheSubscriber;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
 use Drupal\views_test_data\Plugin\views\argument_default\ArgumentDefaultTest as ArgumentDefaultTestPlugin;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests pluggable argument_default for views.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ArgumentDefaultTest extends ViewTestBase {
 
   /**
@@ -28,7 +33,9 @@ class ArgumentDefaultTest extends ViewTestBase {
     'test_argument_default_current_user',
     'test_argument_default_node',
     'test_argument_default_query_param',
-    ];
+    'test_argument_default_date',
+    'test_argument_default_node_with_page',
+  ];
 
   /**
    * {@inheritdoc}
@@ -36,14 +43,15 @@ class ArgumentDefaultTest extends ViewTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'views_ui', 'block'];
 
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
+    parent::setUp($import_test_views, $modules);
 
     $this->enableViewsTestModule();
   }
@@ -53,7 +61,7 @@ class ArgumentDefaultTest extends ViewTestBase {
    *
    * @see \Drupal\views_test_data\Plugin\views\argument_default\ArgumentDefaultTest
    */
-  public function testArgumentDefaultPlugin() {
+  public function testArgumentDefaultPlugin(): void {
     $view = Views::getView('test_view');
 
     // Add a new argument and set the test plugin for the argument_default.
@@ -67,21 +75,22 @@ class ArgumentDefaultTest extends ViewTestBase {
     $id = $view->addHandler('default', 'argument', 'views_test_data', 'name', $options);
     $view->initHandlers();
     $plugin = $view->argument[$id]->getPlugin('argument_default');
+    $this->assertEquals('Default: Argument default test', $view->argument[$id]->adminSummary());
     $this->assertInstanceOf(ArgumentDefaultTestPlugin::class, $plugin);
 
     // Check that the value of the default argument is as expected.
-    $this->assertEqual('John', $view->argument[$id]->getDefaultArgument(), 'The correct argument default value is returned.');
+    $this->assertEquals('John', $view->argument[$id]->getDefaultArgument(), 'The correct argument default value is returned.');
     // Don't pass in a value for the default argument and make sure the query
     // just returns John.
     $this->executeView($view);
-    $this->assertEqual('John', $view->argument[$id]->getValue(), 'The correct argument value is used.');
+    $this->assertEquals('John', $view->argument[$id]->getValue(), 'The correct argument value is used.');
     $expected_result = [['name' => 'John']];
     $this->assertIdenticalResultset($view, $expected_result, ['views_test_data_name' => 'name']);
 
     // Pass in value as argument to be sure that not the default value is used.
     $view->destroy();
     $this->executeView($view, ['George']);
-    $this->assertEqual('George', $view->argument[$id]->getValue(), 'The correct argument value is used.');
+    $this->assertEquals('George', $view->argument[$id]->getValue(), 'The correct argument value is used.');
     $expected_result = [['name' => 'George']];
     $this->assertIdenticalResultset($view, $expected_result, ['views_test_data_name' => 'name']);
   }
@@ -89,7 +98,7 @@ class ArgumentDefaultTest extends ViewTestBase {
   /**
    * Tests the use of a default argument plugin that provides no options.
    */
-  public function testArgumentDefaultNoOptions() {
+  public function testArgumentDefaultNoOptions(): void {
     $admin_user = $this->drupalCreateUser([
       'administer views',
       'administer site configuration',
@@ -101,22 +110,17 @@ class ArgumentDefaultTest extends ViewTestBase {
     $edit = [
       'options[default_argument_type]' => $argument_type,
     ];
-    $this->drupalPostForm('admin/structure/views/nojs/handler/test_argument_default_current_user/default/argument/uid', $edit, 'Apply');
+    $this->drupalGet('admin/structure/views/nojs/handler/test_argument_default_current_user/default/argument/uid');
+    $this->submitForm($edit, 'Apply');
 
     // Note, the undefined index error has two spaces after it.
-    $error = [
-      '%type' => 'Notice',
-      '@message' => 'Undefined index:  ' . $argument_type,
-      '%function' => 'views_handler_argument->validateOptionsForm()',
-    ];
-    $message = t('%type: @message in %function', $error);
-    $this->assertNoRaw($message);
+    $this->assertSession()->pageTextNotContains("Notice: Undefined index:  {$argument_type} in views_handler_argument->validateOptionsForm()");
   }
 
   /**
    * Tests fixed default argument.
    */
-  public function testArgumentDefaultFixed() {
+  public function testArgumentDefaultFixed(): void {
     $random = $this->randomMachineName();
     $view = Views::getView('test_argument_default_fixed');
     $view->setDisplay();
@@ -125,24 +129,54 @@ class ArgumentDefaultTest extends ViewTestBase {
     $view->display_handler->overrideOption('arguments', $options);
     $view->initHandlers();
 
-    $this->assertEqual($random, $view->argument['null']->getDefaultArgument(), 'Fixed argument should be used by default.');
+    $this->assertEquals($random, $view->argument['null']->getDefaultArgument(), 'Fixed argument should be used by default.');
 
-    // Make sure that a normal argument provided is used
+    // Make sure that a normal argument provided is used.
     $random_string = $this->randomMachineName();
     $view->executeDisplay('default', [$random_string]);
 
-    $this->assertEqual($random_string, $view->args[0], 'Provided argument should be used.');
+    $this->assertEquals($random_string, $view->args[0], 'Provided argument should be used.');
   }
 
   /**
-   * @todo Test php default argument.
+   * Tests current date default argument.
+   *
+   * @see \Drupal\views\Plugin\views\argument_default\Date
    */
-  // function testArgumentDefaultPhp() {}
+  public function testArgumentDefaultDate(): void {
+    /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
+    $date_formatter = \Drupal::service('date.formatter');
+    $request_time = \Drupal::requestStack()->getCurrentRequest()->server->get('REQUEST_TIME');
+
+    $view = Views::getView('test_argument_default_date');
+    $view->setDisplay();
+    $view->initHandlers();
+
+    $expected = $date_formatter->format($request_time, 'custom', 'Y-m-d');
+    $this->assertEquals($expected, $view->argument['null']->getDefaultArgument(), 'Current date argument should be used by default.');
+
+    // Update the View to use the Ym format argument.
+    $view = Views::getView('test_argument_default_date');
+    $view->setDisplay();
+    $view->displayHandlers->get('default')->overrideOption('arguments', [
+      'null' => [
+        'id' => 'year_month',
+        'table' => 'node_field_data',
+        'field' => 'created_year_month',
+        'plugin_id' => 'date_year_month',
+        'default_argument_type' => 'date',
+      ],
+    ]);
+    $view->initHandlers();
+
+    $expected = $date_formatter->format($request_time, 'custom', 'Ym');
+    $this->assertEquals($expected, $view->argument['null']->getDefaultArgument(), 'Current date argument should be used by default.');
+  }
 
   /**
-   * Test node default argument.
+   * Tests node default argument.
    */
-  public function testArgumentDefaultNode() {
+  public function testArgumentDefaultNode(): void {
     // Create a user that has permission to place a view block.
     $permissions = [
       'administer views',
@@ -150,12 +184,12 @@ class ArgumentDefaultTest extends ViewTestBase {
       'bypass node access',
       'access user profiles',
       'view all revisions',
-      ];
+    ];
     $views_admin = $this->drupalCreateUser($permissions);
     $this->drupalLogin($views_admin);
 
     // Create nodes where should show themselves again as view block.
-    $node_type = NodeType::create(['type' => 'page', 'label' => 'Page']);
+    $node_type = NodeType::create(['type' => 'page', 'name' => 'Page']);
     $node_type->save();
     $node1 = Node::create(['title' => 'Test node 1', 'type' => 'page']);
     $node1->save();
@@ -165,18 +199,23 @@ class ArgumentDefaultTest extends ViewTestBase {
     // Place the block, visit the pages that display the block, and check that
     // the nodes we expect appear in the respective pages.
     $id = 'view-block-id';
-    $this->drupalPlaceBlock("views_block:test_argument_default_node-block_1", ['id' => $id]);
-    $xpath = '//*[@id="block-' . $id . '"]';
+    $this->drupalPlaceBlock("views_block:test_argument_default_node-block_1", ['id' => 'view_block_id']);
     $this->drupalGet('node/' . $node1->id());
-    $this->assertStringContainsString($node1->getTitle(), $this->xpath($xpath)[0]->getText());
+    $this->assertSession()->elementTextContains('xpath', '//*[@id="block-' . $id . '"]', $node1->getTitle());
     $this->drupalGet('node/' . $node2->id());
-    $this->assertStringContainsString($node2->getTitle(), $this->xpath($xpath)[0]->getText());
+    $this->assertSession()->elementTextContains('xpath', '//*[@id="block-' . $id . '"]', $node2->getTitle());
+
+    // Check the view from node preview page.
+    $node3 = $this->drupalCreateNode(['title' => 'Title 1', 'type' => 'page']);
+    $this->drupalGet($node3->toUrl('edit-form'));
+    $this->submitForm(['title[0][value]' => 'Title 2'], 'Preview');
+    $this->assertSession()->elementTextContains('xpath', '//*[@id="block-' . $id . '"]', $node3->getTitle());
   }
 
   /**
    * Tests the query parameter default argument.
    */
-  public function testArgumentDefaultQueryParameter() {
+  public function testArgumentDefaultQueryParameter(): void {
     $view = Views::getView('test_argument_default_query_param');
 
     $request = Request::create(Url::fromUri('internal:/whatever', ['absolute' => TRUE])->toString());
@@ -184,13 +223,90 @@ class ArgumentDefaultTest extends ViewTestBase {
     // Check the query parameter default argument fallback value.
     $view->setRequest($request);
     $view->initHandlers();
-    $this->assertEqual('all', $view->argument['type']->getDefaultArgument());
+    $this->assertEquals('all', $view->argument['type']->getDefaultArgument());
 
     // Check the query parameter default argument with a value.
     $request->query->add(['the_node_type' => 'page']);
     $view->setRequest($request);
     $view->initHandlers();
-    $this->assertEqual('page', $view->argument['type']->getDefaultArgument());
+    $this->assertEquals('page', $view->argument['type']->getDefaultArgument());
+  }
+
+  /**
+   * Tests the more line generation if a default argument is provided.
+   */
+  public function testArgumentDefaultUrlGeneration(): void {
+    // Create a user that has permission to place a view block.
+    $permissions = [
+      'administer views',
+      'administer blocks',
+      'bypass node access',
+      'access user profiles',
+      'view all revisions',
+    ];
+    $views_admin = $this->drupalCreateUser($permissions);
+    $this->drupalLogin($views_admin);
+
+    // Create nodes where should show themselves again as view block.
+    $node_type = NodeType::create(['type' => 'page', 'name' => 'Page']);
+    $node_type->save();
+    $node = Node::create(['title' => 'Test node 1', 'type' => 'page']);
+    $node->save();
+
+    // Place the block, visit the page that displays the block, and check that
+    // the more link takes the node ID into account and does not ignore
+    // the default argument.
+    $this->drupalPlaceBlock("views_block:test_argument_default_node_with_page-block_1", ['id' => 'view_block_id']);
+    $this->drupalGet('node/' . $node->id());
+    $this->assertSession()->linkByHrefExists('/test-argument-default/' . $node->id());
+  }
+
+  /**
+   * Tests the cacheability of the date argument default.
+   */
+  public function testArgumentDefaultCacheability(): void {
+    // Create page for testing.
+    $view = Views::getView('test_argument_default_date');
+    $view->setDisplay();
+    $view->newDisplay('page', 'Page', 'page_1');
+    $view->displayHandlers->get('page_1')->overrideOption('path', 'path-page-1');
+    $view->displayHandlers->get('page_1')->overrideOption('cache', [
+      'type' => 'time',
+      'options' => [
+        // To eliminate UNCACHEABLE from the page as is.
+        'results_lifespan' => '10000',
+      ],
+    ]);
+    $view->save();
+
+    $this->container->get('module_installer')->uninstall(['page_cache']);
+
+    // Check that the page is not cached with date argument default.
+    $this->drupalGet('path-page-1');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertEquals('UNCACHEABLE (poor cacheability)', $this->getSession()->getResponseHeader(DynamicPageCacheSubscriber::HEADER));
+    // Double check.
+    $this->drupalGet('path-page-1');
+    $this->assertEquals('UNCACHEABLE (poor cacheability)', $this->getSession()->getResponseHeader(DynamicPageCacheSubscriber::HEADER));
+
+    // Change the argument to some cached option.
+    $view = Views::getView('test_argument_default_date');
+    $view->setDisplay();
+    $view->displayHandlers->get('page_1')->overrideOption('arguments', [
+      'null' => [
+        'id' => 'null',
+        'table' => 'views',
+        'field' => 'null',
+      ],
+    ]);
+    $view->save();
+
+    // Check that the page is cached without date argument default.
+    $this->drupalGet('path-page-1');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertEquals('MISS', $this->getSession()->getResponseHeader(DynamicPageCacheSubscriber::HEADER));
+    $this->drupalGet('path-page-1');
+    $this->assertEquals('HIT', $this->getSession()->getResponseHeader(DynamicPageCacheSubscriber::HEADER));
   }
 
 }

@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Page;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests default HTML metatags on a page.
- *
- * @group Page
  */
+#[Group('Page')]
+#[RunTestsInSeparateProcesses]
 class DefaultMetatagsTest extends BrowserTestBase {
 
   /**
@@ -19,19 +23,17 @@ class DefaultMetatagsTest extends BrowserTestBase {
   /**
    * Tests meta tags.
    */
-  public function testMetaTag() {
+  public function testMetaTag(): void {
     $this->drupalGet('');
     // Ensures that the charset metatag is on the page.
-    $result = $this->xpath('//meta[@charset="utf-8"]');
-    $this->assertCount(1, $result);
+    $this->assertSession()->elementsCount('xpath', '//meta[@charset="utf-8"]', 1);
 
     // Ensure that the charset one is the first metatag.
     $result = $this->xpath('//meta');
-    $this->assertEqual('utf-8', (string) $result[0]->getAttribute('charset'));
+    $this->assertEquals('utf-8', (string) $result[0]->getAttribute('charset'));
 
-    // Ensure that the shortcut icon is on the page.
-    $result = $this->xpath('//link[@rel = "shortcut icon"]');
-    $this->assertCount(1, $result, 'The shortcut icon is present.');
+    // Ensure that the icon is on the page.
+    $this->assertSession()->elementsCount('xpath', '//link[@rel = "icon"]', 1);
   }
 
 }

@@ -3,7 +3,7 @@
 namespace Drupal\Composer\Generator\Util;
 
 /**
- * Utilities for accessing composer.json data from drupal/drupal and drupal/core.
+ * Utilities for working with drupal composer.json files and data.
  *
  * Some data is stored in the root composer.json file, while others is found
  * in the core/composer.json file.
@@ -83,7 +83,7 @@ class DrupalCoreComposer {
    */
   public function getRequireDev() {
     $composerJsonData = $this->rootComposerJson();
-    return isset($composerJsonData['require-dev']) ? $composerJsonData['require-dev'] : [];
+    return $composerJsonData['require-dev'] ?? [];
   }
 
   /**
@@ -92,7 +92,7 @@ class DrupalCoreComposer {
    * @param string $packageName
    *   Name of package to find, e.g. 'behat/mink-selenium2-driver'.
    * @param bool $dev
-   *   TRUE: consider only 'packages-dev'. Default: consider only 'packages'
+   *   TRUE: consider only 'packages-dev'. Default: consider only 'packages'.
    *
    * @return array
    *   Package info from composer.lock.

@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Functional;
 
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\taxonomy\Entity\Vocabulary;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Posts an article with a taxonomy term and a date prior to 1970.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class EarlyDateTest extends TaxonomyTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'datetime'];
 
@@ -25,6 +27,9 @@ class EarlyDateTest extends TaxonomyTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -59,9 +64,9 @@ class EarlyDateTest extends TaxonomyTestBase {
   }
 
   /**
-   * Test taxonomy functionality with nodes prior to 1970.
+   * Tests taxonomy functionality with nodes prior to 1970.
    */
-  public function testTaxonomyEarlyDateNode() {
+  public function testTaxonomyEarlyDateNode(): void {
     // Posts an article with a taxonomy term and a date prior to 1970.
     $date = new DrupalDateTime('1969-01-01 00:00:00');
     $edit = [];
@@ -70,10 +75,11 @@ class EarlyDateTest extends TaxonomyTestBase {
     $edit['created[0][value][time]'] = $date->format('H:i:s');
     $edit['body[0][value]'] = $this->randomMachineName();
     $edit['field_tags[target_id]'] = $this->randomMachineName();
-    $this->drupalPostForm('node/add/article', $edit, 'Save');
+    $this->drupalGet('node/add/article');
+    $this->submitForm($edit, 'Save');
     // Checks that the node has been saved.
     $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
-    $this->assertEqual($date->getTimestamp(), $node->getCreatedTime(), 'Legacy node was saved with the right date.');
+    $this->assertEquals($date->getTimestamp(), $node->getCreatedTime(), 'Legacy node was saved with the right date.');
   }
 
 }

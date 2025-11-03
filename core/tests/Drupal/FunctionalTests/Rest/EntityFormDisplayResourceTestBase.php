@@ -1,17 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Rest;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\node\Entity\NodeType;
-use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
+use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 
-abstract class EntityFormDisplayResourceTestBase extends EntityResourceTestBase {
+/**
+ * Resource test base for the entity_form_display entity.
+ */
+abstract class EntityFormDisplayResourceTestBase extends ConfigEntityResourceTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node'];
+  protected static $modules = ['node', 'field_ui'];
 
   /**
    * {@inheritdoc}
@@ -67,15 +72,6 @@ abstract class EntityFormDisplayResourceTestBase extends EntityResourceTestBase 
           'settings' => [],
           'third_party_settings' => [],
         ],
-        'promote' => [
-          'type' => 'boolean_checkbox',
-          'settings' => [
-            'display_label' => TRUE,
-          ],
-          'weight' => 15,
-          'region' => 'content',
-          'third_party_settings' => [],
-        ],
         'status' => [
           'type' => 'boolean_checkbox',
           'weight' => 120,
@@ -83,15 +79,6 @@ abstract class EntityFormDisplayResourceTestBase extends EntityResourceTestBase 
           'settings' => [
             'display_label' => TRUE,
           ],
-          'third_party_settings' => [],
-        ],
-        'sticky' => [
-          'type' => 'boolean_checkbox',
-          'settings' => [
-            'display_label' => TRUE,
-          ],
-          'weight' => 16,
-          'region' => 'content',
           'third_party_settings' => [],
         ],
         'title' => [
@@ -122,7 +109,10 @@ abstract class EntityFormDisplayResourceTestBase extends EntityResourceTestBase 
           'node.type.camelids',
         ],
       ],
-      'hidden' => [],
+      'hidden' => [
+        'promote' => TRUE,
+        'sticky' => TRUE,
+      ],
       'id' => 'node.camelids.default',
       'langcode' => 'en',
       'mode' => 'default',
@@ -137,6 +127,7 @@ abstract class EntityFormDisplayResourceTestBase extends EntityResourceTestBase 
    */
   protected function getNormalizedPostEntity() {
     // @todo Update in https://www.drupal.org/node/2300677.
+    return [];
   }
 
   /**

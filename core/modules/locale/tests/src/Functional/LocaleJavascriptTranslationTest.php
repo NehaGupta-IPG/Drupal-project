@@ -1,23 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\Component\Render\FormattableMarkup;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore descripcion mostrar
 /**
  * Tests parsing js files for translatable strings.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleJavascriptTranslationTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['locale', 'locale_test'];
 
@@ -26,19 +28,20 @@ class LocaleJavascriptTranslationTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  public function testFileParsing() {
+  /**
+   * Tests file parsing.
+   *
+   * @legacy-covers ::\_locale_parse_js_file
+   */
+  public function testFileParsing(): void {
 
     // This test is for ensuring that the regular expression in
     // _locale_parse_js_file() finds translatable source strings in all valid
     // JavaScript syntax regardless of the coding style used, especially with
     // respect to optional whitespace, line breaks, etc.
-    // - We test locale_test.es6.js, because that is the one that contains a
+    // - We test locale_test.js, because that is the one that contains a
     //   variety of whitespace styles.
-    // - We also test the transpiled locale_test.js as an extra double-check
-    //   that JavaScript transpilation doesn't change what
-    //   _locale_parse_js_file() finds.
-    $files[] = __DIR__ . '/../../locale_test.es6.js';
-    $files[] = __DIR__ . '/../../locale_test.js';
+    $files[] = __DIR__ . '/../../js/locale_test.js';
 
     foreach ($files as $filename) {
       // Parse the file to look for source strings.
@@ -97,24 +100,23 @@ class LocaleJavascriptTranslationTest extends BrowserTestBase {
 
       // Assert that all strings were found properly.
       foreach ($test_strings as $str => $context) {
-        $args = ['%source' => $str, '%context' => $context];
 
         // Make sure that the string was found in the file.
-        $this->assertTrue(isset($source_strings[$str]), new FormattableMarkup('Found source string: %source', $args));
+        $this->assertTrue(isset($source_strings[$str]), "Found source string: $str");
 
         // Make sure that the proper context was matched.
         $this->assertArrayHasKey($str, $source_strings);
         $this->assertSame($context, $source_strings[$str]);
       }
 
-      $this->assertSame(count($test_strings), count($source_strings), 'Found correct number of source strings.');
+      $this->assertSameSize($test_strings, $source_strings, 'Found correct number of source strings.');
     }
   }
 
   /**
    * Assert translations JS is added before drupal.js, because it depends on it.
    */
-  public function testLocaleTranslationJsDependencies() {
+  public function testLocaleTranslationJsDependencies(): void {
     // User to add and remove language.
     $admin_user = $this->drupalCreateUser([
       'administer languages',
@@ -136,11 +138,13 @@ class LocaleJavascriptTranslationTest extends BrowserTestBase {
       'label' => $name,
       'direction' => LanguageInterface::DIRECTION_LTR,
     ];
-    $this->drupalPostForm('admin/config/regional/language/add', $edit, 'Add custom language');
+    $this->drupalGet('admin/config/regional/language/add');
+    $this->submitForm($edit, 'Add custom language');
 
     // Set path prefix.
     $edit = ["prefix[$langcode]" => $prefix];
-    $this->drupalPostForm('admin/config/regional/language/detection/url', $edit, 'Save configuration');
+    $this->drupalGet('admin/config/regional/language/detection/url');
+    $this->submitForm($edit, 'Save configuration');
 
     // This forces locale.admin.js string sources to be imported, which contains
     // the next translation.
@@ -151,7 +155,7 @@ class LocaleJavascriptTranslationTest extends BrowserTestBase {
       ->getStrings([
         'source' => 'Show description',
         'type' => 'javascript',
-        'name' => 'core/modules/locale/locale.admin.js',
+        'name' => 'core/modules/locale/js/locale.admin.js',
       ]);
     $string = $strings[0];
 
@@ -164,8 +168,8 @@ class LocaleJavascriptTranslationTest extends BrowserTestBase {
     $js_filename = $prefix . '_' . $js_translation_files[$prefix] . '.js';
 
     $content = $this->getSession()->getPage()->getContent();
-    $this->assertRaw('core/misc/drupal.js');
-    $this->assertRaw($js_filename);
+    $this->assertSession()->responseContains('core/misc/drupal.js');
+    $this->assertSession()->responseContains($js_filename);
     // Assert translations JS is included before drupal.js.
     $this->assertLessThan(strpos($content, 'core/misc/drupal.js'), strpos($content, $js_filename));
   }

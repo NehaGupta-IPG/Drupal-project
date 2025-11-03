@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Menu;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests local actions derived from router and added/altered via hooks.
- *
- * @group Menu
  */
+#[Group('Menu')]
+#[RunTestsInSeparateProcesses]
 class LocalActionTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var string[]
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'menu_test'];
 
@@ -37,13 +39,19 @@ class LocalActionTest extends BrowserTestBase {
   /**
    * Tests appearance of local actions.
    */
-  public function testLocalAction() {
+  public function testLocalAction(): void {
     $this->drupalGet('menu-test-local-action');
     // Ensure that both menu and route based actions are shown.
     $this->assertLocalAction([
       [Url::fromRoute('menu_test.local_action4'), 'My dynamic-title action'],
-      [Url::fromRoute('menu_test.local_action4'), Html::escape("<script>alert('Welcome to the jungle!')</script>")],
-      [Url::fromRoute('menu_test.local_action4'), Html::escape("<script>alert('Welcome to the derived jungle!')</script>")],
+      [
+        Url::fromRoute('menu_test.local_action4'),
+        Html::escape("<script>alert('Welcome to the jungle!')</script>"),
+      ],
+      [
+        Url::fromRoute('menu_test.local_action4'),
+        Html::escape("<script>alert('Welcome to the derived jungle!')</script>"),
+      ],
       [Url::fromRoute('menu_test.local_action2'), 'My hook_menu action'],
       [Url::fromRoute('menu_test.local_action3'), 'My YAML discovery action'],
       [Url::fromRoute('menu_test.local_action5'), 'Title override'],
@@ -70,21 +78,23 @@ class LocalActionTest extends BrowserTestBase {
    *
    * @param array $actions
    *   A list of expected action link titles, keyed by the hrefs.
+   *
+   * @internal
    */
-  protected function assertLocalAction(array $actions) {
+  protected function assertLocalAction(array $actions): void {
     $elements = $this->xpath('//a[contains(@class, :class)]', [
       ':class' => 'button-action',
     ]);
     $index = 0;
     foreach ($actions as $action) {
       /** @var \Drupal\Core\Url $url */
-      list($url, $title) = $action;
+      [$url, $title] = $action;
       // SimpleXML gives us the unescaped text, not the actual escaped markup,
       // so use a pattern instead to check the raw content.
       // This behavior is a bug in libxml, see
       // https://bugs.php.net/bug.php?id=49437.
       $this->assertSession()->responseMatches('@<a [^>]*class="[^"]*button-action[^"]*"[^>]*>' . preg_quote($title, '@') . '</@');
-      $this->assertEqual($url->toString(), $elements[$index]->getAttribute('href'));
+      $this->assertEquals($url->toString(), $elements[$index]->getAttribute('href'));
       $index++;
     }
   }

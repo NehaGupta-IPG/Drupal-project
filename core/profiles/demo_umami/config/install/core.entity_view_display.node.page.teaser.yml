@@ -3,7 +3,7 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.node.teaser
-    - field.field.node.page.body
+    - field.field.node.page.field_body
     - field.field.node.page.layout_builder__layout
     - node.type.page
   module:
@@ -14,14 +14,14 @@ targetEntityType: node
 bundle: page
 mode: teaser
 content:
-  body:
+  field_body:
+    type: text_trimmed
     label: hidden
-    type: text_summary_or_trimmed
-    weight: 100
-    region: content
     settings:
       trim_length: 600
     third_party_settings: {  }
+    weight: 100
+    region: content
   links:
     weight: 101
     region: content

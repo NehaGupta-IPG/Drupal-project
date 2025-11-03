@@ -2,11 +2,16 @@
 
 namespace Drupal\layout_builder\Element;
 
+use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Ajax\AjaxHelperTrait;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
+use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Render\Element\RenderElement;
+use Drupal\Core\Render\Element\RenderElementBase;
+use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\Core\Url;
 use Drupal\layout_builder\Context\LayoutBuilderContextTrait;
 use Drupal\layout_builder\Event\PrepareLayoutEvent;
@@ -14,17 +19,16 @@ use Drupal\layout_builder\LayoutBuilderEvents;
 use Drupal\layout_builder\LayoutBuilderHighlightTrait;
 use Drupal\layout_builder\SectionStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Defines a render element for building the Layout Builder UI.
  *
- * @RenderElement("layout_builder")
- *
  * @internal
  *   Plugin classes are internal.
  */
-class LayoutBuilder extends RenderElement implements ContainerFactoryPluginInterface {
+#[RenderElement('layout_builder')]
+class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginInterface {
 
   use AjaxHelperTrait;
   use LayoutBuilderContextTrait;
@@ -33,7 +37,7 @@ class LayoutBuilder extends RenderElement implements ContainerFactoryPluginInter
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
    */
   protected $eventDispatcher;
 
@@ -46,24 +50,12 @@ class LayoutBuilder extends RenderElement implements ContainerFactoryPluginInter
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher service.
-   * @param \Drupal\Core\Messenger\MessengerInterface|null $messenger
-   *   The messenger service. This is no longer used and will be removed in
-   *   drupal:10.0.0.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, $event_dispatcher, $messenger = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
-    if (!($event_dispatcher instanceof EventDispatcherInterface)) {
-      @trigger_error('The event_dispatcher service should be passed to LayoutBuilder::__construct() instead of the layout_builder.tempstore_repository service since 9.1.0. This will be required in Drupal 10.0.0. See https://www.drupal.org/node/3152690', E_USER_DEPRECATED);
-      $event_dispatcher = \Drupal::service('event_dispatcher');
-    }
     $this->eventDispatcher = $event_dispatcher;
-
-    if ($messenger) {
-      @trigger_error('Calling LayoutBuilder::__construct() with the $messenger argument is deprecated in drupal:9.1.0 and will be removed in drupal:10.0.0. See https://www.drupal.org/node/3152690', E_USER_DEPRECATED);
-    }
   }
 
   /**
@@ -87,7 +79,88 @@ class LayoutBuilder extends RenderElement implements ContainerFactoryPluginInter
       '#pre_render' => [
         [$this, 'preRender'],
       ],
+      '#process' => [
+        [static::class, 'layoutBuilderElementGetKeys'],
+      ],
     ];
+  }
+
+  /**
+   * Form element #process callback.
+   *
+   * Save the layout builder element array parents as a property on the top form
+   * element, so that they can be used to access the element within the form
+   * render array later.
+   *
+   * @param array $element
+   *   The render array for the layout builder element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   Form state object.
+   * @param array $form
+   *   The render array for the complete form.
+   *
+   * @return array
+   *   The layout builder element render array after processing.
+   *
+   * @see \Drupal\layout_builder\Controller\LayoutBuilderHtmlEntityFormController
+   */
+  public static function layoutBuilderElementGetKeys(array $element, FormStateInterface $form_state, array &$form): array {
+    $form['#layout_builder_element_keys'] = $element['#array_parents'];
+    $form['#pre_render'][] = [static::class, 'renderLayoutBuilderAfterForm'];
+    $form['#post_render'][] = [static::class, 'addRenderedLayoutBuilder'];
+    return $element;
+  }
+
+  /**
+   * Render API #pre_render callback for form containing layout builder element.
+   *
+   * Because the layout builder element can contain components with forms, it
+   * needs to exist outside forms within the DOM, to avoid nested form tags.
+   * The layout builder element is rendered to markup here and saved, and later
+   * the saved markup will be appended after the form markup.
+   *
+   * @param array $form
+   *   The rendered form.
+   *
+   * @return array
+   *   Renders the layout builder element, if it exists, and adds it to the
+   *   form.
+   *
+   * @see ::addRenderedLayoutBuilder()
+   */
+  #[TrustedCallback]
+  public static function renderLayoutBuilderAfterForm(array $form): array {
+    if (isset($form['#layout_builder_element_keys'])) {
+      $layout_builder_element = &NestedArray::getValue($form, $form['#layout_builder_element_keys']);
+      // Save the rendered layout builder HTML to a non-rendering child key.
+      // Since this method is a pre_render callback, it is assumed that it is
+      // called while rendering with an active render context, so that the
+      // cache metadata and attachments bubble correctly.
+      $form['#layout_builder_markup'] = \Drupal::service('renderer')->render($layout_builder_element);
+      // Remove the layout builder child element within form array.
+      $layout_builder_element = [];
+    }
+    return $form;
+  }
+
+  /**
+   * Render API #post_render callback that adds layout builder markup to form.
+   *
+   * @param string $html
+   *   The rendered form.
+   * @param array $form
+   *   The form render array.
+   *
+   * @return string
+   *   The render string with any layout builder markup added.
+   */
+  #[TrustedCallback]
+  public static function addRenderedLayoutBuilder(string $html, array $form): string {
+    if (isset($form['#layout_builder_markup'])) {
+      $html .= $form['#layout_builder_markup'];
+    }
+
+    return $html;
   }
 
   /**
@@ -134,6 +207,7 @@ class LayoutBuilder extends RenderElement implements ContainerFactoryPluginInter
     $output['#type'] = 'container';
     $output['#attributes']['id'] = 'layout-builder';
     $output['#attributes']['class'][] = 'layout-builder';
+    $output['#attributes']['class'][] = Html::getClass('layout-builder--' . $section_storage->getPluginId());
     // Mark this UI as uncacheable.
     $output['#cache']['max-age'] = 0;
     return $output;
@@ -233,11 +307,11 @@ class LayoutBuilder extends RenderElement implements ContainerFactoryPluginInter
     $storage_id = $section_storage->getStorageId();
     $section = $section_storage->getSection($delta);
 
-    $layout = $section->getLayout();
+    $layout = $section->getLayout($this->getPopulatedContexts($section_storage));
     $layout_settings = $section->getLayoutSettings();
     $section_label = !empty($layout_settings['label']) ? $layout_settings['label'] : $this->t('Section @section', ['@section' => $delta + 1]);
 
-    $build = $section->toRenderArray($this->getAvailableContexts($section_storage), TRUE);
+    $build = $section->toRenderArray($this->getPopulatedContexts($section_storage), TRUE);
     $layout_definition = $layout->getPluginDefinition();
 
     $region_labels = $layout_definition->getRegionLabels();
@@ -310,7 +384,7 @@ class LayoutBuilder extends RenderElement implements ContainerFactoryPluginInter
 
       // Get weights of all children for use by the region label.
       $weights = array_map(function ($a) {
-        return isset($a['#weight']) ? $a['#weight'] : 0;
+        return $a['#weight'] ?? 0;
       }, $build[$region]);
 
       // The region label is made visible when the move block dialog is open.

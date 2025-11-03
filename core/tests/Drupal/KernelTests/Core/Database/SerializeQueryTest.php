@@ -1,18 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Database;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests serializing and unserializing a query.
- *
- * @group Database
  */
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class SerializeQueryTest extends DatabaseTestBase {
 
   /**
    * Confirms that a query can be serialized and unserialized.
    */
-  public function testSerializeQuery() {
+  public function testSerializeQuery(): void {
     $query = $this->connection->select('test');
     $query->addField('test', 'age');
     $query->condition('name', 'Ringo');
@@ -20,7 +25,7 @@ class SerializeQueryTest extends DatabaseTestBase {
     // assertion.
     $query = unserialize(serialize($query));
     $results = $query->execute()->fetchCol();
-    $this->assertEqual(28, $results[0], 'Query properly executed after unserialization.');
+    $this->assertEquals(28, $results[0], 'Query properly executed after unserialization.');
   }
 
 }

@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Functional;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests setting a custom default moderation state.
- *
- * @group content_moderation
  */
+#[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class DefaultModerationStateTest extends ModerationStateTestBase {
 
   /**
@@ -25,13 +30,12 @@ class DefaultModerationStateTest extends ModerationStateTestBase {
   }
 
   /**
-   * Test a workflow with a default moderation state set.
+   * Tests a workflow with a default moderation state set.
    */
-  public function testPublishedDefaultState() {
+  public function testPublishedDefaultState(): void {
     // Set the default moderation state to be "published".
-    $this->drupalPostForm('admin/config/workflow/workflows/manage/' . $this->workflow->id(), [
-      'type_settings[workflow_settings][default_moderation_state]' => 'published',
-    ], 'Save');
+    $this->drupalGet('admin/config/workflow/workflows/manage/' . $this->workflow->id());
+    $this->submitForm(['type_settings[workflow_settings][default_moderation_state]' => 'published'], 'Save');
 
     $this->drupalGet('node/add/moderated_content');
     $this->assertEquals('published', $this->assertSession()->selectExists('moderation_state[0][state]')->getValue());
@@ -44,15 +48,14 @@ class DefaultModerationStateTest extends ModerationStateTestBase {
   }
 
   /**
-   * Test access to deleting the default state.
+   * Tests access to deleting the default state.
    */
-  public function testDeleteDefaultStateAccess() {
+  public function testDeleteDefaultStateAccess(): void {
     $this->drupalGet('admin/config/workflow/workflows/manage/editorial/state/archived/delete');
     $this->assertSession()->statusCodeEquals(200);
 
-    $this->drupalPostForm('admin/config/workflow/workflows/manage/' . $this->workflow->id(), [
-      'type_settings[workflow_settings][default_moderation_state]' => 'archived',
-    ], 'Save');
+    $this->drupalGet('admin/config/workflow/workflows/manage/' . $this->workflow->id());
+    $this->submitForm(['type_settings[workflow_settings][default_moderation_state]' => 'archived'], 'Save');
 
     $this->drupalGet('admin/config/workflow/workflows/manage/editorial/state/archived/delete');
     $this->assertSession()->statusCodeEquals(403);

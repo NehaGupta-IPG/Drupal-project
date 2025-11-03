@@ -1,25 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\Migrate\d6;
 
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Migrate field instance option translations.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateFieldInstanceOptionTranslationTest extends MigrateDrupal6TestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-      'config_translation',
-      'language',
-      'locale',
-      'menu_ui',
-    ];
+    'config_translation',
+    'language',
+    'locale',
+    'menu_ui',
+  ];
 
   /**
    * {@inheritdoc}
@@ -40,7 +44,7 @@ class MigrateFieldInstanceOptionTranslationTest extends MigrateDrupal6TestBase {
   /**
    * Tests migration of file variables to file.settings.yml.
    */
-  public function testFieldInstanceOptionTranslation() {
+  public function testFieldInstanceOptionTranslation(): void {
     $language_manager = $this->container->get('language_manager');
 
     /** @var \Drupal\language\Config\LanguageConfigOverride $config_translation */

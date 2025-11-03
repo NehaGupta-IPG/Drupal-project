@@ -1,17 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\workspaces\Kernel;
 
+use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestMulRevPub;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\workspaces\Plugin\Validation\Constraint\EntityReferenceSupportedNewEntitiesConstraintValidator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\workspaces\Plugin\Validation\Constraint\EntityReferenceSupportedNewEntitiesConstraintValidator
- * @group workspaces
+ * Tests Drupal\workspaces\Plugin\Validation\Constraint\EntityReferenceSupportedNewEntitiesConstraintValidator.
  */
+#[CoversClass(EntityReferenceSupportedNewEntitiesConstraintValidator::class)]
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class EntityReferenceSupportedNewEntitiesConstraintValidatorTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -25,8 +34,14 @@ class EntityReferenceSupportedNewEntitiesConstraintValidatorTest extends KernelT
     'user',
     'workspaces',
     'entity_test',
-    'path_alias',
   ];
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManager
+   */
+  protected EntityTypeManager $entityTypeManager;
 
   /**
    * {@inheritdoc}
@@ -35,7 +50,6 @@ class EntityReferenceSupportedNewEntitiesConstraintValidatorTest extends KernelT
     parent::setUp();
 
     $this->installEntitySchema('user');
-    $this->installSchema('system', ['sequences']);
     $this->createUser();
 
     $fields['supported_reference'] = BaseFieldDefinition::create('entity_reference')->setSetting('target_type', 'entity_test_mulrevpub');
@@ -47,9 +61,11 @@ class EntityReferenceSupportedNewEntitiesConstraintValidatorTest extends KernelT
   }
 
   /**
-   * @covers ::validate
+   * Tests new entities allowed in default workspace.
+   *
+   * @legacy-covers ::validate
    */
-  public function testNewEntitiesAllowedInDefaultWorkspace() {
+  public function testNewEntitiesAllowedInDefaultWorkspace(): void {
     $entity = EntityTestMulRevPub::create([
       'unsupported_reference' => [
         'entity' => EntityTest::create([]),
@@ -62,9 +78,11 @@ class EntityReferenceSupportedNewEntitiesConstraintValidatorTest extends KernelT
   }
 
   /**
-   * @covers ::validate
+   * Tests new entities forbidden in non default workspace.
+   *
+   * @legacy-covers ::validate
    */
-  public function testNewEntitiesForbiddenInNonDefaultWorkspace() {
+  public function testNewEntitiesForbiddenInNonDefaultWorkspace(): void {
     $this->switchToWorkspace('stage');
     $entity = EntityTestMulRevPub::create([
       'unsupported_reference' => [
@@ -76,7 +94,7 @@ class EntityReferenceSupportedNewEntitiesConstraintValidatorTest extends KernelT
     ]);
     $violations = $entity->validate();
     $this->assertCount(1, $violations);
-    $this->assertEquals('<em class="placeholder">Test entity entities</em> can only be created in the default workspace.', $violations[0]->getMessage());
+    $this->assertEquals('Test entity entities can only be created in the default workspace.', $violations[0]->getMessage());
   }
 
 }

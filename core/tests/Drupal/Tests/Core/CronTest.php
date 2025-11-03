@@ -1,15 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core;
 
+use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Cache\MemoryBackend;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Cron;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
+use Drupal\Core\Lock\NullLockBackend;
 use Drupal\Core\Queue\DelayedRequeueException;
 use Drupal\Core\Queue\Memory;
 use Drupal\Core\Queue\RequeueException;
 use Drupal\Core\Queue\SuspendQueueException;
 use Drupal\Core\State\State;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Prophecy\Argument\ArgumentsWildcard;
 use Psr\Log\LoggerInterface;
@@ -17,10 +27,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Tests the Cron class.
- *
- * @group Cron
- * @coversDefaultClass \Drupal\Core\Cron
  */
+#[CoversClass(Cron::class)]
+#[Group('Cron')]
 class CronTest extends UnitTestCase {
 
   const REQUEUE_COUNT = 3;
@@ -60,18 +69,13 @@ class CronTest extends UnitTestCase {
     parent::setUp();
 
     // Construct a state object used for testing logger assertions.
-    $this->state = new State(new KeyValueMemoryFactory());
+    $time = $this->prophesize(TimeInterface::class)->reveal();
+    $this->state = new State(new KeyValueMemoryFactory(), new MemoryBackend($time), new NullLockBackend());
 
     // Create a mock logger to set a flag in the resulting state.
     $logger = $this->prophesize('Drupal\Core\Logger\LoggerChannelInterface');
-    // Safely ignore the cron re-run message when failing to acquire a lock.
-    //
-    // We don't need to run regular cron tasks, and we're still implicitly
-    // testing that queues are being processed.
-    //
-    // This argument will need to be updated to match the message text in
-    // Drupal\Core\Cron::run() should the original text ever be updated.
-    $logger->warning(Argument::exact('Attempting to re-run cron while it is already running.'))->shouldBeCalled();
+    // Safely ignore the cron success message.
+    $logger->info('Cron run completed.')->shouldBeCalled();
     // Set a flag to track when a message is logged by adding a callback
     // function for each logging method.
     foreach (get_class_methods(LoggerInterface::class) as $logger_method) {
@@ -87,11 +91,18 @@ class CronTest extends UnitTestCase {
     // Create a mock time service.
     $time = $this->prophesize('Drupal\Component\Datetime\TimeInterface');
 
+    // Create a mock config factory and config object.
+    $config_factory = $this->prophesize(ConfigFactoryInterface::class);
+    $config = $this->prophesize(ImmutableConfig::class);
+    $config->get('logging')->willReturn(FALSE);
+    $config_factory->get('system.cron')->willReturn($config->reveal());
+
     // Build the container using the resulting mock objects.
     \Drupal::setContainer(new ContainerBuilder());
     \Drupal::getContainer()->set('logger.factory', $logger_factory->reveal());
     \Drupal::getContainer()->set('datetime.time', $time->reveal());
     \Drupal::getContainer()->set('state', $this->state);
+    \Drupal::getContainer()->set('config.factory', $config_factory->reveal());
 
     // Create mock objects for constructing the Cron class.
     $module_handler = $this->prophesize('Drupal\Core\Extension\ModuleHandlerInterface');
@@ -99,11 +110,15 @@ class CronTest extends UnitTestCase {
     $queue_worker_manager = $this->prophesize('Drupal\Core\Queue\QueueWorkerManagerInterface');
     $state = $this->prophesize('Drupal\Core\State\StateInterface');
     $account_switcher = $this->prophesize('Drupal\Core\Session\AccountSwitcherInterface');
+    $queueConfig = [
+      'suspendMaximumWait' => 30.0,
+    ];
 
     // Create a lock that will always fail when attempting to acquire; we're
     // only interested in testing ::processQueues(), not the other stuff.
     $lock_backend = $this->prophesize('Drupal\Core\Lock\LockBackendInterface');
-    $lock_backend->acquire(Argument::exact('cron'), Argument::cetera())->willReturn(FALSE);
+    $lock_backend->acquire('cron', Argument::cetera())->willReturn(TRUE);
+    $lock_backend->release('cron')->shouldBeCalled();
 
     // Create a queue worker definition for testing purposes.
     $queue_worker = $this->randomMachineName();
@@ -120,6 +135,8 @@ class CronTest extends UnitTestCase {
 
     // Create a mock queue worker plugin instance based on above definition.
     $queue_worker_plugin = $this->prophesize('Drupal\Core\Queue\QueueWorkerInterface');
+    $queue_worker_plugin->getPluginId()->willReturn($queue_worker);
+    $queue_worker_plugin->getPluginDefinition()->willReturn($queue_worker_definition);
     $queue_worker_plugin->processItem('Complete')->willReturn();
     $queue_worker_plugin->processItem('Exception')->willThrow(\Exception::class);
     $queue_worker_plugin->processItem('DelayedRequeueException')->willThrow(DelayedRequeueException::class);
@@ -146,13 +163,13 @@ class CronTest extends UnitTestCase {
     $queue_worker_manager->createInstance($queue_worker)->willReturn($queue_worker_plugin->reveal());
 
     // Construct the Cron class to test.
-    $this->cron = new Cron($module_handler->reveal(), $lock_backend->reveal(), $queue_factory->reveal(), $state->reveal(), $account_switcher->reveal(), $logger->reveal(), $queue_worker_manager->reveal(), $time->reveal());
+    $this->cron = new Cron($module_handler->reveal(), $lock_backend->reveal(), $queue_factory->reveal(), $state->reveal(), $account_switcher->reveal(), $logger->reveal(), $queue_worker_manager->reveal(), $time->reveal(), $queueConfig);
   }
 
   /**
    * Resets the testing state.
    */
-  protected function resetTestingState() {
+  protected function resetTestingState(): void {
     $this->queue->deleteQueue();
     $this->state->set('cron_test.message_logged', FALSE);
     $this->state->set('cron_test.requeue_count', NULL);
@@ -161,7 +178,7 @@ class CronTest extends UnitTestCase {
   /**
    * Data provider for ::testProcessQueues() method.
    */
-  public function processQueuesTestData() {
+  public static function processQueuesTestData() {
     return [
       ['Complete', 'assertFalse', 0],
       ['Exception', 'assertTrue', 1],
@@ -174,10 +191,10 @@ class CronTest extends UnitTestCase {
   /**
    * Tests the ::processQueues() method.
    *
-   * @covers ::processQueues
-   * @dataProvider processQueuesTestData
+   * @legacy-covers ::processQueues
    */
-  public function testProcessQueues($item, $message_logged_assertion, $count_post_run) {
+  #[DataProvider('processQueuesTestData')]
+  public function testProcessQueues($item, $message_logged_assertion, $count_post_run): void {
     $this->resetTestingState();
     $this->queue->createItem($item);
     $this->assertFalse($this->state->get('cron_test.message_logged'));
@@ -190,7 +207,7 @@ class CronTest extends UnitTestCase {
   /**
    * Verify that RequeueException causes an item to be processed multiple times.
    */
-  public function testRequeueException() {
+  public function testRequeueException(): void {
     $this->resetTestingState();
     $this->queue->createItem('RequeueException');
     $this->cron->run();

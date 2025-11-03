@@ -131,6 +131,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    * Gets the keyvalue collection for tracking the installed schema.
    *
    * @return \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   *   The key-value collection storage.
    *
    * @todo Inject this dependency in the constructor once this class can be
    *   instantiated as a regular entity handler:
@@ -189,7 +190,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    * @return \Drupal\Core\Entity\Sql\DefaultTableMapping
    *   A table mapping object.
    */
-  protected function getTableMapping(EntityTypeInterface $entity_type, array $storage_definitions = NULL) {
+  protected function getTableMapping(EntityTypeInterface $entity_type, ?array $storage_definitions = NULL) {
     // Allow passing a single field storage definition when updating a field.
     if ($storage_definitions && count($storage_definitions) === 1) {
       $storage_definition = reset($storage_definitions);
@@ -442,14 +443,14 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * {@inheritdoc}
    */
-  public function onFieldableEntityTypeUpdate(EntityTypeInterface $entity_type, EntityTypeInterface $original, array $field_storage_definitions, array $original_field_storage_definitions, array &$sandbox = NULL) {
+  public function onFieldableEntityTypeUpdate(EntityTypeInterface $entity_type, EntityTypeInterface $original, array $field_storage_definitions, array $original_field_storage_definitions, ?array &$sandbox = NULL) {
     $this->traitOnFieldableEntityTypeUpdate($entity_type, $original, $field_storage_definitions, $original_field_storage_definitions, $sandbox);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function preUpdateEntityTypeSchema(EntityTypeInterface $entity_type, EntityTypeInterface $original, array $field_storage_definitions, array $original_field_storage_definitions, array &$sandbox = NULL) {
+  protected function preUpdateEntityTypeSchema(EntityTypeInterface $entity_type, EntityTypeInterface $original, array $field_storage_definitions, array $original_field_storage_definitions, ?array &$sandbox = NULL) {
     $temporary_prefix = static::getTemporaryTableMappingPrefix($entity_type, $field_storage_definitions);
     $sandbox['temporary_table_mapping'] = $this->storage->getCustomTableMapping($entity_type, $field_storage_definitions, $temporary_prefix);
     $sandbox['new_table_mapping'] = $this->storage->getCustomTableMapping($entity_type, $field_storage_definitions);
@@ -513,7 +514,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * {@inheritdoc}
    */
-  protected function postUpdateEntityTypeSchema(EntityTypeInterface $entity_type, EntityTypeInterface $original, array $field_storage_definitions, array $original_field_storage_definitions, array &$sandbox = NULL) {
+  protected function postUpdateEntityTypeSchema(EntityTypeInterface $entity_type, EntityTypeInterface $original, array $field_storage_definitions, array $original_field_storage_definitions, ?array &$sandbox = NULL) {
     /** @var \Drupal\Core\Entity\Sql\TableMappingInterface $original_table_mapping */
     $original_table_mapping = $sandbox['original_table_mapping'];
     /** @var \Drupal\Core\Entity\Sql\TableMappingInterface $new_table_mapping */
@@ -763,12 +764,14 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
         }
       }
 
-      if ($this->database->supportsTransactionalDDL()) {
-        // If the database supports transactional DDL, we can go ahead and rely
-        // on it. If not, we will have to rollback manually if something fails.
-        $transaction = $this->database->startTransaction();
-      }
       try {
+        if ($this->database->supportsTransactionalDDL()) {
+          // If the database supports transactional DDL, we can go ahead and
+          // rely on it. If not, we will have to rollback manually if something
+          // fails.
+          $transaction = $this->database->startTransaction();
+        }
+
         // Copy the data from the base table.
         $this->database->insert($dedicated_table_name)
           ->from($this->getSelectQueryForFieldStorageDeletion($field_table_name, $shared_table_field_columns, $dedicated_table_field_columns))
@@ -788,8 +791,10 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
         }
       }
       catch (\Exception $e) {
-        if (isset($transaction)) {
-          $transaction->rollBack();
+        if ($this->database->supportsTransactionalDDL()) {
+          if (isset($transaction)) {
+            $transaction->rollBack();
+          }
         }
         else {
           // Delete the dedicated tables.
@@ -1144,7 +1149,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
         // Allow for indexes and unique keys to specified as an array of column
         // name and length.
         if (is_array($column)) {
-          list($column_name, $length) = $column;
+          [$column_name, $length] = $column;
           $data[$real_key][] = [$column_mapping[$column_name], $length];
         }
         else {
@@ -1373,7 +1378,11 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       'description' => "The data table for $entity_type_id entities.",
       'primary key' => [$id_key, $entity_type->getKey('langcode')],
       'indexes' => [
-        $entity_type_id . '__id__default_langcode__langcode' => [$id_key, $entity_type->getKey('default_langcode'), $entity_type->getKey('langcode')],
+        $entity_type_id . '__id__default_langcode__langcode' => [
+          $id_key,
+          $entity_type->getKey('default_langcode'),
+          $entity_type->getKey('langcode'),
+        ],
       ],
       'foreign keys' => [
         $entity_type_id => [
@@ -1411,7 +1420,11 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       'description' => "The revision data table for $entity_type_id entities.",
       'primary key' => [$revision_key, $entity_type->getKey('langcode')],
       'indexes' => [
-        $entity_type_id . '__id__default_langcode__langcode' => [$id_key, $entity_type->getKey('default_langcode'), $entity_type->getKey('langcode')],
+        $entity_type_id . '__id__default_langcode__langcode' => [
+          $id_key,
+          $entity_type->getKey('default_langcode'),
+          $entity_type->getKey('langcode'),
+        ],
       ],
       'foreign keys' => [
         $entity_type_id => [
@@ -1433,7 +1446,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Adds defaults to a table schema definition.
    *
-   * @param $schema
+   * @param array $schema
    *   The schema definition array for a single table, passed by reference.
    */
   protected function addTableDefaults(&$schema) {
@@ -1452,9 +1465,6 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    *   The entity type.
    * @param array $schema
    *   The table schema, passed by reference.
-   *
-   * @return array
-   *   A partial schema array for the base table.
    */
   protected function processDataTable(ContentEntityTypeInterface $entity_type, array &$schema) {
     // Marking the respective fields as NOT NULL makes the indexes more
@@ -1467,11 +1477,8 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    *
    * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
    *   The entity type.
-   * @param array $schema
+   * @param array &$schema
    *   The table schema, passed by reference.
-   *
-   * @return array
-   *   A partial schema array for the base table.
    */
   protected function processRevisionDataTable(ContentEntityTypeInterface $entity_type, array &$schema) {
     // Marking the respective fields as NOT NULL makes the indexes more
@@ -1526,7 +1533,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    *   (optional) The original field storage definition. This is relevant (and
    *   required) only for updates. Defaults to NULL.
    */
-  protected function performFieldSchemaOperation($operation, FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original = NULL) {
+  protected function performFieldSchemaOperation($operation, FieldStorageDefinitionInterface $storage_definition, ?FieldStorageDefinitionInterface $original = NULL) {
     $table_mapping = $this->getTableMapping($this->entityType, [$storage_definition]);
     if ($table_mapping->requiresDedicatedTableStorage($storage_definition)) {
       $this->{$operation . 'DedicatedTableSchema'}($storage_definition, $original);
@@ -1724,12 +1731,13 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   protected function updateDedicatedTableSchema(FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original) {
     if (!$this->storage->countFieldData($original, TRUE)) {
       // There is no data. Re-create the tables completely.
-      if ($this->database->supportsTransactionalDDL()) {
-        // If the database supports transactional DDL, we can go ahead and rely
-        // on it. If not, we will have to rollback manually if something fails.
-        $transaction = $this->database->startTransaction();
-      }
       try {
+        if ($this->database->supportsTransactionalDDL()) {
+          // If the database supports transactional DDL, we can go ahead and
+          // rely on it. If not, we will have to rollback manually if something
+          // fails.
+          $transaction = $this->database->startTransaction();
+        }
         // Since there is no data we may be switching from a shared table schema
         // to a dedicated table schema, hence we should use the proper API.
         $this->performFieldSchemaOperation('delete', $original);
@@ -1737,7 +1745,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       }
       catch (\Exception $e) {
         if ($this->database->supportsTransactionalDDL()) {
-          $transaction->rollBack();
+          if (isset($transaction)) {
+            $transaction->rollBack();
+          }
         }
         else {
           // Recreate tables.
@@ -1747,7 +1757,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       }
     }
     else {
-      if ($this->hasColumnChanges($storage_definition, $original)) {
+      if (empty($storage_definition->getSetting('column_changes_handled')) && $this->hasColumnChanges($storage_definition, $original)) {
         throw new FieldStorageDefinitionUpdateForbiddenException('The SQL storage cannot change the schema for an existing field (' . $storage_definition->getName() . ' in ' . $storage_definition->getTargetEntityTypeId() . ' entity) with data.');
       }
       // There is data, so there are no column changes. Drop all the prior
@@ -1815,12 +1825,13 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    */
   protected function updateSharedTableSchema(FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original) {
     if (!$this->storage->countFieldData($original, TRUE)) {
-      if ($this->database->supportsTransactionalDDL()) {
-        // If the database supports transactional DDL, we can go ahead and rely
-        // on it. If not, we will have to rollback manually if something fails.
-        $transaction = $this->database->startTransaction();
-      }
       try {
+        if ($this->database->supportsTransactionalDDL()) {
+          // If the database supports transactional DDL, we can go ahead and
+          // rely on it. If not, we will have to rollback manually if something
+          // fails.
+          $transaction = $this->database->startTransaction();
+        }
         // Since there is no data we may be switching from a dedicated table
         // to a schema table schema, hence we should use the proper API.
         $this->performFieldSchemaOperation('delete', $original);
@@ -1828,7 +1839,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       }
       catch (\Exception $e) {
         if ($this->database->supportsTransactionalDDL()) {
-          $transaction->rollBack();
+          if (isset($transaction)) {
+            $transaction->rollBack();
+          }
         }
         else {
           // Recreate original schema.
@@ -1838,7 +1851,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       }
     }
     else {
-      if ($this->hasColumnChanges($storage_definition, $original)) {
+      if (empty($storage_definition->getSetting('column_changes_handled')) && $this->hasColumnChanges($storage_definition, $original)) {
         throw new FieldStorageDefinitionUpdateForbiddenException('The SQL storage cannot change the schema for an existing field (' . $storage_definition->getName() . ' in ' . $storage_definition->getTargetEntityTypeId() . ' entity) with data.');
       }
 
@@ -1914,7 +1927,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    *   keys involving its columns will be processed. Otherwise all defined
    *   entity indexes and keys will be processed.
    */
-  protected function createEntitySchemaIndexes(array $entity_schema, FieldStorageDefinitionInterface $storage_definition = NULL) {
+  protected function createEntitySchemaIndexes(array $entity_schema, ?FieldStorageDefinitionInterface $storage_definition = NULL) {
     $schema_handler = $this->database->schema();
 
     if ($storage_definition) {
@@ -1973,7 +1986,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    *   keys involving its columns will be processed. Otherwise all defined
    *   entity indexes and keys will be processed.
    */
-  protected function deleteEntitySchemaIndexes(array $entity_schema_data, FieldStorageDefinitionInterface $storage_definition = NULL) {
+  protected function deleteEntitySchemaIndexes(array $entity_schema_data, ?FieldStorageDefinitionInterface $storage_definition = NULL) {
     $schema_handler = $this->database->schema();
 
     if ($storage_definition) {
@@ -2233,7 +2246,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    *
    * @see hook_schema()
    */
-  protected function getDedicatedTableSchema(FieldStorageDefinitionInterface $storage_definition, ContentEntityTypeInterface $entity_type = NULL) {
+  protected function getDedicatedTableSchema(FieldStorageDefinitionInterface $storage_definition, ?ContentEntityTypeInterface $entity_type = NULL) {
     $entity_type = $entity_type ?: $this->entityType;
     $description_current = "Data storage for {$storage_definition->getTargetEntityTypeId()} field {$storage_definition->getName()}.";
     $description_revision = "Revision archive storage for {$storage_definition->getTargetEntityTypeId()} field {$storage_definition->getName()}.";
@@ -2540,7 +2553,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   }
 
   /**
-   * Typecasts values to proper datatypes.
+   * Typecasts values to the proper data type.
    *
    * MySQL PDO silently casts, e.g. FALSE and '' to 0, when inserting the value
    * into an integer column, but PostgreSQL PDO does not. Use the schema

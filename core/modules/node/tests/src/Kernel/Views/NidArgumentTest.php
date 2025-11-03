@@ -1,18 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel\Views;
 
 use Drupal\node\Entity\Node;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the nid argument handler.
  *
- * @group node
  * @see \Drupal\node\Plugin\views\argument\Nid
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NidArgumentTest extends ViewsKernelTestBase {
 
   /**
@@ -23,7 +28,6 @@ class NidArgumentTest extends ViewsKernelTestBase {
     'field',
     'text',
     'node_test_config',
-    'user',
     'node_test_views',
   ];
 
@@ -48,9 +52,9 @@ class NidArgumentTest extends ViewsKernelTestBase {
   }
 
   /**
-   * Test the nid argument.
+   * Tests the nid argument.
    */
-  public function testNidArgument() {
+  public function testNidArgument(): void {
     $view = Views::getView('test_nid_argument');
     $view->setDisplay();
 
@@ -72,10 +76,10 @@ class NidArgumentTest extends ViewsKernelTestBase {
     $view->destroy();
     $view->preview('default', [$node2->id()]);
     // Verify that the title is overridden.
-    $this->assertEqual($node2->getTitle(), $view->getTitle());
+    $this->assertEquals($node2->getTitle(), $view->getTitle());
     // Verify that the argument filtering works.
     $this->assertCount(1, $view->result, 'Found the expected number of results.');
-    $this->assertEqual($node2->id(), (string) $view->style_plugin->getField(0, 'nid'), 'Found the correct nid.');
+    $this->assertEquals($node2->id(), (string) $view->style_plugin->getField(0, 'nid'), 'Found the correct nid.');
 
     // Verify that setting a non-existing id as argument results in no nodes
     // being shown.

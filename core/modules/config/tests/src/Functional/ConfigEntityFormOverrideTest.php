@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that config overrides do not bleed through in entity forms and lists.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigEntityFormOverrideTest extends BrowserTestBase {
 
   /**
@@ -24,7 +28,7 @@ class ConfigEntityFormOverrideTest extends BrowserTestBase {
   /**
    * Tests that overrides do not affect forms or listing screens.
    */
-  public function testFormsWithOverrides() {
+  public function testFormsWithOverrides(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'administer site configuration',
     ]));
@@ -47,14 +51,13 @@ class ConfigEntityFormOverrideTest extends BrowserTestBase {
 
     // Test that the original label on the listing page is intact.
     $this->drupalGet('admin/structure/config_test');
-    $this->assertText($original_label);
-    $this->assertNoText($overridden_label);
+    $this->assertSession()->pageTextContains($original_label);
+    $this->assertSession()->pageTextNotContains($overridden_label);
 
     // Test that the original label on the editing page is intact.
     $this->drupalGet('admin/structure/config_test/manage/dotted.default');
-    $elements = $this->xpath('//input[@name="label"]');
-    $this->assertSame($original_label, $elements[0]->getValue());
-    $this->assertNoText($overridden_label);
+    $this->assertSession()->fieldValueEquals('label', $original_label);
+    $this->assertSession()->pageTextNotContains($overridden_label);
 
     // Change to a new label and test that the listing now has the edited label.
     $edit = [
@@ -62,13 +65,12 @@ class ConfigEntityFormOverrideTest extends BrowserTestBase {
     ];
     $this->submitForm($edit, 'Save');
     $this->drupalGet('admin/structure/config_test');
-    $this->assertNoText($overridden_label);
-    $this->assertText($edited_label);
+    $this->assertSession()->pageTextNotContains($overridden_label);
+    $this->assertSession()->pageTextContains($edited_label);
 
     // Test that the editing page now has the edited label.
     $this->drupalGet('admin/structure/config_test/manage/dotted.default');
-    $elements = $this->xpath('//input[@name="label"]');
-    $this->assertSame($edited_label, $elements[0]->getValue());
+    $this->assertSession()->fieldValueEquals('label', $edited_label);
 
     // Test that the overridden label is still loaded with the entity.
     $this->assertEquals($overridden_label, $config_test_storage->load('dotted.default')->label());

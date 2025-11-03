@@ -55,7 +55,7 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
   public function __construct(ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, LanguageManagerInterface $language_manager) {
     $this->factory = new ContainerFactory($this, $this->pluginInterface);
     $this->alterInfo('migration_plugins');
-    $this->setCacheBackend($cache_backend, 'migration_plugins', ['migration_plugins']);
+    $this->setCacheBackend($cache_backend, 'migration_plugins');
     $this->moduleHandler = $module_handler;
   }
 
@@ -80,7 +80,10 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
       // This gets rid of migrations with explicit providers set if one of the
       // providers do not exist before we try to use a potentially non-existing
       // deriver. This is a rare case.
-      $filtered_discovery = new ProviderFilterDecorator($only_with_source_discovery, [$this->moduleHandler, 'moduleExists']);
+      $filtered_discovery = new ProviderFilterDecorator($only_with_source_discovery, [
+        $this->moduleHandler,
+        'moduleExists',
+      ]);
       $this->discovery = new ContainerDerivativeDiscoveryDecorator($filtered_discovery);
     }
     return $this->discovery;
@@ -104,15 +107,24 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
 
     $factory = $this->getFactory();
     $migration_ids = (array) $migration_id;
+
+    // We need to expand any derivative migrations. Derivative migrations are
+    // calculated by migration derivers such as D6NodeDeriver. This allows
+    // migrations to depend on the base id and then have a dependency on all
+    // derivative migrations. For example, d6_comment depends on d6_node but
+    // after we've expanded the dependencies it will depend on d6_node:page,
+    // d6_node:story and so on, for other derivative migrations.
     $plugin_ids = $this->expandPluginIds($migration_ids);
 
     $instances = [];
     foreach ($plugin_ids as $plugin_id) {
-      $instances[$plugin_id] = $factory->createInstance($plugin_id, isset($configuration[$plugin_id]) ? $configuration[$plugin_id] : []);
+      $instances[$plugin_id] = $factory->createInstance($plugin_id, $configuration[$plugin_id] ?? []);
     }
 
+    // @todo Remove loop when the ability to call ::getMigrationDependencies()
+    //   without expanding plugins is removed.
     foreach ($instances as $migration) {
-      $migration->set('migration_dependencies', array_map([$this, 'expandPluginIds'], $migration->getMigrationDependencies()));
+      $migration->set('migration_dependencies', $migration->getMigrationDependencies());
     }
 
     // Sort the migrations based on their dependencies.
@@ -130,22 +142,13 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
   }
 
   /**
-   * Expand derivative migration dependencies.
-   *
-   * We need to expand any derivative migrations. Derivative migrations are
-   * calculated by migration derivers such as D6NodeDeriver. This allows
-   * migrations to depend on the base id and then have a dependency on all
-   * derivative migrations. For example, d6_comment depends on d6_node but after
-   * we've expanded the dependencies it will depend on d6_node:page,
-   * d6_node:story and so on, for other derivative migrations.
-   *
-   * @return array
-   *   An array of expanded plugin ids.
+   * {@inheritdoc}
    */
-  protected function expandPluginIds(array $migration_ids) {
+  public function expandPluginIds(array $migration_ids) {
     $plugin_ids = [];
+    $all_ids = array_keys($this->getDefinitions());
     foreach ($migration_ids as $id) {
-      $plugin_ids += preg_grep('/^' . preg_quote($id, '/') . PluginBase::DERIVATIVE_SEPARATOR . '/', array_keys($this->getDefinitions()));
+      $plugin_ids = array_merge($plugin_ids, preg_grep('/^' . preg_quote($id, '/') . PluginBase::DERIVATIVE_SEPARATOR . '/', $all_ids));
       if ($this->hasDefinition($id)) {
         $plugin_ids[] = $id;
       }
@@ -226,7 +229,7 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
    *   The dynamic ID mapping.
    */
   protected function addDependency(array &$graph, $id, $dependency, $dynamic_ids) {
-    $dependencies = isset($dynamic_ids[$dependency]) ? $dynamic_ids[$dependency] : [$dependency];
+    $dependencies = $dynamic_ids[$dependency] ?? [$dependency];
     if (!isset($graph[$id]['edges'])) {
       $graph[$id]['edges'] = [];
     }
@@ -237,7 +240,7 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
    * {@inheritdoc}
    */
   public function createStubMigration(array $definition) {
-    $id = isset($definition['id']) ? $definition['id'] : uniqid();
+    $id = $definition['id'] ?? uniqid();
     return Migration::create(\Drupal::getContainer(), [], $id, $definition);
   }
 
@@ -247,9 +250,10 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
    * @return array
    *   List of definitions to store in cache.
    *
-   * @todo This is a temporary solution to the fact that migration source
-   *   plugins have more than one provider. This functionality will be moved to
-   *   core in https://www.drupal.org/node/2786355.
+   * @todo This provides backwards compatibility for migration source plugins
+   *   using annotations and having more than one provider. This functionality
+   *   will be deprecated and removed with plugin discovery by annotations in
+   *   https://www.drupal.org/project/drupal/issues/3522409.
    */
   protected function findDefinitions() {
     $definitions = $this->getDiscovery()->getDefinitions();

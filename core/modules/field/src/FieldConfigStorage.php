@@ -101,7 +101,7 @@ class FieldConfigStorage extends FieldConfigStorageBase {
    */
   public function loadByProperties(array $conditions = []) {
     // Include deleted fields if specified in the $conditions parameters.
-    $include_deleted = isset($conditions['include_deleted']) ? $conditions['include_deleted'] : FALSE;
+    $include_deleted = $conditions['include_deleted'] ?? FALSE;
     unset($conditions['include_deleted']);
 
     $fields = [];
@@ -150,11 +150,11 @@ class FieldConfigStorage extends FieldConfigStorageBase {
             $checked_value = $field_storage->uuid();
             break;
 
-          case 'uuid';
+          case 'uuid':
             $checked_value = $field->uuid();
             break;
 
-          case 'deleted';
+          case 'deleted':
             $checked_value = $field->isDeleted();
             break;
 

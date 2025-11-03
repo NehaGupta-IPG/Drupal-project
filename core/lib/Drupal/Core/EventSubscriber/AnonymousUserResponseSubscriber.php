@@ -38,7 +38,7 @@ class AnonymousUserResponseSubscriber implements EventSubscriberInterface {
    *   The event to process.
    */
   public function onRespond(ResponseEvent $event) {
-    if (!$event->isMasterRequest()) {
+    if (!$event->isMainRequest()) {
       return;
     }
 
@@ -71,7 +71,7 @@ class AnonymousUserResponseSubscriber implements EventSubscriberInterface {
    * @return array
    *   An array of event listener definitions.
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     // Priority 5, so that it runs before FinishResponseSubscriber, but after
     // event subscribers that add the associated cacheability metadata (which
     // have priority 10). This one is conditional, so must run after those.

@@ -1,16 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Functional;
 
+use Drupal\Component\Utility\Html;
 use Drupal\file\Entity\File;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the 'managed_file' element type.
  *
- * @group file
  * @todo Create a FileTestBase class and move FileFieldTestBase methods
  *   that aren't related to fields into it.
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileManagedFileElementTest extends FileFieldTestBase {
 
   /**
@@ -21,7 +27,7 @@ class FileManagedFileElementTest extends FileFieldTestBase {
   /**
    * Tests the managed_file element type.
    */
-  public function testManagedFile() {
+  public function testManagedFile(): void {
     // Check that $element['#size'] is passed to the child upload element.
     $this->drupalGet('file/test');
     $field = $this->assertSession()->fieldExists("files[nested_file]");
@@ -37,9 +43,16 @@ class FileManagedFileElementTest extends FileFieldTestBase {
           $input_base_name = $tree ? 'nested_file' : 'file';
           $file_field_name = $multiple ? 'files[' . $input_base_name . '][]' : 'files[' . $input_base_name . ']';
 
+          $this->drupalGet($path);
+
+          // Ensure the aria-describedby relationship works as expected.
+          $input_id = Html::getId('edit_' . $input_base_name);
+          $this->assertSession()->elementExists('css', '#' . $input_id . '--description');
+          $this->assertSession()->elementExists('css', '[aria-describedby="' . $input_id . '--description"]');
+
           // Submit without a file.
-          $this->drupalPostForm($path, [], 'Save');
-          $this->assertRaw(t('The file ids are %fids.', ['%fids' => implode(',', [])]));
+          $this->submitForm([], 'Save');
+          $this->assertSession()->pageTextContains("The file ids are .");
 
           // Submit with a file, but with an invalid form token. Ensure the file
           // was not saved.
@@ -51,21 +64,23 @@ class FileManagedFileElementTest extends FileFieldTestBase {
             $file_field_name => \Drupal::service('file_system')->realpath($test_file->getFileUri()),
           ];
           $this->submitForm($edit, 'Save');
-          $this->assertText('The form has become outdated.');
+          $this->assertSession()->pageTextContains('The form has become outdated.');
           $last_fid = $this->getLastFileId();
-          $this->assertEqual($last_fid_prior, $last_fid, 'File was not saved when uploaded with an invalid form token.');
+          $this->assertEquals($last_fid_prior, $last_fid, 'File was not saved when uploaded with an invalid form token.');
 
           // Submit a new file, without using the Upload button.
           $last_fid_prior = $this->getLastFileId();
           $edit = [$file_field_name => \Drupal::service('file_system')->realpath($test_file->getFileUri())];
-          $this->drupalPostForm($path, $edit, 'Save');
+          $this->drupalGet($path);
+          $this->submitForm($edit, 'Save');
           $last_fid = $this->getLastFileId();
           $this->assertGreaterThan($last_fid_prior, $last_fid, 'New file got saved.');
-          $this->assertRaw(t('The file ids are %fids.', ['%fids' => implode(',', [$last_fid])]));
+          $this->assertSession()->pageTextContains("The file ids are $last_fid.");
 
           // Submit no new input, but with a default file.
-          $this->drupalPostForm($path . '/' . $last_fid, [], 'Save');
-          $this->assertRaw(t('The file ids are %fids.', ['%fids' => implode(',', [$last_fid])]));
+          $this->drupalGet($path . '/' . $last_fid);
+          $this->submitForm([], 'Save');
+          $this->assertSession()->pageTextContains("The file ids are $last_fid.");
 
           // Upload, then Submit.
           $last_fid_prior = $this->getLastFileId();
@@ -75,7 +90,7 @@ class FileManagedFileElementTest extends FileFieldTestBase {
           $last_fid = $this->getLastFileId();
           $this->assertGreaterThan($last_fid_prior, $last_fid, 'New file got uploaded.');
           $this->submitForm([], 'Save');
-          $this->assertRaw(t('The file ids are %fids.', ['%fids' => implode(',', [$last_fid])]));
+          $this->assertSession()->pageTextContains("The file ids are $last_fid.");
 
           // Remove, then Submit.
           $remove_button_title = $multiple ? 'Remove selected' : 'Remove';
@@ -87,7 +102,7 @@ class FileManagedFileElementTest extends FileFieldTestBase {
           $this->drupalGet($path . '/' . $last_fid);
           $this->submitForm($remove_edit, $remove_button_title);
           $this->submitForm([], 'Save');
-          $this->assertRaw(t('The file ids are %fids.', ['%fids' => '']));
+          $this->assertSession()->pageTextContains("The file ids are .");
 
           // Upload, then Remove, then Submit.
           $this->drupalGet($path);
@@ -101,7 +116,7 @@ class FileManagedFileElementTest extends FileFieldTestBase {
           $this->submitForm($remove_edit, $remove_button_title);
 
           $this->submitForm([], 'Save');
-          $this->assertRaw(t('The file ids are %fids.', ['%fids' => '']));
+          $this->assertSession()->pageTextContains("The file ids are .");
         }
       }
     }
@@ -126,13 +141,14 @@ class FileManagedFileElementTest extends FileFieldTestBase {
     // Save the entire form.
     $this->submitForm([], 'Save');
     // Check that two files are saved into a single multiple file element.
-    $this->assertRaw(t('The file ids are %fids.', ['%fids' => implode(',', $fid_list)]));
+    $this->assertSession()->pageTextContains("The file ids are " . implode(',', $fid_list) . ".");
 
     // Delete only the first file.
     $edit = [
       'nested[file][file_' . $fid_list[0] . '][selected]' => '1',
     ];
-    $this->drupalPostForm($path . '/' . implode(',', $fid_list), $edit, 'Remove selected');
+    $this->drupalGet($path . '/' . implode(',', $fid_list));
+    $this->submitForm($edit, 'Remove selected');
 
     // Check that the first file has been deleted but not the second.
     $this->assertSession()->fieldNotExists("nested[file][file_{$fid_list[0]}][selected]");
@@ -142,7 +158,7 @@ class FileManagedFileElementTest extends FileFieldTestBase {
   /**
    * Ensure that warning is shown if file on the field has been removed.
    */
-  public function testManagedFileRemoved() {
+  public function testManagedFileRemoved(): void {
     $this->drupalGet('file/test/1/0/1');
     $test_file = $this->getTestFile('text');
     $file_field_name = 'files[nested_file][]';
@@ -157,18 +173,17 @@ class FileManagedFileElementTest extends FileFieldTestBase {
     $this->submitForm($edit, 'Upload');
     // We expect the title 'Managed <em>file & butter</em>' which got escaped
     // via a t() call before.
-    $this->assertRaw('The file referenced by the Managed <em>file &amp; butter</em> field does not exist.');
+    $this->assertSession()->responseContains('The file referenced by the Managed <em>file &amp; butter</em> field does not exist.');
   }
 
   /**
    * Tests file names have leading . removed.
    */
-  public function testFileNameTrim() {
+  public function testFileNameTrim(): void {
     file_put_contents('public://.leading-period.txt', $this->randomString(32));
     $last_fid_prior = $this->getLastFileId();
-    $this->drupalPostForm('file/test/0/0/0', [
-      'files[file]' => \Drupal::service('file_system')->realpath('public://.leading-period.txt'),
-    ], 'Save');
+    $this->drupalGet('file/test/0/0/0');
+    $this->submitForm(['files[file]' => \Drupal::service('file_system')->realpath('public://.leading-period.txt')], 'Save');
     $next_fid = $this->getLastFileId();
     $this->assertGreaterThan($last_fid_prior, $next_fid);
     $file = File::load($next_fid);
@@ -178,7 +193,7 @@ class FileManagedFileElementTest extends FileFieldTestBase {
   /**
    * Ensure a file entity can be saved when the file does not exist on disk.
    */
-  public function testFileRemovedFromDisk() {
+  public function testFileRemovedFromDisk(): void {
     $this->drupalGet('file/test/1/0/1');
     $test_file = $this->getTestFile('text');
     $file_field_name = 'files[nested_file][]';
@@ -188,7 +203,7 @@ class FileManagedFileElementTest extends FileFieldTestBase {
     $this->submitForm([], 'Save');
 
     $fid = $this->getLastFileId();
-    /** @var $file \Drupal\file\FileInterface */
+    /** @var \Drupal\file\FileInterface $file */
     $file = $this->container->get('entity_type.manager')->getStorage('file')->load($fid);
     $file->setPermanent();
     $file->save();
@@ -201,7 +216,7 @@ class FileManagedFileElementTest extends FileFieldTestBase {
   /**
    * Verify that unused permanent files can be used.
    */
-  public function testUnusedPermanentFileValidation() {
+  public function testUnusedPermanentFileValidation(): void {
 
     // Create a permanent file without usages.
     $file = $this->getTestFile('image');
@@ -212,8 +227,8 @@ class FileManagedFileElementTest extends FileFieldTestBase {
     // allowed to reference an unused file.
     $this->drupalGet('file/test/1/0/1/' . $file->id());
     $this->submitForm([], 'Save');
-    $this->assertNoText('The file used in the Managed file &amp; butter field may not be referenced.');
-    $this->assertText('The file ids are ' . $file->id());
+    $this->assertSession()->pageTextNotContains('The file used in the Managed file & butter field may not be referenced.');
+    $this->assertSession()->pageTextContains('The file ids are ' . $file->id());
 
     // Enable marking unused files as temporary, unused permanent files must not
     // be referenced now.
@@ -222,8 +237,8 @@ class FileManagedFileElementTest extends FileFieldTestBase {
       ->save();
     $this->drupalGet('file/test/1/0/1/' . $file->id());
     $this->submitForm([], 'Save');
-    $this->assertText('The file used in the Managed file &amp; butter field may not be referenced.');
-    $this->assertNoText('The file ids are ' . $file->id());
+    $this->assertSession()->pageTextContains('The file used in the Managed file & butter field may not be referenced.');
+    $this->assertSession()->pageTextNotContains('The file ids are ' . $file->id());
 
     // Make the file temporary, now using it is allowed.
     $file->setTemporary();
@@ -231,8 +246,8 @@ class FileManagedFileElementTest extends FileFieldTestBase {
 
     $this->drupalGet('file/test/1/0/1/' . $file->id());
     $this->submitForm([], 'Save');
-    $this->assertNoText('The file used in the Managed file &amp; butter field may not be referenced.');
-    $this->assertText('The file ids are ' . $file->id());
+    $this->assertSession()->pageTextNotContains('The file used in the Managed file & butter field may not be referenced.');
+    $this->assertSession()->pageTextContains('The file ids are ' . $file->id());
 
     // Make the file permanent again and add a usage from itself, referencing is
     // still allowed.
@@ -245,8 +260,8 @@ class FileManagedFileElementTest extends FileFieldTestBase {
 
     $this->drupalGet('file/test/1/0/1/' . $file->id());
     $this->submitForm([], 'Save');
-    $this->assertNoText('The file used in the Managed file &amp; butter field may not be referenced.');
-    $this->assertText('The file ids are ' . $file->id());
+    $this->assertSession()->pageTextNotContains('The file used in the Managed file & butter field may not be referenced.');
+    $this->assertSession()->pageTextContains('The file ids are ' . $file->id());
   }
 
 }

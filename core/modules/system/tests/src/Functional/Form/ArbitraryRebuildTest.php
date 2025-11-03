@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests altering forms to be rebuilt so there are multiple steps.
- *
- * @group Form
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class ArbitraryRebuildTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['text', 'form_test'];
 
@@ -25,6 +27,9 @@ class ArbitraryRebuildTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -54,13 +59,14 @@ class ArbitraryRebuildTest extends BrowserTestBase {
   /**
    * Tests a basic rebuild with the user registration form.
    */
-  public function testUserRegistrationRebuild() {
+  public function testUserRegistrationRebuild(): void {
     $edit = [
       'name' => 'foo',
       'mail' => 'bar@example.com',
     ];
-    $this->drupalPostForm('user/register', $edit, 'Rebuild');
-    $this->assertText('Form rebuilt.');
+    $this->drupalGet('user/register');
+    $this->submitForm($edit, 'Rebuild');
+    $this->assertSession()->pageTextContains('Form rebuilt.');
     $this->assertSession()->fieldValueEquals('name', 'foo');
     $this->assertSession()->fieldValueEquals('mail', 'bar@example.com');
   }
@@ -68,13 +74,14 @@ class ArbitraryRebuildTest extends BrowserTestBase {
   /**
    * Tests a rebuild caused by a multiple value field.
    */
-  public function testUserRegistrationMultipleField() {
+  public function testUserRegistrationMultipleField(): void {
     $edit = [
       'name' => 'foo',
       'mail' => 'bar@example.com',
     ];
-    $this->drupalPostForm('user/register', $edit, 'Add another item');
-    $this->assertText('Test a multiple valued field');
+    $this->drupalGet('user/register');
+    $this->submitForm($edit, 'Add another item');
+    $this->assertSession()->pageTextContains('Test a multiple valued field');
     $this->assertSession()->fieldValueEquals('name', 'foo');
     $this->assertSession()->fieldValueEquals('mail', 'bar@example.com');
   }

@@ -1,15 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Form;
 
 use Drupal\Core\Form\FormCache;
 use Drupal\Core\Form\FormState;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Form\FormCache
- * @group Form
+ * Tests Drupal\Core\Form\FormCache.
  */
+#[CoversClass(FormCache::class)]
+#[Group('Form')]
 class FormCacheTest extends UnitTestCase {
 
   /**
@@ -43,7 +48,7 @@ class FormCacheTest extends UnitTestCase {
   /**
    * The mocked module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Prophecy\Prophecy\ObjectProphecy
    */
   protected $moduleHandler;
 
@@ -85,30 +90,20 @@ class FormCacheTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  protected $runTestInSeparateProcess = TRUE;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $preserveGlobalState = FALSE;
-
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
 
-    $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
+    $this->moduleHandler = $this->prophesize('Drupal\Core\Extension\ModuleHandlerInterface');
 
     $this->formCacheStore = $this->createMock('Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface');
     $this->formStateCacheStore = $this->createMock('Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface');
     $this->keyValueExpirableFactory = $this->createMock('Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface');
     $this->keyValueExpirableFactory->expects($this->any())
       ->method('get')
-      ->will($this->returnValueMap([
+      ->willReturnMap([
         ['form', $this->formCacheStore],
         ['form_state', $this->formStateCacheStore],
-      ]));
+      ]);
 
     $this->csrfToken = $this->getMockBuilder('Drupal\Core\Access\CsrfTokenGenerator')
       ->disableOriginalConstructor()
@@ -119,13 +114,15 @@ class FormCacheTest extends UnitTestCase {
     $this->requestStack = $this->createMock('\Symfony\Component\HttpFoundation\RequestStack');
     $this->requestPolicy = $this->createMock('\Drupal\Core\PageCache\RequestPolicyInterface');
 
-    $this->formCache = new FormCache($this->root, $this->keyValueExpirableFactory, $this->moduleHandler, $this->account, $this->csrfToken, $this->logger, $this->requestStack, $this->requestPolicy);
+    $this->formCache = new FormCache($this->root, $this->keyValueExpirableFactory, $this->moduleHandler->reveal(), $this->account, $this->csrfToken, $this->logger, $this->requestStack, $this->requestPolicy);
   }
 
   /**
-   * @covers ::getCache
+   * Tests get cache valid token.
+   *
+   * @legacy-covers ::getCache
    */
-  public function testGetCacheValidToken() {
+  public function testGetCacheValidToken(): void {
     $form_build_id = 'the_form_build_id';
     $form_state = new FormState();
     $cache_token = 'the_cache_token';
@@ -147,9 +144,11 @@ class FormCacheTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getCache
+   * Tests get cache invalid token.
+   *
+   * @legacy-covers ::getCache
    */
-  public function testGetCacheInvalidToken() {
+  public function testGetCacheInvalidToken(): void {
     $form_build_id = 'the_form_build_id';
     $form_state = new FormState();
     $cache_token = 'the_cache_token';
@@ -171,9 +170,11 @@ class FormCacheTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getCache
+   * Tests get cache anon user.
+   *
+   * @legacy-covers ::getCache
    */
-  public function testGetCacheAnonUser() {
+  public function testGetCacheAnonUser(): void {
     $form_build_id = 'the_form_build_id';
     $form_state = new FormState();
     $cached_form = ['#cache_token' => NULL];
@@ -193,9 +194,11 @@ class FormCacheTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getCache
+   * Tests get cache auth user.
+   *
+   * @legacy-covers ::getCache
    */
-  public function testGetCacheAuthUser() {
+  public function testGetCacheAuthUser(): void {
     $form_build_id = 'the_form_build_id';
     $form_state = new FormState();
     $cached_form = ['#cache_token' => NULL];
@@ -213,9 +216,11 @@ class FormCacheTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getCache
+   * Tests get cache no form.
+   *
+   * @legacy-covers ::getCache
    */
-  public function testGetCacheNoForm() {
+  public function testGetCacheNoForm(): void {
     $form_build_id = 'the_form_build_id';
     $form_state = new FormState();
     $cached_form = NULL;
@@ -232,35 +237,11 @@ class FormCacheTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getCache
+   * Tests load cached form state.
+   *
+   * @legacy-covers ::loadCachedFormState
    */
-  public function testGetCacheImmutableForm() {
-    $form_build_id = 'the_form_build_id';
-    $form_state = (new FormState())
-      ->addBuildInfo('immutable', TRUE);
-    $cached_form = [
-      '#build_id' => 'the_old_build_form_id',
-    ];
-
-    $this->account->expects($this->once())
-      ->method('isAnonymous')
-      ->willReturn(TRUE);
-    $this->formCacheStore->expects($this->once())
-      ->method('get')
-      ->with($form_build_id)
-      ->willReturn($cached_form);
-
-    $form = $this->formCache->getCache($form_build_id, $form_state);
-    $this->assertSame($cached_form['#build_id'], $form['#build_id_old']);
-    $this->assertNotSame($cached_form['#build_id'], $form['#build_id']);
-    $this->assertSame($form['#build_id'], $form['form_build_id']['#value']);
-    $this->assertSame($form['#build_id'], $form['form_build_id']['#id']);
-  }
-
-  /**
-   * @covers ::loadCachedFormState
-   */
-  public function testLoadCachedFormState() {
+  public function testLoadCachedFormState(): void {
     $form_build_id = 'the_form_build_id';
     $form_state = new FormState();
     $cached_form = ['#cache_token' => NULL];
@@ -284,9 +265,11 @@ class FormCacheTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::loadCachedFormState
+   * Tests load cached form state with files.
+   *
+   * @legacy-covers ::loadCachedFormState
    */
-  public function testLoadCachedFormStateWithFiles() {
+  public function testLoadCachedFormStateWithFiles(): void {
     $form_build_id = 'the_form_build_id';
     $form_state = new FormState();
     $cached_form = ['#cache_token' => NULL];
@@ -311,12 +294,10 @@ class FormCacheTest extends UnitTestCase {
         ],
       ],
     ];
-    $this->moduleHandler->expects($this->at(0))
-      ->method('loadInclude')
-      ->with('a_module', 'the_type', 'some_name');
-    $this->moduleHandler->expects($this->at(1))
-      ->method('loadInclude')
-      ->with('another_module', 'inc', 'another_module');
+    $this->moduleHandler->loadInclude('a_module', 'the_type', 'some_name')
+      ->shouldBeCalledOnce();
+    $this->moduleHandler->loadInclude('another_module', 'inc', 'another_module')
+      ->shouldBeCalledOnce();
     $this->formStateCacheStore->expects($this->once())
       ->method('get')
       ->with($form_build_id)
@@ -326,9 +307,11 @@ class FormCacheTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::setCache
+   * Tests set cache with form.
+   *
+   * @legacy-covers ::setCache
    */
-  public function testSetCacheWithForm() {
+  public function testSetCacheWithForm(): void {
     $form_build_id = 'the_form_build_id';
     $form = [
       '#form_id' => 'the_form_id',
@@ -348,9 +331,11 @@ class FormCacheTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::setCache
+   * Tests set cache without form.
+   *
+   * @legacy-covers ::setCache
    */
-  public function testSetCacheWithoutForm() {
+  public function testSetCacheWithoutForm(): void {
     $form_build_id = 'the_form_build_id';
     $form = NULL;
     $form_state = new FormState();
@@ -367,9 +352,11 @@ class FormCacheTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::setCache
+   * Tests set cache auth user.
+   *
+   * @legacy-covers ::setCache
    */
-  public function testSetCacheAuthUser() {
+  public function testSetCacheAuthUser(): void {
     $form_build_id = 'the_form_build_id';
     $form = [];
     $form_state = new FormState();
@@ -397,9 +384,11 @@ class FormCacheTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::setCache
+   * Tests set cache build id mismatch.
+   *
+   * @legacy-covers ::setCache
    */
-  public function testSetCacheBuildIdMismatch() {
+  public function testSetCacheBuildIdMismatch(): void {
     $form_build_id = 'the_form_build_id';
     $form = [
       '#form_id' => 'the_form_id',
@@ -418,9 +407,11 @@ class FormCacheTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::deleteCache
+   * Tests delete cache.
+   *
+   * @legacy-covers ::deleteCache
    */
-  public function testDeleteCache() {
+  public function testDeleteCache(): void {
     $form_build_id = 'the_form_build_id';
 
     $this->formCacheStore->expects($this->once())

@@ -1,16 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test for proper version fallback in case of a development release.
- *
- * @group language
  */
+#[Group('language')]
+#[RunTestsInSeparateProcesses]
 class LocaleUpdateDevelopmentReleaseTest extends BrowserTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['locale', 'locale_test_development_release'];
 
   /**
@@ -18,9 +25,12 @@ class LocaleUpdateDevelopmentReleaseTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
-    module_load_include('compare.inc', 'locale');
+    \Drupal::moduleHandler()->loadInclude('locale', 'inc', 'locale.compare');
     $admin_user = $this->drupalCreateUser([
       'administer modules',
       'administer languages',
@@ -28,15 +38,19 @@ class LocaleUpdateDevelopmentReleaseTest extends BrowserTestBase {
       'translate interface',
     ]);
     $this->drupalLogin($admin_user);
-    $this->drupalPostForm('admin/config/regional/language/add', ['predefined_langcode' => 'hu'], 'Add language');
+    $this->drupalGet('admin/config/regional/language/add');
+    $this->submitForm(['predefined_langcode' => 'hu'], 'Add language');
   }
 
-  public function testLocaleUpdateDevelopmentRelease() {
+  /**
+   * Tests locale update development release.
+   *
+   * @legacy-covers ::\locale_translation_build_projects
+   */
+  public function testLocaleUpdateDevelopmentRelease(): void {
     $projects = locale_translation_build_projects();
-    $this->verbose($projects['drupal']->info['version']);
-    $this->assertEqual('8.0.x', $projects['drupal']->info['version'], 'The branch of the core dev release.');
-    $this->verbose($projects['contrib']->info['version']);
-    $this->assertEqual('12.x-10.x', $projects['contrib']->info['version'], 'The branch of the contrib module dev release.');
+    $this->assertEquals('8.0.x', $projects['drupal']->info['version'], 'The branch of the core dev release.');
+    $this->assertEquals('12.x-10.x', $projects['contrib']->info['version'], 'The branch of the contrib module dev release.');
   }
 
 }

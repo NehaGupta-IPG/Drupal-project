@@ -1,18 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests no results behavior.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ViewsNoResultsBehaviorTest extends ViewTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'user'];
 
@@ -24,8 +27,8 @@ class ViewsNoResultsBehaviorTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp();
+  protected function setUp($import_test_views = TRUE, $modules = []): void {
+    parent::setUp($import_test_views, $modules);
     $this->enableViewsTestModule();
     $user = $this->createUser([], NULL, TRUE);
     $this->drupalLogin($user);
@@ -40,9 +43,9 @@ class ViewsNoResultsBehaviorTest extends ViewTestBase {
   /**
    * Tests the view with the text.
    */
-  public function testDuplicateText() {
+  public function testDuplicateText(): void {
     $output = $this->drupalGet('admin/content');
-    $this->assertEqual(1, substr_count($output, 'No content available.'), 'Only one message should be present');
+    $this->assertEquals(1, substr_count($output, 'No content available.'), 'Only one message should be present');
   }
 
 }

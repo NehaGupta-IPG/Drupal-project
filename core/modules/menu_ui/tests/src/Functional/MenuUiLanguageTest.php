@@ -1,28 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\menu_ui\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\menu_ui\Traits\MenuUiTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests for menu_ui language settings.
  *
  * Create menu and menu links in non-English language, and edit language
  * settings.
- *
- * @group menu_ui
  */
+#[Group('menu_ui')]
+#[RunTestsInSeparateProcesses]
 class MenuUiLanguageTest extends BrowserTestBase {
 
   use MenuUiTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',
@@ -35,6 +37,9 @@ class MenuUiLanguageTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -55,10 +60,10 @@ class MenuUiLanguageTest extends BrowserTestBase {
   /**
    * Tests menu language settings and the defaults for menu link items.
    */
-  public function testMenuLanguage() {
+  public function testMenuLanguage(): void {
     // Create a test menu to test the various language-related settings.
     // Machine name has to be lowercase.
-    $menu_name = mb_strtolower($this->randomMachineName(16));
+    $menu_name = $this->randomMachineName(16);
     $label = $this->randomString();
     $edit = [
       'id' => $menu_name,
@@ -66,7 +71,8 @@ class MenuUiLanguageTest extends BrowserTestBase {
       'label' => $label,
       'langcode' => 'aa',
     ];
-    $this->drupalPostForm('admin/structure/menu/add', $edit, 'Save');
+    $this->drupalGet('admin/structure/menu/add');
+    $this->submitForm($edit, 'Save');
     ContentLanguageSettings::loadByEntityTypeBundle('menu_link_content', 'menu_link_content')
       ->setDefaultLangcode('bb')
       ->setLanguageAlterable(TRUE)
@@ -84,7 +90,8 @@ class MenuUiLanguageTest extends BrowserTestBase {
       'title[0][value]' => $link_title,
       'link[0][uri]' => $link_path,
     ];
-    $this->drupalPostForm("admin/structure/menu/manage/$menu_name/add", $edit, 'Save');
+    $this->drupalGet("admin/structure/menu/manage/{$menu_name}/add");
+    $this->submitForm($edit, 'Save');
     // Check the link was added with the correct menu link default language.
     $menu_links = \Drupal::entityTypeManager()->getStorage('menu_link_content')->loadByProperties(['title' => $link_title]);
     $menu_link = reset($menu_links);
@@ -106,7 +113,8 @@ class MenuUiLanguageTest extends BrowserTestBase {
       'title[0][value]' => $link_title,
       'link[0][uri]' => $link_path,
     ];
-    $this->drupalPostForm("admin/structure/menu/manage/$menu_name/add", $edit, 'Save');
+    $this->drupalGet("admin/structure/menu/manage/{$menu_name}/add");
+    $this->submitForm($edit, 'Save');
     // Check the link was added with the correct new menu link default language.
     $menu_links = \Drupal::entityTypeManager()->getStorage('menu_link_content')->loadByProperties(['title' => $link_title]);
     $menu_link = reset($menu_links);
@@ -120,7 +128,8 @@ class MenuUiLanguageTest extends BrowserTestBase {
     $edit = [
       'langcode[0][value]' => 'bb',
     ];
-    $this->drupalPostForm('admin/structure/menu/item/' . $menu_link->id() . '/edit', $edit, 'Save');
+    $this->drupalGet('admin/structure/menu/item/' . $menu_link->id() . '/edit');
+    $this->submitForm($edit, 'Save');
     $this->assertMenuLink([
       'menu_name' => $menu_name,
       'route_name' => '<front>',

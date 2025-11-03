@@ -4,10 +4,13 @@ namespace Drupal\views_ui;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Timer;
-use Drupal\Core\EventSubscriber\AjaxResponseSubscriber;
+use Drupal\Component\Utility\Xss;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TempStore\Lock;
+use Drupal\views\Controller\ViewAjaxController;
 use Drupal\views\Views;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\views\ViewExecutable;
@@ -17,13 +20,16 @@ use Drupal\views\Plugin\views\query\Sql;
 use Drupal\views\Entity\View;
 use Drupal\views\ViewEntityInterface;
 use Drupal\Core\Routing\RouteObjectInterface;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Stores UI related temporary settings.
  */
+#[\AllowDynamicProperties]
 class ViewUI implements ViewEntityInterface {
+
+  use StringTranslationTrait;
 
   /**
    * Indicates if a view is currently being edited.
@@ -37,6 +43,7 @@ class ViewUI implements ViewEntityInterface {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $changed_display;
 
   /**
@@ -44,6 +51,7 @@ class ViewUI implements ViewEntityInterface {
    *
    * @var float
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $render_time;
 
   /**
@@ -68,6 +76,7 @@ class ViewUI implements ViewEntityInterface {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $temporary_options;
 
   /**
@@ -82,9 +91,8 @@ class ViewUI implements ViewEntityInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $live_preview;
-
-  public $renderPreview = FALSE;
 
   /**
    * The View storage object.
@@ -121,8 +129,9 @@ class ViewUI implements ViewEntityInterface {
   ];
 
   /**
-   * Whether the config is being created, updated or deleted through the
-   * import process.
+   * Whether the config is being synced through the import process.
+   *
+   * This is the case with create, update or delete.
    *
    * @var bool
    */
@@ -134,6 +143,11 @@ class ViewUI implements ViewEntityInterface {
    * @var bool
    */
   private $isUninstalling = FALSE;
+
+  /**
+   * The entity type.
+   */
+  protected string $entityType;
 
   /**
    * Constructs a View UI object.
@@ -154,7 +168,7 @@ class ViewUI implements ViewEntityInterface {
       return $this->storage->get($property_name, $langcode);
     }
 
-    return isset($this->{$property_name}) ? $this->{$property_name} : NULL;
+    return $this->{$property_name} ?? NULL;
   }
 
   /**
@@ -215,17 +229,18 @@ class ViewUI implements ViewEntityInterface {
     // Determine whether the values the user entered are intended to apply to
     // the current display or the default display.
 
-    list($was_defaulted, $is_defaulted, $revert) = $this->getOverrideValues($form, $form_state);
+    [$was_defaulted, $is_defaulted, $revert] = $this->getOverrideValues($form, $form_state);
 
-    // Based on the user's choice in the display dropdown, determine which display
-    // these changes apply to.
+    // Based on the user's choice in the display dropdown, determine which
+    // display these changes apply to.
     $display_id = $form_state->get('display_id');
     if ($revert) {
       // If it's revert just change the override and return.
       $display = &$this->getExecutable()->displayHandlers->get($display_id);
       $display->optionsOverride($form, $form_state);
 
-      // Don't execute the normal submit handling but still store the changed view into cache.
+      // Don't execute the normal submit handling but still store the changed
+      // view into cache.
       $this->cacheSet();
       return;
     }
@@ -269,12 +284,13 @@ class ViewUI implements ViewEntityInterface {
   }
 
   /**
-   * Provide a standard set of Apply/Cancel/OK buttons for the forms. Also provide
-   * a hidden op operator because the forms plugin doesn't seem to properly
-   * provide which button was clicked.
+   * Provides a standard set of Apply/Cancel/OK buttons for the forms.
    *
-   * TODO: Is the hidden op operator still here somewhere, or is that part of the
-   * docblock outdated?
+   * This will also provide a hidden op operator because the forms plugin
+   * doesn't seem to properly provide which button was clicked.
+   *
+   * @todo Is the hidden op operator still here somewhere, or is that part of
+   *   the docblock outdated?
    */
   public function getStandardButtons(&$form, FormStateInterface $form_state, $form_id, $name = NULL) {
     $form['actions'] = [
@@ -282,11 +298,11 @@ class ViewUI implements ViewEntityInterface {
     ];
 
     if (empty($name)) {
-      $name = t('Apply');
+      $name = $this->t('Apply');
       if (!empty($this->stack) && count($this->stack) > 1) {
-        $name = t('Apply and continue');
+        $name = $this->t('Apply and continue');
       }
-      $names = [t('Apply'), t('Apply and continue')];
+      $names = [$this->t('Apply'), $this->t('Apply and continue')];
     }
 
     // Forms that are purely informational set an ok_button flag, so we know not
@@ -322,17 +338,22 @@ class ViewUI implements ViewEntityInterface {
     }
 
     // Create a "Cancel" button. For purely informational forms, label it "OK".
-    $cancel_submit = function_exists($form_id . '_cancel') ? $form_id . '_cancel' : [$this, 'standardCancel'];
+    $cancel_submit = [$this, 'standardCancel'];
+    if (function_exists($form_id . '_cancel')) {
+      @trigger_error('Support for magic cancel submit handlers such as ' . $form_id . '_cancel() is deprecated in drupal:11.3.0 and removed in drupal:13.0.0. Specify a submit handler in a class method instead. See https://www.drupal.org/node/3536715', E_USER_DEPRECATED);
+      $cancel_submit = $form_id . '_cancel';
+    }
     $form['actions']['cancel'] = [
       '#type' => 'submit',
-      '#value' => !$form_state->get('ok_button') ? t('Cancel') : t('Ok'),
+      '#value' => !$form_state->get('ok_button') ? $this->t('Cancel') : $this->t('Ok'),
       '#submit' => [$cancel_submit],
       '#validate' => [],
       '#limit_validation_errors' => [],
     ];
 
     // Compatibility, to be removed later: // TODO: When is "later"?
-    // We used to set these items on the form, but now we want them on the $form_state:
+    // We used to set these items on the form, but now we want them on the
+    // $form_state:
     if (isset($form['#title'])) {
       $form_state->set('title', $form['#title']);
     }
@@ -349,8 +370,9 @@ class ViewUI implements ViewEntityInterface {
   public function getOverrideValues($form, FormStateInterface $form_state) {
     // Make sure the dropdown exists in the first place.
     if ($form_state->hasValue(['override', 'dropdown'])) {
-      // #default_value is used to determine whether it was the default value or not.
-      // So the available options are: $display, 'default' and 'default_revert', not 'defaults'.
+      // #default_value is used to determine whether it was the default value or
+      // not. So the available options are: $display, 'default' and
+      // 'default_revert', not 'defaults'.
       $was_defaulted = ($form['override']['dropdown']['#default_value'] === 'defaults');
       $dropdown = $form_state->getValue(['override', 'dropdown']);
       $is_defaulted = ($dropdown === 'default');
@@ -373,8 +395,9 @@ class ViewUI implements ViewEntityInterface {
   }
 
   /**
-   * Add another form to the stack; clicking 'apply' will go to this form
-   * rather than closing the ajax popup.
+   * Adds another form to the stack.
+   *
+   * Clicking 'apply' will go to this form rather than closing the ajax popup.
    */
   public function addFormToStack($key, $display_id, $type, $id = NULL, $top = FALSE, $rebuild_keys = FALSE) {
     // Reset the cache of IDs. Drupal rather aggressively prevents ID
@@ -388,8 +411,8 @@ class ViewUI implements ViewEntityInterface {
 
     $stack = [implode('-', array_filter([$key, $this->id(), $display_id, $type, $id])), $key, $display_id, $type, $id];
     // If we're being asked to add this form to the bottom of the stack, no
-    // special logic is required. Our work is equally easy if we were asked to add
-    // to the top of the stack, but there's nothing in it yet.
+    // special logic is required. Our work is equally easy if we were asked to
+    // add to the top of the stack, but there's nothing in it yet.
     if (!$top || empty($this->stack)) {
       $this->stack[] = $stack;
     }
@@ -429,7 +452,7 @@ class ViewUI implements ViewEntityInterface {
     $display_id = $form_state->get('display_id');
 
     // Handle the override select.
-    list($was_defaulted, $is_defaulted) = $this->getOverrideValues($form, $form_state);
+    [$was_defaulted, $is_defaulted] = $this->getOverrideValues($form, $form_state);
     if ($was_defaulted && !$is_defaulted) {
       // We were using the default display's values, but we're now overriding
       // the default display and saving values specific to this display.
@@ -448,18 +471,20 @@ class ViewUI implements ViewEntityInterface {
     }
 
     if (!$form_state->isValueEmpty('name') && is_array($form_state->getValue('name'))) {
-      // Loop through each of the items that were checked and add them to the view.
+      // Loop through each of the items that were checked and add them to the
+      // view.
       foreach (array_keys(array_filter($form_state->getValue('name'))) as $field) {
-        list($table, $field) = explode('.', $field, 2);
+        [$table, $field] = explode('.', $field, 2);
 
         if ($cut = strpos($field, '$')) {
           $field = substr($field, 0, $cut);
         }
         $id = $this->getExecutable()->addHandler($display_id, $type, $table, $field);
 
-        // check to see if we have group by settings
+        // Check to see if we have group by settings.
         $key = $type;
-        // Footer,header and empty text have a different internal handler type(area).
+        // Footer,header and empty text have a different internal handler
+        // type(area).
         if (isset($types[$type]['type'])) {
           $key = $types[$type]['type'];
         }
@@ -472,11 +497,12 @@ class ViewUI implements ViewEntityInterface {
           $this->addFormToStack('handler-group', $display_id, $type, $id);
         }
 
-        // check to see if this type has settings, if so add the settings form first
+        // Check to see if this type has settings, if so add the settings form
+        // first.
         if ($handler && $handler->hasExtraOptions()) {
           $this->addFormToStack('handler-extra', $display_id, $type, $id);
         }
-        // Then add the form to the stack
+        // Then add the form to the stack.
         $this->addFormToStack('handler', $display_id, $type, $id);
       }
     }
@@ -485,7 +511,7 @@ class ViewUI implements ViewEntityInterface {
       unset($this->form_cache);
     }
 
-    // Store in cache
+    // Store in cache.
     $this->cacheSet();
   }
 
@@ -502,7 +528,7 @@ class ViewUI implements ViewEntityInterface {
   }
 
   /**
-   * Add the list of queries run during render to buildinfo.
+   * Add the list of queries run during render to build info.
    *
    * @see ViewUI::startQueryCapture()
    */
@@ -513,7 +539,8 @@ class ViewUI implements ViewEntityInterface {
   }
 
   public function renderPreview($display_id, $args = []) {
-    // Save the current path so it can be restored before returning from this function.
+    // Save the current path so it can be restored before returning from this
+    // function.
     $request_stack = \Drupal::requestStack();
     $current_request = $request_stack->getCurrentRequest();
     $executable = $this->getExecutable();
@@ -536,16 +563,16 @@ class ViewUI implements ViewEntityInterface {
     $errors = $executable->validate();
     $executable->destroy();
     if (empty($errors)) {
-      $this->ajax = TRUE;
       $executable->live_preview = TRUE;
 
-      // AJAX happens via HTTP POST but everything expects exposed data to
-      // be in GET. Copy stuff but remove ajax-framework specific keys.
-      // If we're clicking on links in a preview, though, we could actually
-      // have some input in the query parameters, so we merge request() and
-      // query() to ensure we get it all.
+      // AJAX can happen via HTTP POST but everything expects exposed data to
+      // be in GET. If we're clicking on links in a preview, though, we could
+      // actually have some input in the query parameters, so we merge request()
+      // and query() to ensure we get have all the values exposed.
+      // We also make sure to remove ajax-framework specific keys and form
+      // tokens to avoid any problems.
       $exposed_input = array_merge(\Drupal::request()->request->all(), \Drupal::request()->query->all());
-      foreach (['view_name', 'view_display_id', 'view_args', 'view_path', 'view_dom_id', 'pager_element', 'view_base_path', AjaxResponseSubscriber::AJAX_REQUEST_PARAMETER, 'ajax_page_state', 'form_id', 'form_build_id', 'form_token'] as $key) {
+      foreach (array_merge(ViewAjaxController::FILTERED_QUERY_PARAMETERS, ['form_id', 'form_build_id', 'form_token']) as $key) {
         if (isset($exposed_input[$key])) {
           unset($exposed_input[$key]);
         }
@@ -554,7 +581,7 @@ class ViewUI implements ViewEntityInterface {
 
       if (!$executable->setDisplay($display_id)) {
         return [
-          '#markup' => t('Invalid display id @display', ['@display' => $display_id]),
+          '#markup' => $this->t('Invalid display id @display', ['@display' => $display_id]),
         ];
       }
 
@@ -574,7 +601,7 @@ class ViewUI implements ViewEntityInterface {
       $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, \Drupal::service('router.route_provider')->getRouteByName('entity.view.preview_form'));
       $request->attributes->set('view', $this->storage);
       $request->attributes->set('display_id', $display_id);
-      $raw_parameters = new ParameterBag();
+      $raw_parameters = new InputBag();
       $raw_parameters->set('view', $this->id());
       $raw_parameters->set('display_id', $display_id);
       $request->attributes->set('_raw_variables', $raw_parameters);
@@ -582,12 +609,14 @@ class ViewUI implements ViewEntityInterface {
       foreach ($args as $key => $arg) {
         $request->attributes->set('arg_' . $key, $arg);
       }
+      $request->setSession($request_stack->getSession());
       $request_stack->push($request);
 
       // Suppress contextual links of entities within the result set during a
       // Preview.
-      // @todo We'll want to add contextual links specific to editing the View, so
-      //   the suppression may need to be moved deeper into the Preview pipeline.
+      // @todo We'll want to add contextual links specific to editing the View,
+      //   so the suppression may need to be moved deeper into the Preview
+      //   pipeline.
       views_ui_contextual_links_suppress_push();
 
       $show_additional_queries = $config->get('ui.show.additional_queries');
@@ -652,14 +681,14 @@ class ViewUI implements ViewEntityInterface {
             if (!empty($this->additionalQueries)) {
               $queries[] = [
                 '#prefix' => '<strong>',
-                '#markup' => t('These queries were run during view rendering:'),
+                '#markup' => $this->t('These queries were run during view rendering:'),
                 '#suffix' => '</strong>',
               ];
               foreach ($this->additionalQueries as $query) {
                 $query_string = strtr($query['query'], $query['args']);
                 $queries[] = [
                   '#prefix' => "\n",
-                  '#markup' => t('[@time ms] @query', ['@time' => round($query['time'] * 100000, 1) / 100000.0, '@query' => $query_string]),
+                  '#markup' => $this->t('[@time ms] @query', ['@time' => round($query['time'] * 100000, 1) / 100000.0, '@query' => $query_string]),
                 ];
               }
 
@@ -673,9 +702,9 @@ class ViewUI implements ViewEntityInterface {
                 [
                   'data' => [
                     '#prefix' => '<pre>',
-                     'queries' => $queries,
-                     '#suffix' => '</pre>',
-                    ],
+                    'queries' => $queries,
+                    '#suffix' => '</pre>',
+                  ],
                 ],
               ];
             }
@@ -691,6 +720,7 @@ class ViewUI implements ViewEntityInterface {
               [
                 'data' => [
                   '#markup' => $executable->getTitle(),
+                  '#allowed_tags' => Xss::getHtmlTagList(),
                 ],
               ],
             ];
@@ -700,13 +730,13 @@ class ViewUI implements ViewEntityInterface {
               $path = Link::fromTextAndUrl($path->toString(), $path)->toString();
             }
             else {
-              $path = t('This display has no path.');
+              $path = $this->t('This display has no path.');
             }
             $rows['query'][] = [
               [
                 'data' => [
                   '#prefix' => '<strong>',
-                  '#markup' => t('Path'),
+                  '#markup' => $this->t('Path'),
                   '#suffix' => '</strong>',
                 ],
               ],
@@ -725,7 +755,7 @@ class ViewUI implements ViewEntityInterface {
                   '#template' => "<strong>{% trans 'Query build time' %}</strong>",
                 ],
               ],
-              t('@time ms', ['@time' => intval($executable->build_time * 100000) / 100]),
+              $this->t('@time ms', ['@time' => intval($executable->build_time * 100000) / 100]),
             ];
 
             $rows['statistics'][] = [
@@ -735,7 +765,7 @@ class ViewUI implements ViewEntityInterface {
                   '#template' => "<strong>{% trans 'Query execute time' %}</strong>",
                 ],
               ],
-              t('@time ms', ['@time' => intval($executable->execute_time * 100000) / 100]),
+              $this->t('@time ms', ['@time' => intval($executable->execute_time * 100000) / 100]),
             ];
 
             $rows['statistics'][] = [
@@ -745,7 +775,7 @@ class ViewUI implements ViewEntityInterface {
                   '#template' => "<strong>{% trans 'View render time' %}</strong>",
                 ],
               ],
-              t('@time ms', ['@time' => intval($this->render_time * 100) / 100]),
+              $this->t('@time ms', ['@time' => intval($this->render_time * 100) / 100]),
             ];
           }
           \Drupal::moduleHandler()->alter('views_preview_info', $rows, $executable);
@@ -758,13 +788,13 @@ class ViewUI implements ViewEntityInterface {
               [
                 'data' => [
                   '#prefix' => '<strong>',
-                  '#markup' => t('Query'),
+                  '#markup' => $this->t('Query'),
                   '#suffix' => '</strong>',
                 ],
               ],
               [
                 'data' => [
-                  '#markup' => t('No query was run'),
+                  '#markup' => $this->t('No query was run'),
                 ],
               ],
             ];
@@ -774,13 +804,13 @@ class ViewUI implements ViewEntityInterface {
               [
                 'data' => [
                   '#prefix' => '<strong>',
-                  '#markup' => t('Query'),
+                  '#markup' => $this->t('Query'),
                   '#suffix' => '</strong>',
                 ],
               ],
               [
                 'data' => [
-                  '#markup' => t('No query was run'),
+                  '#markup' => $this->t('No query was run'),
                 ],
               ],
             ];
@@ -794,7 +824,7 @@ class ViewUI implements ViewEntityInterface {
           \Drupal::messenger()->addError($error);
         }
       }
-      $preview = ['#markup' => t('Unable to preview due to validation errors.')];
+      $preview = ['#markup' => $this->t('Unable to preview due to validation errors.')];
     }
 
     // Assemble the preview, the query info, and the query statistics in the
@@ -830,7 +860,7 @@ class ViewUI implements ViewEntityInterface {
   /**
    * Get the user's current progress through the form stack.
    *
-   * @return
+   * @return array|false
    *   FALSE if the user is not currently in a multiple-form stack. Otherwise,
    *   an associative array with the following keys:
    *   - current: The number of the current form on the stack.
@@ -860,7 +890,7 @@ class ViewUI implements ViewEntityInterface {
    */
   public function cacheSet() {
     if ($this->isLocked()) {
-      \Drupal::messenger()->addError(t('Changes cannot be made to a locked view.'));
+      \Drupal::messenger()->addError($this->t('Changes cannot be made to a locked view.'));
       return;
     }
 
@@ -966,7 +996,7 @@ class ViewUI implements ViewEntityInterface {
   /**
    * {@inheritdoc}
    */
-  public static function loadMultiple(array $ids = NULL) {
+  public static function loadMultiple(?array $ids = NULL) {
     return View::loadMultiple($ids);
   }
 
@@ -994,7 +1024,7 @@ class ViewUI implements ViewEntityInterface {
   /**
    * {@inheritdoc}
    */
-  public function toUrl($rel = 'edit-form', array $options = []) {
+  public function toUrl($rel = NULL, array $options = []) {
     return $this->storage->toUrl($rel, $options);
   }
 
@@ -1036,7 +1066,7 @@ class ViewUI implements ViewEntityInterface {
   /**
    * {@inheritdoc}
    */
-  public function access($operation = 'view', AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access($operation = 'view', ?AccountInterface $account = NULL, $return_as_object = FALSE) {
     return $this->storage->access($operation, $account, $return_as_object);
   }
 
@@ -1362,6 +1392,21 @@ class ViewUI implements ViewEntityInterface {
    */
   public function unsetLock() {
     $this->lock = NULL;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOriginal(): ?static {
+    return $this->storage->getOriginal();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOriginal(?EntityInterface $original): static {
+    $this->storage->setOriginal($original);
     return $this;
   }
 

@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\menu_link_content\Functional;
 
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\system\Entity\Menu;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the menu link content delete UI.
- *
- * @group Menu
  */
+#[Group('Menu')]
+#[RunTestsInSeparateProcesses]
 class MenuLinkContentDeleteFormTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['menu_link_content'];
 
@@ -37,23 +39,20 @@ class MenuLinkContentDeleteFormTest extends BrowserTestBase {
   /**
    * Tests the MenuLinkContentDeleteForm class.
    */
-  public function testMenuLinkContentDeleteForm() {
+  public function testMenuLinkContentDeleteForm(): void {
     // Add new menu item.
-    $this->drupalPostForm(
-      'admin/structure/menu/manage/admin/add',
-      [
-        'title[0][value]' => t('Front page'),
-        'link[0][uri]' => '<front>',
-      ],
-      'Save'
-    );
-    $this->assertText('The menu link has been saved.');
+    $this->drupalGet('admin/structure/menu/manage/admin/add');
+    $this->submitForm([
+      'title[0][value]' => 'Front page',
+      'link[0][uri]' => '<front>',
+    ], 'Save');
+    $this->assertSession()->pageTextContains('The menu link has been saved.');
 
     $menu_link = MenuLinkContent::load(1);
     $this->drupalGet($menu_link->toUrl('delete-form'));
-    $this->assertRaw(t('Are you sure you want to delete the custom menu link %name?', ['%name' => $menu_link->label()]));
+    $this->assertSession()->pageTextContains("Are you sure you want to delete the custom menu link {$menu_link->label()}?");
     $this->assertSession()->linkExists('Cancel');
-    // Make sure cancel link points to link edit
+    // Make sure cancel link points to link edit.
     $this->assertSession()->linkByHrefExists($menu_link->toUrl('edit-form')->toString());
 
     \Drupal::service('module_installer')->install(['menu_ui']);
@@ -63,7 +62,7 @@ class MenuLinkContentDeleteFormTest extends BrowserTestBase {
     $menu = Menu::load($menu_link->getMenuName());
     $this->assertSession()->linkByHrefExists($menu->toUrl('edit-form')->toString());
     $this->submitForm([], 'Delete');
-    $this->assertRaw(t('The menu link %title has been deleted.', ['%title' => $menu_link->label()]));
+    $this->assertSession()->pageTextContains("The menu link {$menu_link->label()} has been deleted.");
   }
 
 }

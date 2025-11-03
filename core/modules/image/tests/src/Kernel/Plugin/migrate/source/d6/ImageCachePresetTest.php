@@ -1,16 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\image\Kernel\Plugin\migrate\source\d6;
 
+use Drupal\image\Plugin\migrate\source\d6\ImageCachePreset;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore actionid imagecache presetid presetname
 /**
  * Tests the d6_imagecache_presets source plugin.
- *
- * @covers \Drupal\image\Plugin\migrate\source\d6\ImageCachePreset
- *
- * @group image
  */
+#[CoversClass(ImageCachePreset::class)]
+#[Group('image')]
+#[RunTestsInSeparateProcesses]
 class ImageCachePresetTest extends MigrateSqlSourceTestBase {
 
   /**
@@ -21,14 +27,14 @@ class ImageCachePresetTest extends MigrateSqlSourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function providerSource() {
+  public static function providerSource() {
     $tests = [];
 
     // The source data.
     $tests[0]['source_data']['imagecache_preset'] = [
       [
         'presetid' => '1',
-        'presetname' => 'slackjaw_boys',
+        'presetname' => 'slack_jaw_boys',
       ],
     ];
     $tests[0]['source_data']['imagecache_action'] = [
@@ -46,7 +52,7 @@ class ImageCachePresetTest extends MigrateSqlSourceTestBase {
     $tests[0]['expected_data'] = [
       [
         'presetid' => '1',
-        'presetname' => 'slackjaw_boys',
+        'presetname' => 'slack_jaw_boys',
         'actions' => [
           [
             'actionid' => '3',

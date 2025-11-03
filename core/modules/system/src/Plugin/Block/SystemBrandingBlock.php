@@ -2,49 +2,43 @@
 
 namespace Drupal\system\Plugin\Block;
 
+use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\system\Form\SystemBrandingOffCanvasForm;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a block to display 'Site branding' elements.
- *
- * @Block(
- *   id = "system_branding_block",
- *   admin_label = @Translation("Site branding"),
- *   forms = {
- *     "settings_tray" = "Drupal\system\Form\SystemBrandingOffCanvasForm",
- *   },
- * )
  */
+#[Block(
+  id: "system_branding_block",
+  admin_label: new TranslatableMarkup("Site branding"),
+  forms: ['settings_tray' => SystemBrandingOffCanvasForm::class]
+)]
 class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**
-   * Stores the configuration factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
    * Creates a SystemBrandingBlock instance.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected ConfigFactoryInterface $configFactory,
+    protected ?ThemeSettingsProvider $themeSettingsProvider = NULL,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->configFactory = $config_factory;
+    if ($themeSettingsProvider === NULL) {
+      @trigger_error('Calling ' . __CLASS__ . ' constructor without the $themeSettingsProvider argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3035289', E_USER_DEPRECATED);
+      $this->themeSettingsProvider = \Drupal::service(ThemeSettingsProvider::class);
+    }
   }
 
   /**
@@ -55,7 +49,8 @@ class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInt
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('config.factory')
+      $container->get('config.factory'),
+      $container->get(ThemeSettingsProvider::class),
     );
   }
 
@@ -75,19 +70,14 @@ class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInt
    * {@inheritdoc}
    */
   public function blockForm($form, FormStateInterface $form_state) {
-    // Get the theme.
-    $theme = $form_state->get('block_theme');
-
     // Get permissions.
     $url_system_theme_settings = new Url('system.theme_settings');
-    $url_system_theme_settings_theme = new Url('system.theme_settings_theme', ['theme' => $theme]);
 
-    if ($url_system_theme_settings->access() && $url_system_theme_settings_theme->access()) {
-      // Provide links to the Appearance Settings and Theme Settings pages
-      // if the user has access to administer themes.
-      $site_logo_description = $this->t('Defined on the <a href=":appearance">Appearance Settings</a> or <a href=":theme">Theme Settings</a> page.', [
-        ':appearance' => $url_system_theme_settings->toString(),
-        ':theme' => $url_system_theme_settings_theme->toString(),
+    if ($url_system_theme_settings->access()) {
+      // Provide links to the Appearance Settings page if the user has access to
+      // administer themes.
+      $site_logo_description = $this->t('Defined on the <a href="@appearance">Appearance Settings</a> page.', [
+        '@appearance' => $url_system_theme_settings->toString(),
       ]);
     }
     else {
@@ -158,7 +148,7 @@ class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInt
 
     $build['site_logo'] = [
       '#theme' => 'image',
-      '#uri' => theme_get_setting('logo.url'),
+      '#uri' => $this->themeSettingsProvider->getSetting('logo.url'),
       '#alt' => $this->t('Home'),
       '#access' => $this->configuration['use_site_logo'],
     ];

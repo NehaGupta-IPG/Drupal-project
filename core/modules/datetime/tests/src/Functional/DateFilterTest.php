@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\datetime\Functional;
 
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
@@ -7,14 +9,16 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Functional\ViewTestBase;
-use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test exposed datetime filters functionality.
  *
- * @group views
  * @see \Drupal\datetime\Plugin\views\filter\Date
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class DateFilterTest extends ViewTestBase {
 
   /**
@@ -50,9 +54,8 @@ class DateFilterTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
-    ViewTestData::createTestViews(static::class, ['datetime_test']);
+  protected function setUp($import_test_views = TRUE, $modules = ['datetime_test']): void {
+    parent::setUp($import_test_views, $modules);
 
     // Add a date field to page nodes.
     $node_type = NodeType::create([
@@ -82,10 +85,19 @@ class DateFilterTest extends ViewTestBase {
   /**
    * Tests the limit of the expose operator functionality.
    */
-  public function testLimitExposedOperators() {
+  public function testLimitExposedOperators(): void {
 
+    $edit = [];
     $this->drupalGet('test_exposed_filter_datetime');
     $this->assertSession()->statusCodeEquals(200);
+
+    // Ensure that invalid date format entries in the exposed filter are
+    // validated.
+    $edit = ['edit-field-date-value-value' => 'lun 2018-04-27'];
+    $this->submitForm($edit, 'Apply');
+    $this->assertSession()->pageTextContains('Invalid date format.');
+    $this->assertSession()->pageTextNotContains('Exception: DateTime object not set.');
+
     $this->assertSession()->optionExists('edit-field-date-value-op', '=');
     $this->assertSession()->optionNotExists('edit-field-date-value-op', '>');
     $this->assertSession()->optionNotExists('edit-field-date-value-op', '>=');
@@ -99,8 +111,10 @@ class DateFilterTest extends ViewTestBase {
     $edit = [];
     $edit['options[operator]'] = '>';
     $edit['options[expose][operator_list][]'] = ['>', '>=', 'between'];
-    $this->drupalPostForm('admin/structure/views/nojs/handler/test_exposed_filter_datetime/default/filter/field_date_value', $edit, 'Apply');
-    $this->drupalPostForm('admin/structure/views/view/test_exposed_filter_datetime/edit/default', [], 'Save');
+    $this->drupalGet('admin/structure/views/nojs/handler/test_exposed_filter_datetime/default/filter/field_date_value');
+    $this->submitForm($edit, 'Apply');
+    $this->drupalGet('admin/structure/views/view/test_exposed_filter_datetime/edit/default');
+    $this->submitForm([], 'Save');
 
     $this->drupalGet('test_exposed_filter_datetime');
     $this->assertSession()->statusCodeEquals(200);
@@ -118,8 +132,9 @@ class DateFilterTest extends ViewTestBase {
     $edit = [];
     $edit['options[operator]'] = '=';
     $edit['options[expose][operator_list][]'] = ['<', '>'];
-    $this->drupalPostForm('admin/structure/views/nojs/handler/test_exposed_filter_datetime/default/filter/field_date_value', $edit, 'Apply');
-    $this->assertText('You selected the "Is equal to" operator as the default value but is not included in the list of limited operators.');
+    $this->drupalGet('admin/structure/views/nojs/handler/test_exposed_filter_datetime/default/filter/field_date_value');
+    $this->submitForm($edit, 'Apply');
+    $this->assertSession()->pageTextContains('You selected the "Is equal to" operator as the default value but is not included in the list of limited operators.');
   }
 
 }

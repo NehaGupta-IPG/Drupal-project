@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\Tests\migrate_drupal_ui\Functional;
+declare(strict_types=1);
 
-use Drupal\Tests\migrate_drupal\Traits\CreateTestContentEntitiesTrait;
+namespace Drupal\Tests\migrate_drupal_ui\Functional;
 
 /**
  * Provides a base class for testing the review step of the Upgrade form.
@@ -10,8 +10,6 @@ use Drupal\Tests\migrate_drupal\Traits\CreateTestContentEntitiesTrait;
  * When using this test class, enable translation modules.
  */
 abstract class MultilingualReviewPageTestBase extends MigrateUpgradeTestBase {
-
-  use CreateTestContentEntitiesTrait;
 
   /**
    * {@inheritdoc}
@@ -40,25 +38,11 @@ abstract class MultilingualReviewPageTestBase extends MigrateUpgradeTestBase {
    *
    * @see \Drupal\Tests\migrate_drupal_ui\Functional\MigrateUpgradeExecuteTestBase
    */
-  public function testMigrateUpgradeReviewPage() {
+  public function testMigrateUpgradeReviewPage(): void {
     $this->prepare();
     // Start the upgrade process.
-    $this->drupalGet('/upgrade');
-    $this->submitForm([], 'Continue');
-
-    // Get valid credentials.
-    $edits = $this->translatePostValues($this->getCredentials());
-
-    $this->submitForm($edits, 'Review upgrade');
+    $this->submitCredentialForm();
     $this->submitForm([], 'I acknowledge I may lose data. Continue anyway.');
-
-    // Ensure there are no errors about missing modules from the test module.
-    $session = $this->assertSession();
-    $session->pageTextNotContains(t('Source module not found for migration_provider_no_annotation.'));
-    $session->pageTextNotContains(t('Source module not found for migration_provider_test.'));
-    $session->pageTextNotContains(t('Destination module not found for migration_provider_test'));
-    // Ensure there are no errors about any other missing migration providers.
-    $session->pageTextNotContains(t('module not found'));
 
     // Test the upgrade paths.
     $this->assertReviewForm();
@@ -76,7 +60,7 @@ abstract class MultilingualReviewPageTestBase extends MigrateUpgradeTestBase {
     // Start the upgrade process.
     $this->drupalGet('/upgrade');
     $this->submitForm([], 'Continue');
-    $this->submitForm($edits, 'Review upgrade');
+    $this->submitForm($this->edits, 'Review upgrade');
     $this->submitForm([], 'I acknowledge I may lose data. Continue anyway.');
 
     // Test the upgrade paths. First remove the module from the available paths

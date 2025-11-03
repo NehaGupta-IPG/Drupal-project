@@ -1,22 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Form;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Serialization\Json;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the vertical_tabs form element for expected behavior.
- *
- * @group Form
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class ElementsVerticalTabsTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['form_test'];
 
@@ -39,6 +40,9 @@ class ElementsVerticalTabsTest extends BrowserTestBase {
    */
   protected $webUser;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -50,57 +54,35 @@ class ElementsVerticalTabsTest extends BrowserTestBase {
   }
 
   /**
-   * Ensures that vertical-tabs.js is included before collapse.js.
-   *
-   * Otherwise, collapse.js adds "SHOW" or "HIDE" labels to the tabs.
-   */
-  public function testJavaScriptOrdering() {
-    $this->drupalGet('form_test/vertical-tabs');
-    $content = $this->getSession()->getPage()->getContent();
-    $position1 = strpos($content, 'core/misc/vertical-tabs.js');
-    $position2 = strpos($content, 'core/misc/collapse.js');
-    $this->assertNotFalse($position1);
-    $this->assertNotFalse($position2);
-    $this->assertGreaterThan($position1, $position2, 'vertical-tabs.js is included before collapse.js');
-  }
-
-  /**
    * Ensures that vertical tab markup is not shown if user has no tab access.
    */
-  public function testWrapperNotShownWhenEmpty() {
+  public function testWrapperNotShownWhenEmpty(): void {
     // Test admin user can see vertical tabs and wrapper.
     $this->drupalGet('form_test/vertical-tabs');
-    $wrapper = $this->xpath("//div[@data-vertical-tabs-panes]");
-    $this->assertTrue(isset($wrapper[0]), 'Vertical tab panes found.');
+    $this->assertSession()->elementExists('xpath', "//div[@data-vertical-tabs-panes]");
 
     // Test wrapper markup not present for non-privileged web user.
     $this->drupalLogin($this->webUser);
     $this->drupalGet('form_test/vertical-tabs');
-    $wrapper = $this->xpath("//div[@data-vertical-tabs-panes]");
-    $this->assertFalse(isset($wrapper[0]), 'Vertical tab wrappers are not displayed to unprivileged users.');
+    $this->assertSession()->elementNotExists('xpath', "//div[@data-vertical-tabs-panes]");
   }
 
   /**
    * Ensures that default vertical tab is correctly selected.
    */
-  public function testDefaultTab() {
+  public function testDefaultTab(): void {
     $this->drupalGet('form_test/vertical-tabs');
-
-    $value = $this->assertSession()
-      ->elementExists('css', 'input[name="vertical_tabs__active_tab"]')
-      ->getValue();
-
-    $this->assertSame('edit-tab3', $value, t('The default vertical tab is correctly selected.'));
+    $this->assertSession()->elementAttributeContains('css', 'input[name="vertical_tabs__active_tab"]', 'value', 'edit-tab3');
   }
 
   /**
    * Ensures that vertical tab form values are cleaned.
    */
-  public function testDefaultTabCleaned() {
+  public function testDefaultTabCleaned(): void {
     $this->drupalGet('form_test/form-state-values-clean');
     $this->submitForm([], 'Submit');
     $values = Json::decode($this->getSession()->getPage()->getContent());
-    $this->assertFalse(isset($values['vertical_tabs__active_tab']), new FormattableMarkup('%element was removed.', ['%element' => 'vertical_tabs__active_tab']));
+    $this->assertFalse(isset($values['vertical_tabs__active_tab']), 'vertical_tabs__active_tab was removed.');
   }
 
 }

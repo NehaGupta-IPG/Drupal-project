@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\Core\Database\Database;
 use Drupal\node\NodeInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Create a node with revisions and test viewing, saving, reverting, and
- * deleting revisions for user with access to all.
- *
- * @group node
+ * Tests global node CRUD operation permissions.
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeRevisionsAllTest extends NodeTestBase {
 
   /**
@@ -21,7 +24,7 @@ class NodeRevisionsAllTest extends NodeTestBase {
   /**
    * A list of nodes created to be used as starting point of different tests.
    *
-   * @var Drupal\node\NodeInterface[]
+   * @var \Drupal\node\NodeInterface[]
    */
   protected $nodes;
 
@@ -63,9 +66,6 @@ class NodeRevisionsAllTest extends NodeTestBase {
     // Create a user for revision authoring.
     // This must be different from user performing revert.
     $this->revisionUser = $this->drupalCreateUser();
-
-    $settings = get_object_vars($node);
-    $settings['revision'] = 1;
 
     $nodes = [];
     $logs = [];
@@ -113,7 +113,7 @@ class NodeRevisionsAllTest extends NodeTestBase {
   /**
    * Checks node revision operations.
    */
-  public function testRevisions() {
+  public function testRevisions(): void {
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     $nodes = $this->nodes;
     $logs = $this->revisionLogs;
@@ -135,27 +135,22 @@ class NodeRevisionsAllTest extends NodeTestBase {
 
     // Confirm the correct revision text appears on "view revisions" page.
     $this->drupalGet("node/" . $node->id() . "/revisions/" . $node->getRevisionId() . "/view");
-    $this->assertText($node->body->value);
+    $this->assertSession()->pageTextContains($node->body->value);
 
     // Confirm the correct revision log message appears on the "revisions
     // overview" page.
     $this->drupalGet("node/" . $node->id() . "/revisions");
     foreach ($logs as $revision_log) {
-      $this->assertText($revision_log);
+      $this->assertSession()->pageTextContains($revision_log);
     }
 
     // Confirm that this is the current revision.
     $this->assertTrue($node->isDefaultRevision(), 'Third node revision is the current one.');
 
     // Confirm that revisions revert properly.
-    $this->drupalPostForm("node/" . $node->id() . "/revisions/" . $nodes[1]->getRevisionId() . "/revert", [], 'Revert');
-    $this->assertRaw(t('@type %title has been reverted to the revision from %revision-date.',
-      [
-        '@type' => 'Basic page',
-        '%title' => $nodes[1]->getTitle(),
-        '%revision-date' => $this->container->get('date.formatter')->format($nodes[1]->getRevisionCreationTime()),
-      ]));
-    $node_storage->resetCache([$node->id()]);
+    $this->drupalGet("node/" . $node->id() . "/revisions/" . $nodes[1]->getRevisionId() . "/revert");
+    $this->submitForm([], 'Revert');
+    $this->assertSession()->pageTextContains("Basic page {$nodes[1]->getTitle()} has been reverted to the revision from {$this->container->get('date.formatter')->format($nodes[1]->getRevisionCreationTime())}.");
     $reverted_node = $node_storage->load($node->id());
     $this->assertSame($nodes[1]->body->value, $reverted_node->body->value, 'Node reverted correctly.');
 
@@ -165,22 +160,19 @@ class NodeRevisionsAllTest extends NodeTestBase {
     $this->assertNotSame($this->revisionUser->id(), $reverted_node->getRevisionUserId(), 'Node revision author is not original revision author.');
 
     // Confirm that this is not the current version.
-    $node = node_revision_load($node->getRevisionId());
+    $node = $node_storage->loadRevision($node->getRevisionId());
     $this->assertFalse($node->isDefaultRevision(), 'Third node revision is not the current one.');
 
     // Confirm that the node can still be updated.
-    $this->drupalPostForm("node/" . $reverted_node->id() . "/edit", ['body[0][value]' => 'We are Drupal.'], 'Save');
-    $this->assertText('Basic page ' . $reverted_node->getTitle() . ' has been updated.');
-    $this->assertText('We are Drupal.');
+    $this->drupalGet("node/" . $reverted_node->id() . "/edit");
+    $this->submitForm(['body[0][value]' => 'We are Drupal.'], 'Save');
+    $this->assertSession()->pageTextContains('Basic page ' . $reverted_node->getTitle() . ' has been updated.');
+    $this->assertSession()->pageTextContains('We are Drupal.');
 
     // Confirm revisions delete properly.
-    $this->drupalPostForm("node/" . $node->id() . "/revisions/" . $nodes[1]->getRevisionId() . "/delete", [], 'Delete');
-    $this->assertRaw(t('Revision from %revision-date of @type %title has been deleted.',
-      [
-        '%revision-date' => $this->container->get('date.formatter')->format($nodes[1]->getRevisionCreationTime()),
-        '@type' => 'Basic page',
-        '%title' => $nodes[1]->getTitle(),
-      ]));
+    $this->drupalGet("node/" . $node->id() . "/revisions/" . $nodes[1]->getRevisionId() . "/delete");
+    $this->submitForm([], 'Delete');
+    $this->assertSession()->pageTextContains("Revision from {$this->container->get('date.formatter')->format($nodes[1]->getRevisionCreationTime())} of Basic page {$nodes[1]->getTitle()} has been deleted.");
     $nids = \Drupal::entityQuery('node')
       ->allRevisions()
       ->accessCheck(FALSE)
@@ -191,19 +183,16 @@ class NodeRevisionsAllTest extends NodeTestBase {
 
     // Set the revision timestamp to an older date to make sure that the
     // confirmation message correctly displays the stored revision date.
-    $old_revision_date = REQUEST_TIME - 86400;
+    $old_revision_date = \Drupal::time()->getRequestTime() - 86400;
     Database::getConnection()->update('node_revision')
       ->condition('vid', $nodes[2]->getRevisionId())
       ->fields([
         'revision_timestamp' => $old_revision_date,
       ])
       ->execute();
-    $this->drupalPostForm("node/" . $node->id() . "/revisions/" . $nodes[2]->getRevisionId() . "/revert", [], 'Revert');
-    $this->assertRaw(t('@type %title has been reverted to the revision from %revision-date.', [
-      '@type' => 'Basic page',
-      '%title' => $nodes[2]->getTitle(),
-      '%revision-date' => $this->container->get('date.formatter')->format($old_revision_date),
-    ]));
+    $this->drupalGet("node/" . $node->id() . "/revisions/" . $nodes[2]->getRevisionId() . "/revert");
+    $this->submitForm([], 'Revert');
+    $this->assertSession()->pageTextContains("Basic page {$nodes[2]->getTitle()} has been reverted to the revision from {$this->container->get('date.formatter')->format($old_revision_date)}.");
 
     // Create 50 more revisions in order to trigger paging on the revisions
     // overview screen.
@@ -218,15 +207,15 @@ class NodeRevisionsAllTest extends NodeTestBase {
     $this->drupalGet('node/' . $node->id() . '/revisions');
 
     // Check that the pager exists.
-    $this->assertRaw('page=1');
+    $this->assertSession()->responseContains('page=1');
 
     // Check that the last revision is displayed on the first page.
-    $this->assertText(end($logs));
+    $this->assertSession()->pageTextContains(end($logs));
 
     // Go to the second page and check that one of the initial three revisions
     // is displayed.
-    $this->clickLink(t('Page 2'));
-    $this->assertText($logs[2]);
+    $this->clickLink('Page 2');
+    $this->assertSession()->pageTextContains($logs[2]);
   }
 
 }

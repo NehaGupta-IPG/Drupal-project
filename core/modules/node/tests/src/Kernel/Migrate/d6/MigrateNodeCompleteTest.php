@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel\Migrate\d6;
 
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\file\Kernel\Migrate\d6\FileMigrationTestTrait;
 use Drupal\Tests\migrate_drupal\Traits\CreateTestContentEntitiesTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test class for a complete node migration for Drupal 6.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateNodeCompleteTest extends MigrateNodeTestBase {
 
   use FileMigrationTestTrait;
@@ -23,14 +28,12 @@ class MigrateNodeCompleteTest extends MigrateNodeTestBase {
     'language',
     'content_translation',
     'menu_ui',
-    // Required for translation migrations.
-    'migrate_drupal_multilingual',
   ];
 
   /**
    * The entity storage for node.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var \Drupal\Core\Entity\RevisionableStorageInterface
    */
   protected $nodeStorage;
 
@@ -58,21 +61,21 @@ class MigrateNodeCompleteTest extends MigrateNodeTestBase {
   /**
    * Tests the complete node migration.
    */
-  public function testNodeCompleteMigration() {
+  public function testNodeCompleteMigration(): void {
     $db = \Drupal::database();
     $this->assertEquals($this->expectedNodeFieldRevisionTable(), $db->select('node_field_revision', 'nr')
       ->fields('nr')
       ->orderBy('vid')
       ->orderBy('langcode')
       ->execute()
-      ->fetchAll(\PDO::FETCH_ASSOC));
+      ->fetchAll(FetchAs::Associative));
     $this->assertEquals($this->expectedNodeFieldDataTable(), $db->select('node_field_data', 'nr')
       ->fields('nr')
       ->orderBy('nid')
       ->orderBy('vid')
       ->orderBy('langcode')
       ->execute()
-      ->fetchAll(\PDO::FETCH_ASSOC));
+      ->fetchAll(FetchAs::Associative));
 
     // Now load and test each revision, including the field 'field_text_plain'
     // which has text reflecting the revision.
@@ -80,6 +83,13 @@ class MigrateNodeCompleteTest extends MigrateNodeTestBase {
     foreach ($this->expectedNodeFieldRevisionTable() as $key => $revision) {
       $this->assertRevision($revision, $data[$key]);
     }
+
+    // Test the order in multi-value fields.
+    $revision = $this->nodeStorage->loadRevision(21);
+    $this->assertSame([
+      ['target_id' => '15'],
+      ['target_id' => '16'],
+    ], $revision->get('field_company')->getValue());
   }
 
   /**
@@ -89,9 +99,11 @@ class MigrateNodeCompleteTest extends MigrateNodeTestBase {
    *   An array of revision data matching a node_field_revision table row.
    * @param array $data
    *   An array of revision data.
+   *
+   * @internal
    */
-  protected function assertRevision(array $revision, array $data) {
-    /* @var  \Drupal\node\NodeInterface $actual */
+  protected function assertRevision(array $revision, array $data): void {
+    /** @var  \Drupal\node\NodeInterface $actual */
     $actual = $this->nodeStorage->loadRevision($revision['vid'])
       ->getTranslation($revision['langcode']);
     $this->assertInstanceOf(NodeInterface::class, $actual);
@@ -109,7 +121,7 @@ class MigrateNodeCompleteTest extends MigrateNodeTestBase {
    * @return array
    *   The expected table rows.
    */
-  protected function expectedNodeFieldDataTable() {
+  protected function expectedNodeFieldDataTable(): array {
     return [
       0 =>
         [
@@ -516,7 +528,7 @@ class MigrateNodeCompleteTest extends MigrateNodeTestBase {
    * @return array
    *   The table.
    */
-  protected function expectedNodeFieldRevisionTable() {
+  protected function expectedNodeFieldRevisionTable(): array {
     return [
       0 =>
         [
@@ -1037,218 +1049,218 @@ class MigrateNodeCompleteTest extends MigrateNodeTestBase {
    * @return array
    *   Selected properties and fields on the revision.
    */
-  protected function expectedRevisionEntityData() {
+  protected function expectedRevisionEntityData(): array {
     return [
-      $revision_data = [
+      [
         // Node 1, revision 1, und.
         0 =>
           [
             'log' => NULL,
             'created' => '1390095702',
-            'changed' => '1390095702',
+            'changed' => 1390095702,
           ],
         // Node 2, revision 3, und.
         1 =>
           [
             'log' => NULL,
             'created' => '1420718386',
-            'changed' => '1420718386',
+            'changed' => 1420718386,
           ],
         // Node 3, revision 4, und.
         2 =>
           [
             'log' => NULL,
             'created' => '1390095701',
-            'changed' => '1390095701',
+            'changed' => 1390095701,
           ],
         // Node 1, revision 5, und.
         3 =>
           [
             'log' => 'modified rev 2',
             'created' => '1390095703',
-            'changed' => '1390095703',
+            'changed' => 1390095703,
           ],
         // Node 4, revision 6, und.
         4 =>
           [
             'log' => NULL,
             'created' => '1390095701',
-            'changed' => '1390095701',
+            'changed' => 1390095701,
           ],
         // Node 5, revision 7, und.
         5 =>
           [
             'log' => NULL,
             'created' => '1390095701',
-            'changed' => '1390095701',
+            'changed' => 1390095701,
           ],
         // Node 6, revision 8, und.
         6 =>
           [
             'log' => NULL,
             'created' => '1390095701',
-            'changed' => '1390095701',
+            'changed' => 1390095701,
           ],
         // Node 7, revision 9, und.
         7 =>
           [
             'log' => NULL,
             'created' => '1390095701',
-            'changed' => '1390095701',
+            'changed' => 1390095701,
           ],
         // Node 8, revision 10, und.
         8 =>
           [
             'log' => NULL,
             'created' => '1390095701',
-            'changed' => '1390095701',
+            'changed' => 1390095701,
           ],
         // Node 9, revision 11, und.
         9 =>
           [
             'log' => NULL,
             'created' => '1390095701',
-            'changed' => '1390095701',
+            'changed' => 1390095701,
           ],
         // Node 9, revision 12, und.
         10 =>
           [
             'log' => NULL,
             'created' => '1444671588',
-            'changed' => '1444671588',
+            'changed' => 1444671588,
           ],
         // Node 10, revision 13, en.
         11 =>
           [
             'log' => NULL,
             'created' => '1444238808',
-            'changed' => '1444238808',
+            'changed' => 1444238808,
           ],
         // Node 10, revision 14, en.
         12 =>
           [
             'log' => NULL,
             'created' => '1444239050',
-            'changed' => '1444238808',
+            'changed' => 1444238808,
           ],
         // Node 10, revision 14, fr.
         13 =>
           [
             'log' => NULL,
             'created' => '1444239050',
-            'changed' => '1444239050',
+            'changed' => 1444239050,
           ],
         // Node 12, revision 15, zu.
         14 =>
           [
             'log' => NULL,
             'created' => '1444238808',
-            'changed' => '1444238808',
+            'changed' => 1444238808,
           ],
         // Node 12, revision 16, en.
         15 =>
           [
             'log' => NULL,
             'created' => '1444239050',
-            'changed' => '1444239050',
+            'changed' => 1444239050,
           ],
         // Node 12, revision 16, zu.
         16 =>
           [
             'log' => NULL,
             'created' => '1444239050',
-            'changed' => '1444238808',
+            'changed' => 1444238808,
           ],
         // Node 14, revision 17, und.
         17 =>
           [
             'log' => NULL,
             'created' => '1493066668',
-            'changed' => '1493066668',
+            'changed' => 1493066668,
           ],
         // Node 15, revision 18, und.
         18 =>
           [
             'log' => NULL,
             'created' => '1493066677',
-            'changed' => '1493066677',
+            'changed' => 1493066677,
           ],
         // Node 16, revision 19, und.
         19 =>
           [
             'log' => NULL,
             'created' => '1493066684',
-            'changed' => '1493066684',
+            'changed' => 1493066684,
           ],
         // Node 17, revision 20, und.
         20 =>
           [
             'log' => NULL,
             'created' => '1493066693',
-            'changed' => '1493066693',
+            'changed' => 1493066693,
           ],
         // Node 18, revision 21, und.
         21 =>
           [
             'log' => NULL,
             'created' => '1494966544',
-            'changed' => '1494966544',
+            'changed' => 1494966544,
           ],
         // Node 19, revision 22, und.
         22 =>
           [
             'log' => NULL,
             'created' => '1501955771',
-            'changed' => '1501955771',
+            'changed' => 1501955771,
           ],
         // Node 12, revision 23, en.
         23 =>
           [
             'log' => NULL,
             'created' => '1520613305',
-            'changed' => '1444239050',
+            'changed' => 1444239050,
           ],
         // Node 12, revision 23, fr.
         24 =>
           [
             'log' => NULL,
             'created' => '1520613305',
-            'changed' => '1520613305',
+            'changed' => 1520613305,
           ],
         // Node 12, revision 23, zu.
         25 =>
           [
             'log' => NULL,
             'created' => '1520613305',
-            'changed' => '1444238808',
+            'changed' => 1444238808,
           ],
         // Node 1, revision 2001, und.
         26 =>
           [
             'log' => 'modified rev 3',
             'created' => '1420861423',
-            'changed' => '1420861423',
+            'changed' => 1420861423,
           ],
         // Node 21, revision 2002, en.
         27 =>
           [
             'log' => NULL,
             'created' => '1534014650',
-            'changed' => '1534014650',
+            'changed' => 1534014650,
           ],
         // Node 21, revision 2003, en.
         28 =>
           [
             'log' => NULL,
             'created' => '1534014687',
-            'changed' => '1534014650',
+            'changed' => 1534014650,
           ],
         // Node 21, revision 2003, fr.
         29 =>
           [
             'log' => NULL,
             'created' => '1534014687',
-            'changed' => '1534014687',
+            'changed' => 1534014687,
           ],
       ],
     ];

@@ -1,21 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\search\Functional;
 
 use Behat\Mink\Exception\ResponseTextException;
+use Drupal\comment\CommentPreviewMode;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\CronRunTrait;
 use Drupal\user\RoleInterface;
-use Drupal\filter\Entity\FilterFormat;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests integration searching comments.
- *
- * @group search
  */
+#[Group('search')]
+#[RunTestsInSeparateProcesses]
 class SearchCommentTest extends BrowserTestBase {
 
   use CommentTestTrait;
@@ -59,6 +64,9 @@ class SearchCommentTest extends BrowserTestBase {
    */
   protected $node;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -93,7 +101,7 @@ class SearchCommentTest extends BrowserTestBase {
   /**
    * Verify that comments are rendered using proper format in search results.
    */
-  public function testSearchResultsComment() {
+  public function testSearchResultsComment(): void {
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     // Create basic_html format that escapes all HTML.
     $basic_html_format = FilterFormat::create([
@@ -111,7 +119,7 @@ class SearchCommentTest extends BrowserTestBase {
 
     // Make preview optional.
     $field = FieldConfig::loadByName('node', 'article', 'comment');
-    $field->setSetting('preview', DRUPAL_OPTIONAL);
+    $field->setSetting('preview', CommentPreviewMode::Optional->value);
     $field->save();
 
     // Allow anonymous users to search content.
@@ -120,7 +128,8 @@ class SearchCommentTest extends BrowserTestBase {
       RoleInterface::ANONYMOUS_ID . '[access comments]' => 1,
       RoleInterface::ANONYMOUS_ID . '[post comments]' => 1,
     ];
-    $this->drupalPostForm('admin/people/permissions', $edit, 'Save permissions');
+    $this->drupalGet('admin/people/permissions');
+    $this->submitForm($edit, 'Save permissions');
 
     // Create a node.
     $node = $this->drupalCreateNode(['type' => 'article']);
@@ -130,24 +139,27 @@ class SearchCommentTest extends BrowserTestBase {
     $edit_comment['comment_body[0][value]'] = '<h1>' . $comment_body . '</h1>';
     $full_html_format_id = 'full_html';
     $edit_comment['comment_body[0][format]'] = $full_html_format_id;
-    $this->drupalPostForm('comment/reply/node/' . $node->id() . '/comment', $edit_comment, 'Save');
+    $this->drupalGet('comment/reply/node/' . $node->id() . '/comment');
+    $this->submitForm($edit_comment, 'Save');
 
     // Post a comment with an evil script tag in the comment subject and a
     // script tag nearby a keyword in the comment body. Use the 'FULL HTML' text
     // format so the script tag stored.
     $edit_comment2 = [];
-    $edit_comment2['subject[0][value]'] = "<script>alert('subjectkeyword');</script>";
-    $edit_comment2['comment_body[0][value]'] = "nearbykeyword<script>alert('somethinggeneric');</script>";
+    $edit_comment2['subject[0][value]'] = "<script>alert('subject_keyword');</script>";
+    $edit_comment2['comment_body[0][value]'] = "nearby-keyword<script>alert('something generic');</script>";
     $edit_comment2['comment_body[0][format]'] = $full_html_format_id;
-    $this->drupalPostForm('comment/reply/node/' . $node->id() . '/comment', $edit_comment2, 'Save');
+    $this->drupalGet('comment/reply/node/' . $node->id() . '/comment');
+    $this->submitForm($edit_comment2, 'Save');
 
     // Post a comment with a keyword inside an evil script tag in the comment
     // body. Use the 'FULL HTML' text format so the script tag is stored.
     $edit_comment3 = [];
-    $edit_comment3['subject[0][value]'] = 'asubject';
-    $edit_comment3['comment_body[0][value]'] = "<script>alert('insidekeyword');</script>";
+    $edit_comment3['subject[0][value]'] = 'a subject';
+    $edit_comment3['comment_body[0][value]'] = "<script>alert('inside-keyword');</script>";
     $edit_comment3['comment_body[0][format]'] = $full_html_format_id;
-    $this->drupalPostForm('comment/reply/node/' . $node->id() . '/comment', $edit_comment3, 'Save');
+    $this->drupalGet('comment/reply/node/' . $node->id() . '/comment');
+    $this->submitForm($edit_comment3, 'Save');
 
     // Invoke search index update.
     $this->drupalLogout();
@@ -157,57 +169,60 @@ class SearchCommentTest extends BrowserTestBase {
     $edit = [
       'keys' => "'" . $edit_comment['subject[0][value]'] . "'",
     ];
-    $this->drupalPostForm('search/node', $edit, 'Search');
-    $node_storage->resetCache([$node->id()]);
+    $this->drupalGet('search/node');
+    $this->submitForm($edit, 'Search');
     $node2 = $node_storage->load($node->id());
-    $this->assertText($node2->label());
-    $this->assertText($edit_comment['subject[0][value]']);
+    $this->assertSession()->pageTextContains($node2->label());
+    $this->assertSession()->pageTextContains($edit_comment['subject[0][value]']);
 
     // Search for the comment body.
     $edit = [
       'keys' => "'" . $comment_body . "'",
     ];
     $this->submitForm($edit, 'Search');
-    $this->assertText($node2->label());
+    $this->assertSession()->pageTextContains($node2->label());
 
     // Verify that comment is rendered using proper format.
-    $this->assertText($comment_body);
+    $this->assertSession()->pageTextContains($comment_body);
     // Verify that HTML in comment body is not hidden.
-    $this->assertNoRaw(t('n/a'));
+    $this->assertSession()->pageTextNotContains('n/a');
     $this->assertSession()->assertNoEscaped($edit_comment['comment_body[0][value]']);
 
     // Search for the evil script comment subject.
     $edit = [
-      'keys' => 'subjectkeyword',
+      'keys' => 'subject_keyword',
     ];
-    $this->drupalPostForm('search/node', $edit, 'Search');
+    $this->drupalGet('search/node');
+    $this->submitForm($edit, 'Search');
 
     // Verify the evil comment subject is escaped in search results.
-    $this->assertRaw('&lt;script&gt;alert(&#039;<strong>subjectkeyword</strong>&#039;);');
-    $this->assertNoRaw('<script>');
+    $this->assertSession()->responseContains('&lt;script&gt;alert(&#039;<strong>subject_keyword</strong>&#039;);');
+    $this->assertSession()->responseNotContains('<script>');
 
     // Search for the keyword near the evil script tag in the comment body.
     $edit = [
-      'keys' => 'nearbykeyword',
+      'keys' => 'nearby-keyword',
     ];
-    $this->drupalPostForm('search/node', $edit, 'Search');
+    $this->drupalGet('search/node');
+    $this->submitForm($edit, 'Search');
 
     // Verify that nearby script tag in the evil comment body is stripped from
     // search results.
-    $this->assertRaw('<strong>nearbykeyword</strong>');
-    $this->assertNoRaw('<script>');
+    $this->assertSession()->responseContains('<strong>nearby-keyword</strong>');
+    $this->assertSession()->responseNotContains('<script>');
 
     // Search for contents inside the evil script tag in the comment body.
     $edit = [
-      'keys' => 'insidekeyword',
+      'keys' => 'inside-keyword',
     ];
-    $this->drupalPostForm('search/node', $edit, 'Search');
+    $this->drupalGet('search/node');
+    $this->submitForm($edit, 'Search');
 
     // @todo Verify the actual search results.
     //   https://www.drupal.org/node/2551135
 
     // Verify there is no script tag in search results.
-    $this->assertNoRaw('<script>');
+    $this->assertSession()->responseNotContains('<script>');
 
     // Hide comments.
     $this->drupalLogin($this->adminUser);
@@ -219,14 +234,15 @@ class SearchCommentTest extends BrowserTestBase {
     $this->cronRun();
 
     // Search for $title.
-    $this->drupalPostForm('search/node', $edit, 'Search');
-    $this->assertText('Your search yielded no results.');
+    $this->drupalGet('search/node');
+    $this->submitForm($edit, 'Search');
+    $this->assertSession()->pageTextContains('Your search yielded no results.');
   }
 
   /**
    * Verify access rules for comment indexing with different permissions.
    */
-  public function testSearchResultsCommentAccess() {
+  public function testSearchResultsCommentAccess(): void {
     $comment_body = 'Test comment body';
     $this->commentSubject = 'Test comment subject';
     $roles = $this->adminUser->getRoles(TRUE);
@@ -235,7 +251,7 @@ class SearchCommentTest extends BrowserTestBase {
     // Create a node.
     // Make preview optional.
     $field = FieldConfig::loadByName('node', 'article', 'comment');
-    $field->setSetting('preview', DRUPAL_OPTIONAL);
+    $field->setSetting('preview', CommentPreviewMode::Optional->value);
     $field->save();
     $this->node = $this->drupalCreateNode(['type' => 'article']);
 
@@ -243,7 +259,8 @@ class SearchCommentTest extends BrowserTestBase {
     $edit_comment = [];
     $edit_comment['subject[0][value]'] = $this->commentSubject;
     $edit_comment['comment_body[0][value]'] = '<h1>' . $comment_body . '</h1>';
-    $this->drupalPostForm('comment/reply/node/' . $this->node->id() . '/comment', $edit_comment, 'Save');
+    $this->drupalGet('comment/reply/node/' . $this->node->id() . '/comment');
+    $this->submitForm($edit_comment, 'Save');
 
     $this->drupalLogout();
     $this->setRolePermissions(RoleInterface::ANONYMOUS_ID);
@@ -287,7 +304,7 @@ class SearchCommentTest extends BrowserTestBase {
   /**
    * Set permissions for role.
    */
-  public function setRolePermissions($rid, $access_comments = FALSE, $search_content = TRUE) {
+  public function setRolePermissions($rid, $access_comments = FALSE, $search_content = TRUE): void {
     $permissions = [
       'access comments' => $access_comments,
       'search content' => $search_content,
@@ -297,8 +314,10 @@ class SearchCommentTest extends BrowserTestBase {
 
   /**
    * Update search index and search for comment.
+   *
+   * @internal
    */
-  public function assertCommentAccess($assume_access, $message) {
+  public function assertCommentAccess(bool $assume_access, string $message): void {
     // Invoke search index update.
     \Drupal::service('search.index')->markForReindex('node_search', $this->node->id());
     $this->cronRun();
@@ -307,7 +326,8 @@ class SearchCommentTest extends BrowserTestBase {
     $edit = [
       'keys' => "'" . $this->commentSubject . "'",
     ];
-    $this->drupalPostForm('search/node', $edit, 'Search');
+    $this->drupalGet('search/node');
+    $this->submitForm($edit, 'Search');
 
     try {
       if ($assume_access) {
@@ -315,10 +335,10 @@ class SearchCommentTest extends BrowserTestBase {
         $this->assertSession()->pageTextContains($this->commentSubject);
       }
       else {
-        $this->assertSession()->pageTextContains(t('Your search yielded no results.'));
+        $this->assertSession()->pageTextContains('Your search yielded no results.');
       }
     }
-    catch (ResponseTextException $exception) {
+    catch (ResponseTextException) {
       $this->fail($message);
     }
   }
@@ -326,7 +346,7 @@ class SearchCommentTest extends BrowserTestBase {
   /**
    * Verify that 'add new comment' does not appear in search results or index.
    */
-  public function testAddNewComment() {
+  public function testAddNewComment(): void {
     // Create a node with a short body.
     $settings = [
       'type' => 'article',
@@ -347,7 +367,7 @@ class SearchCommentTest extends BrowserTestBase {
     // Verify that if you view the node on its own page, 'add new comment'
     // is there.
     $this->drupalGet('node/' . $node->id());
-    $this->assertText('Add new comment');
+    $this->assertSession()->pageTextContains('Add new comment');
 
     // Run cron to index this page.
     $this->drupalLogout();
@@ -355,14 +375,16 @@ class SearchCommentTest extends BrowserTestBase {
 
     // Search for 'comment'. Should be no results.
     $this->drupalLogin($user);
-    $this->drupalPostForm('search/node', ['keys' => 'comment'], 'Search');
-    $this->assertText('Your search yielded no results');
+    $this->drupalGet('search/node');
+    $this->submitForm(['keys' => 'comment'], 'Search');
+    $this->assertSession()->pageTextContains('Your search yielded no results');
 
     // Search for the node title. Should be found, and 'Add new comment' should
     // not be part of the search snippet.
-    $this->drupalPostForm('search/node', ['keys' => 'short'], 'Search');
-    $this->assertText($node->label());
-    $this->assertNoText('Add new comment');
+    $this->drupalGet('search/node');
+    $this->submitForm(['keys' => 'short'], 'Search');
+    $this->assertSession()->pageTextContains($node->label());
+    $this->assertSession()->pageTextNotContains('Add new comment');
   }
 
 }

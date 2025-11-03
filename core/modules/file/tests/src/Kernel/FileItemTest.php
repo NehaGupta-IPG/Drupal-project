@@ -1,28 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Kernel;
 
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
+use Drupal\file\Plugin\Field\FieldType\FileItem;
+use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests using entity fields of the file field type.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileItemTest extends FieldKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['file'];
 
@@ -40,6 +44,9 @@ class FileItemTest extends FieldKernelTestBase {
    */
   protected $directory;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -77,14 +84,14 @@ class FileItemTest extends FieldKernelTestBase {
   /**
    * Tests using entity fields of the file field type.
    */
-  public function testFileItem() {
+  public function testFileItem(): void {
     // Check that the selection handler was automatically assigned to
     // 'default:file'.
     $field_definition = FieldConfig::load('entity_test.entity_test.file_test');
     $handler_id = $field_definition->getSetting('handler');
-    $this->assertEqual('default:file', $handler_id);
+    $this->assertEquals('default:file', $handler_id);
 
-    // Create a test entity with the
+    // Create a test entity with the test file field.
     $entity = EntityTest::create();
     $entity->file_test->target_id = $this->file->id();
     $entity->file_test->display = 1;
@@ -95,12 +102,12 @@ class FileItemTest extends FieldKernelTestBase {
     $entity = EntityTest::load($entity->id());
     $this->assertInstanceOf(FieldItemListInterface::class, $entity->file_test);
     $this->assertInstanceOf(FieldItemInterface::class, $entity->file_test[0]);
-    $this->assertEqual($this->file->id(), $entity->file_test->target_id);
-    $this->assertEqual(1, $entity->file_test->display);
-    $this->assertEqual($description, $entity->file_test->description);
-    $this->assertEqual($this->file->getFileUri(), $entity->file_test->entity->getFileUri());
-    $this->assertEqual($this->file->id(), $entity->file_test->entity->id());
-    $this->assertEqual($this->file->uuid(), $entity->file_test->entity->uuid());
+    $this->assertEquals($this->file->id(), $entity->file_test->target_id);
+    $this->assertEquals(1, $entity->file_test->display);
+    $this->assertEquals($description, $entity->file_test->description);
+    $this->assertEquals($this->file->getFileUri(), $entity->file_test->entity->getFileUri());
+    $this->assertEquals($this->file->id(), $entity->file_test->entity->id());
+    $this->assertEquals($this->file->uuid(), $entity->file_test->entity->uuid());
 
     // Make sure the computed files reflects updates to the file.
     file_put_contents('public://example-2.txt', $this->randomMachineName());
@@ -110,8 +117,8 @@ class FileItemTest extends FieldKernelTestBase {
     $file2->save();
 
     $entity->file_test->target_id = $file2->id();
-    $this->assertEqual($entity->file_test->entity->id(), $file2->id());
-    $this->assertEqual($entity->file_test->entity->getFileUri(), $file2->getFileUri());
+    $this->assertEquals($entity->file_test->entity->id(), $file2->id());
+    $this->assertEquals($entity->file_test->entity->getFileUri(), $file2->getFileUri());
 
     // Test the deletion of an entity having an entity reference field targeting
     // a non-existing entity.
@@ -128,7 +135,7 @@ class FileItemTest extends FieldKernelTestBase {
     /** @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager */
     $stream_wrapper_manager = \Drupal::service('stream_wrapper_manager');
 
-    $this->assertEqual($this->directory, dirname($stream_wrapper_manager::getTarget($uri)));
+    $this->assertEquals($this->directory, dirname($stream_wrapper_manager::getTarget($uri)));
 
     // Make sure the computed files reflects updates to the file.
     file_put_contents('public://example-3.txt', $this->randomMachineName());
@@ -151,7 +158,49 @@ class FileItemTest extends FieldKernelTestBase {
       ->view($entity, 'default');
     \Drupal::service('renderer')->renderRoot($output);
     $this->assertTrue(!empty($entity->file_test->entity));
-    $this->assertEqual($uri, $entity->file_test->entity->getFileUri());
+    $this->assertEquals($uri, $entity->file_test->entity->getFileUri());
+
+    // Test file URIs with empty and custom directories.
+    $this->validateFileUriForDirectory(
+      '', 'public://'
+    );
+    $this->validateFileUriForDirectory(
+      'custom_directory/subdir', 'public://custom_directory/subdir/'
+    );
+  }
+
+  /**
+   * Tests file URIs generated for a given file directory.
+   *
+   * @param string $file_directory
+   *   The file directory to test (e.g., empty or 'custom_directory/subdir').
+   * @param string $expected_start
+   *   The expected starting string of the file URI (e.g., 'public://').
+   */
+  private function validateFileUriForDirectory(string $file_directory, string $expected_start): void {
+    // Mock the field definition with the specified file directory.
+    $definition = $this->createMock(FieldDefinitionInterface::class);
+    $definition->expects($this->any())
+      ->method('getSettings')
+      ->willReturn([
+        'file_extensions' => 'txt',
+        'file_directory' => $file_directory,
+        'uri_scheme' => 'public',
+        'display_default' => TRUE,
+      ]);
+
+    // Generate a sample file value.
+    $value = FileItem::generateSampleValue($definition);
+    $this->assertNotEmpty($value);
+
+    // Load the file entity and get its URI.
+    $fid = $value['target_id'];
+    $file = File::load($fid);
+    $fileUri = $file->getFileUri();
+
+    // Verify the file URI starts with the expected protocol and structure.
+    $this->assertStringStartsWith($expected_start, $fileUri);
+    $this->assertMatchesRegularExpression('#^' . preg_quote($expected_start, '#') . '[^/]+#', $fileUri);
   }
 
 }

@@ -70,7 +70,7 @@ class LanguageRequestSubscriber implements EventSubscriberInterface {
    *   The Event to process.
    */
   public function onKernelRequestLanguage(RequestEvent $event) {
-    if ($event->isMasterRequest()) {
+    if ($event->isMainRequest()) {
       $this->setLanguageOverrides();
     }
   }
@@ -103,7 +103,7 @@ class LanguageRequestSubscriber implements EventSubscriberInterface {
    * @return array
    *   An array of event listener definitions.
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events[KernelEvents::REQUEST][] = ['onKernelRequestLanguage', 255];
     $events[DrupalKernelInterface::CONTAINER_INITIALIZE_SUBREQUEST_FINISHED][] = ['onContainerInitializeSubrequestFinished', 255];
 

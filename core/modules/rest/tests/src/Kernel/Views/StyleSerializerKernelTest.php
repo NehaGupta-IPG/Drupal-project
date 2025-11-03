@@ -1,15 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\rest\Kernel\Views;
 
+use Drupal\rest\Plugin\views\style\Serializer;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Entity\View;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\rest\Plugin\views\style\Serializer
- * @group views
+ * Tests Drupal\rest\Plugin\views\style\Serializer.
  */
+#[CoversClass(Serializer::class)]
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class StyleSerializerKernelTest extends ViewsKernelTestBase {
 
   /**
@@ -32,9 +40,11 @@ class StyleSerializerKernelTest extends ViewsKernelTestBase {
   }
 
   /**
-   * @covers ::calculateDependencies
+   * Tests calculate dependencies.
+   *
+   * @legacy-covers ::calculateDependencies
    */
-  public function testCalculateDepenencies() {
+  public function testCalculateDependencies(): void {
     /** @var \Drupal\views\Entity\View $view */
     $view = View::load('test_serializer_display_entity');
     $display = &$view->getDisplay('rest_export_1');
@@ -46,16 +56,6 @@ class StyleSerializerKernelTest extends ViewsKernelTestBase {
 
     $view->calculateDependencies();
     $this->assertEquals(['module' => ['rest', 'serialization', 'user']], $view->getDependencies());
-
-    \Drupal::service('module_installer')->install(['hal']);
-
-    $view = View::load('test_serializer_display_entity');
-    $display = &$view->getDisplay('rest_export_1');
-    $display['display_options']['style']['options']['formats'] = ['json', 'xml', 'hal_json'];
-    $view->save();
-
-    $view->calculateDependencies();
-    $this->assertEquals(['module' => ['hal', 'rest', 'serialization', 'user']], $view->getDependencies());
   }
 
 }

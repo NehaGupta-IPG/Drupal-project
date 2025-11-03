@@ -5,95 +5,6 @@
  * API for loading and interacting with Drupal modules.
  */
 
-use Drupal\Core\Extension\ExtensionDiscovery;
-
-/**
- * Loads a module's installation hooks.
- *
- * @param $module
- *   The name of the module (without the .module extension).
- *
- * @return
- *   The name of the module's install file, if successful; FALSE otherwise.
- */
-function module_load_install($module) {
-  // Make sure the installation API is available
-  include_once __DIR__ . '/install.inc';
-
-  return module_load_include('install', $module);
-}
-
-/**
- * Loads a module include file.
- *
- * Examples:
- * @code
- *   // Load node.admin.inc from the node module.
- *   module_load_include('inc', 'node', 'node.admin');
- *   // Load content_types.inc from the node module.
- *   module_load_include('inc', 'node', 'content_types');
- * @endcode
- *
- * Do not use this function to load an install file, use module_load_install()
- * instead. Do not use this function in a global context since it requires
- * Drupal to be fully bootstrapped, use require_once DRUPAL_ROOT . '/path/file'
- * instead.
- *
- * @param $type
- *   The include file's type (file extension).
- * @param $module
- *   The module to which the include file belongs.
- * @param $name
- *   (optional) The base file name (without the $type extension). If omitted,
- *   $module is used; i.e., resulting in "$module.$type" by default.
- *
- * @return
- *   The name of the included file, if successful; FALSE otherwise.
- *
- * @todo The module_handler service has a loadInclude() method which performs
- *   this same task but only for enabled modules. Figure out a way to move this
- *   functionality entirely into the module_handler while keeping the ability to
- *   load the files of disabled modules.
- */
-function module_load_include($type, $module, $name = NULL) {
-  if (!isset($name)) {
-    $name = $module;
-  }
-
-  if (function_exists('drupal_get_path')) {
-    $file = DRUPAL_ROOT . '/' . drupal_get_path('module', $module) . "/$name.$type";
-    if (is_file($file)) {
-      require_once $file;
-      return $file;
-    }
-  }
-  return FALSE;
-}
-
-/**
- * Returns an array of modules required by core.
- */
-function drupal_required_modules() {
-  $listing = new ExtensionDiscovery(\Drupal::root());
-  $files = $listing->scan('module');
-  $required = [];
-
-  // Unless called by the installer, an installation profile is required and
-  // must always be loaded.
-  if ($profile = \Drupal::installProfile()) {
-    $required[] = $profile;
-  }
-
-  foreach ($files as $name => $file) {
-    $info = \Drupal::service('info_parser')->parse($file->getPathname());
-    if (!empty($info) && !empty($info['required']) && $info['required']) {
-      $required[] = $name;
-    }
-  }
-
-  return $required;
-}
-
 /**
  * Sets weight of a particular module.
  *
@@ -104,7 +15,7 @@ function drupal_required_modules() {
  * @param int $weight
  *   An integer representing the weight of the module.
  */
-function module_set_weight($module, $weight) {
+function module_set_weight($module, $weight): void {
   $extension_config = \Drupal::configFactory()->getEditable('core.extension');
   if ($extension_config->get("module.$module") !== NULL) {
     // Pre-cast the $weight to an integer so that we can save this without using

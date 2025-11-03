@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\FunctionalJavascript\Number;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\node\Entity\Node;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the numeric field widget.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class NumberFieldTest extends WebDriverTestBase {
 
   /**
@@ -42,13 +46,13 @@ class NumberFieldTest extends WebDriverTestBase {
   }
 
   /**
-   * Test default formatter behavior.
+   * Tests default formatter behavior.
    */
-  public function testNumberFormatter() {
-    $type = mb_strtolower($this->randomMachineName());
-    $float_field = mb_strtolower($this->randomMachineName());
-    $integer_field = mb_strtolower($this->randomMachineName());
-    $thousand_separators = ['', '.', ',', ' ', chr(8201), "'"];
+  public function testNumberFormatter(): void {
+    $type = $this->randomMachineName();
+    $float_field = $this->randomMachineName();
+    $integer_field = $this->randomMachineName();
+    $thousand_separators = ['', '.', ',', ' ', mb_chr(8201, 'UTF-8'), "'"];
     $decimal_separators = ['.', ','];
     $prefix = $this->randomMachineName();
     $suffix = $this->randomMachineName();
@@ -133,26 +137,26 @@ class NumberFieldTest extends WebDriverTestBase {
     $scale = rand(0, 10);
 
     $page = $this->getSession()->getPage();
-    $page->pressButton("${float_field}_settings_edit");
+    $page->pressButton("{$float_field}_settings_edit");
     $assert_session->waitForElement('css', '.ajax-new-content');
     $edit = [
-      "fields[${float_field}][settings_edit_form][settings][prefix_suffix]" => TRUE,
-      "fields[${float_field}][settings_edit_form][settings][scale]" => $scale,
-      "fields[${float_field}][settings_edit_form][settings][decimal_separator]" => $decimal_separator,
-      "fields[${float_field}][settings_edit_form][settings][thousand_separator]" => $thousand_separator,
+      "fields[{$float_field}][settings_edit_form][settings][prefix_suffix]" => TRUE,
+      "fields[{$float_field}][settings_edit_form][settings][scale]" => $scale,
+      "fields[{$float_field}][settings_edit_form][settings][decimal_separator]" => $decimal_separator,
+      "fields[{$float_field}][settings_edit_form][settings][thousand_separator]" => $thousand_separator,
     ];
     foreach ($edit as $name => $value) {
       $page->fillField($name, $value);
     }
-    $page->pressButton("${float_field}_plugin_settings_update");
+    $page->pressButton("{$float_field}_plugin_settings_update");
     $assert_session->waitForElement('css', '.field-plugin-summary-cell > .ajax-new-content');
     $this->submitForm([], 'Save');
 
     // Check number_decimal and number_unformatted formatters behavior.
     $this->drupalGet('node/' . $node->id());
     $float_formatted = number_format($random_float, $scale, $decimal_separator, $thousand_separator);
-    $this->assertRaw("$prefix$float_formatted$suffix");
-    $this->assertRaw((string) $random_integer);
+    $this->assertSession()->responseContains("$prefix$float_formatted$suffix");
+    $this->assertSession()->responseContains((string) $random_integer);
 
     // Configure the number_decimal formatter.
     \Drupal::service('entity_display.repository')->getViewDisplay('node', $type)
@@ -165,16 +169,16 @@ class NumberFieldTest extends WebDriverTestBase {
     $thousand_separator = $thousand_separators[array_rand($thousand_separators)];
 
     $page = $this->getSession()->getPage();
-    $page->pressButton("${integer_field}_settings_edit");
+    $page->pressButton("{$integer_field}_settings_edit");
     $assert_session->waitForElement('css', '.ajax-new-content');
     $edit = [
-      "fields[${integer_field}][settings_edit_form][settings][prefix_suffix]" => FALSE,
-      "fields[${integer_field}][settings_edit_form][settings][thousand_separator]" => $thousand_separator,
+      "fields[{$integer_field}][settings_edit_form][settings][prefix_suffix]" => FALSE,
+      "fields[{$integer_field}][settings_edit_form][settings][thousand_separator]" => $thousand_separator,
     ];
     foreach ($edit as $name => $value) {
       $page->fillField($name, $value);
     }
-    $page->pressButton("${integer_field}_plugin_settings_update");
+    $page->pressButton("{$integer_field}_plugin_settings_update");
     $assert_session->waitForElement('css', '.field-plugin-summary-cell > .ajax-new-content');
     $this->submitForm([], 'Save');
 
@@ -182,7 +186,7 @@ class NumberFieldTest extends WebDriverTestBase {
     $this->drupalGet('node/' . $node->id());
 
     $integer_formatted = number_format($random_integer, 0, '', $thousand_separator);
-    $this->assertRaw($integer_formatted);
+    $this->assertSession()->responseContains($integer_formatted);
   }
 
 }

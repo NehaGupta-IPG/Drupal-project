@@ -2,8 +2,15 @@
 
 namespace Drupal\field\Plugin\migrate\source\d6;
 
+// cspell:ignore cnfi
+
 /**
- * Gets field instance option label translations.
+ * Drupal 6 i18n field instance option labels source from database.
+ *
+ * For available configuration keys, refer to the parent classes.
+ *
+ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+ * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
  *
  * @MigrateSource(
  *   id = "d6_field_instance_option_translation",

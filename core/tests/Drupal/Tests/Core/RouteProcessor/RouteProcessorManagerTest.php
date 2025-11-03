@@ -1,17 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\RouteProcessor;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\RouteProcessor\RouteProcessorManager;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Routing\Route;
 
 /**
- * @coversDefaultClass \Drupal\Core\RouteProcessor\RouteProcessorManager
- * @group RouteProcessor
+ * Tests Drupal\Core\RouteProcessor\RouteProcessorManager.
  */
+#[CoversClass(RouteProcessorManager::class)]
+#[Group('RouteProcessor')]
 class RouteProcessorManagerTest extends UnitTestCase {
 
   /**
@@ -21,14 +26,19 @@ class RouteProcessorManagerTest extends UnitTestCase {
    */
   protected $processorManager;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->processorManager = new RouteProcessorManager();
   }
 
   /**
    * Tests the Route process manager functionality.
    */
-  public function testRouteProcessorManager() {
+  public function testRouteProcessorManager(): void {
     $route = new Route('');
     $parameters = ['test' => 'test'];
     $route_name = 'test_name';
@@ -61,6 +71,7 @@ class RouteProcessorManagerTest extends UnitTestCase {
    *   The parameters to use in mock with() expectation.
    *
    * @return \Drupal\Core\RouteProcessor\OutboundRouteProcessorInterface|\PHPUnit\Framework\MockObject\MockObject
+   *   The mock processor object.
    */
   protected function getMockProcessor($route_name, $route, $parameters) {
     $processor = $this->createMock('Drupal\Core\RouteProcessor\OutboundRouteProcessorInterface');

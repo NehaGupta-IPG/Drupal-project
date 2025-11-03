@@ -1,22 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Form;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests confirmation forms.
- *
- * @group Form
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class ConfirmFormTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['form_test'];
 
@@ -25,30 +26,35 @@ class ConfirmFormTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  public function testConfirmForm() {
+  /**
+   * Tests the confirm form functionality, including submission and cancellation.
+   */
+  public function testConfirmForm(): void {
     // Test the building of the form.
     $this->drupalGet('form-test/confirm-form');
     $site_name = $this->config('system.site')->get('name');
     $this->assertSession()->titleEquals("ConfirmFormTestForm::getQuestion(). | $site_name");
-    $this->assertText('ConfirmFormTestForm::getDescription().');
+    $this->assertSession()->pageTextContains('ConfirmFormTestForm::getDescription().');
     $this->assertSession()->buttonExists('ConfirmFormTestForm::getConfirmText().');
 
     // Test cancelling the form.
-    $this->clickLink(t('ConfirmFormTestForm::getCancelText().'));
+    $this->clickLink('ConfirmFormTestForm::getCancelText().');
     $this->assertSession()->addressEquals('form-test/autocomplete');
 
     // Test submitting the form.
-    $this->drupalPostForm('form-test/confirm-form', [], 'ConfirmFormTestForm::getConfirmText().');
-    $this->assertText('The ConfirmFormTestForm::submitForm() method was used for this form.');
+    $this->drupalGet('form-test/confirm-form');
+    $this->submitForm([], 'ConfirmFormTestForm::getConfirmText().');
+    $this->assertSession()->pageTextContains('The ConfirmFormTestForm::submitForm() method was used for this form.');
     $this->assertSession()->addressEquals('');
 
     // Test submitting the form with a destination.
-    $this->drupalPostForm('form-test/confirm-form', [], 'ConfirmFormTestForm::getConfirmText().', ['query' => ['destination' => 'admin/config']]);
+    $this->drupalGet('form-test/confirm-form', ['query' => ['destination' => 'admin/config']]);
+    $this->submitForm([], 'ConfirmFormTestForm::getConfirmText().');
     $this->assertSession()->addressEquals('admin/config');
 
     // Test cancelling the form with a complex destination.
     $this->drupalGet('form-test/confirm-form-array-path');
-    $this->clickLink(t('ConfirmFormArrayPathTestForm::getCancelText().'));
+    $this->clickLink('ConfirmFormArrayPathTestForm::getCancelText().');
     // Verify that the form's complex cancel link was followed.
     $this->assertSession()->addressEquals('form-test/confirm-form?destination=admin/config');
   }
@@ -56,37 +62,18 @@ class ConfirmFormTest extends BrowserTestBase {
   /**
    * Tests that the confirm form does not use external destinations.
    */
-  public function testConfirmFormWithExternalDestination() {
+  public function testConfirmFormWithExternalDestination(): void {
     $this->drupalGet('form-test/confirm-form');
-    $this->assertCancelLinkUrl(Url::fromRoute('form_test.route8'));
+    $this->assertSession()->linkByHrefExists(Url::fromRoute('form_test.route8')->toString());
     $this->drupalGet('form-test/confirm-form', ['query' => ['destination' => 'node']]);
-    $this->assertCancelLinkUrl(Url::fromUri('internal:/node'));
+    $this->assertSession()->linkByHrefExists(Url::fromUri('internal:/node')->toString());
     $this->drupalGet('form-test/confirm-form', ['query' => ['destination' => 'http://example.com']]);
-    $this->assertCancelLinkUrl(Url::fromRoute('form_test.route8'));
+    $this->assertSession()->linkByHrefExists(Url::fromRoute('form_test.route8')->toString());
     $this->drupalGet('form-test/confirm-form', ['query' => ['destination' => '<front>']]);
-    $this->assertCancelLinkUrl(Url::fromRoute('<front>'));
+    $this->assertSession()->linkByHrefExists(Url::fromRoute('<front>')->toString());
     // Other invalid destinations, should fall back to the form default.
     $this->drupalGet('form-test/confirm-form', ['query' => ['destination' => '/http://example.com']]);
-    $this->assertCancelLinkUrl(Url::fromRoute('form_test.route8'));
-  }
-
-  /**
-   * Asserts that a cancel link is present pointing to the provided URL.
-   *
-   * @param \Drupal\Core\Url $url
-   *   The url to check for.
-   * @param string $message
-   *   The assert message.
-   * @param string $group
-   *   The assertion group.
-   *
-   * @return bool
-   *   Result of the assertion.
-   */
-  public function assertCancelLinkUrl(Url $url, $message = '', $group = 'Other') {
-    $links = $this->xpath('//a[@href=:url]', [':url' => $url->toString()]);
-    $message = ($message ? $message : new FormattableMarkup('Cancel link with URL %url found.', ['%url' => $url->toString()]));
-    return $this->assertTrue(isset($links[0]), $message, $group);
+    $this->assertSession()->linkByHrefExists(Url::fromRoute('form_test.route8')->toString());
   }
 
 }

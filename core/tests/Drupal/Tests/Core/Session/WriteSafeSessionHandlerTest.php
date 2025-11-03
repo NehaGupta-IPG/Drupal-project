@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Session;
 
-use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Session\WriteSafeSessionHandler;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests \Drupal\Core\Session\WriteSafeSessionHandler.
- *
- * @coversDefaultClass \Drupal\Core\Session\WriteSafeSessionHandler
- * @group Session
  */
+#[CoversClass(WriteSafeSessionHandler::class)]
+#[Group('Session')]
 class WriteSafeSessionHandlerTest extends UnitTestCase {
 
   /**
@@ -27,7 +31,12 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
    */
   protected $sessionHandler;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->wrappedSessionHandler = $this->createMock('SessionHandlerInterface');
     $this->sessionHandler = new WriteSafeSessionHandler($this->wrappedSessionHandler);
   }
@@ -35,26 +44,21 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
   /**
    * Tests creating a WriteSafeSessionHandler with default arguments.
    *
-   * @covers ::__construct
-   * @covers ::isSessionWritable
-   * @covers ::write
+   * @legacy-covers ::__construct
+   * @legacy-covers ::isSessionWritable
+   * @legacy-covers ::write
    */
-  public function testConstructWriteSafeSessionHandlerDefaultArgs() {
+  public function testConstructWriteSafeSessionHandlerDefaultArgs(): void {
     $session_id = 'some-id';
     $session_data = 'serialized-session-data';
 
     $this->assertTrue($this->sessionHandler->isSessionWritable());
 
     // Writing should be enabled, return value passed to the caller by default.
-    $this->wrappedSessionHandler->expects($this->at(0))
+    $this->wrappedSessionHandler->expects($this->exactly(2))
       ->method('write')
       ->with($session_id, $session_data)
-      ->will($this->returnValue(TRUE));
-
-    $this->wrappedSessionHandler->expects($this->at(1))
-      ->method('write')
-      ->with($session_id, $session_data)
-      ->will($this->returnValue(FALSE));
+      ->willReturnOnConsecutiveCalls(TRUE, FALSE);
 
     $result = $this->sessionHandler->write($session_id, $session_data);
     $this->assertTrue($result);
@@ -66,11 +70,11 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
   /**
    * Tests creating a WriteSafeSessionHandler with session writing disabled.
    *
-   * @covers ::__construct
-   * @covers ::isSessionWritable
-   * @covers ::write
+   * @legacy-covers ::__construct
+   * @legacy-covers ::isSessionWritable
+   * @legacy-covers ::write
    */
-  public function testConstructWriteSafeSessionHandlerDisableWriting() {
+  public function testConstructWriteSafeSessionHandlerDisableWriting(): void {
     $session_id = 'some-id';
     $session_data = 'serialized-session-data';
 
@@ -86,10 +90,10 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
   /**
    * Tests using setSessionWritable to enable/disable session writing.
    *
-   * @covers ::setSessionWritable
-   * @covers ::write
+   * @legacy-covers ::setSessionWritable
+   * @legacy-covers ::write
    */
-  public function testSetSessionWritable() {
+  public function testSetSessionWritable(): void {
     $session_id = 'some-id';
     $session_data = 'serialized-session-data';
 
@@ -111,15 +115,10 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
     $this->assertTrue($this->sessionHandler->isSessionWritable());
 
     // Writing should be enabled, return value passed to the caller by default.
-    $this->wrappedSessionHandler->expects($this->at(0))
+    $this->wrappedSessionHandler->expects($this->exactly(2))
       ->method('write')
       ->with($session_id, $session_data)
-      ->will($this->returnValue(TRUE));
-
-    $this->wrappedSessionHandler->expects($this->at(1))
-      ->method('write')
-      ->with($session_id, $session_data)
-      ->will($this->returnValue(FALSE));
+      ->willReturnOnConsecutiveCalls(TRUE, FALSE);
 
     $result = $this->sessionHandler->write($session_id, $session_data);
     $this->assertTrue($result);
@@ -131,18 +130,18 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
   /**
    * Tests that other invocations are passed unmodified to the wrapped handler.
    *
-   * @covers ::setSessionWritable
-   * @covers ::open
-   * @covers ::read
-   * @covers ::close
-   * @covers ::destroy
-   * @covers ::gc
-   * @dataProvider providerTestOtherMethods
+   * @legacy-covers ::setSessionWritable
+   * @legacy-covers ::open
+   * @legacy-covers ::read
+   * @legacy-covers ::close
+   * @legacy-covers ::destroy
+   * @legacy-covers ::gc
    */
-  public function testOtherMethods($method, $expected_result, $args) {
+  #[DataProvider('providerTestOtherMethods')]
+  public function testOtherMethods($method, $expected_result, $args): void {
     $invocation = $this->wrappedSessionHandler->expects($this->exactly(2))
       ->method($method)
-      ->will($this->returnValue($expected_result));
+      ->willReturn($expected_result);
 
     // Set the parameter matcher.
     call_user_func_array([$invocation, 'with'], $args);
@@ -165,13 +164,13 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
    * @return array
    *   Test data.
    */
-  public function providerTestOtherMethods() {
+  public static function providerTestOtherMethods() {
     return [
       ['open', TRUE, ['/some/path', 'some-session-id']],
       ['read', 'some-session-data', ['a-session-id']],
       ['close', TRUE, []],
       ['destroy', TRUE, ['old-session-id']],
-      ['gc', TRUE, [42]],
+      ['gc', 0, [42]],
     ];
   }
 

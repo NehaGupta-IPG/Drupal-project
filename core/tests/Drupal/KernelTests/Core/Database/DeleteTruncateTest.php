@@ -1,6 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Database;
+
+use Drupal\Core\Database\DatabaseExceptionWrapper;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests delete and truncate queries.
@@ -12,15 +18,15 @@ namespace Drupal\KernelTests\Core\Database;
  * The TRUNCATE tests are not extensive either, because the behavior of
  * TRUNCATE queries is not consistent across database engines. We only test
  * that a TRUNCATE query actually deletes all rows from the target table.
- *
- * @group Database
  */
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class DeleteTruncateTest extends DatabaseTestBase {
 
   /**
    * Confirms that we can use a subselect in a delete successfully.
    */
-  public function testSubselectDelete() {
+  public function testSubselectDelete(): void {
     $num_records_before = $this->connection->query('SELECT COUNT(*) FROM {test_task}')->fetchField();
     $pid_to_delete = $this->connection->query("SELECT * FROM {test_task} WHERE [task] = 'sleep' ORDER BY [tid]")->fetchField();
 
@@ -32,16 +38,16 @@ class DeleteTruncateTest extends DatabaseTestBase {
       ->condition('pid', $subquery, 'IN');
 
     $num_deleted = $delete->execute();
-    $this->assertEqual(1, $num_deleted, 'Deleted 1 record.');
+    $this->assertEquals(1, $num_deleted, 'Deleted 1 record.');
 
     $num_records_after = $this->connection->query('SELECT COUNT(*) FROM {test_task}')->fetchField();
-    $this->assertEqual($num_records_before, $num_records_after + $num_deleted, 'Deletion adds up.');
+    $this->assertEquals($num_records_before, $num_records_after + $num_deleted, 'Deletion adds up.');
   }
 
   /**
    * Confirms that we can delete a single record successfully.
    */
-  public function testSimpleDelete() {
+  public function testSimpleDelete(): void {
     $num_records_before = $this->connection->query('SELECT COUNT(*) FROM {test}')->fetchField();
 
     $num_deleted = $this->connection->delete('test')
@@ -50,29 +56,30 @@ class DeleteTruncateTest extends DatabaseTestBase {
     $this->assertSame(1, $num_deleted, 'Deleted 1 record.');
 
     $num_records_after = $this->connection->query('SELECT COUNT(*) FROM {test}')->fetchField();
-    $this->assertEqual($num_records_before, $num_records_after + $num_deleted, 'Deletion adds up.');
+    $this->assertEquals($num_records_before, $num_records_after + $num_deleted, 'Deletion adds up.');
   }
 
   /**
    * Confirms that we can truncate a whole table successfully.
    */
-  public function testTruncate() {
+  public function testTruncate(): void {
     $num_records_before = $this->connection->query("SELECT COUNT(*) FROM {test}")->fetchField();
     $this->assertNotEmpty($num_records_before);
 
     $this->connection->truncate('test')->execute();
 
     $num_records_after = $this->connection->query("SELECT COUNT(*) FROM {test}")->fetchField();
-    $this->assertEqual(0, $num_records_after, 'Truncate really deletes everything.');
+    $this->assertEquals(0, $num_records_after, 'Truncate really deletes everything.');
   }
 
   /**
    * Confirms that we can truncate a whole table while in transaction.
    */
-  public function testTruncateInTransaction() {
+  public function testTruncateInTransaction(): void {
     $num_records_before = $this->connection->select('test')->countQuery()->execute()->fetchField();
     $this->assertGreaterThan(0, $num_records_before, 'The table is not empty.');
 
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
     $transaction = $this->connection->startTransaction('test_truncate_in_transaction');
     $this->connection->insert('test')
       ->fields([
@@ -94,6 +101,7 @@ class DeleteTruncateTest extends DatabaseTestBase {
 
     // Close the transaction, and check that there are still no records in the
     // table.
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
     $transaction = NULL;
     $this->assertFalse($this->connection->inTransaction());
     $num_records_after = $this->connection->select('test')->countQuery()->execute()->fetchField();
@@ -103,10 +111,11 @@ class DeleteTruncateTest extends DatabaseTestBase {
   /**
    * Confirms that transaction rollback voids a truncate operation.
    */
-  public function testTruncateTransactionRollback() {
+  public function testTruncateTransactionRollback(): void {
     $num_records_before = $this->connection->select('test')->countQuery()->execute()->fetchField();
     $this->assertGreaterThan(0, $num_records_before, 'The table is not empty.');
 
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
     $transaction = $this->connection->startTransaction('test_truncate_in_transaction');
     $this->connection->insert('test')
       ->fields([
@@ -128,7 +137,7 @@ class DeleteTruncateTest extends DatabaseTestBase {
 
     // Roll back the transaction, and check that we are back to status before
     // insert and truncate.
-    $this->connection->rollBack();
+    $transaction->rollBack();
     $this->assertFalse($this->connection->inTransaction());
     $num_records_after = $this->connection->select('test')->countQuery()->execute()->fetchField();
     $this->assertEquals($num_records_before, $num_records_after);
@@ -137,7 +146,7 @@ class DeleteTruncateTest extends DatabaseTestBase {
   /**
    * Confirms that we can delete a single special column name record successfully.
    */
-  public function testSpecialColumnDelete() {
+  public function testSpecialColumnDelete(): void {
     $num_records_before = $this->connection->query('SELECT COUNT(*) FROM {select}')->fetchField();
 
     $num_deleted = $this->connection->delete('select')
@@ -147,6 +156,22 @@ class DeleteTruncateTest extends DatabaseTestBase {
 
     $num_records_after = $this->connection->query('SELECT COUNT(*) FROM {select}')->fetchField();
     $this->assertEquals($num_records_before, $num_records_after + $num_deleted, 'Deletion adds up.');
+  }
+
+  /**
+   * Deleting from a not existing table throws a DatabaseExceptionWrapper.
+   */
+  public function testDeleteFromNonExistingTable(): void {
+    $this->expectException(DatabaseExceptionWrapper::class);
+    $this->connection->delete('a-table-that-does-not-exist')->execute();
+  }
+
+  /**
+   * Truncating a not existing table throws a DatabaseExceptionWrapper.
+   */
+  public function testTruncateNonExistingTable(): void {
+    $this->expectException(DatabaseExceptionWrapper::class);
+    $this->connection->truncate('a-table-that-does-not-exist')->execute();
   }
 
 }

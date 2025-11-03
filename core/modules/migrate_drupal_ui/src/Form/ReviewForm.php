@@ -2,9 +2,11 @@
 
 namespace Drupal\migrate_drupal_ui\Form;
 
+use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
-use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
@@ -47,13 +49,6 @@ class ReviewForm extends MigrateUpgradeFormBase {
   protected $migrationState;
 
   /**
-   * Module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * Source system data set in buildForm().
    *
    * @var array
@@ -73,17 +68,22 @@ class ReviewForm extends MigrateUpgradeFormBase {
    *   Migration state service.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler service.
+   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   *   The module extension list.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time service.
    */
-  public function __construct(StateInterface $state, MigrationPluginManagerInterface $migration_plugin_manager, PrivateTempStoreFactory $tempstore_private, MigrationState $migrationState, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler = NULL) {
+  public function __construct(
+    StateInterface $state,
+    MigrationPluginManagerInterface $migration_plugin_manager,
+    PrivateTempStoreFactory $tempstore_private,
+    MigrationState $migrationState,
+    ConfigFactoryInterface $config_factory,
+    protected ModuleExtensionList $moduleExtensionList,
+    protected TimeInterface $time,
+  ) {
     parent::__construct($config_factory, $migration_plugin_manager, $state, $tempstore_private);
     $this->migrationState = $migrationState;
-    if (!$module_handler) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $module_handler argument is deprecated in drupal:9.1.0 and will be required in drupal:10.0.0. See https://www.drupal.org/node/3136769', E_USER_DEPRECATED);
-      $module_handler = \Drupal::service('module_handler');
-    }
-    $this->moduleHandler = $module_handler;
   }
 
   /**
@@ -96,7 +96,8 @@ class ReviewForm extends MigrateUpgradeFormBase {
       $container->get('tempstore.private'),
       $container->get('migrate_drupal.migration_state'),
       $container->get('config.factory'),
-      $container->get('module_handler')
+      $container->get('extension.list.module'),
+      $container->get('datetime.time'),
     );
   }
 
@@ -137,7 +138,7 @@ class ReviewForm extends MigrateUpgradeFormBase {
       '#open' => TRUE,
       '#title' => $this->t('Modules that will not be upgraded'),
       '#summary_attributes' => ['id' => ['error']],
-      '#description' => $this->t("The new site is missing modules corresponding to the old site's modules. Unless they are installed prior to the upgrade, configuration and/or content needed by them will not be available on your new site. <a href=':review'>Read the checklist</a> to help decide what to do.", [':review' => 'https://www.drupal.org/docs/8/upgrade/upgrade-using-web-browser#pre-upgrade-analysis']),
+      '#description' => $this->t('The new site is missing modules corresponding to the old site\'s modules. Unless they are installed prior to the upgrade, configuration and/or content needed by them will not be available on your new site. <a href=":review">Read the checklist</a> to help decide what to do.', [':review' => 'https://www.drupal.org/docs/upgrading-drupal/upgrading-from-drupal-6-or-drupal-7/upgrade-using-web-browser#pre-upgrade-analysis']),
       '#weight' => 2,
     ];
     $missing_module_list['module_list'] = [
@@ -241,23 +242,18 @@ class ReviewForm extends MigrateUpgradeFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config['source_base_path'] = $this->store->get('source_base_path');
     $config['source_private_file_path'] = $this->store->get('source_private_file_path');
-    $batch = [
-      'title' => $this->t('Running upgrade'),
-      'progress_message' => '',
-      'operations' => [
-        [
-          [MigrateUpgradeImportBatch::class, 'run'],
-          [array_keys($this->migrations), $config],
-        ],
-      ],
-      'finished' => [
-        MigrateUpgradeImportBatch::class, 'finished',
-      ],
-    ];
-    batch_set($batch);
+    $batch_builder = (new BatchBuilder())
+      ->setTitle($this->t('Running upgrade'))
+      ->setProgressMessage('')
+      ->addOperation([
+        MigrateUpgradeImportBatch::class,
+        'run',
+      ], [array_keys($this->migrations), $config])
+      ->setFinishCallback([MigrateUpgradeImportBatch::class, 'finished']);
+    batch_set($batch_builder->toArray());
     $form_state->setRedirect('<front>');
     $this->store->set('step', 'overview');
-    $this->state->set('migrate_drupal_ui.performed', REQUEST_TIME);
+    $this->state->set('migrate_drupal_ui.performed', $this->time->getRequestTime());
   }
 
   /**
@@ -288,7 +284,10 @@ class ReviewForm extends MigrateUpgradeFormBase {
   protected function prepareOutput(array $migration_state) {
     $output = [];
     foreach ($migration_state as $source_machine_name => $destination_modules) {
-      $data = unserialize($this->systemData['module'][$source_machine_name]['info']);
+      $data = NULL;
+      if (isset($this->systemData['module'][$source_machine_name]['info'])) {
+        $data = unserialize($this->systemData['module'][$source_machine_name]['info'], ['allowed_classes' => FALSE]);
+      }
       $source_module_name = $data['name'] ?? $source_machine_name;
       // Get the names of all the destination modules.
       $destination_module_names = [];
@@ -300,9 +299,9 @@ class ReviewForm extends MigrateUpgradeFormBase {
           }
           else {
             try {
-              $destination_module_names[] = $this->moduleHandler->getName($destination_module);
+              $destination_module_names[] = $this->moduleExtensionList->getName($destination_module);
             }
-            catch (UnknownExtensionException $e) {
+            catch (UnknownExtensionException) {
               $destination_module_names[] = $destination_module;
             }
           }

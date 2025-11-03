@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Routing;
 
 use Drupal\Core\Path\CurrentPathStack;
@@ -7,22 +9,27 @@ use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\Routing\RouteCompiler;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Routing\Router;
-use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * @coversDefaultClass \Drupal\Core\Routing\Router
- * @group Routing
+ * Tests Drupal\Core\Routing\Router.
  */
+#[CoversClass(Router::class)]
+#[Group('Routing')]
 class RouterTest extends UnitTestCase {
 
   /**
-   * @covers ::applyFitOrder
+   * Tests matches with different fit order.
+   *
+   * @legacy-covers ::applyFitOrder
    */
-  public function testMatchesWithDifferentFitOrder() {
+  public function testMatchesWithDifferentFitOrder(): void {
     $route_provider = $this->prophesize(RouteProviderInterface::class);
 
     $route_collection = new RouteCollection();
@@ -38,13 +45,14 @@ class RouterTest extends UnitTestCase {
     $route_provider->getRouteCollectionForRequest(Argument::any())
       ->willReturn($route_collection);
 
-    $url_generator = $this->prophesize(UrlGeneratorInterface::class);
     $current_path_stack = $this->prophesize(CurrentPathStack::class);
-    $router = new Router($route_provider->reveal(), $current_path_stack->reveal(), $url_generator->reveal());
+    $router = new Router($route_provider->reveal(), $current_path_stack->reveal());
 
-    $request_context = $this->prophesize(RequestContext::class);
-    $request_context->getScheme()->willReturn('http');
-    $router->setContext($request_context->reveal());
+    $request_context = $this->createMock(RequestContext::class);
+    $request_context->expects($this->any())
+      ->method('getScheme')
+      ->willReturn('http');
+    $router->setContext($request_context);
 
     $current_path_stack->getPath(Argument::any())->willReturn('/user/1');
     $result = $router->match('/user/1');
@@ -55,6 +63,9 @@ class RouterTest extends UnitTestCase {
     $result = $router->match('/user/login');
 
     $this->assertEquals('user_login', $result['_route']);
+
+    $this->expectException(ResourceNotFoundException::class);
+    $router->match('/user/login ');
   }
 
 }

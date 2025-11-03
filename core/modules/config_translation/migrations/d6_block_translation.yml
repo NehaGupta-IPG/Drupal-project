@@ -39,8 +39,6 @@ process:
           1: forum_new_block
         locale:
           0: language_block
-        node:
-          0: node_syndicate_block
         search:
           0: search_form_block
         statistics:
@@ -65,6 +63,8 @@ process:
       - admin_theme
 destination:
   plugin: entity:block
+  translations: true
 migration_dependencies:
   required:
     - d6_block
+    - language

@@ -1,41 +1,48 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\block\Unit\BlockRepositoryTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\block\Unit;
 
 use Drupal\block\BlockRepository;
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\block\BlockRepository
- * @group block
+ * Tests Drupal\block\BlockRepository.
  */
+#[CoversClass(BlockRepository::class)]
+#[Group('block')]
 class BlockRepositoryTest extends UnitTestCase {
 
   /**
+   * The block repository.
+   *
    * @var \Drupal\block\BlockRepository
    */
   protected $blockRepository;
 
   /**
+   * The block storage or a mock.
+   *
    * @var \Drupal\Core\Entity\EntityStorageInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $blockStorage;
 
   /**
+   * The theme for the test.
+   *
    * @var string
    */
   protected $theme;
 
   /**
+   * The context handler of a mock.
+   *
    * @var \Drupal\Core\Plugin\Context\ContextHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $contextHandler;
@@ -63,7 +70,7 @@ class BlockRepositoryTest extends UnitTestCase {
     $theme_manager = $this->createMock('Drupal\Core\Theme\ThemeManagerInterface');
     $theme_manager->expects($this->atLeastOnce())
       ->method('getActiveTheme')
-      ->will($this->returnValue($active_theme));
+      ->willReturn($active_theme);
 
     $this->contextHandler = $this->createMock('Drupal\Core\Plugin\Context\ContextHandlerInterface');
     $this->blockStorage = $this->createMock('Drupal\Core\Entity\EntityStorageInterface');
@@ -79,17 +86,16 @@ class BlockRepositoryTest extends UnitTestCase {
   /**
    * Tests the retrieval of block entities.
    *
-   * @covers ::getVisibleBlocksPerRegion
-   *
-   * @dataProvider providerBlocksConfig
+   * @legacy-covers ::getVisibleBlocksPerRegion
    */
-  public function testGetVisibleBlocksPerRegion(array $blocks_config, array $expected_blocks) {
+  #[DataProvider('providerBlocksConfig')]
+  public function testGetVisibleBlocksPerRegion(array $blocks_config, array $expected_blocks): void {
     $blocks = [];
     foreach ($blocks_config as $block_id => $block_config) {
       $block = $this->createMock('Drupal\block\BlockInterface');
       $block->expects($this->once())
         ->method('access')
-        ->will($this->returnValue($block_config[0]));
+        ->willReturn($block_config[0]);
       $block->expects($block_config[0] ? $this->atLeastOnce() : $this->never())
         ->method('getRegion')
         ->willReturn($block_config[1]);
@@ -117,7 +123,10 @@ class BlockRepositoryTest extends UnitTestCase {
     $this->assertEquals($expected_blocks, $result);
   }
 
-  public function providerBlocksConfig() {
+  /**
+   * Provides data to testGetVisibleBlocksPerRegion().
+   */
+  public static function providerBlocksConfig() {
     $blocks_config = [
       'block1' => [
         AccessResult::allowed(), 'top', 0,
@@ -152,9 +161,9 @@ class BlockRepositoryTest extends UnitTestCase {
   /**
    * Tests the retrieval of block entities that are context-aware.
    *
-   * @covers ::getVisibleBlocksPerRegion
+   * @legacy-covers ::getVisibleBlocksPerRegion
    */
-  public function testGetVisibleBlocksPerRegionWithContext() {
+  public function testGetVisibleBlocksPerRegionWithContext(): void {
     $block = $this->createMock('Drupal\block\BlockInterface');
     $block->expects($this->once())
       ->method('access')
@@ -190,7 +199,4 @@ class BlockRepositoryTest extends UnitTestCase {
     $this->assertEquals(['config:block.block.block_id'], $cacheable_metadata['top']->getCacheTags());
   }
 
-}
-
-interface TestContextAwareBlockInterface extends BlockPluginInterface, ContextAwarePluginInterface {
 }

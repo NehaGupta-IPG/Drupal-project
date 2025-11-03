@@ -1,19 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Kernel;
 
+use Drupal\content_moderation\ContentModerationStateStorageSchema;
 use Drupal\content_moderation\Entity\ContentModerationState;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test the ContentModerationState storage schema.
- *
- * @coversDefaultClass \Drupal\content_moderation\ContentModerationStateStorageSchema
- * @group content_moderation
  */
+#[CoversClass(ContentModerationStateStorageSchema::class)]
+#[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class ContentModerationStateStorageSchemaTest extends KernelTestBase {
 
   use ContentModerationTestTrait;
@@ -25,7 +31,6 @@ class ContentModerationStateStorageSchemaTest extends KernelTestBase {
     'node',
     'content_moderation',
     'user',
-    'system',
     'text',
     'workflows',
     'entity_test',
@@ -46,6 +51,7 @@ class ContentModerationStateStorageSchemaTest extends KernelTestBase {
 
     NodeType::create([
       'type' => 'example',
+      'name' => 'Example',
     ])->save();
     $workflow = $this->createEditorialWorkflow();
     $workflow->getTypePlugin()->addEntityTypeAndBundle('node', 'example');
@@ -53,11 +59,11 @@ class ContentModerationStateStorageSchemaTest extends KernelTestBase {
   }
 
   /**
-   * Test the ContentModerationState unique keys.
+   * Tests the ContentModerationState unique keys.
    *
-   * @covers ::getEntitySchema
+   * @legacy-covers ::getEntitySchema
    */
-  public function testUniqueKeys() {
+  public function testUniqueKeys(): void {
     // Create a node which will create a new ContentModerationState entity.
     $node = Node::create([
       'title' => 'Test title',
@@ -124,8 +130,10 @@ class ContentModerationStateStorageSchemaTest extends KernelTestBase {
    *   An array of entity values.
    * @param bool $has_exception
    *   If an exception should be triggered when saving the entity.
+   *
+   * @internal
    */
-  protected function assertStorageException(array $values, $has_exception) {
+  protected function assertStorageException(array $values, bool $has_exception): void {
     $defaults = [
       'moderation_state' => 'draft',
       'workflow' => 'editorial',
@@ -135,7 +143,7 @@ class ContentModerationStateStorageSchemaTest extends KernelTestBase {
     try {
       ContentModerationState::updateOrCreateFromEntity($entity);
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       $exception_triggered = TRUE;
     }
     $this->assertEquals($has_exception, $exception_triggered);

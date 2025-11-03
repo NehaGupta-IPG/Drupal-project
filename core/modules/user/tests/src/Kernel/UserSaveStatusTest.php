@@ -1,33 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests user saving status.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserSaveStatusTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'user', 'field'];
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('user');
   }
 
   /**
-   * Test SAVED_NEW and SAVED_UPDATED statuses for user entity type.
+   * Tests SAVED_NEW and SAVED_UPDATED statuses for user entity type.
    */
-  public function testUserSaveStatus() {
+  public function testUserSaveStatus(): void {
     // Create a new user.
     $values = [
       'uid' => 1,
@@ -37,12 +42,12 @@ class UserSaveStatusTest extends KernelTestBase {
 
     // Test SAVED_NEW.
     $return = $user->save();
-    $this->assertEqual(SAVED_NEW, $return, "User was saved with SAVED_NEW status.");
+    $this->assertEquals(SAVED_NEW, $return, "User was saved with SAVED_NEW status.");
 
     // Test SAVED_UPDATED.
     $user->name = $this->randomMachineName();
     $return = $user->save();
-    $this->assertEqual(SAVED_UPDATED, $return, "User was saved with SAVED_UPDATED status.");
+    $this->assertEquals(SAVED_UPDATED, $return, "User was saved with SAVED_UPDATED status.");
   }
 
 }

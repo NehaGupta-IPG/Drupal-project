@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\TypedData\DataDefinition;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation constraints for EntityTypeConstraintValidator.
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityTypeConstraintValidatorTest extends EntityKernelTestBase {
 
   /**
@@ -16,19 +20,25 @@ class EntityTypeConstraintValidatorTest extends EntityKernelTestBase {
    *
    * @var \Drupal\Core\TypedData\TypedDataManager
    */
-  protected $typedData;
+  protected $typedDataManager;
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['node', 'field', 'user'];
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
-    $this->typedData = $this->container->get('typed_data_manager');
+    $this->typedDataManager = $this->container->get('typed_data_manager');
   }
 
   /**
    * Tests the EntityTypeConstraintValidator.
    */
-  public function testValidation() {
+  public function testValidation(): void {
     // Create a typed data definition with an EntityType constraint.
     $entity_type = 'node';
     $definition = DataDefinition::create('entity_reference')
@@ -39,23 +49,23 @@ class EntityTypeConstraintValidatorTest extends EntityKernelTestBase {
 
     // Test the validation.
     $node = $this->container->get('entity_type.manager')->getStorage('node')->create(['type' => 'page']);
-    $typed_data = $this->typedData->create($definition, $node);
+    $typed_data = $this->typedDataManager->create($definition, $node);
     $violations = $typed_data->validate();
-    $this->assertEqual(0, $violations->count(), 'Validation passed for correct value.');
+    $this->assertEquals(0, $violations->count(), 'Validation passed for correct value.');
 
     // Test the validation when an invalid value (in this case a user entity)
     // is passed.
     $account = $this->createUser();
 
-    $typed_data = $this->typedData->create($definition, $account);
+    $typed_data = $this->typedDataManager->create($definition, $account);
     $violations = $typed_data->validate();
-    $this->assertEqual(1, $violations->count(), 'Validation failed for incorrect value.');
+    $this->assertEquals(1, $violations->count(), 'Validation failed for incorrect value.');
 
     // Make sure the information provided by a violation is correct.
     $violation = $violations[0];
-    $this->assertEqual(t('The entity must be of type %type.', ['%type' => $entity_type]), $violation->getMessage(), 'The message for invalid value is correct.');
-    $this->assertEqual($typed_data, $violation->getRoot(), 'Violation root is correct.');
-    $this->assertEqual($account, $violation->getInvalidValue(), 'The invalid value is set correctly in the violation.');
+    $this->assertEquals(sprintf('The entity must be of type %s.', $entity_type), $violation->getMessage(), 'The message for invalid value is correct.');
+    $this->assertEquals($typed_data, $violation->getRoot(), 'Violation root is correct.');
+    $this->assertEquals($account, $violation->getInvalidValue(), 'The invalid value is set correctly in the violation.');
   }
 
 }

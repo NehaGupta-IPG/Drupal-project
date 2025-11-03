@@ -2,10 +2,11 @@
 
 namespace Drupal\layout_builder\Plugin\Block;
 
-use Drupal\block_content\Access\RefinableDependentAccessInterface;
-use Drupal\block_content\Access\RefinableDependentAccessTrait;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\RefinableDependentAccessInterface;
+use Drupal\Core\Access\RefinableDependentAccessTrait;
+use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
@@ -14,21 +15,22 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\SubformStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\layout_builder\Plugin\Derivative\InlineBlockDeriver;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines an inline block plugin type.
  *
- * @Block(
- *  id = "inline_block",
- *  admin_label = @Translation("Inline block"),
- *  category = @Translation("Inline blocks"),
- *  deriver = "Drupal\layout_builder\Plugin\Derivative\InlineBlockDeriver",
- * )
- *
  * @internal
  *   Plugin classes are internal.
  */
+#[Block(
+   id: 'inline_block',
+   admin_label: new TranslatableMarkup('Inline block'),
+   category: new TranslatableMarkup('Inline blocks'),
+   deriver: InlineBlockDeriver::class,
+)]
 class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, RefinableDependentAccessInterface {
 
   use RefinableDependentAccessTrait;
@@ -115,6 +117,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
   public function defaultConfiguration() {
     return [
       'view_mode' => 'full',
+      'block_id' => NULL,
       'block_revision_id' => NULL,
       'block_serialized' => NULL,
     ];
@@ -149,7 +152,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
   }
 
   /**
-   * Process callback to insert a Custom Block form.
+   * Process callback to insert a Content Block form.
    *
    * @param array $element
    *   The containing element.
@@ -157,7 +160,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
    *   The form state.
    *
    * @return array
-   *   The containing element, with the Custom Block form inserted.
+   *   The containing element, with the Content Block form inserted.
    */
   public static function processBlockForm(array $element, FormStateInterface $form_state) {
     /** @var \Drupal\block_content\BlockContentInterface $block */
@@ -283,12 +286,13 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
     }
 
     if ($block) {
-      // Since the custom block is only set if it was unserialized, the flag
+      // Since the content block is only set if it was unserialized, the flag
       // will only effect blocks which were modified or serialized originally.
       if ($new_revision) {
         $block->setNewRevision();
       }
       $block->save();
+      $this->configuration['block_id'] = $block->id();
       $this->configuration['block_revision_id'] = $block->getRevisionId();
       $this->configuration['block_serialized'] = NULL;
     }

@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests ContentEntityBase::hasTranslationChanges().
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class ContentEntityHasChangesTest extends KernelTestBase {
 
   /**
@@ -32,13 +36,12 @@ class ContentEntityHasChangesTest extends KernelTestBase {
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('entity_test_mulrev_changed_rev');
-    $this->installSchema('system', 'sequences');
   }
 
   /**
    * Tests the correct functionality of the hasTranslationChanges() function.
    */
-  public function testHasTranslationChanges() {
+  public function testHasTranslationChanges(): void {
     $user1 = User::create([
       'name' => 'username1',
       'status' => 1,
@@ -51,7 +54,7 @@ class ContentEntityHasChangesTest extends KernelTestBase {
     ]);
     $user2->save();
 
-    /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = $this->container->get('entity_type.manager')
       ->getStorage('entity_test_mulrev_changed_rev');
     /** @var \Drupal\entity_test\Entity\EntityTestMulRevChangedWithRevisionLog $entity */

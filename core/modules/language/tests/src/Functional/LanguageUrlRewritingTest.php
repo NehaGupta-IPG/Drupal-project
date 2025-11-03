@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\language\Functional;
 
 use Drupal\Core\Language\Language;
@@ -7,19 +9,19 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests that URL rewriting works as expected.
- *
- * @group language
  */
+#[Group('language')]
+#[RunTestsInSeparateProcesses]
 class LanguageUrlRewritingTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language', 'language_test'];
 
@@ -35,6 +37,9 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
    */
   protected $webUser;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -48,28 +53,30 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
     // Install French language.
     $edit = [];
     $edit['predefined_langcode'] = 'fr';
-    $this->drupalPostForm('admin/config/regional/language/add', $edit, 'Add language');
+    $this->drupalGet('admin/config/regional/language/add');
+    $this->submitForm($edit, 'Add language');
 
     // Enable URL language detection and selection.
     $edit = ['language_interface[enabled][language-url]' => 1];
-    $this->drupalPostForm('admin/config/regional/language/detection', $edit, 'Save settings');
+    $this->drupalGet('admin/config/regional/language/detection');
+    $this->submitForm($edit, 'Save settings');
 
     // Check that drupalSettings contains path prefix.
     $this->drupalGet('fr/admin/config/regional/language/detection');
-    $this->assertRaw('"pathPrefix":"fr\/"');
+    $this->assertSession()->responseContains('"pathPrefix":"fr\/"');
   }
 
   /**
    * Check that non-installed languages are not considered.
    */
-  public function testUrlRewritingEdgeCases() {
+  public function testUrlRewritingEdgeCases(): void {
     // Check URL rewriting with a non-installed language.
     $non_existing = new Language(['id' => $this->randomMachineName()]);
     $this->checkUrl($non_existing, 'Path language is ignored if language is not installed.');
 
     // Check that URL rewriting is not applied to subrequests.
     $this->drupalGet('language_test/subrequest');
-    $this->assertText($this->webUser->getAccountName());
+    $this->assertSession()->pageTextContains($this->webUser->getAccountName());
   }
 
   /**
@@ -84,18 +91,18 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
    * @param string $message
    *   Message to display in assertion that language prefixes are not added.
    */
-  private function checkUrl(LanguageInterface $language, $message) {
+  private function checkUrl(LanguageInterface $language, $message): void {
     $options = ['language' => $language, 'script' => ''];
     $base_path = trim(base_path(), '/');
     $rewritten_path = trim(str_replace($base_path, '', Url::fromRoute('<front>', [], $options)->toString()), '/');
     $segments = explode('/', $rewritten_path, 2);
     $prefix = $segments[0];
-    $path = isset($segments[1]) ? $segments[1] : $prefix;
+    $path = $segments[1] ?? $prefix;
 
     // If the rewritten URL has not a language prefix we pick a random prefix so
     // we can always check the prefixed URL.
     $prefixes = $this->config('language.negotiation')->get('url.prefixes');
-    $stored_prefix = isset($prefixes[$language->getId()]) ? $prefixes[$language->getId()] : $this->randomMachineName();
+    $stored_prefix = $prefixes[$language->getId()] ?? $this->randomMachineName();
     $this->assertNotEquals($prefix, $stored_prefix, $message);
     $prefix = $stored_prefix;
 
@@ -106,7 +113,7 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
   /**
    * Check URL rewriting when using a domain name and a non-standard port.
    */
-  public function testDomainNameNegotiationPort() {
+  public function testDomainNameNegotiationPort(): void {
     global $base_url;
     $language_domain = 'example.fr';
     // Get the current host URI we're running on.
@@ -116,7 +123,8 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
       'domain[en]' => $base_url_host,
       'domain[fr]' => $language_domain,
     ];
-    $this->drupalPostForm('admin/config/regional/language/detection/url', $edit, 'Save configuration');
+    $this->drupalGet('admin/config/regional/language/detection/url');
+    $this->submitForm($edit, 'Save configuration');
     // Rebuild the container so that the new language gets picked up by services
     // that hold the list of languages.
     $this->rebuildContainer();
@@ -131,7 +139,7 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
 
     // In case index.php is part of the URLs, we need to adapt the asserted
     // URLs as well.
-    $index_php = strpos(Url::fromRoute('<front>', [], ['absolute' => TRUE])->toString(), 'index.php') !== FALSE;
+    $index_php = str_contains(Url::fromRoute('<front>', [], ['absolute' => TRUE])->toString(), 'index.php');
 
     $request = Request::createFromGlobals();
     $server = $request->server->all();
@@ -146,7 +154,7 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
 
     $expected = ($index_php ? 'http://example.fr:88/index.php' : 'http://example.fr:88') . rtrim(base_path(), '/') . '/';
 
-    $this->assertEqual($expected, $url, 'The right port is used.');
+    $this->assertEquals($expected, $url, 'The right port is used.');
 
     // If we set the port explicitly, it should not be overridden.
     $url = Url::fromRoute('<front>', [], [
@@ -157,7 +165,7 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
 
     $expected = $index_php ? 'http://example.fr:90/index.php' : 'http://example.fr:90' . rtrim(base_path(), '/') . '/';
 
-    $this->assertEqual($expected, $url, 'A given port is not overridden.');
+    $this->assertEquals($expected, $url, 'A given port is not overridden.');
 
   }
 

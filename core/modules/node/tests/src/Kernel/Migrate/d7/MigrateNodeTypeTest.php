@@ -1,24 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel\Migrate\d7;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\FieldConfigInterface;
-use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\NodeTypeInterface;
+use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Upgrade node types to node.type.*.yml.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class MigrateNodeTypeTest extends MigrateDrupal7TestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'text', 'menu_ui'];
 
@@ -33,8 +35,6 @@ class MigrateNodeTypeTest extends MigrateDrupal7TestBase {
   /**
    * Tests a single node type.
    *
-   * @dataProvider testNodeTypeDataProvider
-   *
    * @param string $id
    *   The node type ID.
    * @param string $label
@@ -43,8 +43,20 @@ class MigrateNodeTypeTest extends MigrateDrupal7TestBase {
    *   The expected node type description.
    * @param string $help
    *   The expected help text.
+   * @param bool $display_submitted
+   *   If submission information is displayed.
+   * @param bool $new_revision
+   *   If this is a new revision.
+   * @param array|null $expected_available_menus
+   *   The expected menus.
+   * @param string|null $expected_parent
+   *   The expected menu parents.
+   * @param string|null $body_label
+   *   (optional) The label for the body field.
+   *
+   * @internal
    */
-  protected function assertEntity($id, $label, $description, $help, $display_submitted, $new_revision, $expected_available_menus, $expected_parent, $body_label = NULL) {
+  protected function assertEntity(string $id, string $label, string $description, string $help, bool $display_submitted, bool $new_revision, ?array $expected_available_menus, ?string $expected_parent, ?string $body_label = NULL): void {
     /** @var \Drupal\node\NodeTypeInterface $entity */
     $entity = NodeType::load($id);
     $this->assertInstanceOf(NodeTypeInterface::class, $entity);
@@ -70,9 +82,9 @@ class MigrateNodeTypeTest extends MigrateDrupal7TestBase {
   /**
    * Tests Drupal 7 node type to Drupal 8 migration.
    */
-  public function testNodeType() {
-    $expected_available_menus = ['main-menu'];
-    $expected_parent = 'main-menu:0:';
+  public function testNodeType(): void {
+    $expected_available_menus = ['main'];
+    $expected_parent = 'main:';
 
     $this->assertEntity('article', 'Article', 'Use <em>articles</em> for time-sensitive content like news, press releases or blog posts.', 'Help text for articles', TRUE, FALSE, $expected_available_menus, $expected_parent, "Body");
     $this->assertEntity('blog', 'Blog entry', 'Use for multi-user blogs. Every user gets a personal blog.', 'Blog away, good sir!', TRUE, FALSE, $expected_available_menus, $expected_parent, 'Body');
@@ -85,10 +97,10 @@ class MigrateNodeTypeTest extends MigrateDrupal7TestBase {
 
     // This node type does not carry a body field.
     $expected_available_menus = [
-      'main-menu',
-      'management',
-      'navigation',
-      'user-menu',
+      'main',
+      'admin',
+      'tools',
+      'account',
     ];
     $this->assertEntity('test_content_type', 'Test content type', 'This is the description of the test content type.', 'Help text for test content type', FALSE, TRUE, $expected_available_menus, $expected_parent);
   }

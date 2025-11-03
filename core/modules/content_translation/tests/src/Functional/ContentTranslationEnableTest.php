@@ -1,14 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_translation\Functional;
 
+use Drupal\language\Form\ContentLanguageSettingsForm;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test enabling content translation module.
- *
- * @group content_translation
  */
+#[Group('content_translation')]
+#[CoversClass(ContentLanguageSettingsForm::class)]
+#[CoversFunction('_content_translation_form_language_content_settings_form_alter')]
+#[RunTestsInSeparateProcesses]
 class ContentTranslationEnableTest extends BrowserTestBase {
 
   /**
@@ -24,7 +34,12 @@ class ContentTranslationEnableTest extends BrowserTestBase {
   /**
    * Tests that entity schemas are up-to-date after enabling translation.
    */
-  public function testEnable() {
+  public function testEnable(): void {
+    $this->rootUser = $this->drupalCreateUser([
+      'administer modules',
+      'administer site configuration',
+      'administer content types',
+    ]);
     $this->drupalLogin($this->rootUser);
     // Enable modules and make sure the related config entity type definitions
     // are installed.
@@ -32,20 +47,25 @@ class ContentTranslationEnableTest extends BrowserTestBase {
       'modules[content_translation][enable]' => TRUE,
       'modules[language][enable]' => TRUE,
     ];
-    $this->drupalPostForm('admin/modules', $edit, 'Install');
+    $this->drupalGet('admin/modules');
+    $this->submitForm($edit, 'Install');
+    $this->rebuildContainer();
 
     // Status messages are shown.
-    $this->assertText('This site has only a single language enabled. Add at least one more language in order to translate content.');
-    $this->assertText('Enable translation for content types, taxonomy vocabularies, accounts, or any other element you wish to translate.');
+    $this->assertSession()->statusMessageContains('This site has only a single language enabled. Add at least one more language in order to translate content.', 'warning');
+    $this->assertSession()->statusMessageContains('Enable translation for content types, taxonomy vocabularies, accounts, or any other element you wish to translate.', 'warning');
 
     // No pending updates should be available.
     $this->drupalGet('admin/reports/status');
-    $requirement_value = $this->cssSelect("details.system-status-report__entry summary:contains('Entity/field definitions') + div");
-    $this->assertEqual(t('Up to date'), trim($requirement_value[0]->getText()));
+    $this->assertSession()->elementTextEquals('css', "details.system-status-report__entry summary:contains('Entity/field definitions') + div", 'Up to date');
 
+    $this->grantPermissions(Role::load(Role::AUTHENTICATED_ID), [
+      'administer content translation',
+      'administer languages',
+    ]);
     $this->drupalGet('admin/config/regional/content-language');
     // The node entity type should not be an option because it has no bundles.
-    $this->assertNoRaw('entity_types[node]');
+    $this->assertSession()->responseNotContains('entity_types[node]');
     // Enable content translation on entity types that have will have a
     // content_translation_uid.
     $edit = [
@@ -58,8 +78,7 @@ class ContentTranslationEnableTest extends BrowserTestBase {
 
     // No pending updates should be available.
     $this->drupalGet('admin/reports/status');
-    $requirement_value = $this->cssSelect("details.system-status-report__entry summary:contains('Entity/field definitions') + div");
-    $this->assertEqual(t('Up to date'), trim($requirement_value[0]->getText()));
+    $this->assertSession()->elementTextEquals('css', "details.system-status-report__entry summary:contains('Entity/field definitions') + div", 'Up to date');
 
     // Create a node type and check the content translation settings are now
     // available for nodes.
@@ -68,9 +87,10 @@ class ContentTranslationEnableTest extends BrowserTestBase {
       'title_label' => 'title for foo',
       'type' => 'foo',
     ];
-    $this->drupalPostForm('admin/structure/types/add', $edit, 'Save content type');
+    $this->drupalGet('admin/structure/types/add');
+    $this->submitForm($edit, 'Save');
     $this->drupalGet('admin/config/regional/content-language');
-    $this->assertRaw('entity_types[node]');
+    $this->assertSession()->responseContains('entity_types[node]');
   }
 
 }

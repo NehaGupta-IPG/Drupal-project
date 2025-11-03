@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\dynamic_page_cache\Functional;
 
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Url;
 use Drupal\dynamic_page_cache\EventSubscriber\DynamicPageCacheSubscriber;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Enables the Dynamic Page Cache and tests it in various scenarios.
@@ -16,16 +20,11 @@ use Drupal\Tests\BrowserTestBase;
  * all of that again. It is tested in
  * RendererBubblingTest::testConditionalCacheContextBubblingSelfHealing().
  *
- * @group dynamic_page_cache
- *
  * @see \Drupal\dynamic_page_cache\EventSubscriber\DynamicPageCacheSubscriber
  */
+#[Group('dynamic_page_cache')]
+#[RunTestsInSeparateProcesses]
 class DynamicPageCacheIntegrationTest extends BrowserTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $dumpHeaders = TRUE;
 
   /**
    * {@inheritdoc}
@@ -51,12 +50,12 @@ class DynamicPageCacheIntegrationTest extends BrowserTestBase {
   /**
    * Tests that Dynamic Page Cache works correctly, and verifies the edge cases.
    */
-  public function testDynamicPageCache() {
+  public function testDynamicPageCache(): void {
     // Controllers returning plain response objects are ignored by Dynamic Page
     // Cache.
     $url = Url::fromUri('route:dynamic_page_cache_test.response');
     $this->drupalGet($url);
-    $this->assertSession()->responseHeaderDoesNotExist(DynamicPageCacheSubscriber::HEADER);
+    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'UNCACHEABLE (no cacheability)');
 
     // Controllers returning CacheableResponseInterface (cacheable response)
     // objects are handled by Dynamic Page Cache.
@@ -81,10 +80,10 @@ class DynamicPageCacheIntegrationTest extends BrowserTestBase {
     foreach (['llama', 'piggy', 'unicorn', 'kitten'] as $animal) {
       $url = Url::fromUri('route:dynamic_page_cache_test.html.with_cache_contexts', ['query' => ['animal' => $animal]]);
       $this->drupalGet($url);
-      $this->assertRaw($animal);
+      $this->assertSession()->pageTextContains($animal);
       $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'MISS');
       $this->drupalGet($url);
-      $this->assertRaw($animal);
+      $this->assertSession()->pageTextContains($animal);
       $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'HIT');
 
       // Finally, let's also verify that the 'dynamic_page_cache_test.html'
@@ -100,32 +99,38 @@ class DynamicPageCacheIntegrationTest extends BrowserTestBase {
     // response, are ignored by Dynamic Page Cache (but only because those
     // wrapper formats' responses do not implement CacheableResponseInterface).
     $this->drupalGet('dynamic-page-cache-test/html', ['query' => [MainContentViewSubscriber::WRAPPER_FORMAT => 'drupal_ajax']]);
-    $this->assertSession()->responseHeaderDoesNotExist(DynamicPageCacheSubscriber::HEADER);
     $this->drupalGet('dynamic-page-cache-test/html', ['query' => [MainContentViewSubscriber::WRAPPER_FORMAT => 'drupal_dialog']]);
-    $this->assertSession()->responseHeaderDoesNotExist(DynamicPageCacheSubscriber::HEADER);
+    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'UNCACHEABLE (no cacheability)');
     $this->drupalGet('dynamic-page-cache-test/html', ['query' => [MainContentViewSubscriber::WRAPPER_FORMAT => 'drupal_modal']]);
-    $this->assertSession()->responseHeaderDoesNotExist(DynamicPageCacheSubscriber::HEADER);
+    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'UNCACHEABLE (no cacheability)');
 
     // Admin routes are ignored by Dynamic Page Cache.
     $this->drupalGet('dynamic-page-cache-test/html/admin');
-    $this->assertSession()->responseHeaderDoesNotExist(DynamicPageCacheSubscriber::HEADER);
+    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'UNCACHEABLE (response policy)');
     $this->drupalGet('dynamic-page-cache-test/response/admin');
-    $this->assertSession()->responseHeaderDoesNotExist(DynamicPageCacheSubscriber::HEADER);
+    // Even this is an admin route, the lack of cacheability prevails in the
+    // header explanation.
+    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'UNCACHEABLE (no cacheability)');
     $this->drupalGet('dynamic-page-cache-test/cacheable-response/admin');
-    $this->assertSession()->responseHeaderDoesNotExist(DynamicPageCacheSubscriber::HEADER);
+    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'UNCACHEABLE (response policy)');
 
     // Max-age = 0 responses are ignored by Dynamic Page Cache.
     $this->drupalGet('dynamic-page-cache-test/html/uncacheable/max-age');
-    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'UNCACHEABLE');
+    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'UNCACHEABLE (poor cacheability)');
 
     // 'user' cache context responses are ignored by Dynamic Page Cache.
     $this->drupalGet('dynamic-page-cache-test/html/uncacheable/contexts');
-    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'UNCACHEABLE');
+    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'UNCACHEABLE (poor cacheability)');
 
     // 'current-temperature' cache tag responses are ignored by Dynamic Page
     // Cache.
     $this->drupalGet('dynamic-page-cache-test/html/uncacheable/tags');
     $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'MISS');
+
+    // Route access checkers can also bubble up cacheability data.
+    $this->drupalGet('/dynamic-page-cache-test/html/uncacheable/route-access');
+    $this->assertSession()->responseHeaderExists(DynamicPageCacheSubscriber::HEADER);
+    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'UNCACHEABLE (poor cacheability)');
   }
 
 }

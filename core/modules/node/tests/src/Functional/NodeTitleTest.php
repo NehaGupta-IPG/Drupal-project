@@ -1,30 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Component\Utility\Html;
+use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests node title.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeTitleTest extends NodeTestBase {
 
   use CommentTestTrait;
+  use AssertBreadcrumbTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['comment', 'views', 'block'];
 
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'stark';
 
   /**
    * A user with permission to bypass access content.
@@ -54,44 +58,41 @@ class NodeTitleTest extends NodeTestBase {
   /**
    * Creates one node and tests if the node title has the correct value.
    */
-  public function testNodeTitle() {
+  public function testNodeTitle(): void {
     // Create "Basic page" content with title.
     // Add the node to the frontpage so we can test if teaser links are
     // clickable.
-    $settings = [
-      'title' => $this->randomMachineName(8),
+    $node = $this->drupalCreateNode([
+      'title' => 'Test node title',
       'promote' => 1,
-    ];
-    $node = $this->drupalCreateNode($settings);
+    ]);
 
     // Test <title> tag.
-    $this->drupalGet('node/' . $node->id());
-    $xpath = '//title';
-    $this->assertEqual($this->xpath($xpath)[0]->getText(), $node->label() . ' | Drupal', 'Page title is equal to node title.', 'Node');
+    $this->drupalGet($node->toUrl());
+    $this->assertSession()->elementTextEquals('xpath', '//title', 'Test node title | Drupal');
 
     // Test breadcrumb in comment preview.
-    $this->drupalGet('comment/reply/node/' . $node->id() . '/comment');
-    $xpath = '//nav[@class="breadcrumb"]/ol/li[last()]/a';
-    $this->assertEqual($this->xpath($xpath)[0]->getText(), $node->label(), 'Node breadcrumb is equal to node title.', 'Node');
+    $this->assertBreadcrumb('comment/reply/node/' . $node->id() . '/comment', [
+      '' => 'Home',
+      'node/' . $node->id() => 'Test node title',
+    ]);
 
-    // Test node title in comment preview.
-    $this->assertEqual($this->xpath('//article[contains(concat(" ", normalize-space(@class), " "), :node-class)]/h2/a/span', [':node-class' => ' node--type-' . $node->bundle() . ' '])[0]->getText(), $node->label(), 'Node preview title is equal to node title.', 'Node');
+    // Verify that the page title includes the node title.
+    $this->assertSession()->titleEquals('Add new comment to Test node title | Drupal');
 
     // Test node title is clickable on teaser list (/node).
     $this->drupalGet('node');
     $this->clickLink($node->label());
 
     // Test edge case where node title is set to 0.
-    $settings = [
+    $node = $this->drupalCreateNode([
       'title' => 0,
-    ];
-    $node = $this->drupalCreateNode($settings);
+    ]);
     // Test that 0 appears as <title>.
-    $this->drupalGet('node/' . $node->id());
+    $this->drupalGet($node->toUrl());
     $this->assertSession()->titleEquals('0 | Drupal');
     // Test that 0 appears in the template <h1>.
-    $xpath = '//h1';
-    $this->assertSame('0', $this->xpath($xpath)[0]->getText(), 'Node title is displayed as 0.');
+    $this->assertSession()->elementTextEquals('xpath', '//h1', '0');
 
     // Test edge case where node title contains special characters.
     $edge_case_title = 'article\'s "title".';
@@ -102,12 +103,12 @@ class NodeTitleTest extends NodeTestBase {
     // Test that the title appears as <title>. The title will be escaped on the
     // the page.
     $edge_case_title_escaped = Html::escape($edge_case_title);
-    $this->drupalGet('node/' . $node->id());
-    $this->assertRaw('<title>' . $edge_case_title_escaped . ' | Drupal</title>');
+    $this->drupalGet($node->toUrl());
+    $this->assertSession()->responseContains('<title>' . $edge_case_title_escaped . ' | Drupal</title>');
 
     // Test that the title appears as <title> when reloading the node page.
-    $this->drupalGet('node/' . $node->id());
-    $this->assertRaw('<title>' . $edge_case_title_escaped . ' | Drupal</title>');
+    $this->drupalGet($node->toUrl());
+    $this->assertSession()->responseContains('<title>' . $edge_case_title_escaped . ' | Drupal</title>');
 
   }
 

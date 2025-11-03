@@ -5,37 +5,29 @@
  * Post update functions for File.
  */
 
-use Drupal\Core\Config\Entity\ConfigEntityUpdater;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\file\Plugin\Field\FieldType\FileItem;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
- * Add txt to allowed extensions for all fields that allow uploads of insecure files.
+ * Implements hook_removed_post_updates().
  */
-function file_post_update_add_txt_if_allows_insecure_extensions(&$sandbox = NULL) {
-  if (\Drupal::config('system.file')->get('allow_insecure_uploads')) {
-    return t('The system is configured to allow insecure file uploads. No file field updates are necessary.');
-  }
+function file_removed_post_updates(): array {
+  return [
+    'file_post_update_add_txt_if_allows_insecure_extensions' => '10.0.0',
+    'file_post_update_add_permissions_to_roles' => '11.0.0',
+    'file_post_update_add_default_filename_sanitization_configuration' => '11.0.0',
+  ];
+}
 
-  $updater = function (FieldConfig $field) {
-    // Determine if this field uses an item definition that extends FileItem.
-    if (is_subclass_of($field->getItemDefinition()->getClass(), FileItem::class)) {
-      $allowed_extensions_string = trim($field->getSetting('file_extensions'));
-      $allowed_extensions = array_filter(explode(' ', $allowed_extensions_string));
-      if (in_array('txt', $allowed_extensions, TRUE)) {
-        // Since .txt is specifically allowed, there's nothing to do.
-        return FALSE;
-      }
-      foreach ($allowed_extensions as $extension) {
-        // Allow .txt if an insecure extension is allowed.
-        if (preg_match(FILE_INSECURE_EXTENSION_REGEX, 'test.' . $extension)) {
-          $allowed_extensions_string .= ' txt';
-          $field->setSetting('file_extensions', $allowed_extensions_string);
-          return TRUE;
-        }
-      }
-      return FALSE;
-    }
-  };
-  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'field_config', $updater);
+/**
+ * Adds a value for the 'playsinline' setting of the 'file_video' formatter.
+ *
+ * @deprecated in drupal:12.3.0 and is removed from drupal:13.0.0. This was
+ *   rolled back due to a bug in the implementation and is now a no-op function
+ *   and is kept only to prevent errors when updating.
+ *
+ * @see https://www.drupal.org/project/drupal/issues/3533291
+ */
+function file_post_update_add_playsinline(array &$sandbox = []): ?TranslatableMarkup {
+  // No-op.
+  return NULL;
 }

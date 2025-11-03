@@ -1,27 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Unit\Plugin\migrate\field\d6;
 
+use Drupal\file\Plugin\migrate\field\d6\FileField;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
 use Drupal\Tests\UnitTestCase;
-use Drupal\file\Plugin\migrate\field\d6\FileField;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 
-// cspell:ignore imagefield
-
+// cspell:ignore filefield imagefield
 /**
- * @coversDefaultClass \Drupal\file\Plugin\migrate\field\d6\FileField
- * @group file
+ * Tests Drupal\file\Plugin\migrate\field\d6\FileField.
  */
+#[CoversClass(FileField::class)]
+#[Group('file')]
 class FileFieldTest extends UnitTestCase {
 
   /**
+   * The migrate field plugin.
+   *
    * @var \Drupal\migrate_drupal\Plugin\MigrateFieldInterface
    */
   protected $plugin;
 
   /**
+   * The migration.
+   *
    * @var \Drupal\migrate\Plugin\MigrationInterface
    */
   protected $migration;
@@ -30,6 +39,8 @@ class FileFieldTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->plugin = new FileField([], 'file', []);
 
     $migration = $this->prophesize(MigrationInterface::class);
@@ -46,14 +57,16 @@ class FileFieldTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::defineValueProcessPipeline
+   * Tests define value process pipeline.
+   *
+   * @legacy-covers ::defineValueProcessPipeline
    */
-  public function testDefineValueProcessPipeline($method = 'defineValueProcessPipeline') {
-    $this->plugin->$method($this->migration, 'somefieldname', []);
+  public function testDefineValueProcessPipeline($method = 'defineValueProcessPipeline'): void {
+    $this->plugin->$method($this->migration, 'field_name', []);
 
     $expected = [
       'plugin' => 'd6_field_file',
-      'source' => 'somefieldname',
+      'source' => 'field_name',
     ];
     $this->assertSame($expected, $this->migration->getProcess());
   }
@@ -61,7 +74,7 @@ class FileFieldTest extends UnitTestCase {
   /**
    * Data provider for testGetFieldType().
    */
-  public function getFieldTypeProvider() {
+  public static function getFieldTypeProvider() {
     return [
       ['image', 'imagefield_widget'],
       ['file', 'filefield_widget'],
@@ -70,10 +83,12 @@ class FileFieldTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getFieldType
-   * @dataProvider getFieldTypeProvider
+   * Tests get field type.
+   *
+   * @legacy-covers ::getFieldType
    */
-  public function testGetFieldType($expected_type, $widget_type, array $settings = []) {
+  #[DataProvider('getFieldTypeProvider')]
+  public function testGetFieldType($expected_type, $widget_type, array $settings = []): void {
     $row = new Row();
     $row->setSourceProperty('widget_type', $widget_type);
     $row->setSourceProperty('global_settings', $settings);

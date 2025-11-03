@@ -2,8 +2,8 @@
 
 namespace Drupal\responsive_image\Plugin\migrate\source\d7;
 
-use Drupal\migrate\Plugin\migrate\source\SqlBase;
 use Drupal\migrate\Row;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * Gets Drupal responsive image styles source from database.
@@ -13,14 +13,14 @@ use Drupal\migrate\Row;
  * Drupal 8, create the respective your_theme.breakpoints.yml file at
  * the root of the theme.
  *
- * @see https://www.drupal.org/docs/8/theming-drupal-8/working-with-breakpoints-in-drupal-8
+ * @see https://www.drupal.org/docs/develop/theming-drupal/working-with-breakpoints-in-drupal
  *
  * @MigrateSource(
  *   id = "d7_responsive_image_styles",
  *   source_module = "picture"
  * )
  */
-class ResponsiveImageStyles extends SqlBase {
+class ResponsiveImageStyles extends DrupalSqlBase {
 
   /**
    * {@inheritdoc}

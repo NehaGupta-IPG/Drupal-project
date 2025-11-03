@@ -6,73 +6,11 @@
  */
 
 use Drupal\Component\Utility\Crypt;
-use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Utility\Error;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
-/**
- * Minimum allowed version of PHP for Drupal to be bootstrapped.
- *
- * Below this version:
- * - The installer cannot be run.
- * - Updates cannot be run.
- * - Modules and themes cannot be enabled.
- * - If a site managed to bypass all of the above, then an error is shown in
- *   the status report and various fatal errors occur on various pages.
- *
- * @deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Use
- *   \Drupal::MINIMUM_PHP instead.
- *
- * @see https://www.drupal.org/node/2909361
- * @see install.php
- */
-const DRUPAL_MINIMUM_PHP = \Drupal::MINIMUM_PHP;
-
-/**
- * Minimum supported version of PHP.
- *
- * Below this version:
- * - New sites cannot be installed, except from within tests.
- * - Updates from previous Drupal versions can be run, but users are warned
- *   that Drupal no longer supports that PHP version.
- * - An error is shown in the status report that the PHP version is too old.
- *
- * @deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Use
- *   \Drupal::MINIMUM_SUPPORTED_PHP instead.
- *
- * @see https://www.drupal.org/node/2909361
- */
-const DRUPAL_MINIMUM_SUPPORTED_PHP = \Drupal::MINIMUM_SUPPORTED_PHP;
-
-/**
- * Minimum recommended version of PHP.
- *
- * Sites installing Drupal on PHP versions lower than this will see a warning
- * message, but Drupal can still be installed. Used for (e.g.) PHP versions
- * that have reached their EOL or will in the near future.
- *
- * @deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Use
- *   \Drupal::RECOMMENDED_PHP instead.
- *
- * @see https://www.drupal.org/node/2909361
- */
-const DRUPAL_RECOMMENDED_PHP = \Drupal::RECOMMENDED_PHP;
-
-/**
- * Minimum recommended value of PHP memory_limit.
- *
- * 64M was chosen as a minimum requirement in order to allow for additional
- * contributed modules to be installed prior to hitting the limit. However,
- * 40M is the target for the Standard installation profile.
- *
- * @deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Use
- *   \Drupal::MINIMUM_PHP_MEMORY_LIMIT instead.
- *
- * @see https://www.drupal.org/node/2909361
- */
-const DRUPAL_MINIMUM_PHP_MEMORY_LIMIT = \Drupal::MINIMUM_PHP_MEMORY_LIMIT;
+// cspell:ignore htkey
 
 /**
  * Error reporting level: display no errors.
@@ -100,112 +38,11 @@ const ERROR_REPORTING_DISPLAY_VERBOSE = 'verbose';
 const DRUPAL_EXTENSION_NAME_MAX_LENGTH = 50;
 
 /**
- * Time of the current request in seconds elapsed since the Unix Epoch.
- *
- * This differs from $_SERVER['REQUEST_TIME'], which is stored as a float
- * since PHP 5.4.0. Float timestamps confuse most PHP functions
- * (including date_create()).
- *
- * @see http://php.net/manual/reserved.variables.server.php
- * @see http://php.net/manual/function.time.php
- *
- * @deprecated in drupal:8.3.0 and is removed from drupal:10.0.0.
- *   Use \Drupal::time()->getRequestTime();
- *
- * @see https://www.drupal.org/node/2785211
- */
-define('REQUEST_TIME', (int) $_SERVER['REQUEST_TIME']);
-
-/**
  * Defines the root directory of the Drupal installation.
  *
  * This strips two levels of directories off the current directory.
  */
 define('DRUPAL_ROOT', dirname(__DIR__, 2));
-
-/**
- * Returns and optionally sets the filename for a system resource.
- *
- * The filename, whether provided, cached, or retrieved from the database, is
- * only returned if the file exists.
- *
- * This function plays a key role in allowing Drupal's resources (modules
- * and themes) to be located in different places depending on a site's
- * configuration. For example, a module 'foo' may legally be located
- * in any of these three places:
- *
- * core/modules/foo/foo.info.yml
- * modules/foo/foo.info.yml
- * sites/example.com/modules/foo/foo.info.yml
- *
- * Calling drupal_get_filename('module', 'foo') will give you one of
- * the above, depending on where the module is located.
- *
- * @param $type
- *   The type of the item; one of 'core', 'profile', 'module', 'theme', or
- *   'theme_engine'.
- * @param $name
- *   The name of the item for which the filename is requested. Ignored for
- *   $type 'core'.
- * @param $filename
- *   The filename of the item if it is to be set explicitly rather
- *   than by consulting the database.
- *
- * @return string
- *   The filename of the requested item or NULL if the item is not found.
- */
-function drupal_get_filename($type, $name, $filename = NULL) {
-  // Type 'core' only exists to simplify application-level logic; it always maps
-  // to the /core directory, whereas $name is ignored. It is only requested via
-  // drupal_get_path(). /core/core.info.yml does not exist, but is required
-  // since drupal_get_path() returns the dirname() of the returned pathname.
-  if ($type === 'core') {
-    return 'core/core.info.yml';
-  }
-
-  try {
-    /** @var \Drupal\Core\Extension\ExtensionList $extension_list */
-    $extension_list = \Drupal::service("extension.list.$type");
-    if (isset($filename)) {
-      // Manually add the info file path of an extension.
-      $extension_list->setPathname($name, $filename);
-    }
-    return $extension_list->getPathname($name);
-  }
-  catch (ServiceNotFoundException $e) {
-    // Catch the exception. This will result in triggering an error.
-    // If the service is unknown, create a user-level error message.
-    trigger_error(
-      sprintf('Unknown type specified: "%s". Must be one of: "core", "profile", "module", "theme", or "theme_engine".', $type),
-      E_USER_WARNING
-    );
-  }
-  catch (\InvalidArgumentException $e) {
-    // Catch the exception. This will result in triggering an error.
-    // If the filename is still unknown, create a user-level error message.
-    trigger_error(
-      sprintf('The following %s is missing from the file system: %s', $type, $name),
-      E_USER_WARNING
-    );
-  }
-}
-
-/**
- * Returns the path to a system item (module, theme, etc.).
- *
- * @param $type
- *   The type of the item; one of 'core', 'profile', 'module', 'theme', or
- *   'theme_engine'.
- * @param $name
- *   The name of the item for which the path is requested. Ignored for
- *   $type 'core'.
- *
- * @return string
- *   The path to the requested item or an empty string if the item is not found.
- */
-function drupal_get_path($type, $name) {
-  return dirname(drupal_get_filename($type, $name));
-}
 
 /**
  * Translates a string to the current language or to a given language.
@@ -246,61 +83,23 @@ function drupal_get_path($type, $name) {
  * @ingroup sanitization
  */
 function t($string, array $args = [], array $options = []) {
+  // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
   return new TranslatableMarkup($string, $args, $options);
-}
-
-/**
- * Logs an exception.
- *
- * This is a wrapper logging function which automatically decodes an exception.
- *
- * @param $type
- *   The category to which this message belongs.
- * @param $exception
- *   The exception that is going to be logged.
- * @param $message
- *   The message to store in the log. If empty, a text that contains all useful
- *   information about the passed-in exception is used.
- * @param $variables
- *   Array of variables to replace in the message on display or
- *   NULL if message is already translated or not possible to
- *   translate.
- * @param $severity
- *   The severity of the message, as per RFC 3164.
- * @param $link
- *   A link to associate with the message.
- *
- * @see \Drupal\Core\Utility\Error::decodeException()
- */
-function watchdog_exception($type, Exception $exception, $message = NULL, $variables = [], $severity = RfcLogLevel::ERROR, $link = NULL) {
-
-  // Use a default value if $message is not set.
-  if (empty($message)) {
-    $message = '%type: @message in %function (line %line of %file).';
-  }
-
-  if ($link) {
-    $variables['link'] = $link;
-  }
-
-  $variables += Error::decodeException($exception);
-
-  \Drupal::logger($type)->log($severity, $message, $variables);
 }
 
 /**
  * Provides custom PHP error handling.
  *
- * @param $error_level
+ * @param int $error_level
  *   The level of the error raised.
- * @param $message
+ * @param string $message
  *   The error message.
- * @param $filename
+ * @param string $filename
  *   (optional) The filename that the error was raised in.
- * @param $line
+ * @param int $line
  *   (optional) The line number the error was raised at.
  */
-function _drupal_error_handler($error_level, $message, $filename = NULL, $line = NULL) {
+function _drupal_error_handler($error_level, $message, $filename = NULL, $line = NULL): void {
   require_once __DIR__ . '/errors.inc';
   _drupal_error_handler_real($error_level, $message, $filename, $line);
 }
@@ -315,7 +114,7 @@ function _drupal_error_handler($error_level, $message, $filename = NULL, $line =
  * @param \Exception|\Throwable $exception
  *   The exception object that was thrown.
  */
-function _drupal_exception_handler($exception) {
+function _drupal_exception_handler($exception): void {
   require_once __DIR__ . '/errors.inc';
 
   try {
@@ -336,7 +135,7 @@ function _drupal_exception_handler($exception) {
  * @param \Exception|\Throwable $exception2
  *   The second exception object that was thrown.
  */
-function _drupal_exception_handler_additional($exception, $exception2) {
+function _drupal_exception_handler_additional($exception, $exception2): void {
   // Another uncaught exception was thrown while handling the first one.
   // If we are displaying errors, then do so with no possibility of a further
   // uncaught exception being thrown.
@@ -348,7 +147,7 @@ function _drupal_exception_handler_additional($exception, $exception2) {
 }
 
 /**
- * Returns the test prefix if this is an internal request from SimpleTest.
+ * Returns the test prefix if this is an internal request from a test.
  *
  * @param string $new_prefix
  *   Internal use only. A new prefix to be stored.
@@ -371,13 +170,12 @@ function drupal_valid_test_ua($new_prefix = NULL) {
   // a test environment.
   $test_prefix = FALSE;
 
-  // A valid Simpletest request will contain a hashed and salted authentication
-  // code. Check if this code is present in a cookie or custom user agent
-  // string.
-  $http_user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : NULL;
-  $user_agent = isset($_COOKIE['SIMPLETEST_USER_AGENT']) ? $_COOKIE['SIMPLETEST_USER_AGENT'] : $http_user_agent;
+  // A valid test request will contain a hashed and salted authentication code.
+  // Check if this code is present in a cookie or custom user agent string.
+  $http_user_agent = $_SERVER['HTTP_USER_AGENT'] ?? NULL;
+  $user_agent = $_COOKIE['SIMPLETEST_USER_AGENT'] ?? $http_user_agent;
   if (isset($user_agent) && preg_match("/^simple(\w+\d+):(.+):(.+):(.+)$/", $user_agent, $matches)) {
-    list(, $prefix, $time, $salt, $hmac) = $matches;
+    [, $prefix, $time, $salt, $hmac] = $matches;
     $check_string = $prefix . ':' . $time . ':' . $salt;
     // Read the hash salt prepared by drupal_generate_test_ua().
     // This function is called before settings.php is read and Drupal's error
@@ -399,7 +197,7 @@ function drupal_valid_test_ua($new_prefix = NULL) {
     }
     // The file properties add more entropy not easily accessible to others.
     $key = $private_key . filectime(__FILE__) . fileinode(__FILE__);
-    $time_diff = REQUEST_TIME - $time;
+    $time_diff = time() - $time;
     $test_hmac = Crypt::hmacBase64($check_string, $key);
     // Since we are making a local request a 600 second time window is allowed,
     // and the HMAC must match.
@@ -415,7 +213,10 @@ function drupal_valid_test_ua($new_prefix = NULL) {
 }
 
 /**
- * Generates a user agent string with a HMAC and timestamp for simpletest.
+ * Generates a user agent string with a HMAC and timestamp for tests.
+ *
+ * @return string|null
+ *   The user agent, or NULL on failure.
  */
 function drupal_generate_test_ua($prefix) {
   static $key, $last_prefix;
@@ -440,7 +241,9 @@ function drupal_generate_test_ua($prefix) {
       // Generate and save a new hash salt for a test run.
       // Consumed by drupal_valid_test_ua() before settings.php is loaded.
       $private_key = Crypt::randomBytesBase64(55);
-      file_put_contents($key_file, $private_key);
+      if (!@file_put_contents($key_file, $private_key)) {
+        return NULL;
+      }
     }
     // The file properties add more entropy not easily accessible to others.
     $key = $private_key . filectime(__FILE__) . fileinode(__FILE__);
@@ -459,7 +262,7 @@ function drupal_generate_test_ua($prefix) {
  *
  * @see _drupal_maintenance_theme()
  */
-function drupal_maintenance_theme() {
+function drupal_maintenance_theme(): void {
   require_once __DIR__ . '/theme.maintenance.inc';
   _drupal_maintenance_theme();
 }
@@ -513,7 +316,7 @@ function drupal_maintenance_theme() {
  *
  * Example:
  * @code
- * function mymodule_log_stream_handle($new_handle = NULL) {
+ * function my_module_log_stream_handle($new_handle = NULL) {
  *   static $handle;
  *   if (isset($new_handle)) {
  *     $handle = $new_handle;
@@ -559,14 +362,14 @@ function drupal_maintenance_theme() {
  * }
  * @endcode
  *
- * @param $name
+ * @param string|null $name
  *   Globally unique name for the variable. For a function with only one static,
  *   variable, the function name (e.g. via the PHP magic __FUNCTION__ constant)
  *   is recommended. For a function with multiple static variables add a
  *   distinguishing suffix to the function name for each one.
- * @param $default_value
+ * @param mixed|null $default_value
  *   Optional default value.
- * @param $reset
+ * @param bool $reset
  *   TRUE to reset one or all variables(s). This parameter is only used
  *   internally and should not be passed in; use drupal_static_reset() instead.
  *   (This function's return value should not be used when TRUE is passed in.)
@@ -577,47 +380,59 @@ function drupal_maintenance_theme() {
  * @see drupal_static_reset()
  */
 function &drupal_static($name, $default_value = NULL, $reset = FALSE) {
-  static $data = [], $default = [];
-  // First check if dealing with a previously defined static variable.
-  if (isset($data[$name]) || array_key_exists($name, $data)) {
-    // Non-NULL $name and both $data[$name] and $default[$name] statics exist.
-    if ($reset) {
-      // Reset pre-existing static variable to its default value.
-      $data[$name] = $default[$name];
-    }
-    return $data[$name];
-  }
-  // Neither $data[$name] nor $default[$name] static variables exist.
+  static $data = [], $defaults = [];
   if (isset($name)) {
-    if ($reset) {
-      // Reset was called before a default is set and yet a variable must be
-      // returned.
-      return $data;
+    // Check if we're dealing with a previously defined static variable.
+    if (\array_key_exists($name, $data)) {
+      // Both $data[$name] and (implicitly) $defaults[$name] statics exist.
+      if ($reset) {
+        // Reset pre-existing static variable to its default value.
+        $data[$name] = $defaults[$name];
+      }
     }
-    // First call with new non-NULL $name. Initialize a new static variable.
-    $default[$name] = $data[$name] = $default_value;
+    else {
+      // Neither $data[$name] nor $defaults[$name] static variables exist.
+      if ($reset) {
+        // Reset was called before any value for $name was set, so we should
+        // not set anything ($default_value is not reliable in this case). As
+        // the function returns a reference, we must still return a variable.
+        // (Code using $reset does not use the return value).
+        return $data;
+      }
+      // First call with new non-NULL $name. Initialize a new static variable.
+      $defaults[$name] = $data[$name] = $default_value;
+    }
+    // Return a reference to the named variable.
     return $data[$name];
   }
-  // Reset all: ($name == NULL). This needs to be done one at a time so that
-  // references returned by earlier invocations of drupal_static() also get
-  // reset.
-  foreach ($default as $name => $value) {
-    $data[$name] = $value;
+  else {
+    // Reset all: ($name == NULL). This needs to be done one at a time so that
+    // references returned by earlier invocations of drupal_static() also get
+    // reset.
+    foreach ($defaults as $name => $value) {
+      $data[$name] = $value;
+    }
+    // As the function returns a reference, we must still return a variable.
+    return $data;
   }
-  // As the function returns a reference, the return should always be a
-  // variable.
-  return $data;
 }
 
 /**
  * Resets one or all centrally stored static variable(s).
  *
- * @param $name
+ * @param string $name
  *   Name of the static variable to reset. Omit to reset all variables.
  *   Resetting all variables should only be used, for example, for running
  *   unit tests with a clean environment.
  */
-function drupal_static_reset($name = NULL) {
+function drupal_static_reset($name = NULL): void {
+  switch ($name) {
+    case 'node_access_view_all_nodes':
+      @trigger_error('Calling drupal_static_reset() with "node_access_view_all_nodes" as argument is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal::service(\'node.view_all_nodes_memory_cache\')->deleteAll(); instead. See https://www.drupal.org/node/3038909', E_USER_DEPRECATED);
+      \Drupal::service('node.view_all_nodes_memory_cache')->deleteAll();
+      break;
+
+  }
   drupal_static($name, NULL, TRUE);
 }
 
@@ -629,7 +444,7 @@ function drupal_static_reset($name = NULL) {
  *
  * @param callable $callback
  *   The shutdown function to register.
- * @param ...
+ * @param mixed ...$args
  *   Additional arguments to pass to the shutdown function.
  *
  * @return array
@@ -638,7 +453,7 @@ function drupal_static_reset($name = NULL) {
  * @see register_shutdown_function()
  * @ingroup php_wrappers
  */
-function &drupal_register_shutdown_function($callback = NULL) {
+function &drupal_register_shutdown_function($callback = NULL, ...$args) {
   // We cannot use drupal_static() here because the static cache is reset during
   // batch processing, which breaks batch handling.
   static $callbacks = [];
@@ -648,10 +463,7 @@ function &drupal_register_shutdown_function($callback = NULL) {
     if (empty($callbacks)) {
       register_shutdown_function('_drupal_shutdown_function');
     }
-    $args = func_get_args();
-    // Remove $callback from the arguments.
-    unset($args[0]);
-    // Save callback and arguments
+    // Save callback and arguments.
     $callbacks[] = ['callback' => $callback, 'arguments' => $args];
   }
   return $callbacks;
@@ -660,7 +472,7 @@ function &drupal_register_shutdown_function($callback = NULL) {
 /**
  * Executes registered shutdown functions.
  */
-function _drupal_shutdown_function() {
+function _drupal_shutdown_function(): void {
   $callbacks = &drupal_register_shutdown_function();
 
   // Set the CWD to DRUPAL_ROOT as it is not guaranteed to be the same as it
@@ -690,7 +502,7 @@ function _drupal_shutdown_function() {
  *
  * @see _drupal_shutdown_function()
  */
-function _drupal_shutdown_function_handle_exception($exception) {
+function _drupal_shutdown_function_handle_exception($exception): void {
   // If using PHP-FPM then fastcgi_finish_request() will have been fired
   // preventing further output to the browser.
   if (!function_exists('fastcgi_finish_request')) {

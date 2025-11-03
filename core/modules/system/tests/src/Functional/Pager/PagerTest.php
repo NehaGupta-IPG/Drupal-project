@@ -1,24 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Pager;
 
 use Behat\Mink\Element\NodeElement;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests pager functionality.
- *
- * @group Pager
  */
+#[Group('Pager')]
+#[RunTestsInSeparateProcesses]
 class PagerTest extends BrowserTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['dblog', 'image', 'pager_test'];
 
@@ -34,10 +36,14 @@ class PagerTest extends BrowserTestBase {
    */
   protected $adminUser;
 
-  protected $profile = 'testing';
-
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
+
+    // Start from a clean log.
+    \Drupal::database()->delete('watchdog')->execute();
 
     // Insert 300 log messages.
     $logger = $this->container->get('logger.factory')->get('pager_test');
@@ -55,7 +61,7 @@ class PagerTest extends BrowserTestBase {
   /**
    * Tests markup and CSS classes of pager links.
    */
-  public function testActiveClass() {
+  public function testActiveClass(): void {
     // Verify first page.
     $this->drupalGet('admin/reports/dblog');
     $current_page = 0;
@@ -67,10 +73,10 @@ class PagerTest extends BrowserTestBase {
     $this->assertPagerItems($current_page);
 
     // Verify last page.
-    $elements = $this->xpath('//li[contains(@class, :class)]/a', [':class' => 'pager__item--last']);
-    preg_match('@page=(\d+)@', $elements[0]->getAttribute('href'), $matches);
+    $element = $this->assertSession()->elementExists('xpath', '//li[contains(@class, "pager__item--last")]/a');
+    preg_match('@page=(\d+)@', $element->getAttribute('href'), $matches);
     $current_page = (int) $matches[1];
-    $this->drupalGet($GLOBALS['base_root'] . parse_url($this->getUrl())['path'] . $elements[0]->getAttribute('href'), ['external' => TRUE]);
+    $this->drupalGet($this->getAbsoluteUrl(parse_url($this->getUrl())['path'] . $element->getAttribute('href')), ['external' => TRUE]);
     $this->assertPagerItems($current_page);
 
     // Verify the pager does not render on a list without pagination.
@@ -79,38 +85,35 @@ class PagerTest extends BrowserTestBase {
   }
 
   /**
-   * Test proper functioning of the query parameters and the pager cache context.
+   * Tests pager query parameters and cache context.
    */
-  public function testPagerQueryParametersAndCacheContext() {
+  public function testPagerQueryParametersAndCacheContext(): void {
     // First page.
     $this->drupalGet('pager-test/query-parameters');
-    $this->assertText('Pager calls: 0');
-    $this->assertText('[url.query_args.pagers:0]=0.0');
+    $this->assertSession()->pageTextContains('Pager calls: 0');
+    $this->assertSession()->pageTextContains('[url.query_args.pagers:0]=0.0');
     $this->assertCacheContext('url.query_args');
 
     // Go to last page, the count of pager calls need to go to 1.
-    $elements = $this->xpath('//li[contains(@class, :class)]/a', [':class' => 'pager__item--last']);
-    $elements[0]->click();
-    $this->assertText('Pager calls: 1');
-    $this->assertText('[url.query_args.pagers:0]=0.60');
+    $this->assertSession()->elementExists('xpath', '//li[contains(@class, "pager__item--last")]/a')->click();
+    $this->assertSession()->pageTextContains('Pager calls: 1');
+    $this->assertSession()->pageTextContains('[url.query_args.pagers:0]=0.60');
     $this->assertCacheContext('url.query_args');
 
     // Reset counter to 0.
     $this->drupalGet('pager-test/query-parameters');
     // Go back to first page, the count of pager calls need to go to 2.
-    $elements = $this->xpath('//li[contains(@class, :class)]/a', [':class' => 'pager__item--last']);
-    $elements[0]->click();
-    $elements = $this->xpath('//li[contains(@class, :class)]/a', [':class' => 'pager__item--first']);
-    $elements[0]->click();
-    $this->assertText('Pager calls: 2');
-    $this->assertText('[url.query_args.pagers:0]=0.0');
+    $this->assertSession()->elementExists('xpath', '//li[contains(@class, "pager__item--last")]/a')->click();
+    $this->assertSession()->elementExists('xpath', '//li[contains(@class, "pager__item--first")]/a')->click();
+    $this->assertSession()->pageTextContains('Pager calls: 2');
+    $this->assertSession()->pageTextContains('[url.query_args.pagers:0]=0.0');
     $this->assertCacheContext('url.query_args');
   }
 
   /**
-   * Test proper functioning of multiple pagers.
+   * Tests proper functioning of multiple pagers.
    */
-  public function testMultiplePagers() {
+  public function testMultiplePagers(): void {
     // First page.
     $this->drupalGet('pager-test/multiple-pagers');
 
@@ -120,7 +123,7 @@ class PagerTest extends BrowserTestBase {
     $test_data = [
       // With no query, all pagers set to first page.
       [
-        'input_query' => NULL,
+        'input_query' => '',
         'expected_page' => [0 => '1', 1 => '1', 4 => '1'],
         'expected_query' => '?page=0,0,,,0',
       ],
@@ -178,22 +181,22 @@ class PagerTest extends BrowserTestBase {
 
     // We loop through the page with the test data query parameters, and check
     // that the active page for each pager element has the expected page
-    // (1-indexed) and resulting query parameter
+    // (1-indexed) and resulting query parameter.
     foreach ($test_data as $data) {
       $input_query = str_replace(' ', '%20', $data['input_query']);
-      $this->drupalGet($GLOBALS['base_root'] . parse_url($this->getUrl())['path'] . $input_query, ['external' => TRUE]);
+      $this->drupalGet($this->getAbsoluteUrl(parse_url($this->getUrl())['path'] . $input_query), ['external' => TRUE]);
       foreach ([0, 1, 4] as $pager_element) {
         $active_page = $this->cssSelect("div.test-pager-{$pager_element} ul.pager__items li.is-active:contains('{$data['expected_page'][$pager_element]}')");
         $destination = str_replace('%2C', ',', $active_page[0]->find('css', 'a')->getAttribute('href'));
-        $this->assertEqual($data['expected_query'], $destination);
+        $this->assertStringEndsWith($data['expected_query'], $destination);
       }
     }
   }
 
   /**
-   * Test proper functioning of the ellipsis.
+   * Tests proper functioning of the ellipsis.
    */
-  public function testPagerEllipsis() {
+  public function testPagerEllipsis(): void {
     // Insert 100 extra log messages to get 9 pages.
     $logger = $this->container->get('logger.factory')->get('pager_test');
     for ($i = 0; $i < 100; $i++) {
@@ -218,8 +221,10 @@ class PagerTest extends BrowserTestBase {
    *
    * @param int $current_page
    *   The current pager page the internal browser is on.
+   *
+   * @internal
    */
-  protected function assertPagerItems($current_page) {
+  protected function assertPagerItems(int $current_page): void {
     $elements = $this->xpath('//ul[contains(@class, :class)]/li', [':class' => 'pager__items']);
     $this->assertNotEmpty($elements, 'Pager found.');
 
@@ -253,7 +258,7 @@ class PagerTest extends BrowserTestBase {
         $this->assertNotEmpty($link, 'Element for current page has link.');
         $destination = $link->getAttribute('href');
         // URL query string param is 0-indexed.
-        $this->assertEqual('?page=' . ($page - 1), $destination);
+        $this->assertEquals('?page=' . ($page - 1), $destination);
       }
       else {
         $this->assertNoClass($element, 'is-active', "Element for page $page has no .is-active class.");
@@ -263,7 +268,7 @@ class PagerTest extends BrowserTestBase {
         // Pager link has an attribute set in pager_test_preprocess_pager().
         $this->assertEquals('yes', $link->getAttribute('pager-test'));
         $destination = $link->getAttribute('href');
-        $this->assertEqual('?page=' . ($page - 1), $destination);
+        $this->assertEquals('?page=' . ($page - 1), $destination);
       }
       unset($elements[--$page]);
     }
@@ -278,7 +283,7 @@ class PagerTest extends BrowserTestBase {
       $this->assertNoClass($link, 'is-active', 'Link to first page is not active.');
       $this->assertEquals('first', $link->getAttribute('pager-test'));
       $destination = $link->getAttribute('href');
-      $this->assertEqual('?page=0', $destination);
+      $this->assertEquals('?page=0', $destination);
     }
     if (isset($previous)) {
       $this->assertClass($previous, 'pager__item--previous', 'Element for first page has .pager__item--previous class.');
@@ -288,7 +293,7 @@ class PagerTest extends BrowserTestBase {
       $this->assertEquals('previous', $link->getAttribute('pager-test'));
       $destination = $link->getAttribute('href');
       // URL query string param is 0-indexed, $current_page is 1-indexed.
-      $this->assertEqual('?page=' . ($current_page - 2), $destination);
+      $this->assertEquals('?page=' . ($current_page - 2), $destination);
     }
     if (isset($next)) {
       $this->assertClass($next, 'pager__item--next', 'Element for next page has .pager__item--next class.');
@@ -298,7 +303,7 @@ class PagerTest extends BrowserTestBase {
       $this->assertEquals('next', $link->getAttribute('pager-test'));
       $destination = $link->getAttribute('href');
       // URL query string param is 0-indexed, $current_page is 1-indexed.
-      $this->assertEqual('?page=' . $current_page, $destination);
+      $this->assertEquals('?page=' . $current_page, $destination);
     }
     if (isset($last)) {
       $link = $last->find('css', 'a');
@@ -308,7 +313,7 @@ class PagerTest extends BrowserTestBase {
       $this->assertEquals('last', $link->getAttribute('pager-test'));
       $destination = $link->getAttribute('href');
       // URL query string param is 0-indexed.
-      $this->assertEqual('?page=' . ($total_pages - 1), $destination);
+      $this->assertEquals('?page=' . ($total_pages - 1), $destination);
     }
   }
 
@@ -321,8 +326,10 @@ class PagerTest extends BrowserTestBase {
    *   The class to assert.
    * @param string $message
    *   (optional) A verbose message to output.
+   *
+   * @internal
    */
-  protected function assertClass(NodeElement $element, $class, $message = NULL) {
+  protected function assertClass(NodeElement $element, string $class, ?string $message = NULL): void {
     if (!isset($message)) {
       $message = "Class .$class found.";
     }
@@ -338,8 +345,10 @@ class PagerTest extends BrowserTestBase {
    *   The class to assert.
    * @param string $message
    *   (optional) A verbose message to output.
+   *
+   * @internal
    */
-  protected function assertNoClass(NodeElement $element, $class, $message = NULL) {
+  protected function assertNoClass(NodeElement $element, string $class, ?string $message = NULL): void {
     if (!isset($message)) {
       $message = "Class .$class not found.";
     }

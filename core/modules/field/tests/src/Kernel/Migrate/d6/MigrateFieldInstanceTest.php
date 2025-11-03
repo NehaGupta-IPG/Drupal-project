@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\Migrate\d6;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\link\LinkItemInterface;
-use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
 use Drupal\node\Entity\Node;
+use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Migrate field instances.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateFieldInstanceTest extends MigrateDrupal6TestBase {
 
   /**
@@ -22,7 +26,7 @@ class MigrateFieldInstanceTest extends MigrateDrupal6TestBase {
   /**
    * Tests migration of file variables to file.settings.yml.
    */
-  public function testFieldInstanceMigration() {
+  public function testFieldInstanceMigration(): void {
     $this->migrateFields();
     $this->installConfig(['comment']);
     $this->executeMigration('d6_comment_type');
@@ -33,7 +37,7 @@ class MigrateFieldInstanceTest extends MigrateDrupal6TestBase {
     $field = FieldConfig::load('node.story.field_test');
     $this->assertSame('Text Field', $field->label());
     // field_test is a text_long field, which have no settings.
-    $this->assertSame([], $field->getSettings());
+    $this->assertSame(['allowed_formats' => []], $field->getSettings());
     $this->assertSame('text for default value', $entity->field_test->value);
 
     // Test a number field.
@@ -101,7 +105,7 @@ class MigrateFieldInstanceTest extends MigrateDrupal6TestBase {
     $expected = ['title' => 2, 'link_type' => LinkItemInterface::LINK_GENERIC];
     $this->assertSame($expected, $field->getSettings());
     $this->assertSame('default link title', $entity->field_test_link->title, 'Field field_test_link default title is correct.');
-    $this->assertSame('https://www.drupal.org', $entity->field_test_link->url, 'Field field_test_link default title is correct.');
+    $this->assertSame('https://www.drupal.org', $entity->field_test_link->uri);
     $this->assertSame([], $entity->field_test_link->options['attributes']);
 
     // Test date field.
@@ -177,7 +181,7 @@ class MigrateFieldInstanceTest extends MigrateDrupal6TestBase {
   /**
    * Tests migrating fields into non-existent content types.
    */
-  public function testMigrateFieldIntoUnknownNodeType() {
+  public function testMigrateFieldIntoUnknownNodeType(): void {
     $this->sourceDatabase->delete('node_type')
       ->condition('type', 'test_planet')
       ->execute();

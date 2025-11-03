@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\user\Entity\User;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests node_access and select queries with node_access tag functionality with
- * multiple languages with node_access_test_language which is language-aware.
- *
- * @group node
+ * Tests multilingual node access with a language-aware module.
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeAccessLanguageAwareTest extends NodeAccessTestBase {
 
   /**
@@ -45,6 +47,9 @@ class NodeAccessLanguageAwareTest extends NodeAccessTestBase {
    */
   protected $webUser;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -76,9 +81,11 @@ class NodeAccessLanguageAwareTest extends NodeAccessTestBase {
     // Create a normal authenticated user.
     $this->webUser = $this->drupalCreateUser(['access content']);
 
-    // Load the user 1 user for later use as an admin user with permission to
-    // see everything.
-    $this->adminUser = User::load(1);
+    // Create a user as an admin user with permission bypass node access
+    // to see everything.
+    $this->adminUser = $this->drupalCreateUser([
+      'bypass node access',
+    ]);
 
     // Add Hungarian and Catalan.
     ConfigurableLanguage::createFromLangcode('hu')->save();
@@ -89,13 +96,13 @@ class NodeAccessLanguageAwareTest extends NodeAccessTestBase {
 
     // Create six nodes:
     // 1. Four Hungarian nodes with Catalan translations
-    //   - One with neither language marked as private.
-    //   - One with only the Hungarian translation private.
-    //   - One with only the Catalan translation private.
-    //   - One with both the Hungarian and Catalan translations private.
+    //    - One with neither language marked as private.
+    //    - One with only the Hungarian translation private.
+    //    - One with only the Catalan translation private.
+    //    - One with both the Hungarian and Catalan translations private.
     // 2. Two nodes with no language specified.
-    //   - One public.
-    //   - One private.
+    //    - One public.
+    //    - One private.
     $this->nodes['both_public'] = $node = $this->drupalCreateNode([
       'body' => [[]],
       'langcode' => 'hu',
@@ -149,7 +156,7 @@ class NodeAccessLanguageAwareTest extends NodeAccessTestBase {
   /**
    * Tests node access and node access queries with multiple node languages.
    */
-  public function testNodeAccessLanguageAware() {
+  public function testNodeAccessLanguageAware(): void {
     // The node_access_test_language module only grants view access.
     $expected_node_access = ['view' => TRUE, 'update' => FALSE, 'delete' => FALSE];
     $expected_node_access_no_access = ['view' => FALSE, 'update' => FALSE, 'delete' => FALSE];
@@ -247,7 +254,7 @@ class NodeAccessLanguageAwareTest extends NodeAccessTestBase {
     $nids = $select->execute()->fetchAllAssoc('nid');
 
     // There are no nodes with German translations, so no results are returned.
-    $this->assertTrue(empty($nids), 'Query returns an empty result when the de langcode is specified.');
+    $this->assertEmpty($nids, 'Query returns an empty result when the de langcode is specified.');
 
     // Query the nodes table as admin user (full access) with the node access
     // tag and no specific langcode.

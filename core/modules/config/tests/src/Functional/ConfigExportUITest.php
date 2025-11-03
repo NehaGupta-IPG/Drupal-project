@@ -1,23 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config\Functional;
 
 use Drupal\Core\Archiver\Tar;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the user interface for exporting configuration.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigExportUITest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['config', 'config_test'];
 
@@ -45,14 +47,15 @@ class ConfigExportUITest extends BrowserTestBase {
   /**
    * Tests export of configuration.
    */
-  public function testExport() {
+  public function testExport(): void {
     // Verify the export page with export submit button is available.
     $this->drupalGet('admin/config/development/configuration/full/export');
     $this->assertSession()->buttonExists('Export');
 
     // Submit the export form and verify response. This will create a file in
     // temporary directory with the default name config.tar.gz.
-    $this->drupalPostForm('admin/config/development/configuration/full/export', [], 'Export');
+    $this->drupalGet('admin/config/development/configuration/full/export');
+    $this->submitForm([], 'Export');
     $this->assertSession()->statusCodeEquals(200);
 
     // Test if header contains file name with hostname and timestamp.
@@ -83,13 +86,13 @@ class ConfigExportUITest extends BrowserTestBase {
     // Ensure the test configuration override is in effect but was not exported.
     $this->assertSame('Foo', \Drupal::config('system.maintenance')->get('message'));
     $archiver->extract($temp_directory, ['system.maintenance.yml']);
-    $file_contents = file_get_contents($temp_directory . '/' . 'system.maintenance.yml');
+    $file_contents = file_get_contents($temp_directory . '/system.maintenance.yml');
     $exported = Yaml::decode($file_contents);
     $this->assertNotSame('Foo', $exported['message']);
 
     // Check the single export form doesn't have "form-required" elements.
     $this->drupalGet('admin/config/development/configuration/single/export');
-    $this->assertNoRaw('js-form-required form-required');
+    $this->assertSession()->responseNotContains('js-form-required form-required');
 
     // Ensure the temporary file is not available to users without the
     // permission.

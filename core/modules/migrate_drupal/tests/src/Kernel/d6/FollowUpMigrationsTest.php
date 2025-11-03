@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal\Kernel\d6;
 
 use Drupal\node\Entity\Node;
 use Drupal\Tests\node\Kernel\Migrate\d6\MigrateNodeTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests follow-up migrations.
- *
- * @group migrate_drupal
  */
+#[Group('migrate_drupal')]
+#[RunTestsInSeparateProcesses]
 class FollowUpMigrationsTest extends MigrateNodeTestBase {
 
   /**
@@ -19,8 +23,6 @@ class FollowUpMigrationsTest extends MigrateNodeTestBase {
     'content_translation',
     'language',
     'menu_ui',
-    // A requirement for d6_node_translation.
-    'migrate_drupal_multilingual',
   ];
 
   /**
@@ -37,9 +39,9 @@ class FollowUpMigrationsTest extends MigrateNodeTestBase {
   }
 
   /**
-   * Test entity reference translations.
+   * Tests entity reference translations.
    */
-  public function testEntityReferenceTranslations() {
+  public function testEntityReferenceTranslations(): void {
     // Test the entity reference field before the follow-up migrations.
     $node = Node::load(10);
     $this->assertSame('13', $node->get('field_reference')->target_id);

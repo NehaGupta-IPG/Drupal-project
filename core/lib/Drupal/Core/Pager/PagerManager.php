@@ -32,6 +32,13 @@ class PagerManager implements PagerManagerInterface {
   protected $pagers;
 
   /**
+   * The highest pager ID created so far.
+   *
+   * @var int
+   */
+  protected $maxPagerElementId = -1;
+
+  /**
    * Construct a PagerManager object.
    *
    * @param \Drupal\Core\Pager\PagerParametersInterface $pager_params
@@ -55,7 +62,7 @@ class PagerManager implements PagerManagerInterface {
    * {@inheritdoc}
    */
   public function getPager($element = 0) {
-    return isset($this->pagers[$element]) ? $this->pagers[$element] : NULL;
+    return $this->pagers[$element] ?? NULL;
   }
 
   /**
@@ -90,13 +97,17 @@ class PagerManager implements PagerManagerInterface {
   }
 
   /**
-   * Gets the extent of the pager page element IDs.
-   *
-   * @return int
-   *   The maximum element ID available, -1 if there are no elements.
+   * {@inheritdoc}
    */
-  protected function getMaxPagerElementId() {
-    return empty($this->pagers) ? -1 : max(array_keys($this->pagers));
+  public function getMaxPagerElementId() {
+    return $this->maxPagerElementId;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function reservePagerElementId(int $element): void {
+    $this->maxPagerElementId = max($element, $this->maxPagerElementId);
   }
 
   /**
@@ -108,6 +119,7 @@ class PagerManager implements PagerManagerInterface {
    *   The pager index.
    */
   protected function setPager(Pager $pager, $element = 0) {
+    $this->maxPagerElementId = max($element, $this->maxPagerElementId);
     $this->pagers[$element] = $pager;
   }
 

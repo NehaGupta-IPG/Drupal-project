@@ -1,21 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media_library\Kernel;
 
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormState;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\media\Entity\MediaType;
+use Drupal\media_library\MediaLibraryState;
+use Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the media library widget.
- *
- * @coversDefaultClass \Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget
- * @group media_library
  */
+#[CoversClass(MediaLibraryWidget::class)]
+#[Group('media_library')]
+#[RunTestsInSeparateProcesses]
 class MediaLibraryWidgetTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -27,6 +35,8 @@ class MediaLibraryWidgetTest extends KernelTestBase {
     'media',
     'media_library',
     'field',
+    'file',
+    'filter',
     'image',
     'system',
     'views',
@@ -40,6 +50,13 @@ class MediaLibraryWidgetTest extends KernelTestBase {
    * @var \Drupal\user\Entity\User
    */
   protected $adminUser;
+
+  /**
+   * The base field definition.
+   *
+   * @var \Drupal\Core\Field\BaseFieldDefinition
+   */
+  protected BaseFieldDefinition $baseField;
 
   /**
    * {@inheritdoc}
@@ -61,7 +78,6 @@ class MediaLibraryWidgetTest extends KernelTestBase {
     $this->installEntitySchema('entity_test');
     $this->installEntitySchema('entity_test_rev');
     $this->installEntitySchema('user');
-    $this->installSchema('system', ['sequences']);
     $this->installConfig([
       'system',
       'image',
@@ -87,7 +103,7 @@ class MediaLibraryWidgetTest extends KernelTestBase {
   /**
    * Test the media library widget access.
    */
-  public function testWidgetAccess() {
+  public function testWidgetAccess(): void {
     $entity = EntityTest::create([
       'name' => 'sample entity',
     ]);
@@ -99,7 +115,7 @@ class MediaLibraryWidgetTest extends KernelTestBase {
   /**
    * Test the media library widget access with a revisionable entity type.
    */
-  public function testRevisionableWidgetAccess() {
+  public function testRevisionableWidgetAccess(): void {
     $allowed_revision = EntityTestRev::create([
       'name' => 'allowed_access',
     ]);
@@ -128,8 +144,10 @@ class MediaLibraryWidgetTest extends KernelTestBase {
    *   The media library state.
    *
    * @throws \Exception
+   *
+   * @internal
    */
-  protected function assertMediaLibraryStateAccess($access, $user, $state) {
+  protected function assertMediaLibraryStateAccess(bool $access, AccountInterface $user, MediaLibraryState $state): void {
     $ui_builder = $this->container->get('media_library.ui_builder');
     $access_result = $ui_builder->checkAccess($user, $state);
     $this->assertEquals($access, $access_result->isAllowed());

@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalJavascriptTests\Ajax;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Performs tests on AJAX forms in cached pages.
- *
- * @group Ajax
  */
+#[Group('Ajax')]
+#[RunTestsInSeparateProcesses]
 class AjaxFormPageCacheTest extends WebDriverTestBase {
 
   /**
@@ -19,7 +23,7 @@ class AjaxFormPageCacheTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'stark';
 
   /**
    * {@inheritdoc}
@@ -36,15 +40,15 @@ class AjaxFormPageCacheTest extends WebDriverTestBase {
    * Return the build id of the current form.
    */
   protected function getFormBuildId() {
-    $build_id_fields = $this->xpath('//input[@name="form_build_id"]');
-    $this->assertCount(1, $build_id_fields, 'One form build id field on the page');
-    return $build_id_fields[0]->getValue();
+    // Ensure the hidden 'form_build_id' field is unique.
+    $this->assertSession()->elementsCount('xpath', '//input[@name="form_build_id"]', 1);
+    return $this->assertSession()->hiddenFieldExists('form_build_id')->getValue();
   }
 
   /**
    * Create a simple form, then submit the form via AJAX to change to it.
    */
-  public function testSimpleAJAXFormValue() {
+  public function testSimpleAJAXFormValue(): void {
     $this->drupalGet('ajax_forms_test_get_form');
     $build_id_initial = $this->getFormBuildId();
 
@@ -93,7 +97,7 @@ class AjaxFormPageCacheTest extends WebDriverTestBase {
     $this->assertNotNull($green_span2, 'DOM update: After reload - the selected color SPAN is green.');
 
     $build_id_from_cache_first_ajax = $this->getFormBuildId();
-    $this->assertNotEquals($build_id_from_cache_initial, $build_id_from_cache_first_ajax, 'Build id is changed in the simpletest-DOM on first AJAX submission');
+    $this->assertNotEquals($build_id_from_cache_initial, $build_id_from_cache_first_ajax, 'Build id is changed in the DOM on first AJAX submission');
     $this->assertNotEquals($build_id_first_ajax, $build_id_from_cache_first_ajax, 'Build id from first user is not reused');
 
     // Changing the value of a select input element, triggers an AJAX
@@ -114,18 +118,18 @@ class AjaxFormPageCacheTest extends WebDriverTestBase {
    *
    * @see \Drupal\system\Tests\Ajax\ElementValidationTest::testAjaxElementValidation()
    */
-  public function testAjaxElementValidation() {
+  public function testAjaxElementValidation(): void {
     $this->drupalGet('ajax_validation_test');
     // Changing the value of the textfield will trigger an AJAX
     // request/response.
-    $field = $this->getSession()->getPage()->findField('drivertext');
+    $field = $this->getSession()->getPage()->findField('driver_text');
     $field->setValue('some dumb text');
     $field->blur();
 
     // When the AJAX command updates the DOM a <ul> unsorted list
     // "message__list" structure will appear on the page echoing back the
     // "some dumb text" message.
-    $placeholder = $this->assertSession()->waitForElement('css', "ul.messages__list li.messages__item em:contains('some dumb text')");
+    $placeholder = $this->assertSession()->waitForElement('css', "[aria-label='Status message'] > ul > li > em:contains('some dumb text')");
     $this->assertNotNull($placeholder, 'Message structure containing input data located.');
   }
 

@@ -1,19 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views_ui\Functional;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests covering Preview of unsaved Views.
- *
- * @group views_ui
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class UnsavedPreviewTest extends UITestBase {
 
   /**
-    * Views used by this test.
-    *
-    * @var array
-    */
+   * Views used by this test.
+   *
+   * @var array
+   */
   public static $testViews = ['content'];
 
   /**
@@ -36,8 +41,8 @@ class UnsavedPreviewTest extends UITestBase {
   /**
    * Sets up a Drupal site for running functional and integration tests.
    */
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp(FALSE);
+  protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
+    parent::setUp(FALSE, $modules);
 
     $this->adminUser = $this->drupalCreateUser(['administer views']);
     $this->drupalLogin($this->adminUser);
@@ -46,7 +51,7 @@ class UnsavedPreviewTest extends UITestBase {
   /**
    * Tests previews of unsaved new page displays.
    */
-  public function testUnsavedPageDisplayPreview() {
+  public function testUnsavedPageDisplayPreview(): void {
     $this->drupalCreateContentType(['type' => 'page']);
     for ($i = 0; $i < 5; $i++) {
       $this->drupalCreateNode();
@@ -61,12 +66,12 @@ class UnsavedPreviewTest extends UITestBase {
     $this->drupalGet('admin/structure/views/nojs/display/content/page_2/path');
     $this->assertSession()->statusCodeEquals(200);
 
-    $this->submitForm(['path' => 'foobarbaz'], 'Apply');
+    $this->submitForm(['path' => 'foobar'], 'Apply');
     $this->assertSession()->statusCodeEquals(200);
 
     $this->submitForm([], 'Update preview');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertText('This display has no path');
+    $this->assertSession()->pageTextContains('This display has no path');
 
     $this->drupalGet('admin/structure/views/view/content/edit/page_2');
     $this->assertSession()->statusCodeEquals(200);
@@ -76,7 +81,7 @@ class UnsavedPreviewTest extends UITestBase {
 
     $this->submitForm([], 'Update preview');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->linkByHrefExists('foobarbaz');
+    $this->assertSession()->linkByHrefExists('foobar');
   }
 
 }

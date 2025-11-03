@@ -1,24 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Functional;
 
+use Drupal\comment\Entity\Comment;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
-use Drupal\comment\Entity\Comment;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Generates text using placeholders for dummy content to check comment token
- * replacement.
- *
- * @group comment
+ * Tests comment token replacement.
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentTokenReplaceTest extends CommentTestBase {
 
   /**
@@ -34,7 +36,7 @@ class CommentTokenReplaceTest extends CommentTestBase {
   /**
    * Creates a comment, then tests the tokens generated from it.
    */
-  public function testCommentTokenReplacement() {
+  public function testCommentTokenReplacement(): void {
     $token_service = \Drupal::token();
     $language_interface = \Drupal::languageManager()->getCurrentLanguage();
     $url_options = [
@@ -78,6 +80,7 @@ class CommentTokenReplaceTest extends CommentTestBase {
     // Generate and test tokens.
     $tests = [];
     $tests['[comment:cid]'] = $comment->id();
+    $tests['[comment:uuid]'] = $comment->uuid();
     $tests['[comment:hostname]'] = $comment->getHostname();
     $tests['[comment:author]'] = Html::escape($comment->getAuthorName());
     $tests['[comment:mail]'] = $this->adminUser->getEmail();
@@ -91,6 +94,7 @@ class CommentTokenReplaceTest extends CommentTestBase {
     $tests['[comment:created:since]'] = \Drupal::service('date.formatter')->formatTimeDiffSince($comment->getCreatedTime(), ['langcode' => $language_interface->getId()]);
     $tests['[comment:changed:since]'] = \Drupal::service('date.formatter')->formatTimeDiffSince($comment->getChangedTimeAcrossTranslations(), ['langcode' => $language_interface->getId()]);
     $tests['[comment:parent:cid]'] = $comment->hasParentComment() ? $comment->getParentComment()->id() : NULL;
+    $tests['[comment:parent:uuid]'] = $comment->hasParentComment() ? $comment->getParentComment()->uuid() : NULL;
     $tests['[comment:parent:title]'] = $parent_comment->getSubject();
     $tests['[comment:entity]'] = Html::escape($node->getTitle());
     // Test node specific tokens.
@@ -102,6 +106,7 @@ class CommentTokenReplaceTest extends CommentTestBase {
     $base_bubbleable_metadata = BubbleableMetadata::createFromObject($comment);
     $metadata_tests = [];
     $metadata_tests['[comment:cid]'] = $base_bubbleable_metadata;
+    $metadata_tests['[comment:uuid]'] = $base_bubbleable_metadata;
     $metadata_tests['[comment:hostname]'] = $base_bubbleable_metadata;
     $bubbleable_metadata = clone $base_bubbleable_metadata;
     $bubbleable_metadata->addCacheableDependency($this->adminUser);
@@ -123,6 +128,7 @@ class CommentTokenReplaceTest extends CommentTestBase {
     $metadata_tests['[comment:changed:since]'] = $bubbleable_metadata->setCacheMaxAge(0);
     $bubbleable_metadata = clone $base_bubbleable_metadata;
     $metadata_tests['[comment:parent:cid]'] = $bubbleable_metadata->addCacheTags(['comment:1']);
+    $metadata_tests['[comment:parent:uuid]'] = $bubbleable_metadata->addCacheTags(['comment:1']);
     $metadata_tests['[comment:parent:title]'] = $bubbleable_metadata;
     $bubbleable_metadata = clone $base_bubbleable_metadata;
     $metadata_tests['[comment:entity]'] = $bubbleable_metadata->addCacheTags(['node:2']);
@@ -139,8 +145,8 @@ class CommentTokenReplaceTest extends CommentTestBase {
     foreach ($tests as $input => $expected) {
       $bubbleable_metadata = new BubbleableMetadata();
       $output = $token_service->replace($input, ['comment' => $comment], ['langcode' => $language_interface->getId()], $bubbleable_metadata);
-      $this->assertEqual($expected, $output, new FormattableMarkup('Comment token %token replaced.', ['%token' => $input]));
-      $this->assertEqual($metadata_tests[$input], $bubbleable_metadata);
+      $this->assertSame((string) $expected, (string) $output, "Failed test case: {$input}");
+      $this->assertEquals($metadata_tests[$input], $bubbleable_metadata);
     }
 
     // Test anonymous comment author.
@@ -148,7 +154,7 @@ class CommentTokenReplaceTest extends CommentTestBase {
     $comment->setOwnerId(0)->setAuthorName($author_name);
     $input = '[comment:author]';
     $output = $token_service->replace($input, ['comment' => $comment], ['langcode' => $language_interface->getId()]);
-    $this->assertEqual(Html::escape($author_name), $output, new FormattableMarkup('Comment author token %token replaced.', ['%token' => $input]));
+    $this->assertSame((string) Html::escape($author_name), (string) $output);
     // Add comment field to user and term entities.
     $this->addDefaultCommentField('user', 'user', 'comment', CommentItemInterface::OPEN, 'comment_user');
     $this->addDefaultCommentField('taxonomy_term', 'tags', 'comment', CommentItemInterface::OPEN, 'comment_term');
@@ -176,17 +182,13 @@ class CommentTokenReplaceTest extends CommentTestBase {
     // user and term.
     $tests = [];
     $tests['[entity:comment-count]'] = 2;
-    $tests['[entity:comment-count-new]'] = 2;
     $tests['[node:comment-count]'] = 2;
-    $tests['[node:comment-count-new]'] = 2;
     $tests['[user:comment-count]'] = 1;
-    $tests['[user:comment-count-new]'] = 1;
     $tests['[term:comment-count]'] = 1;
-    $tests['[term:comment-count-new]'] = 1;
 
     foreach ($tests as $input => $expected) {
       $output = $token_service->replace($input, ['entity' => $node, 'node' => $node, 'user' => $user, 'term' => $term], ['langcode' => $language_interface->getId()]);
-      $this->assertEqual($expected, $output, new FormattableMarkup('Comment token %token replaced.', ['%token' => $input]));
+      $this->assertSame((string) $expected, (string) $output, "Failed test case: {$input}");
     }
   }
 

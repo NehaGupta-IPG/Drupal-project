@@ -1,16 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that users can be assigned and unassigned roles.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserRolesAssignmentTest extends BrowserTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
     $admin_user = $this->drupalCreateUser([
@@ -26,31 +33,31 @@ class UserRolesAssignmentTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Tests that a user can be assigned a role and that the role can be removed
-   * again.
+   * Test that user can be assigned role and that the role can be removed again.
    */
-  public function testAssignAndRemoveRole() {
+  public function testAssignAndRemoveRole(): void {
     $rid = $this->drupalCreateRole(['administer users']);
     $account = $this->drupalCreateUser();
 
     // Assign the role to the user.
-    $this->drupalPostForm('user/' . $account->id() . '/edit', ["roles[$rid]" => $rid], 'Save');
-    $this->assertText('The changes have been saved.');
+    $this->drupalGet('user/' . $account->id() . '/edit');
+    $this->submitForm(["roles[{$rid}]" => $rid], 'Save');
+    $this->assertSession()->pageTextContains('The changes have been saved.');
     $this->assertSession()->checkboxChecked('edit-roles-' . $rid);
     $this->userLoadAndCheckRoleAssigned($account, $rid);
 
     // Remove the role from the user.
-    $this->drupalPostForm('user/' . $account->id() . '/edit', ["roles[$rid]" => FALSE], 'Save');
-    $this->assertText('The changes have been saved.');
+    $this->drupalGet('user/' . $account->id() . '/edit');
+    $this->submitForm(["roles[{$rid}]" => FALSE], 'Save');
+    $this->assertSession()->pageTextContains('The changes have been saved.');
     $this->assertSession()->checkboxNotChecked('edit-roles-' . $rid);
     $this->userLoadAndCheckRoleAssigned($account, $rid, FALSE);
   }
 
   /**
-   * Tests that when creating a user the role can be assigned. And that it can
-   * be removed again.
+   * Tests assigning a role at user creation and removing the role.
    */
-  public function testCreateUserWithRole() {
+  public function testCreateUserWithRole(): void {
     $rid = $this->drupalCreateRole(['administer users']);
     // Create a new user and add the role at the same time.
     $edit = [
@@ -60,8 +67,9 @@ class UserRolesAssignmentTest extends BrowserTestBase {
       'pass[pass2]' => $pass,
       "roles[$rid]" => $rid,
     ];
-    $this->drupalPostForm('admin/people/create', $edit, 'Create new account');
-    $this->assertText('Created a new user account for ' . $edit['name'] . '.');
+    $this->drupalGet('admin/people/create');
+    $this->submitForm($edit, 'Create new account');
+    $this->assertSession()->pageTextContains('Created a new user account for ' . $edit['name'] . '.');
     // Get the newly added user.
     $account = user_load_by_name($edit['name']);
 
@@ -70,8 +78,9 @@ class UserRolesAssignmentTest extends BrowserTestBase {
     $this->userLoadAndCheckRoleAssigned($account, $rid);
 
     // Remove the role again.
-    $this->drupalPostForm('user/' . $account->id() . '/edit', ["roles[$rid]" => FALSE], 'Save');
-    $this->assertText('The changes have been saved.');
+    $this->drupalGet('user/' . $account->id() . '/edit');
+    $this->submitForm(["roles[{$rid}]" => FALSE], 'Save');
+    $this->assertSession()->pageTextContains('The changes have been saved.');
     $this->assertSession()->checkboxNotChecked('edit-roles-' . $rid);
     $this->userLoadAndCheckRoleAssigned($account, $rid, FALSE);
   }
@@ -87,7 +96,7 @@ class UserRolesAssignmentTest extends BrowserTestBase {
    *   (optional) Whether to assert that $rid exists (TRUE) or not (FALSE).
    *   Defaults to TRUE.
    */
-  private function userLoadAndCheckRoleAssigned($account, $rid, $is_assigned = TRUE) {
+  private function userLoadAndCheckRoleAssigned($account, $rid, $is_assigned = TRUE): void {
     $user_storage = $this->container->get('entity_type.manager')->getStorage('user');
     $user_storage->resetCache([$account->id()]);
     $account = $user_storage->load($account->id());

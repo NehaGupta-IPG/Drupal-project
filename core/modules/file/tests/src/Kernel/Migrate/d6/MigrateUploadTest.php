@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Kernel\Migrate\d6;
 
 use Drupal\file\Entity\File;
-use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
 use Drupal\node\Entity\Node;
+use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Migrate association data between nodes and files.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateUploadTest extends MigrateDrupal6TestBase {
 
   /**
@@ -44,8 +48,8 @@ class MigrateUploadTest extends MigrateDrupal6TestBase {
         'filemime' => 'text/plain',
         'created' => 1,
         'changed' => 1,
-        'status' => FILE_STATUS_PERMANENT,
       ]);
+      $file->setPermanent();
       $file->enforceIsNew();
       file_put_contents($file->getFileUri(), 'hello world');
 
@@ -64,9 +68,9 @@ class MigrateUploadTest extends MigrateDrupal6TestBase {
   }
 
   /**
-   * Test upload migration from Drupal 6 to Drupal 8.
+   * Tests upload migration from Drupal 6 to Drupal 8.
    */
-  public function testUpload() {
+  public function testUpload(): void {
     $this->container->get('entity_type.manager')
       ->getStorage('node')
       ->resetCache([1, 2, 12]);

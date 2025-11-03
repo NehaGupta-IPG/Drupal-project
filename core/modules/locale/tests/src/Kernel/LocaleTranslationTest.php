@@ -1,14 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\locale\Kernel;
 
-use Drupal\locale\LocaleTranslation;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\locale\LocaleTranslation;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\locale\LocaleTranslation
- * @group locale
+ * Tests Drupal\locale\LocaleTranslation.
  */
+#[CoversClass(LocaleTranslation::class)]
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleTranslationTest extends KernelTestBase {
 
   /**
@@ -19,30 +26,34 @@ class LocaleTranslationTest extends KernelTestBase {
   ];
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    $this->installSchema('locale', [
+      'locales_location',
+      'locales_source',
+      'locales_target',
+    ]);
+  }
+
+  /**
    * Tests that \Drupal\locale\LocaleTranslation is serializable.
    */
-  public function testSerializable() {
+  public function testSerializable(): void {
+    /** @var \Drupal\locale\LocaleTranslation $translation */
     $translation = $this->container->get('string_translator.locale.lookup');
     $this->assertInstanceOf(LocaleTranslation::class, $translation);
+    // Ensure that the \Drupal\locale\LocaleTranslation::$translations property
+    // has some cached translations in it. Without this, serialization will not
+    // actually be tested fully.
+    $translation->getStringTranslation('es', 'test', '');
 
     // Prove that serialization and deserialization works without errors.
     $this->assertNotNull($translation);
     $unserialized = unserialize(serialize($translation));
     $this->assertInstanceOf(LocaleTranslation::class, $unserialized);
-
-    // Ensure that all properties on the unserialized object match the original.
-    $translation_reflection = new \ReflectionObject($translation);
-    $unserialized_reflection = new \ReflectionObject($unserialized);
-    // Ignore the '_serviceIds' property in the comparison.
-    $properties = array_filter($translation_reflection->getProperties(), function ($value) {
-      return $value->getName() !== '_serviceIds';
-    });
-    foreach ($properties as $value) {
-      $value->setAccessible(TRUE);
-      $unserialized_property = $unserialized_reflection->getProperty($value->getName());
-      $unserialized_property->setAccessible(TRUE);
-      $this->assertEquals($unserialized_property->getValue($unserialized), $value->getValue($translation));
-    }
   }
 
 }

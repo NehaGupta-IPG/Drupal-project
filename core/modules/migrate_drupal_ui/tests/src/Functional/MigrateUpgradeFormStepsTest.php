@@ -1,21 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal_ui\Functional;
 
 use Drupal\migrate_drupal\MigrationConfigurationTrait;
-use Drupal\Tests\migrate_drupal\Traits\CreateTestContentEntitiesTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\WebAssert;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the flow of the Migrate Drupal UI form.
- *
- * @group migrate_drupal_ui
  */
+#[Group('migrate_drupal_ui')]
+#[RunTestsInSeparateProcesses]
 class MigrateUpgradeFormStepsTest extends BrowserTestBase {
 
   use MigrationConfigurationTrait;
-  use CreateTestContentEntitiesTrait;
 
   /**
    * {@inheritdoc}
@@ -39,7 +41,7 @@ class MigrateUpgradeFormStepsTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getSourceBasePath() {
+  protected function getSourceBasePath(): string {
     return __DIR__ . '/files';
   }
 
@@ -52,7 +54,7 @@ class MigrateUpgradeFormStepsTest extends BrowserTestBase {
    * this order; Overview or Incremental, if a migration has already been run
    * then Credential, Id conflict, if conflicts are detected, and lastly Review.
    */
-  public function testMigrateUpgradeReviewPage() {
+  public function testMigrateUpgradeReviewPage(): void {
     /** @var \Drupal\Core\TempStore\PrivateTempStore  $store */
     $store = \Drupal::service('tempstore.private')->get('migrate_drupal_ui');
     $state = \Drupal::service('state');
@@ -63,7 +65,7 @@ class MigrateUpgradeFormStepsTest extends BrowserTestBase {
     // form.
     $session = $this->assertSession();
     // Get the current major version.
-    list($destination_site_version) = explode('.', \Drupal::VERSION, 2);
+    [$destination_site_version] = explode('.', \Drupal::VERSION, 2);
     $expected['initial'] = "Upgrade a site by importing its files and the data from its database into a clean and empty new install of Drupal $destination_site_version.";
     $expected['incremental'] = "An upgrade has already been performed on this site.";
 
@@ -127,8 +129,10 @@ class MigrateUpgradeFormStepsTest extends BrowserTestBase {
    *   The WebAssert object.
    * @param string $expected
    *   The expected response text.
+   *
+   * @internal
    */
-  protected function assertFirstForm(WebAssert $session, $expected) {
+  protected function assertFirstForm(WebAssert $session, string $expected): void {
     $paths = [
       '',
       '/incremental',

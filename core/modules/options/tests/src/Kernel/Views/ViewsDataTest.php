@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\options\Kernel\Views;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test to ensure views data is properly created for the Options module.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ViewsDataTest extends OptionsTestBase {
 
   /**
@@ -30,6 +34,11 @@ class ViewsDataTest extends OptionsTestBase {
   protected $fieldStorage;
 
   /**
+   * @var int
+   */
+  protected int $field;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp($import_test_views = TRUE): void {
@@ -43,7 +52,7 @@ class ViewsDataTest extends OptionsTestBase {
       'type' => 'list_string',
       'cardinality' => 1,
       'settings' => [
-        'allowed_values_function' => 'options_test_dynamic_values_callback',
+        'allowed_values_function' => '\Drupal\options_test\OptionsAllowedValues::dynamicValues',
       ],
     ]);
     $this->fieldStorage->save();
@@ -59,13 +68,13 @@ class ViewsDataTest extends OptionsTestBase {
   /**
    * Tests the option module's implementation of hook_field_views_data().
    */
-  public function testOptionsFieldViewsData() {
+  public function testOptionsFieldViewsData(): void {
     $field_data = \Drupal::service('views.views_data')->get('entity_test__test_options');
 
     // Check that the options module has properly overridden default views data.
     $test_options_field = $field_data['test_options_value'];
-    $this->assertEqual('string_list_field', $test_options_field['argument']['id'], 'Argument handler is properly set for fields with allowed value callbacks.');
-    $this->assertEqual('list_field', $test_options_field['filter']['id'], 'Filter handler is properly set for fields with allowed value callbacks.');
+    $this->assertEquals('string_list_field', $test_options_field['argument']['id'], 'Argument handler is properly set for fields with allowed value callbacks.');
+    $this->assertEquals('list_field', $test_options_field['filter']['id'], 'Filter handler is properly set for fields with allowed value callbacks.');
   }
 
 }

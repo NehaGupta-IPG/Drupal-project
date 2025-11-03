@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Entity;
 
 use Drupal\Component\Uuid\Php;
@@ -10,12 +12,14 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\search\Entity\SearchPage;
 use Drupal\system\Entity\Action;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests ConfigEntity importing.
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class ConfigEntityImportTest extends KernelTestBase {
 
   use BlockCreationTrait;
@@ -24,7 +28,6 @@ class ConfigEntityImportTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'action',
     'block',
     'config_test',
     'filter',
@@ -37,9 +40,9 @@ class ConfigEntityImportTest extends KernelTestBase {
   /**
    * Runs test methods for each module within a single test run.
    */
-  public function testConfigUpdateImport() {
-    $this->installConfig(['action', 'block', 'filter', 'image']);
-    $this->container->get('theme_installer')->install(['bartik']);
+  public function testConfigUpdateImport(): void {
+    $this->installConfig(['block', 'filter', 'image']);
+    $this->container->get('theme_installer')->install(['olivero']);
     $config_storage = $this->container->get('config.storage');
     // Ensure the 'system.site' config.
     $config_storage->write('system.site', ['uuid' => (new Php())->generate()]);
@@ -56,7 +59,7 @@ class ConfigEntityImportTest extends KernelTestBase {
   /**
    * Tests updating an action during import.
    */
-  protected function doActionUpdate() {
+  protected function doActionUpdate(): void {
     // Create a test action with a known label.
     $name = 'system.action.apple';
     $entity = Action::create([
@@ -77,13 +80,13 @@ class ConfigEntityImportTest extends KernelTestBase {
   /**
    * Tests updating a block during import.
    */
-  protected function doBlockUpdate() {
+  protected function doBlockUpdate(): void {
     // Create a test block with a known label.
     $name = 'block.block.apple';
     $block = $this->placeBlock('system_powered_by_block', [
       'id' => 'apple',
       'label' => 'Red Delicious',
-      'theme' => 'bartik',
+      'theme' => 'olivero',
     ]);
 
     $this->checkSinglePluginConfigSync($block, 'settings', 'label', 'Red Delicious');
@@ -97,11 +100,11 @@ class ConfigEntityImportTest extends KernelTestBase {
   /**
    * Tests updating a filter format during import.
    */
-  protected function doFilterFormatUpdate() {
+  protected function doFilterFormatUpdate(): void {
     // Create a test filter format with a known label.
     $name = 'filter.format.plain_text';
 
-    /** @var $entity \Drupal\filter\Entity\FilterFormat */
+    /** @var \Drupal\filter\Entity\FilterFormat $entity */
     $entity = FilterFormat::load('plain_text');
     $plugin_collection = $entity->getPluginCollections()['filters'];
 
@@ -129,11 +132,11 @@ class ConfigEntityImportTest extends KernelTestBase {
   /**
    * Tests updating an image style during import.
    */
-  protected function doImageStyleUpdate() {
+  protected function doImageStyleUpdate(): void {
     // Create a test image style with a known label.
     $name = 'image.style.thumbnail';
 
-    /** @var $entity \Drupal\image\Entity\ImageStyle */
+    /** @var \Drupal\image\Entity\ImageStyle $entity */
     $entity = ImageStyle::load('thumbnail');
     $plugin_collection = $entity->getPluginCollections()['effects'];
 
@@ -166,11 +169,13 @@ class ConfigEntityImportTest extends KernelTestBase {
   /**
    * Tests updating a search page during import.
    */
-  protected function doSearchPageUpdate() {
+  protected function doSearchPageUpdate(): void {
     // Create a test search page with a known label.
     $name = 'search.page.apple';
     $entity = SearchPage::create([
       'id' => 'apple',
+      'label' => 'Apple search',
+      'path' => 'apple',
       'plugin' => 'search_extra_type_search',
     ]);
     $entity->save();
@@ -186,7 +191,7 @@ class ConfigEntityImportTest extends KernelTestBase {
   /**
    * Tests updating of third party settings.
    */
-  protected function doThirdPartySettingsUpdate() {
+  protected function doThirdPartySettingsUpdate(): void {
     // Create a test action with a known label.
     $name = 'system.action.third_party_settings_test';
 
@@ -223,7 +228,7 @@ class ConfigEntityImportTest extends KernelTestBase {
    * @param mixed $expected
    *   The expected default value of the plugin config setting.
    */
-  protected function checkSinglePluginConfigSync(EntityWithPluginCollectionInterface $entity, $config_key, $setting_key, $expected) {
+  protected function checkSinglePluginConfigSync(EntityWithPluginCollectionInterface $entity, $config_key, $setting_key, $expected): void {
     $plugin_collection = $entity->getPluginCollections()[$config_key];
     $settings = $entity->get($config_key);
 
@@ -254,8 +259,10 @@ class ConfigEntityImportTest extends KernelTestBase {
    *   The original data stored in the config object.
    * @param array $custom_data
    *   The new data to store in the config object.
+   *
+   * @internal
    */
-  public function assertConfigUpdateImport($name, $original_data, $custom_data) {
+  public function assertConfigUpdateImport(string $name, array $original_data, array $custom_data): void {
     $this->container->get('config.storage.sync')->write($name, $custom_data);
 
     // Verify the active configuration still returns the default values.

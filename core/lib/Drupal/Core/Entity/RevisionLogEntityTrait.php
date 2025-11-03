@@ -64,14 +64,14 @@ trait RevisionLogEntityTrait {
   }
 
   /**
-   * Implements \Drupal\Core\Entity\RevisionLogInterface::getRevisionCreationTime().
+   * {@inheritdoc}
    */
   public function getRevisionCreationTime() {
     return $this->{$this->getEntityType()->getRevisionMetadataKey('revision_created')}->value;
   }
 
   /**
-   * Implements \Drupal\Core\Entity\RevisionLogInterface::setRevisionCreationTime().
+   * {@inheritdoc}
    */
   public function setRevisionCreationTime($timestamp) {
     $this->{$this->getEntityType()->getRevisionMetadataKey('revision_created')}->value = $timestamp;
@@ -109,36 +109,18 @@ trait RevisionLogEntityTrait {
   }
 
   /**
-   * Implements \Drupal\Core\Entity\RevisionLogInterface::getRevisionLogMessage().
+   * {@inheritdoc}
    */
   public function getRevisionLogMessage() {
     return $this->{$this->getEntityType()->getRevisionMetadataKey('revision_log_message')}->value;
   }
 
   /**
-   * Implements \Drupal\Core\Entity\RevisionLogInterface::setRevisionLogMessage().
+   * {@inheritdoc}
    */
   public function setRevisionLogMessage($revision_log_message) {
     $this->{$this->getEntityType()->getRevisionMetadataKey('revision_log_message')}->value = $revision_log_message;
     return $this;
-  }
-
-  /**
-   * Gets the name of a revision metadata field.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   A content entity type definition.
-   * @param string $key
-   *   The revision metadata key to get, must be one of 'revision_created',
-   *   'revision_user' or 'revision_log_message'.
-   *
-   * @return string
-   *   The name of the field for the specified $key.
-   */
-  protected static function getRevisionMetadataKey(EntityTypeInterface $entity_type, $key) {
-    @trigger_error(static::class . 'getRevisionMetadataKey() is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Use $entity_type->getRevisionMetadataKey() instead. See: https://www.drupal.org/node/2831499', E_USER_DEPRECATED);
-    /** @var \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type */
-    return $entity_type->getRevisionMetadataKey($key);
   }
 
   /**

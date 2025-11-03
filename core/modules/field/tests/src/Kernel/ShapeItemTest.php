@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel;
 
 use Drupal\Core\Field\FieldItemInterface;
@@ -7,18 +9,18 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the new entity API for the shape field type.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class ShapeItemTest extends FieldKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field_test'];
 
@@ -29,6 +31,9 @@ class ShapeItemTest extends FieldKernelTestBase {
    */
   protected $fieldName = 'field_shape';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -46,9 +51,9 @@ class ShapeItemTest extends FieldKernelTestBase {
   }
 
   /**
-   * Tests using entity fields of the field field type.
+   * Tests using entity fields of the shape field type.
    */
-  public function testShapeItem() {
+  public function testShapeItem(): void {
     // Verify entity creation.
     $entity = EntityTest::create();
     $shape = 'cube';
@@ -63,24 +68,24 @@ class ShapeItemTest extends FieldKernelTestBase {
     $entity = EntityTest::load($id);
     $this->assertInstanceOf(FieldItemListInterface::class, $entity->{$this->fieldName});
     $this->assertInstanceOf(FieldItemInterface::class, $entity->{$this->fieldName}[0]);
-    $this->assertEqual($shape, $entity->{$this->fieldName}->shape);
-    $this->assertEqual($color, $entity->{$this->fieldName}->color);
-    $this->assertEqual($shape, $entity->{$this->fieldName}[0]->shape);
-    $this->assertEqual($color, $entity->{$this->fieldName}[0]->color);
+    $this->assertEquals($shape, $entity->{$this->fieldName}->shape);
+    $this->assertEquals($color, $entity->{$this->fieldName}->color);
+    $this->assertEquals($shape, $entity->{$this->fieldName}[0]->shape);
+    $this->assertEquals($color, $entity->{$this->fieldName}[0]->color);
 
     // Verify changing the field value.
     $new_shape = 'circle';
     $new_color = 'red';
     $entity->{$this->fieldName}->shape = $new_shape;
     $entity->{$this->fieldName}->color = $new_color;
-    $this->assertEqual($new_shape, $entity->{$this->fieldName}->shape);
-    $this->assertEqual($new_color, $entity->{$this->fieldName}->color);
+    $this->assertEquals($new_shape, $entity->{$this->fieldName}->shape);
+    $this->assertEquals($new_color, $entity->{$this->fieldName}->color);
 
     // Read changed entity and assert changed values.
     $entity->save();
     $entity = EntityTest::load($id);
-    $this->assertEqual($new_shape, $entity->{$this->fieldName}->shape);
-    $this->assertEqual($new_color, $entity->{$this->fieldName}->color);
+    $this->assertEquals($new_shape, $entity->{$this->fieldName}->shape);
+    $this->assertEquals($new_color, $entity->{$this->fieldName}->color);
   }
 
 }

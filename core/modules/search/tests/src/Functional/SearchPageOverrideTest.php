@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\search\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests if the result page can be overridden.
  *
  * Verifies that a plugin can override the buildResults() method to
  * control what the search results page looks like.
- *
- * @group search
  */
+#[Group('search')]
+#[RunTestsInSeparateProcesses]
 class SearchPageOverrideTest extends BrowserTestBase {
 
   /**
@@ -31,6 +35,9 @@ class SearchPageOverrideTest extends BrowserTestBase {
    */
   public $searchUser;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -42,11 +49,14 @@ class SearchPageOverrideTest extends BrowserTestBase {
     $this->drupalLogin($this->searchUser);
   }
 
-  public function testSearchPageHook() {
+  /**
+   * Tests that the search results page can be overridden by a custom plugin.
+   */
+  public function testSearchPageHook(): void {
     $keys = 'bike shed ' . $this->randomMachineName();
     $this->drupalGet("search/dummy_path", ['query' => ['keys' => $keys]]);
-    $this->assertText('Dummy search snippet');
-    $this->assertText('Test page text is here');
+    $this->assertSession()->pageTextContains('Dummy search snippet');
+    $this->assertSession()->pageTextContains('Test page text is here');
   }
 
 }

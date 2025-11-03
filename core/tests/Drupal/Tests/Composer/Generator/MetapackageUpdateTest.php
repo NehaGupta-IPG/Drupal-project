@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Composer\Generator;
 
 use Drupal\Composer\Generator\Builder\DrupalCoreRecommendedBuilder;
@@ -7,20 +9,20 @@ use Drupal\Composer\Generator\Builder\DrupalDevDependenciesBuilder;
 use Drupal\Composer\Generator\Builder\DrupalPinnedDevDependenciesBuilder;
 use Drupal\Composer\Generator\PackageGenerator;
 use Drupal\Composer\Generator\Util\DrupalCoreComposer;
-
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Test to see if the metapackages are up-to-date with the root composer.lock.
- *
- * @group Metapackage
  */
+#[Group('Metapackage')]
 class MetapackageUpdateTest extends TestCase {
 
   /**
-   * Test data for testUpdated.
+   * Provides test data for testUpdated.
    */
-  public function updatedTestData() {
+  public static function updatedTestData() {
     return [
       [
         DrupalCoreRecommendedBuilder::class,
@@ -38,7 +40,7 @@ class MetapackageUpdateTest extends TestCase {
   }
 
   /**
-   * Test to see if the generated metapackages are in sync with composer.lock.
+   * Tests to see if the generated metapackages are in sync with composer.lock.
    *
    * Note that this is not a test of code correctness, but rather it merely
    * confirms if the package builder was used on the most recent set of
@@ -49,11 +51,10 @@ class MetapackageUpdateTest extends TestCase {
    * @param string $builderClass
    *   The metapackage builder to test.
    * @param string $path
-   *   The relative path to the metapackage
-   *
-   *  @dataProvider updatedTestData
+   *   The relative path to the metapackage.
    */
-  public function testUpdated($builderClass, $path) {
+  #[DataProvider('updatedTestData')]
+  public function testUpdated($builderClass, $path): void {
     // Create a DrupalCoreComposer for the System Under Test (current repo)
     $repositoryRoot = dirname(__DIR__, 6);
     $drupalCoreInfo = DrupalCoreComposer::createFromPath($repositoryRoot);

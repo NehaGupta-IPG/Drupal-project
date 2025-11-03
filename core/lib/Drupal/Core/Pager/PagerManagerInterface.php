@@ -33,7 +33,7 @@ interface PagerManagerInterface {
    * before executing it. For example:
    * @code
    *   $query = $connection->select('some_table')
-   *     ->extend('Drupal\Core\Database\Query\PagerSelectExtender');
+   *     ->extend(PagerSelectExtender::class);
    * @endcode
    *
    * However, if you are using a different method for generating the items to be
@@ -43,18 +43,18 @@ interface PagerManagerInterface {
    * that invokes an external datastore with an SQL-like syntax:
    * @code
    *   // First find the total number of items and initialize the pager.
-   *   $total = mymodule_select("SELECT COUNT(*) FROM data WHERE status = 1")->result();
-   *   $num_per_page = \Drupal::config('mymodule.settings')->get('num_per_page');
+   *   $total = my_module_select("SELECT COUNT(*) FROM data WHERE status = 1")->result();
+   *   $num_per_page = \Drupal::config('my_module.settings')->get('num_per_page');
    *   $pager = \Drupal::service('pager.manager')->createPager($total, $num_per_page);
    *   $page = $pager->getCurrentPage();
    *
    *   // Next, retrieve the items for the current page and put them into a
    *   // render array.
    *   $offset = $num_per_page * $page;
-   *   $result = mymodule_select("SELECT * FROM data " . $where . " LIMIT %d, %d", $offset, $num_per_page)->fetchAll();
+   *   $result = my_module_select("SELECT * FROM data " . $where . " LIMIT %d, %d", $offset, $num_per_page)->fetchAll();
    *   $render = [];
    *   $render[] = [
-   *     '#theme' => 'mymodule_results',
+   *     '#theme' => 'my_module_results',
    *     '#result' => $result,
    *   ];
    *
@@ -76,9 +76,9 @@ interface PagerManagerInterface {
    *   // page of results that will exist within the set.
    *   $pager_manager = \Drupal::service('pager.manager');
    *   $page = $pager_manager->findPage();
-   *   $num_per_page = \Drupal::config('mymodule.settings')->get('num_per_page');
+   *   $num_per_page = \Drupal::config('my_module.settings')->get('num_per_page');
    *   $offset = $num_per_page * $page;
-   *   $result = mymodule_remote_search($keywords, $offset, $num_per_page);
+   *   $result = my_module_remote_search($keywords, $offset, $num_per_page);
    *
    *   // Now that we have the total number of results, initialize the pager.
    *   $pager_manager = \Drupal::service('pager.manager');
@@ -162,5 +162,27 @@ interface PagerManagerInterface {
    *   The altered $query parameter array.
    */
   public function getUpdatedParameters(array $query, $element, $index);
+
+  /**
+   * Gets the extent of the pager page element IDs.
+   *
+   * @return int
+   *   The maximum element ID available, -1 if there are no elements.
+   */
+  public function getMaxPagerElementId();
+
+  /**
+   * Reserve a pager element ID.
+   *
+   * Calling code may need to reserve the ID of a pager before actually creating
+   * it. This methods allows to do so ensuring no collision occurs with
+   * ::getMaxPagerElementId().
+   *
+   * @param int $element
+   *   The ID of the pager to be reserved.
+   *
+   * @see \Drupal\Core\Database\Query\PagerSelectExtender::element()
+   */
+  public function reservePagerElementId(int $element): void;
 
 }

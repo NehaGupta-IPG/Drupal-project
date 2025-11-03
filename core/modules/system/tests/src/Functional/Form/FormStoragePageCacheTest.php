@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests form storage from cached pages.
- *
- * @group Form
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class FormStoragePageCacheTest extends BrowserTestBase {
 
   /**
@@ -35,46 +39,53 @@ class FormStoragePageCacheTest extends BrowserTestBase {
   /**
    * Return the build id of the current form.
    */
-  protected function getFormBuildId() {
-    $build_id_fields = $this->xpath('//input[@name="form_build_id"]');
-    $this->assertCount(1, $build_id_fields, 'One form build id field on the page');
-    return (string) $build_id_fields[0]->getAttribute('value');
+  protected function getFormBuildId(): string {
+    // Ensure the hidden 'form_build_id' field is unique.
+    $this->assertSession()->elementsCount('xpath', '//input[@name="form_build_id"]', 1);
+    $form_build_id_element = $this->assertSession()->hiddenFieldExists('form_build_id');
+    // Test that the autocomplete attribute is set to off to prevent Firefox and
+    // similar browsers from retaining the form build ID on browser reload.
+    // @todo Add actual testing that the form build ID is not retained once
+    // Firefox is included in automated testing in
+    // https://www.drupal.org/project/drupal/issues/3462680.
+    $this->assertSame('off', $form_build_id_element->getAttribute('autocomplete'));
+    return (string) $form_build_id_element->getAttribute('value');
   }
 
   /**
    * Build-id is regenerated when validating cached form.
    */
-  public function testValidateFormStorageOnCachedPage() {
+  public function testValidateFormStorageOnCachedPage(): void {
     $this->drupalGet('form-test/form-storage-page-cache');
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'MISS');
-    $this->assertText('No old build id');
+    $this->assertSession()->pageTextContains('No old build id');
     $build_id_initial = $this->getFormBuildId();
 
     // Trigger validation error by submitting an empty title.
     $edit = ['title' => ''];
     $this->submitForm($edit, 'Save');
-    $this->assertText('No old build id');
+    $this->assertSession()->pageTextContains('No old build id');
     $build_id_first_validation = $this->getFormBuildId();
     $this->assertNotEquals($build_id_initial, $build_id_first_validation, 'Build id changes when form validation fails');
 
     // Trigger validation error by again submitting an empty title.
     $edit = ['title' => ''];
     $this->submitForm($edit, 'Save');
-    $this->assertText('No old build id');
+    $this->assertSession()->pageTextContains('No old build id');
     $build_id_second_validation = $this->getFormBuildId();
-    $this->assertEqual($build_id_first_validation, $build_id_second_validation, 'Build id remains the same when form validation fails subsequently');
+    $this->assertEquals($build_id_first_validation, $build_id_second_validation, 'Build id remains the same when form validation fails subsequently');
 
     // Repeat the test sequence but this time with a page loaded from the cache.
     $this->drupalGet('form-test/form-storage-page-cache');
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'HIT');
-    $this->assertText('No old build id');
+    $this->assertSession()->pageTextContains('No old build id');
     $build_id_from_cache_initial = $this->getFormBuildId();
-    $this->assertEqual($build_id_initial, $build_id_from_cache_initial, 'Build id is the same as on the first request');
+    $this->assertEquals($build_id_initial, $build_id_from_cache_initial, 'Build id is the same as on the first request');
 
     // Trigger validation error by submitting an empty title.
     $edit = ['title' => ''];
     $this->submitForm($edit, 'Save');
-    $this->assertText('No old build id');
+    $this->assertSession()->pageTextContains('No old build id');
     $build_id_from_cache_first_validation = $this->getFormBuildId();
     $this->assertNotEquals($build_id_initial, $build_id_from_cache_first_validation, 'Build id changes when form validation fails');
     $this->assertNotEquals($build_id_first_validation, $build_id_from_cache_first_validation, 'Build id from first user is not reused');
@@ -82,18 +93,18 @@ class FormStoragePageCacheTest extends BrowserTestBase {
     // Trigger validation error by again submitting an empty title.
     $edit = ['title' => ''];
     $this->submitForm($edit, 'Save');
-    $this->assertText('No old build id');
+    $this->assertSession()->pageTextContains('No old build id');
     $build_id_from_cache_second_validation = $this->getFormBuildId();
-    $this->assertEqual($build_id_from_cache_first_validation, $build_id_from_cache_second_validation, 'Build id remains the same when form validation fails subsequently');
+    $this->assertEquals($build_id_from_cache_first_validation, $build_id_from_cache_second_validation, 'Build id remains the same when form validation fails subsequently');
   }
 
   /**
    * Build-id is regenerated when rebuilding cached form.
    */
-  public function testRebuildFormStorageOnCachedPage() {
+  public function testRebuildFormStorageOnCachedPage(): void {
     $this->drupalGet('form-test/form-storage-page-cache');
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'MISS');
-    $this->assertText('No old build id');
+    $this->assertSession()->pageTextContains('No old build id');
     $build_id_initial = $this->getFormBuildId();
 
     // Trigger rebuild, should regenerate build id. When a submit handler
@@ -103,15 +114,15 @@ class FormStoragePageCacheTest extends BrowserTestBase {
     // that initial build ID.
     $edit = ['title' => 'something'];
     $this->submitForm($edit, 'Rebuild');
-    $this->assertNoText('No old build id');
-    $this->assertNoText($build_id_initial);
+    $this->assertSession()->pageTextNotContains('No old build id');
+    $this->assertSession()->pageTextNotContains($build_id_initial);
     $build_id_first_rebuild = $this->getFormBuildId();
     $this->assertNotEquals($build_id_initial, $build_id_first_rebuild, 'Build id changes on first rebuild.');
 
     // Trigger subsequent rebuild, should regenerate the build id again.
     $edit = ['title' => 'something'];
     $this->submitForm($edit, 'Rebuild');
-    $this->assertText($build_id_first_rebuild);
+    $this->assertSession()->pageTextContains($build_id_first_rebuild);
     $build_id_second_rebuild = $this->getFormBuildId();
     $this->assertNotEquals($build_id_first_rebuild, $build_id_second_rebuild, 'Build id changes on second rebuild.');
   }

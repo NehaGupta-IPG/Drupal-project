@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal_ui\Functional;
 
 use Drupal\Core\Database\Database;
@@ -7,7 +9,6 @@ use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate_drupal\MigrationConfigurationTrait;
 use Drupal\user\Entity\User;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\Tests\migrate_drupal\Traits\CreateTestContentEntitiesTrait;
 
 /**
  * Provides a base class for testing migration upgrades in the UI.
@@ -15,7 +16,6 @@ use Drupal\Tests\migrate_drupal\Traits\CreateTestContentEntitiesTrait;
 abstract class MigrateUpgradeTestBase extends BrowserTestBase {
 
   use MigrationConfigurationTrait;
-  use CreateTestContentEntitiesTrait;
 
   /**
    * Use the Standard profile to test help implementations of many core modules.
@@ -39,9 +39,16 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
   protected $destinationSiteVersion;
 
   /**
+   * Input data for the credential form.
+   *
+   * @var array
+   */
+  protected $edits;
+
+  /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->createMigrationConnection();
     $this->sourceDatabase = Database::getConnection('default', 'migrate_drupal_ui');
@@ -54,6 +61,20 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
   }
 
   /**
+   * Navigates to the credential form and submits valid credentials.
+   */
+  public function submitCredentialForm() {
+    $this->drupalGet('/upgrade');
+    $this->submitForm([], 'Continue');
+
+    // Get valid credentials.
+    $this->edits = $this->translatePostValues($this->getCredentials());
+
+    // When the Credential form is submitted the migrate map tables are created.
+    $this->submitForm($this->edits, 'Review upgrade');
+  }
+
+  /**
    * Loads a database fixture into the source database connection.
    *
    * @param string $path
@@ -63,7 +84,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
     $default_db = Database::getConnection()->getKey();
     Database::setActiveConnection($this->sourceDatabase->getKey());
 
-    if (substr($path, -3) == '.gz') {
+    if (str_ends_with($path, '.gz')) {
       $path = 'compress.zlib://' . $path;
     }
     require $path;
@@ -80,18 +101,18 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
     $connection_info = Database::getConnectionInfo('default')['default'];
     if ($connection_info['driver'] === 'sqlite') {
       // Create database file in the test site's public file directory so that
-      // \Drupal\simpletest\TestBase::restoreEnvironment() will delete this once
-      // the test is complete.
+      // \Drupal\Tests\BrowserTestBase::cleanupEnvironment() will delete this
+      // once the test is complete.
       $file = $this->publicFilesDirectory . '/' . $this->testId . '-migrate.db.sqlite';
       touch($file);
       $connection_info['database'] = $file;
       $connection_info['prefix'] = '';
     }
     else {
-      $prefix = is_array($connection_info['prefix']) ? $connection_info['prefix']['default'] : $connection_info['prefix'];
-      // Simpletest uses fixed length prefixes. Create a new prefix for the
+      $prefix = $connection_info['prefix'];
+      // Test databases use fixed length prefixes. Create a new prefix for the
       // source database. Adding to the end of the prefix ensures that
-      // \Drupal\simpletest\TestBase::restoreEnvironment() will remove the
+      // \Drupal\Tests\BrowserTestBase::cleanupEnvironment() will remove the
       // additional tables.
       $connection_info['prefix'] = $prefix . '0';
     }
@@ -102,7 +123,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function tearDown() {
+  protected function tearDown(): void {
     Database::removeConnection('migrate_drupal_ui');
     parent::tearDown();
   }
@@ -169,7 +190,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
       $session->pageTextContains($label);
     }
     $session->pageTextContainsOnce('content items');
-    $session->pageTextContains('There is translated content of these types:');
+    $session->pageTextContains('Check whether there is translated content of these types:');
   }
 
   /**
@@ -184,7 +205,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
    *
    * @throws \Behat\Mink\Exception\ExpectationException
    */
-  protected function assertReviewForm(array $available_paths = NULL, array $missing_paths = NULL) {
+  protected function assertReviewForm(?array $available_paths = NULL, ?array $missing_paths = NULL) {
     $session = $this->assertSession();
     $session->pageTextContains('What will be upgraded?');
 
@@ -218,7 +239,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
    */
   protected function assertUpgrade(array $entity_counts) {
     $session = $this->assertSession();
-    $session->pageTextContains(t('Congratulations, you upgraded Drupal!'));
+    $session->pageTextContains('Congratulations, you upgraded Drupal!');
 
     // Assert the count of entities after the upgrade. First, reset all the
     // statics after migration to ensure entities are loadable.
@@ -226,17 +247,17 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
     // Check that the expected number of entities is the same as the actual
     // number of entities.
     $entity_definitions = array_keys(\Drupal::entityTypeManager()->getDefinitions());
+    ksort($entity_counts);
     $expected_count_keys = array_keys($entity_counts);
     sort($entity_definitions);
-    sort($expected_count_keys);
     $this->assertSame($expected_count_keys, $entity_definitions);
 
-    // Assert the correct number of entities exist.
+    // Assert the correct number of entities exists.
+    $actual_entity_counts = [];
     foreach ($entity_definitions as $entity_type) {
-      $real_count = (int) \Drupal::entityQuery($entity_type)->count()->execute();
-      $expected_count = $entity_counts[$entity_type];
-      $this->assertSame($expected_count, $real_count, "Found $real_count $entity_type entities, expected $expected_count.");
+      $actual_entity_counts[$entity_type] = (int) \Drupal::entityQuery($entity_type)->accessCheck(FALSE)->count()->execute();
     }
+    $this->assertSame($entity_counts, $actual_entity_counts);
 
     $plugin_manager = \Drupal::service('plugin.manager.migration');
     $version = $this->getLegacyDrupalVersion($this->sourceDatabase);
@@ -248,7 +269,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
         // Convert $source_id into a keyless array so that
         // \Drupal\migrate\Plugin\migrate\id_map\Sql::getSourceHash() works as
         // expected.
-        $source_id_values = array_values(unserialize($source_id));
+        $source_id_values = array_values(unserialize($source_id, ['allowed_classes' => FALSE]));
         $row = $id_map->getRowBySource($source_id_values);
         $destination = serialize($id_map->currentDestination());
         $message = "Migration of $source_id to $destination as part of the {$migration->id()} migration. The source row status is " . $row['source_row_status'];
@@ -276,13 +297,14 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
     $connection_options = $this->sourceDatabase->getConnectionOptions();
     $version = $this->getLegacyDrupalVersion($this->sourceDatabase);
     $driver = $connection_options['driver'];
-    $connection_options['prefix'] = $connection_options['prefix']['default'];
 
     // Use the driver connection form to get the correct options out of the
     // database settings. This supports all of the databases we test against.
-    $drivers = drupal_get_database_types();
-    $form = $drivers[$driver]->getFormOptions($connection_options);
+    $drivers = Database::getDriverList()->getInstallableList();
+    $form = $drivers[$driver]->getInstallTasks()->getFormOptions($connection_options);
     $connection_options = array_intersect_key($connection_options, $form + $form['advanced_options']);
+    // Remove isolation_level since that option is not configurable in the UI.
+    unset($connection_options['isolation_level']);
     $edit = [
       $driver => $connection_options,
       'source_private_file_path' => $this->getSourceBasePath(),
@@ -321,6 +343,16 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
   }
 
   /**
+   * Gets the file data.
+   *
+   * @return string[][]
+   *   Data from the source file_managed table.
+   */
+  protected function getManagedFiles() {
+    return [];
+  }
+
+  /**
    * Checks public and private files are copied but not temporary files.
    */
   protected function assertFileMigrations() {
@@ -331,12 +363,22 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
       $scheme = $matches[1];
       $filepath = $fs->realpath($file['uri']);
       if ($scheme === 'temporary') {
-        $this->assertFileNotExists($filepath);
+        $this->assertFileDoesNotExist($filepath);
       }
       else {
         $this->assertFileExists($filepath);
       }
     }
+  }
+
+  /**
+   * Confirm emails were sent.
+   */
+  protected function assertEmailsSent() {
+    // There should be one user activation email.
+    $captured_emails = \Drupal::state()->get('system.test_mail_collector', []);
+    $this->assertCount(1, $captured_emails);
+    $this->assertEquals('user_status_activated', $captured_emails[0]['id']);
   }
 
 }

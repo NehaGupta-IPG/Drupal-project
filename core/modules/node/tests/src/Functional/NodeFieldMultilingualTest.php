@@ -1,32 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional;
 
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests multilingual support for fields.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeFieldMultilingualTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'language'];
 
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -47,15 +52,17 @@ class NodeFieldMultilingualTest extends BrowserTestBase {
     ConfigurableLanguage::createFromLangcode('it')->save();
 
     // Enable URL language detection and selection.
-    $edit = ['language_interface[enabled][language-url]' => '1'];
-    $this->drupalPostForm('admin/config/regional/language/detection', $edit, 'Save settings');
+    $this->config('language.types')->set('negotiation.language_interface.enabled', [
+      'language-url' => -8,
+      'language-selected' => 12,
+    ])->save();
 
     // Set "Basic page" content type to use multilingual support.
-    $edit = [
-      'language_configuration[language_alterable]' => TRUE,
-    ];
-    $this->drupalPostForm('admin/structure/types/manage/page', $edit, 'Save content type');
-    $this->assertRaw(t('The content type %type has been updated.', ['%type' => 'Basic page']));
+    \Drupal::entityTypeManager()->getStorage('language_content_settings')->create([
+      'target_entity_type_id' => 'node',
+      'target_bundle' => 'page',
+      'language_alterable' => TRUE,
+    ])->save();
 
     // Make node body translatable.
     $field_storage = FieldStorageConfig::loadByName('node', 'body');
@@ -66,7 +73,7 @@ class NodeFieldMultilingualTest extends BrowserTestBase {
   /**
    * Tests whether field languages are correctly set through the node form.
    */
-  public function testMultilingualNodeForm() {
+  public function testMultilingualNodeForm(): void {
     // Create "Basic page" content.
     $langcode = language_get_default_langcode('node', 'page');
     $title_key = 'title[0][value]';
@@ -78,7 +85,8 @@ class NodeFieldMultilingualTest extends BrowserTestBase {
     $edit = [];
     $edit[$title_key] = $title_value;
     $edit[$body_key] = $body_value;
-    $this->drupalPostForm('node/add/page', $edit, 'Save');
+    $this->drupalGet('node/add/page');
+    $this->submitForm($edit, 'Save');
 
     // Check that the node exists in the database.
     $node = $this->drupalGetNodeByTitle($edit[$title_key]);
@@ -106,18 +114,18 @@ class NodeFieldMultilingualTest extends BrowserTestBase {
     $this->drupalGet("it/node/{$node->id()}");
     // Verify that body is correctly displayed using Italian as requested
     // language.
-    $this->assertRaw($body_value);
+    $this->assertSession()->pageTextContains($body_value);
 
     $this->drupalGet("node/{$node->id()}");
     // Verify that body is correctly displayed using English as requested
     // language.
-    $this->assertRaw($body_value);
+    $this->assertSession()->pageTextContains($body_value);
   }
 
   /**
    * Tests multilingual field display settings.
    */
-  public function testMultilingualDisplaySettings() {
+  public function testMultilingualDisplaySettings(): void {
     // Create "Basic page" content.
     $title_key = 'title[0][value]';
     $title_value = $this->randomMachineName(8);
@@ -128,7 +136,8 @@ class NodeFieldMultilingualTest extends BrowserTestBase {
     $edit = [];
     $edit[$title_key] = $title_value;
     $edit[$body_key] = $body_value;
-    $this->drupalPostForm('node/add/page', $edit, 'Save');
+    $this->drupalGet('node/add/page');
+    $this->submitForm($edit, 'Save');
 
     // Check that the node exists in the database.
     $node = $this->drupalGetNodeByTitle($edit[$title_key]);
@@ -136,11 +145,7 @@ class NodeFieldMultilingualTest extends BrowserTestBase {
 
     // Check if node body is showed.
     $this->drupalGet('node/' . $node->id());
-    $body = $this->xpath('//article[contains(concat(" ", normalize-space(@class), " "), :node-class)]//div[contains(concat(" ", normalize-space(@class), " "), :content-class)]/descendant::p', [
-      ':node-class' => ' node ',
-      ':content-class' => 'node__content',
-    ]);
-    $this->assertEqual($body[0]->getText(), $node->body->value, 'Node body found.');
+    $this->assertSession()->elementTextEquals('xpath', "//article/div//p", $node->body->value);
   }
 
 }

@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\path\Functional;
 
 use Drupal\Core\Language\LanguageInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Confirm that the Path module user interface works with languages.
- *
- * @group path
  */
+#[Group('path')]
+#[RunTestsInSeparateProcesses]
 class PathLanguageUiTest extends PathTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['path', 'locale', 'locale_test'];
 
@@ -23,6 +25,9 @@ class PathLanguageUiTest extends PathTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -41,61 +46,66 @@ class PathLanguageUiTest extends PathTestBase {
     $edit = [];
     $edit['predefined_langcode'] = 'fr';
 
-    $this->drupalPostForm('admin/config/regional/language/add', $edit, 'Add language');
+    $this->drupalGet('admin/config/regional/language/add');
+    $this->submitForm($edit, 'Add language');
 
     // Enable URL language detection and selection.
     $edit = ['language_interface[enabled][language-url]' => 1];
-    $this->drupalPostForm('admin/config/regional/language/detection', $edit, 'Save settings');
+    $this->drupalGet('admin/config/regional/language/detection');
+    $this->submitForm($edit, 'Save settings');
   }
 
   /**
    * Tests that a language-neutral URL alias works.
    */
-  public function testLanguageNeutralUrl() {
+  public function testLanguageNeutralUrl(): void {
     $name = $this->randomMachineName(8);
     $edit = [];
     $edit['path[0][value]'] = '/admin/config/search/path';
     $edit['alias[0][value]'] = '/' . $name;
-    $this->drupalPostForm('admin/config/search/path/add', $edit, 'Save');
+    $this->drupalGet('admin/config/search/path/add');
+    $this->submitForm($edit, 'Save');
 
     $this->drupalGet($name);
-    $this->assertText('Filter aliases');
+    $this->assertSession()->pageTextContains('Filter aliases');
   }
 
   /**
    * Tests that a default language URL alias works.
    */
-  public function testDefaultLanguageUrl() {
+  public function testDefaultLanguageUrl(): void {
     $name = $this->randomMachineName(8);
     $edit = [];
     $edit['path[0][value]'] = '/admin/config/search/path';
     $edit['alias[0][value]'] = '/' . $name;
     $edit['langcode[0][value]'] = 'en';
-    $this->drupalPostForm('admin/config/search/path/add', $edit, 'Save');
+    $this->drupalGet('admin/config/search/path/add');
+    $this->submitForm($edit, 'Save');
 
     $this->drupalGet($name);
-    $this->assertText('Filter aliases');
+    $this->assertSession()->pageTextContains('Filter aliases');
   }
 
   /**
    * Tests that a non-default language URL alias works.
    */
-  public function testNonDefaultUrl() {
+  public function testNonDefaultUrl(): void {
     $name = $this->randomMachineName(8);
     $edit = [];
     $edit['path[0][value]'] = '/admin/config/search/path';
     $edit['alias[0][value]'] = '/' . $name;
     $edit['langcode[0][value]'] = 'fr';
-    $this->drupalPostForm('admin/config/search/path/add', $edit, 'Save');
+    $this->drupalGet('admin/config/search/path/add');
+    $this->submitForm($edit, 'Save');
 
     $this->drupalGet('fr/' . $name);
-    $this->assertText('Filter aliases');
+    $this->assertSession()->pageTextContains('Filter aliases');
   }
 
   /**
-   * Test that language unspecific aliases are shown and saved in the node form.
+   * Tests language unspecific aliases are shown and saved in the node form.
    */
-  public function testNotSpecifiedNode() {
+  public function testNotSpecifiedNode(): void {
     // Create test node.
     $node = $this->drupalCreateNode();
 
@@ -106,7 +116,8 @@ class PathLanguageUiTest extends PathTestBase {
       'alias[0][value]' => '/' . $this->getRandomGenerator()->word(8),
       'langcode[0][value]' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
     ];
-    $this->drupalPostForm('admin/config/search/path/add', $edit, 'Save');
+    $this->drupalGet('admin/config/search/path/add');
+    $this->submitForm($edit, 'Save');
 
     $this->drupalGet($node->toUrl('edit-form'));
     $this->assertSession()->fieldValueEquals('path[0][alias]', $edit['alias[0][value]']);
@@ -119,9 +130,9 @@ class PathLanguageUiTest extends PathTestBase {
     // Create another node, with no alias, to ensure non-language specific
     // aliases are loaded correctly.
     $node = $this->drupalCreateNode();
-    $this->drupalget($node->toUrl('edit-form'));
+    $this->drupalGet($node->toUrl('edit-form'));
     $this->submitForm([], 'Save');
-    $this->assertSession()->pageTextNotContains(t('The alias is already in use.'));
+    $this->assertSession()->pageTextNotContains('The alias is already in use.');
   }
 
 }

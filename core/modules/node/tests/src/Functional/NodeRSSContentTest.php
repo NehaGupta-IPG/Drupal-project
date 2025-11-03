@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\filter\Entity\FilterFormat;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensures that data added to nodes by other modules appears in RSS feeds.
@@ -10,9 +14,9 @@ use Drupal\filter\Entity\FilterFormat;
  * Create a node, enable the node_test module to ensure that extra data is
  * added to the node's renderable array, then verify that the data appears on
  * the site-wide RSS feed at rss.xml.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeRSSContentTest extends NodeTestBase {
 
   /**
@@ -27,6 +31,9 @@ class NodeRSSContentTest extends NodeTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -44,7 +51,7 @@ class NodeRSSContentTest extends NodeTestBase {
   /**
    * Ensures that a new node includes the custom data when added to an RSS feed.
    */
-  public function testNodeRSSContent() {
+  public function testNodeRSSContent(): void {
     // Create a node.
     $node = $this->drupalCreateNode(['type' => 'article', 'promote' => 1]);
 
@@ -52,29 +59,29 @@ class NodeRSSContentTest extends NodeTestBase {
 
     // Check that content added in 'rss' view mode appear in RSS feed.
     $rss_only_content = 'Extra data that should appear only in the RSS feed for node ' . $node->id() . '.';
-    $this->assertText($rss_only_content);
+    $this->assertSession()->responseContains($rss_only_content);
 
     // Check that content added in view modes other than 'rss' doesn't
     // appear in RSS feed.
     $non_rss_content = 'Extra data that should appear everywhere except the RSS feed for node ' . $node->id() . '.';
-    $this->assertNoText($non_rss_content);
+    $this->assertSession()->responseNotContains($non_rss_content);
 
     // Check that extra RSS elements and namespaces are added to RSS feed.
-    $test_element = '<testElement>' . t('Value of testElement RSS element for node @nid.', ['@nid' => $node->id()]) . '</testElement>';
-    $test_ns = 'xmlns:drupaltest="http://example.com/test-namespace"';
-    $this->assertRaw($test_element);
-    $this->assertRaw($test_ns);
+    $test_element = "<testElement>Value of testElement RSS element for node {$node->id()}.</testElement>";
+    $test_ns = 'xmlns:test="http://example.com/test-namespace"';
+    $this->assertSession()->responseContains($test_element);
+    $this->assertSession()->responseContains($test_ns);
 
     // Check that content added in 'rss' view mode doesn't appear when
     // viewing node.
     $this->drupalGet('node/' . $node->id());
-    $this->assertNoText($rss_only_content);
+    $this->assertSession()->responseNotContains($rss_only_content);
   }
 
   /**
    * Tests relative, root-relative, protocol-relative and absolute URLs.
    */
-  public function testUrlHandling() {
+  public function testUrlHandling(): void {
     // Only the plain_text text format is available by default, which escapes
     // all HTML.
     FilterFormat::create([
@@ -87,20 +94,22 @@ class NodeRSSContentTest extends NodeTestBase {
       'type' => 'article',
       'promote' => 1,
     ];
+    /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
+    $file_url_generator = \Drupal::service('file_url_generator');
     $this->drupalCreateNode($defaults + [
       'body' => [
-        'value' => '<p><a href="' . file_url_transform_relative(file_create_url('public://root-relative')) . '">Root-relative URL</a></p>',
+        'value' => '<p><a href="' . $file_url_generator->generate('public://root-relative')->toString() . '">Root-relative URL</a></p>',
         'format' => 'full_html',
       ],
     ]);
-    $protocol_relative_url = substr(file_create_url('public://protocol-relative'), strlen(\Drupal::request()->getScheme() . ':'));
+    $protocol_relative_url = substr($file_url_generator->generate('public://protocol-relative')->setAbsolute()->toString(), strlen(\Drupal::request()->getScheme() . ':'));
     $this->drupalCreateNode($defaults + [
       'body' => [
         'value' => '<p><a href="' . $protocol_relative_url . '">Protocol-relative URL</a></p>',
         'format' => 'full_html',
       ],
     ]);
-    $absolute_url = file_create_url('public://absolute');
+    $absolute_url = $file_url_generator->generate('public://absolute')->setAbsolute()->toString();
     $this->drupalCreateNode($defaults + [
       'body' => [
         'value' => '<p><a href="' . $absolute_url . '">Absolute URL</a></p>',
@@ -110,11 +119,11 @@ class NodeRSSContentTest extends NodeTestBase {
 
     $this->drupalGet('rss.xml');
     // Verify that root-relative URL is transformed to absolute.
-    $this->assertRaw(file_create_url('public://root-relative'));
+    $this->assertSession()->responseContains($file_url_generator->generate('public://root-relative')->setAbsolute()->toString());
     // Verify that protocol-relative URL is left untouched.
-    $this->assertRaw($protocol_relative_url);
+    $this->assertSession()->responseContains($protocol_relative_url);
     // Verify that absolute URL is left untouched.
-    $this->assertRaw($absolute_url);
+    $this->assertSession()->responseContains($absolute_url);
   }
 
 }

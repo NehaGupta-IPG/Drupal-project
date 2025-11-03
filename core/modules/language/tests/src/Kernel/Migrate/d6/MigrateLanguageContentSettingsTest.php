@@ -1,16 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\language\Kernel\Migrate\d6;
 
 use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests migration of language content setting variables,
- * language_content_type_$type, i18n_node_options_* and i18n_lock_node_*.
+ * Tests the migration of language-related settings.
  *
- * @group migrate_drupal_6
+ * Settings tested include language content setting variables,
+ * language_content_type_$type, i18n_node_options_* and i18n_lock_node_*.
  */
+#[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateLanguageContentSettingsTest extends MigrateDrupal6TestBase {
 
   /**
@@ -32,13 +38,17 @@ class MigrateLanguageContentSettingsTest extends MigrateDrupal6TestBase {
 
     $this->installConfig(['node']);
     $this->installEntitySchema('node');
-    $this->executeMigrations(['d6_node_type', 'd6_language_content_settings']);
+    $this->executeMigrations([
+      'language',
+      'd6_node_type',
+      'd6_language_content_settings',
+    ]);
   }
 
   /**
    * Tests migration of content language settings.
    */
-  public function testLanguageContent() {
+  public function testLanguageContent(): void {
     // Assert that a translatable content is still translatable.
     $config = $this->config('language.content_settings.node.article');
     $this->assertSame($config->get('target_entity_type_id'), 'node');
@@ -51,13 +61,8 @@ class MigrateLanguageContentSettingsTest extends MigrateDrupal6TestBase {
     $this->assertTrue($config->isDefaultConfiguration());
     $this->assertFalse($config->isLanguageAlterable());
     $this->assertSame($config->getDefaultLangcode(), 'site_default');
-  }
 
-  /**
-   * Tests migration of content language settings when there is no language lock.
-   */
-  public function testLanguageContentWithNoLanguageLock() {
-    // Assert that a we can assign a language.
+    // Assert that a we can assign a language when there is no language lock.
     $config = ContentLanguageSettings::loadByEntityTypeBundle('node', 'employee');
     $this->assertSame($config->getDefaultLangcode(), 'current_interface');
     $this->assertTrue($config->isLanguageAlterable());

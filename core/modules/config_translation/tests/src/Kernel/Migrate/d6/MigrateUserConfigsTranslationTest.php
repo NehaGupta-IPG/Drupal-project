@@ -1,19 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config_translation\Kernel\Migrate\d6;
 
-use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use Drupal\Tests\SchemaCheckTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Upgrade i18n variables to user.*.yml.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateUserConfigsTranslationTest extends MigrateDrupal6TestBase {
 
   use SchemaCheckTestTrait;
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = [
     'language',
     'locale',
@@ -27,13 +34,19 @@ class MigrateUserConfigsTranslationTest extends MigrateDrupal6TestBase {
     parent::setUp();
     $this->installSchema('locale',
       ['locales_source', 'locales_target', 'locales_location']);
-    $this->executeMigrations(['d6_user_mail_translation', 'd6_user_settings_translation']);
+    $this->executeMigrations([
+      'language',
+      'd6_user_mail',
+      'd6_user_settings',
+      'd6_user_mail_translation',
+      'd6_user_settings_translation',
+    ]);
   }
 
   /**
    * Tests migration of i18n user variables to user.mail.yml.
    */
-  public function testUserMail() {
+  public function testUserMail(): void {
     $config = \Drupal::service('language_manager')->getLanguageConfigOverride('fr', 'user.mail');
     $this->assertSame('fr - Account details for [user:name] at [site:name] (approved)', $config->get('status_activated.subject'));
     $this->assertSame("fr - [user:name],\r\n\r\nYour account at [site:name] has been activated.\r\n\r\nYou may now log in by clicking on this link or copying and pasting it in your browser:\r\n\r\n[user:one-time-login-url]\r\n\r\nThis is a one-time login, so it can be used only once.\r\n\r\nAfter logging in, you will be redirected to [user:edit-url] so you can change your password.\r\n\r\nOnce you have set your own password, you will be able to log in to [site:login-url] in the future using:\r\n\r\nusername: [user:name]\r\n", $config->get('status_activated.body'));
@@ -54,12 +67,8 @@ class MigrateUserConfigsTranslationTest extends MigrateDrupal6TestBase {
     $config = \Drupal::service('language_manager')->getLanguageConfigOverride('zu', 'user.mail');
     $this->assertSame('zu - An administrator created an account for you at [site:name]', $config->get('register_admin_created.subject'));
     $this->assertSame("zu - [user:name],\r\n\r\nA site administrator at [site:name] has created an account for you. You may now log in to [site:login-url] using the following username and password:\r\n\r\nusername: [user:name]\r\npassword: \r\n\r\nYou may also log in by clicking on this link or copying and pasting it in your browser:\r\n\r\n[user:one-time-login-url]\r\n\r\nThis is a one-time login, so it can be used only once.\r\n\r\nAfter logging in, you will be redirected to [user:edit-url] so you can change your password.\r\n\r\n\r\n--  [site:name] team", $config->get('register_admin_created.body'));
-  }
 
-  /**
-   * Tests migration of i18n user variables to user.settings.yml.
-   */
-  public function testUserSettings() {
+    // Tests migration of i18n user variables to user.settings.yml.
     $config = \Drupal::service('language_manager')->getLanguageConfigOverride('fr', 'user.settings');
     $this->assertSame(1, $config->get('notify.status_blocked'));
     $this->assertSame(0, $config->get('notify.status_activated'));

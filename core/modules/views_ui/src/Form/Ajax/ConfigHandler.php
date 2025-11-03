@@ -49,7 +49,7 @@ class ConfigHandler extends ViewsFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, Request $request = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?Request $request = NULL) {
     /** @var \Drupal\views\Entity\View $view */
     $view = $form_state->get('view');
     $display_id = $form_state->get('display_id');
@@ -78,6 +78,7 @@ class ConfigHandler extends ViewsFormBase {
       }
       else {
         $types = ViewExecutable::getHandlerTypes();
+        $form['#title'] = $this->t('Configure @type: @item', ['@type' => $types[$type]['lstitle'], '@item' => $handler->adminLabel()]);
 
         // If this item can come from the default display, show a dropdown
         // that lets the user choose which display the changes should apply to.
@@ -93,13 +94,13 @@ class ConfigHandler extends ViewsFormBase {
         $relationship_options = [];
 
         foreach ($relationships as $relationship) {
-          // relationships can't link back to self. But also, due to ordering,
+          // Relationships can't link back to self. But also, due to ordering,
           // relationships can only link to prior relationships.
           if ($type == 'relationship' && $id == $relationship['id']) {
             break;
           }
           $relationship_handler = Views::handlerManager('relationship')->getHandler($relationship);
-          // ignore invalid/broken relationships.
+          // Ignore invalid/broken relationships.
           if (empty($relationship_handler)) {
             continue;
           }
@@ -150,8 +151,6 @@ class ConfigHandler extends ViewsFormBase {
           ];
         }
 
-        $form['#title'] = $this->t('Configure @type: @item', ['@type' => $types[$type]['lstitle'], '@item' => $handler->adminLabel()]);
-
         if (!empty($handler->definition['help'])) {
           $form['options']['form_description'] = [
             '#markup' => $handler->definition['help'],
@@ -195,6 +194,9 @@ class ConfigHandler extends ViewsFormBase {
     $form_state->get('handler')->validateOptionsForm($form['options'], $form_state);
 
     if ($form_state->getErrors()) {
+      // Trigger a form rerender so error messages are displayed correctly in
+      // the AJAX modal.
+      // @see \Drupal\views_ui\Form\Ajax\ViewsFormBase::ajaxFormWrapper()
       $form_state->set('rerender', TRUE);
     }
   }
@@ -245,7 +247,7 @@ class ConfigHandler extends ViewsFormBase {
     // extra stuff on the form is not sent through.
     $handler->unpackOptions($handler->options, $options, NULL, FALSE);
 
-    // Store the item back on the view
+    // Store the item back on the view.
     $executable->setHandler($display_id, $type, $id, $handler->options);
 
     // Ensure any temporary options are removed.
@@ -253,7 +255,7 @@ class ConfigHandler extends ViewsFormBase {
       unset($view->temporary_options[$type][$id]);
     }
 
-    // Write to cache
+    // Write to cache.
     $view->cacheSet();
   }
 
@@ -265,8 +267,8 @@ class ConfigHandler extends ViewsFormBase {
     $display_id = $form_state->get('display_id');
     $type = $form_state->get('type');
     $id = $form_state->get('id');
-    // Store the item back on the view
-    list($was_defaulted, $is_defaulted) = $view->getOverrideValues($form, $form_state);
+    // Store the item back on the view.
+    [$was_defaulted, $is_defaulted] = $view->getOverrideValues($form, $form_state);
     $executable = $view->getExecutable();
     // If the display selection was changed toggle the override value.
     if ($was_defaulted != $is_defaulted) {
@@ -275,7 +277,7 @@ class ConfigHandler extends ViewsFormBase {
     }
     $executable->removeHandler($display_id, $type, $id);
 
-    // Write to cache
+    // Write to cache.
     $view->cacheSet();
   }
 

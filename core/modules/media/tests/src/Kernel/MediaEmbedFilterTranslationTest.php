@@ -1,15 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\Kernel;
 
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\media\Plugin\Filter\MediaEmbed;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that media embeds are translated based on text (host entity) language.
- *
- * @coversDefaultClass \Drupal\media\Plugin\Filter\MediaEmbed
- * @group media
  */
+#[CoversClass(MediaEmbed::class)]
+#[Group('media')]
+#[RunTestsInSeparateProcesses]
 class MediaEmbedFilterTranslationTest extends MediaEmbedFilterTestBase {
 
   /**
@@ -33,18 +40,17 @@ class MediaEmbedFilterTranslationTest extends MediaEmbedFilterTestBase {
 
     $this->embeddedEntity->addTranslation('pt-br')
       ->set('field_media_image', [
-      'target_id' => $this->image->id(),
-      'alt' => 'pt-br alt',
-      'title' => 'pt-br title',
-    ])->save();
+        'target_id' => $this->image->id(),
+        'alt' => 'pt-br alt',
+        'title' => 'pt-br title',
+      ])->save();
   }
 
   /**
    * Tests that the expected embedded media entity translation is selected.
-   *
-   * @dataProvider providerTranslationSituations
    */
-  public function testTranslationSelection($text_langcode, $expected_title_langcode) {
+  #[DataProvider('providerTranslationSituations')]
+  public function testTranslationSelection($text_langcode, $expected_title_langcode): void {
     $text = $this->createEmbedCode([
       'data-entity-type' => 'media',
       'data-entity-uuid' => static::EMBEDDED_ENTITY_UUID,
@@ -62,13 +68,13 @@ class MediaEmbedFilterTranslationTest extends MediaEmbedFilterTestBase {
     // based on the host entity's language, which should require a cache context
     // to be associated. (The host entity's language may itself be selected
     // based on the request context, but that is of no concern to this filter.)
-    $this->assertSame($result->getCacheContexts(), ['timezone', 'user.permissions']);
+    $this->assertEqualsCanonicalizing($result->getCacheContexts(), ['timezone', 'user.permissions']);
   }
 
   /**
    * Data provider for testTranslationSelection().
    */
-  public function providerTranslationSituations() {
+  public static function providerTranslationSituations() {
     $embedded_entity_translation_languages = ['en', 'pt-br'];
 
     foreach (['en', 'pt-br', 'nl'] as $text_langcode) {

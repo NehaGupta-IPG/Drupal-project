@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Unit\Normalizer;
 
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -16,15 +18,19 @@ use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\ResourceType\ResourceTypeRelationship;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepository;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
- * @coversDefaultClass \Drupal\jsonapi\Normalizer\ResourceIdentifierNormalizer
- * @group jsonapi
+ * Tests Drupal\jsonapi\Normalizer\ResourceIdentifierNormalizer.
  *
  * @internal
  */
+#[CoversClass(ResourceIdentifierNormalizer::class)]
+#[Group('jsonapi')]
 class ResourceIdentifierNormalizerTest extends UnitTestCase {
 
   /**
@@ -44,7 +50,9 @@ class ResourceIdentifierNormalizerTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
+    parent::setUp();
+
     $target_resource_type = new ResourceType('lorem', 'dummy_bundle', NULL);
     $relationship_fields = [
       'field_dummy' => new ResourceTypeRelationship('field_dummy'),
@@ -104,10 +112,12 @@ class ResourceIdentifierNormalizerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::denormalize
-   * @dataProvider denormalizeProvider
+   * Tests denormalize.
+   *
+   * @legacy-covers ::denormalize
    */
-  public function testDenormalize($input, $field_name, $expected) {
+  #[DataProvider('denormalizeProvider')]
+  public function testDenormalize($input, $field_name, $expected): void {
     $entity = $this->prophesize(FieldableEntityInterface::class);
     $context = [
       'resource_type' => $this->resourceType,
@@ -124,7 +134,7 @@ class ResourceIdentifierNormalizerTest extends UnitTestCase {
    * @return array
    *   The data for the test method.
    */
-  public function denormalizeProvider() {
+  public static function denormalizeProvider() {
     return [
       [
         ['data' => [['type' => 'lorem--dummy_bundle', 'id' => '4e6cb61d-4f04-437f-99fe-42c002393658']]],
@@ -145,10 +155,12 @@ class ResourceIdentifierNormalizerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::denormalize
-   * @dataProvider denormalizeInvalidResourceProvider
+   * Tests denormalize invalid resource.
+   *
+   * @legacy-covers ::denormalize
    */
-  public function testDenormalizeInvalidResource($data, $field_name) {
+  #[DataProvider('denormalizeInvalidResourceProvider')]
+  public function testDenormalizeInvalidResource($data, $field_name): void {
     $context = [
       'resource_type' => $this->resourceType,
       'related' => $field_name,
@@ -164,7 +176,7 @@ class ResourceIdentifierNormalizerTest extends UnitTestCase {
    * @return array
    *   The input data for the test method.
    */
-  public function denormalizeInvalidResourceProvider() {
+  public static function denormalizeInvalidResourceProvider() {
     return [
       [
         [

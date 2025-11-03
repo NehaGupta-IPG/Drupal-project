@@ -1,28 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\telephone\Kernel;
 
-use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Tests\field\Kernel\FieldKernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the new entity API for the telephone field type.
- *
- * @group telephone
  */
+#[Group('telephone')]
+#[RunTestsInSeparateProcesses]
 class TelephoneItemTest extends FieldKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['telephone'];
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -43,7 +48,7 @@ class TelephoneItemTest extends FieldKernelTestBase {
   /**
    * Tests using entity fields of the telephone field type.
    */
-  public function testTestItem() {
+  public function testTestItem(): void {
     // Verify entity creation.
     $entity = EntityTest::create();
     $value = '+0123456789';
@@ -56,18 +61,18 @@ class TelephoneItemTest extends FieldKernelTestBase {
     $entity = EntityTest::load($id);
     $this->assertInstanceOf(FieldItemListInterface::class, $entity->field_test);
     $this->assertInstanceOf(FieldItemInterface::class, $entity->field_test[0]);
-    $this->assertEqual($value, $entity->field_test->value);
-    $this->assertEqual($value, $entity->field_test[0]->value);
+    $this->assertEquals($value, $entity->field_test->value);
+    $this->assertEquals($value, $entity->field_test[0]->value);
 
     // Verify changing the field value.
     $new_value = '+41' . rand(1000000, 9999999);
     $entity->field_test->value = $new_value;
-    $this->assertEqual($new_value, $entity->field_test->value);
+    $this->assertEquals($new_value, $entity->field_test->value);
 
     // Read changed entity and assert changed values.
     $entity->save();
     $entity = EntityTest::load($id);
-    $this->assertEqual($new_value, $entity->field_test->value);
+    $this->assertEquals($new_value, $entity->field_test->value);
 
     // Test sample item generation.
     $entity = EntityTest::create();

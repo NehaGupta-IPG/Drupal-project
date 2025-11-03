@@ -1,17 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Entity\EntityBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Link;
+use Drupal\Tests\Core\Config\Entity\StubConfigEntity;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Entity\EntityBase
- * @group Entity
+ * Tests Drupal\Core\Entity\EntityBase.
  */
+#[CoversClass(EntityBase::class)]
+#[Group('Entity')]
 class EntityLinkTest extends UnitTestCase {
 
   /**
@@ -53,13 +61,12 @@ class EntityLinkTest extends UnitTestCase {
   }
 
   /**
-   * Tests for the Entity::toLink() method.
+   * Tests for the EntityBase::toLink() method.
    *
-   * @covers ::toLink
-   *
-   * @dataProvider providerTestLink
+   * @legacy-covers ::toLink
    */
-  public function testToLink($entity_label, $link_text, $expected_text, $link_rel = 'canonical', array $link_options = []) {
+  #[DataProvider('providerTestLink')]
+  public function testToLink($entity_label, $link_text, $expected_text, $link_rel = 'canonical', array $link_options = []): void {
     $language = new Language(['id' => 'es']);
     $link_options += ['language' => $language];
     $this->languageManager->expects($this->any())
@@ -90,13 +97,12 @@ class EntityLinkTest extends UnitTestCase {
       ->expects($this->any())
       ->method('getDefinition')
       ->with($entity_type_id)
-      ->will($this->returnValue($entity_type));
+      ->willReturn($entity_type);
 
-    /** @var \Drupal\Core\Entity\Entity $entity */
-    $entity = $this->getMockForAbstractClass('Drupal\Core\Entity\EntityBase', [
+    $entity = new StubConfigEntity(
       ['id' => $entity_id, 'label' => $entity_label, 'langcode' => 'es'],
       $entity_type_id,
-    ]);
+    );
 
     $expected_link = Link::createFromRoute(
       $expected_text,
@@ -112,12 +118,12 @@ class EntityLinkTest extends UnitTestCase {
   /**
    * Provides test data for testLink().
    */
-  public function providerTestLink() {
+  public static function providerTestLink() {
     $data = [];
     $data[] = [
       'some_entity_label',
-      'qwerqwer',
-      'qwerqwer',
+      'link text',
+      'link text',
     ];
     $data[] = [
       'some_entity_label',
@@ -131,22 +137,22 @@ class EntityLinkTest extends UnitTestCase {
     ];
     $data[] = [
       'some_entity_label',
-      'qwerqwer',
-      'qwerqwer',
+      'link text',
+      'link text',
       'edit-form',
     ];
     $data[] = [
       'some_entity_label',
-      'qwerqwer',
-      'qwerqwer',
+      'link text',
+      'link text',
       'edit-form',
     ];
     $data[] = [
       'some_entity_label',
-      'qwerqwer',
-      'qwerqwer',
+      'link text',
+      'link text',
       'edit-form',
-      ['foo' => 'qwer'],
+      ['foo' => 'bar'],
     ];
     return $data;
   }

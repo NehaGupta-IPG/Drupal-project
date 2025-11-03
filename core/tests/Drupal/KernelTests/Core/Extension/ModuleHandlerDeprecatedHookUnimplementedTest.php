@@ -1,28 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Extension;
 
+use Drupal\Core\Extension\ModuleHandler;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test whether unimplemented deprecated hook invocations trigger errors.
- *
- * @group Extension
- *
- * @coversDefaultClass Drupal\Core\Extension\ModuleHandler
  */
+#[CoversClass(ModuleHandler::class)]
+#[Group('Extension')]
+#[RunTestsInSeparateProcesses]
 class ModuleHandlerDeprecatedHookUnimplementedTest extends KernelTestBase {
 
   /**
-   * @covers ::alterDeprecated
-   * @covers ::invokeAllDeprecated
-   * @covers ::invokeDeprecated
+   * Tests unimplemented hooks.
+   *
+   * @legacy-covers ::alterDeprecated
+   * @legacy-covers ::invokeAllDeprecated
+   * @legacy-covers ::invokeDeprecated
    */
-  public function testUnimplementedHooks() {
+  public function testUnimplementedHooks(): void {
     $unimplemented_hook_name = 'unimplemented_hook_name';
 
-    /* @var $module_handler \Drupal\Core\Extension\ModuleHandlerInterface */
+    /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */
     $module_handler = $this->container->get('module_handler');
     $this->assertInstanceOf(ModuleHandlerInterface::class, $module_handler);
 

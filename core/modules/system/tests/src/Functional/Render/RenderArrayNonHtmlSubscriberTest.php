@@ -1,21 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Render;
 
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Functional test verifying that render array throws 406 for non-HTML requests.
- *
- * @group Render
  */
+#[Group('Render')]
+#[RunTestsInSeparateProcesses]
 class RenderArrayNonHtmlSubscriberTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['render_array_non_html_subscriber_test'];
 
@@ -27,23 +29,23 @@ class RenderArrayNonHtmlSubscriberTest extends BrowserTestBase {
   /**
    * Tests handling of responses by events subscriber.
    */
-  public function testResponses() {
+  public function testResponses(): void {
     // Test that event subscriber does not interfere with normal requests.
     $url = Url::fromRoute('render_array_non_html_subscriber_test.render_array');
 
     $this->drupalGet($url);
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertRaw(t('Controller response successfully rendered.'));
+    $this->assertSession()->pageTextContains("Controller response successfully rendered.");
 
     // Test that correct response code is returned for any non-HTML format.
-    foreach (['json', 'hal+json', 'xml', 'foo'] as $format) {
+    foreach (['json', 'xml', 'foo'] as $format) {
       $url = Url::fromRoute('render_array_non_html_subscriber_test.render_array', [
         '_format' => $format,
       ]);
 
       $this->drupalGet($url);
       $this->assertSession()->statusCodeEquals(406);
-      $this->assertNoRaw(t('Controller response successfully rendered.'));
+      $this->assertSession()->pageTextNotContains("Controller response successfully rendered.");
     }
 
     // Test that event subscriber does not interfere with raw string responses.
@@ -53,7 +55,7 @@ class RenderArrayNonHtmlSubscriberTest extends BrowserTestBase {
 
     $this->drupalGet($url);
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertRaw(t('Raw controller response.'));
+    $this->assertSession()->responseContains("Raw controller response.");
   }
 
 }

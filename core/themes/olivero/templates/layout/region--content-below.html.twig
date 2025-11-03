@@ -9,7 +9,7 @@
  * - region: The name of the region variable as defined in the theme's
  *   .info.yml file.
  *
- * @see template_preprocess_region()
+ * @see \Drupal\Core\Theme\ThemePreprocess::preprocessRegion()
  */
 #}
 {%
@@ -22,7 +22,7 @@
 {{ attach_library('olivero/content-below') }}
 
 {% if content %}
-  <aside{{ attributes.addClass(classes) }}>
+  <div{{ attributes.addClass(classes) }}>
     {{ content }}
-  </aside>
+  </div>
 {% endif %}

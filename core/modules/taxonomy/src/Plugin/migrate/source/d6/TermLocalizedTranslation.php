@@ -4,8 +4,16 @@ namespace Drupal\taxonomy\Plugin\migrate\source\d6;
 
 use Drupal\migrate\Row;
 
+// cspell:ignore ltlanguage objectid
+
 /**
- * Gets i18n taxonomy terms from source database.
+ * Drupal 6 i18n taxonomy terms source from database.
+ *
+ * For available configuration keys, refer to the parent classes.
+ *
+ * @see \Drupal\taxonomy\Plugin\migrate\source\d6\Term
+ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+ * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
  *
  * @MigrateSource(
  *   id = "d6_term_localized_translation",
@@ -32,6 +40,7 @@ class TermLocalizedTranslation extends Term {
     // Add in the property, which is either name or description.
     // Cast td.tid as char for PostgreSQL compatibility.
     $query->leftJoin('i18n_strings', 'i18n', 'CAST([td].[tid] AS CHAR(255)) = [i18n].[objectid]');
+    $query->condition('i18n.type', 'term');
     $query->addField('i18n', 'lid');
     $query->addField('i18n', 'property');
 
@@ -64,6 +73,7 @@ class TermLocalizedTranslation extends Term {
     $other_property = ($property == 'name') ? 'description' : 'name';
     $query = $this->select('i18n_strings', 'i18n')
       ->fields('i18n', ['lid'])
+      ->condition('i18n.type', 'term')
       ->condition('i18n.property', $other_property)
       ->condition('i18n.objectid', $tid);
     $query->leftJoin('locales_target', 'lt', '[i18n].[lid] = [lt].[lid]');

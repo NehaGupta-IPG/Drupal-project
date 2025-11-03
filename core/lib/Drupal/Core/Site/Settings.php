@@ -4,6 +4,7 @@ namespace Drupal\Core\Site;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Database;
+use Drupal\DrupalInstalled;
 
 /**
  * Read only settings that are initialized with the class.
@@ -38,21 +39,9 @@ final class Settings {
    * @see self::handleDeprecations()
    */
   private static $deprecatedSettings = [
-    'sanitize_input_whitelist' => [
-      'replacement' => 'sanitize_input_safe_keys',
-      'message' => 'The "sanitize_input_whitelist" setting is deprecated in drupal:9.1.0 and will be removed in drupal:10.0.0. Use Drupal\Core\Security\RequestSanitizer::SANITIZE_INPUT_SAFE_KEYS instead. See https://www.drupal.org/node/3163148.',
-    ],
-    'twig_sandbox_whitelisted_classes' => [
-      'replacement' => 'twig_sandbox_allowed_classes',
-      'message' => 'The "twig_sandbox_whitelisted_classes" setting is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Use "twig_sandbox_allowed_classes" instead. See https://www.drupal.org/node/3162897.',
-    ],
-    'twig_sandbox_whitelisted_methods' => [
-      'replacement' => 'twig_sandbox_allowed_methods',
-      'message' => 'The "twig_sandbox_whitelisted_methods" setting is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Use "twig_sandbox_allowed_methods" instead. See https://www.drupal.org/node/3162897.',
-    ],
-    'twig_sandbox_whitelisted_prefixes' => [
-      'replacement' => 'twig_sandbox_allowed_prefixes',
-      'message' => 'The "twig_sandbox_whitelisted_prefixes" setting is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Use "twig_sandbox_allowed_prefixes" instead. See https://www.drupal.org/node/3162897.',
+    'state_cache' => [
+      'replacement' => '',
+      'message' => 'The "state_cache" setting is deprecated in drupal:11.0.0. This setting should be removed from the settings file, since its usage has been removed. See https://www.drupal.org/node/3177901.',
     ],
   ];
 
@@ -73,7 +62,7 @@ final class Settings {
    * A singleton is used because this class is used before the container is
    * available.
    *
-   * @return \Drupal\Core\Site\Settings
+   * @return $this
    *
    * @throws \BadMethodCallException
    *   Thrown when the settings instance has not been initialized yet.
@@ -94,7 +83,7 @@ final class Settings {
   /**
    * Prevents settings from being serialized.
    */
-  public function __sleep() {
+  public function __sleep(): array {
     throw new \LogicException('Settings can not be serialized. This probably means you are serializing an object that has an indirect reference to the Settings object. Adjust your code so that is not necessary.');
   }
 
@@ -117,9 +106,10 @@ final class Settings {
     // If the caller is asking for the value of a deprecated setting, trigger a
     // deprecation message about it.
     if (isset(self::$deprecatedSettings[$name])) {
+      // phpcs:ignore Drupal.Semantics.FunctionTriggerError
       @trigger_error(self::$deprecatedSettings[$name]['message'], E_USER_DEPRECATED);
     }
-    return isset(self::$instance->storage[$name]) ? self::$instance->storage[$name] : $default;
+    return self::$instance->storage[$name] ?? $default;
   }
 
   /**
@@ -160,20 +150,7 @@ final class Settings {
     self::handleDeprecations($settings);
 
     // Initialize databases.
-    foreach ($databases as $key => $targets) {
-      foreach ($targets as $target => $info) {
-        Database::addConnectionInfo($key, $target, $info);
-        // If the database driver is provided by a module, then its code may
-        // need to be instantiated prior to when the module's root namespace
-        // is added to the autoloader, because that happens during service
-        // container initialization but the container definition is likely in
-        // the database. Therefore, allow the connection info to specify an
-        // autoload directory for the driver.
-        if (isset($info['autoload'])) {
-          $class_loader->addPsr4($info['namespace'] . '\\', $info['autoload']);
-        }
-      }
-    }
+    Database::setMultipleConnectionInfo($databases, $class_loader, $app_root);
 
     // Initialize Settings.
     new Settings($settings);
@@ -212,9 +189,13 @@ final class Settings {
    * module directories setting apcu_ensure_unique_prefix would allow the sites
    * to share APCu cache items.
    *
-   * @param $identifier
+   * @param string $identifier
    *   An identifier for the prefix. For example, 'class_loader' or
    *   'cache_backend'.
+   * @param string $root
+   *   The app root.
+   * @param string $site_path
+   *   (optional) The site path. Defaults to an empty string.
    *
    * @return string
    *   The prefix for APCu user cache keys.
@@ -223,9 +204,9 @@ final class Settings {
    */
   public static function getApcuPrefix($identifier, $root, $site_path = '') {
     if (static::get('apcu_ensure_unique_prefix', TRUE)) {
-      return 'drupal.' . $identifier . '.' . \Drupal::VERSION . '.' . static::get('deployment_identifier') . '.' . hash_hmac('sha256', $identifier, static::get('hash_salt') . '.' . $root . '/' . $site_path);
+      return 'drupal.' . $identifier . '.' . (class_exists(DrupalInstalled::class) ? DrupalInstalled::VERSIONS_HASH : \Drupal::VERSION) . '.' . static::get('deployment_identifier') . '.' . hash_hmac('sha256', $identifier, static::get('hash_salt') . '.' . $root . '/' . $site_path);
     }
-    return 'drupal.' . $identifier . '.' . \Drupal::VERSION . '.' . static::get('deployment_identifier') . '.' . Crypt::hashBase64($root . '/' . $site_path);
+    return 'drupal.' . $identifier . '.' . (class_exists(DrupalInstalled::class) ? DrupalInstalled::VERSIONS_HASH : \Drupal::VERSION) . '.' . static::get('deployment_identifier') . '.' . Crypt::hashBase64($root . '/' . $site_path);
   }
 
   /**

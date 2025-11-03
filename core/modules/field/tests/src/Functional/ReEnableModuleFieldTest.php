@@ -1,25 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Functional;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\CronRunTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the behavior of a field module after being disabled and re-enabled.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class ReEnableModuleFieldTest extends BrowserTestBase {
 
   use CronRunTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'field',
@@ -34,6 +36,9 @@ class ReEnableModuleFieldTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -45,11 +50,11 @@ class ReEnableModuleFieldTest extends BrowserTestBase {
   }
 
   /**
-   * Test the behavior of a field module after being disabled and re-enabled.
+   * Tests the behavior of a field module after being disabled and re-enabled.
    *
    * @see field_system_info_alter()
    */
-  public function testReEnabledField() {
+  public function testReEnabledField(): void {
     // Add a telephone field to the article content type.
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'field_telephone',
@@ -92,7 +97,7 @@ class ReEnableModuleFieldTest extends BrowserTestBase {
       'field_telephone[0][value]' => "123456789",
     ];
     $this->submitForm($edit, 'Save');
-    $this->assertRaw('<a href="tel:123456789">');
+    $this->assertSession()->responseContains('<a href="tel:123456789">');
 
     // Test that the module can't be uninstalled from the UI while there is data
     // for its fields.
@@ -102,7 +107,7 @@ class ReEnableModuleFieldTest extends BrowserTestBase {
     ]);
     $this->drupalLogin($admin_user);
     $this->drupalGet('admin/modules/uninstall');
-    $this->assertText("The Telephone number field type is used in the following field: node.field_telephone");
+    $this->assertSession()->pageTextContains("The Telephone number field type is used in the following field: node.field_telephone");
 
     // Add another telephone field to a different entity type in order to test
     // the message for the case when multiple fields are blocking the
@@ -120,17 +125,20 @@ class ReEnableModuleFieldTest extends BrowserTestBase {
     ])->save();
 
     $this->drupalGet('admin/modules/uninstall');
-    $this->assertText("The Telephone number field type is used in the following fields: node.field_telephone, user.field_telephone_2");
+    $this->assertSession()->pageTextContains("The Telephone number field type is used in the following fields: node.field_telephone, user.field_telephone_2");
 
     // Delete both fields.
     $field_storage->delete();
     $field_storage2->delete();
 
     $this->drupalGet('admin/modules/uninstall');
-    $this->assertText('Fields pending deletion');
+    $this->assertSession()->pageTextContains('Uninstall');
+    $this->assertSession()->pageTextContains('Fields pending deletion');
     $this->cronRun();
-    $this->assertNoText("The Telephone number field type is used in the following field: node.field_telephone");
-    $this->assertNoText('Fields pending deletion');
+    $this->drupalGet('admin/modules/uninstall');
+    $this->assertSession()->pageTextContains('Uninstall');
+    $this->assertSession()->pageTextNotContains("The Telephone number field type is used in the following field: node.field_telephone");
+    $this->assertSession()->pageTextNotContains('Fields pending deletion');
   }
 
 }

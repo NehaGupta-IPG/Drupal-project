@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Composer\Plugin\VendorHardening;
 
 use Composer\Composer;
@@ -8,6 +10,7 @@ use Composer\Installer\PackageEvent;
 use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
 use Composer\Package\BasePackage;
+use Composer\Package\PackageInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
@@ -48,7 +51,7 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
   protected $config;
 
   /**
-   * List of projects already cleaned
+   * List of projects already cleaned.
    *
    * @var string[]
    */
@@ -57,7 +60,7 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
   /**
    * {@inheritdoc}
    */
-  public function activate(Composer $composer, IOInterface $io) {
+  public function activate(Composer $composer, IOInterface $io): void {
     $this->composer = $composer;
     $this->io = $io;
 
@@ -68,19 +71,19 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
   /**
    * {@inheritdoc}
    */
-  public function deactivate(Composer $composer, IOInterface $io) {
+  public function deactivate(Composer $composer, IOInterface $io): void {
   }
 
   /**
    * {@inheritdoc}
    */
-  public function uninstall(Composer $composer, IOInterface $io) {
+  public function uninstall(Composer $composer, IOInterface $io): void {
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       ScriptEvents::POST_AUTOLOAD_DUMP => 'onPostAutoloadDump',
       ScriptEvents::POST_UPDATE_CMD => 'onPostCmd',
@@ -98,7 +101,7 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
    * @param \Composer\Script\Event $event
    *   The Composer event.
    */
-  public function onPostAutoloadDump(Event $event) {
+  public function onPostAutoloadDump(Event $event): void {
     $this->writeAccessRestrictionFiles($this->composer->getConfig()->get('vendor-dir'));
   }
 
@@ -108,16 +111,17 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
    * @param \Composer\Script\Event $event
    *   The Composer event.
    */
-  public function onPostCmd(Event $event) {
-    $this->cleanAllPackages($this->composer->getConfig()->get('vendor-dir'));
+  public function onPostCmd(Event $event): void {
+    $this->cleanAllPackages();
   }
 
   /**
    * PRE_PACKAGE_INSTALL event handler.
    *
    * @param \Composer\Installer\PackageEvent $event
+   *   The package event.
    */
-  public function onPrePackageInstall(PackageEvent $event) {
+  public function onPrePackageInstall(PackageEvent $event): void {
     /** @var \Composer\Package\CompletePackage $package */
     $package = $event->getOperation()->getPackage();
     $this->removeBinBeforeCleanup($package);
@@ -127,8 +131,9 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
    * PRE_PACKAGE_UPDATE event handler.
    *
    * @param \Composer\Installer\PackageEvent $event
+   *   The package event.
    */
-  public function onPrePackageUpdate(PackageEvent $event) {
+  public function onPrePackageUpdate(PackageEvent $event): void {
     /** @var \Composer\Package\CompletePackage $package */
     $package = $event->getOperation()->getTargetPackage();
     $this->removeBinBeforeCleanup($package);
@@ -138,24 +143,20 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
    * POST_PACKAGE_INSTALL event handler.
    *
    * @param \Composer\Installer\PackageEvent $event
+   *   The package event.
    */
-  public function onPostPackageInstall(PackageEvent $event) {
-    /** @var \Composer\Package\CompletePackage $package */
-    $package = $event->getOperation()->getPackage();
-    $package_name = $package->getName();
-    $this->cleanPackage($this->composer->getConfig()->get('vendor-dir'), $package_name);
+  public function onPostPackageInstall(PackageEvent $event): void {
+    $this->cleanPackage($event->getOperation()->getPackage());
   }
 
   /**
    * POST_PACKAGE_UPDATE event handler.
    *
    * @param \Composer\Installer\PackageEvent $event
+   *   The package event.
    */
-  public function onPostPackageUpdate(PackageEvent $event) {
-    /** @var \Composer\Package\CompletePackage $package */
-    $package = $event->getOperation()->getTargetPackage();
-    $package_name = $package->getName();
-    $this->cleanPackage($this->composer->getConfig()->get('vendor-dir'), $package_name);
+  public function onPostPackageUpdate(PackageEvent $event): void {
+    $this->cleanPackage($event->getOperation()->getTargetPackage());
   }
 
   /**
@@ -167,7 +168,7 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
    * @param \Composer\Package\BasePackage $package
    *   The package we're cleaning up.
    */
-  protected function removeBinBeforeCleanup(BasePackage $package) {
+  protected function removeBinBeforeCleanup(BasePackage $package): void {
     // We can process AliasPackage and Package objects, and they share the
     // BasePackage parent class. However, since there is no common interface for
     // these package types that allow for the setBinaries() method, and since
@@ -209,13 +210,14 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
    * @return string[]
    *   Bin files to remove, with the file as both the key and the value.
    */
-  protected function findBinOverlap($binaries, $clean_paths) {
+  protected function findBinOverlap(array $binaries, array $clean_paths): array {
     // Make a filesystem model to explore. This is a keyed array that looks like
-    // all the places that will be removed by cleanup. 'tests/src' becomes
-    // $filesystem['tests']['src'] = TRUE;
+    // all the places that will be removed by cleanup. For example, the path
+    // "tests/src" becomes "$filesystem['tests']['src'] = TRUE".
     $filesystem = [];
     foreach ($clean_paths as $clean_path) {
       $clean_pieces = explode("/", $clean_path);
+      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
       $current = &$filesystem;
       foreach ($clean_pieces as $clean_piece) {
         $current = &$current[$clean_piece];
@@ -250,19 +252,30 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
    * @return \Composer\Package\PackageInterface[]
    *   The list of installed packages.
    */
-  protected function getInstalledPackages() {
+  protected function getInstalledPackages(): array {
     return $this->composer->getRepositoryManager()->getLocalRepository()->getPackages();
+  }
+
+  /**
+   * Gets the installed path for a package.
+   *
+   * @param \Composer\Package\PackageInterface $package
+   *   The package.
+   *
+   * @return string
+   *   Path to the install path for the package, relative to the project. This
+   *   accounts for changes made by composer/installers, if any.
+   */
+  protected function getInstallPathForPackage(PackageInterface $package): string {
+    return $this->composer->getInstallationManager()->getInstallPath($package);
   }
 
   /**
    * Clean all configured packages.
    *
    * This applies in the context of a post-command event.
-   *
-   * @param string $vendor_dir
-   *   Path to vendor directory
    */
-  public function cleanAllPackages($vendor_dir) {
+  public function cleanAllPackages(): void {
     // Get a list of all the packages available after the update or install
     // command.
     $installed_packages = [];
@@ -271,20 +284,22 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
       $installed_packages[strtolower($package->getName())] = $package;
     }
 
+    $all_cleanup_paths = $this->config->getAllCleanupPaths();
+
     // Get all the packages that we should clean up but haven't already.
-    $cleanup_packages = array_diff_key($this->config->getAllCleanupPaths(), $this->packagesAlreadyCleaned);
+    $cleanup_paths = array_diff_key($all_cleanup_paths, $this->packagesAlreadyCleaned);
 
     // Get all the packages that are installed that we should clean up.
-    $packages_to_be_cleaned = array_intersect_key($cleanup_packages, $installed_packages);
+    $packages_to_be_cleaned = array_intersect_key($cleanup_paths, $installed_packages);
 
     if (!$packages_to_be_cleaned) {
-      $this->io->writeError('<info>Vendor directory already clean.</info>');
+      $this->io->writeError('<info>Packages already clean.</info>');
       return;
     }
-    $this->io->writeError('<info>Cleaning vendor directory.</info>');
+    $this->io->writeError('<info>Cleaning installed packages.</info>');
 
-    foreach ($packages_to_be_cleaned as $package_name => $paths_for_package) {
-      $this->cleanPathsForPackage($vendor_dir, $package_name, $paths_for_package);
+    foreach ($packages_to_be_cleaned as $package_name => $paths) {
+      $this->cleanPathsForPackage($installed_packages[$package_name], $all_cleanup_paths[$package_name]);
     }
   }
 
@@ -293,14 +308,12 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
    *
    * This applies in the context of a package post-install or post-update event.
    *
-   * @param string $vendor_dir
-   *   Path to vendor directory
-   * @param string $package_name
-   *   Name of the package to clean
+   * @param \Composer\Package\PackageInterface $package
+   *   The package to clean.
    */
-  public function cleanPackage($vendor_dir, $package_name) {
+  public function cleanPackage(PackageInterface $package): void {
     // Normalize package names to lower case.
-    $package_name = strtolower($package_name);
+    $package_name = strtolower($package->getName());
     if (isset($this->packagesAlreadyCleaned[$package_name])) {
       $this->io->writeError(sprintf('%s<info>%s</info> already cleaned.', str_repeat(' ', 4), $package_name), TRUE, IOInterface::VERY_VERBOSE);
       return;
@@ -309,67 +322,63 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
     $paths_for_package = $this->config->getPathsForPackage($package_name);
     if ($paths_for_package) {
       $this->io->writeError(sprintf('%sCleaning: <info>%s</info>', str_repeat(' ', 4), $package_name));
-      $this->cleanPathsForPackage($vendor_dir, $package_name, $paths_for_package);
+      $this->cleanPathsForPackage($package, $paths_for_package);
     }
   }
 
   /**
    * Clean the installed directories for a named package.
    *
-   * @param string $vendor_dir
-   *   Path to vendor directory.
-   * @param string $package_name
-   *   Name of package to sanitize.
-   * @param string $paths_for_package
-   *   List of directories in $package_name to remove
+   * @param \Composer\Package\PackageInterface $package
+   *   The package to clean.
+   * @param string[] $paths_for_package
+   *   List of directories in $package_name to remove.
    */
-  protected function cleanPathsForPackage($vendor_dir, $package_name, $paths_for_package) {
+  protected function cleanPathsForPackage(PackageInterface $package, $paths_for_package): void {
     // Whatever happens here, this package counts as cleaned so that we don't
     // process it more than once.
+    $package_name = strtolower($package->getName());
     $this->packagesAlreadyCleaned[$package_name] = TRUE;
 
-    $package_dir = $vendor_dir . '/' . $package_name;
+    $package_dir = $this->getInstallPathForPackage($package);
     if (!is_dir($package_dir)) {
       return;
     }
 
-    $this->io->writeError(sprintf('%sCleaning directories in <comment>%s</comment>', str_repeat(' ', 4), $package_name), TRUE, IOInterface::VERY_VERBOSE);
+    $this->io->writeError(sprintf('%sCleaning paths in <comment>%s</comment>', str_repeat(' ', 4), $package_name), TRUE, IOInterface::VERY_VERBOSE);
     $fs = new Filesystem();
     foreach ($paths_for_package as $cleanup_item) {
       $cleanup_path = $package_dir . '/' . $cleanup_item;
-      if (!is_dir($cleanup_path)) {
+      if (!file_exists($cleanup_path)) {
         // If the package has changed or the --prefer-dist version does not
         // include the directory. This is not an error.
-        $this->io->writeError(sprintf("%s<comment>Directory '%s' does not exist.</comment>", str_repeat(' ', 6), $cleanup_path), TRUE, IOInterface::VERY_VERBOSE);
+        $this->io->writeError(sprintf("%s<comment>Path '%s' does not exist.</comment>", str_repeat(' ', 6), $cleanup_path), TRUE, IOInterface::VERY_VERBOSE);
         continue;
       }
 
-      if (!$fs->removeDirectory($cleanup_path)) {
+      if (!$fs->remove($cleanup_path)) {
         // Always display a message if this fails as it means something
         // has gone wrong. Therefore the message has to include the
         // package name as the first informational message might not
         // exist.
-        $this->io->writeError(sprintf("%s<error>Failure removing directory '%s'</error> in package <comment>%s</comment>.", str_repeat(' ', 6), $cleanup_item, $package_name), TRUE, IOInterface::NORMAL);
+        $this->io->writeError(sprintf("%s<error>Failure removing path '%s'</error> in package <comment>%s</comment>.", str_repeat(' ', 6), $cleanup_item, $package_name), TRUE, IOInterface::NORMAL);
         continue;
       }
 
-      $this->io->writeError(sprintf("%sRemoving directory <info>'%s'</info>", str_repeat(' ', 4), $cleanup_item), TRUE, IOInterface::VERBOSE);
+      $this->io->writeError(sprintf("%sRemoving path <info>'%s'</info>", str_repeat(' ', 4), $cleanup_item), TRUE, IOInterface::VERBOSE);
     }
   }
 
   /**
-   * Place .htaccess and web.config files into the vendor directory.
+   * Place .htaccess file into the vendor directory.
    *
    * @param string $vendor_dir
    *   Path to vendor directory.
    */
-  public function writeAccessRestrictionFiles($vendor_dir) {
-    $this->io->writeError('<info>Hardening vendor directory with .htaccess and web.config files.</info>');
+  public function writeAccessRestrictionFiles(string $vendor_dir): void {
+    $this->io->writeError('<info>Hardening vendor directory with .htaccess file.</info>');
     // Prevent access to vendor directory on Apache servers.
     FileSecurity::writeHtaccess($vendor_dir, TRUE);
-
-    // Prevent access to vendor directory on IIS servers.
-    FileSecurity::writeWebConfig($vendor_dir);
   }
 
 }

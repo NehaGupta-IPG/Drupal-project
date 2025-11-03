@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Kernel\Migrate\d6;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the migration of comment form's subject display from Drupal 6.
- *
- * @group comment
- * @group migrate_drupal_6
  */
+#[Group('comment')]
+#[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateCommentEntityFormDisplaySubjectTest extends MigrateDrupal6TestBase {
 
   /**
@@ -35,8 +39,10 @@ class MigrateCommentEntityFormDisplaySubjectTest extends MigrateDrupal6TestBase 
    *
    * @param string $id
    *   The entity form display ID.
+   *
+   * @internal
    */
-  protected function assertSubjectVisible($id) {
+  protected function assertSubjectVisible(string $id): void {
     $component = EntityFormDisplay::load($id)->getComponent('subject');
     $this->assertIsArray($component);
     $this->assertSame('string_textfield', $component['type']);
@@ -48,8 +54,10 @@ class MigrateCommentEntityFormDisplaySubjectTest extends MigrateDrupal6TestBase 
    *
    * @param string $id
    *   The entity form display ID.
+   *
+   * @internal
    */
-  protected function assertSubjectNotVisible($id) {
+  protected function assertSubjectNotVisible(string $id): void {
     $component = EntityFormDisplay::load($id)->getComponent('subject');
     $this->assertNull($component);
   }
@@ -57,7 +65,7 @@ class MigrateCommentEntityFormDisplaySubjectTest extends MigrateDrupal6TestBase 
   /**
    * Tests the migrated display configuration.
    */
-  public function testMigration() {
+  public function testMigration(): void {
     $this->assertSubjectVisible('comment.comment_node_article.default');
     $this->assertSubjectVisible('comment.comment_node_company.default');
     $this->assertSubjectVisible('comment.comment_node_employee.default');

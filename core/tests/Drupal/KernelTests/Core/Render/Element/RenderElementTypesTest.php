@@ -1,25 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Render\Element;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests the markup of core render element types passed to drupal_render().
- *
- * @group Common
+ * Tests the rendered markup of core render element types.
  */
+#[Group('Common')]
+#[RunTestsInSeparateProcesses]
 class RenderElementTypesTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'router_test'];
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
     $this->installConfig(['system']);
@@ -34,23 +39,18 @@ class RenderElementTypesTest extends KernelTestBase {
    *   The expected markup.
    * @param string $message
    *   Assertion message.
+   *
+   * @internal
    */
-  protected function assertElements(array $elements, $expected_html, $message) {
+  protected function assertElements(array $elements, string $expected_html, string $message): void {
     $actual_html = (string) \Drupal::service('renderer')->renderRoot($elements);
-
-    $out = '<table><tr>';
-    $out .= '<td valign="top"><pre>' . Html::escape($expected_html) . '</pre></td>';
-    $out .= '<td valign="top"><pre>' . Html::escape($actual_html) . '</pre></td>';
-    $out .= '</tr></table>';
-    $this->verbose($out);
-
     $this->assertSame($expected_html, $actual_html, Html::escape($message));
   }
 
   /**
    * Tests system #type 'container'.
    */
-  public function testContainer() {
+  public function testContainer(): void {
     // Basic container with no attributes.
     $this->assertElements([
       '#type' => 'container',
@@ -78,7 +78,7 @@ class RenderElementTypesTest extends KernelTestBase {
   /**
    * Tests system #type 'html_tag'.
    */
-  public function testHtmlTag() {
+  public function testHtmlTag(): void {
     // Test void element.
     $this->assertElements([
       '#type' => 'html_tag',
@@ -116,7 +116,7 @@ class RenderElementTypesTest extends KernelTestBase {
   /**
    * Tests system #type 'more_link'.
    */
-  public function testMoreLink() {
+  public function testMoreLink(): void {
     $elements = [
       [
         'name' => "#type 'more_link' anchor tag generation without extra classes",
@@ -187,16 +187,16 @@ class RenderElementTypesTest extends KernelTestBase {
     ];
 
     foreach ($elements as $element) {
-      $xml = new \SimpleXMLElement(\Drupal::service('renderer')->renderRoot($element['value']));
+      $xml = new \SimpleXMLElement((string) \Drupal::service('renderer')->renderRoot($element['value']));
       $result = $xml->xpath($element['expected']);
-      $this->assertNotEmpty($result, '"' . $element['name'] . '" input rendered correctly by drupal_render().');
+      $this->assertNotEmpty($result, '"' . $element['name'] . '" input rendered correctly.');
     }
   }
 
   /**
    * Tests system #type 'system_compact_link'.
    */
-  public function testSystemCompactLink() {
+  public function testSystemCompactLink(): void {
     $elements = [
       [
         'name' => "#type 'system_compact_link' when admin compact mode is off",
@@ -218,9 +218,9 @@ class RenderElementTypesTest extends KernelTestBase {
     ];
 
     foreach ($elements as $element) {
-      $xml = new \SimpleXMLElement(\Drupal::service('renderer')->renderRoot($element['value']));
+      $xml = new \SimpleXMLElement((string) \Drupal::service('renderer')->renderRoot($element['value']));
       $result = $xml->xpath($element['expected']);
-      $this->assertNotEmpty($result, '"' . $element['name'] . '" is rendered correctly by drupal_render().');
+      $this->assertNotEmpty($result, '"' . $element['name'] . '" is rendered correctly.');
     }
 
     // Set admin compact mode on for additional tests.
@@ -234,9 +234,104 @@ class RenderElementTypesTest extends KernelTestBase {
       'expected' => '//div[@class="compact-link"]/a[contains(@href, "admin/compact?") and text()="Show descriptions"]',
     ];
 
-    $xml = new \SimpleXMLElement(\Drupal::service('renderer')->renderRoot($element['value']));
+    $xml = new \SimpleXMLElement((string) \Drupal::service('renderer')->renderRoot($element['value']));
     $result = $xml->xpath($element['expected']);
-    $this->assertNotEmpty($result, '"' . $element['name'] . '" is rendered correctly by drupal_render().');
+    $this->assertNotEmpty($result, '"' . $element['name'] . '" is rendered correctly.');
+  }
+
+  /**
+   * Tests system #type 'link'.
+   */
+  public function testLink(): void {
+    $elements = [
+      [
+        'name' => "#type 'link' simple anchor tag",
+        'value' => [
+          '#type' => 'link',
+          '#title' => 'title',
+          '#url' => Url::fromUri('https://www.drupal.org'),
+        ],
+        'expected' => '//a[@href="https://www.drupal.org" and text()="title"]',
+      ],
+      [
+        'name' => "#type 'link' anchor tag with extra classes in ['#attributes']",
+        'value' => [
+          '#type' => 'link',
+          '#title' => 'title',
+          '#url' => Url::fromUri('https://www.drupal.org'),
+          '#attributes' => [
+            'class' => ['attributes-class'],
+          ],
+          '#options' => [],
+        ],
+        'expected' => '//a[@href="https://www.drupal.org" and @class="attributes-class" and text()="title"]',
+      ],
+      [
+        'name' => "#type 'link' anchor tag with extra classes in ['#options']['attributes']",
+        'value' => [
+          '#type' => 'link',
+          '#title' => 'title',
+          '#url' => Url::fromUri('https://www.drupal.org'),
+          '#attributes' => [],
+          '#options' => [
+            'attributes' => [
+              'class' => ['options-attributes-class'],
+            ],
+          ],
+        ],
+        'expected' => '//a[@href="https://www.drupal.org" and @class="options-attributes-class" and text()="title"]',
+      ],
+      [
+        'name' => "#type 'link' anchor tag with extra classes in both ['#attributes'] and ['#options']['attributes']",
+        'value' => [
+          '#type' => 'link',
+          '#title' => 'title',
+          '#url' => Url::fromUri('https://www.drupal.org'),
+          '#attributes' => [
+            'class' => ['attributes-class'],
+          ],
+          '#options' => [
+            'attributes' => [
+              'class' => ['options-attributes-class'],
+            ],
+          ],
+        ],
+        'expected' => '//a[@href="https://www.drupal.org" and @class="options-attributes-class attributes-class" and text()="title"]',
+      ],
+      [
+        'name' => "#type 'link' anchor tag with extra classes in both ['#attributes'] and ['#options']['attributes'] as strings",
+        'value' => [
+          '#type' => 'link',
+          '#title' => 'title',
+          '#url' => Url::fromUri('https://www.drupal.org'),
+          '#attributes' => [
+            'class' => 'attributes-class',
+          ],
+          '#options' => [
+            'attributes' => [
+              'class' => 'options-attributes-class',
+            ],
+          ],
+        ],
+        'expected' => '//a[@href="https://www.drupal.org" and contains(@class,"options-attributes-class") and contains(@class,"attributes-class") and text()="title"]',
+      ],
+      [
+        'name' => "#type 'link' anchor tag with extra classes in Url object ['#options']['attributes'] which are ignored",
+        'value' => [
+          '#type' => 'link',
+          '#title' => 'title',
+          '#url' => Url::fromUri('https://www.drupal.org')->setOption('attributes', ['class' => 'url-options-attributes-class']),
+          '#attributes' => [],
+          '#options' => [],
+        ],
+        'expected' => '//a[@href="https://www.drupal.org" and not(@class) and text()="title"]',
+      ],
+    ];
+    foreach ($elements as $element) {
+      $xml = new \SimpleXMLElement((string) \Drupal::service('renderer')->renderRoot($element['value']));
+      $result = $xml->xpath($element['expected']);
+      $this->assertNotEmpty($result, '"' . $element['name'] . '" input rendered correctly.');
+    }
   }
 
 }

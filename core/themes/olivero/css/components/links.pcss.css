@@ -3,7 +3,7 @@
  * Links component.
  */
 
-@import "../base/variables.pcss.css";
+@import "../base/media-queries.pcss.css";
 
 .links.inline {
   margin-inline-start: 0;
@@ -18,11 +18,5 @@
     &:not(:last-child) {
       padding-inline-end: 1em;
     }
-  }
-}
-
-.node--type-book .links.inline {
-  @media (--md) {
-    text-align: end;
   }
 }

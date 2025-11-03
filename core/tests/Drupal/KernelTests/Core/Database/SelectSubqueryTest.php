@@ -1,18 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Database;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Select query builder.
- *
- * @group Database
  */
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class SelectSubqueryTest extends DatabaseTestBase {
 
   /**
    * Tests that we can use a subquery in a FROM clause.
    */
-  public function testFromSubquerySelect() {
+  public function testFromSubquerySelect(): void {
     // Create a subquery, which is just a normal query object.
     $subquery = $this->connection->select('test_task', 'tt');
     $subquery->addField('tt', 'pid', 'pid');
@@ -33,10 +38,12 @@ class SelectSubqueryTest extends DatabaseTestBase {
       $select->condition('task', 'code');
 
       // The resulting query should be equivalent to:
+      // @code
       // SELECT t.name
       // FROM (SELECT tt.pid AS pid, tt.task AS task FROM test_task tt WHERE priority=1) tt
       //   INNER JOIN test t ON t.id=tt.pid
       // WHERE tt.task = 'code'
+      // @endcode
       $people = $select->execute()->fetchCol();
 
       $this->assertCount(1, $people, 'Returned the correct number of rows.');
@@ -46,7 +53,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
   /**
    * Tests that we can use a subquery in a FROM clause with a LIMIT.
    */
-  public function testFromSubquerySelectWithLimit() {
+  public function testFromSubquerySelectWithLimit(): void {
     // Create a subquery, which is just a normal query object.
     $subquery = $this->connection->select('test_task', 'tt');
     $subquery->addField('tt', 'pid', 'pid');
@@ -61,9 +68,11 @@ class SelectSubqueryTest extends DatabaseTestBase {
     $select->addField('t', 'name');
 
     // The resulting query should be equivalent to:
+    // @code
     // SELECT t.name
     // FROM (SELECT tt.pid AS pid, tt.task AS task FROM test_task tt ORDER BY priority DESC LIMIT 1 OFFSET 0) tt
     //   INNER JOIN test t ON t.id=tt.pid
+    // @endcode
     $people = $select->execute()->fetchCol();
 
     $this->assertCount(1, $people, 'Returned the correct number of rows.');
@@ -72,7 +81,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
   /**
    * Tests that we can use a subquery with an IN operator in a WHERE clause.
    */
-  public function testConditionSubquerySelect() {
+  public function testConditionSubquerySelect(): void {
     // Create a subquery, which is just a normal query object.
     $subquery = $this->connection->select('test_task', 'tt');
     $subquery->addField('tt', 'pid', 'pid');
@@ -93,9 +102,9 @@ class SelectSubqueryTest extends DatabaseTestBase {
   }
 
   /**
-   * Test that we can use a subquery with a relational operator in a WHERE clause.
+   * Tests we can use a subquery with a relational operator in a WHERE clause.
    */
-  public function testConditionSubquerySelect2() {
+  public function testConditionSubquerySelect2(): void {
     // Create a subquery, which is just a normal query object.
     $subquery = $this->connection->select('test', 't2');
     $subquery->addExpression('AVG([t2].[age])');
@@ -114,9 +123,9 @@ class SelectSubqueryTest extends DatabaseTestBase {
   }
 
   /**
-   * Test that we can use 2 subqueries with a relational operator in a WHERE clause.
+   * Tests we can use 2 subqueries with a relational operator in a WHERE clause.
    */
-  public function testConditionSubquerySelect3() {
+  public function testConditionSubquerySelect3(): void {
     // Create subquery 1, which is just a normal query object.
     $subquery1 = $this->connection->select('test_task', 'tt');
     $subquery1->addExpression('AVG([tt].[priority])');
@@ -140,13 +149,13 @@ class SelectSubqueryTest extends DatabaseTestBase {
   }
 
   /**
-   * Test that we can use multiple subqueries.
+   * Tests that we can use multiple subqueries.
    *
    * This test uses a subquery at the left hand side and multiple subqueries at
    * the right hand side. The test query may not be that logical but that's due
    * to the limited amount of data and tables. 'Valid' use cases do exist :)
    */
-  public function testConditionSubquerySelect4() {
+  public function testConditionSubquerySelect4(): void {
     // Create subquery 1, which is just a normal query object.
     $subquery1 = $this->connection->select('test_task', 'tt');
     $subquery1->addExpression('AVG([tt].[priority])');
@@ -168,11 +177,13 @@ class SelectSubqueryTest extends DatabaseTestBase {
     $select->condition($subquery1, [$subquery2, $subquery3], 'BETWEEN');
 
     // The resulting query should be equivalent to:
+    // @code
     // SELECT t.name AS name
     // FROM {test} t
     // WHERE (SELECT AVG(tt.priority) AS expression FROM {test_task} tt WHERE (tt.pid = t.id))
     //   BETWEEN (SELECT MIN(tt2.priority) AS expression FROM {test_task} tt2 WHERE (tt2.pid <> t.id))
     //       AND (SELECT AVG(tt3.priority) AS expression FROM {test_task} tt3 WHERE (tt3.pid <> t.id));
+    // @endcode
     $people = $select->execute()->fetchCol();
     $this->assertEqualsCanonicalizing(['George', 'Paul'], $people, 'Returned George and Paul.');
   }
@@ -180,7 +191,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
   /**
    * Tests that we can use a subquery in a JOIN clause.
    */
-  public function testJoinSubquerySelect() {
+  public function testJoinSubquerySelect(): void {
     // Create a subquery, which is just a normal query object.
     $subquery = $this->connection->select('test_task', 'tt');
     $subquery->addField('tt', 'pid', 'pid');
@@ -193,9 +204,11 @@ class SelectSubqueryTest extends DatabaseTestBase {
     $select->addField('t', 'name');
 
     // The resulting query should be equivalent to:
+    // @code
     // SELECT t.name
     // FROM test t
     //   INNER JOIN (SELECT tt.pid AS pid FROM test_task tt WHERE priority=1) tt ON t.id=tt.pid
+    // @endcode
     $people = $select->execute()->fetchCol();
 
     $this->assertCount(2, $people, 'Returned the correct number of rows.');
@@ -207,7 +220,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
    * We essentially select all rows from the {test} table that have matching
    * rows in the {test_people} table based on the shared name column.
    */
-  public function testExistsSubquerySelect() {
+  public function testExistsSubquerySelect(): void {
     // Put George into {test_people}.
     $this->connection->insert('test_people')
       ->fields([
@@ -222,7 +235,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
     // Subquery to {test_people}.
     $subquery = $this->connection->select('test_people', 'tp')
       ->fields('tp', ['name'])
-      ->where('[tp].[name] = [t].[name]');
+      ->where('[tp].[age] = [t].[age]');
     $query->exists($subquery);
     $result = $query->execute();
 
@@ -237,7 +250,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
    * We essentially select all rows from the {test} table that don't have
    * matching rows in the {test_people} table based on the shared name column.
    */
-  public function testNotExistsSubquerySelect() {
+  public function testNotExistsSubquerySelect(): void {
     // Put George into {test_people}.
     $this->connection->insert('test_people')
       ->fields([
@@ -253,7 +266,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
     // Subquery to {test_people}.
     $subquery = $this->connection->select('test_people', 'tp')
       ->fields('tp', ['name'])
-      ->where('[tp].[name] = [t].[name]');
+      ->where('[tp].[age] = [t].[age]');
     $query->notExists($subquery);
 
     // Ensure that we got the right number of records.

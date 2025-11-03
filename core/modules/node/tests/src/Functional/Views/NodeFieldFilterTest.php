@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional\Views;
 
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests node field filters with translations.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeFieldFilterTest extends NodeTestBase {
 
   /**
@@ -38,8 +42,8 @@ class NodeFieldFilterTest extends NodeTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  protected function setUp($import_test_views = TRUE, $modules = ['node_test_views']): void {
+    parent::setUp($import_test_views, $modules);
 
     // Create Page content type.
     if ($this->profile != 'standard') {
@@ -58,7 +62,12 @@ class NodeFieldFilterTest extends NodeTestBase {
     ];
 
     // Create node with translations.
-    $node = $this->drupalCreateNode(['title' => $this->nodeTitles['en'], 'langcode' => 'en', 'type' => 'page', 'body' => [['value' => $this->nodeTitles['en']]]]);
+    $node = $this->drupalCreateNode([
+      'title' => $this->nodeTitles['en'],
+      'langcode' => 'en',
+      'type' => 'page',
+      'body' => [['value' => $this->nodeTitles['en']]],
+    ]);
     foreach (['es', 'fr'] as $langcode) {
       $translation = $node->addTranslation($langcode, ['title' => $this->nodeTitles[$langcode]]);
       $translation->body->value = $this->nodeTitles[$langcode];
@@ -69,7 +78,7 @@ class NodeFieldFilterTest extends NodeTestBase {
   /**
    * Tests body and title filters.
    */
-  public function testFilters() {
+  public function testFilters(): void {
     // Test the title filter page, which filters for title contains 'Comida'.
     // Should show just the Spanish translation, once.
     $this->assertPageCounts('test-title-filter', ['es' => 1, 'fr' => 0, 'en' => 0], 'Comida title filter');
@@ -97,8 +106,10 @@ class NodeFieldFilterTest extends NodeTestBase {
    *   that translation should be shown on the given page.
    * @param string $message
    *   Message suffix to display.
+   *
+   * @internal
    */
-  protected function assertPageCounts($path, $counts, $message) {
+  protected function assertPageCounts(string $path, array $counts, string $message): void {
     // Disable read more links.
     \Drupal::service('entity_display.repository')
       ->getViewDisplay('node', 'page', 'teaser')
@@ -113,7 +124,7 @@ class NodeFieldFilterTest extends NodeTestBase {
     // page, and they are the same. So the title/body string should appear on
     // the page twice as many times as the input count.
     foreach ($counts as $langcode => $count) {
-      $this->assertEqual(2 * $count, substr_count($text, $this->nodeTitles[$langcode]), 'Translation ' . $langcode . ' has count ' . $count . ' with ' . $message);
+      $this->assertEquals(2 * $count, substr_count($text, $this->nodeTitles[$langcode]), 'Translation ' . $langcode . ' has count ' . $count . ' with ' . $message);
     }
   }
 

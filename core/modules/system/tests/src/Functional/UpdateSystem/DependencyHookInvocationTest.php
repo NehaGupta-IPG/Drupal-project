@@ -1,21 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\UpdateSystem;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests that the hook invocation for determining update dependencies works
- * correctly.
- *
- * @group Update
+ * Tests the hook invocation for determining update dependencies.
  */
+#[Group('Update')]
+#[RunTestsInSeparateProcesses]
 class DependencyHookInvocationTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'update_test_0',
@@ -28,15 +29,18 @@ class DependencyHookInvocationTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
     require_once $this->root . '/core/includes/update.inc';
   }
 
   /**
-   * Test the structure of the array returned by hook_update_dependencies().
+   * Tests the structure of the array returned by hook_update_dependencies().
    */
-  public function testHookUpdateDependencies() {
+  public function testHookUpdateDependencies(): void {
     $update_dependencies = update_retrieve_dependencies();
     $this->assertSame(8001, $update_dependencies['update_test_0'][8001]['update_test_1'], 'An update function that has a dependency on two separate modules has the first dependency recorded correctly.');
     $this->assertSame(8002, $update_dependencies['update_test_0'][8001]['update_test_2'], 'An update function that has a dependency on two separate modules has the second dependency recorded correctly.');

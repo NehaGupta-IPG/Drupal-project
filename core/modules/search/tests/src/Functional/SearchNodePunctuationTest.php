@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\search\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests search functionality with punctuation and HTML entities.
- *
- * @group search
  */
+#[Group('search')]
+#[RunTestsInSeparateProcesses]
 class SearchNodePunctuationTest extends BrowserTestBase {
 
   /**
@@ -28,6 +32,9 @@ class SearchNodePunctuationTest extends BrowserTestBase {
    */
   public $testUser;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -47,7 +54,7 @@ class SearchNodePunctuationTest extends BrowserTestBase {
   /**
    * Tests that search works with punctuation and HTML entities.
    */
-  public function testPhraseSearchPunctuation() {
+  public function testPhraseSearchPunctuation(): void {
     $node = $this->drupalCreateNode(['body' => [['value' => "The bunny's ears were fluffy."]]]);
     // cSpell:disable-next-line
     $this->drupalCreateNode(['body' => [['value' => 'Dignissim Aliquam &amp; Quieligo meus natu quae quia te. Damnum&copy; erat&mdash; neo pneum. Facilisi feugiat ibidem ratis.']]]);
@@ -60,8 +67,9 @@ class SearchNodePunctuationTest extends BrowserTestBase {
 
     // Submit a phrase wrapped in double quotes to include the punctuation.
     $edit = ['keys' => '"bunny\'s"'];
-    $this->drupalPostForm('search/node', $edit, 'Search');
-    $this->assertText($node->label());
+    $this->drupalGet('search/node');
+    $this->submitForm($edit, 'Search');
+    $this->assertSession()->pageTextContains($node->label());
 
     // Check if the author is linked correctly to the user profile page.
     $username = $node->getOwner()->getAccountName();
@@ -69,14 +77,16 @@ class SearchNodePunctuationTest extends BrowserTestBase {
 
     // Search for "&" and verify entities are not broken up in the output.
     $edit = ['keys' => '&'];
-    $this->drupalPostForm('search/node', $edit, 'Search');
-    $this->assertNoRaw('<strong>&</strong>amp;');
-    $this->assertText('You must include at least one keyword');
+    $this->drupalGet('search/node');
+    $this->submitForm($edit, 'Search');
+    $this->assertSession()->responseNotContains('<strong>&</strong>amp;');
+    $this->assertSession()->statusMessageContains('You must include at least one keyword', 'warning');
 
     $edit = ['keys' => '&amp;'];
-    $this->drupalPostForm('search/node', $edit, 'Search');
-    $this->assertNoRaw('<strong>&</strong>amp;');
-    $this->assertText('You must include at least one keyword');
+    $this->drupalGet('search/node');
+    $this->submitForm($edit, 'Search');
+    $this->assertSession()->responseNotContains('<strong>&</strong>amp;');
+    $this->assertSession()->statusMessageContains('You must include at least one keyword', 'warning');
   }
 
 }

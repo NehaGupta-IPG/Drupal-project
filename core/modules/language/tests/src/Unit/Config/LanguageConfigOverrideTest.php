@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\language\Unit\Config;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\language\Config\LanguageConfigOverride;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\language\Config\LanguageConfigOverride
- * @group Config
- * @group language
+ * Tests Drupal\language\Config\LanguageConfigOverride.
  */
+#[CoversClass(LanguageConfigOverride::class)]
+#[Group('Config')]
+#[Group('language')]
 class LanguageConfigOverrideTest extends UnitTestCase {
 
   /**
@@ -30,7 +35,7 @@ class LanguageConfigOverrideTest extends UnitTestCase {
   /**
    * Event Dispatcher.
    *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $eventDispatcher;
 
@@ -52,8 +57,10 @@ class LanguageConfigOverrideTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->storage = $this->createMock('Drupal\Core\Config\StorageInterface');
-    $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+    $this->eventDispatcher = $this->createMock('Symfony\Contracts\EventDispatcher\EventDispatcherInterface');
     $this->typedConfig = $this->createMock('\Drupal\Core\Config\TypedConfigManagerInterface');
     $this->configTranslation = new LanguageConfigOverride('config.test', $this->storage, $this->typedConfig, $this->eventDispatcher);
     $this->cacheTagsInvalidator = $this->createMock('Drupal\Core\Cache\CacheTagsInvalidatorInterface');
@@ -64,9 +71,11 @@ class LanguageConfigOverrideTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::save
+   * Tests save new.
+   *
+   * @legacy-covers ::save
    */
-  public function testSaveNew() {
+  public function testSaveNew(): void {
     $this->cacheTagsInvalidator->expects($this->once())
       ->method('invalidateTags')
       ->with(['config:config.test']);
@@ -75,9 +84,11 @@ class LanguageConfigOverrideTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::save
+   * Tests save existing.
+   *
+   * @legacy-covers ::save
    */
-  public function testSaveExisting() {
+  public function testSaveExisting(): void {
     $this->cacheTagsInvalidator->expects($this->once())
       ->method('invalidateTags')
       ->with(['config:config.test']);
@@ -86,9 +97,11 @@ class LanguageConfigOverrideTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::delete
+   * Tests delete.
+   *
+   * @legacy-covers ::delete
    */
-  public function testDelete() {
+  public function testDelete(): void {
     $this->cacheTagsInvalidator->expects($this->once())
       ->method('invalidateTags')
       ->with(['config:config.test']);

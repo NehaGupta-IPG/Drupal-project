@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\path_alias\Functional\Rest;
 
 use Drupal\Core\Language\LanguageInterface;
@@ -14,7 +16,7 @@ abstract class PathAliasResourceTestBase extends EntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['path_alias'];
+  protected static $modules = ['path', 'path_alias'];
 
   /**
    * {@inheritdoc}
@@ -114,13 +116,6 @@ abstract class PathAliasResourceTestBase extends EntityResourceTestBase {
         ],
       ],
     ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getExpectedCacheContexts() {
-    return ['user.permissions'];
   }
 
 }

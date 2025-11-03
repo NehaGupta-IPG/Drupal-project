@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the loading of multiple nodes.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeLoadMultipleTest extends NodeAccessTestBase {
 
   /**
@@ -30,7 +34,7 @@ class NodeLoadMultipleTest extends NodeAccessTestBase {
   /**
    * Creates four nodes and ensures that they are loaded correctly.
    */
-  public function testNodeMultipleLoad() {
+  public function testNodeMultipleLoad(): void {
     $node1 = $this->drupalCreateNode(['type' => 'article', 'promote' => 1]);
     $node2 = $this->drupalCreateNode(['type' => 'article', 'promote' => 1]);
     $node3 = $this->drupalCreateNode(['type' => 'article', 'promote' => 0]);
@@ -39,8 +43,8 @@ class NodeLoadMultipleTest extends NodeAccessTestBase {
     // Load nodes with only a condition. Nodes 3 and 4 will be loaded.
     $nodes = $this->container->get('entity_type.manager')->getStorage('node')
       ->loadByProperties(['promote' => 0]);
-    $this->assertEqual($node3->label(), $nodes[$node3->id()]->label(), 'Node was loaded.');
-    $this->assertEqual($node4->label(), $nodes[$node4->id()]->label(), 'Node was loaded.');
+    $this->assertEquals($node3->label(), $nodes[$node3->id()]->label(), 'Node was loaded.');
+    $this->assertEquals($node4->label(), $nodes[$node4->id()]->label(), 'Node was loaded.');
     $this->assertCount(2, $nodes);
 
     // Load nodes by nid. Nodes 1, 2 and 4 will be loaded.
@@ -57,7 +61,7 @@ class NodeLoadMultipleTest extends NodeAccessTestBase {
   /**
    * Creates four nodes with not case sensitive fields and load them.
    */
-  public function testNodeMultipleLoadCaseSensitiveFalse() {
+  public function testNodeMultipleLoadCaseSensitiveFalse(): void {
     $field_first_storage = FieldStorageConfig::create([
       'field_name' => 'field_first',
       'entity_type' => 'node',
@@ -94,7 +98,7 @@ class NodeLoadMultipleTest extends NodeAccessTestBase {
       'field_first' => '1234',
       'field_second' => 'test_value_1',
     ]);
-    $node2 = $this->drupalCreateNode([
+    $this->drupalCreateNode([
       'type' => 'page',
       'field_first' => '1234',
       'field_second' => 'test_value_2',
@@ -104,7 +108,7 @@ class NodeLoadMultipleTest extends NodeAccessTestBase {
       'field_first' => '5678',
       'field_second' => 'test_value_1',
     ]);
-    $node4 = $this->drupalCreateNode([
+    $this->drupalCreateNode([
       'type' => 'page',
       'field_first' => '5678',
       'field_second' => 'test_value_2',
@@ -114,10 +118,10 @@ class NodeLoadMultipleTest extends NodeAccessTestBase {
     $nodes = $this->container->get('entity_type.manager')->getStorage('node')
       ->loadByProperties(['field_first' => ['1234', '5678'], 'field_second' => 'test_value_1']);
     $this->assertCount(2, $nodes);
-    $this->assertEqual($node1->field_first->value, $nodes[$node1->id()]->field_first->value);
-    $this->assertEqual($node1->field_second->value, $nodes[$node1->id()]->field_second->value);
-    $this->assertEqual($node3->field_first->value, $nodes[$node3->id()]->field_first->value);
-    $this->assertEqual($node3->field_second->value, $nodes[$node3->id()]->field_second->value);
+    $this->assertEquals($node1->field_first->value, $nodes[$node1->id()]->field_first->value);
+    $this->assertEquals($node1->field_second->value, $nodes[$node1->id()]->field_second->value);
+    $this->assertEquals($node3->field_first->value, $nodes[$node3->id()]->field_first->value);
+    $this->assertEquals($node3->field_second->value, $nodes[$node3->id()]->field_second->value);
   }
 
 }

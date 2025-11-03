@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\dblog\Kernel;
 
 use Drupal\dblog\Controller\DbLogController;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests for the DbLogController class.
- *
- * @group dblog
  */
+#[Group('dblog')]
+#[RunTestsInSeparateProcesses]
 class DbLogControllerTest extends KernelTestBase {
 
   /**
@@ -17,7 +21,10 @@ class DbLogControllerTest extends KernelTestBase {
    */
   protected static $modules = ['dblog', 'user'];
 
-  public function setUp(): void {
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('user');
     $this->installSchema('dblog', ['watchdog']);
@@ -26,7 +33,7 @@ class DbLogControllerTest extends KernelTestBase {
   /**
    * Tests links with non latin characters.
    */
-  public function testNonLatinCharacters() {
+  public function testNonLatinCharacters(): void {
 
     $link = 'hello-
       科州的小九寨沟绝美高山湖泊酱凉拌素鸡照烧鸡黄玫瑰
@@ -59,7 +66,7 @@ class DbLogControllerTest extends KernelTestBase {
   /**
    * Tests corrupted log entries can still display available data.
    */
-  public function testDbLogCorrupted() {
+  public function testDbLogCorrupted(): void {
     $dblog_controller = DbLogController::create($this->container);
 
     // Check message with properly serialized data.

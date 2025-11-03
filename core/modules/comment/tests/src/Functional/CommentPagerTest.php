@@ -1,33 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\CommentManagerInterface;
-use Drupal\Component\Render\FormattableMarkup;
+use Drupal\comment\CommentPreviewMode;
 use Drupal\node\Entity\Node;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests paging of comments and their settings.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentPagerTest extends CommentTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'stark';
 
   /**
    * Confirms comment paging works correctly with flat and threaded comments.
    */
-  public function testCommentPaging() {
+  public function testCommentPaging(): void {
     $this->drupalLogin($this->adminUser);
 
     // Set comment variables.
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
-    $this->setCommentPreview(DRUPAL_DISABLED);
+    $this->setCommentPreview(CommentPreviewMode::Disabled);
 
     // Create a node and three comments.
     $node = $this->drupalCreateNode(['type' => 'article', 'promote' => 1]);
@@ -38,6 +42,14 @@ class CommentPagerTest extends CommentTestBase {
 
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.');
 
+    // Set "Comments per page" as zero and verify that all comments are
+    // appearing on the page.
+    $this->setCommentsPerPage(0);
+    $this->drupalGet('node/' . $node->id());
+    $this->assertTrue($this->commentExists($comments[0]), 'Comment 1 appears on page.');
+    $this->assertTrue($this->commentExists($comments[1]), 'Comment 2 appears on page.');
+    $this->assertTrue($this->commentExists($comments[2]), 'Comment 3 appears on page.');
+
     // Set comments to one per page so that we are able to test paging without
     // needing to insert large numbers of comments.
     $this->setCommentsPerPage(1);
@@ -45,7 +57,7 @@ class CommentPagerTest extends CommentTestBase {
     // Check the first page of the node, and confirm the correct comments are
     // shown.
     $this->drupalGet('node/' . $node->id());
-    $this->assertRaw(t('next'));
+    $this->assertSession()->pageTextContains('next');
     $this->assertTrue($this->commentExists($comments[0]), 'Comment 1 appears on page 1.');
     $this->assertFalse($this->commentExists($comments[1]), 'Comment 2 does not appear on page 1.');
     $this->assertFalse($this->commentExists($comments[2]), 'Comment 3 does not appear on page 1.');
@@ -92,6 +104,10 @@ class CommentPagerTest extends CommentTestBase {
     $this->setCommentsPerPage(0);
     $this->drupalGet('node/' . $node->id(), ['query' => ['page' => 0]]);
     $this->assertFalse($this->commentExists($reply2, TRUE), 'Threaded mode works correctly when comments per page is 0.');
+    // Test that all main comments are appearing in the threaded mode.
+    $this->assertTrue($this->commentExists($comments[0]), 'Comment 1 appears on page.');
+    $this->assertTrue($this->commentExists($comments[1]), 'Comment 2 appears on page.');
+    $this->assertTrue($this->commentExists($comments[2]), 'Comment 3 appears on page.');
 
     $this->drupalLogout();
   }
@@ -99,13 +115,13 @@ class CommentPagerTest extends CommentTestBase {
   /**
    * Confirms comment paging works correctly with flat and threaded comments.
    */
-  public function testCommentPermalink() {
+  public function testCommentPermalink(): void {
     $this->drupalLogin($this->adminUser);
 
     // Set comment variables.
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
-    $this->setCommentPreview(DRUPAL_DISABLED);
+    $this->setCommentPreview(CommentPreviewMode::Disabled);
 
     // Create a node and three comments.
     $node = $this->drupalCreateNode(['type' => 'article', 'promote' => 1]);
@@ -131,13 +147,13 @@ class CommentPagerTest extends CommentTestBase {
   /**
    * Tests comment ordering and threading.
    */
-  public function testCommentOrderingThreading() {
+  public function testCommentOrderingThreading(): void {
     $this->drupalLogin($this->adminUser);
 
     // Set comment variables.
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
-    $this->setCommentPreview(DRUPAL_DISABLED);
+    $this->setCommentPreview(CommentPreviewMode::Disabled);
 
     // Display all the comments on the same page.
     $this->setCommentsPerPage(1000);
@@ -210,8 +226,10 @@ class CommentPagerTest extends CommentTestBase {
    *   An array of comments, must be of the type CommentInterface.
    * @param array $expected_order
    *   An array of keys from $comments describing the expected order.
+   *
+   * @internal
    */
-  public function assertCommentOrder(array $comments, array $expected_order) {
+  public function assertCommentOrder(array $comments, array $expected_order): void {
     $expected_cids = [];
 
     // First, rekey the expected order by cid.
@@ -224,19 +242,19 @@ class CommentPagerTest extends CommentTestBase {
     foreach ($comment_anchors as $anchor) {
       $result_order[] = substr($anchor->getAttribute('id'), 8);
     }
-    return $this->assertEqual($expected_cids, $result_order, new FormattableMarkup('Comment order: expected @expected, returned @returned.', ['@expected' => implode(',', $expected_cids), '@returned' => implode(',', $result_order)]));
+    $this->assertEquals($expected_cids, $result_order, sprintf('Comment order: expected %s, returned %s.', implode(',', $expected_cids), implode(',', $result_order)));
   }
 
   /**
    * Tests calculation of first page with new comment.
    */
-  public function testCommentNewPageIndicator() {
+  public function testCommentNewPageIndicator(): void {
     $this->drupalLogin($this->adminUser);
 
     // Set comment variables.
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
-    $this->setCommentPreview(DRUPAL_DISABLED);
+    $this->setCommentPreview(CommentPreviewMode::Disabled);
 
     // Set comments to one per page so that we are able to test paging without
     // needing to insert large numbers of comments.
@@ -272,17 +290,17 @@ class CommentPagerTest extends CommentTestBase {
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.');
 
     $expected_pages = [
-      // Page of comment 5
+      // Page of comment 5.
       1 => 5,
-      // Page of comment 4
+      // Page of comment 4.
       2 => 4,
-      // Page of comment 3
+      // Page of comment 3.
       3 => 3,
-      // Page of comment 2
+      // Page of comment 2.
       4 => 2,
-      // Page of comment 1
+      // Page of comment 1.
       5 => 1,
-      // Page of comment 0
+      // Page of comment 0.
       6 => 0,
     ];
 
@@ -290,23 +308,23 @@ class CommentPagerTest extends CommentTestBase {
     foreach ($expected_pages as $new_replies => $expected_page) {
       $returned_page = \Drupal::entityTypeManager()->getStorage('comment')
         ->getNewCommentPageNumber($node->get('comment')->comment_count, $new_replies, $node, 'comment');
-      $this->assertSame($expected_page, $returned_page, new FormattableMarkup('Flat mode, @new replies: expected page @expected, returned page @returned.', ['@new' => $new_replies, '@expected' => $expected_page, '@returned' => $returned_page]));
+      $this->assertSame($expected_page, $returned_page, "Flat mode, $new_replies replies: expected page $expected_page, returned page $returned_page.");
     }
 
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Switched to threaded mode.');
 
     $expected_pages = [
-      // Page of comment 5
+      // Page of comment 5.
       1 => 5,
-      // Page of comment 4
+      // Page of comment 4.
       2 => 1,
-      // Page of comment 4
+      // Page of comment 4.
       3 => 1,
-      // Page of comment 4
+      // Page of comment 4.
       4 => 1,
-      // Page of comment 4
+      // Page of comment 4.
       5 => 1,
-      // Page of comment 0
+      // Page of comment 0.
       6 => 0,
     ];
 
@@ -315,14 +333,14 @@ class CommentPagerTest extends CommentTestBase {
     foreach ($expected_pages as $new_replies => $expected_page) {
       $returned_page = \Drupal::entityTypeManager()->getStorage('comment')
         ->getNewCommentPageNumber($node->get('comment')->comment_count, $new_replies, $node, 'comment');
-      $this->assertEqual($expected_page, $returned_page, new FormattableMarkup('Threaded mode, @new replies: expected page @expected, returned page @returned.', ['@new' => $new_replies, '@expected' => $expected_page, '@returned' => $returned_page]));
+      $this->assertEquals($expected_page, $returned_page, "Threaded mode, $new_replies replies: expected page $expected_page, returned page $returned_page.");
     }
   }
 
   /**
    * Confirms comment paging works correctly with two pagers.
    */
-  public function testTwoPagers() {
+  public function testTwoPagers(): void {
     // Add another field to article content-type.
     $this->addDefaultCommentField('node', 'article', 'comment_2');
     // Set default to display comment list with unique pager id.
@@ -344,17 +362,17 @@ class CommentPagerTest extends CommentTestBase {
     $this->drupalLogin($account);
     $this->drupalGet('admin/structure/types/manage/article/display');
     // No summary for standard pager.
-    $this->assertNoText('Pager ID: 0');
-    $this->assertText('Pager ID: 1');
+    $this->assertSession()->pageTextNotContains('Pager ID: 0');
+    $this->assertSession()->pageTextContains('Pager ID: 1');
     $this->submitForm([], 'comment_settings_edit');
     // Change default pager to 2.
     $this->submitForm(['fields[comment][settings_edit_form][settings][pager_id]' => 2], 'Save');
-    $this->assertText('Pager ID: 2');
+    $this->assertSession()->pageTextContains('Pager ID: 2');
     // Revert the changes.
     $this->submitForm([], 'comment_settings_edit');
     $this->submitForm(['fields[comment][settings_edit_form][settings][pager_id]' => 0], 'Save');
     // No summary for standard pager.
-    $this->assertNoText('Pager ID: 0');
+    $this->assertSession()->pageTextNotContains('Pager ID: 0');
 
     $this->drupalLogin($this->adminUser);
 
@@ -364,17 +382,14 @@ class CommentPagerTest extends CommentTestBase {
     $comments = [];
     foreach (['comment', 'comment_2'] as $field_name) {
       $this->setCommentForm(TRUE, $field_name);
-      $this->setCommentPreview(DRUPAL_OPTIONAL, $field_name);
+      $this->setCommentPreview(CommentPreviewMode::Optional, $field_name);
       $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.', $field_name);
 
       // Set comments to one per page so that we are able to test paging without
       // needing to insert large numbers of comments.
       $this->setCommentsPerPage(1, $field_name);
-      for ($i = 0; $i < 3; $i++) {
-        $comment = t('Comment @count on field @field', [
-          '@count' => $i + 1,
-          '@field' => $field_name,
-        ]);
+      for ($i = 1; $i <= 4; $i++) {
+        $comment = "Comment $i on field $field_name";
         $comments[] = $this->postComment($node, $comment, $comment, TRUE, $field_name);
       }
     }
@@ -382,26 +397,26 @@ class CommentPagerTest extends CommentTestBase {
     // Check the first page of the node, and confirm the correct comments are
     // shown.
     $this->drupalGet('node/' . $node->id());
-    $this->assertRaw(t('next'));
-    $this->assertRaw('Comment 1 on field comment');
-    $this->assertRaw('Comment 1 on field comment_2');
+    $this->assertSession()->pageTextContains('next');
+    $this->assertSession()->pageTextContains('Comment 1 on field comment');
+    $this->assertSession()->pageTextContains('Comment 1 on field comment_2');
     // Navigate to next page of field 1.
     $this->clickLinkWithXPath('//h3/a[normalize-space(text())=:label]/ancestor::section[1]//a[@rel="next"]', [':label' => 'Comment 1 on field comment']);
     // Check only one pager updated.
-    $this->assertRaw('Comment 2 on field comment');
-    $this->assertRaw('Comment 1 on field comment_2');
+    $this->assertSession()->pageTextContains('Comment 2 on field comment');
+    $this->assertSession()->pageTextContains('Comment 1 on field comment_2');
     // Return to page 1.
     $this->drupalGet('node/' . $node->id());
     // Navigate to next page of field 2.
     $this->clickLinkWithXPath('//h3/a[normalize-space(text())=:label]/ancestor::section[1]//a[@rel="next"]', [':label' => 'Comment 1 on field comment_2']);
     // Check only one pager updated.
-    $this->assertRaw('Comment 1 on field comment');
-    $this->assertRaw('Comment 2 on field comment_2');
+    $this->assertSession()->pageTextContains('Comment 1 on field comment');
+    $this->assertSession()->pageTextContains('Comment 2 on field comment_2');
     // Navigate to next page of field 1.
     $this->clickLinkWithXPath('//h3/a[normalize-space(text())=:label]/ancestor::section[1]//a[@rel="next"]', [':label' => 'Comment 1 on field comment']);
     // Check only one pager updated.
-    $this->assertRaw('Comment 2 on field comment');
-    $this->assertRaw('Comment 2 on field comment_2');
+    $this->assertSession()->pageTextContains('Comment 2 on field comment');
+    $this->assertSession()->pageTextContains('Comment 2 on field comment_2');
   }
 
   /**
@@ -433,7 +448,7 @@ class CommentPagerTest extends CommentTestBase {
       $url_target = $this->getAbsoluteUrl($urls[$index]->getAttribute('href'));
       return $this->drupalGet($url_target);
     }
-    $this->fail(new FormattableMarkup('Link %label does not exist on @url_before', ['%label' => $xpath, '@url_before' => $url_before]), 'Browser');
+    $this->fail("Link $xpath does not exist on $url_before");
     return FALSE;
   }
 

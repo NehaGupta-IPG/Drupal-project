@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\search\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verify the search results using administration theme for specific plugins.
@@ -10,15 +14,21 @@ use Drupal\Tests\BrowserTestBase;
  * @see \Drupal\search\Annotation\SearchPlugin::$use_admin_theme
  * @see \Drupal\search\Routing\SearchPageRoutes::routes()
  * @see \Drupal\Tests\system\Functional\System\ThemeTest::testAdministrationTheme()
- *
- * @group search
  */
+#[Group('search')]
+#[RunTestsInSeparateProcesses]
 class SearchAdminThemeTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'search', 'search_extra_type', 'user'];
+  protected static $modules = [
+    'help',
+    'node',
+    'search',
+    'search_extra_type',
+    'user',
+  ];
 
   /**
    * {@inheritdoc}
@@ -30,7 +40,7 @@ class SearchAdminThemeTest extends BrowserTestBase {
    *
    * @var string
    */
-  protected $adminTheme = 'seven';
+  protected $adminTheme = 'claro';
 
   /**
    * {@inheritdoc}
@@ -48,6 +58,7 @@ class SearchAdminThemeTest extends BrowserTestBase {
     $user = $this->drupalCreateUser([
       'access content',
       'search content',
+      'access help pages',
       'access user profiles',
       'view the administration theme',
     ]);
@@ -62,7 +73,7 @@ class SearchAdminThemeTest extends BrowserTestBase {
    * @see \Drupal\search_extra_type\Plugin\Search\SearchExtraTypeSearch
    * @see \Drupal\user\Plugin\Search\UserSearch
    */
-  public function testSearchUsingAdminTheme() {
+  public function testSearchUsingAdminTheme(): void {
     /** @var \Drupal\search\SearchPageRepositoryInterface $repository */
     $repository = \Drupal::service('search.search_page_repository');
     $pages = $repository->getActiveSearchPages();
@@ -70,6 +81,7 @@ class SearchAdminThemeTest extends BrowserTestBase {
     $page_ids = [
       'node_search' => FALSE,
       'dummy_search_type' => TRUE,
+      'help_search' => TRUE,
       'user_search' => FALSE,
     ];
     foreach ($page_ids as $page_id => $use_admin_theme) {
@@ -93,13 +105,15 @@ class SearchAdminThemeTest extends BrowserTestBase {
    *
    * @param bool $is_admin
    *   TRUE to test for administrative theme, FALSE otherwise.
+   *
+   * @internal
    */
-  protected function assertAdminTheme($is_admin) {
+  protected function assertAdminTheme(bool $is_admin): void {
     if ($is_admin) {
-      $this->assertRaw('core/themes/' . $this->adminTheme);
+      $this->assertSession()->responseContains('core/themes/' . $this->adminTheme);
     }
     else {
-      $this->assertNoRaw('core/themes/' . $this->adminTheme);
+      $this->assertSession()->responseNotContains('core/themes/' . $this->adminTheme);
     }
   }
 

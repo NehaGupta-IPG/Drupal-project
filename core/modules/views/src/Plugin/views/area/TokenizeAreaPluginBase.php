@@ -3,6 +3,7 @@
 namespace Drupal\views\Plugin\views\area;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Component\Utility\Xss;
 
 /**
  * Tokenized base class for area handlers.
@@ -41,14 +42,15 @@ abstract class TokenizeAreaPluginBase extends AreaPluginBase {
   public function tokenForm(&$form, FormStateInterface $form_state) {
     $form['tokenize'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Use replacement tokens from the first row'),
+      '#title' => $this->t('Include tokens from the first row'),
+      '#description' => $this->t('Enable this to use tokens from fields in the first result row, if present. Global tokens (e.g., site name) and contextual argument tokens are always available.'),
       '#default_value' => $this->options['tokenize'],
     ];
 
     // Get a list of the available fields and arguments for token replacement.
     $options = [];
-    $optgroup_arguments = (string) t('Arguments');
-    $optgroup_fields = (string) t('Fields');
+    $optgroup_arguments = (string) $this->t('Arguments');
+    $optgroup_fields = (string) $this->t('Fields');
     foreach ($this->view->display_handler->getHandlers('field') as $field => $handler) {
       $options[$optgroup_fields]["{{ $field }}"] = $handler->adminLabel();
     }
@@ -85,6 +87,11 @@ abstract class TokenizeAreaPluginBase extends AreaPluginBase {
           ];
         }
       }
+      $form['tokens']['html_help'] = [
+        '#markup' => '<p>' . $this->t('You may include the following allowed HTML tags with these "Replacement patterns": <code>@tags</code>', [
+          '@tags' => '<' . implode('> <', Xss::getAdminTagList()) . '>',
+        ]) . '</p>',
+      ];
     }
 
     $this->globalTokenForm($form, $form_state);
@@ -101,11 +108,14 @@ abstract class TokenizeAreaPluginBase extends AreaPluginBase {
    *   will be replaced.
    */
   public function tokenizeValue($value) {
+    // As we add the globalTokenForm() we also should replace the token here.
+    $value = $this->globalTokenReplace($value);
+
     if ($this->options['tokenize']) {
       $value = $this->view->getStyle()->tokenizeValue($value, 0);
     }
-    // As we add the globalTokenForm() we also should replace the token here.
-    return $this->globalTokenReplace($value);
+
+    return $value;
   }
 
 }

@@ -1,23 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
+use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests exposed forms functionality.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ExposedFormCheckboxesTest extends ViewTestBase {
 
-  use EntityReferenceTestTrait;
+  use EntityReferenceFieldCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -51,8 +55,8 @@ class ExposedFormCheckboxesTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp(FALSE);
+  protected function setUp($import_test_views = TRUE, $modules = []): void {
+    parent::setUp(FALSE, $modules);
 
     // Create a vocabulary and entity reference field so we can test the "is all
     // of" filter operator. Must be done ahead of the view import so the
@@ -82,7 +86,7 @@ class ExposedFormCheckboxesTest extends ViewTestBase {
   /**
    * Tests overriding the default render option with checkboxes.
    */
-  public function testExposedFormRenderCheckboxes() {
+  public function testExposedFormRenderCheckboxes(): void {
     // Use a test theme to convert multi-select elements into checkboxes.
     \Drupal::service('theme_installer')->install(['views_test_checkboxes_theme']);
     $this->config('system.theme')
@@ -97,25 +101,25 @@ class ExposedFormCheckboxesTest extends ViewTestBase {
     $view->save();
     $this->drupalGet('test_exposed_form_checkboxes');
 
-    $actual = $this->xpath('//form//input[@type="checkbox" and @name="type[article]"]');
-    $this->assertCount(1, $actual, 'Article option renders as a checkbox.');
-    $actual = $this->xpath('//form//input[@type="checkbox" and @name="type[page]"]');
-    $this->assertCount(1, $actual, 'Page option renders as a checkbox');
+    $this->assertSame('checkbox', $this->assertSession()->fieldExists('type[article]')->getAttribute('type'));
+    $this->assertSame('checkbox', $this->assertSession()->fieldExists('type[page]')->getAttribute('type'));
 
     // Ensure that all results are displayed.
-    $rows = $this->xpath("//div[contains(@class, 'views-row')]");
-    $this->assertCount(5, $rows, '5 rows are displayed by default on the first page when no options are checked.');
+    // 5 rows are displayed by default on the first page when no options are
+    // checked.
+    $this->assertSession()->elementsCount('xpath', "//div[contains(@class, 'views-row')]", 5);
 
+    // 1 row is displayed by default on the second page when no options are
+    // checked.
     $this->clickLink('Page 2');
-    $rows = $this->xpath("//div[contains(@class, 'views-row')]");
-    $this->assertCount(1, $rows, '1 row is displayed by default on the second page when no options are checked.');
-    $this->assertNoText('An illegal choice has been detected. Please contact the site administrator.');
+    $this->assertSession()->elementsCount('xpath', "//div[contains(@class, 'views-row')]", 1);
+    $this->assertSession()->pageTextNotContains('The submitted value in the Type element is not allowed.');
   }
 
   /**
    * Tests that "is all of" filters work with checkboxes.
    */
-  public function testExposedIsAllOfFilter() {
+  public function testExposedIsAllOfFilter(): void {
     foreach (['Term 1', 'Term 2', 'Term 3'] as $term_name) {
       // Add a few terms to the new vocabulary.
       $term = Term::create([
@@ -127,14 +131,14 @@ class ExposedFormCheckboxesTest extends ViewTestBase {
     }
 
     // Create a field.
-    $field_name = mb_strtolower($this->randomMachineName());
+    $field_name = $this->randomMachineName();
     $handler_settings = [
       'target_bundles' => [
         $this->vocabulary->id() => $this->vocabulary->id(),
       ],
       'auto_create' => FALSE,
     ];
-    $this->createEntityReferenceField('node', 'article', $field_name, NULL, 'taxonomy_term', 'default', $handler_settings, FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+    $this->createEntityReferenceField('node', 'article', $field_name, 'Reference Field', 'taxonomy_term', 'default', $handler_settings, FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
 
     // Add some test nodes.
     $this->createNode([
@@ -155,18 +159,17 @@ class ExposedFormCheckboxesTest extends ViewTestBase {
     $this->drupalGet('test_exposed_form_checkboxes');
 
     // Ensure that all results are displayed.
-    $rows = $this->xpath("//div[contains(@class, 'views-row')]");
-    $this->assertCount(8, $rows, 'All rows are displayed by default on the first page when no options are checked.');
-    $this->assertNoText('An illegal choice has been detected. Please contact the site administrator.');
+    // All rows are displayed by default on the first page when no options are
+    // checked.
+    $this->assertSession()->elementsCount('xpath', "//div[contains(@class, 'views-row')]", 8);
+    $this->assertSession()->pageTextNotContains('The submitted value in the Reference Field element is not allowed.');
 
     // Select one option and ensure we still have results.
     $tid = $this->terms[0]->id();
     $this->submitForm(["tid[$tid]" => $tid], 'Apply');
-
     // Ensure only nodes tagged with $tid are displayed.
-    $rows = $this->xpath("//div[contains(@class, 'views-row')]");
-    $this->assertCount(2, $rows, 'Correct rows are displayed when a tid is selected.');
-    $this->assertNoText('An illegal choice has been detected. Please contact the site administrator.');
+    $this->assertSession()->elementsCount('xpath', "//div[contains(@class, 'views-row')]", 2);
+    $this->assertSession()->pageTextNotContains('The submitted value in the Reference Field element is not allowed.');
   }
 
 }

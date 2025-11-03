@@ -1,44 +1,39 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\Component\Utility\Crypt;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigNameException;
 use Drupal\Core\Config\ConfigValueException;
-use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\DatabaseStorage;
 use Drupal\Core\Config\UnsupportedDataTypeConfigException;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests CRUD operations on configuration objects.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigCRUDTest extends KernelTestBase {
 
   /**
    * Exempt from strict schema checking.
    *
-   * @see \Drupal\Core\Config\Development\ConfigSchemaChecker
-   *
    * @var bool
+   *
+   * @see \Drupal\Core\Config\Development\ConfigSchemaChecker
    */
   protected $strictConfigSchema = FALSE;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  protected static $modules = ['system'];
-
-  /**
    * Tests CRUD operations.
    */
-  public function testCRUD() {
+  public function testCRUD(): void {
     $event_dispatcher = $this->container->get('event_dispatcher');
     $typed_config_manager = $this->container->get('config.typed');
 
@@ -173,7 +168,7 @@ class ConfigCRUDTest extends KernelTestBase {
     $new_config = $this->config($new_name);
     $expected_values = [
       'value' => 'herp',
-      '404' => 'derp',
+      '404' => 'foo',
     ];
     $new_config->merge($expected_values);
     $new_config->save();
@@ -190,9 +185,9 @@ class ConfigCRUDTest extends KernelTestBase {
   /**
    * Tests the validation of configuration object names.
    */
-  public function testNameValidation() {
+  public function testNameValidation(): void {
     // Verify that an object name without namespace causes an exception.
-    $name = 'nonamespace';
+    $name = 'no_namespace';
     try {
       $this->config($name)->save();
       $this->fail('Expected ConfigNameException was thrown for a name without a namespace.');
@@ -202,7 +197,7 @@ class ConfigCRUDTest extends KernelTestBase {
     }
 
     // Verify that a name longer than the maximum length causes an exception.
-    $name = 'config_test.herman_melville.moby_dick_or_the_whale.harper_1851.now_small_fowls_flew_screaming_over_the_yet_yawning_gulf_a_sullen_white_surf_beat_against_its_steep_sides_then_all_collapsed_and_the_great_shroud_of_the_sea_rolled_on_as_it_rolled_five_thousand_years_ago';
+    $name = 'config_test.herman_melville.dick_or_the_whale.harper_1851.now_small_fowls_flew_screaming_over_the_yet_yawning_gulf_a_sullen_white_surf_beat_against_its_steep_sides_then_all_collapsed_and_the_great_shroud_of_the_sea_rolled_on_as_it_rolled_five_thousand_years_ago';
     try {
       $this->config($name)->save();
       $this->fail('Expected ConfigNameException was thrown for a name longer than Config::MAX_NAME_LENGTH.');
@@ -219,13 +214,11 @@ class ConfigCRUDTest extends KernelTestBase {
         $config = $this->config($name);
         $config->save();
       }
-      catch (ConfigNameException $e) {
+      catch (ConfigNameException) {
         unset($test_characters[$i]);
       }
     }
-    $this->assertTrue(empty($test_characters), new FormattableMarkup('Expected ConfigNameException was thrown for all invalid name characters: @characters', [
-      '@characters' => implode(' ', $characters),
-    ]));
+    $this->assertEmpty($test_characters, sprintf('Expected ConfigNameException was thrown for all invalid name characters: %s', implode(' ', $characters)));
 
     // Verify that a valid config object name can be saved.
     $name = 'namespace.object';
@@ -233,7 +226,7 @@ class ConfigCRUDTest extends KernelTestBase {
       $config = $this->config($name);
       $config->save();
     }
-    catch (ConfigNameException $e) {
+    catch (ConfigNameException) {
       $this->fail('ConfigNameException was not thrown for a valid object name.');
     }
 
@@ -242,7 +235,7 @@ class ConfigCRUDTest extends KernelTestBase {
   /**
    * Tests the validation of configuration object values.
    */
-  public function testValueValidation() {
+  public function testValueValidation(): void {
     // Verify that setData() will catch dotted keys.
     try {
       $this->config('namespace.object')->setData(['key.value' => 12])->save();
@@ -265,13 +258,11 @@ class ConfigCRUDTest extends KernelTestBase {
   /**
    * Tests data type handling.
    */
-  public function testDataTypes() {
+  public function testDataTypes(): void {
     \Drupal::service('module_installer')->install(['config_test']);
     $storage = new DatabaseStorage($this->container->get('database'), 'config');
     $name = 'config_test.types';
     $config = $this->config($name);
-    $original_content = file_get_contents(drupal_get_path('module', 'config_test') . '/' . InstallStorage::CONFIG_INSTALL_DIRECTORY . "/$name.yml");
-    $this->verbose('<pre>' . $original_content . "\n" . var_export($storage->read($name), TRUE));
 
     // Verify variable data types are intact.
     $data = [
@@ -282,11 +273,29 @@ class ConfigCRUDTest extends KernelTestBase {
       'float_as_integer' => (float) 1,
       'hex' => 0xC,
       'int' => 99,
-      'octal' => 0775,
+      // Symfony 5.1's YAML parser issues a deprecation when reading octal with
+      // a leading zero, to comply with YAML 1.2. However PECL YAML is still
+      // YAML 1.1 compliant.
+      // @todo Revisit parsing of octal once PECL YAML supports YAML 1.2.
+      //   https://www.drupal.org/project/drupal/issues/3205480
+      //   'octal' => 0775,
       'string' => 'string',
       'string_int' => '1',
+      'nullable_array' => NULL,
+      'nullable_boolean' => NULL,
+      'nullable_exp' => NULL,
+      'nullable_float' => NULL,
+      'nullable_float_as_integer' => NULL,
+      'nullable_hex' => NULL,
+      'nullable_int' => NULL,
+      'nullable_octal' => NULL,
+      'nullable_string' => NULL,
+      'nullable_string_int' => NULL,
+      'mapping_with_only_required_keys' => [],
+      'mapping_with_some_required_keys' => [],
+      'mapping_with_only_optional_keys' => [],
     ];
-    $data['_core']['default_config_hash'] = Crypt::hashBase64(serialize($data));
+    $data = ['_core' => ['default_config_hash' => Crypt::hashBase64(serialize($data))]] + $data;
     $this->assertSame($data, $config->get());
 
     // Re-set each key using Config::set().
@@ -297,7 +306,6 @@ class ConfigCRUDTest extends KernelTestBase {
     $this->assertSame($data, $config->get());
     // Assert the data against the file storage.
     $this->assertSame($data, $storage->read($name));
-    $this->verbose('<pre>' . $name . var_export($storage->read($name), TRUE));
 
     // Set data using config::setData().
     $config->setData($data)->save();
@@ -318,7 +326,7 @@ class ConfigCRUDTest extends KernelTestBase {
       $config->set('stream', fopen(__FILE__, 'r'))->save();
       $this->fail('No Exception thrown upon saving invalid data type.');
     }
-    catch (UnsupportedDataTypeConfigException $e) {
+    catch (UnsupportedDataTypeConfigException) {
       // Expected exception; just continue testing.
     }
 
@@ -333,7 +341,7 @@ class ConfigCRUDTest extends KernelTestBase {
       $config->set('stream', fopen(__FILE__, 'r'))->save();
       $this->fail('No Exception thrown upon saving invalid data type.');
     }
-    catch (UnsupportedDataTypeConfigException $e) {
+    catch (UnsupportedDataTypeConfigException) {
       // Expected exception; just continue testing.
     }
   }

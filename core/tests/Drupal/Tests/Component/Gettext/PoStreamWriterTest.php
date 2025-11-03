@@ -1,21 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Gettext;
 
+use Drupal\Component\Gettext\PoHeader;
 use Drupal\Component\Gettext\PoItem;
 use Drupal\Component\Gettext\PoStreamWriter;
-use Drupal\Tests\PhpUnitCompatibilityTrait;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
- * @coversDefaultClass \Drupal\Component\Gettext\PoStreamWriter
- * @group Gettext
+ * Tests Drupal\Component\Gettext\PoStreamWriter.
  */
+#[CoversClass(PoStreamWriter::class)]
+#[Group('Gettext')]
 class PoStreamWriterTest extends TestCase {
 
-  use PhpUnitCompatibilityTrait;
+  use ProphecyTrait;
 
   /**
    * The PO writer object under test.
@@ -37,29 +44,34 @@ class PoStreamWriterTest extends TestCase {
   protected function setUp(): void {
     parent::setUp();
 
+    $poHeader = $this->prophesize(PoHeader::class);
+    $poHeader->__toString()->willReturn('');
     $this->poWriter = new PoStreamWriter();
+    $this->poWriter->setHeader($poHeader->reveal());
 
     $root = vfsStream::setup();
-    $this->poFile = new vfsStreamFile('powriter.po');
+    $this->poFile = new vfsStreamFile('poWriter.po');
     $root->addChild($this->poFile);
   }
 
   /**
-   * @covers ::getURI
+   * @legacy-covers ::getURI
    */
-  public function testGetUriException() {
-    $this->expectException(\Exception::class, 'No URI set.');
+  public function testGetUriException(): void {
+    $this->expectException(\Exception::class);
+    $this->expectExceptionMessage('No URI set.');
 
     $this->poWriter->getURI();
   }
 
   /**
-   * @covers ::writeItem
-   * @dataProvider providerWriteData
+   * @legacy-covers ::writeItem
    */
-  public function testWriteItem($poContent, $expected, $long) {
+  #[DataProvider('providerWriteData')]
+  public function testWriteItem($poContent, $expected, $long): void {
     if ($long) {
-      $this->expectException(\Exception::class, 'Unable to write data:');
+      $this->expectException(\Exception::class);
+      $this->expectExceptionMessage('Unable to write data:');
     }
 
     // Limit the file system quota to make the write fail on long strings.
@@ -82,7 +94,7 @@ class PoStreamWriterTest extends TestCase {
    *   - Written content.
    *   - Content longer than 10 bytes.
    */
-  public function providerWriteData() {
+  public static function providerWriteData() {
     // cSpell:disable
     return [
       ['', '', FALSE],
@@ -97,10 +109,11 @@ class PoStreamWriterTest extends TestCase {
   }
 
   /**
-   * @covers ::close
+   * @legacy-covers ::close
    */
-  public function testCloseException() {
-    $this->expectException(\Exception::class, 'Cannot close stream that is not open.');
+  public function testCloseException(): void {
+    $this->expectException(\Exception::class);
+    $this->expectExceptionMessage('Cannot close stream that is not open.');
 
     $this->poWriter->close();
   }

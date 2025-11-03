@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\database_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Database\Query\TableSortExtender;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -13,6 +16,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  * Controller routines for database_test routes.
  */
 class DatabaseTestController extends ControllerBase {
+
+  use StringTranslationTrait;
 
   /**
    * The database connection.
@@ -41,29 +46,13 @@ class DatabaseTestController extends ControllerBase {
   }
 
   /**
-   * Creates temporary table and outputs the table name and its number of rows.
-   *
-   * We need to test that the table created is temporary, so we run it here, in a
-   * separate menu callback request; After this request is done, the temporary
-   * table should automatically dropped.
-   *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
-   */
-  public function dbQueryTemporary() {
-    $table_name = $this->connection->queryTemporary('SELECT [age] FROM {test}', []);
-    return new JsonResponse([
-      'table_name' => $table_name,
-      'row_count' => $this->connection->select($table_name)->countQuery()->execute()->fetchField(),
-    ]);
-  }
-
-  /**
    * Runs a pager query and returns the results.
    *
    * This function does care about the page GET parameter, as set by the
-   * simpletest HTTP call.
+   * test HTTP call.
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   A JSON response containing the names of the test entries.
    */
   public function pagerQueryEven($limit) {
     $query = $this->connection->select('test', 't');
@@ -87,9 +76,10 @@ class DatabaseTestController extends ControllerBase {
    * Runs a pager query and returns the results.
    *
    * This function does care about the page GET parameter, as set by the
-   * simpletest HTTP call.
+   * test HTTP call.
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   A JSON response containing the names of the test entries.
    */
   public function pagerQueryOdd($limit) {
     $query = $this->connection->select('test_task', 't');
@@ -113,16 +103,17 @@ class DatabaseTestController extends ControllerBase {
    * Runs a tablesort query and returns the results.
    *
    * This function does care about the page GET parameter, as set by the
-   * simpletest HTTP call.
+   * test HTTP call.
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   A JSON response containing the test tasks.
    */
   public function testTablesort() {
     $header = [
-      'tid' => ['data' => t('Task ID'), 'field' => 'tid', 'sort' => 'desc'],
-      'pid' => ['data' => t('Person ID'), 'field' => 'pid'],
-      'task' => ['data' => t('Task'), 'field' => 'task'],
-      'priority' => ['data' => t('Priority'), 'field' => 'priority'],
+      'tid' => ['data' => $this->t('Task ID'), 'field' => 'tid', 'sort' => 'desc'],
+      'pid' => ['data' => $this->t('Person ID'), 'field' => 'pid'],
+      'task' => ['data' => $this->t('Task'), 'field' => 'task'],
+      'priority' => ['data' => $this->t('Priority'), 'field' => 'priority'],
     ];
 
     $query = $this->connection->select('test_task', 't');
@@ -145,16 +136,17 @@ class DatabaseTestController extends ControllerBase {
    * Runs a tablesort query with a second order_by after and returns the results.
    *
    * This function does care about the page GET parameter, as set by the
-   * simpletest HTTP call.
+   * test HTTP call.
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   A JSON response containing the test tasks.
    */
   public function testTablesortFirst() {
     $header = [
-      'tid' => ['data' => t('Task ID'), 'field' => 'tid', 'sort' => 'desc'],
-      'pid' => ['data' => t('Person ID'), 'field' => 'pid'],
-      'task' => ['data' => t('Task'), 'field' => 'task'],
-      'priority' => ['data' => t('Priority'), 'field' => 'priority'],
+      'tid' => ['data' => $this->t('Task ID'), 'field' => 'tid', 'sort' => 'desc'],
+      'pid' => ['data' => $this->t('Person ID'), 'field' => 'pid'],
+      'task' => ['data' => $this->t('Task'), 'field' => 'task'],
+      'priority' => ['data' => $this->t('Priority'), 'field' => 'priority'],
     ];
 
     $query = $this->connection->select('test_task', 't');

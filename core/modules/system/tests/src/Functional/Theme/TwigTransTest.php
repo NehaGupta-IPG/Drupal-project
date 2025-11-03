@@ -1,22 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Twig\Error\SyntaxError;
 
+// cspell:ignore contaynz errrf herro kontex muun playsholdr starrrrr starzzzz
+// cspell:ignore sunz sunzzzzzzz txtzzzz
 /**
  * Tests Twig "trans" tags.
- *
- * @group Theme
  */
+#[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class TwigTransTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'theme_test',
@@ -70,17 +74,17 @@ class TwigTransTest extends BrowserTestBase {
     $this->installLanguages();
 
     // Assign Lolspeak (xx) to be the default language.
-    $this->config('system.site')->set('default_langcode', 'xx')->save();
     $this->rebuildContainer();
+    $this->config('system.site')->set('default_langcode', 'xx')->save();
 
     // Check that lolspeak is the default language for the site.
-    $this->assertEqual('xx', \Drupal::languageManager()->getDefaultLanguage()->getId(), 'Lolspeak is the default language');
+    $this->assertEquals('xx', \Drupal::languageManager()->getDefaultLanguage()->getId(), 'Lolspeak is the default language');
   }
 
   /**
-   * Test Twig "trans" tags.
+   * Tests Twig "trans" tags.
    */
-  public function testTwigTransTags() {
+  public function testTwigTransTags(): void {
     // Run this once without and once with Twig debug because trans can work
     // differently depending on that setting.
     $this->drupalGet('twig-theme-test/trans', ['language' => \Drupal::languageManager()->getLanguage('xx')]);
@@ -98,9 +102,9 @@ class TwigTransTest extends BrowserTestBase {
   }
 
   /**
-   * Test empty Twig "trans" tags.
+   * Tests empty Twig "trans" tags.
    */
-  public function testEmptyTwigTransTags() {
+  public function testEmptyTwigTransTags(): void {
     $elements = [
       '#type' => 'inline_template',
       '#template' => '{% trans %}{% endtrans %}',
@@ -109,81 +113,104 @@ class TwigTransTest extends BrowserTestBase {
     $renderer = \Drupal::service('renderer');
 
     try {
-      $renderer->renderPlain($elements);
+      $renderer->renderInIsolation($elements);
 
       $this->fail('{% trans %}{% endtrans %} did not throw an exception.');
     }
     catch (SyntaxError $e) {
       $this->assertStringContainsString('{% trans %} tag cannot be empty', $e->getMessage());
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       $this->fail('{% trans %}{% endtrans %} threw an unexpected exception.');
     }
   }
 
   /**
-   * Asserts Twig trans tags.
+   * Testing trans with render array value.
    */
-  protected function assertTwigTransTags() {
+  public function testTransRenderArray(): void {
+    $elements = [
+      '#type' => 'inline_template',
+      '#template' => '{% trans %}This is a {{ var }}.{% endtrans %}',
+      '#context' => [
+        'var' => [
+          '#prefix' => '<strong>',
+          '#markup' => 'trans render array',
+          '#suffix' => '</strong>',
+        ],
+      ],
+    ];
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = \Drupal::service('renderer');
+    $text = (string) $renderer->renderInIsolation($elements);
+    $this->assertSame('This is a <strong>trans render array</strong>.', $text);
+  }
+
+  /**
+   * Asserts Twig trans tags.
+   *
+   * @internal
+   */
+  protected function assertTwigTransTags(): void {
     // Assert that {% trans "Hello sun." %} is translated correctly.
-    $this->assertText('OH HAI SUNZ');
+    $this->assertSession()->pageTextContains('OH HAI SUNZ');
 
     // Assert that {% trans "Hello sun." %} with {"context": "Lolspeak"} is
     // translated correctly.
-    $this->assertText('O HAI SUNZZZZZZZ');
+    $this->assertSession()->pageTextContains('O HAI SUNZZZZZZZ');
 
     // Assert that {{ "Hello Earth."|trans }} is translated correctly.
-    $this->assertText('O HERRO ERRRF.');
+    $this->assertSession()->pageTextContains('O HERRO ERRRF.');
 
     // Assert that {% trans %}Hello moon.{% endtrans %} is translated correctly.
-    $this->assertText('OH HAI TEH MUUN');
+    $this->assertSession()->pageTextContains('OH HAI TEH MUUN');
 
     // Assert that {% trans %} with {% plural count = 1 %} is translated
     // correctly.
-    $this->assertText('O HAI STARRRRR');
+    $this->assertSession()->pageTextContains('O HAI STARRRRR');
 
     // Assert that {% trans %} with {% plural count = 2 %} is translated
     // correctly.
-    $this->assertText('O HAI 2 STARZZZZ');
+    $this->assertSession()->pageTextContains('O HAI 2 STARZZZZ');
 
     // Assert that {{ token }} was successfully translated and prefixed
     // with "@".
-    $this->assertRaw('ESCAPEE: &amp;&quot;&lt;&gt;');
+    $this->assertSession()->responseContains('ESCAPEE: &amp;&quot;&lt;&gt;');
 
     // Assert that {{ token|placeholder }} was successfully translated and
     // prefixed with "%".
-    $this->assertRaw('PLAYSHOLDR: <em class="placeholder">&amp;&quot;&lt;&gt;</em>');
+    $this->assertSession()->responseContains('PLAYSHOLDR: <em class="placeholder">&amp;&quot;&lt;&gt;</em>');
 
     // Assert that {{ complex.tokens }} were successfully translated with
     // appropriate prefixes.
-    $this->assertRaw('DIS complex token HAZ LENGTH OV: 3. IT CONTAYNZ: <em class="placeholder">12345</em> AN &amp;&quot;&lt;&gt;.');
+    $this->assertSession()->responseContains('DIS complex token HAZ LENGTH OV: 3. IT CONTAYNZ: <em class="placeholder">12345</em> AN &amp;&quot;&lt;&gt;.');
 
     // Assert that {% trans %} with a context only msgid is excluded from
     // translation.
-    $this->assertText('I have context.');
+    $this->assertSession()->pageTextContains('I have context.');
 
     // Assert that {% trans with {"context": "Lolspeak"} %} was successfully
     // translated with context.
-    $this->assertText('I HAZ KONTEX.');
+    $this->assertSession()->pageTextContains('I HAZ KONTEX.');
 
     // Assert that {% trans with {"langcode": "zz"} %} is successfully
     // translated in specified language.
-    $this->assertText('O HAI NU TXT.');
+    $this->assertSession()->pageTextContains('O HAI NU TXT.');
 
     // Assert that {% trans with {"context": "Lolspeak", "langcode": "zz"} %}
     // is successfully translated with context in specified language.
-    $this->assertText('O HAI NU TXTZZZZ.');
+    $this->assertSession()->pageTextContains('O HAI NU TXTZZZZ.');
 
     // Makes sure https://www.drupal.org/node/2489024 doesn't happen without
     // twig debug.
     // Ensure that running php code inside a Twig trans is not possible.
-    $this->assertNoText(pi());
+    $this->assertSession()->pageTextNotContains((string) pi());
   }
 
   /**
    * Helper function: install languages.
    */
-  protected function installLanguages() {
+  protected function installLanguages(): void {
     $file_system = \Drupal::service('file_system');
     foreach ($this->languages as $langcode => $name) {
       // Generate custom .po contents for the language.
@@ -198,8 +225,9 @@ class TwigTransTest extends BrowserTestBase {
         ];
 
         // Install the language in Drupal.
-        $this->drupalPostForm('admin/config/regional/language/add', $edit, 'Add custom language');
-        $this->assertRaw('"edit-languages-' . $langcode . '-weight"');
+        $this->drupalGet('admin/config/regional/language/add');
+        $this->submitForm($edit, 'Add custom language');
+        $this->assertSession()->responseContains('"edit-languages-' . $langcode . '-weight"');
 
         // Import the custom .po contents for the language.
         $filename = $file_system->tempnam('temporary://', "po_") . '.po';
@@ -209,7 +237,8 @@ class TwigTransTest extends BrowserTestBase {
           'langcode' => $langcode,
           'customized' => TRUE,
         ];
-        $this->drupalPostForm('admin/config/regional/translate/import', $options, 'Import');
+        $this->drupalGet('admin/config/regional/translate/import');
+        $this->submitForm($options, 'Import');
         $file_system->unlink($filename);
       }
     }

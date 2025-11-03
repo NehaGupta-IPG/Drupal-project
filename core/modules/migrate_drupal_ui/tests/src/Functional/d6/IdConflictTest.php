@@ -1,31 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal_ui\Functional\d6;
 
 use Drupal\Tests\migrate_drupal_ui\Functional\MigrateUpgradeExecuteTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal 6 Id Conflict page.
- *
- * @group migrate_drupal_ui
  */
+#[Group('migrate_drupal_ui')]
+#[RunTestsInSeparateProcesses]
 class IdConflictTest extends MigrateUpgradeExecuteTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'language',
-    'content_translation',
     'config_translation',
+    'content_translation',
+    'language',
     'migrate_drupal_ui',
     'telephone',
-    'aggregator',
-    'book',
-    'forum',
-    'statistics',
-    // Required for translation migrations.
-    'migrate_drupal_multilingual',
   ];
 
   /**
@@ -33,64 +31,51 @@ class IdConflictTest extends MigrateUpgradeExecuteTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->loadFixture(drupal_get_path('module', 'migrate_drupal') . '/tests/fixtures/drupal6.php');
+    $this->loadFixture($this->getModulePath('migrate_drupal') . '/tests/fixtures/drupal6.php');
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getSourceBasePath() {
+  protected function getSourceBasePath(): string {
     return __DIR__ . '/files';
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getEntityCounts() {
+  protected function getEntityCounts(): array {
+    return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getEntityCountsIncremental() {
+  protected function getEntityCountsIncremental(): array {
+    return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getAvailablePaths() {
+  protected function getAvailablePaths(): array {
+    return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getMissingPaths() {
+  protected function getMissingPaths(): array {
+    return [];
   }
 
   /**
    * Tests ID Conflict form.
    */
-  public function testMigrateUpgradeExecute() {
-    $this->drupalGet('/upgrade');
-    $session = $this->assertSession();
-    $session->responseContains("Upgrade a site by importing its files and the data from its database into a clean and empty new install of Drupal $this->destinationSiteVersion.");
-
-    $this->submitForm([], 'Continue');
-    $session->pageTextContains('Provide credentials for the database of the Drupal site you want to upgrade.');
-    $session->fieldExists('mysql[host]');
-
-    // Get valid credentials.
-    $edits = $this->translatePostValues($this->getCredentials());
-
+  public function testIdConflictForm(): void {
     // Start the upgrade process.
-    $this->drupalGet('/upgrade');
-    $session->responseContains("Upgrade a site by importing its files and the data from its database into a clean and empty new install of Drupal $this->destinationSiteVersion.");
+    $this->submitCredentialForm();
 
-    $this->submitForm([], 'Continue');
-    $session->pageTextContains('Provide credentials for the database of the Drupal site you want to upgrade.');
-    $session->fieldExists('mysql[host]');
-
-    $this->submitForm($edits, 'Review upgrade');
     $entity_types = [
       'block_content',
       'menu_link_content',

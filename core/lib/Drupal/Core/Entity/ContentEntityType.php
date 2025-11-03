@@ -12,6 +12,7 @@ class ContentEntityType extends EntityType implements ContentEntityTypeInterface
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $revision_metadata_keys = [];
 
   /**
@@ -65,7 +66,7 @@ class ContentEntityType extends EntityType implements ContentEntityTypeInterface
    */
   public function getRevisionMetadataKey($key) {
     $keys = $this->getRevisionMetadataKeys();
-    return isset($keys[$key]) ? $keys[$key] : FALSE;
+    return $keys[$key] ?? FALSE;
   }
 
   /**

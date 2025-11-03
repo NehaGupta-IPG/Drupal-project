@@ -1,21 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\Email;
 
-use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Tests\field\Kernel\FieldKernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the new entity API for the email field type.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class EmailItemTest extends FieldKernelTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -43,7 +50,7 @@ class EmailItemTest extends FieldKernelTestBase {
   /**
    * Tests using entity fields of the email field type.
    */
-  public function testEmailItem() {
+  public function testEmailItem(): void {
     // Verify entity creation.
     $entity = EntityTest::create();
     $value = 'test@example.com';
@@ -56,18 +63,18 @@ class EmailItemTest extends FieldKernelTestBase {
     $entity = EntityTest::load($id);
     $this->assertInstanceOf(FieldItemListInterface::class, $entity->field_email);
     $this->assertInstanceOf(FieldItemInterface::class, $entity->field_email[0]);
-    $this->assertEqual($value, $entity->field_email->value);
-    $this->assertEqual($value, $entity->field_email[0]->value);
+    $this->assertEquals($value, $entity->field_email->value);
+    $this->assertEquals($value, $entity->field_email[0]->value);
 
     // Verify changing the email value.
     $new_value = $this->randomMachineName();
     $entity->field_email->value = $new_value;
-    $this->assertEqual($new_value, $entity->field_email->value);
+    $this->assertEquals($new_value, $entity->field_email->value);
 
     // Read changed entity and assert changed values.
     $entity->save();
     $entity = EntityTest::load($id);
-    $this->assertEqual($new_value, $entity->field_email->value);
+    $this->assertEquals($new_value, $entity->field_email->value);
 
     // Test sample item generation.
     $entity = EntityTest::create();
