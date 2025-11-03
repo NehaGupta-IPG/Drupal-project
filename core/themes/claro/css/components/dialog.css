@@ -125,8 +125,7 @@
   display: flex;
   gap: var(--space-s);
   justify-content: flex-end;
-  margin-block: var(--space-m);
-  margin-inline-end: var(--space-l);
+  margin: 0.875rem;
 }
 
 :is(:is(.ui-dialog > .ui-dialog-buttonpane) .ui-dialog-buttonset) > * {
