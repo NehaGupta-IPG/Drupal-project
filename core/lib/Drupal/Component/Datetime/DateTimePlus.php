@@ -216,7 +216,7 @@ class DateTimePlus {
         // Strip reset if set since format does not support this.
         $format = ltrim($format, '!');
         if ($date->format($format) !== $time) {
-            throw new \UnexpectedValueException('The created date does not match the input value.');
+          throw new \UnexpectedValueException('The created date does not match the input value.');
         }
       }
     }
