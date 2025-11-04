@@ -10,8 +10,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-// cspell:ignore #*|%
-
 /**
  * Tests Drupal\Component\Datetime\DateTimePlus.
  */
@@ -460,6 +458,7 @@ class DateTimePlusTest extends TestCase {
       // Regression test for https://www.drupal.org/node/2084455.
       [['hour' => 59, 'minute' => 1, 'second' => 1], 'America/Chicago', \InvalidArgumentException::class],
       // Test for special characters, which are invalid
+      // cspell:disable-next-line
       [['year' => '#*|%', 'month' => '#*|%', 'day' => 8, 'hour' => '10', 'minute' => 1, 'second' => 1], 'America/Chicago', \InvalidArgumentException::class],
     ];
   }
