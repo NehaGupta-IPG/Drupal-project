@@ -5,7 +5,6 @@
 
 .messages {
   padding: 15px 20px 15px 35px; /* LTR */
-  word-wrap: break-word;
   border: 1px solid;
   border-width: 1px 1px 1px 0; /* LTR */
   border-radius: 2px;

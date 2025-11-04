@@ -9,5 +9,5 @@
 }
 .display-mode-table td {
   max-width: 50px;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
 }

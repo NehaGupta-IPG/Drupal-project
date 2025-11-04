@@ -173,7 +173,7 @@
 
 @media screen and (max-width: 48em) {
   .system-status-report {
-    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 }
 

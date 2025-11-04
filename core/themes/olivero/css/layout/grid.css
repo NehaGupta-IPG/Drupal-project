@@ -14,7 +14,7 @@
   display: grid;
   grid-template-rows: 1fr;
   grid-template-columns: repeat(var(--grid-col-count), minmax(0, 1fr));
-  grid-column-gap: var(--grid-gap);
+  column-gap: var(--grid-gap);
 
   /* .grid-full classes nested 3 or more deep go full width. */
   & .grid-full .grid-full {

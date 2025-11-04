@@ -31,6 +31,5 @@
 
 .views-view-responsive-grid--vertical .views-view-responsive-grid__item > * {
   padding-bottom: var(--views-responsive-grid--layout-gap);
-  page-break-inside: avoid;
   break-inside: avoid;
 }

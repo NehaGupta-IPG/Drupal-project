@@ -30,7 +30,7 @@
 
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(max(var(--views-grid-item--min-width), var(--views-grid-item--max-width)), 1fr));
-  grid-gap: var(--views-grid--layout-gap);
+  gap: var(--views-grid--layout-gap);
 }
 
 .views-view-grid--vertical {
@@ -42,7 +42,6 @@
   & .views-view-grid__item {
     & > * {
       padding-block-end: var(--views-grid--layout-gap);
-      page-break-inside: avoid;
       break-inside: avoid;
     }
   }
