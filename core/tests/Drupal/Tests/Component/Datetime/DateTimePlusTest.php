@@ -457,6 +457,8 @@ class DateTimePlusTest extends TestCase {
       [['year' => 2010, 'month' => 7, 'day' => 8, 'hour' => 8, 'minute' => 88, 'second' => 0], 'America/Chicago', \InvalidArgumentException::class],
       // Regression test for https://www.drupal.org/node/2084455.
       [['hour' => 59, 'minute' => 1, 'second' => 1], 'America/Chicago', \InvalidArgumentException::class],
+      // Test for special characters, which are invalid
+      [['year' => '#*|%', 'month' => '#*|%', 'day' => 8, 'hour' => '10', 'minute' => 1, 'second' => 1], 'America/Chicago', \InvalidArgumentException::class],
     ];
   }
 
