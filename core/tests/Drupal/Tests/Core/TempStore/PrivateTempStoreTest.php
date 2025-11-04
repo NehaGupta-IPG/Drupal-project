@@ -181,7 +181,7 @@ class PrivateTempStoreTest extends UnitTestCase {
    * @return array
    *   Test data.
    */
-  public function providerTestSetExpire(): array {
+  public static function providerTestSetExpire(): array {
     return [
       // A NULL expire value falls back to the default value.
       [NULL, $this->defaultExpire],
