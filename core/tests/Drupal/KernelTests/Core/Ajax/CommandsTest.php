@@ -1,20 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Ajax;
 
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\InsertCommand;
 use Drupal\Core\EventSubscriber\AjaxResponseSubscriber;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * Performs tests on AJAX framework commands.
- *
- * @group Ajax
  */
+#[Group('Ajax')]
+#[RunTestsInSeparateProcesses]
 class CommandsTest extends KernelTestBase {
 
   /**
@@ -30,7 +35,7 @@ class CommandsTest extends KernelTestBase {
   /**
    * Regression test: Settings command exists regardless of JS aggregation.
    */
-  public function testAttachedSettings() {
+  public function testAttachedSettings(): void {
     $assert = function ($message) {
       $response = new AjaxResponse();
       $response->setAttachments([
@@ -39,7 +44,7 @@ class CommandsTest extends KernelTestBase {
       ]);
 
       $ajax_response_attachments_processor = \Drupal::service('ajax_response.attachments_processor');
-      $subscriber = new AjaxResponseSubscriber($ajax_response_attachments_processor);
+      $subscriber = new AjaxResponseSubscriber(fn() => $ajax_response_attachments_processor);
       $event = new ResponseEvent(
         \Drupal::service('http_kernel'),
         new Request(),
@@ -64,10 +69,9 @@ class CommandsTest extends KernelTestBase {
 
   /**
    * Checks empty content in commands does not throw exceptions.
-   *
-   * @doesNotPerformAssertions
    */
-  public function testEmptyInsertCommand() {
+  #[DoesNotPerformAssertions]
+  public function testEmptyInsertCommand(): void {
     (new InsertCommand('foobar', []))->render();
   }
 

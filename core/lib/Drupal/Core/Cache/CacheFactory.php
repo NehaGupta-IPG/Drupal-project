@@ -2,16 +2,13 @@
 
 namespace Drupal\Core\Cache;
 
+use Drupal\Core\Site\Settings;
+use Psr\Container\ContainerInterface;
+
 /**
  * Defines the cache backend factory.
  */
-use Drupal\Core\Site\Settings;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-
-class CacheFactory implements CacheFactoryInterface, ContainerAwareInterface {
-
-  use ContainerAwareTrait;
+class CacheFactory implements CacheFactoryInterface {
 
   /**
    * The site settings.
@@ -43,6 +40,18 @@ class CacheFactory implements CacheFactoryInterface, ContainerAwareInterface {
    * @var array
    */
   protected $memoryDefaultBinBackends;
+
+  /**
+   * The service container.
+   */
+  protected ContainerInterface $container;
+
+  /**
+   * Sets the service container.
+   */
+  public function setContainer(ContainerInterface $container): void {
+    $this->container = $container;
+  }
 
   /**
    * Constructs CacheFactory object.

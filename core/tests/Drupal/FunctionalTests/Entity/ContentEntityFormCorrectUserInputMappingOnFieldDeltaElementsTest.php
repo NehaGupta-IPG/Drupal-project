@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Entity;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the correct mapping of user input on the correct field delta elements.
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class ContentEntityFormCorrectUserInputMappingOnFieldDeltaElementsTest extends BrowserTestBase {
 
   /**
@@ -76,7 +80,7 @@ class ContentEntityFormCorrectUserInputMappingOnFieldDeltaElementsTest extends B
   /**
    * Tests the correct user input mapping on complex fields.
    */
-  public function testCorrectUserInputMappingOnComplexFields() {
+  public function testCorrectUserInputMappingOnComplexFields(): void {
     /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
     $storage = $this->container->get('entity_type.manager')->getStorage($this->entityTypeId);
 
@@ -130,7 +134,6 @@ class ContentEntityFormCorrectUserInputMappingOnFieldDeltaElementsTest extends B
     $this->submitForm($edit, "{$this->fieldName}_0_remove_button");
     $this->submitForm([], 'Save');
 
-    $storage->resetCache([$entity->id()]);
     $entity = $storage->load($entity->id());
     $this->assertEquals([
       ['shape' => 'rectangle', 'color' => 'green'],

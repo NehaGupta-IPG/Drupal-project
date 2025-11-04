@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config\Functional;
 
 use Drupal\Core\Config\Schema\SchemaIncompleteException;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the functionality of ConfigSchemaChecker in BrowserTestBase tests.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class SchemaConfigListenerWebTest extends BrowserTestBase {
 
   /**
@@ -25,7 +29,7 @@ class SchemaConfigListenerWebTest extends BrowserTestBase {
   /**
    * Tests \Drupal\Core\Config\Development\ConfigSchemaChecker.
    */
-  public function testConfigSchemaChecker() {
+  public function testConfigSchemaChecker(): void {
     $this->drupalLogin($this->drupalCreateUser(['administer site configuration']));
 
     // Test a non-existing schema.

@@ -6,17 +6,17 @@ namespace Drupal\BuildTests\Composer\Component;
 
 use Drupal\BuildTests\Composer\ComposerBuildTestBase;
 use Drupal\Composer\Composer;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Finder\Finder;
 
 /**
  * Try to install dependencies per component, using Composer.
- *
- * @group #slow
- * @group Composer
- * @group Component
- *
- * @coversNothing
  */
+#[CoversNothing]
+#[Group('Composer')]
+#[Group('Component')]
 class ComponentsIsolatedBuildTest extends ComposerBuildTestBase {
 
   /**
@@ -25,13 +25,13 @@ class ComponentsIsolatedBuildTest extends ComposerBuildTestBase {
    * @return array
    *   An array with relative paths to the component paths.
    */
-  public function provideComponentPaths(): array {
+  public static function provideComponentPaths(): array {
     $data = [];
     // During the dataProvider phase, there is not a workspace directory yet.
     // So we will find relative paths and assemble them with the workspace
     // path later.
-    $drupal_root = $this->getDrupalRoot();
-    $composer_json_finder = $this->getComponentPathsFinder($drupal_root);
+    $drupal_root = self::getDrupalRootStatic();
+    $composer_json_finder = self::getComponentPathsFinder($drupal_root);
 
     /** @var \Symfony\Component\Finder\SplFileInfo $path */
     foreach ($composer_json_finder->getIterator() as $path) {
@@ -42,9 +42,8 @@ class ComponentsIsolatedBuildTest extends ComposerBuildTestBase {
 
   /**
    * Test whether components' composer.json can be installed in isolation.
-   *
-   * @dataProvider provideComponentPaths
    */
+  #[DataProvider('provideComponentPaths')]
   public function testComponentComposerJson(string $component_path): void {
     // Only copy the components. Copy all of them because some of them depend on
     // each other.

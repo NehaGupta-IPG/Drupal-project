@@ -6,13 +6,16 @@ namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests read-only mode for CKEditor 5.
  *
- * @group ckeditor5
  * @internal
  */
+#[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
 class CKEditor5ReadOnlyModeTest extends CKEditor5TestBase {
 
   /**
@@ -52,10 +55,9 @@ class CKEditor5ReadOnlyModeTest extends CKEditor5TestBase {
   /**
    * Test that disabling a CKEditor 5 field results in an uneditable editor.
    */
-  public function testReadOnlyMode() {
-    $page = $this->getSession()->getPage();
+  public function testReadOnlyMode(): void {
     $assert_session = $this->assertSession();
-    $this->addNewTextFormat($page, $assert_session);
+    $this->addNewTextFormat();
 
     // Check that both CKEditor 5 fields are editable.
     $this->drupalGet('node/add');

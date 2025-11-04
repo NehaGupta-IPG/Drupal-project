@@ -1,21 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block_content\Functional;
 
 use Drupal\block_content\Entity\BlockContent;
-use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
 use Drupal\Tests\system\Functional\Entity\EntityCacheTagsTestBase;
-use Symfony\Component\HttpFoundation\Request;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Content Block entity's cache tags.
- *
- * @group block_content
  */
+#[Group('block_content')]
+#[RunTestsInSeparateProcesses]
 class BlockContentCacheTagsTest extends EntityCacheTagsTestBase {
+
+  use BlockContentCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -31,13 +36,11 @@ class BlockContentCacheTagsTest extends EntityCacheTagsTestBase {
    * {@inheritdoc}
    */
   protected function createEntity() {
-    $block_content_type = BlockContentType::create([
+    $this->createBlockContentType([
       'id' => 'basic',
       'label' => 'basic',
       'revision' => FALSE,
-    ]);
-    $block_content_type->save();
-    block_content_add_body_field($block_content_type->id());
+    ], TRUE);
 
     // Create a "Llama" content block.
     $block_content = BlockContent::create([
@@ -58,7 +61,7 @@ class BlockContentCacheTagsTest extends EntityCacheTagsTestBase {
    *
    * @see \Drupal\block_content\BlockContentAccessControlHandler::checkAccess()
    */
-  protected function getAccessCacheContextsForEntity(EntityInterface $entity) {
+  protected function getAccessCacheContextsForEntity(EntityInterface $entity): array {
     return [];
   }
 
@@ -67,26 +70,19 @@ class BlockContentCacheTagsTest extends EntityCacheTagsTestBase {
    *
    * Each comment must have a comment body, which always has a text format.
    */
-  protected function getAdditionalCacheTagsForEntity(EntityInterface $entity) {
+  protected function getAdditionalCacheTagsForEntity(EntityInterface $entity): array {
     return ['config:filter.format.plain_text'];
   }
 
   /**
    * Tests that the block is cached with the correct contexts and tags.
    */
-  public function testBlock() {
+  public function testBlock(): void {
     $block = $this->drupalPlaceBlock('block_content:' . $this->entity->uuid());
     $build = $this->container->get('entity_type.manager')->getViewBuilder('block')->view($block, 'block');
 
     // Render the block.
-    // @todo The request stack manipulation won't be necessary once
-    //   https://www.drupal.org/node/2367555 is fixed and the
-    //   corresponding $request->isMethodCacheable() checks are removed from
-    //   Drupal\Core\Render\Renderer.
-    $request_stack = $this->container->get('request_stack');
-    $request_stack->push(new Request());
     $this->container->get('renderer')->renderRoot($build);
-    $request_stack->pop();
 
     // Expected keys, contexts, and tags for the block.
     // @see \Drupal\block\BlockViewBuilder::viewMultiple()

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Kernel;
 
 use Drupal\comment\CommentInterface;
@@ -10,20 +12,20 @@ use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests comment validation constraints.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentValidationTest extends EntityKernelTestBase {
   use CommentTestTrait;
   use EntityReferenceFieldCreationTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['comment', 'node'];
 
@@ -39,7 +41,7 @@ class CommentValidationTest extends EntityKernelTestBase {
   /**
    * Tests the comment validation constraints.
    */
-  public function testValidation() {
+  public function testValidation(): void {
     // Add a user.
     $user = User::create(['name' => 'test', 'status' => TRUE]);
     $user->save();
@@ -190,7 +192,7 @@ class CommentValidationTest extends EntityKernelTestBase {
   /**
    * Tests that comments of unpublished nodes are not valid.
    */
-  public function testValidationOfCommentOfUnpublishedNode() {
+  public function testValidationOfCommentOfUnpublishedNode(): void {
     // Create a page node type.
     $this->entityTypeManager->getStorage('node_type')->create([
       'type' => 'page',

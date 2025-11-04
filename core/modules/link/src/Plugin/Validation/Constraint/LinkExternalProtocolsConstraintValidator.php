@@ -13,23 +13,22 @@ class LinkExternalProtocolsConstraintValidator extends ConstraintValidator {
 
   /**
    * {@inheritdoc}
-   *
-   * phpcs:ignore Drupal.Commenting.FunctionComment.VoidReturn
-   * @return void
    */
-  public function validate($value, Constraint $constraint) {
+  public function validate($value, Constraint $constraint): void {
     if (isset($value)) {
       try {
         /** @var \Drupal\Core\Url $url */
         $url = $value->getUrl();
       }
       // If the URL is malformed this constraint cannot check further.
-      catch (\InvalidArgumentException $e) {
+      catch (\InvalidArgumentException) {
         return;
       }
       // Disallow external URLs using untrusted protocols.
       if ($url->isExternal() && !in_array(parse_url($url->getUri(), PHP_URL_SCHEME), UrlHelper::getAllowedProtocols())) {
-        $this->context->addViolation($constraint->message, ['@uri' => $value->uri]);
+        $this->context->buildViolation($constraint->message, ['@uri' => $value->uri])
+          ->atPath('uri')
+          ->addViolation();
       }
     }
   }

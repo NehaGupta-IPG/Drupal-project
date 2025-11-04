@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\config_override_test\Cache\PirateDayCacheContext;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests if configuration overrides correctly affect cacheability metadata.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class CacheabilityMetadataConfigOverrideTest extends KernelTestBase {
 
   /**
@@ -20,8 +24,10 @@ class CacheabilityMetadataConfigOverrideTest extends KernelTestBase {
     'block_content',
     'config',
     'config_override_test',
+    'field',
     'path_alias',
     'system',
+    'text',
     'user',
   ];
 
@@ -32,13 +38,16 @@ class CacheabilityMetadataConfigOverrideTest extends KernelTestBase {
     parent::setUp();
     $this->container->get('theme_installer')->install(['stark']);
     $this->installEntitySchema('block_content');
-    $this->installConfig(['config_override_test']);
+    $this->installConfig([
+      'block_content',
+      'config_override_test',
+    ]);
   }
 
   /**
    * Tests if config overrides correctly set cacheability metadata.
    */
-  public function testConfigOverride() {
+  public function testConfigOverride(): void {
     // It's pirate day today!
     $GLOBALS['it_is_pirate_day'] = TRUE;
 
@@ -58,7 +67,7 @@ class CacheabilityMetadataConfigOverrideTest extends KernelTestBase {
   /**
    * Tests if config overrides set cacheability metadata on config entities.
    */
-  public function testConfigEntityOverride() {
+  public function testConfigEntityOverride(): void {
     // It's pirate day today!
     $GLOBALS['it_is_pirate_day'] = TRUE;
 

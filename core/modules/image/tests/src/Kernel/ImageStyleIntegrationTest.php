@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\image\Kernel;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
@@ -9,12 +11,14 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the integration of ImageStyle with the core.
- *
- * @group image
  */
+#[Group('image')]
+#[RunTestsInSeparateProcesses]
 class ImageStyleIntegrationTest extends KernelTestBase {
 
   /**
@@ -24,7 +28,6 @@ class ImageStyleIntegrationTest extends KernelTestBase {
     'image',
     'file',
     'field',
-    'system',
     'user',
     'node',
   ];
@@ -40,7 +43,7 @@ class ImageStyleIntegrationTest extends KernelTestBase {
   /**
    * Tests the dependency between ImageStyle and entity display components.
    */
-  public function testEntityDisplayDependency() {
+  public function testEntityDisplayDependency(): void {
     // Create two image styles.
     /** @var \Drupal\image\ImageStyleInterface $style */
     $style = ImageStyle::create([
@@ -134,7 +137,7 @@ class ImageStyleIntegrationTest extends KernelTestBase {
   /**
    * Tests renaming the ImageStyle.
    */
-  public function testEntityDisplayDependencyRename() {
+  public function testEntityDisplayDependencyRename(): void {
     // Create an image style.
     /** @var \Drupal\image\ImageStyleInterface $style */
     $style = ImageStyle::create([

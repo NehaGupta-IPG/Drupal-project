@@ -3,17 +3,24 @@
 namespace Drupal\Core\StreamWrapper;
 
 use Drupal\Core\Site\Settings;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Psr\Container\ContainerInterface;
 
 /**
  * Provides a StreamWrapper manager.
  *
  * @see \Drupal\Core\StreamWrapper\StreamWrapperInterface
  */
-class StreamWrapperManager implements ContainerAwareInterface, StreamWrapperManagerInterface {
+class StreamWrapperManager implements StreamWrapperManagerInterface {
 
-  use ContainerAwareTrait;
+  /**
+   * Constructs a StreamWrapperManager object.
+   *
+   * @param \Psr\Container\ContainerInterface $container
+   *   The stream wrapper service locator.
+   */
+  public function __construct(
+    protected readonly ContainerInterface $container,
+  ) {}
 
   /**
    * Contains stream wrapper info.
@@ -124,7 +131,7 @@ class StreamWrapperManager implements ContainerAwareInterface, StreamWrapperMana
    * @param string $uri
    *   The URI of the stream.
    *
-   * @return \Drupal\Core\StreamWrapper\StreamWrapperInterface|bool
+   * @return \Drupal\Core\StreamWrapper\StreamWrapperInterface|false
    *   A stream wrapper object, or false if the scheme is not available.
    */
   protected function getWrapper($scheme, $uri) {
@@ -169,7 +176,7 @@ class StreamWrapperManager implements ContainerAwareInterface, StreamWrapperMana
   }
 
   /**
-   * Unregisters the tagged stream wrappers.
+   * Deregisters the tagged stream wrappers.
    *
    * Internal use only.
    */

@@ -1,33 +1,39 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Theme;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\ExtensionNameLengthException;
 use Drupal\Core\Extension\ExtensionNameReservedException;
 use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\Extension\ModuleUninstallValidatorException;
-use Drupal\Core\Extension\Exception\UnknownExtensionException;
+use Drupal\Core\Extension\ThemeExtensionList;
+use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests installing and uninstalling of themes.
- *
- * @group Extension
  */
+#[Group('Extension')]
+#[RunTestsInSeparateProcesses]
 class ThemeInstallerTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system'];
 
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
     // Some test methods involve ModuleHandler operations, which attempt to
     // rebuild and dump routes.
@@ -46,24 +52,24 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Verifies that no themes are installed by default.
    */
-  public function testEmpty() {
+  public function testEmpty(): void {
     $this->assertEmpty($this->extensionConfig()->get('theme'));
 
     $this->assertEmpty(array_keys($this->themeHandler()->listInfo()));
     $this->assertEmpty(array_keys(\Drupal::service('theme_handler')->listInfo()));
 
     // Rebuilding available themes should always yield results though.
-    $this->assertNotEmpty($this->themeHandler()->rebuildThemeData()['stark'], 'ThemeHandler::rebuildThemeData() yields all available themes.');
+    $this->assertNotEmpty($this->extensionListTheme()->reset()->getList()['stark'], 'ThemeExtensionList::getList() yields all available themes.');
 
-    // theme_get_setting() should return global default theme settings.
-    $this->assertTrue(theme_get_setting('features.favicon'));
+    // The theme settings provider should return global default theme settings.
+    $this->assertTrue(\Drupal::service(ThemeSettingsProvider::class)->getSetting('features.favicon'));
   }
 
   /**
    * Tests installing a theme.
    */
-  public function testInstall() {
-    $name = 'test_basetheme';
+  public function testInstall(): void {
+    $name = 'test_base_theme';
 
     $themes = $this->themeHandler()->listInfo();
     $this->assertFalse(isset($themes[$name]));
@@ -76,18 +82,19 @@ class ThemeInstallerTest extends KernelTestBase {
     $this->assertTrue(isset($themes[$name]));
     $this->assertEquals($name, $themes[$name]->getName());
 
-    // Verify that test_basetheme.settings is active.
-    $this->assertFalse(theme_get_setting('features.favicon', $name));
-    $this->assertEquals('only', theme_get_setting('base', $name));
-    $this->assertEquals('base', theme_get_setting('override', $name));
+    // Verify that test_base_theme.settings is active.
+    $themeSettingsProvider = \Drupal::service(ThemeSettingsProvider::class);
+    $this->assertFalse($themeSettingsProvider->getSetting('features.favicon', $name));
+    $this->assertEquals('only', $themeSettingsProvider->getSetting('base', $name));
+    $this->assertEquals('base', $themeSettingsProvider->getSetting('override', $name));
   }
 
   /**
    * Tests installing a sub-theme.
    */
-  public function testInstallSubTheme() {
-    $name = 'test_subtheme';
-    $base_name = 'test_basetheme';
+  public function testInstallSubTheme(): void {
+    $name = 'test_child_theme';
+    $base_name = 'test_parent_theme';
 
     $themes = $this->themeHandler()->listInfo();
     $this->assertEmpty(array_keys($themes));
@@ -97,6 +104,12 @@ class ThemeInstallerTest extends KernelTestBase {
     $themes = $this->themeHandler()->listInfo();
     $this->assertTrue(isset($themes[$name]));
     $this->assertTrue(isset($themes[$base_name]));
+
+    $expectedOrder = [
+      $base_name,
+      $name,
+    ];
+    $this->assertEquals($expectedOrder, array_keys($themes));
 
     $this->themeInstaller()->uninstall([$name]);
 
@@ -108,7 +121,7 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Tests installing a non-existing theme.
    */
-  public function testInstallNonExisting() {
+  public function testInstallNonExisting(): void {
     $name = 'non_existing_theme';
 
     $themes = $this->themeHandler()->listInfo();
@@ -130,7 +143,7 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Tests installing a theme with a too long name.
    */
-  public function testInstallNameTooLong() {
+  public function testInstallNameTooLong(): void {
     $name = 'test_theme_having_veery_long_name_which_is_too_long';
 
     try {
@@ -146,7 +159,7 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Tests installing a theme with the same name as an enabled module.
    */
-  public function testInstallThemeSameNameAsModule() {
+  public function testInstallThemeSameNameAsModule(): void {
     $name = 'name_collision_test';
 
     // Install and uninstall the theme.
@@ -163,10 +176,9 @@ class ThemeInstallerTest extends KernelTestBase {
 
   /**
    * Tests installing a theme with unmet module dependencies.
-   *
-   * @dataProvider providerTestInstallThemeWithUnmetModuleDependencies
    */
-  public function testInstallThemeWithUnmetModuleDependencies($theme_name, $installed_modules, $message) {
+  #[DataProvider('providerTestInstallThemeWithUnmetModuleDependencies')]
+  public function testInstallThemeWithUnmetModuleDependencies($theme_name, $installed_modules, $message): void {
     $this->moduleInstaller()->install($installed_modules);
     $themes = $this->themeHandler()->listInfo();
     $this->assertEmpty($themes);
@@ -178,11 +190,10 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Tests trying to install a deprecated theme.
    *
-   * @covers \Drupal\Core\Extension\ThemeInstaller::install
-   *
-   * @group legacy
+   * @legacy-covers \Drupal\Core\Extension\ThemeInstaller::install
    */
-  public function testInstallDeprecated() {
+  #[IgnoreDeprecations]
+  public function testInstallDeprecated(): void {
     $this->expectDeprecation("The theme 'deprecated_theme_test' is deprecated. See https://example.com/deprecated");
     $this->themeInstaller()->install(['deprecated_theme_test']);
     $this->assertTrue(\Drupal::service('theme_handler')->themeExists('deprecated_theme_test'));
@@ -191,7 +202,7 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Data provider for testInstallThemeWithUnmetModuleDependencies().
    */
-  public function providerTestInstallThemeWithUnmetModuleDependencies() {
+  public static function providerTestInstallThemeWithUnmetModuleDependencies() {
     return [
       'theme with uninstalled module dependencies' => [
         'test_theme_depending_on_modules',
@@ -234,7 +245,7 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Tests installing a theme with module dependencies that are met.
    */
-  public function testInstallThemeWithMetModuleDependencies() {
+  public function testInstallThemeWithMetModuleDependencies(): void {
     $name = 'test_theme_depending_on_modules';
     $themes = $this->themeHandler()->listInfo();
     $this->assertArrayNotHasKey($name, $themes);
@@ -250,7 +261,7 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Tests uninstalling the default theme.
    */
-  public function testUninstallDefault() {
+  public function testUninstallDefault(): void {
     $name = 'stark';
     $other_name = 'olivero';
     $this->themeInstaller()->install([$name, $other_name]);
@@ -277,7 +288,7 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Tests uninstalling the admin theme.
    */
-  public function testUninstallAdmin() {
+  public function testUninstallAdmin(): void {
     $name = 'stark';
     $other_name = 'olivero';
     $this->themeInstaller()->install([$name, $other_name]);
@@ -304,9 +315,9 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Tests uninstalling a sub-theme.
    */
-  public function testUninstallSubTheme() {
+  public function testUninstallSubTheme(): void {
     $name = 'test_subtheme';
-    $base_name = 'test_basetheme';
+    $base_name = 'test_base_theme';
 
     $this->themeInstaller()->install([$name]);
     $this->themeInstaller()->uninstall([$name]);
@@ -319,8 +330,8 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Tests uninstalling a base theme before its sub-theme.
    */
-  public function testUninstallBaseBeforeSubTheme() {
-    $name = 'test_basetheme';
+  public function testUninstallBaseBeforeSubTheme(): void {
+    $name = 'test_base_theme';
     $sub_name = 'test_subtheme';
 
     $this->themeInstaller()->install([$sub_name]);
@@ -349,7 +360,7 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Tests uninstalling a non-existing theme.
    */
-  public function testUninstallNonExisting() {
+  public function testUninstallNonExisting(): void {
     $name = 'non_existing_theme';
 
     $themes = $this->themeHandler()->listInfo();
@@ -362,8 +373,8 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Tests uninstalling a theme.
    */
-  public function testUninstall() {
-    $name = 'test_basetheme';
+  public function testUninstall(): void {
+    $name = 'test_base_theme';
 
     $this->themeInstaller()->install([$name]);
     $this->assertNotEmpty($this->config("$name.settings")->get());
@@ -385,8 +396,8 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Tests uninstalling a theme that is not installed.
    */
-  public function testUninstallNotInstalled() {
-    $name = 'test_basetheme';
+  public function testUninstallNotInstalled(): void {
+    $name = 'test_base_theme';
 
     $themes = $this->themeHandler()->listInfo();
     $this->assertEmpty(array_keys($themes));
@@ -399,7 +410,7 @@ class ThemeInstallerTest extends KernelTestBase {
    *
    * @see module_test_system_info_alter()
    */
-  public function testThemeInfoAlter() {
+  public function testThemeInfoAlter(): void {
     $name = 'stark';
     $this->container->get('state')->set('module_test.hook_system_info_alter', TRUE);
 
@@ -446,6 +457,7 @@ class ThemeInstallerTest extends KernelTestBase {
    * Returns the theme handler service.
    *
    * @return \Drupal\Core\Extension\ThemeHandlerInterface
+   *   The theme handler service.
    */
   protected function themeHandler() {
     return $this->container->get('theme_handler');
@@ -455,6 +467,7 @@ class ThemeInstallerTest extends KernelTestBase {
    * Returns the theme installer service.
    *
    * @return \Drupal\Core\Extension\ThemeInstallerInterface
+   *   The theme installer service.
    */
   protected function themeInstaller() {
     return $this->container->get('theme_installer');
@@ -464,6 +477,7 @@ class ThemeInstallerTest extends KernelTestBase {
    * Returns the system.theme config object.
    *
    * @return \Drupal\Core\Config\Config
+   *   The system.theme config object.
    */
   protected function extensionConfig() {
     return $this->config('core.extension');
@@ -473,8 +487,9 @@ class ThemeInstallerTest extends KernelTestBase {
    * Returns the ModuleHandler.
    *
    * @return \Drupal\Core\Extension\ModuleHandlerInterface
+   *   The ModuleHandler.
    */
-  protected function moduleHandler() {
+  protected function moduleHandler(): ?object {
     return $this->container->get('module_handler');
   }
 
@@ -482,9 +497,20 @@ class ThemeInstallerTest extends KernelTestBase {
    * Returns the ModuleInstaller.
    *
    * @return \Drupal\Core\Extension\ModuleInstallerInterface
+   *   The ModuleInstaller.
    */
-  protected function moduleInstaller() {
+  protected function moduleInstaller(): ?object {
     return $this->container->get('module_installer');
+  }
+
+  /**
+   * Returns the ThemeExtensionList.
+   *
+   * @return \Drupal\Core\Extension\ThemeExtensionList
+   *   The ThemeExtensionList.
+   */
+  protected function extensionListTheme(): ThemeExtensionList {
+    return $this->container->get('extension.list.theme');
   }
 
 }

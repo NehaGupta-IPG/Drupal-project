@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Core\DrupalKernel;
@@ -53,9 +55,9 @@ abstract class InstallerTestBase extends BrowserTestBase {
   /**
    * Additional parameters to use for installer screens.
    *
-   * @see FunctionalTestSetupTrait::installParameters()
-   *
    * @var array
+   *
+   * @see FunctionalTestSetupTrait::installParameters()
    */
   protected $parameters = [];
 
@@ -269,7 +271,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
    * Override this method to test specific requirements warnings or errors
    * during the installer.
    *
-   * @see system_requirements()
+   * @see \Drupal\system\Install\SystemRequirements
    */
   protected function setUpRequirementsProblem() {
     if (version_compare(phpversion(), PhpRequirements::getMinimumSupportedPhp()) < 0) {

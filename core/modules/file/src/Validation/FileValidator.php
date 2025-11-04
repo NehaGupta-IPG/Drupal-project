@@ -4,10 +4,7 @@ namespace Drupal\file\Validation;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Validation\ConstraintManager;
-use Drupal\Core\Validation\DrupalTranslator;
 use Drupal\file\FileInterface;
-use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -33,7 +30,7 @@ class FileValidator implements FileValidatorInterface {
     protected ValidatorInterface $validator,
     protected ConstraintManager $constraintManager,
     protected EventDispatcherInterface $eventDispatcher,
-    protected ModuleHandlerInterface $moduleHandler
+    protected ModuleHandlerInterface $moduleHandler,
   ) {}
 
   /**
@@ -41,44 +38,16 @@ class FileValidator implements FileValidatorInterface {
    */
   public function validate(FileInterface $file, array $validators): ConstraintViolationListInterface {
     $constraints = [];
-    $errors = [];
     foreach ($validators as $validator => $options) {
-      if (function_exists($validator)) {
-        @trigger_error('Support for file validation function ' . $validator . '() is deprecated in drupal:10.2.0 and will be removed in drupal:11.0.0. Use Symfony Constraints instead. See https://www.drupal.org/node/3363700', E_USER_DEPRECATED);
-        array_unshift($options, $file);
-        // Call the validation function.
-        // Options are a list of function args.
-        $errors = array_merge($errors, call_user_func_array($validator, $options));
-      }
-      else {
-        // Create the constraint.
-        // Options are an associative array of constraint properties and values.
-        $constraints[] = $this->constraintManager->create($validator, $options);
-      }
-    }
-
-    // Call legacy hook implementations.
-    $errors = array_merge($errors, $this->moduleHandler->invokeAllDeprecated('Use file validation events instead. See https://www.drupal.org/node/3363700', 'file_validate', [$file]));
-
-    $violations = new ConstraintViolationList();
-
-    // Convert legacy errors to violations.
-    $translator = new DrupalTranslator();
-    foreach ($errors as $error) {
-      $violation = new ConstraintViolation($translator->trans($error),
-        $error,
-        [],
-        $file,
-        '',
-        NULL
-      );
-      $violations->add($violation);
+      // Create the constraint.
+      // Options are an associative array of constraint properties and values.
+      $constraints[] = $this->constraintManager->create($validator, $options);
     }
 
     // Get the typed data.
     $fileTypedData = $file->getTypedData();
 
-    $violations->addAll($this->validator->validate($fileTypedData, $constraints));
+    $violations = $this->validator->validate($fileTypedData, $constraints);
 
     $this->eventDispatcher->dispatch(new FileValidationEvent($file, $violations));
 

@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the loading of multiple taxonomy terms at once.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class LoadMultipleTest extends KernelTestBase {
 
   use TaxonomyTestTrait;
@@ -19,7 +23,6 @@ class LoadMultipleTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'taxonomy',
     'user',
     'text',
@@ -38,7 +41,7 @@ class LoadMultipleTest extends KernelTestBase {
   /**
    * Tests loading multiple taxonomy terms by term ID and vocabulary.
    */
-  public function testTaxonomyTermMultipleLoad() {
+  public function testTaxonomyTermMultipleLoad(): void {
     // Create a vocabulary.
     $vocabulary = $this->createVocabulary();
 

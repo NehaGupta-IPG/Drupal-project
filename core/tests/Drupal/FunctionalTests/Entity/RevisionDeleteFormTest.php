@@ -1,20 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Entity;
 
-use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Entity\Form\RevisionDeleteForm;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\entity_test\Entity\EntityTestRevPub;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests deleting a revision with revision delete form.
- *
- * @group Entity
- * @group #slow
- * @coversDefaultClass \Drupal\Core\Entity\Form\RevisionDeleteForm
  */
+#[CoversClass(RevisionDeleteForm::class)]
+#[Group('Entity')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class RevisionDeleteFormTest extends BrowserTestBase {
 
   /**
@@ -42,16 +47,25 @@ class RevisionDeleteFormTest extends BrowserTestBase {
 
   /**
    * Tests title by whether entity supports revision creation dates.
+   */
+  public function testPageTitle(): void {
+    foreach (static::providerPageTitle() as $cases) {
+      [$entityTypeId, $expectedQuestion] = $cases;
+      $this->doTestPageTitle($entityTypeId, $expectedQuestion);
+    }
+  }
+
+  /**
+   * Tests title by whether entity supports revision creation dates.
    *
    * @param string $entityTypeId
    *   The entity type to test.
    * @param string $expectedQuestion
    *   The expected question/page title.
    *
-   * @covers ::getQuestion
-   * @dataProvider providerPageTitle
+   * @legacy-covers ::getQuestion
    */
-  public function testPageTitle(string $entityTypeId, string $expectedQuestion): void {
+  protected function doTestPageTitle(string $entityTypeId, string $expectedQuestion): void {
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = \Drupal::entityTypeManager()->getStorage($entityTypeId);
 
@@ -85,17 +99,17 @@ class RevisionDeleteFormTest extends BrowserTestBase {
   /**
    * Data provider for testPageTitle.
    */
-  public function providerPageTitle(): array {
+  public static function providerPageTitle(): array {
     return [
       ['entity_test_rev', 'Are you sure you want to delete the revision?'],
-      ['entity_test_revlog', 'Are you sure you want to delete the revision from Sun, 01/11/2009 - 16:00?'],
+      ['entity_test_revlog', 'Are you sure you want to delete the revision from Sun, 11 Jan 2009 - 16:00?'],
     ];
   }
 
   /**
    * Test cannot delete latest revision.
    *
-   * @covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
+   * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
   public function testAccessDeleteLatestDefault(): void {
     /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
@@ -111,11 +125,20 @@ class RevisionDeleteFormTest extends BrowserTestBase {
   }
 
   /**
+   * Test that revisions can and can't be deleted in various scenarios.
+   */
+  public function testAccessDelete(): void {
+    $this->testAccessDeleteLatestForwardRevision();
+    $this->testAccessDeleteDefault();
+    $this->testAccessDeleteNonLatest();
+  }
+
+  /**
    * Ensure that forward revision can be deleted.
    *
-   * @covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
+   * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
-  public function testAccessDeleteLatestForwardRevision(): void {
+  protected function testAccessDeleteLatestForwardRevision(): void {
     /** @var \Drupal\entity_test\Entity\EntityTestRevPub $entity */
     $entity = EntityTestRevPub::create();
     $entity->setName('delete revision');
@@ -139,9 +162,9 @@ class RevisionDeleteFormTest extends BrowserTestBase {
   /**
    * Test cannot delete default revision.
    *
-   * @covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
+   * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
-  public function testAccessDeleteDefault(): void {
+  protected function testAccessDeleteDefault(): void {
     /** @var \Drupal\entity_test\Entity\EntityTestRevPub $entity */
     $entity = EntityTestRevPub::create();
     $entity->setName('delete revision');
@@ -174,9 +197,9 @@ class RevisionDeleteFormTest extends BrowserTestBase {
   /**
    * Test can delete non-latest revision.
    *
-   * @covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
+   * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
-  public function testAccessDeleteNonLatest(): void {
+  protected function testAccessDeleteNonLatest(): void {
     /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
     $entity = EntityTestRev::create();
     $entity->setName('delete revision');
@@ -194,6 +217,16 @@ class RevisionDeleteFormTest extends BrowserTestBase {
     $this->drupalGet($revision->toUrl('revision-delete-form'));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertTrue($revision->access('delete revision', $this->rootUser, FALSE));
+  }
+
+  /**
+   * Tests revision deletion form.
+   */
+  public function testSubmitForm(): void {
+    foreach (static::providerSubmitForm() as $case) {
+      [$permissions, $entityTypeId, $entityLabel, $totalRevisions, $expectedLog, $expectedMessage, $expectedDestination] = $case;
+      $this->doTestSubmitForm($permissions, $entityTypeId, $entityLabel, $totalRevisions, $expectedLog, $expectedMessage, $expectedDestination);
+    }
   }
 
   /**
@@ -215,10 +248,9 @@ class RevisionDeleteFormTest extends BrowserTestBase {
    * @param string|int $expectedDestination
    *   Expected destination after deletion.
    *
-   * @covers ::submitForm
-   * @dataProvider providerSubmitForm
+   * @legacy-covers ::submitForm
    */
-  public function testSubmitForm(array $permissions, string $entityTypeId, string $entityLabel, int $totalRevisions, string $expectedLog, string $expectedMessage, $expectedDestination): void {
+  protected function doTestSubmitForm(array $permissions, string $entityTypeId, string $entityLabel, int $totalRevisions, array $expectedLog, string $expectedMessage, $expectedDestination): void {
     if (count($permissions) > 0) {
       $this->drupalLogin($this->createUser($permissions));
     }
@@ -268,15 +300,18 @@ class RevisionDeleteFormTest extends BrowserTestBase {
 
     // Logger log.
     $logs = $this->getLogs($entity->getEntityType()->getProvider());
-    $this->assertEquals([0 => $expectedLog], $logs);
+    $this->assertCount(1, $logs);
+    $this->assertEquals("@type: deleted %title revision %revision.", $logs[0]->message);
+    $this->assertEquals($expectedLog, unserialize($logs[0]->variables));
     // Messenger message.
     $this->assertSession()->pageTextContains($expectedMessage);
+    \Drupal::database()->delete('watchdog')->execute();
   }
 
   /**
    * Data provider for testSubmitForm.
    */
-  public function providerSubmitForm(): array {
+  public static function providerSubmitForm(): array {
     $data = [];
 
     $data['not supporting revision log, one revision remaining after delete, no view access'] = [
@@ -284,7 +319,11 @@ class RevisionDeleteFormTest extends BrowserTestBase {
       'entity_test_rev',
       'view all revisions, delete revision',
       2,
-      'entity_test_rev: deleted <em class="placeholder">view all revisions, delete revision</em> revision <em class="placeholder">1</em>.',
+      [
+        '@type' => 'entity_test_rev',
+        '%title' => 'view all revisions, delete revision',
+        '%revision' => '1',
+      ],
       'Revision of Entity Test Bundle view all revisions, delete revision has been deleted.',
       '/entity_test_rev/1/revisions',
     ];
@@ -294,9 +333,13 @@ class RevisionDeleteFormTest extends BrowserTestBase {
       'entity_test_rev',
       'view, view all revisions, delete revision',
       2,
-      'entity_test_rev: deleted <em class="placeholder">view, view all revisions, delete revision</em> revision <em class="placeholder">1</em>.',
+      [
+        '@type' => 'entity_test_rev',
+        '%title' => 'view, view all revisions, delete revision',
+        '%revision' => '3',
+      ],
       'Revision of Entity Test Bundle view, view all revisions, delete revision has been deleted.',
-      '/entity_test_rev/1/revisions',
+      '/entity_test_rev/2/revisions',
     ];
 
     $data['supporting revision log, one revision remaining after delete, no view access'] = [
@@ -304,8 +347,12 @@ class RevisionDeleteFormTest extends BrowserTestBase {
       'entity_test_revlog',
       'view all revisions, delete revision',
       2,
-      'entity_test_revlog: deleted <em class="placeholder">view all revisions, delete revision</em> revision <em class="placeholder">1</em>.',
-      'Revision from Sun, 01/11/2009 - 16:00 of Test entity - revisions log view all revisions, delete revision has been deleted.',
+      [
+        '@type' => 'entity_test_revlog',
+        '%title' => 'view all revisions, delete revision',
+        '%revision' => '1',
+      ],
+      'Revision from Sun, 11 Jan 2009 - 16:00 of Test entity - revisions log view all revisions, delete revision has been deleted.',
       '/entity_test_revlog/1/revisions',
     ];
 
@@ -314,9 +361,13 @@ class RevisionDeleteFormTest extends BrowserTestBase {
       'entity_test_revlog',
       'view, view all revisions, delete revision',
       2,
-      'entity_test_revlog: deleted <em class="placeholder">view, view all revisions, delete revision</em> revision <em class="placeholder">1</em>.',
-      'Revision from Sun, 01/11/2009 - 16:00 of Test entity - revisions log view, view all revisions, delete revision has been deleted.',
-      '/entity_test_revlog/1/revisions',
+      [
+        '@type' => 'entity_test_revlog',
+        '%title' => 'view, view all revisions, delete revision',
+        '%revision' => '3',
+      ],
+      'Revision from Sun, 11 Jan 2009 - 16:00 of Test entity - revisions log view, view all revisions, delete revision has been deleted.',
+      '/entity_test_revlog/2/revisions',
     ];
 
     return $data;
@@ -332,10 +383,11 @@ class RevisionDeleteFormTest extends BrowserTestBase {
    *   Watchdog entries.
    */
   protected function getLogs(string $channel): array {
-    $logs = \Drupal::database()->query("SELECT * FROM {watchdog} WHERE type = :type", [':type' => $channel])->fetchAll();
-    return array_map(function (object $log) {
-      return (string) new FormattableMarkup($log->message, unserialize($log->variables));
-    }, $logs);
+    return \Drupal::database()->select('watchdog')
+      ->fields('watchdog')
+      ->condition('type', $channel)
+      ->execute()
+      ->fetchAll();
   }
 
 }

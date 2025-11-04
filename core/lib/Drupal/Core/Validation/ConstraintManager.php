@@ -7,11 +7,16 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Validation\Attribute\Constraint;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\EmailConstraint;
 use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Choice;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\IdenticalTo;
+use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
 /**
  * Constraint plugin manager.
@@ -27,9 +32,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *
  * Constraint plugins may specify data types to which support is limited via the
  * 'type' key of plugin definitions. See
- * \Drupal\Core\Validation\Annotation\Constraint for details.
+ * \Drupal\Core\Validation\Attribute\Constraint for details.
  *
- * @see \Drupal\Core\Validation\Annotation\Constraint
+ * @see \Drupal\Core\Validation\Attribute\Constraint
  */
 class ConstraintManager extends DefaultPluginManager {
 
@@ -46,7 +51,7 @@ class ConstraintManager extends DefaultPluginManager {
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
     $this->factory = new ConstraintFactory($this);
-    parent::__construct('Plugin/Validation/Constraint', $namespaces, $module_handler, NULL, 'Drupal\Core\Validation\Annotation\Constraint');
+    parent::__construct('Plugin/Validation/Constraint', $namespaces, $module_handler, NULL, Constraint::class, 'Drupal\Core\Validation\Annotation\Constraint');
     $this->alterInfo('validation_constraint');
     $this->setCacheBackend($cache_backend, 'validation_constraint_plugins');
   }
@@ -113,6 +118,26 @@ class ConstraintManager extends DefaultPluginManager {
     $this->getDiscovery()->setDefinition('Choice', [
       'label' => new TranslatableMarkup('Choice'),
       'class' => Choice::class,
+      'type' => FALSE,
+    ]);
+    $this->getDiscovery()->setDefinition('File', [
+      'label' => new TranslatableMarkup('File'),
+      'class' => File::class,
+      'type' => ['string'],
+    ]);
+    $this->getDiscovery()->setDefinition('Image', [
+      'label' => new TranslatableMarkup('Image'),
+      'class' => Image::class,
+      'type' => ['string'],
+    ]);
+    $this->getDiscovery()->setDefinition('PositiveOrZero', [
+      'label' => new TranslatableMarkup('Positive or zero'),
+      'class' => PositiveOrZero::class,
+      'type' => ['integer'],
+    ]);
+    $this->getDiscovery()->setDefinition('IdenticalTo', [
+      'label' => new TranslatableMarkup('IdenticalTo'),
+      'class' => IdenticalTo::class,
       'type' => FALSE,
     ]);
   }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Unit\Plugin\views\field;
 
 use Drupal\comment\Plugin\views\field\LinkReply;
@@ -13,11 +15,14 @@ use Drupal\Tests\views\Traits\ViewsLoggerTestTrait;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\comment\Plugin\views\field\LinkReply
- * @group comment
+ * Tests Drupal\comment\Plugin\views\field\LinkReply.
  */
+#[CoversClass(LinkReply::class)]
+#[Group('comment')]
 class LinkReplyTest extends UnitTestCase {
 
   use ViewsLoggerTestTrait;
@@ -36,7 +41,7 @@ class LinkReplyTest extends UnitTestCase {
   /**
    * Test the render method when getEntity returns NULL.
    *
-   * @covers ::render
+   * @legacy-covers ::render
    */
   public function testRenderNullEntity(): void {
     $row = new ResultRow();

@@ -1,21 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Unit\Plugin\Action;
 
 use Drupal\user\Plugin\Action\AddRoleUser;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\user\Plugin\Action\AddRoleUser
- * @group user
+ * Tests Drupal\user\Plugin\Action\AddRoleUser.
  */
+#[CoversClass(AddRoleUser::class)]
+#[Group('user')]
 class AddRoleUserTest extends RoleUserTestBase {
 
   /**
    * Tests the execute method on a user with a role.
    */
-  public function testExecuteAddExistingRole() {
+  public function testExecuteAddExistingRole(): void {
     $this->account->expects($this->never())
-      ->method('addRole');
+      ->method('addRole')
+      ->willReturn($this->account);
 
     $this->account->expects($this->any())
       ->method('hasRole')
@@ -31,9 +37,10 @@ class AddRoleUserTest extends RoleUserTestBase {
   /**
    * Tests the execute method on a user without a specific role.
    */
-  public function testExecuteAddNonExistingRole() {
+  public function testExecuteAddNonExistingRole(): void {
     $this->account->expects($this->once())
-      ->method('addRole');
+      ->method('addRole')
+      ->willReturn($this->account);
 
     $this->account->expects($this->any())
       ->method('hasRole')

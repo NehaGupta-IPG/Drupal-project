@@ -1,17 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\menu_link_content\Kernel\Plugin\migrate\source\d6;
 
+use Drupal\menu_link_content\Plugin\migrate\source\d6\MenuLinkTranslation;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
-// cspell:ignore objectid objectindex
-
+// cspell:ignore mlid objectid objectindex plid
 /**
  * Tests menu link translation source plugin.
- *
- * @covers \Drupal\menu_link_content\Plugin\migrate\source\d6\MenuLinkTranslation
- * @group menu_link_content
  */
+#[CoversClass(MenuLinkTranslation::class)]
+#[Group('menu_link_content')]
+#[RunTestsInSeparateProcesses]
 class MenuLinkTranslationTest extends MigrateSqlSourceTestBase {
 
   /**
@@ -22,7 +27,7 @@ class MenuLinkTranslationTest extends MigrateSqlSourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function providerSource() {
+  public static function providerSource() {
     $test = [];
     $test[0]['source_data']['menu_links'] = [
       [
@@ -203,7 +208,7 @@ class MenuLinkTranslationTest extends MigrateSqlSourceTestBase {
       ],
     ];
 
-    $test[0]['expected_results'] = [
+    $test[0]['expected_data'] = [
       [
         'menu_name' => 'menu-test-menu',
         'mlid' => 139,

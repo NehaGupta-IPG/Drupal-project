@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Wizard;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests wizard for generic revisionable entities.
- *
- * @group Views
  */
+#[Group('Views')]
+#[RunTestsInSeparateProcesses]
 class EntityTestRevisionTest extends WizardTestBase {
 
   /**
@@ -22,7 +27,7 @@ class EntityTestRevisionTest extends WizardTestBase {
   /**
    * Tests creating a view of revisions where the type is not on the base table.
    */
-  public function testRevisionsViewWithNoTypeOnBaseTable() {
+  public function testRevisionsViewWithNoTypeOnBaseTable(): void {
     $type = [
       'show[wizard_key]' => 'standard:entity_test_rev_revision',
     ];

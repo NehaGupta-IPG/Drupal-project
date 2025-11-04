@@ -1,24 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Composer\Generator;
 
+use Drupal\Composer\Composer;
 use Drupal\Composer\Generator\Builder\DrupalCoreRecommendedBuilder;
 use Drupal\Composer\Generator\Builder\DrupalDevDependenciesBuilder;
 use Drupal\Composer\Generator\Builder\DrupalPinnedDevDependenciesBuilder;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use Drupal\Composer\Composer;
 
 /**
  * Test DrupalCoreRecommendedBuilder.
- *
- * @group Metapackage
  */
+#[Group('Metapackage')]
 class BuilderTest extends TestCase {
 
   /**
    * Provides test data for testBuilder.
    */
-  public function builderTestData() {
+  public static function builderTestData() {
     return [
       [
         DrupalCoreRecommendedBuilder::class,
@@ -83,10 +86,9 @@ class BuilderTest extends TestCase {
 
   /**
    * Tests all of the various kinds of builders.
-   *
-   * @dataProvider builderTestData
    */
-  public function testBuilder($builderClass, $expected) {
+  #[DataProvider('builderTestData')]
+  public function testBuilder($builderClass, $expected): void {
     $fixtures = new Fixtures();
     $drupalCoreInfo = $fixtures->drupalCoreComposerFixture();
 

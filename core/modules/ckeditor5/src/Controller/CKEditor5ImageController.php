@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\ckeditor5\Controller;
 
+use Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface;
 use Drupal\Component\Utility\Bytes;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Environment;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\File\Exception\FileException;
+use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Lock\LockBackendInterface;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\editor\Entity\Editor;
-use Drupal\file\Upload\FileUploadHandler;
+use Drupal\file\Upload\FileUploadHandlerInterface;
 use Drupal\file\Upload\FormUploadedFile;
-use Drupal\file\Validation\FileValidatorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,8 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
-use Symfony\Component\Mime\MimeTypeGuesserInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Mime\MimeTypes;
 
 /**
  * Returns response for CKEditor 5 Simple image upload adapter.
@@ -36,62 +35,23 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class CKEditor5ImageController extends ControllerBase {
 
   /**
-   * The default allowed image extensions.
-   */
-  const DEFAULT_IMAGE_EXTENSIONS = 'gif png jpg jpeg';
-
-  /**
-   * The file system service.
-   */
-  protected FileSystemInterface $fileSystem;
-
-  /**
-   * The lock.
-   */
-  protected LockBackendInterface $lock;
-
-  /**
-   * The file upload handler.
-   */
-  protected FileUploadHandler $fileUploadHandler;
-
-  /**
    * Constructs a new CKEditor5ImageController.
    *
    * @param \Drupal\Core\File\FileSystemInterface $fileSystem
+   *   The file system service.
+   * @param \Drupal\file\Upload\FileUploadHandlerInterface $fileUploadHandler
    *   The file upload handler.
-   * @param \Drupal\Core\Session\AccountInterface|\Drupal\file\Upload\FileUploadHandler $fileUploadHandler
-   *   The currently authenticated user.
-   * @param \Symfony\Component\Mime\MimeTypeGuesserInterface|\Drupal\Core\Lock\LockBackendInterface $mime_type_guesser
-   *   The MIME type guesser.
-   * @param \Drupal\Core\Lock\LockBackendInterface|null $lock
+   * @param \Drupal\Core\Lock\LockBackendInterface $lock
    *   The lock service.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|null $event_dispatcher
-   *   The event dispatcher.
-   * @param \Drupal\file\Validation\FileValidatorInterface|null $file_validator
-   *   The file validator.
+   * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface $pluginManager
+   *   The CKEditor 5 plugin manager.
    */
-  public function __construct(FileSystemInterface $fileSystem, AccountInterface | FileUploadHandler $fileUploadHandler, MimeTypeGuesserInterface | LockBackendInterface $mime_type_guesser, LockBackendInterface $lock = NULL, EventDispatcherInterface $event_dispatcher = NULL, FileValidatorInterface $file_validator = NULL) {
-    $this->fileSystem = $fileSystem;
-    if ($fileUploadHandler instanceof AccountInterface) {
-      @trigger_error('Calling ' . __METHOD__ . '() with the $current_user argument is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. See https://www.drupal.org/node/3388990', E_USER_DEPRECATED);
-      $fileUploadHandler = \Drupal::service('file.upload_handler');
-    }
-    $this->fileUploadHandler = $fileUploadHandler;
-    if ($mime_type_guesser instanceof MimeTypeGuesserInterface) {
-      @trigger_error('Calling ' . __METHOD__ . '() with the $mime_type_guesser argument is deprecated in drupal:10.3.0 and is replaced with $lock from drupal:11.0.0. See https://www.drupal.org/node/3388990', E_USER_DEPRECATED);
-      $mime_type_guesser = \Drupal::service('lock');
-    }
-    $this->lock = $mime_type_guesser;
-    if ($lock) {
-      @trigger_error('Calling ' . __METHOD__ . '() with the $lock argument in position 4 is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. See https://www.drupal.org/node/3388990', E_USER_DEPRECATED);
-    }
-    if ($event_dispatcher) {
-      @trigger_error('Calling ' . __METHOD__ . '() with the $event_dispatcher argument is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. See https://www.drupal.org/node/3388990', E_USER_DEPRECATED);
-    }
-    if ($file_validator) {
-      @trigger_error('Calling ' . __METHOD__ . '() with the $file_validator argument is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. See https://www.drupal.org/node/3388990', E_USER_DEPRECATED);
-    }
+  public function __construct(
+    protected FileSystemInterface $fileSystem,
+    protected FileUploadHandlerInterface $fileUploadHandler,
+    protected LockBackendInterface $lock,
+    protected CKEditor5PluginManagerInterface $pluginManager,
+  ) {
   }
 
   /**
@@ -101,7 +61,8 @@ class CKEditor5ImageController extends ControllerBase {
     return new static(
       $container->get('file_system'),
       $container->get('file.upload_handler'),
-      $container->get('lock')
+      $container->get('lock'),
+      $container->get('plugin.manager.ckeditor5.plugin')
     );
   }
 
@@ -121,8 +82,11 @@ class CKEditor5ImageController extends ControllerBase {
    */
   public function upload(Request $request): Response {
     // Getting the UploadedFile directly from the request.
-    /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $upload */
+    /** @var \Symfony\Component\HttpFoundation\File\UploadedFile|null $upload */
     $upload = $request->files->get('upload');
+    if ($upload === NULL || !$upload->isValid()) {
+      throw new HttpException(500, $upload?->getErrorMessage() ?: 'Invalid file upload');
+    }
     $filename = $upload->getClientOriginalName();
 
     /** @var \Drupal\editor\EditorInterface $editor */
@@ -138,7 +102,7 @@ class CKEditor5ImageController extends ControllerBase {
     $validators = $this->getImageUploadValidators($settings);
 
     $file_uri = "{$destination}/{$filename}";
-    $file_uri = $this->fileSystem->getDestinationFilename($file_uri, FileSystemInterface::EXISTS_RENAME);
+    $file_uri = $this->fileSystem->getDestinationFilename($file_uri, FileExists::Rename);
 
     // Lock based on the prepared file URI.
     $lock_id = $this->generateLockIdFromFileUri($file_uri);
@@ -149,15 +113,15 @@ class CKEditor5ImageController extends ControllerBase {
 
     try {
       $uploadedFile = new FormUploadedFile($upload);
-      $uploadResult = $this->fileUploadHandler->handleFileUpload($uploadedFile, $validators, $destination, FileSystemInterface::EXISTS_RENAME, FALSE);
+      $uploadResult = $this->fileUploadHandler->handleFileUpload($uploadedFile, $validators, $destination, FileExists::Rename);
       if ($uploadResult->hasViolations()) {
         throw new UnprocessableEntityHttpException((string) $uploadResult->getViolations());
       }
     }
-    catch (FileException $e) {
+    catch (FileException) {
       throw new HttpException(500, 'File could not be saved');
     }
-    catch (LockAcquiringException $e) {
+    catch (LockAcquiringException) {
       throw new HttpException(503, sprintf('File "%s" is already locked for writing.', $upload->getClientOriginalName()), NULL, ['Retry-After' => 1]);
     }
 
@@ -175,14 +139,24 @@ class CKEditor5ImageController extends ControllerBase {
    * Gets the image upload validators.
    */
   protected function getImageUploadValidators(array $settings): array {
-    $max_filesize = min(Bytes::toNumber($settings['max_size']), Environment::getUploadMaxSize());
+    $max_filesize = $settings['max_size']
+      ? Bytes::toNumber($settings['max_size'])
+      : Environment::getUploadMaxSize();
     $max_dimensions = 0;
     if (!empty($settings['max_dimensions']['width']) || !empty($settings['max_dimensions']['height'])) {
       $max_dimensions = $settings['max_dimensions']['width'] . 'x' . $settings['max_dimensions']['height'];
     }
+
+    $mimetypes = MimeTypes::getDefault();
+    $imageUploadPlugin = $this->pluginManager->getDefinition('ckeditor5_imageUpload')->toArray();
+    $allowed_extensions = [];
+    foreach ($imageUploadPlugin['ckeditor5']['config']['image']['upload']['types'] as $mime_type) {
+      $allowed_extensions = array_merge($allowed_extensions, $mimetypes->getExtensions('image/' . $mime_type));
+    }
+
     return [
       'FileExtension' => [
-        'extensions' => self::DEFAULT_IMAGE_EXTENSIONS,
+        'extensions' => implode(' ', $allowed_extensions),
       ],
       'FileSizeLimit' => [
         'fileLimit' => $max_filesize,

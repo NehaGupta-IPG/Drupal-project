@@ -4,6 +4,7 @@ namespace Drupal\node\Plugin\views\area;
 
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Url;
+use Drupal\views\Attribute\ViewsArea;
 use Drupal\views\Plugin\views\area\AreaPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -11,9 +12,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Defines an area plugin to display a node/add link.
  *
  * @ingroup views_area_handlers
- *
- * @ViewsArea("node_listing_empty")
  */
+#[ViewsArea("node_listing_empty")]
 class ListingEmpty extends AreaPluginBase {
 
   /**
@@ -63,11 +63,11 @@ class ListingEmpty extends AreaPluginBase {
         '#theme' => 'links',
         '#links' => [
           [
-            'url' => Url::fromRoute('node.add_page'),
+            'url' => Url::fromRoute('entity.node.add_page'),
             'title' => $this->t('Add content'),
           ],
         ],
-        '#access' => $this->accessManager->checkNamedRoute('node.add_page', [], $account),
+        '#access' => $this->accessManager->checkNamedRoute('entity.node.add_page', [], $account),
       ];
       return $element;
     }

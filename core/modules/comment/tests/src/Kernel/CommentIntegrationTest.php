@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Kernel;
 
 use Drupal\comment\Entity\Comment;
@@ -11,12 +13,14 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests integration of comment with other components.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentIntegrationTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -29,7 +33,6 @@ class CommentIntegrationTest extends KernelTestBase {
     'field',
     'entity_test',
     'user',
-    'system',
     'dblog',
   ];
 
@@ -57,7 +60,7 @@ class CommentIntegrationTest extends KernelTestBase {
    * @see comment_entity_view_display_presave()
    * @see CommentDefaultFormatter::calculateDependencies()
    */
-  public function testViewMode() {
+  public function testViewMode(): void {
     $mode = $this->randomMachineName();
     // Create a new comment view mode and a view display entity.
     EntityViewMode::create([
@@ -149,7 +152,7 @@ class CommentIntegrationTest extends KernelTestBase {
   /**
    * Tests the default owner of comment entities.
    */
-  public function testCommentDefaultOwner() {
+  public function testCommentDefaultOwner(): void {
     $comment = Comment::create([
       'comment_type' => 'comment',
     ]);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\workspaces\Kernel;
 
 use Drupal\Core\Entity\EntityStorageException;
@@ -8,12 +10,14 @@ use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\workspaces\Entity\Workspace;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests CRUD operations for workspaces.
- *
- * @group workspaces
  */
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceCRUDTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -53,7 +57,6 @@ class WorkspaceCRUDTest extends KernelTestBase {
     'filter',
     'node',
     'text',
-    'path_alias',
   ];
 
   /**
@@ -67,9 +70,8 @@ class WorkspaceCRUDTest extends KernelTestBase {
     $this->installSchema('node', ['node_access']);
 
     $this->installEntitySchema('workspace');
-    $this->installSchema('workspaces', ['workspace_association']);
+    $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
     $this->installEntitySchema('node');
-    $this->installEntitySchema('path_alias');
 
     $this->installConfig(['filter', 'node', 'system']);
 
@@ -83,7 +85,7 @@ class WorkspaceCRUDTest extends KernelTestBase {
   /**
    * Tests the deletion of workspaces.
    */
-  public function testDeletingWorkspaces() {
+  public function testDeletingWorkspaces(): void {
     $admin = $this->createUser([
       'administer nodes',
       'create workspace',
@@ -209,7 +211,7 @@ class WorkspaceCRUDTest extends KernelTestBase {
   /**
    * Tests that deleting a workspace keeps its already published content.
    */
-  public function testDeletingPublishedWorkspace() {
+  public function testDeletingPublishedWorkspace(): void {
     $admin = $this->createUser([
       'administer nodes',
       'create workspace',
@@ -231,7 +233,7 @@ class WorkspaceCRUDTest extends KernelTestBase {
     $workspace->save();
     $this->workspaceManager->setActiveWorkspace($workspace);
 
-    // Create a new node in the 'stage' workspace
+    // Create a new node in the 'stage' workspace.
     $node = $this->createNode(['status' => TRUE]);
 
     // Create an additional workspace-specific revision for the node.
@@ -283,7 +285,7 @@ class WorkspaceCRUDTest extends KernelTestBase {
   /**
    * Tests that a workspace with children can not be deleted.
    */
-  public function testDeletingWorkspaceWithChildren() {
+  public function testDeletingWorkspaceWithChildren(): void {
     $stage = Workspace::create(['id' => 'stage', 'label' => 'Stage']);
     $stage->save();
 
@@ -311,7 +313,7 @@ class WorkspaceCRUDTest extends KernelTestBase {
   /**
    * Tests loading the workspace tree when there are no workspaces available.
    */
-  public function testEmptyWorkspaceTree() {
+  public function testEmptyWorkspaceTree(): void {
     $tree = \Drupal::service('workspaces.repository')->loadTree();
     $this->assertSame([], $tree);
   }

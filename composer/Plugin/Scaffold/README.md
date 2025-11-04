@@ -7,6 +7,8 @@ This takes care of:
   - Placing scaffold files (like `index.php`, `update.php`, …) from the
     `drupal/core` project into their desired location inside the web root. Only
     individual files may be scaffolded with this plugin.
+  - Writing a DrupalInstalled.php file, which holds a PHP class that defines
+    values about the current installation as class constants.
   - Writing an autoload.php file to the web root, which includes the Composer
     autoload.php file.
 
@@ -19,7 +21,7 @@ possible; for example, a project layout very similar to the current
 [drupal-composer/drupal-project](https://github.com/drupal-composer/drupal-scaffold)
 template will also be provided. When one of these projects is used, the user
 should be able to use `composer require` and `composer update` on a Drupal site
-immediately after untarring the downloaded archive.
+immediately after extracting the downloaded archive.
 
 Note that the dependencies of a Drupal site are only able to scaffold files if
 explicitly granted that right in the top-level composer.json file. See
@@ -389,7 +391,7 @@ Sample composer.json for a project that relies on packages that use composer-sca
   "name": "my/project",
   "require": {
     "drupal/core-composer-scaffold": "*",
-    "composer/installers": "^2.0",
+    "composer/installers": "^2.3",
     "cweagans/composer-patches": "^1.6.5",
     "drupal/core": "^8.8.x-dev",
     "service-provider/d8-scaffold-files": "^1"
@@ -450,7 +452,6 @@ Sample composer.json for composer-scaffold files in drupal/assets:
         "[web-root]/index.php": "assets/index.php",
         "[web-root]/robots.txt": "assets/robots.txt",
         "[web-root]/update.php": "assets/update.php",
-        "[web-root]/web.config": "assets/web.config"
       }
     }
   }

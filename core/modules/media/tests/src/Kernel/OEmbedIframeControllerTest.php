@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\Kernel;
 
 use Drupal\Core\Render\HtmlResponse;
@@ -7,14 +9,19 @@ use Drupal\media\Controller\OEmbedIframeController;
 use Drupal\media\OEmbed\Provider;
 use Drupal\media\OEmbed\Resource;
 use Drupal\TestTools\Random;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @coversDefaultClass \Drupal\media\Controller\OEmbedIframeController
- *
- * @group media
+ * Tests Drupal\media\Controller\OEmbedIframeController.
  */
+#[CoversClass(OEmbedIframeController::class)]
+#[Group('media')]
+#[RunTestsInSeparateProcesses]
 class OEmbedIframeControllerTest extends MediaKernelTestBase {
 
   /**
@@ -26,6 +33,7 @@ class OEmbedIframeControllerTest extends MediaKernelTestBase {
    * Data provider for testBadHashParameter().
    *
    * @return array
+   *   An array of test cases.OffCanvasDialogTest.php
    */
   public static function providerBadHashParameter() {
     return [
@@ -44,11 +52,10 @@ class OEmbedIframeControllerTest extends MediaKernelTestBase {
    * @param string $hash
    *   The 'hash' query string parameter.
    *
-   * @dataProvider providerBadHashParameter
-   *
-   * @covers ::render
+   * @legacy-covers ::render
    */
-  public function testBadHashParameter($hash) {
+  #[DataProvider('providerBadHashParameter')]
+  public function testBadHashParameter($hash): void {
     /** @var callable $controller */
     $controller = $this->container
       ->get('controller_resolver')
@@ -70,9 +77,9 @@ class OEmbedIframeControllerTest extends MediaKernelTestBase {
    *
    * @see media_test_oembed_preprocess_media_oembed_iframe()
    *
-   * @covers ::render
+   * @legacy-covers ::render
    */
-  public function testResourcePassedToPreprocess() {
+  public function testResourcePassedToPreprocess(): void {
     $hash = $this->container->get('media.oembed.iframe_url_helper')
       ->getHash('', 0, 0);
 

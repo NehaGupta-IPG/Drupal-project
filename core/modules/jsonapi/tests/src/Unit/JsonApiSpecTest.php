@@ -1,25 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Unit;
 
 use Drupal\jsonapi\JsonApiSpec;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
+// cspell:ignore kitt
 /**
- * @coversDefaultClass \Drupal\jsonapi\JsonApiSpec
- * @group jsonapi
+ * Tests Drupal\jsonapi\JsonApiSpec.
  *
  * @internal
  */
+#[CoversClass(JsonApiSpec::class)]
+#[Group('jsonapi')]
 class JsonApiSpecTest extends UnitTestCase {
 
   /**
    * Ensures that member names are properly validated.
    *
-   * @dataProvider providerTestIsValidMemberName
-   * @covers ::isValidMemberName
+   * @legacy-covers ::isValidMemberName
    */
-  public function testIsValidMemberName($member_name, $expected) {
+  #[DataProvider('providerTestIsValidMemberName')]
+  public function testIsValidMemberName($member_name, $expected): void {
     $this->assertSame($expected, JsonApiSpec::isValidMemberName($member_name));
   }
 
@@ -36,9 +43,9 @@ class JsonApiSpecTest extends UnitTestCase {
     $data['hyphen-start'] = ['-kittens', FALSE];
     $data['hyphen-middle'] = ['kitt-ens', TRUE];
     $data['hyphen-end'] = ['kittens-', FALSE];
-    $data['lowline-start'] = ['_kittens', FALSE];
-    $data['lowline-middle'] = ['kitt_ens', TRUE];
-    $data['lowline-end'] = ['kittens_', FALSE];
+    $data['low-line-start'] = ['_kittens', FALSE];
+    $data['low-line-middle'] = ['kitt_ens', TRUE];
+    $data['low-line-end'] = ['kittens_', FALSE];
     $data['space-start'] = [' kittens', FALSE];
     $data['space-middle'] = ['kitt ens', TRUE];
     $data['space-end'] = ['kittens ', FALSE];
@@ -96,11 +103,11 @@ class JsonApiSpecTest extends UnitTestCase {
   /**
    * Provides test cases.
    *
-   * @dataProvider providerTestIsValidCustomQueryParameter
-   * @covers ::isValidCustomQueryParameter
-   * @covers ::isValidMemberName
+   * @legacy-covers ::isValidCustomQueryParameter
+   * @legacy-covers ::isValidMemberName
    */
-  public function testIsValidCustomQueryParameter($custom_query_parameter, $expected) {
+  #[DataProvider('providerTestIsValidCustomQueryParameter')]
+  public function testIsValidCustomQueryParameter($custom_query_parameter, $expected): void {
     $this->assertSame($expected, JsonApiSpec::isValidCustomQueryParameter($custom_query_parameter));
   }
 

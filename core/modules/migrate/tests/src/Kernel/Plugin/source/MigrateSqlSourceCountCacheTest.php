@@ -1,18 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Kernel\Plugin\source;
 
+use Drupal\migrate_sql_count_cache_test\Plugin\migrate\source\SqlCountCache;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests SqlBase source count caching.
  *
- * @covers \Drupal\migrate_sql_count_cache_test\Plugin\migrate\source\SqlCountCache
- * @covers \Drupal\migrate\Plugin\migrate\source\SqlBase::doCount
- * @covers \Drupal\migrate\Plugin\migrate\source\SourcePluginBase::count
- *
- * @group migrate
+ * @legacy-covers \Drupal\migrate\Plugin\migrate\source\SqlBase::doCount
+ * @legacy-covers \Drupal\migrate\Plugin\migrate\source\SourcePluginBase::count
  */
+#[CoversClass(SqlCountCache::class)]
+#[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class MigrateSqlSourceCountCacheTest extends MigrateSqlSourceTestBase {
 
   /**
@@ -23,7 +29,7 @@ class MigrateSqlSourceCountCacheTest extends MigrateSqlSourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function providerSource() {
+  public static function providerSource() {
     // All tests use the same source_data, expected_data, expected_count, and
     // high_water. The high water is set later to maintain the order of the
     // parameters.

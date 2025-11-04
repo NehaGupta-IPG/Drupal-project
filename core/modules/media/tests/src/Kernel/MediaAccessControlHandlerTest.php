@@ -1,19 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\Kernel;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\media\Entity\Media;
+use Drupal\media\MediaAccessControlHandler;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the media access control handler.
- *
- * @group media
- *
- * @coversDefaultClass \Drupal\media\MediaAccessControlHandler
  */
+#[CoversClass(MediaAccessControlHandler::class)]
+#[Group('media')]
+#[RunTestsInSeparateProcesses]
 class MediaAccessControlHandlerTest extends MediaKernelTestBase {
 
   use UserCreationTrait;
@@ -36,10 +42,10 @@ class MediaAccessControlHandlerTest extends MediaKernelTestBase {
    * @param bool $is_latest_revision
    *   If FALSE, the media is historic revision.
    *
-   * @covers ::checkAccess
-   * @dataProvider providerAccess
+   * @legacy-covers ::checkAccess
    */
-  public function testAccess(array $permissions, array $entity_values, string $operation, AccessResultInterface $expected_result, array $expected_cache_contexts, array $expected_cache_tags, bool $is_latest_revision) {
+  #[DataProvider('providerAccess')]
+  public function testAccess(array $permissions, array $entity_values, string $operation, AccessResultInterface $expected_result, array $expected_cache_contexts, array $expected_cache_tags, bool $is_latest_revision): void {
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $entityStorage $entity_storage */
     $entity_storage = $this->container->get('entity_type.manager')->getStorage('media');
 
@@ -76,6 +82,8 @@ class MediaAccessControlHandlerTest extends MediaKernelTestBase {
   }
 
   /**
+   * Tests create access.
+   *
    * @param string[] $permissions
    *   User permissions.
    * @param \Drupal\Core\Access\AccessResultInterface $expected_result
@@ -85,10 +93,10 @@ class MediaAccessControlHandlerTest extends MediaKernelTestBase {
    * @param string[] $expected_cache_tags
    *   Expected cache tags.
    *
-   * @covers ::checkCreateAccess
-   * @dataProvider providerCreateAccess
+   * @legacy-covers ::checkCreateAccess
    */
-  public function testCreateAccess(array $permissions, AccessResultInterface $expected_result, array $expected_cache_contexts, array $expected_cache_tags) {
+  #[DataProvider('providerCreateAccess')]
+  public function testCreateAccess(array $permissions, AccessResultInterface $expected_result, array $expected_cache_contexts, array $expected_cache_tags): void {
     $user = $this->createUser($permissions);
 
     /** @var \Drupal\Core\Entity\EntityAccessControlHandlerInterface $access_handler */
@@ -132,7 +140,7 @@ class MediaAccessControlHandlerTest extends MediaKernelTestBase {
    * @return array
    *   The data sets to test.
    */
-  public function providerAccess() {
+  public static function providerAccess() {
     $test_data = [];
 
     // Check published / unpublished media access for a user owning the media
@@ -483,7 +491,7 @@ class MediaAccessControlHandlerTest extends MediaKernelTestBase {
       'view all revisions',
       AccessResult::neutral(),
       ['user.permissions'],
-      ['media:1'],
+      [],
       TRUE,
     ];
     $test_data['admins can view all revisions'] = [
@@ -496,12 +504,12 @@ class MediaAccessControlHandlerTest extends MediaKernelTestBase {
       TRUE,
     ];
     $test_data['view all revisions with view bundle permission'] = [
-      ['view any test media revisions'],
-      [],
+      ['view any test media revisions', 'view media'],
+      ['status' => TRUE],
       'view all revisions',
       AccessResult::allowed(),
       ['user.permissions'],
-      [],
+      ['media:1'],
       TRUE,
     ];
     // Revert revisions:
@@ -624,7 +632,7 @@ class MediaAccessControlHandlerTest extends MediaKernelTestBase {
    * @return array
    *   The data sets to test.
    */
-  public function providerCreateAccess() {
+  public static function providerCreateAccess() {
     $test_data = [];
 
     // Check create access for a user without permissions.
@@ -769,10 +777,7 @@ class MediaAccessControlHandlerTest extends MediaKernelTestBase {
     $entity->save();
     $this->assertTrue($entity->get('revision_log_message')->access('view', $admin));
     $this->assertTrue($entity->get('revision_log_message')->access('view', $editor));
-    // revision_log_message field access can be granted with the "view revision"
-    // operation. "view revision" access is granted if the user is allowed to
-    // view the default revision of the media entity.
-    $this->assertTrue($entity->get('revision_log_message')->access('view', $viewer));
+    $this->assertFalse($entity->get('revision_log_message')->access('view', $viewer));
     $entity->setUnpublished()->save();
     \Drupal::entityTypeManager()->getAccessControlHandler('media')->resetCache();
     $this->assertFalse($entity->get('revision_log_message')->access('view', $viewer));

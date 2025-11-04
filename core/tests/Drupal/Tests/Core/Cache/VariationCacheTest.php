@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Cache;
 
+use Drupal\Component\Datetime\Time;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheRedirect;
 use Drupal\Core\Cache\Context\CacheContextsManager;
@@ -9,17 +12,21 @@ use Drupal\Core\Cache\Context\ContextCacheKeys;
 use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Cache\VariationCache;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @coversDefaultClass \Drupal\Core\Cache\VariationCache
- * @group Cache
+ * Tests Drupal\Core\Cache\VariationCache.
  */
+#[CoversClass(VariationCache::class)]
+#[Group('Cache')]
 class VariationCacheTest extends UnitTestCase {
 
   /**
-   * The prophesized request stack.
+   * The mock request stack.
    *
    * @var \Symfony\Component\HttpFoundation\RequestStack|\Prophecy\Prophecy\ProphecyInterface
    */
@@ -33,7 +40,7 @@ class VariationCacheTest extends UnitTestCase {
   protected $memoryBackend;
 
   /**
-   * The prophesized cache contexts manager.
+   * The mock cache contexts manager.
    *
    * @var \Drupal\Core\Cache\Context\CacheContextsManager|\Prophecy\Prophecy\ProphecyInterface
    */
@@ -123,7 +130,7 @@ class VariationCacheTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->requestStack = $this->prophesize(RequestStack::class);
-    $this->memoryBackend = new MemoryBackend();
+    $this->memoryBackend = new MemoryBackend(new Time());
     $this->cacheContextsManager = $this->prophesize(CacheContextsManager::class);
 
     $housing_type = &$this->housingType;
@@ -178,10 +185,10 @@ class VariationCacheTest extends UnitTestCase {
   /**
    * Tests a cache item that has no variations.
    *
-   * @covers ::get
-   * @covers ::set
+   * @legacy-covers ::get
+   * @legacy-covers ::set
    */
-  public function testNoVariations() {
+  public function testNoVariations(): void {
     $data = 'You have a nice house!';
     $cacheability = (new CacheableMetadata())->setCacheTags(['bar', 'foo']);
     $initial_cacheability = (new CacheableMetadata())->setCacheTags(['foo']);
@@ -192,10 +199,10 @@ class VariationCacheTest extends UnitTestCase {
   /**
    * Tests a cache item that only ever varies by one context.
    *
-   * @covers ::get
-   * @covers ::set
+   * @legacy-covers ::get
+   * @legacy-covers ::set
    */
-  public function testSingleVariation() {
+  public function testSingleVariation(): void {
     $cacheability = $this->housingTypeCacheability;
 
     $house_data = [
@@ -215,10 +222,10 @@ class VariationCacheTest extends UnitTestCase {
   /**
    * Tests a cache item that has nested variations.
    *
-   * @covers ::get
-   * @covers ::set
+   * @legacy-covers ::get
+   * @legacy-covers ::set
    */
-  public function testNestedVariations() {
+  public function testNestedVariations(): void {
     // We are running this scenario in the best possible outcome: The redirects
     // are stored in expanding order, meaning the simplest one is stored first
     // and the nested ones are stored in subsequent ::set() calls. This means no
@@ -265,12 +272,11 @@ class VariationCacheTest extends UnitTestCase {
   /**
    * Tests a cache item that has nested variations that trigger self-healing.
    *
-   * @covers ::get
-   * @covers ::set
-   *
-   * @depends testNestedVariations
+   * @legacy-covers ::get
+   * @legacy-covers ::set
    */
-  public function testNestedVariationsSelfHealing() {
+  #[Depends('testNestedVariations')]
+  public function testNestedVariationsSelfHealing(): void {
     // This is the worst possible scenario: A very specific item was stored
     // first, followed by a less specific one. This means an overly specific
     // cache redirect was stored that needs to be dumbed down. After this
@@ -324,10 +330,10 @@ class VariationCacheTest extends UnitTestCase {
   /**
    * Tests self-healing for a cache item that has split variations.
    *
-   * @covers ::get
-   * @covers ::set
+   * @legacy-covers ::get
+   * @legacy-covers ::set
    */
-  public function testSplitVariationsSelfHealing() {
+  public function testSplitVariationsSelfHealing(): void {
     // This is an edge case. Something varies by AB where some values of B
     // trigger the whole to vary by either C, D or nothing extra. But due to an
     // unfortunate series of requests, only ABC and ABD variations were cached.
@@ -394,12 +400,12 @@ class VariationCacheTest extends UnitTestCase {
   }
 
   /**
-   * Tests exception for a cache item that has incompatible variations.
+   * Tests exception for a cache item that has incomplete variations.
    *
-   * @covers ::get
-   * @covers ::set
+   * @legacy-covers ::get
+   * @legacy-covers ::set
    */
-  public function testIncompatibleVariationsException() {
+  public function testIncompleteVariationsException(): void {
     // This should never happen. When someone first stores something in the
     // cache using context A and then tries to store something using context B,
     // something is wrong. There should always be at least one shared context at
@@ -420,6 +426,189 @@ class VariationCacheTest extends UnitTestCase {
   }
 
   /**
+   * Tests exception for a cache item that has an incomplete redirect.
+   *
+   * @legacy-covers ::get
+   * @legacy-covers ::set
+   */
+  public function testIncompleteRedirectException(): void {
+    // @todo Remove in Drupal 12.0.0. For more information, see:
+    //   https://www.drupal.org/project/drupal/issues/3468921
+    set_error_handler(static function (int $errno, string $errstr): never {
+      throw new \LogicException($errstr, $errno);
+    }, E_USER_WARNING);
+
+    // This should never happen. When we have a cache redirect at address A,
+    // pointing to 'A,B:foo' and then someone tries to store a cache redirect at
+    // A pointing to 'A,B', something is wrong. The cache contexts leading up to
+    // a cache redirect should always be present on the redirect itself. In this
+    // example, the final cache redirect should be for 'A,B:foo,B'.
+    $this->expectException(\LogicException::class);
+    $this->expectExceptionMessage('Trying to overwrite a cache redirect for "your:housing:situation:ht.house" with one that has nothing in common, old one at address "house.type" was pointing to "garden.type:zen", new one points to "garden.type".');
+
+    $this->housingType = 'house';
+    $house_cacheability = (new CacheableMetadata())
+      ->setCacheContexts(['house.type']);
+
+    $this->gardenType = '1';
+    $calculated_garden_cacheability = (new CacheableMetadata())
+      ->setCacheContexts(['house.type', 'garden.type:zen']);
+
+    $this->setVariationCacheItem('You have a house with zen garden!', $calculated_garden_cacheability, $house_cacheability);
+
+    $this->gardenType = 'baroque garden';
+    $garden_cacheability = (new CacheableMetadata())
+      ->setCacheContexts(['house.type', 'garden.type']);
+
+    try {
+      $this->setVariationCacheItem('You have a house with a baroque garden!', $garden_cacheability, $house_cacheability);
+    }
+    finally {
+      restore_error_handler();
+    }
+  }
+
+  /**
+   * Tests exception for a cache item that has incompatible cache redirects.
+   *
+   * @legacy-covers ::get
+   * @legacy-covers ::set
+   */
+  public function testIncompatibleRedirectsException(): void {
+    // @todo Remove in Drupal 12.0.0. For more information, see:
+    //   https://www.drupal.org/project/drupal/issues/3468921
+    set_error_handler(static function (int $errno, string $errstr): never {
+      throw new \LogicException($errstr, $errno);
+    }, E_USER_WARNING);
+
+    // This should never happen. When someone first triggers the storing of a
+    // redirect using context A and then tries to store another redirect in the
+    // same spot using context B, something is wrong. The cache contexts of all
+    // previous redirects should always be present on the next redirect or item
+    // you're trying to store.
+    $this->expectException(\LogicException::class);
+    $this->expectExceptionMessage('Trying to overwrite a cache redirect for "your:housing:situation:ht.house" with one that has nothing in common, old one at address "house.type" was pointing to "garden.type", new one points to "house.orientation".');
+
+    $this->housingType = 'house';
+    $house_cacheability = (new CacheableMetadata())
+      ->setCacheContexts(['house.type']);
+
+    $this->gardenType = 'garden';
+    $garden_cacheability = (new CacheableMetadata())
+      ->setCacheContexts(['house.type', 'garden.type']);
+
+    $this->houseOrientation = 'north';
+    $orientation_cacheability = (new CacheableMetadata())
+      ->setCacheContexts(['house.type', 'house.orientation']);
+
+    $this->setVariationCacheItem('You have a nice house with a garden!', $garden_cacheability, $house_cacheability);
+    try {
+      $this->setVariationCacheItem('You have a nice north-facing house!', $orientation_cacheability, $house_cacheability);
+    }
+    finally {
+      restore_error_handler();
+    }
+  }
+
+  /**
+   * Tests the same as above, but with more redirects.
+   *
+   * @legacy-covers ::get
+   * @legacy-covers ::set
+   */
+  #[Depends('testIncompatibleRedirectsException')]
+  public function testIncompatibleChainedRedirectsException(): void {
+    // @todo Remove in Drupal 12.0.0. For more information, see:
+    //   https://www.drupal.org/project/drupal/issues/3468921
+    set_error_handler(static function (int $errno, string $errstr): never {
+      throw new \LogicException($errstr, $errno);
+    }, E_USER_WARNING);
+
+    $this->expectException(\LogicException::class);
+    $this->expectExceptionMessage('Trying to overwrite a cache redirect for "your:housing:situation:gt.garden:ht.house" with one that has nothing in common, old one at address "house.type, garden.type" was pointing to "house.orientation", new one points to "solar.type".');
+
+    $this->housingType = 'house';
+    $house_cacheability = (new CacheableMetadata())
+      ->setCacheContexts(['house.type']);
+
+    $this->gardenType = 'no-garden';
+    $garden_cacheability = (new CacheableMetadata())
+      ->setCacheContexts(['house.type', 'garden.type']);
+
+    // This should set a redirect at ht.house specifying garden.type. So the
+    // redirects below should find this redirect to be fine before getting to
+    // the problematic one.
+    $this->setVariationCacheItem('You have a nice house with no garden!', $garden_cacheability, $house_cacheability);
+    $this->gardenType = 'garden';
+
+    $this->houseOrientation = 'north';
+    $orientation_cacheability = (new CacheableMetadata())
+      ->setCacheContexts(['house.type', 'garden.type', 'house.orientation']);
+
+    $this->solarType = 'solar';
+    $solar_cacheability = (new CacheableMetadata())
+      ->setCacheContexts(['house.type', 'garden.type', 'solar.type']);
+
+    $this->setVariationCacheItem('You have a nice north-facing house with a garden!', $orientation_cacheability, $house_cacheability);
+    try {
+      $this->setVariationCacheItem('You have a nice house with solar panels and a garden!', $solar_cacheability, $house_cacheability);
+    }
+    finally {
+      restore_error_handler();
+    }
+  }
+
+  /**
+   * Tests the same as above, but even more complex.
+   *
+   * @legacy-covers ::get
+   * @legacy-covers ::set
+   */
+  #[Depends('testIncompatibleChainedRedirectsException')]
+  public function testIncompatibleChainedRedirectsComplexException(): void {
+    // @todo Remove in Drupal 12.0.0. For more information, see:
+    //   https://www.drupal.org/project/drupal/issues/3468921
+    set_error_handler(static function (int $errno, string $errstr): never {
+      throw new \LogicException($errstr, $errno);
+    }, E_USER_WARNING);
+
+    $this->expectException(\LogicException::class);
+    $this->expectExceptionMessage('Trying to overwrite a cache redirect for "your:housing:situation:gt.garden:ht.house" with one that has nothing in common, old one at address "house.type, garden.type" was pointing to "house.orientation", new one points to "solar.type".');
+
+    $this->housingType = 'house';
+    $house_cacheability = (new CacheableMetadata())
+      ->setCacheContexts(['house.type']);
+
+    $this->gardenType = 'garden';
+    $this->houseOrientation = 'north';
+    $orientation_cacheability = (new CacheableMetadata())
+      ->setCacheContexts(['house.type', 'garden.type', 'house.orientation']);
+
+    $this->solarType = 'solar';
+    $solar_cacheability = (new CacheableMetadata())
+      ->setCacheContexts(['house.type', 'garden.type', 'solar.type']);
+
+    // This time, nothing primes the redirects so the first set will create a
+    // redirect at ht.house, pointing to house.type, garden.type and solar.type.
+    $this->setVariationCacheItem('You have a nice house with solar panels and a garden!', $solar_cacheability, $house_cacheability);
+
+    // The second set will try to store a redirect at ht.house, pointing to
+    // house.type, garden.type and house.orientation. This will trigger the
+    // creation of a common redirect at ht.house, pointing to garden.type.
+    $this->setVariationCacheItem('You have a nice north-facing house with a garden!', $orientation_cacheability, $house_cacheability);
+
+    // Now we arrive at the same scenario as the test above. We have a redirect
+    // chain at house.type of garden.type and finally house.orientation, but are
+    // trying to set solar.type at that last address.
+    try {
+      $this->setVariationCacheItem('You have a nice house with solar panels and a garden!', $solar_cacheability, $house_cacheability);
+    }
+    finally {
+      restore_error_handler();
+    }
+  }
+
+  /**
    * Creates the sorted cache ID from cache ID parts.
    *
    * When core optimizes cache contexts it returns the keys alphabetically. To
@@ -431,7 +620,7 @@ class VariationCacheTest extends UnitTestCase {
    * @return string
    *   The correct cache ID.
    */
-  protected function getSortedCacheId($cache_id_parts) {
+  protected function getSortedCacheId($cache_id_parts): string {
     sort($cache_id_parts);
     array_unshift($cache_id_parts, $this->cacheIdBase);
     return implode(':', $cache_id_parts);
@@ -447,7 +636,7 @@ class VariationCacheTest extends UnitTestCase {
    * @param \Drupal\Core\Cache\CacheableMetadata $initial_cacheability
    *   The initial cacheability that should be used.
    */
-  protected function setVariationCacheItem($data, CacheableMetadata $cacheability, CacheableMetadata $initial_cacheability) {
+  protected function setVariationCacheItem($data, CacheableMetadata $cacheability, CacheableMetadata $initial_cacheability): void {
     $this->variationCache->set($this->cacheKeys, $data, $cacheability, $initial_cacheability);
   }
 
@@ -461,7 +650,7 @@ class VariationCacheTest extends UnitTestCase {
    * @param \Drupal\Core\Cache\CacheableMetadata $initial_cacheability
    *   The initial cacheability that should be used.
    */
-  protected function assertVariationCacheItem($data, CacheableMetadata $cacheability, CacheableMetadata $initial_cacheability) {
+  protected function assertVariationCacheItem($data, CacheableMetadata $cacheability, CacheableMetadata $initial_cacheability): void {
     $cache_item = $this->variationCache->get($this->cacheKeys, $initial_cacheability);
     $this->assertNotFalse($cache_item, 'Variable data was stored and retrieved successfully.');
     $this->assertEquals($data, $cache_item->data, 'Variable cache item contains the right data.');
@@ -474,7 +663,7 @@ class VariationCacheTest extends UnitTestCase {
    * @param \Drupal\Core\Cache\CacheableMetadata $initial_cacheability
    *   The initial cacheability that should be used.
    */
-  protected function assertVariationCacheMiss(CacheableMetadata $initial_cacheability) {
+  protected function assertVariationCacheMiss(CacheableMetadata $initial_cacheability): void {
     $this->assertFalse($this->variationCache->get($this->cacheKeys, $initial_cacheability), 'Nothing could be retrieved for the active cache contexts.');
   }
 
@@ -489,7 +678,7 @@ class VariationCacheTest extends UnitTestCase {
    *   (optional) The cacheability that should have been used. Does not apply
    *   when checking for cache redirects.
    */
-  protected function assertCacheBackendItem(string $cid, $data, CacheableMetadata $cacheability = NULL) {
+  protected function assertCacheBackendItem(string $cid, $data, ?CacheableMetadata $cacheability = NULL): void {
     $cache_backend_item = $this->memoryBackend->get($cid);
     $this->assertNotFalse($cache_backend_item, 'The data was stored and retrieved successfully.');
     $this->assertEquals($data, $cache_backend_item->data, 'Cache item contains the right data.');

@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media_library\FunctionalJavascript;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Tests the grid-style media overview page.
- *
- * @group media_library
  */
+#[Group('media_library')]
+#[RunTestsInSeparateProcesses]
 class MediaOverviewTest extends MediaLibraryTestBase {
 
   /**
@@ -58,7 +61,7 @@ class MediaOverviewTest extends MediaLibraryTestBase {
   /**
    * Tests that the Media Library's administration page works as expected.
    */
-  public function testAdministrationPage() {
+  public function testAdministrationPage(): void {
     $session = $this->getSession();
     $page = $session->getPage();
     $assert_session = $this->assertSession();

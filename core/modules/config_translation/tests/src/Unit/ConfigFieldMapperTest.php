@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config_translation\Unit;
 
 use Drupal\config_translation\ConfigFieldMapper;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the functionality provided by the configuration field mapper.
- *
- * @group config_translation
- *
- * @coversDefaultClass \Drupal\config_translation\ConfigFieldMapper
  */
+#[CoversClass(ConfigFieldMapper::class)]
+#[Group('config_translation')]
 class ConfigFieldMapperTest extends UnitTestCase {
 
   /**
@@ -83,9 +85,9 @@ class ConfigFieldMapperTest extends UnitTestCase {
   /**
    * Tests ConfigFieldMapper::setEntity().
    *
-   * @covers ::setEntity
+   * @legacy-covers ::setEntity
    */
-  public function testSetEntity() {
+  public function testSetEntity(): void {
     $entity_type = $this->createMock('Drupal\Core\Config\Entity\ConfigEntityTypeInterface');
     $entity_type
       ->expects($this->any())

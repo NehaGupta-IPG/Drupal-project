@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Path;
 
 use Drupal\Core\Routing\RequestContext;
@@ -7,14 +9,16 @@ use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the path validator.
  *
- * @group Path
- *
  * @see \Drupal\Core\Path\PathValidator
  */
+#[Group('Path')]
+#[RunTestsInSeparateProcesses]
 class PathValidatorTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -33,7 +37,10 @@ class PathValidatorTest extends KernelTestBase {
     $this->installEntitySchema('entity_test');
   }
 
-  public function testGetUrlIfValidWithoutAccessCheck() {
+  /**
+   * Tests getting a Url for CLI and HTTP methods.
+   */
+  public function testGetUrlIfValidWithoutAccessCheck(): void {
     $requestContext = \Drupal::service('router.request_context');
     $pathValidator = \Drupal::service('path.validator');
 
@@ -64,8 +71,10 @@ class PathValidatorTest extends KernelTestBase {
         }
         $this->container->set('router.request_context', new RequestContext());
       }
+      else {
+        $requestContext->setMethod($method);
+      }
 
-      $requestContext->setMethod($method);
       /** @var \Drupal\Core\Url $url */
       $url = $pathValidator->getUrlIfValidWithoutAccessCheck($entity->toUrl()->toString(TRUE)->getGeneratedUrl());
       $this->assertEquals($method, $requestContext->getMethod());

@@ -1,18 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Transliteration;
 
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Transliteration\PhpTransliteration;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests Transliteration component functionality.
  *
- * @group Transliteration
- *
  * @coversClass \Drupal\Core\Transliteration\PhpTransliteration
  */
+#[Group('Transliteration')]
 class PhpTransliterationTest extends UnitTestCase {
 
   /**
@@ -27,10 +30,9 @@ class PhpTransliterationTest extends UnitTestCase {
    * @param string|null $printable
    *   (optional) An alternative version of the original string which is
    *   printable in the output.
-   *
-   * @dataProvider providerTestPhpTransliterationWithAlter
    */
-  public function testPhpTransliterationWithAlter($langcode, $original, $expected, $printable = NULL) {
+  #[DataProvider('providerTestPhpTransliterationWithAlter')]
+  public function testPhpTransliterationWithAlter($langcode, $original, $expected, $printable = NULL): void {
     if ($printable === NULL) {
       $printable = $original;
     }
@@ -42,7 +44,8 @@ class PhpTransliterationTest extends UnitTestCase {
       ->method('alter')
       ->willReturnCallback(function ($hook, &$overrides, $langcode) {
         if ($langcode == 'zz') {
-          // The default transliteration of Ä is A, but change it to Z for testing.
+          // The default transliteration of Ä is A, but change it to Z for
+          // testing.
           $overrides[0xC4] = 'Z';
           // Also provide transliterations of two 5-byte characters from
           // http://wikipedia.org/wiki/Gothic_alphabet.
@@ -60,8 +63,9 @@ class PhpTransliterationTest extends UnitTestCase {
    * Provides test data for testPhpTransliterationWithAlter.
    *
    * @return array
+   *   An array of test data for testPhpTransliterationWithAlter.
    */
-  public function providerTestPhpTransliterationWithAlter() {
+  public static function providerTestPhpTransliterationWithAlter() {
     $random_generator = new Random();
     $random = $random_generator->string(10);
     // Make some strings with two, three, and four-byte characters for testing.

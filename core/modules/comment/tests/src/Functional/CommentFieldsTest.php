@@ -1,24 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
-use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\field\Entity\FieldConfig;
 use Drupal\comment\Entity\CommentType;
+use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests fields on comments.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentFieldsTest extends CommentTestBase {
 
   /**
-   * Install the field UI.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field_ui'];
 
@@ -30,7 +31,7 @@ class CommentFieldsTest extends CommentTestBase {
   /**
    * Tests that the default 'comment_body' field is correctly added.
    */
-  public function testCommentDefaultFields() {
+  public function testCommentDefaultFields(): void {
     // Do not make assumptions on default node types created by the test
     // installation profile, and create our own.
     $this->drupalCreateContentType(['type' => 'test_node_type']);
@@ -57,7 +58,7 @@ class CommentFieldsTest extends CommentTestBase {
     $field_storage = FieldStorageConfig::loadByName('comment', 'comment_body');
     $this->assertInstanceOf(FieldStorageConfig::class, $field_storage);
     $field = FieldConfig::loadByName('comment', 'comment', 'comment_body');
-    $this->assertTrue(isset($field), new FormattableMarkup('The comment_body field is present for comments on type @type', ['@type' => $type_name]));
+    $this->assertTrue(isset($field), "The comment_body field is present for comments on type $type_name");
 
     // Test adding a field that defaults to CommentItemInterface::CLOSED.
     $this->addDefaultCommentField('node', 'test_node_type', 'who_likes_ponies', CommentItemInterface::CLOSED, 'who_likes_ponies');
@@ -68,7 +69,7 @@ class CommentFieldsTest extends CommentTestBase {
   /**
    * Tests that you can remove a comment field.
    */
-  public function testCommentFieldDelete() {
+  public function testCommentFieldDelete(): void {
     $this->drupalCreateContentType(['type' => 'test_node_type']);
     $this->addDefaultCommentField('node', 'test_node_type');
     // We want to test the handling of removing the primary comment field, so we
@@ -98,7 +99,7 @@ class CommentFieldsTest extends CommentTestBase {
   /**
    * Tests link building with non-default comment field names.
    */
-  public function testCommentFieldLinksNonDefaultName() {
+  public function testCommentFieldLinksNonDefaultName(): void {
     $this->drupalCreateContentType(['type' => 'test_node_type']);
     $this->addDefaultCommentField('node', 'test_node_type', 'comment2');
 
@@ -115,6 +116,7 @@ class CommentFieldsTest extends CommentTestBase {
     $node = $this->drupalCreateNode([
       'title' => 'Baloney',
       'type' => 'test_node_type',
+      'promote' => TRUE,
     ]);
 
     // Go to the node first so that web_user2 see new comments.
@@ -135,16 +137,12 @@ class CommentFieldsTest extends CommentTestBase {
     // we need a node listing, let's use views for that.
     $this->container->get('module_installer')->install(['views'], TRUE);
     $this->drupalGet('node');
-
-    $link_info = $this->getDrupalSettings()['comment']['newCommentsLinks']['node']['comment2']['2'];
-    $this->assertSame(1, $link_info['new_comment_count']);
-    $this->assertSame($node->toUrl('canonical', ['fragment' => 'new'])->toString(), $link_info['first_new_comment_link']);
   }
 
   /**
    * Tests creating a comment field through the interface.
    */
-  public function testCommentFieldCreate() {
+  public function testCommentFieldCreate(): void {
     // Create user who can administer user fields.
     $user = $this->drupalCreateUser([
       'administer user fields',
@@ -153,14 +151,11 @@ class CommentFieldsTest extends CommentTestBase {
 
     // Create comment field in account settings.
     $edit = [
-      'new_storage_type' => 'comment',
-    ];
-    $this->drupalGet('admin/config/people/accounts/fields/add-field');
-    $this->submitForm($edit, 'Continue');
-    $edit = [
       'label' => 'User comment',
       'field_name' => 'user_comment',
     ];
+    $this->drupalGet('admin/config/people/accounts/fields/add-field');
+    $this->clickLink('Comments');
     $this->submitForm($edit, 'Continue');
 
     // Try to save the comment field without selecting a comment type.
@@ -193,71 +188,8 @@ class CommentFieldsTest extends CommentTestBase {
       'settings[per_page]' => 0,
     ];
     $this->drupalGet('admin/config/people/accounts/add-field/user/field_user_comment');
-    $this->submitForm($edit, 'Save settings');
+    $this->submitForm($edit, 'Save');
     $this->assertSession()->statusMessageContains('Saved User comment configuration.', 'status');
-  }
-
-  /**
-   * Tests that comment module works when installed after a content module.
-   */
-  public function testCommentInstallAfterContentModule() {
-    // Create a user to do module administration.
-    $this->adminUser = $this->drupalCreateUser([
-      'access administration pages',
-      'administer modules',
-    ]);
-    $this->drupalLogin($this->adminUser);
-
-    // Drop default comment field added in CommentTestBase::setUp().
-    FieldStorageConfig::loadByName('node', 'comment')->delete();
-    if ($field_storage = FieldStorageConfig::loadByName('node', 'comment_forum')) {
-      $field_storage->delete();
-    }
-
-    // Purge field data now to allow comment module to be uninstalled once the
-    // field has been deleted.
-    field_purge_batch(10);
-
-    // Uninstall the comment module.
-    $edit = [];
-    $edit['uninstall[comment]'] = TRUE;
-    $this->drupalGet('admin/modules/uninstall');
-    $this->submitForm($edit, 'Uninstall');
-    $this->submitForm([], 'Uninstall');
-    $this->rebuildContainer();
-    $this->assertFalse($this->container->get('module_handler')->moduleExists('comment'), 'Comment module uninstalled.');
-
-    // Install core content type module (book).
-    $edit = [];
-    $edit['modules[book][enable]'] = 'book';
-    $this->drupalGet('admin/modules');
-    $this->submitForm($edit, 'Install');
-
-    // Now install the comment module.
-    $edit = [];
-    $edit['modules[comment][enable]'] = 'comment';
-    $this->drupalGet('admin/modules');
-    $this->submitForm($edit, 'Install');
-    $this->rebuildContainer();
-    $this->assertTrue($this->container->get('module_handler')->moduleExists('comment'), 'Comment module enabled.');
-
-    // Create nodes of each type.
-    $this->addDefaultCommentField('node', 'book');
-    $book_node = $this->drupalCreateNode(['type' => 'book']);
-
-    $this->drupalLogout();
-
-    // Try to post a comment on each node. A failure will be triggered if the
-    // comment body is missing on one of these forms, due to postComment()
-    // asserting that the body is actually posted correctly.
-    $this->webUser = $this->drupalCreateUser([
-      'access content',
-      'access comments',
-      'post comments',
-      'skip comment approval',
-    ]);
-    $this->drupalLogin($this->webUser);
-    $this->postComment($book_node, $this->randomMachineName(), $this->randomMachineName());
   }
 
 }
