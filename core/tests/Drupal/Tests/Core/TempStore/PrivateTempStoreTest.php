@@ -184,7 +184,7 @@ class PrivateTempStoreTest extends UnitTestCase {
   public static function providerTestSetExpire(): array {
     return [
       // A NULL expire value falls back to the default value.
-      [NULL, self::defaultExpire],
+      [NULL, self::$defaultExpire],
       [123456, 123456],
     ];
   }
