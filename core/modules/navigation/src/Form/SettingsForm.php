@@ -139,7 +139,7 @@ final class SettingsForm extends ConfigFormBase {
       '@local-file' => $local_file,
     ]);
 
-    $allowed = 'png jpg jpeg';
+    $allowed = 'png jpg jpeg svg';
     $max_navigation_allowed = $config->get('logo.max.filesize');
     $max_system_allowed = Environment::getUploadMaxSize();
     $max_allowed = $max_navigation_allowed < $max_system_allowed ? $max_navigation_allowed : $max_system_allowed;
@@ -194,7 +194,7 @@ final class SettingsForm extends ConfigFormBase {
       $file = _file_save_upload_from_form($form['logo']['custom']['logo_upload'], $form_state, 0);
       if ($file) {
         $logo_dimensions = $this->adjustLogoDimensions($file);
-        if (!$logo_dimensions) {
+        if (!$logo_dimensions && $file->getMimeType() !== 'image/svg+xml') {
           $config = $this->config('navigation.settings');
           $width = $config->get('logo.width');
           $height = $config->get('logo.height');
