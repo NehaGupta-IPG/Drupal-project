@@ -348,6 +348,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
       'indexes' => [
         'name_created' => ['name', 'created'],
         'expire' => ['expire'],
+        'queue_claim_idx' => ['name', 'expire', 'created'],
       ],
     ];
   }
