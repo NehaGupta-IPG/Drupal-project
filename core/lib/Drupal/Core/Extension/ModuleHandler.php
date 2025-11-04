@@ -471,6 +471,8 @@ class ModuleHandler implements ModuleHandlerInterface {
    *   List of implementation callables.
    */
   protected function getCombinedListeners(array $hooks): array {
+    $original_hooks = $hooks;
+    $hooks = array_unique($hooks);
     // Get implementation lists for each hook.
     /** @var list<\Drupal\Core\Hook\ImplementationList> $lists */
     $lists = array_map($this->getHookImplementationList(...), $hooks);
@@ -521,7 +523,8 @@ class ModuleHandler implements ModuleHandlerInterface {
       fn (string $module) => $identifiers_by_module[$module],
       $modules,
     ));
-    foreach ($hooks as $hook) {
+    // Include order operations for repeated hooks, to keep existing behavior.
+    foreach ($original_hooks as $hook) {
       foreach ($this->getHookOrderingRules($hook) as $rule) {
         $rule->apply($identifiers, $modules_by_identifier);
         // Order operations must not:
