@@ -21,7 +21,7 @@ class DblogHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match): ?string {
+  public function help($route_name, RouteMatchInterface $route_match): string|array|null {
     switch ($route_name) {
       case 'help.page.dblog':
         $output = '';
@@ -39,7 +39,18 @@ class DblogHooks {
         return $output;
 
       case 'dblog.overview':
-        return '<p>' . $this->t('The Database Logging module logs system events in the Drupal database. Monitor your site or debug site problems on this page.') . '</p>';
+        // Display current server time and attach JS for live updates.
+        $server_time = \Drupal::service('date.formatter')->format(\Drupal::time()->getRequestTime(), 'custom', 'Y-m-d H:i:s');
+        $output = '';
+        $output .= '<p>' . $this->t('The Database Logging module logs system events in the Drupal database. Monitor your site or debug site problems on this page. Current Server Time (Page Load): <span id="dblog-server-time">@time</span>', ['@time' => $server_time]) . '</p>';
+        return [
+          '#markup' => $output,
+          '#attached' => [
+            'library' => [
+              'dblog/live_time',
+            ],
+          ],
+        ];
     }
     return NULL;
   }
