@@ -10,6 +10,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
+// cspell:ignore #*|%
+
 /**
  * Tests Drupal\Component\Datetime\DateTimePlus.
  */
