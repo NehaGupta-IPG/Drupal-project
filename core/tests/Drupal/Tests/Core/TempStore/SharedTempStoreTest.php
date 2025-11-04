@@ -177,7 +177,7 @@ class SharedTempStoreTest extends UnitTestCase {
    *
    * @dataProvider providerTestSetExpire
    *
-   * @covers ::set
+   * @legacy-covers ::set
    */
   public function testSet(?int $expire, int $expected_expire): void {
     $this->lock->expects($this->once())
@@ -202,7 +202,7 @@ class SharedTempStoreTest extends UnitTestCase {
    *
    * @dataProvider providerTestSetExpire
    *
-   * @covers ::setIfNotExists
+   * @legacy-covers ::setIfNotExists
    */
   public function testSetIfNotExists(?int $expire, int $expected_expire): void {
     $this->keyValue->expects($this->once())
