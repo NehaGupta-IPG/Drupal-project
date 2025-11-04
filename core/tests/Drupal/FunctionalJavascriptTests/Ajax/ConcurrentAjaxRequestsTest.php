@@ -3,12 +3,14 @@
 namespace Drupal\FunctionalJavascriptTests\Ajax;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests concurrency of AJAX requests.
- *
- * @group Ajax
  */
+#[Group('Ajax')]
+#[RunTestsInSeparateProcesses]
 class ConcurrentAjaxRequestsTest extends WebDriverTestBase
 {
 
