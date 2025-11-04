@@ -81,10 +81,14 @@ node.configure_rebuild_confirm:
   requirements:
     _permission: 'rebuild node access permissions'
 
-# @todo remove these aliases as well as overrides in NodeRouteProvider
+# @todo remove these aliases as well as overrides in NodeRouteProvider and NodeRevisionRouteProvider.
 # https://www.drupal.org/project/drupal/issues/3506653 is done.
 # @see https://www.drupal.org/project/drupal/issues/3540865
 entity.node.add_page:
   alias: 'node.add_page'
 entity.node.add_form:
   alias: 'node.add'
+entity.node.revision_delete_form:
+  alias: 'node.revision_delete_confirm'
+entity.node.revision_revert_form:
+  alias: 'node.revision_revert_confirm'
