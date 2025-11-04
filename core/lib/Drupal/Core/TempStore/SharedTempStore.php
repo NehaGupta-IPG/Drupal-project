@@ -217,8 +217,6 @@ class SharedTempStore {
    * @param int|null $expire
    *   The time to live for an item, in seconds.
    *
-   * @return $this
-   *
    * @throws \Drupal\Core\TempStore\TempStoreException
    *   Thrown when a lock for the backend storage could not be acquired.
    */
