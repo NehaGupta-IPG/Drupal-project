@@ -117,11 +117,13 @@ class PrivateTempStore {
    *   The data to store.
    * @param int|null $expire
    *   The time to live for an item, in seconds.
+   * 
+   * @return $this
    *
    * @throws \Drupal\Core\TempStore\TempStoreException
    *   Thrown when a lock for the backend storage could not be acquired.
    */
-  public function set($key, $value, ?int $expire = NULL): void {
+  public function set($key, $value, ?int $expire = NULL) {
     if ($this->currentUser->isAnonymous()) {
       $session = $this->requestStack->getSession();
       if (!$session->has('core.tempstore.private.owner')) {
@@ -150,6 +152,7 @@ class PrivateTempStore {
 
     $this->storage->setWithExpire($key, $value, $expire);
     $this->lockBackend->release($key);
+    return $this;
   }
 
   /**

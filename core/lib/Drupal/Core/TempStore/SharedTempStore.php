@@ -216,11 +216,13 @@ class SharedTempStore {
    *   The data to store.
    * @param int|null $expire
    *   The time to live for an item, in seconds.
+   * 
+   * @return $this
    *
    * @throws \Drupal\Core\TempStore\TempStoreException
    *   Thrown when a lock for the backend storage could not be acquired.
    */
-  public function set($key, $value, ?int $expire = NULL): void {
+  public function set($key, $value, ?int $expire = NULL) {
     if (!$this->lockBackend->acquire($key)) {
       $this->lockBackend->wait($key);
       if (!$this->lockBackend->acquire($key)) {
@@ -242,6 +244,7 @@ class SharedTempStore {
 
     $this->storage->setWithExpire($key, $value, $expire);
     $this->lockBackend->release($key);
+    return $this;
   }
 
   /**
