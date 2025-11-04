@@ -175,7 +175,7 @@ class ViewsLocalTask extends DeriverBase implements ContainerDeriverInterface {
    * @param array $local_tasks
    *   The set of all local tasks, which will be adjusted.
    */
-  protected function applyBaseRoute(ViewExecutable $view, string $task_id, array &$local_tasks) {
+  protected function applyBaseRoute(ViewExecutable $view, string $task_id, array &$local_tasks): void {
     // Find out the parent route.
     // @todo Find out how to find both the root and parent tab the best way.
     $path = $view->display_handler->getPath();

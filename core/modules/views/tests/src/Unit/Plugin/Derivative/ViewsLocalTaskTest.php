@@ -305,7 +305,7 @@ class ViewsLocalTaskTest extends UnitTestCase {
   /**
    * Tests fetching the derivatives on a view with a default local task.
    */
-  public function testGetDerivativeDefinitionsWithParentLocalTask() {
+  public function testGetDerivativeDefinitionsWithParentLocalTask(): void {
     $executable = $this->getMockBuilder('Drupal\views\ViewExecutable')
       ->disableOriginalConstructor()
       ->getMock();
