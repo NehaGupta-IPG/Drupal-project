@@ -95,7 +95,7 @@
     "sortablejs": "^1.15.6",
     "stylelint": "^16.19.1",
     "stylelint-checkstyle-formatter": "^0.1.2",
-    "stylelint-config-standard": "^38.0.0",
+    "stylelint-config-standard": "^39.0.1",
     "stylelint-order": "^7.0.0",
     "stylelint-prettier": "^5.0.3",
     "tabbable": "^6.2.0",
