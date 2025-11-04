@@ -38,7 +38,7 @@ class DateTimeIso8601 extends StringData implements DateTimeInterface {
       // Data of this type must always be stored in UTC.
       $datetime = new DrupalDateTime($this->value, 'UTC');
     }
-      return $datetime;
+    return $datetime;
   }
 
   /**
