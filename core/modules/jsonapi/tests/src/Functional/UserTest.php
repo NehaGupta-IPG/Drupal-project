@@ -57,6 +57,13 @@ class UserTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $viewProtectedFieldNames = [
+    'pass' => NULL,
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
   protected static $anonymousUsersCanViewLabels = TRUE;
 
   /**
