@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\ajax_test\Form;
 
 use Drupal\Core\Ajax\AjaxResponse;
@@ -11,22 +13,19 @@ use Drupal\Core\Url;
 /**
  * Form to test concurrent AJAX requests.
  */
-class AjaxTestConcurrentRequestsForm extends FormBase
-{
+class AjaxTestConcurrentRequestsForm extends FormBase {
 
   /**
    * {@inheritdoc}
    */
-  public function getFormId()
-  {
+  public function getFormId() {
     return 'ajax_test_concurrent_requests_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state)
-  {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     $form['slow'] = [
       '#type' => 'submit',
       '#value' => $this->t('Slow request'),
@@ -87,8 +86,7 @@ class AjaxTestConcurrentRequestsForm extends FormBase
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state)
-  {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus($this->t('Submitted slow counter: @counter.', [
       '@counter' => $form_state->get(['counter', 'op_slow']) ?? 0,
     ]));
@@ -100,16 +98,14 @@ class AjaxTestConcurrentRequestsForm extends FormBase
   /**
    * Submit callback that sets the form to be rebuilt.
    */
-  public static function rebuildSubmit(array $form, FormStateInterface $form_state)
-  {
+  public static function rebuildSubmit(array $form, FormStateInterface $form_state): void {
     $form_state->setRebuild();
   }
 
   /**
    * Submit callback that increases the button counter by one.
    */
-  public static function increaseCounterSubmit(array $form, FormStateInterface $form_state)
-  {
+  public static function increaseCounterSubmit(array $form, FormStateInterface $form_state): void {
     $button = $form_state->getTriggeringElement();
     sleep($button['#request_time'] ?? 0);
 
@@ -122,17 +118,21 @@ class AjaxTestConcurrentRequestsForm extends FormBase
 
   /**
    * Empty AJAX callback.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   The AJAX response.
    */
-  public static function increaseCounterAjax(array $form, FormStateInterface $form_state)
-  {
+  public static function increaseCounterAjax(array $form, FormStateInterface $form_state): AjaxResponse {
     return new AjaxResponse();
   }
 
   /**
    * AJAX callback that triggers a click on the non-blocking link.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   The AJAX response.
    */
-  public static function chainedAjax(array $form, FormStateInterface $form_state)
-  {
+  public static function chainedAjax(array $form, FormStateInterface $form_state): AjaxResponse {
     $response = new AjaxResponse();
 
     $selector = $form['non_blocking']['#attributes']['data-drupal-selector'];

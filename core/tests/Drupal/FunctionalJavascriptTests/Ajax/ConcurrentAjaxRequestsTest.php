@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalJavascriptTests\Ajax;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\hold_test\HoldTestHelper;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -11,8 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Ajax')]
 #[RunTestsInSeparateProcesses]
-class ConcurrentAjaxRequestsTest extends WebDriverTestBase
-{
+class ConcurrentAjaxRequestsTest extends WebDriverTestBase {
 
   /**
    * {@inheritdoc}
@@ -30,8 +32,7 @@ class ConcurrentAjaxRequestsTest extends WebDriverTestBase
   /**
    * Tests that AJAX blocking requests do not allow concurrent requests.
    */
-  public function testBlockingRequests()
-  {
+  public function testBlockingRequests(): void {
     $this->drupalGet('ajax-test/concurrent-requests-form');
 
     $assert_session = $this->assertSession();
@@ -85,18 +86,17 @@ class ConcurrentAjaxRequestsTest extends WebDriverTestBase
   /**
    * Tests that non-blocking AJAX requests allow concurrent requests.
    */
-  public function testNonBlockingRequests()
-  {
+  public function testNonBlockingRequests(): void {
     $this->drupalGet('ajax-test/concurrent-requests-form');
 
     $assert_session = $this->assertSession();
     // Hold all the responses.
-    hold_test_response(TRUE);
+    HoldTestHelper::requestHold(TRUE);
     // Launch a non-blocking request and a blocking request.
     $this->clickLink('Non-blocking request');
     $assert_session->buttonExists('Fast request')->press();
     // Release all the paused responses.
-    hold_test_response(FALSE);
+    HoldTestHelper::responseHold(FALSE);
     $assert_session->assertWaitOnAjaxRequest();
     // Verify that the link AJAX request has been completed.
     $assert_session->pageTextContains('Current theme: stark');
