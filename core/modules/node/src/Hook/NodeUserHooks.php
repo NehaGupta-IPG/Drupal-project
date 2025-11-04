@@ -56,4 +56,13 @@ class NodeUserHooks {
     }
   }
 
+  /**
+   * Implements hook_block_alter().
+   */
+  #[Hook('block_alter')]
+  public function blockAlter(&$definitions): void {
+    // Hide the deprecated Syndicate block from the UI.
+    $definitions['node_syndicate_block']['_block_ui_hidden'] = TRUE;
+  }
+
 }

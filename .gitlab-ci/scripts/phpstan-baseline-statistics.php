@@ -25,6 +25,12 @@ if (!isset($args[2])) {
 }
 $outputFilePath = $args[2];
 
+$outputFilePath = __DIR__ . "/../../";
+if ($artifactsDirectory = getenv('_ARTIFACTS_DIR')) {
+  $outputFilePath .= $artifactsDirectory . \DIRECTORY_SEPARATOR;
+}
+$outputFilePath .= "phpstan-metrics.txt";
+
 $stats = ['__total' => 0];
 foreach ($ignoreErrors as $ignore) {
   $identifier = $ignore['identifier'] ?? '* not specified *';
