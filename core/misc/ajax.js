@@ -279,6 +279,7 @@
    * @type {Array.<Drupal.Ajax|null>}
    */
   Drupal.ajax.instances = [];
+  Drupal.ajax.blockingAllowed = true;
 
   /**
    * List all objects where the associated element is not in the DOM
@@ -542,14 +543,24 @@
       },
       beforeSubmit(formValues, elementSettings, options) {
         ajax.ajaxing = true;
+        if (ajax.blocking) {
+          Drupal.ajax.blockingAllowed = false;
+        }
         ajax.preCommandsFocusedElementSelector = null;
         return ajax.beforeSubmit(formValues, elementSettings, options);
       },
       beforeSend(xmlhttprequest, options) {
         ajax.ajaxing = true;
+        if (ajax.blocking) {
+          Drupal.ajax.blockingAllowed = false;
+        }
         return ajax.beforeSend(xmlhttprequest, options);
       },
       success(response, status, xmlhttprequest) {
+        if (ajax.blocking) {
+          Drupal.ajax.blockingAllowed = true;
+        }
+
         ajax.preCommandsFocusedElementSelector =
           document.activeElement.getAttribute('data-drupal-selector');
 
@@ -606,6 +617,10 @@
         ajax.ajaxing = false;
       },
       complete(xmlhttprequest, status) {
+        if (ajax.blocking) {
+          Drupal.ajax.blockingAllowed = true;
+        }
+
         if (status === 'error' || status === 'parsererror') {
           return ajax.error(xmlhttprequest, ajax.url);
         }
@@ -711,6 +726,9 @@
       // Unset the ajax.ajaxing flag here because it won't be unset during
       // the complete response.
       this.ajaxing = false;
+      if (this.blocking) {
+        Drupal.ajax.blockingAllowed = true;
+      }
       window.alert(
         `An error occurred while attempting to process ${this.options.url}: ${e.message}`,
       );
@@ -777,6 +795,10 @@
 
     // Create a synonym for this to reduce code confusion.
     const ajax = this;
+
+    if (ajax.blocking && !Drupal.ajax.blockingAllowed) {
+      return;
+    }
 
     // Do not perform another Ajax command if one is already in progress.
     if (ajax.ajaxing) {
