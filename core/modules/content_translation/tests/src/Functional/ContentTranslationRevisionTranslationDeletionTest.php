@@ -197,6 +197,9 @@ class ContentTranslationRevisionTranslationDeletionTest extends ContentTranslati
         'node' => $id,
         'node_revision' => $it_revision->getRevisionId(),
       ],
+      [
+        'language' => ConfigurableLanguage::load('it'),
+      ]
     );
     $revision_deletion_href = $revision_deletion_url->toString();
     $this->getSession()->getDriver()->click("//a[@href='$revision_deletion_href']");
