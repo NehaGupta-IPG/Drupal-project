@@ -74,7 +74,7 @@ class PrivateTempStoreTest extends UnitTestCase {
    *
    * @var int
    */
-  protected int $defaultExpire = 604800;
+  protected static int $defaultExpire;
 
   /**
    * {@inheritdoc}
@@ -93,7 +93,9 @@ class PrivateTempStoreTest extends UnitTestCase {
     $request = Request::createFromGlobals();
     $this->requestStack->push($request);
 
-    $this->tempStore = new PrivateTempStore($this->keyValue, $this->lock, $this->currentUser, $this->requestStack, $this->defaultExpire);
+    self::$defaultExpire = 604800;
+
+    $this->tempStore = new PrivateTempStore($this->keyValue, $this->lock, $this->currentUser, $this->requestStack, self::$defaultExpire);
 
     $this->ownObject = (object) [
       'data' => 'test_data',
@@ -104,7 +106,6 @@ class PrivateTempStoreTest extends UnitTestCase {
     // Clone the object but change the owner.
     $this->otherObject = clone $this->ownObject;
     $this->otherObject->owner = 2;
-    $this->defaultExpire = $defaultExpire;
   }
 
   /**
@@ -183,7 +184,7 @@ class PrivateTempStoreTest extends UnitTestCase {
   public static function providerTestSetExpire(): array {
     return [
       // A NULL expire value falls back to the default value.
-      [NULL, $this->defaultExpire],
+      [NULL, self::defaultExpire],
       [123456, 123456],
     ];
   }

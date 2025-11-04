@@ -77,7 +77,7 @@ class SharedTempStoreTest extends UnitTestCase {
    *
    * @var int
    */
-  protected int $defaultExpire = 604800;
+  protected static int $defaultExpire;
 
   /**
    * {@inheritdoc}
@@ -94,7 +94,9 @@ class SharedTempStoreTest extends UnitTestCase {
     $this->requestStack->push($request);
     $current_user = $this->createMock(AccountProxyInterface::class);
 
-    $this->tempStore = new SharedTempStore($this->keyValue, $this->lock, $this->owner, $this->requestStack, $current_user, $this->defaultExpire);
+    self::$defaultExpire = 604800;
+
+    $this->tempStore = new SharedTempStore($this->keyValue, $this->lock, $this->owner, $this->requestStack, $current_user, self::$defaultExpire);
 
     $this->ownObject = (object) [
       'data' => 'test_data',
@@ -105,7 +107,6 @@ class SharedTempStoreTest extends UnitTestCase {
     // Clone the object but change the owner.
     $this->otherObject = clone $this->ownObject;
     $this->otherObject->owner = 2;
-    $this->defaultExpire = $defaultExpire;
   }
 
   /**
@@ -219,7 +220,7 @@ class SharedTempStoreTest extends UnitTestCase {
   public static function providerTestSetExpire(): array {
     return [
       // A NULL expire value falls back to the default value.
-      [NULL, $this->defaultExpire],
+      [NULL, self::$defaultExpire],
       [123456, 123456],
     ];
   }
