@@ -222,7 +222,7 @@ class SharedTempStore {
    * @throws \Drupal\Core\TempStore\TempStoreException
    *   Thrown when a lock for the backend storage could not be acquired.
    */
-  public function set($key, $value, ?int $expire = NULL) {
+  public function set($key, $value, ?int $expire = NULL): self {
     if (!$this->lockBackend->acquire($key)) {
       $this->lockBackend->wait($key);
       if (!$this->lockBackend->acquire($key)) {

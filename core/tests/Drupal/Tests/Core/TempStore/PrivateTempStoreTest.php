@@ -104,6 +104,7 @@ class PrivateTempStoreTest extends UnitTestCase {
     // Clone the object but change the owner.
     $this->otherObject = clone $this->ownObject;
     $this->otherObject->owner = 2;
+    $this->defaultExpire = $defaultExpire;
   }
 
   /**

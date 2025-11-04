@@ -123,7 +123,7 @@ class PrivateTempStore {
    * @throws \Drupal\Core\TempStore\TempStoreException
    *   Thrown when a lock for the backend storage could not be acquired.
    */
-  public function set($key, $value, ?int $expire = NULL) {
+  public function set($key, $value, ?int $expire = NULL): self {
     if ($this->currentUser->isAnonymous()) {
       $session = $this->requestStack->getSession();
       if (!$session->has('core.tempstore.private.owner')) {
