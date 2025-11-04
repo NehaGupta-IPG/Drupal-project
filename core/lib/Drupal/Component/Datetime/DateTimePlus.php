@@ -131,7 +131,7 @@ class DateTimePlus {
       return new static($iso_date, $timezone, $settings);
     }
     else {
-      throw new \InvalidArgumentException('The array contains invalid values.');
+      throw new \InvalidArgumentException('The input contains invalid values.');
     }
   }
 
