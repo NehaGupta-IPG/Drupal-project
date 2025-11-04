@@ -468,7 +468,8 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
             // Get the new field item value (it can't be empty here):
             $new_value = $new_field_item->getValue();
 
-            // Get the old value from the translation original if it is available.
+            // Get the old value from the translation original if it is
+            // available.
             $old_value = NULL;
             if ($translation_original) {
               $old_value = $translation_original->get($entity_field_name)->getValue();
