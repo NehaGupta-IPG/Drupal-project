@@ -21,7 +21,7 @@ h3 {
 
 .site-name {
   margin-top: var(--space-s);
-  word-wrap: break-word;
+  overflow-wrap: break-word;
   color: var(--color-gray);
   font-size: var(--font-size-xl);
 }

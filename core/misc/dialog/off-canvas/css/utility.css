@@ -23,7 +23,7 @@
     clip: rect(1px, 1px, 1px, 1px);
     width: 1px !important;
     height: 1px !important;
-    word-wrap: normal;
+    overflow-wrap: normal;
 
     &.focusable:is(:active, :focus) {
       position: static !important;

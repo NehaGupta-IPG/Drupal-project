@@ -24,7 +24,7 @@
   clip: rect(1px, 1px, 1px, 1px);
   width: 1px;
   height: 1px;
-  word-wrap: normal;
+  overflow-wrap: normal;
 }
 
 .claro-details.claro-details--package-listing,

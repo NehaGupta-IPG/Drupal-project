@@ -5,7 +5,6 @@
 
 .messages {
   padding: 20px;
-  word-wrap: break-word;
   color: inherit;
   overflow-wrap: break-word;
 }
@@ -50,7 +49,7 @@ drupal-umami-messages::part(heading) {
   clip: rect(1px, 1px, 1px, 1px);
   width: 1px;
   height: 1px;
-  word-wrap: normal;
+  overflow-wrap: normal;
 }
 drupal-umami-messages::part(content) {
   display: flex;

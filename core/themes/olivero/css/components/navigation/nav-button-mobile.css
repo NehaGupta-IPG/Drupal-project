@@ -52,7 +52,7 @@
   clip: rect(1px, 1px, 1px, 1px);
   width: 1px;
   height: 1px;
-  word-wrap: normal;
+  overflow-wrap: normal;
 
   @media (min-width: 31.25rem) {
     position: static;

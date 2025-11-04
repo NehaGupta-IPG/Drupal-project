@@ -28,6 +28,7 @@ module.exports = (filePath, callback) => {
         },
         features: {
           'blank-pseudo-class': false,
+          'break-properties': false,
           'focus-visible-pseudo-class': false,
           'focus-within-pseudo-class': false,
           'has-pseudo-class': false,
