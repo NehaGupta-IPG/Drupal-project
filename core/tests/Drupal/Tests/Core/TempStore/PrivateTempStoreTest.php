@@ -153,8 +153,6 @@ class PrivateTempStoreTest extends UnitTestCase {
   /**
    * Tests a successful set() call.
    *
-   * @dataProvider providerTestSetExpire
-   *
    * @legacy-covers ::set
    */
   public function testSet(?int $expire, int $expected_expire): void {
