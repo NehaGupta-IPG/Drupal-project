@@ -31,16 +31,17 @@ class DateTimeIso8601 extends StringData implements DateTimeInterface {
           echo $e->getMessage();
         }
       }
-        // Data of this type must always be stored in UTC.
-        $datetime = DrupalDateTime::createFromArray($this->value, 'UTC');
-      }
-      else {
+      // Data of this type must always be stored in UTC.
+      $datetime = DrupalDateTime::createFromArray($this->value, 'UTC');
+    }
+    else {
         // Data of this type must always be stored in UTC.
         $datetime = new DrupalDateTime($this->value, 'UTC');
-      }
-      return $datetime;
     }
+      return $datetime;
   }
+
+
 
   /**
    * {@inheritdoc}
