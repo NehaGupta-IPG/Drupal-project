@@ -138,7 +138,12 @@ abstract class WorkflowTypeBase extends ConfigurablePluginBase implements Workfl
    */
   public function getState($state_id) {
     if (!isset($this->configuration['states'][$state_id])) {
-      throw new \InvalidArgumentException("The state '$state_id' does not exist in workflow.");
+      return new State(
+        $this,
+        NULL,
+        'Deleted State',
+        NULL
+      );
     }
     return new State(
       $this,
