@@ -212,6 +212,14 @@ class LinkFieldTest extends BrowserTestBase {
     $this->assertValidEntries($field_name, $valid_internal_entries);
     $this->assertInvalidEntries($field_name, $valid_external_entries + $invalid_internal_entries);
 
+    // Test the value displayed in link field after deleting the referenced
+    // item.
+    $reference_to_be_deleted = [
+      $node->label() . ' (1)',
+      'entity:node/1',
+    ];
+    $this->assertDeletedEntries($field_name, $reference_to_be_deleted);
+
     // Ensure that users with 'link to any page', don't apply access checking.
     $this->drupalLogin($this->drupalCreateUser([
       'view test entity',
@@ -882,6 +890,36 @@ class LinkFieldTest extends BrowserTestBase {
     $content = $display->build($entity);
     $output = \Drupal::service('renderer')->renderRoot($content);
     return (string) $output;
+  }
+
+  /**
+   * Test link field after deleting the referenced item.
+   *
+   * @param string $field_name
+   *   The field name.
+   * @param array $valid_entries
+   *   The values to be saved in the link field..
+   */
+  protected function assertDeletedEntries(string $field_name, array $valid_entries): void {
+    $entities_created = [];
+    // Add node reference to entities.
+    foreach ($valid_entries as $uri) {
+      $edit = [
+        "{$field_name}[0][uri]" => $uri,
+      ];
+      $this->drupalGet('entity_test/add');
+      $this->submitForm($edit, 'Save');
+      $entities_created[] = $this->getUrl();
+    }
+    // Delete the referenced node.
+    $referenced_node = $this->container->get('entity_type.manager')->getStorage('node')->load('1');
+    $node_title = $referenced_node->label();
+    $referenced_node->delete();
+    foreach ($entities_created as $entity_edit_path) {
+      $this->drupalGet($entity_edit_path);
+      $this->assertSession()->fieldValueNotEquals("{$field_name}[0][uri]", $node_title . ' (1)');
+      $this->assertSession()->fieldValueNotEquals("{$field_name}[0][uri]", "entity:node/1");
+    }
   }
 
 }
