@@ -51,35 +51,39 @@
         }
       }
 
-      const originalClose = settings.dialog.close;
-      // Overwrite the close method to remove the dialog on closing.
-      settings.dialog.close = function (event, ...args) {
-        originalClose.apply(settings.dialog, [event, ...args]);
-        // Check if the opener element is inside an AJAX container.
-        const $element = $(event.target);
-        const ajaxContainer = $element.data('uiDialog')
-          ? $element
-              .data('uiDialog')
-              .opener.closest('[data-drupal-ajax-container]')
-          : [];
+      if (!settings.dialogAjaxAware) {
+        settings.dialogAjaxAware = true;
 
-        // If the opener element was in an ajax container, and focus is on the
-        // body element, we can assume focus was lost. To recover, focus is
-        // moved to the first focusable element in the container.
-        if (
-          ajaxContainer.length &&
-          (document.activeElement === document.body ||
-            $(document.activeElement).not(':visible'))
-        ) {
-          const focusableChildren = focusable(ajaxContainer[0]);
-          if (focusableChildren.length > 0) {
-            setTimeout(() => {
-              focusableChildren[0].focus();
-            }, 0);
+        const originalClose = settings.dialog.close;
+        // Overwrite the close method to remove the dialog on closing.
+        settings.dialog.close = function (event, ...args) {
+          originalClose.apply(settings.dialog, [event, ...args]);
+          // Check if the opener element is inside an AJAX container.
+          const $element = $(event.target);
+          const ajaxContainer = $element.data('uiDialog')
+            ? $element
+                .data('uiDialog')
+                .opener.closest('[data-drupal-ajax-container]')
+            : [];
+
+          // If the opener element was in an ajax container, and focus is on the
+          // body element, we can assume focus was lost. To recover, focus is
+          // moved to the first focusable element in the container.
+          if (
+            ajaxContainer.length &&
+            (document.activeElement === document.body ||
+              $(document.activeElement).not(':visible'))
+          ) {
+            const focusableChildren = focusable(ajaxContainer[0]);
+            if (focusableChildren.length > 0) {
+              setTimeout(() => {
+                focusableChildren[0].focus();
+              }, 0);
+            }
           }
-        }
-        $(event.target).remove();
-      };
+          $(event.target).remove();
+        };
+      }
     },
 
     /**
