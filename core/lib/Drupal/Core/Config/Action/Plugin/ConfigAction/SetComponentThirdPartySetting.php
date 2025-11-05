@@ -147,7 +147,7 @@ final class SetComponentThirdPartySetting implements ConfigActionPluginInterface
    * @param \Drupal\Core\Entity\Display\EntityDisplayInterface $entity
    *   The display entity.
    */
-  protected function applySingle(array $value, int $key, EntityDisplayInterface $entity): void {
+  private function applySingle(array $value, int $key, EntityDisplayInterface $entity): void {
     if (!isset($value['component'], $value['provider'])) {
       throw new ConfigActionException("The setComponentThirdPartySetting action requires an array with 'component' and 'provider'.");
     }
