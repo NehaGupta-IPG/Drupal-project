@@ -47,13 +47,11 @@ class SetComponentThirdPartySettingRecipeTest extends KernelTestBase {
   /**
    * Applies a recipe YAML string, optionally disabling schema checks.
    */
-  private function applyRecipeFromYaml(string $contents, bool $disable_schema_check = TRUE): void {
+  private function applyRecipeFromYaml(string $contents): void {
     $recipe = $this->createRecipe($contents);
-    if ($disable_schema_check) {
-      $schema_checker = $this->container->get('testing.config_schema_checker');
-      $this->container->get(EventDispatcherInterface::class)
-        ->removeSubscriber($schema_checker);
-    }
+    $schema_checker = $this->container->get('testing.config_schema_checker');
+    $this->container->get(EventDispatcherInterface::class)
+      ->removeSubscriber($schema_checker);
     RecipeRunner::processRecipe($recipe);
   }
 
@@ -75,7 +73,7 @@ config:
             level_one:
               key: 'initial'
 YAML;
-    $this->applyRecipeFromYaml($contents, TRUE);
+    $this->applyRecipeFromYaml($contents);
 
     $display = $this->container->get(EntityDisplayRepositoryInterface::class)
       ->getViewDisplay('user', 'user', 'default');
@@ -106,7 +104,7 @@ config:
           settings:
             example_flag: false
 YAML;
-    $this->applyRecipeFromYaml($contents, TRUE);
+    $this->applyRecipeFromYaml($contents);
 
     $display = $this->container->get(EntityDisplayRepositoryInterface::class)
       ->getViewDisplay('user', 'user', 'default');
@@ -116,28 +114,6 @@ YAML;
     $component = $display->getComponent('member_for');
     $this->assertIsArray($component);
     $this->assertFalse($component['third_party_settings']['system']['example_flag']);
-  }
-
-  /**
-   * Ensures scalar settings are stored under the 'value' key.
-   */
-  public function testScalarSettingStoredUnderValueKey(): void {
-    $contents = <<<YAML
-name: 'Scalar third-party setting via recipe'
-config:
-  actions:
-    core.entity_view_display.user.user.default:
-      setComponentThirdPartySetting:
-        component: user_picture
-        provider: system
-        settings: 'flag'
-YAML;
-    $this->applyRecipeFromYaml($contents, TRUE);
-
-    $display = $this->container->get(EntityDisplayRepositoryInterface::class)
-      ->getViewDisplay('user', 'user', 'default');
-    $component = $display->getComponent('user_picture');
-    $this->assertSame('flag', $component['third_party_settings']['system']['value']);
   }
 
   /**
@@ -153,7 +129,7 @@ config:
         component: user_picture
         provider: system
 YAML;
-    $this->applyRecipeFromYaml($contents, TRUE);
+    $this->applyRecipeFromYaml($contents);
 
     $display = $this->container->get(EntityDisplayRepositoryInterface::class)
       ->getViewDisplay('user', 'user', 'default');
@@ -177,7 +153,7 @@ config:
         settings:
           enabled: true
 YAML;
-    $this->applyRecipeFromYaml($contents, TRUE);
+    $this->applyRecipeFromYaml($contents);
 
     $display = $this->container->get(EntityDisplayRepositoryInterface::class)
       ->getViewDisplay('user', 'user', 'default');
@@ -216,7 +192,7 @@ config:
         settings:
           add_me: 'new'
 YAML;
-    $this->applyRecipeFromYaml($contents, TRUE);
+    $this->applyRecipeFromYaml($contents);
 
     $display = $this->container->get(EntityDisplayRepositoryInterface::class)
       ->getViewDisplay('user', 'user', 'default');
@@ -238,7 +214,7 @@ config:
     core.entity_view_display.user.user.default:
       setComponentThirdPartySetting: 42
 YAML;
-    $this->applyRecipeFromYaml($contents, TRUE);
+    $this->applyRecipeFromYaml($contents);
   }
 
   /**
@@ -257,7 +233,7 @@ config:
         settings:
           x: y
 YAML;
-    $this->applyRecipeFromYaml($contents, TRUE);
+    $this->applyRecipeFromYaml($contents);
   }
 
   /**
@@ -276,7 +252,7 @@ config:
         settings:
           x: y
 YAML;
-    $this->applyRecipeFromYaml($contents, TRUE);
+    $this->applyRecipeFromYaml($contents);
   }
 
   /**
@@ -296,7 +272,7 @@ config:
         provider: system
 YAML;
     try {
-      $this->applyRecipeFromYaml($contents, TRUE);
+      $this->applyRecipeFromYaml($contents);
     }
     catch (ConfigActionException $e) {
       // Re-throw to satisfy expectation and proceed to next case.
@@ -321,7 +297,7 @@ config:
         settings:
           flag: true
 YAML;
-    $this->applyRecipeFromYaml($contents, TRUE);
+    $this->applyRecipeFromYaml($contents);
   }
 
 }

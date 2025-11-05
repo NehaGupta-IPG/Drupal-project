@@ -55,6 +55,13 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\FullyValidatableConstrai
 class ConfigActionManager extends DefaultPluginManager {
 
   /**
+   * The placeholder which is replaced with the ID of the current bundle.
+   *
+   * @var string
+   */
+  private const BUNDLE_PLACEHOLDER = '%bundle';
+
+  /**
    * Information about all deprecated plugin IDs.
    *
    * @var string[]
@@ -281,6 +288,41 @@ class ConfigActionManager extends DefaultPluginManager {
       @trigger_error(self::$deprecatedPluginIds[$plugin_id]['message'], E_USER_DEPRECATED);
     }
     return $instance;
+  }
+
+  /**
+   * Replaces placeholders recursively.
+   *
+   * @param mixed $data
+   *   The data to process. If this is an array, it'll be processed recursively.
+   * @param array $replacements
+   *   An array whose keys are the placeholders to replace in the data, and
+   *   whose values are the the replacements. Normally this will only mention
+   *   the `%bundle` and `%label` placeholders. If $data is an array, the only
+   *   placeholder that is replaced in the array's keys is `%bundle`.
+   *
+   * @return mixed
+   *   The given $data, with the `%bundle` and `%label` placeholders replaced.
+   */
+  public static function replacePlaceholders(mixed $data, array $replacements): mixed {
+    assert(array_key_exists(static::BUNDLE_PLACEHOLDER, $replacements));
+
+    if (is_string($data)) {
+      $data = str_replace(array_keys($replacements), $replacements, $data);
+    }
+    elseif (is_array($data)) {
+      foreach ($data as $old_key => $value) {
+        $value = static::replacePlaceholders($value, $replacements);
+
+        // Only replace the `%bundle` placeholder in array keys.
+        $new_key = str_replace(static::BUNDLE_PLACEHOLDER, $replacements[static::BUNDLE_PLACEHOLDER], $old_key);
+        if ($old_key !== $new_key) {
+          unset($data[$old_key]);
+        }
+        $data[$new_key] = $value;
+      }
+    }
+    return $data;
   }
 
 }
