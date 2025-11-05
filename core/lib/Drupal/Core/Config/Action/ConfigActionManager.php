@@ -305,17 +305,17 @@ class ConfigActionManager extends DefaultPluginManager {
    *   The given $data, with the `%bundle` and `%label` placeholders replaced.
    */
   public static function replacePlaceholders(mixed $data, array $replacements): mixed {
-    assert(array_key_exists(static::BUNDLE_PLACEHOLDER, $replacements));
+    assert(array_key_exists(self::BUNDLE_PLACEHOLDER, $replacements));
 
     if (is_string($data)) {
       $data = str_replace(array_keys($replacements), $replacements, $data);
     }
     elseif (is_array($data)) {
       foreach ($data as $old_key => $value) {
-        $value = static::replacePlaceholders($value, $replacements);
+        $value = self::replacePlaceholders($value, $replacements);
 
         // Only replace the `%bundle` placeholder in array keys.
-        $new_key = str_replace(static::BUNDLE_PLACEHOLDER, $replacements[static::BUNDLE_PLACEHOLDER], $old_key);
+        $new_key = str_replace(self::BUNDLE_PLACEHOLDER, $replacements[self::BUNDLE_PLACEHOLDER], $old_key);
         if ($old_key !== $new_key) {
           unset($data[$old_key]);
         }
