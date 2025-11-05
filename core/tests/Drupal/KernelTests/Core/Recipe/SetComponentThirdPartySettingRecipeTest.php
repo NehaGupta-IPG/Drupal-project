@@ -39,7 +39,7 @@ class SetComponentThirdPartySettingRecipeTest extends KernelTestBase {
     // Ensure the user entity and its default displays exist before applying
     // the recipe action targeting the user default view display.
     $this->installEntitySchema('user');
-    $this->installConfig(['user']);
+    $this->installConfig(['user', 'image']);
     $this->container->get(EntityDisplayRepositoryInterface::class)
       ->getViewDisplay('user', 'user', 'default')
       ->setComponent('user_picture', [
