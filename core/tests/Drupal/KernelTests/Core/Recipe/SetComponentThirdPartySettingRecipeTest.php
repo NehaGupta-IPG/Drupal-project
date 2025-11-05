@@ -88,7 +88,7 @@ YAML;
    */
   public function testApplyRecipeMultipleComponents(): void {
     $contents = <<<YAML
-name: 'Set third-party setting via recipe'
+name: 'Set multiple third-party settings via recipe'
 config:
   actions:
     core.entity_view_display.user.user.default:
