@@ -103,7 +103,6 @@ class ActiveTheme {
       'owner' => 'twig',
       'logo' => '',
       'libraries' => [],
-      'extension' => 'html.twig',
       'base_theme_extensions' => [],
       'regions' => [],
       'libraries_override' => [],
