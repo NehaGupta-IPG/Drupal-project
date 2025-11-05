@@ -6,13 +6,13 @@ namespace Drupal\Core\Config\Action\Plugin\ConfigAction;
 
 use Drupal\Core\Config\Action\Attribute\ConfigAction;
 use Drupal\Core\Config\Action\ConfigActionException;
+use Drupal\Core\Config\Action\ConfigActionManager;
 use Drupal\Core\Config\Action\ConfigActionPluginInterface;
 use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Entity\Display\EntityDisplayInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Sets a third-party setting on a display component without overwriting it.
@@ -26,7 +26,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * - settings (array|scalar): The setting value or an array of settings.
  *   If an array is provided, it will be merged into the component's
  *   third_party_settings for the given provider.
+ * - replace (boolean): If TRUE replace settings, otherwise merge.
  * Or alternatively a list of parameters with the same structure as above.
+ *
+ * It is possible to use such placeholders in component settings:
+ * - %bundle - the target bundle of entity display being modified,
+ * - %entity_type - the entity type of entity display being modified,
+ * - %view_mode - the view/form mode of entity display being modified.
  *
  * Example usages in a recipe:
  *
@@ -66,50 +72,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
     'entity_form_display',
   ],
 )]
-final class SetComponentThirdPartySetting implements ConfigActionPluginInterface, ContainerFactoryPluginInterface {
+final class SetComponentThirdPartySetting extends PluginBase implements ConfigActionPluginInterface, ContainerFactoryPluginInterface {
 
-  /**
-   * The placeholder which is replaced with the ID of the current bundle.
-   *
-   * @var string
-   */
-  private const BUNDLE_PLACEHOLDER = '%bundle';
-
-  /**
-   * The placeholder which is replaced with the ID of the current entity type.
-   *
-   * @var string
-   */
-  private const ENTITY_TYPE_PLACEHOLDER = '%entity_type';
-
-  /**
-   * The placeholder which is replaced with the ID of the current view mode.
-   *
-   * @var string
-   */
-  private const VIEW_MODE_PLACEHOLDER = '%view_mode';
-
-  /**
-   * Constructs a SetComponentThirdPartySetting object.
-   *
-   * @param \Drupal\Core\Config\ConfigManagerInterface $configManager
-   *   The config manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   The module handler.
-   */
   public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
     private readonly ConfigManagerInterface $configManager,
-    private readonly ModuleHandlerInterface $moduleHandler,
-  ) {}
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $container->get(ConfigManagerInterface::class),
-      $container->get(ModuleHandlerInterface::class),
-    );
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
   /**
@@ -122,14 +93,6 @@ final class SetComponentThirdPartySetting implements ConfigActionPluginInterface
     // Convert the parameters to a list of parameters.
     if (!array_is_list($value)) {
       $value = [$value];
-    }
-    else {
-      // Check that each config action parameter is an array.
-      foreach ($value as $item) {
-        if (!is_array($item)) {
-          throw new ConfigActionException("The setComponentThirdPartySetting action requires an array of settings.");
-        }
-      }
     }
     $entity = $this->configManager->loadConfigEntityByName($configName);
     assert($entity instanceof EntityDisplayInterface);
@@ -148,88 +111,44 @@ final class SetComponentThirdPartySetting implements ConfigActionPluginInterface
    *   The display entity.
    */
   private function applySingle(array $value, int $key, EntityDisplayInterface $entity): void {
-    if (!isset($value['component'], $value['provider'])) {
+    if (empty($value['component']) || empty($value['provider'])) {
       throw new ConfigActionException("The setComponentThirdPartySetting action requires an array with 'component' and 'provider'.");
-    }
-
-    if (!is_string($value['component']) || $value['component'] === '') {
-      throw new ConfigActionException("The 'component' must be a non-empty string.");
-    }
-    if (!is_string($value['provider']) || $value['provider'] === '') {
-      throw new ConfigActionException("The 'provider' must be a non-empty string.");
     }
     $component = $value['component'];
     $provider = $value['provider'];
-    if (!$this->moduleHandler->moduleExists($provider)) {
-      throw new ConfigActionException("The 'provider' module '$provider' does not exist or is not enabled.");
-    }
+    $replace = $value['replace'] ?? FALSE;
     // Replace placeholders.
-    $value = static::replacePlaceholders($value, [
-      static::BUNDLE_PLACEHOLDER => $entity->getTargetBundle(),
-      static::ENTITY_TYPE_PLACEHOLDER => $entity->getTargetEntityTypeId(),
-      static::VIEW_MODE_PLACEHOLDER => $entity->getMode(),
+    $value = ConfigActionManager::replacePlaceholders($value, [
+      '%bundle' => $entity->getTargetBundle(),
+      '%entity_type' => $entity->getTargetEntityTypeId(),
+      '%view_mode' => $entity->getMode(),
     ]);
 
     $settings = $value['settings'] ?? NULL;
 
-    // Ensure the component exists in the display; if hidden, we still allow
-    // setting third-party settings by creating/normalizing its structure.
-    $component_config = $entity->getComponent($component) ?? [];
-    if (!isset($component_config['settings']) || !is_array($component_config['settings'])) {
-      $component_config['settings'] = [];
+    // Ensure the component exists in the display.
+    $component_config = $entity->getComponent($component);
+    if (empty($component_config)) {
+      throw new ConfigActionException(sprintf("Component %s does not exist or hidden.", $component));
     }
-    if (!isset($component_config['third_party_settings']) || !is_array($component_config['third_party_settings'])) {
-      $component_config['third_party_settings'] = [];
-    }
+    // Make sure the required properties are set.
+    $component_config['settings'] ??= [];
+    $component_config['third_party_settings'] ??= [];
 
     if (is_array($settings)) {
-      $existing = $component_config['third_party_settings'][$provider] ?? [];
-      if (!is_array($existing)) {
-        $existing = [];
+      if ($replace) {
+        $component_config['third_party_settings'][$provider] = $settings;
       }
-      $component_config['third_party_settings'][$provider] = array_merge($existing, $settings);
-    }
-    else {
-      // Scalar setting gets stored under a generic key 'value'.
-      $component_config['third_party_settings'][$provider]['value'] = $settings;
+      else {
+        $existing = $component_config['third_party_settings'][$provider] ?? [];
+        if (!is_array($existing)) {
+          $existing = [];
+        }
+        $component_config['third_party_settings'][$provider] = array_merge($existing, $settings);
+      }
     }
 
     $entity->setComponent($component, $component_config);
-  }
-
-  /**
-   * Replaces placeholders recursively.
-   *
-   * @param mixed $data
-   *   The data to process. If this is an array, it'll be processed recursively.
-   * @param array $replacements
-   *   An array whose keys are the placeholders to replace in the data, and
-   *   whose values are the the replacements. Normally this will only mention
-   *   the `%bundle` and `%label` placeholders. If $data is an array, the only
-   *   placeholder that is replaced in the array's keys is `%bundle`.
-   *
-   * @return mixed
-   *   The given $data, with the `%bundle` and `%label` placeholders replaced.
-   */
-  private static function replacePlaceholders(mixed $data, array $replacements): mixed {
-    assert(array_key_exists(static::BUNDLE_PLACEHOLDER, $replacements));
-
-    if (is_string($data)) {
-      $data = str_replace(array_keys($replacements), $replacements, $data);
-    }
-    elseif (is_array($data)) {
-      foreach ($data as $old_key => $value) {
-        $value = static::replacePlaceholders($value, $replacements);
-
-        // Only replace the `%bundle` placeholder in array keys.
-        $new_key = str_replace(static::BUNDLE_PLACEHOLDER, $replacements[static::BUNDLE_PLACEHOLDER], $old_key);
-        if ($old_key !== $new_key) {
-          unset($data[$old_key]);
-        }
-        $data[$new_key] = $value;
-      }
-    }
-    return $data;
   }
 
 }
