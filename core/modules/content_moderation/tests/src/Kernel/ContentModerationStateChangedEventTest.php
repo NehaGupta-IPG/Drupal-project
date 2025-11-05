@@ -114,7 +114,7 @@ class ContentModerationStateChangedEventTest extends KernelTestBase {
           $expectedEventName = &$args[1];
 
           $this->assertSame($expectedEventName, $event_name);
-          $this->assertSame($expectedEvent->getWorkflow, $event->getWorkflow());
+          $this->assertSame($expectedEvent->getWorkflow(), $event->getWorkflow());
           $this->assertSame($expectedEvent->getOriginalState(), $event->getOriginalState());
           $this->assertSame($expectedEvent->getNewState(), $event->getNewState());
           $this->assertSame($expectedEvent->getModeratedEntity()->getEntityTypeId(), $event->getModeratedEntity()->getEntityTypeId());
