@@ -59,7 +59,7 @@ class ContentModerationStateChangedEventTest extends KernelTestBase {
     $this->installConfig('content_moderation');
 
     NodeType::create([
-      'title' => 'Test node',
+      'name' => 'Test node',
       'type' => 'example',
     ])->save();
 
