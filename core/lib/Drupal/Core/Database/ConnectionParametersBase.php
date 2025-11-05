@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Database;
 
+use Composer\Autoload\ClassLoader;
+
 /**
  * Base class for connection parameters objects.
  */
@@ -29,6 +31,86 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   }
 
   /**
+   * Creates an instance from a database URL.
+   *
+   * @param string $url
+   *   The URL.
+   * @param bool|null $include_test_drivers
+   *   (optional) Whether to include test extensions. If FALSE, all 'tests'
+   *   directories are excluded in the search. When NULL will be determined by
+   *   the extension_discovery_scan_tests setting.
+   *
+   * @return ConnectionParametersInterface
+   *   The database connection info.
+   *
+   * @throws \InvalidArgumentException
+   *   Exception thrown when the provided URL does not meet the minimum
+   *   requirements.
+   * @throws \RuntimeException
+   *   Exception thrown when a module provided database driver does not exist.
+   */
+  final public static function createFromUrl(string $url, ?bool $include_test_drivers = NULL): ConnectionParametersInterface {
+    // Check that the URL is well formed, starting with 'scheme://', where
+    // 'scheme' is a database driver name.
+    if (preg_match('/^(.*):\/\//', $url, $matches) !== 1) {
+      throw new \InvalidArgumentException("Missing scheme in URL '$url'");
+    }
+    $driverName = $matches[1];
+
+    // Determine if the database driver is provided by a module.
+    // @todo https://www.drupal.org/project/drupal/issues/3250999. Refactor when
+    // all database drivers are provided by modules.
+    $url_components = parse_url($url);
+    $url_component_query = $url_components['query'] ?? '';
+    parse_str($url_component_query, $query);
+
+    // Use the driver name as the module name when the module name is not
+    // provided.
+    $module = $query['module'] ?? $driverName;
+    assert(is_string($module));
+
+    $driverNamespace = "Drupal\\{$module}\\Driver\\Database\\{$driverName}";
+
+    /** @var \Drupal\Core\Extension\DatabaseDriver $driver */
+    $driver = Database::getDriverList()
+      ->includeTestDrivers($include_test_drivers)
+      ->get($driverNamespace);
+
+    // Set up an additional autoloader. We don't use the main autoloader as
+    // this method can be called before Drupal is installed and is never
+    // called during regular runtime.
+    $additional_class_loader = new ClassLoader();
+    $additional_class_loader->addPsr4($driverNamespace . '\\', $driver->getPath());
+    $additional_class_loader->register();
+    $connection_class = $driverNamespace . '\\Connection';
+    if (!class_exists($connection_class)) {
+      throw new \InvalidArgumentException("Can not convert '$url' to a database connection, class '$connection_class' does not exist");
+    }
+
+    // When the database driver is extending another database driver, then
+    // add autoload info for the parent database driver as well.
+    $autoloadInfo = $driver->getAutoloadInfo();
+    if (isset($autoloadInfo['dependencies'])) {
+      foreach ($autoloadInfo['dependencies'] as $dependency) {
+        $additional_class_loader->addPsr4($dependency['namespace'] . '\\', $dependency['autoload']);
+      }
+    }
+
+    $additional_class_loader->register(TRUE);
+
+    $options = $connection_class::createConnectionOptionsFromUrl($url, NULL);
+
+    // Add the necessary information to autoload code.
+    // @see \Drupal\Core\Site\Settings::initialize()
+    $options['autoload'] = $driver->getPath() . DIRECTORY_SEPARATOR;
+    if (isset($autoloadInfo['dependencies'])) {
+      $options['dependencies'] = $autoloadInfo['dependencies'];
+    }
+
+    return Database::getConnectionParametersFromOptionsArray($options);
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getParameters(): static|array {
@@ -40,6 +122,13 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public function getConnectionClass(): string {
     return $this->namespace . '\\Connection';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function processOptionsArray(array $options): array {
+    return $options;
   }
 
   /**
@@ -81,13 +170,6 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
     }
 
     return $url;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function processOptionsArray(array $options): array {
-    return $options;
   }
 
   /**

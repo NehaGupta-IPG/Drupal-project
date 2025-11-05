@@ -519,8 +519,14 @@ abstract class Database {
    *   requirements.
    * @throws \RuntimeException
    *   Exception thrown when a module provided database driver does not exist.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   *   ConnectionParametersBase::createFromUrl() instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   public static function convertDbUrlToConnectionInfo(string $url, $root = NULL, ?bool $include_test_drivers = NULL): ConnectionParametersInterface {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ConnectionParametersBase::createFromUrl() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     if ($root !== NULL) {
       if (is_bool($root)) {
         $include_test_drivers = $root;
@@ -529,65 +535,7 @@ abstract class Database {
         @trigger_error("Passing a string \$root value to " . __METHOD__ . "() is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3511287", E_USER_DEPRECATED);
       }
     }
-
-    // Check that the URL is well formed, starting with 'scheme://', where
-    // 'scheme' is a database driver name.
-    if (preg_match('/^(.*):\/\//', $url, $matches) !== 1) {
-      throw new \InvalidArgumentException("Missing scheme in URL '$url'");
-    }
-    $driverName = $matches[1];
-
-    // Determine if the database driver is provided by a module.
-    // @todo https://www.drupal.org/project/drupal/issues/3250999. Refactor when
-    // all database drivers are provided by modules.
-    $url_components = parse_url($url);
-    $url_component_query = $url_components['query'] ?? '';
-    parse_str($url_component_query, $query);
-
-    // Use the driver name as the module name when the module name is not
-    // provided.
-    $module = $query['module'] ?? $driverName;
-    assert(is_string($module));
-
-    $driverNamespace = "Drupal\\{$module}\\Driver\\Database\\{$driverName}";
-
-    /** @var \Drupal\Core\Extension\DatabaseDriver $driver */
-    $driver = self::getDriverList()
-      ->includeTestDrivers($include_test_drivers)
-      ->get($driverNamespace);
-
-    // Set up an additional autoloader. We don't use the main autoloader as
-    // this method can be called before Drupal is installed and is never
-    // called during regular runtime.
-    $additional_class_loader = new ClassLoader();
-    $additional_class_loader->addPsr4($driverNamespace . '\\', $driver->getPath());
-    $additional_class_loader->register();
-    $connection_class = $driverNamespace . '\\Connection';
-    if (!class_exists($connection_class)) {
-      throw new \InvalidArgumentException("Can not convert '$url' to a database connection, class '$connection_class' does not exist");
-    }
-
-    // When the database driver is extending another database driver, then
-    // add autoload info for the parent database driver as well.
-    $autoloadInfo = $driver->getAutoloadInfo();
-    if (isset($autoloadInfo['dependencies'])) {
-      foreach ($autoloadInfo['dependencies'] as $dependency) {
-        $additional_class_loader->addPsr4($dependency['namespace'] . '\\', $dependency['autoload']);
-      }
-    }
-
-    $additional_class_loader->register(TRUE);
-
-    $options = $connection_class::createConnectionOptionsFromUrl($url, NULL);
-
-    // Add the necessary information to autoload code.
-    // @see \Drupal\Core\Site\Settings::initialize()
-    $options['autoload'] = $driver->getPath() . DIRECTORY_SEPARATOR;
-    if (isset($autoloadInfo['dependencies'])) {
-      $options['dependencies'] = $autoloadInfo['dependencies'];
-    }
-
-    return self::getConnectionParametersFromOptionsArray($options);
+    return ConnectionParametersBase::createFromUrl($url, $include_test_drivers);
   }
 
   /**
