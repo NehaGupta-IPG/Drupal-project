@@ -26,6 +26,7 @@ class SetComponentThirdPartySettingRecipeTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    'image',
     'system',
     'user',
   ];
