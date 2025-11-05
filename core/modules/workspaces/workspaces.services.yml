@@ -20,7 +20,7 @@ services:
   Drupal\workspaces\WorkspaceOperationFactory: '@workspaces.operation_factory'
   workspaces.association:
     class: Drupal\workspaces\WorkspaceAssociation
-    arguments: ['@database', '@entity_type.manager', '@workspaces.repository', '@logger.channel.workspaces']
+    autowire: true
     tags:
       - { name: backend_overridable }
   Drupal\workspaces\WorkspaceAssociationInterface: '@workspaces.association'
@@ -106,3 +106,9 @@ services:
     public: false
     arguments: ['@.inner', '@workspaces.manager', '@workspaces.information', '@typed_data_manager']
   Drupal\workspaces\Controller\WorkspacesHtmlEntityFormController: '@workspaces.controller.entity_form'
+
+  Drupal\workspaces\WorkspacesCron:
+    decorates: cron
+    decoration_priority: -100
+    autowire: true
+    public: false
