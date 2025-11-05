@@ -13,6 +13,7 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Constraint\Constraint;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
