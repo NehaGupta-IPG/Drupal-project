@@ -6,7 +6,7 @@ namespace Drupal\package_manager;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Extension\ModuleUninstallValidatorInterface;
-use Drupal\Core\Queue\QueueFactory;
+use Drupal\Core\Queue\QueueFactoryInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TempStore\SharedTempStoreFactory;
 use PhpTuf\ComposerStager\API\Core\BeginnerInterface;
@@ -32,7 +32,7 @@ final class PackageManagerUninstallValidator implements ModuleUninstallValidator
     private readonly BeginnerInterface $beginner,
     private readonly StagerInterface $stager,
     private readonly CommitterInterface $committer,
-    private readonly QueueFactory $queueFactory,
+    private readonly QueueFactoryInterface $queueFactory,
     private readonly EventDispatcherInterface $eventDispatcher,
     private readonly SharedTempStoreFactory $sharedTempStoreFactory,
     private readonly TimeInterface $time,
