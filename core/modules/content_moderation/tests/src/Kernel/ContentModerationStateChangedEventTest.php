@@ -18,9 +18,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Tests events are properly fired during create/save of moderation states.
- *
- * @group content_moderation
  */
+#[Group('content_moderation')]
 class ContentModerationStateChangedEventTest extends KernelTestBase {
 
   use ContentModerationTestTrait;
@@ -109,7 +108,7 @@ class ContentModerationStateChangedEventTest extends KernelTestBase {
           'content_moderation.state_changed',
         ],
         $this->callback(function (ContentModerationStateChangedEvent $event, $event_name) use (&$args) {
-          /** @var ContentModerationStateChangedEvent $expectedEvent */
+          /** @var \Drupal\content_moderation\Event\ContentModerationStateChangedEvent $expectedEvent */
           $expectedEvent = &$args[0];
           $expectedEventName = &$args[1];
 
@@ -222,7 +221,7 @@ final class ContentModerationStateChangedEventAreEqual extends Constraint {
   /**
    * Creates a ContentModerationStateChangedEventAreEqual constraint.
    *
-   * @param ContentModerationStateChangedEvent $expected
+   * @param \Drupal\content_moderation\Event\ContentModerationStateChangedEvent $expected
    *   The expected ContentModerationStateChangedEvent.
    */
   public function __construct(protected readonly ContentModerationStateChangedEvent $expected) {}
