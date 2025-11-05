@@ -97,7 +97,7 @@ class ElementInfoManagerTest extends UnitTestCase {
 
     $this->themeManager->expects($this->any())
       ->method('getActiveTheme')
-      ->willReturn(new ActiveTheme(['name' => 'test']));
+      ->willReturn(new ActiveTheme(['name' => 'test', 'extension' => $this->createMock('Drupal\Core\Extension\Extension')]));
 
     $element_info->expects($this->once())
       ->method('createInstance')
@@ -150,7 +150,7 @@ class ElementInfoManagerTest extends UnitTestCase {
   public function testGetInfoProperty(): void {
     $this->themeManager
       ->method('getActiveTheme')
-      ->willReturn(new ActiveTheme(['name' => 'test']));
+      ->willReturn(new ActiveTheme(['name' => 'test', 'extension' => $this->createMock('Drupal\Core\Extension\Extension')]));
 
     $element_info = new TestElementInfoManager(new \ArrayObject(), $this->cache, $this->themeHandler, $this->moduleHandler, $this->themeManager);
     $this->assertSame('baz', $element_info->getInfoProperty('foo', '#bar'));

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Theme;
 
+use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
@@ -145,7 +146,7 @@ class RegistryTest extends UnitTestCase {
       'libraries_override' => [],
       'libraries_extend' => [],
       'libraries' => [],
-      'extension' => '.twig',
+      'extension' => new Extension($this->root, 'theme', 'core/modules/system/tests/themes/test_theme/test_theme.info.yml'),
       'base_theme_extensions' => [],
     ]);
 
@@ -157,7 +158,7 @@ class RegistryTest extends UnitTestCase {
       'libraries_override' => [],
       'libraries_extend' => [],
       'libraries' => [],
-      'extension' => '.twig',
+      'extension' => new Extension($this->root, 'theme', 'core/tests/fixtures/test_stable/test_stable.info.yml'),
       'base_theme_extensions' => [],
     ]);
 
