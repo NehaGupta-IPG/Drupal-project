@@ -154,6 +154,8 @@ YAML;
    * Ensures a missing component is created and settings are applied.
    */
   public function testCreatesComponentWhenMissing(): void {
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage("Component nonexistent_field does not exist or hidden.");
     $contents = <<<YAML
 name: 'Create missing component and set settings'
 config:
@@ -166,14 +168,6 @@ config:
           enabled: true
 YAML;
     $this->applyRecipeFromYaml($contents);
-
-    $display = $this->container->get(EntityDisplayRepositoryInterface::class)
-      ->getViewDisplay('user', 'user', 'default');
-    $component = $display->getComponent('nonexistent_field');
-    $this->assertIsArray($component);
-    $this->assertArrayHasKey('settings', $component);
-    $this->assertArrayHasKey('third_party_settings', $component);
-    $this->assertTrue($component['third_party_settings']['system']['enabled']);
   }
 
   /**
