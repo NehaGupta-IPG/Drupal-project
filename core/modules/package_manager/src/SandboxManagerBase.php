@@ -7,7 +7,7 @@ namespace Drupal\package_manager;
 use Composer\Semver\VersionParser;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Random;
-use Drupal\Core\Queue\QueueFactory;
+use Drupal\Core\Queue\QueueFactoryInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -176,7 +176,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
     protected readonly BeginnerInterface $beginner,
     protected readonly StagerInterface $stager,
     protected readonly CommitterInterface $committer,
-    protected readonly QueueFactory $queueFactory,
+    protected readonly QueueFactoryInterface $queueFactory,
     protected EventDispatcherInterface $eventDispatcher,
     protected readonly SharedTempStoreFactory $tempStoreFactory,
     protected readonly TimeInterface $time,
