@@ -30,7 +30,7 @@ class ContentModerationStateChangedEvent extends Event {
   /**
    * The state the content was before, or FALSE if none existed.
    *
-   * @var string|FALSE
+   * @var string|false
    */
   protected $originalState;
 
