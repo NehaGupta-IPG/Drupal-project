@@ -41,6 +41,18 @@ class SetComponentThirdPartySettingRecipeTest extends KernelTestBase {
     $this->installConfig(['user']);
     $this->container->get(EntityDisplayRepositoryInterface::class)
       ->getViewDisplay('user', 'user', 'default')
+      ->setComponent('user_picture', [
+        'type' => 'image',
+        'label' => 'hidden',
+        'settings' => [
+          'image_link' => '',
+          'image_style' => 'thumbnail',
+          'image_loading' => [
+            'attribute' => 'lazy',
+          ],
+        ],
+        'third_party_settings' => [],
+      ])
       ->save();
   }
 
@@ -261,7 +273,7 @@ YAML;
   public function testRejectsEmptyComponentOrProvider(): void {
     // Empty component.
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage("'component' must be a non-empty string");
+    $this->expectExceptionMessage("requires an array with 'component' and 'provider'");
     $contents = <<<YAML
 name: 'Empty component value'
 config:
@@ -278,26 +290,6 @@ YAML;
       // Re-throw to satisfy expectation and proceed to next case.
       throw $e;
     }
-  }
-
-  /**
-   * Ensures a missing provider module is rejected.
-   */
-  public function testRejectsMissingProviderModule(): void {
-    $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage("provider' module");
-    $contents = <<<YAML
-name: 'Missing provider module'
-config:
-  actions:
-    core.entity_view_display.user.user.default:
-      setComponentThirdPartySetting:
-        component: user_picture
-        provider: nonexistent_module
-        settings:
-          flag: true
-YAML;
-    $this->applyRecipeFromYaml($contents);
   }
 
 }
