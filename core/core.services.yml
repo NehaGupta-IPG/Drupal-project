@@ -617,6 +617,7 @@ services:
   queue:
     class: Drupal\Core\Queue\QueueFactory
     autowire: true
+  Drupal\Core\Queue\QueueFactory: '@queue'
   Drupal\Core\Queue\QueueFactoryInterface: '@queue'
   queue.database:
     class: Drupal\Core\Queue\QueueDatabaseFactory
