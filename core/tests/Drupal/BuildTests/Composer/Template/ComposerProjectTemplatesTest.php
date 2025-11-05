@@ -8,6 +8,7 @@ use Composer\Json\JsonFile;
 use Composer\Semver\VersionParser;
 use Drupal\BuildTests\Composer\ComposerBuildTestBase;
 use Drupal\Composer\Composer;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
@@ -24,6 +25,7 @@ use PHPUnit\Framework\Attributes\Group;
  * This is because Composer only uses the packages.json file to resolve the
  * project template and not any other dependencies.
  */
+#[CoversNothing]
 #[Group('Template')]
 class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
 
@@ -32,7 +34,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
    *
    * @see https://getcomposer.org/doc/04-schema.md#minimum-stability
    */
-  protected const MINIMUM_STABILITY = 'stable';
+  protected const MINIMUM_STABILITY = 'beta';
 
   /**
    * The order of stability strings from least stable to most stable.
@@ -110,6 +112,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
 
     $exclude = [
       'drupal/core',
+      'drupal/core-composer-scaffold',
       'drupal/core-recipe-unpack',
       'drupal/core-project-message',
       'drupal/core-vendor-hardening',

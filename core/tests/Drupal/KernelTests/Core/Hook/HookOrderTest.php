@@ -9,11 +9,16 @@ use Drupal\bbb_hook_order_test\Hook\BHooks;
 use Drupal\ccc_hook_order_test\Hook\CHooks;
 use Drupal\ddd_hook_order_test\Hook\DHooks;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @group Hook
- * @group legacy
+ * Tests Hook Order.
  */
+#[Group('Hook')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class HookOrderTest extends KernelTestBase {
 
   use HookOrderTestTrait;
@@ -87,6 +92,19 @@ class HookOrderTest extends KernelTestBase {
         AHooks::class . '::testBothParametersHook',
       ],
       \Drupal::moduleHandler()->invokeAll('test_both_parameters_hook'),
+    );
+  }
+
+  /**
+   * Test procedural implementation with Reorder and Remove.
+   */
+  public function testHookReorderProcedural(): void {
+    $this->assertSameCallList(
+      [
+        'bbb_hook_order_test_test_procedural_reorder',
+        AHooks::class . '::testProceduralReorder',
+      ],
+      \Drupal::moduleHandler()->invokeAll('test_procedural_reorder'),
     );
   }
 

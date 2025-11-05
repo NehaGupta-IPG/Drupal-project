@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field_layout\Kernel;
 
+use Drupal\field_layout\Entity\FieldLayoutEntityDisplayTrait;
 use Drupal\field_layout\Entity\FieldLayoutEntityViewDisplay;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\field_layout\Entity\FieldLayoutEntityDisplayTrait
- * @group field_layout
+ * Tests Drupal\field_layout\Entity\FieldLayoutEntityDisplayTrait.
  */
+#[CoversClass(FieldLayoutEntityDisplayTrait::class)]
+#[Group('field_layout')]
+#[RunTestsInSeparateProcesses]
 class FieldLayoutEntityDisplayTest extends KernelTestBase {
 
   /**
@@ -27,8 +33,10 @@ class FieldLayoutEntityDisplayTest extends KernelTestBase {
   ];
 
   /**
-   * @covers ::preSave
-   * @covers ::calculateDependencies
+   * Tests pre save.
+   *
+   * @legacy-covers ::preSave
+   * @legacy-covers ::calculateDependencies
    */
   public function testPreSave(): void {
     $this->installSchema('user', ['users_data']);

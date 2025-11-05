@@ -7,12 +7,14 @@ namespace Drupal\Tests\search\Functional;
 use Drupal\Core\Database\Database;
 use Drupal\search\SearchIndexInterface;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests search index is updated properly when nodes are removed or updated.
- *
- * @group search
  */
+#[Group('search')]
+#[RunTestsInSeparateProcesses]
 class SearchNodeUpdateAndDeletionTest extends BrowserTestBase {
 
   /**

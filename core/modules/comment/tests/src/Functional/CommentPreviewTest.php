@@ -6,21 +6,28 @@ namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\CommentPreviewMode;
+use Drupal\comment\Entity\Comment;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\comment\Entity\Comment;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests comment preview.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentPreviewTest extends CommentTestBase {
 
   use TestFileCreationTrait {
     getTestFiles as drupalGetTestFiles;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $profile = 'minimal';
 
   /**
    * {@inheritdoc}

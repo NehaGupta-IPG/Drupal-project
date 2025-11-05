@@ -786,6 +786,7 @@ function hook_install_tasks_alter(&$tasks, $install_state) {
  * @see https://www.drupal.org/node/2535316
  */
 // phpcs:enable
+// phpcs:ignore Drupal.Commenting.FunctionComment.Missing, Drupal.Commenting.FunctionComment.MissingReturnComment
 function hook_update_N(&$sandbox) {
   // For non-batch updates, the signature can simply be:
   // "function hook_update_N() {".
@@ -902,6 +903,7 @@ function hook_update_N(&$sandbox) {
  * @see hook_removed_post_updates()
  */
 // phpcs:enable
+// phpcs:ignore Drupal.Commenting.FunctionComment.Missing
 function hook_post_update_NAME(&$sandbox) {
   // Example of updating some content.
   $node = \Drupal\node\Entity\Node::load(123);
@@ -921,6 +923,8 @@ function hook_post_update_NAME(&$sandbox) {
 
 /**
  * Return an array of removed hook_post_update_NAME() function names.
+ *
+ * Only procedural implementations are supported for this hook.
  *
  * This should be used to indicate post-update functions that have existed in
  * some previous version of the module, but are no longer available.
@@ -945,6 +949,8 @@ function hook_removed_post_updates(): array {
 
 /**
  * Return an array of information about module update dependencies.
+ *
+ * Only procedural implementations are supported for this hook.
  *
  * This can be used to indicate update functions from other modules that your
  * module's update functions depend on, or vice versa. It is used by the update

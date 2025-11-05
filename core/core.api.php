@@ -467,6 +467,9 @@
  *   - data: Contains data that can vary by path or similar context.
  *   - discovery: Contains cached discovery data for things such as plugins,
  *     views_data, or YAML discovered data such as library info.
+ *   - memory: An in-memory cache bin, also called static cache. Useful
+ *     alternative to properties when cache invalidation is needed, for example
+ *     through cache tags.
  *
  * A module can define a cache bin by defining a service in its
  * modulename.services.yml file as follows (substituting the desired name for
@@ -479,6 +482,15 @@
  *   factory: ['@cache_factory', 'get']
  *   arguments: [name_of_bin]
  * @endcode
+ *
+ * The tag can also include a default backend, which is useful for example
+ * when defining in-memory (which uses a separate tag) or fast chained bin.
+ *
+ * @code
+ * - { name: cache.bin, default_backend: cache.backend.chainedfast }
+ * - { name: cache.bin.memory, default_backend: cache.backend.memory.memory }
+ * @endcode
+ *
  * See the @link container Services topic @endlink for more on defining
  * services.
  *
@@ -1672,8 +1684,10 @@
  * - hook_install_tasks()
  * - hook_install_tasks_alter()
  * - hook_post_update_NAME()
+ * - hook_removed_post_updates()
  * - hook_schema()
  * - hook_uninstall()
+ * - hook_update_dependencies()
  * - hook_update_last_removed()
  * - hook_update_N()
  *
