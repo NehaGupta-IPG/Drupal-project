@@ -8,6 +8,8 @@ namespace Drupal\locale;
 interface PluralFormulaInterface {
 
   /**
+   * Creates a plural formula.
+   *
    * @param string $langcode
    *   The language code to get the formula for.
    * @param int $plural_count

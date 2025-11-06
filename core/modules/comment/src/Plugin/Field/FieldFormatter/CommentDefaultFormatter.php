@@ -75,6 +75,8 @@ class CommentDefaultFormatter extends FormatterBase {
   protected $entityFormBuilder;
 
   /**
+   * The current route match.
+   *
    * @var \Drupal\Core\Routing\RouteMatchInterface
    */
   protected $routeMatch;

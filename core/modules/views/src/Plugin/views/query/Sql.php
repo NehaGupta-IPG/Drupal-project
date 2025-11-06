@@ -106,6 +106,8 @@ class Sql extends QueryPluginBase {
   public $distinct = FALSE;
 
   /**
+   * A flag to indicate if an an aggregation function has been set.
+   *
    * @var bool
    */
   protected $hasAggregate = FALSE;

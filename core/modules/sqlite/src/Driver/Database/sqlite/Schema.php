@@ -9,12 +9,10 @@ use Drupal\Core\Database\Schema as DatabaseSchema;
 // cspell:ignore autoincrement autoindex
 
 /**
+ * SQLite implementation of \Drupal\Core\Database\Schema.
+ *
  * @ingroup schemaapi
  * @{
- */
-
-/**
- * SQLite implementation of \Drupal\Core\Database\Schema.
  */
 class Schema extends DatabaseSchema {
 

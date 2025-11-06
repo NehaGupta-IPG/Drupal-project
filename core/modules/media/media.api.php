@@ -2,14 +2,10 @@
 
 /**
  * @file
+ * Hooks related to Media and its plugins.
  */
 
 use Drupal\media\OEmbed\Provider;
-
-/**
- * @file
- * Hooks related to Media and its plugins.
- */
 
 /**
  * @addtogroup hooks

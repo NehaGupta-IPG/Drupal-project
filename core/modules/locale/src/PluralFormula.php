@@ -13,11 +13,15 @@ use Drupal\Core\State\StateInterface;
 class PluralFormula implements PluralFormulaInterface {
 
   /**
+   * The language manager.
+   *
    * @var \Drupal\Core\Language\LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
+   * The state service.
+   *
    * @var \Drupal\Core\State\StateInterface
    */
   protected $state;
@@ -42,6 +46,8 @@ class PluralFormula implements PluralFormulaInterface {
   protected $formulae;
 
   /**
+   * Constructs a PluralFormula object.
+   *
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
    * @param \Drupal\Core\State\StateInterface $state

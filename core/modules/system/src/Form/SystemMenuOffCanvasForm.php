@@ -41,11 +41,15 @@ class SystemMenuOffCanvasForm extends PluginFormBase implements ContainerInjecti
   protected $menu;
 
   /**
+   * The menu storage.
+   *
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
   protected $menuStorage;
 
   /**
+   * The entity type manager.
+   *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;

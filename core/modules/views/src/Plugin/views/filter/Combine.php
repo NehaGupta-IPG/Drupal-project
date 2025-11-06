@@ -14,6 +14,8 @@ use Drupal\views\Attribute\ViewsFilter;
 class Combine extends StringFilter {
 
   /**
+   * The views query.
+   *
    * @var \Drupal\views\Plugin\views\query\QueryPluginBase
    */
   public $query;

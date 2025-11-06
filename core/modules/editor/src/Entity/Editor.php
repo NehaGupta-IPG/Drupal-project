@@ -86,6 +86,8 @@ class Editor extends ConfigEntityBase implements EditorInterface {
   protected $filterFormat;
 
   /**
+   * The plugin manager.
+   *
    * @var \Drupal\Component\Plugin\PluginManagerInterface
    */
   protected $editorPluginManager;

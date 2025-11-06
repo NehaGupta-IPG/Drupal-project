@@ -41,6 +41,8 @@ class ContentPreprocess implements ContainerInjectionInterface {
   }
 
   /**
+   * Preprocess theme variables for a node.
+   *
    * @param array $variables
    *   Theme variables to preprocess.
    *

@@ -60,8 +60,10 @@
     <exclude name="Drupal.Commenting.DocComment.LongFullStop"/>
   </rule>
   <rule  ref="Drupal.Commenting.DocComment.MissingShort">
-    <include-pattern>core/*/Unit/*</include-pattern>
-    <include-pattern>core/*/FunctionalJavascript/*</include-pattern>
+    <exclude-pattern>*/tests/*</exclude-pattern>
+    <exclude-pattern>core/lib/*</exclude-pattern>
+    <exclude-pattern>core/modules/*/*.inc</exclude-pattern>
+    <exclude-pattern>core/modules/*/*.module</exclude-pattern>
   </rule>
   <rule ref="Drupal.Commenting.DocCommentAlignment"/>
   <rule ref="Drupal.Commenting.DocCommentLongArraySyntax"/>

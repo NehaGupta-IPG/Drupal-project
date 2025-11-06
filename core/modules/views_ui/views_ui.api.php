@@ -2,14 +2,10 @@
 
 /**
  * @file
+ * Describes hooks provided by the Views UI module.
  */
 
 use Drupal\views_ui\ViewUI;
-
-/**
- * @file
- * Describes hooks provided by the Views UI module.
- */
 
 /**
  * @addtogroup hooks

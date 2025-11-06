@@ -13,6 +13,8 @@ use Drupal\workflows\WorkflowInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Add moderation to a content type.
+ *
  * @internal
  *   This API is experimental.
  */

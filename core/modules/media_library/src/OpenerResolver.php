@@ -17,6 +17,8 @@ namespace Drupal\media_library;
 class OpenerResolver implements OpenerResolverInterface {
 
   /**
+   * An array of media library openers.
+   *
    * @var \Drupal\media_library\MediaLibraryOpenerInterface[]
    */
   protected array $openers = [];

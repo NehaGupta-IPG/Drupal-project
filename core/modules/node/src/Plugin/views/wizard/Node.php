@@ -14,11 +14,9 @@ use Drupal\views\Plugin\views\wizard\WizardPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @todo Replace numbers with constants.
- */
-
-/**
  * Tests creating node views with the wizard.
+ *
+ * @todo Replace numbers with constants.
  */
 #[ViewsWizard(
   id: 'node',

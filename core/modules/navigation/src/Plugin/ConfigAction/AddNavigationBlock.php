@@ -18,6 +18,8 @@ use Drupal\layout_builder\SectionStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Config action plugin to add an navigation block.
+ *
  * @internal
  *   This API is experimental.
  */
