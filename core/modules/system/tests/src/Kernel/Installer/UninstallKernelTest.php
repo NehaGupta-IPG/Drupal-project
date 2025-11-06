@@ -6,12 +6,14 @@ namespace Drupal\Tests\system\Kernel\Installer;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\module_test\PluginManagerCacheClearer;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the uninstallation of modules.
- *
- * @group Module
  */
+#[Group('Module')]
+#[RunTestsInSeparateProcesses]
 class UninstallKernelTest extends KernelTestBase {
 
   /**

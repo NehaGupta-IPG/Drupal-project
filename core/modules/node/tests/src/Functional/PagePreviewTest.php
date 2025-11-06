@@ -18,11 +18,13 @@ use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the node entity preview functionality.
  */
 #[Group('node')]
+#[RunTestsInSeparateProcesses]
 class PagePreviewTest extends NodeTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -523,7 +525,10 @@ class PagePreviewTest extends NodeTestBase {
     $edit2 = [$title_key => 'Another page title'];
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm($edit2, 'Preview');
-    $this->assertSession()->addressEquals(Url::fromRoute('entity.node.preview', ['node_preview' => $node->uuid(), 'view_mode_id' => 'full']));
+    $this->assertSession()->addressEquals(Url::fromRoute('entity.node.preview', [
+      'node_preview' => $node->uuid(),
+      'view_mode_id' => 'full',
+    ]));
     $this->assertSession()->pageTextContains($edit2[$title_key]);
   }
 
