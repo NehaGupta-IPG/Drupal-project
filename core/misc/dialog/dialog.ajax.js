@@ -96,12 +96,18 @@
       const buttonSelectors =
         '.form-actions input[type=submit], .form-actions a.button, .form-actions a.action-link';
       const buttonElements = $dialog[0].querySelectorAll(buttonSelectors);
+      const buttonClassIgnoreList = [
+        // Prevent Drupal.ajax.bindAjaxLinks() from finding dialog buttons.
+        'use-ajax',
+      ];
 
       buttonElements.forEach((button) => {
         button.style.display = 'none';
         buttons.push({
           text: button.innerHTML || button.getAttribute('value'),
-          class: button.getAttribute('class'),
+          class: button.classList.values()
+            .filter(val => !buttonClassIgnoreList.includes(val))
+            .toArray().join(' '),
           'data-once': button.dataset.once,
           click(e) {
             if (button.tagName === 'A') {
