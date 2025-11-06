@@ -196,7 +196,7 @@ class LinkGenerator implements LinkGeneratorInterface {
    */
   protected function doGenerate($generated_link, $attributes, $variables) {
     if (!($variables['text'] instanceof MarkupInterface)) {
-      $variables['text'] = Html::escape($variables['text']);
+      $variables['text'] = Html::escape($variables['text'] ?? '');
     }
     $attributes = new Attribute($attributes);
     // This is safe because Attribute does escaping and $variables['text'] is
