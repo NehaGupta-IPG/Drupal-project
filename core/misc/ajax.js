@@ -281,6 +281,137 @@
   Drupal.ajax.instances = [];
 
   /**
+   * Utility: return all Ajax-enabled elements within the same form as `el`.
+   * Elements not in a form are ignored.
+   *
+   * @param {HTMLElement} el
+   * @return {Array<HTMLElement>}
+   */
+  Drupal.ajax._getAjaxElementsInSameForm = function (el) {
+    if (!el || !el.form) {
+      return [];
+    }
+    const form = el.form;
+    const list = [];
+    Drupal.ajax.instances.forEach((inst) => {
+      if (inst && inst.element && inst.element.form === form) {
+        list.push(inst.element);
+      }
+    });
+    return list;
+  };
+
+  /**
+   * Utility: return submit-capable controls within the same form as `el`.
+   * Includes controls inside the form and those associated via the [form] attribute.
+   *
+   * @param {HTMLElement} el
+   * @return {Array<HTMLElement>}
+   */
+  Drupal.ajax._getSubmitControlsInSameForm = function (el) {
+    if (!el || !el.form) {
+      return [];
+    }
+    const form = el.form;
+    const formId = form.getAttribute('id');
+    // Submit-capable controls: <button type="submit">, <button> with no type (defaults to submit),
+    // <input type="submit">, <input type="image">.
+    const insideSelector = 'button[type="submit"], button:not([type]), input[type="submit"], input[type="image"]';
+    const inside = Array.prototype.slice.call(form.querySelectorAll(insideSelector));
+    let external = [];
+    if (formId) {
+      const cssEscape = (window.CSS && window.CSS.escape)
+        ? window.CSS.escape
+        : function (ident) {
+            // Minimal fallback: escape any character that is not alphanumeric, underscore, or hyphen.
+            return String(ident).replace(/[^a-zA-Z0-9_-]/g, '\\$&');
+          };
+      const externalSelector = `${insideSelector}[form="${cssEscape(formId)}"]`;
+      external = Array.prototype.slice.call(document.querySelectorAll(externalSelector));
+    }
+    // Merge and deduplicate while preserving order: inside first, then external.
+    const seen = new Set();
+    const result = [];
+    inside.concat(external).forEach((node) => {
+      if (!seen.has(node)) {
+        seen.add(node);
+        result.push(node);
+      }
+    });
+    return result;
+  };
+
+  /**
+   * Utility: focus-time peers = Ajax-enabled peers + submit-capable controls in same form.
+   * @param {HTMLElement} el
+   * @return {Array<HTMLElement>}
+   */
+  Drupal.ajax._getFocusPeersWithSubmitControls = function (el) {
+    const ajaxPeers = Drupal.ajax._getAjaxElementsInSameForm(el);
+    const submitPeers = Drupal.ajax._getSubmitControlsInSameForm(el);
+    // Deduplicate.
+    const set = new Set();
+    const out = [];
+    ajaxPeers.concat(submitPeers).forEach((node) => {
+      if (!set.has(node)) {
+        set.add(node);
+        out.push(node);
+      }
+    });
+    return out;
+  };
+
+  /**
+   * Utility: lock pointer-events on a set of elements with a given key.
+   * Stores previous inline value and reference-counts by keys.
+   *
+   * @param {Array<HTMLElement>|NodeList|jQuery} elements
+   * @param {string} key
+   */
+  Drupal.ajax._lockPointerEvents = function (elements, key) {
+    $(elements).each(function () {
+      const $el = $(this);
+      const data = $el.data('drupalPeLocks') || { keys: {}, count: 0, prev: null };
+      if (!data.count) {
+        data.prev = this.style.pointerEvents || '';
+      }
+      if (!data.keys[key]) {
+        data.keys[key] = 1;
+        data.count += 1;
+      }
+      this.style.pointerEvents = 'none';
+      $el.data('drupalPeLocks', data);
+    });
+  };
+
+  /**
+   * Utility: unlock pointer-events previously locked with a given key.
+   *
+   * @param {Array<HTMLElement>|NodeList|jQuery} elements
+   * @param {string} key
+   */
+  Drupal.ajax._unlockPointerEvents = function (elements, key) {
+    $(elements).each(function () {
+      const $el = $(this);
+      const data = $el.data('drupalPeLocks');
+      if (!data) {
+        return;
+      }
+      if (data.keys[key]) {
+        delete data.keys[key];
+        data.count = Math.max(0, data.count - 1);
+      }
+      if (data.count === 0) {
+        // Restore previous inline style.
+        this.style.pointerEvents = data.prev || '';
+        $el.removeData('drupalPeLocks');
+      } else {
+        $el.data('drupalPeLocks', data);
+      }
+    });
+  };
+
+  /**
    * List all objects where the associated element is not in the DOM
    *
    * This method ignores {@link Drupal.Ajax} objects not bound to DOM elements
@@ -606,6 +737,18 @@
         ajax.ajaxing = false;
       },
       complete(xmlhttprequest, status) {
+        // Always restore pointer-events to their initial state for any locks
+        // created by this Ajax instance during focus or request.
+        if (ajax._peRequestKey && ajax._peersSnapshot) {
+          Drupal.ajax._unlockPointerEvents(ajax._peersSnapshot, ajax._peRequestKey);
+          ajax._peRequestKey = null;
+          ajax._peersSnapshot = null;
+        }
+        if (ajax._focusPeKey && ajax._peers) {
+          Drupal.ajax._unlockPointerEvents(ajax._peers, ajax._focusPeKey);
+          ajax._peers = null;
+          ajax._focusActive = false;
+        }
         if (status === 'error' || status === 'parsererror') {
           return ajax.error(xmlhttprequest, ajax.url);
         }
@@ -663,6 +806,47 @@
     if (elementSettings.prevent) {
       $(ajax.element).on(elementSettings.prevent, false);
     }
+
+    // Pointer-events management:
+    // 1) When focusing an element with an Ajax handler: disable pointer events
+    //    on all other Ajax-enabled fields in the same form until the next
+    //    Ajax request for this element completes. When the user blurs/finishes
+    //    (blur/change/Enter), also disable the focused element itself.
+    // 2) When triggering an Ajax request from this element: disable pointer
+    //    events on all Ajax-enabled elements in the same form until the request
+    //    completes.
+    const focusKey = `pe:${ajax.instanceIndex}:focus`;
+    ajax._focusPeKey = focusKey;
+    ajax._focusHandlers = ajax._focusHandlers || {};
+
+    $(ajax.element).on('focusin', function () {
+      const peers = Drupal.ajax._getFocusPeersWithSubmitControls(ajax.element);
+      ajax._peers = peers;
+      const others = peers.filter ? peers.filter((el) => el !== ajax.element) : $(peers).not(ajax.element).toArray();
+      Drupal.ajax._lockPointerEvents(others, focusKey);
+      ajax._focusActive = true;
+
+      // If the user leaves the field without triggering Ajax, restore others.
+      const restoreIfNoAjax = function () {
+        // If a request hasn't started for this instance, restore locks on others.
+        if (!ajax.ajaxing) {
+          Drupal.ajax._unlockPointerEvents(others, focusKey);
+          ajax._focusActive = false;
+        }
+        $(ajax.element).off('blur.ajaxPe change.ajaxPe keydown.ajaxPe');
+      };
+      ajax._focusHandlers.restoreIfNoAjax = restoreIfNoAjax;
+
+      $(ajax.element)
+        .on('blur.ajaxPe', restoreIfNoAjax)
+        .on('change.ajaxPe', restoreIfNoAjax)
+        .on('keydown.ajaxPe', function (e) {
+          if (e.which === 13) {
+            // Let the Ajax flow handle pointer locking.
+            $(ajax.element).off('blur.ajaxPe change.ajaxPe keydown.ajaxPe');
+          }
+        });
+    });
   };
 
   /**
@@ -905,6 +1089,19 @@
     // the element from triggering a new request, but does not prevent the user
     // from changing its value.
     $(this.element).prop('disabled', true);
+
+    // Lock pointer-events for all ajax-enabled elements in the same form.
+    if (this.element && this.element.form) {
+      this._peRequestKey = `pe:${this.instanceIndex}:req:${Date.now()}`;
+      this._peersSnapshot = Drupal.ajax._getAjaxElementsInSameForm(this.element);
+      Drupal.ajax._lockPointerEvents(this._peersSnapshot, this._peRequestKey);
+      // Clear any focus handlers for this element, they are superseded by the request lock.
+      $(this.element).off('blur.ajaxPe change.ajaxPe keydown.ajaxPe');
+      // If a focus lock was active, also ensure the current element is locked via focus key.
+      if (this._focusPeKey) {
+        Drupal.ajax._lockPointerEvents([this.element], this._focusPeKey);
+      }
+    }
 
     if (!this.progress || !this.progress.type) {
       return;
