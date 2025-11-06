@@ -31,9 +31,9 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   }
 
   /**
-   * Process the configuration file for database information.
+   * Converts a connection options array to a ConnectionParameters object.
    *
-   * @param ConnectionInfoArray|list<ConnectionInfoArray> $info
+   * @param ConnectionInfoArray|list<ConnectionInfoArray> $$connection_options
    *   The database connection information, as defined in settings.php. The
    *   structure of this array depends on the database driver it is connecting
    *   to.
@@ -46,16 +46,21 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    * @return \Drupal\Core\Database\ConnectionParametersInterface
    *   A validated connection info array.
    */
-  final public static function parseConnectionArray(array $info, ?ClassLoader $class_loader = NULL, ?string $app_root = NULL): ConnectionParametersInterface {
+  final public static function createFromOptionsArray(array $connection_options, ?ClassLoader $class_loader = NULL, ?string $app_root = NULL): ConnectionParametersInterface {
     // If there is no "driver" property, then we assume it's an array of
     // possible connections for this target. Pick one at random. That allows
     // us to have, for example, multiple replica servers.
-    if (empty($info['driver'])) {
-      $info_pick = $info[mt_rand(0, count($info) - 1)];
+    if (empty($connection_options['driver'])) {
+      $info_pick = $connection_options[mt_rand(0, count($connection_options) - 1)];
     }
 
     /** @var ConnectionInfoArray $options */
-    $options = $info_pick ?? $info;
+    $options = $info_pick ?? $connection_options;
+
+    $options = array_merge([
+      'namespace' => '',
+      'autoload' => '',
+    ], $options);
 
     // Force port to an int if it exists.
     if (isset($options['port'])) {
@@ -119,32 +124,14 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
       }
     }
 
-    return self::createFromOptionsArray($options);
-  }
-
-  /**
-   * Converts a connection options array to a ConnectionParameters object.
-   *
-   * @param ConnectionInfoArray $connection_options
-   *   An array of options for the connection.
-   *
-   * @return ConnectionParametersInterface
-   *   A ConnectionParameters object.
-   */
-  final public static function createFromOptionsArray(array $connection_options): ConnectionParametersInterface {
-    $connection_options = array_merge([
-      'namespace' => '',
-      'autoload' => '',
-    ], $connection_options);
-
-    $class = $connection_options['namespace'] . '\\ConnectionParameters';
+    $class = $options['namespace'] . '\\ConnectionParameters';
 
     if (class_exists($class)) {
-      $connection_options = $class::processOptionsArray($connection_options);
-      return new $class(...$connection_options);
+      $options = $class::processOptionsArray($options);
+      return new $class(...$options);
     }
 
-    return new class ($connection_options) extends ConnectionParametersBase {
+    return new class ($options) extends ConnectionParametersBase {
 
       /**
        * Backfill connection options.

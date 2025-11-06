@@ -205,7 +205,7 @@ abstract class Database {
    */
   final public static function parseConnectionInfo(array $info, ?ClassLoader $class_loader = NULL, ?string $app_root = NULL): ConnectionParametersInterface {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ConnectionParametersBase::createFromArrayOptions() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
-    return ConnectionParametersBase::parseConnectionArray($info, $class_loader, $app_root);
+    return ConnectionParametersBase::createFromOptionsArray($info, $class_loader, $app_root);
   }
 
   /**
@@ -239,7 +239,7 @@ abstract class Database {
     if (!empty(self::$databaseInfo[$key][$target])) {
       return;
     }
-    self::$databaseInfo[$key][$target] = is_array($info) ? ConnectionParametersBase::parseConnectionArray($info, $class_loader, $app_root) : $info;
+    self::$databaseInfo[$key][$target] = is_array($info) ? ConnectionParametersBase::createFromOptionsArray($info, $class_loader, $app_root) : $info;
   }
 
   /**
