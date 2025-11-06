@@ -638,7 +638,6 @@ class FieldPluginBaseTest extends UnitTestCase {
       '#type' => 'inline_template',
       '#template' => 'test-path/' . explode('/', $path)[1],
       '#context' => ['foo' => 123],
-      '#post_render' => [function () {}],
     ];
 
     $this->renderer->expects($this->once())
@@ -702,7 +701,6 @@ class FieldPluginBaseTest extends UnitTestCase {
       '#type' => 'inline_template',
       '#template' => $path,
       '#context' => ['foo' => $context['context_path']],
-      '#post_render' => [function () {}],
     ];
 
     $this->renderer->expects($this->once())
@@ -957,7 +955,6 @@ class FieldPluginBaseTest extends UnitTestCase {
       '#type' => 'inline_template',
       '#template' => $test_class,
       '#context' => $tokens,
-      '#post_render' => [function () {}],
     ];
 
     // We're not testing the token rendering itself, just that the function
