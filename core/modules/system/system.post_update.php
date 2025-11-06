@@ -127,6 +127,25 @@ function system_post_update_convert_empty_description_entity_form_modes_to_null(
 }
 
 /**
+ * Add the titles into the static_menu_link_overrides config.
+ */
+function system_post_update_add_title_link_overrides(): void {
+  /** @var \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager */
+  $menuLinkManager = \Drupal::service('plugin.manager.menu.link');
+  $definitions = $menuLinkManager->getDefinitions();
+
+  /** @var \Drupal\Core\Menu\StaticMenuLinkOverrides $staticOverrides */
+  $staticOverrides = \Drupal::service('menu_link.static.overrides');
+
+  $overrides = $staticOverrides->loadMultipleOverrides(array_keys($definitions));
+  foreach ($overrides as $id => $changes) {
+    // By default use the same link title.
+    $changes['title'] = $definitions[$id]['title'];
+    $staticOverrides->saveOverride($id, $changes);
+  }
+}
+
+/**
  * Delete obsolete system.rss configuration.
  */
 function system_post_update_delete_rss_config(array &$sandbox): void {
@@ -146,24 +165,5 @@ function system_post_update_delete_rss_config(array &$sandbox): void {
 
   if (!isset($sandbox['#finished']) || $sandbox['#finished'] >= 1) {
     \Drupal::configFactory()->getEditable('system.rss')->delete();
-  }
-}
-
-/**
- * Add the titles into the static_menu_link_overrides config.
- */
-function system_post_update_add_title_link_overrides() {
-  /** @var Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager */
-  $menuLinkManager = \Drupal::service('plugin.manager.menu.link');
-  $definitions = $menuLinkManager->getDefinitions();
-
-  /** @var Drupal\Core\Menu\StaticMenuLinkOverrides $staticOverrides */
-  $staticOverrides = \Drupal::service('menu_link.static.overrides');
-
-  $overrides = $staticOverrides->loadMultipleOverrides(array_keys($definitions));
-  foreach ($overrides as $id => $changes) {
-    // By default use the same link title.
-    $changes['title'] = $definitions[$id]['title'];
-    $staticOverrides->saveOverride($id, $changes);
   }
 }
