@@ -3,7 +3,6 @@
 namespace Drupal\views\Plugin\views;
 
 use Drupal\Component\Plugin\DependentPluginInterface;
-use Drupal\Component\Utility\Xss;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -338,15 +337,13 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
   /**
    * Replaces Views' tokens in a given string.
    *
-   * The resulting string will be sanitized with Xss::filterAdmin.
-   *
    * @param string $text
-   *   Unsanitized string with possible tokens.
+   *   String with possible tokens.
    * @param array $tokens
    *   Array of token => replacement_value items.
    *
    * @return string
-   *   The sanitized string with tokens replaced.
+   *   The string with tokens replaced.
    */
   protected function viewsTokenReplace($text, $tokens) {
     if (!strlen($text)) {
@@ -354,7 +351,7 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
       return '';
     }
     if (empty($tokens)) {
-      return Xss::filterAdmin($text);
+      return $text;
     }
 
     $twig_tokens = [];
@@ -395,19 +392,10 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
     }
 
     if ($twig_tokens) {
-      // Use the unfiltered text for the Twig template, then filter the output.
-      // Otherwise, Xss::filterAdmin could remove valid Twig syntax before the
-      // template is parsed.
-
       $build = [
         '#type' => 'inline_template',
         '#template' => $text,
         '#context' => $twig_tokens,
-        '#post_render' => [
-          function ($children, $elements) {
-            return Xss::filterAdmin($children);
-          },
-        ],
       ];
 
       // Currently you cannot attach assets to tokens with
@@ -417,7 +405,7 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
       return (string) $this->getRenderer()->renderInIsolation($build);
     }
     else {
-      return Xss::filterAdmin($text);
+      return $text;
     }
   }
 
