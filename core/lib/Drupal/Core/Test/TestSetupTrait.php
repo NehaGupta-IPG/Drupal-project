@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Test;
 
+use Drupal\Core\Database\ConnectionParametersBase;
 use Drupal\Core\Database\Database;
 
 /**
@@ -154,7 +155,7 @@ trait TestSetupTrait {
       // Ensure no existing database gets in the way. If a default database
       // exists already it must be removed.
       Database::removeConnection('default');
-      $database = Database::convertDbUrlToConnectionInfo($db_url, TRUE);
+      $database = ConnectionParametersBase::createFromUrl($db_url, TRUE);
       Database::addConnectionInfo('default', 'default', $database);
     }
 

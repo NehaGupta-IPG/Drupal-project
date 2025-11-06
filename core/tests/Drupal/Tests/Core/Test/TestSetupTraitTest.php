@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Test;
 
+use Drupal\Core\Database\ConnectionParametersBase;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Test\TestSetupTrait;
 use Drupal\Tests\UnitTestCase;
@@ -32,7 +33,7 @@ class TestSetupTraitTest extends UnitTestCase {
   public function testChangeDatabasePrefix(): void {
     $root = dirname(__FILE__, 7);
     putenv('SIMPLETEST_DB=pgsql://user:pass@127.0.0.1/db');
-    $connection_info = Database::convertDbUrlToConnectionInfo('mysql://user:pass@localhost/db');
+    $connection_info = ConnectionParametersBase::createFromUrl('mysql://user:pass@localhost/db');
     Database::addConnectionInfo('default', 'default', $connection_info);
     $this->assertEquals('mysql', Database::getConnectionInfo()['default']['driver']);
     $this->assertEquals('localhost', Database::getConnectionInfo()['default']['host']);

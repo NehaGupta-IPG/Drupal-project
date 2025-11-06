@@ -2,7 +2,7 @@
 
 namespace Drupal\Core\Command;
 
-use Drupal\Core\Database\ConnectionParameters;
+use Drupal\Core\Database\ConnectionParametersBase;
 use Drupal\Core\Database\Database;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -42,7 +42,7 @@ class DbCommandBase extends Command {
       Database::addConnectionInfo(
         'db-tools',
         'default',
-        ConnectionParameters::createFromUrl($input->getOption('database-url')),
+        ConnectionParametersBase::createFromUrl($input->getOption('database-url')),
       );
       $key = 'db-tools';
     }
