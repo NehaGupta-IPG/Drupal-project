@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 
 // cspell:ignore dummydb
+
 /**
  * Tests for database URL to/from database connection array conversions.
  *

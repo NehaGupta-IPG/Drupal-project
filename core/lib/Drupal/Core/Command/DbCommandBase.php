@@ -39,11 +39,7 @@ class DbCommandBase extends Command {
       if (Database::getConnectionInfo('db-tools')) {
         throw new \RuntimeException('Database "db-tools" is already defined. Cannot define database provided.');
       }
-      Database::addConnectionInfo(
-        'db-tools',
-        'default',
-        ConnectionParametersBase::createFromUrl($input->getOption('database-url')),
-      );
+      Database::addConnectionInfo('db-tools', 'default', ConnectionParametersBase::createFromUrl($input->getOption('database-url')));
       $key = 'db-tools';
     }
     else {
