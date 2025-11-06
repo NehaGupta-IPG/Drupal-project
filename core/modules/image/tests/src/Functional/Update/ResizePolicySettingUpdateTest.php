@@ -9,8 +9,6 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 
 /**
  * Tests addition of new image resize_policy setting.
- *
- * @group Update
  */
 class ResizePolicySettingUpdateTest extends UpdatePathTestBase {
 
