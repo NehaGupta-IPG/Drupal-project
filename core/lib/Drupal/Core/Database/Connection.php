@@ -185,7 +185,7 @@ abstract class Connection {
     assert(count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
 
     if (is_array($connection_options)) {
-      $connection_options = Database::getConnectionParametersFromOptionsArray($connection_options);
+      $connection_options = ConnectionParametersBase::createFromOptionsArray($connection_options);
     }
 
     // Manage the table prefix.
@@ -1406,7 +1406,7 @@ abstract class Connection {
    */
   public static function createUrlFromConnectionOptions(array $connection_options) {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ConnectionParameters::asUrl() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
-    return Database::getConnectionParametersFromOptionsArray($connection_options)->asUrl();
+    return ConnectionParametersBase::createFromOptionsArray($connection_options)->asUrl();
   }
 
   /**

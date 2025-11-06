@@ -171,7 +171,7 @@ trait TestSetupTrait {
         // Replace the full table prefix definition to ensure that no table
         // prefixes of the test runner leak into the test.
         $options['prefix'] .= $this->databasePrefix;
-        $connection_info[$target] = Database::getConnectionParametersFromOptionsArray($options);
+        $connection_info[$target] = ConnectionParametersBase::createFromOptionsArray($options);
       }
       Database::removeConnection('default');
       Database::addConnectionInfo('default', 'default', $connection_info['default']);

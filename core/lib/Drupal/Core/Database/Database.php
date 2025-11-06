@@ -271,7 +271,7 @@ abstract class Database {
       }
     }
 
-    return self::getConnectionParametersFromOptionsArray($options);
+    return ConnectionParametersBase::createFromOptionsArray($options);
   }
 
   /**
@@ -614,97 +614,6 @@ abstract class Database {
       $registered = TRUE;
       drupal_register_shutdown_function('\Drupal\Core\Database\Database::commitAllOnShutdown', TRUE);
     }
-  }
-
-  /**
-   * Converts a connection options array to a ConnectionParameters object.
-   *
-   * @param ConnectionInfoArray $connection_options
-   *   An array of options for the connection.
-   *
-   * @return ConnectionParametersInterface
-   *   A ConnectionParameters object.
-   */
-  final public static function getConnectionParametersFromOptionsArray(array $connection_options): ConnectionParametersInterface {
-    $connection_options = array_merge([
-      'namespace' => '',
-      'autoload' => '',
-    ], $connection_options);
-
-    $class = $connection_options['namespace'] . '\\ConnectionParameters';
-
-    if (class_exists($class)) {
-      $connection_options = $class::processOptionsArray($connection_options);
-      return new $class(...$connection_options);
-    }
-
-    return new class ($connection_options) extends ConnectionParametersBase {
-
-      /**
-       * Backfill connection options.
-       */
-      private array $optionsBackfill;
-
-      public function __construct(array $options) {
-        parent::__construct(
-          $options['driver'],
-          $options['namespace'],
-          $options['autoload'],
-          $options['database'],
-          $options['prefix'] ?? '',
-          $options['module'] ?? NULL,
-          $options['username'] ?? NULL,
-          $options['password'] ?? NULL,
-          $options['host'] ?? NULL,
-          $options['port'] ?? NULL,
-          $options['dependencies'] ?? NULL,
-        );
-        $this->optionsBackfill = array_merge($options, get_object_vars($this));
-      }
-
-      /**
-       * {@inheritdoc}
-       */
-      public function getParameters(): array {
-        return $this->optionsBackfill;
-      }
-
-      /**
-       * {@inheritdoc}
-       */
-      public function toArray(): array {
-        return $this->optionsBackfill;
-      }
-
-      /**
-       * This is for BC support only.
-       */
-      public function offsetExists(mixed $offset): bool {
-        return array_key_exists($offset, $this->optionsBackfill);
-      }
-
-      /**
-       * This is for BC support only.
-       */
-      public function &offsetGet(mixed $offset): mixed {
-        return $this->optionsBackfill[$offset];
-      }
-
-      /**
-       * This is for BC support only.
-       */
-      public function offsetSet(mixed $offset, mixed $value): void {
-        $this->optionsBackfill[$offset] = $value;
-      }
-
-      /**
-       * This is for BC support only.
-       */
-      public function offsetUnset(mixed $offset): void {
-        unset($this->optionsBackfill[$offset]);
-      }
-
-    };
   }
 
 }

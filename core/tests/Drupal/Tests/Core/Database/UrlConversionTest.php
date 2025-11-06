@@ -14,7 +14,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 
 // cspell:ignore dummydb
 /**
@@ -25,8 +25,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[CoversClass(Database::class)]
 #[Group('Database')]
-#[PreserveGlobalState(FALSE)]
-#[RunTestsInSeparateProcesses]
 class UrlConversionTest extends UnitTestCase {
 
   /**
@@ -347,6 +345,8 @@ class UrlConversionTest extends UnitTestCase {
    */
   #[DataProvider('providerGetConnectionInfoAsUrl')]
   #[IgnoreDeprecations]
+  #[PreserveGlobalState(FALSE)]
+  #[RunInSeparateProcess]
   public function testGetConnectionInfoAsUrl(array $info, $expected_url): void {
     Database::addConnectionInfo('default', 'default', $info);
     $url = Database::getConnectionInfoAsUrl();
@@ -356,6 +356,8 @@ class UrlConversionTest extends UnitTestCase {
   /**
    * Tests ConnectionParameters::asUrl() to get connection info as a URL.
    */
+  #[PreserveGlobalState(FALSE)]
+  #[RunInSeparateProcess]
   #[DataProvider('providerGetConnectionInfoAsUrl')]
   public function testConnectionParametersAsUrl(array $info, string $expectedUrl): void {
     Database::addConnectionInfo('default', 'default', $info);
