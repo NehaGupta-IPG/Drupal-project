@@ -103,22 +103,8 @@ class StaticMenuLinkOverridesTest extends UnitTestCase {
     ];
     $definitions_save_2 = [
       'definitions' => [
-        'test1' => [
-          'parent' => 'test0',
-          'menu_name' => '',
-          'weight' => 0,
-          'expanded' => FALSE,
-          'enabled' => FALSE,
-          'title' => '',
-        ],
-        'test1__la___ma' => [
-          'parent' => 'test1',
-          'menu_name' => '',
-          'weight' => 0,
-          'expanded' => FALSE,
-          'enabled' => FALSE,
-          'title' => '',
-        ],
+        'test1' => ['parent' => 'test0', 'menu_name' => '', 'weight' => 0, 'expanded' => FALSE, 'enabled' => FALSE, 'title' => ''],
+        'test1__la___ma' => ['parent' => 'test1', 'menu_name' => '', 'weight' => 0, 'expanded' => FALSE, 'enabled' => FALSE, 'title' => ''],
       ],
     ];
 
