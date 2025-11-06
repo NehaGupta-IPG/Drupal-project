@@ -14,7 +14,7 @@ class MenuLinkDefault extends MenuLinkBase implements ContainerFactoryPluginInte
    * {@inheritdoc}
    */
   protected $overrideAllowed = [
-    'title' => 1, 
+    'title' => 1,
     'menu_name' => 1,
     'parent' => 1,
     'weight' => 1,
