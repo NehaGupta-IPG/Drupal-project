@@ -33,7 +33,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   /**
    * Converts a connection options array to a ConnectionParameters object.
    *
-   * @param ConnectionInfoArray|list<ConnectionInfoArray> $$connection_options
+   * @param ConnectionInfoArray|list<ConnectionInfoArray> $connection_options
    *   The database connection information, as defined in settings.php. The
    *   structure of this array depends on the database driver it is connecting
    *   to.
