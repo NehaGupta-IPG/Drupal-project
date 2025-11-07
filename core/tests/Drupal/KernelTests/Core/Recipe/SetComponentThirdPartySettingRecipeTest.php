@@ -26,6 +26,7 @@ class SetComponentThirdPartySettingRecipeTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    'file',
     'field',
     'image',
     'system',
@@ -38,6 +39,7 @@ class SetComponentThirdPartySettingRecipeTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->enableModules([
+      'file',
       'field',
       'image',
     ]);
