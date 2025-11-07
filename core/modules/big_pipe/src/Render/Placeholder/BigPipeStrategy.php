@@ -92,7 +92,7 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
     // served with big pipe responses. This is because dynamic_page_cache hits
     // will usually not have any big pipe placeholders to replace and therefore
     // can be cached in internal/external page caches.
-    if (!$this->sessionConfiguration->hasSession($this->requestStack->getCurrentRequest())
+    if (!$this->sessionConfiguration->hasSession($request)
       && !$this->moduleHandler->moduleExists('dynamic_page_cache')
     ) {
       return [];
