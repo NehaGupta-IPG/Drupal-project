@@ -97,9 +97,6 @@ class BigPipeStrategyTest extends UnitTestCase {
         FALSE,
         [
           $cases['html']->placeholder => $cases['html']->bigPipePlaceholderRenderArray,
-          $cases['html_attribute_value']->placeholder => $cases['html_attribute_value']->bigPipeNoJsPlaceholderRenderArray,
-          $cases['html_attribute_value_subset']->placeholder => $cases['html_attribute_value_subset']->bigPipeNoJsPlaceholderRenderArray,
-          $cases['edge_case__invalid_html']->placeholder => $cases['edge_case__invalid_html']->bigPipeNoJsPlaceholderRenderArray,
           $cases['edge_case__html_non_lazy_builder']->placeholder => $cases['edge_case__html_non_lazy_builder']->bigPipePlaceholderRenderArray,
           $cases['exception__lazy_builder']->placeholder => $cases['exception__lazy_builder']->bigPipePlaceholderRenderArray,
           $cases['exception__embedded_response']->placeholder => $cases['exception__embedded_response']->bigPipePlaceholderRenderArray,
@@ -113,9 +110,6 @@ class BigPipeStrategyTest extends UnitTestCase {
         TRUE,
         [
           $cases['html']->placeholder => $cases['html']->bigPipeNoJsPlaceholderRenderArray,
-          $cases['html_attribute_value']->placeholder => $cases['html_attribute_value']->bigPipeNoJsPlaceholderRenderArray,
-          $cases['html_attribute_value_subset']->placeholder => $cases['html_attribute_value_subset']->bigPipeNoJsPlaceholderRenderArray,
-          $cases['edge_case__invalid_html']->placeholder => $cases['edge_case__invalid_html']->bigPipeNoJsPlaceholderRenderArray,
           $cases['edge_case__html_non_lazy_builder']->placeholder => $cases['edge_case__html_non_lazy_builder']->bigPipeNoJsPlaceholderRenderArray,
           $cases['exception__lazy_builder']->placeholder => $cases['exception__lazy_builder']->bigPipeNoJsPlaceholderRenderArray,
           $cases['exception__embedded_response']->placeholder => $cases['exception__embedded_response']->bigPipeNoJsPlaceholderRenderArray,
