@@ -26,6 +26,7 @@ class SetComponentThirdPartySettingRecipeTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    'field',
     'image',
     'system',
     'user',
@@ -36,7 +37,10 @@ class SetComponentThirdPartySettingRecipeTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->enableModules(['image']);
+    $this->enableModules([
+      'field',
+      'image',
+    ]);
     // Ensure the user entity and its default displays exist before applying
     // the recipe action targeting the user default view display.
     $this->installEntitySchema('user');
