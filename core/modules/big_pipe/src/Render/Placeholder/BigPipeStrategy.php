@@ -88,6 +88,16 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
       return [];
     }
 
+    // If dynamic_page_cache is installed, allow session-less requests to be
+    // served with big pipe responses. This is because dynamic_page_cache hits
+    // will usually not have any big pipe placeholders to replace and therefore
+    // can be cached in internal/external page caches.
+    if (!$this->sessionConfiguration->hasSession($this->requestStack->getCurrentRequest())
+      && !$this->moduleHandler->moduleExists('dynamic_page_cache')
+    ) {
+      return [];
+    }
+
     // Routes can opt out from using the BigPipe HTML delivery technique.
     if ($this->routeMatch->getRouteObject()->getOption('_no_big_pipe')) {
       return [];
@@ -106,11 +116,6 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
    *   The BigPipe placeholders.
    */
   protected function doProcessPlaceholders(array $placeholders) {
-    if (!$this->sessionConfiguration->hasSession($this->requestStack->getCurrentRequest())
-      && !$this->moduleHandler->moduleExists('dynamic_page_cache')
-    ) {
-      return [];
-    }
     $overridden_placeholders = [];
     foreach ($placeholders as $placeholder => $placeholder_elements) {
       // BigPipe uses JavaScript and the DOM to find the placeholder to replace.
