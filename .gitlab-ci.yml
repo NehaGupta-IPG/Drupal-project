@@ -374,6 +374,8 @@ default:
   <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_DB: "mysql-8"
+    _TARGET_DB_DRIVER: "mysql"
+    _TARGET_DB_DRIVER_MODULE: "mysql"
 
 # Jobs running on commits.
 # The value set in the "needs" property will determine the order in the sequence.
@@ -429,6 +431,7 @@ default:
     - *core-spellcheck
     - mv -f /build/core/package.json $CI_PROJECT_DIR/core/package.json
     - mv -f /build/core/yarn.lock $CI_PROJECT_DIR/core/yarn.lock
+    - rm -rf $CI_PROJECT_DIR/core/node_modules || true
     - mv /build/core/node_modules $CI_PROJECT_DIR/core
   cache:
     key:
