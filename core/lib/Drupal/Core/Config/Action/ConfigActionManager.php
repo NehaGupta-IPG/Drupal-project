@@ -299,7 +299,7 @@ class ConfigActionManager extends DefaultPluginManager {
    */
   public static function replacePlaceholders(mixed $data, array $replacements): mixed {
     if (is_string($data)) {
-      $data = str_replace(array_keys($replacements), $replacements, $data);
+      return strtr($data, $replacements);
     }
     elseif (is_array($data)) {
       foreach ($data as $old_key => $value) {
