@@ -33,6 +33,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  * - %bundle - the target bundle of entity display being modified,
  * - %entity_type - the entity type of entity display being modified,
  * - %view_mode - the view/form mode of entity display being modified.
+ * The action resolves placeholders only within the provided settings array or
+ * scalar value; other keys (such as the component name) are used verbatim.
  *
  * Example usages in a recipe:
  *
@@ -117,14 +119,17 @@ final class SetComponentThirdPartySetting extends PluginBase implements ConfigAc
     $component = $value['component'];
     $provider = $value['provider'];
     $replace = $value['replace'] ?? FALSE;
-    // Replace placeholders.
-    $value = ConfigActionManager::replacePlaceholders($value, [
+
+    $placeholders = [
       '%bundle' => $entity->getTargetBundle(),
       '%entity_type' => $entity->getTargetEntityTypeId(),
       '%view_mode' => $entity->getMode(),
-    ]);
+    ];
 
     $settings = $value['settings'] ?? NULL;
+    if ($settings !== NULL) {
+      $settings = ConfigActionManager::replacePlaceholders($settings, $placeholders);
+    }
 
     // Ensure the component exists in the display.
     $component_config = $entity->getComponent($component);
