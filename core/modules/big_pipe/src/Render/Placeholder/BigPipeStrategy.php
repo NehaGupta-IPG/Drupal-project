@@ -88,6 +88,11 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
       return [];
     }
 
+    // Routes can opt out from using the BigPipe HTML delivery technique.
+    if ($this->routeMatch->getRouteObject()->getOption('_no_big_pipe')) {
+      return [];
+    }
+
     // If dynamic_page_cache is installed, allow session-less requests to be
     // served with big pipe responses. This is because dynamic_page_cache hits
     // will usually not have any big pipe placeholders to replace and therefore
@@ -95,11 +100,6 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
     if (!$this->sessionConfiguration->hasSession($request)
       && !$this->moduleHandler->moduleExists('dynamic_page_cache')
     ) {
-      return [];
-    }
-
-    // Routes can opt out from using the BigPipe HTML delivery technique.
-    if ($this->routeMatch->getRouteObject()->getOption('_no_big_pipe')) {
       return [];
     }
 
