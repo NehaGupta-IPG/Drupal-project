@@ -198,6 +198,9 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
       '#suffix' => '</span>',
       '#cache' => [
         'max-age' => 0,
+        'contexts' => [
+          'session.exists',
+        ],
       ],
       '#attached' => [
         'library' => [
