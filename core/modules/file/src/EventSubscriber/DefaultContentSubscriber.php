@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\file\EventSubscriber;
 
+use Drupal\Core\DefaultContent\PreEntityImportEvent;
 use Drupal\Core\DefaultContent\PreExportEvent;
 use Drupal\file\FileInterface;
+use Drupal\file\Plugin\Field\FieldType\FileUriItem;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -23,7 +25,10 @@ class DefaultContentSubscriber implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents(): array {
-    return [PreExportEvent::class => 'preExport'];
+    return [
+      PreExportEvent::class => 'preExport',
+      PreEntityImportEvent::class => 'preEntityImport',
+    ];
   }
 
   /**
@@ -43,6 +48,13 @@ class DefaultContentSubscriber implements EventSubscriberInterface {
 
       if (file_exists($uri)) {
         $event->metadata->addAttachment($uri, $name);
+
+        // URL-encode the file URI so that it can pass strict validation on
+        // import. This is reversed in ::preEntityImport().
+        $event->setCallback(
+          'field_item:file_uri',
+          fn (FileUriItem $item): array => array_map('urlencode', $item->getValue()),
+        );
       }
       else {
         $this->logger?->warning('The file (%uri) associated with file entity %name does not exist.', [
@@ -51,6 +63,22 @@ class DefaultContentSubscriber implements EventSubscriberInterface {
         ]);
       }
     }
+  }
+
+  /**
+   * Reacts before a file entity is imported.
+   *
+   * @param \Drupal\Core\DefaultContent\PreExportEvent $event
+   *   The event object.
+   */
+  public function preEntityImport(PreEntityImportEvent $event): void {
+    if ($event->metadata['entity_type'] !== 'file') {
+      return;
+    }
+    $event->data['default']['uri'] = array_map(
+      'urldecode',
+      $event->data['default']['uri'],
+    );
   }
 
 }
