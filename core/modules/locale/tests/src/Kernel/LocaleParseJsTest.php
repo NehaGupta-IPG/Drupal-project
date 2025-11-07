@@ -35,7 +35,7 @@ class LocaleParseJsTest extends KernelTestBase {
   /**
    * Check that we can parse JS from stream wrappers.
    */
-  public function testBuildProjects() {
+  public function testBuildProjects(): void {
     $public_path = 'public://locale_stream_wrapper_test.js';
     $contents = "[Drupal.t('The Pine Bluff Variant'),Drupal.t('Small potatoes'),Drupal.t('Paper hearts')]";
     file_put_contents($public_path, $contents);
