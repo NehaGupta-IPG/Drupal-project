@@ -2,6 +2,7 @@
 
 namespace Drupal\locale\Hook;
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Link;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
@@ -203,7 +204,7 @@ class LocaleHooks {
   public function jsAlter(&$javascript, AttachedAssetsInterface $assets, LanguageInterface $language): void {
     $files = [];
     foreach ($javascript as $item) {
-      if (isset($item['type']) && $item['type'] == 'file') {
+      if (isset($item['type']) && $item['type'] == 'file' && !UrlHelper::isExternal($item['data'])) {
         // Ignore the JS translation placeholder file.
         if ($item['data'] === 'core/modules/locale/locale.translation.js') {
           continue;
