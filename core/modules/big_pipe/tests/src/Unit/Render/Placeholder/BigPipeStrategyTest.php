@@ -52,10 +52,15 @@ class BigPipeStrategyTest extends UnitTestCase {
     $big_pipe_strategy = new BigPipeStrategy($session_configuration->reveal(), $request_stack->reveal(), $route_match->reveal());
     $processed_placeholders = $big_pipe_strategy->processPlaceholders($placeholders);
 
-    if ($request->isMethodCacheable() && !$route_match_has_no_big_pipe_option && $request_has_session) {
+    if ($request->isMethodCacheable() && !$route_match_has_no_big_pipe_option) {
       $this->assertSameSize($expected_big_pipe_placeholders, $processed_placeholders, 'BigPipe is able to deliver all placeholders.');
       foreach (array_keys($placeholders) as $placeholder) {
-        $this->assertSame($expected_big_pipe_placeholders[$placeholder], $processed_placeholders[$placeholder], "Verifying how BigPipeStrategy handles the placeholder '$placeholder'");
+        // If the request has a session, every placeholder will be processed by
+        // Big Pipe. Otherwise ensure only the explicitly expected placeholders
+        // are checked.
+        if ($request_has_session || isset($expected_big_pipe_placeholders[$placeholder])) {
+          $this->assertSame($expected_big_pipe_placeholders[$placeholder], $processed_placeholders[$placeholder], "Verifying how BigPipeStrategy handles the placeholder '$placeholder'");
+        }
       }
     }
     else {
@@ -90,7 +95,12 @@ class BigPipeStrategyTest extends UnitTestCase {
         FALSE,
         FALSE,
         FALSE,
-        [],
+        [
+          $cases['html']->placeholder => $cases['html']->bigPipePlaceholderRenderArray,
+          $cases['edge_case__html_non_lazy_builder']->placeholder => $cases['edge_case__html_non_lazy_builder']->bigPipePlaceholderRenderArray,
+          $cases['exception__lazy_builder']->placeholder => $cases['exception__lazy_builder']->bigPipePlaceholderRenderArray,
+          $cases['exception__embedded_response']->placeholder => $cases['exception__embedded_response']->bigPipePlaceholderRenderArray,
+        ],
       ],
       '_no_big_pipe absent, no session, no-JS cookie present' => [
         $placeholders,
@@ -98,7 +108,12 @@ class BigPipeStrategyTest extends UnitTestCase {
         FALSE,
         FALSE,
         TRUE,
-        [],
+        [
+          $cases['html']->placeholder => $cases['html']->bigPipeNoJsPlaceholderRenderArray,
+          $cases['edge_case__html_non_lazy_builder']->placeholder => $cases['edge_case__html_non_lazy_builder']->bigPipeNoJsPlaceholderRenderArray,
+          $cases['exception__lazy_builder']->placeholder => $cases['exception__lazy_builder']->bigPipeNoJsPlaceholderRenderArray,
+          $cases['exception__embedded_response']->placeholder => $cases['exception__embedded_response']->bigPipeNoJsPlaceholderRenderArray,
+        ],
       ],
       '_no_big_pipe present, no session, no-JS cookie absent' => [
         $placeholders,
