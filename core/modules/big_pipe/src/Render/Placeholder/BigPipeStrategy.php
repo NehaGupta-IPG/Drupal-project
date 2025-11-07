@@ -5,6 +5,7 @@ namespace Drupal\big_pipe\Render\Placeholder;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Render\Placeholder\PlaceholderStrategyInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\SessionConfigurationInterface;
@@ -65,41 +66,11 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
    */
   const NOJS_COOKIE = 'big_pipe_nojs';
 
-  /**
-   * The session configuration.
-   *
-   * @var \Drupal\Core\Session\SessionConfigurationInterface
-   */
-  protected $sessionConfiguration;
-
-  /**
-   * The request stack.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   */
-  protected $requestStack;
-
-  /**
-   * The current route match.
-   *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
-   */
-  protected $routeMatch;
-
-  /**
-   * Constructs a new BigPipeStrategy class.
-   *
-   * @param \Drupal\Core\Session\SessionConfigurationInterface $session_configuration
-   *   The session configuration.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match.
-   */
-  public function __construct(SessionConfigurationInterface $session_configuration, RequestStack $request_stack, RouteMatchInterface $route_match) {
-    $this->sessionConfiguration = $session_configuration;
-    $this->requestStack = $request_stack;
-    $this->routeMatch = $route_match;
+  public function __construct(protected SessionConfigurationInterface $sessionConfiguration, protected RequestStack $requestStack, protected RouteMatchInterface $routeMatch, protected ?ModuleHandlerInterface $moduleHandler = NULL) {
+    if (!isset($moduleHandler)) {
+      trigger_error('Calling ' . __METHOD__ . ' without the module handler service is deprecated in drupal:11.3.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3508508.');
+      $this->moduleHandler = \Drupal::service('module_handler');
+    }
   }
 
   /**
@@ -135,6 +106,11 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
    *   The BigPipe placeholders.
    */
   protected function doProcessPlaceholders(array $placeholders) {
+    if (!$this->sessionConfiguration->hasSession($this->requestStack->getCurrentRequest())
+      && !$this->moduleHandler->moduleExists('dynamic_page_cache')
+    ) {
+      return [];
+    }
     $overridden_placeholders = [];
     foreach ($placeholders as $placeholder => $placeholder_elements) {
       // BigPipe uses JavaScript and the DOM to find the placeholder to replace.
@@ -151,16 +127,7 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
       // @see \Drupal\Core\Form\FormBuilder::renderFormTokenPlaceholder()
       // @see \Drupal\Core\Form\FormBuilder::renderPlaceholderFormAction()
       if (static::placeholderIsAttributeSafe($placeholder)) {
-        // When there is no session, fall through to the single flush strategy
-        // rather than creating a no-js placeholder, so that pages on which the
-        // only big pipe placeholders would be attribute-safe ones can be served
-        // without big pipe at all, allowing them to be edge cached.
-        if (!$this->sessionConfiguration->hasSession($this->requestStack->getCurrentRequest())) {
-          continue;
-        }
-        else {
-          $overridden_placeholders[$placeholder] = static::createBigPipeNoJsPlaceholder($placeholder, $placeholder_elements, TRUE);
-        }
+        $overridden_placeholders[$placeholder] = static::createBigPipeNoJsPlaceholder($placeholder, $placeholder_elements, TRUE);
       }
       else {
         // If the current request/session doesn't have JavaScript, fall back to

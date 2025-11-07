@@ -9,7 +9,7 @@ services:
     arguments: ['@big_pipe']
   placeholder_strategy.big_pipe:
     class: Drupal\big_pipe\Render\Placeholder\BigPipeStrategy
-    arguments: ['@session_configuration', '@request_stack', '@current_route_match']
+    arguments: ['@session_configuration', '@request_stack', '@current_route_match', '@module_handler']
     tags:
       - { name: placeholder_strategy, priority: 0 }
   big_pipe:
