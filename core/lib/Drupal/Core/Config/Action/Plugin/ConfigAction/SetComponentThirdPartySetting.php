@@ -8,6 +8,7 @@ use Drupal\Core\Config\Action\Attribute\ConfigAction;
 use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionManager;
 use Drupal\Core\Config\Action\ConfigActionPluginInterface;
+use Drupal\Core\Config\Action\Plugin\ConfigAction\Deriver\SetComponentThirdPartySettingDeriver;
 use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\DependencyInjection\AutowiredInstanceTrait;
 use Drupal\Core\Entity\Display\EntityDisplayInterface;
@@ -70,6 +71,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
     'entity_view_display',
     'entity_form_display',
   ],
+  deriver: SetComponentThirdPartySettingDeriver::class,
 )]
 final class SetComponentThirdPartySetting implements ConfigActionPluginInterface, ContainerFactoryPluginInterface {
 
@@ -120,12 +122,12 @@ final class SetComponentThirdPartySetting implements ConfigActionPluginInterface
     // Ensure the component exists in the display.
     $component = $entity->getComponent($value['component']);
     if ($component === NULL) {
-      throw new ConfigActionException(sprintf("Component %s does not exist or hidden.", $component));
+      throw new ConfigActionException(sprintf("Component %s does not exist or hidden.", $value['component']));
     }
     $component['third_party_settings'][$provider] = ConfigActionManager::replacePlaceholders($value['settings'] ?? [], [
       '%bundle' => $entity->getTargetBundle(),
       '%entity_type' => $entity->getTargetEntityTypeId(),
-      '%view_mode' => $entity->getMode(),
+      '%display_mode' => $entity->getMode(),
     ]);
     $entity->setComponent($value['component'], $component);
   }
