@@ -147,6 +147,12 @@ final class SetComponentThirdPartySetting extends PluginBase implements ConfigAc
         $component_config['third_party_settings'][$provider] = array_merge($existing, $settings);
       }
     }
+    elseif ($settings === NULL) {
+      $component_config['third_party_settings'][$provider] = ['value' => NULL];
+    }
+    else {
+      $component_config['third_party_settings'][$provider] = $settings;
+    }
 
     $entity->setComponent($component, $component_config);
   }
