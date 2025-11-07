@@ -8,31 +8,33 @@ use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Render\MarkupTrait;
 use Drupal\Core\GeneratedLink;
-use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Twig with MarkupInterface objects.
- *
- * @group Theme
  */
+#[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class TwigMarkupInterfaceTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',
   ];
 
   /**
-   * @dataProvider providerTestMarkupInterfaceEmpty
-   */
+ * Tests markup interface empty.
+ */
+  #[DataProvider('providerTestMarkupInterfaceEmpty')]
   public function testMarkupInterfaceEmpty($expected, $variable): void {
     $this->assertSame($expected, (string) $this->renderObjectWithTwig($variable));
   }

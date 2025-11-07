@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\workspaces\Kernel;
 
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
-use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\workspaces\Entity\Workspace;
+use Drupal\workspaces\WorkspaceAssociation;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests workspace associations.
- *
- * @coversDefaultClass \Drupal\workspaces\WorkspaceAssociation
- *
- * @group workspaces
  */
+#[CoversClass(WorkspaceAssociation::class)]
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceAssociationTest extends KernelTestBase {
 
-  use ContentTypeCreationTrait;
-  use NodeCreationTrait;
   use UserCreationTrait;
   use WorkspaceTestTrait;
 
@@ -35,13 +36,11 @@ class WorkspaceAssociationTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'field',
-    'filter',
-    'node',
-    'text',
+    'entity_test',
     'user',
     'system',
     'workspaces',
+    'workspaces_test',
   ];
 
   /**
@@ -52,16 +51,14 @@ class WorkspaceAssociationTest extends KernelTestBase {
 
     $this->entityTypeManager = \Drupal::entityTypeManager();
 
-    $this->installEntitySchema('node');
+    $this->installEntitySchema('entity_test_mulrevpub');
+    $this->installEntitySchema('entity_test_mulrevpub_string_id');
     $this->installEntitySchema('user');
     $this->installEntitySchema('workspace');
 
-    $this->installConfig(['filter', 'node', 'system']);
+    $this->installConfig(['system']);
 
-    $this->installSchema('node', ['node_access']);
-    $this->installSchema('workspaces', ['workspace_association']);
-
-    $this->createContentType(['type' => 'article']);
+    $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
 
     $permissions = array_intersect([
       'administer nodes',
@@ -71,6 +68,10 @@ class WorkspaceAssociationTest extends KernelTestBase {
     ], array_keys($this->container->get('user.permissions')->getPermissions()));
     $this->setCurrentUser($this->createUser($permissions));
 
+    $this->workspaces['qa'] = Workspace::create(['id' => 'qa', 'label' => 'QA']);
+    $this->workspaces['qa']->save();
+    $this->workspaces['preview'] = Workspace::create(['id' => 'preview', 'label' => 'Preview']);
+    $this->workspaces['preview']->save();
     $this->workspaces['stage'] = Workspace::create(['id' => 'stage', 'label' => 'Stage']);
     $this->workspaces['stage']->save();
     $this->workspaces['dev'] = Workspace::create(['id' => 'dev', 'parent' => 'stage', 'label' => 'Dev']);
@@ -80,27 +81,32 @@ class WorkspaceAssociationTest extends KernelTestBase {
   /**
    * Tests the revisions tracked by a workspace.
    *
-   * @covers ::getTrackedEntities
-   * @covers ::getAssociatedRevisions
+   * @param string $entity_type_id
+   *   The ID of the entity type to test.
+   * @param array $entity_values
+   *   An array of values for the entities created in this test.
+   *
+   * @legacy-covers ::getTrackedEntities
+   * @legacy-covers ::getAssociatedRevisions
    */
-  public function testWorkspaceAssociation(): void {
-    $this->createNode(['title' => 'Test article 1 - live - unpublished', 'type' => 'article', 'status' => 0]);
-    $this->createNode(['title' => 'Test article 2 - live - published', 'type' => 'article']);
+  #[DataProvider('getEntityTypeIds')]
+  public function testWorkspaceAssociation(string $entity_type_id, array $entity_values): void {
+    $entity_1 = $this->createEntity($entity_type_id, $entity_values[1]);
+    $this->createEntity($entity_type_id, $entity_values[2]);
 
     // Edit one of the existing nodes in 'stage'.
     $this->switchToWorkspace('stage');
-    $node = $this->entityTypeManager->getStorage('node')->load(1);
-    $node->setTitle('Test article 1 - stage - published');
-    $node->setPublished();
+    $entity_1->set('name', 'Test entity 1 - stage - published');
+    $entity_1->setPublished();
     // This creates rev. 3.
-    $node->save();
+    $entity_1->save();
 
     // Generate content with the following structure:
     // Stage:
-    // - Test article 3 - stage - unpublished (rev. 4)
-    // - Test article 4 - stage - published (rev. 5 and 6)
-    $this->createNode(['title' => 'Test article 3 - stage - unpublished', 'type' => 'article', 'status' => 0]);
-    $this->createNode(['title' => 'Test article 4 - stage - published', 'type' => 'article']);
+    // - Test entity 3 - stage - unpublished (rev. 4)
+    // - Test entity 4 - stage - published (rev. 5 and 6)
+    $this->createEntity($entity_type_id, $entity_values[3]);
+    $this->createEntity($entity_type_id, $entity_values[4]);
 
     $expected_latest_revisions = [
       'stage' => [3, 4, 6],
@@ -111,17 +117,17 @@ class WorkspaceAssociationTest extends KernelTestBase {
     $expected_initial_revisions = [
       'stage' => [4, 5],
     ];
-    $this->assertWorkspaceAssociations('node', $expected_latest_revisions, $expected_all_revisions, $expected_initial_revisions);
+    $this->assertWorkspaceAssociations($entity_type_id, $expected_latest_revisions, $expected_all_revisions, $expected_initial_revisions);
 
     // Dev:
-    // - Test article 1 - stage - published (rev. 3)
-    // - Test article 3 - stage - unpublished (rev. 4)
-    // - Test article 4 - stage - published (rev. 5 and 6)
-    // - Test article 5 - dev - unpublished (rev. 7)
-    // - Test article 6 - dev - published (rev. 8 and 9)
+    // - Test entity 1 - stage - published (rev. 3)
+    // - Test entity 3 - stage - unpublished (rev. 4)
+    // - Test entity 4 - stage - published (rev. 5 and 6)
+    // - Test entity 5 - dev - unpublished (rev. 7)
+    // - Test entity 6 - dev - published (rev. 8 and 9)
     $this->switchToWorkspace('dev');
-    $this->createNode(['title' => 'Test article 5 - dev - unpublished', 'type' => 'article', 'status' => 0]);
-    $this->createNode(['title' => 'Test article 6 - dev - published', 'type' => 'article']);
+    $this->createEntity($entity_type_id, $entity_values[5]);
+    $this->createEntity($entity_type_id, $entity_values[6]);
 
     $expected_latest_revisions += [
       'dev' => [3, 4, 6, 7, 9],
@@ -134,7 +140,7 @@ class WorkspaceAssociationTest extends KernelTestBase {
     $expected_initial_revisions += [
       'dev' => [7, 8],
     ];
-    $this->assertWorkspaceAssociations('node', $expected_latest_revisions, $expected_all_revisions, $expected_initial_revisions);
+    $this->assertWorkspaceAssociations($entity_type_id, $expected_latest_revisions, $expected_all_revisions, $expected_initial_revisions);
 
     // Merge 'dev' into 'stage' and check the workspace associations.
     /** @var \Drupal\workspaces\WorkspaceMergerInterface $workspace_merger */
@@ -155,7 +161,70 @@ class WorkspaceAssociationTest extends KernelTestBase {
     // Which leaves revision 8 as the only remaining initial revision in 'dev'.
     $expected_initial_revisions['dev'] = [8];
 
-    $this->assertWorkspaceAssociations('node', $expected_latest_revisions, $expected_all_revisions, $expected_initial_revisions);
+    $this->assertWorkspaceAssociations($entity_type_id, $expected_latest_revisions, $expected_all_revisions, $expected_initial_revisions);
+
+    // Publish 'stage' and check the workspace associations.
+    /** @var \Drupal\workspaces\WorkspacePublisherInterface $workspace_publisher */
+    $workspace_publisher = \Drupal::service('workspaces.operation_factory')->getPublisher($this->workspaces['stage']);
+    $workspace_publisher->publish();
+
+    $expected_revisions['stage'] = $expected_revisions['dev'] = [];
+    $this->assertWorkspaceAssociations($entity_type_id, $expected_revisions, $expected_revisions, $expected_revisions);
+  }
+
+  /**
+   * The data provider for ::testWorkspaceAssociation().
+   */
+  public static function getEntityTypeIds(): array {
+    return [
+      [
+        'entity_type_id' => 'entity_test_mulrevpub',
+        'entity_values' => [
+          1 => ['name' => 'Test entity 1 - live - unpublished', 'status' => FALSE],
+          2 => ['name' => 'Test entity 2 - live - published', 'status' => TRUE],
+          3 => ['name' => 'Test entity 3 - stage - unpublished', 'status' => FALSE],
+          4 => ['name' => 'Test entity 4 - stage - published', 'status' => TRUE],
+          5 => ['name' => 'Test entity 5 - dev - unpublished', 'status' => FALSE],
+          6 => ['name' => 'Test entity 6 - dev - published', 'status' => TRUE],
+        ],
+      ],
+      [
+        'entity_type_id' => 'entity_test_mulrevpub_string_id',
+        'entity_values' => [
+          1 => ['id' => 'test_1', 'name' => 'Test entity 1 - live - unpublished', 'status' => FALSE],
+          2 => ['id' => 'test_2', 'name' => 'Test entity 2 - live - published', 'status' => TRUE],
+          3 => ['id' => 'test_3', 'name' => 'Test entity 3 - stage - unpublished', 'status' => FALSE],
+          4 => ['id' => 'test_4', 'name' => 'Test entity 4 - stage - published', 'status' => TRUE],
+          5 => ['id' => 'test_5', 'name' => 'Test entity 5 - dev - unpublished', 'status' => FALSE],
+          6 => ['id' => 'test_6', 'name' => 'Test entity 6 - dev - published', 'status' => TRUE],
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * Tests the count of revisions returned for tracked entities listing.
+   *
+   * @legacy-covers ::getTrackedEntitiesForListing
+   */
+  public function testWorkspaceAssociationForListing(): void {
+    $this->switchToWorkspace($this->workspaces['stage']->id());
+    $entity_type_id = 'entity_test_mulrevpub';
+
+    for ($i = 1; $i <= 51; ++$i) {
+      $this->createEntity($entity_type_id, ['name' => "Test entity {$i}"]);
+    }
+
+    /** @var \Drupal\workspaces\WorkspaceAssociationInterface $workspace_association */
+    $workspace_association = \Drupal::service('workspaces.association');
+
+    // The default behavior uses a pager with 50 items per page.
+    $tracked_items = $workspace_association->getTrackedEntitiesForListing($this->workspaces['stage']->id());
+    $this->assertEquals(50, count($tracked_items[$entity_type_id]));
+
+    // Verifies that all items are returned, not broken into pages.
+    $tracked_items_no_pager = $workspace_association->getTrackedEntitiesForListing($this->workspaces['stage']->id(), NULL, FALSE);
+    $this->assertEquals(51, count($tracked_items_no_pager[$entity_type_id]));
   }
 
   /**
@@ -171,7 +240,7 @@ class WorkspaceAssociationTest extends KernelTestBase {
    *   An array of expected values for the initial revisions, i.e. for the
    *   entities that were created in the specified workspace.
    */
-  protected function assertWorkspaceAssociations($entity_type_id, array $expected_latest_revisions, array $expected_all_revisions, array $expected_initial_revisions) {
+  protected function assertWorkspaceAssociations($entity_type_id, array $expected_latest_revisions, array $expected_all_revisions, array $expected_initial_revisions): void {
     $workspace_association = \Drupal::service('workspaces.association');
     foreach ($expected_latest_revisions as $workspace_id => $expected_tracked_revision_ids) {
       $tracked_entities = $workspace_association->getTrackedEntities($workspace_id, $entity_type_id);
@@ -188,6 +257,187 @@ class WorkspaceAssociationTest extends KernelTestBase {
       $initial_revisions = $workspace_association->getAssociatedInitialRevisions($workspace_id, $entity_type_id);
       $this->assertEquals($expected_initial_revision_ids, array_keys($initial_revisions));
     }
+  }
+
+  /**
+   * Tests moving an entity with multiple revisions between workspaces.
+   *
+   * @legacy-covers ::moveTrackedEntities
+   */
+  public function testMoveTrackedEntitiesWithMultipleRevisions(): void {
+    $entity_type_id = 'entity_test_mulrevpub';
+    $workspace_association = \Drupal::service('workspaces.association');
+
+    // Get the workspace field name for later assertions.
+    $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
+    assert($entity_type instanceof ContentEntityTypeInterface);
+    $workspace_field = $entity_type->getRevisionMetadataKey('workspace');
+    $storage = $this->entityTypeManager->getStorage($entity_type_id);
+
+    // Create an entity with multiple revisions in 'preview'.
+    $this->switchToWorkspace('preview');
+    $entity = $this->createEntity($entity_type_id, ['name' => 'Entity with revisions']);
+    $entity->setName('Updated name 1');
+    $entity->save();
+    $entity->setName('Updated name 2');
+    $entity->save();
+
+    $preview_revisions = $workspace_association->getAssociatedRevisions('preview', $entity_type_id);
+
+    // Move the entity to 'qa'.
+    $workspace_association->moveTrackedEntities('preview', 'qa', $entity_type_id, [$entity->id()]);
+
+    // Verify all revisions have been moved.
+    $this->assertEmpty($workspace_association->getAssociatedRevisions('preview', $entity_type_id));
+
+    $qa_revisions = $workspace_association->getAssociatedRevisions('qa', $entity_type_id);
+    $this->assertEquals($preview_revisions, $qa_revisions);
+
+    // Verify the workspace field was updated on all revisions.
+    foreach ($storage->loadMultipleRevisions(array_keys($qa_revisions)) as $revision) {
+      $this->assertEquals('qa', $revision->{$workspace_field}->target_id);
+    }
+  }
+
+  /**
+   * Tests moving all entities of a specific type while leaving others.
+   *
+   * @legacy-covers ::moveTrackedEntities
+   */
+  public function testMoveTrackedEntitiesOfSpecificType(): void {
+    $entity_type_id = 'entity_test_mulrevpub';
+    $entity_type_id_string = 'entity_test_mulrevpub_string_id';
+    $workspace_association = \Drupal::service('workspaces.association');
+
+    // Get the workspace field name for later assertions.
+    $entity_type_string_id = $this->entityTypeManager->getDefinition($entity_type_id_string);
+    $workspace_field_string_id = $entity_type_string_id->getRevisionMetadataKey('workspace');
+    $storage_string_id = $this->entityTypeManager->getStorage($entity_type_id_string);
+
+    // Create entities of different types in 'preview'.
+    $this->switchToWorkspace('preview');
+
+    $this->createEntity($entity_type_id, ['name' => 'Integer entity 1']);
+    $this->createEntity($entity_type_id, ['name' => 'Integer entity 2']);
+    $entity_string_1 = $this->createEntity($entity_type_id_string, ['id' => 'str_1', 'name' => 'String entity 1']);
+    $entity_string_2 = $this->createEntity($entity_type_id_string, ['id' => 'str_2', 'name' => 'String entity 2']);
+
+    // Move only the integer ID entities to 'qa'.
+    $workspace_association->moveTrackedEntities('preview', 'qa', $entity_type_id);
+
+    // Verify integer ID entities were moved.
+    $this->assertEmpty($workspace_association->getTrackedEntities('preview', $entity_type_id)[$entity_type_id] ?? []);
+    $this->assertCount(2, $workspace_association->getTrackedEntities('qa', $entity_type_id)[$entity_type_id]);
+
+    // Verify string ID entities remain in 'preview'.
+    $this->assertCount(2, $workspace_association->getTrackedEntities('preview', $entity_type_id_string)[$entity_type_id_string]);
+    $this->assertEmpty($workspace_association->getTrackedEntities('qa', $entity_type_id_string)[$entity_type_id_string] ?? []);
+
+    $preview_string_entities = $workspace_association->getTrackedEntities('preview', $entity_type_id_string);
+    $this->assertContains($entity_string_1->id(), $preview_string_entities[$entity_type_id_string] ?? []);
+    $this->assertContains($entity_string_2->id(), $preview_string_entities[$entity_type_id_string] ?? []);
+
+    // Verify string entities workspace field is still 'preview'.
+    $string_revision = $storage_string_id->loadRevision($entity_string_1->getRevisionId());
+    $this->assertEquals('preview', $string_revision->{$workspace_field_string_id}->target_id);
+  }
+
+  /**
+   * Tests moving all tracked entities of all types between workspaces.
+   *
+   * @legacy-covers ::moveTrackedEntities
+   */
+  public function testMoveAllTrackedEntities(): void {
+    $entity_type_id = 'entity_test_mulrevpub';
+    $entity_type_id_string = 'entity_test_mulrevpub_string_id';
+    $workspace_association = \Drupal::service('workspaces.association');
+
+    // Create entities of different types in 'preview'.
+    $this->switchToWorkspace('preview');
+    $this->createEntity($entity_type_id, ['name' => 'Integer entity']);
+    $this->createEntity($entity_type_id_string, ['id' => 'str_test', 'name' => 'String entity']);
+
+    // Move all entities from 'preview' to 'qa'.
+    $workspace_association->moveTrackedEntities('preview', 'qa');
+
+    $this->assertEmpty($workspace_association->getTrackedEntities('preview', $entity_type_id)[$entity_type_id] ?? []);
+    $this->assertEmpty($workspace_association->getTrackedEntities('preview', $entity_type_id_string)[$entity_type_id_string] ?? []);
+    $this->assertCount(1, $workspace_association->getTrackedEntities('qa', $entity_type_id)[$entity_type_id]);
+    $this->assertCount(1, $workspace_association->getTrackedEntities('qa', $entity_type_id_string)[$entity_type_id_string]);
+  }
+
+  /**
+   * Tests validation for moveTrackedEntities().
+   *
+   * @legacy-covers ::moveTrackedEntities
+   */
+  #[DataProvider('providerMoveTrackedEntitiesValidation')]
+  public function testMoveTrackedEntitiesValidation(
+    string $source_workspace_id,
+    string $target_workspace_id,
+    ?string $entity_type_id,
+    ?array $entity_ids,
+    string $exception_class,
+    string $exception_message,
+  ): void {
+    $workspace_association = \Drupal::service('workspaces.association');
+
+    $this->expectException($exception_class);
+    $this->expectExceptionMessage($exception_message);
+
+    $workspace_association->moveTrackedEntities($source_workspace_id, $target_workspace_id, $entity_type_id, $entity_ids);
+  }
+
+  /**
+   * Data provider for testMoveTrackedEntitiesValidation().
+   *
+   * @return array
+   *   Test cases with workspace IDs, entity type, entity IDs, and expected
+   *   exceptions.
+   */
+  public static function providerMoveTrackedEntitiesValidation(): array {
+    return [
+      'same source and target workspace' => [
+        'source_workspace_id' => 'qa',
+        'target_workspace_id' => 'qa',
+        'entity_type_id' => 'entity_test_mulrevpub',
+        'entity_ids' => NULL,
+        'exception_class' => \InvalidArgumentException::class,
+        'exception_message' => 'Source and target workspace IDs cannot be the same.',
+      ],
+      'entity IDs without entity type' => [
+        'source_workspace_id' => 'stage',
+        'target_workspace_id' => 'qa',
+        'entity_type_id' => NULL,
+        'entity_ids' => [1, 2, 3],
+        'exception_class' => \InvalidArgumentException::class,
+        'exception_message' => 'Entity type ID must be provided when entity IDs are specified.',
+      ],
+      'source workspace is not top-level' => [
+        'source_workspace_id' => 'dev',
+        'target_workspace_id' => 'qa',
+        'entity_type_id' => 'entity_test_mulrevpub',
+        'entity_ids' => NULL,
+        'exception_class' => \DomainException::class,
+        'exception_message' => 'Both the source and target must be valid top-level workspaces.',
+      ],
+      'target workspace is not top-level' => [
+        'source_workspace_id' => 'qa',
+        'target_workspace_id' => 'dev',
+        'entity_type_id' => 'entity_test_mulrevpub',
+        'entity_ids' => NULL,
+        'exception_class' => \DomainException::class,
+        'exception_message' => 'Both the source and target must be valid top-level workspaces.',
+      ],
+      'source workspace has children' => [
+        'source_workspace_id' => 'stage',
+        'target_workspace_id' => 'qa',
+        'entity_type_id' => 'entity_test_mulrevpub',
+        'entity_ids' => NULL,
+        'exception_class' => \DomainException::class,
+        'exception_message' => 'Both the source and target must be valid top-level workspaces.',
+      ],
+    ];
   }
 
 }

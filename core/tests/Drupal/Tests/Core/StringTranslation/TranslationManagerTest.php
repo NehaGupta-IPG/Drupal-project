@@ -7,11 +7,15 @@ namespace Drupal\Tests\Core\StringTranslation;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\StringTranslation\TranslationManager;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\StringTranslation\TranslationManager
- * @group StringTranslation
+ * Tests Drupal\Core\StringTranslation\TranslationManager.
  */
+#[CoversClass(TranslationManager::class)]
+#[Group('StringTranslation')]
 class TranslationManagerTest extends UnitTestCase {
 
   /**
@@ -32,7 +36,9 @@ class TranslationManagerTest extends UnitTestCase {
 
   /**
    * Provides some test data for formatPlural()
+   *
    * @return array
+   *   An array of test data for formatPlural().
    */
   public static function providerTestFormatPlural() {
     return [
@@ -47,8 +53,9 @@ class TranslationManagerTest extends UnitTestCase {
   }
 
   /**
-   * @dataProvider providerTestFormatPlural
-   */
+ * Tests format plural.
+ */
+  #[DataProvider('providerTestFormatPlural')]
   public function testFormatPlural($count, $singular, $plural, array $args, array $options, $expected): void {
     $langcode = empty($options['langcode']) ? 'fr' : $options['langcode'];
     $translator = $this->createMock('\Drupal\Core\StringTranslation\Translator\TranslatorInterface');
@@ -74,9 +81,8 @@ class TranslationManagerTest extends UnitTestCase {
    *   An associative array of replacements to make after translation.
    * @param string $expected_string
    *   The expected translated string value.
-   *
-   * @dataProvider providerTestTranslatePlaceholder
    */
+  #[DataProvider('providerTestTranslatePlaceholder')]
   public function testTranslatePlaceholder($string, array $args, $expected_string): void {
     $actual = $this->translationManager->translate($string, $args);
     $this->assertInstanceOf(MarkupInterface::class, $actual);
@@ -87,6 +93,7 @@ class TranslationManagerTest extends UnitTestCase {
    * Provides test data for translate().
    *
    * @return array
+   *   An array of test data for translate().
    */
   public static function providerTestTranslatePlaceholder() {
     return [
@@ -99,6 +106,9 @@ class TranslationManagerTest extends UnitTestCase {
 
 }
 
+/**
+ * A chained translation implementation used for testing.
+ */
 class TestTranslationManager extends TranslationManager {
 
   public function __construct() {

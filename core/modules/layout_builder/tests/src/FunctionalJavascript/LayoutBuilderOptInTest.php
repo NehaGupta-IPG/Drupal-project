@@ -6,12 +6,14 @@ namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\layout_builder\Traits\EnableLayoutBuilderTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the ability for opting in and out of Layout Builder.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderOptInTest extends WebDriverTestBase {
 
   use EnableLayoutBuilderTrait;
@@ -134,11 +136,11 @@ class LayoutBuilderOptInTest extends WebDriverTestBase {
     $this->drupalGet($layout_builder_ui);
     $assert_session->pageTextContains('You are not authorized to access this page.');
 
-    // The original body formatter is reflected in Field UI.
     $this->drupalGet($field_ui_prefix);
-    $assert_session->fieldValueEquals('fields[body][type]', 'text_default');
-
-    // Change the body formatter to Summary.
+    // Change the body formatter to Summary and move the block back into
+    // the content region.
+    $assert_session->buttonExists('Show row weights')->click();
+    $page->selectFieldOption('fields[body][region]', 'content');
     $page->selectFieldOption('fields[body][type]', 'text_summary_or_trimmed');
     $assert_session->assertWaitOnAjaxRequest();
     $page->pressButton('Save');
@@ -172,7 +174,7 @@ class LayoutBuilderOptInTest extends WebDriverTestBase {
    * @return string
    *   The path.
    */
-  protected function getPathForFieldBlock($entity_type_id, $bundle, $view_mode, $field_name) {
+  protected function getPathForFieldBlock($entity_type_id, $bundle, $view_mode, $field_name): string {
     $delta = 0;
     /** @var \Drupal\layout_builder\Entity\LayoutEntityDisplayInterface $display */
     $display = $this->container->get('entity_type.manager')->getStorage('entity_view_display')->load("$entity_type_id.$bundle.$view_mode");

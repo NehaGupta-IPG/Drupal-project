@@ -38,6 +38,10 @@ class DrupalCoreRecommendedBuilder extends DrupalPackageBuilder {
       // to use any compatible version without needing to switch off of
       // drupal/core-recommended.
       'psr/http-message',
+      // sebastian/diff is a PHPUnit dependency with an annual major release
+      // cycle. In order to allow supporting multiple PHPUnit major versions,
+      // we cannot let it be pinned.
+      'sebastian/diff',
     ];
 
     // Copy the 'packages' section from the Composer lock into our 'require'
@@ -59,6 +63,7 @@ class DrupalCoreRecommendedBuilder extends DrupalPackageBuilder {
    * Returns the initial package metadata that describes the metapackage.
    *
    * @return array
+   *   The initial package metadata.
    */
   protected function initialPackageMetadata() {
     return [

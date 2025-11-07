@@ -18,15 +18,16 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 use GuzzleHttp\RequestOptions;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API regression tests.
  *
- * @group jsonapi
- * @group #slow
- *
  * @internal
  */
+#[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
 
   use CommentTestTrait;
@@ -93,7 +94,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
       'node',
       'page',
       'field_test',
-      NULL,
+      'Test',
       'user',
       'default',
       [
@@ -145,7 +146,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
       'node',
       'journal_article',
       'field_issue',
-      NULL,
+      'Issue',
       'node',
       'default',
       [
