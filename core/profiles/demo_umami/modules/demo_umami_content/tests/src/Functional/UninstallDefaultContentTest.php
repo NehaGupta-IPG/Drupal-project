@@ -133,6 +133,11 @@ class UninstallDefaultContentTest extends BrowserTestBase {
     foreach ($this->expectedBlocks() as $block_info) {
       $this->drupalGet($block_info['path']);
 
+      // Big pipe is installed, and thinks that the browser supports js when it
+      // doesn't. Visit the page a second time to get a render cache hit on
+      // placeholder blocks, so that they actually appear in the HTML.
+      $this->drupalGet($block_info['path']);
+
       // Verify that the block is placed.
       $assert->pageTextContains($block_info['unique_text']);
 
