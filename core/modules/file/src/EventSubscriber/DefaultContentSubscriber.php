@@ -75,9 +75,9 @@ class DefaultContentSubscriber implements EventSubscriberInterface {
     if ($event->metadata['entity_type'] !== 'file') {
       return;
     }
-    $event->data['default']['uri'] = array_map(
+    $event->data['default']['uri'][0] = array_map(
       'urldecode',
-      $event->data['default']['uri'],
+      $event->data['default']['uri'][0],
     );
   }
 

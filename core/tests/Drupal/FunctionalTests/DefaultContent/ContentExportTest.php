@@ -495,6 +495,51 @@ class ContentExportTest extends BrowserTestBase {
   }
 
   /**
+   * Tests exporting and importing a file with a non-URL-safe URI.
+   */
+  public function testExportFileWithNonUrlSafeCharactersInUri(): void {
+    mkdir('public://photos (2038)');
+    $raw_uri = 'public://photos (2038)/has unsafe & characters?.png';
+    $this->getRandomGenerator()->image($raw_uri, '100x100', '100x100');
+    $this->assertFileExists($raw_uri);
+
+    $file = File::create(['uri' => $raw_uri]);
+    $file->save();
+    $file_uuid = $file->uuid();
+
+    $process = $this->runDrupalCommand([
+      'content:export',
+      'file',
+      $file->id(),
+      '--dir=public://content',
+    ]);
+    $this->assertSame(0, $process->wait());
+    $this->assertFileExists('public://content/file/has unsafe & characters?.png');
+    $exported_file = "public://content/file/$file_uuid.yml";
+    $this->assertFileExists($exported_file);
+    $exported_file = file_get_contents($exported_file);
+    $exported_file = Yaml::decode($exported_file);
+    $this->assertSame(
+      urlencode($raw_uri),
+      $exported_file['default']['uri'][0]['value'],
+    );
+
+    // Delete the file so we can confirm that we can re-import it successfully.
+    unlink($raw_uri);
+    $file->delete();
+    $this->assertFileDoesNotExist($raw_uri);
+
+    $finder = new Finder('public://content');
+    $this->container->get(Importer::class)->importContent($finder);
+    $imported_uri = $this->container->get(EntityRepositoryInterface::class)
+      ->loadEntityByUuid('file', $file_uuid)
+      ?->getFileUri();
+    $this->assertSame($raw_uri, $imported_uri);
+    assert(is_string($imported_uri));
+    $this->assertFileExists($imported_uri);
+  }
+
+  /**
    * Recursively sorts an array by key.
    *
    * @param array $data
