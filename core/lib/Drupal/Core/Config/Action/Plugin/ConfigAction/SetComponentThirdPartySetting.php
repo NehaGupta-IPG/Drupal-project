@@ -126,7 +126,7 @@ final class SetComponentThirdPartySetting implements ConfigActionPluginInterface
       '%bundle' => $entity->getTargetBundle(),
       '%entity_type' => $entity->getTargetEntityTypeId(),
       '%view_mode' => $entity->getMode(),
-    ]);;
+    ]);
     $entity->setComponent($value['component'], $component);
   }
 
