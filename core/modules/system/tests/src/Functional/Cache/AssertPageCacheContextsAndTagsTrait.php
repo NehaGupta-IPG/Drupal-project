@@ -74,6 +74,12 @@ trait AssertPageCacheContextsAndTagsTrait {
     sort($expected_contexts);
     sort($expected_tags);
 
+    if (\Drupal::moduleHandler()->moduleExists('big_pipe')) {
+      // Assert cache miss + expected cache contexts + tags.
+      $this->drupalGet($absolute_url);
+      $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'UNCACHEABLE (response policy)');
+    }
+
     // Assert cache miss + expected cache contexts + tags.
     $this->drupalGet($absolute_url);
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'MISS');
