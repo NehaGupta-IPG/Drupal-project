@@ -106,8 +106,8 @@ class BigPipeTest extends BrowserTestBase {
 
     // 3. Session (anonymous).
     $this->drupalGet(Url::fromRoute('user.login', [], ['query' => ['trigger_session' => 1]]));
-    $this->drupalGet(Url::fromRoute('big_pipe_test'));
     $this->assertSessionCookieExists('1');
+    $this->drupalGet(Url::fromRoute('big_pipe_test'));
     $this->assertBigPipeNoJsCookieExists('0');
     $this->assertSession()->responseContains('<noscript><meta http-equiv="Refresh" content="0; URL=' . base_path() . 'big_pipe/no-js?destination=' . base_path() . 'big_pipe_test" />' . "\n" . '</noscript>');
     $this->assertSession()->responseNotContains($no_js_to_js_markup);
