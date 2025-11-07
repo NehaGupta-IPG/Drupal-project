@@ -305,7 +305,9 @@ class ConfigActionManager extends DefaultPluginManager {
       foreach ($data as $old_key => $value) {
         $new_key = self::replacePlaceholders($old_key, $replacements);
         $data[$new_key] = self::replacePlaceholders($value, $replacements);
-        unset($data[$old_key]);
+        if ($old_key !== $new_key) {
+          unset($data[$old_key]);
+        }
       }
     }
     return $data;
