@@ -13,19 +13,20 @@ use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test decoupled translation revisions.
  */
 #[CoversClass(ContentEntityStorageBase::class)]
 #[Group('entity')]
+#[RunTestsInSeparateProcesses]
 class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'entity_test',
     'language',
   ];

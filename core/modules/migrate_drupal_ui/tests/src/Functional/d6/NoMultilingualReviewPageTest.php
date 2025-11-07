@@ -6,6 +6,7 @@ namespace Drupal\Tests\migrate_drupal_ui\Functional\d6;
 
 use Drupal\Tests\migrate_drupal_ui\Functional\NoMultilingualReviewPageTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore multigroup nodeaccess
 /**
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[Group('migrate_drupal_6')]
 #[Group('migrate_drupal_ui')]
+#[RunTestsInSeparateProcesses]
 class NoMultilingualReviewPageTest extends NoMultilingualReviewPageTestBase {
 
   /**
@@ -55,7 +57,6 @@ class NoMultilingualReviewPageTest extends NoMultilingualReviewPageTestBase {
       'Blog API',
       'Calendar Signup',
       'Comment',
-      'Contact',
       'Content',
       'Content Copy',
       'Content Multigroup',
@@ -138,6 +139,7 @@ class NoMultilingualReviewPageTest extends NoMultilingualReviewPageTestBase {
       'Book',
       'CCK translation',
       'Color',
+      'Contact',
       'Content type translation',
       'Devel',
       'Devel generate',

@@ -7,17 +7,14 @@ namespace Drupal\KernelTests\Core\KeyValueStore;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\KeyValueStore\KeyValueFactory;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the key-value database storage.
  */
 #[Group('KeyValueStore')]
+#[RunTestsInSeparateProcesses]
 class DatabaseStorageExpirableTest extends StorageTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * {@inheritdoc}

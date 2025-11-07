@@ -7,13 +7,16 @@ namespace Drupal\Tests\serialization\Kernel;
 use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Test field level normalization process.
- *
- * @group serialization
  */
+#[Group('serialization')]
+#[RunTestsInSeparateProcesses]
 class FieldItemSerializationTest extends NormalizerTestBase {
 
   /**
@@ -21,12 +24,10 @@ class FieldItemSerializationTest extends NormalizerTestBase {
    */
   protected static $modules = [
     'serialization',
-    'system',
     'field',
     'entity_test',
     'text',
     'filter',
-    'user',
     'field_normalization_test',
   ];
 
@@ -167,9 +168,8 @@ class FieldItemSerializationTest extends NormalizerTestBase {
    *   The test modules to install.
    * @param string $format
    *   The format to test. (NULL results in the format-agnostic normalization.)
-   *
-   * @dataProvider providerTestCustomBooleanNormalization
    */
+  #[DataProvider('providerTestCustomBooleanNormalization')]
   public function testCustomBooleanNormalization(array $test_modules, $format): void {
     // Asserts the entity contains the value we set.
     $this->assertFalse($this->entity->field_test_boolean->value);

@@ -20,6 +20,7 @@ use Drupal\Tests\Core\Routing\RoutingFixtures;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -31,6 +32,7 @@ use Symfony\Component\Routing\RouteCollection;
  * Confirm that the default route provider is working correctly.
  */
 #[Group('Routing')]
+#[RunTestsInSeparateProcesses]
 class RouteProviderTest extends KernelTestBase {
 
   use PathAliasTestTrait;
@@ -40,7 +42,6 @@ class RouteProviderTest extends KernelTestBase {
    */
   protected static $modules = [
     'url_alter_test',
-    'system',
     'language',
     'path_alias',
   ];
