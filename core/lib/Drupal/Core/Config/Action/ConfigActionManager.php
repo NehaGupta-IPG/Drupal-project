@@ -55,13 +55,6 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\FullyValidatableConstrai
 class ConfigActionManager extends DefaultPluginManager {
 
   /**
-   * The placeholder which is replaced with the ID of the current bundle.
-   *
-   * @var string
-   */
-  private const BUNDLE_PLACEHOLDER = '%bundle';
-
-  /**
    * Information about all deprecated plugin IDs.
    *
    * @var string[]
@@ -305,21 +298,14 @@ class ConfigActionManager extends DefaultPluginManager {
    *   The given $data, with the `%bundle` and `%label` placeholders replaced.
    */
   public static function replacePlaceholders(mixed $data, array $replacements): mixed {
-    assert(array_key_exists(self::BUNDLE_PLACEHOLDER, $replacements));
-
     if (is_string($data)) {
       $data = str_replace(array_keys($replacements), $replacements, $data);
     }
     elseif (is_array($data)) {
       foreach ($data as $old_key => $value) {
-        $value = self::replacePlaceholders($value, $replacements);
-
-        // Only replace the `%bundle` placeholder in array keys.
-        $new_key = str_replace(self::BUNDLE_PLACEHOLDER, $replacements[self::BUNDLE_PLACEHOLDER], $old_key);
-        if ($old_key !== $new_key) {
-          unset($data[$old_key]);
-        }
-        $data[$new_key] = $value;
+        $new_key = self::replacePlaceholders($old_key, $replacements);
+        $data[$new_key] = self::replacePlaceholders($value, $replacements);
+        unset($data[$old_key]);
       }
     }
     return $data;

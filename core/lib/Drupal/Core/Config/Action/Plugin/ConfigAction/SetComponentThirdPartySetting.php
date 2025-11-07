@@ -9,46 +9,43 @@ use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionManager;
 use Drupal\Core\Config\Action\ConfigActionPluginInterface;
 use Drupal\Core\Config\ConfigManagerInterface;
+use Drupal\Core\DependencyInjection\AutowiredInstanceTrait;
 use Drupal\Core\Entity\Display\EntityDisplayInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Sets a third-party setting on a display component without overwriting it.
+ * Sets a third-party setting on an entity form or view display component.
  *
- * Applies to entity view/form display config entities that extend
- * \Drupal\Core\Entity\EntityDisplayBase.
+ * The following settings are required:
+ * - `component` (string): The machine name of the display component.
+ * - `provider` (string): The extension (module or theme) that is providing
+ *   the third-party settings.
+ * - `settings` (array): An array of third-party settings to store for the given
+ *   provider on the given component. Any existing third-party settings will be
+ *   replaced.
  *
- * Expected value structure for apply():
- * - component (string): The component/field machine name.
- * - provider (string): Module providing the third-party setting.
- * - settings (array|scalar): The setting value or an array of settings.
- *   If an array is provided, it will be merged into the component's
- *   third_party_settings for the given provider.
- * - replace (boolean): If TRUE replace settings, otherwise merge.
- * Or alternatively a list of parameters with the same structure as above.
- *
- * It is possible to use such placeholders in component settings:
- * - %bundle - the target bundle of entity display being modified,
- * - %entity_type - the entity type of entity display being modified,
- * - %view_mode - the view/form mode of entity display being modified.
- * The action resolves placeholders only within the provided settings array or
- * scalar value; other keys (such as the component name) are used verbatim.
+ * It is possible to use the following placeholders in the settings array:
+ * - %bundle: the target bundle of entity display being modified.
+ * - %entity_type: the target entity type of entity display being modified.
+ * - %view_mode: the display mode of entity display being modified.
  *
  * Example usages in a recipe:
  *
  * @code
  * config:
  *   actions:
- *     # Sets 3rd party setting of 'system' module on 'user_picture' component.
+ *     # Sets third-party setting of on the `user_picture` component, on
+ *     # behalf of the System module.
  *     core.entity_view_display.user.user.default:
  *       setComponentThirdPartySetting:
  *         component: user_picture
  *         provider: system
  *         settings:
  *           example_flag: true
- *     # It is possible to set 3rd party settings of multiple components.
+ *
+ *     # It is possible to set third-party settings on multiple components.
  *     core.entity_view_display.user.user.compact:
  *       setComponentThirdPartySetting:
  *         -
@@ -74,31 +71,35 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
     'entity_form_display',
   ],
 )]
-final class SetComponentThirdPartySetting extends PluginBase implements ConfigActionPluginInterface, ContainerFactoryPluginInterface {
+final class SetComponentThirdPartySetting implements ConfigActionPluginInterface, ContainerFactoryPluginInterface {
+
+  use AutowiredInstanceTrait;
 
   public function __construct(
-    array $configuration,
-    $plugin_id,
-    $plugin_definition,
     private readonly ConfigManagerInterface $configManager,
-  ) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  ) {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
+    return self::createInstanceAutowired($container);
   }
 
   /**
    * {@inheritdoc}
    */
   public function apply(string $configName, mixed $value): void {
-    // If config action settings are not an array, do early exit, as action is
-    // not possible to execute.
     assert(is_array($value));
-    // Convert the parameters to a list of parameters.
-    if (!array_is_list($value)) {
-      $value = [$value];
-    }
+
     $entity = $this->configManager->loadConfigEntityByName($configName);
     assert($entity instanceof EntityDisplayInterface);
-    array_walk($value, [$this, 'applySingle'], $entity);
+
+    // Convert the parameters to a list of parameters.
+    $values = array_is_list($value) ? $value : [$value];
+    foreach ($values as $value) {
+      $this->applySingle($value, $entity);
+    }
     $entity->save();
   }
 
@@ -107,59 +108,26 @@ final class SetComponentThirdPartySetting extends PluginBase implements ConfigAc
    *
    * @param array $value
    *   The config action parameters.
-   * @param int $key
-   *   The id of set of parameters.
    * @param \Drupal\Core\Entity\Display\EntityDisplayInterface $entity
    *   The display entity.
    */
-  private function applySingle(array $value, int $key, EntityDisplayInterface $entity): void {
+  private function applySingle(array $value, EntityDisplayInterface $entity): void {
     if (empty($value['component']) || empty($value['provider'])) {
       throw new ConfigActionException("The setComponentThirdPartySetting action requires an array with 'component' and 'provider'.");
     }
-    $component = $value['component'];
     $provider = $value['provider'];
-    $replace = $value['replace'] ?? FALSE;
 
-    $placeholders = [
+    // Ensure the component exists in the display.
+    $component = $entity->getComponent($value['component']);
+    if ($component === NULL) {
+      throw new ConfigActionException(sprintf("Component %s does not exist or hidden.", $component));
+    }
+    $component['third_party_settings'][$provider] = ConfigActionManager::replacePlaceholders($value['settings'] ?? [], [
       '%bundle' => $entity->getTargetBundle(),
       '%entity_type' => $entity->getTargetEntityTypeId(),
       '%view_mode' => $entity->getMode(),
-    ];
-
-    $settings = $value['settings'] ?? NULL;
-    if ($settings !== NULL) {
-      $settings = ConfigActionManager::replacePlaceholders($settings, $placeholders);
-    }
-
-    // Ensure the component exists in the display.
-    $component_config = $entity->getComponent($component);
-    if (empty($component_config)) {
-      throw new ConfigActionException(sprintf("Component %s does not exist or hidden.", $component));
-    }
-    // Make sure the required properties are set.
-    $component_config['settings'] ??= [];
-    $component_config['third_party_settings'] ??= [];
-
-    if (is_array($settings)) {
-      if ($replace) {
-        $component_config['third_party_settings'][$provider] = $settings;
-      }
-      else {
-        $existing = $component_config['third_party_settings'][$provider] ?? [];
-        if (!is_array($existing)) {
-          $existing = [];
-        }
-        $component_config['third_party_settings'][$provider] = array_merge($existing, $settings);
-      }
-    }
-    elseif ($settings === NULL) {
-      $component_config['third_party_settings'][$provider] = ['value' => NULL];
-    }
-    else {
-      $component_config['third_party_settings'][$provider] = $settings;
-    }
-
-    $entity->setComponent($component, $component_config);
+    ]);;
+    $entity->setComponent($value['component'], $component);
   }
 
 }
