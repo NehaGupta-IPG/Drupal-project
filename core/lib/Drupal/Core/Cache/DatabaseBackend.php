@@ -245,6 +245,18 @@ class DatabaseBackend implements CacheBackendInterface {
    * @see \Drupal\Core\Cache\CacheBackendInterface::setMultiple()
    */
   protected function doSetMultiple(array $items) {
+
+    $tags_for_preload = [];
+    foreach ($items as $item) {
+      if (isset($item['tags'])) {
+        assert(Inspector::assertAllStrings($item['tags']), 'Cache Tags must be strings.');
+        $tags_for_preload[] = $item['tags'];
+      }
+    }
+    if ($this->checksumProvider instanceof CacheTagsChecksumPreloadInterface) {
+      $this->checksumProvider->registerCacheTagsForPreload(array_merge(...$tags_for_preload));
+    }
+
     // Chunk the items as the database might not be able to receive thousands
     // of items in a single query.
     $chunks = array_chunk($items, self::MAX_ITEMS_PER_CACHE_SET, TRUE);
@@ -258,7 +270,6 @@ class DatabaseBackend implements CacheBackendInterface {
           'tags' => [],
         ];
 
-        assert(Inspector::assertAllStrings($item['tags']), 'Cache Tags must be strings.');
         $item['tags'] = array_unique($item['tags']);
         // Sort the cache tags so that they are stored consistently in the DB.
         sort($item['tags']);
