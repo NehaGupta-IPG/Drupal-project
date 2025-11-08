@@ -8,6 +8,7 @@ base:
       css/components/clearfix.module.css: { weight: -10 }
       css/components/hidden.module.css: { weight: -10 }
       css/components/js.module.css: { weight: -10 }
+      css/components/position-container.module.css: { weight: -10 }
 
 admin:
   version: VERSION
