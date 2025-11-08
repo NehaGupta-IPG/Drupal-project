@@ -123,4 +123,30 @@ class MachineNameTest extends UnitTestCase {
     }
   }
 
+  /**
+   * Tests ::validateMachineName() with an empty 'replace' element key.
+   */
+  public function testValidateMachineNameWithEmptyReplace(): void {
+    $element = [
+      '#id' => 'test',
+      '#type' => 'machine_name',
+      '#machine_name' => [
+        'replace' => '',
+        'replace_pattern' => '[^a-z0-9_]+',
+      ],
+      '#value' => 'example_value',
+      '#name' => 'test_machine_name',
+    ];
+    $form_state = $this->createMock(FormStateInterface::class);
+    $form_state->expects($this->never())
+      ->method('setError');
+    // Set the initial_values to avoid the unique machine name check.
+    $form_state->expects($this->once())
+      ->method('get')
+      ->with('machine_name.initial_values')
+      ->willReturn(['test_machine_name' => 'example_value']);
+    $complete_form = [];
+    MachineName::validateMachineName($element, $form_state, $complete_form);
+  }
+
 }
