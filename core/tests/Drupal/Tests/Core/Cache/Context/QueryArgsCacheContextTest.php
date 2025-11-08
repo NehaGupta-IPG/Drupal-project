@@ -47,9 +47,9 @@ class QueryArgsCacheContextTest extends UnitTestCase {
       [['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'], 'panda', 'drools'],
       [['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'], 'z', '0'],
       [['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'], 'chicken', ''],
-      [['llama' => ['rocks', 'kitty']], 'llama', '0=rocks&1=kitty'],
-      [['llama' => ['rocks' => 'fuzzball', 'monkey' => 'patch']], 'llama', 'rocks=fuzzball&monkey=patch'],
-      [['llama' => ['rocks' => ['nested', 'bonobo']]], 'llama', 'rocks%5B0%5D=nested&rocks%5B1%5D=bonobo'],
+      [['llama' => ['rocks', 'kitty']], 'llama', 'llama%5B0%5D=rocks&llama%5B1%5D=kitty'],
+      [['llama' => ['rocks' => 'fuzzball', 'monkey' => 'patch']], 'llama', 'llama%5Brocks%5D=fuzzball&llama%5Bmonkey%5D=patch'],
+      [['llama' => ['rocks' => ['nested', 'bonobo']]], 'llama', 'llama%5Brocks%5D%5B0%5D=nested&llama%5Brocks%5D%5B1%5D=bonobo'],
     ];
   }
 

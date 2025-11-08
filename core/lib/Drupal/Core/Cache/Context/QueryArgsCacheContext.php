@@ -28,15 +28,15 @@ class QueryArgsCacheContext extends RequestStackCacheContextBase implements Calc
       // All arguments requested. Use normalized query string to minimize
       // variations.
       $value = $this->requestStack->getCurrentRequest()->getQueryString();
-      return ($value !== NULL) ? $value : '';
+      return ($value !== NULL) ? (string) $value : '';
     }
     elseif ($this->requestStack->getCurrentRequest()->query->has($query_arg)) {
       $value = $this->requestStack->getCurrentRequest()->query->all()[$query_arg];
       if (is_array($value)) {
-        return http_build_query($value);
+        return http_build_query([$query_arg => $value], '', '&');
       }
       elseif ($value !== '') {
-        return $value;
+        return (string) $value;
       }
       return '?valueless?';
     }

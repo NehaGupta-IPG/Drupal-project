@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Cache\Context;
 
+use Drupal\Component\Assertion\Inspector;
 use Drupal\Core\Cache\CacheableMetadata;
 
 /**
@@ -27,6 +28,7 @@ class ContextCacheKeys extends CacheableMetadata {
     // Sorting keys warrants that different combination of the same keys
     // generates the same cache cid.
     // @see \Drupal\Core\Render\RenderCache::createCacheID()
+    assert(Inspector::assertAllStrings($keys));
     sort($keys);
     $this->keys = $keys;
   }
