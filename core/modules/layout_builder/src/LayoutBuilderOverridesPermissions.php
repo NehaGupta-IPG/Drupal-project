@@ -96,6 +96,10 @@ class LayoutBuilderOverridesPermissions implements ContainerInjectionInterface {
           'title' => $this->t('%entity_type - %bundle: Configure layout overrides for @entity_type_plural that the user can edit', $args),
           'dependencies' => $dependencies,
         ];
+        $permissions["revert $bundle $entity_type_id to default layout"] = [
+          'title' => $this->t('%entity_type - %bundle: Revert @entity_type_plural to the default layout', $args),
+          'dependencies' => $dependencies,
+        ];
       }
       else {
         $permissions["configure all $bundle $entity_type_id layout overrides"] = [
@@ -105,6 +109,10 @@ class LayoutBuilderOverridesPermissions implements ContainerInjectionInterface {
         ];
         $permissions["configure editable $bundle $entity_type_id layout overrides"] = [
           'title' => $this->t('%entity_type: Configure layout overrides for @entity_type_plural that the user can edit', $args),
+          'dependencies' => $dependencies,
+        ];
+        $permissions["revert $bundle $entity_type_id to default layout"] = [
+          'title' => $this->t('%entity_type: Revert @entity_type_plural to the default layout', $args),
           'dependencies' => $dependencies,
         ];
       }

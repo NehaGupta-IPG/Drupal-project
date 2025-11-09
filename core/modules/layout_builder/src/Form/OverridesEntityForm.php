@@ -169,12 +169,16 @@ class OverridesEntityForm extends ContentEntityForm implements WorkspaceDynamicS
     $actions['discard_changes']['#limit_validation_errors'] = [];
     // @todo This button should be conditionally displayed, see
     //   https://www.drupal.org/node/2917777.
-    $actions['revert'] = [
-      '#type' => 'submit',
-      '#value' => $this->t('Revert to defaults'),
-      '#submit' => ['::redirectOnSubmit'],
-      '#redirect' => 'revert',
-    ];
+    $entity = $this->getEntity();
+    $permission = \sprintf("revert %s %s to default layout", $entity->bundle(), $entity->getEntityTypeId());
+    if ($this->currentUser()->hasPermission($permission)) {
+      $actions['revert'] = [
+        '#type' => 'submit',
+        '#value' => $this->t('Revert to defaults'),
+        '#submit' => ['::redirectOnSubmit'],
+        '#redirect' => 'revert',
+      ];
+    }
     return $actions;
   }
 

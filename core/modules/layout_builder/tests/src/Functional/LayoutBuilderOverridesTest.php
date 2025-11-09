@@ -6,6 +6,7 @@ namespace Drupal\Tests\layout_builder\Functional;
 
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\node\Entity\Node;
+use Drupal\Tests\layout_builder\Traits\EnableLayoutBuilderTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('layout_builder')]
 #[RunTestsInSeparateProcesses]
 class LayoutBuilderOverridesTest extends LayoutBuilderTestBase {
+
+  use EnableLayoutBuilderTrait;
 
   /**
    * Tests deleting a field in-use by an overridden layout.
@@ -182,17 +185,16 @@ class LayoutBuilderOverridesTest extends LayoutBuilderTestBase {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
+    $field_ui_prefix = 'admin/structure/types/manage/bundle_with_section_field';
+    // Enable overrides.
+    $display = LayoutBuilderEntityViewDisplay::load('node.bundle_with_section_field.default');
+    $this->enableLayoutBuilder($display);
+
     $this->drupalLogin($this->drupalCreateUser([
       'configure any layout',
       'administer node display',
+      'revert bundle_with_section_field node to default layout',
     ]));
-
-    $field_ui_prefix = 'admin/structure/types/manage/bundle_with_section_field';
-    // Enable overrides.
-    $this->drupalGet("{$field_ui_prefix}/display/default");
-    $this->submitForm(['layout[enabled]' => TRUE], 'Save');
-    $this->drupalGet("{$field_ui_prefix}/display/default");
-    $this->submitForm(['layout[allow_custom]' => TRUE], 'Save');
 
     // By default, there is one section.
     $this->drupalGet('node/1');
@@ -266,6 +268,35 @@ class LayoutBuilderOverridesTest extends LayoutBuilderTestBase {
     $page->pressButton('Revert');
     $assert_session->elementsCount('css', '.layout', 0);
     $assert_session->pageTextNotContains('The first node body');
+  }
+
+  /**
+   * Tests the permission to revert overrides to the default.
+   */
+  public function testRevertPermission(): void {
+    // Enable overrides.
+    $display = LayoutBuilderEntityViewDisplay::load('node.bundle_with_section_field.default');
+    $this->enableLayoutBuilder($display);
+
+    // Login as a user without the revert permission.
+    $this->drupalLogin($this->drupalCreateUser([
+      'configure any layout',
+      'administer node display',
+    ]));
+    $this->drupalGet('node/1/layout');
+    $this->assertSession()->elementExists('css', '.layout-builder__add-section');
+    $this->assertSession()->buttonNotExists('Revert to defaults');
+
+    // Login as a user with the revert permission.
+    $this->drupalLogin($this->drupalCreateUser([
+      'configure any layout',
+      'administer node display',
+      'revert bundle_with_section_field node to default layout',
+    ]));
+    $this->drupalGet('node/1/layout');
+    $this->assertSession()->elementExists('css', '.layout-builder__add-section');
+    $this->assertSession()->buttonExists('Revert to defaults');
+
   }
 
 }

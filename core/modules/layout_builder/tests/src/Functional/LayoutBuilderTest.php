@@ -182,6 +182,15 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
     // Enable overrides.
     $this->drupalGet("{$field_ui_prefix}/display/default");
     $this->submitForm(['layout[allow_custom]' => TRUE], 'Save');
+
+    // Login as a user that can revert to default on overrides.
+    $this->drupalLogin($this->drupalCreateUser([
+      'configure any layout',
+      'administer node display',
+      'administer node fields',
+      'revert bundle_with_section_field node to default layout',
+    ]));
+
     $this->drupalGet('node/1');
 
     // Remove the section from the defaults.
