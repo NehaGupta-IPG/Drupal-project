@@ -41,6 +41,7 @@ use Drupal\workspaces\WorkspaceViewBuilder;
     'label' => 'label',
     'uid' => 'uid',
     'owner' => 'uid',
+    'bundle' => 'provider',
   ],
   handlers: [
     'list_builder' => WorkspaceListBuilder::class,
