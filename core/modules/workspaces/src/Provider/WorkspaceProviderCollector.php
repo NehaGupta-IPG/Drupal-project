@@ -16,7 +16,7 @@ class WorkspaceProviderCollector {
   /**
    * The workspace providers.
    *
-   * @var array<string,\Drupal\workspaces\Provider\WorkspaceProviderInterface> $providers
+   * @var array<string,\Drupal\workspaces\Provider\WorkspaceProviderInterface>
    */
   protected array $providers;
 
