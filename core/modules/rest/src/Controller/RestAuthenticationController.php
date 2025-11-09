@@ -127,7 +127,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('user.flood_control'),
       $container->get('entity_type.manager')->getStorage('user'),
@@ -149,7 +149,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
    * @return \Symfony\Component\HttpFoundation\Response
    *   A response which contains the ID and CSRF token.
    */
-  public function login(Request $request) {
+  public function login(Request $request): Response {
     $format = $this->getRequestFormat($request);
 
     $content = $request->getContent();
@@ -234,7 +234,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response object.
    */
-  public function resetPassword(Request $request) {
+  public function resetPassword(Request $request): Response {
     $format = $this->getRequestFormat($request);
 
     $content = $request->getContent();
@@ -301,7 +301,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response object.
    */
-  public function logout() {
+  public function logout(): Response {
     $this->userLogout();
     return new Response(NULL, 204);
   }
@@ -319,7 +319,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response.
    */
-  public function loginStatus() {
+  public function loginStatus(): Response {
     if ($this->currentUser()->isAuthenticated()) {
       $response = new Response(self::LOGGED_IN);
     }
@@ -339,7 +339,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
    * @return string
    *   The format of the request.
    */
-  protected function getRequestFormat(Request $request) {
+  protected function getRequestFormat(Request $request): string {
     $format = $request->getRequestFormat();
     if (!in_array($format, $this->serializerFormats)) {
       throw new BadRequestHttpException("Unrecognized format: $format.");
@@ -355,7 +355,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
    * @param string $username
    *   The user name sent for login credentials.
    */
-  protected function floodControl(Request $request, $username): void {
+  protected function floodControl(Request $request, string $username): void {
     $flood_config = $this->config('user.flood');
     if (!$this->userFloodControl->isAllowed('user.failed_login_ip', $flood_config->get('ip_limit'), $flood_config->get('ip_window'))) {
       throw new AccessDeniedHttpException('Access is blocked because of IP based flood prevention.', NULL, Response::HTTP_TOO_MANY_REQUESTS);
@@ -387,7 +387,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
    * @return string
    *   The login identifier or if the user does not exist an empty string.
    */
-  protected function getLoginFloodIdentifier(Request $request, $username) {
+  protected function getLoginFloodIdentifier(Request $request, string $username): string {
     $flood_config = $this->config('user.flood');
     $accounts = $this->userStorage->loadByProperties(['name' => $username, 'status' => 1]);
     if ($account = reset($accounts)) {
