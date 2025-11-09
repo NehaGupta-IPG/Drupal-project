@@ -5,11 +5,11 @@ namespace Drupal\rest\Controller;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\user\UserAuthenticationInterface;
 use Drupal\user\UserFloodControlInterface;
 use Drupal\user\UserInterface;
-use Drupal\user\UserStorageInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,11 +45,11 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
   protected $userFloodControl;
 
   /**
-   * The user storage.
+   * The entity type manager.
    *
-   * @var \Drupal\user\UserStorageInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $userStorage;
+  protected $entityTypeManager;
 
   /**
    * The CSRF token generator.
@@ -98,8 +98,8 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
    *
    * @param \Drupal\user\UserFloodControlInterface $user_flood_control
    *   The user flood control service.
-   * @param \Drupal\user\UserStorageInterface $user_storage
-   *   The user storage.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Drupal\Core\Access\CsrfTokenGenerator $csrf_token
    *   The CSRF token generator.
    * @param \Drupal\user\UserAuthenticationInterface $user_auth
@@ -113,9 +113,9 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
    */
-  public function __construct(UserFloodControlInterface $user_flood_control, UserStorageInterface $user_storage, CsrfTokenGenerator $csrf_token, UserAuthenticationInterface $user_auth, RouteProviderInterface $route_provider, Serializer $serializer, array $serializer_formats, LoggerInterface $logger) {
+  public function __construct(UserFloodControlInterface $user_flood_control, EntityTypeManagerInterface $entity_type_manager, CsrfTokenGenerator $csrf_token, UserAuthenticationInterface $user_auth, RouteProviderInterface $route_provider, Serializer $serializer, array $serializer_formats, LoggerInterface $logger) {
     $this->userFloodControl = $user_flood_control;
-    $this->userStorage = $user_storage;
+    $this->entityTypeManager = $entity_type_manager;
     $this->csrfToken = $csrf_token;
     $this->userAuth = $user_auth;
     $this->serializer = $serializer;
@@ -130,7 +130,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
   public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('user.flood_control'),
-      $container->get('entity_type.manager')->getStorage('user'),
+      $container->get('entity_type.manager'),
       $container->get('csrf_token'),
       $container->get('user.auth'),
       $container->get('router.route_provider'),
@@ -173,7 +173,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
       $account = $this->userAuth->lookupAccount($credentials['name']);
     }
     else {
-      $accounts = $this->userStorage->loadByProperties(['name' => $credentials['name']]);
+      $accounts = $this->entityTypeManager->getStorage('user')->loadByProperties(['name' => $credentials['name']]);
       if ($accounts) {
         $account = reset($accounts);
       }
@@ -250,11 +250,11 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
     $users = [];
     if (isset($credentials['name'])) {
       $identifier = $credentials['name'];
-      $users = $this->userStorage->loadByProperties(['name' => trim($identifier)]);
+      $users = $this->entityTypeManager->getStorage('user')->loadByProperties(['name' => trim($identifier)]);
     }
     elseif (isset($credentials['mail'])) {
       $identifier = $credentials['mail'];
-      $users = $this->userStorage->loadByProperties(['mail' => trim($identifier)]);
+      $users = $this->entityTypeManager->getStorage('user')->loadByProperties(['mail' => trim($identifier)]);
     }
 
     /** @var \Drupal\user\UserInterface $account */
@@ -389,7 +389,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
    */
   protected function getLoginFloodIdentifier(Request $request, string $username): string {
     $flood_config = $this->config('user.flood');
-    $accounts = $this->userStorage->loadByProperties(['name' => $username, 'status' => 1]);
+    $accounts = $this->entityTypeManager->getStorage('user')->loadByProperties(['name' => $username, 'status' => 1]);
     if ($account = reset($accounts)) {
       if ($flood_config->get('uid_only')) {
         // Register flood events based on the uid only, so they apply for any
