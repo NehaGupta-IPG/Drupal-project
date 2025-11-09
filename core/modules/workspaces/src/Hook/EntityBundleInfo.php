@@ -12,7 +12,7 @@ use Drupal\workspaces\Provider\WorkspaceProviderCollector;
 final class EntityBundleInfo {
 
   public function __construct(
-    private readonly WorkspaceProviderCollector $collector
+    private readonly WorkspaceProviderCollector $collector,
   ) {}
 
   /**
