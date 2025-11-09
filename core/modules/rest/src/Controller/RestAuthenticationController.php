@@ -7,7 +7,6 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\user\UserAuthenticationInterface;
-use Drupal\user\UserAuthInterface;
 use Drupal\user\UserFloodControlInterface;
 use Drupal\user\UserInterface;
 use Drupal\user\UserStorageInterface;
@@ -17,7 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
 
 /**
@@ -104,7 +102,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
    *   The user storage.
    * @param \Drupal\Core\Access\CsrfTokenGenerator $csrf_token
    *   The CSRF token generator.
-   * @param \Drupal\user\UserAuthenticationInterface|\Drupal\user\UserAuthInterface $user_auth
+   * @param \Drupal\user\UserAuthenticationInterface $user_auth
    *   The user authentication.
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
    *   The route provider.
@@ -115,13 +113,10 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
    */
-  public function __construct(UserFloodControlInterface $user_flood_control, UserStorageInterface $user_storage, CsrfTokenGenerator $csrf_token, UserAuthenticationInterface|UserAuthInterface $user_auth, RouteProviderInterface $route_provider, Serializer $serializer, array $serializer_formats, LoggerInterface $logger) {
+  public function __construct(UserFloodControlInterface $user_flood_control, UserStorageInterface $user_storage, CsrfTokenGenerator $csrf_token, UserAuthenticationInterface $user_auth, RouteProviderInterface $route_provider, Serializer $serializer, array $serializer_formats, LoggerInterface $logger) {
     $this->userFloodControl = $user_flood_control;
     $this->userStorage = $user_storage;
     $this->csrfToken = $csrf_token;
-    if (!$user_auth instanceof UserAuthenticationInterface) {
-      @trigger_error('The $user_auth parameter implementing UserAuthInterface is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. Implement UserAuthenticationInterface instead. See https://www.drupal.org/node/3411040');
-    }
     $this->userAuth = $user_auth;
     $this->serializer = $serializer;
     $this->serializerFormats = $serializer_formats;
@@ -133,24 +128,14 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    if ($container->hasParameter('serializer.formats') && $container->has('serializer')) {
-      $serializer = $container->get('serializer');
-      $formats = $container->getParameter('serializer.formats');
-    }
-    else {
-      $formats = ['json'];
-      $encoders = [new JsonEncoder()];
-      $serializer = new Serializer([], $encoders);
-    }
-
     return new static(
       $container->get('user.flood_control'),
       $container->get('entity_type.manager')->getStorage('user'),
       $container->get('csrf_token'),
       $container->get('user.auth'),
       $container->get('router.route_provider'),
-      $serializer,
-      $formats,
+      $container->get('serializer'),
+      $container->getParameter('serializer.formats'),
       $container->get('logger.factory')->get('user')
     );
   }
@@ -298,24 +283,6 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
       '%identifier' => $identifier,
     ]);
     return new Response();
-  }
-
-  /**
-   * Verifies if the user is blocked.
-   *
-   * @param string $name
-   *   The username.
-   *
-   * @return bool
-   *   TRUE if the user is blocked, otherwise FALSE.
-   *
-   * @deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There
-   * is no replacement.
-   * @see https://www.drupal.org/node/3425340
-   */
-  protected function userIsBlocked($name) {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3425340', E_USER_DEPRECATED);
-    return user_is_blocked($name);
   }
 
   /**
