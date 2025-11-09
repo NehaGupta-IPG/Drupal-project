@@ -30,7 +30,7 @@ class WorkspaceProviderCollector {
     #[AutowireIterator(tag: 'workspace_provider', defaultIndexMethod: 'getId')]
     iterable $providers,
   ) {
-    $this->providers = iterator_to_array($this->providers);
+    $this->providers = iterator_to_array($providers);
   }
 
   /**
