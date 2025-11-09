@@ -1,0 +1,5 @@
+services:
+  batch_test.cloudflare_query_string_sort_subscriber:
+    class: Drupal\batch_test\EventSubscriber\CloudflareQueryStringSortSubscriber
+    tags:
+      - { name: event_subscriber }
