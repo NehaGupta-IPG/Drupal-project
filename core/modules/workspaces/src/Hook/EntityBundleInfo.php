@@ -22,7 +22,7 @@ final class EntityBundleInfo {
   public function entityBundleInfo(): array {
     $bundles = [];
     foreach ($this->collector->getProviders() as $id => $provider) {
-      $bundles[$id] = [
+      $bundles['workspace'][$id] = [
         'label' => $id,
       ];
     }
