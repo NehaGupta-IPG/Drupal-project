@@ -104,4 +104,17 @@ abstract class EntityConfirmFormBase extends EntityForm implements ConfirmFormIn
    */
   public function delete(array $form, FormStateInterface $form_state) {}
 
+  /**
+   * {@inheritdoc}
+   */
+  public function validate(array $form, FormStateInterface $form_state) {
+    // It is not necessary nor possible to validate a content entity in a
+    // confirmation form.
+    if ($this->getEntity() instanceof ContentEntityInterface) {
+      return;
+    }
+
+    parent::validateForm($form, $form_state);
+  }
+
 }

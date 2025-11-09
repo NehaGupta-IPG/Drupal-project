@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Entity;
 
+@trigger_error('The ' . __NAMESPACE__ . '\EntityDeleteFormTrait is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Instead, use \Drupal\Core\Entity\EntityDeleteForm. See https://www.drupal.org/node/2491057', E_USER_DEPRECATED);
+
 use Drupal\Core\Config\Entity\ConfigDependencyDeleteFormTrait;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -11,6 +13,13 @@ use Drupal\Core\Url;
  *
  * This trait relies on the StringTranslationTrait and the logger method added
  * by FormBase.
+ *
+ * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use the
+ *   \Drupal\Core\Entity\EntityDeleteForm instead.
+ *
+ * @see https://www.drupal.org/node/2926275
+ *
+ * @internal
  *
  * @ingroup entity_api
  */

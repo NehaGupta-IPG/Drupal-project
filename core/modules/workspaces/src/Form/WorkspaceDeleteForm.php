@@ -2,10 +2,7 @@
 
 namespace Drupal\workspaces\Form;
 
-use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\ContentEntityDeleteForm;
-use Drupal\Core\Entity\EntityRepositoryInterface;
-use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\workspaces\WorkspaceAssociationInterface;
 use Drupal\workspaces\WorkspaceRepositoryInterface;
@@ -17,13 +14,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @internal
  */
 class WorkspaceDeleteForm extends ContentEntityDeleteForm {
-
-  /**
-   * The workspace entity.
-   *
-   * @var \Drupal\workspaces\WorkspaceInterface
-   */
-  protected $entity;
 
   /**
    * The workspace association service.
@@ -44,30 +34,21 @@ class WorkspaceDeleteForm extends ContentEntityDeleteForm {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity.repository'),
       $container->get('workspaces.association'),
-      $container->get('workspaces.repository'),
-      $container->get('entity_type.bundle.info'),
-      $container->get('datetime.time')
+      $container->get('workspaces.repository')
     );
   }
 
   /**
    * Constructs a WorkspaceDeleteForm object.
    *
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository service.
    * @param \Drupal\workspaces\WorkspaceAssociationInterface $workspace_association
    *   The workspace association service to check how many revisions will be
    *   deleted.
    * @param \Drupal\workspaces\WorkspaceRepositoryInterface $workspace_repository
    *   The workspace repository service.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
-   *   The entity type bundle service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, WorkspaceAssociationInterface $workspace_association, WorkspaceRepositoryInterface $workspace_repository, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL) {
+  public function __construct(WorkspaceAssociationInterface $workspace_association, WorkspaceRepositoryInterface $workspace_repository) {
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
     $this->workspaceAssociation = $workspace_association;
     $this->workspaceRepository = $workspace_repository;
