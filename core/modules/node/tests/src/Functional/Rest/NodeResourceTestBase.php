@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional\Rest;
 
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
@@ -201,7 +202,7 @@ abstract class NodeResourceTestBase extends EntityResourceTestBase {
         [
           'alias' => '/llama',
           'pid' => 1,
-          'langcode' => 'en',
+          'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
         ],
       ],
     ];

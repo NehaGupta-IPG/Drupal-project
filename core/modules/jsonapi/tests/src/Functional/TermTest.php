@@ -8,6 +8,7 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\jsonapi\JsonApiSpec;
 use Drupal\taxonomy\Entity\Term;
@@ -280,7 +281,7 @@ class TermTest extends ResourceTestBase {
           'path' => [
             'alias' => '/llama',
             'pid' => 1,
-            'langcode' => 'en',
+            'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
           ],
           'weight' => 0,
           'drupal_internal__tid' => 1,

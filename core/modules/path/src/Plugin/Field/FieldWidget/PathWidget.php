@@ -6,6 +6,7 @@ use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
@@ -25,6 +26,11 @@ class PathWidget extends WidgetBase {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $entity = $items->getEntity();
 
+    $langcode = $items[$delta]->langcode;
+    if (!$entity->get('path')->getFieldDefinition()->isTranslatable()) {
+      $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED;
+    }
+
     $element += [
       '#element_validate' => [[static::class, 'validateFormElement']],
     ];
@@ -38,7 +44,7 @@ class PathWidget extends WidgetBase {
     ];
     $element['pid'] = [
       '#type' => 'value',
-      '#value' => $items[$delta]->pid,
+      '#value' => $langcode === LanguageInterface::LANGCODE_NOT_SPECIFIED || $items->getLangcode() === $langcode ? $items[$delta]->pid : NULL,
     ];
     $element['source'] = [
       '#type' => 'value',
@@ -46,7 +52,7 @@ class PathWidget extends WidgetBase {
     ];
     $element['langcode'] = [
       '#type' => 'value',
-      '#value' => $items[$delta]->langcode,
+      '#value' => $langcode,
     ];
 
     // If the advanced settings tabs-set is available (normally rendered in the

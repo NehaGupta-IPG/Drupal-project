@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\taxonomy\Functional\Rest;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
@@ -219,7 +220,7 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
         [
           'alias' => '/llama',
           'pid' => 1,
-          'langcode' => 'en',
+          'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
         ],
       ],
       'status' => [
