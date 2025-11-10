@@ -155,7 +155,7 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
   }
 
   /**
-   * Tests that overrides do not affect listing screens.
+   * Tests that overrides do affect listing screens by default.
    */
   public function testListingPageWithOverrides(): void {
     $original_label = 'Default';
@@ -175,8 +175,8 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
 
     // Test that the original label on the listing page is intact.
     $this->drupalGet('admin/config/regional/config-translation/config_test');
-    $this->assertSession()->pageTextContains($original_label);
-    $this->assertSession()->pageTextNotContains($overridden_label);
+    $this->assertSession()->pageTextNotContains($original_label);
+    $this->assertSession()->pageTextContains($overridden_label);
   }
 
   /**
