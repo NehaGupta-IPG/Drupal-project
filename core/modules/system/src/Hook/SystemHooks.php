@@ -290,7 +290,9 @@ class SystemHooks {
       // used, information not otherwise available when aggregation is enabled.
       $minimal_libraries = $library_dependency_resolver->getMinimalRepresentativeSubset(array_unique(array_merge($assets->getLibraries(), $assets->getAlreadyLoadedLibraries())));
       sort($minimal_libraries);
-      $settings['ajaxPageState']['libraries'] = implode(',', $minimal_libraries);
+      if (!empty($minimal_libraries)) {
+        $settings['ajaxPageState']['libraries'] = implode(',', $minimal_libraries);
+      }
     }
   }
 
