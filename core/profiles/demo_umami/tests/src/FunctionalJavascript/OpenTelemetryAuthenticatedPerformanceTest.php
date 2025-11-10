@@ -76,7 +76,7 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 5,
       'ScriptCount' => 1,
-      'ScriptBytes' => 73031,
+      'ScriptBytes' => 13150,
       'StylesheetCount' => 2,
       'StylesheetBytes' => 39163,
     ];
@@ -128,25 +128,25 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
     }, 'administratorNodePage');
 
     $expected = [
-      'QueryCount' => 435,
-      'CacheGetCount' => 484,
+      'QueryCount' => 418,
+      'CacheGetCount' => 422,
       'CacheGetCountByBin' => [
-        'config' => 174,
+        'config' => 156,
         'bootstrap' => 16,
         'discovery' => 107,
-        'data' => 67,
+        'data' => 23,
         'entity' => 25,
         'dynamic_page_cache' => 1,
         'default' => 31,
         'render' => 39,
         'menu' => 24,
       ],
-      'CacheSetCount' => 467,
+      'CacheSetCount' => 405,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 51,
+      'CacheTagLookupQueryCount' => 32,
       'ScriptCount' => 3,
-      'ScriptBytes' => 198000,
+      'ScriptBytes' => 198900,
       'StylesheetCount' => 8,
       'StylesheetBytes' => 77250,
     ];
